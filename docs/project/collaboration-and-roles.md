@@ -62,3 +62,30 @@ Codex 可连续跑 20h、质量高——但**长跑必须有 harness 防跑偏**
 ## 6. 与 CLAUDE.md / openspec 的关系
 
 本文件是**协作层**(谁干什么);`CLAUDE.md` 是**宪法层**(项目是什么+技术锁定);openspec 是**执行层**(change 怎么推进)。三者配套:宪法定边界,本文件定分工,openspec 管落地。
+
+## 7. 想清楚 → 执行:Pocock / OpenSpec / Superpowers 三工具协作
+
+> 磊哥 2026-06-17 定调。三者不冲突,是一条流水线;别一上来乱用技能,也别跳过"想清楚"直奔 propose。
+
+| 工具 | 管什么 | 一句话 |
+|---|---|---|
+| **Pocock**(`~/.codex/skills/pocock`) | **现在处在哪一阶段** | 现有仓库二开的路由器:先分诊(S0 intake / S1 grill / S2 design / S3 spec / S4 build / S5 diagnose / S6 close),**只推荐一个主技能**,grill-first,写入门禁(dry-run)。 |
+| **OpenSpec** | **做什么** | 变更与行为契约的事实源。车控 demo / 能力 schema / 安全门控 / LoRA trace 都先进 `openspec/changes/<change>/` 再落 `specs/`。 |
+| **Superpowers** | **怎么高质量执行** | brainstorming / writing-plans / TDD / systematic-debugging / verification 等纪律技能,保证实现·测试·验证不虚。 |
+
+```
+Pocock 先判断这是什么活
+   ↓
+OpenSpec 把要做的行为 / 变更写成契约
+   ↓
+Superpowers 按工程纪律执行、验证、收口
+```
+
+**MAformac 推荐流水线**:
+1. 模糊想法:`pocock` 分诊 + `openspec-explore` 拆问题(+ `superpowers:brainstorming` 设计探索)
+2. 方向清楚:`/opsx:propose <change>` 生成 proposal / design / tasks / specs
+3. 实现:`/opsx:apply <change>` + 按需叠加 Superpowers(TDD / 调试 / 验证)
+4. 做完:`openspec-sync-specs` 合 delta 回主规格 → `openspec-archive-change` 归档
+5. 涉分支 / PR:Superpowers 收口类(verification / finishing-branch)+ GPT Pro 云端审
+
+**铁律(2026-06-17 教训)**:起任何 change 前,**Pocock 先判断要不要先 grill / 设计拷打**;不跳过"想清楚"直奔 propose。
