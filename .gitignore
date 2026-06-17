@@ -1,0 +1,18 @@
+# 开源参考代码(1.2G,外部代码不进主仓;保留 reports/snapshots 作研究证据)
+referencerepo/repos/
+
+# openspec 工作区数据(specs/changes 进 git,但临时态除外)
+# (openspec init 后再细化)
+
+# macOS
+.DS_Store
+
+# Xcode / Swift
+build/
+.build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+
+# 临时
+*.tmp
