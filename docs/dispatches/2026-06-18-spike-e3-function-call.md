@@ -1,62 +1,66 @@
-# Dispatch: spike E3 — Qwen3-1.7B base function call 生死线验证（change3 task 0.1）
+# Dispatch: spike E3 — Qwen3-1.7B base function call 生死线（change3 task 0.1）· **v2 续跑版**
+
+> **v2(2026-06-18)**:Codex 首跑已落隔离包 + harness + 55 样本 + `swift build` 通过,**卡在 metallib 运行态坑被磊哥中断**。本版整合实测坑,**续跑从「解 metallib + 跑 smoke」继续,不从头重写**。
 
 ## 0. 路由元信息
-- **TO**:Codex（长跑,无人值守量化实验）
-- **FROM**:Claude（CC,管前端+原型+审计）
-- **MODE / MODEL**:Codex 长跑 spike + Superpowers verification
-- **PRIORITY**:P0（change3 生死线前置;结果决定 execution 实装路径 + 新 `define-intent-routing` change 的 FC 泛化层怎么做）
-- **一句话 DELIVERABLE**:量化 Qwen3-1.7B-4bit 经 `mlx-swift-lm` 的 **base**（无 LoRA）function call 能力（触发率/格式稳定性/拒识/延迟/G3 参数规划），出 **go/no-go + 实测数据报告**。
+- **TO**:Codex（长跑续跑）· **FROM**:Claude · **PRIORITY**:P0（change3 生死线）
+- **一句话 DELIVERABLE**:解 metallib 运行态坑 → 跑 smoke → 全量 55 条 → G1-G5 实测数据 + go/no-go。
 
-## 1. 冷启动背景（承接方零上下文也能懂）
-- **项目**:MAformac = 纯端侧 iOS/macOS 离线车控**演示助手**（**demo,不接真车,全 mock**）,Qwen3-1.7B+LoRA 大脑。**起手必读** `/Users/wanglei/workspace/MAformac/CLAUDE.md` → `docs/cockpit-voice-fc-premortem-2026-06-18.md`（座舱三层原理 + base 1.7B 硬数据 + demo 边界）→ 本 dispatch。
-- **本任务**:change3 `define-execution-contract` 的 **task 0.1 前置 spike**（go/no-go）。adopt `mlx-swift-lm` 上游 tool-call parser 是 change3 根架构决策,需 base 1.7B function call 能力实测才坐实。
-- **为什么现在做**:base 1.7B 的 function call 触发率/格式是整个三层架构的**地基未知数**。spike 一跑,change3 实装路径 + 新 intent-routing change 的 FC 泛化层实现,都有实测支撑。**先验地基再盖楼,不拍脑袋**。
-- **背景硬数据**（oracle 已搜,prompt 别当结论,自己实测）:BFCL Qwen3-1.7B overall ~55%/multi-turn ~17%;微调小模型可碾压通用大模型(xLAM-3b-fc 65.74%、in-vehicle Phi-3 1.8B+LoRA 0.86>规则0.75)→ **base 弱不等于 no-go,LoRA 兜底**。
+## 0.5 🟢 续跑基线（Codex 首跑已落,验证过,别重做）
+`dev/spike-e3/` 已落地且 **`swift build -c release` 通过**:
+- **Package.swift**:依赖 pin 已修正——`mlx-swift-lm` exact **3.31.3**(2026-04-15 latest) / `swift-transformers` **1.3.3** / `swift-huggingface` **0.9.0**;products 含 MLXLLM/MLXLMCommon/MLXHuggingFace/Tokenizers/HuggingFace。
+- **Sources/SpikeE3/main.swift**:harness = 单模型加载 + **每 case 新 `ChatSession`**(避历史污染) + `enable_thinking=false` 双保险(additionalContext + 系统指令) + 采集 `.chunk`/`.toolCall`/`.info` 三类事件 + **区分「真 .toolCall」vs「工具 JSON 塞进 .chunk content」**(G2 指纹) + 55 样本(8 capability × 5 条 L1-L4/G3 + 15 负例:闲聊/跨域/OOD/restraint)。
+- README / .gitignore / 报告占位齐。
 
-## 2. 任务(TASK)
-跑 spike E3,量化 base Qwen3-1.7B-4bit 的 function call 能力。**只做 spike,不做 change3 完整实装**（decode/错误枚举/DemoGuard/执行链留 change3 主体）。
-- **2.1 环境（隔离,不污染主项目）**:**spike harness 放 `dev/spike-e3/` 下一个独立 SPM 包**（自己的 `Package.swift` 加 `mlx-swift-lm`,pin exact tag),**绝不碰仓根主 `Package.swift`**——主项目编译不该被 MLX Metal 栈拖累,直到 change3 确定 adopt 才正式并入。下 Qwen3-1.7B-4bit mlx 量化模型(HF `mlx-community`,~1GB,模型不入仓)。
-- **2.2 harness**:最小 Swift 可执行 target,喂样本,**显式锁 `toolCallFormat = .json`**(不靠 `infer()`),消费 `.toolCall` 事件,统计 5 维。`enable_thinking=false`。
-- **2.3 测试样本（实采,非 LLM 自造）**:用 `contracts/capabilities.yaml` 8 能力 × 5 幕话术造 **N≥40 条**车控指令(L1 精确「打开空调」/L2 模糊「我有点热」/L3 场景「下雨了」/L4 自由「热得像蒸笼」)+ **M≥15 条**非车控拒识负样本(闲聊/无关)。
-- **2.4 量化 5 维 + go/no-go**（见验收门）。
+**卡死点**:`swift run -c release` → `Failed to load the default metallib`(**非模型能力,是 SwiftPM 命令行不编译 Metal shaders 的已知坑**)。
 
-## 3. Prerequisite Check（起手必跑）
+## 1. 🔴 实测坑清单（Codex 首跑 catch,续跑必避）
+1. **metallib 运行态坑（关键阻塞,先解这个）**:`swift run`/`swift build` 命令行**不编译 Metal shaders** → runtime `Failed to load default metallib`。**解法**:① 最简 = `open Package.swift` 在 Xcode ⌘R(磊哥本机有 Xcode);② 无人值守 = `xcodebuild -scheme spike-e3 -configuration Release -destination 'platform=macOS' build` 让 Xcode 编 metallib → 跑 `DerivedData/.../Release/spike-e3` 产物(metallib bundle 应在旁);③ 兜底 = 手动 copy `mlx-swift_Cmlx.bundle`+`default.metallib` 到产物同目录。源:[mlx metallib 坑](https://github.com/Trans-N-ai/swama/issues/30)。
+2. **API 差异（3.31.3 实际 tag,别按参考源码假设）**:`LLMModelFactory.qwen3_1_7b_4bit` **未暴露** → 用 `ModelConfiguration(id: "mlx-community/Qwen3-1.7B-4bit", toolCallFormat: .json)` 避 registry 耦合(Codex 已改);HuggingFace loader 是**宏要加 `#`**;`streamDetails` 显式传**空 images/videos**;MLXHuggingFace 宏要 harness 显式引 swift-transformers + swift-huggingface(Codex 已加)。
+3. **依赖版本漂移**:swift-transformers 1.3.3 要 swift-huggingface **≥0.9.0**(非 0.8.1,已修);swift-syntax 解析到 600.0.1(参考 602.x floor 不一致但 build 过,放行)。
+4. **首次 release build 慢**(编译 MLX C++/Metal 栈)= 预期,不是卡死。
+
+## 2. 任务（续跑步骤）
+- **2.1 解 metallib**(坑 #1 三选一)→ 跑 `--limit 3` smoke,验**模型下载 + 加载 + 收到 `.toolCall` 事件**(非 `.chunk` 含 `<tool_call>` 原文)。**smoke 不过 → 写 BLOCKED + 实际异常,别假装跑过模型**。
+- **2.2 smoke 过 → 跑全量 55 条**,采集 5 维(G1-G5)。
+- **2.3 出报告**(`Reports/spike-e3-report.md` + `results.json`)+ go/no-go 裁决。
+- **弹药增量（B/C/D 盘点,2026-06-18）**:
+  - 用 mlx-swift-lm **官方 `ToolSpec`**(PR #174,`UserInput(chat:tools:[ToolSpec])`)不手搓 schema(若首跑已用则确认,未用补)。
+  - **实测 Qwen3 的 `ToolCallFormat.json` 解析正确**(Gemma Issue #259 前科:`infer` 漏模型族 → 不能假设官方都对)。
+  - 模型用 **4bit/Q4_K_M,避 IQ 量化**(Apple GPU IQ 反而慢)。
+  - G4 延迟:抄 mlx-swift `LLMEval` 的 on-device tok/s 统计(TTFT=prefill 时间);**别长预热**(热降频 5-15min 掉 15-41%)。
+
+## 3. Prerequisite Check（续跑起手,快核）
 ```bash
-cd /Users/wanglei/workspace/MAformac
-openspec status --change "define-execution-contract"   # 期望 0/14(snapshot 2026-06-18)
-git status --short
-xcrun simctl list runtimes | grep -i ios               # iOS 26.5 ready
-swift --version                                         # 本机 Swift 6.3.2 / M5
-# mlx-swift-lm latest stable tag(pin 用,标 snapshot 时间):
-gh release list --repo ml-explore/mlx-swift-lm | head -3
+cd /Users/wanglei/workspace/MAformac/dev/spike-e3
+ls Sources/SpikeE3/ Reports/ 2>/dev/null    # 确认首跑产物在
+swift build -c release 2>&1 | tail -2        # 应已通过(基线)
+xcrun simctl list runtimes | grep -i ios     # iOS 26.5 ready
 ```
 
 ## 4. 边界(CONSTRAINTS)
-- **🔴 demo 边界(CLAUDE §6 + magnet 重申)**:**这是 demo,不接真车**。spike 只验 base function call 能力,**不**实现真车控/CAN/ECU。真实车厂脱敏「某车厂」。**不降级**(1.7B 主线,不偷换 0.6B/llama.cpp)。
-- **🔴 隔离**:spike 代码限 `dev/spike-e3/`(独立 SPM 包);**禁碰主 `Package.swift` / App/ / Core/**。模型权重不入仓(`.gitignore`)。
-- **只做 spike**:不写 DemoGuard 完整门/错误枚举三态/执行链(change3 主体)。本 spike 产出 = 数据 + 裁决,不是 change3 实装。
-- **OUT_OF_SCOPE**:LoRA 训练(change5)、完整 ToolCallFrame 薄层(change3 主体)、voice。超范围返回说明,不顺手扩。
+- **🔴 demo 边界**:demo 不接真车,只验 base function call 能力;真实车厂脱敏「某车厂」;**不降级**(1.7B 主线)。
+- **🔴 隔离**:只动 `dev/spike-e3/`,**禁碰主 `Package.swift` / App / Core**;模型权重不入仓(`.gitignore` 已配)。
+- **只做 spike**:不写 DemoGuard/错误枚举/执行链(change3 主体)。
 
-## 5. 验收门（pre-mortem 硬 gate,不只验 happy path）
-> 「收到 `.toolCall` 事件」只是最外层。pre-mortem 要的是下面 5 维实测。
-- **G1 触发率**:N 条车控指令的 `.toolCall` 解析成功率。**go/no-go**:≥80% go(直接推进 change3 主体)/ 50-80% go + 记「LoRA Day1 重点采漏触发样本」/ <50% LoRA 前置 + 记 **HIGH risk**(回报必停让磊哥拍)。
-- **G2 格式稳定性**:统计 Qwen 把 FC 当 JSON text 塞进 `.chunk` content 而非 `.toolCall` 事件的比例（T2 失配指纹 + 已知坑）。
-- **G3 拒识**:M 条非车控负样本的误调率（验「不该调不乱调」,不幻觉车控）。
-- **G4 延迟**:实测 tok/s + 单条多槽位 JSON 出参耗时;明确锚点（到 `.toolCall` vs 到完整 JSON）;测 streaming（边出边解析）是否可行。**对照 demo 北极星「反应快」**。
-- **G5 G3 参数规划 mini-spike**:测 base 能否做「大海颜色→色值枚举」类**开放词→枚举映射**（座舱 G3 泛化）。出能/不能 + 实例。**决定新 intent-routing change 的 FC 泛化层靠 LLM 还是端侧小表**。
-- **横切**:`enable_thinking=false` 实测（thinking 破坏 tool parser,非偏好）;含 `<think>` → 记 think_leak。
-- **failure** → 写 failure receipt（risk_state 枚举 + 实际异常）,别静默吞。
+## 5. 验收门（5 维硬 gate,不只验 happy path）
+- **G1 触发率**:N 条车控的 `.toolCall` 解析成功率。**go/no-go**:≥80% go / 50-80% go+LoRA Day1 采漏触发 / <50% LoRA 前置 + **HIGH risk 停下让磊哥拍**。
+- **G2 格式稳定性**:统计 Qwen 把 FC 塞进 `.chunk` content 而非 `.toolCall` 的比例(T2 指纹)。
+- **G3 拒识**:15 负例的误调率(「不该调不乱调」)。
+- **G4 延迟**:tok/s + TTFT + 多槽位 JSON 出参耗时;锚点(到 `.toolCall` vs 完整 JSON);streaming 可行性。
+- **G5 参数规划 mini-spike**:base 能否「大海颜色→色值枚举」(座舱 G3)→ 决定新 intent-routing 的 FC 泛化层靠 LLM vs 端侧小表。
+- `enable_thinking=false` 实测;含 `<think>` → 记 think_leak。
+- **failure → 写 failure receipt(实际异常)**,别静默吞。
 
-## 6. 相关文件（优先读,≤5,绝对路径）
-1. `/Users/wanglei/workspace/MAformac/openspec/changes/define-execution-contract/{design,tasks}.md`（task 0.1 + adopt 决策 + Risks + mlx 源码锚点）
-2. `/Users/wanglei/workspace/MAformac/docs/cockpit-voice-fc-premortem-2026-06-18.md`（座舱三层 + base 1.7B 硬数据 + **demo 边界划线**）
-3. `/Users/wanglei/workspace/MAformac/docs/execution-pre-mortem-2026-06-18.md`（8 发现 + `mlx-swift-lm` 源码锚点 `Libraries/MLXLMCommon/Tool/`）
-4. `/Users/wanglei/workspace/MAformac/docs/qwen3-engineering-notes.md`（Qwen3 工程硬约束 4 隐藏层 + enable_thinking）
-5. `/Users/wanglei/workspace/MAformac/contracts/capabilities.yaml`（8 能力 → 造 N 条实采样本）
+## 6. 相关文件（≤5,绝对路径）
+1. `/Users/wanglei/workspace/MAformac/dev/spike-e3/`（**续跑基线:Package.swift + main.swift + 55 样本**）
+2. `/Users/wanglei/workspace/MAformac/openspec/changes/define-execution-contract/{design,tasks}.md`（task 0.1 + adopt 决策 + Risks）
+3. `/Users/wanglei/workspace/MAformac/docs/cockpit-voice-fc-premortem-2026-06-18.md`（座舱原理 + base 1.7B 硬数据 + demo 边界）
+4. `/Users/wanglei/workspace/MAformac/docs/execution-pre-mortem-2026-06-18.md`（mlx-swift-lm 源码锚点）
+5. `/Users/wanglei/workspace/MAformac/contracts/capabilities.yaml`（8 能力源）
 
-## 7. 完成回报格式（DELIVERABLE,带 status field）
+## 7. 完成回报（带 status field）
 - **status**:`done` / `blocked` / `partial`
-- **产出清单**:spike 报告（**G1-G5 实测数据 + go/no-go 裁决**）+ harness 代码(`dev/spike-e3/`)+ `Package.swift` mlx pin tag（snapshot 时间）。
-- **BLOCKED**:`BLOCKED: <缺什么> FROM: <需谁/资源>`（如模型下载失败/mlx 编译失败 → 记实际异常）。
-- **关键发现 / 偏差**:分清 `introduced`（本次引入）vs `exposed`（旧债暴露）。
-- **下一步建议**:① change3 主体实装接入点;② 基于 G5 给新 `define-intent-routing` 的 FC 泛化层实现建议（LLM vs 端侧小表）;③ 若 G1 <80% → LoRA Day1 采样策略。
+- **产出**:spike 报告(**G1-G5 实测数据 + go/no-go**)+ harness(`dev/spike-e3/`)。
+- **BLOCKED**:`BLOCKED: <缺什么> FROM: <需谁/资源>`(如 metallib 三路都不通 / 模型下载失败 → 记实际异常)。
+- **introduced vs exposed** + **下一步建议**(change3 主体接入点 / 基于 G5 给 intent-routing FC 泛化层建议 / G1<80% 的 LoRA 采样策略)。

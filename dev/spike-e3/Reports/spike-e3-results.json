@@ -1,0 +1,1732 @@
+{
+  "mlxSwiftLMTag" : "3.31.3",
+  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+  "results" : [
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.21602296829223633,
+        "generationTokenCount" : 21,
+        "promptTime" : 0.39972901344299316,
+        "promptTokenCount" : 1325,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.211885226904
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 637,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 620,
+      "id" : "P001",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "power" : "on"
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "打开空调"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "{\"name\": \"set_cabin_ac\", \"arguments\": {\"power\": \"off\"}}",
+      "completion" : {
+        "generationTime" : 0.1927950382232666,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.3514448404312134,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 93.3633985909693
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 559,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 359,
+      "id" : "P002",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "把空调关掉"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3766469955444336,
+        "generationTokenCount" : 36,
+        "promptTime" : 0.34643399715423584,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 95.58021284084032
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 735,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 718,
+      "id" : "P003",
+      "isNegative" : false,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "mode" : "cooling",
+            "power" : "on",
+            "target_temperature" : 25
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "我有点热"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.1898210048675537,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.38919007778167725,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.82617591535444
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 595,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 578,
+      "id" : "P004",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "太阳晒了一路，车里越来越闷热"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.291795015335083,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.3456209897994995,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 95.95777353443198
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 653,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 634,
+      "id" : "P005",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "mode" : "cooling",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "热得像蒸笼，帮我降一降"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.30570900440216064,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.34655702114105225,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.8614518460518
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 671,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 653,
+      "id" : "P006",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2,
+            "position" : "driver"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "打开主驾座椅加热到2挡"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.31802797317504883,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.34599602222442627,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.33132469604305
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 681,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 664,
+      "id" : "P007",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "passenger"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "副驾暖座调到3挡"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "{\"name\": \"set_cabin_seat_heating\", \"arguments\": {\"position\": \"passenger\", \"level\": 1}}",
+      "completion" : {
+        "generationTime" : 0.2880359888076782,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.34711194038391113,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 93.73828635708406
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 650,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : false,
+      "firstEventMs" : 354,
+      "id" : "P008",
+      "isNegative" : false,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "屁股有点冷"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3012629747390747,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.345566987991333,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 96.26141421831554
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 662,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 643,
+      "id" : "P009",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 1,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "冬天刚上车，座椅太冰了"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.24314701557159424,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.34721899032592773,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.59297678785487
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 608,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 590,
+      "id" : "P010",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "座垫像冰块，给我暖一下"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3139089345932007,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.34715306758880615,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 95.56911796370962
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 676,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : true,
+      "firstEventMs" : 658,
+      "id" : "P011",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2,
+            "position" : "driver"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "打开主驾座椅通风到2挡"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3304060697555542,
+        "generationTokenCount" : 31,
+        "promptTime" : 0.3481210470199585,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 93.82394222640906
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 698,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : true,
+      "firstEventMs" : 679,
+      "id" : "P012",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 1,
+            "position" : "passenger"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "副驾座椅吹风调到1挡"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "{\"name\": \"set_cabin_seat_heating\", \"arguments\": {\"level\": 1, \"position\": \"passenger\"}}",
+      "completion" : {
+        "generationTime" : 0.2845219373703003,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.34652698040008545,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.89602190097551
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 644,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : false,
+      "firstEventMs" : 351,
+      "id" : "P013",
+      "isNegative" : false,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "后背出汗了"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2593749761581421,
+        "generationTokenCount" : 24,
+        "promptTime" : 0.3462250232696533,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 92.53012898733566
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 618,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : true,
+      "firstEventMs" : 599,
+      "id" : "P014",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "夏天坐垫太闷了"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.32851505279541016,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.3463749885559082,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 91.32001637283619
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 688,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : true,
+      "firstEventMs" : 669,
+      "id" : "P015",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "座椅像捂着热气，帮我散散"
+    },
+    {
+      "capability" : "cabin.window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.30427706241607666,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.3438138961791992,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 92.02139582152283
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 661,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 642,
+      "id" : "P016",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 50,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "把主驾车窗打开一半"
+    },
+    {
+      "capability" : "cabin.window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2845350503921509,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.3457179069519043,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.89164854308163
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 643,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 625,
+      "id" : "P017",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 0,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "关上所有车窗"
+    },
+    {
+      "capability" : "cabin.window",
+      "chunkText" : "{\"name\": \"set_cabin_window\", \"arguments\": {\"position\": \"passenger\", \"percent\": 50}}",
+      "completion" : {
+        "generationTime" : 0.2758450508117676,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.345302939414978,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.25581471730663
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 634,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : false,
+      "firstEventMs" : 350,
+      "id" : "P018",
+      "isNegative" : false,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "副驾有点闷，透透气"
+    },
+    {
+      "capability" : "cabin.window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3145970106124878,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3449589014053345,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 92.18142265096544
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 672,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 654,
+      "id" : "P019",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "下雨了，帮我把窗户关好"
+    },
+    {
+      "capability" : "cabin.window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2624959945678711,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.3462560176849365,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 83.81080266088277
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 621,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : false,
+      "firstEventMs" : 603,
+      "id" : "P020",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "车里像不通风，开条缝"
+    },
+    {
+      "capability" : "cabin.ambient_light",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3465520143508911,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.37760794162750244,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 83.6815219623479
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 739,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 717,
+      "id" : "P021",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "blue",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "打开蓝色氛围灯"
+    },
+    {
+      "capability" : "cabin.ambient_light",
+      "chunkText" : "{\"name\": \"set_cabin_ambient_light\", \"arguments\": {\"power\": \"off\"}}",
+      "completion" : {
+        "generationTime" : 0.23424196243286133,
+        "generationTokenCount" : 20,
+        "promptTime" : 0.3793410062789917,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 85.38179834337932
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 633,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : false,
+      "firstEventMs" : 388,
+      "id" : "P022",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "关掉氛围灯"
+    },
+    {
+      "capability" : "cabin.ambient_light",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3461110591888428,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3758188486099243,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 83.78813455994545
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 739,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 718,
+      "id" : "P023",
+      "isNegative" : false,
+      "sourceLevel" : "L2_alias",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "warm",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "换成暖色灯"
+    },
+    {
+      "capability" : "cabin.ambient_light",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3445160388946533,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.37803196907043457,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 84.17605198597929
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 739,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 719,
+      "id" : "P024",
+      "isNegative" : false,
+      "sourceLevel" : "G3_open_word_to_enum",
+      "tags" : [
+        "g3_parameter_planning"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "blue",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "我想要大海颜色的氛围灯"
+    },
+    {
+      "capability" : "cabin.ambient_light",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.36160802841186523,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.36218106746673584,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 80.19733446562061
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 743,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 724,
+      "id" : "P025",
+      "isNegative" : false,
+      "sourceLevel" : "G3_open_word_to_enum",
+      "tags" : [
+        "g3_parameter_planning"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "warm",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "车里来点夜晚海边的感觉"
+    },
+    {
+      "capability" : "cabin.screen_brightness",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2500588893890381,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.34904706478118896,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 91.97833380846912
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 612,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : true,
+      "firstEventMs" : 594,
+      "id" : "P026",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 40
+          },
+          "name" : "set_cabin_screen_brightness"
+        }
+      ],
+      "utterance" : "把屏幕亮度调到40%"
+    },
+    {
+      "capability" : "cabin.screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"delta\": \"dimmer\", \"percent\": 50}}",
+      "completion" : {
+        "generationTime" : 0.27370691299438477,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.3456380367279053,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 98.6456633653017
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 632,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 351,
+      "id" : "P027",
+      "isNegative" : false,
+      "sourceLevel" : "L2_delta",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "屏幕调暗一点"
+    },
+    {
+      "capability" : "cabin.screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"delta\": \"dimmer\", \"percent\": 100}}",
+      "completion" : {
+        "generationTime" : 0.2919520139694214,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.342013955116272,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 95.9061717688054
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 648,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 346,
+      "id" : "P028",
+      "isNegative" : false,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "屏幕太亮了"
+    },
+    {
+      "capability" : "cabin.screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"delta\": \"dimmer\", \"percent\": 50}}",
+      "completion" : {
+        "generationTime" : 0.2806299924850464,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.3429989814758301,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 96.21209679303512
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 639,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 351,
+      "id" : "P029",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "晚上开车屏幕晃眼"
+    },
+    {
+      "capability" : "cabin.screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_ambient_light\", \"arguments\": {\"color\": \"warm\", \"power\": \"on\"}}",
+      "completion" : {
+        "generationTime" : 0.2675330638885498,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.3452509641647339,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.18424938620373
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 626,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 351,
+      "id" : "P030",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "亮得我头疼，柔和一点"
+    },
+    {
+      "capability" : "cabin.fan",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.23677408695220947,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.3499230146408081,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 92.91557316591188
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 603,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 586,
+      "id" : "P031",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "风量调到3挡"
+    },
+    {
+      "capability" : "cabin.fan",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.22485089302062988,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.34547603130340576,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.84261785423071
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 582,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 565,
+      "id" : "P032",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 0
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "把风量关到0挡"
+    },
+    {
+      "capability" : "cabin.fan",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.23379600048065186,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.34530699253082275,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.09912896187735
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 592,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 573,
+      "id" : "P033",
+      "isNegative" : false,
+      "sourceLevel" : "L2_delta",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 1
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "风小一点"
+    },
+    {
+      "capability" : "cabin.fan",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.23380708694458008,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.345289945602417,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 94.0946670500827
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 593,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 575,
+      "id" : "P034",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 1
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "车里空气不流动"
+    },
+    {
+      "capability" : "cabin.fan",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.22600698471069336,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.3512660264968872,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.34212430718335
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 591,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 573,
+      "id" : "P035",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "闷得没风，吹大点"
+    },
+    {
+      "capability" : "cabin.comfort_query",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2294609546661377,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.34723711013793945,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 95.87687819049509
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 593,
+      "expectedTool" : "query_cabin_comfort",
+      "expectedToolHit" : true,
+      "firstEventMs" : 575,
+      "id" : "P036",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "topic" : "temperature"
+          },
+          "name" : "query_cabin_comfort"
+        }
+      ],
+      "utterance" : "查一下车里几度"
+    },
+    {
+      "capability" : "cabin.comfort_query",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.23614299297332764,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.3475339412689209,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.39861306237383
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 597,
+      "expectedTool" : "query_cabin_comfort",
+      "expectedToolHit" : true,
+      "firstEventMs" : 580,
+      "id" : "P037",
+      "isNegative" : false,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "topic" : "hvac"
+          },
+          "name" : "query_cabin_comfort"
+        }
+      ],
+      "utterance" : "空调现在什么状态"
+    },
+    {
+      "capability" : "cabin.comfort_query",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.28890204429626465,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.34445393085479736,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 96.91866344596173
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 646,
+      "expectedTool" : "query_cabin_comfort",
+      "expectedToolHit" : false,
+      "firstEventMs" : 628,
+      "id" : "P038",
+      "isNegative" : false,
+      "sourceLevel" : "L2_topic",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "座椅现在什么状态"
+    },
+    {
+      "capability" : "cabin.comfort_query",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.22665202617645264,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.349342942237854,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.065093002401
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 595,
+      "expectedTool" : "query_cabin_comfort",
+      "expectedToolHit" : true,
+      "firstEventMs" : 577,
+      "id" : "P039",
+      "isNegative" : false,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "topic" : "all"
+          },
+          "name" : "query_cabin_comfort"
+        }
+      ],
+      "utterance" : "现在车里舒适状态怎么样"
+    },
+    {
+      "capability" : "cabin.comfort_query",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.22684502601623535,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.34888601303100586,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 96.9825099820591
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 589,
+      "expectedTool" : "query_cabin_comfort",
+      "expectedToolHit" : true,
+      "firstEventMs" : 570,
+      "id" : "P040",
+      "isNegative" : false,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "topic" : "all"
+          },
+          "name" : "query_cabin_comfort"
+        }
+      ],
+      "utterance" : "帮我看看这会儿车里舒服不舒服"
+    },
+    {
+      "capability" : "negative.chat",
+      "chunkText" : "今天天气怎么样",
+      "completion" : {
+        "generationTime" : 0.030545949935913086,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.35198497772216797,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 98.21269288708154
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 402,
+      "expectedToolHit" : true,
+      "firstEventMs" : 364,
+      "id" : "N001",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_chat",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "今天天气怎么样"
+    },
+    {
+      "capability" : "negative.chat",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2226419448852539,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.35418200492858887,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 98.81336605884596
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 589,
+      "expectedToolHit" : false,
+      "firstEventMs" : 572,
+      "id" : "N002",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_writing",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "帮我写一首关于海的诗"
+    },
+    {
+      "capability" : "negative.translation",
+      "chunkText" : "不可以执行。",
+      "completion" : {
+        "generationTime" : 0.030183076858520508,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.3489840030670166,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 99.39344534230669
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 392,
+      "expectedToolHit" : true,
+      "firstEventMs" : 354,
+      "id" : "N003",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_translation",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "把这句话翻译成英文"
+    },
+    {
+      "capability" : "negative.chat",
+      "chunkText" : "哈哈，讲个笑话：为什么自行车会掉队？因为它总是“后轮”发力。",
+      "completion" : {
+        "generationTime" : 0.21589696407318115,
+        "generationTokenCount" : 21,
+        "promptTime" : 0.354280948638916,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.2686211228138
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 582,
+      "expectedToolHit" : true,
+      "firstEventMs" : 359,
+      "id" : "N004",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_joke",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "讲个笑话"
+    },
+    {
+      "capability" : "negative.finance",
+      "chunkText" : "不予处理。",
+      "completion" : {
+        "generationTime" : 0.030246973037719727,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.35015690326690674,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 99.18347850076853
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 392,
+      "expectedToolHit" : true,
+      "firstEventMs" : 355,
+      "id" : "N005",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_finance",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "查一下今天美股行情"
+    },
+    {
+      "capability" : "negative.food",
+      "chunkText" : "不予处理。",
+      "completion" : {
+        "generationTime" : 0.030364990234375,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.3591890335083008,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 98.79798994974874
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 402,
+      "expectedToolHit" : true,
+      "firstEventMs" : 364,
+      "id" : "N006",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_food",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "给我订一杯咖啡"
+    },
+    {
+      "capability" : "negative.navigation",
+      "chunkText" : "无法提供导航服务，请您自行查看地图或使用其他导航工具。",
+      "completion" : {
+        "generationTime" : 0.15555906295776367,
+        "generationTokenCount" : 15,
+        "promptTime" : 0.35676801204681396,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 96.42639724612314
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 528,
+      "expectedToolHit" : true,
+      "firstEventMs" : 366,
+      "id" : "N007",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_navigation",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "导航去公司"
+    },
+    {
+      "capability" : "negative.music",
+      "chunkText" : "∅",
+      "completion" : {
+        "generationTime" : 0.009987950325012207,
+        "generationTokenCount" : 1,
+        "promptTime" : 0.3540540933609009,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 100.12064211971116
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 381,
+      "expectedToolHit" : true,
+      "firstEventMs" : 362,
+      "id" : "N008",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_music",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "播放周杰伦的歌"
+    },
+    {
+      "capability" : "negative.mail",
+      "chunkText" : "无法执行此请求，请提供具体的邮件内容和信息。",
+      "completion" : {
+        "generationTime" : 0.13388895988464355,
+        "generationTokenCount" : 13,
+        "promptTime" : 0.3572121858596802,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.0953841989704
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 504,
+      "expectedToolHit" : true,
+      "firstEventMs" : 362,
+      "id" : "N009",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_mail",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "给老板发邮件"
+    },
+    {
+      "capability" : "negative.calendar",
+      "chunkText" : "∅",
+      "completion" : {
+        "generationTime" : 0.011580944061279297,
+        "generationTokenCount" : 1,
+        "promptTime" : 0.35746216773986816,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 86.34874624284596
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 386,
+      "expectedToolHit" : true,
+      "firstEventMs" : 365,
+      "id" : "N012",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_calendar",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "明天提醒我开会"
+    },
+    {
+      "capability" : "negative.search",
+      "chunkText" : "不予处理。",
+      "completion" : {
+        "generationTime" : 0.029825925827026367,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.37215113639831543,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 100.58363376206044
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 423,
+      "expectedToolHit" : true,
+      "firstEventMs" : 386,
+      "id" : "N013",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_local_search",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "搜索附近餐厅"
+    },
+    {
+      "capability" : "negative.knowledge",
+      "chunkText" : "我无法解释量子力学，因为这超出了我的知识范围。您可能需要查阅专业的科学书籍或资源来了解这一领域。",
+      "completion" : {
+        "generationTime" : 0.2876089811325073,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.35783302783966064,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 97.35440072053879
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 659,
+      "expectedToolHit" : true,
+      "firstEventMs" : 364,
+      "id" : "N014",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_knowledge",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "解释一下量子力学"
+    },
+    {
+      "capability" : "negative.asr_hallucination",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 3.933906555175781e-06,
+        "generationTokenCount" : 0,
+        "promptTime" : 0.3642771244049072,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 0
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 386,
+      "expectedToolHit" : true,
+      "firstEventMs" : 379,
+      "id" : "N015",
+      "isNegative" : true,
+      "sourceLevel" : "OOD_hallucination",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "请不吝点赞"
+    },
+    {
+      "capability" : "negative.restraint",
+      "chunkText" : "{\"name\": \"set_cabin_ac\", \"arguments\": {\"power\": \"off\"}}",
+      "completion" : {
+        "generationTime" : 0.1856679916381836,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.37176501750946045,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 96.94724352422092
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 578,
+      "expectedToolHit" : true,
+      "firstEventMs" : 385,
+      "id" : "N016",
+      "isNegative" : true,
+      "sourceLevel" : "restraint",
+      "tags" : [
+        "restraint"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "不要开空调"
+    },
+    {
+      "capability" : "negative.restraint",
+      "chunkText" : "{\"name\": \"query_cabin_comfort\", \"arguments\": {\"topic\": \"temperature\"}}",
+      "completion" : {
+        "generationTime" : 0.2163029909133911,
+        "generationTokenCount" : 19,
+        "promptTime" : 0.3628818988800049,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 87.83974701305773
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 598,
+      "expectedToolHit" : true,
+      "firstEventMs" : 374,
+      "id" : "N017",
+      "isNegative" : true,
+      "sourceLevel" : "restraint",
+      "tags" : [
+        "restraint"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "已经26度了，不要再调"
+    }
+  ],
+  "snapshotTime" : "2026-06-18T00:00:00+08:00",
+  "status" : "done",
+  "summary" : {
+    "decision" : "go+LoRA: change3 可继续薄层验证，但 LoRA Day1 必采漏触发样本",
+    "g1TriggerCount" : 31,
+    "g1TriggerRate" : 0.775,
+    "g2ContentToolCallCount" : 9,
+    "g2ContentToolCallRate" : 0.225,
+    "g3NegativeFalseCallCount" : 1,
+    "g3NegativeFalseCallRate" : 0.06666666666666667,
+    "g4AverageElapsedMs" : 598.8909090909091,
+    "g4AverageFirstEventMs" : 516.6363636363636,
+    "g4AverageTokensPerSecond" : 92.51087683653878,
+    "g5Cases" : 2,
+    "g5EnumSuccessCount" : 1,
+    "g5EnumSuccessRate" : 0.5,
+    "negativeCount" : 15,
+    "positiveCount" : 40,
+    "positiveExpectedToolHitRate" : 0.7,
+    "thinkLeakCount" : 0
+  },
+  "totalCases" : 55
+}

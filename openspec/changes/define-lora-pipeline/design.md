@@ -4,7 +4,7 @@ LoRA 是护城河(真实座舱 bug → 真实分布)。pre-mortem 料 `qwen3-eng
 
 ## Goals / Non-Goals
 
-**Goals:** 5 态数据 pipeline + 脱敏 fail-closed + 数据分桶 + base vs LoRA 对比。
+**Goals:** 5 态数据 pipeline + 脱敏 fail-closed + 数据分桶 + base vs LoRA 对比。spike E3 审计后,LoRA 首要目标从"教会意图"修正为**稳定输出 `<tool_call>` 包裹**:base 已有 35/40=87.5% 工具意图正确率,主要缺的是格式通道稳定性。
 **Non-Goals:** 泛聊天 / 导出真实文本 / GRPO / capabilities 未定前批量生成。
 
 ## Decisions
@@ -30,7 +30,13 @@ source_inventory_abstract_only   (只盘点抽象,不导原文)
 ```
 
 ### 数据分桶(qwen3-notes §6)
-`positive`(标准映射)/ `ambiguity`(模糊说→工具)/ `unsafe`(拒识边界)/ `readback`(不一致不播成功)/ `no_think_formatting`(无 think 污染)。
+`positive`(标准映射)/ `ambiguity`(模糊说→工具)/ `unsafe`(拒识边界)/ `readback`(不一致不播成功)/ `no_think_formatting`(无 think 污染)/ `tool_call_wrapper_format`(必须包 `<tool_call>`)/ `restraint_bare_json_negative`(防 fallback 放大误执行)。
+
+### spike E3 审计回流:LoRA 先修格式包裹,不是重教意图
+E3 raw `.toolCall` 触发率 31/40=77.5%,但 9 条 content 伪工具全是裸 JSON,7/9 语义可恢复;真实工具意图正确率是 35/40=87.5%。因此 Day1 LoRA 样本优先级调整:
+1. **格式对齐正样本**:同一意图必须输出 `<tool_call>{"name":...,"arguments":...}</tool_call>`,不能输出裸 JSON 文本。重点覆盖 `screen_brightness`:本次 P027/P028/P029 均为正确裸 JSON 但未进 `.toolCall`,P030 则错到 ambient_light。
+2. **restraint 裸 JSON 负样本**:把 `不要开空调`→裸 `set_cabin_ac off`、`已经26度了,不要再调`→裸 `query_cabin_comfort` 这类风险纳入 `unsafe/restraint_bare_json_negative`;目标是即使 change3 有 content-fallback,LoRA 也不把 restraint 输出成可执行候选。
+3. **意图补强为次级**:继续保留模糊说/拒识/readback 样本,但不再把"教模型理解车控意图"作为 Day1 主假设;主假设是"意图大体够用,格式包裹不稳"。
 
 ### 训练 JSONL + eval 分离
 OpenAI-compatible `messages + tools`;`tool_calls[].function.arguments` 序列化 JSON string,eval metadata 保留 object 便精确比对;`demo_must_pass` 标 `must_not_train: true`。
@@ -41,7 +47,7 @@ rank 8/16、alpha 16/32、dropout 0.05、target `q_proj/v_proj` 起步(必要扩
 ### 决策表
 | 决策 | 选 | 不选 |
 |---|---|---|
-| LoRA 目标 | 模糊说→工具 + 拒识/边界/readback | 泛聊天/补知识 |
+| LoRA 目标 | 稳定 `<tool_call>` 包裹 + screen_brightness 格式崩塌修复 + 拒识/边界/readback | 泛聊天/补知识/把 87.5% 已会的意图当主训练目标 |
 | 数据出仓 | 本地脱敏,训练集不入仓(仅权重) | 导出真实文本 |
 | eval/train | 分离 + must_not_train | 混用(数据泄漏) |
 | think | 不算 loss | 算 loss(污染行为) |
@@ -56,6 +62,7 @@ rank 8/16、alpha 16/32、dropout 0.05、target `q_proj/v_proj` 起步(必要扩
 - [DB 旧表名] → 用 `ki_evidence_links`/`ki_evidence_annotations`,非旧单数 `ki_evidence`。源:Codex DB 核实。
 - [capabilities 未定前生成训练样本 → 工具名/slot 漂移] → 先 change2 定稿。源:Codex 03:27。
 - [LoRA adapter 可能泄漏敏感表达] → 后续安全评估(adapter 也不放仓)。源:Codex 03。
+- [change3 content-fallback 放大误执行] → LoRA Day1 必加 restraint 裸 JSON 负样本,防模型在"不要/别再/已经够了"语境输出裸工具候选。源:spike E3 cross-vendor 审计。
 
 ## Migration Plan
 
@@ -64,4 +71,4 @@ rank 8/16、alpha 16/32、dropout 0.05、target `q_proj/v_proj` 起步(必要扩
 ## Open Questions
 
 - 从 50 条候选起 + 人工审核流程(磊哥拍)。
-- 若 change3 E3 spike 出 base 1.7B 触发率低 → LoRA Day1 trace 优先采「漏触发」样本。
+- Day1 格式对齐集的最小规模:先覆盖 screen_brightness / off / query / restraint 裸 JSON,再扩模糊说。
