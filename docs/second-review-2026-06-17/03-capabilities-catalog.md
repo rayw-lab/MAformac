@@ -1,5 +1,7 @@
 # 03 `capabilities.yaml` 能力目录设计
 
+> ⚠️ **已 SUPERSEDED** by `contracts/capabilities.yaml`(2026-06-18 change2 定稿,8 条 `cabin.*` 能力)。本文是历史候选设计,不再维护;实际契约以 `capabilities.yaml` 为准。
+
 ## 判断
 
 `capabilities.yaml` 应成为 MAformac 的单一事实源，但它现在还不是事实，只是强候选设计。当前仓库没有这个文件，也没有生成物。下一步如果选择“敲核心契约”，应该先做 5-10 条温度/座椅/车窗样板，而不是一口气导入全部功能清单。

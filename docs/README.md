@@ -2,7 +2,7 @@
 
 > **MA = Master Agent**(MAformac = Master Agent for macOS/iOS)。
 > **北极星**:方案经理给客户演示用,客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑。
-> **形态**:纯端侧(iOS/macOS)、离线、Qwen3-0.6B + LoRA 大脑、mock 车控、可插拔多技能(Phase1 车控 → 导航/音乐/外卖 via MCP)。
+> **形态**:纯端侧(iOS/macOS)、离线、Qwen3-1.7B + LoRA 大脑(0.6B 仅作真机吃紧时的轻量备选)、mock 车控、可插拔多技能(Phase1 车控 → 导航/音乐/外卖 via MCP)。
 
 ## 文档清单(按阅读顺序)
 
@@ -12,6 +12,8 @@
 | `tech-baseline-from-raw.md` (v0.1, §1–§12) | **主基座**:项目定义/降维映射/7 层架构/Capability+Tool schema/八大垂域+多domain功能清单/FC语义四级/快慢路由+三态推荐/DialogueState/barge-in/repo映射/eval+话术+badcase/decisions D1–D18 + §12.1 磊哥裁决 | 470 |
 | `tech-baseline-supplement-v0.2.md` (§13–§17) | **补充**:多阶规划层/中枢调度+Agentic-Skill分工/LoRA 工程化闭环⭐/安全门控+必过集/decisions D19–D37 | 405 |
 | `integration-blueprint.md` (§0–§10) | **装配蓝图**:38 肩膀三类分法(进app/开发期/抄思路)+ 模型尺寸(1.7B 主力)+ 7层×repo 装配图 + 端到端数据流 + 骨架目录 + 第一刀 + 对标 AWS AgentCore + 读全报告补漏 | ~230 |
+| `voice-pipeline-from-raw.md` | **语音链路专题**(from raw):中文车控热词(promptTokens)+ SpeechTextNormalizer + 8 态机 + 800ms 延迟预算;**顶部有拍板对齐段** | ~350 |
+| `qwen3-engineering-notes.md` | **Qwen3 工程专题**:「能 tool call」是表层信号 + 4 隐藏层 + 10 条教训 + 外网/38repo + **change 3-6 硬约束** | ~130 |
 
 ## Decisions 状态总览(D1–D37)
 
@@ -24,7 +26,7 @@
 
 ## 关键已锁主线(speed-read)
 
-- 主线模型 = Qwen3-0.6B + LoRA(FoundationModels 因不可微调出局,留逃生口)
+- 主线模型 = Qwen3-1.7B + LoRA(0.6B 仅作轻量备选;FoundationModels 因不可微调出局,留逃生口)
 - 规则吃 80% 高频车控,LLM 只碰 20% 模糊/跨域;**LoRA 必做**,只练「模糊说→跨域映射」
 - 端状态**自包含** = UI 卡片亮暗 + TTS 模拟(无外部系统方);执行=改卡片态+播报
 - 文本先行(开发顺序)+ ASR(WhisperKit)必交付;barge-in 首版按钮打断,VAD 二期
@@ -38,4 +40,4 @@
 
 - **A) 敲核心契约** ⭐:`tools.json`(八大垂域)+ `DialogueState` schema + `Capability/Tool` 协议落成实际文件——是骨架与 spike 的输入,护城河
 - B) 出项目骨架:SwiftUI + AgentCore 目录结构 + 空协议文件
-- C) Mac 原型 spike:llama-server + Qwen3-0.6B 出第一个结构化 JSON,验证链路
+- C) Mac 原型 spike:mlx_lm.server + Qwen3-1.7B 出第一个结构化工具调用,验证链路;llama-server/GGUF 只作 grammar 对照

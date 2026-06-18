@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAformac · 车控 UI 三方案</title>
+<style>
+  /* ============ 基底 ============ */
+  :root{
+    --bg0:#05060c; --bg1:#0a0e1a; --ink:#eaf0ff; --ink-dim:#8a93b2;
+    --glow-cyan:#00e5ff; --glow-violet:#7b5cff; --amber:#ffb13c; --holo:#37f5c4;
+    --font: -apple-system,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:
+      radial-gradient(900px 600px at 18% -5%, #1a1336 0%, transparent 60%),
+      radial-gradient(1000px 700px at 95% 0%, #0a2540 0%, transparent 55%),
+      var(--bg0);
+    color:var(--ink); font-family:var(--font); -webkit-font-smoothing:antialiased;
+    min-height:100%; padding:48px 24px 72px;}
+  .head{max-width:1280px;margin:0 auto 44px}
+  .kicker{font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-dim);font-weight:600}
+  h1{font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-.02em;margin:10px 0 8px;
+     background:linear-gradient(92deg,#fff 30%,var(--glow-cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--ink-dim);font-size:clamp(14px,1.5vw,17px);max-width:760px;line-height:1.6}
+  .sub b{color:var(--ink)}
+
+  /* ============ 三栏布局 ============ */
+  .grid{display:flex;flex-wrap:wrap;gap:40px;justify-content:center;align-items:flex-start;max-width:1280px;margin:0 auto}
+  .col{width:340px;display:flex;flex-direction:column;align-items:center;gap:20px}
+  .tag{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-dim);font-weight:700}
+  .col h2{font-size:21px;font-weight:800;letter-spacing:-.01em}
+  .col .note{font-size:13px;line-height:1.65;color:var(--ink-dim);text-align:left}
+  .col .note b{color:var(--ink)}
+  .win{font-size:12.5px;line-height:1.55;color:#bfe9ff;background:rgba(0,229,255,.07);
+       border:1px solid rgba(0,229,255,.18);border-radius:12px;padding:10px 13px;text-align:left}
+
+  /* ============ iPhone 外框 ============ */
+  .phone{width:300px;height:620px;border-radius:46px;padding:11px;position:relative;
+    background:linear-gradient(160deg,#23262f,#0c0d12);
+    box-shadow:0 40px 80px -20px rgba(0,0,0,.8), 0 0 0 2px rgba(255,255,255,.04) inset;}
+  .notch{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:96px;height:30px;
+    background:#000;border-radius:18px;z-index:30}
+  .screen{width:100%;height:100%;border-radius:36px;overflow:hidden;position:relative;display:flex;flex-direction:column}
+
+  /* 通用屏内排版 */
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px 6px;font-size:12px;font-weight:600}
+  .appbar{padding:6px 20px 12px}
+  .appbar .ttl{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .appbar .scn{font-size:11px;color:var(--ink-dim);margin-top:2px}
+  .seats{display:flex;gap:7px;padding:4px 18px 12px}
+  .seat{flex:1;text-align:center;font-size:10px;font-weight:700;padding:7px 0;border-radius:11px;letter-spacing:.02em}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:2px 18px;flex:1;align-content:start}
+  .card{border-radius:16px;padding:13px;min-height:74px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+  .card .ic{font-size:18px}
+  .card .lbl{font-size:11px;color:var(--ink-dim);font-weight:600}
+  .card .val{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .bubble{margin:6px 18px 4px;font-size:12px;line-height:1.5}
+  .bubble .u{color:var(--ink)}
+  .bubble .a{color:var(--ink-dim)}
+  .mic{margin:8px auto 16px;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+
+  /* ====== 方案1 深空辉光 ====== */
+  .s1 .screen{background:radial-gradient(120% 80% at 50% 0%,#101630,#05060c)}
+  .s1 .statusbar,.s1 .appbar .ttl{color:#eaf0ff}
+  .s1 .seat{background:rgba(255,255,255,.04);color:var(--ink-dim);border:1px solid rgba(255,255,255,.06)}
+  .s1 .seat.on{background:linear-gradient(135deg,rgba(123,92,255,.35),rgba(0,229,255,.22));color:#fff;
+    border-color:rgba(0,229,255,.5);box-shadow:0 0 18px rgba(0,229,255,.35)}
+  .s1 .card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+  .s1 .card .ic,.s1 .card .val{color:#5f6a8c}
+  .s1 .card.on{background:linear-gradient(150deg,rgba(0,229,255,.16),rgba(123,92,255,.14));
+    border-color:rgba(0,229,255,.5);box-shadow:0 0 22px rgba(0,229,255,.28),0 0 40px rgba(123,92,255,.18) inset;
+    animation:breathe 3.4s ease-in-out infinite}
+  .s1 .card.on .ic{color:var(--glow-cyan);text-shadow:0 0 14px var(--glow-cyan)}
+  .s1 .card.on .val{color:#fff}
+  .s1 .mic{background:radial-gradient(circle at 50% 35%,#1aa6ff,#5f2bff);box-shadow:0 0 30px rgba(0,170,255,.6),0 8px 20px rgba(0,0,0,.5)}
+  @keyframes breathe{0%,100%{box-shadow:0 0 18px rgba(0,229,255,.22),0 0 30px rgba(123,92,255,.12) inset}
+    50%{box-shadow:0 0 30px rgba(0,229,255,.45),0 0 55px rgba(123,92,255,.3) inset}}
+
+  /* ====== 方案2 液态极简 ====== */
+  .s2 .screen{background:linear-gradient(180deg,#15171c 0%,#0c0d10 100%)}
+  .s2 .appbar .ttl{color:#f4f5f7;font-weight:700}
+  .s2 .seat{background:transparent;color:#4d525e;font-weight:600}
+  .s2 .seat.on{color:var(--amber)}
+  .s2 .grid2{grid-template-columns:1fr 1fr;gap:14px}
+  .s2 .card{background:transparent;padding:8px 4px;min-height:64px;border-radius:0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .s2 .card .lbl{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+  .s2 .card .val{font-size:26px;font-weight:300;letter-spacing:-.02em;color:#3c414c}
+  .s2 .card.on .val{color:#fff}
+  .s2 .card.on .lbl{color:var(--amber)}
+  .s2 .card .ic{display:none}
+  .s2 .hero{padding:4px 22px 2px}
+  .s2 .hero .t{font-size:13px;color:var(--ink-dim);font-weight:600}
+  .s2 .hero .n{font-size:56px;font-weight:200;letter-spacing:-.04em;line-height:1;color:#fff}
+  .s2 .hero .n span{font-size:22px;color:var(--amber);font-weight:400}
+  .s2 .mic{background:none;border:1.5px solid var(--amber);color:var(--amber)}
+
+  /* ====== 方案3 座舱HUD ====== */
+  .s3 .screen{background:radial-gradient(130% 90% at 50% 10%,#06231f,#04080a)}
+  .s3 .appbar .ttl{color:#dffff6}
+  .s3 .seat{background:rgba(55,245,196,.05);color:#5a8a80;border:1px solid rgba(55,245,196,.14)}
+  .s3 .seat.on{background:rgba(55,245,196,.16);color:#aefce8;border-color:var(--holo);box-shadow:0 0 14px rgba(55,245,196,.4)}
+  .s3 .ringwrap{display:flex;justify-content:center;gap:14px;padding:8px 18px 6px}
+  .s3 .ring{width:104px;height:104px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(55,245,196,.08), transparent 70%),
+      conic-gradient(var(--holo) 0% 62%, rgba(55,245,196,.12) 62% 100%);
+    box-shadow:0 0 22px rgba(55,245,196,.25);position:relative}
+  .s3 .ring::after{content:"";position:absolute;inset:9px;border-radius:50%;background:#04181500;background-color:#051a17}
+  .s3 .ring .rn{position:relative;z-index:2;font-size:24px;font-weight:800;color:#fff;letter-spacing:-.02em}
+  .s3 .ring .rl{position:relative;z-index:2;font-size:9px;color:var(--holo);letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+  .s3 .grid2{grid-template-columns:1fr 1fr 1fr;gap:8px;padding:4px 16px}
+  .s3 .card{background:rgba(55,245,196,.05);border:1px solid rgba(55,245,196,.13);min-height:58px;border-radius:12px;padding:9px}
+  .s3 .card .ic,.s3 .card .val{color:#5a8a80}
+  .s3 .card.on{border-color:var(--holo);background:rgba(55,245,196,.12);box-shadow:0 0 14px rgba(55,245,196,.25)}
+  .s3 .card.on .ic{color:var(--holo)} .s3 .card.on .val{color:#eafffb}
+  .s3 .mic{background:radial-gradient(circle at 50% 35%,#37f5c4,#0a7d63);color:#04130f;box-shadow:0 0 26px rgba(55,245,196,.5)}
+
+  .reco{max-width:1280px;margin:46px auto 0;padding:18px 22px;border-radius:16px;
+    background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);font-size:14px;line-height:1.7}
+  .reco b{color:var(--glow-cyan)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media (max-width:760px){.col{width:300px}}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="kicker">MAformac · 端侧车控演示助手</div>
+    <h1>车控 UI · 三方案对比</h1>
+    <p class="sub">同一套车控内容(空调/座椅/车窗 + 座舱位置条 + 语音),三种「科技未来感」调性。目标:<b>一眼碾压 AWS 那个扁平 Android 灰卡片</b>。iPhone 竖屏,投屏给会议室。</p>
+  </div>
+
+  <div class="grid">
+    <!-- ========== 方案1 深空辉光 ========== -->
+    <div class="col s1">
+      <div class="phone"><div class="notch"></div><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>🌐 在线 · 100%</span></div>
+        <div class="appbar"><div class="ttl">MAformac</div><div class="scn">场景:默认舱 ▾</div></div>
+        <div class="seats"><div class="seat">主驾</div><div class="seat on">副驾 · 👗红</div><div class="seat">后排</div></div>
+        <div class="grid2">
+          <div class="card on"><div class="ic">❄️</div><div><div class="lbl">空调</div><div class="val">26°C</div></div></div>
+          <div class="card on"><div class="ic">💺</div><div><div class="lbl">座椅加热</div><div class="val">2 档</div></div></div>
+          <div class="card"><div class="ic">🪟</div><div><div class="lbl">车窗</div><div class="val">关</div></div></div>
+          <div class="card"><div class="ic">💡</div><div><div class="lbl">灯光</div><div class="val">关</div></div></div>
+          <div class="card"><div class="ic">🌬️</div><div><div class="lbl">风量</div><div class="val">2 档</div></div></div>
+          <div class="card"><div class="ic">🌸</div><div><div class="lbl">香氛</div><div class="val">关</div></div></div>
+        </div>
+        <div class="bubble"><div class="u">"我有点冷"</div><div class="a">→ 已升温至 26°,开座椅加热</div></div>
+        <div class="mic">🎤</div>
+      </div></div>
+      <div class="tag">方案 1 · 推荐 ⭐</div>
+      <h2>深空辉光 Deep Space Glow</h2>
+      <p class="note">深黑底 · 半透明玻璃卡片 · <b>点亮即青紫辉光呼吸</b> · 数值发光。参考:蔚来/理想暗色车机、科幻 HUD。</p>
+      <div class="win">超 AWS:它的卡片是死的;这个"打开空调"那一下<b>辉光扩散+呼吸</b>,投屏冲击最强。</div>
+    </div>
+
+    <!-- ========== 方案2 液态极简 ========== -->
+    <div class="col s2">
+      <div class="phone"><div class="notch"></div><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>在线 · 100%</span></div>
+        <div class="appbar"><div class="ttl">MAformac</div><div class="scn" style="color:#5a5f6b">默认舱</div></div>
+        <div class="seats"><div class="seat">主驾</div><div class="seat on">副驾·红</div><div class="seat">后排</div></div>
+        <div class="hero"><div class="t">空调 · 主驾</div><div class="n">26<span>°C</span></div></div>
+        <div class="grid2">
+          <div class="card on"><div class="lbl">座椅加热</div><div class="val">2档</div></div>
+          <div class="card on"><div class="lbl">风量</div><div class="val">2档</div></div>
+          <div class="card"><div class="lbl">车窗</div><div class="val">关</div></div>
+          <div class="card"><div class="lbl">灯光</div><div class="val">关</div></div>
+        </div>
+        <div class="bubble"><div class="u">"我有点冷"</div><div class="a">→ 升温 · 座椅加热</div></div>
+        <div class="mic">🎤</div>
+      </div></div>
+      <div class="tag">方案 2</div>
+      <h2>液态极简 Liquid Minimal</h2>
+      <p class="note">深灰渐变 · <b>超大温度数字</b> · 单一琥珀强调 · 大留白 · 流体过渡。参考:Vision Pro、Arc。</p>
+      <div class="win">超 AWS:它密集小字无层级;这个<b>一眼看到重点</b>,高级感拉满。风险:可能"太素不够热闹"。</div>
+    </div>
+
+    <!-- ========== 方案3 座舱HUD ========== -->
+    <div class="col s3">
+      <div class="phone"><div class="notch"></div><div class="screen">
+        <div class="statusbar"><span>9:41</span><span>🌐 在线</span></div>
+        <div class="appbar"><div class="ttl">MAformac</div><div class="scn" style="color:#5a8a80">默认舱 ▾</div></div>
+        <div class="seats"><div class="seat">主驾</div><div class="seat on">副驾·👗红</div><div class="seat">后排</div></div>
+        <div class="ringwrap">
+          <div class="ring"><div class="rn">26°</div><div class="rl">空调</div></div>
+          <div class="ring" style="background:radial-gradient(circle at 50% 50%,rgba(55,245,196,.08),transparent 70%),conic-gradient(var(--holo) 0% 40%,rgba(55,245,196,.12) 40% 100%)"><div class="rn">2</div><div class="rl">风量</div></div>
+        </div>
+        <div class="grid2">
+          <div class="card on"><div class="ic">💺</div><div class="val">加热2</div></div>
+          <div class="card"><div class="ic">🪟</div><div class="val">关</div></div>
+          <div class="card"><div class="ic">💡</div><div class="val">关</div></div>
+          <div class="card"><div class="ic">🌸</div><div class="val">关</div></div>
+          <div class="card on"><div class="ic">🎵</div><div class="val">轻音乐</div></div>
+          <div class="card"><div class="ic">🌡️</div><div class="val">舒适</div></div>
+        </div>
+        <div class="bubble"><div class="u" style="color:#dffff6">"我有点冷"</div><div class="a" style="color:#5a8a80">→ 升温 · 座椅加热</div></div>
+        <div class="mic">🎤</div>
+      </div></div>
+      <div class="tag">方案 3</div>
+      <h2>座舱 HUD Cockpit HUD</h2>
+      <p class="note"><b>环形温度仪表 + 弧形风量</b> · 全息青绿 · 数据可视化。参考:保时捷/EQS 仪表、Rivian。</p>
+      <div class="win">超 AWS:它是方卡片;这个<b>环形仪表专业感+科技感最强</b>。风险:工作量大,偏"仪表"离对话助手稍远。</div>
+    </div>
+  </div>
+
+  <div class="reco">
+    <b>我推荐方案 1（深空辉光)</b> —— 科技感 + "点亮呼吸"动效最炸场、最碾压 AWS 扁平丑,又不像方案 3 那么重、不像方案 2 那么素;玻璃辉光和"端侧 AI 高端产品"调性最配。<br>
+    也可<b>混搭</b>:方案 1 的辉光质感 + 方案 2 的超大关键数字 + 方案 3 的座舱位置高亮。你挑一个(或说混搭点),我把它做成可交互的真原型(点卡片亮/灭、语音气泡动画)。
+  </div>
+</body>
+</html>

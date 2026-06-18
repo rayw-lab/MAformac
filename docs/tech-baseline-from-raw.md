@@ -82,6 +82,8 @@ MAformac 是一个**纯端侧（iOS / macOS）、完全离线、以 Qwen3-0.6B +
 
 ### 4.1 统一 Tool schema（FC 母版）
 
+> ⚠️ 本节(§4.1)已 **SUPERSEDED** by `contracts/capabilities.yaml`(2026-06-18 change2 定稿)。下方为历史设计,实际 tool schema 以 `capabilities.yaml` 为准;§4.2 起其余章节仍有效。
+
 ```jsonc
 // 一条 Tool 定义（本地车控 mock 工具与 MCP 导航工具结构完全一致）
 {

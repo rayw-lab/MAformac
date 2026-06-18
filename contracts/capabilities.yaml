@@ -1,0 +1,598 @@
+version: 1
+state: active
+source_of_truth: contracts/capabilities.yaml
+notes:
+  - "MAformac Phase1 MVP vehicle capability contract."
+  - "This file is the single manually maintained source for tool schemas, UI cards, eval refs, trace schema, voice aliases, and LoRA labels."
+  - "Generated Swift types and tool_schemas.json are owned by later changes."
+
+supersedes:
+  - id: 03-openspec-input
+    status: superseded
+    path: docs/repo-intelligence/2026-06-17-gitnexus/03-openspec-input.md
+    replacement: contracts/capabilities.yaml
+  - id: 03-capabilities-catalog
+    status: superseded
+    path: docs/second-review-2026-06-17/03-capabilities-catalog.md
+    replacement: contracts/capabilities.yaml
+  - id: tech-baseline §4.1
+    status: superseded
+    path: docs/tech-baseline-from-raw.md
+    replacement: contracts/capabilities.yaml
+
+schema:
+  required_fields:
+    - id
+    - status
+    - display_zh
+    - aliases
+    - tool_schema
+    - reference_binding
+    - execution
+    - demo_guard
+    - response
+    - eval_refs
+  capability_status:
+    - active
+    - planned
+  state_cell_fields:
+    - key
+    - actualValue
+    - desiredValue
+    - availability
+    - timestamp
+    - source
+    - revision
+    - visualState
+  visual_state_enum:
+    - normal
+    - satisfied
+    - changing
+    - blocked_with_alternative
+    - blocked_hard
+    - unsafe
+    - unknown
+
+capabilities:
+  - id: cabin.ac
+    status: active
+    display_zh: 空调
+    aliases:
+      - 打开空调
+      - 关掉空调
+      - 冷气
+      - 暖风
+      - 制冷
+      - 制热
+      - 我有点冷
+      - 我有点热
+    tool_schema:
+      name: set_cabin_ac
+      description: 控制本地 mock 空调开关、温度和冷暖模式。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          power:
+            type: string
+            enum:
+              - on
+              - off
+              - unchanged
+          target_temperature:
+            type: integer
+            minimum: 16
+            maximum: 30
+          delta:
+            type: string
+            enum:
+              - warmer
+              - cooler
+              - none
+          mode:
+            type: string
+            enum:
+              - auto
+              - cooling
+              - heating
+        required:
+          - power
+    reference_binding:
+      vss_path: Vehicle.Cabin.HVAC.IsAirConditioningActive
+      readable: true
+      writable: true
+      type: boolean
+      unit: null
+      allowed_values:
+        - on
+        - off
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: hvac.ac
+      related_state_cells:
+        - hvac.temperature
+      idempotent: true
+      exclusive_bus: hvac
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: true
+      range:
+        target_temperature:
+          minimum: 16
+          maximum: 30
+      enum:
+        power:
+          - on
+          - off
+          - unchanged
+        mode:
+          - auto
+          - cooling
+          - heating
+      preconditions: []
+    response:
+      success_readback_zh: 空调已调整为{actualValue}
+      failure_fallback_zh: 空调当前无法调整
+    eval_refs:
+      - demo.fast_path.open_ac
+      - demo.comfort.cold
+
+  - id: cabin.seat_heating
+    status: active
+    display_zh: 座椅加热
+    aliases:
+      - 座椅加热
+      - 暖座
+      - 座垫加热
+      - 主驾座椅加热
+      - 副驾座椅加热
+    tool_schema:
+      name: set_cabin_seat_heating
+      description: 调整本地 mock 座椅加热挡位。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          position:
+            type: string
+            enum:
+              - driver
+              - passenger
+              - all
+          level:
+            type: integer
+            minimum: 0
+            maximum: 3
+        required:
+          - position
+          - level
+    reference_binding:
+      vss_path: Vehicle.Cabin.Seat.Row1.Driver.Heating
+      readable: true
+      writable: true
+      type: integer
+      unit: level
+      allowed_values:
+        - 0
+        - 1
+        - 2
+        - 3
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: seat.driver.heat
+      idempotent: true
+      exclusive_bus: seat_comfort
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: true
+      range:
+        level:
+          minimum: 0
+          maximum: 3
+      enum:
+        position:
+          - driver
+          - passenger
+          - all
+      preconditions: []
+    response:
+      success_readback_zh: 座椅加热已调到{actualValue}挡
+      failure_fallback_zh: 座椅加热当前无法调整
+    eval_refs:
+      - demo.comfort.cold
+
+  - id: cabin.seat_ventilation
+    status: active
+    display_zh: 座椅通风
+    aliases:
+      - 座椅通风
+      - 散热座椅
+      - 空调座椅
+      - 座椅风扇
+      - 座椅吹风
+    tool_schema:
+      name: set_cabin_seat_ventilation
+      description: 调整本地 mock 座椅通风挡位。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          position:
+            type: string
+            enum:
+              - driver
+              - passenger
+              - all
+          level:
+            type: integer
+            minimum: 0
+            maximum: 3
+        required:
+          - position
+          - level
+    reference_binding:
+      vss_path: Vehicle.Cabin.Seat.Row1.Driver.Ventilation
+      readable: true
+      writable: true
+      type: integer
+      unit: level
+      allowed_values:
+        - 0
+        - 1
+        - 2
+        - 3
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: seat.driver.ventilation
+      idempotent: true
+      exclusive_bus: seat_comfort
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: true
+      range:
+        level:
+          minimum: 0
+          maximum: 3
+      enum:
+        position:
+          - driver
+          - passenger
+          - all
+      preconditions: []
+    response:
+      success_readback_zh: 座椅通风已调到{actualValue}挡
+      failure_fallback_zh: 座椅通风当前无法调整
+    eval_refs:
+      - demo.comfort.summer
+
+  - id: cabin.window
+    status: active
+    display_zh: 车窗
+    aliases:
+      - 开窗
+      - 关窗
+      - 车窗
+      - 窗户
+      - 玻璃
+      - 给副驾开窗
+    tool_schema:
+      name: set_cabin_window
+      description: 调整本地 mock 车窗开度百分比。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          position:
+            type: string
+            enum:
+              - driver
+              - passenger
+              - rear_left
+              - rear_right
+              - all
+          percent:
+            type: integer
+            minimum: 0
+            maximum: 100
+        required:
+          - position
+          - percent
+    reference_binding:
+      vss_path: Vehicle.Cabin.Door.Row1.Driver.Window.Position
+      readable: true
+      writable: true
+      type: integer
+      unit: percent
+      allowed_values: []
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: window.driver
+      idempotent: true
+      exclusive_bus: window
+    demo_guard:
+      risk_level: R1
+      confirm_policy: none
+      writable: true
+      range:
+        percent:
+          minimum: 0
+          maximum: 100
+      enum:
+        position:
+          - driver
+          - passenger
+          - rear_left
+          - rear_right
+          - all
+      preconditions: []
+    response:
+      success_readback_zh: 车窗已调整到{actualValue}
+      failure_fallback_zh: 车窗当前无法调整
+    eval_refs:
+      - demo.basic.window
+      - demo.scene.passenger_window
+
+  - id: cabin.ambient_light
+    status: active
+    display_zh: 氛围灯
+    aliases:
+      - 氛围灯
+      - 车内灯
+      - 灯光
+      - 换个灯光
+      - 蓝色氛围灯
+      - 暖色灯
+    tool_schema:
+      name: set_cabin_ambient_light
+      description: 调整本地 mock 氛围灯开关和颜色。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          power:
+            type: string
+            enum:
+              - on
+              - off
+              - unchanged
+          color:
+            type: string
+            enum:
+              - warm
+              - cool
+              - blue
+              - amber
+              - white
+        required:
+          - power
+    reference_binding:
+      vss_path: Vehicle.Cabin.Light.AmbientLight
+      readable: true
+      writable: true
+      type: string
+      unit: null
+      allowed_values:
+        - off
+        - warm
+        - cool
+        - blue
+        - amber
+        - white
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: lighting.ambient
+      idempotent: true
+      exclusive_bus: lighting
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: true
+      range: {}
+      enum:
+        power:
+          - on
+          - off
+          - unchanged
+        color:
+          - warm
+          - cool
+          - blue
+          - amber
+          - white
+      preconditions: []
+    response:
+      success_readback_zh: 氛围灯已调整为{actualValue}
+      failure_fallback_zh: 氛围灯当前无法调整
+    eval_refs:
+      - demo.scene.ambient_light
+
+  - id: cabin.screen_brightness
+    status: active
+    display_zh: 屏幕亮度
+    aliases:
+      - 屏幕亮度
+      - 屏幕
+      - 亮度
+      - 调暗
+      - 太亮了
+      - 我头疼
+    tool_schema:
+      name: set_cabin_screen_brightness
+      description: 调整本地 mock 中控屏幕亮度百分比。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          percent:
+            type: integer
+            minimum: 0
+            maximum: 100
+          delta:
+            type: string
+            enum:
+              - brighter
+              - dimmer
+              - none
+        required:
+          - percent
+    reference_binding:
+      vss_path: Vehicle.Cabin.Infotainment.Display.Brightness
+      readable: true
+      writable: true
+      type: integer
+      unit: percent
+      allowed_values: []
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: screen.brightness
+      idempotent: true
+      exclusive_bus: display
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: true
+      range:
+        percent:
+          minimum: 0
+          maximum: 100
+      enum:
+        delta:
+          - brighter
+          - dimmer
+          - none
+      preconditions: []
+    response:
+      success_readback_zh: 屏幕亮度已调整到{actualValue}
+      failure_fallback_zh: 屏幕亮度当前无法调整
+    eval_refs:
+      - demo.comfort.headache
+
+  - id: cabin.fan
+    status: active
+    display_zh: 风量
+    aliases:
+      - 风量
+      - 风速
+      - 吹风
+      - 风小一点
+      - 风大一点
+    tool_schema:
+      name: set_cabin_fan
+      description: 调整本地 mock 空调风量挡位。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          level:
+            type: integer
+            minimum: 0
+            maximum: 5
+        required:
+          - level
+    reference_binding:
+      vss_path: Vehicle.Cabin.HVAC.Station.Row1.Driver.FanSpeed
+      readable: true
+      writable: true
+      type: integer
+      unit: level
+      allowed_values:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: update_mock_state
+      state_cell: fan.speed
+      idempotent: true
+      exclusive_bus: hvac
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: true
+      range:
+        level:
+          minimum: 0
+          maximum: 5
+      enum: {}
+      preconditions: []
+    response:
+      success_readback_zh: 风量已调到{actualValue}挡
+      failure_fallback_zh: 风量当前无法调整
+    eval_refs:
+      - demo.basic.fan
+
+  - id: cabin.comfort_query
+    status: active
+    display_zh: 舒适状态查询
+    aliases:
+      - 现在几度
+      - 车里几度
+      - 什么状态
+      - 空调现在什么状态
+      - 查一下舒适状态
+    tool_schema:
+      name: query_cabin_comfort
+      description: 读取本地 mock 舒适状态,不写入车控状态。
+      parameters:
+        type: object
+        additionalProperties: false
+        properties:
+          topic:
+            type: string
+            enum:
+              - temperature
+              - hvac
+              - seat
+              - all
+        required:
+          - topic
+    reference_binding:
+      vss_path: Vehicle.Cabin.HVAC.AmbientAirTemperature
+      readable: true
+      writable: false
+      type: integer
+      unit: celsius
+      allowed_values: []
+      raw_source_policy: abstracted_only
+    execution:
+      connector: local
+      mock_behavior: read_mock_state
+      state_cell: hvac.temperature
+      idempotent: true
+      exclusive_bus: none
+    demo_guard:
+      risk_level: R0
+      confirm_policy: none
+      writable: false
+      range: {}
+      enum:
+        topic:
+          - temperature
+          - hvac
+          - seat
+          - all
+      preconditions: []
+    response:
+      success_readback_zh: 当前舒适状态为{actualValue}
+      failure_fallback_zh: 当前无法读取舒适状态
+    eval_refs:
+      - demo.query.comfort

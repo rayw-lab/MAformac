@@ -1,0 +1,43 @@
+version: 1
+state: active
+
+agents:
+  - id: vehicle-control
+    display_zh: 车控
+    connector: local
+    enabled: true
+    availability: available
+    surface_policy: primary_panel
+    capability_ids:
+      - cabin.ac
+      - cabin.seat_heating
+      - cabin.seat_ventilation
+      - cabin.window
+      - cabin.ambient_light
+      - cabin.screen_brightness
+      - cabin.fan
+      - cabin.comfort_query
+
+  - id: navigation
+    display_zh: 导航
+    connector: mock
+    enabled: false
+    availability: planned
+    surface_policy: overlay_card
+    capability_ids: []
+
+  - id: music
+    display_zh: 音乐
+    connector: mock
+    enabled: false
+    availability: planned
+    surface_policy: overlay_card
+    capability_ids: []
+
+  - id: food-delivery
+    display_zh: 外卖
+    connector: mock
+    enabled: false
+    availability: planned
+    surface_policy: overlay_card
+    capability_ids: []

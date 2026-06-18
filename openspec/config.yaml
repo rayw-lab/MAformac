@@ -8,8 +8,9 @@ context: |
   北极星:客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑。
 
   技术(候选,非锁死):
-  - 大脑 Qwen3-1.7B + LoRA 为候选主线,0.6B 为轻量 fallback;LLMBackend 协议可换。
-    先用 1.7B 推进,不前置做 0.6B/1.7B benchmark(本地不慢);真机吃紧再回退。
+  - 大脑 Qwen3-1.7B + LoRA 为**主线**;0.6B / FoundationModels / llama.cpp 仅作轻量备选 / baseline / 对照,
+    **不作默认方案**。先用 1.7B 推进,不前置做 benchmark;**除非真机实测 1.7B 跑不动,不提前降级**。
+    LLMBackend 协议可换。
   - 车控全 mock:端状态自包含 = UI 卡片亮暗 + TTS 模拟,无外部系统方喂状态。
   - 规则吃 80% 高频明确指令,LLM 只碰 20% 模糊/跨域;LoRA 必做(只练"模糊说→跨域映射")。
   - 平台 SwiftUI(macOS+iOS),无后端;Python 库零进 iOS(只在 Mac 开发期用)。
@@ -17,13 +18,26 @@ context: |
   推进方法论:OpenSpec(做什么)+ Pocock(现在哪一阶段)+ Superpowers(怎么高质量执行)。
   详见 docs/project/collaboration-and-roles.md §7。
 
-  默认路线:S0 资料堆 → S1 OpenSpec 建项契约 → S2 capability 样板 → S3 文本 mock 闭环
+  默认路线(方向非瀑布门):S0 资料堆 → S1 OpenSpec 建项契约 → S2 capability 样板 → S3 文本 mock 闭环
            → S4 模型 benchmark → S5 离线语音闭环 → S6 iOS/macOS 个人演示包。
+
+  OpenSpec change 拆法(2026-06-18,7 个;权威见 docs/lessons-learned.md §E/§F):
+  1. define-demo-mvp-contract ✅done+archive(顶层:成功标准/non-goals/边界/MVP=车控+ASR+TTS+LoRA/5幕)
+  2. define-capability-contract ✅done+archive(capabilities.yaml schema 三合一 + 8 车控能力)
+  3. define-execution-contract(**纯 execution**:消费上游 ToolCallFrame + adopt mlx-swift-lm 薄层 + 错误枚举 + DemoGuard 代码门 + mock state + readback + trace;起手 spike E3 验 base 1.7B function call)
+  4. define-voice-contract(WhisperKit ASR + SpeechTextNormalizer + TTS + 语音态机)
+  5. define-lora-pipeline(bug 数据脱敏 → 五件套 → MLX-LM LoRA)
+  6. define-vehicle-tool-bench(eval:demo must-pass=100% + 泛化≥85 + Unsafe=0 / readback mismatch=0 死门)
+  7. define-intent-routing(**2026-06-18 新增**,座舱三层原理调研后:三层分流[规则NLU/FC快思考泛化/慢思考] + FC 泛化层 G3/G4 读端状态参数规划 + 规则快路径完整化;explore 排 spike E3 后,用实测数据不拍脑袋)
+  依赖序(非串行 gate):1✅ → 2✅ →（3 execution[spike E3 先] + 7 intent-routing[spike 后 explore]）→ 4 voice →（5、6 依赖 2）。
+  座舱三层原理 + demo 边界(量产标准豁免/安全门思想保留)全料:docs/cockpit-voice-fc-premortem-2026-06-18.md。
 
   边界红线(无例外):
   - 不做真车控 / CAN·ECU·OBD / 量产座舱 / 客户侧运行产品。
   - 源料来自真实座舱项目(某车厂)+ 开源 repo 研究:只抽象语义/协议骨架进 capabilities.yaml,
-    真实客户公司名(一律「某车厂」)/报价/密钥/PII/禁外传原文 **绝不入仓、不上云、不进训练集**。
+    真实客户公司名(一律「某车厂」)/ 车型代号 / 报价 / 密钥 / PII / 真实人名 / 禁外传原文
+    **绝不入仓、不上云、不进训练集**。
+  - **真实座舱 bug 训练集(即便本地脱敏)不入仓、不上云;仅 LoRA 权重产物可入仓**。
   - 唯一契约源:contracts/capabilities.yaml(其余 tool_schemas.json 等皆为生成物)。
 
 # 各 artifact 的硬规则 —— 创建对应 artifact 时强制遵守
@@ -31,13 +45,19 @@ rules:
   proposal:
     - 必须有 Non-goals 段(显式列出"不做什么")
     - 必须有可验收的成功标准(如"固定演示集 N 条,断网全过,错误不冒充成功")
+    - 商业 / 主观信号(客户反应、听感)不混入硬验收,单列为非自动化 success signal
     - 只写演示语境:车控 = mock 卡片 + TTS,不是真车控制
   specs:
-    - 只写可观察行为(Requirement SHALL/MUST + Scenario GIVEN/WHEN/THEN),不写类名/库/实现步骤
+    - 只写可观察行为(Requirement SHALL/MUST + Scenario GIVEN/WHEN/THEN),不写类名 / 库 / 文件名 / 实现步骤
     - 行为契约必含:只 mock 车控、断网可演、错误不冒充成功(读回 mock 态才算成功)
+    - 数值范围 / 枚举只引"能力声明的范围",不在 spec 写死具体数值(数值在 capabilities.yaml)
   design:
     - 主链路明确:文本输入 → 意图解析 → ToolCall → DemoGuard → mock state → trace
     - 安全门控是代码不是 prompt;模型不直接执行动作
+    - Pre-Mortem(坑点先行,方法论 = Klein/HBR;移植 vibecosystem 的 scout+oracle,非闭门造):每个新技术点/库/模型 propose/动手前跑——
+      **scout** = 搜本机 38 repo + 历史做法(file:line);**oracle** = CC subagent + CC 多路 WebSearch 搜外部 pitfall(GitHub issues +「known issues/gotchas」;**不派 Codex/GPT Pro**——每个 agent 用自己的 subagent+web)。
+      Risks 段必须写「已搜到的具体失败模式 + 来源」,不写空泛通用风险;「应该能 work」念头 = 强制搜坑信号(乐观不是放行)。
+      spike 报告必含「测了哪些 failure mode / 哪些没测」。详见 memory `premortem-adopt-vibecosystem`。
   tasks:
     - 拆到 Codex 可独立执行(每条有明确产出 + 验收标准)
     - 标注是否需叠加 Superpowers(TDD / 调试 / verification)

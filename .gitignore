@@ -11,8 +11,41 @@ referencerepo/repos/
 build/
 .build/
 DerivedData/
+*.xcresult
+*.hmap
+*.ipa
 *.xcuserstate
 *.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
 
 # 临时
 *.tmp
+
+# 模型 / 权重 / 训练与真实座舱资料
+models/
+weights/
+checkpoints/
+datasets/
+training-data/
+raw-data/
+vehicle-raw/
+seat-cockpit-raw/
+*.safetensors
+*.gguf
+*.mlx
+*.mlpackage
+*.mlmodelc
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.parquet
+*.sqlite
+*.db
+
+# Python 开发期环境(不得进 iOS)
+.venv/
+venv/
+__pycache__/
+*.pyc

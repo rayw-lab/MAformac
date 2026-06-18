@@ -2,8 +2,8 @@
 project: MAformac — Master Agent for macOS / iOS
 mode: solo / demo-tool          # 激活 fresheveryday-mode 轻治理（见全局 rules）
 methodology: OpenSpec(做什么) + Pocock(哪阶段) + Superpowers(怎么执行)
-status: S0 资料堆 ✅ → S1 OpenSpec 建项契约(脑暴 explore 中)
-updated: 2026-06-17
+status: apply 阶段(change1/2 done+archive) → 7-change 依赖序;当前 = spike E3(change3 生死线)
+updated: 2026-06-18
 ---
 
 # MAformac — 项目宪法
@@ -95,9 +95,16 @@ D1–D37 全锁(D20/D30/D35/D37 已于 2026-06-17 对话拍板),见 `tech-baseli
 - 新 session 起手回忆;阶段推进(S→S)时复核路线与 decisions 是否仍成立。
 - 三工具协作的实际命中与盲点 → 回写 collaboration §7。
 
-## 9. 下一步:S1 建项契约（脑暴先行)
+## 9. 下一步:apply 阶段（change1/2 done+archive,spike E3 是当前生死线）
 
-Pocock 分诊结论 = **S1 grill / explore**(产品·演示层未锁)。顺序:
-1. **脑暴**(当前):`superpowers:brainstorming` + `openspec-explore` + pocock grill-first → 把产品·演示层想透(客户 / 演示叙事 / 炸场点 / 成功标准 / 兜底)。
-2. 想清楚 → `/opsx:propose define-demo-mvp-contract` 起首个 change(proposal 含 Non-goals + 成功标准 / specs 行为契约 / design 主链路 / tasks 给 Codex)。
-3. 顺 artifact 流 → S2 `contracts/capabilities.yaml` 8 条样板。
+契约层完成:6 change propose done;**change1/2 已实装 + archive**(`specs/demo-experience` + `specs/vehicle-capabilities` 入库)。座舱三层原理调研后**新增 `define-intent-routing`(路线 6→7 change)**。
+
+**7-change 路线 + 状态**:
+- 1 `demo-mvp` ✅ **done+archive**(15/15,walking skeleton) / 2 `capability` ✅ **done+archive**(8 cabin.* 定稿;deep-audit cross-vendor 35/40 YELLOW)
+- 3 `execution`(当前):**纯 execution**(消费上游 ToolCallFrame;adopt mlx-swift-lm 薄层)。起手 = **spike E3 派 Codex**(验 base 1.7B function call,生死线;加 pre-mortem 硬 gate:触发率≥80%/格式塞content/拒识负样本/延迟/G3参数规划mini-spike)。arguments→JSONValue 留本 change(import MLXLMCommon 会拖整个 MLX Metal 栈)
+- **新 `define-intent-routing`**(未 propose):三层分流(规则NLU/FC快思考泛化/慢思考)+ FC 泛化层 G3/G4 读端状态参数规划 + 规则快路径完整化;**explore 排在 spike E3 之后**(用实测数据,不拍脑袋)
+- 4 `voice` / 5 `lora` / 6 `vehicle-tool-bench`:propose✅ 待 apply;每个 apply 前 pre-mortem reflex 自动跑,派 Codex 用 `docs/dispatches/_TEMPLATE.md`
+
+**座舱原理 + demo 边界**(全料 `docs/cockpit-voice-fc-premortem-2026-06-18.md`):真实座舱三层非二分;**🟡 demo 不接真车,量产标准(ISO26262/端云/QPS/误吸率)豁免,但安全门思想/参数规划/读mock态/工具约束/LoRA 保留**。
+
+起手读:本文件 → 最近 `docs/handoffs/` → `docs/cockpit-voice-fc-premortem-2026-06-18.md` → `docs/{voice,execution}-pre-mortem-2026-06-18.md`(坑点全料)。
