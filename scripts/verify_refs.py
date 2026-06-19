@@ -28,6 +28,7 @@ COVERAGE_REPORT = CONTRACTS_DIR / "semantic-coverage-report.md"
 STATE_CELLS_YAML = CONTRACTS_DIR / "state-cells.yaml"
 MANIFEST_YAML = CONTRACTS_DIR / "source-snapshot-manifest.yaml"
 L1_ALLOWLIST_YAML = CONTRACTS_DIR / "l1-demo-allowlist.yaml"
+RISK_POLICY_YAML = CONTRACTS_DIR / "risk-policy.yaml"
 
 UNRESOLVED_LIMIT = 0.02
 FORBIDDEN_SUBSTRINGS = [
@@ -148,7 +149,7 @@ def verify_range_classification(rows: list[dict[str, Any]]) -> None:
 
 
 def verify_leak_scan() -> None:
-    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML]
+    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML, RISK_POLICY_YAML]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         for marker in FORBIDDEN_SUBSTRINGS:
@@ -311,6 +312,40 @@ def verify_l1_closure(rows: list[dict[str, Any]]) -> int:
     return l1_count
 
 
+def verify_risk_policy() -> int:
+    """risk-policy.yaml 内部一致校验（独立, 不与 C1 行 risk 耦合）。
+
+    C1 行 risk 字段仍全空（verify_contract_invariants 强制 risk==""）。本文件只定义
+    "风险级→demo 行为"映射, 把 risk 写进 C1 需同刀改 gen_c1+verify(T2 耦合), 本 change 不做。
+    """
+    policy = safe_load_yaml(RISK_POLICY_YAML)
+    meta = policy.get("meta", {})
+    source_kind_enum = set(meta.get("source_kind_enum", []))
+    demo_action_enum = set(meta.get("demo_action_enum", []))
+    if not source_kind_enum:
+        raise C1Error("risk-policy: meta.source_kind_enum missing/empty")
+    if not demo_action_enum:
+        raise C1Error("risk-policy: meta.demo_action_enum missing/empty")
+    levels = policy.get("risk_levels", {})
+    if not isinstance(levels, dict) or not levels:
+        raise C1Error("risk-policy: risk_levels missing/empty")
+    for name, lvl in levels.items():
+        for key in ("asil_origin", "demo_action", "confirm_timeout_s", "source"):
+            if key not in lvl:
+                raise C1Error(f"risk-policy: {name} missing '{key}'")
+        if lvl["demo_action"] not in demo_action_enum:
+            raise C1Error(f"risk-policy: {name} bad demo_action {lvl['demo_action']!r}")
+        if lvl["source"] not in source_kind_enum:
+            raise C1Error(f"risk-policy: {name} bad source {lvl['source']!r}")
+        timeout = lvl["confirm_timeout_s"]
+        if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or timeout < 0:
+            raise C1Error(f"risk-policy: {name} confirm_timeout_s must be number >=0")
+    for fb in policy.get("forbidden", []) or []:
+        if fb.get("risk_level") not in levels:
+            raise C1Error(f"risk-policy: forbidden rule {fb.get('rule_id')!r} -> unknown risk_level {fb.get('risk_level')!r}")
+    return len(levels)
+
+
 def main() -> int:
     manifest = load_manifest()
     rows = read_jsonl(CONTRACT_JSONL)
@@ -327,12 +362,14 @@ def main() -> int:
     if state_cells_closure == "active":
         l1_count = verify_l1_closure(rows)
         l1_line = f" l1_closure=ok (L1_rows={l1_count})"
+    risk_levels = verify_risk_policy()
     print("schema=ok")
     print("refs=ok")
     print("ledger=ok")
     print("range_conflicts=ok")
     print("coverage=ok")
     print(f"state_cells=ok (c1_c2_closure={state_cells_closure}){l1_line}")
+    print(f"risk_policy=ok (levels={risk_levels})")
     return 0
 
 

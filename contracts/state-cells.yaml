@@ -105,7 +105,54 @@ devices:
         source_kind: c2_demo_decision
     readback_cell_group: [window.position, window.motion, window.lock]
 
-# ===== 场景所需 cell（scenario_required）— 待 demo-scenarios.yaml(magnet 定场景)后回填 =====
+  # ===== 横铺批设备组（task 4.1; 范式同 ac/window）=====
+
+  screen:
+    display_zh: 屏幕
+    service: cmd                                  # C1 jsonl device=screen_brightness service=cmd(§28 已核)
+    state_cells:
+      - id: screen.brightness
+        display_zh: 屏幕亮度
+        type: int
+        unit: percent                             # 协议 by_percent offset=<百分比>; 协议无硬边界 → demo 用百分比口径
+        scope: [中控屏, 仪表屏, 主驾屏, 副驾屏, 全车屏]  # 协议 screen_type 43 屏 → demo 精做 5, 余走 L2(§28: screen_type 一手枚举取子集)
+        execution_range: {min: 0, max: 100, step: 1}  # c2_demo_decision: 协议无硬边界(range_authority_note); 同 window.position 百分比口径
+        source_kind: c2_demo_decision
+        exp_step:                                 # 映射协议一手 offset token(§28)
+          little: 10                              # "调亮/暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
+        state_kinds: [empty, known, unknown]
+        readback_zh: "{屏幕}亮度{值}%"
+        # 炸点(模糊金例, 真实 bug 命中): "屏幕太暗了 → 调亮"(纯陈述→动作)
+    readback_cell_group: [screen.brightness]
+
+  ambient_light:
+    display_zh: 氛围灯
+    service: carControl                           # C1 jsonl device=atmosphere_lamp_* service=carControl(§28 已核)
+    state_cells:
+      - id: ambient.color
+        display_zh: 氛围灯颜色
+        type: enum
+        values: [红, 橙, 黄, 绿, 青, 蓝, 紫, 白]   # ⚠️ c2_demo_decision: 协议 set_mode offset=<序号>(索引), 无命名颜色枚举(§28) → demo 自定常用 8 色, 待 magnet 确认
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        # 协议 atmosphere_lamp_color 仅 set_mode primitive; "调成红色"=demo 把序号映射为命名色
+      - id: ambient.brightness
+        display_zh: 氛围灯亮度
+        type: int
+        unit: percent                             # 协议 by_percent offset=<百分比>; 协议无硬边界 → demo 用百分比口径
+        scope: [面发光氛围灯, 轮廓氛围灯, 门板氛围灯, 仪表板氛围灯, 中央通道氛围灯]  # 协议 name= 5 类(§28 一手), demo 全收
+        execution_range: {min: 0, max: 100, step: 1}  # c2_demo_decision: 协议无硬边界(range_authority_note); 百分比口径
+        source_kind: c2_demo_decision
+        exp_step:                                 # 映射协议一手 offset token(§28)
+          little: 10                              # "调暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
+        state_kinds: [empty, known, unknown]
+        readback_zh: "{氛围灯}亮度{值}%"
+    readback_cell_group: [ambient.color, ambient.brightness]
+
+# ===== 场景所需 cell（scenario_required）=====
+# demo-scenarios.yaml(magnet reviewed)5 幕已写: 涉及 cell 全部落在 device_cells(ac/window/screen/ambient)
+# ∪ safety_cells(vehicle.speed/gear) 内, 无额外场景专属 cell 需求 →  保持空。
+# 幕5 car_door 为安全门拒识(refuse_explain, 不下发), 无 mock 态变化, 故不需 door cell。
 scenario_cells: []
 
 # ===== 安全门 cell（safety）— L4 demo 优雅拒识（豁免 ISO26262）=====

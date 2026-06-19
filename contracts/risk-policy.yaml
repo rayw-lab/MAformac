@@ -1,0 +1,63 @@
+# contracts/risk-policy.yaml — demo 风险分级策略（独立, 不写入 C1 行）
+# ---------------------------------------------------------------------------
+# 归属: openspec change define-c1c2-contract / task 3.1（CC 定）
+# ---------------------------------------------------------------------------
+# ⚠️ 本文件是独立 demo 风险策略。C1 行的 `risk` 字段【仍全空】(见 verify_refs.verify_contract_invariants:
+#    risk != "" 即报错)。把 risk 写进 C1 行需同刀改 gen_c1 + verify_refs(T2 耦合), 本 change 不做。
+#    本文件只定义"风险级→demo 行为"映射, 由 verify_risk_policy 校验内部一致, 不与 C1 行耦合。
+# ---------------------------------------------------------------------------
+# 安全门思想保留, 量产标准豁免（CLAUDE §7 / cockpit-premortem）:
+#   demo 不接真车 → ISO26262 / ASIL 功能安全联锁标准【豁免】;
+#   但"按风险分级 + 行驶中危险动作优雅拒识"的【思想】保留, 做炸场效果。
+#   二次确认(R1)在 demo 是"展示它懂分寸"的炸场效果, 非真功能安全联锁。
+# ---------------------------------------------------------------------------
+meta:
+  scope: demo
+  iso26262_exemption: true
+  exemption_note: demo 不接真车, ISO26262/ASIL 联锁豁免; 保留风险分级 + 安全门拒识思想做炸场
+  # source 防"安全口径漂移": demo 拍的 vs 参考 ASIL 思想 vs 硬禁规则
+  source_kind_enum: [c2_demo_decision, asil_reference, safety_reference]
+  demo_action_enum: [execute, confirm, refuse_explain]
+
+# ===== 风险级 → demo 行为（ASIL 轨：每级标参考 ASIL 思想来源，demo 豁免真标准）=====
+risk_levels:
+
+  R0:
+    display_zh: 常规座舱
+    asil_origin: QM                  # Quality Management（无功能安全要求级）
+    demo_action: execute             # 直接执行
+    confirm_timeout_s: 0
+    source: c2_demo_decision
+    examples_zh: 调温 / 调窗开度 / 调屏幕亮度 / 调氛围灯
+
+  R1:
+    display_zh: 需二次确认
+    asil_origin: ASIL-A(参考)        # 低安全要求思想；demo 豁免真 ASIL 评定
+    demo_action: confirm             # 二次确认（炸场：展示"它懂分寸"）
+    confirm_timeout_s: 5             # demo 决策：5s 内无确认则取消
+    source: asil_reference
+    examples_zh: 全部车窗全开 / 大幅一次性调节（demo 可选演）
+
+  R2:
+    display_zh: 行驶中危险动作
+    asil_origin: forbidden_while_moving   # 硬禁（行驶上下文），非可确认
+    demo_action: refuse_explain      # 优雅拒识 + 中文解释（climax 炸点）
+    confirm_timeout_s: 0
+    source: safety_reference
+    examples_zh: 行驶中（车速>0）开车门 / 开后备箱
+
+# ===== forbidden 双轨：硬禁规则（触发条件 + 命中设备 → 映射风险级）=====
+forbidden:
+  - rule_id: door_open_while_moving
+    display_zh: 行驶中开门类
+    trigger: vehicle.speed > 0       # 端态 safety_cells: vehicle.speed / vehicle.gear
+    devices: [car_door, door, tailgate, electric_tailgate_switch]   # C1 实有意图（§28 已核）
+    risk_level: R2
+    refuse_readback_zh: 行驶中为了安全暂时不能开门, 停稳后我再帮您
+
+# ===== 校验闭合（verify_risk_policy）=====
+closure_notes:
+  - 每 risk_level 必有 {asil_origin, demo_action, confirm_timeout_s, source}
+  - demo_action ∈ demo_action_enum；source ∈ source_kind_enum；confirm_timeout_s ≥ 0
+  - 每条 forbidden.risk_level 必在 risk_levels 存在
+  - C1 行 risk 字段不受本文件影响（仍全空，T2 耦合留后续 change）
