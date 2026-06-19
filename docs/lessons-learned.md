@@ -16,7 +16,7 @@
 
 1. **MLX Swift 无 GBNF grammar**:结构化输出靠 prompt+few-shot + `ToolCallFormat` 解析 + Codable 严格解码 + retry≤1 + `decode_failed` 转澄清,**不是 token 级硬约束**。
 2. **Qwen3 工具调用格式不是项目协作协议**:`Hermes` 只指外部生态里常见的 `<tool_call>` XML 输出兼容点,不是 Codex/Claude 分工协议,也不是 MAformac 的内部标准。项目内部标准仍是 `ToolCallFrame` + `capabilities.yaml`;模型输出端先顺 Qwen3 原生工具调用格式(`ToolCallFormat.xmlFunction`)降低 `decode_failed`,解析后再映射到内部 `ToolCallFrame`。**别强制模型直接吐自定义 JSON**(违训练分布、增 decode_failed)。
-3. **bug 数据脱敏(硬边界)**:含车型 T19CFL / 真实人名 / 客户 → **绝不入仓、不上云**;本地清洗去敏样本,**训练集本身也不入仓**(仅 LoRA 权重可)。
+3. **bug 数据脱敏(硬边界)**:含真实车型代号 / 真实人名 / 客户名 → **绝不入仓、不上云**;本地清洗去敏样本,**训练集本身也不入仓**(仅 LoRA 权重可)。
 4. **capabilities.yaml / agents.yaml 必须分层**:capabilities 管工具/槽位/mock行为/eval;agents 管 domain/connector/surface_policy/权限边界;**agent 只引用 capability id,不重复定义**(防双源漂移)。
 5. **导航 surface 按设备**:iPhone 竖屏 `fullscreen + overlay_card`;Mac/iPad 才 `split_panel`。`fullscreen` 是 surface_policy 一种,非独立窗口系统。
 6. **Registry 是依赖,不是链路串行节点**:CapabilityRegistry/AgentRegistry 由 Router **启动时加载、运行时查询**,不是每请求过的节点。
@@ -28,6 +28,7 @@
 12. **从领域资料推目标库 API 时必须核源码,别按「同款机制」假设字段名**(2026-06-18 Codex cross-vendor catch):我派的 workflow agent 读某车厂热词资料,按「同款机制」假设 WhisperKit 有 `DecodingOptions.contextualStrings`——实际源码**无此字段**,真实 API 是 `promptTokens + usePrefillPrompt`(Whisper initial_prompt 机制)。**语义对、字段名错**。Codex 读 WhisperKit 源码 catch 出,CC grep 实证(`TextDecoder.swift:198`)。→ 通用:agent 读资料得出「用库 X 的字段 Y」类断言时,**必 grep 目标库源码验证字段存在**。**cross-vendor 互补范式:一方读资料(语义/约束),一方读源码(API 实证),双签才稳**——本次 workflow(资料)× Codex(源码)正是此范式。
 13. **后续建议默认不降级**(2026-06-18 磊哥纠正):Xcode 已经在下,开发路径按完整主线推进:Qwen3-1.7B + LoRA、WhisperKit ASR、TTS、安全门控、mock readback 都保留。`0.6B`、Foundation Models、llama.cpp 只能作为轻量备选 / baseline / 对照实验,不能把它们写成默认方案;除非真机实测证明 1.7B 跑不动,否则不要为了省事提前降级。
 14. **Qwen3-1.7B 端侧工程:「能 tool call」是表层信号**(2026-06-18 Codex 调研 + Step1 实证,**详见 `docs/qwen3-engineering-notes.md`**):格式对只过最外层,真骨头在 4 隐藏层——restraint(该忍住时忍住)/ parser hygiene(malformed / think_leak / 多轮历史炸模板皆常态)/ context budget(标称 32K ≠ 能用)/ LoRA 样本边界(约束行为非补知识)。横切硬约束:`enable_thinking=false`(thinking **破坏** tool parser,非偏好)、禁 ReAct stopword、schema 完整(否则模型纠结「打开空调怎么 open」)、Release 真机验(Python server 不替代 Swift)。落 change 3-6 的硬约束见 qwen3-notes §6。
+15. **DemoGuard 是 schema 门,不是语义拒识门**(2026-06-19 self-audit catch):DemoGuard 读 `capabilities.yaml.demo_guard`(risk_level/writable/range/enum/互斥/前置),挡 unknown tool/越界/缺字段/非法 enum/不可写——**挡不住 schema 合法的 restraint**(「不要开空调」→`set_cabin_ac{power:off}` 合法)**和意图越界**(写诗→误触发合法 `set_cabin_fan{level:2}`)。demo_guard **无 restraint allowlist 字段**,做不到语义拒识。→ **真防线分层**:restraint/意图越界拒识 = intent-routing 拒识层 + LoRA 负样本 + base 模型(**非 DemoGuard**);DemoGuard 只保 schema/range/risk 安全 + 不崩 + 读回真态。**content-fallback 把裸 JSON restraint 负例(raw 未触发)变候选→过 schema 门→执行,有已知 G3 代价(1/15→3/15)**,设可配置开关,净影响留 change6 量化。修正了 change3 design E1a「fallback 过 guard 不恶化 G3」的原论证。
 
 ## C. Codex 好做法(CC 学习)
 
@@ -72,3 +73,17 @@
 4. **base 1.7B「能调」是 happy path,触发率/格式/拒识才是真门**(oracle联网):BFCL Qwen3-1.7B overall **55.49%**/multi-turn **16.88%**;微调小模型碾压通用大(xLAM-3b-fc 65.74%、in-vehicle Phi-3 1.8B+LoRA 0.86>规则0.75)→ **LoRA 必做不是可选**。spike E3 加硬gate(触发率/格式塞content/拒识负样本/延迟/G3参数规划mini-spike),不只验「收到.toolCall事件」(呼应 B14 happy-path 表层信号)。
 
 5. **方法命中:多路调研(scout 本机raw + oracle 联网 + magnet 语料)三方互证**找盲点比单路强。oracle 仅 claude subagent+WebSearch(未派Codex/GPT Pro)够用;scout 派 claude subagent 读 raw(read-heavy)抽象 + 守边界(真实车厂全脱敏「某车厂」)。
+
+6. **cross-agent grill 工作流 + self-audit 对抗(2026-06-19 实证,高价值 SOP)**:复杂设计 explore = CC 出 grill 问题(自包含 + 候选 + CC 倾向 + 反问)→ 磊哥贴另一窗口(Codex 系)answer → CC **辩证吸收**(不迎合,raw/项目文件核引用 file:line,找 catch)→ 记 explore 笔记 → 逐轮收敛(判定/横切/端状态/边界 4 轮)→ pre-mortem(oracle 联网扫 grill 没覆盖的新坑,本次 9 坑超 4 轮 grill)→ present design 逐节 approve → propose 4 artifact。实证 `define-intent-routing`。**self-audit 对抗有价值**:CC subagent 审 CC 主线程交付,catch 出主线程「explore 标了 propose 却漏的」(change6 二分漂移)——同 model family 也值(独立上下文 + 对抗视角,codex-metacognition §16/§22 实证)。配套:propose artifact 须回流 explore 笔记里登记的「待对齐漂移」,否则 self-audit 会 catch fake-green 遗漏。
+
+## G. apply 阶段 dispatch self-audit 对抗实证(2026-06-19,change3)
+
+> 起因:apply change3 = CC 写派 Codex 的实装 dispatch;磊哥定「写完 dispatch 后派 subagent CC 审计」。延续 §F6 self-audit,但落在 **apply/dispatch 阶段**(非 explore/propose),catch 实装级盲点。
+
+1. **dispatch self-audit 真有价值(本轮 6 catch 全成立)**:CC subagent 对抗审 CC 主线程刚写的 dispatch,catch 主线程「以为写清了」实则漏的——T7 命名漂移**只修一处**(漏 `DemoActionExecutor`+`FastPathIntentEngine` 两处,会 build 绿但执行链断)/ codegen 触发机制黑洞(撞 `Package.swift` exclude + 不动 Package 红线)/ T5 fixture「禁自造」与「数组归一」物理矛盾(实采 0 数组)/ frame 必填字段无 fixture 来源 / 最危险负例 N002 被一锅烩。**同 model family 也值**(独立上下文 + 对抗 prompt「找漏洞不迎合」)。
+
+2. **🔴 辩证吸收要挖更深,不盲从 subagent(本轮最高价值)**:subagent 说「N002/N016/N017 靠 DemoGuard restraint 挡」——CC 主线程**不盲信,核 `capabilities.yaml` 实证 demo_guard 根本无 restraint 字段**,挖到比 subagent 更深的 catch:**DemoGuard schema 门 ≠ 语义拒识门**(见 B15)。→ **self-audit 双层**:① subagent 找主线程盲点 ② 主线程辩证核 subagent(核它引用、挖它 catch 里的 catch)。两层都做才到位(呼应 A5「辩证 check 跨 agent 结论双向」)。
+
+3. **pre-mortem scout 直读源码在 apply 阶段 catch 实装坑**:scout 直读 pin 的 mlx-swift-lm 3.31.3 → catch「`JSONToolCallParser.swift` 文件不存在」(execution-pre-mortem 锚点失效,实际并入 `ToolCallFormat.swift`)+「`.json` format 是 tagged,裸 JSON 漏成 `.chunk` 的确切根因」+ change1/change2 命名漂移。→ **propose 时的源码锚点,apply 前必按 pin 版本复核**(库版本/文件结构会变,锚点会失效)。
+
+4. **范围解耦(E1b)= apply 阶段 pre-mortem 的结构性产出**:oracle 实证「MLX 在 iOS Simulator 必崩 + metallib 打包 + 内存 entitlement 全未验」→ change3 拆成「纯逻辑契约层(spike fixture 驱动,`swift test` 可跑)」+「MLX runtime 接入(先最小真机冒烟)」。**契约层与 backend 解耦**(自定义 JSONValue 不 import 上游)让单测不被 backend 平台坑传染,呼应 D「runtime 抽象先行」。

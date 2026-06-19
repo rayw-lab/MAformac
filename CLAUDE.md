@@ -74,7 +74,7 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 
 ## 5. 关键已锁决策
 
-D1–D37 全锁(D20/D30/D35/D37 已于 2026-06-17 对话拍板),见 `tech-baseline §12 + §12.1` 与 `supplement §17`。铁律:规则吃 80% / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS / runtime 抽象先行 / LoRA Day1 埋 trace。
+D1–D38 全锁(D20/D30/D35/D37 于 2026-06-17 拍板;**D38**=2026-06-19 两轮 pre-mortem 后续架构融合决策:端云三层分层 + multi-turn 悬崖降维(跨域编排走确定性骨架 / 短期记忆走 query rewrite)+ iPhone 模型 4B 天花板,见 `supplement §17+§18`),见 `tech-baseline §12 + §12.1` 与 `supplement §17+§18`。铁律:规则吃 80% / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS / runtime 抽象先行 / LoRA Day1 埋 trace。
 
 ## 6. 边界红线（硬约束,无例外）
 

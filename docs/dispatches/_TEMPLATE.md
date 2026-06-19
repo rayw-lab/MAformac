@@ -35,6 +35,10 @@ git status --short                    # 验工作树
 - **红线**(完整见 `CLAUDE.md §6`):真实客户名一律「某车厂」;报价 / 密钥 / PII / 车型代号 **绝不入仓**;真实 bug 训练集即便脱敏也**不入仓**(仅 LoRA 权重产物可);**不降级**(Qwen3-1.7B+LoRA 主线,0.6B/FoundationModels/llama.cpp 仅备选对照)。
 - **禁区**:<不许动的文件 / 目录>
 - **OUT_OF_SCOPE**:超出本 dispatch 范围 → 返回说明 + 建议归属,**不硬扛、不顺手扩**。
+- **🔴 多 agent git 协作三纪律**(2026-06-19 pre-mortem 沉淀;官方 Claude Code/Codex + 社区共识;硬约束):
+  1. **一 agent 一 worktree 一分支**:本 dispatch 在**指定隔离 worktree + feature 分支**执行(派单方先 `git worktree add ../<repo>-<change> -b feat/<change>`,dispatch 写死 cwd=该 worktree),**不在 main 主树裸跑**(防两 agent 同 worktree 撞车 + git 态串味幻觉)。
+  2. **main 单写者**:只 CC(协调者)merge main;承接方**只在自己 feature 分支 commit**,**禁 merge / 禁 archive / 禁动 main 或其他 change**(越界即 dispatch FAIL)。
+  3. **强制 ground-truth git 验证**(防幻觉):任何「完成 / 已 commit / 已 archive」断言**必须附 `git -C <worktree> status --short` + `git log --oneline -5` + `git branch --show-current` 的实际 stdout**,不接受自述;CC 收稿后**自跑一遍交叉核对**。实证:2026-06-19 Codex 在共享 worktree 幻觉过一个不存在的 commit + archive 操作。
 
 ## 5. 验收门
 > codex-metacognition §23 三硬约束 + OpenSpec tasks 验收 + Pre-Mortem(见 `~/.claude/skills/learned/pre-mortem.md`)。
