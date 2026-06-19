@@ -65,7 +65,7 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 
 - **平台**:macOS + iOS,SwiftUI 一套,无后端。
 - **大脑**:Qwen3-**1.7B + LoRA = 候选主线**(先 1.7B 推进,**不前置 benchmark**;0.6B 为轻量 fallback;FoundationModels 仅 baseline/逃生口)。`LLMBackend` 协议可换 → 主 `mlx-swift-lm`,备 `llama.swift`/llamafile。
-- **语音**:WhisperKit(ASR,D14);**文本先行**(开发序,D15)、ASR 必交付;barge-in 首版按钮打断(D13)。
+- **语音**:ASR 走 `ASRBackend` 抽象——**sherpa-onnx 中文模型(Paraformer/SenseVoice)主候选 + WhisperKit fallback/baseline**(D14 v2,2026-06-19 跨厂商二审改:中文抗噪 Paraformer≫Whisper;热词仅 transducer 模型可选门,Paraformer 路线靠拼音 fuzzy+封闭词表+LoRA音近);**文本先行**(开发序,D15)、ASR 必交付;barge-in 首版按钮打断(D13)。
 - **车控**:全 mock(D16)——**端状态自包含 = UI 卡片亮暗 + TTS 模拟**,无外部系统方。
 - **架构**:理解→**三层路由(规则 NLU / 意图收缩 clarifyTag→FC 泛化 / 慢思考)**→规划→安全门→**分层执行兜底(L1 精做 / L2 通用 mock / L3 越界 / L4 安全)**+ barge-in 包裹 + DialogueState 贯穿。
 - **核心抽象**:`Capability` + 统一 `Tool` schema + **契约 SSOT = `semantic-function-contract`(C1,源行级全集)+ `scenario-state-protocol`(C2,场景端态)**(模型/规则/UI/eval/LoRA 数据皆派生;`value` 四件套 + device×动作原语×槽三元 + clarifyTag)。
@@ -77,7 +77,7 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 
 D1–D37 + **Q1–Q15**(C1/C2 契约,见 grill/ADR)。铁律:规则吃 80% / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS / runtime 抽象先行 / LoRA Day1 埋 trace。
 
-**v2 重审(2026-06-19)**:D16 端态 8→102 原子能力 P0 子集(C2)/ D30 训练栈 adopt unsloth+Hammer+xLAM(C5)/ D35 must-pass→全集覆盖率双轴 bench(C6)/ D37 安全门→risk-policy 单源(R0–R3 收 ASIL/forbidden)+ clarifyTag。**范围真值纠错**(端态打点为准,旧 16-30/0-5 是拍错):空调温度 **18-32℃**(车型相关)、风量 **1-10 档**、座椅 0-3、车窗 0-100%。**契约 SSOT 全集精确靠 codegen 从冻结快照派生(非手写)+ 分流账本(unclassified=0,quarantine≠drop)**。
+**v2 重审(2026-06-19)**:D16 端态 8→102 原子能力 P0 子集(C2)/ D30 训练栈 adopt unsloth+Hammer+xLAM(C5)/ D35 must-pass→全集覆盖率双轴 bench(C6)/ D37 安全门→risk-policy 单源(R0–R3 收 ASIL/forbidden)+ clarifyTag/ **D14 ASR→sherpa-onnx 中文主+WhisperKit fallback+ASRBackend 抽象(C7,跨厂商二审改)**。**范围真值纠错**(端态打点为准,旧 16-30/0-5 是拍错):空调温度 **18-32℃**(车型相关)、风量 **1-10 档**、座椅 0-3、车窗 0-100%。**契约 SSOT 全集精确靠 codegen 从冻结快照派生(非手写)+ 分流账本(unclassified=0,quarantine≠drop)**。
 
 ## 6. 边界红线（硬约束,无例外）
 
