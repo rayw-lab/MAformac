@@ -1,4 +1,6 @@
-# demo must-pass 必过集 — candidate(待磊哥定稿)
+# demo must-pass 必过集 — candidate ⚠️【SUPERSEDED_BY_C1C2,勿用】
+
+> ⚠️ **authority: superseded(2026-06-19 v2)** —— 本 candidate 基于**旧扁平 8 能力 `capabilities.yaml` 硬映射**,已被 C1/C2 推翻。**勿用作 C6 bench 基线**;C6 必过集改从 C1 `semantic-function-contract.jsonl` + C2 `demo-scenarios.yaml` + `l1-demo-allowlist` 派生。下方「映射是硬契约 / 有点冷→固定 26 度」是旧口径(且范围 18-30/1-7 拍错),仅留历史。详见 `CLAUDE.md §9`。
 
 > **状态**:candidate / 待磊哥确认。**定稿后归 `change6 vehicle-tool-bench`**(`design.md` Open Questions「demo must-pass 15-25 条具体清单 需磊哥确认 5 幕话术」)。
 > **来源**:`contracts/capabilities.yaml`(8 capability 硬映射 + eval_refs)× `tech-baseline-supplement §16.3/§16.4`(字段 + 四层门 + 放行态)× `define-vehicle-tool-bench/design.md`(四个 0 死门 + 双维度)× `define-intent-routing`(三层 route_kind)。

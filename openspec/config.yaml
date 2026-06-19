@@ -34,9 +34,9 @@ context: |
 
   边界红线(无例外):
   - 不做真车控 / CAN·ECU·OBD / 量产座舱 / 客户侧运行产品。
-  - 源料来自真实座舱项目(某车厂)+ 开源 repo 研究:只抽象语义/协议骨架进 capabilities.yaml,
-    真实客户公司名(一律「某车厂」)/ 车型代号 / 报价 / 密钥 / PII / 真实人名 / 禁外传原文
-    **绝不入仓、不上云、不进训练集**。
+  - 源料来自真实座舱项目(某车厂)+ 开源 repo 研究:只抽象语义/协议骨架进契约,不复制原文语料。
+    **分级脱敏**(2026-06-19 校准):🔴 绝不入仓 = 密钥 / PII / 报价 / 真实人名 / 禁外传原文;
+    🟡 private 内网可接受 = 车型代号(AH8/T19 等)/ 供应商名(非密钥,仅 private 仓,绝不进训练集 / 不上公开仓);客户公司名正文仍统一「某车厂」。
   - **真实座舱 bug 训练集(即便本地脱敏)不入仓、不上云;仅 LoRA 权重产物可入仓**。
   - 唯一契约源(v2):contracts/semantic-function-contract.jsonl(C1 源行级主源;function-spec-full.yaml/规则查表/LoRA 话术/bench fixture 皆生成物;旧 capabilities.yaml 被 C1 supersede)。冻结源 xlsx 快照在外部 raw 只读 + manifest 锚 content_digest,仓内只放 manifest + JSONL 镜像 + coverage 报告(源料绝不进仓)。
 

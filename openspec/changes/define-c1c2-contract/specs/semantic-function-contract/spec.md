@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: 生成式全集覆盖且派生自冻结快照
-语义契约 SHALL 从冻结源快照 codegen 机械派生,覆盖 `airControl/carControl/cmd` 的全集源行,不得手写源行。每条契约记录 SHALL 保留 provenance(source_sheet / source_row_no / 内容 hash)。冻结快照 SHALL 由 manifest 的 `content_digest` 锚定(xlsx 字节级重存不破坏锚定)。
+语义契约 SHALL 从冻结源快照 codegen 机械派生,覆盖 `airControl/carControl/cmd` 的全集源行,不得手写源行。每条契约记录 SHALL 保留 provenance(source_sheet / source_row_no / 内容 hash)。冻结快照 SHALL 由 manifest 锚定;manifest **SHALL 同时含 `content_digest`(语义内容指纹,xlsx 字节级重存不破坏锚定,作语义漂移判据)与 `file_sha256`(文件字节,防换文件)双 hash**。
 
 #### Scenario: 从冻结快照生成
 - **WHEN** 对锁定 content_digest 的冻结快照运行 codegen
