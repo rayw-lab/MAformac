@@ -128,21 +128,21 @@
 > 磊哥质疑「1.7B 镜像 8B（量产 8B 中枢+编排，传统语义+FC 走快路）是否成立」。经 **/probe + /pre-mortem + 6 流证据交叉验证**（本地生产 3 + 联网 3，全料 `docs/research/2026-06-19-architecture-validity-deepdive.md`）：
 
 **裁决（ACH 排除法）**：
-- **❌ 镜像 8B 不成立（置信 92）**：NVIDIA SLM-agents(2506.02153) / TinyAgent(2409.00608) / Cerence CaLLM Edge / 编排器瓶颈(2601.11327) / 生产一手承认(交付手册:792) / Snips —— 6 流全否。
-- **✅ 反转架构成立（置信 90）= MAformac 已锁 D 系列**：**规则吃高频 + 窄域 LoRA 小模型只产单跳 FC + code 编排（非模型）+ 受限解码保格式**。Snips/Picovoice/HA Assist/Cerence/Octopus/TinyAgent/SayCan/Alexa Lex 全是它的实现。**不是赌，是已验证范式的合理组合。**
+- **❌ 镜像 8B 不成立（方向强支持，非量化）**：NVIDIA SLM-agents(2506.02153) / TinyAgent(2409.00608) / Cerence CaLLM Edge / 编排器瓶颈(2601.11327) / 生产一手承认(交付手册:792) / Snips —— 6 流全否。
+- **✅ 反转架构成立（方向强支持）= MAformac 已锁 D 系列**：**规则吃高频 + 窄域 LoRA 小模型只产单跳 FC + code 编排（非模型）+ 受限解码保格式**。Snips/Picovoice/HA Assist/Cerence/Octopus/TinyAgent/SayCan/Alexa Lex 全是它的实现。**不是赌，是已验证范式的合理组合。**
 
-**现存条件可行性（Opus 知识，三主 tiger 被实际栈中和）**：
+**现存条件可行性（Opus 知识 + 跨厂商二审 2026-06-20 校准：通用 tiger 被实际栈【降低，非中和；closure 需项目实测】）**：
 
-| 通用 tiger | 你的栈（mlx-swift+Apple Silicon+Qwen3-1.7B+GBNF+8-bit）中和后 |
+| 通用 tiger | 实际栈降低（⚠️ 非已闭，需实测） |
 |---|---|
-| 延迟 CPU 1.5B=10.3s | **走 Metal/ANE 非 CPU**，1.7B decode 50-100 tok/s → FC <1-2s(warm)，落"慢思考正常"区；快路规则担"反应快" |
-| base FC 断崖(LLaMA 12.71%) | **Qwen3-1.7B 自带 tool-call 模板+工具预训练**，起点更高；LoRA 再补 |
-| 格式崩(1B schema 22%) | **GBNF/xgrammar 现成 → 100% schema 合法** |
-| 内存(3B 不进 jetsam) | **1.7B 8-bit ~2GB < iPhone 8GB×50%**，装得下，不压 4-bit（保精度） |
+| 延迟 CPU 1.5B=10.3s | 走 Metal/ANE 非 CPU，方向利好；**但端到端延迟 = ASR endpoint+prefill+grammar decode+TTS/UI+cold+thermal，closure 需 device p50/95/99 实测**（MLX≠秒回闭合） |
+| base FC 断崖(LLaMA 12.71%) | Qwen3-1.7B tool-call 预训练起点更高；**但 Qwen3 原生支持 parallel/multi-step tool call + tool-call 外额外文本，单跳须 runtime 强制(§12 gate)，非"模板已解决"** |
+| 格式崩(1B schema 22%) | GBNF 保**结构**合法；**不保语义/选对工具/参数/前置**——需 semantic+precondition+stale-state gate(§12) |
+| 内存(3B 不进 jetsam) | 1.7B 8-bit **权重**~2GB；**但进程还有 KV cache/ASR model/runtime/TTS/UI/audio buffer，iOS jetsam 会终止超限进程**——需 device 实测 margin，WhisperKit fallback 不可与 sherpa+Qwen 同时 eager load |
 
-**唯一残余赌点（不可消，spike E3 闭）**：1.7B+LoRA 在 3990 数据上"**结合端状态的模糊意图→正确意图/参数**"的**语义命中率**（格式已由受限解码解决）。生产一手承认小模型"暂时做不到"（交付手册:792）；跨行业先例乐观（**Qwen2.5-1.5B 真人嘈杂话 86.4%**，HA arXiv 2502.12923）。**有 fallback**（换 3B 核内存 / 砍慢路保规则快路 / 退"金句模糊"）。
+**唯一残余赌点（spike E3 闭）**：1.7B+LoRA 在 3990 数据上"**结合端状态的模糊意图→正确意图/参数**"的**语义命中率**。生产一手承认小模型"暂时做不到"（交付手册:792）；跨行业乐观（Qwen2.5-1.5B 真人话 86.4%，HA arXiv 2502.12923）。**有 fallback**（换 3B 核内存 / 砍慢路保规则快路 / 退"金句模糊"）。
 
-**诚实信心**：策略 soundness **~92%**（6 流收敛 + 三 tiger 现存条件已解 + 排除法跑完）；**经验性 100% = NO**（认识论上只能 spike E3 实测填，此刻称 100% = happy-path 谎言）。**分析 loop 已收敛，严谨收尾 = 锁定反转架构 + 跑 spike E3。**
+**诚实信心（跨厂商二审校准，删伪精确数字）**：**架构方向 = 强支持**——6 流证据是【架构先验】(NVIDIA SLM-agents position paper / Snips pipeline / TinyAgent benchmark / Cerence)，**非 MAformac 当前实现的通过证明**；**实现闭合 = 未验**，不量化数字，待 spike E3 **项目自有 audio→intent→state-transition eval**。⚠️ 原"策略 soundness ~92%"是过度量化，**撤回**。**经验性 100% = NO**（只能 spike 实测填）。分析 loop 收敛，严谨收尾 = 锁定反转架构方向 + 跑 spike E3 + 实装 §12 gate。
 
 **🔴 实现回潮硬约束（写进 capabilities.yaml/dispatch 模板 enforce）**：**"编排/多步 state 必须在 code（DialogueState/state machine），模型单次调用只产单跳 ToolCallFrame；禁止 model 自由决定 next-tool 的 agent loop。"** —— 8B 范式深入人心，实现时极易反射性写"让模型 decide next tool"的回潮，须 contract 硬拦。
 
@@ -258,4 +258,19 @@
 | **C7 voice** | `research/2026-06-19-asr-alignment-research.md`(含二审修正块) | **D14**:`ASRBackend`抽象 + **sherpa-onnx中文(Paraformer/SenseVoice)主 + WhisperKit fallback**;从 capabilities/state-cells 派生 **3 生成物** `hotwords.txt`(仅transducer模型)/`pinyin_lexicon.json`(Apple CFStringTransform封闭词表)/`asr_noisy_pairs.jsonl`;**端侧不跑 post-ASR LLM 纠错** | 热词(transducer-only可选门,Paraformer路线不依赖) / iPhone真机延迟实测 |
 
 > **实现回潮硬约束（§5.1 重申，写进 capabilities/dispatch）**：编排/多步 state 必须在 code，模型单次只产单跳 ToolCallFrame，禁 model 自由决定 next-tool。
-> **demo-scenarios.yaml 现状**：当前是 interim（generalization 框架已对，但需补 C6 字段 schema `expected_tool_calls/expected_state_delta/expect_no_call/failure_class` + 路由路径标注）→ C4/C6 apply 时重写。
+> **demo-scenarios.yaml 现状**：当前是 interim/C6-seed（generalization 框架已对，但需补 C6 字段 schema `input_zh/expected_tool_calls/expected_state_delta/expect_no_call/failure_class` + 路由路径标注）→ C4/C6 apply 时重写。`verify_demo_scenarios` 已加最小门(防悬空+防退回规则脚本)。
+
+## 12.1 跨厂商三审 deferred_gates（2026-06-20；C3-C7 实装时机器守，非 C1/C2 archive-blocker）
+
+> 来源：Claude 自审 + Codex 二审 + GPT Pro 三审，**已过项目现实 filter**（内部演示 demo + 人在场 + 自训数据 + 轻治理，见 memory `maformac-internal-demo-audit-filter`）。license/demo-FAQ 两条已降级（见末）。
+
+- **C3 single-call runtime contract（Tiger，必实装）**：runtime 只接受 exactly 1 ToolCallFrame 或 1 NoAction/Clarify；多 tool_call / 额外文本 / 缺必填 / unknown enum / stale `state_revision` / finish_reason=length → **reject/clarify，不 repair-to-action**（Qwen3 原生多步，单跳靠这层强制非模型自觉）。
+- **C3 gate 链**：schema(字段/enum/range)→semantic(工具当前 state 可执行?)→precondition(AC off 时"升温"=code 转 turn_on+set_temp，非模型决定)→stale-state(带 `state_revision`)→**fail-closed**(parser repair 只修格式，repair 后仍过 semantic gate；repair_rate 超阈判模型 failed)。
+- **C4 路由**：multi-intent **code 确定性 splitter/clarification**（"顺手说一句"高频，code 拆非 model loop）；模型只看 **code 派生 state features**(comfort_state/active_zone/available_single_actions/last_action/state_revision)，非全量态自推。
+- **C5 数据**：失败步 train_on_turn=false，但**下轮 assistant apology/clarify/no-op 必须训**(学恢复)；templated 加同形 negative/minimal pair；asr_noisy 从选定 backend **真实 confusion log** 生成(非纯合成)。
+- **C6 评测**：ToolCall 集合匹配 + 空匹配拒识 + **兜底回复语正确性**(OOD/暂不支持优雅引导，用 3990 回复语清单) + (轻量) audio→ASR→intent→state E2E + latency/repair_rate。
+- **C7 voice**：demo-mode preflight(PTT 非常开/预授麦权/不录 TTS 回灌/preload 单 ASR backend 不同时 load sherpa+WhisperKit/每轮显示"我听到的是:xxx"便救场)；mock state machine 契约 `ToolCall→StateTransition→VisualEffect→SpokenAck`(视觉态可信=销售演示价值)。
+
+**🟢 已降级（过项目现实 filter，非 gate；磊哥 2026-06-20 校准）**：
+- **home-llm license**：MAformac **内部演示 demo（非销售产品）** + 只 adopt **方法/pattern** + 训**自有数据**(3990/bug)，**不 ship home-llm weights/datasets/模板**。CC BY-NC-4.0 对内部 demo 非 blocker，**能吸收尽量吸收**；未来变商用再 review。
+- **demo-success FAQ 系统**：产品问答/量产对比/座舱亮点叙事 = **人(方案经理在场)担**，非 demo 工具；兜底=人 + 3990 回复语清单。**不建独立 FAQ/sales 系统**。

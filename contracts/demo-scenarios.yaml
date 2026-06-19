@@ -17,6 +17,11 @@ meta:
   narrative: 混合框架（轻量「现场体验座舱助手」背景 + 每幕独立可跳 + 维度易→难递进 + 安全门 climax）
   driven_by: lora_generalization            # 非 rule_matching
   feeds: [c5_lora_train_seed, c6_demo_must_pass_eval]
+  # ⚠️ 状态: C6 seed / interim — 非已闭合 contract(跨厂商审计 2026-06-20 防"reviewed 候选伪装闭合")。
+  #    待 C4/C6 apply 补: ① routing-aware(每幕标 快规则/慢Qwen 路径 + clarifyTag)
+  #    ② C6 字段 schema(input_zh / expected_tool_calls / expected_state_delta / expect_no_call / failure_class)
+  #    ③ scenario_required cell 回填 state-cells。现仅作 LoRA/C6 种子 + 引用绑定验证(verify_demo_scenarios 最小门)。
+  status: c6_seed_interim
   variants_note: utterance_variants 为泛化示例 + LoRA 种子, 非匹配白名单; 现场话术即兴, 模型泛化
   # demo 初始 mock 端态（每幕可在 initial_state 覆盖）
   initial_state_default:

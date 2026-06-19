@@ -29,6 +29,7 @@ STATE_CELLS_YAML = CONTRACTS_DIR / "state-cells.yaml"
 MANIFEST_YAML = CONTRACTS_DIR / "source-snapshot-manifest.yaml"
 L1_ALLOWLIST_YAML = CONTRACTS_DIR / "l1-demo-allowlist.yaml"
 RISK_POLICY_YAML = CONTRACTS_DIR / "risk-policy.yaml"
+DEMO_SCENARIOS_YAML = CONTRACTS_DIR / "demo-scenarios.yaml"
 
 UNRESOLVED_LIMIT = 0.02
 FORBIDDEN_SUBSTRINGS = [
@@ -149,7 +150,7 @@ def verify_range_classification(rows: list[dict[str, Any]]) -> None:
 
 
 def verify_leak_scan() -> None:
-    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML, RISK_POLICY_YAML]
+    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML, RISK_POLICY_YAML, DEMO_SCENARIOS_YAML]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         for marker in FORBIDDEN_SUBSTRINGS:
@@ -346,6 +347,62 @@ def verify_risk_policy() -> int:
     return len(levels)
 
 
+def verify_demo_scenarios(rows: list[dict[str, Any]], transitions: list[dict[str, Any]]) -> int:
+    """demo-scenarios.yaml 最小校验(C6 seed/interim).
+
+    现为 C6 seed(routing-aware 重写 + C6 字段 schema 待 C4/C6 apply),本门只:
+    - driven_by==lora_generalization(防退回规则脚本)
+    - 引用不悬空: c1_ref/precondition_action.device ∈ C1; state_cell(s)/state_read ∈ C2; followup_transition ∈ C1 followup
+    - utterance_variants 非空(LoRA/C6 seed)
+    不强制完整 contract(那是 C4/C6 的活)。
+    """
+    spec = safe_load_yaml(DEMO_SCENARIOS_YAML)
+    meta = spec.get("meta", {})
+    if meta.get("driven_by") != "lora_generalization":
+        raise C1Error("demo-scenarios: meta.driven_by must be 'lora_generalization' (非规则脚本)")
+    c1_devices = {row["device"] for row in rows}
+    c2_cells = _state_cell_ids()
+    transition_ids = {t["transition_id"] for t in transitions}
+    scenes = spec.get("scenes", [])
+    if not scenes:
+        raise C1Error("demo-scenarios: no scenes")
+
+    def chk_dev(ref: Any, ctx: str) -> None:
+        for r in (ref if isinstance(ref, list) else [ref]):
+            dev = r.get("device") if isinstance(r, dict) else None
+            if dev and dev not in c1_devices:
+                raise C1Error(f"demo-scenarios: {ctx} c1_ref device {dev!r} not in C1 contract")
+
+    def chk_cells(cells: Any, ctx: str) -> None:
+        for c in (cells if isinstance(cells, list) else [cells]):
+            if c not in c2_cells:
+                raise C1Error(f"demo-scenarios: {ctx} state cell {c!r} not in state-cells")
+
+    beats = 0
+    for sc in scenes:
+        sid = sc.get("id", "?")
+        units = (sc.get("beats") or []) + (sc.get("turns") or [])
+        if not units:
+            raise C1Error(f"demo-scenarios: scene {sid} has no beats/turns")
+        for u in units:
+            beats += 1
+            ctx = f"scene {sid}"
+            if "c1_ref" in u:
+                chk_dev(u["c1_ref"], ctx)
+            if "precondition_action" in u:
+                chk_dev(u["precondition_action"], ctx)
+            for key in ("state_cell", "state_cells", "state_read"):
+                if key in u:
+                    chk_cells(u[key], ctx)
+            ft = u.get("followup_transition")
+            if ft and ft not in transition_ids:
+                raise C1Error(f"demo-scenarios: {ctx} followup_transition {ft!r} not in C1 followup")
+            uv = u.get("utterance_variants")
+            if not isinstance(uv, list) or not uv:
+                raise C1Error(f"demo-scenarios: {ctx} utterance_variants must be non-empty (LoRA/C6 seed)")
+    return beats
+
+
 def main() -> int:
     manifest = load_manifest()
     rows = read_jsonl(CONTRACT_JSONL)
@@ -363,6 +420,7 @@ def main() -> int:
         l1_count = verify_l1_closure(rows)
         l1_line = f" l1_closure=ok (L1_rows={l1_count})"
     risk_levels = verify_risk_policy()
+    demo_beats = verify_demo_scenarios(rows, transitions)
     print("schema=ok")
     print("refs=ok")
     print("ledger=ok")
@@ -370,6 +428,7 @@ def main() -> int:
     print("coverage=ok")
     print(f"state_cells=ok (c1_c2_closure={state_cells_closure}){l1_line}")
     print(f"risk_policy=ok (levels={risk_levels})")
+    print(f"demo_scenarios=ok (beats={demo_beats}, status=C6-seed)")
     return 0
 
 

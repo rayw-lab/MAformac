@@ -13,13 +13,13 @@
 - [x] 2.4 [CC定/codex] clarifyTag + `semantic-followup-transitions.jsonl`(两端引用校验)。**验收** unresolved≤2%
 
 ## 3. C1 治理产物(magnet reviewed)
-- [ ] 3.1 [CC定] `risk-policy.yaml`:`Rn→{asil_origin,demo_action,confirm_timeout_s,source}`,收 ASIL/forbidden 双轨,**注明 demo 豁免 ISO26262、二次确认=炸场效果**。**验收** 每 risk 有 mapping
+- [x] 3.1 [CC定] `risk-policy.yaml`(**standalone 政策,2026-06-20**):R0/R1/R2 + forbidden 三级 + demo_action/confirm_timeout_s,**注明 demo 豁免 ISO26262、二次确认=炸场效果**。`verify_risk_policy` 校验(levels=3)✅。**T2 耦合 deferred**:C1 源行 risk 字段仍全空(行级 risk 派生需同刀改 gen_c1+verify,见 memory `maformac-c1c2-coupled-change-T2`),C3/C4 实装时回填
 - [x] 3.2 [**magnet reviewed**] `l1-demo-allowlist.yaml`:磊哥拍炸点(纵切批 ac_temperature/window reviewed + transition_id 绑定;横铺批 screen/ambient/safety scope reviewed pending C2),粒度 `device+primitive+execution_range_cell+required_followup_transitions`。**验收** review_status=reviewed;C1 的 L1 从它派生(非手写)✅
 - [x] 3.3 [CC定/codex] exec_tier 挂源行,L1 派生自 allowlist(`gen_c1.apply_l1_allowlist`)。**验收** C1 的 L1 行集 ≡ allowlist 展开集(双向,`verify_l1_closure`,76 L1 行)✅。risk 仍全空(risk-policy task 3.1 未做)
 
 ## 4. C2 场景端态协议
-- [ ] 4.1 [CC定/codex] `state-cells.yaml`:三源并集(L1_device ∪ scenario_required ∪ safety),`execution_range` 权威,状态模型 = **3 生命周期态(`state_kinds`: 空 empty / 有值 known / 未知 unknown)+ `default`(初始默认, 如 off/P)+ 业务枚举(`values`: on/off、opening/closing…)** 三者分离不混;"关闭"= 业务值非独立态。**验收** 每 cell 满足某 allowlist 需求或场景/安全需求
-- [ ] 4.2 [**magnet reviewed**] `demo-scenarios.yaml`:初始态 + 触发话术绑定(磊哥定场景)。**验收** 覆盖 5 幕 + L1 readback/多轮/参数规划
+- [x] 4.1 [CC定/codex] `state-cells.yaml`:三源并集(L1_device ∪ scenario_required ∪ safety),`execution_range` 权威,状态模型 = **3 生命周期态(`state_kinds`: 空 empty / 有值 known / 未知 unknown)+ `default`(初始默认, 如 off/P)+ 业务枚举(`values`: on/off、opening/closing…)** 三者分离不混;"关闭"= 业务值非独立态。横铺 2026-06-20 补 screen + ambient_light cells(§28 grounded:screen service=cmd,ambient=carControl)。**验收** 每 cell 满足某 allowlist/场景/安全需求 ✅。⚠️ 3 个 demo-decided 值待 magnet 拍(brightness 0-100 / exp_step 10 / ambient 8 命名色)——demo 取值非协议一手源,已 flag
+- [x] 4.2 [**magnet reviewed**] `demo-scenarios.yaml`(**C6-seed interim,非闭合 contract**):泛化 showcase 规格(非规则脚本),5 幕 9 beats,每幕意图类 + 话术变体(泛化种子非匹配白名单)+ C1/C2 引用绑定。`verify_demo_scenarios` 最小门(防悬空+防退回规则脚本+driven_by=lora_generalization)✅。**C4/C6 apply 时重写**:补 routing-aware(快规则/慢Qwen 路径标注)+ C6 字段 schema(input_zh/expected_tool_calls/expected_state_delta/expect_no_call/failure_class)+ scenario cell 回填
 - [ ] 4.3 [CC定] 脱敏参考映射(可选):「字段语义→cell」,禁来源方/车型/责任方/上传频率。**验收** 无客户标识
 - [x] 4.4 [CC定] 接口:C1 `execution_range_ref` 按 exec_tier 分级(L1 concrete 落 C2 cell / L2 none)。**验收** L1 必 concrete 且 ref 落 C2 存在 cell、L2 ref 空(`verify_l1_closure` 校验)✅
 
@@ -30,7 +30,7 @@
 
 ## 6. supersede + 基建文档级联
 - [ ] 6.1 [CC] `vehicle-capabilities` 标 superseded(delta 已写,archive 时合并)
-- [ ] 6.2 [CC] 基建文档级联:CLAUDE.md(§2 路线/§4 架构/§5 决策 D16/D30/D35/D37/范围纠错 18-32·1-10)、decisions、docs/README、lessons-learned §E/§F、collaboration §7、MEMORY.md/memory。**验收** 无文档仍指旧 8 能力/二分路由/旧范围
+- [x] 6.2 [CC] 基建文档级联:权威文档(CLAUDE.md §2/§4/§5/§9、docs/README 权威表、SRD、design.md、proposal.md)全部正确框「旧 8 能力扁平+二分路由被推翻 → C1/C2 SSOT」+ 范围纠错(18-32 / 1-10);candidate 文档(demo-must-pass-candidate)带 SUPERSEDED_BY_C1C2 banner;D14 ASR sync。**验收** 无权威文档仍指旧口径 ✅;残留命中仅在 dated 历史快照(second-review-2026-06-17/、repo-intelligence/、archive/、lessons-learned 引归档 change)——这些是快照不改。`research/home-llm-teardown` 一处描述 teardown 时旧 capabilities 状态,非权威,低优
 
 ## 7. 验证(纵切先行,甲-混 + Superpowers verification)
 - [x] 7.1 [CC] 纵切 `空调温度`(ac_temperature→ac.temp_setpoint)+`车窗`(window→window.position)贯穿全栈验接口。**验收** 两设备 C1 L1→execution_range_ref→C2 cell 闭环(76 L1 行)、make verify 绿 ✅
