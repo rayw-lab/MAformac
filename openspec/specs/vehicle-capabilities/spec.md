@@ -3,38 +3,13 @@
 ## Purpose
 TBD - created by archiving change define-capability-contract. Update Purpose after archive.
 ## Requirements
-### Requirement: 能力定义有唯一权威源
-系统 SHALL 以唯一权威源定义所有车控能力;tool schema / UI 卡片数据 / eval fixture / 训练数据 / trace schema 等 SHALL 全部从该权威源派生,不存在第二处人工维护的能力定义。
+### Requirement: 车控能力契约已迁移至 C1/C2(本能力降为指针)
 
-#### Scenario: 派生物与权威源一致
-- **WHEN** 生成 tool schema 或 UI 卡片数据
-- **THEN** 其内容与权威源一致,无第二处人工维护源
+旧扁平 8 能力被全部 REMOVE 后,`vehicle-capabilities` 能力 SHALL 仅作为指向新事实源的指针:其行为契约全部由 `semantic-function-contract`(C1,源行级全集语义 SSOT)与 `scenario-state-protocol`(C2,场景端态)承载。下游消费方(模型/规则/UI/eval/LoRA 数据)MUST 引用 C1/C2,不得再以扁平 `capabilities.yaml` 为事实源。
 
-### Requirement: 每条车控能力声明口语别名
-每条车控能力 SHALL 声明中文别名(口语变体);归一化层 SHALL 据此将口语说法回收到规范能力。
+#### Scenario: 下游查询车控能力的行为契约
 
-#### Scenario: 别名归一
-- **WHEN** 用户说出能力的口语变体(如「散热座椅」「空调座椅」)
-- **THEN** 系统归一到规范能力(座椅通风)
-
-### Requirement: 每条能力声明 mock 执行与 readback
-每条车控能力 SHALL 声明 mock 执行行为(改哪个状态)与 readback 规则;执行后系统 SHALL 读回实际 mock 状态再播报。
-
-#### Scenario: 执行改状态并读回
-- **WHEN** 一条能力被执行
-- **THEN** 对应状态更新,系统读回该值用于播报
-
-### Requirement: 危险或带范围能力声明 demo_guard
-带数值范围、枚举或风险的能力 SHALL 声明 demo_guard(风险等级 / 确认策略 / 范围 / 前置条件);超出该能力声明范围的值 SHALL 被拒绝。
-
-#### Scenario: 越界被 guard 拒绝
-- **WHEN** 能力收到超出其声明范围的参数
-- **THEN** demo_guard 拒绝执行,不修正不猜测,转澄清或拒识
-
-### Requirement: MVP 车控能力集覆盖 5 幕演示
-系统 SHALL 提供覆盖 5 幕演示的 MVP 车控能力集:空调(开关 + 温度 + 升降温)/ 座椅加热 / 座椅通风 / 车窗百分比 / 氛围灯 / 屏幕亮度 / 风量 / 舒适状态查询。降噪由车机底层(ECNR)自动承担,不属车控能力集。
-
-#### Scenario: 5 幕能力可达
-- **WHEN** 演示走 5 幕话术(基础控制 / 我有点冷 / 我头疼 / 断网 / 场景炫)
-- **THEN** 所涉车控能力(空调 / 座椅加热 / 屏幕亮度 / 氛围灯 / 车窗等)均在能力集内
+- **WHEN** 任意下游产物需要车控能力的行为契约
+- **THEN** 解析对象为 `semantic-function-contract`(C1)+ `scenario-state-protocol`(C2)
+- **AND** 旧扁平 8 能力 `capabilities.yaml` 不作为事实源(仅历史参考)
 

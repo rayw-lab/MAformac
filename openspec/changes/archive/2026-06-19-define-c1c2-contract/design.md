@@ -57,7 +57,7 @@
 
 ## Migration Plan
 
-1. supersede:新 `semantic-function-contract` spec ADDED + `vehicle-capabilities` 标 superseded(archive 不动)。
+1. supersede:新 `semantic-function-contract`+`scenario-state-protocol` spec ADDED;`vehicle-capabilities` 旧 5 Requirement REMOVED + 加 1 墓碑 Requirement(降为指向 C1/C2 的指针,非清空——OpenSpec 不许空 spec)。
 2. 冻结快照:`freeze` 脚本(校验 dimension/合并/schema → 写快照 + content_digest + manifest)→ codegen 从快照派生。
 3. rollback:git revert;`_parked/` 旧 change 不动(随时可 rebase)。
 4. C3–C7 rebase 触发:本 change apply+archive 后,按 `_parked/README` 复用度逐个移回。
