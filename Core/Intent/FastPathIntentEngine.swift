@@ -15,14 +15,12 @@ public struct FastPathIntentEngine: Sendable {
 
         return ToolCallFrame(
             agentID: "vehicle-control",
-            capabilityID: "vehicle.ac.toggle",
-            toolName: "set_vehicle_control",
-            arguments: [
-                "state_key": "hvac.ac",
-                "target_state": "on"
+            capabilityID: "cabin.ac",
+            toolName: "set_cabin_ac",
+            stringArguments: [
+                "power": "on"
             ],
             surfacePolicy: .primaryPanel
         )
     }
 }
-

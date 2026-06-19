@@ -119,6 +119,16 @@ public final class DemoVehicleStateStore {
         )
     }
 
+    public func readback(for key: String) -> DemoActionReadback {
+        let cell = cellsByKey[key] ?? DemoVehicleStateCell(key: key, actualValue: "unknown", availability: .unknown)
+        return DemoActionReadback(
+            key: cell.key,
+            actualValue: cell.actualValue,
+            revision: cell.revision,
+            spokenText: Self.spokenText(for: cell)
+        )
+    }
+
     public func reset() {
         cellsByKey = Dictionary(uniqueKeysWithValues: Self.defaultCells().map { ($0.key, $0) })
     }

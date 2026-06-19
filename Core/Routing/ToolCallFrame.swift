@@ -52,7 +52,7 @@ public struct ToolCallFrame: Codable, Equatable, Sendable, Identifiable {
     public var agentID: String
     public var capabilityID: String
     public var toolName: String
-    public var arguments: [String: String]
+    public var arguments: [String: JSONValue]
     public var surfacePolicy: SurfacePolicy
 
     public init(
@@ -61,7 +61,7 @@ public struct ToolCallFrame: Codable, Equatable, Sendable, Identifiable {
         agentID: String,
         capabilityID: String,
         toolName: String,
-        arguments: [String: String],
+        arguments: [String: JSONValue],
         surfacePolicy: SurfacePolicy = .primaryPanel
     ) {
         self.id = id
@@ -72,5 +72,24 @@ public struct ToolCallFrame: Codable, Equatable, Sendable, Identifiable {
         self.arguments = arguments
         self.surfacePolicy = surfacePolicy
     }
-}
 
+    public init(
+        id: String = UUID().uuidString,
+        traceID: String = UUID().uuidString,
+        agentID: String,
+        capabilityID: String,
+        toolName: String,
+        stringArguments: [String: String],
+        surfacePolicy: SurfacePolicy = .primaryPanel
+    ) {
+        self.init(
+            id: id,
+            traceID: traceID,
+            agentID: agentID,
+            capabilityID: capabilityID,
+            toolName: toolName,
+            arguments: stringArguments.mapValues { .string($0) },
+            surfacePolicy: surfacePolicy
+        )
+    }
+}

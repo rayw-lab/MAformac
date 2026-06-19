@@ -79,10 +79,23 @@ final class CapabilityContractFileTests: XCTestCase {
     }
 
     private func matches(_ pattern: String, in text: String) -> [String] {
-        (try? NSRegularExpression(pattern: pattern))?.matches(
+        let regex: NSRegularExpression
+        do {
+            regex = try NSRegularExpression(pattern: pattern)
+        } catch {
+            XCTFail("invalid regex \(pattern): \(error)")
+            return []
+        }
+
+        return regex.matches(
             in: text,
             range: NSRange(text.startIndex..., in: text)
-        ).map { String(text[Range($0.range, in: text)!]) } ?? []
+        ).compactMap { match in
+            guard let range = Range(match.range, in: text) else {
+                return nil
+            }
+            return String(text[range])
+        }
     }
 
     private func firstCapture(_ pattern: String, in text: String) throws -> String {
