@@ -10,7 +10,7 @@ meta:
   scope: zh-only
   # source_kind 防"三份权威漂移"(C1语义 / C2执行 / 旧样板)
   source_kind_enum: [c2_demo_decision, protocol_reference, dianpoint_reference]
-  # 生命周期四态词表(统一); 业务取值放各 cell 的 values, 不混进 state_kinds
+  # 生命周期态词表(3 态 empty/known/unknown); 业务取值放各 cell 的 values, 不混进 state_kinds
   state_kinds_vocab: [empty, known, unknown]
   # 数值边界来源说明(§28 已核: 4 协议表+打点表均不含硬边界)
   range_authority_note: >-

@@ -166,7 +166,7 @@ def verify_leak_scan() -> None:
 
 
 def verify_state_cells() -> str:
-    """C2 内部门: schema / source_kind / 数值 range / 四态不混业务枚举 / readback 引用。
+    """C2 内部门: schema / source_kind / 数值 range / 生命周期态不混业务枚举 / readback 引用。
 
     C1↔C2 闭合(execution_range_ref + allowlist 闭合)现阶段显式 deferred,
     不在此假装校验(C1 execution_range_ref 全空 + l1-demo-allowlist 未建)。
@@ -189,7 +189,7 @@ def verify_state_cells() -> str:
         cid = cell["id"]
         if cell["source_kind"] not in source_kind_set:
             raise C1Error(f"state-cells: {cid} bad source_kind {cell['source_kind']!r}")
-        # state_kinds 必填且只能取生命周期词表(四态 vs 业务枚举分离, 不混 on/off/opening)
+        # state_kinds 必填且只能取生命周期词表(生命周期态 vs 业务枚举分离, 不混 on/off/opening)
         sk = cell.get("state_kinds")
         if not isinstance(sk, list) or not sk:
             raise C1Error(f"state-cells: {cid} missing/empty state_kinds")
