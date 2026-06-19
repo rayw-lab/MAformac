@@ -54,7 +54,7 @@ devices:
     display_zh: 空调温度
     state_cell: hvac.temperature
     value_type: int
-    range: { min: 18, max: 32, unit: celsius, step: 1, source: 端态打点AH8 }   # 我之前拍16-30错,真值18-32
+    range: { min: 18, max: 32, unit: celsius, step: 1, source: 端态打点 }   # 我之前拍16-30错,真值18-32
     related_state_cells: [hvac.ac]
     positions: [主驾, 副驾, 全车]
     primitives: [increase_by_exp, decrease_by_exp, increase_by_number, decrease_by_number, adjust_to_number, adjust_to_max, adjust_to_min, adjust_to_gear, query]

@@ -34,4 +34,4 @@
 
 ## 7. 验证(纵切先行,甲-混 + Superpowers verification)
 - [x] 7.1 [CC] 纵切 `空调温度`(ac_temperature→ac.temp_setpoint)+`车窗`(window→window.position)贯穿全栈验接口。**验收** 两设备 C1 L1→execution_range_ref→C2 cell 闭环(76 L1 行)、make verify 绿 ✅
-- [ ] 7.2 [CC] Superpowers verification-before-completion:make verify 全绿 + 纵切闭环 + 脱敏 0 命中 + 覆盖率守恒,才算 C1/C2 可 apply 完成
+- [x] 7.2 [CC] Superpowers verification-before-completion:`make verify` 全绿(exit 0,含 diff 门)+ 纵切闭环(76 L1 行)+ 脱敏 0 命中 + 覆盖率守恒 ✅(2026-06-20)。archive 前再过 CC subagent 对抗审计

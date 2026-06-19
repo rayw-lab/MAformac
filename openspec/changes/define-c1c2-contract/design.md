@@ -62,8 +62,8 @@
 3. rollback:git revert;`_parked/` 旧 change 不动(随时可 rebase)。
 4. C3–C7 rebase 触发:本 change apply+archive 后,按 `_parked/README` 复用度逐个移回。
 
-## Open Questions(apply 前需磊哥拍 / 现场核)
+## Open Questions —— ✅ apply 阶段已全部 resolved(2026-06-20 回填)
 
-- **C2 端态一手源**:`工作簿1.xlsx` 是量产上传清单(非 demo 场景态),demo 场景 cell 由磊哥定哪些(C2 是原创 mock,不复刻量产)。
-- **L1 allowlist ~10 炸点最终名单**:磊哥拍(reviewed,不可机器派生)。
-- **冻结快照落点**:`raw/05-Projects/MAformac/source-snapshots/` 下 4 张表的 content_digest 待 freeze 脚本生成。
+- **C2 端态一手源**:✅ 已定。C2 是原创 mock(不复刻量产);`state-cells.yaml` 三源并集(L1_device ∪ scenario_required ∪ safety),demo 场景 cell 已建(含横铺 screen/ambient)。3 个 demo-decided 取值(brightness/exp_step/ambient 色)已 flag 待 magnet 拍(非协议一手源)。
+- **L1 allowlist ~10 炸点最终名单**:✅ magnet reviewed(`l1-demo-allowlist.yaml` `reviewed_by: magnet`),C1 的 L1 行集从它派生(76 行,三向闭合)。
+- **冻结快照落点**:✅ freeze 脚本已跑,4 张 C1 金钥匙表 content_digest 入 `source-snapshot-manifest.yaml`(source_rows=3990)。C2 端态源仍按 open question 留空(原创 mock,无需冻结量产表)。
