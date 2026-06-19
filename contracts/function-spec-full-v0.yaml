@@ -1,0 +1,105 @@
+# MAformac 功能清单全集 v0 — 单一事实源(SSOT)
+# 内化自基座(某车厂语义四级协议,脱敏:只留 intent 协议骨架,不含原始语料/客户标识)。
+# 设计:device × action-primitive × slot 三元分解(USPTO/Alexa 范式)+ value 四件套。
+# 用途:① codegen → tool schema(Qwen 原生格式)+ 规则查表 + LoRA 训练 schema + E2E bench
+#       ② 范围/步长对齐端态打点真值(非拍脑袋)
+# 状态:v0 模板(空调+座椅样板手工定);其余 device 由 codex 从基座 digest 全量生成(见 P0 dispatch)。
+
+version: 0
+source_of_truth: contracts/function-spec-full-v0.yaml
+redaction: intent协议骨架入仓 / 原始中文语料LoRA训练用不入仓(红线)
+
+# ── 归一化动作原语(12;基座 ~114 编码 → 12 原语)──
+# 每个 device 适用其中一个子集 = 该 device 的 intent 集。取代"每设备一个平铺 tool"。
+action_primitives:
+  power_on:          { base_code: activate_instant_device,        value: null, trigger_zh: "打开X" }
+  power_off:         { base_code: deactivate_instant_device,      value: null, trigger_zh: "关闭X" }
+  increase_by_exp:   { base_code: increase_value_little,  value: { ref: CUR,  direct: "+", offset_enum: [LITTLE, MORE], type: EXP },  trigger_zh: "X高一点 / 有点冷(感受词)" }
+  decrease_by_exp:   { base_code: decrease_value_little,  value: { ref: CUR,  direct: "-", offset_enum: [LITTLE, MORE], type: EXP },  trigger_zh: "X低一点 / 有点热" }
+  increase_by_number:{ base_code: increase_value_by_specific_value, value: { ref: CUR,  direct: "+", offset: "<N>", type: SPOT }, trigger_zh: "X高N度/N挡" }
+  decrease_by_number:{ base_code: decrease_value_by_specific_value, value: { ref: CUR,  direct: "-", offset: "<N>", type: SPOT }, trigger_zh: "X低N度/N挡" }
+  adjust_to_number:  { base_code: adjust_value_to_specific_value,  value: { ref: ZERO, direct: "+", offset: "<N>", type: SPOT }, trigger_zh: "X调到N度/N挡(绝对)" }
+  adjust_to_max:     { base_code: adjust_value_to_max,    value: { ref: ZERO, direct: "+", offset: MAX, type: EXP },  trigger_zh: "X调到最高/最大" }
+  adjust_to_min:     { base_code: adjust_value_to_min,    value: { ref: ZERO, direct: "+", offset: MIN, type: EXP },  trigger_zh: "X调到最低/最小" }
+  adjust_to_gear:    { base_code: adjust_value_to_gear,   value: { ref: ZERO, direct: "+", offset_enum: [HIGH, MIDDLE, LOW], type: EXP }, trigger_zh: "X调到高/中/低挡" }
+  by_percent:        { base_code: adjust_value_to_percent, value: { ref: ZERO, direct: "+", offset: "<pct>", type: PERCENT }, trigger_zh: "X调到N%(车窗等)" }
+  set_mode:          { base_code: open_mode,              value: { mode: "<enum>" }, trigger_zh: "X设为<模式>" }
+  set_color:         { base_code: switch_color,           value: { color: "<enum>" }, trigger_zh: "换X颜色 / 大海颜色(开放词)" }
+  query:             { base_code: check_status_or_information, value: null, readonly: true, trigger_zh: "X多少 / 查X" }
+
+# ── clarifyTag 路由标记(意图收缩,业内 FC 手册)──
+clarify_tags: [explicit, implicit, ambiguous, rejected, passthrough]
+# explicit→规则直执行 / implicit→意图收缩→FC泛化 / ambiguous→反问 / rejected→拒识兜底 / passthrough→继承上轮(多轮)
+
+# ── 执行分层(不丢脸架构)──
+exec_tiers: { L1: 精做炸点, L2: 通用mock兜底, L3: 越界延后, L4: 安全门 }
+
+# ── device 清单(样板:空调+座椅;其余由 codex 全量生成)──
+devices:
+  - id: cabin.ac.power
+    service: airControl
+    display_zh: 空调开关
+    state_cell: hvac.ac
+    value_type: enum
+    range: { enum: [on, off] }
+    positions: [主驾, 副驾, 全车]
+    primitives: [power_on, power_off]
+    clarify_examples: { explicit: "打开空调", passthrough: "副驾也打开" }
+    exec_tier: L1
+    risk: R0
+    priority: 高
+
+  - id: cabin.ac.temperature
+    service: airControl
+    display_zh: 空调温度
+    state_cell: hvac.temperature
+    value_type: int
+    range: { min: 18, max: 32, unit: celsius, step: 1, source: 端态打点AH8 }   # 我之前拍16-30错,真值18-32
+    related_state_cells: [hvac.ac]
+    positions: [主驾, 副驾, 全车]
+    primitives: [increase_by_exp, decrease_by_exp, increase_by_number, decrease_by_number, adjust_to_number, adjust_to_max, adjust_to_min, adjust_to_gear, query]
+    step_table: { exp_LITTLE: 1, exp_MORE: 2 }   # 执行层步长(demo 定,非LLM拍):有点冷→+1
+    clarify_examples:
+      explicit: "空调温度调到26度"        # adjust_to_number {ZERO,+,26,SPOT}
+      implicit: "有点冷"                  # increase_by_exp {CUR,+,LITTLE,EXP} → 读端态+步长
+      passthrough: "再高一点"             # 多轮继承
+    exec_tier: L1
+    risk: R0
+    priority: 高
+
+  - id: cabin.ac.fan
+    service: airControl
+    display_zh: 空调风速
+    state_cell: hvac.fan
+    value_type: int
+    range: { min: 1, max: 10, unit: gear, step: 1, source: 端态打点 }   # 我之前拍0-5错,真值1-10
+    positions: [主驾, 副驾, 全车]
+    primitives: [increase_by_exp, decrease_by_exp, increase_by_number, decrease_by_number, adjust_to_number, adjust_to_max, adjust_to_min, adjust_to_gear, query]
+    clarify_examples: { implicit: "风太大了", explicit: "风速调到3挡" }   # badcase警示:风太大→降速非关风扇
+    exec_tier: L1
+    risk: R0
+    priority: 高
+
+  - id: cabin.ac.mode
+    service: airControl
+    display_zh: 空调模式
+    state_cell: hvac.mode
+    value_type: enum
+    range: { enum: [制冷, 制热, 自动, 除雾, 除霜, 内循环, 外循环] }   # 基座 mode 28种,demo 收敛代表集
+    primitives: [set_mode]
+    exec_tier: L1
+    risk: R0
+    priority: 中
+
+  - id: cabin.seat_heat
+    service: carControl
+    display_zh: 座椅加热
+    state_cell: "seat.{position}.heat"   # position-aware(GPT Pro catch 的 P0:不能写死 driver)
+    value_type: int
+    range: { min: 0, max: 3, unit: gear, source: 端态打点 }   # 关闭=0/1/2/3档
+    positions: [主驾, 副驾, 左后, 右后, 全车]
+    primitives: [power_on, power_off, increase_by_exp, decrease_by_exp, adjust_to_number, adjust_to_max, adjust_to_min, adjust_to_gear, query]
+    clarify_examples: { explicit: "座椅加热调到2挡", implicit: "屁股有点凉", passthrough: "副驾也开" }
+    exec_tier: L1
+    risk: R0
+    priority: 高

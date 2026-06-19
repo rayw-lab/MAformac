@@ -15,6 +15,22 @@
 | `voice-pipeline-from-raw.md` | **语音链路专题**(from raw):中文车控热词(promptTokens)+ SpeechTextNormalizer + 8 态机 + 800ms 延迟预算;**顶部有拍板对齐段** | ~350 |
 | `qwen3-engineering-notes.md` | **Qwen3 工程专题**:「能 tool call」是表层信号 + 4 隐藏层 + 10 条教训 + 外网/38repo + **change 3-6 硬约束** | ~130 |
 
+## 🔑 基座语义协议内化(2026-06-19,当前主线 · 索引)
+
+> 4 张某车厂金钥匙表(`~/Downloads/`:公版语义四级协议-编辑版 / 车控功能打点表 / 上下文二次交互功能清单 / 多语种展开V1,**只读不进仓**)深度消化 → MAformac 自有语义协议。**这是 LoRA 语料 + 功能清单 + E2E 基线的根。**
+
+| 文档 | 内容 | 用途 |
+|---|---|---|
+| `baseline-semantic-protocol-2026-06-19.md` | 基座消化:范式 7 要素(value 四件套 ref/direct/offset/type、归一化动作编码 ~114、二次交互矩阵、FC 分流标记)+ `capabilities.yaml` 逐项错对照 + 内化方案 | **语义协议范式权威** |
+| `maformac-function-spec-2026-06-19.md` | MAformac 功能清单 v0 + **§5 不丢脸架构**(L1 精做 / L2 通用 mock 兜底 / L3 越界 / L4 安全门 + LoRA 核心) | **功能清单 + 执行分层** |
+| `demo-must-pass-candidate-2026-06-19.md` | must-pass 必过集 candidate(扁平契约版,**待基于基座重做**) | E2E/验收(待重做) |
+| `baseline-internalization-plan-2026-06-19.md` ⭐ | **总方案**:业内怎么处理巨型表(scout 某车厂 FC 手册:意图收缩+三层路由+分层兜底+安全分级)+ oracle prior art(Hammer/xLAM/unsloth/vLLM-router/typia/outlines/xgrammar/MAC-SLU)+ 6 产物内化方案 + **实施 Roadmap P0-5** + **冻结决策整改清单** + Pre-Mortem 三分类 | **方案+roadmap+整改** |
+| `handoffs/2026-06-19-baseline-internalization.md` | 本波 handoff:重大认知 + 下一步 + 工件位置 | session 交接 |
+| `~/workspace/raw/00-Inbox/maformac-baseline-digest/` *(raw,不进仓)* | 基座 digest 工件 + 解析脚本(carControl 398 设备/975 intent + airControl 16/51 + cmd 257/512 全景);`python3 parse_devices.py` 可重建 | 全集解析工件 |
+
+> **核心认知**:客户随意说 2655+(甚至超出)→ 语义广听懂(LoRA 的核心价值)+ mock 执行分层兜底 = 不丢脸;功能清单 = **全集语义协议**(非 8 个窄 case)。
+> **进行中**:`/pre-mortem` 调研"业内怎么处理巨型协议表"(scout raw 一手做法 + oracle 业内 prior art)→ 待产出 **方案建议 + 实施 roadmap + 冻结决策整改清单**(codex 执行,CC 思考)。
+
 ## Decisions 状态总览(D1–D37)
 
 - 🔒 **已锁定(33)**:D1–D11(工程铁律)、D12–D18(磊哥 2026-06-17 裁决,见 v0.1 §12.1)、D19/D21–D29(部分)/D31–D34/D36

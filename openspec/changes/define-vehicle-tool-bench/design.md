@@ -35,7 +35,9 @@ eval 是 demo 可信度硬门。pre-mortem 料 `qwen3-engineering-notes §6`(eva
 - **泛化分层**:模糊说 ≥90% / 自由说 ≥80% / 上下文 ≤3 轮 ≥85% / 整体 ≥85%(PRD 阈值)。
 
 ### 统一 trace(Codex 04)
-每条 case 输出 `trace_id / route(fast|slow)/ parser_status / decode_status / guard_status / execution_status / readback`。
+每条 case 输出 `trace_id / route_kind / parser_status / decode_status / guard_status / execution_status / readback`。
+
+> **🔴 跨 change 对齐(2026-06-19,apply 前必改)**:原 `route(fast|slow)` 二分 → apply 时 MODIFIED 为 `route_kind` 多态(`rule_fast` / `rule_batch_fast` / `fc_fast` / `slow`),对齐 `define-intent-routing` 三层分流。否则 intent-routing 的 `rule_batch_fast`(规则批快路径,明确「不升慢」)会被二分误归慢路径 → 套错延迟预算(慢≤2500ms 而非快≤800ms)/ fixture expected 对不上 / 砸 must-pass=100% 死门。延迟预算按 `route_kind` 分档判。源:`define-intent-routing/proposal.md:41` + `tasks.md:48`。
 
 ## Risks / Trade-offs(pre-mortem,带来源)
 
@@ -43,7 +45,7 @@ eval 是 demo 可信度硬门。pre-mortem 料 `qwen3-engineering-notes §6`(eva
 - [3 次样本判不稳] → 每 case 10-20 次。源:同上(Qwen3:1.7B 边界稳定性需 10-20 次)。
 - [format 对 ≠ correctness] → 评分 correctness(tool_name/params)权重 > format。源:[AWS tau2](https://github.com/awslabs/agent-training-kit/blob/main/examples/tau2/README.md)。
 - [demo must-pass 死记非泛化] → 双维度(泛化集分层)。源:qwen3-notes §6 + voice-pipeline §5 泛化分层。
-- [慢路径混进快路径预算] → 每 case 标 `route: fast|slow`,快≤800ms/慢≤2500ms 分别判。源:brainstorm §5 延迟分路径。
+- [慢路径混进快路径预算] → 每 case 标 `route_kind`(见统一 trace 对齐注,非 fast|slow 二分),按档分判(快≤800ms / 慢≤2500ms)。源:brainstorm §5 延迟分路径。
 
 ## Migration Plan
 
