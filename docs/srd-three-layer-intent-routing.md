@@ -241,4 +241,21 @@
 - `define-intent-routing` change 的 design.md 以本文为源。
 - 改架构走 openspec change + 回写本文 + 更新 memory。
 
-> **本文未尽（待补）**：精读 `快慢思考切换信源依赖` + `智能体锁域机制与拒识策略` 补 §2/§3/§4 细节；合并 oracle 外部坑入 §9；起 `define-intent-routing` explore。
+> **待补状态（2026-06-19 更新）**：✅ 已精读 `快慢思考切换信源依赖`(1086行) + `多阶任务分类边界`/`MasterAgent`/`中枢` 等一手源（§1-§4 已 grounded）；✅ oracle 外部坑已合并 §9；✅ home-llm 蓝本已深拆（runtime+data，见 `docs/research/`）；✅ ASR 已决策（D14 改 sherpa）。**剩**：`define-intent-routing`(C4) explore 待起（用 spike E3 实测数据，不拍脑袋）。
+
+---
+
+## 12. 实装锚点（架构 → apply 的桥；每 C-change 据此 adopt，2026-06-19 跨厂商二审定）
+
+> 落地约定（Codex 二审 Q2）：**每个 C3-C7 change 的 `design.md` 加 `Research Inputs` 段，固定字段 `source_doc / adopted_rules / deferred_gates`**——把 research/teardown 的 findings 变成 change spec 里的 adopt 指令。不建 DB；`docs/research/INDEX.md` 是索引。
+
+| change | source_doc | adopted_rules（第一刀只吸这些，别整套搬） | deferred_gates |
+|---|---|---|---|
+| **C3 执行契约** | `research/2026-06-19-home-llm-teardown.md` | **5 执行策略字段**：`single_call=true`(模型单产单跳ToolCallFrame,无agent loop) / `parser_repair=true`(三层防御解析+fuzzy_json) / `normalize_in_code=true`(值归一化在code,模型用人类单位) / `constrained_decode=true`(GBNF/受限解码保格式) / `prewarm_on_state_change=true`(KV缓存预热,冷启动解药) | 流式提取(demo非流式够) / ReAct多步(砍) |
+| **C4 三层路由** | `srd`(本文) + `research/architecture-validity-deepdive.md` | 规则快路(L1明确) + 意图收缩(NLU弃权→慢路,clarifyTag) + 落域(车控域内设备定位) + 五判定器(needs_action/slot_ready/safety_gate/repair_path/subject_type) | 真编排/Planner(70B+,砍) |
+| **C5 LoRA 数据** | `research/2026-06-19-home-llm-teardown-data.md` | **manifest 5 桶**：`templated_actions`(3990协议) / `status_requests`(state-cells) / `refusals`(12000bug,already_state+not_available) / `failed_tool_calls`(12000bug,**失败步 train_on_turn=false**) / `asr_noisy_variants`(音近增强);模板随机参数泛化 + distractor落域 + 配比(templated最重) | LLM增广(synthesize式)二期 |
+| **C6 评测** | `research/INDEX.md` C6 段 + `evaluate.py` 拆解 | 落 `contracts/demo-scenarios.yaml`,每场景字段 `input_zh / expected_tool_calls / expected_state_delta / expect_no_call / failure_class`;判定=**ToolCall集合精确匹配 + 空匹配拒识(expect_no_call) + color式容差 + 失败分类**;per-checkpoint选最优 | 大规模覆盖率二期 |
+| **C7 voice** | `research/2026-06-19-asr-alignment-research.md`(含二审修正块) | **D14**:`ASRBackend`抽象 + **sherpa-onnx中文(Paraformer/SenseVoice)主 + WhisperKit fallback**;从 capabilities/state-cells 派生 **3 生成物** `hotwords.txt`(仅transducer模型)/`pinyin_lexicon.json`(Apple CFStringTransform封闭词表)/`asr_noisy_pairs.jsonl`;**端侧不跑 post-ASR LLM 纠错** | 热词(transducer-only可选门,Paraformer路线不依赖) / iPhone真机延迟实测 |
+
+> **实现回潮硬约束（§5.1 重申，写进 capabilities/dispatch）**：编排/多步 state 必须在 code，模型单次只产单跳 ToolCallFrame，禁 model 自由决定 next-tool。
+> **demo-scenarios.yaml 现状**：当前是 interim（generalization 框架已对，但需补 C6 字段 schema `expected_tool_calls/expected_state_delta/expect_no_call/failure_class` + 路由路径标注）→ C4/C6 apply 时重写。

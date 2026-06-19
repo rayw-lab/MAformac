@@ -6,7 +6,19 @@
 
 > ⚠️ **路线 v2(2026-06-19 全量重构,以此为准)**:旧 8 能力扁平契约 + 二分路由被基座内化推翻 → 契约 SSOT 重构 **`define-c1c2-contract`**(C1 `semantic-function-contract` + C2 `scenario-state-protocol`,propose done)。旧 7-change 已物理 park(`openspec/changes/_parked/`)。**路线/架构/决策以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-generated-full-contract-with-mixed-delivery.md` + `CONTEXT.md` 为准**;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**(保留作记录,不再据其执行)。范围真值纠错:空调温度 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 是拍错)。
 
-## 文档清单(按阅读顺序)
+## ⭐ 当前权威文档(v2,2026-06-19,以此为准)
+
+| 文档 | 是什么 |
+|---|---|
+| `CLAUDE.md` (§9) | 项目宪法 + 路线 v2 + 下一步 |
+| ⭐`docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA慢路 + §12 实装锚点) — **必读第一** |
+| `docs/research/INDEX.md` | 调研/teardown 索引 + 应用机制(架构验证6流/home-llm深拆/ASR选型/C5配方/C6评测) |
+| `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` | C1/C2 决策全料(Q1–Q15) |
+| `contracts/semantic-function-contract.jsonl`(C1) + `state-cells.yaml`(C2) + `risk-policy.yaml` | **契约 SSOT**(其余派生) |
+
+> 下方「文档清单 / 基座内化 / Decisions待拍 / ABC候选」多为 **v1 历史快照 + P0 调研归档**(部分被 v2 supersede),作上下文保留,**当前以上表为准**。
+
+## 文档清单(v1 调研/基座归档 · 部分被 v2 supersede)
 
 | 文档 | 内容 | 行数 |
 |---|---|---|
@@ -33,21 +45,20 @@
 > **核心认知**:客户随意说 2655+(甚至超出)→ 语义广听懂(LoRA 的核心价值)+ mock 执行分层兜底 = 不丢脸;功能清单 = **全集语义协议**(非 8 个窄 case)。
 > **进行中**:`/pre-mortem` 调研"业内怎么处理巨型协议表"(scout raw 一手做法 + oracle 业内 prior art)→ 待产出 **方案建议 + 实施 roadmap + 冻结决策整改清单**(codex 执行,CC 思考)。
 
-## Decisions 状态总览(D1–D37)
+## Decisions 状态总览(D1–D37 + Q1–Q15)
 
-- 🔒 **已锁定(33)**:D1–D11(工程铁律)、D12–D18(磊哥 2026-06-17 裁决,见 v0.1 §12.1)、D19/D21–D29(部分)/D31–D34/D36
-- 🟡 **待磊哥拍(4)**:
-  - **D20** 端侧多阶上限 → ⭐ ≤2 阶
-  - **D30** 训练栈 → ⭐ MLX-LM LoRA + Q4
-  - **D35** demo 必过集规模 → ⭐ 15–25 条精选
-  - **D37** demo 保留几个安全门 → ⭐ 全 8 项(五门可视化是卖点)
+- 🔒 **D1–D37 全锁**(D20/D30/D35/D37 已于 2026-06-17 拍板;权威见 `CLAUDE.md §5`)。
+- **v2 重审(2026-06-19)**:D16 端态 8→102 原子能力 P0 子集 / D30 adopt unsloth+Hammer+xLAM / D35 全集覆盖率双轴 bench / D37 risk-policy 单源 / **D14 ASR→sherpa-onnx 中文主+WhisperKit fallback+ASRBackend(跨厂商二审改)**。范围真值:空调 18-32℃ / 风量 1-10 档(旧 16-30/0-5 拍错)。
+- **Q1–Q15** = C1/C2 契约脑暴定稿(见 grill/ADR)。
+
+> ⛔ 下方「下一步候选 ABC / 基座内化进行中」为 v1 历史快照,**已 supersede**(当前路线见 `CLAUDE.md §9` + 上方权威文档表)。
 
 ## 关键已锁主线(speed-read)
 
 - 主线模型 = Qwen3-1.7B + LoRA(0.6B 仅作轻量备选;FoundationModels 因不可微调出局,留逃生口)
 - 规则吃 80% 高频车控,LLM 只碰 20% 模糊/跨域;**LoRA 必做**,只练「模糊说→跨域映射」
 - 端状态**自包含** = UI 卡片亮暗 + TTS 模拟(无外部系统方);执行=改卡片态+播报
-- 文本先行(开发顺序)+ ASR(WhisperKit)必交付;barge-in 首版按钮打断,VAD 二期
+- 文本先行(开发顺序)+ ASR 必交付;**ASR = sherpa-onnx 中文(Paraformer/SenseVoice)主 + WhisperKit fallback + ASRBackend 抽象**(D14 v2,2026-06-19 跨厂商二审改);barge-in 首版按钮打断,VAD 二期
 - 安全/记忆/barge-in 是 38-repo 盲区,需自建
 
 ## 边界声明
