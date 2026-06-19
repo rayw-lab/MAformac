@@ -27,6 +27,15 @@ public struct GeneratedReferenceBinding: Equatable, Sendable {
     public let allowedValues: [String]
 }
 
+public struct GeneratedStateTransform: Equatable, Sendable {
+    public let field: String
+    public let stateCell: String
+    /// When true and the field value equals "unchanged", skip writing this cell.
+    public let unchangedSkip: Bool
+    /// When true, apply ambient composite logic (power:on → write color; power:off → write "off").
+    public let ambientComposite: Bool
+}
+
 public struct GeneratedExecutionRule: Equatable, Sendable {
     public let connector: String
     public let mockBehavior: String
@@ -34,6 +43,8 @@ public struct GeneratedExecutionRule: Equatable, Sendable {
     public let relatedStateCells: [String]
     public let idempotent: Bool
     public let exclusiveBus: String
+    /// Declarative field→state_cell mapping for multi-cell mock transitions.
+    public let stateTransforms: [GeneratedStateTransform]
 }
 
 public struct GeneratedDemoGuardRule: Equatable, Sendable {
@@ -89,7 +100,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "hvac.ac",
                 relatedStateCells: ["hvac.temperature"],
                 idempotent: true,
-                exclusiveBus: "hvac"
+                exclusiveBus: "hvac",
+                stateTransforms: [GeneratedStateTransform(field: "power", stateCell: "hvac.ac", unchangedSkip: true, ambientComposite: false), GeneratedStateTransform(field: "target_temperature", stateCell: "hvac.temperature", unchangedSkip: false, ambientComposite: false)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",
@@ -122,7 +134,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "seat.driver.heat",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "seat_comfort"
+                exclusiveBus: "seat_comfort",
+                stateTransforms: [GeneratedStateTransform(field: "level", stateCell: "seat.driver.heat", unchangedSkip: false, ambientComposite: false)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",
@@ -155,7 +168,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "seat.driver.ventilation",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "seat_comfort"
+                exclusiveBus: "seat_comfort",
+                stateTransforms: [GeneratedStateTransform(field: "level", stateCell: "seat.driver.ventilation", unchangedSkip: false, ambientComposite: false)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",
@@ -188,7 +202,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "window.driver",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "window"
+                exclusiveBus: "window",
+                stateTransforms: [GeneratedStateTransform(field: "percent", stateCell: "window.driver", unchangedSkip: false, ambientComposite: false)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R1",
@@ -221,7 +236,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "lighting.ambient",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "lighting"
+                exclusiveBus: "lighting",
+                stateTransforms: [GeneratedStateTransform(field: "power", stateCell: "lighting.ambient", unchangedSkip: true, ambientComposite: true)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",
@@ -254,7 +270,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "screen.brightness",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "display"
+                exclusiveBus: "display",
+                stateTransforms: [GeneratedStateTransform(field: "percent", stateCell: "screen.brightness", unchangedSkip: false, ambientComposite: false)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",
@@ -287,7 +304,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "fan.speed",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "hvac"
+                exclusiveBus: "hvac",
+                stateTransforms: [GeneratedStateTransform(field: "level", stateCell: "fan.speed", unchangedSkip: false, ambientComposite: false)]
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",
@@ -320,7 +338,8 @@ public enum GeneratedCapabilityCatalog {
                 stateCell: "hvac.temperature",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "none"
+                exclusiveBus: "none",
+                stateTransforms: []
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R0",

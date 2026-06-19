@@ -119,6 +119,25 @@ public final class DemoVehicleStateStore {
         )
     }
 
+    /// Applies multiple state transitions atomically, returning readback for the primary cell.
+    /// Secondary cells are written but their readback is not returned.
+    /// This is the unique write entry point for multi-cell capabilities; immutability is preserved
+    /// by constructing new DemoVehicleStateCell values rather than mutating in place.
+    @discardableResult
+    public func applyMockTransitions(primary: DemoMockTransition, secondary: [DemoMockTransition]) -> DemoActionReadback {
+        for transition in secondary {
+            var cell = cellsByKey[transition.key] ?? DemoVehicleStateCell(key: transition.key, actualValue: "unknown")
+            cell.desiredValue = transition.desiredValue
+            cell.actualValue = transition.desiredValue
+            cell.source = transition.source
+            cell.revision += 1
+            cell.timestamp = Date()
+            cell.visualState = transition.desiredValue == "on" ? .satisfied : .normal
+            cellsByKey[transition.key] = cell
+        }
+        return applyMockTransition(primary)
+    }
+
     public func readback(for key: String) -> DemoActionReadback {
         let cell = cellsByKey[key] ?? DemoVehicleStateCell(key: key, actualValue: "unknown", availability: .unknown)
         return DemoActionReadback(

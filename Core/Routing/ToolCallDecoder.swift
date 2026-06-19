@@ -117,6 +117,17 @@ public struct ToolCallCandidate: Codable, Equatable, Sendable {
     }
 }
 
+/// F5: Unified schema violation reason shared by decoder and guard.
+/// Prefer this enum over raw strings in trace, metrics, and acceptanceTable.
+public enum SchemaViolationReason: String, Codable, Equatable, Sendable {
+    case unknown_tool
+    case unknown_field
+    case missing_field
+    case type_mismatch
+    case invalid_enum
+    case out_of_range
+}
+
 public enum ToolCallDecodeFailureKind: String, Codable, Equatable, Sendable {
     case no_tool_call
     case malformed
@@ -124,6 +135,9 @@ public enum ToolCallDecodeFailureKind: String, Codable, Equatable, Sendable {
     case missing_field
     case type_mismatch
     case out_of_range
+    /// F5: added so acceptanceTable covers all SchemaViolationReason cases
+    case unknown_field
+    case invalid_enum
 
     public static let acceptanceTable: [ToolCallDecodeFailureKind] = [
         .no_tool_call,
@@ -131,6 +145,8 @@ public enum ToolCallDecodeFailureKind: String, Codable, Equatable, Sendable {
         .unknown_tool,
         .missing_field,
         .type_mismatch,
+        .unknown_field,
+        .invalid_enum,
         .out_of_range
     ]
 }
@@ -138,7 +154,11 @@ public enum ToolCallDecodeFailureKind: String, Codable, Equatable, Sendable {
 public enum ToolCallSchemaInvalidReason: Error, Equatable, Sendable {
     case unknown_tool(String)
     case missing_field(toolName: String, field: String)
+    /// F5: use unknown_field instead of type_mismatch for undeclared fields
+    case unknown_field(toolName: String, field: String)
     case type_mismatch(toolName: String, field: String, expected: String, actual: String)
+    /// F5: use invalid_enum for enum validation failures
+    case invalid_enum(toolName: String, field: String, expected: String, actual: String)
     case out_of_range(toolName: String, field: String, minimum: Int, maximum: Int, actual: Int)
 }
 
@@ -176,7 +196,10 @@ public struct ToolCallDecodeRetryPolicy: Sendable {
 public struct ToolCallDecoder: Sendable {
     private let contentFallbackEnabled: Bool
 
-    public init(contentFallbackEnabled: Bool = true) {
+    /// `contentFallbackEnabled` defaults to `false` (fail-closed).
+    /// Set to `true` only when explicitly opting into content-fallback mode
+    /// (e.g., change6 benchmark measuring net G3 impact).
+    public init(contentFallbackEnabled: Bool = false) {
         self.contentFallbackEnabled = contentFallbackEnabled
     }
 
@@ -222,8 +245,12 @@ public struct ToolCallDecoder: Sendable {
                 return .unknown_tool
             case .missing_field:
                 return .missing_field
+            case .unknown_field:   // F5: dedicated kind
+                return .unknown_field
             case .type_mismatch:
                 return .type_mismatch
+            case .invalid_enum:    // F5: dedicated kind
+                return .invalid_enum
             case .out_of_range:
                 return .out_of_range
             }
@@ -272,7 +299,8 @@ public struct ToolCallDecoder: Sendable {
 
         for (field, value) in arguments {
             guard let property = properties[field] else {
-                throw ToolCallDecodeError.schema_invalid(.type_mismatch(toolName: toolName, field: field, expected: "declared_field", actual: field))
+                // F5: use unknown_field (not type_mismatch) for undeclared fields
+                throw ToolCallDecodeError.schema_invalid(.unknown_field(toolName: toolName, field: field))
             }
             try validateType(value, property: property, toolName: toolName, field: field)
             try validateEnum(value, property: property, toolName: toolName, field: field)
@@ -325,7 +353,8 @@ public struct ToolCallDecoder: Sendable {
             return
         }
         guard property.enumValues.contains(actual) else {
-            throw ToolCallDecodeError.schema_invalid(.type_mismatch(
+            // F5: use invalid_enum (not type_mismatch) for enum validation failures
+            throw ToolCallDecodeError.schema_invalid(.invalid_enum(
                 toolName: toolName,
                 field: field,
                 expected: "enum:\(property.enumValues.joined(separator: "|"))",
@@ -352,7 +381,35 @@ public struct ToolCallDecoder: Sendable {
         }
     }
 
+    /// Extracts a single bare JSON object from content.
+    ///
+    /// Uses JSONDecoder as the primary path to correctly handle JSON strings containing
+    /// `{` or `}` characters (F4 fix). Falls back to a string-aware depth scanner only
+    /// when the direct decode fails to extract a bare object.
     private func singleBareJSONObject(in content: String) -> String? {
+        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Content must start with `{` with no leading non-whitespace characters.
+        guard trimmed.hasPrefix("{") else {
+            return nil
+        }
+
+        // F4 primary path: let JSONDecoder handle completeness (handles strings with braces).
+        // We try to decode the trimmed content as a raw JSONValue (object). If it succeeds
+        // and produces an object, the trimmed content is a valid single JSON object.
+        if let data = trimmed.data(using: .utf8),
+           let decoded = try? JSONDecoder().decode(JSONValue.self, from: data),
+           case .object = decoded {
+            return trimmed
+        }
+
+        // F4 fallback: string-aware depth scanner for cases where trimmed content
+        // contains leading object but has trailing content that JSONDecoder rejects.
+        return singleBareJSONObjectViaScanner(in: trimmed)
+    }
+
+    /// String-aware depth scanner that handles JSON string literals containing `{` or `}`.
+    private func singleBareJSONObjectViaScanner(in content: String) -> String? {
         guard let firstBrace = content.firstIndex(of: "{") else {
             return nil
         }
@@ -363,16 +420,26 @@ public struct ToolCallDecoder: Sendable {
 
         var depth = 0
         var closingBrace: String.Index?
+        var inString = false
+        var escape = false
         var index = firstBrace
         while index < content.endIndex {
             let character = content[index]
-            if character == "{" {
-                depth += 1
-            } else if character == "}" {
-                depth -= 1
-                if depth == 0 {
-                    closingBrace = index
-                    break
+            if escape {
+                escape = false
+            } else if character == "\\" {
+                escape = true
+            } else if character == "\"" {
+                inString.toggle()
+            } else if !inString {
+                if character == "{" {
+                    depth += 1
+                } else if character == "}" {
+                    depth -= 1
+                    if depth == 0 {
+                        closingBrace = index
+                        break
+                    }
                 }
             }
             index = content.index(after: index)

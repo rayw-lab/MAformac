@@ -44,6 +44,15 @@ public final class DemoWalkingSkeleton {
         try await handle(candidate: candidate, traceID: UUID().uuidString, decodeMessage: "candidate: \(candidate.toolName)")
     }
 
+    /// Handles raw model content (not a structured tool call).
+    ///
+    /// Fail-closed: content-fallback candidates are only recorded and traced — they are NOT
+    /// executed. Execution requires an explicit `intentConfirmed` route verdict (change7 intent
+    /// gate). This prevents schema-valid restraint/OOD inputs (e.g. N016/N017) from reaching
+    /// the executor.
+    ///
+    /// To opt-in to execution (e.g., change6 benchmark), call `handle(candidate:)` directly
+    /// after checking `candidate.source == .contentFallback` and applying intent gate logic.
     @discardableResult
     public func handle(content: String, stopReason: String? = nil) async throws -> DemoActionReadback {
         let traceID = UUID().uuidString
@@ -63,6 +72,8 @@ public final class DemoWalkingSkeleton {
             throw ToolCallDecodeError.malformed("think_leak")
         }
 
+        // toolCallDecoder is constructed with contentFallbackEnabled: false (fail-closed default),
+        // so contentFallbackCandidate returns nil — no candidate, no execution.
         guard let candidate = try toolCallDecoder.contentFallbackCandidate(from: content, stopReason: stopReason) else {
             traceLogger.recordDecode(
                 traceID: traceID,
@@ -78,7 +89,20 @@ public final class DemoWalkingSkeleton {
             throw ToolCallDecodeError.no_tool_call
         }
 
-        return try await handle(candidate: candidate, traceID: traceID, decodeMessage: "content_fallback: \(candidate.toolName)")
+        // Candidate detected but not executed: record + trace only.
+        // change7 intent gate hook: set intentConfirmed=true on DemoGuardContext before executing.
+        traceLogger.recordDecode(
+            traceID: traceID,
+            message: "content_fallback_candidate_not_executed: \(candidate.toolName)",
+            metadata: [
+                "toolCalls.count": "0",
+                "rawToolCall.count": "0",
+                "fallbackCandidate.count": "1",
+                "executedToolCall.count": "0",
+                "stopReason": stopReason ?? ""
+            ]
+        )
+        throw ToolCallDecodeError.no_tool_call
     }
 
     @discardableResult

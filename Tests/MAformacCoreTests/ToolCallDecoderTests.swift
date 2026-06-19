@@ -22,12 +22,15 @@ final class ToolCallDecoderTests: XCTestCase {
 
     func testDecodeErrorsAreTableDrivenAndSpecific() {
         let decoder = ToolCallDecoder()
+        // F5: acceptanceTable now includes unknown_field and invalid_enum as dedicated entries
         let cases: [(String, ToolCallDecodeError)] = [
             ("no_tool_call", .no_tool_call),
             ("malformed", .malformed("bad_json")),
             ("unknown_tool", .schema_invalid(.unknown_tool("unknown_tool"))),
             ("missing_field", .schema_invalid(.missing_field(toolName: "set_cabin_ac", field: "power"))),
             ("type_mismatch", .schema_invalid(.type_mismatch(toolName: "set_cabin_ac", field: "power", expected: "string", actual: "int"))),
+            ("unknown_field", .schema_invalid(.unknown_field(toolName: "set_cabin_ac", field: "undeclared_field"))),
+            ("invalid_enum", .schema_invalid(.invalid_enum(toolName: "set_cabin_ac", field: "power", expected: "enum:on|off|unchanged", actual: "invalid"))),
             ("out_of_range", .schema_invalid(.out_of_range(toolName: "set_cabin_ac", field: "target_temperature", minimum: 16, maximum: 30, actual: 31)))
         ]
 
@@ -37,6 +40,8 @@ final class ToolCallDecoderTests: XCTestCase {
         XCTAssertEqual(decoder.failureKind(for: .schema_invalid(.unknown_tool("unknown_tool"))), .unknown_tool)
         XCTAssertEqual(decoder.failureKind(for: .schema_invalid(.missing_field(toolName: "set_cabin_ac", field: "power"))), .missing_field)
         XCTAssertEqual(decoder.failureKind(for: .schema_invalid(.type_mismatch(toolName: "set_cabin_ac", field: "power", expected: "string", actual: "int"))), .type_mismatch)
+        XCTAssertEqual(decoder.failureKind(for: .schema_invalid(.unknown_field(toolName: "set_cabin_ac", field: "undeclared_field"))), .unknown_field)
+        XCTAssertEqual(decoder.failureKind(for: .schema_invalid(.invalid_enum(toolName: "set_cabin_ac", field: "power", expected: "enum:on|off|unchanged", actual: "invalid"))), .invalid_enum)
         XCTAssertEqual(decoder.failureKind(for: .schema_invalid(.out_of_range(toolName: "set_cabin_ac", field: "target_temperature", minimum: 16, maximum: 30, actual: 31))), .out_of_range)
     }
 
@@ -61,7 +66,8 @@ final class ToolCallDecoderTests: XCTestCase {
             ),
             (
                 ToolCallCandidate(toolName: "set_cabin_ac", arguments: ["power": .string("invalid")], source: .rawToolCall),
-                .schema_invalid(.type_mismatch(toolName: "set_cabin_ac", field: "power", expected: "enum:on|off|unchanged", actual: "invalid"))
+                // F5: enum violation now throws invalid_enum, not type_mismatch
+                .schema_invalid(.invalid_enum(toolName: "set_cabin_ac", field: "power", expected: "enum:on|off|unchanged", actual: "invalid"))
             )
         ]
 
@@ -105,6 +111,29 @@ final class ToolCallDecoderTests: XCTestCase {
         XCTAssertEqual(stringifiedObject.arguments["scalar"], .int(5))
         XCTAssertEqual(arrayArgument.arguments, ["_value": .array([.string("front"), .int(2)])])
         XCTAssertEqual(scalarArgument.arguments, ["_value": .int(2)])
+    }
+
+    /// F4: content-fallback JSON scanner must correctly handle string arguments containing `{}`.
+    func testContentFallbackHandlesJSONStringArgumentsContainingBraces() throws {
+        let decoder = ToolCallDecoder(contentFallbackEnabled: true)
+        // Argument value "a } b" contains a `}` inside a JSON string — the scanner must not
+        // break on this and incorrectly truncate the JSON object.
+        let content = #"{"name":"query_cabin_comfort","arguments":{"topic":"a } b"}}"#
+
+        // This should parse correctly (even though "a } b" is not a valid enum value,
+        // the JSON structure should decode without error)
+        let candidate = try decoder.contentFallbackCandidate(from: content, stopReason: "stop")
+        XCTAssertNotNil(candidate, "JSON with braces inside string arguments must parse correctly")
+        XCTAssertEqual(candidate?.toolName, "query_cabin_comfort")
+    }
+
+    /// F4: prefix content before `{` must be rejected as before.
+    func testContentFallbackRejectsPrefixBeforeJSONObject() throws {
+        let decoder = ToolCallDecoder(contentFallbackEnabled: true)
+        let prefixContent = #"Here is the call: {"name":"set_cabin_ac","arguments":{"power":"on"}}"#
+
+        let candidate = try decoder.contentFallbackCandidate(from: prefixContent, stopReason: "stop")
+        XCTAssertNil(candidate, "content with non-whitespace prefix must be rejected")
     }
 
     func testUnknownModelStopReasonDecodesAsUnknownInsteadOfThrowing() throws {

@@ -115,6 +115,15 @@ capabilities:
         - hvac.temperature
       idempotent: true
       exclusive_bus: hvac
+      # state_transforms: declarative field→state_cell mapping (multi-cell support).
+      # unchanged_skip: true means skip writing this cell when field value is "unchanged".
+      state_transforms:
+        - field: power
+          state_cell: hvac.ac
+          unchanged_skip: true
+        - field: target_temperature
+          state_cell: hvac.temperature
+          unchanged_skip: false
     demo_guard:
       risk_level: R0
       confirm_policy: none
@@ -187,6 +196,10 @@ capabilities:
       state_cell: seat.driver.heat
       idempotent: true
       exclusive_bus: seat_comfort
+      state_transforms:
+        - field: level
+          state_cell: seat.driver.heat
+          unchanged_skip: false
     demo_guard:
       risk_level: R0
       confirm_policy: none
@@ -254,6 +267,10 @@ capabilities:
       state_cell: seat.driver.ventilation
       idempotent: true
       exclusive_bus: seat_comfort
+      state_transforms:
+        - field: level
+          state_cell: seat.driver.ventilation
+          unchanged_skip: false
     demo_guard:
       risk_level: R0
       confirm_policy: none
@@ -320,6 +337,10 @@ capabilities:
       state_cell: window.driver
       idempotent: true
       exclusive_bus: window
+      state_transforms:
+        - field: percent
+          state_cell: window.driver
+          unchanged_skip: false
     demo_guard:
       risk_level: R1
       confirm_policy: none
@@ -396,6 +417,15 @@ capabilities:
       state_cell: lighting.ambient
       idempotent: true
       exclusive_bus: lighting
+      # Composite semantic: power:off → write "off"; power:on → write color value (or "on" if color absent);
+      # power:unchanged → skip; color:absent when power:on → use color field if present.
+      # ambient_composite: true signals the executor to use composite logic for this capability.
+      ambient_composite: true
+      state_transforms:
+        - field: power
+          state_cell: lighting.ambient
+          unchanged_skip: true
+          ambient_composite: true
     demo_guard:
       risk_level: R0
       confirm_policy: none
@@ -462,6 +492,10 @@ capabilities:
       state_cell: screen.brightness
       idempotent: true
       exclusive_bus: display
+      state_transforms:
+        - field: percent
+          state_cell: screen.brightness
+          unchanged_skip: false
     demo_guard:
       risk_level: R0
       confirm_policy: none
@@ -524,6 +558,10 @@ capabilities:
       state_cell: fan.speed
       idempotent: true
       exclusive_bus: hvac
+      state_transforms:
+        - field: level
+          state_cell: fan.speed
+          unchanged_skip: false
     demo_guard:
       risk_level: R0
       confirm_policy: none

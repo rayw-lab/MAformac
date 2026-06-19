@@ -60,6 +60,24 @@ def swift_string_array(values: list[object] | None) -> str:
     return "[" + ", ".join(swift_string(value) for value in values) + "]"
 
 
+def swift_state_transforms(transforms: list[dict[str, object]] | None) -> str:
+    transforms = transforms or []
+    if not transforms:
+        return "[]"
+    entries = []
+    for t in transforms:
+        unchanged_skip = swift_bool(t.get("unchanged_skip", False))
+        ambient_composite = swift_bool(t.get("ambient_composite", False))
+        entries.append(
+            f"GeneratedStateTransform("
+            f"field: {swift_string(t['field'])}, "
+            f"stateCell: {swift_string(t['state_cell'])}, "
+            f"unchangedSkip: {unchanged_skip}, "
+            f"ambientComposite: {ambient_composite})"
+        )
+    return "[" + ", ".join(entries) + "]"
+
+
 def swift_range_dict(values: dict[str, dict[str, int]] | None) -> str:
     values = values or {}
     if not values:
@@ -138,7 +156,8 @@ def capability_literal(capability: dict[str, object]) -> str:
                 stateCell: {swift_string(execution.get("state_cell", ""))},
                 relatedStateCells: {swift_string_array(execution.get("related_state_cells"))},
                 idempotent: {swift_bool(execution.get("idempotent"))},
-                exclusiveBus: {swift_string(execution.get("exclusive_bus", ""))}
+                exclusiveBus: {swift_string(execution.get("exclusive_bus", ""))},
+                stateTransforms: {swift_state_transforms(execution.get("state_transforms"))}
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: {swift_string(demo_guard.get("risk_level", ""))},
@@ -242,6 +261,15 @@ public struct GeneratedReferenceBinding: Equatable, Sendable {{
     public let allowedValues: [String]
 }}
 
+public struct GeneratedStateTransform: Equatable, Sendable {{
+    public let field: String
+    public let stateCell: String
+    /// When true and the field value equals "unchanged", skip writing this cell.
+    public let unchangedSkip: Bool
+    /// When true, apply ambient composite logic (power:on → write color; power:off → write "off").
+    public let ambientComposite: Bool
+}}
+
 public struct GeneratedExecutionRule: Equatable, Sendable {{
     public let connector: String
     public let mockBehavior: String
@@ -249,6 +277,8 @@ public struct GeneratedExecutionRule: Equatable, Sendable {{
     public let relatedStateCells: [String]
     public let idempotent: Bool
     public let exclusiveBus: String
+    /// Declarative field→state_cell mapping for multi-cell mock transitions.
+    public let stateTransforms: [GeneratedStateTransform]
 }}
 
 public struct GeneratedDemoGuardRule: Equatable, Sendable {{

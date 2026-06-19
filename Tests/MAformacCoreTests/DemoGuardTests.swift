@@ -60,7 +60,8 @@ final class DemoGuardTests: XCTestCase {
                 stateCell: "hvac.ac",
                 relatedStateCells: [],
                 idempotent: true,
-                exclusiveBus: "hvac"
+                exclusiveBus: "hvac",
+                stateTransforms: []
             ),
             demoGuard: GeneratedDemoGuardRule(
                 riskLevel: "R2",

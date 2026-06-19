@@ -1,0 +1,7 @@
+# Python dependencies for MAformac build scripts.
+# Pin versions for reproducible codegen.
+# To install: pip install -r scripts/requirements.txt
+#
+# Drift check (run after editing capabilities.yaml or agents.yaml):
+#   python3 scripts/gen_capabilities.py && git diff --exit-code Core/Generated/GeneratedCapabilityCatalog.swift
+PyYAML==6.0.2
