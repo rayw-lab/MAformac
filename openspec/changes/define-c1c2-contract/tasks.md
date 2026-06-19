@@ -3,14 +3,14 @@
 > 分工:**CC 设计为主**(契约/schema/allowlist/risk-policy/接口);codegen 脚本可派 codex(CC 审);**magnet reviewed** 项见标注。叠加 Superpowers(TDD codegen / verification)。大前提:方案助手 demo,不往真车靠。
 
 ## 1. 冻结源快照 + manifest(provenance 地基)
-- [ ] 1.1 [CC定/codex脚本] `freeze` 脚本:4 张金钥匙 xlsx + C2 端态源 → 拷到 `raw/05-Projects/MAformac/source-snapshots/c1-<date>-<hash8>/`,算 `file_sha256` + `content_digest`(解析行集规范化 hash)。**产出** snapshot + `source-snapshot-manifest.yaml`。**验收** 双 hash + sheets_expected + source_rows;源料不进仓
-- [ ] 1.2 [codex/TDD] codegen 三道硬 gate:`reset_dimensions()` / 合并单元格 forward-fill / schema validation。**验收** WPS dimension 不可靠时仍正确计行;脏行不静默丢
+- [x] 1.1 [CC定/codex脚本] `freeze` 脚本:4 张金钥匙 xlsx + C2 端态源 → 拷到 `raw/05-Projects/MAformac/source-snapshots/c1-<date>-<hash8>/`,算 `file_sha256` + `content_digest`(解析行集规范化 hash)。**产出** snapshot + `source-snapshot-manifest.yaml`。**验收** 双 hash + sheets_expected + source_rows;源料不进仓。Stage A:已冻结 4 张 C1 金钥匙表;C2 端态源仍按 open question 留空,待阶段 B。
+- [x] 1.2 [codex/TDD] codegen 三道硬 gate:`reset_dimensions()` / 合并单元格 forward-fill / schema validation。**验收** WPS dimension 不可靠时仍正确计行;脏行不静默丢
 
 ## 2. C1 codegen:源行级 JSONL 主源
-- [ ] 2.1 [codex/CC审] 解析快照 → `semantic-function-contract.jsonl`(每源行一记录 + provenance + `value` 四件套 + device×primitive×slot)。**验收** source_rows≈3990,每行带 source_sheet/row_no/hash
-- [ ] 2.2 [codex/CC审] 去重:`canonical_semantic_id` + `dedupe_role`(primary 按 survivorship 选非任选,记 rule)。**验收** canonical≈3917
-- [ ] 2.3 [CC定/codex] 分流账本:脏行→quarantine 带 reason,`unclassified=0`,守恒。**验收** `source_rows==valid+quarantined+legacy`
-- [ ] 2.4 [CC定/codex] clarifyTag + `semantic-followup-transitions.jsonl`(两端引用校验)。**验收** unresolved≤2%
+- [x] 2.1 [codex/CC审] 解析快照 → `semantic-function-contract.jsonl`(每源行一记录 + provenance + `value` 四件套 + device×primitive×slot)。**验收** source_rows≈3990,每行带 source_sheet/row_no/hash
+- [x] 2.2 [codex/CC审] 去重:`canonical_semantic_id` + `dedupe_role`(primary 按 survivorship 选非任选,记 rule)。**验收** canonical≈3917
+- [x] 2.3 [CC定/codex] 分流账本:脏行→quarantine 带 reason,`unclassified=0`,守恒。**验收** `source_rows==valid+quarantined+legacy`
+- [x] 2.4 [CC定/codex] clarifyTag + `semantic-followup-transitions.jsonl`(两端引用校验)。**验收** unresolved≤2%
 
 ## 3. C1 治理产物(magnet reviewed)
 - [ ] 3.1 [CC定] `risk-policy.yaml`:`Rn→{asil_origin,demo_action,confirm_timeout_s,source}`,收 ASIL/forbidden 双轨,**注明 demo 豁免 ISO26262、二次确认=炸场效果**。**验收** 每 risk 有 mapping
@@ -24,9 +24,9 @@
 - [ ] 4.4 [CC定] 接口:C1 `execution_range_ref` 按 exec_tier 分级(L1 concrete / L2-L3 generic|none)落 C2 cell。**验收** L1 必 concrete,L2/L3 不悬空
 
 ## 5. 派生视图 + 本地校验门
-- [ ] 5.1 [codex/CC审] `function-spec-full.yaml` 从 JSONL 派生(非手写;P0 671-device 旧稿仅作核对参考)。**验收** device 聚合视图 + `risk_max` 派生
-- [ ] 5.2 [CC定/codex] `make verify` + `verify_refs.py`:regen+diff / 引用完整性 / 分流账本 / range conflict 分类(placeholder_open vs material_conflict)/ coverage。**验收** 5 项全绿
-- [ ] 5.3 [CC定] 脱敏 gate:grep 客户公司名/车型代号/供应商/人名 = 0。**验收** 仓内 0 命中,源 xlsx 不在版本控制
+- [x] 5.1 [codex/CC审] `function-spec-full.yaml` 从 JSONL 派生(非手写;P0 671-device 旧稿仅作核对参考)。**验收** device 聚合视图 + `risk_max` 派生
+- [x] 5.2 [CC定/codex] `make verify` + `verify_refs.py`:regen+diff / 引用完整性 / 分流账本 / range conflict 分类(placeholder_open vs material_conflict)/ coverage。**验收** 5 项全绿
+- [x] 5.3 [CC定] 脱敏 gate:grep 客户公司名/车型代号/供应商/人名 = 0。**验收** 仓内 0 命中,源 xlsx 不在版本控制
 
 ## 6. supersede + 基建文档级联
 - [ ] 6.1 [CC] `vehicle-capabilities` 标 superseded(delta 已写,archive 时合并)
