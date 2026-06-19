@@ -64,6 +64,14 @@ rank 8/16、alpha 16/32、dropout 0.05、target `q_proj/v_proj` 起步(必要扩
 - [LoRA adapter 可能泄漏敏感表达] → 后续安全评估(adapter 也不放仓)。源:Codex 03。
 - [change3 content-fallback 放大误执行] → LoRA Day1 必加 restraint 裸 JSON 负样本,防模型在"不要/别再/已经够了"语境输出裸工具候选。源:spike E3 cross-vendor 审计。
 
+### 🆕 oracle 深挖增量(2026-06-19;repo 新鲜度核过,详见 memory `maformac-lora-train-eval-stack`)
+
+**🐯 HIGH-1 防死记(arg/intent 名值死记非泛化,1.5B unseen 60-70% vs seen 95%)**:训练侧用 **arg-token loss masking**(arg 值 token loss 置 0,只训结构)+ **function masking**(mask 函数/参数名逼读 description)。**adopt**:[Hammer](https://github.com/MadeAgents/Hammer)(function masking)+ [GOAT arxiv 2510.12218](https://arxiv.org/pdf/2510.12218)(arg-token masking)。验收门见 C6 held-out(换说法+没见过 arg 值+bug_id 分层切)。
+**🐯 HIGH-3 防手痒(Hammer 实证 FC 越准 irrelevance ↓)**:训练集**必掺 ≥20% 负样本/无关工具**(xlam-irrelevance 思路);IrrelAcc 进 C6 eval。
+**🐯📄 paper-tiger(demo 砍,fresheveryday 反过度治理)**:① LoRA 灾难性遗忘 → rank≤16/epoch1-3/alpha≤2×rank 安全区,**不上 EWC/OPLoRA** ② 1:1 混通用数据 sweep → solo 单域**不做**(LoRA 已抗遗忘)。
+**🐘 elephant 标注成本黑洞**:1 万 bug 是"问题描述"非"FC 训练对",bug→`(模糊说→ToolCall)` gold 标注是成本+注入标注者偏见 → 先小规模(几百条)+ 两人 agreement 验证再放量;**gold arg 值多样化(别都 26 度,否则必死记)**。
+**adopt 训练栈**:MLX-LM LoRA(本地 Mac)+ Hammer/GOAT masking + unsloth 超参参考。**数据三源全用**:3990 协议 + 12000 bug + raw intake。
+
 ## Migration Plan
 
 本地 Mac 装 `mlx-lm[train]`;数据/五件套/训练集 **不入仓**,仅 LoRA 权重产物可入仓。回滚 git revert(权重)。

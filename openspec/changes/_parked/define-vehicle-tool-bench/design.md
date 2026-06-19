@@ -47,6 +47,15 @@ eval 是 demo 可信度硬门。pre-mortem 料 `qwen3-engineering-notes §6`(eva
 - [demo must-pass 死记非泛化] → 双维度(泛化集分层)。源:qwen3-notes §6 + voice-pipeline §5 泛化分层。
 - [慢路径混进快路径预算] → 每 case 标 `route_kind`(见统一 trace 对齐注,非 fast|slow 二分),按档分判(快≤800ms / 慢≤2500ms)。源:brainstorm §5 延迟分路径。
 
+### 🆕 oracle 深挖增量(2026-06-19;repo 新鲜度核过,详见 memory `maformac-lora-train-eval-stack`)
+
+**🐯 HIGH-1 防死记 held-out**:eval 集必"**换说法 + 没见过的 arg 值 + 按 bug_id 分层切**"(同一 bug 多条说法不许跨 train/eval);报 ID-OOD gap(同分布 vs 换说法,gap>15%=死记)。
+**🐯 HIGH-2 防假提升(base vs LoRA 不公平对比)**:必**同 harness/同 prompt/同 greedy/同 mock/同 parser**+ **分层打分**(function 名/arg/格式 拆开,防 base 被 parser 冤枉)+ 跑前各 `--limit 10` 人眼核 extraction + **train/eval 三层去污**(n-gram + token + embedding cosine>0.8 语义去重)去污后重算。
+**🐯 HIGH-2b 单跑噪声(被误判的真坑)**:temp=0+seed 仍不可复现(并发+浮点);小 eval 集(<100 条)**多跑 3-5 次取均值+报 std**,别信单跑小 delta。源:[Thinking Machines 非确定性](https://www.nextbigfuture.com/2025/11/defeating-nondeterminism-in-llm-inference-by-thinking-machines.html)。
+**🐯 HIGH-3 防手痒**:IrrelAcc(该忍住没乱调)**独立一等验收指标** + eval ≥20% no-call/无关样本;验收双指标(读回 mock 态 + IrrelAcc)非只 AST。
+**🐘 elephant**:通用 bench 测 AST 不测"5min 惊艳+断网不崩";eval 集从三源(3990+12000bug+raw)挖**磊哥认的炸场 case**,验收以读回 mock 态(项目铁律),AST 必要非充分。
+**adopt 方法学不 adopt 集(无车控+中文+restraint+mock 三合一现成集)**:[BFCL-v3/gorilla](https://github.com/ShishirPatil/gorilla)(车控域+state-based eval,12908★活)+ [tau2-bench](https://github.com/sierra-research/tau2-bench)(state 校验,活)+ [When2Call](https://github.com/NVIDIA/When2Call)(restraint 数据集)+ ToolLearning-Eval/BFCL-ZHTW(中文);**骨架抄 AST+state+IrrelAcc 三件套,集子自建**(中文+按 capabilities 契约生成)。
+
 ## Migration Plan
 
 Mac 开发期 eval harness(gorilla/tiny-tool-bench 框架参考;零进 iOS)。eval 集 `must_not_train`(与 change5 train 集分离)。
