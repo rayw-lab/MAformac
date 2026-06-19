@@ -36,7 +36,7 @@ verify-refs: .venv/.deps.stamp
 	$(PYTHON) scripts/verify_refs.py
 
 # state-cells.yaml 为手写 C2 契约(非生成), 纳入 diff 防未提交漂移; 不进 regen
-HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml
+HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml
 
 diff:
 	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(HANDWRITTEN_CONTRACTS) scripts Makefile

@@ -1,0 +1,97 @@
+# contracts/l1-demo-allowlist.yaml — L1 精做炸点名单(reviewed)
+# ---------------------------------------------------------------------------
+# 归属: openspec change define-c1c2-contract / task 3.2(magnet reviewed)
+# 唯一 reviewed 来源: C1 行 exec_tier=L1 只能从本表 allowlist 段展开集派生(非手写)
+# 粒度: device + primitive + execution_range_cell(→C2)+ required_state_cell_groups + required_followup_transitions
+# device/primitive 对齐 C1 jsonl 实际值(§28 已核); transition_id 一手绑定(§28 已核存在+语义)
+# ---------------------------------------------------------------------------
+meta:
+  review_status: reviewed
+  reviewed_by: magnet
+  reviewed_at: "2026-06-19"
+  dianpoint_dimensions: [模糊理解, 多意图, 记忆多轮, 快FC泛化, 状态感知读回, 安全门拒识]
+  batches: [纵切, 横铺]
+  l1_derivation_note: >-
+    gen_c1 只从 allowlist 段(纵切批)派生 exec_tier=L1 + execution_range_ref=execution_range_cell(concrete);
+    allowlist_pending_c2 段(横铺批)C2 cell 未建, 不派生 L1, 待 C2 补 cell 后移入 allowlist。
+
+# ============================================================================
+# 纵切批(C2 state-cells 已就绪 → L1 派生 + execution_range_ref 闭合)
+# ============================================================================
+allowlist:
+
+  - device: ac_temperature              # C1 jsonl device(44 行, §28 已核)
+    display_zh: 空调温度
+    batch: 纵切
+    dimensions: [模糊理解, 多意图, 记忆多轮, 状态感知读回]
+    primitives:                          # 对齐 device=ac_temperature 实际 action_primitive
+      - increase_by_exp                  # "调高一点"=经验值(EXP)← 模糊
+      - decrease_by_exp                  # "调低一点"
+      - adjust_to_number                 # "调到24度"=绝对(SPOT)
+      - adjust_to_gear                   # "调到高挡"=经验档
+      - adjust_to_max                    # "调到最高"
+      - adjust_to_min                    # "调到最低"
+      - query                            # "查空调温度"← 状态感知读回
+    execution_range_cell: ac.temp_setpoint          # C2 cell(execution_range 权威), L1 行 ref 落此
+    required_state_cell_groups: [air_conditioner]   # C2 device: ac.power+temp_setpoint+mode+fan_speed
+    required_followup_transitions:
+      - trans_1c865cc53b2fbb92           # open_ac→raise_ac_temperature_by_exp(inherit 空调+direction)="打开空调...再高点"
+    炸点说法:
+      - "有点冷 → 升温(模糊陈述→动作)"
+      - "打开空调把温度调到24度(多意图: open_ac + adjust_to_number)"
+      - "再高一点(记忆继承+exp)← trans_1c865cc53b2fbb92"
+      - "关空调(已关)→ '空调已经是关闭的了'(状态感知, 真实 bug 反例)"
+
+  - device: window                       # C1 jsonl device(38 行, §28 已核精确 primitive 不含 pause)
+    display_zh: 车窗
+    batch: 纵切
+    dimensions: [快FC泛化, 模糊理解, 记忆多轮]
+    primitives:
+      - power_on                         # "打开车窗"
+      - power_off                        # "关闭车窗"
+      - adjust_to_number                 # "打开到30%"=spec
+      - by_percent                       # "再开30%"
+      - increase_by_number               # "再开2挡"=spec 增量
+      - increase_by_exp                  # "开大点"=经验 ← 模糊
+      - decrease_by_exp                  # "关小点"
+      - adjust_to_max                    # "全开"
+    execution_range_cell: window.position
+    required_intents:                    # pause 属 window_slide 家族(非 device=window primitive), L1 演"暂停车窗"额外引
+      - pause_window_slide
+    required_state_cell_groups: [window]            # C2 device: window.position+motion+lock
+    required_followup_transitions:
+      - trans_1dfefae41fa915f5           # open_window→open_window_little(inherit position)="打开车窗...开大点"
+    炸点说法:
+      - "打开主驾车窗(position fan-out 泛化)"
+      - "打开到30%(spec) / 开大点(经验+记忆继承position)← trans_1dfefae41fa915f5"
+
+# ============================================================================
+# 横铺批(scope reviewed; C2 state-cells 待补 → 不派生 L1; 纵切验全栈后再铺)
+# ============================================================================
+allowlist_pending_c2:
+  - device: screen_brightness
+    display_zh: 屏幕亮度
+    dimensions: [模糊理解]
+    primitives: [increase_by_exp, decrease_by_exp, adjust_to_number, by_percent]
+    pending_state_cell_groups: [screen]             # ⚠️ C2 需补 screen.brightness cell
+    炸点说法: ["屏幕太暗了 → 调亮(纯陈述→动作, 最强模糊金例, 真实 bug 命中)"]
+  - device: [atmosphere_lamp_color, atmosphere_lamp_brightness]
+    display_zh: 氛围灯
+    dimensions: [多意图]
+    primitives: [set_mode, increase_by_exp, by_percent, adjust_to_number]
+    pending_state_cell_groups: [ambient_light]      # ⚠️ C2 需补 ambient.color+brightness
+    炸点说法: ["氛围灯调成红色调暗一点(多意图: color set_mode + brightness exp)"]
+  - device: __safety_gate__
+    display_zh: 安全门拒识
+    dimensions: [安全门拒识]
+    required_safety_cells: [vehicle.speed, vehicle.gear]   # C2 safety_cells 已有
+    炸点说法: ["行驶中(speed>0)'开车门' → 优雅拒识+解释(豁免ISO26262)"]
+
+# ============================================================================
+# 派生闭合(make verify 校验)
+# ============================================================================
+closure_notes:
+  - C1 行 exec_tier=L1 ≡ allowlist 段 (device,primitive) 展开集(双向校验)
+  - L1 行 execution_range_ref = 对应 device 的 execution_range_cell(concrete), 该 cell 必在 C2 state-cells 存在
+  - required_followup_transitions 的 transition_id 必在 C1 followup jsonl 存在
+  - required_intents 的 intent 必在 C1 jsonl 存在(pause_window_slide 在 window_slide device)

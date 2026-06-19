@@ -27,6 +27,7 @@ FUNCTION_SPEC_YAML = CONTRACTS_DIR / "function-spec-full.yaml"
 COVERAGE_REPORT = CONTRACTS_DIR / "semantic-coverage-report.md"
 STATE_CELLS_YAML = CONTRACTS_DIR / "state-cells.yaml"
 MANIFEST_YAML = CONTRACTS_DIR / "source-snapshot-manifest.yaml"
+L1_ALLOWLIST_YAML = CONTRACTS_DIR / "l1-demo-allowlist.yaml"
 
 UNRESOLVED_LIMIT = 0.02
 FORBIDDEN_SUBSTRINGS = [
@@ -87,9 +88,9 @@ def verify_contract_invariants(manifest: dict[str, Any], rows: list[dict[str, An
     if not canonical_ids:
         raise C1Error("no contract rows")
     for row in rows:
-        if row["exec_tier"] != "L2":
-            raise C1Error(f"exec_tier is not L2: {row['contract_row_id']}")
-        if row["risk"] != "":
+        if row["exec_tier"] not in ("L1", "L2"):
+            raise C1Error(f"exec_tier not in L1/L2: {row['contract_row_id']}")
+        if row["risk"] != "":  # risk-policy(task 3.1)未做前 risk 仍全空
             raise C1Error(f"risk is not empty: {row['contract_row_id']}")
         if set(row["value"].keys()) != {"ref", "direct", "offset", "type"}:
             raise C1Error(f"value tuple shape mismatch: {row['contract_row_id']}")
@@ -147,7 +148,7 @@ def verify_range_classification(rows: list[dict[str, Any]]) -> None:
 
 
 def verify_leak_scan() -> None:
-    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML]
+    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         for marker in FORBIDDEN_SUBSTRINGS:
@@ -247,17 +248,67 @@ def verify_state_cells() -> str:
     if len(all_ids) != len(set(all_ids)):
         raise C1Error("state-cells: duplicate cell id")
 
-    # 闭合状态: 现阶段必须显式 deferred(不假装闭合); active 需闭合校验已实装
+    # 闭合状态: deferred=不假装闭合; active=由 verify_l1_closure 实装 C1↔allowlist↔C2 校验
     closure = meta.get("c1_c2_closure", {})
     status = closure.get("status")
     if status not in ("deferred", "active"):
         raise C1Error(f"state-cells: c1_c2_closure.status must be deferred|active, got {status!r}")
-    if status == "active":
-        raise C1Error(
-            "state-cells: closure=active but execution_range_ref/allowlist closure not implemented; "
-            "must stay deferred until l1-demo-allowlist + risk-policy land (同刀改 gen_c1/verify_refs)"
-        )
     return status
+
+
+def _state_cell_ids() -> set[str]:
+    spec = safe_load_yaml(STATE_CELLS_YAML)
+    ids: set[str] = set()
+    for dev in spec.get("devices", {}).values():
+        for cell in dev.get("state_cells", []):
+            ids.add(cell["id"])
+    for cell in spec.get("safety_cells", []) or []:
+        ids.add(cell["id"])
+    return ids
+
+
+def verify_l1_closure(rows: list[dict[str, Any]]) -> int:
+    """C1 L1 ↔ l1-allowlist ↔ C2 cell 双向闭合 + execution_range_ref 分级(closure=active 时跑)。
+
+    - L1 行: (device,primitive) 必在 allowlist 展开集(无手写 L1)+ range_ref_kind=concrete +
+      execution_range_ref = 该 entry 的 execution_range_cell + 该 cell 必在 C2 state-cells 存在。
+    - L2 行: range_ref_kind ∈ {generic,none} + execution_range_ref ""。
+    - 双向: allowlist 展开集每个 (device,primitive) 必有 ≥1 L1 行(不悬空)。
+    """
+    allowlist = safe_load_yaml(L1_ALLOWLIST_YAML)
+    expansion: set[tuple[str, str]] = set()
+    cell_of: dict[tuple[str, str], str] = {}
+    for entry in allowlist.get("allowlist", []):
+        device = entry["device"]
+        cell = entry["execution_range_cell"]
+        for prim in entry.get("primitives", []):
+            expansion.add((device, prim))
+            cell_of[(device, prim)] = cell
+    c2_cells = _state_cell_ids()
+    seen_l1: set[tuple[str, str]] = set()
+    l1_count = 0
+    for row in rows:
+        key = (row["device"], row["action_primitive"])
+        if row["exec_tier"] == "L1":
+            l1_count += 1
+            if key not in expansion:
+                raise C1Error(f"L1 row not in allowlist expansion (no hand-written L1): {row['contract_row_id']} {key}")
+            if row["range_ref_kind"] != "concrete":
+                raise C1Error(f"L1 row range_ref_kind must be concrete: {row['contract_row_id']}")
+            if row["execution_range_ref"] != cell_of[key]:
+                raise C1Error(f"L1 execution_range_ref mismatch: {row['contract_row_id']} -> {row['execution_range_ref']}")
+            if row["execution_range_ref"] not in c2_cells:
+                raise C1Error(f"L1 execution_range_ref not a C2 cell: {row['contract_row_id']} -> {row['execution_range_ref']}")
+            seen_l1.add(key)
+        else:
+            if row["range_ref_kind"] not in ("generic", "none"):
+                raise C1Error(f"L2 row range_ref_kind must be generic/none: {row['contract_row_id']}")
+            if row["execution_range_ref"] != "":
+                raise C1Error(f"L2 row execution_range_ref must be empty: {row['contract_row_id']}")
+    missing = expansion - seen_l1
+    if missing:
+        raise C1Error(f"allowlist expansion not realized in C1 (dangling): {sorted(missing)}")
+    return l1_count
 
 
 def main() -> int:
@@ -272,12 +323,16 @@ def main() -> int:
     verify_range_classification(rows)
     verify_leak_scan()
     state_cells_closure = verify_state_cells()
+    l1_line = ""
+    if state_cells_closure == "active":
+        l1_count = verify_l1_closure(rows)
+        l1_line = f" l1_closure=ok (L1_rows={l1_count})"
     print("schema=ok")
     print("refs=ok")
     print("ledger=ok")
     print("range_conflicts=ok")
     print("coverage=ok")
-    print(f"state_cells=ok (c1_c2_closure={state_cells_closure}, deferred_until=l1-demo-allowlist)")
+    print(f"state_cells=ok (c1_c2_closure={state_cells_closure}){l1_line}")
     return 0
 
 

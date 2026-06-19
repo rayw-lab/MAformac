@@ -30,6 +30,7 @@ from c1_common import (
     normalize_primitive,
     parse_ds_protocol,
     row_field,
+    safe_load_yaml,
     sha256_json,
     sha256_text,
     slot_identity,
@@ -40,6 +41,7 @@ from c1_common import (
 )
 
 CONTRACT_JSONL = CONTRACTS_DIR / "semantic-function-contract.jsonl"
+L1_ALLOWLIST = CONTRACTS_DIR / "l1-demo-allowlist.yaml"
 FOLLOWUP_JSONL = CONTRACTS_DIR / "semantic-followup-transitions.jsonl"
 QUARANTINE_JSONL = CONTRACTS_DIR / "semantic-quarantine.jsonl"
 FUNCTION_SPEC_YAML = CONTRACTS_DIR / "function-spec-full.yaml"
@@ -130,10 +132,10 @@ CONTRACT_SCHEMA: dict[str, Any] = {
         "dedupe_group_id": {"type": "string", "pattern": "^dedupe_[0-9a-f]{16}$"},
         "dedupe_role": {"enum": ["primary", "variant"]},
         "primary_selection_rule_version": {"const": "v1:complete-ds-action-code-then-source-order"},
-        "exec_tier": {"const": "L2"},
+        "exec_tier": {"enum": ["L1", "L2"]},
         "risk": {"const": ""},
-        "range_ref_kind": {"const": "none"},
-        "execution_range_ref": {"const": ""},
+        "range_ref_kind": {"enum": ["concrete", "generic", "none"]},
+        "execution_range_ref": {"type": "string"},
     },
 }
 
@@ -578,6 +580,29 @@ def build_coverage_report(
     return "\n".join(lines)
 
 
+def apply_l1_allowlist(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """从 reviewed l1-demo-allowlist 派生 exec_tier=L1 + execution_range_ref(concrete)。
+
+    L1 唯一来源 = allowlist 段(纵切批)的 (device, primitive) 展开集, 非手写。
+    命中 → L1 + execution_range_ref=该 device 的 execution_range_cell + range_ref_kind=concrete;
+    未命中保持 classify_semantic_row 默认(L2 / none / "")。risk 不在此处理(risk-policy 单独 task)。
+    """
+    allowlist = safe_load_yaml(L1_ALLOWLIST)
+    l1_cell: dict[tuple[str, str], str] = {}
+    for entry in allowlist.get("allowlist", []):
+        device = entry["device"]
+        cell = entry["execution_range_cell"]
+        for prim in entry.get("primitives", []):
+            l1_cell[(device, prim)] = cell
+    for row in rows:
+        cell = l1_cell.get((row["device"], row["action_primitive"]))
+        if cell is not None:
+            row["exec_tier"] = "L1"
+            row["execution_range_ref"] = cell
+            row["range_ref_kind"] = "concrete"
+    return rows
+
+
 def main() -> int:
     manifest = load_manifest()
     try:
@@ -588,6 +613,7 @@ def main() -> int:
         print(f"failure_receipt={CONTRACTS_DIR / 'semantic-function-contract.failure-receipt.md'}", file=sys.stderr)
         return 2
 
+    rows = apply_l1_allowlist(rows)
     transitions, _, followup_stats = build_followup_rows(manifest, rows)
     validate_contract_rows(rows)
 

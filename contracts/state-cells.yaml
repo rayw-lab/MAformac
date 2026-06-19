@@ -18,13 +18,13 @@ meta:
     对齐分支端态打点纠错口径(CLAUDE.md:80), 非协议四级表一手真值。
   # C1↔C2 闭合: 现未闭合(C1 execution_range_ref 全空 const "", l1-allowlist 未建)
   c1_c2_closure:
-    status: deferred
-    deferred_until: l1-demo-allowlist
+    status: active
+    activated_at: "2026-06-19"
     note: >-
-      execution_range_ref 闭合 + allowlist.required_state_cell_groups 闭合校验
-      待 l1-demo-allowlist.yaml + risk-policy.yaml 落地时同刀启用;
-      届时必须同步改 gen_c1.py(exec_tier/risk/execution_range_ref 硬约束)
-      与 verify_refs.py(L2/risk 空值断言)。现阶段只跑 C2 内部门, 不假装闭合。
+      C1↔C2 闭合已启用(T2): gen_c1.apply_l1_allowlist 从 l1-demo-allowlist 派生 exec_tier=L1
+      + execution_range_ref=execution_range_cell(concrete); verify_refs.verify_l1_closure
+      双向校验(L1 行集 ≡ allowlist 展开集; L1 ref 落 C2 存在 cell; L2 ref 空)。
+      risk 仍全空(risk-policy task 3.1 未做, 不影响闭合)。
 
 # ===== L1 精做设备 cell 组（纵切两设备先行; 完整 cell 组, 非单 cell）=====
 devices:
