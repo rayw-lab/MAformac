@@ -65,7 +65,7 @@
 
 | Repo / 资源 | star / pushedAt | adopt 什么 |
 |---|---|---|
-| **MadeAgents/Hammer** ⭐ | 119★ / 2025-06(ICLR25 Spotlight) | 端侧 FC + Qwen 底座 + **function masking**(函数名/参数名随机掩码,逼模型靠 description 语义理解、防作弊)+ **拒识数据**(无匹配 tool → output `[]`)+ 训练脚本 |
+| **MadeAgents/Hammer** ⭐ | 119★ / 2025-06(arxiv 2410.04587,**无会议背书**;超1年未动→方法学原始+stdlib稳定仍 adopt,补 GOAT/xLAM 更新鲜)| 端侧 FC + Qwen 底座 + **function masking**(函数名/参数名随机掩码,逼模型靠 description 语义理解、防作弊;§28 核:data_processing.py 293行纯stdlib,与训练框架解耦)+ **拒识数据**(无匹配 tool → output `[]`)+ 训练脚本 |
 | **Salesforce/xLAM + xlam-function-calling-60k** ⭐ | 628★ / 2026-06 | 数据格式标准 `{query, tools[], answers[]}` = **协议表→训练对的天然 JSON 落点**;APIGen 三阶段过滤(语法/可执行/语义) |
 | **unslothai/unsloth** ⭐ | 66795★ / 2026-06-18 | Qwen3-1.7B LoRA/QLoRA 训练框架,2× 速度半显存 |
 | **argilla/distilabel** | 3283★ / 2026-06-15 | 合成数据 pipeline 编排(模板填槽→LLM 改写→校验) |
