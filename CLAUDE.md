@@ -2,8 +2,8 @@
 project: MAformac — Master Agent for macOS / iOS
 mode: solo / demo-tool          # 激活 fresheveryday-mode 轻治理（见全局 rules）
 methodology: OpenSpec(做什么) + Pocock(哪阶段) + Superpowers(怎么执行)
-status: apply 阶段(change1/2 done+archive) → 7-change 依赖序;当前 = spike E3(change3 生死线)
-updated: 2026-06-18
+status: 契约 SSOT 重构(define-c1c2-contract C1+C2 propose done,待 GPT Pro 审 + 拍 open question);路线 v2(旧 7-change 已物理 park)
+updated: 2026-06-19
 ---
 
 # MAformac — 项目宪法
@@ -25,23 +25,23 @@ MAformac 是**纯端侧（macOS + iOS）、完全离线、Qwen3 小模型 + LoRA
 
 **OpenSpec 核心机制**:`openspec/specs/` = 唯一事实源(行为契约);`openspec/changes/` = 提议(自包含文件夹,archive 才 merge)。Spec 只写可观察行为(Requirement SHALL + Scenario GIVEN/WHEN/THEN),不写实现。Delta(ADDED/MODIFIED/REMOVED)。Artifact 流是依赖图不是死门(可迭代回改),但守 **agree before build**。
 
-### MAformac 默认路线（S0–S6,方向非瀑布门）
+### MAformac 默认路线（v2,2026-06-19 全量重构;方向非瀑布门）
 
-`S0 资料堆 ✅ → S1 OpenSpec 建项契约 → S2 capability 样板 → S3 文本 mock 闭环 → S4 模型 benchmark → S5 离线语音闭环 → S6 iOS/macOS 个人演示包`
+旧 8 能力扁平契约 + 二分路由被基座内化推翻 → 新路线以**契约 SSOT 为根**(C1 全集语义契约 + C2 场景端态),后续执行/路由/LoRA/bench/voice 在其上 rebase。
 
 | 状态 | 目标 | openspec 落点 |
 |---|---|---|
-| S0 资料堆 ✅ | 调研/基座/蓝图落地 | `docs/` |
-| **S1 建项契约**(当前) | demo 做什么/为什么/成功标准/行为契约 | change `define-demo-mvp-contract`(proposal/specs/design/tasks) |
-| S2 capability 样板 | 8 条样板防漂移 | `contracts/capabilities.yaml` |
-| S3 文本 mock 闭环 | 核心链路可跑 | 文本→意图→ToolCall→DemoGuard→mock state→trace |
-| S4 模型 benchmark | 数据拍模型(先 1.7B) | — |
-| S5 离线语音闭环 | push-to-talk + ASR + TTS | — |
+| S0 资料堆 ✅ | 调研/基座/4 金钥匙内化 | `docs/` |
+| S1 建项契约 ✅ | demo 做什么/成功标准/行为契约(骨架) | `define-demo-mvp-contract`(archive) |
+| **S2 契约 SSOT 重构**(当前) | 全集语义契约 + 场景端态(推翻扁平 8 能力) | **`define-c1c2-contract`(C1 semantic-function-contract + C2 scenario-state-protocol)** |
+| S3 执行契约层 + 文本 mock 闭环 | 核心链路可跑 | C3(文本→意图→ToolCall→DemoGuard→mock state→trace) |
+| S4 三层路由 + 意图收缩 + LoRA 全量 | 语义广听懂 + 分层兜底 | C4 + C5 |
+| S5 bench 不丢脸基线 + 离线语音 | 全集覆盖死门 + push-to-talk | C6 + C7 |
 | S6 个人演示包 | iPhone 可装、断网可演 | — |
 
-PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈specs+capabilities.yaml / ARCH≈design.md / 任务≈tasks.md / 决策≈design 内 Architecture Decisions(承接 D1–D37)。
+PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈specs+contracts / ARCH≈design.md / 任务≈tasks.md / 决策≈design 内 Architecture Decisions(承接 D1–D37 + Q1–Q15)。
 
-> **想清楚先行**(2026-06-17 教训,两次踩坑):起任何 change 前,Pocock 先分诊"要不要先 grill/脑暴";**不跳过 explore 直奔 propose,也不跳过 propose 直奔代码**。
+> **想清楚先行**(2026-06-17/19 教训):起任何 change 前先 brainstorm/grill;**不跳过 explore 直奔 propose,也不跳过 propose 直奔代码**。C1/C2 经 Q1–Q15 脑暴(CC↔codex,2 轮 oracle)定稿。
 
 ## 3. 文档与工作区
 
@@ -51,13 +51,13 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 | `AGENTS.md` | Codex 入口(路由到 CLAUDE.md) |
 | `docs/README.md` | 文档地图(短入口) |
 | `docs/project/collaboration-and-roles.md` | **协作分工 + 三工具协作(§7)** |
-| `docs/research-archive-*.md` / `tech-baseline-*` / `integration-blueprint.md` | P0 调研/基座/蓝图(→ 喂 design.md) |
-| `docs/second-review-2026-06-17/` | Codex cross-vendor 二审 |
-| `openspec/config.yaml` | 项目上下文 + artifact 硬规则(propose 防漂移) |
+| `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` | **C1/C2 决策全料**(Q1–Q15 + oracle + 领域语言) |
+| `docs/research-archive-*.md` / `tech-baseline-*` / `integration-blueprint.md` | P0 调研/基座/蓝图(部分被 v2 supersede,见各文件标注) |
+| `openspec/config.yaml` | 项目上下文 + artifact 硬规则(propose 防漂移,已 v2) |
 | `openspec/specs/` | **行为契约事实源**(capabilities) |
-| `openspec/changes/` | 进行中的变更 |
-| `contracts/capabilities.yaml` *(S2 建)* | **唯一契约源**(其余 tool_schemas.json 等皆生成物) |
-| `docs/handoffs/` *(待建)* | session 交接(收工 ≤ 40 行) |
+| `openspec/changes/` | 进行中变更;`_parked/` = 旧 7-change 暂缓(见其 README) |
+| `contracts/semantic-function-contract.jsonl` *(C1 建)* | **唯一契约源**(源行级全集;`function-spec-full.yaml`/规则/LoRA/bench 皆生成物) |
+| `docs/handoffs/` | session 交接(收工 ≤ 40 行) |
 
 > `docs/` 放**设计资产**(相对稳定);`openspec/` 放**活的推进事实源**(随 archive 生长)。互补不重复。
 
@@ -67,44 +67,49 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 - **大脑**:Qwen3-**1.7B + LoRA = 候选主线**(先 1.7B 推进,**不前置 benchmark**;0.6B 为轻量 fallback;FoundationModels 仅 baseline/逃生口)。`LLMBackend` 协议可换 → 主 `mlx-swift-lm`,备 `llama.swift`/llamafile。
 - **语音**:WhisperKit(ASR,D14);**文本先行**(开发序,D15)、ASR 必交付;barge-in 首版按钮打断(D13)。
 - **车控**:全 mock(D16)——**端状态自包含 = UI 卡片亮暗 + TTS 模拟**,无外部系统方。
-- **架构**:7 层(理解→路由→规划→安全→执行 + barge-in 包裹 + DialogueState 贯穿),详见 baseline §3。
-- **核心抽象**:`Capability`(本地/MCP 同构)+ 统一 `Tool` schema + **`contracts/capabilities.yaml` 单一事实源**(模型/规则/UI/eval/LoRA 数据皆派生)。
-- **规则 vs 模型**:规则吃 80% 高频明确,LLM 只碰 20% 模糊/跨域;**LoRA 必做**(只练"模糊说→跨域映射")。
+- **架构**:理解→**三层路由(规则 NLU / 意图收缩 clarifyTag→FC 泛化 / 慢思考)**→规划→安全门→**分层执行兜底(L1 精做 / L2 通用 mock / L3 越界 / L4 安全)**+ barge-in 包裹 + DialogueState 贯穿。
+- **核心抽象**:`Capability` + 统一 `Tool` schema + **契约 SSOT = `semantic-function-contract`(C1,源行级全集)+ `scenario-state-protocol`(C2,场景端态)**(模型/规则/UI/eval/LoRA 数据皆派生;`value` 四件套 + device×动作原语×槽三元 + clarifyTag)。
+- **规则 vs 模型**:规则吃 80% 高频明确,LLM 只碰 20% 模糊/跨域;**LoRA 全量必做**(练"模糊说→跨域映射",加权采样非笛卡尔积)。
+- **不丢脸**:客户随意说全集 → 语义广听懂(LoRA)+ mock 分层兜底(L1 ~10 精做 / L2 广覆盖),不只 8 个窄 case。
 - **多 domain**:P1 车控;导航/音乐/外卖 via MCP 二期。
 
 ## 5. 关键已锁决策
 
-D1–D37 全锁(D20/D30/D35/D37 已于 2026-06-17 对话拍板),见 `tech-baseline §12 + §12.1` 与 `supplement §17`。铁律:规则吃 80% / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS / runtime 抽象先行 / LoRA Day1 埋 trace。
+D1–D37 + **Q1–Q15**(C1/C2 契约,见 grill/ADR)。铁律:规则吃 80% / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS / runtime 抽象先行 / LoRA Day1 埋 trace。
+
+**v2 重审(2026-06-19)**:D16 端态 8→102 原子能力 P0 子集(C2)/ D30 训练栈 adopt unsloth+Hammer+xLAM(C5)/ D35 must-pass→全集覆盖率双轴 bench(C6)/ D37 安全门→risk-policy 单源(R0–R3 收 ASIL/forbidden)+ clarifyTag。**范围真值纠错**(端态打点为准,旧 16-30/0-5 是拍错):空调温度 **18-32℃**(车型相关)、风量 **1-10 档**、座椅 0-3、车窗 0-100%。**契约 SSOT 全集精确靠 codegen 从冻结快照派生(非手写)+ 分流账本(unclassified=0,quarantine≠drop)**。
 
 ## 6. 边界红线（硬约束,无例外）
 
-源料来自真实座舱项目(某车厂)+ repo 研究。**只抽象语义/架构/协议,绝不复制**:真实客户公司名(一律「某车厂」)、报价/成本、密钥/PII、标注「禁止外传/对内」的原文。RAW(`~/workspace/raw/`)与下载目录是**只读参考源,不进 MAformac 仓、不上 GitHub(即便 private)、不入训练集**。仓已上云 `rayw-lab/MAformac`(private),边界更要守。
+源料来自真实座舱项目(某车厂)+ repo 研究。**只抽象语义/架构/协议,绝不复制**:真实客户公司名(一律「某车厂」)、车型代号、报价/成本、密钥/PII、标注「禁止外传/对内」的原文。RAW(`~/workspace/raw/`)与下载目录是**只读参考源,不进 MAformac 仓、不上 GitHub(即便 private)、不入训练集**。冻结源快照在外部 raw 只读,仓内只放 manifest(hash)+ JSONL 镜像 + 派生物。仓已上云 `rayw-lab/MAformac`(private),边界更要守。
 
 ## 7. 协作约定（给未来 Claude）
 
-- 称呼「磊哥」;默认中文;术语首现「中文（English）」。
-- 分工:磊哥拍板;Claude+GPT Pro 陪聊定 what;**Claude 管前端+原型**;Codex 代码长跑(20h,TDD);GPT Pro 云端审 PR。详见 collaboration-and-roles.md。
-- **solo demo 轻治理**:能取巧的运行时灵活取巧,但 **LoRA / 安全门控 / 能力治理不省**。
+- 称呼「磊哥」;默认中文;术语首现「中文（English）」。**选择题打字列选项 + ⭐默认,不用 AskUserQuestion 弹窗**(磊哥环境看不到弹窗)。
+- 分工:磊哥拍板;Claude+codex 脑暴定 what(CC↔codex grill);**Claude 管前端+原型 + 契约设计**;Codex 代码长跑(TDD)+ 脑暴对手;GPT Pro 云端审 PR/设计。详见 collaboration-and-roles.md。
+- **solo demo 轻治理**:能取巧的运行时灵活取巧,但 **LoRA / 安全门控 / 能力治理 / 契约 SSOT 不省**。
 - 选择题给 ⭐ 默认 + 量化,不制造决策疲劳。
-- **agree before build**:spec 未对齐不写实现代码;**想清楚未做不起 propose**。
+- **agree before build**:spec 未对齐不写实现代码;**想清楚未做不起 propose**;**重大设计先讨论别急执行**(2026-06-19 教训,见 memory)。
 
 ## 8. 维护纪律（经常回忆更新）
 
 本宪法 + `collaboration-and-roles.md` + 默认路线 + decisions + `openspec/config.yaml` 是**活文档**:
-- 重大决策/路线调整/协作方式变化 → **立即回写**对应文件。
+- 重大决策/路线调整/协作方式变化 → **立即回写**对应文件(基建文档级联,相关都更新)。
 - 新 session 起手回忆;阶段推进(S→S)时复核路线与 decisions 是否仍成立。
 - 三工具协作的实际命中与盲点 → 回写 collaboration §7。
 
-## 9. 下一步:apply 阶段（change1/2 done+archive,spike E3 是当前生死线）
+## 9. 下一步:C1/C2 契约 SSOT(propose done → 审 → apply)
 
-契约层完成:6 change propose done;**change1/2 已实装 + archive**(`specs/demo-experience` + `specs/vehicle-capabilities` 入库)。座舱三层原理调研后**新增 `define-intent-routing`(路线 6→7 change)**。
+**路线 v2**(旧 7-change 已 park → `openspec/changes/_parked/`,见其 README 复用度):
 
-**7-change 路线 + 状态**:
-- 1 `demo-mvp` ✅ **done+archive**(15/15,walking skeleton) / 2 `capability` ✅ **done+archive**(8 cabin.* 定稿;deep-audit cross-vendor 35/40 YELLOW)
-- 3 `execution`(当前):**纯 execution**(消费上游 ToolCallFrame;adopt mlx-swift-lm 薄层)。起手 = **spike E3 派 Codex**(验 base 1.7B function call,生死线;加 pre-mortem 硬 gate:触发率≥80%/格式塞content/拒识负样本/延迟/G3参数规划mini-spike)。arguments→JSONValue 留本 change(import MLXLMCommon 会拖整个 MLX Metal 栈)
-- **新 `define-intent-routing`**(未 propose):三层分流(规则NLU/FC快思考泛化/慢思考)+ FC 泛化层 G3/G4 读端状态参数规划 + 规则快路径完整化;**explore 排在 spike E3 之后**(用实测数据,不拍脑袋)
-- 4 `voice` / 5 `lora` / 6 `vehicle-tool-bench`:propose✅ 待 apply;每个 apply 前 pre-mortem reflex 自动跑,派 Codex 用 `docs/dispatches/_TEMPLATE.md`
+- ✅ `define-demo-mvp-contract`(archive,骨架)
+- ⚠️ `define-capability-contract`(archive,扁平 8 能力)→ 被 C1 supersede
+- **`define-c1c2-contract`(当前,propose done,一个 change 两个 capability spec):**
+  - **C1 `semantic-function-contract`**:源行级 JSONL 全集(`airControl/carControl/cmd`,source_rows≈3990,codegen 从冻结快照派生)+ value 四件套 + device×原语×槽三元 + clarifyTag + followup sidecar + risk-policy + l1-allowlist + 冻结快照 manifest(双 hash)+ 分流账本 + `make verify` 本地门
+  - **C2 `scenario-state-protocol`**:demo 场景端态(L1_device ∪ scenario_required ∪ safety)+ execution_range 权威 + demo scenarios + 脱敏参考映射(非量产复刻)
+  - 接口互锁写 design.md 共享段;archive 同波(避双向循环)
+- **C3–C7(parked,C1/C2 archive 后 rebase)**:C3 执行契约层(←execution 骨架可复用 46340f1)/ C4 三层路由+意图收缩(←intent-routing 重写)/ C5 LoRA 全量(←lora 重写)/ C6 vehicle-tool-bench(←bench 重写)/ C7 voice(←voice 高可复用)
 
-**座舱原理 + demo 边界**(全料 `docs/cockpit-voice-fc-premortem-2026-06-18.md`):真实座舱三层非二分;**🟡 demo 不接真车,量产标准(ISO26262/端云/QPS/误吸率)豁免,但安全门思想/参数规划/读mock态/工具约束/LoRA 保留**。
+**当前断点**:C1/C2 propose done → **提 PR + GPT Pro 云端审契约设计**(含 2 open question:C2 端态一手源 / L1 allowlist ~10 名单待磊哥拍)→ 审回 + 拍 open question → `/opsx:apply` 进 build(甲-混:纵切 空调温度+车窗 验全栈再横铺)。
 
-起手读:本文件 → 最近 `docs/handoffs/` → `docs/cockpit-voice-fc-premortem-2026-06-18.md` → `docs/{voice,execution}-pre-mortem-2026-06-18.md`(坑点全料)。
+起手读:本文件 → 最近 `docs/handoffs/` → `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md`(C1/C2 全料)→ `docs/cockpit-voice-fc-premortem-2026-06-18.md`(座舱原理 + demo 边界)。

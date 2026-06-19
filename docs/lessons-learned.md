@@ -52,6 +52,9 @@
 `GitNexus 03-openspec-input` / `Codex 03-capabilities-catalog` / `tech-baseline §4.1` 三处 schema draft 字段不一致 → 在 `define-capability-contract` change **三合一定稿一份权威**,其余标"历史草案"。
 
 ### 修订后 OpenSpec change 拆法(2026-06-18 收敛为 6 个)
+
+> ⚠️ **已转 v2(2026-06-19 全量重构)**:本 6-change 拆法被 `define-c1c2-contract`(C1+C2 契约 SSOT)推翻,旧 change 物理 park(`openspec/changes/_parked/`)。以 `CLAUDE.md §9` + `openspec/config.yaml` v2 + `docs/adr/0001-*` 为准;本段保留作历史。
+
 1. `define-demo-mvp-contract` — demo 成功标准/non-goals/边界;**MVP=车控+ASR+TTS+LoRA**
 2. `define-capability-contract` — 三处 schema 三合一 + 8 条样板;vss_path 可选(MVP 不强制)
 3. `define-execution-contract` — `ToolCallFrame` + Qwen3 工具调用 XML 解析 + `DemoGuard` 代码门 + mock state + readback + trace;这条执行链紧耦合,合一比拆成 toolcall/guard 更稳。

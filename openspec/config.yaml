@@ -21,16 +21,16 @@ context: |
   默认路线(方向非瀑布门):S0 资料堆 → S1 OpenSpec 建项契约 → S2 capability 样板 → S3 文本 mock 闭环
            → S4 模型 benchmark → S5 离线语音闭环 → S6 iOS/macOS 个人演示包。
 
-  OpenSpec change 拆法(2026-06-18,7 个;权威见 docs/lessons-learned.md §E/§F):
-  1. define-demo-mvp-contract ✅done+archive(顶层:成功标准/non-goals/边界/MVP=车控+ASR+TTS+LoRA/5幕)
-  2. define-capability-contract ✅done+archive(capabilities.yaml schema 三合一 + 8 车控能力)
-  3. define-execution-contract(**纯 execution**:消费上游 ToolCallFrame + adopt mlx-swift-lm 薄层 + 错误枚举 + DemoGuard 代码门 + mock state + readback + trace;起手 spike E3 验 base 1.7B function call)
-  4. define-voice-contract(WhisperKit ASR + SpeechTextNormalizer + TTS + 语音态机)
-  5. define-lora-pipeline(bug 数据脱敏 → 五件套 → MLX-LM LoRA)
-  6. define-vehicle-tool-bench(eval:demo must-pass=100% + 泛化≥85 + Unsafe=0 / readback mismatch=0 死门)
-  7. define-intent-routing(**2026-06-18 新增**,座舱三层原理调研后:三层分流[规则NLU/FC快思考泛化/慢思考] + FC 泛化层 G3/G4 读端状态参数规划 + 规则快路径完整化;explore 排 spike E3 后,用实测数据不拍脑袋)
-  依赖序(非串行 gate):1✅ → 2✅ →（3 execution[spike E3 先] + 7 intent-routing[spike 后 explore]）→ 4 voice →（5、6 依赖 2）。
-  座舱三层原理 + demo 边界(量产标准豁免/安全门思想保留)全料:docs/cockpit-voice-fc-premortem-2026-06-18.md。
+  OpenSpec change 拆法(v2,2026-06-19 全量重构;旧 7-change 已物理 park → openspec/changes/_parked/,见其 README 复用度):
+  ✅ define-demo-mvp-contract done+archive(成功标准/non-goals/边界/MVP/5幕,骨架保留)
+  ⚠️ define-capability-contract done+archive(扁平 8 能力)→ 被 C1 supersede(新 semantic-function-contract spec 替代 vehicle-capabilities)
+  **当前:define-c1c2-contract(一个 change,两个 capability spec delta,CC 亲自设计)**
+    - C1 semantic-function-contract:源行级 JSONL 全集(airControl/carControl/cmd,source_rows≈3990,codegen 派生非手写)+ value 四件套 + device×原语×槽三元 + clarifyTag + followup sidecar + risk-policy + l1-allowlist + 冻结快照 manifest + 分流账本(unclassified=0/quarantine≠drop)+ make verify 本地门
+    - C2 scenario-state-protocol:demo 场景端态(L1_device_cells ∪ scenario_required_cells ∪ safety_cells)+ execution_range 权威 + demo scenarios + 脱敏参考映射
+    - 接口互锁(execution_range_ref/range_ref_kind/l1-allowlist)写 design.md 共享段;archive 同波(避双向循环)
+  C3–C7(parked,C1/C2 archive 后按 _parked/README 复用度 rebase):C3 执行(←execution,骨架可复用 46340f1)/ C4 三层路由+意图收缩(←intent-routing,重写)/ C5 LoRA 全量(←lora,重写)/ C6 vehicle-tool-bench(←bench,重写)/ C7 voice(←voice,高可复用)
+  依赖序:C1+C2(当前,CC 设计)→ C3 → C4 → C5 → C6 → C7。甲档=生成式全集精确(codegen 派生非手写)+ 甲-混节奏(C1/C2 先做对,纵切 空调温度+车窗 验全栈,再横铺)。
+  决策全料:docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md + docs/adr/0001-generated-full-contract-with-mixed-delivery.md + CONTEXT.md(领域语言)。
 
   边界红线(无例外):
   - 不做真车控 / CAN·ECU·OBD / 量产座舱 / 客户侧运行产品。
@@ -38,7 +38,7 @@ context: |
     真实客户公司名(一律「某车厂」)/ 车型代号 / 报价 / 密钥 / PII / 真实人名 / 禁外传原文
     **绝不入仓、不上云、不进训练集**。
   - **真实座舱 bug 训练集(即便本地脱敏)不入仓、不上云;仅 LoRA 权重产物可入仓**。
-  - 唯一契约源:contracts/capabilities.yaml(其余 tool_schemas.json 等皆为生成物)。
+  - 唯一契约源(v2):contracts/semantic-function-contract.jsonl(C1 源行级主源;function-spec-full.yaml/规则查表/LoRA 话术/bench fixture 皆生成物;旧 capabilities.yaml 被 C1 supersede)。冻结源 xlsx 快照在外部 raw 只读 + manifest 锚 content_digest,仓内只放 manifest + JSONL 镜像 + coverage 报告(源料绝不进仓)。
 
 # 各 artifact 的硬规则 —— 创建对应 artifact 时强制遵守
 rules:
