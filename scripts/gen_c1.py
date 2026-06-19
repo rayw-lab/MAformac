@@ -142,6 +142,94 @@ def nonempty_hash(value: str) -> str:
     return sha256_text(value) if value else ""
 
 
+def classify_semantic_row(
+    manifest: dict[str, Any],
+    sheet_name: str,
+    row: dict[str, Any],
+    header_map: dict[str, int],
+) -> tuple[str, dict[str, Any]]:
+    """Classify one source row as ('valid', record) or ('quarantine', record).
+
+    Pure decision unit extracted from build_semantic_rows so quarantine logic is
+    unit-testable (scripts/test_quarantine.py). Behavior is byte-identical to the
+    prior inline loop, guarded by `make verify` regen + git diff --exit-code.
+    """
+    row_no = row["row_no"]
+    row_values = row["values"]
+    source_row_hash = sha256_json({"sheet": sheet_name, "row_no": row_no, "values": row_values})
+    function_text = row_values[header_map["function_text"]]
+    ds_text = row_values[header_map["ds_protocol"]]
+    if not row["nonblank"] or not function_text or not ds_text:
+        return "quarantine", quarantine_record(manifest, sheet_name, row_no, source_row_hash, "empty_semantics")
+    try:
+        ds_protocol = parse_ds_protocol(ds_text)
+        service = normalize_cell(ds_protocol.get("service")) or sheet_name
+        intent = normalize_cell(ds_protocol.get("intent"))
+        slots = ds_protocol.get("semantic", {}).get("slots", {})
+        if not isinstance(slots, dict):
+            raise ValueError("semantic.slots is not an object")
+        value = extract_value_tuple(slots, sheet_name, row_no)
+    except ValueExtractionError:
+        raise
+    except Exception as exc:
+        return "quarantine", quarantine_record(
+            manifest, sheet_name, row_no, source_row_hash, "malformed", detail=str(exc)
+        )
+    if not service or not intent:
+        return "quarantine", quarantine_record(
+            manifest, sheet_name, row_no, source_row_hash, "malformed", detail="missing service or intent"
+        )
+    action_code = row_values[header_map["action_code"]]
+    slot, slot_keys = slot_identity(slots)
+    semantic_range = row_values[header_map["semantic_range"]]
+    fc_fuzzy = row_values[header_map["fc_fuzzy"]]
+    fc_free = row_values[header_map["fc_free"]]
+    example = row_values[header_map["example_utterance"]]
+    canonical_basis = {"service": service, "function_text": function_text}
+    canonical_hash = sha256_json(canonical_basis)[:16]
+    return "valid", {
+        "contract_row_id": f"c1_{sheet_name}_{row_no:06d}",
+        "source_domain": sheet_name,
+        "source_sheet": sheet_name,
+        "source_row_no": row_no,
+        "source_row_hash": source_row_hash,
+        "service": service,
+        "intent": intent,
+        "ds_protocol": ds_protocol,
+        "value": value,
+        "device": derive_device(intent),
+        "action_primitive": normalize_primitive(action_code, intent),
+        "slot": slot,
+        "slot_keys": slot_keys,
+        "action_code": action_code,
+        "range": semantic_range,
+        "range_class": classify_range(semantic_range),
+        "fc_flags": {
+            "fuzzy": bool(fc_fuzzy),
+            "free": bool(fc_free),
+            "fuzzy_hash": nonempty_hash(fc_fuzzy),
+            "free_hash": nonempty_hash(fc_free),
+        },
+        "clarify_tag": "implicit" if fc_fuzzy or fc_free else "explicit",
+        "second_turn_refs": [],
+        "redaction_state": "example_hash_only",
+        "example_utterance_hash": nonempty_hash(example),
+        "example_utterance_kind": "source_example" if example else "none",
+        "external_evidence_ref": (
+            f"snapshot:{manifest['snapshot_id']}:semantic_protocol_edit:{sheet_name}:{row_no}"
+        ),
+        "evidence_ref_kind": "snapshot",
+        "canonical_semantic_id": f"sem_{canonical_hash}",
+        "dedupe_group_id": f"dedupe_{canonical_hash}",
+        "dedupe_role": "variant",
+        "primary_selection_rule_version": "v1:complete-ds-action-code-then-source-order",
+        "exec_tier": "L2",
+        "risk": "",
+        "range_ref_kind": "none",
+        "execution_range_ref": "",
+    }
+
+
 def build_semantic_rows(manifest: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     source_file = snapshot_file_path(manifest, "semantic_protocol_edit")
     sheets = extract_workbook(source_file, CORE_SHEETS)
@@ -160,107 +248,11 @@ def build_semantic_rows(manifest: dict[str, Any]) -> tuple[list[dict[str, Any]],
             "calculate_dimension": sheet.calculate_dimension,
         }
         for row in sheet.rows:
-            row_no = row["row_no"]
-            row_values = row["values"]
-            source_row_hash = sha256_json({"sheet": sheet_name, "row_no": row_no, "values": row_values})
-            function_text = row_values[header_map["function_text"]]
-            ds_text = row_values[header_map["ds_protocol"]]
-            if not row["nonblank"] or not function_text or not ds_text:
-                quarantine.append(
-                    quarantine_record(
-                        manifest,
-                        sheet_name,
-                        row_no,
-                        source_row_hash,
-                        "empty_semantics",
-                    )
-                )
-                continue
-            try:
-                ds_protocol = parse_ds_protocol(ds_text)
-                service = normalize_cell(ds_protocol.get("service")) or sheet_name
-                intent = normalize_cell(ds_protocol.get("intent"))
-                slots = ds_protocol.get("semantic", {}).get("slots", {})
-                if not isinstance(slots, dict):
-                    raise ValueError("semantic.slots is not an object")
-                value = extract_value_tuple(slots, sheet_name, row_no)
-            except ValueExtractionError:
-                raise
-            except Exception as exc:
-                quarantine.append(
-                    quarantine_record(
-                        manifest,
-                        sheet_name,
-                        row_no,
-                        source_row_hash,
-                        "malformed",
-                        detail=str(exc),
-                    )
-                )
-                continue
-            if not service or not intent:
-                quarantine.append(
-                    quarantine_record(
-                        manifest,
-                        sheet_name,
-                        row_no,
-                        source_row_hash,
-                        "malformed",
-                        detail="missing service or intent",
-                    )
-                )
-                continue
-            action_code = row_values[header_map["action_code"]]
-            slot, slot_keys = slot_identity(slots)
-            semantic_range = row_values[header_map["semantic_range"]]
-            fc_fuzzy = row_values[header_map["fc_fuzzy"]]
-            fc_free = row_values[header_map["fc_free"]]
-            example = row_values[header_map["example_utterance"]]
-            canonical_basis = {"service": service, "function_text": function_text}
-            canonical_hash = sha256_json(canonical_basis)[:16]
-            valid_rows.append(
-                {
-                    "contract_row_id": f"c1_{sheet_name}_{row_no:06d}",
-                    "source_domain": sheet_name,
-                    "source_sheet": sheet_name,
-                    "source_row_no": row_no,
-                    "source_row_hash": source_row_hash,
-                    "service": service,
-                    "intent": intent,
-                    "ds_protocol": ds_protocol,
-                    "value": value,
-                    "device": derive_device(intent),
-                    "action_primitive": normalize_primitive(action_code, intent),
-                    "slot": slot,
-                    "slot_keys": slot_keys,
-                    "action_code": action_code,
-                    "range": semantic_range,
-                    "range_class": classify_range(semantic_range),
-                    "fc_flags": {
-                        "fuzzy": bool(fc_fuzzy),
-                        "free": bool(fc_free),
-                        "fuzzy_hash": nonempty_hash(fc_fuzzy),
-                        "free_hash": nonempty_hash(fc_free),
-                    },
-                    "clarify_tag": "implicit" if fc_fuzzy or fc_free else "explicit",
-                    "second_turn_refs": [],
-                    "redaction_state": "example_hash_only",
-                    "example_utterance_hash": nonempty_hash(example),
-                    "example_utterance_kind": "source_example" if example else "none",
-                    "external_evidence_ref": (
-                        f"snapshot:{manifest['snapshot_id']}:semantic_protocol_edit:{sheet_name}:{row_no}"
-                    ),
-                    "evidence_ref_kind": "snapshot",
-                    "canonical_semantic_id": f"sem_{canonical_hash}",
-                    "dedupe_group_id": f"dedupe_{canonical_hash}",
-                    "dedupe_role": "variant",
-                    "primary_selection_rule_version": "v1:complete-ds-action-code-then-source-order",
-                    "exec_tier": "L2",
-                    "risk": "",
-                    "range_ref_kind": "none",
-                    "execution_range_ref": "",
-                }
-            )
+            kind, record = classify_semantic_row(manifest, sheet_name, row, header_map)
+            if kind == "quarantine":
+                quarantine.append(record)
+            else:
+                valid_rows.append(record)
 
     by_canonical: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in valid_rows:

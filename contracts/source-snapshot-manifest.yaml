@@ -1,7 +1,7 @@
 version: 1
 snapshot_id: c1-2026-06-19-9b7e4b82
-frozen_at: '2026-06-19T09:26:19+00:00'
-snapshot_dir: /Users/wanglei/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82
+frozen_at: '2026-06-19T10:58:02+00:00'
+snapshot_dir: ~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82
 aggregate_content_digest: 9b7e4b827d4aa238464e80fe04ebc7888a70a12b71dcefc87d4614d8c763a002
 contract_scope:
   domains:
@@ -15,8 +15,8 @@ c1_semantic_sources:
   authority_kind: c1_primary
   source_filename: "\u516C\u7248\u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u534F\u8BAE\u8868-\u7F16\u8F91\u7248.xlsx"
   source_reachable: true
-  snapshot_file: "/Users/wanglei/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u516C\u7248\u8BED\
-    \u4E49\u56DB\u7EA7\u529F\u80FD\u534F\u8BAE\u8868-\u7F16\u8F91\u7248.xlsx"
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u516C\u7248\u8BED\u4E49\u56DB\
+    \u7EA7\u529F\u80FD\u534F\u8BAE\u8868-\u7F16\u8F91\u7248.xlsx"
   file_sha256: b4b9e88c1d61e84f255e8f05f11cc7fb5ece96f1dae9da118571132a3eefab6f
   content_digest: 4ebc3481cd18792f2274f8b0f2511c8934971f2cf1aa569f8d71cd3a53ad1422
   sheets_expected:
@@ -71,8 +71,8 @@ c1_reference_sources:
   source_filename: "\u591A\u8BED\u79CD\u516C\u7248\u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u5C55\u5F00\u534F\u8BAE\u8868V1\u7248\
     .xlsx"
   source_reachable: true
-  snapshot_file: "/Users/wanglei/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u591A\u8BED\u79CD\
-    \u516C\u7248\u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u5C55\u5F00\u534F\u8BAE\u8868V1\u7248.xlsx"
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u591A\u8BED\u79CD\u516C\u7248\
+    \u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u5C55\u5F00\u534F\u8BAE\u8868V1\u7248.xlsx"
   file_sha256: 55c3a5579c3505f8e3f0421b6dea72e12ac9393277fc37022e5e25da5ee70b49
   content_digest: f11908c928af00028d5ae21c8fbd03973a02b01de0fcf97bbaed53803378b65d
   sheets_expected:
@@ -125,8 +125,8 @@ c1_reference_sources:
   authority_kind: c1_reference
   source_filename: "\u8F66\u63A7\u529F\u80FD\u6253\u70B9\u8868.xlsx"
   source_reachable: true
-  snapshot_file: "/Users/wanglei/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u8F66\u63A7\u529F\
-    \u80FD\u6253\u70B9\u8868.xlsx"
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u8F66\u63A7\u529F\u80FD\u6253\
+    \u70B9\u8868.xlsx"
   file_sha256: 288cb105969c8395762aababdd38730e6239b0bdf3c82db0d290493603c297a0
   content_digest: 736055ef97e821898787e53ad5fbe52c56b7f4ac8e3bbd2278a6b92ba16ef26f
   sheets_expected:
@@ -179,8 +179,8 @@ c1_reference_sources:
   authority_kind: c1_followup_source
   source_filename: "\u4E0A\u4E0B\u6587\u4E8C\u6B21\u4EA4\u4E92\u529F\u80FD\u6E05\u5355.xlsx"
   source_reachable: true
-  snapshot_file: "/Users/wanglei/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u4E0A\u4E0B\u6587\
-    \u4E8C\u6B21\u4EA4\u4E92\u529F\u80FD\u6E05\u5355.xlsx"
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u4E0A\u4E0B\u6587\u4E8C\u6B21\
+    \u4EA4\u4E92\u529F\u80FD\u6E05\u5355.xlsx"
   file_sha256: 0ec81641241acf70b3c5a98db18247235ecc5b77d0772dc627dd4084d3cf53aa
   content_digest: 9eba70175bdebb98c99f1406c9e24c693587ac7122a0460d5aba90f9f588e5d6
   sheets_expected:

@@ -17,6 +17,7 @@ from c1_common import (
     file_sha256,
     load_manifest,
     manifest_path,
+    portable_path,
     sha256_json,
     utc_now_iso,
 )
@@ -36,7 +37,7 @@ def build_source_entry(source: dict, snapshot_dir: Path) -> dict:
         "authority_kind": source["authority_kind"],
         "source_filename": source["filename"],
         "source_reachable": live_path.exists(),
-        "snapshot_file": str(snapshot_path),
+        "snapshot_file": portable_path(snapshot_path),
         "file_sha256": file_sha256(snapshot_path),
         "content_digest": digest,
         "sheets_expected": source["expected_sheets"],
@@ -75,7 +76,7 @@ def freeze() -> dict:
         "version": 1,
         "snapshot_id": snapshot_id,
         "frozen_at": utc_now_iso(),
-        "snapshot_dir": str(snapshot_dir),
+        "snapshot_dir": portable_path(snapshot_dir),
         "aggregate_content_digest": aggregate_digest,
         "contract_scope": {
             "domains": list(CORE_SHEETS),
@@ -101,7 +102,7 @@ def check() -> dict:
     errors = []
     all_sources = manifest.get("c1_semantic_sources", []) + manifest.get("c1_reference_sources", [])
     for source in all_sources:
-        path = Path(source["snapshot_file"])
+        path = Path(source["snapshot_file"]).expanduser()
         if not path.exists():
             errors.append(f"missing snapshot file: {path}")
             continue

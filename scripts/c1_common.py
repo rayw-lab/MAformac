@@ -396,6 +396,19 @@ def content_digest_for_workbook(path: Path, expected_sheets: list[str]) -> tuple
     return digest, {"sheet_stats": sheet_stats, "missing_expected_sheets": missing}
 
 
+def portable_path(path: Path) -> str:
+    """Serialize a path as ~/... when under $HOME so committed manifest is machine-portable.
+
+    Avoids baking a personal absolute path (e.g. /Users/<name>/...) into the repo;
+    readers must call Path(value).expanduser().
+    """
+    home = Path.home()
+    try:
+        return f"~/{path.relative_to(home)}"
+    except ValueError:
+        return str(path)
+
+
 def manifest_path() -> Path:
     return CONTRACTS_DIR / "source-snapshot-manifest.yaml"
 
@@ -410,10 +423,10 @@ def load_manifest() -> dict[str, Any]:
 def snapshot_file_path(manifest: dict[str, Any], source_key: str) -> Path:
     for source in manifest.get("c1_semantic_sources", []):
         if source.get("source_key") == source_key:
-            return Path(source["snapshot_file"])
+            return Path(source["snapshot_file"]).expanduser()
     for source in manifest.get("c1_reference_sources", []):
         if source.get("source_key") == source_key:
-            return Path(source["snapshot_file"])
+            return Path(source["snapshot_file"]).expanduser()
     raise C1Error(f"source key not found in manifest: {source_key}")
 
 
