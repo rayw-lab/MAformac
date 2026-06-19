@@ -25,6 +25,7 @@ FOLLOWUP_JSONL = CONTRACTS_DIR / "semantic-followup-transitions.jsonl"
 QUARANTINE_JSONL = CONTRACTS_DIR / "semantic-quarantine.jsonl"
 FUNCTION_SPEC_YAML = CONTRACTS_DIR / "function-spec-full.yaml"
 COVERAGE_REPORT = CONTRACTS_DIR / "semantic-coverage-report.md"
+STATE_CELLS_YAML = CONTRACTS_DIR / "state-cells.yaml"
 
 UNRESOLVED_LIMIT = 0.02
 FORBIDDEN_SUBSTRINGS = [
@@ -145,7 +146,7 @@ def verify_range_classification(rows: list[dict[str, Any]]) -> None:
 
 
 def verify_leak_scan() -> None:
-    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT]
+    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         for marker in FORBIDDEN_SUBSTRINGS:
@@ -163,6 +164,87 @@ def verify_leak_scan() -> None:
         raise C1Error(f"xlsx files tracked in git:\n{result.stdout}")
 
 
+def verify_state_cells() -> str:
+    """C2 内部门: schema / source_kind / 数值 range / 四态不混业务枚举 / readback 引用。
+
+    C1↔C2 闭合(execution_range_ref + allowlist 闭合)现阶段显式 deferred,
+    不在此假装校验(C1 execution_range_ref 全空 + l1-demo-allowlist 未建)。
+    """
+    spec = safe_load_yaml(STATE_CELLS_YAML)
+    meta = spec.get("meta", {})
+    source_kind_enum = meta.get("source_kind_enum")
+    state_kinds_vocab = meta.get("state_kinds_vocab")
+    if not isinstance(source_kind_enum, list) or not source_kind_enum:
+        raise C1Error("state-cells: meta.source_kind_enum missing/empty")
+    if not isinstance(state_kinds_vocab, list) or not state_kinds_vocab:
+        raise C1Error("state-cells: meta.state_kinds_vocab missing/empty")
+    source_kind_set = set(source_kind_enum)
+    state_kinds_set = set(state_kinds_vocab)
+
+    def check_cell(cell: dict[str, Any], context: str) -> str:
+        for key in ("id", "type", "source_kind"):
+            if key not in cell:
+                raise C1Error(f"state-cells: {context} cell missing '{key}': {cell.get('id', '?')}")
+        cid = cell["id"]
+        if cell["source_kind"] not in source_kind_set:
+            raise C1Error(f"state-cells: {cid} bad source_kind {cell['source_kind']!r}")
+        ctype = cell["type"]
+        if ctype == "int":
+            rng = cell.get("execution_range")
+            if not isinstance(rng, dict) or not {"min", "max", "step"} <= set(rng):
+                raise C1Error(f"state-cells: int cell {cid} missing execution_range.min/max/step")
+            if rng["min"] > rng["max"]:
+                raise C1Error(f"state-cells: int cell {cid} min>max")
+            if rng["step"] <= 0:
+                raise C1Error(f"state-cells: int cell {cid} step<=0")
+        elif ctype == "enum":
+            values = cell.get("values")
+            if not isinstance(values, list) or not values:
+                raise C1Error(f"state-cells: enum cell {cid} missing values")
+        else:
+            raise C1Error(f"state-cells: {cid} unknown type {ctype!r}")
+        # 四态 vs 业务枚举分离: state_kinds 只能取生命周期词表, 不混 on/off/opening 等
+        bad = set(cell.get("state_kinds", [])) - state_kinds_set
+        if bad:
+            raise C1Error(f"state-cells: {cid} state_kinds mixes non-lifecycle values {sorted(bad)}")
+        return cid
+
+    all_ids: list[str] = []
+    devices = spec.get("devices", {})
+    if not isinstance(devices, dict) or not devices:
+        raise C1Error("state-cells: devices missing/empty")
+    for dkey, dev in devices.items():
+        cells = dev.get("state_cells", [])
+        if not cells:
+            raise C1Error(f"state-cells: device {dkey} has no state_cells")
+        local_ids = set()
+        for cell in cells:
+            cid = check_cell(cell, f"device {dkey}")
+            all_ids.append(cid)
+            local_ids.add(cid)
+        for ref in dev.get("readback_cell_group", []):
+            if ref not in local_ids:
+                raise C1Error(f"state-cells: device {dkey} readback_cell_group ref {ref!r} not in its state_cells")
+    for cell in spec.get("safety_cells", []) or []:
+        all_ids.append(check_cell(cell, "safety"))
+    for cell in spec.get("scenario_cells", []) or []:
+        all_ids.append(check_cell(cell, "scenario"))
+    if len(all_ids) != len(set(all_ids)):
+        raise C1Error("state-cells: duplicate cell id")
+
+    # 闭合状态: 现阶段必须显式 deferred(不假装闭合); active 需闭合校验已实装
+    closure = meta.get("c1_c2_closure", {})
+    status = closure.get("status")
+    if status not in ("deferred", "active"):
+        raise C1Error(f"state-cells: c1_c2_closure.status must be deferred|active, got {status!r}")
+    if status == "active":
+        raise C1Error(
+            "state-cells: closure=active but execution_range_ref/allowlist closure not implemented; "
+            "must stay deferred until l1-demo-allowlist + risk-policy land (同刀改 gen_c1/verify_refs)"
+        )
+    return status
+
+
 def main() -> int:
     manifest = load_manifest()
     rows = read_jsonl(CONTRACT_JSONL)
@@ -174,11 +256,13 @@ def main() -> int:
     verify_function_spec(rows)
     verify_range_classification(rows)
     verify_leak_scan()
+    state_cells_closure = verify_state_cells()
     print("schema=ok")
     print("refs=ok")
     print("ledger=ok")
     print("range_conflicts=ok")
     print("coverage=ok")
+    print(f"state_cells=ok (c1_c2_closure={state_cells_closure}, deferred_until=l1-demo-allowlist)")
     return 0
 
 
