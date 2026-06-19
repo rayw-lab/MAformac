@@ -4,6 +4,8 @@
 > **北极星**:方案经理给客户演示用,客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑。
 > **形态**:纯端侧(iOS/macOS)、离线、Qwen3-1.7B + LoRA 大脑(0.6B 仅作真机吃紧时的轻量备选)、mock 车控、可插拔多技能(Phase1 车控 → 导航/音乐/外卖 via MCP)。
 
+> ⚠️ **路线 v2(2026-06-19 全量重构,以此为准)**:旧 8 能力扁平契约 + 二分路由被基座内化推翻 → 契约 SSOT 重构 **`define-c1c2-contract`**(C1 `semantic-function-contract` + C2 `scenario-state-protocol`,propose done)。旧 7-change 已物理 park(`openspec/changes/_parked/`)。**路线/架构/决策以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-generated-full-contract-with-mixed-delivery.md` + `CONTEXT.md` 为准**;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**(保留作记录,不再据其执行)。范围真值纠错:空调温度 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 是拍错)。
+
 ## 文档清单(按阅读顺序)
 
 | 文档 | 内容 | 行数 |

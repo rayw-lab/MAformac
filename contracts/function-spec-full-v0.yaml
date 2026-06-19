@@ -1,12 +1,12 @@
-# MAformac 功能清单全集 v0 — 单一事实源(SSOT)
-# 内化自基座(某车厂语义四级协议,脱敏:只留 intent 协议骨架,不含原始语料/客户标识)。
+# MAformac 功能清单 v0 — ⚠️ 参考模板(reference_template),【非 C1 SSOT】
+# DO_NOT_USE_AS_C1_SOURCE_OF_TRUTH — C1 真源 = contracts/semantic-function-contract.jsonl
+#   (define-c1c2-contract,源行级全集 JSONL,从冻结快照 codegen 派生 + make verify 守护)。
+#   本文件仅手工样板(空调+座椅),供 codegen schema 设计参考,不作权威、不作覆盖率证明。
+# 内化自基座(某车厂语义四级协议,脱敏:只留 intent 协议骨架,不含原始语料)。
 # 设计:device × action-primitive × slot 三元分解(USPTO/Alexa 范式)+ value 四件套。
-# 用途:① codegen → tool schema(Qwen 原生格式)+ 规则查表 + LoRA 训练 schema + E2E bench
-#       ② 范围/步长对齐端态打点真值(非拍脑袋)
-# 状态:v0 模板(空调+座椅样板手工定);其余 device 由 codex 从基座 digest 全量生成(见 P0 dispatch)。
 
 version: 0
-source_of_truth: contracts/function-spec-full-v0.yaml
+authority: reference_template   # ⚠️ 非权威源;C1 SSOT = semantic-function-contract.jsonl
 redaction: intent协议骨架入仓 / 原始中文语料LoRA训练用不入仓(红线)
 
 # ── 归一化动作原语(12;基座 ~114 编码 → 12 原语)──

@@ -1,0 +1,174 @@
+# C2 场景端态协议 — state cells（demo 自有 mock 态）
+# ---------------------------------------------------------------------------
+# 归属: openspec change define-c1c2-contract / task 4.1（CC 设计, magnet reviewed 数值）
+# 三源并集: L1_device_cells ∪ scenario_required_cells ∪ safety_cells
+# execution_range = 执行边界唯一权威（C1 只能引用, 不得覆盖）
+# 脱敏: 仅座舱通用语义, 不含敏感商业或个人信息
+# 范围: 中文 only（华氏度/多语种暂搁, magnet 2026-06-19 定）
+# ---------------------------------------------------------------------------
+meta:
+  scope: zh-only
+  # source_kind 防"三份权威漂移"(C1语义 / C2执行 / 旧样板)
+  source_kind_enum: [c2_demo_decision, protocol_reference, dianpoint_reference]
+  # 生命周期态词表(3 态 empty/known/unknown); 业务取值放各 cell 的 values, 不混进 state_kinds
+  state_kinds_vocab: [empty, known, unknown]
+  # 数值边界来源说明(§28 已核: 4 协议表+打点表均不含硬边界)
+  range_authority_note: >-
+    18-32℃ / 风量 1-10 / 车窗 0-100% 均为 C2 demo 执行口径,
+    对齐分支端态打点纠错口径(CLAUDE.md:80), 非协议四级表一手真值。
+  # C1↔C2 闭合: 现未闭合(C1 execution_range_ref 全空 const "", l1-allowlist 未建)
+  c1_c2_closure:
+    status: active
+    activated_at: "2026-06-19"
+    note: >-
+      C1↔C2 闭合已启用(T2): gen_c1.apply_l1_allowlist 从 l1-demo-allowlist 派生 exec_tier=L1
+      + execution_range_ref=execution_range_cell(concrete); verify_refs.verify_l1_closure
+      双向校验(L1 行集 ≡ allowlist 展开集; L1 ref 落 C2 存在 cell; L2 ref 空)。
+      risk 仍全空(risk-policy task 3.1 未做, 不影响闭合)。
+
+# ===== L1 精做设备 cell 组（纵切两设备先行; 完整 cell 组, 非单 cell）=====
+devices:
+
+  air_conditioner:
+    display_zh: 空调
+    service: airControl
+    state_cells:
+      - id: ac.power
+        display_zh: 空调开关
+        type: enum
+        values: [on, off]
+        default: off
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "空调{已打开|已关闭}"
+        # ★ 状态感知读回炸点(真实 bug: 已关还回ok): query"关空调"先读 power→off→"已经是关闭的了"
+      - id: ac.temp_setpoint
+        display_zh: 空调温度
+        type: int
+        unit: celsius
+        scope: [主驾, 副驾, 左后, 右后, 全车]      # 协议 38 温区 → demo 精做 5, 余走 L2
+        execution_range: {min: 18, max: 32, step: 1}
+        source_kind: c2_demo_decision
+        exp_step:                                  # 经验值映射协议一手 offset token(§28)
+          little: 2                                # "调高/低一点" = ±2°C
+          gear: {LOWER: 18, LOW: 20, MIDDLE: 25, HIGH: 29, HIGHER: 32}  # "调到X挡"
+          extreme: {MAX: 32, MIN: 18}              # "调到最高/最低"
+        state_kinds: [empty, known, unknown]
+        depends_on: [ac.power]
+        readback_zh: "{温区}空调温度{值}度"
+      - id: ac.mode
+        display_zh: 空调模式
+        type: enum
+        values: [制冷, 制热, auto]
+        state_kinds: [empty, known, unknown]
+        source_kind: protocol_reference
+      - id: ac.fan_speed
+        display_zh: 空调风量
+        type: int
+        unit: gear
+        scope: [主驾, 副驾, 全车]
+        execution_range: {min: 1, max: 10, step: 1}  # magnet 拍: 对齐端态打点口径(非协议一手)
+        source_kind: c2_demo_decision
+        exp_step: {little: 1}
+        state_kinds: [empty, known, unknown]
+    readback_cell_group: [ac.power, ac.temp_setpoint, ac.mode, ac.fan_speed]
+
+  window:
+    display_zh: 车窗
+    service: carControl
+    state_cells:
+      - id: window.position
+        display_zh: 车窗开度
+        type: int
+        unit: percent
+        scope: [主驾, 副驾, 左后, 右后, 全车]      # 协议 32 position → demo 精做 5
+        execution_range: {min: 0, max: 100, step: 1}  # 0=全关(值, 非独立态)
+        source_kind: c2_demo_decision
+        exp_step: {little: 20}                      # "开大点/关小点" = ±20%(协议 _little)
+        gear_map: {"1挡": 25, "2挡": 50, "3挡": 75, "4挡": 100}  # 协议双轨(挡↔%), 映射=C2 决策
+        state_kinds: [empty, known, unknown]
+        readback_zh: "{位置}车窗开度{值}%"
+      - id: window.motion
+        display_zh: 车窗运动态
+        type: enum
+        values: [opening, closing, stopped, paused]
+        default: stopped
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        # 协议一手有 pause_function/pause_action → 必建 motion cell
+      - id: window.lock
+        display_zh: 车窗锁
+        type: enum
+        values: [locked, unlocked]
+        default: unlocked
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+    readback_cell_group: [window.position, window.motion, window.lock]
+
+  # ===== 横铺批设备组（task 4.1; 范式同 ac/window）=====
+
+  screen:
+    display_zh: 屏幕
+    service: cmd                                  # C1 jsonl device=screen_brightness service=cmd(§28 已核)
+    state_cells:
+      - id: screen.brightness
+        display_zh: 屏幕亮度
+        type: int
+        unit: percent                             # 协议 by_percent offset=<百分比>; 协议无硬边界 → demo 用百分比口径
+        scope: [中控屏, 仪表屏, 主驾屏, 副驾屏, 全车屏]  # 协议 screen_type 43 屏 → demo 精做 5, 余走 L2(§28: screen_type 一手枚举取子集)
+        execution_range: {min: 0, max: 100, step: 1}  # c2_demo_decision: 协议无硬边界(range_authority_note); 同 window.position 百分比口径
+        source_kind: c2_demo_decision
+        exp_step:                                 # 映射协议一手 offset token(§28)
+          little: 10                              # "调亮/暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
+        state_kinds: [empty, known, unknown]
+        readback_zh: "{屏幕}亮度{值}%"
+        # 炸点(模糊金例, 真实 bug 命中): "屏幕太暗了 → 调亮"(纯陈述→动作)
+    readback_cell_group: [screen.brightness]
+
+  ambient_light:
+    display_zh: 氛围灯
+    service: carControl                           # C1 jsonl device=atmosphere_lamp_* service=carControl(§28 已核)
+    state_cells:
+      - id: ambient.color
+        display_zh: 氛围灯颜色
+        type: enum
+        values: [红, 橙, 黄, 绿, 青, 蓝, 紫, 白]   # ⚠️ c2_demo_decision: 协议 set_mode offset=<序号>(索引), 无命名颜色枚举(§28) → demo 自定常用 8 色, 待 magnet 确认
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        # 协议 atmosphere_lamp_color 仅 set_mode primitive; "调成红色"=demo 把序号映射为命名色
+      - id: ambient.brightness
+        display_zh: 氛围灯亮度
+        type: int
+        unit: percent                             # 协议 by_percent offset=<百分比>; 协议无硬边界 → demo 用百分比口径
+        scope: [面发光氛围灯, 轮廓氛围灯, 门板氛围灯, 仪表板氛围灯, 中央通道氛围灯]  # 协议 name= 5 类(§28 一手), demo 全收
+        execution_range: {min: 0, max: 100, step: 1}  # c2_demo_decision: 协议无硬边界(range_authority_note); 百分比口径
+        source_kind: c2_demo_decision
+        exp_step:                                 # 映射协议一手 offset token(§28)
+          little: 10                              # "调暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
+        state_kinds: [empty, known, unknown]
+        readback_zh: "{氛围灯}亮度{值}%"
+    readback_cell_group: [ambient.color, ambient.brightness]
+
+# ===== 场景所需 cell（scenario_required）=====
+# demo-scenarios.yaml(magnet reviewed)5 幕已写: 涉及 cell 全部落在 device_cells(ac/window/screen/ambient)
+# ∪ safety_cells(vehicle.speed/gear) 内, 无额外场景专属 cell 需求 →  保持空。
+# 幕5 car_door 为安全门拒识(refuse_explain, 不下发), 无 mock 态变化, 故不需 door cell。
+scenario_cells: []
+
+# ===== 安全门 cell（safety）— L4 demo 优雅拒识（豁免 ISO26262）=====
+safety_cells:
+  - id: vehicle.speed
+    display_zh: 车速
+    type: int
+    unit: kmh
+    execution_range: {min: 0, max: 180, step: 1}
+    state_kinds: [empty, known, unknown]
+    source_kind: c2_demo_decision
+    # 行驶中(speed>0)"开车门" → 安全门拒识 + 解释(炸场效果, 非真功能安全)
+  - id: vehicle.gear
+    display_zh: 挡位
+    type: enum
+    values: [P, R, N, D]
+    default: P
+    state_kinds: [empty, known, unknown]
+    source_kind: c2_demo_decision

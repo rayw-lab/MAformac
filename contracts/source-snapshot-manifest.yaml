@@ -1,0 +1,222 @@
+version: 1
+snapshot_id: c1-2026-06-19-9b7e4b82
+frozen_at: '2026-06-19T10:58:02+00:00'
+snapshot_dir: ~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82
+aggregate_content_digest: 9b7e4b827d4aa238464e80fe04ebc7888a70a12b71dcefc87d4614d8c763a002
+contract_scope:
+  domains:
+  - airControl
+  - carControl
+  - cmd
+  source_rows: 3990
+  source_rows_basis: semantic_protocol_edit physical rows after header in airControl/carControl/cmd
+c1_semantic_sources:
+- source_key: semantic_protocol_edit
+  authority_kind: c1_primary
+  source_filename: "\u516C\u7248\u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u534F\u8BAE\u8868-\u7F16\u8F91\u7248.xlsx"
+  source_reachable: true
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u516C\u7248\u8BED\u4E49\u56DB\
+    \u7EA7\u529F\u80FD\u534F\u8BAE\u8868-\u7F16\u8F91\u7248.xlsx"
+  file_sha256: b4b9e88c1d61e84f255e8f05f11cc7fb5ece96f1dae9da118571132a3eefab6f
+  content_digest: 4ebc3481cd18792f2274f8b0f2511c8934971f2cf1aa569f8d71cd3a53ad1422
+  sheets_expected:
+  - airControl
+  - carControl
+  - cmd
+  missing_expected_sheets: []
+  contract_source_rows: 3990
+  sheet_stats:
+    airControl:
+      rows_after_header: 178
+      nonblank_rows_after_header: 178
+      max_row: 179
+      max_column: 31
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 179
+      read_only_columns_after_gate: 31
+    carControl:
+      rows_after_header: 2656
+      nonblank_rows_after_header: 2656
+      max_row: 2657
+      max_column: 31
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 2657
+      read_only_columns_after_gate: 31
+    cmd:
+      rows_after_header: 1156
+      nonblank_rows_after_header: 1156
+      max_row: 1157
+      max_column: 31
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 1157
+      read_only_columns_after_gate: 31
+c1_reference_sources:
+- source_key: multilingual_expansion_v1
+  authority_kind: c1_reference
+  source_filename: "\u591A\u8BED\u79CD\u516C\u7248\u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u5C55\u5F00\u534F\u8BAE\u8868V1\u7248\
+    .xlsx"
+  source_reachable: true
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u591A\u8BED\u79CD\u516C\u7248\
+    \u8BED\u4E49\u56DB\u7EA7\u529F\u80FD\u5C55\u5F00\u534F\u8BAE\u8868V1\u7248.xlsx"
+  file_sha256: 55c3a5579c3505f8e3f0421b6dea72e12ac9393277fc37022e5e25da5ee70b49
+  content_digest: f11908c928af00028d5ae21c8fbd03973a02b01de0fcf97bbaed53803378b65d
+  sheets_expected:
+  - airControl
+  - carControl
+  - cmd
+  missing_expected_sheets: []
+  contract_source_rows: 0
+  sheet_stats:
+    airControl:
+      rows_after_header: 371
+      nonblank_rows_after_header: 371
+      max_row: 372
+      max_column: 27
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 372
+      read_only_columns_after_gate: 27
+    carControl:
+      rows_after_header: 2639
+      nonblank_rows_after_header: 2639
+      max_row: 2640
+      max_column: 27
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 2640
+      read_only_columns_after_gate: 27
+    cmd:
+      rows_after_header: 1134
+      nonblank_rows_after_header: 1134
+      max_row: 1135
+      max_column: 27
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 1135
+      read_only_columns_after_gate: 27
+- source_key: vehicle_function_points
+  authority_kind: c1_reference
+  source_filename: "\u8F66\u63A7\u529F\u80FD\u6253\u70B9\u8868.xlsx"
+  source_reachable: true
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u8F66\u63A7\u529F\u80FD\u6253\
+    \u70B9\u8868.xlsx"
+  file_sha256: 288cb105969c8395762aababdd38730e6239b0bdf3c82db0d290493603c297a0
+  content_digest: 736055ef97e821898787e53ad5fbe52c56b7f4ac8e3bbd2278a6b92ba16ef26f
+  sheets_expected:
+  - airControl
+  - carControl
+  - cmd
+  missing_expected_sheets: []
+  contract_source_rows: 0
+  sheet_stats:
+    airControl:
+      rows_after_header: 160
+      nonblank_rows_after_header: 160
+      max_row: 161
+      max_column: 20
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 161
+      read_only_columns_after_gate: 20
+    carControl:
+      rows_after_header: 1573
+      nonblank_rows_after_header: 1573
+      max_row: 1574
+      max_column: 21
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 1574
+      read_only_columns_after_gate: 21
+    cmd:
+      rows_after_header: 698
+      nonblank_rows_after_header: 698
+      max_row: 699
+      max_column: 20
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 699
+      read_only_columns_after_gate: 20
+- source_key: followup_function_list
+  authority_kind: c1_followup_source
+  source_filename: "\u4E0A\u4E0B\u6587\u4E8C\u6B21\u4EA4\u4E92\u529F\u80FD\u6E05\u5355.xlsx"
+  source_reachable: true
+  snapshot_file: "~/workspace/raw/05-Projects/MAformac/source-snapshots/c1-2026-06-19-9b7e4b82/\u4E0A\u4E0B\u6587\u4E8C\u6B21\
+    \u4EA4\u4E92\u529F\u80FD\u6E05\u5355.xlsx"
+  file_sha256: 0ec81641241acf70b3c5a98db18247235ecc5b77d0772dc627dd4084d3cf53aa
+  content_digest: 9eba70175bdebb98c99f1406c9e24c693587ac7122a0460d5aba90f9f588e5d6
+  sheets_expected:
+  - airControl
+  - carControl
+  missing_expected_sheets: []
+  contract_source_rows: 0
+  sheet_stats:
+    airControl:
+      rows_after_header: 491
+      nonblank_rows_after_header: 339
+      max_row: 492
+      max_column: 15
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 492
+      read_only_columns_after_gate: 15
+    carControl:
+      rows_after_header: 2982
+      nonblank_rows_after_header: 2770
+      max_row: 2983
+      max_column: 23
+      calculate_dimension: A1:A1
+      merged_ranges_count: null
+      merged_filled_cells_count: null
+      formula_cells_count: null
+      read_only_dimension_before: A1:A1
+      reset_dimensions_applied: true
+      read_only_rows_after_gate: 2983
+      read_only_columns_after_gate: 23
+c2_state_reference_sources: []
+authority_notes:
+- Source xlsx files stay outside the git repository under raw source-snapshots.
+- file_sha256 protects frozen file identity; content_digest protects normalized semantic row content.
+- C2 state authority is not defined in stage A; reference sources are recorded but not promoted.

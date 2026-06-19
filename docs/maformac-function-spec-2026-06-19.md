@@ -1,5 +1,7 @@
 # MAformac 功能清单 + 语义协议表 v0(草案)
 
+> ⚠️ **authority: superseded / historical(2026-06-19 v2)** —— 本文是 C1/C2 之前的 v0 草案。**范围/步长一律以 C2 `scenario-state-protocol` 的 `execution_range` 为准**(§4 表里「18–30℃ / 1–7 挡」是 v0 拍错值,真值 **18-32 / 1-10**);设备选型已转 C1 `l1-demo-allowlist`(**能力维度炸点 = 模糊/快FC/多意图/记忆,非设备清单**);"不丢脸架构 L1-L4" 仍有效。仅留历史,勿据此执行。详见 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md`。
+
 > **定位**:MAformac demo 自己的**功能清单 + 语义协议事实源**,维度参考 4 份金钥匙(`baseline-semantic-protocol-2026-06-19.md`),叠加 MAformac 特有(mock 态/readback/R级)。**后续 = E2E 测试基线**(每个四级功能 → 一组 E2E case)+ `contracts/capabilities.yaml` 升级蓝本。
 > **状态**:v0 草案。**设备选型 / 取值范围 / 步长 / 收敛粒度待磊哥校准**(基座 3900 intent,demo 必须收敛)。
 > **红线**:协议范式抽象自某车厂基座(只读),本清单是 MAformac 自有重写,不含客户标识/原文语料。

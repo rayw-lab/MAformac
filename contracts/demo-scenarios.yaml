@@ -1,0 +1,143 @@
+# contracts/demo-scenarios.yaml — demo 5 幕「泛化 showcase 规格」（非规则脚本）
+# ---------------------------------------------------------------------------
+# 归属: openspec change define-c1c2-contract / task 4.2（magnet reviewed）
+# ---------------------------------------------------------------------------
+# ⚠️ 本文件不是固定话术脚本。每幕定【意图类 + 期望行为】, 配若干【话术变体】。
+#    变体不用于规则匹配, 用途有二:
+#      ① 表达泛化目标 ——「多一个字少一个字」皆应命中同一意图（现场话术即兴）。
+#      ② 当 C5 LoRA 训练 / C6 评测的种子（非穷举, 示范覆盖面）。
+#    demo 的惊艳来自 LoRA 泛化（20% 模糊/跨域/记忆/状态感知）, 不来自规则匹配。
+#    规则只兜 80% 高频明确指令（见 CLAUDE.md §4「规则 vs 模型」）。
+#    —— 若把本 demo 做成规则查表, 现场换个说法即崩, 毫无意义（magnet 2026-06-19 定）。
+# ---------------------------------------------------------------------------
+meta:
+  review_status: reviewed
+  reviewed_by: magnet
+  reviewed_at: "2026-06-19"
+  narrative: 混合框架（轻量「现场体验座舱助手」背景 + 每幕独立可跳 + 维度易→难递进 + 安全门 climax）
+  driven_by: lora_generalization            # 非 rule_matching
+  feeds: [c5_lora_train_seed, c6_demo_must_pass_eval]
+  variants_note: utterance_variants 为泛化示例 + LoRA 种子, 非匹配白名单; 现场话术即兴, 模型泛化
+  # demo 初始 mock 端态（每幕可在 initial_state 覆盖）
+  initial_state_default:
+    ac.power: off
+    ac.temp_setpoint: known
+    window.position: 0
+    window.motion: stopped
+    ambient.color: off
+    vehicle.speed: 0
+    vehicle.gear: P
+  # 端态/读回引用 C2 state-cells.yaml（唯一 execution_range/readback 权威, 本文件不重复定义数值）
+  state_source: contracts/state-cells.yaml
+  c1_intent_source: contracts/semantic-function-contract.jsonl
+
+scenes:
+
+  - id: scene1
+    title: 听得懂人话
+    wow: 不用说"调高空调", 一句感受它就懂; 已关的不重复执行
+    dimensions: [模糊理解, 状态感知读回]
+    initial_state: {ac.power: off}
+    beats:
+      - intent_class: 状态感知拒重复            # query 先于 action
+        dimension: 状态感知读回
+        c1_ref: {device: ac_temperature, primitive: query}
+        state_read: ac.power
+        utterance_variants: ["关空调", "把空调关了", "空调关掉", "不用空调了"]
+        expected_behavior: 读 ac.power=off → 不下发动作
+        expected_readback_zh: 空调已经是关闭的了            # 真实 bug 反例: 已关却回"已为您关闭"
+      - intent_class: 陈述温感→升温             # 模糊: 纯感受陈述映射到动作
+        dimension: 模糊理解
+        c1_ref: {device: ac_temperature, primitive: increase_by_exp}    # 经验值, exp_step.little
+        precondition_action: {device: ac, primitive: power_on}   # open_ac=device:ac/power_on（§28 已核, 非 ac_temperature）
+        utterance_variants: ["有点冷", "好冷啊", "冻死了", "车里温度有点低", "凉飕飕的"]
+        expected_behavior: 开空调 + 升温（经验暖值, 见 state-cells ac.temp_setpoint.exp_step）
+        expected_readback_zh: 已为您打开空调, 温度调高了
+      - intent_class: 陈述屏暗→调亮             # 最强模糊金例（真实 bug 命中）
+        dimension: 模糊理解
+        c1_ref: {device: screen_brightness, primitive: increase_by_exp}
+        state_cell: screen.brightness
+        utterance_variants: ["屏幕太暗了", "屏幕看不清", "亮度低了点", "屏幕有点暗"]
+        expected_behavior: 屏幕调亮（经验值）
+        expected_readback_zh: 屏幕已调亮
+
+  - id: scene2
+    title: 一句顶三句
+    wow: 一句话同时干两件事
+    dimensions: [多意图]
+    initial_state: {ac.power: off, ambient.color: off}
+    beats:
+      - intent_class: 开空调+设定温度           # open_ac + adjust_to_number
+        dimension: 多意图
+        c1_ref:
+          - {device: ac_temperature, primitive: power_on}
+          - {device: ac_temperature, primitive: adjust_to_number}
+        utterance_variants: ["打开空调把温度调到24度", "开空调调到24度", "空调打开设成24", "把空调开了温度24"]
+        expected_behavior: 开空调 + 温度=24（见 state-cells ac.temp_setpoint.execution_range）
+        expected_readback_zh: 空调已打开, 温度24度
+      - intent_class: 氛围灯换色+调暗           # color set_mode + brightness exp
+        dimension: 多意图
+        c1_ref:
+          - {device: atmosphere_lamp_color, primitive: set_mode}
+          - {device: atmosphere_lamp_brightness, primitive: decrease_by_exp}
+        state_cells: [ambient.color, ambient.brightness]
+        utterance_variants: ["氛围灯调成红色再调暗一点", "氛围灯红色暗一点", "把氛围灯弄成红的调暗", "红色氛围灯暗点"]
+        expected_behavior: 氛围灯色=红 + 亮度调暗
+        expected_readback_zh: 氛围灯已设为红色并调暗
+
+  - id: scene3
+    title: 记得上文
+    wow: 不用重复说对象, 接着上句改
+    dimensions: [记忆多轮]
+    initial_state: {window.position: 0}
+    turns:
+      - turn: 1
+        intent_class: 开车窗
+        c1_ref: {device: window, primitive: power_on}
+        utterance_variants: ["打开车窗", "把车窗开开", "开一下窗户"]
+        expected_behavior: 车窗开到默认开度
+      - turn: 2
+        intent_class: 继承对象继续调            # 记忆: 继承上轮 window.position
+        c1_ref: {device: window, primitive: by_percent}
+        followup_transition: trans_1dfefae41fa915f5     # open_window→open_window_little(继承 position)
+        utterance_variants: ["开大点", "再开大些", "拉大一点", "再大点"]
+        expected_behavior: 在上轮开度基础上 +20%（继承 window.position, 见 state-cells exp_step.little）
+        expected_readback_zh: 车窗已开大
+
+  - id: scene4
+    title: 没教过也会
+    wow: 说没逐一训练过的具体车窗, 它也能泛化定位
+    dimensions: [快FC泛化]
+    initial_state: {window.position: 0}
+    beats:
+      - intent_class: 指定车窗位置泛化           # scope fan-out: 协议 5 精做区, 未逐一训练
+        dimension: 快FC泛化
+        c1_ref: {device: window, primitive: power_on}
+        state_cell: window.position           # scope: [主驾,副驾,左后,右后,全车]
+        utterance_variants: ["打开主驾车窗", "把主驾的窗开一下", "开一下驾驶位车窗", "主驾那个窗户打开"]
+        expected_behavior: 车窗 scope=主驾 开启（泛化到具体车窗, 非逐区死记）
+        expected_readback_zh: 主驾车窗已打开
+
+  - id: scene5
+    title: 关键时刻拦得住
+    wow: 行驶中危险动作优雅拒识 + 解释（不是冷冰冰报错）
+    climax: true
+    dimensions: [安全门拒识]
+    initial_state: {vehicle.speed: 30, vehicle.gear: D}   # 方案经理 mock 切「行驶模式」（手动, 最可控）
+    safety_gate:
+      trigger_cells: [vehicle.speed, vehicle.gear]        # speed>0 / gear∈{R,N,D}
+      note: demo 豁免 ISO26262, 炸场效果非真功能安全（见 l1-demo-allowlist __safety_gate__）
+    beats:
+      - intent_class: 行驶中危险动作（开门类）   # 识别危险【意图类】(任意说法) + 行驶上下文 → 拒
+        dimension: 安全门拒识
+        c1_ref: {device: car_door}             # C1 有 car_door/door/tailgate 意图
+        utterance_variants: ["打开车门", "把车门打开", "开一下门", "车门开开", "开个后备箱"]
+        expected_behavior: 检测 vehicle.speed>0 → 安全门拒识, 不下发
+        expected_readback_zh: 行驶中为了安全暂时不能开门, 停稳后我再帮您
+
+# ---------------------------------------------------------------------------
+# 收尾闭合（archive 前由主线程做, 非本文件职责）:
+#   - scene 涉及的 C2 cell（screen.brightness / ambient.* 等）→ state-cells.yaml devices 段建（task 4.1）
+#   - scene_required cell → state-cells.yaml scenario_cells 回填（如安全 climax 已用 safety_cells, 多数已覆盖）
+#   - 5 幕 must-pass → C6 demo 评测集（泛化命中率, 非话术匹配率）
+# ---------------------------------------------------------------------------

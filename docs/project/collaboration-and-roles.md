@@ -57,7 +57,7 @@ Codex 可连续跑 20h、质量高——但**长跑必须有 harness 防跑偏**
 
 - Codex 实装守 `CLAUDE.md` 边界:客户名一律「某车厂」、全 mock 车控、Python 零进 iOS、安全检查是代码不是 prompt。
 - Claude 前端原型守**审美 5 Gate**(层级/对齐/遮挡/字体/重量)。
-- 客户原始协议(讯飞表格等)**不进仓、不上云**;只抽象进 `contracts/capabilities.yaml`。
+- 客户原始协议(讯飞表格等)+ 源 xlsx 冻结快照 **不进仓、不上云**;只抽象进 **C1 `contracts/semantic-function-contract.jsonl`**(源行级 SSOT,v2;旧 `capabilities.yaml` 已被 supersede),冻结快照在外部 raw 只读 + manifest 锚 content_digest。
 
 ## 6. 与 CLAUDE.md / openspec 的关系
 
