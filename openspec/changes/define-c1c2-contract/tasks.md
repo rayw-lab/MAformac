@@ -18,7 +18,7 @@
 - [ ] 3.3 [CC定/codex] exec_tier/risk 挂源行,L1 派生自 allowlist。**验收** C1 的 L1 行集 ≡ allowlist 展开集(双向)
 
 ## 4. C2 场景端态协议
-- [ ] 4.1 [CC定/codex] `state-cells.yaml`:三源并集(L1_device ∪ scenario_required ∪ safety),`execution_range` 权威,四态(空≠默认≠未知≠关闭)。**验收** 每 cell 满足某 allowlist 需求或场景/安全需求
+- [ ] 4.1 [CC定/codex] `state-cells.yaml`:三源并集(L1_device ∪ scenario_required ∪ safety),`execution_range` 权威,状态模型 = **3 生命周期态(`state_kinds`: 空 empty / 有值 known / 未知 unknown)+ `default`(初始默认, 如 off/P)+ 业务枚举(`values`: on/off、opening/closing…)** 三者分离不混;"关闭"= 业务值非独立态。**验收** 每 cell 满足某 allowlist 需求或场景/安全需求
 - [ ] 4.2 [**magnet reviewed**] `demo-scenarios.yaml`:初始态 + 触发话术绑定(磊哥定场景)。**验收** 覆盖 5 幕 + L1 readback/多轮/参数规划
 - [ ] 4.3 [CC定] 脱敏参考映射(可选):「字段语义→cell」,禁来源方/车型/责任方/上传频率。**验收** 无客户标识
 - [ ] 4.4 [CC定] 接口:C1 `execution_range_ref` 按 exec_tier 分级(L1 concrete / L2-L3 generic|none)落 C2 cell。**验收** L1 必 concrete,L2/L3 不悬空

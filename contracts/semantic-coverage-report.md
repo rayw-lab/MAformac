@@ -60,7 +60,7 @@ snapshot_id: `c1-2026-06-19-9b7e4b82`
 | material_candidate | 2483 |
 | none | 1507 |
 
-Stage A has no C2 execution range authority yet, so concrete material conflicts are not asserted.
+C2 state-cells.yaml exists (owns execution_range); C1<->C2 execution_range_ref closure is deferred until l1-demo-allowlist, so concrete material conflicts are not asserted yet.
 
 ## Quarantine
 

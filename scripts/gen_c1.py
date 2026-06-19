@@ -551,7 +551,7 @@ def build_coverage_report(
             f"| material_candidate | {range_classes.get('material_candidate', 0)} |",
             f"| none | {range_classes.get('none', 0)} |",
             "",
-            "Stage A has no C2 execution range authority yet, so concrete material conflicts are not asserted.",
+            "C2 state-cells.yaml exists (owns execution_range); C1<->C2 execution_range_ref closure is deferred until l1-demo-allowlist, so concrete material conflicts are not asserted yet.",
             "",
             "## Quarantine",
             "",

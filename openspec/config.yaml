@@ -50,7 +50,7 @@ rules:
   specs:
     - 只写可观察行为(Requirement SHALL/MUST + Scenario GIVEN/WHEN/THEN),不写类名 / 库 / 文件名 / 实现步骤
     - 行为契约必含:只 mock 车控、断网可演、错误不冒充成功(读回 mock 态才算成功)
-    - 数值范围 / 枚举只引"能力声明的范围",不在 spec 写死具体数值(数值在 capabilities.yaml)
+    - 数值范围 / 枚举只引"能力声明的范围",不在 spec 写死具体数值(v2:执行边界数值在 C2 `contracts/state-cells.yaml` 的 execution_range;语义 range 在 C1 `semantic-function-contract.jsonl`;旧 capabilities.yaml 已被 C1/C2 supersede)
   design:
     - 主链路明确:文本输入 → 意图解析 → ToolCall → DemoGuard → mock state → trace
     - 安全门控是代码不是 prompt;模型不直接执行动作

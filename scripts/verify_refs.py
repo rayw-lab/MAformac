@@ -26,6 +26,7 @@ QUARANTINE_JSONL = CONTRACTS_DIR / "semantic-quarantine.jsonl"
 FUNCTION_SPEC_YAML = CONTRACTS_DIR / "function-spec-full.yaml"
 COVERAGE_REPORT = CONTRACTS_DIR / "semantic-coverage-report.md"
 STATE_CELLS_YAML = CONTRACTS_DIR / "state-cells.yaml"
+MANIFEST_YAML = CONTRACTS_DIR / "source-snapshot-manifest.yaml"
 
 UNRESOLVED_LIMIT = 0.02
 FORBIDDEN_SUBSTRINGS = [
@@ -146,7 +147,7 @@ def verify_range_classification(rows: list[dict[str, Any]]) -> None:
 
 
 def verify_leak_scan() -> None:
-    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML]
+    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         for marker in FORBIDDEN_SUBSTRINGS:
@@ -188,6 +189,13 @@ def verify_state_cells() -> str:
         cid = cell["id"]
         if cell["source_kind"] not in source_kind_set:
             raise C1Error(f"state-cells: {cid} bad source_kind {cell['source_kind']!r}")
+        # state_kinds 必填且只能取生命周期词表(四态 vs 业务枚举分离, 不混 on/off/opening)
+        sk = cell.get("state_kinds")
+        if not isinstance(sk, list) or not sk:
+            raise C1Error(f"state-cells: {cid} missing/empty state_kinds")
+        bad = set(sk) - state_kinds_set
+        if bad:
+            raise C1Error(f"state-cells: {cid} state_kinds mixes non-lifecycle values {sorted(bad)}")
         ctype = cell["type"]
         if ctype == "int":
             rng = cell.get("execution_range")
@@ -197,16 +205,19 @@ def verify_state_cells() -> str:
                 raise C1Error(f"state-cells: int cell {cid} min>max")
             if rng["step"] <= 0:
                 raise C1Error(f"state-cells: int cell {cid} step<=0")
+            # 数值边界是 demo 决策(协议不给硬边界): 带 execution_range 的 int 必须 c2_demo_decision 防漂
+            if cell["source_kind"] != "c2_demo_decision":
+                raise C1Error(f"state-cells: int cell {cid} w/ execution_range must be source_kind=c2_demo_decision")
+            if "default" in cell and not (rng["min"] <= cell["default"] <= rng["max"]):
+                raise C1Error(f"state-cells: int cell {cid} default {cell['default']!r} out of execution_range")
         elif ctype == "enum":
             values = cell.get("values")
             if not isinstance(values, list) or not values:
                 raise C1Error(f"state-cells: enum cell {cid} missing values")
+            if "default" in cell and cell["default"] not in values:
+                raise C1Error(f"state-cells: enum cell {cid} default {cell['default']!r} not in values")
         else:
             raise C1Error(f"state-cells: {cid} unknown type {ctype!r}")
-        # 四态 vs 业务枚举分离: state_kinds 只能取生命周期词表, 不混 on/off/opening 等
-        bad = set(cell.get("state_kinds", [])) - state_kinds_set
-        if bad:
-            raise C1Error(f"state-cells: {cid} state_kinds mixes non-lifecycle values {sorted(bad)}")
         return cid
 
     all_ids: list[str] = []
@@ -225,6 +236,10 @@ def verify_state_cells() -> str:
         for ref in dev.get("readback_cell_group", []):
             if ref not in local_ids:
                 raise C1Error(f"state-cells: device {dkey} readback_cell_group ref {ref!r} not in its state_cells")
+        for cell in cells:
+            for dep in cell.get("depends_on", []):
+                if dep not in local_ids:
+                    raise C1Error(f"state-cells: device {dkey} cell {cell['id']} depends_on {dep!r} not in its state_cells")
     for cell in spec.get("safety_cells", []) or []:
         all_ids.append(check_cell(cell, "safety"))
     for cell in spec.get("scenario_cells", []) or []:
