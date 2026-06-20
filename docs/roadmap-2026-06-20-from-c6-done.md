@@ -1,6 +1,6 @@
 # MAformac Roadmap — 新基线 2026-06-20（C6 done 起点）
 
-> **此文是「此时此刻」往后的唯一推进事实源**。把三刀 / 38 项 / 14-repo synthesis / Qwen 可行性 / 磊哥评审全部收敛成一条从 **C6 apply done** 起步的清晰路线。
+> **此文是「此时此刻」往后的唯一推进事实源**。把三刀 / 38 项 / 14-repo synthesis / Qwen 可行性 / 磊哥评审全部收敛成一条从 **C6 apply done** 起步的清晰路线；2026-06-20 archive closeout 后，P0 已收口，当前入口是 P1-A C5 数据门 + P1-B Qwen spike。
 > **方法论骨架 = 项目五件套 harness（OpenSpec + Pocock + Superpowers + Pi + Mastra）的精髓**（§1），后续每个 C-change 照此推进。
 > 配套读：`docs/research/2026-06-20-eval-memory-deepdive-synthesis.md`（吸纳意见全料）+ `CLAUDE.md`（宪法）+ `docs/srd-three-layer-intent-routing.md`（架构）。
 > 一手 file:line 锚点均已 verified（2026-06-20，§28/§30）；标「评审引用」者 = 待该 change 实装时再核。
@@ -12,12 +12,12 @@
 | 资产 | 状态 | 证据 |
 |---|---|---|
 | C1 `semantic-function-contract` / C2 `scenario-state-protocol` | **archived → `openspec/specs/`** | a9888bc |
-| C3 `define-execution-contract`（单跳 ToolCallFrame + DemoGuard + mock state + 五段 trace） | **apply done（swift test 48 绿）但 `tasks 0/38` 未勾、未 archive** ⚠️ | `openspec list` |
-| C6 `define-vehicle-tool-bench`（四硬门 + judge 不洗白 + replay 指纹 eval_run + 双轴） | **✓ Complete、未 archive**；base Qwen3-1.7B 无 LoRA **hard_fail**（IrrelAcc 0.789<0.9 / hard_failure 170/225）= C5 提升的诚实可复现锚点 | `openspec list` + `Reports/c6-base-*/` |
+| C3 `define-execution-contract`（单跳 ToolCallFrame + DemoGuard + mock state + 五段 trace） | **archived → `openspec/specs/tool-execution/`**；7.3 Qwen sampling 未实测，已迁移到 P1-B Qwen spike | `openspec/changes/archive/2026-06-20-define-execution-contract/` |
+| C6 `define-vehicle-tool-bench`（四硬门 + judge 不洗白 + replay 指纹 eval_run + 双轴） | **archived → `openspec/specs/vehicle-tool-bench/`**；base Qwen3-1.7B 无 LoRA **hard_fail**（IrrelAcc 0.789<0.9 / hard_failure 170/225）= C5 提升的诚实可复现锚点；archive-check verify-gold pass | `Reports/c6-gold-verify-archive-check-20260620-185441/` |
 | 14-repo teardown + Qwen3.5-2B 可行性 + synthesis | **committed 31edafc → push origin/main** | git |
 | C4 三层路由/短时记忆 · C5 LoRA 数据 · C7 离线语音 | **未起（待解冻）** | — |
 
-**新基线一句话**：能跑的链路（C1→C2→C3→C6）都立住了，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**往后第一优先不是扩 C6、不是急训 LoRA，而是先把 C6 这把尺子修准（P0），再立 C5 数据门（P1），最后解冻 C4/C7（P2）。**
+**新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**往后第一优先不是扩 C6、不是急训 LoRA，而是 P1-A C5 数据门 + P1-B Qwen spike 并行；P1-C train 必须等两门都过。**
 
 ---
 
@@ -104,6 +104,8 @@
 ## 4. 执行序列 P0 → P1 → P2（依赖分批，每项带 file:line + harness 落点）
 
 ### 🔴 P0 — C6 完备化收尾（在未 archive 的 C6 change 内补 delta，补完 archive；**不做完不训 LoRA**）
+
+> **Status 2026-06-20 archive closeout**: P0-1/P0-2/P0-3/P0-4 已完成并 archive；C3 7.3 债已迁移到 P1-B Qwen spike；C3/C6 active changes 均已移动到 `openspec/changes/archive/`。
 
 > Pocock S4 build · OpenSpec「现 change 补 delta → archive」· Superpowers TDD · Mastra scorer/trajectory/judge。
 > **为何不开 C5-0 新 change**：C6 ✓ Complete 但未 archive，这 4 项修的全是 C6 资产（harness/cases/envelope）；带 NIT archive = 带病归档（§30），新 change = 碎片化。补完才是 C6 真 done。
@@ -214,7 +216,7 @@ pass^k / run_repetitions 多跑方差（base/边界 case N≥5，temp=0）+ fail
    └─🎨 H7 UI/UE 重评 ── C7 后 / S6 演示包前
 ```
 
-**起手第一步**：P0-1（readback 复用 `renderReadback`）—— 最小、纯代码、坐实 NIT1，且立刻让 C6 这把尺子量得准。派 codex TDD 长跑（before 门读 C2/C3 契约，after 门跑 swift test 全绿 + diff）。
+**起手第一步**：P1-A C5 数据门 + P1-B Qwen spike 并行。P1-C LoRA train 仍等数据门过 + spike 定模型后再启动。
 
 ---
 

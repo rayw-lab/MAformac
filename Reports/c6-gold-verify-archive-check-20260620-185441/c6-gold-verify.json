@@ -1,0 +1,894 @@
+{
+  "candidate_count" : 59,
+  "cases" : 57,
+  "gold_replay_fail_count" : 0,
+  "gold_replay_pass_count" : 57,
+  "results" : [
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-003",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-004",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-005",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-006",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-COV-007",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-003",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-004",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-005",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-006",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-007",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-008",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-009",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-010",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-011",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-012",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-013",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-014",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-015",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-016",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-017",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-018",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-019",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-020",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-021",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-022",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-023",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-024",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-025",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-026",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-027",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-028",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-029",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-MP-030",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-003",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-004",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-005",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-006",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-007",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-NEG-008",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "open_driver_window_20",
+      "case_id" : "C6-TRAP-AMB-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "acceptable",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-AMB-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "dim_ambient_light",
+      "case_id" : "C6-TRAP-AMB-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "acceptable",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-AMB-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-ASR-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-ASR-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-CORR-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-CORR-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-LURE-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-LURE-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-NEG-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-NEG-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : true,
+      "readback_pass" : true,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-SAFE-001",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    },
+    {
+      "candidate_id" : "primary",
+      "case_id" : "C6-TRAP-SAFE-002",
+      "clarify_pass" : true,
+      "failure_classes" : [
+
+      ],
+      "gold_replay_pass" : true,
+      "quality" : "primary",
+      "readback_applicable" : false,
+      "readback_pass" : false,
+      "source_refs_pass" : true,
+      "state_delta_pass" : true,
+      "tool_call_pass" : true
+    }
+  ],
+  "status" : "pass"
+}

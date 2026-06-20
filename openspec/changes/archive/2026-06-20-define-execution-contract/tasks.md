@@ -52,7 +52,7 @@
 
 - [x] 7.1 非流式 parser 采用 Swift 等效策略,对照 home-llm `_async_parse_completion`。验收:fenced JSON + thinking strip fixture 通过。(spike + TDD)
 - [x] 7.2 受限解码方案 spike:MLX JSON schema / outlines-swift / xgrammar 至少二选一实测,结论写入 docs。验收:格式合法率与延迟记录。(spike)
-- [ ] 7.3 Qwen3 sampling 起点用 home-llm `temp=0.6/top_k=20/top_p=0.95` 做对照,再与低温确定性配置比较。验收:触发率、格式合法率、latency 表格。
+- [x] 7.3 Qwen3 sampling 起点用 home-llm `temp=0.6/top_k=20/top_p=0.95` 做对照,再与低温确定性配置比较。验收:触发率、格式合法率、latency 表格。**Superseded/moved to P1-B Qwen spike**: C3 has no active model runtime path; see `docs/research/2026-06-20-c3-home-llm-adopt-spike.md §7.3` and roadmap P1-B. Do not hard-code sampling in C3.
 - [x] 7.4 KV prewarm 仅留 runtime hook 或实现最小 app-start prewarm。验收:明确归 C3 或 C7 的边界说明。
 
 ## 8. Verification
