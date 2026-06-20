@@ -55,20 +55,29 @@ public struct C3ExecutionPipeline: Sendable {
         store: DemoVehicleStateStore,
         traceLogger: any TraceLogger
     ) throws -> C3ExecutionResult {
-        traceLogger.recordDecode(traceID: frame.traceID, message: "\(frame.candidateSource.rawValue):\(frame.device).\(frame.actionPrimitive)")
+        let decodeAttributes = TraceAttributes(
+            candidateSource: frame.candidateSource,
+            toolCallCount: 1,
+            repairUsed: frame.candidateSource == .parserRepair
+        )
+        traceLogger.recordDecode(
+            traceID: frame.traceID,
+            message: "\(frame.candidateSource.rawValue):\(frame.device).\(frame.actionPrimitive)",
+            attributes: decodeAttributes
+        )
 
         guard let semanticRow = semantic.first(device: frame.device, actionPrimitive: frame.actionPrimitive) else {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "semantic_invalid")
+            traceLogger.recordGuard(traceID: frame.traceID, message: "semantic_invalid", attributes: TraceAttributes(guardReason: "semantic_invalid"))
             throw ToolExecutionError.semanticInvalid("unknown_device_or_primitive")
         }
 
         if semanticRow.clarifyTag == "implicit", !intentConfirmedProvider() {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "intent_not_confirmed")
+            traceLogger.recordGuard(traceID: frame.traceID, message: "intent_not_confirmed", attributes: TraceAttributes(guardReason: "intent_not_confirmed"))
             throw ToolExecutionError.guardDenied("intent_not_confirmed")
         }
 
         guard frame.stateRevision >= store.currentRevision else {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "stale_state")
+            traceLogger.recordGuard(traceID: frame.traceID, message: "stale_state", attributes: TraceAttributes(guardReason: "stale_state"))
             throw ToolExecutionError.staleState(expected: store.currentRevision, actual: frame.stateRevision)
         }
 
@@ -76,23 +85,27 @@ public struct C3ExecutionPipeline: Sendable {
         case .allow:
             break
         case .confirm(let reason):
-            traceLogger.recordGuard(traceID: frame.traceID, message: reason)
+            traceLogger.recordGuard(traceID: frame.traceID, message: reason, attributes: TraceAttributes(guardReason: reason))
             throw ToolExecutionError.guardDenied(reason)
         case .refuse(let reason):
-            traceLogger.recordGuard(traceID: frame.traceID, message: reason)
+            traceLogger.recordGuard(traceID: frame.traceID, message: reason, attributes: TraceAttributes(guardReason: reason))
             throw ToolExecutionError.guardDenied(reason)
         }
 
         let transitions = try planTransitions(for: frame, store: store)
         traceLogger.recordPlan(traceID: frame.traceID, message: transitions.map { "\($0.key)=\($0.desiredValue)" }.joined(separator: ","))
-        traceLogger.recordGuard(traceID: frame.traceID, message: "allow")
+        traceLogger.recordGuard(traceID: frame.traceID, message: "allow", attributes: TraceAttributes(guardReason: "allow"))
 
         var readbacks: [DemoActionReadback] = []
         for transition in transitions {
             let applied = store.applyMockTransition(transition)
             traceLogger.recordExecute(traceID: frame.traceID, message: "\(applied.key)=\(applied.actualValue)")
             let verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
-            traceLogger.recordReadback(traceID: frame.traceID, message: verified.spokenText)
+            traceLogger.recordReadback(
+                traceID: frame.traceID,
+                message: verified.spokenText,
+                attributes: TraceAttributes(readbackResult: .verified)
+            )
             readbacks.append(verified)
         }
 
