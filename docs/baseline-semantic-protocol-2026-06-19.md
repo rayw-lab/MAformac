@@ -11,7 +11,7 @@
 > - **31 列 → C1 jsonl 字段映射**(关键列):
 >   - col6 四级功能带协议赋值 → 槽位模板 · col8 NLU协议 → `ds_protocol` · col9 NLU取值范围 → `range`
 >   - col20 示例说法 → `example_utterance`(脱敏 hash) · **col21 功能类型编码 → `action_code`**(=114 编码) · col22 泛化句式槽映射 → slot 关系
->   - **col23/24/25 = L1/L2/L3 句式 → 三层路由泛化语料一手源**(L1 精确指令/L2 模糊/L3 更松,是 LoRA 训练 + 三层路由分级的根)
+>   - ⚠️ **col23-25(预留 L1/L2/L3 句式列)实测全空**(2026-06-20 逐列核实纠错,曾误当语料源)。**训练语料真实源 = col20 示例说法(100% 全有=种子)+ col22 泛化句式槽映射(规则模板,如 `(空调温度)#<name>`)+ col30/31 FC模糊说/自由说(是/否=分流标记)+ value 四件套 + LLM 增广模糊/自由说变体**。**L1/L2/L3 是路由层级(执行分层)非表列**:由 col30/31 FC 标记派生(FC=否→L1 规则快路;FC模糊=是→L2 慢路 LoRA;FC自由=是→L3 更松)。详见 §2⑥
 >   - **col30/31 = FC模糊说/FC自由说(是/否)→ `fc_flags{fuzzy,free}`**(=intent-routing 分流分类依据:否→规则快路;是→慢路 FC 泛化)
 > - **114 功能类型编码 → 12 归一化动作原语**(动作归一化=灵魂,非每设备一个平铺 tool)。高频原语:`set_mode 709 / power_on 553 / power_off 551 / adjust_to_number 448 / by_percent 333 / increase_by_exp 252 / decrease_by_exp 188 / adjust_to_max 142 / adjust_to_min 142 / adjust_to_gear 128`,每个有 `_position_` 位置变体。
 > - **value 四件套 `{ref,direct,offset,type}`**(参数规划核心,定义见 §2②):type 分布 = **EXP 734(逆规整,模糊"有点冷"→increase_by_exp) / SPOT 459(抠槽,"调到26度"→offset=26) / PERCENT 373("车窗50%")**。**抠槽=从话抽具体值(SPOT/PERCENT);逆规整=模糊感受词→规整 offset_enum(EXP)**(见 CONTEXT.md 术语)。
