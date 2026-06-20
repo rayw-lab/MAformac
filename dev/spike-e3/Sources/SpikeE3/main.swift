@@ -45,7 +45,11 @@ private struct SpikeRunner {
         }
         print("Model loaded")
 
-        let cases = Array(sampleCases.prefix(options.limit ?? sampleCases.count))
+        let loadedCases = try options.casesJSONL.map(loadC6Cases(from:)) ?? sampleCases
+        let limitedCases = Array(loadedCases.prefix(options.limit ?? loadedCases.count))
+        let cases = (0..<options.repeatCount).flatMap { runIndex in
+            limitedCases.map { $0.withRunIndex(runIndex) }
+        }
         var results: [CaseResult] = []
         results.reserveCapacity(cases.count)
 
@@ -135,6 +139,7 @@ private struct SpikeRunner {
 
         return CaseResult(
             id: sample.id,
+            runIndex: sample.runIndex,
             capability: sample.capability,
             sourceLevel: sample.sourceLevel,
             utterance: sample.utterance,
@@ -156,6 +161,8 @@ private struct SpikeRunner {
 private struct RunOptions {
     var limit: Int?
     var outputDir = "Reports"
+    var casesJSONL: String?
+    var repeatCount = 1
 
     init(arguments: [String]) {
         var iterator = arguments.dropFirst().makeIterator()
@@ -168,6 +175,14 @@ private struct RunOptions {
             case "--output-dir":
                 if let value = iterator.next() {
                     outputDir = value
+                }
+            case "--cases-jsonl":
+                if let value = iterator.next() {
+                    casesJSONL = value
+                }
+            case "--repeat":
+                if let value = iterator.next(), let count = Int(value) {
+                    repeatCount = max(1, count)
                 }
             default:
                 break
@@ -325,6 +340,7 @@ private struct EvalCase: Codable, Sendable {
     let isNegative: Bool
     let tags: [String]
     let maxTokens: Int
+    let runIndex: Int?
 
     init(
         id: String,
@@ -334,7 +350,8 @@ private struct EvalCase: Codable, Sendable {
         expectedTool: String?,
         isNegative: Bool = false,
         tags: [String] = [],
-        maxTokens: Int = 96
+        maxTokens: Int = 96,
+        runIndex: Int? = nil
     ) {
         self.id = id
         self.capability = capability
@@ -344,6 +361,74 @@ private struct EvalCase: Codable, Sendable {
         self.isNegative = isNegative
         self.tags = tags
         self.maxTokens = maxTokens
+        self.runIndex = runIndex
+    }
+
+    func withRunIndex(_ runIndex: Int) -> EvalCase {
+        EvalCase(
+            id: id,
+            capability: capability,
+            sourceLevel: sourceLevel,
+            utterance: utterance,
+            expectedTool: expectedTool,
+            isNegative: isNegative,
+            tags: tags,
+            maxTokens: maxTokens,
+            runIndex: runIndex
+        )
+    }
+}
+
+private func loadC6Cases(from path: String) throws -> [EvalCase] {
+    let text = try String(contentsOfFile: path, encoding: .utf8)
+    let decoder = JSONDecoder()
+    return try text
+        .split(whereSeparator: \.isNewline)
+        .map { try decoder.decode(C6InputCase.self, from: Data(String($0).utf8)).evalCase }
+}
+
+private struct C6InputCase: Decodable {
+    var caseID: String
+    var inputZh: String
+    var expectedToolCalls: [C6ExpectedToolCall]
+    var expectNoCall: Bool
+    var tags: C6InputTags
+
+    enum CodingKeys: String, CodingKey {
+        case caseID = "case_id"
+        case inputZh = "input_zh"
+        case expectedToolCalls = "expected_tool_calls"
+        case expectNoCall = "expect_no_call"
+        case tags
+    }
+
+    var evalCase: EvalCase {
+        EvalCase(
+            id: caseID,
+            capability: tags.contractDevice.isEmpty ? "c6" : tags.contractDevice,
+            sourceLevel: tags.sampleKind,
+            utterance: inputZh,
+            expectedTool: expectNoCall ? nil : expectedToolCalls.first?.name,
+            isNegative: expectNoCall,
+            tags: [tags.bucket, tags.sampleKind],
+            maxTokens: 96
+        )
+    }
+}
+
+private struct C6ExpectedToolCall: Decodable {
+    var name: String
+}
+
+private struct C6InputTags: Decodable {
+    var bucket: String
+    var contractDevice: String
+    var sampleKind: String
+
+    enum CodingKeys: String, CodingKey {
+        case bucket
+        case contractDevice = "contract_device"
+        case sampleKind = "sample_kind"
     }
 }
 
@@ -438,6 +523,7 @@ private struct CompletionInfoSnapshot: Codable, Sendable {
 
 private struct CaseResult: Codable, Sendable {
     let id: String
+    let runIndex: Int?
     let capability: String
     let sourceLevel: String
     let utterance: String
