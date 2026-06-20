@@ -78,3 +78,32 @@
 - [x] 11.2 base 无 LoRA 时允许 `lora_adapter_digest=""`；只要 `lora_adapter_id` 或 `lora_checkpoint_id` 非空，就要求 `lora_adapter_digest` 非空，否则抛 `missingEvalRunField` 基础设施错误。
 - [x] 11.3 `C6BenchCLI summarize` 显式要求 `--model-artifact PATH`、`--tokenizer-artifact PATH`，可选 `--lora-adapter PATH`，并用 `C6Hash.fileHash(url:)` 计算本地文件 digest；目录路径报 usage error。
 - [x] 11.4 单测覆盖 base digest 非空、LoRA id 缺 digest 红门、`C6Hash.fileHash` 内容差异、summary 顶层与 eval_run digest 一致。
+
+## 12. P0-3 Trap Cases + Alternatives
+
+### 12.A P0-3a Alternatives schema + matcher
+
+- [x] 12.A.1 `C6BenchCase` 支持 `alternatives`，旧 JSONL 缺省解码为 `[]`。
+- [x] 12.A.2 `C6GoldAlternative` 至少包含 `id / expected_tool_calls / expect_no_call / expected_state_delta / readback_assertion / clarify_tag / failure_class / quality / reason`。
+- [x] 12.A.3 runner 只把 `quality="acceptable"` alternative 纳入 pass candidate；`degraded` 和未知 quality 不放行。
+- [x] 12.A.4 单测覆盖 primary fail + acceptable alternative pass、非 acceptable alternative 不放行。
+
+### 12.B P0-3b Trap cases
+
+- [x] 12.B.1 在 P0-4a baseline `verify-gold` 通过后，新增 12 条 trap cases，覆盖否定、诱饵、冗余改口、模糊、安全继承、低置信 ASR 六类。
+- [x] 12.B.2 新增 trap cases 的 `source_refs` 全部可解析，`must_pass=true` 时必须 `must_not_train=true`。
+- [x] 12.B.3 模糊 case 才允许 alternatives；明确指令不得滥加 alternatives。
+
+## 13. P0-4 verify-gold Self-check
+
+### 13.A P0-4a Skeleton verifies current 45 cases
+
+- [x] 13.A.1 新增确定性 `C6GoldVerifier`，回放 primary gold 与 acceptable alternatives，输出 ToolCall/state/readback/clarify/source_refs 轴。
+- [x] 13.A.2 新增 `C6BenchCLI verify-gold`，输出 `c6-gold-verify.json` 与 `c6-gold-verify.md`，失败时非零退出。
+- [x] 13.A.3 单测覆盖 happy path、缺 C2 readback template、state delta 不一致、primary fail + acceptable alternative pass。
+- [x] 13.A.4 baseline 旧 45 条 `verify-gold` 全部通过。验收报告：`Reports/c6-gold-verify-baseline-readback-authorized-20260620-182330/c6-gold-verify.json`。
+
+### 13.B P0-4b Final verifies full trap-gold dataset
+
+- [x] 13.B.1 P0-3b 新增 trap cases 后，对全量 cases 再跑 `verify-gold`。
+- [x] 13.B.2 final `verify-gold` 必须全量 pass 才允许写 `ready_for_archive=true`。验收报告：`Reports/c6-gold-verify-final-20260620-182557/c6-gold-verify.json`。

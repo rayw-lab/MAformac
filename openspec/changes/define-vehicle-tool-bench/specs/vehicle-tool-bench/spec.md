@@ -36,6 +36,25 @@ Each C6 case SHALL include `pre_state`, `input_zh`, `expected_tool_calls`, `expe
 - **THEN** `expect_no_call` is true
 - **AND** `expected_tool_calls` is empty
 
+### Requirement: Case schema MAY carry acceptable gold alternatives
+C6 bench cases MAY include `alternatives`. Each alternative SHALL include `id`, `expected_tool_calls`, `expect_no_call`, `expected_state_delta`, `readback_assertion`, `clarify_tag`, `failure_class`, `quality`, and `reason`. During P0, only alternatives with `quality="acceptable"` SHALL participate in pass candidacy. `quality="degraded"` and unknown quality values SHALL NOT satisfy hard gates. A case SHALL pass if the primary gold or any acceptable alternative satisfies all deterministic hard gates. Judge scoring SHALL NOT participate in selecting or accepting alternatives.
+
+#### Scenario: Missing alternatives decodes as empty
+- **GIVEN** an older C6 JSONL case without `alternatives`
+- **WHEN** the case is decoded
+- **THEN** the case has an empty alternatives list
+
+#### Scenario: Acceptable alternative can satisfy hard gates
+- **GIVEN** a case whose primary gold fails ToolCall matching
+- **AND** the case includes an acceptable alternative whose ToolCall, state delta, readback, and clarify expectations match the runtime output
+- **WHEN** C6 evaluates the case
+- **THEN** the case hard gates pass
+
+#### Scenario: Non-acceptable alternatives do not pass
+- **GIVEN** a case with `quality="degraded"` or unknown-quality alternatives
+- **WHEN** runtime output only matches those alternatives
+- **THEN** the case remains hard-failed
+
 ### Requirement: C6 SHALL reference the Qwen tool-call format contract
 The C6 bench harness SHALL read `contracts/qwen-tool-call-format.yaml` for model family, runtime parser, thinking setting, wrapper, and arguments shape. The C6 bench SHALL NOT define an independent chat template, wrapper, parser mode, or arguments shape that can diverge from C3 runtime or C5 data generation.
 
@@ -67,6 +86,12 @@ C6 SHALL enforce four first-class deterministic hard gates before any judge scor
 - **GIVEN** a case whose `clarify_tag` requires clarification or refusal
 - **WHEN** the runtime executes or silently succeeds instead
 - **THEN** the clarification hard gate fails
+
+#### Scenario: Refusal text evidence is deterministic when asserted
+- **GIVEN** a rejected or ambiguous no-call case with `readback_assertion.contains` text evidence
+- **WHEN** the runtime emits no ToolCall but omits that text evidence
+- **THEN** the clarification/refusal hard gate fails
+- **AND** judge score cannot turn it into a hard pass
 
 ### Requirement: Readback gate SHALL reuse C2 readback templates
 C6 SHALL derive expected readback text for state-changing cases from C2 `contracts/state-cells.yaml` `readback_zh` templates through the same `StateCellContractLookup.renderReadback` contract used by C3 execution. C6 SHALL NOT satisfy the readback gate with machine-form state strings such as `state_key=value`, assertion-only tokens, or negated readback text. If a state-changing expected cell has no C2 `readback_zh` render path, the readback gate SHALL fail rather than fall back to handwritten C6 wording. For no-call cases, C6 SHALL NOT report `readback_match=true`; the readback metric SHALL be non-applicable/false without adding a readback hard failure.
@@ -105,6 +130,33 @@ C6 SHALL derive expected readback text for state-changing cases from C2 `contrac
 - **WHEN** the runtime emits no ToolCall
 - **THEN** `readback_match` is false
 - **AND** the case does not receive a readback hard failure solely from the non-applicable readback gate
+
+### Requirement: C6 SHALL provide deterministic gold self-verification
+C6 SHALL provide a deterministic `verify-gold` check. The check SHALL replay every primary gold candidate and every acceptable alternative as a perfect agent against C6 mock state. A case is gold-valid only if at least one candidate satisfies ToolCall, expected state delta, readback, clarify/refusal, and source reference expectations. State-changing candidates SHALL use C2 `readback_zh` rendering for readback verification; a missing C2 render path SHALL fail the readback axis rather than falling back to assertion-only text. For no-call/refusal candidates, readback SHALL be reported as non-applicable instead of pass. Failures SHALL report whether the failing axis is ToolCall, state delta, readback, source refs, clarify/refusal, or infra.
+
+#### Scenario: Perfect-agent replay passes valid gold
+- **GIVEN** a C6 case whose expected ToolCalls produce the expected mock state delta
+- **AND** C2 can render readback text for the expected state cells
+- **WHEN** `verify-gold` replays the case
+- **THEN** the case reports `gold_replay_pass=true`
+
+#### Scenario: Missing C2 readback template fails gold verification
+- **GIVEN** a state-changing C6 gold candidate whose expected state cell has no C2 `readback_zh`
+- **WHEN** `verify-gold` replays the candidate
+- **THEN** `readback_pass=false`
+- **AND** the candidate records a readback failure class
+
+#### Scenario: State-changing gold must declare an expected state delta
+- **GIVEN** a C6 gold candidate with a mutating `set_*` ToolCall
+- **WHEN** `expected_state_delta` is empty
+- **THEN** `verify-gold` records `state_delta_pass=false`
+- **AND** the candidate records a state-delta failure class
+
+#### Scenario: Verify-gold command fails closed
+- **GIVEN** any case has no primary or acceptable candidate with `gold_replay_pass=true`
+- **WHEN** `C6BenchCLI verify-gold` finishes
+- **THEN** it writes JSON and Markdown reports
+- **AND** exits non-zero
 
 ### Requirement: Runner SHALL emit hard-gate metrics
 C6 runner SHALL emit `IrrelAcc`, `no_tool_false_positive_count`, `state_delta_match`, `readback_match`, and `clarify_match`. `no-call` and unrelated samples SHALL account for at least 20% of the eval set as negative samples. This 20% value is dataset composition, not the IrrelAcc passing threshold.

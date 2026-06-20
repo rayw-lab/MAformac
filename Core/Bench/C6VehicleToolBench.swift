@@ -49,6 +49,52 @@ public struct C6ReadbackAssertion: Codable, Equatable, Sendable {
     }
 }
 
+public struct C6GoldAlternative: Codable, Equatable, Sendable {
+    public var id: String
+    public var expectedToolCalls: [C6ToolCall]
+    public var expectNoCall: Bool
+    public var expectedStateDelta: [String: String]
+    public var readbackAssertion: C6ReadbackAssertion
+    public var clarifyTag: C6ClarifyTag
+    public var failureClass: C6FailureClass
+    public var quality: String
+    public var reason: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case expectedToolCalls = "expected_tool_calls"
+        case expectNoCall = "expect_no_call"
+        case expectedStateDelta = "expected_state_delta"
+        case readbackAssertion = "readback_assertion"
+        case clarifyTag = "clarify_tag"
+        case failureClass = "failure_class"
+        case quality
+        case reason
+    }
+
+    public init(
+        id: String,
+        expectedToolCalls: [C6ToolCall],
+        expectNoCall: Bool,
+        expectedStateDelta: [String: String],
+        readbackAssertion: C6ReadbackAssertion,
+        clarifyTag: C6ClarifyTag,
+        failureClass: C6FailureClass,
+        quality: String,
+        reason: String
+    ) {
+        self.id = id
+        self.expectedToolCalls = expectedToolCalls
+        self.expectNoCall = expectNoCall
+        self.expectedStateDelta = expectedStateDelta
+        self.readbackAssertion = readbackAssertion
+        self.clarifyTag = clarifyTag
+        self.failureClass = failureClass
+        self.quality = quality
+        self.reason = reason
+    }
+}
+
 public struct C6SourceRefs: Codable, Equatable, Sendable {
     public var semanticContractIDs: [String]
     public var stateCellIDs: [String]
@@ -121,6 +167,7 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
     public var readbackAssertion: C6ReadbackAssertion
     public var clarifyTag: C6ClarifyTag
     public var failureClass: C6FailureClass
+    public var alternatives: [C6GoldAlternative]
 
     enum CodingKeys: String, CodingKey {
         case caseID = "case_id"
@@ -134,6 +181,7 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         case readbackAssertion = "readback_assertion"
         case clarifyTag = "clarify_tag"
         case failureClass = "failure_class"
+        case alternatives
     }
 
     public init(
@@ -147,7 +195,8 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         expectedStateDelta: [String: String],
         readbackAssertion: C6ReadbackAssertion,
         clarifyTag: C6ClarifyTag,
-        failureClass: C6FailureClass
+        failureClass: C6FailureClass,
+        alternatives: [C6GoldAlternative] = []
     ) {
         self.caseID = caseID
         self.sourceRefs = sourceRefs
@@ -160,6 +209,39 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         self.readbackAssertion = readbackAssertion
         self.clarifyTag = clarifyTag
         self.failureClass = failureClass
+        self.alternatives = alternatives
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.caseID = try container.decode(String.self, forKey: .caseID)
+        self.sourceRefs = try container.decode(C6SourceRefs.self, forKey: .sourceRefs)
+        self.tags = try container.decode(C6CaseTags.self, forKey: .tags)
+        self.preState = try container.decode([String: String].self, forKey: .preState)
+        self.inputZh = try container.decode(String.self, forKey: .inputZh)
+        self.expectedToolCalls = try container.decode([C6ToolCall].self, forKey: .expectedToolCalls)
+        self.expectNoCall = try container.decode(Bool.self, forKey: .expectNoCall)
+        self.expectedStateDelta = try container.decode([String: String].self, forKey: .expectedStateDelta)
+        self.readbackAssertion = try container.decode(C6ReadbackAssertion.self, forKey: .readbackAssertion)
+        self.clarifyTag = try container.decode(C6ClarifyTag.self, forKey: .clarifyTag)
+        self.failureClass = try container.decode(C6FailureClass.self, forKey: .failureClass)
+        self.alternatives = try container.decodeIfPresent([C6GoldAlternative].self, forKey: .alternatives) ?? []
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(caseID, forKey: .caseID)
+        try container.encode(sourceRefs, forKey: .sourceRefs)
+        try container.encode(tags, forKey: .tags)
+        try container.encode(preState, forKey: .preState)
+        try container.encode(inputZh, forKey: .inputZh)
+        try container.encode(expectedToolCalls, forKey: .expectedToolCalls)
+        try container.encode(expectNoCall, forKey: .expectNoCall)
+        try container.encode(expectedStateDelta, forKey: .expectedStateDelta)
+        try container.encode(readbackAssertion, forKey: .readbackAssertion)
+        try container.encode(clarifyTag, forKey: .clarifyTag)
+        try container.encode(failureClass, forKey: .failureClass)
+        try container.encode(alternatives, forKey: .alternatives)
     }
 }
 
@@ -621,6 +703,203 @@ public struct C6Summary: Codable, Equatable, Sendable {
     }
 }
 
+public struct C6GoldVerificationResult: Codable, Equatable, Sendable {
+    public var caseID: String
+    public var candidateID: String
+    public var quality: String
+    public var toolCallPass: Bool
+    public var stateDeltaPass: Bool
+    public var readbackApplicable: Bool
+    public var readbackPass: Bool
+    public var clarifyPass: Bool
+    public var sourceRefsPass: Bool
+    public var goldReplayPass: Bool
+    public var failureClasses: [C6FailureClass]
+
+    enum CodingKeys: String, CodingKey {
+        case caseID = "case_id"
+        case candidateID = "candidate_id"
+        case quality
+        case toolCallPass = "tool_call_pass"
+        case stateDeltaPass = "state_delta_pass"
+        case readbackApplicable = "readback_applicable"
+        case readbackPass = "readback_pass"
+        case clarifyPass = "clarify_pass"
+        case sourceRefsPass = "source_refs_pass"
+        case goldReplayPass = "gold_replay_pass"
+        case failureClasses = "failure_classes"
+    }
+}
+
+public struct C6GoldVerificationReport: Codable, Equatable, Sendable {
+    public var status: String
+    public var cases: Int
+    public var candidateCount: Int
+    public var goldReplayPassCount: Int
+    public var goldReplayFailCount: Int
+    public var results: [C6GoldVerificationResult]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case cases
+        case candidateCount = "candidate_count"
+        case goldReplayPassCount = "gold_replay_pass_count"
+        case goldReplayFailCount = "gold_replay_fail_count"
+        case results
+    }
+}
+
+public struct C6GoldVerifier: Sendable {
+    public init() {}
+
+    public func verify(
+        cases: [C6BenchCase],
+        stateCells: StateCellContractLookup,
+        validation: C6DatasetValidation
+    ) -> [C6GoldVerificationResult] {
+        let sourceRefsPass = validation.unresolvedSourceRefCount == 0
+        return cases.flatMap { item in
+            candidates(for: item).map { candidate in
+                verify(caseID: item.caseID, candidate: candidate, preState: item.preState, stateCells: stateCells, sourceRefsPass: sourceRefsPass)
+            }
+        }
+    }
+
+    public func report(
+        cases: [C6BenchCase],
+        stateCells: StateCellContractLookup,
+        validation: C6DatasetValidation
+    ) -> C6GoldVerificationReport {
+        let results = verify(cases: cases, stateCells: stateCells, validation: validation)
+        let caseIDs = Set(cases.map(\.caseID))
+        let passingCaseIDs = Set(results.filter(\.goldReplayPass).map(\.caseID))
+        let failingCaseCount = caseIDs.subtracting(passingCaseIDs).count
+        return C6GoldVerificationReport(
+            status: failingCaseCount == 0 ? "pass" : "fail",
+            cases: caseIDs.count,
+            candidateCount: results.count,
+            goldReplayPassCount: passingCaseIDs.count,
+            goldReplayFailCount: failingCaseCount,
+            results: results.sorted { ($0.caseID, $0.candidateID) < ($1.caseID, $1.candidateID) }
+        )
+    }
+
+    private struct GoldCandidate {
+        var id: String
+        var quality: String
+        var expectedToolCalls: [C6ToolCall]
+        var expectNoCall: Bool
+        var expectedStateDelta: [String: String]
+        var readbackAssertion: C6ReadbackAssertion
+        var clarifyTag: C6ClarifyTag
+    }
+
+    private func candidates(for item: C6BenchCase) -> [GoldCandidate] {
+        let primary = GoldCandidate(
+            id: "primary",
+            quality: "primary",
+            expectedToolCalls: item.expectedToolCalls,
+            expectNoCall: item.expectNoCall,
+            expectedStateDelta: item.expectedStateDelta,
+            readbackAssertion: item.readbackAssertion,
+            clarifyTag: item.clarifyTag
+        )
+        let alternatives = item.alternatives
+            .filter { $0.quality == "acceptable" }
+            .map { alternative in
+                GoldCandidate(
+                    id: alternative.id,
+                    quality: alternative.quality,
+                    expectedToolCalls: alternative.expectedToolCalls,
+                    expectNoCall: alternative.expectNoCall,
+                    expectedStateDelta: alternative.expectedStateDelta,
+                    readbackAssertion: alternative.readbackAssertion,
+                    clarifyTag: alternative.clarifyTag
+                )
+            }
+        return [primary] + alternatives
+    }
+
+    private func verify(
+        caseID: String,
+        candidate: GoldCandidate,
+        preState: [String: String],
+        stateCells: StateCellContractLookup,
+        sourceRefsPass: Bool
+    ) -> C6GoldVerificationResult {
+        let toolCallPass = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: candidate.expectedToolCalls)
+            && (!candidate.expectNoCall || candidate.expectedToolCalls.isEmpty)
+        let finalState = C6MockStateApplier.apply(toolCalls: candidate.expectedToolCalls, to: preState, stateCells: stateCells)
+        let stateDeltaMatches = candidate.expectedStateDelta.allSatisfy { key, value in
+            finalState[key] == value
+        }
+        let stateDeltaPass = stateDeltaMatches && (!requiresStateDelta(candidate) || !candidate.expectedStateDelta.isEmpty)
+        let readbackApplicable = !candidate.expectNoCall
+            && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
+        let readbackPass: Bool
+        if readbackApplicable,
+           let outputText = C6ReadbackRenderer.goldReplayOutputText(
+            delta: candidate.expectedStateDelta,
+            assertion: candidate.readbackAssertion,
+            stateCells: stateCells
+           ) {
+            readbackPass = C6ReadbackRenderer.matches(
+                delta: candidate.expectedStateDelta,
+                assertion: candidate.readbackAssertion,
+                outputText: outputText,
+                stateCells: stateCells
+            )
+        } else {
+            readbackPass = false
+        }
+        let clarifyPass = clarifyGoldMatches(candidate)
+
+        var failures: [C6FailureClass] = []
+        if !toolCallPass {
+            failures.append(candidate.expectNoCall ? .noCall : .toolCall)
+        }
+        if !stateDeltaPass {
+            failures.append(.stateDelta)
+        }
+        if readbackApplicable && !readbackPass {
+            failures.append(.readback)
+        }
+        if !clarifyPass {
+            failures.append(candidate.clarifyTag == .rejected ? .refusal : .clarify)
+        }
+        if !sourceRefsPass {
+            failures.append(.infra)
+        }
+
+        return C6GoldVerificationResult(
+            caseID: caseID,
+            candidateID: candidate.id,
+            quality: candidate.quality,
+            toolCallPass: toolCallPass,
+            stateDeltaPass: stateDeltaPass,
+            readbackApplicable: readbackApplicable,
+            readbackPass: readbackPass,
+            clarifyPass: clarifyPass,
+            sourceRefsPass: sourceRefsPass,
+            goldReplayPass: failures.isEmpty,
+            failureClasses: failures
+        )
+    }
+
+    private func clarifyGoldMatches(_ candidate: GoldCandidate) -> Bool {
+        switch candidate.clarifyTag {
+        case .rejected, .ambiguous:
+            return candidate.expectedToolCalls.isEmpty
+        case .explicit, .implicit, .passthrough:
+            return candidate.expectNoCall ? candidate.expectedToolCalls.isEmpty : !candidate.expectedToolCalls.isEmpty
+        }
+    }
+
+    private func requiresStateDelta(_ candidate: GoldCandidate) -> Bool {
+        !candidate.expectNoCall && candidate.expectedToolCalls.contains { $0.name.hasPrefix("set_") }
+    }
+}
+
 public struct C6BenchRunner: Sendable {
     public var qwenToolCallFormatVersion: String
     public var contractDigest: String
@@ -655,58 +934,15 @@ public struct C6BenchRunner: Sendable {
     }
 
     public func evaluate(case benchCase: C6BenchCase, output: C6RuntimeOutput, runIndex: Int = 0) throws -> C6EvalRun {
-        let toolMatch = C6ToolCallMatcher.matches(expected: benchCase.expectedToolCalls, actual: output.toolCalls)
-        let noToolFalsePositiveCount = benchCase.expectNoCall ? output.toolCalls.count : 0
         let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells)
-        let stateMatch = benchCase.expectedStateDelta.allSatisfy { key, value in
-            finalState[key] == value
+        let candidateResults = goldCandidates(for: benchCase).map { candidate in
+            evaluate(candidate: candidate, output: output, finalState: finalState)
         }
-        let readbackApplicable = !benchCase.expectNoCall
-            && (!benchCase.expectedStateDelta.isEmpty || !benchCase.readbackAssertion.contains.isEmpty)
-        let readbackMatch = readbackApplicable && C6ReadbackRenderer.matches(
-            delta: benchCase.expectedStateDelta,
-            assertion: benchCase.readbackAssertion,
-            outputText: output.text,
-            stateCells: stateCells
-        )
-        let clarifyMatch = clarifyGateMatches(case: benchCase, output: output)
-
-        var failures: [C6FailureClass] = []
-        if output.parserFailure {
-            failures.append(.parser)
-        }
-        if !benchCase.expectNoCall, !toolMatch {
-            failures.append(.toolCall)
-        }
-        if noToolFalsePositiveCount > 0 {
-            failures.append(.noCall)
-        }
-        if !stateMatch {
-            failures.append(.stateDelta)
-        }
-        if readbackApplicable && !readbackMatch {
-            failures.append(.readback)
-        }
-        if !clarifyMatch {
-            failures.append(benchCase.clarifyTag == .rejected ? .refusal : .clarify)
-        }
-
-        let hardFailed = !failures.isEmpty
-        let judge = hardFailed ? nil : C6Judge.score(case: benchCase, text: output.text)
+        var gate = candidateResults.first { !$0.hardFailed } ?? candidateResults[0]
+        gate.judge = gate.hardFailed ? nil : C6Judge.score(case: benchCase, text: output.text)
         let actualDigest = C6Hash.sha256Hex(C6CanonicalJSON.encode(output.toolCalls))
         let promptHash = C6Hash.sha256Hex(Data(benchCase.inputZh.utf8))
         let runID = "c6-\(benchCase.caseID)-\(runIndex)"
-
-        let gate = C6GateResult(
-            toolCallSetMatch: toolMatch,
-            noToolFalsePositiveCount: noToolFalsePositiveCount,
-            stateDeltaMatch: stateMatch,
-            readbackMatch: readbackMatch,
-            clarifyMatch: clarifyMatch,
-            hardFailed: hardFailed,
-            failureClasses: failures,
-            judge: judge
-        )
 
         let run = C6EvalRun(
             runID: runID,
@@ -729,6 +965,93 @@ public struct C6BenchRunner: Sendable {
             throw C6InfraError.missingEvalRunField(benchCase.caseID)
         }
         return run
+    }
+
+    private struct GoldCandidate {
+        var expectedToolCalls: [C6ToolCall]
+        var expectNoCall: Bool
+        var expectedStateDelta: [String: String]
+        var readbackAssertion: C6ReadbackAssertion
+        var clarifyTag: C6ClarifyTag
+    }
+
+    private func goldCandidates(for benchCase: C6BenchCase) -> [GoldCandidate] {
+        let primary = GoldCandidate(
+            expectedToolCalls: benchCase.expectedToolCalls,
+            expectNoCall: benchCase.expectNoCall,
+            expectedStateDelta: benchCase.expectedStateDelta,
+            readbackAssertion: benchCase.readbackAssertion,
+            clarifyTag: benchCase.clarifyTag
+        )
+        let acceptable = benchCase.alternatives
+            .filter { $0.quality == "acceptable" }
+            .map { alternative in
+                GoldCandidate(
+                    expectedToolCalls: alternative.expectedToolCalls,
+                    expectNoCall: alternative.expectNoCall,
+                    expectedStateDelta: alternative.expectedStateDelta,
+                    readbackAssertion: alternative.readbackAssertion,
+                    clarifyTag: alternative.clarifyTag
+                )
+            }
+        return [primary] + acceptable
+    }
+
+    private func evaluate(
+        candidate: GoldCandidate,
+        output: C6RuntimeOutput,
+        finalState: [String: String]
+    ) -> C6GateResult {
+        let toolMatch = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: output.toolCalls)
+        let noToolFalsePositiveCount = candidate.expectNoCall ? output.toolCalls.count : 0
+        let stateMatch = candidate.expectedStateDelta.allSatisfy { key, value in
+            finalState[key] == value
+        }
+        let readbackApplicable = !candidate.expectNoCall
+            && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
+        let readbackMatch = readbackApplicable && C6ReadbackRenderer.matches(
+            delta: candidate.expectedStateDelta,
+            assertion: candidate.readbackAssertion,
+            outputText: output.text,
+            stateCells: stateCells
+        )
+        let clarifyMatch = clarifyGateMatches(
+            clarifyTag: candidate.clarifyTag,
+            expectNoCall: candidate.expectNoCall,
+            assertion: candidate.readbackAssertion,
+            output: output
+        )
+
+        var failures: [C6FailureClass] = []
+        if output.parserFailure {
+            failures.append(.parser)
+        }
+        if !candidate.expectNoCall, !toolMatch {
+            failures.append(.toolCall)
+        }
+        if noToolFalsePositiveCount > 0 {
+            failures.append(.noCall)
+        }
+        if !stateMatch {
+            failures.append(.stateDelta)
+        }
+        if readbackApplicable && !readbackMatch {
+            failures.append(.readback)
+        }
+        if !clarifyMatch {
+            failures.append(candidate.clarifyTag == .rejected ? .refusal : .clarify)
+        }
+
+        return C6GateResult(
+            toolCallSetMatch: toolMatch,
+            noToolFalsePositiveCount: noToolFalsePositiveCount,
+            stateDeltaMatch: stateMatch,
+            readbackMatch: readbackMatch,
+            clarifyMatch: clarifyMatch,
+            hardFailed: !failures.isEmpty,
+            failureClasses: failures,
+            judge: nil
+        )
     }
 
     public func summarize(cases: [C6BenchCase], runs: [C6EvalRun], validation: C6DatasetValidation) -> C6Summary {
@@ -786,13 +1109,30 @@ public struct C6BenchRunner: Sendable {
         )
     }
 
-    private func clarifyGateMatches(case benchCase: C6BenchCase, output: C6RuntimeOutput) -> Bool {
-        switch benchCase.clarifyTag {
+    private func clarifyGateMatches(
+        clarifyTag: C6ClarifyTag,
+        expectNoCall: Bool,
+        assertion: C6ReadbackAssertion,
+        output: C6RuntimeOutput
+    ) -> Bool {
+        switch clarifyTag {
         case .rejected, .ambiguous:
-            return output.toolCalls.isEmpty
+            return output.toolCalls.isEmpty && textEvidenceMatches(assertion: assertion, outputText: output.text)
         case .explicit, .implicit, .passthrough:
-            return benchCase.expectNoCall ? output.toolCalls.isEmpty : !output.toolCalls.isEmpty
+            return expectNoCall ? output.toolCalls.isEmpty : !output.toolCalls.isEmpty
         }
+    }
+
+    private func textEvidenceMatches(assertion: C6ReadbackAssertion, outputText: String) -> Bool {
+        let tokens = assertion.contains.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        guard !tokens.isEmpty else {
+            return true
+        }
+        let trimmedOutput = outputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedOutput.isEmpty else {
+            return false
+        }
+        return tokens.allSatisfy { trimmedOutput.contains($0) }
     }
 }
 
@@ -940,7 +1280,7 @@ public enum C6ReadbackRenderer {
         var tokens: [String]
     }
 
-    public static func render(delta: [String: String], stateCells: StateCellContractLookup, fallbackText: String) -> String {
+    private static func render(delta: [String: String], stateCells: StateCellContractLookup, fallbackText: String) -> String {
         guard !delta.isEmpty else {
             return fallbackText
         }
@@ -952,6 +1292,28 @@ public enum C6ReadbackRenderer {
             .sorted()
             .joined(separator: " ")
         return rendered.isEmpty ? fallbackText : rendered
+    }
+
+    fileprivate static func goldReplayOutputText(
+        delta: [String: String],
+        assertion: C6ReadbackAssertion,
+        stateCells: StateCellContractLookup
+    ) -> String? {
+        guard !delta.isEmpty else {
+            let tokens = uniqueNonEmpty(assertion.contains)
+            return tokens.isEmpty ? nil : tokens.joined(separator: " ")
+        }
+        let rendered = delta
+            .compactMap { key, value -> String? in
+                let parts = splitStateKey(key)
+                guard stateCells.cell(id: parts.baseID)?.readbackTemplate != nil else {
+                    return nil
+                }
+                return stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value)
+            }
+            .sorted()
+            .joined(separator: " ")
+        return rendered.isEmpty ? nil : rendered
     }
 
     public static func matches(

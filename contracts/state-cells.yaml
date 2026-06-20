@@ -71,6 +71,7 @@ devices:
         source_kind: c2_demo_decision
         exp_step: {little: 1}
         state_kinds: [empty, known, unknown]
+        readback_zh: "{温区}空调风量{值}挡"
     readback_cell_group: [ac.power, ac.temp_setpoint, ac.mode, ac.fan_speed]
 
   window:
@@ -135,6 +136,7 @@ devices:
         values: [红, 橙, 黄, 绿, 青, 蓝, 紫, 白]   # ⚠️ c2_demo_decision: 协议 set_mode offset=<序号>(索引), 无命名颜色枚举(§28) → demo 自定常用 8 色, 待 magnet 确认
         state_kinds: [empty, known, unknown]
         source_kind: c2_demo_decision
+        readback_zh: "氛围灯颜色{值}"
         # 协议 atmosphere_lamp_color 仅 set_mode primitive; "调成红色"=demo 把序号映射为命名色
       - id: ambient.brightness
         display_zh: 氛围灯亮度

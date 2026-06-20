@@ -24,6 +24,51 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertTrue(noCall.expectedToolCalls.isEmpty)
     }
 
+    func testDatasetCodecDefaultsMissingAlternativesToEmptyArray() throws {
+        let jsonl = """
+        {"case_id":"C6-OLD-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off"},"input_zh":"打开空调","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none"}
+        """
+
+        let cases = try C6DatasetCodec().decodeJSONL(jsonl)
+
+        XCTAssertEqual(cases.count, 1)
+        XCTAssertEqual(cases[0].alternatives, [])
+    }
+
+    func testDatasetCodecDecodesAcceptableAlternative() throws {
+        let jsonl = """
+        {"case_id":"C6-ALT-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off","window.position[主驾]":"0"},"input_zh":"有点闷","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none","alternatives":[{"id":"open_driver_window","expected_tool_calls":[{"name":"set_cabin_window","arguments":{"position":"driver","percent":"20"}}],"expect_no_call":false,"expected_state_delta":{"window.position[主驾]":"20"},"readback_assertion":{"contains":["主驾","20"]},"clarify_tag":"implicit","failure_class":"none","quality":"acceptable","reason":"通风是闷热表达的可接受车控解"}]}
+        """
+
+        let item = try XCTUnwrap(try C6DatasetCodec().decodeJSONL(jsonl).first)
+
+        XCTAssertEqual(item.alternatives.count, 1)
+        XCTAssertEqual(item.alternatives[0].id, "open_driver_window")
+        XCTAssertEqual(item.alternatives[0].quality, "acceptable")
+    }
+
+    func testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives() throws {
+        let generator = try makeGenerator()
+        let cases = try C6DatasetCodec().decodeJSONL(readRepoFile("contracts/c6-bench-cases.jsonl"))
+        let validation = generator.validate(cases)
+        let trapCases = cases.filter { $0.caseID.hasPrefix("C6-TRAP-") }
+        let trapKinds = Dictionary(grouping: trapCases, by: \.tags.sampleKind)
+        let alternativesCount = trapCases.map(\.alternatives.count).reduce(0, +)
+
+        XCTAssertEqual(validation.unresolvedSourceRefCount, 0)
+        XCTAssertEqual(validation.mustPassWithoutMustNotTrainCount, 0)
+        XCTAssertEqual(trapCases.count, 12)
+        XCTAssertEqual(trapKinds["trap-negation"]?.count, 2)
+        XCTAssertEqual(trapKinds["trap-numeric-lure"]?.count, 2)
+        XCTAssertEqual(trapKinds["trap-correction"]?.count, 2)
+        XCTAssertEqual(trapKinds["trap-ambiguous"]?.count, 2)
+        XCTAssertEqual(trapKinds["trap-safety-inheritance"]?.count, 2)
+        XCTAssertEqual(trapKinds["trap-low-confidence-asr"]?.count, 2)
+        XCTAssertEqual(alternativesCount, 2)
+        XCTAssertTrue(trapCases.allSatisfy { $0.tags.mustPass && $0.tags.mustNotTrain })
+        XCTAssertTrue(trapCases.filter { $0.tags.sampleKind == "trap-low-confidence-asr" }.allSatisfy { !$0.readbackAssertion.contains.isEmpty })
+    }
+
     func testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates() throws {
         let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
@@ -58,6 +103,187 @@ final class C6VehicleToolBenchTests: XCTestCase {
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
         ]))
         XCTAssertTrue(duplicate.gateResult.failureClasses.contains(.toolCall))
+    }
+
+    func testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"],
+            preState: ["ac.power": "off", "window.position[主驾]": "0"],
+            alternatives: [
+                C6GoldAlternative(
+                    id: "open_driver_window",
+                    expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])],
+                    expectNoCall: false,
+                    expectedStateDelta: ["window.position[主驾]": "20"],
+                    readbackAssertion: C6ReadbackAssertion(contains: ["主驾", "20"]),
+                    clarifyTag: .implicit,
+                    failureClass: .none,
+                    quality: "acceptable",
+                    reason: "通风是可接受替代解"
+                )
+            ]
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])
+        ], text: "主驾车窗已打开到20%"))
+
+        XCTAssertFalse(result.gateResult.hardFailed)
+        XCTAssertTrue(result.gateResult.toolCallSetMatch)
+        XCTAssertTrue(result.gateResult.stateDeltaMatch)
+        XCTAssertTrue(result.gateResult.readbackMatch)
+    }
+
+    func testDegradedAndUnknownAlternativesDoNotSatisfyHardGates() throws {
+        let runner = try makeRunner()
+        let alternatives = ["degraded", "unknown"].map { quality in
+            C6GoldAlternative(
+                id: "alt-\(quality)",
+                expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])],
+                expectNoCall: false,
+                expectedStateDelta: ["window.position[主驾]": "20"],
+                readbackAssertion: C6ReadbackAssertion(contains: ["主驾", "20"]),
+                clarifyTag: .implicit,
+                failureClass: .none,
+                quality: quality,
+                reason: "not acceptable"
+            )
+        }
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"],
+            preState: ["ac.power": "off", "window.position[主驾]": "0"],
+            alternatives: alternatives
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])
+        ], text: "主驾车窗已打开到20%"))
+
+        XCTAssertTrue(result.gateResult.hardFailed)
+        XCTAssertTrue(result.gateResult.failureClasses.contains(.toolCall))
+    }
+
+    func testGoldVerifierHappyPathReplaysPrimaryGold() throws {
+        let stateCells = try makeStateCells()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        let report = C6GoldVerifier().report(cases: [caseItem], stateCells: stateCells, validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(report.status, "pass")
+        XCTAssertEqual(report.goldReplayPassCount, 1)
+        XCTAssertEqual(report.goldReplayFailCount, 0)
+        XCTAssertEqual(report.results[0].candidateID, "primary")
+        XCTAssertTrue(report.results[0].toolCallPass)
+        XCTAssertTrue(report.results[0].stateDeltaPass)
+        XCTAssertTrue(report.results[0].readbackPass)
+    }
+
+    func testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate() throws {
+        let stateCells = try missingReadbackStateCells()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        let report = C6GoldVerifier().report(cases: [caseItem], stateCells: stateCells, validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(report.status, "fail")
+        XCTAssertEqual(report.goldReplayFailCount, 1)
+        XCTAssertFalse(report.results[0].readbackPass)
+        XCTAssertTrue(report.results[0].failureClasses.contains(.readback))
+    }
+
+    func testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta() throws {
+        let stateCells = try makeStateCells()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "off"],
+            readbackContains: ["空调"]
+        )
+
+        let report = C6GoldVerifier().report(cases: [caseItem], stateCells: stateCells, validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(report.status, "fail")
+        XCTAssertFalse(report.results[0].stateDeltaPass)
+        XCTAssertTrue(report.results[0].failureClasses.contains(.stateDelta))
+    }
+
+    func testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta() throws {
+        let stateCells = try makeStateCells()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: [:],
+            readbackContains: ["空调"]
+        )
+
+        let report = C6GoldVerifier().report(cases: [caseItem], stateCells: stateCells, validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(report.status, "fail")
+        XCTAssertFalse(report.results[0].stateDeltaPass)
+        XCTAssertTrue(report.results[0].failureClasses.contains(.stateDelta))
+    }
+
+    func testGoldVerifierTreatsAcceptableAlternativeAsCaseValid() throws {
+        let stateCells = try makeStateCells()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "off"],
+            readbackContains: ["空调"],
+            preState: ["ac.power": "off", "window.position[主驾]": "0"],
+            alternatives: [
+                C6GoldAlternative(
+                    id: "open_driver_window",
+                    expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])],
+                    expectNoCall: false,
+                    expectedStateDelta: ["window.position[主驾]": "20"],
+                    readbackAssertion: C6ReadbackAssertion(contains: ["主驾", "20"]),
+                    clarifyTag: .implicit,
+                    failureClass: .none,
+                    quality: "acceptable",
+                    reason: "可接受替代解"
+                )
+            ]
+        )
+
+        let report = C6GoldVerifier().report(cases: [caseItem], stateCells: stateCells, validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(report.status, "pass")
+        XCTAssertEqual(report.candidateCount, 2)
+        XCTAssertEqual(report.goldReplayPassCount, 1)
+        XCTAssertEqual(report.goldReplayFailCount, 0)
+        XCTAssertTrue(report.results.contains { $0.candidateID == "open_driver_window" && $0.goldReplayPass })
+        XCTAssertTrue(report.results.contains { $0.candidateID == "primary" && !$0.goldReplayPass })
+    }
+
+    func testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass() throws {
+        let stateCells = try makeStateCells()
+        let caseItem = C6BenchCase.fixture(
+            bucket: .refusal,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: ["vehicle.speed": "30"],
+            readbackContains: ["行驶中"],
+            clarifyTag: .rejected,
+            preState: ["vehicle.speed": "30", "vehicle.gear": "D"]
+        )
+
+        let report = C6GoldVerifier().report(cases: [caseItem], stateCells: stateCells, validation: goldValidation(caseCount: 1))
+        let result = try XCTUnwrap(report.results.first)
+
+        XCTAssertEqual(report.status, "pass")
+        XCTAssertFalse(result.readbackApplicable)
+        XCTAssertFalse(result.readbackPass)
+        XCTAssertFalse(result.failureClasses.contains(.readback))
     }
 
     func testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese() throws {
@@ -103,20 +329,41 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing() throws {
-        let runner = try makeRunner()
+        let runner = try makeRunner(stateCells: missingReadbackStateCells())
         let caseItem = C6BenchCase.fixture(
-            expectedToolCalls: [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "red"])],
-            expectedStateDelta: ["ambient.color": "红"],
-            readbackContains: ["氛围灯", "红"]
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
         )
 
         let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "red"])
-        ], text: "氛围灯红色已打开"))
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))
 
         XCTAssertTrue(result.gateResult.stateDeltaMatch)
         XCTAssertFalse(result.gateResult.readbackMatch)
         XCTAssertTrue(result.gateResult.failureClasses.contains(.readback))
+    }
+
+    func testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            bucket: .refusal,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: ["vehicle.speed": "30"],
+            readbackContains: ["行驶中"],
+            clarifyTag: .rejected,
+            preState: ["vehicle.speed": "30", "vehicle.gear": "D"]
+        )
+
+        let emptyText = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [], text: ""))
+        XCTAssertTrue(emptyText.gateResult.hardFailed)
+        XCTAssertTrue(emptyText.gateResult.failureClasses.contains(.refusal))
+        XCTAssertFalse(emptyText.gateResult.failureClasses.contains(.readback))
+
+        let refusalText = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [], text: "行驶中不能开门"))
+        XCTAssertFalse(refusalText.gateResult.hardFailed)
     }
 
     func testReadbackGateRejectsNegatedTokenMatch() throws {
@@ -379,6 +626,22 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(Set(summary.evalRuns.map(\.loraAdapterDigest)), [""])
     }
 
+    private func goldValidation(caseCount: Int) -> C6DatasetValidation {
+        C6DatasetValidation(
+            caseCount: caseCount,
+            negativeRatio: 0,
+            unresolvedSourceRefCount: 0,
+            mustPassCount: caseCount,
+            mustPassWithoutMustNotTrainCount: 0,
+            representedDevices: 1,
+            totalContractDevices: 1
+        )
+    }
+
+    private func makeStateCells() throws -> StateCellContractLookup {
+        try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
+    }
+
     func testFormatDigestChangesWhenFormatFileContentChanges() throws {
         let first = C6Hash.sha256Hex(Data("runtime_parser: json\n".utf8))
         let second = C6Hash.sha256Hex(Data("runtime_parser: xml\n".utf8))
@@ -413,7 +676,8 @@ final class C6VehicleToolBenchTests: XCTestCase {
         tokenizerDigest: String = "tokenizer-digest",
         loraAdapterID: String = "",
         loraCheckpointID: String = "",
-        loraAdapterDigest: String = ""
+        loraAdapterDigest: String = "",
+        stateCells: StateCellContractLookup? = nil
     ) throws -> C6BenchRunner {
         C6BenchRunner(
             qwenToolCallFormatVersion: "format-hash",
@@ -424,7 +688,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
             loraAdapterDigest: loraAdapterDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
-            stateCells: try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
+            stateCells: try stateCells ?? StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
         )
     }
 
@@ -435,6 +699,17 @@ final class C6VehicleToolBenchTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
         return try String(contentsOf: repoRoot.appendingPathComponent(relativePath), encoding: .utf8)
+    }
+
+    private func missingReadbackStateCells() throws -> StateCellContractLookup {
+        try StateCellContractLookup(yaml: """
+        device_cells:
+          ac:
+            state_cells:
+              - id: ac.power
+                type: enum
+                values: [on, off]
+        """)
     }
 }
 
@@ -449,7 +724,8 @@ private extension C6BenchCase {
         preState: [String: String] = [
             "ac.power": "off",
             "screen.brightness[中控屏]": "70"
-        ]
+        ],
+        alternatives: [C6GoldAlternative] = []
     ) -> C6BenchCase {
         C6BenchCase(
             caseID: "C6-FIXTURE-001",
@@ -462,7 +738,8 @@ private extension C6BenchCase {
             expectedStateDelta: expectedStateDelta,
             readbackAssertion: C6ReadbackAssertion(contains: readbackContains),
             clarifyTag: clarifyTag,
-            failureClass: .none
+            failureClass: .none,
+            alternatives: alternatives
         )
     }
 }

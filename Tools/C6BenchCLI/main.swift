@@ -23,6 +23,8 @@ struct C6BenchCLI {
             try generate(options)
         case "summarize":
             try summarize(options)
+        case "verify-gold", "verify_gold":
+            try verifyGold(options)
         default:
             throw CLIError.usage("unknown command: \(options.command)")
         }
@@ -84,6 +86,9 @@ struct C6BenchCLI {
         if loraAdapterDigest.isEmpty && (!loraAdapterID.isEmpty || !loraCheckpointID.isEmpty) {
             throw CLIError.usage("summarize requires --lora-adapter when model results carry LoRA identifiers")
         }
+        if !loraAdapterDigest.isEmpty && loraAdapterID.isEmpty && loraCheckpointID.isEmpty {
+            throw CLIError.usage("--lora-adapter was provided but model results carry no LoRA identifiers")
+        }
         let runner = C6BenchRunner(
             qwenToolCallFormatVersion: qwenHash,
             contractDigest: contractDigest,
@@ -125,6 +130,35 @@ struct C6BenchCLI {
         print("wrote \(jsonURL.path)")
         print("wrote \(markdownURL.path)")
         print("status=\(summary.status) runs=\(summary.totalRuns) cases=\(summary.totalCases) IrrelAcc=\(String(format: "%.3f", summary.IrrelAcc)) hard_failures=\(summary.hardFailureCount)")
+    }
+
+    private static func verifyGold(_ options: Options) throws {
+        let repoRoot = options.repoRoot
+        let datasetText = try String(contentsOf: repoRoot.appendingPathComponent("contracts/c6-bench-cases.jsonl"), encoding: .utf8)
+        let cases = try C6DatasetCodec().decodeJSONL(datasetText)
+        let generator = try makeGenerator(repoRoot: repoRoot)
+        let validation = generator.validate(cases)
+        let report = C6GoldVerifier().report(cases: cases, stateCells: generator.stateCells, validation: validation)
+        let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        let jsonURL = outputDir.appendingPathComponent("c6-gold-verify.json")
+        try encoder.encode(report).write(to: jsonURL)
+        let markdownURL = outputDir.appendingPathComponent("c6-gold-verify.md")
+        try renderGoldVerifyMarkdown(report: report).write(to: markdownURL, atomically: true, encoding: .utf8)
+        print("wrote \(jsonURL.path)")
+        print("wrote \(markdownURL.path)")
+        print("status=\(report.status) cases=\(report.cases) candidates=\(report.candidateCount) gold_replay_pass=\(report.goldReplayPassCount) gold_replay_fail=\(report.goldReplayFailCount)")
+        guard report.status == "pass" else {
+            let passedIDs = Set(report.results.filter(\.goldReplayPass).map(\.caseID))
+            let failedIDs = Set(report.results.map(\.caseID))
+                .subtracting(passedIDs)
+                .sorted()
+                .prefix(10)
+                .joined(separator: ",")
+            throw CLIError.usage("verify-gold failed: failing_candidate_case_ids=\(failedIDs)")
+        }
     }
 
     private static func makeGenerator(repoRoot: URL) throws -> C6DatasetGenerator {
@@ -187,6 +221,23 @@ struct C6BenchCLI {
         \(summary.perCaseStats.map { "- \($0.caseID): runs=\($0.runCount), hard_pass_mean=\(String(format: "%.3f", $0.hardPassMean)), hard_pass_variance=\(String(format: "%.3f", $0.hardPassVariance)), elapsed_mean_ms=\(String(format: "%.1f", $0.elapsedMeanMs)), elapsed_variance_ms=\(String(format: "%.1f", $0.elapsedVarianceMs))" }.joined(separator: "\n"))
         """
     }
+
+    private static func renderGoldVerifyMarkdown(report: C6GoldVerificationReport) -> String {
+        """
+        # C6 gold verification
+
+        status: \(report.status)
+        cases: \(report.cases)
+        candidate_count: \(report.candidateCount)
+        gold_replay_pass_count: \(report.goldReplayPassCount)
+        gold_replay_fail_count: \(report.goldReplayFailCount)
+
+        ## Per candidate
+        \(report.results.map { result in
+            "- \(result.caseID) / \(result.candidateID) [\(result.quality)]: gold_replay_pass=\(result.goldReplayPass), tool_call_pass=\(result.toolCallPass), state_delta_pass=\(result.stateDeltaPass), readback_applicable=\(result.readbackApplicable), readback_pass=\(result.readbackPass), clarify_pass=\(result.clarifyPass), source_refs_pass=\(result.sourceRefsPass), failure_classes=\(result.failureClasses.map(\.rawValue).joined(separator: ","))"
+        }.joined(separator: "\n"))
+        """
+    }
 }
 
 private struct Options {
@@ -200,7 +251,7 @@ private struct Options {
 
     init(arguments: [String]) throws {
         guard arguments.count >= 2 else {
-            throw CLIError.usage("usage: C6BenchCLI <generate|summarize> [--repo-root PATH] [--model-results PATH] [--model-artifact PATH] [--tokenizer-artifact PATH] [--lora-adapter PATH] [--output-dir PATH]")
+            throw CLIError.usage("usage: C6BenchCLI <generate|summarize|verify-gold> [--repo-root PATH] [--model-results PATH] [--model-artifact PATH] [--tokenizer-artifact PATH] [--lora-adapter PATH] [--output-dir PATH]")
         }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
