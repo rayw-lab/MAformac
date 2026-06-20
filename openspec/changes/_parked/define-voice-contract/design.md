@@ -30,6 +30,9 @@ VAD/KWS 接口预留,Phase2 barge-in 接入(**非砍,是预留**)。
  → SpeechSynthesisEngine(AVSpeech,只播操作对象+readback,可中断)
 ```
 
+### 待解冻 adopt:端到端 span 分层(Q1)
+Mastra trace teardown 已归档到 `docs/research/2026-06-20-mastra-teardown-workflow-eval-trace.md`,38 项 backlog 归档到 `docs/优化待讨论-吸收内化措施38项-2026-06-20.md`。C7 解冻时 ASR/normalization 层 SHALL 产上层 span,挂同一个 `runId/traceId` 树；C3 五段仍只保留 `decode/plan/guard/execute/readback`,作为语音链路下游子树。低置信澄清、ASR 拒识、TTS 播报状态写 C7 span attributes,不新增 C3 stage。
+
 ### 关键决策表
 | 决策 | 选 | 不选(原因) |
 |---|---|---|

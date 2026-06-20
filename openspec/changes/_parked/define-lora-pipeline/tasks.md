@@ -13,10 +13,13 @@
 
 - [ ] 2.1 `training_jsonl_candidate`:OpenAI-compatible `messages + tools`;5 分桶(positive / ambiguity / unsafe / readback / no_think_formatting)。验收:JSONL 合法 + 5 桶齐 + tokenizer rendering 通过。
 - [ ] 2.2 **从 50 条 redacted candidate 起 + 人工审核**(磊哥)再扩大。**需磊哥显式授权从运行态 DB 生成**。验收:50 条经人工审核。
+- [ ] 2.3 引用 `contracts/qwen-tool-call-format.yaml` 渲染训练样本,不在生成脚本中另写 wrapper / arguments 形态。验收:`format_contract_version` 写入 receipt,正例 `<tool_call>{...}</tool_call>` 与 restraint 负例均符合 #39。
+- [ ] 2.4 每批输出 `verification_receipt.json`:`row_count / bucket_counts / format_contract_version / tool_call_format_pass_rate / split_whitelist / parent_semantic_overlap / must_not_train_violations`。验收:receipt 字段齐,`parent_semantic_overlap=0`,`must_not_train_violations=0`,格式合规率达门。
+- [ ] 2.5 Hammer/GOAT masking 三形态:function 名 / 参数名 / 默认值与常见值。验收:三类 masking 样本均存在,不把 arg 值死记作为主要学习目标。
 
 ## 3. eval 锁定(5 态第 4 态)
 
-- [ ] 3.1 `eval_jsonl_locked`:`demo_must_pass` 样本标 `must_not_train: true`(eval/train 分离,防泄漏)。验收:eval 集与 train 集无交集。
+- [ ] 3.1 `eval_jsonl_locked`:`demo_must_pass` 样本标 `must_not_train: true`(eval/train 分离,防泄漏)。验收:eval 集与 train 集无交集,split whitelist 显式列出 formal splits,禁止 glob 污染 totals。
 
 ## 4. LoRA 训练 + 对比(5 态第 5 态)
 

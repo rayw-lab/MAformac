@@ -41,6 +41,12 @@ E3 raw `.toolCall` 触发率 31/40=77.5%,但 9 条 content 伪工具全是裸 JS
 ### 训练 JSONL + eval 分离
 OpenAI-compatible `messages + tools`;`tool_calls[].function.arguments` 序列化 JSON string,eval metadata 保留 object 便精确比对;`demo_must_pass` 标 `must_not_train: true`。
 
+### 待解冻 adopt:#39 Qwen tool-call 格式单一源
+C5 数据生成 SHALL 引用 `contracts/qwen-tool-call-format.yaml`,不得在生成脚本里另写 chat template / wrapper / arguments 形态。当前 C3 runtime 锁定 `model_family=qwen3`, `runtime_parser=json`, `thinking=false`, `wrapper=tool_call`, `arguments_shape=json_object`;训练样本的正例与负例都必须按该契约渲染,防 C5 学到 runtime 不识别的格式。
+
+### 待解冻 adopt:Q6 数据质量门
+每批生成 SHALL 输出 `verification_receipt.json`,至少含 `row_count / bucket_counts / format_contract_version / tool_call_format_pass_rate / split_whitelist / parent_semantic_overlap / must_not_train_violations`。硬门:`parent_overlap=0`, `must_not_train_violations=0`, 且 #39 格式合规。Hammer/GOAT masking 拆成三类覆盖:function 名 masking、参数名 masking、默认值/常见值 masking,避免只死记结构名和值。
+
 ### MLX-LM LoRA 配置(本地 Mac,非 iOS)
 rank 8/16、alpha 16/32、dropout 0.05、target `q_proj/v_proj` 起步(必要扩 `q/k/v/o/gate/up/down`);**think traces 不算 loss**;输出 Q4。
 

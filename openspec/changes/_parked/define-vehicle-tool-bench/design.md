@@ -37,6 +37,15 @@ eval 是 demo 可信度硬门。pre-mortem 料 `qwen3-engineering-notes §6`(eva
 ### 统一 trace(Codex 04)
 每条 case 输出 `trace_id / route_kind / parser_status / decode_status / guard_status / execution_status / readback`。
 
+### 待解冻 adopt:#39 格式契约 + #40 replay 指纹
+C6 bench harness SHALL 引用 `contracts/qwen-tool-call-format.yaml`,不得另写 runtime parser / wrapper / arguments 形态。每条 `eval_run` 输出 `run_id / case_id / model_id / lora_adapter_id / lora_checkpoint_id / qwen_tool_call_format_version / prompt_hash / sampling_seed / tool_output_digest / contract_digest`,并挂到 Q1 的 `runId` trace 树,用于 per-checkpoint diff 和回归归因。
+
+### 待解冻 adopt:Q3 judge 边界
+新增 Requirement:judge 不参与放行硬门。确定性硬门先过:`Unsafe false pass=0 / readback mismatch=0 / no-tool false positive=0 / must-pass=100%`;任一失败总分归零,LLM judge 不得洗白。judge 仅在硬门全过后评文本主观项,输出 schema 只保留 `clarify_text_score / refusal_text_score / reason`;TTS 听感归人工 S-PASS,不进自动硬验收。
+
+### 待解冻 adopt:Q4 case schema 与四类一等硬门
+C6 正式 case schema SHALL 包含 `pre_state / input_zh / expected_tool_calls / expect_no_call / expected_state_delta / readback_assertion / clarify_tag / failure_class`。runner SHALL 输出 `IrrelAcc / no_tool_false_positive_count / state_delta_match / readback_match / clarify_match`。任一 no-call 误触发、状态差异错误、读回不一致、该澄清未澄清都为硬失败,judge 不参与。
+
 > **🔴 跨 change 对齐(2026-06-19,apply 前必改)**:原 `route(fast|slow)` 二分 → apply 时 MODIFIED 为 `route_kind` 多态(`rule_fast` / `rule_batch_fast` / `fc_fast` / `slow`),对齐 `define-intent-routing` 三层分流。否则 intent-routing 的 `rule_batch_fast`(规则批快路径,明确「不升慢」)会被二分误归慢路径 → 套错延迟预算(慢≤2500ms 而非快≤800ms)/ fixture expected 对不上 / 砸 must-pass=100% 死门。延迟预算按 `route_kind` 分档判。源:`define-intent-routing/proposal.md:41` + `tasks.md:48`。
 
 ## Risks / Trade-offs(pre-mortem,带来源)
