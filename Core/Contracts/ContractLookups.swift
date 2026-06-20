@@ -157,6 +157,43 @@ public struct StateCellContractLookup: Sendable {
         cellsByID.values.sorted { $0.id < $1.id }
     }
 
+    /// 用 C2 `readback_zh` 模板渲染播报文本(gap#5)。
+    /// mock state key 形如 `ac.temp_setpoint[主驾]` → 取 base cell id 查模板,把 scope/value 填入占位符。
+    /// 模板占位符按 C2 现状有 `{温区}/{位置}/{屏幕}/{氛围灯}`(均代表 scope)与 `{值}`;
+    /// enum 形如 `空调{已打开|已关闭}` 由调用方传 enum 渲染。无模板时返回 nil,交回调用方走兜底。
+    public func renderReadback(stateKey: String, scope: String?, value: String) -> String? {
+        let baseID = stateKey.contains("[") ? String(stateKey.prefix(while: { $0 != "[" })) : stateKey
+        guard let cell = cellsByID[baseID], let template = cell.readbackTemplate else {
+            return nil
+        }
+        var result = template
+        for placeholder in ["{温区}", "{位置}", "{屏幕}", "{氛围灯}", "{区域}", "{位}"] {
+            result = result.replacingOccurrences(of: placeholder, with: scope ?? "")
+        }
+        result = result.replacingOccurrences(of: "{值}", with: value)
+        // enum-branch 形式 `空调{已打开|已关闭}`:按 value 在 cell.values 中的位置选分支。
+        result = Self.resolveEnumBranch(result, value: value, values: cell.values)
+        return result
+    }
+
+    /// 把模板里的 `{分支A|分支B|...}` 按 value 在 enum values 列表中的索引展开。
+    /// 无法匹配索引时取第一分支兜底,保证不把原始 `{...|...}` 漏给 TTS。
+    private static func resolveEnumBranch(_ template: String, value: String, values: [String]) -> String {
+        guard let open = template.firstIndex(of: "{"),
+              let close = template.firstIndex(of: "}"),
+              open < close else {
+            return template
+        }
+        let inner = String(template[template.index(after: open)..<close])
+        guard inner.contains("|") else {
+            return template
+        }
+        let branches = inner.components(separatedBy: "|")
+        let index = values.firstIndex(of: value) ?? 0
+        let chosen = index < branches.count ? branches[index] : (branches.first ?? "")
+        return template.replacingCharacters(in: open...close, with: chosen)
+    }
+
     private static func parseCells(yaml: String) -> [String: StateCellDefinition] {
         var cells: [String: StateCellDefinition] = [:]
         var current: StateCellDefinition?

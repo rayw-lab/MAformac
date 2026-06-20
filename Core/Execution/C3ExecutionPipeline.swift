@@ -110,7 +110,15 @@ public struct C3ExecutionPipeline: Sendable {
         for transition in transitions {
             let applied = store.applyMockTransition(transition)
             traceLogger.recordExecute(traceID: frame.traceID, message: "\(applied.key)=\(applied.actualValue)")
-            let verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
+            var verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
+            // gap#5:播报优先消费 C2 readback_zh 模板,而非 store 硬编码兜底。
+            if let rendered = stateCells.renderReadback(
+                stateKey: transition.key,
+                scope: scope(forKey: transition.key),
+                value: verified.actualValue
+            ) {
+                verified.spokenText = rendered
+            }
             traceLogger.recordReadback(
                 traceID: frame.traceID,
                 message: verified.spokenText,
@@ -191,6 +199,14 @@ public struct C3ExecutionPipeline: Sendable {
 
     private func scopedKey(_ cellID: String, scope: String) -> String {
         "\(cellID)[\(scope)]"
+    }
+
+    /// 从 scoped mock key(如 `ac.temp_setpoint[主驾]`)提取 scope 段;无 scope 返回 nil。
+    private func scope(forKey key: String) -> String? {
+        guard let open = key.firstIndex(of: "["), let close = key.firstIndex(of: "]"), open < close else {
+            return nil
+        }
+        return String(key[key.index(after: open)..<close])
     }
 
     @MainActor
