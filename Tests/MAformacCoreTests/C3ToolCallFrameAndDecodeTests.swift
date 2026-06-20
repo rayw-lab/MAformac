@@ -73,6 +73,23 @@ final class C3ToolCallFrameAndDecodeTests: XCTestCase {
             XCTAssertEqual(error as? ToolExecutionError, .thinkLeak)
         }
     }
+
+    func testNonStreamingCompletionStripsThinkingAndParsesFencedJSONCandidate() throws {
+        let decoder = ToolCallCandidateDecoder(contentFallbackEnabled: true)
+        let completion = """
+        <think>先识别用户想打开主驾车窗</think>
+        ```json
+        {"device":"window","action_primitive":"power_on","slot":{"position":"主驾"},"value":{"ref":"ZERO","direct":"+","offset":"100","type":"PERCENT"},"state_revision":0}
+        ```
+        """
+
+        let frame = try decoder.decodeNonStreamingCompletion(completion)
+
+        XCTAssertEqual(frame.device, "window")
+        XCTAssertEqual(frame.actionPrimitive, "power_on")
+        XCTAssertEqual(frame.slots["position"], "主驾")
+        XCTAssertEqual(frame.candidateSource, .parserRepair)
+    }
 }
 
 private extension ToolCallFrame {

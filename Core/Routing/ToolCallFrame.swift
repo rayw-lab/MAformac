@@ -309,6 +309,34 @@ public struct ToolCallCandidateDecoder: Sendable {
         )
     }
 
+    public func decodeNonStreamingCompletion(_ completion: String) throws -> ToolCallFrame {
+        let stripped = stripThinking(from: completion)
+        let candidate = extractFencedJSON(from: stripped) ?? stripped.trimmingCharacters(in: .whitespacesAndNewlines)
+        var frame = try decodeContentFallback(candidate)
+        frame.candidateSource = .parserRepair
+        return frame
+    }
+
+    private func stripThinking(from content: String) -> String {
+        var result = content
+        while let start = result.range(of: "<think>"),
+              let end = result.range(of: "</think>", range: start.upperBound..<result.endIndex) {
+            result.removeSubrange(start.lowerBound..<end.upperBound)
+        }
+        return result
+    }
+
+    private func extractFencedJSON(from content: String) -> String? {
+        guard let fenceStart = content.range(of: "```json") ?? content.range(of: "```") else {
+            return nil
+        }
+        let bodyStart = fenceStart.upperBound
+        guard let fenceEnd = content.range(of: "```", range: bodyStart..<content.endIndex) else {
+            return nil
+        }
+        return String(content[bodyStart..<fenceEnd.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func decodeStringMap(_ raw: Any?, field: String) throws -> [String: String]? {
         guard let raw else {
             return nil
