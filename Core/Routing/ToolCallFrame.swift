@@ -87,6 +87,38 @@ public enum MalformedReason: Equatable, Sendable {
     case contentFallbackDisabled
     case invalidJSON
     case nonObjectArguments
+    case lengthTruncated
+}
+
+/// 解码完成时的 stop/finish 元信息。控制路径以此判断候选是否可信。
+/// spec tool-execution:16/23-26 — finish_reason=length 表示输出被截断，不得 repair 成动作。
+public enum DecodeFinishReason: String, Codable, Equatable, Sendable {
+    case stop
+    case length
+    case toolCalls = "tool_calls"
+    case contentFilter = "content_filter"
+    case unknown
+}
+
+/// decode 的统一输入：原始 content + completion 元信息。
+/// 旧 content-only 入口由默认值（finishReason=.stop, toolCallCount=1）保持向后兼容。
+public struct ToolCallDecodeInput: Equatable, Sendable {
+    public var content: String
+    public var finishReason: DecodeFinishReason
+    public var stopReason: String?
+    public var toolCallCount: Int
+
+    public init(
+        content: String,
+        finishReason: DecodeFinishReason = .stop,
+        stopReason: String? = nil,
+        toolCallCount: Int = 1
+    ) {
+        self.content = content
+        self.finishReason = finishReason
+        self.stopReason = stopReason
+        self.toolCallCount = toolCallCount
+    }
 }
 
 public enum ToolExecutionError: Error, Equatable, Sendable {
@@ -263,6 +295,20 @@ public struct ToolCallCandidateDecoder: Sendable {
         self.contentFallbackEnabled = contentFallbackEnabled
         self.allowedActionPrimitives = allowedActionPrimitives
         self.allowedValueTypes = allowedValueTypes
+    }
+
+    /// 元信息感知的解码入口。先用 completion 元信息做 fail-closed gate,再走 content fallback。
+    /// spec tool-execution:16「finish reason length / 多 tool call → reject,不 repair-to-action」。
+    public func decode(_ input: ToolCallDecodeInput) throws -> ToolCallFrame {
+        // length 截断:即使 JSON 碰巧可解析,也是被截断的不可信输出,标 decode failed,不进 repair。
+        guard input.finishReason != .length else {
+            throw ToolExecutionError.malformed(.lengthTruncated)
+        }
+        // 单发约束:tool_call_count > 1 在 decode 边界就拒,不选其一执行(spec:16/18-21)。
+        guard input.toolCallCount <= 1 else {
+            throw ToolExecutionError.schemaInvalid(.multipleFrames)
+        }
+        return try decodeContentFallback(input.content)
     }
 
     public func decodeContentFallback(_ content: String) throws -> ToolCallFrame {
