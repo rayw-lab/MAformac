@@ -25,9 +25,9 @@ decision: raw parser-only = go+LoRA; cross-vendor audit-adjusted = GO for change
 - negative bare JSON risk: 2 additional negative cases emitted bare JSON in content (`N016` restraint -> `set_cabin_ac off`; `N017` restraint -> `query_cabin_comfort`). A naive content fallback would worsen G3 from 1/15 to up to 3/15; fallback must produce candidates that pass strict decode + DemoGuard/restraint before execution.
 
 ## G4 latency / streaming
-- average elapsed: 598.89 ms
-- average first stream event: 516.64 ms
-- average generation tok/s: 92.51
+- average elapsed: 681.20 ms
+- average first stream event: 584.65 ms
+- average generation tok/s: 79.12
 - anchor: elapsed is prompt submit to stream completion; first event is prompt submit to first `.chunk` / `.toolCall` / `.info`.
 
 ## G5 G3 parameter-planning mini-spike
@@ -62,4 +62,5 @@ decision: raw parser-only = go+LoRA; cross-vendor audit-adjusted = GO for change
 - `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
 - Samples are derived from `contracts/capabilities.yaml` 8 active capabilities and project restraint/OOD seeds; no model-generated samples are used.
 - This is a base-model spike only. No LoRA training, no main app integration, no real vehicle control.
-- Report corrections after cross-vendor audit are documentation-only; the harness collection/statistics logic and raw `spike-e3-results.json` were not changed.
+- This file now reflects the 2026-06-20 rerun. The harness still emits the fixed sample snapshot timestamp; metrics are from the current `spike-e3-results.json`.
+- Cross-vendor audit corrections remain documentation-only relative to the rerun results; they do not change harness collection/statistics logic.
