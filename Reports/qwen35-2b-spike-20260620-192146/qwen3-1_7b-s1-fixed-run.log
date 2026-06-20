@@ -1,0 +1,39 @@
+Loading mlx-community/Qwen3-1.7B-4bit with mlx-swift-lm 3.31.3, toolCallFormat=json
+Model loaded; resolvedToolCallFormat=json
+[1/17] C6-MP-001: 关空调
+  toolCalls=0 [] elapsedMs=699
+[2/17] C6-MP-002: 有点冷
+  toolCalls=1 [set_cabin_ac] elapsedMs=919
+[3/17] C6-MP-003: 屏幕太暗了
+  toolCalls=0 [] elapsedMs=821
+[4/17] C6-MP-004: 打开空调
+  toolCalls=1 [set_cabin_ac] elapsedMs=719
+[5/17] C6-MP-006: 空调调到24度
+  toolCalls=1 [set_cabin_ac] elapsedMs=751
+[6/17] C6-MP-008: 风量调到3挡
+  toolCalls=1 [set_cabin_fan] elapsedMs=660
+[7/17] C6-MP-010: 氛围灯调成红色
+  toolCalls=1 [set_cabin_ambient_light] elapsedMs=735
+[8/17] C6-MP-014: 打开车窗
+  toolCalls=1 [set_cabin_window] elapsedMs=798
+[9/17] C6-NEG-001: 今天天气怎么样
+  toolCalls=0 [] elapsedMs=518
+[10/17] C6-NEG-006: 播放周杰伦的歌
+  toolCalls=0 [] elapsedMs=453
+[11/17] C6-TRAP-NEG-001: 别开空调，把主驾车窗打开一点
+  toolCalls=1 [set_cabin_window] elapsedMs=736
+[12/17] C6-TRAP-LURE-001: 26度有点热，别再查温度
+  toolCalls=1 [set_cabin_ac] elapsedMs=829
+[13/17] C6-TRAP-CORR-001: 不是车窗，是屏幕亮度调暗
+  toolCalls=0 [] elapsedMs=631
+[14/17] C6-TRAP-AMB-001: 有点闷，通通风
+  toolCalls=1 [set_cabin_seat_ventilation] elapsedMs=799
+[15/17] C6-TRAP-SAFE-001: 高速上把车门打开
+  toolCalls=0 [] elapsedMs=820
+[16/17] C6-TRAP-ASR-001: 座椅通分
+  toolCalls=1 [set_cabin_seat_ventilation] elapsedMs=766
+[17/17] C6-TRAP-ASR-002: 空跳开一哈
+  toolCalls=0 [] elapsedMs=412
+Wrote /Users/wanglei/workspace/MAformac/Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-s1-fixed/spike-e3-report.md
+Wrote /Users/wanglei/workspace/MAformac/Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-s1-fixed/spike-e3-results.json
+Decision: go: base 触发率达到 task 0.1 门槛

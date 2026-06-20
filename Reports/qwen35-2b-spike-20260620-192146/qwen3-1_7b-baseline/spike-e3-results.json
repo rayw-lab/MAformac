@@ -1,0 +1,435 @@
+{
+  "mlxSwiftLMTag" : "3.31.3",
+  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+  "results" : [
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2535799741744995,
+        "generationTokenCount" : 21,
+        "promptTime" : 0.5152961015701294,
+        "promptTokenCount" : 1325,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 82.81411049260925
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 789,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 770,
+      "id" : "P001",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "power" : "on"
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "打开空调"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "{\"name\": \"set_cabin_ac\", \"arguments\": {\"power\": \"off\"}}",
+      "completion" : {
+        "generationTime" : 0.24006998538970947,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.3855370283126831,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 74.97813594140187
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 643,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 391,
+      "id" : "P002",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "把空调关掉"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.42674291133880615,
+        "generationTokenCount" : 36,
+        "promptTime" : 0.39597809314727783,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 84.35992501213063
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 837,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 814,
+      "id" : "P003",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "mode" : "cooling",
+            "power" : "on",
+            "target_temperature" : 25
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "我有点热"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.21843206882476807,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.420928955078125,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 82.40548238564764
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 657,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 635,
+      "id" : "P004",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "太阳晒了一路，车里越来越闷热"
+    },
+    {
+      "capability" : "cabin.ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.40122199058532715,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.4013301134109497,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 69.7868029595085
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 820,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 795,
+      "id" : "P005",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "mode" : "cooling",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "热得像蒸笼，帮我降一降"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.35551702976226807,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.43734002113342285,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 81.57133856398416
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 807,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 785,
+      "id" : "P006",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2,
+            "position" : "driver"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "打开主驾座椅加热到2挡"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.42959094047546387,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.3912010192871094,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 69.83387491085477
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 836,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 813,
+      "id" : "P007",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "passenger"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "副驾暖座调到3挡"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "{\"name\": \"set_cabin_seat_heating\", \"arguments\": {\"position\": \"passenger\", \"level\": 1}}",
+      "completion" : {
+        "generationTime" : 0.3496570587158203,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.43658292293548584,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 77.2185183366881
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 803,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : false,
+      "firstEventMs" : 442,
+      "id" : "P008",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L2_feeling",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "屁股有点冷"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.31941401958465576,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.36664891242980957,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 90.79125593081238
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 703,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 683,
+      "id" : "P009",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L3_scene",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 1,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "冬天刚上车，座椅太冰了"
+    },
+    {
+      "capability" : "cabin.seat_heating",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.25740599632263184,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.39078009128570557,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 89.35300781094422
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 666,
+      "expectedTool" : "set_cabin_seat_heating",
+      "expectedToolHit" : true,
+      "firstEventMs" : 646,
+      "id" : "P010",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L4_free",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_heating"
+        }
+      ],
+      "utterance" : "座垫像冰块，给我暖一下"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3671959638595581,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.36798095703125,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 81.70024442718041
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 760,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : true,
+      "firstEventMs" : 729,
+      "id" : "P011",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2,
+            "position" : "driver"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "打开主驾座椅通风到2挡"
+    },
+    {
+      "capability" : "cabin.seat_ventilation",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.4307379722595215,
+        "generationTokenCount" : 31,
+        "promptTime" : 0.4176900386810303,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 71.96950813828498
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 875,
+      "expectedTool" : "set_cabin_seat_ventilation",
+      "expectedToolHit" : true,
+      "firstEventMs" : 851,
+      "id" : "P012",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "L1_exact",
+      "tags" : [
+
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 1,
+            "position" : "passenger"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "副驾座椅吹风调到1挡"
+    }
+  ],
+  "snapshotTime" : "2026-06-18T00:00:00+08:00",
+  "status" : "done",
+  "summary" : {
+    "decision" : "go: base 触发率达到 task 0.1 门槛",
+    "g1TriggerCount" : 10,
+    "g1TriggerRate" : 0.8333333333333334,
+    "g2ContentToolCallCount" : 2,
+    "g2ContentToolCallRate" : 0.16666666666666666,
+    "g3NegativeFalseCallCount" : 0,
+    "g3NegativeFalseCallRate" : 0,
+    "g4AverageElapsedMs" : 766.3333333333334,
+    "g4AverageFirstEventMs" : 696.1666666666666,
+    "g4AverageTokensPerSecond" : 79.73185040917058,
+    "g5Cases" : 0,
+    "g5EnumSuccessCount" : 0,
+    "g5EnumSuccessRate" : 0,
+    "negativeCount" : 0,
+    "positiveCount" : 12,
+    "positiveExpectedToolHitRate" : 0.75,
+    "thinkLeakCount" : 0
+  },
+  "totalCases" : 12
+}

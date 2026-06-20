@@ -6,7 +6,8 @@ import MLXLLM
 import MLXLMCommon
 import Tokenizers
 
-private let modelID = "mlx-community/Qwen3-1.7B-4bit"
+// Keep the default pinned to the current 1.7B baseline; Qwen3.5 runs only via explicit spike args.
+private let defaultModelID = "mlx-community/Qwen3-1.7B-4bit"
 private let mlxSwiftLMTag = "3.31.3"
 private let snapshotTime = "2026-06-18T00:00:00+08:00"
 
@@ -26,24 +27,26 @@ private struct SpikeRunner {
     let arguments: [String]
 
     func run() async throws {
-        let options = RunOptions(arguments: arguments)
+        let options = try RunOptions(arguments: arguments)
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+        let requestedToolCallFormat = try options.resolvedToolCallFormat()
 
         let configuration = ModelConfiguration(
-            id: modelID,
+            id: options.modelID,
             defaultPrompt: "打开空调",
-            toolCallFormat: ToolCallFormat.json
+            toolCallFormat: requestedToolCallFormat
         )
 
-        print("Loading \(modelID) with mlx-swift-lm \(mlxSwiftLMTag), toolCallFormat=.json")
+        print("Loading \(options.modelID) with mlx-swift-lm \(mlxSwiftLMTag), toolCallFormat=\(options.toolCallFormatMode)")
         let modelContext = try await #huggingFaceLoadModel(configuration: configuration) { progress in
             if progress.totalUnitCount > 0 {
                 let percent = Double(progress.completedUnitCount) / Double(progress.totalUnitCount) * 100
                 print(String(format: "download/load progress %.1f%%", percent))
             }
         }
-        print("Model loaded")
+        let resolvedToolCallFormat = formatName(modelContext.configuration.toolCallFormat)
+        print("Model loaded; resolvedToolCallFormat=\(resolvedToolCallFormat)")
 
         let loadedCases = try options.casesJSONL.map(loadC6Cases(from:)) ?? sampleCases
         let limitedCases = Array(loadedCases.prefix(options.limit ?? loadedCases.count))
@@ -64,8 +67,10 @@ private struct SpikeRunner {
         let summary = Summary(results: results)
         let envelope = ResultEnvelope(
             status: "done",
-            modelID: modelID,
+            modelID: options.modelID,
             mlxSwiftLMTag: mlxSwiftLMTag,
+            requestedToolCallFormat: options.toolCallFormatMode,
+            resolvedToolCallFormat: resolvedToolCallFormat,
             snapshotTime: snapshotTime,
             totalCases: results.count,
             summary: summary,
@@ -159,15 +164,25 @@ private struct SpikeRunner {
 }
 
 private struct RunOptions {
+    var modelID = defaultModelID
+    var toolCallFormatMode = "json"
     var limit: Int?
     var outputDir = "Reports"
     var casesJSONL: String?
     var repeatCount = 1
 
-    init(arguments: [String]) {
+    init(arguments: [String]) throws {
         var iterator = arguments.dropFirst().makeIterator()
         while let argument = iterator.next() {
             switch argument {
+            case "--model-id":
+                if let value = iterator.next() {
+                    modelID = value
+                }
+            case "--tool-call-format":
+                if let value = iterator.next() {
+                    toolCallFormatMode = value
+                }
             case "--limit":
                 if let value = iterator.next() {
                     limit = Int(value)
@@ -188,7 +203,39 @@ private struct RunOptions {
                 break
             }
         }
+        _ = try resolvedToolCallFormat()
     }
+
+    func resolvedToolCallFormat() throws -> ToolCallFormat? {
+        switch toolCallFormatMode.lowercased() {
+        case "auto", "infer", "nil":
+            return nil
+        case "json":
+            return .json
+        case "xml_function", "xml-function", "xmlfunction":
+            return .xmlFunction
+        default:
+            throw SpikeError.invalidToolCallFormat(toolCallFormatMode)
+        }
+    }
+}
+
+private enum SpikeError: Error, CustomStringConvertible {
+    case invalidToolCallFormat(String)
+
+    var description: String {
+        switch self {
+        case .invalidToolCallFormat(let value):
+            return "invalid --tool-call-format \(value); expected json, xml_function, or auto"
+        }
+    }
+}
+
+private func formatName(_ format: ToolCallFormat?) -> String {
+    guard let format else {
+        return "nil"
+    }
+    return String(describing: format)
 }
 
 private func elapsedMilliseconds(since start: DispatchTime) -> Int {
@@ -607,6 +654,8 @@ private struct ResultEnvelope: Codable, Sendable {
     let status: String
     let modelID: String
     let mlxSwiftLMTag: String
+    let requestedToolCallFormat: String
+    let resolvedToolCallFormat: String
     let snapshotTime: String
     let totalCases: Int
     let summary: Summary
@@ -672,6 +721,8 @@ private func renderReport(_ envelope: ResultEnvelope) -> String {
     status: \(envelope.status)
     model: \(envelope.modelID)
     mlx-swift-lm: \(envelope.mlxSwiftLMTag)
+    requested_tool_call_format: \(envelope.requestedToolCallFormat)
+    resolved_tool_call_format: \(envelope.resolvedToolCallFormat)
     snapshot_time: \(envelope.snapshotTime)
     cases: \(envelope.totalCases) total = \(summary.positiveCount) positive + \(summary.negativeCount) negative
     decision: \(summary.decision)
@@ -706,7 +757,7 @@ private func renderReport(_ envelope: ResultEnvelope) -> String {
     \(falseNegativeRows.isEmpty ? "- none" : falseNegativeRows)
 
     ## Notes
-    - `toolCallFormat` is explicitly set to `.json`; this avoids `infer()` model_type drift.
+    - `toolCallFormat` requested=\(envelope.requestedToolCallFormat), resolved=\(envelope.resolvedToolCallFormat).
     - `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
     - Samples are derived from `contracts/capabilities.yaml` 8 active capabilities and project restraint/OOD seeds; no model-generated samples are used.
     - This is a base-model spike only. No LoRA training, no main app integration, no real vehicle control.

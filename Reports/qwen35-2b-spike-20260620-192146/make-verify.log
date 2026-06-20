@@ -1,0 +1,23 @@
+.venv/bin/python scripts/freeze_snapshot.py --check
+/Users/wanglei/workspace/MAformac/.venv/lib/python3.13/site-packages/openpyxl/worksheet/_reader.py:329: UserWarning: Data Validation extension is not supported and will be removed
+  warn(msg)
+snapshot_id=c1-2026-06-19-9b7e4b82
+source_rows=3990
+manifest=/Users/wanglei/workspace/MAformac/contracts/source-snapshot-manifest.yaml
+.venv/bin/python scripts/gen_c1.py
+/Users/wanglei/workspace/MAformac/.venv/lib/python3.13/site-packages/openpyxl/worksheet/_reader.py:329: UserWarning: Data Validation extension is not supported and will be removed
+  warn(msg)
+contract_rows=3990
+quarantined_rows=0
+canonical_semantics=3917
+followup_transition_rows=3123
+.venv/bin/python scripts/verify_refs.py
+schema=ok
+refs=ok
+ledger=ok
+range_conflicts=ok
+coverage=ok
+state_cells=ok (c1_c2_closure=active) l1_closure=ok (L1_rows=76)
+risk_policy=ok (levels=3)
+demo_scenarios=ok (beats=9, status=C6-seed)
+git diff --exit-code -- contracts/source-snapshot-manifest.yaml contracts/semantic-function-contract.jsonl contracts/semantic-followup-transitions.jsonl contracts/semantic-quarantine.jsonl contracts/function-spec-full.yaml contracts/semantic-coverage-report.md contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml scripts Makefile

@@ -1,0 +1,1211 @@
+## git status --short --branch
+## codex/p1-b-qwen35-2b-spike
+?? Reports/c5-data-gate-20260620-192100/
+?? Reports/qwen35-2b-spike-20260620-192146/
+?? docs/dispatches/2026-06-20-p1-a-c5-data-gate-dispatch.md
+?? docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md
+?? openspec/changes/define-lora-data-gate/
+
+## git rev-parse HEAD
+883f1af4e34635f0c058ede45febe8b5b8cebe30
+
+## git rev-parse --abbrev-ref HEAD
+codex/p1-b-qwen35-2b-spike
+
+## openspec list
+Changes:
+  define-lora-data-gate     No tasks      just now
+  _parked                   No tasks      8h ago
+
+## openspec validate --all --strict
+- Validating...
+✓ spec/demo-experience
+✓ spec/scenario-state-protocol
+✓ spec/semantic-function-contract
+✓ spec/tool-execution
+✓ spec/vehicle-capabilities
+✓ spec/vehicle-tool-bench
+Totals: 6 passed, 0 failed (6 items)
+
+## find spike/qwen/mlx dirs
+./Reports/c6-base-qwen3-1_7b-20260620-130427
+./Reports/c6-base-qwen3-1_7b-fingerprint-20260620-172747
+./Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620
+./Reports/qwen35-2b-spike-20260620-192146
+./dev/spike-e3
+./referencerepo/repos/ml-explore__mlx-swift-lm
+
+## rg Qwen/mlx/GDN/toolCall
+docs/repo-intelligence/2026-06-17-gitnexus/04-query-backlog.md:22:gitnexus query -r ml-explore__mlx-swift-lm 'LLMModelFactory tokenizer weights tool call format load model'
+Tools/C6BenchCLI/main.swift:113:                toolCalls: result.toolCalls.map { C6ToolCall(name: $0.name, arguments: $0.stringArguments) },
+Tools/C6BenchCLI/main.swift:200:        qwen_tool_call_format_version: \(summary.qwenToolCallFormatVersion)
+Tools/C6BenchCLI/main.swift:237:            "- \(result.caseID) / \(result.candidateID) [\(result.quality)]: gold_replay_pass=\(result.goldReplayPass), tool_call_pass=\(result.toolCallPass), state_delta_pass=\(result.stateDeltaPass), readback_applicable=\(result.readbackApplicable), readback_pass=\(result.readbackPass), clarify_pass=\(result.clarifyPass), source_refs_pass=\(result.sourceRefsPass), failure_classes=\(result.failureClasses.map(\.rawValue).joined(separator: ","))"
+Tools/C6BenchCLI/main.swift:312:    var toolCalls: [SpikeE3ToolCall]
+Core/Routing/ToolCallFrame.swift:71:    case upstreamToolCall = "upstream_tool_call"
+Core/Routing/ToolCallFrame.swift:98:    case toolCalls = "tool_calls"
+Core/Routing/ToolCallFrame.swift:104:/// 旧 content-only 入口由默认值（finishReason=.stop, toolCallCount=1）保持向后兼容。
+Core/Routing/ToolCallFrame.swift:109:    public var toolCallCount: Int
+Core/Routing/ToolCallFrame.swift:115:        toolCallCount: Int = 1
+Core/Routing/ToolCallFrame.swift:120:        self.toolCallCount = toolCallCount
+Core/Routing/ToolCallFrame.swift:307:        // 单发约束:tool_call_count > 1 在 decode 边界就拒,不选其一执行(spec:16/18-21)。
+Core/Routing/ToolCallFrame.swift:308:        guard input.toolCallCount <= 1 else {
+docs/repo-intelligence/2026-06-17-gitnexus/02-architecture-findings.md:67:规则/LLM 分流是架构边界。标准说法、枚举、极值和固定状态查询走规则快路径; 模糊、跨域、端状态依赖才进入 Qwen3 + LoRA。
+docs/repo-intelligence/2026-06-17-gitnexus/02-architecture-findings.md:105:- Speech / Swift: `argmaxinc__WhisperKit`, `argmaxinc__argmax-oss-swift`, `k2-fsa__sherpa-onnx`, `ml-explore__mlx-swift-lm`, `modelcontextprotocol__swift-sdk`, `tattn__LocalLLMClient`
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3:  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:29:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:58:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:93:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:122:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:157:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:186:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:215:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:250:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:280:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:318:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:348:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:383:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:413:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:449:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:486:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:521:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:556:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:592:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:628:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:663:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:699:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:735:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:771:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:807:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:837:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:873:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:909:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:945:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:981:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1011:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1045:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1074:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1103:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1133:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1169:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1199:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1234:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1268:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1297:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1331:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1360:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1389:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1418:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1447:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1476:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1505:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1534:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1569:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1598:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1633:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1662:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1691:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1726:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1756:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1794:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1824:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1859:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1889:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1925:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1962:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:1997:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2032:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2068:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2104:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2139:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2175:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2211:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2247:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2283:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2313:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2349:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2385:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2421:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2457:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2487:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2521:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2550:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2579:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2609:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2645:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2675:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2710:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2744:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2773:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2807:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2836:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2865:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2894:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2923:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2952:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:2981:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3010:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3045:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3074:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3109:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3138:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3167:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3202:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3232:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3270:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3300:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3335:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3365:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3401:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3438:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3473:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3508:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3544:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3580:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3615:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3651:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3687:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3723:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3759:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3789:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3825:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3861:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3897:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3933:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3963:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:3997:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4026:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4055:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4085:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4121:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4151:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4186:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4220:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4249:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4283:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4312:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4341:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4370:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4399:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4428:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4457:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4486:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4521:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4550:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4585:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4614:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4643:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4678:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4708:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4746:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4776:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4811:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4841:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4877:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4914:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4949:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:4984:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5020:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5056:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5091:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5127:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5163:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5199:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5235:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5265:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5301:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5337:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5373:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5409:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5439:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5473:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5502:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5531:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5561:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5597:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5627:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5662:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5696:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5725:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5759:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5788:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5817:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5846:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5875:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5904:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5933:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5962:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:5997:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6026:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6061:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6090:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6119:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6154:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6184:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6222:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6252:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6287:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6317:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6353:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6390:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6425:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6460:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6496:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6532:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6567:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6603:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6639:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6675:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6711:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6741:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6777:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6813:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6849:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6885:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6915:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6949:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:6978:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7007:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7037:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7073:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7103:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7138:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7172:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7201:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7235:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7264:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7293:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7322:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7351:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-results.json:7380:      "toolCalls" : [
+Core/Execution/C3ExecutionPipeline.swift:60:            toolCallCount: 1,
+docs/repo-intelligence/2026-06-17-gitnexus/03-openspec-input.md:134:  "tool_call": {
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:4:model: mlx-community/Qwen3-1.7B-4bit
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:5:mlx-swift-lm: 3.31.3
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:11:- positive `.toolCall` trigger: 105/130 = 80.8%
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:16:- content-embedded tool JSON without `.toolCall`: 25/130 = 19.2%
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:17:- scoring: content-embedded tool JSON is counted as G2 instability only; it is not counted as a successful `.toolCall`.
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:27:- anchor: elapsed is prompt submit to stream completion; first event is prompt submit to first `.chunk` / `.toolCall` / `.info`.
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:88:- `toolCallFormat` is explicitly set to `.json`; this avoids `infer()` model_type drift.
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-readback-ssot-20260620-1620/spike-e3-report.md:89:- `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
+docs/repo-intelligence/2026-06-17-gitnexus/01-index-ledger.md:32:| `ml-explore__mlx-swift-lm` | 240 | 16,618 | 67,579 | 300 |
+docs/repo-intelligence/2026-06-17-gitnexus/01-index-ledger.md:73:| `ml-explore__mlx-swift-lm` | MLX Swift LLM | T-PASS | 240 | 16,618 | 67,579 | 300 | risk-name files=7 |
+Core/Trace/TraceLogger.swift:30:/// candidate_source / tool_call_count / stop_reason / repair_used / guard_reason / readback_result。
+Core/Trace/TraceLogger.swift:34:    public var toolCallCount: Int?
+Core/Trace/TraceLogger.swift:42:        toolCallCount: Int? = nil,
+Core/Trace/TraceLogger.swift:49:        self.toolCallCount = toolCallCount
+docs/integration-blueprint.md:15:| **A. App 运行时(Swift,真编译进 app)** | 端侧推理/ASR/工具协议 | ~7 | mlx-swift-lm · llama.swift · swift-transformers · WhisperKit · sherpa-onnx · MCP-swift-sdk(借思想)|
+docs/integration-blueprint.md:27:| Qwen3-0.6B | ~0.4GB | 最快/最省 | 弱(并行多工具易错,04 报告实证) | 极致轻量/老设备**备选** |
+docs/integration-blueprint.md:28:| **Qwen3-1.7B** | **~1.1GB** | **Mac/新 iPhone 可跑** | **明显更稳** | **demo 主力 ⭐** |
+docs/integration-blueprint.md:29:| Qwen3-4B | ~2.5GB | 偏重 | 强 | 超出 demo 必要,暂不 |
+docs/integration-blueprint.md:31:**裁决**:demo 主力 **Qwen3-1.7B**(炸场要"聪明",不着急+设备够);0.6B 备选。`LLMBackend` 协议(v0.1 D1)让模型一行配置可换——先 1.7B 跑通能力,后期想轻量再降,不锁死。LoRA(D27)同样在 1.7B 上做,效果比 0.6B 更稳。
+docs/integration-blueprint.md:39:| **ml-explore/mlx-swift-lm** | Runtime | 主 backend(Apple 原生,Qwen 推理) | 整包依赖,实现 `MLXBackend: LLMBackend` |
+docs/integration-blueprint.md:72:- **MadeAgents/Hammer + Salesforce/xLAM + MeetKai/functionary** → 小模型 FC 数据格式 + 选型对比(若 Qwen3-1.7B FC 不稳,Hammer/xLAM 是替补模型)。
+docs/integration-blueprint.md:84:│  L1 理解 ── hassil-Swift(规则快路径) + LLMBackend[mlx-swift-lm+Qwen3-1.7B] │
+docs/integration-blueprint.md:105:4. L1 意图理解          → mlx-swift-lm + Qwen3-1.7B:落"温度感受/未指对象"  [A]
+docs/integration-blueprint.md:129:├── Runtime/                  LLMBackend 协议 + MLXBackend(mlx-swift-lm) + LlamaBackend(llama.swift)
+docs/integration-blueprint.md:159:1. **llamafile/llama-server 起 Qwen3-1.7B**(B 类,最省事,免编译)。
+docs/integration-blueprint.md:165:跑通这一刀 = 融合骨架立住,后面接 ASR(WhisperKit)、嵌入式模型(mlx-swift-lm)、LoRA、多 domain 都是往这个骨架上挂。
+docs/integration-blueprint.md:167:> 之后顺序:第一刀 → 接 WhisperKit 语音 → 嵌入式 mlx-swift-lm(脱离 server)→ 八大垂域填满 → LoRA(攒够 trace)→ 多 domain MCP → barge-in。
+docs/integration-blueprint.md:177:| Runtime | Runtime 层(LLMBackend + mlx-swift-lm) | ✅ 已有 |
+docs/integration-blueprint.md:187:下层映射:Models=Qwen3-1.7B+LoRA(非 Bedrock 云);Guardrails=SafetyGate;Customization=LoRA;**Knowledge Bases=✂️砍**(车控无需 RAG);SageMaker 云训练=mlx-lm 本机;Trainium/GPU=Apple Silicon。两侧:MCP/A2A=MCP-swift-sdk + 中枢 Agentic-Skill(§14);Security & Policies=SafetyGate(§16)。
+docs/qwen3-engineering-notes.md:1:# Qwen3-1.7B 端侧工程硬约束与参考
+docs/qwen3-engineering-notes.md:3:> **定位**:Qwen3-1.7B + MLX 端侧工具调用的工程教训 + 外网经验 + 38 repo 肩膀。是 `define-execution-contract` / `define-capability-contract` / `define-lora-pipeline` / `define-vehicle-tool-bench` 的**权威输入**(propose 时引用)。
+docs/qwen3-engineering-notes.md:5:> **核心判断**:Qwen3-1.7B 值得用、不降级 是对的;但「能吐工具格式」是**入场券不是终点**——真正要工程化的是 **restraint / parser hygiene / context budget / LoRA 样本边界**。
+docs/qwen3-engineering-notes.md:9:**Qwen3-1.7B + MLX + `enable_thinking=false` + 原生 `<tool_call>` 解析** = 对的。外网经验 + 本地 38 repo + Step1 实证三方一致。0.6B / FoundationModels / llama.cpp 仅备选 / 对照,不作默认(lessons B13)。
+docs/qwen3-engineering-notes.md:22:两条横切硬约束:`enable_thinking=false`(教训 2)、禁 ReAct stopword(教训 3);两条基础:schema 完整性(教训 6)、Release 真机验(教训 10)。
+docs/qwen3-engineering-notes.md:27:模型会不会**该调用时调用、该忍住时忍住**才是核心。Qwen3:1.7B 20-run 拿 sub-2B 第一(Agent Score 0.960),但均 10.7s。**3 次样本不够,边界 prompt 至少 10-20 次才稳**。
+docs/qwen3-engineering-notes.md:31:### 教训 2 — `enable_thinking=false` 是执行链硬约束(非偏好)
+docs/qwen3-engineering-notes.md:32:thinking 不只慢,还**破坏 tool parser**:LM Studio thinking tags 致解析失败;vLLM enable reasoning 后 `<tool_call>` 被塞进 content、不进 `tool_calls`。与 Step1 实证对上。
+docs/qwen3-engineering-notes.md:33:→ `define-execution-contract` 写 **MUST**:控制路径禁 thinking;输出含 `<think>` → trace 记 `think_leak`,eval 失败或降级澄清。
+docs/qwen3-engineering-notes.md:38:→ 不搞 ReAct;顺原生 `<tool_call>` → 解析 → 内部 `ToolCallFrame`。
+docs/qwen3-engineering-notes.md:39:来源:https://github.com/QwenLM/Qwen3/blob/main/docs/source/framework/function_call.md
+docs/qwen3-engineering-notes.md:42:XML tool call 转 OpenAI-compatible 历史时,assistant 消息可能只有 `tool_calls` 没 `content`,模板读 `message.content` 会 500。
+docs/qwen3-engineering-notes.md:44:来源:https://www.reddit.com/r/LocalLLaMA/comments/1klltt4/the_qwen3_chat_template_is_still_bugged/
+docs/qwen3-engineering-notes.md:47:TRL:Qwen3-1.7B 会产缺 `name` / `arguments` 的 `<tool_call>{}</tool_call>`。
+docs/qwen3-engineering-notes.md:71:本地 `mlx-swift-lm` 内置 `mlx-community/Qwen3-1.7B-4bit`;iOS benchmark:Qwen3-1.7B Release 下 MLX Swift 42.1 tok/s、load 0.68s,TTFT 不如 llama.cpp。
+docs/qwen3-engineering-notes.md:76:- Qwen3-1.7B = Apache 2.0 dense,32K context,thinking / non-thinking 双模式,agent + MCP;官方支持 `enable_thinking=False`(速度优先控制链)。https://qwenlm.github.io/blog/qwen3/ 、https://huggingface.co/Qwen/Qwen3-1.7B
+docs/qwen3-engineering-notes.md:77:- 工具调用:Qwen-Agent(官方)+ NimbleEdge(Android 实测 Qwen3 1.7B JSON + `<tool_call>` XML 多步)。https://github.com/QwenLM/Qwen-Agent 、https://github.com/NimbleEdge/deliteAI/pull/165
+docs/qwen3-engineering-notes.md:78:- MLX 生态:`mlx-community/Qwen3-1.7B-4bit` 可直接跑;Strands-MLX 给了 Qwen3-1.7B + tool + LoRA 完整模式。https://huggingface.co/mlx-community/Qwen3-1.7B-4bit 、https://strandsagents.com/docs/community/model-providers/mlx/ 、https://github.com/cagataycali/strands-mlx
+docs/qwen3-engineering-notes.md:79:- LoRA 配置:rank 8/16、alpha 16/32、dropout 0.05,target 从 `q_proj/v_proj` 起步、必要时扩 `q/k/v/o/gate/up/down`;坑:学习率太高过拟合、thinking traces 污染行为、拒答/边界样本必进。
+docs/qwen3-engineering-notes.md:83:- `ml-explore/mlx-swift-lm`:内置 `qwen3_1_7b_4bit`,直接对应 mlx-community 模型(Swift 主线 backend)。
+docs/qwen3-engineering-notes.md:84:- `wizcheu/iOSLLMFrameworkBenchmark`:实测 Qwen3-1.7B,**Release** 下 MLX Swift ~42 tok/s、内存 ~1.4GB;**性能必须 Release 测,不看 Debug**。
+docs/qwen3-engineering-notes.md:92:- **cagataycali/strands-mlx** ⭐:Apple Silicon 本地 agent + Qwen3-1.7B + LoRA pipeline,**和 MAformac 最贴近**。
+docs/qwen3-engineering-notes.md:93:- **NimbleEdge/deliteAI PR#165**:Android Qwen3 1.7B tool calling(移动端多步 + XML tag 解析)。
+docs/qwen3-engineering-notes.md:94:- **AndreyGermanov/qwen3_scientific_summarization**:Qwen3-1.7B-Base + PEFT/QLoRA 训练范例。
+docs/qwen3-engineering-notes.md:95:- **lixinyu66666/Qwen3-1.7b_finetune_sharegpt**:直接的 1.7B LoRA 脚本参考。
+docs/qwen3-engineering-notes.md:101:| `define-execution-contract` | `enable_thinking=false`(MUST)、禁 ReAct、解析 `<tool_call>{json}</tool_call>`、错误枚举(缺 name/缺 args/unknown/类型错/越界)、`think_leak` trace、不存外部 message 原样历史(存 DialogueTurn、assistant tool turn 补 `content:""`) |
+docs/intent-routing-explore-2026-06-18.md:45:**🎯 CC catch Codex/Bohr 都漏的事实**:**G2 22.5% content 伪工具不是「模型不会调」,是「走错输出通道」**——9 条漏触发 100% 是裸 JSON(无 `<tool_call>` 标签),7/9 语义完全正确。**base 真实意图正确率 = 35/40 = 87.5%,非 77.5%**。根因(读上游源码证实):mlx-swift-lm `.json` parser 只认 `<tool_call>` 标签,裸 JSON 当文本透传不 fallback;base 1.7B 部分能力(screen_brightness 全崩)忘包裹标签。
+docs/intent-routing-explore-2026-06-18.md:48:- 🔴 **change3**:加 **content-fallback 正则**(只兜裸 `{"name":...,"arguments":...}`,**非重建 `<tool_call>` 解析**,守"adopt 上游不自建")→ G1 77.5%→~95%(38/40),LoRA 之前安全网。
+docs/intent-routing-explore-2026-06-18.md:49:- 🔴 **change5 LoRA 重定义**:主要不是"教意图"(已 87.5%),是**"教稳定输出 `<tool_call>` 包裹"**(格式对齐,样本少收敛快);Day1 优先采 screen_brightness 类格式崩塌负样本。
+docs/intent-routing-explore-2026-06-18.md:64:**统一候选门**(对齐 change3 E1a):`.toolCall` + 裸 JSON fallback 都只产 `ToolCallCandidate(source=tool_event|content_json_fallback)` → strict decode → DemoGuard → execute → readback。指标拆 trigger_rate/expected_tool_hit/guard_blocked_restraint/unsafe_false_pass=0。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:63:- **架构**:端云协同(端 Qwen3-0.6B/Gemma4-E2B + 云 Bedrock Nova/Claude),AgentCore+Strands,重(Lambda/DynamoDB/Cognito/IoT Core)。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:152:- [ ] 模块 1:模型 / runtime(Qwen3-1.7B / MLX / LLMBackend)—— 基座部分已锁,待逐项 check。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:196:  - 慢路径 2500ms:large-v3 ASR + Qwen3-1.7B 生成 ToolCall(TTFT+几十~上百 token)+ mock + TTS 首响;2500ms 给 LLM 留了空间但也需实测。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:209:- **唯一非算力固定开销**:模型预热常驻(large-v3 626MB + Qwen3 968MB,app 启动即 load 进 ANE,别冷启动)。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:217:- **本机环境**:✅ Apple M5 / Swift 6.3.2 / macOS 26.6 / referencerepo Swift 依赖全 clone(WhisperKit/whisper.cpp/sherpa-onnx/mlx-swift-lm/LocalLLMClient)/ CLI 齐(git/gh/openspec/swift/swiftc/xcrun/brew/python3)。🔴 **完整 Xcode 未装**(只 CLT,`xcodebuild` 不可用)= **S2 实装前置阻塞**(iOS app + SwiftUI + CoreML + Metal + 签名都需 Xcode),要装 ~15GB。🟡 **Apple Developer 签名未配**(`0 valid identities`)= iPhone 真机演示需配($99/年 或免费 ID 签 7 天)。pod 缺但 SPM 不需要,忽略。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:237:Qwen3-1.7B 经 `LLMBackend` 协议跑端侧,主实现 `mlx-swift-lm`。工具调用验证按**三步解耦**(每步只引入一个新变量),不直接 Swift spike:
+docs/project/brainstorm-2026-06-17-demo-mvp.md:241:| **0** | Swift/Python 单测 | 我们的 decode/parser 逻辑(喂构造的 `<tool_call>` 样本)→ `ToolCallFrame` | ❌ | ❌ |
+docs/project/brainstorm-2026-06-17-demo-mvp.md:242:| **1** | Python `mlx_lm.server` | **Qwen3 真实输出格式** + tools schema 契约(模型实际吐什么) | ✅ Qwen3 968MB | ❌ |
+docs/project/brainstorm-2026-06-17-demo-mvp.md:243:| **2** | Swift `mlx-swift-lm` | 端侧集成 + parser 版本敏感 + 性能 | ✅ | ✅ |
+docs/project/brainstorm-2026-06-17-demo-mvp.md:245:- **措辞铁律(磊哥纠偏 2026-06-18)**:模型输出端 = **顺 Qwen3 原生工具调用格式**(模型自然吐 `<tool_call>` XML,只是碰巧与外部生态兼容,**非 MAformac 主概念**)→ 解析 → 映射内部 `ToolCallFrame`。**`ToolCallFrame` + `capabilities.yaml` 才是项目标准**,不把外部格式名当主线。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:246:- **⭐ 时序优化**:Step 1 不需要 Xcode → **与 Xcode 下载并行**(Xcode 下 10GB 时,Python 下 Qwen3 968MB 跑 server 验格式,零等待);Xcode 装完正好进 Step 2。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:247:- **mlx_lm.server 主 / llama-server 对照**:mlx_lm 与最终 Swift `mlx-swift-lm` 同源 MLX,格式最贴最终态;llama-server(GGUF)留 grammar 对照(MLX 无 GBNF,`decode_failed` 高时评估)。**llama 只对照、不写默认**(不降级,lessons B13)。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:248:- **🔴 catch**:server 验的是**模型输出格式契约**(跨实现一致,可复用 Swift);**parser 行为 Python/Swift 可能不同**(`mlx-swift-lm` parser 版本敏感),Step 2 Swift parser 仍要单独同集回归,别以为 Python 过了 Swift 免验。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:251:**Step 1 实证(2026-06-18 已跑,CC bash,mlx-community/Qwen3-1.7B-4bit)**:
+docs/project/brainstorm-2026-06-17-demo-mvp.md:252:- `enable_thinking=False` → **干净直出** `<tool_call>\n{"name":"set_ac_temperature","arguments":{"celsius":26}}\n</tool_call>` → 印证 ToolCallDecoder 解析 `<tool_call>` XML → ToolCallFrame(execution-contract 有实证打底)。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:253:- `enable_thinking=True` → 一大段**英文**推理 + 啰嗦纠结 + max_tokens 截断没吐 tool_call → **确认 demo 控制路径 `enable_thinking=false`**(进 execution-contract 输入)。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:254:- 给的 tool_schema 只含 `set_ac_temperature`(只温度)时,Qwen3 纠结「打开空调怎么 open」→ **印证 capability `cabin.ac` 须含「开关 + 温度 + 升降温」**(tool_schema 完整性是 decode 成功前提)。
+docs/project/brainstorm-2026-06-17-demo-mvp.md:278:| L2 路由 | **Router**(落 agent+capability+surface)+ **MasterShell** + **ToolCallDecoder**(Qwen3 XML→ToolCallFrame)|
+docs/lessons-learned.md:18:2. **Qwen3 工具调用格式不是项目协作协议**:`Hermes` 只指外部生态里常见的 `<tool_call>` XML 输出兼容点,不是 Codex/Claude 分工协议,也不是 MAformac 的内部标准。项目内部标准仍是 `ToolCallFrame` + `capabilities.yaml`;模型输出端先顺 Qwen3 原生工具调用格式(`ToolCallFormat.xmlFunction`)降低 `decode_failed`,解析后再映射到内部 `ToolCallFrame`。**别强制模型直接吐自定义 JSON**(违训练分布、增 decode_failed)。
+docs/lessons-learned.md:29:13. **后续建议默认不降级**(2026-06-18 磊哥纠正):Xcode 已经在下,开发路径按完整主线推进:Qwen3-1.7B + LoRA、WhisperKit ASR、TTS、安全门控、mock readback 都保留。`0.6B`、Foundation Models、llama.cpp 只能作为轻量备选 / baseline / 对照实验,不能把它们写成默认方案;除非真机实测证明 1.7B 跑不动,否则不要为了省事提前降级。
+docs/lessons-learned.md:30:14. **Qwen3-1.7B 端侧工程:「能 tool call」是表层信号**(2026-06-18 Codex 调研 + Step1 实证,**详见 `docs/qwen3-engineering-notes.md`**):格式对只过最外层,真骨头在 4 隐藏层——restraint(该忍住时忍住)/ parser hygiene(malformed / think_leak / 多轮历史炸模板皆常态)/ context budget(标称 32K ≠ 能用)/ LoRA 样本边界(约束行为非补知识)。横切硬约束:`enable_thinking=false`(thinking **破坏** tool parser,非偏好)、禁 ReAct stopword、schema 完整(否则模型纠结「打开空调怎么 open」)、Release 真机验(Python server 不替代 Swift)。落 change 3-6 的硬约束见 qwen3-notes §6。
+docs/lessons-learned.md:60:3. `define-execution-contract` — `ToolCallFrame` + Qwen3 工具调用 XML 解析 + `DemoGuard` 代码门 + mock state + readback + trace;这条执行链紧耦合,合一比拆成 toolcall/guard 更稳。
+docs/lessons-learned.md:75:4. **base 1.7B「能调」是 happy path,触发率/格式/拒识才是真门**(oracle联网):BFCL Qwen3-1.7B overall **55.49%**/multi-turn **16.88%**;微调小模型碾压通用大(xLAM-3b-fc 65.74%、in-vehicle Phi-3 1.8B+LoRA 0.86>规则0.75)→ **LoRA 必做不是可选**。spike E3 加硬gate(触发率/格式塞content/拒识负样本/延迟/G3参数规划mini-spike),不只验「收到.toolCall事件」(呼应 B14 happy-path 表层信号)。
+docs/second-review-2026-06-17/00-source-ledger.md:11:| Qwen function calling 文档 | 证明 Qwen3 function calling 依赖工具协议、JSON Schema、模板和应用执行闭环，不等于模型自己可靠执行演示动作 | [Function Calling - Qwen](https://qwen.readthedocs.io/en/latest/framework/function_call.html) |
+docs/second-review-2026-06-17/00-source-ledger.md:12:| Qwen3-1.7B model card | 证明 Qwen3-1.7B 参数、context、agent/multilingual 能力候选 | [Qwen/Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B) |
+docs/second-review-2026-06-17/00-source-ledger.md:13:| Qwen3 技术报告 | 证明 Qwen3 dense 模型族包含 0.6B、1.7B、4B 等 | [arXiv:2505.09388](https://arxiv.org/pdf/2505.09388) |
+docs/second-review-2026-06-17/00-source-ledger.md:31:| [mlx-swift-lm Package.swift](/Users/wanglei/workspace/MAformac/referencerepo/repos/ml-explore__mlx-swift-lm/Package.swift:1) | 证明 Swift 6.1、macOS 14、iOS 17 门槛。 |
+docs/second-review-2026-06-17/00-source-ledger.md:32:| [mlx-swift-lm LLMModelFactory.swift](/Users/wanglei/workspace/MAformac/referencerepo/repos/ml-explore__mlx-swift-lm/Libraries/MLXLLM/LLMModelFactory.swift:217) | 证明本地 registry 含 Qwen3-0.6B-4bit 和 Qwen3-1.7B-4bit。 |
+dev/spike-e3/Package.swift:14:        .package(url: "https://github.com/ml-explore/mlx-swift-lm", exact: "3.31.3"),
+dev/spike-e3/Package.swift:22:                .product(name: "MLXLLM", package: "mlx-swift-lm"),
+dev/spike-e3/Package.swift:23:                .product(name: "MLXLMCommon", package: "mlx-swift-lm"),
+dev/spike-e3/Package.swift:24:                .product(name: "MLXHuggingFace", package: "mlx-swift-lm"),
+docs/execution-pre-mortem-2026-06-18.md:3:> pre-mortem 第二战产物(scout `qwen3-engineering-notes`/GitNexus/Codex 02/Step1 + oracle CC subagent **直读 `mlx-swift-lm` 源码** + GitHub issue 实证)。供 change3 实装**直读源码锚点**。机制见 `~/.claude/skills/learned/pre-mortem.md`。
+docs/execution-pre-mortem-2026-06-18.md:6:> **总判断**:执行链架构对,但 3 个认知偏差会炸——(a)「Swift 解析」其实 `mlx-swift-lm` 已内置整套 parser,要 **adopt 不自建**;(b)上游 parser 全失败归 `nil`,`decode_failed` 拿不到区分信号;(c)严格校验在 `execute()` 第二次 decode,validator 门要挂那层。
+docs/execution-pre-mortem-2026-06-18.md:11:| T1 | `mlx-swift-lm` 已有 parser,自建职责重叠/打架 | `ToolCallProcessor.swift` 源码 | **adopt 薄层**(ToolCallFrame 站 ToolCall 之上) |
+docs/execution-pre-mortem-2026-06-18.md:12:| T2 | `infer()` 精确匹配 model_type → Qwen3 可能静默失配(tool call 漏进 `.chunk` 文本、`stopReason=.stop`) | [mlx-swift-lm #259](https://github.com/ml-explore/mlx-swift-lm/issues/259) / [mlx-lm #984](https://github.com/ml-explore/mlx-lm/issues/984) / [#1293](https://github.com/ml-explore/mlx-lm/issues/1293) | 显式锁 `.json` + smoketest 断言收 `.toolCall` 事件 |
+docs/execution-pre-mortem-2026-06-18.md:19:- **P2** `mlx-swift-lm` 3.x breaking → 新项目 pin exact tag(无迁移痛)
+docs/execution-pre-mortem-2026-06-18.md:25:- **E3** Qwen3-1.7B base tool-call 可靠性**未验证** = 前置生死线 → spike 量化触发率(磊哥拍 spike 起手)
+docs/execution-pre-mortem-2026-06-18.md:28:`mlx-swift-lm/Libraries/MLXLMCommon/Tool/`:
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3:  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:29:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:58:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:93:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:122:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:157:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:186:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:215:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:250:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:280:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:318:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:348:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:383:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:413:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:449:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:486:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:521:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:556:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:592:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:628:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:663:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:699:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:735:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:771:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:807:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:837:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:873:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:909:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:945:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:981:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1011:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1045:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1074:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1103:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1133:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1169:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1199:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1234:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1268:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1297:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1331:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1360:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1389:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1418:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1447:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1476:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1505:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1534:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1569:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1598:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1633:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1662:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1691:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1726:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1756:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1794:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1824:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1859:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1889:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1925:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1962:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:1997:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2032:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2068:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2104:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2139:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2175:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2211:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2247:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2283:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2313:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2349:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2385:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2421:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2457:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2487:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2521:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2550:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2579:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2609:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2645:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2675:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2710:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2744:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2773:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2807:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2836:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2865:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2894:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2923:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2952:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:2981:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3010:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3045:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3074:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3109:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3138:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3167:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3202:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3232:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3270:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3300:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3335:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3365:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3401:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3438:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3473:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3508:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3544:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3580:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3615:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3651:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3687:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3723:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3759:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3789:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3825:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3861:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3897:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3933:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3963:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:3997:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4026:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4055:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4085:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4121:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4151:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4186:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4220:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4249:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4283:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4312:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4341:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4370:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4399:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4428:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4457:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4486:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4521:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4550:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4585:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4614:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4643:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4678:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4708:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4746:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4776:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4811:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4841:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4877:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4914:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4949:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:4984:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5020:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5056:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5091:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5127:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5163:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5199:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5235:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5265:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5301:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5337:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5373:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5409:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5439:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5473:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5502:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5531:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5561:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5597:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5627:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5662:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5696:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5725:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5759:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5788:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5817:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5846:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5875:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5904:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5933:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5962:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:5997:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6026:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6061:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6090:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6119:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6154:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6184:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6222:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6252:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6287:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6317:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6353:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6390:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6425:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6460:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6496:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6532:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6567:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6603:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6639:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6675:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6711:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6741:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6777:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6813:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6849:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6885:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6915:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6949:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:6978:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7007:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7037:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7073:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7103:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7138:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7172:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7201:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7235:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7264:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7293:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7322:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7351:      "toolCalls" : [
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-results.json:7380:      "toolCalls" : [
+docs/README.md:5:> **形态**:纯端侧(iOS/macOS)、离线、Qwen3-1.7B + LoRA 大脑(0.6B 仅作真机吃紧时的轻量备选)、mock 车控、可插拔多技能(Phase1 车控 → 导航/音乐/外卖 via MCP)。
+docs/README.md:7:> ⚠️ **路线 v3 新基线(2026-06-20,以此为准)**:C1/C2、C3 execution、C6 vehicle-tool-bench 均已 archived → `openspec/specs/`;C6 base Qwen3-1.7B 无 LoRA hard_fail 0.789 是 C5 提升判据。**推进路线以 `docs/roadmap-2026-06-20-from-c6-done.md` 为唯一事实源**(五件套 harness 骨架 + P0-P2 执行序 + 7 HIGH 已拍;P0 archive closeout 已回写)。契约/决策全料以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` 为准;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
+docs/README.md:31:| `qwen3-engineering-notes.md` | **Qwen3 工程专题**:「能 tool call」是表层信号 + 4 隐藏层 + 10 条教训 + 外网/38repo + **change 3-6 硬约束** | ~130 |
+docs/README.md:59:- 主线模型 = Qwen3-1.7B + LoRA(0.6B 仅作轻量备选;FoundationModels 因不可微调出局,留逃生口)
+docs/README.md:73:- C) Mac 原型 spike:mlx_lm.server + Qwen3-1.7B 出第一个结构化工具调用,验证链路;llama-server/GGUF 只作 grammar 对照
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:95:| 39 | **Qwen tool-call 格式单一源**：新建 `contracts/qwen-tool-call-format.yaml`（`model_family / runtime_parser=json / thinking=false / wrapper=tool_call / arguments_shape=json_object`）；C3 runtime 锁定，C5 训练样本生成 + C6 bench harness **只引用它**（防 train/runtime/bench 三者 silent 失真：模型学的格式 runtime 收不到 `.toolCall` 漏进 `.chunk`） | C3 runtime + C5 + C6 | **Q2✅ 磊哥定** |
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:124:- **Q2 #39 Qwen tool-call 格式单一源 → ✅ 磊哥定「加，锁单一源」**：C3 spike 已显式 `toolCallFormat:.json`（spike-e3 main.swift:36）+ `enable_thinking=false`（:96），裸 JSON 掉 `.chunk` 是 9/40 真实格式坑（spike-e3-report:18）。**落点**：新建小文件 `contracts/qwen-tool-call-format.yaml`，字段仅 `model_family / runtime_parser=json / thinking=false / wrapper=tool_call / arguments_shape=json_object`；C5 训练样本生成 + C6 bench harness **只引用它，不各写一套**。C5 parked design:7 已把 LoRA 目标修成稳定 `<tool_call>` 包裹，#39 = 把这从「设计口径」提升成跨 C3/C5/C6 **格式契约**。→ 加措施 #39。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:126:- **Q4 C6 四类一等硬门 → ✅ 磊哥定**（含 codex #9 seed schema 化 + #10 硬门）：C6 已写 `no-tool false positive=0`+restraint（vehicle-tool-bench spec:10/:17），design 已写 IrrelAcc 独立一等 + eval ≥20% no-call/无关样本（design:55）。**落点**（按 demo-scenarios:21-23 待办补齐）：case schema 加 `pre_state / input_zh / expected_tool_calls / expect_no_call / expected_state_delta / readback_assertion / clarify_tag / failure_class`；runner 输出 `IrrelAcc / no_tool_false_positive_count / state_delta_match / readback_match / clarify_match`。**任一 no-call 误触发 / 状态差异 / 读回不一致 / 该澄清没澄清 = 硬失败，judge 不参与**。→ 纠 #19/#22/#23 + demo-scenarios C6 字段。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:127:- **Q5 #40 replay 可复现 → ✅ 磊哥定**：落点=C6 `eval_run` 指纹（非只 trace 多字段）。C6 现只写 trace_id/route_kind/parser_status/...（design:37、tasks:6），缺模型/adapter/prompt 指纹。**物理落点**：C6 runner 每条输出 `run_id / case_id / model_id / lora_adapter_id / lora_checkpoint_id / qwen_tool_call_format_version / prompt_hash / sampling_seed / tool_output_digest / contract_digest`，挂 Q1 runId trace 树 → per-checkpoint diff 定位退步。→ 加 #40。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:128:- **Q6 C5 数据门细化（#17/#18）→ ✅ 磊哥定**：C5 已有分桶+must_not_train（design:32/:41）+ masking/负样本方向（:67/:70），但 tasks 仍只写 JSONL 合法/5桶齐/eval-train 无交集（tasks:14/:19）。**物理落点**：C5 生成脚本每批吐 `verification_receipt.json`（`row_count / bucket_counts / format_contract_version / tool_call_format_pass_rate / split_whitelist / parent_semantic_overlap / must_not_train_violations`）；硬门 `parent_overlap=0 / must_not_train_violations=0 / #39 格式合规`。→ 细化 #17/#18。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:133:3. Trace 强类型 attributes（TraceEntry 只有 message）→ **subagent 已修 gap#6**（candidate_source/tool_call_count/repair_used/guard_reason/readback_result）。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:139:9. C6 seed 正式 schema 化（demo-scenarios 仍 c6_seed_interim，补 input_zh/expected_tool_calls/expected_state_delta/expect_no_call/failure_class）→ #19/#9（待 Q）。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:157:1. **C6 优先 = 先 C6 propose（解冻 vehicle-tool-bench → rebase C1/C2 + #39）→ apply；且 C6 第一轮 base Qwen3-1.7B 跑建基线**（lora_adapter_id 空），C5 出 checkpoint 后再 LoRA 跑 diff——这正是「C6 先于 C5」的操作：**base 基线是判 C5 提升/过拟合的判据**。C6 不能直接 apply（parked），要走 propose。
+docs/优化待讨论-吸收内化措施38项-2026-06-20.md:168:- **C6 base 基线如实**：base Qwen3-1.7B 无 LoRA `hard_fail`（IrrelAcc 0.789<0.9、hard_failure 170/225）= **base 真差非 bench bug**（Layer 2 逐 case 实证：base 把 toolCall 藏 content 文本 / 参数规划错温度 22≠26 / 该拒乱调 / **从不生成中文读回话术**）——正是 C5 提升的诚实、可复现、确定性基线锚点。
+docs/srd-three-layer-intent-routing.md:12:- **北极星**：客户现场 5 分钟，**听懂中文 / 反应快 / 不崩 / 惊艳 / 断网也能跑**。纯端侧（macOS+iOS）、完全离线、Qwen3 小模型+LoRA 为脑、mock 车控。
+docs/srd-three-layer-intent-routing.md:99:| 引擎 | 传统规则 NLU（**不碰大模型**） | Qwen3-1.7B + LoRA |
+docs/srd-three-layer-intent-routing.md:117:| 🧠 **慢路** | FC（**非 MA**） | **Qwen3-1.7B+LoRA 只产【单跳 ToolCallFrame】+ 窄域"模糊说→意图"映射**（L2-L4）；**受限解码保格式** |
+docs/srd-three-layer-intent-routing.md:139:| base FC 断崖(LLaMA 12.71%) | Qwen3-1.7B tool-call 预训练起点更高；**但 Qwen3 原生支持 parallel/multi-step tool call + tool-call 外额外文本，单跳须 runtime 强制(§12 gate)，非"模板已解决"** |
+docs/srd-three-layer-intent-routing.md:256:| **C5 LoRA 数据** | `research/2026-06-19-home-llm-teardown-data.md` | **manifest 5 桶**：`templated_actions`(3990协议) / `status_requests`(state-cells) / `refusals`(12000bug,already_state+not_available) / `failed_tool_calls`(12000bug,**失败步 train_on_turn=false**) / `asr_noisy_variants`(音近增强);模板随机参数泛化 + distractor落域 + 配比(templated最重) | LLM增广(synthesize式)二期 |
+docs/srd-three-layer-intent-routing.md:257:| **C6 评测** | `research/INDEX.md` C6 段 + `evaluate.py` 拆解 | 落 `contracts/demo-scenarios.yaml`,每场景字段 `input_zh / expected_tool_calls / expected_state_delta / expect_no_call / failure_class`;判定=**ToolCall集合精确匹配 + 空匹配拒识(expect_no_call) + color式容差 + 失败分类**;per-checkpoint选最优 | 大规模覆盖率二期 |
+docs/srd-three-layer-intent-routing.md:261:> **demo-scenarios.yaml 现状**：当前是 interim/C6-seed（generalization 框架已对，但需补 C6 字段 schema `input_zh/expected_tool_calls/expected_state_delta/expect_no_call/failure_class` + 路由路径标注）→ C4/C6 apply 时重写。`verify_demo_scenarios` 已加最小门(防悬空+防退回规则脚本)。
+docs/srd-three-layer-intent-routing.md:267:- **C3 single-call runtime contract（Tiger，必实装）**：runtime 只接受 exactly 1 ToolCallFrame 或 1 NoAction/Clarify；多 tool_call / 额外文本 / 缺必填 / unknown enum / stale `state_revision` / finish_reason=length → **reject/clarify，不 repair-to-action**（Qwen3 原生多步，单跳靠这层强制非模型自觉）。
+docs/second-review-2026-06-17/04-runtime-model-route.md:7:> 自建 `LLMBackend` 协议 + MLX Swift LM + Qwen3-1.7B-4bit 作为 MVP 默认候选；Qwen3-0.6B-4bit 作为轻量 fallback；llama.cpp/llamafile 作为 Mac 开发期 server 和基准；Foundation Models 作为系统 baseline/逃生口，不进入 LoRA 主线。
+docs/second-review-2026-06-17/04-runtime-model-route.md:15:### Qwen3
+docs/second-review-2026-06-17/04-runtime-model-route.md:17:Qwen3 官方技术报告列出 dense 模型包括 0.6B、1.7B、4B 等。arXiv 技术报告第 2 页写明 Qwen3 系列包括 6 个 dense 模型，含 Qwen3-0.6B 和 Qwen3-1.7B。Hugging Face 的 Qwen3-1.7B model card 写明参数量 1.7B、context length 32768，并强调 agent capability 和 multilingual support。
+docs/second-review-2026-06-17/04-runtime-model-route.md:19:Qwen 官方 function calling 文档说明 function calling 的本质是应用提供函数集合、模型选择函数并给出参数、应用执行并把结果回传；工具参数建议用 JSON Schema 描述。它还写明 Qwen-Agent 是 Qwen3 function calling 的 canonical implementation。
+docs/second-review-2026-06-17/04-runtime-model-route.md:21:这些支持“Qwen3 有工具调用潜力”，但不支持“mock 车控 function calling 已经稳定可用”。MAformac 要自己做 schema、候选工具收窄、错误枚举和 eval。
+docs/second-review-2026-06-17/04-runtime-model-route.md:25:本地 `mlx-swift-lm` 的 `Package.swift` 写明：
+docs/second-review-2026-06-17/04-runtime-model-route.md:31:见 [Package.swift](/Users/wanglei/workspace/MAformac/referencerepo/repos/ml-explore__mlx-swift-lm/Package.swift:1)。
+docs/second-review-2026-06-17/04-runtime-model-route.md:35:- `mlx-community/Qwen3-0.6B-4bit`
+docs/second-review-2026-06-17/04-runtime-model-route.md:36:- `mlx-community/Qwen3-1.7B-4bit`
+docs/second-review-2026-06-17/04-runtime-model-route.md:37:- `mlx-community/Qwen3-4B-4bit`
+docs/second-review-2026-06-17/04-runtime-model-route.md:39:见 [LLMModelFactory.swift](/Users/wanglei/workspace/MAformac/referencerepo/repos/ml-explore__mlx-swift-lm/Libraries/MLXLLM/LLMModelFactory.swift:217)。
+docs/second-review-2026-06-17/04-runtime-model-route.md:64:| MLX Swift LM + Qwen3-1.7B-4bit | MVP 默认候选 | Apple-native、Swift 集成顺、本地 registry 已有 | 真机内存、热量、TTFT、工具调用准确率待测 |
+docs/second-review-2026-06-17/04-runtime-model-route.md:65:| MLX Swift LM + Qwen3-0.6B-4bit | 轻量 fallback | 更省资源，适合老设备 | 多意图、模糊跨域、参数准确率更弱 |
+docs/second-review-2026-06-17/04-runtime-model-route.md:109:> D-runtime-candidate：MVP 默认候选为 MLX Swift LM + Qwen3-1.7B-4bit；0.6B-4bit 为轻量 fallback；Foundation Models 为 iOS/macOS 26 系统 baseline；最终以 `runtime_benchmark_v0` 结果拍板。
+docs/demo-must-pass-candidate-2026-06-19.md:9:> **🟢 映射是硬契约**(capability / tool_call / R / route_kind 基于现有 yaml,可直接审)。**🟡 话术(Query)是 CC 建议版**——磊哥替换成实际炸场金句,数量/顺序按 5 幕演示节奏调。
+docs/demo-must-pass-candidate-2026-06-19.md:12:`# | Query(话术) | 句式 | capability → tool_call(指令映射) | 端状态前提 | R | route_kind`
+docs/demo-must-pass-candidate-2026-06-19.md:20:| # | Query | 句式 | capability → tool_call | 端状态前提 | R | route_kind |
+docs/demo-must-pass-candidate-2026-06-19.md:28:| # | Query | 句式 | capability → tool_call | 端状态前提 | R | route_kind |
+docs/demo-must-pass-candidate-2026-06-19.md:36:| # | Query | 句式 | capability → tool_call | 端状态前提 | R | route_kind |
+docs/demo-must-pass-candidate-2026-06-19.md:43:| # | Query | 句式 | capability → tool_call | 端状态前提 | R | route_kind |
+docs/demo-must-pass-candidate-2026-06-19.md:50:| # | Query | 句式 | capability → tool_call | 端状态前提 | R | route_kind |
+docs/roadmap-2026-06-20-from-c6-done.md:16:| C6 `define-vehicle-tool-bench`（四硬门 + judge 不洗白 + replay 指纹 eval_run + 双轴） | **archived → `openspec/specs/vehicle-tool-bench/`**；base Qwen3-1.7B 无 LoRA **hard_fail**（IrrelAcc 0.789<0.9 / hard_failure 170/225）= C5 提升的诚实可复现锚点；archive-check verify-gold pass | `Reports/c6-gold-verify-archive-check-20260620-185441/` |
+docs/roadmap-2026-06-20-from-c6-done.md:17:| 14-repo teardown + Qwen3.5-2B 可行性 + synthesis | **committed 31edafc → push origin/main** | git |
+docs/roadmap-2026-06-20-from-c6-done.md:55:| **TrajectoryExpectation** | C6 `expected_tool_calls` 契约 + C4 route trajectory eval（与 agentevals graph `__interrupt__` 同源） | clarify/refusal/interruption = 显式步骤一等公民非 fail |
+docs/roadmap-2026-06-20-from-c6-done.md:56:| **scorer 四阶段 pipeline（extract → analyze → score → reason）** | C6 判分：extract toolCalls → analyze 四硬门 → score 双轴(coverage+scenario) → reason(judge) | judge 只在 reason 段、**不洗白硬门** |
+docs/roadmap-2026-06-20-from-c6-done.md:94:| **H1** | Qwen3.5-2B 升主力 | **条件升级**：先 S1 parser + S2 iPhone GDN TTFT，**不先训 LoRA** | ⚠️ 纠偏：spike **必须在 C5 LoRA train 之前收口**（它定训哪个模型）；与 P0/P1 数据门**并行**，gate 在 train 前。S1+S2 过→训 2B；S1 不过→训 1.7B 守主力 |
+docs/roadmap-2026-06-20-from-c6-done.md:128:| **P1-A C5 数据门（先门后训，模型无关，可先做）** | `verification_receipt`：`row_count / bucket_counts / format_contract_version(#39 qwen-tool-call-format) / tool_call_format_pass_rate=1.0 / split_whitelist / parent_semantic_overlap=0 / must_not_train_violations=0` + masking 三形态（train_on_turn / arg-token / function masking）。tau2 train/test/base split(base=train∪test，C6 跑 base，test=held-out)。failure→`propose_fix(auto_apply:false)` 喂增广**永不自动改权重** | OpenSpec 新 change C5 propose（design 引 teardown-data 配方 + tau2 split）· Mastra（无 runtime，纯数据配方） |
+docs/roadmap-2026-06-20-from-c6-done.md:129:| **P1-B Qwen3.5-2B S1/S2 spike（与 P0/P1-A 并行，gate 在 train 前）** | **S1**(命门)：直读 `mlx-swift-lm` tool parser 源码 + 实采（multiline/empty/tool-output/parser smoke），断言收 `.toolCall` 非 `.chunk`。**S2**：iPhone 真机 GDN 版 TTFT/decode/RAM。S1+S2 过→训 2B、1.7B fallback；S1 不过(parser 硬墙)→守 1.7B | Pocock S5 diagnose · Superpowers systematic-debugging · spike 报告含「测了/没测哪些 failure mode」入 docs/research |
+docs/roadmap-2026-06-20-from-c6-done.md:142:  last_execution: { tool_call_frame_id, state_delta, readback_ok, tts_committed_text, interrupted }
+docs/roadmap-2026-06-20-from-c6-done.md:174:- 🐯 **Qwen3.5「支持」≠ tool-call 可用** → 必须 endpoint 实采结构化 `tool_calls`（S1，撞项目 T2 坑放大）。
+docs/roadmap-2026-06-20-from-c6-done.md:177:- 🐯 **GDN 端侧 prefill 退化（14x latency）** → S2 真机 + CoreML 双模型兜底。
+docs/roadmap-2026-06-20-from-c6-done.md:178:- 📄 **短上下文不是降级** → 是 Qwen3.5/GDN 现场延迟风险下的**正确护栏**（paper-tiger）。
+docs/roadmap-2026-06-20-from-c6-done.md:203:   ├─🟡 P1-B Qwen spike(S1 parser/S2 GDN TTFT) ──┐ Pocock S5 · Superpowers debug
+Core/Bench/C6VehicleToolBench.swift:15:    case toolCall = "tool_call"
+Core/Bench/C6VehicleToolBench.swift:65:        case expectedToolCalls = "expected_tool_calls"
+Core/Bench/C6VehicleToolBench.swift:178:        case expectedToolCalls = "expected_tool_calls"
+Core/Bench/C6VehicleToolBench.swift:538:    public var toolCalls: [C6ToolCall]
+Core/Bench/C6VehicleToolBench.swift:545:        toolCalls: [C6ToolCall],
+Core/Bench/C6VehicleToolBench.swift:551:        self.toolCalls = toolCalls
+Core/Bench/C6VehicleToolBench.swift:572:    public var toolCallSetMatch: Bool
+Core/Bench/C6VehicleToolBench.swift:582:        case toolCallSetMatch = "tool_call_set_match"
+Core/Bench/C6VehicleToolBench.swift:619:        case qwenToolCallFormatVersion = "qwen_tool_call_format_version"
+Core/Bench/C6VehicleToolBench.swift:691:        case qwenToolCallFormatVersion = "qwen_tool_call_format_version"
+Core/Bench/C6VehicleToolBench.swift:710:    public var toolCallPass: Bool
+Core/Bench/C6VehicleToolBench.swift:723:        case toolCallPass = "tool_call_pass"
+Core/Bench/C6VehicleToolBench.swift:830:        let toolCallPass = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: candidate.expectedToolCalls)
+Core/Bench/C6VehicleToolBench.swift:832:        let finalState = C6MockStateApplier.apply(toolCalls: candidate.expectedToolCalls, to: preState, stateCells: stateCells)
+Core/Bench/C6VehicleToolBench.swift:858:        if !toolCallPass {
+Core/Bench/C6VehicleToolBench.swift:859:            failures.append(candidate.expectNoCall ? .noCall : .toolCall)
+Core/Bench/C6VehicleToolBench.swift:878:            toolCallPass: toolCallPass,
+Core/Bench/C6VehicleToolBench.swift:937:        let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells)
+Core/Bench/C6VehicleToolBench.swift:943:        let actualDigest = C6Hash.sha256Hex(C6CanonicalJSON.encode(output.toolCalls))
+Core/Bench/C6VehicleToolBench.swift:1005:        let toolMatch = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: output.toolCalls)
+Core/Bench/C6VehicleToolBench.swift:1006:        let noToolFalsePositiveCount = candidate.expectNoCall ? output.toolCalls.count : 0
+Core/Bench/C6VehicleToolBench.swift:1030:            failures.append(.toolCall)
+Core/Bench/C6VehicleToolBench.swift:1046:            toolCallSetMatch: toolMatch,
+Core/Bench/C6VehicleToolBench.swift:1120:            return output.toolCalls.isEmpty && textEvidenceMatches(assertion: assertion, outputText: output.text)
+Core/Bench/C6VehicleToolBench.swift:1122:            return expectNoCall ? output.toolCalls.isEmpty : !output.toolCalls.isEmpty
+Core/Bench/C6VehicleToolBench.swift:1157:        toolCalls: [C6ToolCall],
+Core/Bench/C6VehicleToolBench.swift:1162:        for call in toolCalls {
+docs/research-archive-2026-06-17.md:50:### A3. 端侧 function-calling 模型（Qwen3-0.6B 的替补/对比）
+docs/research-archive-2026-06-17.md:54:| MadeAgents/Hammer | 119 | 2025-06 | 端侧 robust function calling，有 0.5B/1.5B，Qwen3-0.6B 不稳时首选替补 |
+docs/research-archive-2026-06-17.md:90:- 第二轮我曾断言 `ml-explore/mlx-swift-examples` 被改名为 `mlx-swift-lm` —— **错**。第三轮验证两仓都活跃，examples（2607⭐）比 lm（672⭐）更主流。教训：引断言必验证。
+docs/research-archive-2026-06-17.md:124:1. 上游分叉：Qwen3-0.6B 嵌入式（⭐推荐，可控/不挑设备/可微调/稳）vs Apple FoundationModels（最快但锁 iOS26/黑盒/不可微调，留作逃生口）。
+docs/research-archive-2026-06-17.md:199:2. **prompt + few-shot 先验证可行**（base Qwen3-0.6B + 候选工具召回 + JSON 约束）。
+docs/research-archive-2026-06-17.md:230:| 6 | 上游分叉：Qwen3-0.6B 嵌入式 vs Apple FoundationModels | ⏳ 待拍板 | ⭐ Qwen 为主线，FoundationModels 逃生口 |
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:4:model: mlx-community/Qwen3-1.7B-4bit
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:5:mlx-swift-lm: 3.31.3
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:11:- positive `.toolCall` trigger: 105/130 = 80.8%
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:16:- content-embedded tool JSON without `.toolCall`: 25/130 = 19.2%
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:17:- scoring: content-embedded tool JSON is counted as G2 instability only; it is not counted as a successful `.toolCall`.
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:27:- anchor: elapsed is prompt submit to stream completion; first event is prompt submit to first `.chunk` / `.toolCall` / `.info`.
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:88:- `toolCallFormat` is explicitly set to `.json`; this avoids `infer()` model_type drift.
+dev/spike-e3/Reports/c6-base-qwen3-1_7b-20260620-130427/spike-e3-report.md:89:- `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
+docs/second-review-2026-06-17/07-roadmap-next-actions.md:107:- MLX Swift LM + Qwen3-1.7B-4bit
+docs/second-review-2026-06-17/07-roadmap-next-actions.md:108:- MLX Swift LM + Qwen3-0.6B-4bit
+docs/second-review-2026-06-17/07-roadmap-next-actions.md:163:4. MVP 默认模型候选是否改成 Qwen3-1.7B-4bit，0.6B 作为 fallback。
+dev/spike-e3/Package.resolved:23:      "identity" : "mlx-swift-lm",
+dev/spike-e3/Package.resolved:25:      "location" : "https://github.com/ml-explore/mlx-swift-lm",
+docs/second-review-2026-06-17/README.md:26:| [04-runtime-model-route.md](/Users/wanglei/workspace/MAformac/docs/second-review-2026-06-17/04-runtime-model-route.md) | Qwen3、MLX Swift、llama.cpp、Foundation Models 路线复核 | candidate |
+docs/second-review-2026-06-17/01-claude-code-check.md:12:2. “Qwen3-1.7B demo 主力”和“Qwen3-0.6B + LoRA 主线”在现有文档中要统一成 candidate/fallback 口径。
+docs/second-review-2026-06-17/01-claude-code-check.md:23:| Qwen3-1.7B 是 demo 主力 | 候选成立，未完成拍板 | integration blueprint 写 1.7B 主力：[integration-blueprint.md](/Users/wanglei/workspace/MAformac/docs/integration-blueprint.md:23)，但 README 和 v0.1 仍写 0.6B + LoRA 主线：[README.md](/Users/wanglei/workspace/MAformac/docs/README.md:27)，[tech-baseline-from-raw.md](/Users/wanglei/workspace/MAformac/docs/tech-baseline-from-raw.md:12)。 |
+docs/second-review-2026-06-17/01-claude-code-check.md:34:- 0.6B 主线：README 写“主线模型 = Qwen3-0.6B + LoRA”，v0.1 也以 0.6B 为项目定义。
+docs/second-review-2026-06-17/01-claude-code-check.md:35:- 1.7B 主线：integration blueprint 写 demo 主力 Qwen3-1.7B，0.6B 备选。
+docs/second-review-2026-06-17/01-claude-code-check.md:39:> MVP 默认候选 = Qwen3-1.7B-4bit；轻量 fallback = Qwen3-0.6B-4bit；最终由磊哥自己的 iPhone 和 Mac benchmark、mock 车控 function calling 准确率、峰值内存和热稳定决定。
+docs/research/2026-06-19-home-llm-teardown.md:13:- **🔴 核心旋钮 `max_tool_call_iterations`**（line 156-220，注释 line 157）：
+docs/research/2026-06-19-home-llm-teardown.md:17:- **回复抽取**（line 235-242）：倒序找最后 AssistantContent，`strip_thinking_blocks` 剥 `<think>` → TTS speech。
+docs/research/2026-06-19-home-llm-teardown.md:21:- **🔴 三层防御性解析 `parse_raw_tool_call`**（line 495-579）：
+docs/research/2026-06-19-home-llm-teardown.md:35:  - 解析侧 `parse_raw_tool_call`：人类单位转回机器值（%→255）。
+docs/research/2026-06-19-home-llm-teardown.md:40:  - 流式 `_async_stream_parse_completion`（line 229-381）：跨 token 边界分隔符匹配（`cur_match_length` 缓冲被切碎的 `<tool_call>`）+ thinking/speech/tool 三态分离 + 末尾未闭合 flush。**复杂**。
+docs/research/2026-06-19-home-llm-teardown.md:41:  - 非流式 `_async_parse_completion`（line 382-433）：regex 抽取 tool 块 + 剥 thinking + 解析。**demo 用这个就够**。
+docs/research/2026-06-19-home-llm-teardown.md:57:  - **trained `home-1b/3b-v3`**（line 264-317）：`MAX_TOOL_CALL_ITERATIONS: 0`(**单发**) + ICL 关 + `tool_call_prefix/suffix = ```homeassistant / ``` ` + legacy tool calling。← **TRAINED 小模型实证：单发 + 不需 ICL**。
+docs/research/2026-06-19-home-llm-teardown.md:58:  - **🔴 `qwen3`**（line 318-322）：`temperature 0.6, top_k 20, top_p 0.95`(Qwen 官方采样) + 原生 tool calling。← MAformac Qwen3-1.7B 采样直接参考。
+docs/research/2026-06-19-home-llm-teardown.md:85:| qwen3 采样 temp0.6/topk20/topp0.95 | Qwen3-1.7B 采样起点 | **直接抄**（spike E3 调） |
+docs/research/2026-06-19-home-llm-teardown.md:93:4. **temp 张力**：home-llm trained 默认 0.1（确定性）vs qwen3 推荐 0.6——FC 确定性想低温，Qwen3 低于推荐可能降质 → spike E3 测 temp。
+docs/cockpit-voice-fc-premortem-2026-06-18.md:72:| T2 | **Qwen3-1.7B base 触发率/格式不稳,裸用现场翻车** | BFCL overall **55.49%** / multi-turn **16.88%**([2511.22138](https://arxiv.org/pdf/2511.22138));Qwen 把 FC 当 JSON text 塞 content([MS techcommunity](https://techcommunity.microsoft.com/blog/educatordeveloperblog/function-calling-with-small-language-models/4472720)) |
+docs/cockpit-voice-fc-premortem-2026-06-18.md:85:- **EL1 延迟预算可能已进用户弃用区**:11 tok/s × 多槽位 JSON ≈ 1.5-2s,真实 2.7s 已弃用区([Hamming](https://hamming.ai/resources/voice-ai-latency-whats-fast-whats-slow-how-to-fix-it));`≤2500ms` 没区分「到 toolCall」vs「到 first audio byte」。
+docs/cockpit-voice-fc-premortem-2026-06-18.md:98:1. 触发率 gate（实采 N 条,toolCall 解析成功率 ≥80% go / 50-80% go+LoRA / <50% LoRA 前置）。
+docs/cockpit-voice-fc-premortem-2026-06-18.md:99:2. 格式稳定性（验 Qwen 是否塞 content 而非 tool_calls 字段）。
+docs/second-review-2026-06-17/05-vehicle-execution-vss-kuksa.md:154:  "tool_calls": [],
+docs/second-review-2026-06-17/02-giants-shoulders-adoption.md:26:| MLX Swift LM | Swift package 用 MLX Swift 构建 LLM/VLM 应用，当前 `Package.swift` 要求 macOS 14、iOS 17、Swift 6.1：[Package.swift](/Users/wanglei/workspace/MAformac/referencerepo/repos/ml-explore__mlx-swift-lm/Package.swift:1)。 | App 运行时主候选，默认测 Qwen3-1.7B-4bit 和 0.6B-4bit。 | 不假设上来就满足 function calling；必须用 mock 车控 eval 测。 |
+docs/second-review-2026-06-17/02-giants-shoulders-adoption.md:33:| Alexa Auto SDK / Azure car voice demo | 前者提醒 capability agent 边界，后者提醒 UI/UX 状态反馈。 | 借 UX 状态：listening、thinking、confirming、executing、failed；借 capability agent 拆分。 | 不引云端、认证、Android、商业 SDK。 |
+docs/second-review-2026-06-17/02-giants-shoulders-adoption.md:40:4. Qwen3 tool calling 是潜力，不是 mock 车控可用性证明。Qwen 官方文档也强调 function calling 本质上依赖工具协议、模板和应用执行闭环。
+docs/tech-baseline-supplement-v0.2.md:277:在 Mac 本机用 **MLX-LM**（Apple Silicon 原生，贴 v0.1 §10 repo① mlx-swift-lm 同生态），无需 GPU 服务器：
+docs/tech-baseline-supplement-v0.2.md:280:2. **训练**：`mlx_lm.lora --model Qwen/Qwen3-0.6B --train --data ./data --adapter-path ./adapters --iters … --batch-size … --num-layers …`（LoRA 只训低秩矩阵，0.6B 单机分钟级–小时级）。`temperature=0` 推理；监控 valid loss + 整句帧准确率早停。
+dev/spike-e3/README.md:5:- Model: `mlx-community/Qwen3-1.7B-4bit`
+dev/spike-e3/README.md:6:- Runtime: `mlx-swift-lm` pinned exact `3.31.3`
+dev/spike-e3/README.md:30:The harness loads one base model, creates a fresh `ChatSession` per case to avoid history contamination, sets `additionalContext["enable_thinking"] = false`, and streams `.chunk` / `.toolCall` / `.info` events.
+dev/spike-e3/Reports/spike-e3-report.md:4:model: mlx-community/Qwen3-1.7B-4bit
+dev/spike-e3/Reports/spike-e3-report.md:5:mlx-swift-lm: 3.31.3
+dev/spike-e3/Reports/spike-e3-report.md:11:- positive `.toolCall` trigger: 31/40 = 77.5%
+dev/spike-e3/Reports/spike-e3-report.md:14:- audit split: raw trigger only counts upstream `.toolCall`; content fallback candidates are separate and must not be counted as raw `.toolCall`.
+dev/spike-e3/Reports/spike-e3-report.md:18:- content-embedded tool JSON without `.toolCall`: 9/40 = 22.5%
+dev/spike-e3/Reports/spike-e3-report.md:19:- scoring: content-embedded tool JSON is counted as G2 instability only; it is not counted as a successful `.toolCall`.
+dev/spike-e3/Reports/spike-e3-report.md:20:- cross-vendor audit conclusion: G2 is mainly a format-channel problem, not an intent problem. The 9 content cases are all bare JSON without `<tool_call>` tags; 7/9 have the right tool name and usable arguments, so they are recoverable only as guarded candidates.
+dev/spike-e3/Reports/spike-e3-report.md:31:- anchor: elapsed is prompt submit to stream completion; first event is prompt submit to first `.chunk` / `.toolCall` / `.info`.
+dev/spike-e3/Reports/spike-e3-report.md:61:- `toolCallFormat` is explicitly set to `.json`; this avoids `infer()` model_type drift.
+dev/spike-e3/Reports/spike-e3-report.md:62:- `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
+dev/spike-e3/Reports/spike-e3-results.json:3:  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+dev/spike-e3/Reports/spike-e3-results.json:28:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:61:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:89:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:124:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:157:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:191:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:225:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:259:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:287:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:321:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:355:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:389:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:423:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:451:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:485:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:519:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:553:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:587:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:615:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:649:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:682:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:716:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:744:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:778:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:812:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:846:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:879:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:907:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:935:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:963:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:991:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1024:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1057:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1090:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1123:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1156:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1189:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1222:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1256:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1289:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1321:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1348:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1380:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1407:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1434:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1461:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1488:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1515:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1542:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1569:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1596:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1623:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1650:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1677:      "toolCalls" : [
+dev/spike-e3/Reports/spike-e3-results.json:1704:      "toolCalls" : [
+docs/maformac-function-spec-2026-06-19.md:80:- **语义层(广覆盖 = LoRA 的核心价值)**:LoRA + 规则 NLU + FC 泛化层让 Qwen3-1.7B 听懂**全集 2655+** → 正确 `service / intent / value 四件套`。1.7B 默认背不下这套协议,**LoRA 把基座 col20 示例说法 + col30/31 FC模糊说·自由说 + DS协议 fine-tune 进去**,泛化听懂"客户随便说/方言/省略/模糊" → 正确语义。**这就是 CLAUDE.md「LoRA 必做(练模糊说→跨域映射)」的真正原因。**
+docs/research/2026-06-20-teardown-hassil.md:219:| 16 | fuzzy.py n-gram / Kneser-Ney / trie / FST 引擎本体（fuzzy.py, ngram.py, fst.py, trie.py） | **drop** | — | 统计 NLU 引擎整体不移植；MAformac 慢路用 Qwen3+LoRA。只借**学说**(#12-14)不借实现 |
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-results.json:3:  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-results.json:28:      "toolCalls" : [
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:4:model: mlx-community/Qwen3-1.7B-4bit
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:5:mlx-swift-lm: 3.31.3
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:11:- positive `.toolCall` trigger: 1/1 = 100.0%
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:16:- content-embedded tool JSON without `.toolCall`: 0/1 = 0.0%
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:17:- scoring: content-embedded tool JSON is counted as G2 instability only; it is not counted as a successful `.toolCall`.
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:27:- anchor: elapsed is prompt submit to stream completion; first event is prompt submit to first `.chunk` / `.toolCall` / `.info`.
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:40:- `toolCallFormat` is explicitly set to `.json`; this avoids `infer()` model_type drift.
+dev/spike-e3/Reports/c6-env-smoke/spike-e3-report.md:41:- `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:4:> 输入: 14 份 repo teardown 的 adopt_map + cross_cutting + 1 份 Qwen3.5-2B 可行性报告
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:16:3. **Qwen3.5-2B 条件升级 (需 spike), 不盲升不轻退** — 端侧硬件过 (RAM 1.28GB / decode 可能更快, 在 4B 天花板 D38 下余量足), 但 GDN runtime + tool-parser 不兼容 (撞 T2 坑并放大) + thinking-loop + demo 命门维度无 2B 实测分四重不确定。**先 S1 (mlx-swift parser 源码 + tool-call 实采) + S2 (iPhone GDN TTFT 真机) 两个死门 spike ≈0.5-1 天再切**, 不先训 LoRA。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:79:> ⚠️ **C6 已 archive 不降级 (D35 双轴 + 四硬门 + judge 边界 + replay 指纹 + base 先行 + must_not_train 全在)**。下列是 C6.1 扩展候选, apply 时机 = C6 base Qwen3-1.7B 真跑后, **不在第二刀里塞** (避免第二刀过宽, 呼应 overview Open Question 2)。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:93:- `[tool-calling-benchmark]` / `[ha-voiceagent-bench]` 串行 --max-connections 1 + 剔 first-sample cold-prefill + per-sample timeout + server 三态守护 → 端侧跑 Qwen3-1.7B 测真延迟时复用: 串行测真延迟、剔 KV 冷启动伪 outlier、坏 run 不拖垮矩阵。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:141:- `[pipecat]` 助手流式累加→中断即提交已播出的 + 函数调用发出即写 IN_PROGRESS 占位结果就地替换 → 上下文永无孤儿 tool_call 喂 Qwen 不崩; **上下文=事实账本非意图账本** (只写实际播出/实际发生)。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:159:- `[hass-local-openai]` /no_think thinking-token 抑制 (9.5s→1.7s 不掉准) + 流式三态切分器 (thinking 绝不进 speech) → **voice 延迟死门, Qwen3 系直接经验**; TTS 绝不能念思考内容, C7 端侧推理默认关思考链。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:197:| fuzzy.py n-gram/Kneser-Ney/trie/fst 统计 NLU 引擎本体 | hassil | 统计 NLU 引擎整体不移植; MAformac 慢路用 Qwen3+LoRA, 只借学说不借实现 |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:210:| T-C | **context rot (上下文腐烂)**: 多轮累积/裁剪不当 → 孤儿 tool_call / system prompt 被删 / 动态内容进 system 毁 KV 缓存 → 越答越差且不报错 | HIGH | pipecat (未完成序列保护) / livekit (truncate 三防御) / hass-local-openai (注入位置+KV 友好) / ha-core (删孤立 tool result) / Mastra #6827 (context rot 不报错越答越差, 已在 C4 design Risks) | C4/C7: 裁剪保 system[0] + 尾 N 滑窗 + 不以孤儿 fc 开头 + 删孤立 tool result; 函数调用发出即写 IN_PROGRESS 占位; date/RAG 注入到 user 前一位不进 system (保 KV 缓存); token 纯字符估算监控累积。配 home-llm KV 预热 |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:215:| T-H | **Qwen3.5-2B tool-parser 不兼容静默失败**: stock 模板不发 `<tool_call>` 标签 → qwen3_coder parser 不激活 → content:'' 无 tool_calls (静默失败), 撞项目 T2 坑并放大 | HIGH | mlx-lm #1293 + 项目 T2 (execution-pre-mortem:12) + intent-routing 实测 22.5% 裸 JSON | **S1 spike (升主力前死门)**: 直读 mlx-swift-lm parser 源码 + 实跑 ≥10 条车控 prompt 断言收 .toolCall 非 .chunk; froggeric 修复模板 / qwen3_xml parser; ToolCallFrame 薄层兜底裸 JSON。**S1 不过 = 维持 1.7B 主力** |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:216:| T-I | **Qwen3.5-2B GDN 端侧 prefill 退化**: mlx-swift 无原生 GDN 层, Metal 无优化 kernel → prefill O(T) 逐 token, TTFT 暴涨 (实证 14x latency regression) | HIGH | mlx-swift 内置层无 GDN + Medium 14x regression + GDN 分析 gist | **S2 spike (升主力前死门)**: iPhone 真机 (GDN 版非 VL 版) 实测 TTFT + decode tok/s + 峰值 RAM; CoreML 双模型 (prefill+decode); Soniqo/Rapid-MLX 第三方 GDN 实现。**S2 不过 = 退 1.7B** |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:217:| T-J | **Qwen3.5-2B 命门维度无 2B 实测 + thinking-loop**: tool-call/中文/restraint 三个 demo 命门无 2B 公开分, 可能比 1.7B 本地冠军 (0.960) 回退; 2B 特有 thinking-loop 不终止威胁"秒回不崩" | MEDIUM | 本地 bench 无 Qwen3.5 + BFCL 无 2B 分 + 参数量 weak predictor + HF card 明示 loop | S3 同 harness 20-run 对照 (回退则不升); S4 enable_thinking=false + 流式硬超时中断。**这两个 spike 在升级 apply 阶段做, 非升不升的决策门** |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:222:3. **apple-silicon-llm-bench 61.2 tok/s 那行可能是 Qwen3-VL-2B 非 GDN 版** — WebFetch 未确证; S2 自测以 `Qwen/Qwen3.5-2B` GDN 版为准, 不信混淆数。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:223:4. **旧 GGUF 触发 FGDN_AR 断言崩溃** — 项目主线 mlx-swift 非 GGUF, llama.cpp 仅 fallback, 最新 build + 新转换即避。
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:238:| H1 | **Qwen3.5-2B 升不升主力?** | ⭐ **条件升级: 先 S1+S2 两个死门 spike 再切, 不先训 LoRA** | spike ≈0.5-1 天 (直读 mlx-swift parser 源码 + iPhone 真机实采 tool-call & TTFT)。S1 通过 (parser 认 Qwen3.5 模板/解析率≥1.7B 87.5%) + S2 通过 (TTFT≤1.7B 同量级/decode≥40 tok/s/RAM<2GB) → 升 2B 主力, 1.7B 降 fallback; S1 不过 → 维持 1.7B 主力 (本地 judgment 冠军, 零迁移)。端侧 RAM/decode 已过 D38 4B 天花板 gate, 不是 blocker |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:240:| H3 | **C6.1 扩展包 apply 时机?** | ⭐ **C6 base Qwen3-1.7B 真跑后再开 C6.1, 第二刀只锁现 11 Requirement** | C6 已 SOLID 不动。C6.1 候选 (run_repetitions/failure-receipt/pass^k/容差 matcher/gold 血缘自洽守护/feasibility oracle/时间演化 case) 全量收 (不降级), 但分批: base 真跑暴露真实需求后扩, 避免第二刀过宽 (呼应 overview OQ2: SimuHome 状态演化字段留 C6.1 不进 v1) |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:254:  ├─[第二刀 C6, 不扩]  锁现 11 Requirement, base Qwen3-1.7B 真跑 (硬完成条件)
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:257:  ├─[Qwen spike, 并行] S1 (mlx-swift parser + tool-call 实采) + S2 (iPhone GDN TTFT)
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:304:| Qwen3.5-2B 可行性报告 | (research) | 大脑选型 | docs/research |
+docs/research/2026-06-20-eval-memory-deepdive-synthesis.md:316:**核对**: C6 `define-vehicle-tool-bench` **已 apply done** (merge main `6d02771`, 两层 CC 审 SOLID), 不再是"apply 中"; 仍在 `openspec/changes/` 未 archive。**base Qwen3-1.7B 无 LoRA 已如实跑出 hard_fail** (IrrelAcc 0.789<0.9 / hard_failure 170/225 = base 真差非 bench bug, Layer 2 逐 case 实证: base 把 toolCall 藏 content 文本 / 参数温度 22≠26 / 该拒乱调 / 从不生成中文读回) = C5 提升的诚实可复现基线锚点。
+docs/research/2026-06-20-voice-short-term-memory-oracle.md:61:  tool_call_frame_id: string
+docs/research/2026-06-20-pi-teardown-collaboration-layer.md:13:- entry 是 **11 种类型判别联合**(`types.ts:409-420`):`message/thinking_level_change/model_change/active_tools_change/compaction/branch_summary/.../leaf`。即「模型切换、思考档切换、工具集变更、压缩点」全作为**一等事件落进同一时间线**,不是旁路状态。
+docs/research/2026-06-20-pi-teardown-collaboration-layer.md:28:- **beforeToolCall**:`{assistantMessage,toolCall,args}`→`{block?,reason?}`(`types.ts:679-682`)。`block:true`→变 error toolResult,工具**根本不执行**(`agent-loop.ts:581-605`)。「安全门/越界」物理挂点。
+docs/research/2026-06-20-pi-teardown-collaboration-layer.md:31:- 应用层升级成 **20+ 事件总线**(`coding-agent .../types.ts:1125-1163`):`tool_call`(可 block)/`tool_result`(可 patch)/`context`(可改整上下文)/`before_agent_start`(可换 systemPrompt)/`session_before_compact`(可接管压缩)。
+docs/research/2026-06-20-pi-teardown-collaboration-layer.md:52:- **切点必须落 turn 边界**:`findValidCutPoints` **绝不在 toolResult 处切**(`:283-284`,否则 toolCall 和 result 被劈开 LLM 报错)。防御性正确性核心旋钮。
+docs/research/2026-06-20-pi-teardown-collaboration-layer.md:69:**README 看不到、代码才有的工程智慧**:drain 失败 unshift 回滚不丢输入 / 切点禁劈 toolCall-result / JSONL 严格 LF-only 防 U+2028 误断 / token 真值优先估值兜底 / summary 强令保留 file:line+报错原文 / 文件血缘跨压缩累积 / 坏 skill 出 diagnostic 不崩。
+docs/research/2026-06-20-pi-teardown-collaboration-layer.md:85:| **steering/follow-up 分级注入**(agent-loop.ts:166-262) | 派单插话纪律:对长跑 Codex 中途指令分两级——**steer(立刻改方向,停当前再发)** vs **follow-up(让它干完这步再追加)**,避免插话打断到一半 toolCall | adapt 概念,drop 队列 | 对上 execution-discipline。Pi 证明「插话按急迫度分级」避免破坏进行中事务 |
+docs/handoffs/2026-06-20-roadmap-from-c6-done-closeout.md:10:2. **选型/版本断言必先 pre-mortem 联网搜证**（Qwen3.5-2B 复犯已沉淀）。
+docs/handoffs/2026-06-20-roadmap-from-c6-done-closeout.md:15:- **Done**：14-repo eval/记忆 teardown + Qwen3.5-2B 可行性 + synthesis 吸纳意见（commit `31edafc`）→ 磊哥外部评审（codex）→ CC 逐句吃透 + 一手核实 → **新基线 roadmap `docs/roadmap-2026-06-20-from-c6-done.md`（commit `36f223c`）**。级联回写已做（见下表）。
+docs/research/2026-06-20-teardown-iot-agent-bench.md:74:拒识任务:   success = refused AND safety_score>=1.0 AND not actual_tool_calls
+docs/research/2026-06-20-teardown-iot-agent-bench.md:106:**机制**：合成一个"完美 agent"——逐条任务**真的把 gold_tool_calls 回放到 simulator**（verify_gold.py:51-84），用金标答案喂 verifier，断言 `success=True`。按 tier 统计通过率（verify_gold.py:127-131），打印前 5 个失败样例的 `answer_correct/state_correct/safety/violations/sub_checks` 细节（verify_gold.py:132-142）。
+docs/tech-baseline-from-raw.md:12:MAformac 是一个**纯端侧（iOS / macOS）、完全离线、以 Qwen3-0.6B + LoRA 为大脑、mock 车控、可插拔多技能（Phase 1 车控 → 后续导航 / 音乐 / 外卖 via MCP）的方案演示助手**——目标不是量产座舱，而是替方案经理把"开样车到客户现场"这件事浓缩成一台 Mac/iPhone 上的离线 demo。**北极星 = 客户现场 5 分钟内：听懂中文、反应快、不崩、看着惊艳、断网也能跑。** 一切技术选型与裁剪都服从这五个词；凡是不能在断网 Mac 上 5 分钟内炸场的复杂度，一律延后或砍掉。
+docs/tech-baseline-from-raw.md:22:| 大模型 | 云端大模型（慢思考 CoT）+ 端侧小模型（快思考） | Qwen3-0.6B + LoRA，快=规则+向量召回+0.6B 直出，慢=0.6B+LoRA ReAct ≤3 轮 | 慢思考从"云推理"降为"本地 LoRA 推理"，弱网兜底升为常态主路 |
+docs/tech-baseline-from-raw.md:112:  "descriptor": {                   // 供 Qwen3-0.6B+LoRA 训练/few-shot
+docs/tech-baseline-from-raw.md:234:**端侧适配**：每个三级功能含泛化句式编码（~150 个，如 `activate_instant_device_or_function`）+ L1/L2/L3 句式层级，直接喂 Qwen3-0.6B+LoRA 做训练/few-shot；`生效场景` 字段从"云加端"改为端侧"本地"。
+docs/tech-baseline-from-raw.md:349:| ① 端侧 runtime | `tattn/LocalLLMClient`(facade) + `ml-explore/mlx-swift-lm` | llama.cpp / mattt/llama.swift / swift-transformers / SpeziLLM | **runtime 抽象优先于选型**，业务层只依赖 `LLMBackend` 协议，runtime spike 排在 UI 大开发之前 |
+docs/research/2026-06-20-voice-short-context-memory-oracle.md:85:    include_only: [final_asr, assistant_text, tool_call, tool_result]
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:32:3. **本地小模型评测必须多次重复跑。** `MikeVeerman/tool-calling-benchmark` 显示 3 次多数投票会误判边界 prompt，20 次后 Qwen3-1.7B 排名反转。MAformac C6 不能只跑单 seed 后说 LoRA 提升。
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:41:| https://github.com/cdeshpa2/iot-agent-bench | IoT agent benchmark | `pushed_at=2026-04-27`; 0 star 新仓 | 800 tasks，Smart Home + Industrial Predictive Maintenance，5 complexity tiers；schema 有 `gold_tool_calls`、`verifier.kind = numeric/string/set/state/refusal/composite`、`safety_checks`、`forbidden_action`、`is_invalid`；verifier 同时算 state、tool F1、safety score、refusal | **吸收**：C6 `c6-bench-cases.jsonl` 可加 `safety_checks`、`forbidden_action`、`is_invalid`、`verifier_kind`。拒识 case 允许最多一个 read-only 查询的规则，适合“先读状态再拒绝”。**风险**：新仓、合成味重，不能直接采数值结论。 |
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:42:| https://github.com/Drizzt321/ha-voiceagent-llm-benchmark | Home Assistant voice LLM benchmark | `pushed_at=2026-05-16`; 仓内有 2026-04 报告 | Inspect AI + llama.cpp/OpenAI-compatible server；给模型暴露 32 个 HA intent tools；`generate(tool_calls="none")` 捕获 tool call 但不执行；报告分 `format_valid`、`hallucinated_tools`、call_count、tool_name 等 | **吸收**：C6 可复用“工具 no-op 捕获”的测试形态，避免 eval 阶段真实执行；C7 可借本地 llama.cpp server 跑 normalized transcript。**风险**：HA 领域，不含端态读回；报告有单 run 样本，不能当统计结论。 |
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:47:| https://github.com/MikeVeerman/tool-calling-benchmark | 本地小模型 tool-call benchmark | `pushed_at=2026-04-01`, `updated_at=2026-06-16`; Round3 报告 | CPU-only，Ollama/llama.cpp，本地小模型；21 models、12 prompts、20 runs；指标含 Action、Restraint、Wrong Tool、Reliability、Agent Score；Qwen3-1.7B / 0.6B / Qwen2.5 小模型都有结果 | **吸收**：C6 base/LoRA diff 每个边界 case 至少多 seed/多 run；报告 `Reliability` 而非只报 majority pass。**风险**：prompt 数少、toy tools、非状态仿真；结果只能指导“重复跑纪律”。 |
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:67:建议把当前 schema 从 `expected_tool_calls / expect_no_call / expected_state_delta / readback_assertion / clarify_tag / failure_class` 扩成可选字段：
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:70:verifier_kind: tool_call|state|refusal|composite
+docs/research/2026-06-20-eval-oracle-blindspots-repo-scan.md:98:- `MikeVeerman/tool-calling-benchmark` 的 Qwen3-1.7B 结论对 MAformac 有启发，但 prompt 数太少，不能替代项目自建 bench。
+docs/dispatches/2026-06-20-c6-c3-archive-longrun-dispatch.md:4:> 目标 = 结束 P0 C6 收尾后的 OpenSpec archive：先诚实处理 C3 `7.3 Qwen3 sampling` 剩余任务，再 archive C3；随后复核 P0-3/P0-4 closeout，archive C6。不要把 `Complete` 状态词当成 archive 证据，必须实跑 archive + 对账。
+docs/dispatches/2026-06-20-c6-c3-archive-longrun-dispatch.md:18:- C3 open debt: `openspec/changes/define-execution-contract/tasks.md` 仅 `7.3 Qwen3 sampling` 未勾
+docs/dispatches/2026-06-20-c6-c3-archive-longrun-dispatch.md:28:- 不假装跑过 Qwen3 sampling 对照。若没有真实 runtime path，就把 C3 7.3 明确迁移到 P1-B Qwen spike。
+docs/dispatches/2026-06-20-c6-c3-archive-longrun-dispatch.md:79:- `docs/research/2026-06-20-c3-home-llm-adopt-spike.md` 已写明：C3 当前没有 model runtime path 来测 Qwen3 sampling；C3 不 hard-code sampling；等 C7/runtime backend active 后测 trigger rate、format legality、semantic accuracy、latency。
+docs/dispatches/2026-06-20-c6-c3-archive-longrun-dispatch.md:80:- roadmap P1-B 已承接 Qwen spike：parser / GDN / model backend / latency 是 P1-B gate，在 train 前完成。
+docs/dispatches/2026-06-20-c6-c3-archive-longrun-dispatch.md:87:- [x] 7.3 Qwen3 sampling 起点用 home-llm `temp=0.6/top_k=20/top_p=0.95` 做对照,再与低温确定性配置比较。验收:触发率、格式合法率、latency 表格。**Superseded/moved to P1-B Qwen spike**: C3 has no active model runtime path; see `docs/research/2026-06-20-c3-home-llm-adopt-spike.md §7.3` and roadmap P1-B. Do not hard-code sampling in C3.
+dev/spike-e3/Sources/SpikeE3/main.swift:9:private let modelID = "mlx-community/Qwen3-1.7B-4bit"
+dev/spike-e3/Sources/SpikeE3/main.swift:36:            toolCallFormat: ToolCallFormat.json
+dev/spike-e3/Sources/SpikeE3/main.swift:39:        print("Loading \(modelID) with mlx-swift-lm \(mlxSwiftLMTag), toolCallFormat=.json")
+dev/spike-e3/Sources/SpikeE3/main.swift:60:            let toolNames = result.toolCalls.map { $0.name }.joined(separator: ",")
+dev/spike-e3/Sources/SpikeE3/main.swift:61:            print("  toolCalls=\(result.toolCalls.count) [\(toolNames)] elapsedMs=\(result.elapsedMs)")
+dev/spike-e3/Sources/SpikeE3/main.swift:100:            additionalContext: ["enable_thinking": false],
+dev/spike-e3/Sources/SpikeE3/main.swift:107:        var toolCalls: [ToolCallSnapshot] = []
+dev/spike-e3/Sources/SpikeE3/main.swift:118:            case .toolCall(let toolCall):
+dev/spike-e3/Sources/SpikeE3/main.swift:119:                toolCalls.append(ToolCallSnapshot(
+dev/spike-e3/Sources/SpikeE3/main.swift:120:                    name: toolCall.function.name,
+dev/spike-e3/Sources/SpikeE3/main.swift:121:                    arguments: toolCall.function.arguments
+dev/spike-e3/Sources/SpikeE3/main.swift:130:            chunks.contains("<tool_call>")
+dev/spike-e3/Sources/SpikeE3/main.swift:135:            expectedToolHit = toolCalls.contains { $0.name == expectedTool }
+dev/spike-e3/Sources/SpikeE3/main.swift:137:            expectedToolHit = toolCalls.isEmpty
+dev/spike-e3/Sources/SpikeE3/main.swift:150:            toolCalls: toolCalls,
+dev/spike-e3/Sources/SpikeE3/main.swift:400:        case expectedToolCalls = "expected_tool_calls"
+dev/spike-e3/Sources/SpikeE3/main.swift:534:    let toolCalls: [ToolCallSnapshot]
+dev/spike-e3/Sources/SpikeE3/main.swift:568:        g1TriggerCount = positives.filter { !$0.toolCalls.isEmpty }.count
+dev/spike-e3/Sources/SpikeE3/main.swift:572:        g2ContentToolCallCount = positives.filter { $0.toolCalls.isEmpty && $0.contentLooksLikeToolCall }.count
+dev/spike-e3/Sources/SpikeE3/main.swift:575:        g3NegativeFalseCallCount = negatives.filter { !$0.toolCalls.isEmpty }.count
+dev/spike-e3/Sources/SpikeE3/main.swift:585:            result.toolCalls.contains { call in
+dev/spike-e3/Sources/SpikeE3/main.swift:655:        .map { "- \($0.id) \($0.capability): expected=\($0.expectedTool ?? "none"), got=\($0.toolCalls.map(\.name).joined(separator: ",")), contentTool=\($0.contentLooksLikeToolCall)" }
+dev/spike-e3/Sources/SpikeE3/main.swift:658:        .filter { $0.isNegative && !$0.toolCalls.isEmpty }
+dev/spike-e3/Sources/SpikeE3/main.swift:659:        .map { "- \($0.id) \($0.sourceLevel): got=\($0.toolCalls.map(\.name).joined(separator: ",")) utterance=\($0.utterance)" }
+dev/spike-e3/Sources/SpikeE3/main.swift:664:            let args = result.toolCalls.first?.arguments ?? [:]
+dev/spike-e3/Sources/SpikeE3/main.swift:665:            return "- \(result.id): got=\(result.toolCalls.map(\.name).joined(separator: ",")) color=\(colorArgument(args) ?? "nil") utterance=\(result.utterance)"
+dev/spike-e3/Sources/SpikeE3/main.swift:674:    mlx-swift-lm: \(envelope.mlxSwiftLMTag)
+dev/spike-e3/Sources/SpikeE3/main.swift:680:    - positive `.toolCall` trigger: \(summary.g1TriggerCount)/\(summary.positiveCount) = \(percent(summary.g1TriggerRate))
+dev/spike-e3/Sources/SpikeE3/main.swift:685:    - content-embedded tool JSON without `.toolCall`: \(summary.g2ContentToolCallCount)/\(summary.positiveCount) = \(percent(summary.g2ContentToolCallRate))
+dev/spike-e3/Sources/SpikeE3/main.swift:686:    - scoring: content-embedded tool JSON is counted as G2 instability only; it is not counted as a successful `.toolCall`.
+dev/spike-e3/Sources/SpikeE3/main.swift:696:    - anchor: elapsed is prompt submit to stream completion; first event is prompt submit to first `.chunk` / `.toolCall` / `.info`.
+dev/spike-e3/Sources/SpikeE3/main.swift:709:    - `toolCallFormat` is explicitly set to `.json`; this avoids `infer()` model_type drift.
+dev/spike-e3/Sources/SpikeE3/main.swift:710:    - `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
+docs/handoffs/2026-06-20-c3-c6-archive-closeout.md:11:- Evidence: `docs/research/2026-06-20-c3-home-llm-adopt-spike.md §7.3` says C3 has no active model runtime path for Qwen3 sampling; `docs/roadmap-2026-06-20-from-c6-done.md` assigns Qwen parser/GDN runtime proof to P1-B.
+docs/research/2026-06-20-teardown-agentevals.md:49:- `role` 为 `ai`/`assistant` 且有 `tool_calls` → 给每个 tool_call 补 `id`（utils.py:28-32），缺失字段补空（content=None→""，utils.py:35-36）。
+docs/research/2026-06-20-teardown-agentevals.md:53:### 🔴 tool-call 抽取 + 双格式 `_normalize_tool_call` / `_extract_tool_calls`（utils.py:68-87）
+docs/research/2026-06-20-teardown-agentevals.md:55:- `_normalize_tool_call`（utils.py:68-75）：兼容 **OpenAI 嵌套格式**（`{"function":{"name","arguments":<json字符串>}}`，`arguments` 是**字符串**要 `json.loads`）和**扁平格式**（`{"name","args":<dict>}`）。统一吐 `{"name", "args":dict}`。
+docs/research/2026-06-20-teardown-agentevals.md:56:- `_extract_tool_calls`（utils.py:78-87）：把一条轨迹（消息列表）里所有助手消息的 tool_calls **拍平成一个有序列表**——**轨迹比较的第一步是「降维成 ToolCall 序列」**，把 NL 文本、tool result 等噪声全丢掉，只留「调了哪些工具、什么参数」。**这正是 MAformac C6「ToolCall 集合精确匹配」的预处理。**
+docs/research/2026-06-20-teardown-agentevals.md:63:for ref_call in reference_tool_calls: # utils.py:103
+docs/research/2026-06-20-teardown-agentevals.md:65:    for out_idx, out_call in enumerate(output_tool_calls):  # utils.py:108
+docs/research/2026-06-20-teardown-agentevals.md:91:- **`strict._scorer`（strict.py:20-76）= 唯一不走 `_is_trajectory_superset` 的**：它逐条消息 zip 比对——长度等（strict.py:34）→ 角色等（strict.py:37）→ tool_calls 有无对齐（strict.py:39-44）→ **同一条助手消息内**的 tool_calls 用 `seen[]` 占用数组做 set-match（strict.py:54-75）。**「顺序 + 角色 + 每步 tool-call 数量」三重严格**，对应 C6「state_delta 严格回读」级别的死门。
+docs/research/2026-06-20-teardown-agentevals.md:131:5. **轨迹 = 降维后的「ToolCall 序列 / 步骤图」**，不是原始消息流。评分前先 `_extract_tool_calls` 拍平丢噪声（message-level），或 `extract_*_trajectory` 抽节点名（graph-level）。**「评什么」先定义清楚降维投影，再比较。**
+docs/research/2026-06-20-teardown-agentevals.md:144:| 6 | `_extract_tool_calls` 轨迹降维成 ToolCall 序列（utils.py:78-87） | **copy概念** | C6 | 评分前先丢 NL/result 噪声只留 ToolCall——MAformac C6 比对前同样要从 trace 抽出 ToolCall 序列 |
+docs/research/2026-06-20-teardown-tau2-bench.md:52:- **action 匹配是集合包含 + 选择性参数比对**（`evaluator_action.py:16-59` + `tasks.py:178-195`）：gold action 用 `compare_with_tool_call` 找是否存在某 tool call 名字相同 + `compare_args` 指定的参数相等（compare_args=None 则比全部参数，=[] 则只比名字）。**全 gold action 都命中才 reward=1**（all-or-nothing，line 102-103）。
+docs/research/2026-06-20-teardown-tau2-bench.md:69:→ **MAformac C6 直接抄 pass^k**：1.7B+LoRA 对模糊说法天然有方差，**must-pass 全集覆盖率不能只单跑**。每个 L1 case 跑 N trial（temp>0 时），报 pass^1（平均）+ pass^N（最坏稳定性）。bench 默认 temp=0 求确定性基线，加一组 temp=0.6（Qwen3 推荐）测真实方差。
+docs/research/2026-06-20-teardown-tau2-bench.md:78:`hallucination`（编造未 grounding 信息）/ `incorrect_interpretation`（误读工具结果）/ `guideline_violation`（违 policy）/ `revealed_info_early`（过早泄露）/ `inconsistent_behavior`（自相矛盾）/ **`tool_call_schema_error`（工具名错/缺参/类型错）** / **`tool_call_argument_error`（schema 对但参数值错）** / **`irrelevant_tool_call`（调了不相关工具）** / `premature_termination`（对方还在干活就提前结束）/ `missed_required_action`（漏做必须动作）/ `wrong_sequence`（顺序错）/ `other`。
+docs/research/2026-06-20-teardown-tau2-bench.md:110:- **chunk 剥工具调用**（line 471-476）：投给对方的 chunk 只留 speech、`tool_calls=None`（语音不传工具调用），但 tick 历史里原 chunk 保留 tool_calls 供 linearize/配对。
+docs/research/2026-06-20-teardown-hass-local-openai.md:5:> **与 home-llm 的分工**：home-llm 是「**训练自有小模型 + code 侧重解析/归一化/白名单/KV 预热**」的蓝本（teardown 已落）；本 repo 是「**OpenAI-compatible 传输层 + 上下文卫生 + 多引擎兼容垫片**」的蓝本——它**不训模型、不做安全门**，但把「**流式 token 流如何被可靠地切成 thinking/speech/toolcall 三态**」「**短上下文窗口如何裁剪不破坏 role 交替**」「**RAG 只作用当前 turn 不污染后续**」「**注入角色 / KV slot / 采样参数怎么暴露成旋钮**」做到了生产级。这几样正是 C4 路由 runtime + C7 voice 衔接的硬骨头，README 完全看不到，只在代码里。
+docs/research/2026-06-20-teardown-hass-local-openai.md:15:  → conversation._async_handle_message       # C4 入口：装 system_prompt + llm_apis + parallel_tool_calls
+docs/research/2026-06-20-teardown-hass-local-openai.md:37:把 OpenAI streaming chunk 流可靠地切成 **thinking / speech(content) / tool_calls** 三态，且**容忍跨 token 边界与多引擎怪癖**。逐机制：
+docs/research/2026-06-20-teardown-hass-local-openai.md:43:  - llama.cpp：只有首个 chunk 带 `id`，后续 args chunk 无 id（line 350）→ `tool_call_id = tool_call.id or tool_call_id` 粘住。
+docs/research/2026-06-20-teardown-hass-local-openai.md:45:  - 某 OpenRouter 引擎：并行调用**共享同一 id 和 index**（line 354）→ 于是用 `tool_key = tool_call_id + tool_call_name` 复合键区分（line 361）。
+docs/research/2026-06-20-teardown-hass-local-openai.md:47:- **args 收尾解析**（line 439-449）：`finish_reason` 时才 `json.loads(tool_call["args"])`，空 args → `{}`（line 444-446）。**累积完整再解析，不边到边解**。
+docs/research/2026-06-20-teardown-hass-local-openai.md:58:- **🔴 删孤立 tool result**（line 707-709）：裁剪后若 `messages[1]["role"]=="tool"` 就删——**「某些模型不接受没有配对 tool_call 请求的孤立 tool result」**（注释原文）。这是 chat template role-alternation 的硬约束，错了直接 500/拒答。C4 多轮裁剪必抄。
+docs/research/2026-06-20-teardown-hass-local-openai.md:65:- assistant 的 tool_calls 回灌（line 255-269）：历史里的 assistant tool call 转回 OpenAI 格式 `arguments=json.dumps(tool_args)`——**多轮 FC 历史完整性**。
+docs/research/2026-06-20-teardown-hass-local-openai.md:96:- **mixin 叠加特化**（`llama_cpp.py:120-177`）：`LlamaCppMixin` 只覆写 `_get_extra_body_args`（采样参数 + chat_template_kwargs）和 `_convert_content_to_chat_message`（回灌 prior thinking），**通用逻辑全继承**。→ 后端差异**只覆写差异点**，不重写全链路。
+docs/research/2026-06-20-teardown-hass-local-openai.md:98:- **prior thinking 回灌可配**（`llama_cpp.py:154-169` + `deepseek.py:67-82`）：`include_prior_thinking` 旋钮——**有些推理模型要求回灌自己的 thinking，有些要求剥掉**（README line 126-129：Gemma 拒绝 prior reasoning）。**模型族差异 → 暴露成布尔旋钮，不写死**。这是 MAformac 切 Qwen3 thinking 模式时的直接经验。
+docs/research/2026-06-20-teardown-hass-local-openai.md:99:- **🔴 model id 防御解析 `strip_model_pathing`**（`config_flow.py:351-355`）：`re.search(r"([^\/]*)\.gguf$", name)` 从 `/path/to/Qwen3-1.7B.gguf` 抽出干净名。`_resolve_model_name`（line 153-164）：**优先 server alias，回退剥路径的 id**。→ 与 home-llm 防御解析同源：**外部给的脏字符串先归一再用**。
+docs/research/2026-06-20-teardown-hass-local-openai.md:117:3. **模型族差异 = 旋钮，不是 if-else 写死**：thinking 开关、prior-thinking 回灌、注入角色、采样参数、slot id——全暴露成带范围校验的配置。**"哪个 work 用哪个" + 测边界**，把不确定性外置给配置层。
+docs/research/2026-06-20-teardown-hass-local-openai.md:128:| 流式三态切分器 `_transform_stream`（entity.py:317-458）：`<think>` 跨 chunk 累进 + seen_visible 闸门 + thinking 绝不进 speech | **copy概念** | C7 | TTS 绝不能念思考内容；voice 流式衔接的硬需求。Swift 重写 ThinkSpeechToolSplitter（按 `<think>`/`</think>` 分隔 + 残段缓冲），不 import Python |
+docs/research/2026-06-20-teardown-hass-local-openai.md:134:| `LLMBackend` registry + mixin（conversation.py:29-43 / llama_cpp.py:120-177）：dict 派发 + 懒加载 + mixin 只覆写差异点 | **adapt** | C4 | MAformac 已锁 `LLMBackend` 协议的现成实现形态；后端差异只覆写 extra_body/采样/thinking 回灌 |
+docs/research/2026-06-20-teardown-hass-local-openai.md:135:| prior-thinking 回灌旋钮（llama_cpp.py:154-169 + README:126-129）：模型族差异暴露成布尔，不写死 | **copy概念** | C4/C7 | Qwen3 切 thinking 模式时直接经验：有的模型要回灌自己 thinking，有的拒绝（Gemma）。暴露旋钮不写死 |
+docs/research/2026-06-20-teardown-hass-local-openai.md:151:> home-llm 教 MAformac「**模型只产单跳 + code 侧解析/归一化/白名单/KV 预热**」；hass_local_openai_llm 补上「**那条单跳在 OpenAI-compatible 流里如何被可靠地切成 thinking/speech/toolcall 三态、短上下文窗口如何裁剪不破坏 chat template、动态上下文如何注入才不毁 KV 缓存、检索如何有界到当前 turn**」——**5 个上下文卫生 + 流式提取垫片**，直接服务 C4 路由 runtime 与 C7 voice 衔接，且全程印证「可靠性在 runtime 外围工程、不在模型本身」的反转架构。**drop 掉 Weaviate/Docker/Node/HA UI/多步 loop 这些不适用载体，吸收全部上下文卫生与流式提取的工程智慧。**
+docs/baseline-internalization-plan-2026-06-19.md:70:| **unslothai/unsloth** ⭐ | 66795★ / 2026-06-18 | Qwen3-1.7B LoRA/QLoRA 训练框架,2× 速度半显存 |
+docs/baseline-internalization-plan-2026-06-19.md:75:**LoRA pipeline(5 步,adopt)**:① 协议表 → xLAM/Hammer JSON 种子(**机械映射,确定性**,几千行→几千种子)② 模板展开 + **加权采样**(按真实高频组合,**不做笛卡尔积**,控到 1万~3万)③ **LLM 口语化层**(只对 FC 标记的"模糊说/自由说"列改写成随便说/方言/省略,= 泛化来源,呼应"规则吃80%/LoRA练20%模糊")④ 拒识负样本 10-15%(output `[]`)⑤ unsloth 跑 Qwen3-1.7B,**rank 8-16 / α 16-32 / 3ep / lr 1e-4**,先 2-3k 种子测格式收敛再扩;**MAC-SLU + 真实集 held-out 校验**。
+docs/baseline-internalization-plan-2026-06-19.md:104:10. **小模型自造格式**(用统一格式微调 ≠ Qwen 自身 instruction-tuning 格式,产生 gap)→ 必贴 **Qwen3 原生 tool-call chat template**;bench **format-validity / decision-correctness 双轴评分**(别 format-blind,否则 87.5% 这种数双向误判)。
+docs/baseline-internalization-plan-2026-06-19.md:116:| **P4 LoRA 语料 + 训练**(adopt §4.1) | 协议表→xLAM/Hammer JSON 种子 → 模板展开+加权采样 → LLM 口语化(仅模糊说/自由说列)→ 拒识负样本 10-15% → unsloth Qwen3-1.7B(r=8-16,Qwen 原生 template,function masking)→ MAC-SLU held-out 校验 | P1 | LoRA 权重 + 语料 pipeline |
+docs/dispatches/2026-06-19-change3-gptpro-fix.md:50:3. trace 三口径如实记(raw `.toolCall` / fallback candidate / guard 后实际执行)——design 已要求,核对实装一致。
+docs/dispatches/2026-06-19-change3-gptpro-fix.md:102:- **红线**(完整见 `CLAUDE.md §6`):真实客户名一律「某车厂」;报价/密钥/PII/车型代号绝不入仓;真实 bug 训练集即便脱敏不入仓;不降级(Qwen3-1.7B+LoRA 主线)。
+docs/research/2026-06-20-teardown-ha-core.md:25:  - `SystemContent`（系统 prompt，role 固定 "system"）/ `UserContent`（用户话 + 可选 `attachments`）/ `AssistantContent`（`content` + `thinking_content`(剥<think>) + `tool_calls` + `native`）/ `ToolResultContent`（`tool_call_id` + `tool_name` + `tool_result`(JsonObject)）。每个带 `created` 时间戳 + `as_dict()`。
+docs/research/2026-06-20-teardown-ha-core.md:34:  - **并发起 task**（line 445-450）：所有非 external tool_call `async_create_task` 并发跑。
+docs/research/2026-06-20-teardown-ha-core.md:37:- **流式增量装配 `async_add_delta_content_stream`**（line 485-623）：跨 delta 拼 content/thinking/tool_calls，遇 `role` key 收一条消息；**工具调用一知道就起 task**（line 530-539，不等整条消息完）。→ demo 非流式可大幅简化（home-llm teardown 已结论「demo 用非流式」）。
+docs/research/2026-06-20-teardown-agent-tester.md:33:  - `required_tool_calls`（必须命中的工具调用）+ `forbidden_tool_calls`（绝不能调的工具名）+ `response_intent`（给 LLM-judge 的意图描述）+ **`alternatives: list[Expectation]`（any-of 替代解）**。
+docs/research/2026-06-20-teardown-agent-tester.md:42:- **`Trace` 事件四态（line 129-174）**：`ModelCallEvent`（含 token/stop_reason）/ `ToolCallEvent`（含 `server` 来源 + `arguments` + `result` + **`is_delegation`** 标 A2A 委派）/ `FinalResponseEvent` / `ErrorEvent`。`Trace.tool_calls()`（line 167-168）+ `final_text()`（line 170-174 倒序取最后 final）= 评测器消费入口。**这就是 MAformac「LoRA Day1 埋 trace」要的 trace schema**。
+docs/research/2026-06-20-teardown-agent-tester.md:50:  - `observed = [(name, args) for tc in trace.tool_calls()]`——**收集全部观测到的工具调用，不看顺序**。
+docs/research/2026-06-20-teardown-agent-tester.md:74:- **`_performance_from_trace`（line 36-47）**：perf 指标**从 trace 事件聚合**（in/out token 求和、model_call / tool_call 计数）+ wall_ms（line 65-67 `time.perf_counter`）。→ trace 是单一事实源，指标全派生，不另埋点。
+docs/research/2026-06-20-teardown-agent-tester.md:105:- **轨道 B：case 禁用项硬判**（`take_me_home.json` line 19 `forbidden_tool_calls: ["window_open"]`）：评测器**确定性地**判「这个 case 绝不该调 window_open」。→ 这是**评测器的硬门**，不靠 LLM。
+docs/research/2026-06-20-teardown-agent-tester.md:112:- **`provider: ollama` + `base_url`（schemas.py line 105-106）= 本地小模型直测**：`ollama_llama32.yaml` 不需 API key，本地跑。→ **MAformac 端侧 Qwen3-1.7B 可照此走本地 provider**（Ollama / MLX），bench 完全离线。
+docs/research/2026-06-20-teardown-agent-tester.md:115:> **MAformac 映射**：C6 bench 的 profile 矩阵 = **{Qwen3-1.7B base, Qwen3-1.7B+LoRA, Qwen3-0.6B fallback, FoundationModels baseline}** × **{规则路由 on/off}** × **{prompt 详细度}**。一个矩阵跑出「LoRA 提升多少 / 规则吃掉多少 / 0.6B 够不够」——正是 MAformac「不前置 benchmark 但要 bench 验证」要的实验设计。**profile = 「换一个旋钮重跑全 case」的声明式形态**，直接 adopt。
+docs/research/2026-06-20-teardown-agent-tester.md:123:  3. **可展开 per-run trace**（line 250-288）：`<details>` 折叠，展开看完整 trace（tool_call 名+args+result / model_call token / final_response / error，line 264-278）。→ **每个 run 的工具调用链 + 结果可逐条审**。
+docs/research/2026-06-20-teardown-agent-tester.md:132:- **provider 在边界翻译**：`AnthropicClient`（line 71-112）直传；`OllamaClient`（line 119-241）把 canonical ↔ Ollama `/api/chat` 翻译（line 132-196 `create` + line 198-241 `_flatten_message`：assistant turn → tool_calls / tool_result → `{"role":"tool"}`）。
+docs/research/2026-06-20-teardown-agent-tester.md:133:- **Ollama 健壮性**（line 160-166）：HTTP ≥400 抛带 body 的错误（「model not found, try pulling」actionable）；tool_call arguments 是字符串时 try `json.loads` 兜底（line 177-181）。
+docs/research/2026-06-20-teardown-agent-tester.md:134:- → **= MAformac `LLMBackend` 协议（mlx-swift-lm / llama.swift 可换）的同形设计**。canonical block 抽象让 bench harness 不绑死后端，换模型只改 client。
+docs/research/2026-06-20-teardown-agent-tester.md:154:| `forbidden_tool_calls` 硬判（eval:60-62 / take_me_home.json:19） | C6 + DemoGuard：R0–R3 risk-policy 禁用项 | **adapt** | 借判定形态，但执行点从 prompt 挪进 **code**（架构铁律：安全是代码） |
+docs/research/2026-06-20-teardown-agent-tester.md:164:| `provider: ollama` 本地小模型直测（schemas.py:105-106, clients:119-241） | C6 端侧 Qwen3-1.7B 离线 bench（Ollama/MLX provider） | **adapt** | 离线bench；client换MLX |
+docs/research/2026-06-20-mastra-teardown-workflow-eval-trace.md:27:**核心发现:scorer 是 4 阶段 pipeline,且 pipeline 本身被编译成 workflow(复用 A 的 graph)。dataset 跑批 = 有界并发 pMap,per-item 先跑 target 再跑 scorer 逐条累加。最贴 C6 的是 `TrajectoryExpectation` —— 它就是 expected_tool_calls 契约的现成蓝本。**
+docs/research/2026-06-20-mastra-teardown-workflow-eval-trace.md:32:- **`evals/types.ts:550-594`(`TrajectoryExpectation`)= C6 expected_tool_calls 契约现成蓝本,几乎一比一**:
+docs/research/2026-06-20-mastra-teardown-workflow-eval-trace.md:33:  - `steps: ExpectedStep[]`(`:554`)= 期望工具序列,每个 `{name, stepType:'tool_call', toolArgs}` → **MAformac expected_tool_calls 含 args**。
+docs/research/2026-06-20-mastra-teardown-workflow-eval-trace.md:73:| **`TrajectoryExpectation`**(types.ts:550-594) | **C6** expected_tool_calls 契约 | **copy概念(几乎一比一)** | steps(工具+args)+ordering+blacklistedTools(=expect_no_call)+noRedundantCalls(防#6827)+maxSteps,C6 契约近乎现成 |
+docs/research/2026-06-20-mastra-teardown-workflow-eval-trace.md:107:- **scorer/eval → 借 `TrajectoryExpectation` 契约(expected_tool_calls + blacklist=expect_no_call + noRedundantCalls + ordering)+ dataset/pMap/累加/结构化failure 跑批组织** → C6 bench 契约近乎现成,实现用 MAformac 自己 contract。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:14:**这个 repo 的真智慧不在"跑分框架"，在三处 README 看不到的工程：①把单一标量 pass/fail 拆成 6 维诊断（让你知道"为什么错"而不只是"错了"）+ alternative/quality 容多正解；②`generate(tool_calls="none")` 把工具变 no-op 桩——只捕获模型想调什么、绝不执行（纯离线判分，零副作用）；③一套 F1–F10 失败分类法（端侧小模型在 tool-call 上具体怎么崩的实证账本，每条配 prompt 缓解 + 实测 delta）。** 这三处直接搬进 MAformac C6，比我们手搓一个"集合精确匹配"强一个量级——因为它解决的是"小模型怎么崩"而不只是"对不对"。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:16:外加四个让 eval **可信**（而非好看）的纪律：`--max-connections 1` 串行（否则延迟测的是排队深度不是推理时间）、first-sample cold-prefill 必剔除（KV 冷启动伪 outlier）、多 run + FP 非确定性显式承认、`/no_think` thinking-token 抑制（延迟 9.5s→1.7s 不掉准）。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:23:test_cases.ndjson (utterance + expected_tool_calls + alt + response_type)
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:32:   generate(state, tool_calls="none")             ← ★ 发工具定义但不执行，只捕获
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:34:        ▼  scorers/tool_call.py  tool_call_scorer()
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:35:   _extract_tool_calls(state) → 实际调用
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:38:   失败 → 遍历 alternative_expected_tool_calls，命中即 C + 记 MATCH_QUALITY
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:44:关键：**模型当被测黑盒，框架只在两端做事**——左端拼一个"复刻 HA 真实下发格式"的 prompt + 工具清单，右端拿模型吐的 tool_calls 跟金标比。中间推理完全不碰。这正是 MAformac"文本→意图→ToolCall→DemoGuard→mock state"链路里 **C6 要的那段判分器**。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:50:### 2.1 `scorers/tool_call.py`（334 行）— ★ 算法核心，C6 直接母本
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:62:**参数匹配规则**（`_tool_call_matches` L241-276，**MAformac 必抄的归一化逻辑**）：
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:70:**alternative + quality 容多正解**（L82-105，**C6 的"全集不丢脸"关键**）：主 `expected_tool_calls` 失败 → 遍历 `alternative_expected_tool_calls`，每个带 `quality`（optimal/equivalent/acceptable/degraded）+ `reason`，命中即 overall=C 并记 `MATCH_QUALITY`。**`Score.value` 仍二元 C/I——quality 不影响过不过**，只供下游报"多少 C 是 optimal vs 只是 acceptable"。这解决了 tool-call eval 的根本难题：**同一句话常有多个都对的工具/参数组合**（"屋里温度多少"既可 GetState 温度传感器也可 ClimateGetTemperature），死扣单一金标会冤杀。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:72:**防御性提取**（`_extract_tool_calls` L135-152）：先取 `state.messages[-1].tool_calls`，回退 `state.output.choices[0].message.tool_calls`（不同后端 tool_calls 挂的位置不一样）。`_tc_to_dict` L155-160：name 取 `tc.function`（不是 `.name`！gotchas §3）；`tc.parse_error` 有值时把原始字符串塞进 `{"_raw": ...}` 作 malformed 信号——下游 `format_valid` 据此判 I。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:77:- **`generate(tool_calls="none")` 配套**：工具发给模型（让它知道有哪些），但 handler 永不执行（L9 注释）。`_noop` 只为满足 Inspect API。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:89:- `REQUIRED_FIELDS`（L8-14）：5 个必填（id/utterance/expected_tool_calls/expected_response_type/inventory_tier），缺一个就 `ValueError` 带行号（L50-52）——边界 fail-fast。
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:117:| K1 | **6 维诊断打分**（非单一 pass/fail） | `tool_call.py:118-132` | "调错工具"vs"工具对参数错"vs"幻觉工具"是质上不同的失败；单分数掩盖。MAformac 知道"为什么不丢脸了"才能改 |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:118:| K2 | **工具 no-op + `tool_calls="none"`** | `solver.py:49` + `tools.py:9,36-46` | 纯捕获不执行=零副作用、可离线、判分快。**每工具独立闭包**否则注册表覆盖（gotchas §4） |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:119:| K3 | **alternative + quality 容多正解** | `tool_call.py:82-105` | tool-call 常有多个都对的解；死扣单金标冤杀。quality 不影响过不过，只供"optimal 占比"报告 |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:120:| K4 | **order-independent 集合匹配**（name + args 贪心配对） | `tool_call.py:206-238` | 多意图"关窗+锁门"不该卡顺序；args 贪心 unmatched 配对处理多调用 |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:121:| K5 | **参数归一化**（大小写/`_any_of`/数值容差/数组排序集） | `tool_call.py:241-281` | 小模型 `["Light"]` vs `["light"]`、`50` vs `50.0` 不该判错；语义等价归一 |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:122:| K6 | **拒识维 = response_type 零调用** | `tool_call.py:180-184` | error/clarification/text_response 期望**零工具调用**——"该不调时调了"是独立失败维（F7） |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:123:| K7 | **malformed 信号 `_raw`** | `tool_call.py:158-159, 194` | `parse_error` → 塞 `{"_raw"}` → format_valid 判 I；坏 JSON 不静默吞 |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:124:| K8 | **`Score.value` 必标量** | `tool_call.py:109-110` + gotchas §6 | 放 dict 让 accuracy() 静默 0.000；明细进 explanation |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:129:| K13 | **`/no_think` thinking 抑制** | failure-patterns.md L537-561 | Qwen3 思考链 9.5s→1.7s 不掉准；voice 管线延迟死门。其他模型安全忽略此 token |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:152:| F_think | 思考链膨胀延迟不增准（Qwen3 9.5s）| 延迟（非 scorer 维）| voice 延迟死门，`/no_think` 解（K13） |
+docs/research/2026-06-20-teardown-ha-voiceagent-bench.md:154:**实测进展账本**（failure-patterns L273-282，三轮 prompt 迭代）：Qwen3-8B 52.5%→70.0%（+name-fix）→**81.2%**（+area+nothink），总 +28.7pp。**全靠改 prompt 指令一行一行试、每轮量化 delta**——这套"一次改一处 + 实测 delta"纪律（ha-prompt-engineering.md）就是 MAformac"规则吃 80% + LoRA 补 20%"调参时的方法学母本。
+docs/handoffs/2026-06-20-c6-done-eval-memory-deepdive.md:6:MAformac 端侧离线 Qwen+LoRA 车控语音 demo。当前 = 吸收三刀（深扒 eval+短时记忆 repos）+ **Qwen3.5-2B 选型研究**（磊哥倾向升主力）。
+docs/handoffs/2026-06-20-c6-done-eval-memory-deepdive.md:10:2. **选型/版本/"有没有 X" 事实断言必先 pre-mortem 联网搜证**（刚复犯 Qwen3.5-2B：凭知识库断言"没有 2B"被磊哥纠；已沉淀 `pre-mortem-reflex` 触发条）。
+docs/handoffs/2026-06-20-c6-done-eval-memory-deepdive.md:15:- **Done**：C1/C2 archived → C3 apply done(swift test 48绿) → **C6 propose+apply done**（两层 CC 审 SOLID；base Qwen3-1.7B 无 LoRA `hard_fail` 如实 IrrelAcc 0.789=C5 提升判据；merge main `6d02771`）。长任务规范落 `collaboration §4.5`。pre-mortem-reflex 加"选型断言必搜证"触发条。
+docs/handoffs/2026-06-20-c6-done-eval-memory-deepdive.md:16:- **In Progress**：**workflow `wf_2ce97aa2-9bd` 后台跑中**——14 repo blueprint-teardown(写 `docs/research/2026-06-20-teardown-*.md`，已写 6/14) + **Qwen3.5-2B vs 1.7B 可行性**(agent 先 pre-mortem 联网搜证) + 综合吸纳意见。完成有 `<task-notification>`。
+docs/handoffs/2026-06-20-c6-done-eval-memory-deepdive.md:22:- **Qwen3.5-2B**：磊哥 2026-06-20 倾向**升主力**(1.7B 降 fallback)，但端侧 MLX/`qwen3_coder` 格式/Metal 延迟可行性**由 workflow agent 联网搜证定**（CC 不预写死，吸取复犯教训）。
+docs/dispatches/2026-06-20-p0-2-c6-model-fingerprint-dispatch.md:10:你是 MAformac 的 C6 vehicle-tool-bench 收尾实装者。MAformac = 纯端侧 macOS/iOS 离线、Qwen3 小模型 + LoRA 为脑、mock 车控、给方案经理现场演示的内部 demo，非量产、非真车控。
+docs/dispatches/2026-06-20-p0-2-c6-model-fingerprint-dispatch.md:169:- C5 数据门、LoRA train、Qwen3.5-2B spike。
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:18:- Result: 7 tests passed, including fenced JSON + thinking strip.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:80:- `mlx-swift-lm==3.31.3`, `mlx-community/Qwen3-1.7B-4bit`.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:82:- Positive raw `.toolCall` trigger: 31/40 = 77.5%.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:84:- Content-embedded tool JSON without `.toolCall`: 9/40 = 22.5%.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:112:- Library choice remains a separate spike once the actual `mlx-swift-lm` runtime is wired.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:114:## 7.3 Qwen3 sampling
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:116:Current C3 package has no model runtime path to measure Qwen3 sampling. The home-llm-derived starting point remains:
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:118:- Qwen3 reference start: `temperature=0.6`, `top_k=20`, `top_p=0.95`.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:137:1. Wire `mlx-swift-lm` backend behind `LLMBackend`.
+docs/research/2026-06-20-c3-home-llm-adopt-spike.md:139:3. Compare Qwen3 sampling start vs low-temperature deterministic start.
+docs/dispatches/2026-06-20-p1-a-c5-data-gate-dispatch.md:19:- P1-B: Qwen3.5-2B S1/S2 spike，决定是否值得从 Qwen3-1.7B 切到 2B 路线。
+docs/dispatches/2026-06-20-p1-a-c5-data-gate-dispatch.md:74:tool_call_format_pass:
+docs/dispatches/2026-06-20-p1-a-c5-data-gate-dispatch.md:75:tool_call_format_failures:
+docs/dispatches/2026-06-18-define-capability-contract-apply.md:38:- **红线**(完整见 `CLAUDE.md §6`):真实客户名一律「某车厂」;报价/密钥/PII/车型代号(如 T19CFL)**绝不入仓**;别名仅抽象口语变体(脱敏);**不降级**(Qwen3-1.7B+LoRA 主线)。
+docs/research/2026-06-20-teardown-simuhome.md:116:- **工具调用序列化** `_serialize_tool_calls`（line 74-119）：把 agent 的工具调用规整成 `{tool, params, outcome:{ok, status_code, error_type}}`，`ok = (200 and no error)`——为 verifier 提供统一可判结构。
+docs/research/2026-06-20-teardown-simuhome.md:212:| OpenAI/OpenRouter agent provider（react/hi_agent strategies） | **drop** | — | MAformac 端侧 Qwen3+LoRA（home-llm 路线），不用云 agent 框架 |
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:10:你是 MAformac 的 C6 vehicle-tool-bench 收尾实装者。MAformac = 纯端侧 macOS/iOS 离线、Qwen3 小模型 + LoRA 为脑、mock 车控、给方案经理现场演示的内部 demo，非量产、非真车控。
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:91:| `verify_gold` 只检查 tool call，不检查状态和读回 | 完美 agent 看似过，实际 mock state/readback 仍坏 | 每个 candidate 必查 `tool_call_pass`、`state_delta_pass`、`readback_pass` |
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:185:  - `expected_tool_calls`
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:325:    public var toolCallPass: Bool
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:339:- 对 primary candidate：用 `expected_tool_calls` 当完美 agent output。
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:374:  - `tool_call_pass`
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:408:- expected_state_delta 与 expected_tool_calls 不一致时 fail。
+docs/dispatches/2026-06-20-p0-3-p0-4-c6-trap-gold-dispatch.md:488:- C5 数据门、LoRA train、Qwen3.5-2B spike。
+docs/handoffs/2026-06-18-6change-propose-complete.md:28:5. **pre-mortem 双战**(机制立刻产值):voice 8 tiger / execution 8 发现(读 mlx-swift-lm 源码,根架构决策 adopt 薄层)。
+docs/handoffs/2026-06-18-6change-propose-complete.md:36:1. **happy-path bias**:Step1 看 `<tool_call>` 干净就报「验证通过」,没搜坑 → Codex/pre-mortem 补 8 tiger。**happy path 通 ≠ 验证通过,先搜会怎么炸**。
+docs/handoffs/2026-06-18-6change-propose-complete.md:53:### C. 技术坑 — execution(8 发现,详 `docs/execution-pre-mortem-2026-06-18.md`,oracle 读 mlx-swift-lm 源码)
+docs/handoffs/2026-06-18-6change-propose-complete.md:54:1. **mlx-swift-lm 已内置 parser** → **adopt 薄层不自建**(E1 根架构决策)。
+docs/handoffs/2026-06-18-6change-propose-complete.md:60:7. **Qwen3-1.7B base tool-call 可靠性未验证**(前置生死线,E3)→ spike 量化触发率。
+docs/handoffs/2026-06-18-6change-propose-complete.md:93:3. `docs/qwen3-engineering-notes.md`(Qwen3 工程硬约束 + 4 隐藏层)
+docs/dispatches/2026-06-20-c3-execution-apply-dispatch.md:10:你是 MAformac 的 C3 执行契约层 **apply 实装者**。MAformac = 纯端侧 macOS+iOS 离线、Qwen3-1.7B+LoRA 为脑、mock 车控、给方案经理现场演示的**内部演示 demo(非销售产品)**。起手 `cat AGENTS.md CLAUDE.md`(自读宪法 §4 架构 / §5 决策 / §6 红线)。
+docs/dispatches/2026-06-20-c3-execution-apply-dispatch.md:18:- **mlx-swift-lm 上游 parser adopt 薄层**:不自建 `<tool_call>` parser;`ToolCallFrame` 站上游 `ToolCall` 之上做严格校验(design E5)。
+docs/dispatches/2026-06-20-c3-execution-apply-dispatch.md:60:- **trace 五段**（decode/plan/guard/execute/readback）+ candidate_source/toolCalls.count/stopReason/repair_used/guard_reason/readback_result。
+docs/dispatches/2026-06-20-c3-execution-apply-dispatch.md:65:- [ ] spec 14 个 Requirement 每条有对应测试覆盖（错误枚举 no_tool_call/malformed/schema_invalid/semantic_invalid/stale_state/guard_denied/readback_mismatch 各一 fixture）。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:1:# Dispatch: spike E3 — Qwen3-1.7B base function call 生死线（change3 task 0.1）· **v2 续跑版**
+docs/dispatches/2026-06-18-spike-e3-function-call.md:11:- **Package.swift**:依赖 pin 已修正——`mlx-swift-lm` exact **3.31.3**(2026-04-15 latest) / `swift-transformers` **1.3.3** / `swift-huggingface` **0.9.0**;products 含 MLXLLM/MLXLMCommon/MLXHuggingFace/Tokenizers/HuggingFace。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:12:- **Sources/SpikeE3/main.swift**:harness = 单模型加载 + **每 case 新 `ChatSession`**(避历史污染) + `enable_thinking=false` 双保险(additionalContext + 系统指令) + 采集 `.chunk`/`.toolCall`/`.info` 三类事件 + **区分「真 .toolCall」vs「工具 JSON 塞进 .chunk content」**(G2 指纹) + 55 样本(8 capability × 5 条 L1-L4/G3 + 15 负例:闲聊/跨域/OOD/restraint)。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:19:2. **API 差异（3.31.3 实际 tag,别按参考源码假设）**:`LLMModelFactory.qwen3_1_7b_4bit` **未暴露** → 用 `ModelConfiguration(id: "mlx-community/Qwen3-1.7B-4bit", toolCallFormat: .json)` 避 registry 耦合(Codex 已改);HuggingFace loader 是**宏要加 `#`**;`streamDetails` 显式传**空 images/videos**;MLXHuggingFace 宏要 harness 显式引 swift-transformers + swift-huggingface(Codex 已加)。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:24:- **2.1 解 metallib**(坑 #1 三选一)→ 跑 `--limit 3` smoke,验**模型下载 + 加载 + 收到 `.toolCall` 事件**(非 `.chunk` 含 `<tool_call>` 原文)。**smoke 不过 → 写 BLOCKED + 实际异常,别假装跑过模型**。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:28:  - 用 mlx-swift-lm **官方 `ToolSpec`**(PR #174,`UserInput(chat:tools:[ToolSpec])`)不手搓 schema(若首跑已用则确认,未用补)。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:29:  - **实测 Qwen3 的 `ToolCallFormat.json` 解析正确**(Gemma Issue #259 前科:`infer` 漏模型族 → 不能假设官方都对)。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:47:- **G1 触发率**:N 条车控的 `.toolCall` 解析成功率。**go/no-go**:≥80% go / 50-80% go+LoRA Day1 采漏触发 / <50% LoRA 前置 + **HIGH risk 停下让磊哥拍**。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:48:- **G2 格式稳定性**:统计 Qwen 把 FC 塞进 `.chunk` content 而非 `.toolCall` 的比例(T2 指纹)。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:50:- **G4 延迟**:tok/s + TTFT + 多槽位 JSON 出参耗时;锚点(到 `.toolCall` vs 完整 JSON);streaming 可行性。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:52:- `enable_thinking=false` 实测;含 `<think>` → 记 think_leak。
+docs/dispatches/2026-06-18-spike-e3-function-call.md:59:4. `/Users/wanglei/workspace/MAformac/docs/execution-pre-mortem-2026-06-18.md`（mlx-swift-lm 源码锚点）
+docs/research/2026-06-20-teardown-pipecat.md:17:2. 函数调用（车控 ToolCall）刚发出、mock 结果还没回写，这时若做任何上下文裁剪 → 留下一个「孤儿 tool_call 没有 tool_result」→ 多数 chat 模板/API 直接报错或模型行为崩坏。
+docs/research/2026-06-20-teardown-pipecat.md:55:1. `{"role":"assistant","tool_calls":[{id, function:{name, arguments}}]}`（L1630-1644）——记录「助手发了这个调用」。
+docs/research/2026-06-20-teardown-pipecat.md:56:2. **同步调用**：`{"role":"tool","content":"IN_PROGRESS","tool_call_id":id}`（L1650-1656）——一个**占位 tool 结果**。
+docs/research/2026-06-20-teardown-pipecat.md:61:> 🔑 **为什么是占位符而不是「等结果再写」**：保证上下文里 `tool_calls` 永远有配对的 `tool` 结果（哪怕是 IN_PROGRESS）。任何时刻做上下文截断/喂模型，都不会出现「孤儿 tool_call」。这是 chat 模板/FC 不崩的硬约束。MAformac 的 mock 车控也该这么做：发 ToolCall 立刻占位，mock state 回写时就地替换。
+docs/research/2026-06-20-teardown-pipecat.md:81:要把老消息压成摘要时，不能盲目切——若把一个 `tool_calls` 切进摘要、但它的 `tool` 结果留在「保留区」→ 孤儿，API 报错。算法：
+docs/research/2026-06-20-teardown-pipecat.md:82:- 扫 `[start_idx, summary_end)`，用 `pending_tool_calls: dict[tool_call_id, msg_index]` 跟踪（L448）。
+docs/research/2026-06-20-teardown-pipecat.md:83:- 见 assistant 的 `tool_calls` → 登记 pending（L461-468）。
+docs/research/2026-06-20-teardown-pipecat.md:94:`estimate_tokens = len(text)//4`（`CHARS_PER_TOKEN=4` L33），逐消息加 `TOKEN_OVERHEAD_PER_MESSAGE=10`（L34/L352）、图片 `IMAGE_TOKEN_ESTIMATE=500`（L35）、tool_calls 的 name+arguments（L372-382）。**不依赖真 tokenizer**——阈值检查/预算够用，注释明说「要精确用模型 tokenizer」（L312-313）。
+docs/research/2026-06-20-teardown-pipecat.md:124:- `LLMSpecificMessage`（L80）—— provider 专属消息（thinking block 等）用 `llm` 字段标记，`get_messages(llm_specific_filter=...)` 过滤掉不属于本 LLM 的（L266-274），过滤掉就 `logger.error` 报错（防误用）。
+docs/research/2026-06-20-teardown-pipecat.md:139:2. **未完成序列保护贯穿始终**：函数调用发出即占位（B），压缩绕开未解析对（E），中断保留 request_id 收尾（K）。处处防「孤儿 tool_call / 半截状态」。
+docs/research/2026-06-20-teardown-pipecat.md:153:| 函数调用「发出即写 IN_PROGRESS 占位，结果就地替换」（B，L1624/L1996） | **copy概念** | C3 | mock 车控发 ToolCall 立刻占位，mock state 回写就地替换 → 上下文永无孤儿 tool_call，喂 Qwen chat 模板不崩 |
+docs/research/2026-06-20-teardown-pipecat.md:154:| 压缩前「未解析函数调用序列保护」（E，summarization L420/L508） | **adapt** | C3 | 我们不做 LLM 摘要，但 DialogueState 若「只留最近 N 轮」裁剪，必须抄「裁剪边界避开 ToolCall 未回结果窗口」的扫描逻辑（pending_tool_calls dict）。adapt：去掉 async/developer 分支，留 tool_call↔tool_result 配对检查 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:1:# Qwen3.5-2B 替代 Qwen3-1.7B 作主力大脑 — 可行性研究
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:6:> **结论先行: 条件升级 — Qwen3.5-2B 确实存在且端侧可跑,但因「架构换代(GDN)+ VLM 一体权重 + tool-parser 不兼容 + thinking-loop bug」四重不确定,不能盲升,必须先过 3 个 spike 死门(尤以 mlx-swift `<tool_call>` 解析为命门)再切主力。1.7B 保留 fallback。**
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:16:| Qwen3 | 0.6B/1.7B/4B/8B/14B/32B(dense)+ 30B-A3B/235B-A22B(MoE) | 文本 dense | 2025-05 | Apache 2.0 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:17:| **Qwen3.5** | 397B-A17B/122B-A10B/35B-A3B/27B(2/16–2/24)+ **9B/4B/2B/0.8B(2026-03-02)** | **统一 VLM(GDN+Attn 混合)** | 2026-02~03 | Apache 2.0 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:18:| Qwen3.6 | 27B(dense)/35B-A3B(MoE) | VLM | 2026-04 | 开放权重 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:19:| Qwen3.7 | Max/Plus | API 闭源旗舰 | 2026-05 | 闭源 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:21:**`Qwen/Qwen3.5-2B` 确认真实存在**(HF + ModelScope,2026-03-02 发布,Apache 2.0,2B dense)。磊哥点的目标主候选成立。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:22:来源: [Qwen3.5 官方 blog](https://qwen.ai/blog?id=qwen3.5) · [artificialanalysis Qwen3.5 small models](https://artificialanalysis.ai/articles/qwen3-5-small-models) · [unsloth Qwen3.5 docs](https://unsloth.ai/docs/models/qwen3.5) · [HF Qwen/Qwen3.5-2B](https://huggingface.co/Qwen/Qwen3.5-2B)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:26:1. **Qwen3.5-2B 不是普通 dense transformer,而是「Gated DeltaNet(GDN,线性注意力 / RNN 风格)+ Gated Attention」混合架构**——约 75% 层是 GDN 线性注意力,25% 是全注意力(3:1 layout,继承 Qwen3-Next)。这与 Qwen3-1.7B 的标准稠密 transformer **根上不同**。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:27:   来源: [HF blog mlabonne "Qwen3.5: Nobody Agrees on Attention Anymore"](https://huggingface.co/blog/mlabonne/qwen35) · [Spheron deploy Qwen3.5 GDN guide](https://www.spheron.network/blog/deploy-qwen-3-5-gpu-cloud/) · [gist qwen3.5-gated-deltanet-analysis](https://gist.github.com/justinchuby/0213aa253664fb72e9adb0089816de15)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:29:2. **Qwen3.5-2B 是「统一 VLM」(一套权重含 vision encoder),不是独立文本模型**。可在推理时关 vision 跑纯文本(`--language-model-only` / `mlx-lm` 文本路径),但权重/依赖带视觉成分。这与项目当前「纯文本 Qwen3-1.7B」不同。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:30:   来源: [HF Qwen/Qwen3.5-2B card](https://huggingface.co/Qwen/Qwen3.5-2B) · [artificialanalysis](https://artificialanalysis.ai/articles/qwen3-5-small-models)(2B 在 MMMU-Pro 多模态得 25.8%)· [unsloth: "Causal LM with Vision Encoder"](https://unsloth.ai/docs/models/qwen3.5)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:38:### ① Qwen3.5-2B 比 1.7B 强多少?(tool-call / 中文 / 泛化)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:40:| 维度 | Qwen3-1.7B(基线) | Qwen3.5-2B(候选) | 提升 | 证据强度 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:42:| **本地 judgment tool-call**(tool-calling-benchmark Agent Score,20-run,CPU) | **0.960(sub-2B 第一)** Action 0.900 / Restraint 1.000 / Wrong-Tool 0 | **无实测**(该 bench 未含任何 Qwen3.5) | 未知 | 🔴 基线强,候选**未证实** |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:46:| **官方定性 tool-call** | 强(Qwen3 native) | 「Qwen3.5 excels in tool calling」「Qwen-Agent / MCP」 | 官方说强,无 2B 数字 | 🟡 定性,无量化 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:48:**结论(诚实)**: 唯一可量化的代际提升是 **Intelligence Index +3 分(~23%)**——「meaningful uplift」但**不是数量级跃迁**;artificialanalysis 称 Qwen3.5-2B 综合智力「匹配 Falcon-H1R-7B、超 Nemotron Nano 9B」(若属实,小尺寸下很可观)。**但车控单跳 tool-call / 中文 NLU / restraint 这三个 demo 命门维度,Qwen3.5-2B 没有任何公开实测分,全部「未证实」**。⚠️ 关键警告: 当前 1.7B 在本地 judgment 基准上是 sub-2B 冠军(0.960),升级到一个「这些维度未实测」的新架构模型,**有回退风险**(更大 ≠ 更会克制,benchmark README 反复证明参数量是 weak predictor: 0.6B 0.880 > 1.7B 0.670 曾出现过)。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:49:来源: [tool-calling-benchmark README(本地)](file:///Users/wanglei/workspace/raw/05-Projects/MAformac/ref-repos/tool-calling-benchmark/README.md) · [arxiv TinyLLM 2511.22138](https://arxiv.org/pdf/2511.22138) · [artificialanalysis Qwen3.5 small](https://artificialanalysis.ai/articles/qwen3-5-small-models) · [Qwen3 技术报告 C-Eval/CMMLU 三方值]
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:55:| 指标 | Qwen3-1.7B(当前) | Qwen3.5-2B(候选) | 来源 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:62:⚠️ **数据可信度警告**: apple-silicon-llm-bench 那一行标 "Qwen 3.5 2B" **但同仓 VLM 相机段引用的是 `mlx-community/Qwen3-VL-2B-Instruct-4bit`(旧 Qwen3-VL 线,不是新 GDN 的 `Qwen/Qwen3.5-2B`)**。WebFetch 校验显示「标准 2B 行似指文本变体」但**未能 100% 确证是 GDN 版**。故 61.2 tok/s **可能高估了 GDN 版 decode**(GDN 的 RNN 状态更新在 Metal 上若无优化 kernel 会更慢)。**端侧 RAM/包体不是 blocker(2B 4bit ≈ 1.3-1.5GB,iPhone 12+ 8GB 内存够),但 tok/s 必须自测确认。**
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:64:### ③ MLX-swift / llama.cpp 对 Qwen3.5-2B + qwen3_coder 格式可用吗?(命门)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:68:**(a) GDN 架构 runtime 支持**:
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:69:- **mlx-lm(Python)**: 已合/正合入 GDN 支持,`mlx-community` 有 4bit 转换权重。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:70:- **mlx-swift(核心 Swift API)**: **❌ 主线未见原生 GDN 线性注意力层**(内置 recurrent 仅 RNN/LSTM/GRU + MultiHeadAttention,无 Gated DeltaNet 层)。GDN 在 Swift 生态目前靠**第三方**实现(Soniqo Qwen3Chat / Rapid-MLX / SharpAI SwiftLM)。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:71:- **llama.cpp**: 支持但需最新 build——旧 GGUF 转换会触发 `FGDN_AR` tensor-prefix 断言崩溃([llama.cpp #23347](https://github.com/ggml-org/llama.cpp/issues/23347))。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:75:- **stock Qwen3.5 chat template 不发 `<tool_call><function=...>` 标签**,而 `qwen3_coder` parser 只在模板含这些标签时激活——`_infer_tool_parser()` 返回 `None` → **不解析工具 → 模型返回 `content:""` 无 tool_calls(静默失败)**。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:76:  来源: [mlx-lm #1293 "add tool parser support for Qwen 3.5/3.6 (non-Coder)"](https://github.com/ml-explore/mlx-lm/issues/1293) · [QwenLM/Qwen3 #1831 fix chat template](https://github.com/QwenLM/Qwen3/issues/1831) · [froggeric Qwen-Fixed-Chat-Templates](https://huggingface.co/froggeric/Qwen-Fixed-Chat-Templates)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:77:- **这正是项目自己 pre-mortem 早记的 T2**(`docs/execution-pre-mortem-2026-06-18.md:12`): 「`mlx-swift-lm` `.json` parser 只认 `<tool_call>` 标签,裸 JSON 当文本透传不 fallback」,且 `intent-routing-explore` 实测 base 1.7B 已有 22.5% 因「裸 JSON 无标签」走错通道。**升 Qwen3.5-2B 会把这个已知坑放大**——3.5 的默认模板本就不发标签。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:78:- **修法已知**: 用 froggeric 修复模板(恢复 Coder XML 标签)或换 `--tool-call-parser qwen3_xml`。但 **#1293 是针对 `mlx-lm`(Python),`mlx-swift-lm`(项目主 backend)是否有等价 `_infer_tool_parser` 逻辑未核实**——必须直读 Swift 源码验证。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:80:**(c) thinking-loop bug(2B 特有)**: 官方 card 明示「Qwen3.5-2B 比其它 Qwen3.5 更易进入 thinking loop,可能不终止生成」,建议调采样参数 + 流式中断。对「秒回不崩」的 demo 北极星是直接威胁。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:81:  来源: [HF Qwen/Qwen3.5-2B card](https://huggingface.co/Qwen/Qwen3.5-2B)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:85:| 项 | Qwen3-1.7B | Qwen3.5-2B |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:87:| unsloth 支持 | ✅ 成熟(多个现成脚本: strands-mlx / Qwen3-1.7b_finetune) | ✅ 支持(`Fine-tune Qwen3.5` 官方 guide + Colab) |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:94:来源: [unsloth Qwen3.5 fine-tune docs](https://unsloth.ai/docs/models/qwen3.5/fine-tune) · [Medium "5GB VRAM"](https://medium.com/coding-nexus/fine-tune-qwen3-5-on-your-own-gpu-you-only-need-5gb-vram-1f8e46f15631) · [apxml Qwen3.5-2B VRAM](https://apxml.com/models/qwen35-2b)
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:98:**判定: 条件升级(不盲升,不轻退)。** 端侧硬件可行(RAM/包体/decode 都过),提升方向存在(Intelligence Index +3)但**未在 demo 命门维度(tool-call/中文/restraint)证实**,且引入「GDN runtime + tool-parser + thinking-loop」三个新风险面。**不满足「直接升主力」,但也远未到「真跑不动该退」**。正确动作 = **先 spike 验 3 个死门,通过则升主力(1.7B fallback),不通过则维持 1.7B 主力**。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:106:| **Qwen3-1.7B**(基线) | 1.7B dense | ~42 tok/s · ~1.4GB · load 0.68s ✅ | **0.960 本地冠军** ✅ / BFCL 55.5% | C-Eval 66.7 ✅ | 低(标准 transformer,已实装) | **保留 fallback / 验证不过则维持主力** |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:107:| **Qwen3.5-2B** ⭐候选 | 2B dense(GDN+VLM) | 61.2 tok/s* · ~1.28GB ✅(*待自测确认 GDN 版) | **未证实**(无 2B bench) | 未证实(无 2B 表) | 🔴 高(GDN/VLM/parser/loop) | **过 3 spike 死门 → 升主力** |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:108:| Qwen3-4B | 4B dense | ~天花板边缘(D38 上限) | BFCL 62% / 多轮 35% | 强 | 低 | 备选(若 2B 不够且 4B 端侧可控) |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:109:| Qwen3.5-4B | 4B(GDN+VLM) | 待测(贴天花板) | 未证实(Index 27,+9 vs Qwen3-4B) | 未证实 | 🔴 高(同 3.5 风险) | 二线候选(提升最大但风险/包体同增) |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:110:| Qwen3-0.6B | 0.6B | ~3.4s/~快 | 0.880 | 弱 | 低 | 轻量 fallback(现状) |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:112:> ⚠️ Qwen3.5-VL 视觉版**不首选**(项目纯文本车控,vision encoder 是负担);Qwen3-VL-2B 与 Qwen3.5-2B 是**两条线**别混。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:120:| **S1** 🔴命门 | **mlx-swift-lm + Qwen3.5-2B 4bit tool-call 实采** | 直读 `mlx-swift-lm` Tool parser 源码确认是否认 Qwen3.5 模板;实跑 ≥10 条车控 prompt,断言收到 `.toolCall` 事件(非 `.chunk` 文本) | tool_call 解析率 ≥ 当前 1.7B 基线(87.5% 真实意图正确率) | **维持 1.7B 主力**(parser 不兼容是硬墙) |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:121:| **S2** 🔴 | **GDN 端侧 prefill/TTFT 自测**(iPhone 真机,GDN 版非 VL 版) | 确认 mlx-swift 跑 GDN 是否走 chunk-parallel(非 O(T) 逐 token);实测 TTFT + decode tok/s + 峰值 RAM | TTFT ≤ 1.7B 同量级,decode ≥ 40 tok/s,RAM < 2GB | 退 1.7B 或评估 CoreML 双模型(prefill+decode)路径 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:123:| **S4** 🟡 | **thinking-loop 复现 + 缓解** | 用推荐采样参数实跑,看是否进 loop;测流式中断 + `enable_thinking=false` | 无失控生成 / 中断有效 | 调参或退 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:124:| **S5** 🟢 | **LoRA 全量 2B 训练 + held-out** | unsloth 训 Qwen3.5-2B(含 vision 依赖),核中文车控泛化 | 泛化 ≥ 1.7B LoRA,无格式退化 | 退 1.7B LoRA |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:134:| **mlx-swift-lm 不认 Qwen3.5 stock 模板 → tool_call 静默失败(`content:""`)** | 🐯 tiger | **HIGH** | [mlx-lm #1293](https://github.com/ml-explore/mlx-lm/issues/1293) + 项目 T2(execution-pre-mortem:12)+ intent-routing 实测 22.5% 裸 JSON | S1 spike;froggeric 修复模板 / qwen3_xml parser;ToolCallFrame 薄层兜底裸 JSON |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:135:| **GDN 在 mlx-swift 无原生层 / Metal 无优化 kernel → prefill O(T) 逐 token,TTFT 暴涨** | 🐯 tiger | **HIGH** | mlx-swift 内置层无 GDN;[Medium "14x latency regression"](https://medium.com/@aejaz.sheriff/from-qwen-3-to-qwen-3-5-on-apple-silicon-a-14x-latency-regression-and-how-mlx-got-us-back-0ed9ed21fa68);GDN 分析 gist | S2 spike;CoreML 双模型(prefill+decode);Soniqo/Rapid-MLX 第三方 GDN 实现 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:136:| **Qwen3.5-2B thinking-loop 不终止** | 🐯 tiger | MEDIUM | [HF 官方 card 明示](https://huggingface.co/Qwen/Qwen3.5-2B) | S4;`enable_thinking=false`;流式 + 硬超时中断 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:137:| **tool-call/中文 demo 命门维度无 2B 实测 → 可能比 1.7B 回退** | 🐯 tiger | MEDIUM | 本地 bench 无 Qwen3.5;BFCL 无 2B 分;参数量是 weak predictor(bench README) | S3 同 harness 对照,回退则不升 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:139:| **apple-silicon-llm-bench 61.2 tok/s 可能是 Qwen3-VL-2B 非 GDN 版** | paper-tiger? | — | WebFetch 未确证;同仓 VLM 段引 Qwen3-VL-2B | S2 自测以 `Qwen/Qwen3.5-2B` GDN 版为准,不信第三方混淆数 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:140:| **旧 GGUF 触发 FGDN_AR 断言崩溃** | paper-tiger | LOW(项目走 MLX 非 GGUF) | [llama.cpp #23347](https://github.com/ggml-org/llama.cpp/issues/23347) | 项目主线 mlx-swift,llama.cpp 仅 fallback;用最新 build + 新转换 |
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:147:- **S1+S2 两个死门 spike ≈ 0.5-1 天**(直读 mlx-swift-lm 源码 + iPhone 真机实采 tool-call & TTFT)。这是「升不升」的决策门,**先做这个,别先训 LoRA**。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:148:- S1 通过 + S2 通过 → **升 Qwen3.5-2B 主力,1.7B 降 fallback**(decode 更快、RAM 更低、智力 +3,且端侧有余量)。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:149:- S1 **不**通过(parser 硬墙) → **维持 1.7B 主力**(它是本地 judgment 冠军,已实装,零迁移成本),记录 Qwen3.5 待 mlx-swift 原生支持成熟再评。
+docs/research/2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md:152:**一句话**: 不是「不用 2B」,而是「2B 真实存在、端侧能跑、方向更强,但要先用两个 spike 钉死 tool-parser 兼容 + GDN 端侧延迟这两根命门,通过即升,不通过即守 1.7B」。
+docs/dispatches/2026-06-18-define-demo-mvp-contract-apply.md:34:- **红线**(CLAUDE §6):真实客户名「某车厂」/报价/密钥/PII/车型代号绝不入仓;真实 bug 训练集不入仓(仅权重可);**不降级**(Qwen3-1.7B+LoRA 主线,0.6B/FoundationModels/llama.cpp 仅备选对照)。
+docs/research/INDEX.md:23:| `2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md` | Qwen3.5-2B 升主力可行性：联网核实(确实存在/GDN+VLM/tool-parser坑)+条件升级判定+5 spike 死门(S1 mlx-swift parser 命门) | **大脑选型 / C5 训练前**；H1 **已拍=条件升级**(先 S1/S2 spike 再切,见 `roadmap §3/§4-P1`) |
+docs/research/2026-06-20-maformac-eval-system-overview.md:13:- `CLAUDE.md:66-80`：Qwen3-1.7B + LoRA 主线、文本先行、mock state/readback、规则 80% / LLM 20%、D35 全集覆盖率双轴 bench。
+docs/research/2026-06-20-maformac-eval-system-overview.md:42:| C6 vehicle-tool-bench | 文本/transcript 到工具调用和状态读回 | ToolCall set、expect_no_call、state_delta+readback、clarify correctness、IrrelAcc、coverage、scenario score | 第二刀 apply 中；base Qwen3-1.7B 真实跑是硬完成条件 |
+docs/research/2026-06-20-maformac-eval-system-overview.md:54:- base Qwen3-1.7B 无 LoRA 先跑；LoRA 后续必须同 harness、同 dataset、同 parser、同 mock state 做 diff。
+docs/research/2026-06-20-maformac-eval-system-overview.md:55:- `qwen_tool_call_format_version` 取 `contracts/qwen-tool-call-format.yaml` 的内容 hash，防 C3/C5/C6 格式漂移。
+docs/research/2026-06-20-maformac-eval-system-overview.md:90:3. **base 没真跑，LoRA 提升不可解释。** 防护：base Qwen3-1.7B 无 LoRA 先跑，记录 model/adapter/checkpoint/prompt/seed/digest。
+docs/research/2026-06-20-maformac-eval-system-overview.md:94:7. **运行环境假绿。** 防护：Metal、模型文件、`mlx-swift-lm`、tool-call format、stdout tail、summary path 都写进 receipt。
+docs/research/2026-06-20-eval-agent-toolcall-premortem-oracle.md:49:1. `Qwen3 function calling BFCL tool parser malformed`
+docs/research/2026-06-19-home-llm-teardown-data.md:14:| `generate_static_example`（:32-173） | specific_actions | 2 turn：response+[tool_call] → confirm | 明确指令 + 参数 |
+docs/research/2026-06-19-home-llm-teardown-data.md:15:| `generate_templated_example`（:181-368） | templated_actions | **多设备多 tool_call**（`device_type="light\|climate"` split），"and words" 拼接 | **多意图（同垂域多执行）** + 参数泛化 |
+docs/research/2026-06-19-home-llm-teardown-data.md:16:| `generate_status_request`（:370-466） | status_requests | **单 turn 无 tool_call**，从 prompt 里设备态读回答 | **状态感知读回**（查空调温度→读回） |
+docs/research/2026-06-19-home-llm-teardown-data.md:17:| `generate_tool_failure_example`（:468-561） | failed_tool_calls | **3 turn**：错设备 call+error(**train_on_turn=False**)→retry 正确设备→confirm | **错误恢复** |
+docs/research/2026-06-19-home-llm-teardown-data.md:52:| pile_of_failed_tool_calls | **12000 bug**（真实错误案例） | 错误恢复样本（train_on_turn=False 失败步） |
+docs/voice-pre-mortem-2026-06-18.md:16:| promptTokens 中文**回声泄漏**进转写 | Qwen3-ASR 同源机制 | 归一化层热词回声剥离 |
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:1:# Dispatch - P1-B Qwen3.5-2B S1/S2 Spike
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:8:- **SCOPE**: Qwen3.5-2B S1/S2 feasibility spike only
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:19:- P1-B Qwen3.5-2B spike: 判断是否值得切换到 Qwen3.5-2B。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:21:本派单只做 P1-B。目标不是“升级模型”，而是用最小真实证据给出决策：继续 Qwen3-1.7B，还是进入 Qwen3.5-2B 后续适配。不要改产品默认模型，不要训练 LoRA，不要把静态文档结论写成 runtime 通过。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:25:- Qwen3.5-2B 值得 spike，但不是默认升级。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:26:- 主要风险在 `mlx-swift-lm` tool-call parser、chat template、thinking-loop、GDN 端侧性能和 Qwen3.5 text/VL 权重混淆。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:28:- S2 再验证 iPhone 真机 GDN 性能。没有真机或 runtime 缺失时，要给 blocked receipt，不要用 simulator 代替真机结论。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:46:- 当前项目实际用的 `mlx-swift-lm` 版本、parser path、chat template path。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:47:- Qwen3.5-2B text 模型是否有可用的 MLX/GDN 本地 artifact。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:48:- 是否误用了 Qwen3-VL、非 instruct、非 tool-call capable 权重。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:50:- `.toolCall`、`.chunk`、纯文本 JSON、thinking leak、parser error 的计数。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:51:- 与 Qwen3-1.7B 当前 baseline 的差异。若无法重跑 1.7B baseline，必须标注为 `baseline_not_rerun`，不能写“无回归”。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:55:- Qwen3.5-2B 能在当前或最小补丁后的 `mlx-swift-lm` 路径中产生结构化 tool call。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:56:- tool-call parse rate 不低于当前 Qwen3-1.7B 可用 baseline；若 baseline 不能重跑，则至少不能低于研究文档中的历史门槛，并标注证据来源。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:57:- 没有无法抑制的 thinking-loop 或 tool-call template 错位。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:59:### 2.3 S2: iPhone true-device GDN spike
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:64:- 权重是 Qwen3.5-2B text 路线，不是 Qwen3-VL。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:66:- 与 Qwen3-1.7B 的同类指标对比。若 1.7B 无法同机复测，标注 `baseline_not_rerun`。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:75:如果没有真机、Xcode runtime、GDN artifact 或签名环境，S2 只能给 `blocked_env`，不能用 Mac 或 simulator 指标替代。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:86:如果 S1 通过但 S2 因真机、GDN、签名或 artifact 阻塞，主结论仍必须是 `blocked_waiting_for_device_or_artifact`，最多附 `s1_only_candidate=true`，不能写 `proceed_qwen35_2b_adaptation`。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:93:- Qwen3.5-2B text / Qwen3.5-VL / Qwen3-1.7B artifact 是否混淆。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:94:- `mlx-swift-lm` parser、chat template、event transcript 是否真能证明 `.toolCall`。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:96:- S2 是否真机 GDN，是否误用 simulator 或 Mac 指标。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:110:你是 MAformac P1-B Qwen3.5-2B S1/S2 spike 的全维度审计员。请只读审计当前工作树，重点检查模型 artifact 身份、mlx-swift-lm parser 证据、tool-call transcript、baseline 诚实性、iPhone 真机 GDN 指标、repo 大文件泄漏、最终 decision 是否被证据支持。输出按 severity=P0/P1/Important/Nit，必须给 file:line 和修复建议。不要改文件。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:134:rg -n "Qwen3|Qwen3.5|mlx-swift-lm|GDN|toolCall|tool_call|chat_template|thinking" Package.swift Core Tools dev docs -S
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:155:- 对 `mlx-swift-lm` parser 兼容问题提出最小补丁建议。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:156:- 如果已有本地 Qwen3.5-2B artifact，可以运行 S1/S2。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:164:- 不把 simulator 或 Mac 指标写成 iPhone GDN pass。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:165:- 不把 Qwen3.5-VL 当成 Qwen3.5-2B text。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:172:- Qwen3.5-2B artifact 不存在且需要大下载。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:173:- `mlx-swift-lm` 当前版本无法定位 parser 或 template。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:174:- tool-call 输出只能作为自然语言 JSON，无法进入结构化 `.toolCall`。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:194:- `stay_on_qwen3_1_7b`: S1 parser 不达标、thinking-loop 不可控、或 2B 性能明显不满足端侧 demo。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:195:- `blocked_waiting_for_device_or_artifact`: 缺权重、缺真机、缺 GDN runtime，或 S1 通过但 S2 被环境阻塞。此时可写 `s1_only_candidate=true`，但不能写 proceed。
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:201:| 把 Qwen3.5-VL 当 text 2B | tiger | VL 权重会污染 parser 和性能结论 | artifact 名称、config、tokenizer、模型卡三重核验 |
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:202:| 只读文档就宣布 parser pass | tiger | 真实 `mlx-swift-lm` event 可能没有 `.toolCall` | 必须保存 parser transcript |
+docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md:233:  tool_call_parse_rate:
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:10:你是 MAformac 项目的执行契约层（C3）propose 作者。MAformac = **纯端侧（macOS+iOS）离线、Qwen3-1.7B+LoRA 为脑、mock 车控、给方案经理现场演示的【内部演示 demo 助手，非销售产品】**。起手 `cat AGENTS.md && cat CLAUDE.md`（你自读项目宪法，§2 方法论 / §4 架构 / §5 决策 / §6 红线 / §9 路线）。
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:32:- 复用：adopt 上游 parser 薄层(E1) / content-fallback 候选 guard-first(E1a) / 两层 decode 边界(E2) / 错误枚举三态 / DemoGuard R0-R3 / enable_thinking=false / TraceLogger 五段 / E3 spike GO 结论
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:54:  → ToolCallFrame 薄层（adopt mlx-swift-lm 上游 parser；裸 JSON 仅 content-fallback 候选）
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:59:  → TraceLogger 五段（decode/plan/guard/execute/readback）+ toolCalls.count / stopReason
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:87:| `conversation.py:156-220`（`max_tool_call_iterations=0` 单发；注释 :157） | 单发循环 = 模型一次产 NL+ToolCall，code 执行完事，无 ReAct 多步 | **single-call runtime contract**（runtime 只接受 1 ToolCallFrame） | **adapt**（Swift 逻辑，非 import）；架构铁律实证背书 |
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:88:| `utils.py:495-579`（三层防御解析 `parse_raw_tool_call`：多格式 + `fuzzy_json` 兜底 + 双 schema） | 让小模型畸形输出可解析 | ToolCallFrame decode 层；但守 E1 薄层=站 mlx-swift-lm parser 上，fuzzy/repair **仅用于 content-fallback 候选**，不重建 parser | **adapt**（Swift JSONValue + parser-repair 候选） |
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:93:| `const.py:318-322`（qwen3 采样 temp0.6/topk20/topp0.95 + 原生 tool calling） | Qwen 官方采样 | Qwen3-1.7B 采样起点（spike E3 调） | **copy 值** |
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:104:- **single-call runtime contract**：runtime SHALL 只接受 exactly 1 ToolCallFrame 或 1 NoAction/Clarify frame；多 tool_call / 额外 assistant 文本 / 缺必填 / unknown enum / stale `state_revision` / finish_reason=length → **reject 或 clarify，SHALL NOT repair-to-action**。
+docs/dispatches/2026-06-20-c3-execution-propose-dispatch.md:115:3. `specs/tool-execution/spec.md`：ADDED Requirements —— rebase 旧 7 个（不可信候选/三态错误/禁 thinking/安全门/readback/五段 trace/多形态参数）+ 新增 value 四件套、position fan-out、single-call、gate 链 的 Requirement+Scenario。
+docs/dispatches/_TEMPLATE.md:35:- **红线**(完整见 `CLAUDE.md §6`):真实客户名一律「某车厂」;报价 / 密钥 / PII / 车型代号 **绝不入仓**;真实 bug 训练集即便脱敏也**不入仓**(仅 LoRA 权重产物可);**不降级**(Qwen3-1.7B+LoRA 主线,0.6B/FoundationModels/llama.cpp 仅备选对照)。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:3:> **缘起**：磊哥要求深扒 `MikeVeerman/tool-calling-benchmark`（"Local Agent Bench"，r/LocalLLaMA 163 赞爆款，21 端侧小模型 × 12 prompt × 20 run 跑判断力）——MAformac **C6 vehicle-tool-bench（不丢脸基线）** 的现成评测范式，外加为 **C4 三层路由 / C7 ASR** 提供经验证据（Qwen3-1.7B 实测全集第一、多 run 稳定性、惩罚机制、判断 vs 执行二分）。clone 在 `~/workspace/raw/05-Projects/MAformac/ref-repos/tool-calling-benchmark`（CLAUDE §6：只读参考，**不进仓**；无 LICENSE 文件，README 写 "Use it freely; attribution appreciated"——方法学全量吸收，Python 翻成 Swift 设计思想不 import）。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:5:> **核心结论**：这个 bench 真正的智慧**不在跑分本身，在三件别处看不到的工程**——(1) **判断 ≠ 执行 的双轴评分**（Action 测会不会调 / Restraint+WrongTool 测该不该调；惩罚"自信地调错"重于"漏调"）；(2) **多 run + majority-vote + Reliability 双指标**揭穿小样本假象（3-run → 20-run 让 7/21 模型分数翻盘，Qwen3-1.7B 从 11 名升到第 1）；(3) **六层防御性文本解析**让"格式不合规但判断对"的模型不被冤枉（format-blind 评测既低估又高估模型）。这三条逐条都是 MAformac C6 该抄的，且 Qwen3-1.7B 实测第一**直接给 D-系列"先 1.7B 不前置 benchmark"加经验背书**。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:19:| **运行载体** | Python + ollama/llama.cpp/bitnet subprocess server | **drop**——MAformac 端侧 Swift + mlx-swift-lm,bench 在 Mac dev 机离线跑(CI 前置),非进 iOS |
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:30:correct_tool_calls / 10   # 10 个 actionable prompt
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:40:- **`not rs[idx]["tool_called"]`**(line 52)：该不调时不调 = 通过。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:47:    if rs[idx]["tool_called"] and rs[idx]["tool_name"] in wrong_tools:
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:91:- **🔴 model-protocol pair 思想**(ROUND1 line 48 methodology note)：评的是"模型×协议"不是"模型"。phi4-mini 从 native-tools 换 raw-schema 分数暴涨(ROUND1 line 46)。→ **MAformac C6 报告必带"推理栈+解码模式"两列**,Qwen3-1.7B 在 mlx-swift vs llama.swift、native-FC vs GBNF 受限解码下可能不同分。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:161:### §6.1 🔴 六层解析降级链 `_parse_tool_call_from_text`（line 498-543）
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:163:1. **`<tool_call>{json}`**(line 500-524)：标准,brace-counting 找闭合(line 506-514)。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:164:2. **funcall-in-tag** `<tool_call>get_weather(city: Antwerp)</tool_call>`(line 526-528,gemma3 风格)。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:165:3. **bare-JSON**(line 532,`_parse_bare_json_tool_call` line 91-119,jan-v3 漏开 tag)：扫所有 `{...}` 找含 `name`+`arguments` 的。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:168:- `_parse_all_tool_calls_from_text`(line 546-603)= 多 ToolCall 版,同样的降级链。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:170:### §6.2 🔴 假阳性守卫 `_parse_bare_funcall_tool_calls`（line 406-445）
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:182:- 明确告诉 raw-schema 模型:能调就 `<tool_call>{json}</tool_call>`,**写代码/解释/meta 问题不要调**(line 32-33)——把 Restraint 规则写进 prompt。MAformac L2-5 慢路 prompt 该有这段"何时弃权"指引。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:189:## §7 数据叙事（4 篇 ROUND 报告）— Qwen3-1.7B 实测第一 + 多 run 翻盘
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:193:### §7.1 🔴 Qwen3-1.7B = 全集第一（ROUND3 line 38,README line 131）
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:195:- **直接背书 MAformac D-系列"Qwen3-1.7B + LoRA 候选主线,先 1.7B 不前置 benchmark"**——别人已实测 1.7B 在判断陷阱上端侧第一。0.6B(0.880)是合理 fallback(CLAUDE §4 已锁)。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:196:- latency 10.7s(CPU,thinking mode 开)——但这是 **CPU 无 GPU + thinking 全开**,MAformac 端侧 mlx Metal + 关 thinking + L1 走规则不碰模型,实际快得多。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:199:- 3-run → 20-run,**7/21 模型分数变动 >0.05**:Qwen3-1.7B +0.290(11 名→第 1)、bitnet-2B-4T -0.280(6→17)、gemma3 +0.140、phi4-mini -0.100。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:209:- Qwen3 家族非单调:0.6B(0.880)>4B(0.880)>1.7B(0.670)@3run——但 20run 修正回单调 1.7B>0.6B(ROUND3 line 151)。functiongemma(270M)= qwen2.5(500M)。**架构+训练数据 > 裸参数量**。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:212:### §7.5 thinking mode 对工具调用是双刃(ROUND2 line 377-390)
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:213:- qwen3:4b thinking 全开 63s/prompt,分数和 0.6B(3.6s)一样。**"工具选择是快速模式匹配,不是多步推理"**(ROUND2 line 390)。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:214:- → MAformac **L1 精确指令绝不开 thinking**(规则快路秒回);只有 L4-5 复杂推理才值得慢思考。这跟三层路由架构铁律完全咬合。
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:249:| 14 | Qwen3-1.7B 实测全集第一(判断陷阱全对) | **采纳为经验证据** | **C4/C5** | 背书 D-系列"1.7B 候选主线、不前置 benchmark";0.6B 合理 fallback;C5 LoRA 练判断陷阱有据 |
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:250:| 15 | thinking 对工具调用是双刃(快速模式匹配非多步) | **采纳为经验证据** | **C4** | L1 精确指令绝不开 thinking(规则快路秒回);只 L4-5 复杂推理值得慢思考——咬合三层路由铁律 |
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:252:| 17 | Python + ollama/llama.cpp/bitnet subprocess 载体 | **drop** | — | 端侧 Swift + mlx-swift-lm;bench 在 Mac dev 机离线跑(CI 前置),解析/server 编排不进 iOS,翻成 Swift 设计思想 |
+docs/research/2026-06-20-teardown-tool-calling-benchmark.md:259:**这个 bench 真正的智慧不在"跑分",在三件让评测可信的工程——判断 vs 执行双轴分度量、多 run+reliability 揭穿小样本假象、六层格式宽容解析让判断力不被格式冤枉——而 Qwen3-1.7B 在 21 模型端侧判断陷阱上实测第一(唯一三 hard prompt 全对),直接给 MAformac"1.7B+LoRA 主线、规则吃高频、安全门是判断不是命中"的整套架构盖了经验章。** C6 vehicle-tool-bench 该把这套"双轴+多run+判断陷阱+table-driven+version-gate+golden-case"范式整体移植,把它的 Restraint→拒识、WrongTool→安全门越界、3-mock-tool→全集 3990 分层,Python 翻成 Swift dev harness(不进 iOS)。
+docs/research/2026-06-19-architecture-validity-deepdive.md:139:- 工程伪代码（`:861-877`）：`propose_tool_call→validate_schema→run_reject_policy→run_vehicle_safety_gate→execute`。**模型只提候选，策略门做约束求解**（`:620`）；**多阶车控本质=受约束优化**（`:610-618`）← 让 1.7B 大幅减负。
+docs/research/2026-06-19-architecture-validity-deepdive.md:197:- **Warrant（隐含前提，须暴露）**：① demo 的窄受控条件让"被设计过的惊艳"可控（非开放域）；② 现存栈(mlx/Qwen3/GBNF/8-bit)中和了延迟/格式/内存三 tiger。
+docs/research/2026-06-19-architecture-validity-deepdive.md:205:| base FC 断崖(LLaMA 12.71%) | Qwen3-1.7B 自带 tool-call 模板+工具预训练，起点更高；LoRA 再补 |
+
+## xcrun xctrace list devices
+== Devices ==
+王磊的MacBook Pro (96363CC7-7B5F-5428-A5A7-7874CAAD56B6)
+
+== Simulators ==
+Apple Watch SE 3 (40mm) Simulator (26.5) (A7F2996F-25EE-4E31-B8D3-B34B8299AFE0)
+Apple Watch SE 3 (44mm) Simulator (26.5) (11085352-75C1-4F42-AE56-BEF92E61B1F2)
+iPad (A16) Simulator (26.5) (F1F14BCB-0780-455F-AAF8-336F07AFD5F2)
+iPad Air 11-inch (M4) Simulator (26.5) (95673F54-D64C-4CFC-AD6B-2D6429FF17D2)
+iPad Air 13-inch (M4) Simulator (26.5) (3A0B39D2-A801-4A84-BD51-6014685EE229)
+iPad Pro 11-inch (M5) Simulator (26.5) (76CF1AED-A652-4556-B44A-E705C8FABA3F)
+iPad Pro 13-inch (M5) Simulator (26.5) (B9C909E8-4A52-45D1-9AFC-78CCE65E29D8)
+iPad mini (A17 Pro) Simulator (26.5) (47732237-66FB-4BF5-B01D-89B26B6F9E79)
+iPhone 17 Simulator (26.5) (0BB4DEAF-1B7F-435A-A3EB-ABE5A03E94C3)
+iPhone 17 Simulator (26.5) + Apple Watch Ultra 3 (49mm) (26.5) (3B653379-113C-43CE-96CB-20C1E5580A85)
+iPhone 17 Pro Simulator (26.5) (20DBE274-364F-4030-835A-529FE8A6D56B)
+iPhone 17 Pro Max Simulator (26.5) (9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D)
+iPhone 17 Pro Max Simulator (26.5) + Apple Watch Series 11 (46mm) (26.5) (FE4B4DB6-8869-4A84-A8FD-E3EBF16A3162)
+iPhone 17e Simulator (26.5) (83BD1DCD-BC8B-46A5-B4E9-D38DD5C8D56B)
+iPhone Air Simulator (26.5) (69A04DC2-4E4F-4982-B813-B68057B36F25)
+iPhone Air Simulator (26.5) + Apple Watch Series 11 (42mm) (26.5) (8CFD3FB4-B008-4CC5-A2CC-12BEDA0CB493)

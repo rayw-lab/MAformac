@@ -1,0 +1,120 @@
+{
+  "artifacts": {
+    "audit_evidence_appendix": "Reports/qwen35-2b-spike-20260620-192146/audit-evidence-appendix.md",
+    "baseline_parser_transcript": "Reports/qwen35-2b-spike-20260620-192146/baseline-parser-transcript.jsonl",
+    "baseline_run_log": "Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-s1-fixed-run.log",
+    "qwen35_run_log": "Reports/qwen35-2b-spike-20260620-192146/qwen35-2b-s1-fixed-run.log",
+    "root_parser_transcript": "Reports/qwen35-2b-spike-20260620-192146/parser-transcript.jsonl",
+    "selected_cases": "Reports/qwen35-2b-spike-20260620-192146/s1-fixed-cases.jsonl",
+    "xctrace_log": "Reports/qwen35-2b-spike-20260620-192146/xctrace-devices-s2.log"
+  },
+  "branch": "codex/p1-b-qwen35-2b-spike",
+  "decision": "blocked_waiting_for_device_or_artifact",
+  "head": "883f1af4e34635f0c058ede45febe8b5b8cebe30",
+  "mlx_swift_lm": {
+    "current_web_github": "https://github.com/ml-explore/mlx-swift-lm",
+    "current_web_package_index": "https://swiftpackageindex.com/ml-explore/mlx-swift-lm",
+    "evidence": "Reports/qwen35-2b-spike-20260620-192146/mlx-swift-lm-parser-evidence.txt",
+    "format_infer_path": "dev/spike-e3/.build/checkouts/mlx-swift-lm/Libraries/MLXLMCommon/Tool/ToolCallFormat.swift",
+    "parser_path": "dev/spike-e3/.build/checkouts/mlx-swift-lm/Libraries/MLXLMCommon/Tool/Parsers/XMLFunctionParser.swift",
+    "version": "3.31.3"
+  },
+  "qwen35_artifact": {
+    "chat_template_path": "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3.5-2B-4bit/snapshots/674aaa7240b91e8012fcad5d791b7dfe5ba90207/chat_template.jinja",
+    "inventory": "Reports/qwen35-2b-spike-20260620-192146/artifact-inventory.txt",
+    "model_type": "qwen3_5",
+    "repo_id": "mlx-community/Qwen3.5-2B-4bit",
+    "snapshot_path": "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3.5-2B-4bit/snapshots/674aaa7240b91e8012fcad5d791b7dfe5ba90207",
+    "text_config_model_type": "qwen3_5_text"
+  },
+  "reason": "S1 produced structured .toolCall via mlx-swift-lm xmlFunction, but S2 true iPhone GDN metrics are blocked because no true iPhone is connected; Qwen3.5 S1 also has trigger misses and is not a default-upgrade pass.",
+  "s1_only_candidate": true,
+  "s1_parser": {
+    "baseline": {
+      "avg_elapsed_ms": 709.7647058823529,
+      "avg_first_event_ms": 620.5294117647059,
+      "avg_tokens_per_second": 81.33661394909508,
+      "content_tool_json_rate": 0.18181818181818182,
+      "decision_band": "go: base 触发率达到 task 0.1 门槛",
+      "expected_tool_hit_rate": 0.7272727272727273,
+      "model_id": "mlx-community/Qwen3-1.7B-4bit",
+      "negative_false_call_rate": 0.16666666666666666,
+      "parser_transcript": "Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-s1-fixed/parser-transcript.jsonl",
+      "requested_tool_call_format": "json",
+      "resolved_tool_call_format": "json",
+      "result_json": "Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-s1-fixed/spike-e3-results.json",
+      "root_baseline_parser_transcript": "Reports/qwen35-2b-spike-20260620-192146/baseline-parser-transcript.jsonl",
+      "status": "rerun",
+      "think_leak_count": 0,
+      "tool_call_parse_rate": 0.8181818181818182
+    },
+    "prompts": 17,
+    "qwen35": {
+      "avg_elapsed_ms": 896.3529411764706,
+      "avg_first_event_ms": 839.5294117647059,
+      "avg_tokens_per_second": 82.82636666199272,
+      "content_tool_json_rate": 0,
+      "decision_band": "go+LoRA: change3 可继续薄层验证，但 LoRA Day1 必采漏触发样本",
+      "expected_tool_hit_rate": 0.6363636363636364,
+      "misses": [
+        {
+          "case_id": "C6-MP-003",
+          "chunk_text": "屏幕太暗了",
+          "got_tools": []
+        },
+        {
+          "case_id": "C6-TRAP-NEG-001",
+          "chunk_text": "把主驾车窗打开一点",
+          "got_tools": []
+        },
+        {
+          "case_id": "C6-TRAP-LURE-001",
+          "chunk_text": "抱歉，我暂时无法查询温度。",
+          "got_tools": []
+        },
+        {
+          "case_id": "C6-TRAP-AMB-001",
+          "chunk_text": "",
+          "got_tools": [
+            "set_cabin_seat_ventilation"
+          ]
+        }
+      ],
+      "model_id": "mlx-community/Qwen3.5-2B-4bit",
+      "negative_false_call_rate": 0,
+      "negative_false_calls": [],
+      "parser_transcript": "Reports/qwen35-2b-spike-20260620-192146/qwen35-2b-s1-fixed/parser-transcript.jsonl",
+      "requested_tool_call_format": "auto",
+      "resolved_tool_call_format": "xmlFunction",
+      "result_json": "Reports/qwen35-2b-spike-20260620-192146/qwen35-2b-s1-fixed/spike-e3-results.json",
+      "root_parser_transcript": "Reports/qwen35-2b-spike-20260620-192146/parser-transcript.jsonl",
+      "think_leak_count": 0,
+      "tool_call_parse_rate": 0.7272727272727273
+    }
+  },
+  "s2_device": {
+    "rule": "S2 accepts only true iPhone/iOS device GDN metrics; simulators and Mac are not accepted.",
+    "source_log": "Reports/qwen35-2b-spike-20260620-192146/xctrace-devices-s2.log",
+    "status": "blocked_env_no_true_iphone",
+    "true_ios_devices": []
+  },
+  "status": "BLOCKED",
+  "web_verification": [
+    {
+      "finding": "MLX community artifact exists for Qwen3.5-2B-4bit.",
+      "source": "https://huggingface.co/mlx-community/Qwen3.5-2B-4bit"
+    },
+    {
+      "finding": "Official Qwen3.5-2B model exists; model card warns Qwen3.5-2B can enter thinking loops.",
+      "source": "https://huggingface.co/Qwen/Qwen3.5-2B"
+    },
+    {
+      "finding": "Upstream parser discussion confirms Qwen3.5 parser behavior is current and version-sensitive.",
+      "source": "https://github.com/ml-explore/mlx-lm/issues/1293"
+    },
+    {
+      "finding": "Swift Package Index currently lists mlx-swift-lm 3.31.3 and main as selectable/current package versions, with recent package activity.",
+      "source": "https://swiftpackageindex.com/ml-explore/mlx-swift-lm"
+    }
+  ]
+}

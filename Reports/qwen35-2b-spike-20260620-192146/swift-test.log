@@ -1,0 +1,229 @@
+[0/1] Planning build
+Building for debugging...
+[0/6] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.96s)
+Test Suite 'All tests' started at 2026-06-20 19:47:41.916.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-20 19:47:41.917.
+Test Suite 'C3AllowlistPrimitiveGateTests' started at 2026-06-20 19:47:41.917.
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceExecutesReviewedPrimitive]' started.
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceExecutesReviewedPrimitive]' passed (0.271 seconds).
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceRejectsNonReviewedPrimitive]' started.
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceRejectsNonReviewedPrimitive]' passed (0.261 seconds).
+Test Suite 'C3AllowlistPrimitiveGateTests' passed at 2026-06-20 19:47:42.449.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.532 (0.532) seconds
+Test Suite 'C3ContractLookupTests' started at 2026-06-20 19:47:42.449.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testL1AllowlistLookupClosesReviewedDevicesToC2Cells]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testL1AllowlistLookupClosesReviewedDevicesToC2Cells]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty]' passed (0.262 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupFindsC1RowsAndClarifyTags]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupFindsC1RowsAndClarifyTags]' passed (0.296 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupKeepsC1RiskOutOfDemoGuard]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupKeepsC1RiskOutOfDemoGuard]' passed (0.258 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testStateCellLookupReadsExecutionRangeExpStepScopeAndReadback]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testStateCellLookupReadsExecutionRangeExpStepScopeAndReadback]' passed (0.001 seconds).
+Test Suite 'C3ContractLookupTests' passed at 2026-06-20 19:47:43.267.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.818 (0.818) seconds
+Test Suite 'C3DecodeCompletionMetaTests' started at 2026-06-20 19:47:43.267.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testDecodeInputDefaultsKeepBackwardCompatibleStringPath]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testDecodeInputDefaultsKeepBackwardCompatibleStringPath]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testLengthFinishReasonRejectsBeforeRepairEvenWithParseableJSON]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testLengthFinishReasonRejectsBeforeRepairEvenWithParseableJSON]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testMultipleToolCallCountRejectedAsMultipleFrames]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testMultipleToolCallCountRejectedAsMultipleFrames]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testStopFinishReasonWithSingleCallDecodesNormally]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testStopFinishReasonWithSingleCallDecodesNormally]' passed (0.000 seconds).
+Test Suite 'C3DecodeCompletionMetaTests' passed at 2026-06-20 19:47:43.268.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'C3ExecutionPipelineTests' started at 2026-06-20 19:47:43.268.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testFanoutWritesOnlyC2SupportedWindowScopes]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testFanoutWritesOnlyC2SupportedWindowScopes]' passed (0.277 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testImplicitCandidateRequiresIntentConfirmationHook]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testImplicitCandidateRequiresIntentConfirmationHook]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPendingFailedUnknownReadbackTextDoesNotClaimCompletion]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPendingFailedUnknownReadbackTextDoesNotClaimCompletion]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineRejectsStaleStateBeforeExecution]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineRejectsStaleStateBeforeExecution]' passed (0.268 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineTurnsOnACAndAppliesExpTemperatureFromC2Step]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineTurnsOnACAndAppliesExpTemperatureFromC2Step]' passed (0.280 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testReadbackVerifierFailsWhenActualStateDiffersFromExpected]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testReadbackVerifierFailsWhenActualStateDiffersFromExpected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testRiskPolicyDeniesMovingDoorFromIndependentPolicy]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testRiskPolicyDeniesMovingDoorFromIndependentPolicy]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues]' passed (0.277 seconds).
+Test Suite 'C3ExecutionPipelineTests' passed at 2026-06-20 19:47:44.926.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 1.658 (1.658) seconds
+Test Suite 'C3ParamShapeNormalizationTests' started at 2026-06-20 19:47:44.926.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testArrayShapedValueIsNotSilentlyDroppedButRejected]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testArrayShapedValueIsNotSilentlyDroppedButRejected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testScalarShapedValueIsNotSilentlyDroppedButRejected]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testScalarShapedValueIsNotSilentlyDroppedButRejected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONSlotMapIsParsed]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONSlotMapIsParsed]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueObjectIsParsedAndNormalized]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueObjectIsParsedAndNormalized]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueStillEnforcesTypeEnum]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueStillEnforcesTypeEnum]' passed (0.000 seconds).
+Test Suite 'C3ParamShapeNormalizationTests' passed at 2026-06-20 19:47:44.927.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'C3ReadbackTemplateTests' started at 2026-06-20 19:47:44.927.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testACPowerReadbackResolvesEnumBranchFromC2Template]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testACPowerReadbackResolvesEnumBranchFromC2Template]' passed (0.280 seconds).
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testTemperatureReadbackUsesC2TemplateWithScopeAndValue]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testTemperatureReadbackUsesC2TemplateWithScopeAndValue]' passed (0.275 seconds).
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testWindowReadbackUsesC2PercentTemplate]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testWindowReadbackUsesC2PercentTemplate]' passed (0.277 seconds).
+Test Suite 'C3ReadbackTemplateTests' passed at 2026-06-20 19:47:45.758.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.831 (0.832) seconds
+Test Suite 'C3ToolCallFrameAndDecodeTests' started at 2026-06-20 19:47:45.758.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testContentFallbackIsDisabledByDefault]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testContentFallbackIsDisabledByDefault]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNoActionAndClarifyFramesAreAcceptedAsSingleFrame]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNoActionAndClarifyFramesAreAcceptedAsSingleFrame]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNonStreamingCompletionStripsThinkingAndParsesFencedJSONCandidate]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNonStreamingCompletionStripsThinkingAndParsesFencedJSONCandidate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testRuntimeUnionAcceptsExactlyOneFrameAndRejectsMultiFrame]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testRuntimeUnionAcceptsExactlyOneFrameAndRejectsMultiFrame]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrictDecodeMapsUnknownEnumToSchemaInvalidWithoutCrash]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrictDecodeMapsUnknownEnumToSchemaInvalidWithoutCrash]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrongToolCallFrameCodableRoundTripKeepsC1C2Fields]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrongToolCallFrameCodableRoundTripKeepsC1C2Fields]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testThinkingLeakIsRecordedAsFailure]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testThinkingLeakIsRecordedAsFailure]' passed (0.000 seconds).
+Test Suite 'C3ToolCallFrameAndDecodeTests' passed at 2026-06-20 19:47:45.759.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'C3TraceAttributesTests' started at 2026-06-20 19:47:45.759.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testGuardDeniedTraceRecordsGuardReasonAndNoFakeExecuteReadback]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testGuardDeniedTraceRecordsGuardReasonAndNoFakeExecuteReadback]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testParserRepairCandidateMarksRepairUsedInTrace]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testParserRepairCandidateMarksRepairUsedInTrace]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testSuccessfulExecutionRecordsStructuredAttributesAcrossFiveStages]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testSuccessfulExecutionRecordsStructuredAttributesAcrossFiveStages]' passed (0.266 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntriesCarryRunTreeFieldsWithoutChangingFiveStages]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntriesCarryRunTreeFieldsWithoutChangingFiveStages]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntryDecodesOldRecordsWithDefaultSpanKind]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntryDecodesOldRecordsWithDefaultSpanKind]' passed (0.000 seconds).
+Test Suite 'C3TraceAttributesTests' passed at 2026-06-20 19:47:46.582.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.822 (0.823) seconds
+Test Suite 'C5DataGateTests' started at 2026-06-20 19:47:46.582.
+Test Case '-[MAformacCoreTests.C5DataGateTests testBareJSONTrainActionFailsFormatGate]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testBareJSONTrainActionFailsFormatGate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testC6MustPassInTrainFails]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testC6MustPassInTrainFails]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testCleanReceiptIsDataGateReady]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testCleanReceiptIsDataGateReady]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testLegacyRawCandidateSchemaDecodes]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testLegacyRawCandidateSchemaDecodes]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testParentSemanticOverlapInTrainFails]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testParentSemanticOverlapInTrainFails]' passed (0.000 seconds).
+Test Suite 'C5DataGateTests' passed at 2026-06-20 19:47:46.586.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+Test Suite 'C6VehicleToolBenchTests' started at 2026-06-20 19:47:46.586.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testClarifyAndRefusalCorrectnessBlocksWrongAction]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testClarifyAndRefusalCorrectnessBlocksWrongAction]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDecodesAcceptableAlternative]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDecodesAcceptableAlternative]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDefaultsMissingAlternativesToEmptyArray]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDefaultsMissingAlternativesToEmptyArray]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetGenerationCarriesSchemaRefsNegativeRatioAndMustNotTrain]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetGenerationCarriesSchemaRefsNegativeRatioAndMustNotTrain]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDegradedAndUnknownAlternativesDoNotSatisfyHardGates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDegradedAndUnknownAlternativesDoNotSatisfyHardGates]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testExpectNoCallGateCountsFalsePositive]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testExpectNoCallGateCountsFalsePositive]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFileHashChangesWhenFileContentChanges]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFileHashChangesWhenFileContentChanges]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFormatDigestChangesWhenFormatFileContentChanges]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFormatDigestChangesWhenFormatFileContentChanges]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierHappyPathReplaysPrimaryGold]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierHappyPathReplaysPrimaryGold]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierTreatsAcceptableAlternativeAsCaseValid]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierTreatsAcceptableAlternativeAsCaseValid]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testLoRAIdentifierRequiresAdapterDigest]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testLoRAIdentifierRequiresAdapterDigest]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingModelArtifactDigestFailsFingerprintGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingModelArtifactDigestFailsFingerprintGate]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingTokenizerDigestFailsFingerprintGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingTokenizerDigestFailsFingerprintGate]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallCaseDoesNotReportFakeReadbackPass]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallCaseDoesNotReportFakeReadbackPass]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallPreconditionStateDoesNotInvokeReadbackGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallPreconditionStateDoesNotInvokeReadbackGate]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsNegatedTokenMatch]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsNegatedTokenMatch]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateUsesEnumBranchFromStateCellTemplate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateUsesEnumBranchFromStateCellTemplate]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReplayFingerprintRecordsArtifactDigestsAsRequiredFields]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReplayFingerprintRecordsArtifactDigestsAsRequiredFields]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testStateDeltaAndReadbackAreSeparateHardGates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testStateDeltaAndReadbackAreSeparateHardGates]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex]' passed (0.269 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives]' passed (0.267 seconds).
+Test Suite 'C6VehicleToolBenchTests' passed at 2026-06-20 19:47:47.424.
+	 Executed 32 tests, with 0 failures (0 unexpected) in 0.837 (0.838) seconds
+Test Suite 'CapabilityContractFileTests' started at 2026-06-20 19:47:47.424.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractDefinesEightReachableMvpCapabilities]' started.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractDefinesEightReachableMvpCapabilities]' passed (0.004 seconds).
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractIsFailClosedForSensitiveSourceLeakage]' started.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractIsFailClosedForSensitiveSourceLeakage]' passed (0.005 seconds).
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractMarksHistoricalDraftsSuperseded]' started.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractMarksHistoricalDraftsSuperseded]' passed (0.000 seconds).
+Test Suite 'CapabilityContractFileTests' passed at 2026-06-20 19:47:47.433.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.009 (0.009) seconds
+Test Suite 'DemoExperienceAcceptanceScaffoldTests' started at 2026-06-20 19:47:47.433.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testPendingStateDoesNotMasqueradeAsSuccessPlaceholderIsRunnable]' started.
+/Users/wanglei/workspace/MAformac/Tests/MAformacCoreTests/DemoExperienceAcceptanceScaffoldTests.swift:13: -[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testPendingStateDoesNotMasqueradeAsSuccessPlaceholderIsRunnable] : Test skipped - pending/failed/unknown readback assertions are owned by define-execution-contract.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testPendingStateDoesNotMasqueradeAsSuccessPlaceholderIsRunnable]' skipped (0.000 seconds).
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testReadbackMismatchAcceptanceMetricPlaceholderIsRunnable]' started.
+/Users/wanglei/workspace/MAformac/Tests/MAformacCoreTests/DemoExperienceAcceptanceScaffoldTests.swift:5: -[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testReadbackMismatchAcceptanceMetricPlaceholderIsRunnable] : Test skipped - readback mismatch=0 acceptance metric is owned by define-vehicle-tool-bench.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testReadbackMismatchAcceptanceMetricPlaceholderIsRunnable]' skipped (0.000 seconds).
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testUnsafeFalsePassAcceptanceMetricPlaceholderIsRunnable]' started.
+/Users/wanglei/workspace/MAformac/Tests/MAformacCoreTests/DemoExperienceAcceptanceScaffoldTests.swift:9: -[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testUnsafeFalsePassAcceptanceMetricPlaceholderIsRunnable] : Test skipped - Unsafe false pass=0 acceptance metric is owned by define-execution-contract.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testUnsafeFalsePassAcceptanceMetricPlaceholderIsRunnable]' skipped (0.000 seconds).
+Test Suite 'DemoExperienceAcceptanceScaffoldTests' passed at 2026-06-20 19:47:47.434.
+	 Executed 3 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'VehicleStateStoreContractTests' started at 2026-06-20 19:47:47.434.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testDefaultCellsMatchCapabilityMvpSet]' started.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testDefaultCellsMatchCapabilityMvpSet]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testSuccessfulMockTransitionUsesSatisfiedVisualState]' started.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testSuccessfulMockTransitionUsesSatisfiedVisualState]' passed (0.000 seconds).
+Test Suite 'VehicleStateStoreContractTests' passed at 2026-06-20 19:47:47.434.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'WalkingSkeletonTests' started at 2026-06-20 19:47:47.434.
+Test Case '-[MAformacCoreTests.WalkingSkeletonTests testOpenAirConditionerFastPathUpdatesReadbackAndTrace]' started.
+Test Case '-[MAformacCoreTests.WalkingSkeletonTests testOpenAirConditionerFastPathUpdatesReadbackAndTrace]' passed (0.000 seconds).
+Test Suite 'WalkingSkeletonTests' passed at 2026-06-20 19:47:47.434.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-20 19:47:47.434.
+	 Executed 85 tests, with 3 tests skipped and 0 failures (0 unexpected) in 5.513 (5.518) seconds
+Test Suite 'All tests' passed at 2026-06-20 19:47:47.434.
+	 Executed 85 tests, with 3 tests skipped and 0 failures (0 unexpected) in 5.513 (5.518) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

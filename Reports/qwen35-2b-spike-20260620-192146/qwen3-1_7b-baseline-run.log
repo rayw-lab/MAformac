@@ -1,0 +1,29 @@
+Loading mlx-community/Qwen3-1.7B-4bit with mlx-swift-lm 3.31.3, toolCallFormat=.json
+Model loaded
+[1/12] P001: 打开空调
+  toolCalls=1 [set_cabin_ac] elapsedMs=789
+[2/12] P002: 把空调关掉
+  toolCalls=0 [] elapsedMs=643
+[3/12] P003: 我有点热
+  toolCalls=1 [set_cabin_ac] elapsedMs=837
+[4/12] P004: 太阳晒了一路，车里越来越闷热
+  toolCalls=1 [set_cabin_fan] elapsedMs=657
+[5/12] P005: 热得像蒸笼，帮我降一降
+  toolCalls=1 [set_cabin_ac] elapsedMs=820
+[6/12] P006: 打开主驾座椅加热到2挡
+  toolCalls=1 [set_cabin_seat_heating] elapsedMs=807
+[7/12] P007: 副驾暖座调到3挡
+  toolCalls=1 [set_cabin_seat_heating] elapsedMs=836
+[8/12] P008: 屁股有点冷
+  toolCalls=0 [] elapsedMs=803
+[9/12] P009: 冬天刚上车，座椅太冰了
+  toolCalls=1 [set_cabin_seat_heating] elapsedMs=703
+[10/12] P010: 座垫像冰块，给我暖一下
+  toolCalls=1 [set_cabin_seat_heating] elapsedMs=666
+[11/12] P011: 打开主驾座椅通风到2挡
+  toolCalls=1 [set_cabin_seat_ventilation] elapsedMs=760
+[12/12] P012: 副驾座椅吹风调到1挡
+  toolCalls=1 [set_cabin_seat_ventilation] elapsedMs=875
+Wrote /Users/wanglei/workspace/MAformac/Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-baseline/spike-e3-report.md
+Wrote /Users/wanglei/workspace/MAformac/Reports/qwen35-2b-spike-20260620-192146/qwen3-1_7b-baseline/spike-e3-results.json
+Decision: go: base 触发率达到 task 0.1 门槛
