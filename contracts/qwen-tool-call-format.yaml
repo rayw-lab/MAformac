@@ -1,0 +1,8 @@
+# Qwen tool-call 格式单一源（#39，Q2 磊哥定）
+# C3 runtime 已在 dev/spike-e3 锁定 mlx-swift-lm .json format；
+# C5 训练样本生成与 C6 bench harness 只引用本文件，禁各写一套，防 train/runtime/bench silent 失真。
+model_family: qwen3
+runtime_parser: json
+thinking: false
+wrapper: tool_call
+arguments_shape: json_object
