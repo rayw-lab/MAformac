@@ -19,8 +19,8 @@
 | `2026-06-20-voice-short-context-memory-oracle.md` | 语音链路短时上下文记忆 oracle：15 个近三个月活跃 repo，覆盖 HA Assist/HassIL、LiveKit、Pipecat、OVOS/Wyoming、LangGraph、Semantic Kernel、Mem0、QwenPaw 等 | **C7 voice / C4 routing / C6 eval** 设计短时 session、指代继承、工具状态读回和上下文裁剪时 |
 | `2026-06-20-voice-short-term-memory-oracle.md` | 语音链路短时记忆 pre-mortem 主报告：本仓 scout + repo oracle 归纳，定义 DialogueState / VoiceTurnContext、提交时机、TTL、打断、ASR 污染、状态读回等虎坑 | **C4 三层路由 / C7 voice / C6 bench** 写短时记忆合同、负样本和实现前 |
 | `../优化待讨论-吸收内化措施38项-2026-06-20.md` | 38 项吸收措施 + Q1-Q6 grill 结论 + #39/#40 + 三刀落地顺序 | **C3-C7 任一 change 解冻前**，作为 adopt/backlog 总入口 |
-| ⭐ `2026-06-20-eval-memory-deepdive-synthesis.md` | **14 repo teardown + Qwen 可行性的综合吸纳意见**：adopt_by_layer(C4/C5/C6/C7)+10 tiger+6 HIGH 拍板项+不降级二筛+synthesis_path；§6 综合官二审补强(C6 现状/陷阱样本/TTL两层) | **第二批吸纳总入口**（C4/C5/C6/C7 任一解冻前先读这份，再按 §附 跳具体 teardown）；§4 HIGH 待磊哥拍 |
-| `2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md` | Qwen3.5-2B 升主力可行性：联网核实(确实存在/GDN+VLM/tool-parser坑)+条件升级判定+5 spike 死门(S1 mlx-swift parser 命门) | **大脑选型拍板 / C5 训练前**；H1 待磊哥拍 |
+| ⭐ `2026-06-20-eval-memory-deepdive-synthesis.md` | **14 repo teardown + Qwen 可行性的综合吸纳意见**：adopt_by_layer(C4/C5/C6/C7)+10 tiger+不降级二筛+synthesis_path；§6 综合官二审补强(C6 现状/陷阱样本/TTL两层) | **第二批吸纳全料**（C4-C7 解冻前读）；HIGH **已由 `roadmap §3`(H1-H7)收敛拍板**,本文作 dated synthesis 保留 |
+| `2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md` | Qwen3.5-2B 升主力可行性：联网核实(确实存在/GDN+VLM/tool-parser坑)+条件升级判定+5 spike 死门(S1 mlx-swift parser 命门) | **大脑选型 / C5 训练前**；H1 **已拍=条件升级**(先 S1/S2 spike 再切,见 `roadmap §3/§4-P1`) |
 | `2026-06-20-teardown-{14 repos}.md` | 14 个 eval/bench/voice/runtime repo 逐行深拆(tau2/agentevals/nano-eval/iot-agent/simuhome/hassil/ha-core/ovos/livekit/pipecat/hass-local-openai/ha-voiceagent/agent-tester/tool-calling-bench)；每篇带 file:line + adopt/adapt/drop | 对应 C-change 实装时按 synthesis §1 指引跳读具体篇 |
 
 ## §1 应用机制（怎么在未来 session 落地，不靠纯 grep）

@@ -4,14 +4,15 @@
 > **北极星**:方案经理给客户演示用,客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑。
 > **形态**:纯端侧(iOS/macOS)、离线、Qwen3-1.7B + LoRA 大脑(0.6B 仅作真机吃紧时的轻量备选)、mock 车控、可插拔多技能(Phase1 车控 → 导航/音乐/外卖 via MCP)。
 
-> ⚠️ **路线 v2(2026-06-19 全量重构,以此为准)**:旧 8 能力扁平契约 + 二分路由被基座内化推翻 → 契约 SSOT 重构 **`define-c1c2-contract`**(C1 `semantic-function-contract` + C2 `scenario-state-protocol`,propose done)。旧 7-change 已物理 park(`openspec/changes/_parked/`)。**路线/架构/决策以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-generated-full-contract-with-mixed-delivery.md` + `CONTEXT.md` 为准**;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**(保留作记录,不再据其执行)。范围真值纠错:空调温度 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 是拍错)。
+> ⚠️ **路线 v3 新基线(2026-06-20,以此为准)**:C1/C2 已 archived → `openspec/specs/`;C3 execution + C6 vehicle-tool-bench 已 apply done(C6 base Qwen3-1.7B hard_fail 0.789=C5 提升判据)。**推进路线以 `docs/roadmap-2026-06-20-from-c6-done.md` 为唯一事实源**(五件套 harness 骨架 + P0-P2 执行序 + 7 HIGH 已拍)。契约/决策全料以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` 为准;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
 
-## ⭐ 当前权威文档(v2,2026-06-19,以此为准)
+## ⭐ 当前权威文档(v3 新基线,2026-06-20,以此为准)
 
 | 文档 | 是什么 |
 |---|---|
-| `CLAUDE.md` (§9) | 项目宪法 + 路线 v2 + 下一步 |
-| ⭐`docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA慢路 + §12 实装锚点) — **必读第一** |
+| ⭐`docs/roadmap-2026-06-20-from-c6-done.md` | **新基线推进事实源**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图) — **必读第一** |
+| `CLAUDE.md` (§9) | 项目宪法 + 新基线指针 + 下一步 P0 |
+| `docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA 慢路 + §12 实装锚点) |
 | `docs/research/INDEX.md` | 调研/teardown 索引 + 应用机制(架构验证6流/home-llm深拆/ASR选型/C5配方/C6评测) |
 | `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` | C1/C2 决策全料(Q1–Q15) |
 | `contracts/semantic-function-contract.jsonl`(C1) + `state-cells.yaml`(C2) + `risk-policy.yaml` | **契约 SSOT**(其余派生) |
