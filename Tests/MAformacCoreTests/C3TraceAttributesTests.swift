@@ -75,6 +75,43 @@ final class C3TraceAttributesTests: XCTestCase {
         XCTAssertEqual(decode.attributes.repairUsed, true)
     }
 
+    func testTraceEntriesCarryRunTreeFieldsWithoutChangingFiveStages() {
+        let trace = InMemoryTraceLogger(
+            runId: "demo-run-1",
+            parentSpanId: "route-span-1",
+            spanKind: .stage
+        )
+
+        trace.recordDecode(traceID: "trace-tree", message: "decode")
+        trace.recordPlan(traceID: "trace-tree", message: "plan")
+
+        XCTAssertEqual(trace.entries.map(\.stage), [.decode, .plan])
+        XCTAssertEqual(trace.entries.map(\.runId), ["demo-run-1", "demo-run-1"])
+        XCTAssertEqual(trace.entries.map(\.parentSpanId), ["route-span-1", "route-span-1"])
+        XCTAssertEqual(trace.entries.map(\.spanKind), [.stage, .stage])
+    }
+
+    func testTraceEntryDecodesOldRecordsWithDefaultSpanKind() throws {
+        let json = """
+        {
+          "stage": "decode",
+          "traceID": "old-trace",
+          "message": "old entry",
+          "attributes": {},
+          "timestamp": "2026-06-20T00:00:00Z"
+        }
+        """.data(using: .utf8)!
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        let entry = try decoder.decode(TraceEntry.self, from: json)
+
+        XCTAssertEqual(entry.stage, .decode)
+        XCTAssertEqual(entry.spanKind, .stage)
+        XCTAssertNil(entry.runId)
+        XCTAssertNil(entry.parentSpanId)
+    }
+
     private func makePipeline(intentConfirmed: Bool) throws -> C3ExecutionPipeline {
         let semantic = try SemanticContractLookup(jsonl: readRepoFile("contracts/semantic-function-contract.jsonl"))
         let stateCells = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
