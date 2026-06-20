@@ -383,11 +383,26 @@ public struct ToolCallCandidateDecoder: Sendable {
         return String(content[bodyStart..<fenceEnd.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    /// 形态归一:把「字符串化的 JSON 对象」恢复为 [String:Any]。
+    /// spec tool-execution:172「arguments 是字符串化 JSON 对象 → 解析并归一」。
+    /// 非对象形态(数组/标量/解析失败)返回 nil,交由调用方按字段抛 typeMismatch,不静默吞。
+    private func unwrapStringifiedObject(_ raw: Any) -> [String: Any]? {
+        if let map = raw as? [String: Any] {
+            return map
+        }
+        guard let string = raw as? String,
+              let data = string.data(using: .utf8),
+              let parsed = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return nil
+        }
+        return parsed
+    }
+
     private func decodeStringMap(_ raw: Any?, field: String) throws -> [String: String]? {
         guard let raw else {
             return nil
         }
-        guard let map = raw as? [String: Any] else {
+        guard let map = unwrapStringifiedObject(raw) else {
             throw ToolExecutionError.schemaInvalid(.typeMismatch(field))
         }
         var result: [String: String] = [:]
@@ -404,7 +419,8 @@ public struct ToolCallCandidateDecoder: Sendable {
         guard let raw else {
             return ContractValue()
         }
-        guard let map = raw as? [String: Any] else {
+        // 接受内联对象与字符串化 JSON 对象;数组/标量无法归一为四件套 → typeMismatch,不静默丢。
+        guard let map = unwrapStringifiedObject(raw) else {
             throw ToolExecutionError.schemaInvalid(.typeMismatch("value"))
         }
         func string(_ key: String) throws -> String {
