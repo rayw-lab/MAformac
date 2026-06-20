@@ -53,11 +53,43 @@ dialogue_state_schema_version / followup_transition_id / committed_focus_frame
 
 ---
 
-## 待续 grill（Q7+，磊哥「15 不够」同意）
-- **Q7** 超参确认（rank16-32/层-1/α=2r/lr 2e-4/bf16 训→fuse→量化；report §2.2 已强推荐，确认即可）
-- **Q8** 拒识配比（90:10 + Hammer irrelevance-augment + When2Call in-prompt distractor；防过度保守反噬）
-- **Q9** eval-diff（C6 vehicle-tool-bench 死门 + LTX-2 三轴 in-dist/OOD/held-out 泛化诊断；防 over-memorization 骗分）
-- **Q10** 训练触发/验收门（先冒烟拿真数字 + fuse 前后行为对账 #654 防部署掉点）
-- 后续：DoRA vs LoRA A/B、checkpoint 选择（val loss 拐点前）、数据增广到 4-5k 的 lineage 隔离…
+---
 
-> 收口后整理进 OpenSpec change（C5 define-lora-data-gate 扩展或新 train change）的 design.md + tasks.md。
+## 训练配置块（Q7-Q10，已拍 + codex 核 MLX 源码/spec 纠偏）
+
+### Q7 超参（🔴 MLX 实操口径，纠 report PEFT 口径错）
+- 🔴 **MLX `scale` ≠ PEFT `alpha`**：`tuner/lora.py:52 delta=scale*lora_b@lora_a`，scale 直接乘 delta（默认 20），非 alpha/rank 语义。**config 写 `scale`（首版 ~20 或冒烟 A/B），不写 `alpha=2r`**（report §2.2 的 PEFT α=2r 口径在 MLX 不适用）。
+- 🔴 **YAML 显式 `keys` 排除 embedding**：`utils.py:88` auto-discover 含 `nn.Embedding`；config `tie_word_embeddings=True` → 显式写 `self_attn.{q,k,v,o}_proj + mlp.{gate,up,down}_proj`（utils.py:85 config.keys 非 None 则不 auto-discover）。
+- **rank16 主线**（2320 小数据死记风险），rank32 确认组 + DoRA rank8 secondary A/B，不阻塞第一版。
+- 确定值：lr 2e-4 cosine / warmup 5-10% / epochs 2-3（iters≈1740）/ batch4×accum4 / `--num-layers -1`（全28层）/ bf16 训→fuse→量化4bit / val loss 拐点 checkpoint / seq P95。
+- 节奏：rank16/seq1024/50-100 iter 冒烟 → 过了 1160-1740 iters。
+
+### Q8 拒识（🔴 codex 纠三概念混淆 + 成对反事实）
+- 🔴 **三个不同数字别混**：eval 集负样本占比 **≥20%**（spec.md:165 数据组成，明文"非 IrrelAcc 阈值"）/ IrrelAcc 通过阈值 **0.9**（c6 hard gate，base 0.789 fail）/ 训练 refusal 占比 **target 0.10 cap 0.20**（C5）。
+- Hammer 成对反事实**只从 split=train**（不碰 must_not_train/heldout，泄漏门 spec.md:215）；字段 `counterfactual_pair_id/target_tool_present/removed_tool_id/distractor_tool_ids/no_call_reason/expected_tool_calls=[]`。
+- When2Call distractor **进 prompt 教辨别**（非独立 refusal，防过度保守反噬）。
+- checkpoint 同跑 `PositiveToolCallExact+IrrelAcc+no_tool_false_positive_count`，IrrelAcc 涨但正例掉直接回退。
+- `expect_no_call` 四硬门之一（spec.md:71）judge 不洗白。
+
+### Q9 三轴泛化诊断（B 轻量，不另起门）
+- `generalization_diagnostic` 块：`in_dist_probe/heldout/ood_probe` 三轴（n/ToolCallExact/IrrelAcc/hard_gate_pass_rate/delta_vs_base/case_digest）+ gaps（train_heldout_gap_pp/train_ood_gap_pp）+ lineage（parent_overlap=0/leakage_violations=0）+ diagnostic_verdict。
+- **复用 C6 runner/scorer 只多 split/tag 聚合**；C6 判"能不能演示"（死门），三轴判"是不是死记"（诊断）。
+- 门禁两条：`blocked_leakage` 真阻断 / `blocked_missing` 阻断"声称泛化"不阻 C6 release / **gap 先只 warn**（选 checkpoint+补数据，不和 C6 硬门职责打架）。
+- `ood_probe` 真 OOD（新参数值/未见 device×动作组合/方言，非近邻）造法留 C5/C6.1 实装。
+
+### Q10 验收门（acceptance_stage 三级 + fuse 对账）
+- `acceptance_stage`：`train_health`(swift_test+val_loss+smoke = **T-PASS only**) / `trainable_v0`(assistant mask fixture) / `lora_candidate`(c6_base↔lora_diff + fuse_parity + artifact_fingerprints = **V-PASS**)。
+- 🔴 `fuse_parity_gate`：dynamic_adapter vs fused，sample_sets[must_pass/heldout/negative]，C6 same harness，`fail_if toolcall_exact_delta_pp>2 或 must_pass_regression>0`（#654/#757 fuse 掉行为实录）。
+- 权重 fingerprint 已在 C6EvalRun（P0-2：modelArtifactDigest/tokenizerDigest/loraAdapterDigest，spec.md:186 + 代码 597-618 确认）。
+- **val loss 低只 T-PASS，不签 V-PASS**（训练 PASS≠端侧能用，E3 elephant）。
+
+---
+
+## grill 累积价值（到 Q10，比 15 泛问值）
+**1 个真 bug**（fc_flags `bool("否")=True`）+ **4 处 report/CC 口径纠错**（col23-25 空非语料源 / MLX scale≠PEFT alpha / IrrelAcc 阈值 0.9 非 0.2 / auto-discover 挂 tied embedding）+ 三态 masking_stage + route_tier≠exec_tier + 成对反事实字段 + 三轴轻量诊断 + fuse 对账验收门。
+
+## 待续（grill 剩余 + 整合）
+- DoRA vs LoRA / rank16 vs 32 A/B（冒烟后实测，看 C6 hard gates+IrrelAcc 非 train loss）
+- 数据增广 4-5k 的 lineage 隔离（不破 parent_overlap=0）
+- **C5 硬前置：先修 fc_flags bug（gen_c1.py:209 规范化 是/否）重生成 C1**，否则 route_tier 全错
+- C5 dispatch 整合 → OpenSpec change（define-lora-data-gate 扩展 或 新 train change）的 design.md + tasks.md
