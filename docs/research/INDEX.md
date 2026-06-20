@@ -23,6 +23,16 @@
 | `2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md` | Qwen3.5-2B 升主力可行性：联网核实(确实存在/GDN+VLM/tool-parser坑)+条件升级判定+5 spike 死门(S1 mlx-swift parser 命门) | **大脑选型 / C5 训练前**；H1 **已拍=条件升级**(先 S1/S2 spike 再切,见 `roadmap §3/§4-P1`) |
 | `2026-06-20-teardown-{14 repos}.md` | 14 个 eval/bench/voice/runtime repo 逐行深拆(tau2/agentevals/nano-eval/iot-agent/simuhome/hassil/ha-core/ovos/livekit/pipecat/hass-local-openai/ha-voiceagent/agent-tester/tool-calling-bench)；每篇带 file:line + adopt/adapt/drop | 对应 C-change 实装时按 synthesis §1 指引跳读具体篇 |
 
+### P1-C 训练 + 选型（2026-06-20 ultracode 7 路深扒，每路≥10 联网搜证，按 7 lens 拆解）
+| 文档 | 是什么 | 何时读 |
+|---|---|---|
+| ⭐ `2026-06-20-p1c-training-backend-deepdive.md` | **训练后端综合**：锁本机 mlx-lm(M5 over-provisioned/<15min/¥0)/omlx=推理GUI坐实/masking 三形态实为两类机制(C5 四flag)/Qwen3-1.7B 配方超参表/2B 降P2/11 tiger/15 轮 grill 弹药 | **P1-C 训练实装起手必读** |
+| `2026-06-20-p1c-training-backend-finders-raw.md` | 上篇 **7 路 finder 原始调研**(mac-mlx/云GPU/skills/配方/2B架构/坑点/masking 逐路完整发现+source_url+clone) | 综合版漏的细节回这查 |
+| ⭐ `2026-06-20-model-selection-2026-deepdive.md` | **选型综合**：**守 Qwen3-1.7B**(FC+拒识双证据最强/新≠强)+LFM2.5 唯一真新备胎(中文一票否决)+8GB 天花板≤2B+mlx-swift 最优栈+9 tiger | **选型决策事实源**；模型已定守 1.7B(不换 LFM2.5) |
+| `2026-06-20-model-selection-2026-finders-raw.md` | 上篇 **7 路 finder 原始调研**(Qwen小dense/Gemma-Llama/Phi-Smol-国产/FC专家/部署框架/skills/iPhone8GB 逐路 39 候选+source+淘汰理由) | 候选细节/淘汰理由回这查 |
+| `2026-06-20-p1-b-qwen35-2b-s1-s2-spike.md` | P1-B spike：Qwen3.5-2B S1 8/11 劣于 1.7B 9/11 + S2 无真机 blocked + artifact 实为 VL 多模态 | 选型实证锚点 |
+| `2026-06-20-c3-home-llm-adopt-spike.md` | C3 home-llm adopt spike(执行契约层蓝本验证) | C3 实装参考 |
+
 ## §1 应用机制（怎么在未来 session 落地，不靠纯 grep）
 1. **MEMORY.md 指针**（每 session 自动加载）→ 知道这些 doc 存在 + 一句话要点。
 2. **本 INDEX.md**（一行一条 + 何时读）= 轻量索引（README 级，非 DB）。
