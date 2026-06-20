@@ -1,0 +1,24 @@
++zsh:3> openspec validate define-lora-data-gate --strict
+Change 'define-lora-data-gate' is valid
++zsh:4> openspec validate --all --strict
+- Validating...
+✓ change/define-lora-data-gate
+✓ spec/demo-experience
+✓ spec/scenario-state-protocol
+✓ spec/semantic-function-contract
+✓ spec/tool-execution
+✓ spec/vehicle-capabilities
+✓ spec/vehicle-tool-bench
+Totals: 7 passed, 0 failed (7 items)
++zsh:5> git status --short --branch
+## codex/p1-a-c5-data-gate
+ M Package.swift
+?? Core/Bench/C5DataGate.swift
+?? Reports/c5-data-gate-20260620-192100/
+?? Reports/qwen35-2b-spike-20260620-192146/
+?? Tests/MAformacCoreTests/C5DataGateTests.swift
+?? Tools/C5DataGateCLI/
+?? docs/dispatches/2026-06-20-p1-a-c5-data-gate-dispatch.md
+?? docs/dispatches/2026-06-20-p1-b-qwen-spike-dispatch.md
+?? docs/handoffs/2026-06-20-p1-a-c5-data-gate-closeout.md
+?? openspec/changes/define-lora-data-gate/

@@ -1,0 +1,7 @@
+[0/1] Planning build
+Building for debugging...
+[0/3] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'C5DataGateCLI' complete! (0.55s)
+wrote /Users/wanglei/workspace/MAformac/Reports/c5-data-gate-20260620-192100/c5-data-gate-receipt.json
+wrote /Users/wanglei/workspace/MAformac/Reports/c5-data-gate-20260620-192100/c5-data-gate-receipt.md
+status=data_gate_ready rows=3670 must_not_train_violations=0 train_parent_semantic_overlap=0 quarantine=120

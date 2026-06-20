@@ -10,6 +10,7 @@ let package = Package(
     ],
     products: [
         .library(name: "MAformacCore", targets: ["MAformacCore"]),
+        .executable(name: "C5DataGateCLI", targets: ["C5DataGateCLI"]),
         .executable(name: "C6BenchCLI", targets: ["C6BenchCLI"])
     ],
     targets: [
@@ -51,6 +52,11 @@ let package = Package(
             name: "C6BenchCLI",
             dependencies: ["MAformacCore"],
             path: "Tools/C6BenchCLI"
+        ),
+        .executableTarget(
+            name: "C5DataGateCLI",
+            dependencies: ["MAformacCore"],
+            path: "Tools/C5DataGateCLI"
         )
     ]
 )
