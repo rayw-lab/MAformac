@@ -53,6 +53,16 @@ Codex 可连续跑 20h、质量高——但**长跑必须有 harness 防跑偏**
 - **跨 vendor 审计**:Codex 一审(boundary)+ Claude/GPT Pro 二审(catch 同 model bias),如本仓 `docs/second-review-2026-06-17/` 即 Codex 对 Claude 的二审范例。
 - **状态同步**:重大决策入 `docs/decisions.md`;跨 session 靠 `docs/handoffs/`。
 
+## 4.5 长任务开发规范(Pi 形态吸收 #34-38,模板级,不引入 runtime/DB/hook 系统)
+
+> 深扒 Pi(earendil-works/pi ⭐64k)协作层 → 吸收 3 个工程形态为长任务纪律(star>1000 不降级)。**只落模板级,零行代码进产品 runtime**(Pi 是 Node/agent loop,与 MAformac「三层路由+单发」runtime 哲学相反,只站它「让长任务可靠」的工程肩膀)。来源 `docs/research/2026-06-20-pi-teardown-collaboration-layer.md`。
+
+1. **handoff append-only(事件溯源)**:`docs/handoffs/` **永不回改旧 handoff**,每 session 只 append 一条;当前状态 = 顺读全部 handoff 重放(不依赖记忆/快照)。治本反复失忆。
+2. **七段 session-closure 硬模板**:每次收工 handoff 用固定七段——`Goal / Constraints & Preferences / Progress(Done/In Progress/Blocked) / Key Decisions / Next Steps / Critical Context`,**强令保留精确 `file:line` + 报错原文 + 碰过的文件血缘**。让任意 LLM/agent 无缝接力长任务。
+3. **派单 before/after gate**:dispatch 验收门把「prevent rule」写进 schema 而非靠执行端自觉——**before**(动手前 grep 一手源、block 越界 / 禁区不改)+ **after**(动完读回 mock 态校验 / 报告附 ground-truth `swift test`+`git status`+`make verify` stdout)。落地 codex-metacognition §5。
+
+> 边界:**不引入 Pi 的 Node runtime / agent loop / session DB / hook 系统**;不考虑 sandbox/隔离(内部 demo 本机单人)。
+
 ## 5. 边界(各角色都守)
 
 - Codex 实装守 `CLAUDE.md` 边界:客户名一律「某车厂」、全 mock 车控、Python 零进 iOS、安全检查是代码不是 prompt。
