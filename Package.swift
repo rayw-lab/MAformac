@@ -9,7 +9,8 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .library(name: "MAformacCore", targets: ["MAformacCore"])
+        .library(name: "MAformacCore", targets: ["MAformacCore"]),
+        .executable(name: "C6BenchCLI", targets: ["C6BenchCLI"])
     ],
     targets: [
         .target(
@@ -21,14 +22,19 @@ let package = Package(
                 "AGENTS.md",
                 "App",
                 "CLAUDE.md",
+                "CONTEXT.md",
+                "Makefile",
+                "Reports",
                 "Resources",
                 "Tests",
+                "Tools",
                 "contracts",
                 "dev",
                 "docs",
                 "openspec",
                 "prototypes",
                 "referencerepo",
+                "scripts",
                 "MAformac.xcodeproj"
             ],
             sources: [
@@ -40,6 +46,11 @@ let package = Package(
             name: "MAformacCoreTests",
             dependencies: ["MAformacCore"],
             path: "Tests/MAformacCoreTests"
+        ),
+        .executableTarget(
+            name: "C6BenchCLI",
+            dependencies: ["MAformacCore"],
+            path: "Tools/C6BenchCLI"
         )
     ]
 )
