@@ -16,7 +16,7 @@ GENERATED_CONTRACTS := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs diff
+verify: .venv/.deps.stamp verify-source regen verify-refs diff test
 
 # source-free: 只校验已提交产物(JSONL/YAML/coverage/state-cells/manifest)自洽与引用,
 # 不依赖 raw xlsx 快照(别人 clone 仓无 snapshot 也能验契约). verify-refs 只读 manifest+committed, 不读源表.
@@ -25,6 +25,7 @@ verify-generated: .venv/.deps.stamp verify-refs test
 # 合成脏行 fixture: 坐实 quarantine 逻辑生效(source-free, 不需 raw 快照)
 test: .venv/.deps.stamp
 	$(PYTHON) scripts/test_quarantine.py
+	$(PYTHON) scripts/test_fc_flags.py
 
 verify-source: .venv/.deps.stamp
 	$(PYTHON) scripts/freeze_snapshot.py --check

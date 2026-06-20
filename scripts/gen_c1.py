@@ -144,6 +144,10 @@ def nonempty_hash(value: str) -> str:
     return sha256_text(value) if value else ""
 
 
+def fc_is_yes(value: Any) -> bool:
+    return normalize_cell(value) == "是"
+
+
 def classify_semantic_row(
     manifest: dict[str, Any],
     sheet_name: str,
@@ -186,6 +190,8 @@ def classify_semantic_row(
     semantic_range = row_values[header_map["semantic_range"]]
     fc_fuzzy = row_values[header_map["fc_fuzzy"]]
     fc_free = row_values[header_map["fc_free"]]
+    fc_fuzzy_yes = fc_is_yes(fc_fuzzy)
+    fc_free_yes = fc_is_yes(fc_free)
     example = row_values[header_map["example_utterance"]]
     canonical_basis = {"service": service, "function_text": function_text}
     canonical_hash = sha256_json(canonical_basis)[:16]
@@ -207,12 +213,13 @@ def classify_semantic_row(
         "range": semantic_range,
         "range_class": classify_range(semantic_range),
         "fc_flags": {
-            "fuzzy": bool(fc_fuzzy),
-            "free": bool(fc_free),
+            "fuzzy": fc_fuzzy_yes,
+            "free": fc_free_yes,
+            # Hashes keep the source yes/no marker traceable; booleans use normalized yes-only semantics.
             "fuzzy_hash": nonempty_hash(fc_fuzzy),
             "free_hash": nonempty_hash(fc_free),
         },
-        "clarify_tag": "implicit" if fc_fuzzy or fc_free else "explicit",
+        "clarify_tag": "implicit" if fc_fuzzy_yes or fc_free_yes else "explicit",
         "second_turn_refs": [],
         "redaction_state": "example_hash_only",
         "example_utterance_hash": nonempty_hash(example),
