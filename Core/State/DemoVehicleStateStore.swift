@@ -96,6 +96,14 @@ public final class DemoVehicleStateStore {
         cellsByKey.values.sorted { $0.key < $1.key }
     }
 
+    public var currentRevision: Int {
+        cellsByKey.values.map(\.revision).max() ?? 0
+    }
+
+    public var stateValues: [String: String] {
+        cellsByKey.mapValues(\.actualValue)
+    }
+
     public func cell(for key: String) -> DemoVehicleStateCell? {
         cellsByKey[key]
     }
@@ -125,6 +133,20 @@ public final class DemoVehicleStateStore {
 
     public static func defaultCells() -> [DemoVehicleStateCell] {
         [
+            DemoVehicleStateCell(key: "ac.power", actualValue: "off"),
+            DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24"),
+            DemoVehicleStateCell(key: "ac.temp_setpoint[副驾]", actualValue: "24"),
+            DemoVehicleStateCell(key: "ac.temp_setpoint[左后]", actualValue: "24"),
+            DemoVehicleStateCell(key: "ac.temp_setpoint[右后]", actualValue: "24"),
+            DemoVehicleStateCell(key: "window.position[主驾]", actualValue: "0"),
+            DemoVehicleStateCell(key: "window.position[副驾]", actualValue: "0"),
+            DemoVehicleStateCell(key: "window.position[左后]", actualValue: "0"),
+            DemoVehicleStateCell(key: "window.position[右后]", actualValue: "0"),
+            DemoVehicleStateCell(key: "screen.brightness[中控屏]", actualValue: "70"),
+            DemoVehicleStateCell(key: "ambient.brightness[面发光氛围灯]", actualValue: "70"),
+            DemoVehicleStateCell(key: "ambient.color", actualValue: "白"),
+            DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
+            DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P"),
             DemoVehicleStateCell(key: "hvac.ac", actualValue: "off"),
             DemoVehicleStateCell(key: "hvac.temperature", actualValue: "24"),
             DemoVehicleStateCell(key: "seat.driver.heat", actualValue: "off"),
@@ -136,8 +158,12 @@ public final class DemoVehicleStateStore {
         ]
     }
 
-    private static func spokenText(for cell: DemoVehicleStateCell) -> String {
+    public static func spokenText(for cell: DemoVehicleStateCell) -> String {
         switch (cell.key, cell.actualValue) {
+        case ("ac.power", "on"):
+            return "空调已打开"
+        case ("ac.power", "off"):
+            return "空调已关闭"
         case ("hvac.ac", "on"):
             return "空调已打开"
         case ("hvac.ac", "off"):

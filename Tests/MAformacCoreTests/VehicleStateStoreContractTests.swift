@@ -7,7 +7,7 @@ final class VehicleStateStoreContractTests: XCTestCase {
         let store = DemoVehicleStateStore()
         let keys = Set(store.cells.map(\.key))
 
-        XCTAssertEqual(keys, [
+        let legacyMVPKeys: Set<String> = [
             "fan.speed",
             "hvac.ac",
             "hvac.temperature",
@@ -16,7 +16,8 @@ final class VehicleStateStoreContractTests: XCTestCase {
             "seat.driver.heat",
             "seat.driver.ventilation",
             "window.driver"
-        ])
+        ]
+        XCTAssertTrue(legacyMVPKeys.isSubset(of: keys))
     }
 
     @MainActor
