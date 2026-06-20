@@ -12,8 +12,16 @@
 | `2026-06-19-home-llm-teardown-data.md` | home-llm **C5 LoRA 数据配方**：5类样本/模板随机参数/distractor/train_on_turn masking/配比 | **C5 LoRA 实装**（数据生成） |
 | `2026-06-19-asr-alignment-research.md` | ASR 选型(sherpa+Paraformer>Whisper)+对齐(拼音fuzzy/LoRA音近)+**跨厂商二审修正(热词transducer-only/D14改)** | **C7 voice 实装** + D14 决策 |
 | `2026-06-20-mastra-teardown-workflow-eval-trace.md` | Mastra workflow/eval/trace 形态拆解：冻结图、TrajectoryExpectation、scorer pipeline、span 树；只借形态，不进 runtime | **C4 路由 / C6 bench / C3-C6 trace** 解冻或写设计时 |
+| `2026-06-20-maformac-eval-system-overview.md` | MAformac eval 体系鸟瞰 + 近三个月活跃 eval repo oracle 综合：C1/C2→C3→C6→C5→C4→C7→人工门，含 tiger/paper-tiger/elephant | **C6/C5/C4/C7 eval 设计总入口**；回答“我们的 eval 体系是什么样的”时先读 |
+| `2026-06-20-eval-oracle-blindspots-repo-scan.md` | 第二 MAformac eval oracle 补盲：近期活跃 eval repo/benchmark 扫描，覆盖 SimuHome / IoTAgentBench / tau2 / VoiceBench / HalluAudio / HA voice / 本地小模型 / 中文车载 NLU | **C6 bench / C7 voice / C5 leakage hygiene** 定 schema、负样本、状态仿真、多 run 稳定性时 |
 | `2026-06-20-pi-teardown-collaboration-layer.md` | Pi 协作层拆解：append-only handoff、七段 compaction、工具前后 hook、headless 状态行；只进长任务规范 | **长任务 handoff / 派单 / 子审计规范** |
+| `2026-06-20-eval-agent-toolcall-premortem-oracle.md` | C6/C5/C4/C7 eval pre-mortem oracle：近三个月活跃 LLM/agent/tool-call/OS/voice/redteam eval repo 源发现 + failure modes | **C6 bench / C4 路由轨迹 / C5 LoRA 数据 / C7 voice eval** 设计前 |
+| `2026-06-20-voice-short-context-memory-oracle.md` | 语音链路短时上下文记忆 oracle：15 个近三个月活跃 repo，覆盖 HA Assist/HassIL、LiveKit、Pipecat、OVOS/Wyoming、LangGraph、Semantic Kernel、Mem0、QwenPaw 等 | **C7 voice / C4 routing / C6 eval** 设计短时 session、指代继承、工具状态读回和上下文裁剪时 |
+| `2026-06-20-voice-short-term-memory-oracle.md` | 语音链路短时记忆 pre-mortem 主报告：本仓 scout + repo oracle 归纳，定义 DialogueState / VoiceTurnContext、提交时机、TTL、打断、ASR 污染、状态读回等虎坑 | **C4 三层路由 / C7 voice / C6 bench** 写短时记忆合同、负样本和实现前 |
 | `../优化待讨论-吸收内化措施38项-2026-06-20.md` | 38 项吸收措施 + Q1-Q6 grill 结论 + #39/#40 + 三刀落地顺序 | **C3-C7 任一 change 解冻前**，作为 adopt/backlog 总入口 |
+| ⭐ `2026-06-20-eval-memory-deepdive-synthesis.md` | **14 repo teardown + Qwen 可行性的综合吸纳意见**：adopt_by_layer(C4/C5/C6/C7)+10 tiger+6 HIGH 拍板项+不降级二筛+synthesis_path；§6 综合官二审补强(C6 现状/陷阱样本/TTL两层) | **第二批吸纳总入口**（C4/C5/C6/C7 任一解冻前先读这份，再按 §附 跳具体 teardown）；§4 HIGH 待磊哥拍 |
+| `2026-06-20-qwen3.5-2b-vs-1.7b-feasibility.md` | Qwen3.5-2B 升主力可行性：联网核实(确实存在/GDN+VLM/tool-parser坑)+条件升级判定+5 spike 死门(S1 mlx-swift parser 命门) | **大脑选型拍板 / C5 训练前**；H1 待磊哥拍 |
+| `2026-06-20-teardown-{14 repos}.md` | 14 个 eval/bench/voice/runtime repo 逐行深拆(tau2/agentevals/nano-eval/iot-agent/simuhome/hassil/ha-core/ovos/livekit/pipecat/hass-local-openai/ha-voiceagent/agent-tester/tool-calling-bench)；每篇带 file:line + adopt/adapt/drop | 对应 C-change 实装时按 synthesis §1 指引跳读具体篇 |
 
 ## §1 应用机制（怎么在未来 session 落地，不靠纯 grep）
 1. **MEMORY.md 指针**（每 session 自动加载）→ 知道这些 doc 存在 + 一句话要点。
