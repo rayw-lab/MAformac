@@ -16,7 +16,7 @@
 | `define-voice-contract` | 🟢 高可复用 | WhisperKit/ASR/TTS/barge-in 与契约无关,基本整体复用 | → C7 |
 | `define-execution-contract` | 🟡 骨架可复用 | change3 已实装 executor/guard/decoder(worktree `46340f1`);arguments 扁平→value 四件套 + position fan-out 要重做 | → C3 |
 | `define-intent-routing` | 🔴 重写 | 二分→三层 + 意图收缩 `clarifyTag` + state-dict,强依赖新契约 | → C4 |
-| `define-lora-pipeline` | 🔴 重写 | adopt Hammer/xLAM/unsloth + 全集语料,依赖 C1 JSONL | → C5 |
+| `define-lora-pipeline` | ✅ 已取代 | 已由 `define-lora-training` supersede;仅保留 train/eval separation、fail-closed redaction、bucket thinking、base-vs-LoRA comparison 等设计资产 | → `define-lora-training` |
 | `define-vehicle-tool-bench` | 🔴 重写 | 双轴(format/decision)+ OOS + 全集覆盖率,依赖 C1/C2 | → C6 |
 
 ## rebase 触发

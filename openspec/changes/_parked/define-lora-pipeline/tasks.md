@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-06-21**: 本 parked task list 不再执行。C5 后续 apply 以 `openspec/changes/define-lora-training/tasks.md` 为唯一执行清单。
+
 > 范围:6-change 第 5 个。bug 数据 → 脱敏五件套 → MLX-LM LoRA(只练模糊/跨域映射)。pre-mortem 料 `qwen3-notes §6` + Codex `03-lora`。**依赖 change2 capabilities.yaml 定稿**(工具名/slot/error_tag)。数据源 `~/.bug-skill/data.db`。**真实数据抽取需磊哥显式授权**。
 
 ## 0. 前置:redaction validator(fail-closed,起手必做)

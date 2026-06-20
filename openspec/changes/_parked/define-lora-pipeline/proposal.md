@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-06-21**: 本 parked change 已由 active C5 proposal `openspec/changes/define-lora-training/` 取代。旧扁平契约、PEFT `alpha` 口径、旧 target-module defaults 不再作为执行依据;仅保留 train/eval separation、fail-closed redaction、bucket thinking、base-vs-LoRA comparison 等设计资产供新 change 复用。
+
 ## Why
 
 LoRA 是 MVP 必交付项,也是**护城河**:真实座舱 bug → 真实分布(非造),AWS PPT 未体现。LoRA 只练「模糊说 → 跨域工具映射」(规则吃 80% 高频明确,LLM/LoRA 只碰 20% 模糊/跨域)。数据三源(bug-skill-dev 1 万+ bug / 协议清单说法 / raw 语料)→ 脱敏五件套 → MLX-LM LoRA。pre-mortem(`qwen3-notes §6` + Codex `03-lora`)已搜透:约束行为非补知识 / think 不算 loss / 负样本必进 / redaction fail-closed。

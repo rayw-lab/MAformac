@@ -1,3 +1,5 @@
+> **SUPERSEDED 2026-06-21**: 本 parked change 已由 active C5 proposal `openspec/changes/define-lora-training/` 取代。旧扁平契约、PEFT `alpha` 口径、旧 target-module defaults 不再作为执行依据;仅保留 train/eval separation、fail-closed redaction、bucket thinking、base-vs-LoRA comparison 等设计资产供新 change 复用。
+
 ## Context
 
 LoRA 是护城河(真实座舱 bug → 真实分布)。pre-mortem 料 `qwen3-engineering-notes §6`(lora 硬约束)+ Codex `referencerepo/reports/.../03-lora-bug-data-pipeline`(5 态 + safe shape + must_not_train)。数据源 `~/.bug-skill/data.db`(真实运行态)。依赖 change2 `capabilities.yaml`(工具名/slot 定稿后才能批量生成样本)。
