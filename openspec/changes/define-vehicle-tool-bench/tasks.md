@@ -65,3 +65,9 @@
 - [x] 9.2 运行 `openspec validate define-vehicle-tool-bench --strict`。
 - [x] 9.3 运行项目最小验证命令。验收：如果验证命令不可跑，报告 blocker 原文。
 - [x] 9.4 收口报告附 `git status --short --branch`、strict validate stdout、C6 summary 路径、未拍 Open Questions。
+
+## 10. P0-1 Readback Gate Tightening
+
+- [x] 10.1 C6 readback gate 复用 `StateCellContractLookup.renderReadback` / C2 `readback_zh`，不再用 `key=value` 机器串作为期望 readback。
+- [x] 10.2 单测覆盖机器串 fail、C2 中文模板 pass、enum 分支 pass/fail、缺 C2 模板不可 assertion-only pass、否定句 fail、no-call 不虚假 `readback_match=true`。
+- [x] 10.3 `C6BenchCLI summarize` 构造 runner 时注入 C2 `StateCellContractLookup`，保持 CLI 复跑口径与单测一致。

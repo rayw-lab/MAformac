@@ -25,16 +25,16 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
             expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
             expectedStateDelta: ["ac.power": "on"],
-            readbackContains: ["ac.power=on"]
+            readbackContains: ["空调"]
         )
 
         let pass = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
-        ]))
+        ], text: "空调已打开"))
         XCTAssertFalse(pass.gateResult.hardFailed)
         XCTAssertTrue(pass.gateResult.toolCallSetMatch)
 
@@ -60,8 +60,120 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertTrue(duplicate.gateResult.failureClasses.contains(.toolCall))
     }
 
+    func testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])],
+            expectedStateDelta: ["ac.temp_setpoint[主驾]": "26"],
+            readbackContains: ["主驾", "26"]
+        )
+
+        let machineString = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])
+        ], text: "ac.temp_setpoint[主驾]=26"))
+        XCTAssertFalse(machineString.gateResult.readbackMatch)
+        XCTAssertTrue(machineString.gateResult.failureClasses.contains(.readback))
+
+        let chineseReadback = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])
+        ], text: "主驾空调已设为26度"))
+        XCTAssertTrue(chineseReadback.gateResult.readbackMatch)
+        XCTAssertFalse(chineseReadback.gateResult.hardFailed)
+    }
+
+    func testReadbackGateUsesEnumBranchFromStateCellTemplate() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        let wrongBranch = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已关闭"))
+        XCTAssertFalse(wrongBranch.gateResult.readbackMatch)
+        XCTAssertTrue(wrongBranch.gateResult.failureClasses.contains(.readback))
+
+        let rightBranch = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))
+        XCTAssertTrue(rightBranch.gateResult.readbackMatch)
+        XCTAssertFalse(rightBranch.gateResult.hardFailed)
+    }
+
+    func testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "red"])],
+            expectedStateDelta: ["ambient.color": "红"],
+            readbackContains: ["氛围灯", "红"]
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "red"])
+        ], text: "氛围灯红色已打开"))
+
+        XCTAssertTrue(result.gateResult.stateDeltaMatch)
+        XCTAssertFalse(result.gateResult.readbackMatch)
+        XCTAssertTrue(result.gateResult.failureClasses.contains(.readback))
+    }
+
+    func testReadbackGateRejectsNegatedTokenMatch() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])],
+            expectedStateDelta: ["ac.temp_setpoint[主驾]": "26"],
+            readbackContains: ["主驾", "26"]
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])
+        ], text: "主驾空调不是26度"))
+
+        XCTAssertFalse(result.gateResult.readbackMatch)
+        XCTAssertTrue(result.gateResult.failureClasses.contains(.readback))
+    }
+
+    func testNoCallCaseDoesNotReportFakeReadbackPass() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            bucket: .noCall,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: [:],
+            readbackContains: [],
+            clarifyTag: .rejected
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [], text: "这个我不能执行"))
+
+        XCTAssertFalse(result.gateResult.readbackMatch)
+        XCTAssertFalse(result.gateResult.hardFailed)
+    }
+
+    func testNoCallPreconditionStateDoesNotInvokeReadbackGate() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            bucket: .refusal,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: ["vehicle.speed": "30"],
+            readbackContains: ["行驶中"],
+            clarifyTag: .rejected,
+            preState: ["vehicle.speed": "30", "vehicle.gear": "D"]
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [], text: "行驶中不能开门"))
+
+        XCTAssertTrue(result.gateResult.stateDeltaMatch)
+        XCTAssertFalse(result.gateResult.readbackMatch)
+        XCTAssertFalse(result.gateResult.failureClasses.contains(.readback))
+        XCTAssertFalse(result.gateResult.hardFailed)
+    }
+
     func testExpectNoCallGateCountsFalsePositive() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
             bucket: .noCall,
             expectedToolCalls: [],
@@ -79,16 +191,16 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testStateDeltaAndReadbackAreSeparateHardGates() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
             expectedToolCalls: [C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["percent": "40"])],
             expectedStateDelta: ["screen.brightness[中控屏]": "40"],
-            readbackContains: ["screen.brightness[中控屏]=40"]
+            readbackContains: ["屏幕", "40"]
         )
 
         let pass = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
             C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["percent": "40"])
-        ]))
+        ], text: "中控屏幕亮度已调到40%"))
         XCTAssertTrue(pass.gateResult.stateDeltaMatch)
         XCTAssertTrue(pass.gateResult.readbackMatch)
 
@@ -100,7 +212,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testClarifyAndRefusalCorrectnessBlocksWrongAction() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let refusal = C6BenchCase.fixture(
             bucket: .refusal,
             expectedToolCalls: [],
@@ -122,7 +234,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let refusal = C6BenchCase.fixture(
             bucket: .refusal,
             expectedToolCalls: [],
@@ -149,15 +261,15 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testReplayFingerprintRecordsTenRequiredFields() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
             expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
             expectedStateDelta: ["ac.power": "on"],
-            readbackContains: ["ac.power=on"]
+            readbackContains: ["空调"]
         )
         let run = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
-        ], samplingSeed: "3"), runIndex: 3)
+        ], text: "空调已打开", samplingSeed: "3"), runIndex: 3)
 
         XCTAssertTrue(run.hasRequiredFingerprintFields)
         XCTAssertEqual(run.runID, "c6-C6-FIXTURE-001-3")
@@ -169,7 +281,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     func testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex() throws {
-        let runner = makeRunner()
+        let runner = try makeRunner()
         let generator = try makeGenerator()
         let cases = Array(try generator.generate().prefix(5))
         let validation = generator.validate(cases)
@@ -202,8 +314,13 @@ final class C6VehicleToolBenchTests: XCTestCase {
         )
     }
 
-    private func makeRunner() -> C6BenchRunner {
-        C6BenchRunner(qwenToolCallFormatVersion: "format-hash", contractDigest: "contract-digest", modelID: "base")
+    private func makeRunner() throws -> C6BenchRunner {
+        C6BenchRunner(
+            qwenToolCallFormatVersion: "format-hash",
+            contractDigest: "contract-digest",
+            modelID: "base",
+            stateCells: try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
+        )
     }
 
     private func readRepoFile(_ relativePath: String) throws -> String {
@@ -223,16 +340,17 @@ private extension C6BenchCase {
         expectNoCall: Bool = false,
         expectedStateDelta: [String: String],
         readbackContains: [String],
-        clarifyTag: C6ClarifyTag = .implicit
+        clarifyTag: C6ClarifyTag = .implicit,
+        preState: [String: String] = [
+            "ac.power": "off",
+            "screen.brightness[中控屏]": "70"
+        ]
     ) -> C6BenchCase {
         C6BenchCase(
             caseID: "C6-FIXTURE-001",
             sourceRefs: C6SourceRefs(semanticContractIDs: ["c1_fixture"], stateCellIDs: ["ac.power"], scenarioIDs: ["scene1"]),
             tags: C6CaseTags(bucket: bucket, mustPass: true, mustNotTrain: true, contractDevice: "fixture", scenarioID: "scene1", sampleKind: "fixture"),
-            preState: [
-                "ac.power": "off",
-                "screen.brightness[中控屏]": "70"
-            ],
+            preState: preState,
             inputZh: "fixture",
             expectedToolCalls: expectedToolCalls,
             expectNoCall: expectNoCall,

@@ -53,7 +53,8 @@ struct C6BenchCLI {
             contractDigest: contractDigest,
             modelID: envelope.modelID,
             loraAdapterID: "",
-            loraCheckpointID: ""
+            loraCheckpointID: "",
+            stateCells: generator.stateCells
         )
         let caseByID = Dictionary(uniqueKeysWithValues: cases.map { ($0.caseID, $0) })
         var runCounters: [String: Int] = [:]

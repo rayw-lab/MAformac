@@ -611,32 +611,39 @@ public struct C6BenchRunner: Sendable {
     public var modelID: String
     public var loraAdapterID: String
     public var loraCheckpointID: String
+    public var stateCells: StateCellContractLookup
 
     public init(
         qwenToolCallFormatVersion: String,
         contractDigest: String,
         modelID: String,
         loraAdapterID: String = "",
-        loraCheckpointID: String = ""
+        loraCheckpointID: String = "",
+        stateCells: StateCellContractLookup
     ) {
         self.qwenToolCallFormatVersion = qwenToolCallFormatVersion
         self.contractDigest = contractDigest
         self.modelID = modelID
         self.loraAdapterID = loraAdapterID
         self.loraCheckpointID = loraCheckpointID
+        self.stateCells = stateCells
     }
 
     public func evaluate(case benchCase: C6BenchCase, output: C6RuntimeOutput, runIndex: Int = 0) throws -> C6EvalRun {
         let toolMatch = C6ToolCallMatcher.matches(expected: benchCase.expectedToolCalls, actual: output.toolCalls)
         let noToolFalsePositiveCount = benchCase.expectNoCall ? output.toolCalls.count : 0
-        let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState)
+        let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells)
         let stateMatch = benchCase.expectedStateDelta.allSatisfy { key, value in
             finalState[key] == value
         }
-        let readbackText = C6ReadbackRenderer.render(delta: benchCase.expectedStateDelta, fallbackText: output.text)
-        let readbackMatch = benchCase.readbackAssertion.contains.allSatisfy { token in
-            readbackText.contains(token) || output.text.contains(token)
-        }
+        let readbackApplicable = !benchCase.expectNoCall
+            && (!benchCase.expectedStateDelta.isEmpty || !benchCase.readbackAssertion.contains.isEmpty)
+        let readbackMatch = readbackApplicable && C6ReadbackRenderer.matches(
+            delta: benchCase.expectedStateDelta,
+            assertion: benchCase.readbackAssertion,
+            outputText: output.text,
+            stateCells: stateCells
+        )
         let clarifyMatch = clarifyGateMatches(case: benchCase, output: output)
 
         var failures: [C6FailureClass] = []
@@ -652,7 +659,7 @@ public struct C6BenchRunner: Sendable {
         if !stateMatch {
             failures.append(.stateDelta)
         }
-        if !readbackMatch {
+        if readbackApplicable && !readbackMatch {
             failures.append(.readback)
         }
         if !clarifyMatch {
@@ -775,7 +782,11 @@ public enum C6ToolCallMatcher {
 }
 
 public enum C6MockStateApplier {
-    public static func apply(toolCalls: [C6ToolCall], to preState: [String: String]) -> [String: String] {
+    public static func apply(
+        toolCalls: [C6ToolCall],
+        to preState: [String: String],
+        stateCells: StateCellContractLookup
+    ) -> [String: String] {
         var state = preState
         for call in toolCalls {
             switch call.name {
@@ -786,7 +797,7 @@ public enum C6MockStateApplier {
             case "set_cabin_screen_brightness":
                 applyScreen(call.arguments, state: &state)
             case "set_cabin_ambient_light":
-                applyAmbient(call.arguments, state: &state)
+                applyAmbient(call.arguments, state: &state, stateCells: stateCells)
             case "set_cabin_fan":
                 applyFan(call.arguments, state: &state)
             default:
@@ -839,9 +850,9 @@ public enum C6MockStateApplier {
         }
     }
 
-    private static func applyAmbient(_ args: [String: String], state: inout [String: String]) {
+    private static func applyAmbient(_ args: [String: String], state: inout [String: String], stateCells: StateCellContractLookup) {
         if let color = args["color"] {
-            state["ambient.color"] = colorName(color)
+            state["ambient.color"] = c2ColorValue(for: color, stateCells: stateCells)
         } else if args["power"] == "off" {
             state["ambient.color"] = "off"
         }
@@ -877,31 +888,172 @@ public enum C6MockStateApplier {
         }
     }
 
-    private static func colorName(_ value: String) -> String {
-        switch value {
-        case "red":
-            return "红"
-        case "blue", "cool":
-            return "蓝"
-        case "warm", "amber":
-            return "橙"
-        case "white":
-            return "白"
-        default:
-            return value
-        }
+    private static func c2ColorValue(for value: String, stateCells: StateCellContractLookup) -> String {
+        let aliases = [
+            "red": "红",
+            "blue": "蓝",
+            "cool": "蓝",
+            "warm": "橙",
+            "amber": "橙",
+            "white": "白",
+        ]
+        let candidate = aliases[value] ?? value
+        let allowed = stateCells.cell(id: "ambient.color")?.values ?? []
+        return allowed.contains(candidate) ? candidate : value
     }
 }
 
 public enum C6ReadbackRenderer {
-    public static func render(delta: [String: String], fallbackText: String) -> String {
+    private struct ExpectedReadback: Equatable {
+        var rendered: String
+        var tokens: [String]
+    }
+
+    public static func render(delta: [String: String], stateCells: StateCellContractLookup, fallbackText: String) -> String {
         guard !delta.isEmpty else {
             return fallbackText
         }
-        return delta
-            .map { key, value in "\(key)=\(value)" }
+        let rendered = delta
+            .compactMap { key, value -> String? in
+                let parts = splitStateKey(key)
+                return stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value)
+            }
             .sorted()
-            .joined(separator: ",")
+            .joined(separator: " ")
+        return rendered.isEmpty ? fallbackText : rendered
+    }
+
+    public static func matches(
+        delta: [String: String],
+        assertion: C6ReadbackAssertion,
+        outputText: String,
+        stateCells: StateCellContractLookup
+    ) -> Bool {
+        let trimmedOutput = outputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedOutput.isEmpty else {
+            return false
+        }
+
+        if !delta.isEmpty, looksLikeMachineReadback(trimmedOutput, delta: delta) {
+            return false
+        }
+
+        if containsNegativeMarker(trimmedOutput) {
+            return false
+        }
+
+        if delta.isEmpty {
+            let tokens = uniqueNonEmpty(assertion.contains)
+            guard !tokens.isEmpty else {
+                return false
+            }
+            return tokens.allSatisfy { trimmedOutput.contains($0) }
+        }
+
+        guard let expectedReadbacks = expectedReadbacks(delta: delta, stateCells: stateCells) else {
+            return false
+        }
+        return expectedReadbacks.allSatisfy { expected in
+            trimmedOutput.contains(expected.rendered) || expected.tokens.allSatisfy { trimmedOutput.contains($0) }
+        }
+    }
+
+    private static func expectedReadbacks(
+        delta: [String: String],
+        stateCells: StateCellContractLookup
+    ) -> [ExpectedReadback]? {
+        var expected: [ExpectedReadback] = []
+        for (key, value) in delta {
+            let parts = splitStateKey(key)
+            guard let cell = stateCells.cell(id: parts.baseID),
+                  let rendered = stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value),
+                  let template = cell.readbackTemplate else {
+                return nil
+            }
+            expected.append(ExpectedReadback(
+                rendered: rendered,
+                tokens: tokens(from: template, cell: cell, scope: parts.scope, value: value, rendered: rendered)
+            ))
+        }
+        return expected
+    }
+
+    private static func tokens(
+        from template: String,
+        cell: StateCellDefinition,
+        scope: String?,
+        value: String,
+        rendered: String
+    ) -> [String] {
+        if cell.type == "enum" {
+            return [rendered]
+        }
+
+        var tokens: [String] = []
+        if let scope {
+            tokens.append(scope)
+        }
+        tokens.append(value)
+
+        let staticTemplate = template.replacingOccurrences(
+            of: #"\{[^}]+\}"#,
+            with: " ",
+            options: .regularExpression
+        )
+        for fragment in staticTemplate.split(whereSeparator: \.isWhitespace).map(String.init) {
+            tokens.append(contentsOf: normalizedStaticTokens(from: fragment))
+        }
+        return uniqueNonEmpty(tokens)
+    }
+
+    private static func normalizedStaticTokens(from fragment: String) -> [String] {
+        let trimmed = fragment.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return []
+        }
+        for suffix in ["温度", "亮度", "开度"] where trimmed.hasSuffix(suffix) && trimmed.count > suffix.count {
+            return [String(trimmed.dropLast(suffix.count))]
+        }
+        return [trimmed]
+    }
+
+    private static func looksLikeMachineReadback(_ outputText: String, delta: [String: String]) -> Bool {
+        if delta.keys.contains(where: { outputText.contains($0) }) {
+            return true
+        }
+        if outputText.contains("="),
+           (outputText.contains("[") || outputText.contains("]") || delta.values.contains(where: { outputText.contains($0) })) {
+            return true
+        }
+        return false
+    }
+
+    private static func containsNegativeMarker(_ outputText: String) -> Bool {
+        ["不是", "并非", "没有", "无法", "不能", "失败", "不对", "不一致"].contains { outputText.contains($0) }
+    }
+
+    private static func splitStateKey(_ key: String) -> (baseID: String, scope: String?) {
+        guard let open = key.firstIndex(of: "[") else {
+            return (key, nil)
+        }
+        let scopeStart = key.index(after: open)
+        guard let close = key[scopeStart...].firstIndex(of: "]") else {
+            return (String(key[..<open]), nil)
+        }
+        return (String(key[..<open]), String(key[scopeStart..<close]))
+    }
+
+    private static func uniqueNonEmpty(_ values: [String]) -> [String] {
+        var seen: Set<String> = []
+        var result: [String] = []
+        for value in values {
+            let token = value.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !token.isEmpty, seen.insert(token).inserted else {
+                continue
+            }
+            result.append(token)
+        }
+        return result
     }
 }
 

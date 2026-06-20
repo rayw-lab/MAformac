@@ -68,6 +68,44 @@ C6 SHALL enforce four first-class deterministic hard gates before any judge scor
 - **WHEN** the runtime executes or silently succeeds instead
 - **THEN** the clarification hard gate fails
 
+### Requirement: Readback gate SHALL reuse C2 readback templates
+C6 SHALL derive expected readback text for state-changing cases from C2 `contracts/state-cells.yaml` `readback_zh` templates through the same `StateCellContractLookup.renderReadback` contract used by C3 execution. C6 SHALL NOT satisfy the readback gate with machine-form state strings such as `state_key=value`, assertion-only tokens, or negated readback text. If a state-changing expected cell has no C2 `readback_zh` render path, the readback gate SHALL fail rather than fall back to handwritten C6 wording. For no-call cases, C6 SHALL NOT report `readback_match=true`; the readback metric SHALL be non-applicable/false without adding a readback hard failure.
+
+#### Scenario: Machine readback string is rejected
+- **GIVEN** a state-changing case whose C2 template renders `主驾空调温度26度`
+- **WHEN** model output contains `ac.temp_setpoint[主驾]=26`
+- **THEN** `readback_match` is false
+- **AND** the case records a readback hard failure
+
+#### Scenario: C2-rendered Chinese readback is accepted
+- **GIVEN** a state-changing case whose C2 template renders `主驾空调温度26度`
+- **WHEN** model output contains Chinese readback text with the expected zone, device, and value
+- **THEN** `readback_match` is true
+
+#### Scenario: Assertion-only readback is rejected when C2 template is missing
+- **GIVEN** a state-changing case whose expected cell has no C2 `readback_zh`
+- **WHEN** model output contains only handwritten `readback_assertion` tokens
+- **THEN** `readback_match` is false
+- **AND** the case records a readback hard failure
+
+#### Scenario: Negated readback text is rejected
+- **GIVEN** a state-changing case whose C2 template renders `主驾空调温度26度`
+- **WHEN** model output says `主驾空调不是26度`
+- **THEN** `readback_match` is false
+- **AND** the case records a readback hard failure
+
+#### Scenario: Enum readback uses the selected C2 branch
+- **GIVEN** C2 defines `ac.power` readback as `空调{已打开|已关闭}`
+- **WHEN** expected state is `ac.power=on`
+- **THEN** output indicating `空调已关闭` does not satisfy the readback gate
+- **AND** output indicating `空调已打开` satisfies the readback gate
+
+#### Scenario: No-call cases do not fake readback success
+- **GIVEN** a no-call case
+- **WHEN** the runtime emits no ToolCall
+- **THEN** `readback_match` is false
+- **AND** the case does not receive a readback hard failure solely from the non-applicable readback gate
+
 ### Requirement: Runner SHALL emit hard-gate metrics
 C6 runner SHALL emit `IrrelAcc`, `no_tool_false_positive_count`, `state_delta_match`, `readback_match`, and `clarify_match`. `no-call` and unrelated samples SHALL account for at least 20% of the eval set as negative samples. This 20% value is dataset composition, not the IrrelAcc passing threshold.
 
