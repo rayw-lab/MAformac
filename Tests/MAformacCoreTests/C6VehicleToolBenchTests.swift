@@ -260,7 +260,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertFalse(json.contains("tts"))
     }
 
-    func testReplayFingerprintRecordsTenRequiredFields() throws {
+    func testReplayFingerprintRecordsArtifactDigestsAsRequiredFields() throws {
         let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
             expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
@@ -276,8 +276,60 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(run.modelID, "base")
         XCTAssertEqual(run.loraAdapterID, "")
         XCTAssertEqual(run.loraCheckpointID, "")
+        XCTAssertEqual(run.modelArtifactDigest, "model-digest")
+        XCTAssertEqual(run.tokenizerDigest, "tokenizer-digest")
+        XCTAssertEqual(run.loraAdapterDigest, "")
         XCTAssertEqual(run.qwenToolCallFormatVersion, "format-hash")
         XCTAssertEqual(run.contractDigest, "contract-digest")
+    }
+
+    func testLoRAIdentifierRequiresAdapterDigest() throws {
+        let runner = try makeRunner(
+            loraAdapterID: "adapter-a",
+            loraCheckpointID: "ckpt-1",
+            loraAdapterDigest: ""
+        )
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        XCTAssertThrowsError(try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))) { error in
+            XCTAssertEqual(error as? C6InfraError, .missingEvalRunField("C6-FIXTURE-001"))
+        }
+    }
+
+    func testMissingModelArtifactDigestFailsFingerprintGate() throws {
+        let runner = try makeRunner(modelArtifactDigest: "")
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        XCTAssertThrowsError(try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))) { error in
+            XCTAssertEqual(error as? C6InfraError, .missingEvalRunField("C6-FIXTURE-001"))
+        }
+    }
+
+    func testMissingTokenizerDigestFailsFingerprintGate() throws {
+        let runner = try makeRunner(tokenizerDigest: "")
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        XCTAssertThrowsError(try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))) { error in
+            XCTAssertEqual(error as? C6InfraError, .missingEvalRunField("C6-FIXTURE-001"))
+        }
     }
 
     func testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex() throws {
@@ -298,11 +350,53 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(Set(summary.evalRuns.map(\.loraCheckpointID)), [""])
     }
 
+    func testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+        let run = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))
+
+        let summary = runner.summarize(cases: [caseItem], runs: [run], validation: C6DatasetValidation(
+            caseCount: 1,
+            negativeRatio: 0,
+            unresolvedSourceRefCount: 0,
+            mustPassCount: 1,
+            mustPassWithoutMustNotTrainCount: 0,
+            representedDevices: 1,
+            totalContractDevices: 1
+        ))
+
+        XCTAssertEqual(summary.modelArtifactDigest, "model-digest")
+        XCTAssertEqual(summary.tokenizerDigest, "tokenizer-digest")
+        XCTAssertEqual(summary.loraAdapterDigest, "")
+        XCTAssertEqual(Set(summary.evalRuns.map(\.modelArtifactDigest)), ["model-digest"])
+        XCTAssertEqual(Set(summary.evalRuns.map(\.tokenizerDigest)), ["tokenizer-digest"])
+        XCTAssertEqual(Set(summary.evalRuns.map(\.loraAdapterDigest)), [""])
+    }
+
     func testFormatDigestChangesWhenFormatFileContentChanges() throws {
         let first = C6Hash.sha256Hex(Data("runtime_parser: json\n".utf8))
         let second = C6Hash.sha256Hex(Data("runtime_parser: xml\n".utf8))
 
         XCTAssertNotEqual(first, second)
+    }
+
+    func testFileHashChangesWhenFileContentChanges() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("c6-hash-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let firstURL = directory.appendingPathComponent("first.bin")
+        let secondURL = directory.appendingPathComponent("second.bin")
+        try Data("model-a".utf8).write(to: firstURL)
+        try Data("model-b".utf8).write(to: secondURL)
+
+        XCTAssertNotEqual(try C6Hash.fileHash(url: firstURL), try C6Hash.fileHash(url: secondURL))
     }
 
     private func makeGenerator() throws -> C6DatasetGenerator {
@@ -314,11 +408,22 @@ final class C6VehicleToolBenchTests: XCTestCase {
         )
     }
 
-    private func makeRunner() throws -> C6BenchRunner {
+    private func makeRunner(
+        modelArtifactDigest: String = "model-digest",
+        tokenizerDigest: String = "tokenizer-digest",
+        loraAdapterID: String = "",
+        loraCheckpointID: String = "",
+        loraAdapterDigest: String = ""
+    ) throws -> C6BenchRunner {
         C6BenchRunner(
             qwenToolCallFormatVersion: "format-hash",
             contractDigest: "contract-digest",
             modelID: "base",
+            modelArtifactDigest: modelArtifactDigest,
+            tokenizerDigest: tokenizerDigest,
+            loraAdapterDigest: loraAdapterDigest,
+            loraAdapterID: loraAdapterID,
+            loraCheckpointID: loraCheckpointID,
             stateCells: try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
         )
     }

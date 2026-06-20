@@ -512,8 +512,11 @@ public struct C6EvalRun: Codable, Equatable, Sendable {
     public var runID: String
     public var caseID: String
     public var modelID: String
+    public var modelArtifactDigest: String
+    public var tokenizerDigest: String
     public var loraAdapterID: String
     public var loraCheckpointID: String
+    public var loraAdapterDigest: String
     public var qwenToolCallFormatVersion: String
     public var promptHash: String
     public var samplingSeed: String
@@ -526,8 +529,11 @@ public struct C6EvalRun: Codable, Equatable, Sendable {
         case runID = "run_id"
         case caseID = "case_id"
         case modelID = "model_id"
+        case modelArtifactDigest = "model_artifact_digest"
+        case tokenizerDigest = "tokenizer_digest"
         case loraAdapterID = "lora_adapter_id"
         case loraCheckpointID = "lora_checkpoint_id"
+        case loraAdapterDigest = "lora_adapter_digest"
         case qwenToolCallFormatVersion = "qwen_tool_call_format_version"
         case promptHash = "prompt_hash"
         case samplingSeed = "sampling_seed"
@@ -538,9 +544,13 @@ public struct C6EvalRun: Codable, Equatable, Sendable {
     }
 
     public var hasRequiredFingerprintFields: Bool {
-        !runID.isEmpty
+        let hasRequiredLoRADigest = (loraAdapterID.isEmpty && loraCheckpointID.isEmpty) || !loraAdapterDigest.isEmpty
+        return !runID.isEmpty
             && !caseID.isEmpty
             && !modelID.isEmpty
+            && !modelArtifactDigest.isEmpty
+            && !tokenizerDigest.isEmpty
+            && hasRequiredLoRADigest
             && !qwenToolCallFormatVersion.isEmpty
             && !promptHash.isEmpty
             && !samplingSeed.isEmpty
@@ -570,8 +580,11 @@ public struct C6PerCaseStats: Codable, Equatable, Sendable {
 public struct C6Summary: Codable, Equatable, Sendable {
     public var status: String
     public var modelID: String
+    public var modelArtifactDigest: String
+    public var tokenizerDigest: String
     public var loraAdapterID: String
     public var loraCheckpointID: String
+    public var loraAdapterDigest: String
     public var qwenToolCallFormatVersion: String
     public var contractDigest: String
     public var totalCases: Int
@@ -588,8 +601,11 @@ public struct C6Summary: Codable, Equatable, Sendable {
     enum CodingKeys: String, CodingKey {
         case status
         case modelID = "model_id"
+        case modelArtifactDigest = "model_artifact_digest"
+        case tokenizerDigest = "tokenizer_digest"
         case loraAdapterID = "lora_adapter_id"
         case loraCheckpointID = "lora_checkpoint_id"
+        case loraAdapterDigest = "lora_adapter_digest"
         case qwenToolCallFormatVersion = "qwen_tool_call_format_version"
         case contractDigest = "contract_digest"
         case totalCases = "total_cases"
@@ -609,14 +625,20 @@ public struct C6BenchRunner: Sendable {
     public var qwenToolCallFormatVersion: String
     public var contractDigest: String
     public var modelID: String
+    public var modelArtifactDigest: String
+    public var tokenizerDigest: String
     public var loraAdapterID: String
     public var loraCheckpointID: String
+    public var loraAdapterDigest: String
     public var stateCells: StateCellContractLookup
 
     public init(
         qwenToolCallFormatVersion: String,
         contractDigest: String,
         modelID: String,
+        modelArtifactDigest: String,
+        tokenizerDigest: String,
+        loraAdapterDigest: String = "",
         loraAdapterID: String = "",
         loraCheckpointID: String = "",
         stateCells: StateCellContractLookup
@@ -624,8 +646,11 @@ public struct C6BenchRunner: Sendable {
         self.qwenToolCallFormatVersion = qwenToolCallFormatVersion
         self.contractDigest = contractDigest
         self.modelID = modelID
+        self.modelArtifactDigest = modelArtifactDigest
+        self.tokenizerDigest = tokenizerDigest
         self.loraAdapterID = loraAdapterID
         self.loraCheckpointID = loraCheckpointID
+        self.loraAdapterDigest = loraAdapterDigest
         self.stateCells = stateCells
     }
 
@@ -687,8 +712,11 @@ public struct C6BenchRunner: Sendable {
             runID: runID,
             caseID: benchCase.caseID,
             modelID: modelID,
+            modelArtifactDigest: modelArtifactDigest,
+            tokenizerDigest: tokenizerDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
+            loraAdapterDigest: loraAdapterDigest,
             qwenToolCallFormatVersion: qwenToolCallFormatVersion,
             promptHash: promptHash,
             samplingSeed: output.samplingSeed,
@@ -738,8 +766,11 @@ public struct C6BenchRunner: Sendable {
         return C6Summary(
             status: status,
             modelID: modelID,
+            modelArtifactDigest: modelArtifactDigest,
+            tokenizerDigest: tokenizerDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
+            loraAdapterDigest: loraAdapterDigest,
             qwenToolCallFormatVersion: qwenToolCallFormatVersion,
             contractDigest: contractDigest,
             totalCases: cases.count,

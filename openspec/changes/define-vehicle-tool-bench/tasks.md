@@ -71,3 +71,10 @@
 - [x] 10.1 C6 readback gate 复用 `StateCellContractLookup.renderReadback` / C2 `readback_zh`，不再用 `key=value` 机器串作为期望 readback。
 - [x] 10.2 单测覆盖机器串 fail、C2 中文模板 pass、enum 分支 pass/fail、缺 C2 模板不可 assertion-only pass、否定句 fail、no-call 不虚假 `readback_match=true`。
 - [x] 10.3 `C6BenchCLI summarize` 构造 runner 时注入 C2 `StateCellContractLookup`，保持 CLI 复跑口径与单测一致。
+
+## 11. P0-2 Model Artifact Fingerprint
+
+- [x] 11.1 C6 `eval_run` 和 summary 记录 `model_artifact_digest`、`tokenizer_digest`、`lora_adapter_digest`，且 `model_id` 不冒充权重指纹。
+- [x] 11.2 base 无 LoRA 时允许 `lora_adapter_digest=""`；只要 `lora_adapter_id` 或 `lora_checkpoint_id` 非空，就要求 `lora_adapter_digest` 非空，否则抛 `missingEvalRunField` 基础设施错误。
+- [x] 11.3 `C6BenchCLI summarize` 显式要求 `--model-artifact PATH`、`--tokenizer-artifact PATH`，可选 `--lora-adapter PATH`，并用 `C6Hash.fileHash(url:)` 计算本地文件 digest；目录路径报 usage error。
+- [x] 11.4 单测覆盖 base digest 非空、LoRA id 缺 digest 红门、`C6Hash.fileHash` 内容差异、summary 顶层与 eval_run digest 一致。

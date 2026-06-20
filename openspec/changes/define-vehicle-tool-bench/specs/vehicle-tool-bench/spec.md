@@ -129,12 +129,23 @@ C6 SHALL allow an LLM judge only for subjective clarify/refusal text. Judge outp
 - **THEN** the output contains only `clarify_text_score`, `refusal_text_score`, and `reason`
 
 ### Requirement: Replay fingerprint SHALL be recorded per eval run
-Each C6 `eval_run` item SHALL record `run_id`, `case_id`, `model_id`, `lora_adapter_id`, `lora_checkpoint_id`, `qwen_tool_call_format_version`, `prompt_hash`, `sampling_seed`, `tool_output_digest`, and `contract_digest`. These fields SHALL attach to the same run tree used by C3/C6 trace so regressions can be attributed per checkpoint, prompt, format contract, and contract source digest.
+Each C6 `eval_run` item SHALL record `run_id`, `case_id`, `model_id`, `model_artifact_digest`, `tokenizer_digest`, `lora_adapter_id`, `lora_checkpoint_id`, `lora_adapter_digest`, `qwen_tool_call_format_version`, `prompt_hash`, `sampling_seed`, `tool_output_digest`, and `contract_digest`. `model_id` SHALL remain a readable model identifier and SHALL NOT be treated as the model weight fingerprint. `model_artifact_digest` SHALL identify the concrete model artifact file used by the run, `tokenizer_digest` SHALL identify the tokenizer artifact file, and `lora_adapter_digest` SHALL identify the adapter artifact when a LoRA adapter or checkpoint is present. The top-level C6 summary SHALL record the same three artifact digest fields as the eval runs it contains. These fields SHALL attach to the same run tree used by C3/C6 trace so regressions can be attributed per checkpoint, prompt, format contract, artifact, and contract source digest.
 
 #### Scenario: Checkpoint diff is reproducible
 - **GIVEN** two eval runs for the same case
 - **WHEN** a result changes between base and LoRA runs
-- **THEN** the recorded fingerprint identifies model, adapter, checkpoint, prompt hash, seed, tool-output digest, and contract digest
+- **THEN** the recorded fingerprint identifies model ID, model artifact digest, tokenizer digest, adapter ID, adapter checkpoint, adapter artifact digest, prompt hash, seed, tool-output digest, and contract digest
+
+#### Scenario: Base model without LoRA records no adapter digest
+- **GIVEN** a base model run with empty `lora_adapter_id` and empty `lora_checkpoint_id`
+- **WHEN** C6 records the eval run
+- **THEN** `model_artifact_digest` and `tokenizer_digest` are non-empty
+- **AND** `lora_adapter_digest` may be empty
+
+#### Scenario: LoRA identifiers require adapter digest
+- **GIVEN** an eval run with non-empty `lora_adapter_id` or non-empty `lora_checkpoint_id`
+- **WHEN** `lora_adapter_digest` is empty
+- **THEN** the run fails the replay fingerprint gate as an infrastructure error
 
 ### Requirement: Base Qwen3-1.7B baseline SHALL run before LoRA diff
 C6 SHALL first run the full bench with base Qwen3-1.7B and no LoRA adapter. The base run SHALL record empty `lora_adapter_id` and empty `lora_checkpoint_id`. After C5 produces checkpoints, C6 SHALL run the same harness, dataset, prompt policy, parser, mock state, and scoring pipeline against LoRA checkpoints to compute diff. LoRA improvement SHALL NOT be claimed without the base baseline.

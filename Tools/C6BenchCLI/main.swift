@@ -1,9 +1,22 @@
 import Foundation
+import Darwin
 import MAformacCore
 
 @main
 struct C6BenchCLI {
-    static func main() throws {
+    static func main() {
+        do {
+            try run()
+        } catch let error as CLIError {
+            writeError(error.description)
+            exit(64)
+        } catch {
+            writeError("error: \(error)")
+            exit(1)
+        }
+    }
+
+    private static func run() throws {
         let options = try Options(arguments: CommandLine.arguments)
         switch options.command {
         case "generate":
@@ -13,6 +26,13 @@ struct C6BenchCLI {
         default:
             throw CLIError.usage("unknown command: \(options.command)")
         }
+    }
+
+    private static func writeError(_ text: String) {
+        guard let data = "\(text)\n".data(using: .utf8) else {
+            return
+        }
+        FileHandle.standardError.write(data)
     }
 
     private static func generate(_ options: Options) throws {
@@ -41,6 +61,12 @@ struct C6BenchCLI {
         guard let modelResultsPath = options.modelResultsPath else {
             throw CLIError.usage("summarize requires --model-results")
         }
+        guard let modelArtifactPath = options.modelArtifactPath else {
+            throw CLIError.usage("summarize requires --model-artifact PATH")
+        }
+        guard let tokenizerArtifactPath = options.tokenizerArtifactPath else {
+            throw CLIError.usage("summarize requires --tokenizer-artifact PATH")
+        }
         let datasetText = try String(contentsOf: repoRoot.appendingPathComponent("contracts/c6-bench-cases.jsonl"), encoding: .utf8)
         let cases = try C6DatasetCodec().decodeJSONL(datasetText)
         let generator = try makeGenerator(repoRoot: repoRoot)
@@ -48,12 +74,25 @@ struct C6BenchCLI {
         let qwenHash = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
         let contractDigest = try C6Hash.contractDigest(repoRoot: repoRoot, datasetText: datasetText)
         let envelope = try SpikeE3Envelope.load(url: URL(fileURLWithPath: modelResultsPath))
+        let modelArtifactDigest = try artifactDigest(path: modelArtifactPath, flag: "--model-artifact")
+        let tokenizerDigest = try artifactDigest(path: tokenizerArtifactPath, flag: "--tokenizer-artifact")
+        let loraAdapterDigest = try options.loraAdapterPath.map {
+            try artifactDigest(path: $0, flag: "--lora-adapter")
+        } ?? ""
+        let loraAdapterID = envelope.loraAdapterID ?? ""
+        let loraCheckpointID = envelope.loraCheckpointID ?? ""
+        if loraAdapterDigest.isEmpty && (!loraAdapterID.isEmpty || !loraCheckpointID.isEmpty) {
+            throw CLIError.usage("summarize requires --lora-adapter when model results carry LoRA identifiers")
+        }
         let runner = C6BenchRunner(
             qwenToolCallFormatVersion: qwenHash,
             contractDigest: contractDigest,
             modelID: envelope.modelID,
-            loraAdapterID: "",
-            loraCheckpointID: "",
+            modelArtifactDigest: modelArtifactDigest,
+            tokenizerDigest: tokenizerDigest,
+            loraAdapterDigest: loraAdapterDigest,
+            loraAdapterID: loraAdapterID,
+            loraCheckpointID: loraCheckpointID,
             stateCells: generator.stateCells
         )
         let caseByID = Dictionary(uniqueKeysWithValues: cases.map { ($0.caseID, $0) })
@@ -101,14 +140,29 @@ struct C6BenchCLI {
         try String(contentsOf: repoRoot.appendingPathComponent(path), encoding: .utf8)
     }
 
+    private static func artifactDigest(path: String, flag: String) throws -> String {
+        let url = URL(fileURLWithPath: path)
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) else {
+            throw CLIError.usage("\(flag) not found: \(path)")
+        }
+        guard !isDirectory.boolValue else {
+            throw CLIError.usage("\(flag) must be a file; directories are not supported: \(path)")
+        }
+        return try C6Hash.fileHash(url: url)
+    }
+
     private static func renderMarkdown(summary: C6Summary, validation: C6DatasetValidation) -> String {
         """
         # C6 vehicle-tool-bench summary
 
         status: \(summary.status)
         model_id: \(summary.modelID)
+        model_artifact_digest: \(summary.modelArtifactDigest)
+        tokenizer_digest: \(summary.tokenizerDigest)
         lora_adapter_id: "\(summary.loraAdapterID)"
         lora_checkpoint_id: "\(summary.loraCheckpointID)"
+        lora_adapter_digest: "\(summary.loraAdapterDigest)"
         qwen_tool_call_format_version: \(summary.qwenToolCallFormatVersion)
         contract_digest: \(summary.contractDigest)
 
@@ -140,10 +194,13 @@ private struct Options {
     var repoRoot: URL
     var outputDir: String
     var modelResultsPath: String?
+    var modelArtifactPath: String?
+    var tokenizerArtifactPath: String?
+    var loraAdapterPath: String?
 
     init(arguments: [String]) throws {
         guard arguments.count >= 2 else {
-            throw CLIError.usage("usage: C6BenchCLI <generate|summarize> [--repo-root PATH] [--model-results PATH] [--output-dir PATH]")
+            throw CLIError.usage("usage: C6BenchCLI <generate|summarize> [--repo-root PATH] [--model-results PATH] [--model-artifact PATH] [--tokenizer-artifact PATH] [--lora-adapter PATH] [--output-dir PATH]")
         }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -157,6 +214,15 @@ private struct Options {
             case "--model-results":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --model-results value") }
                 modelResultsPath = value
+            case "--model-artifact":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --model-artifact value") }
+                modelArtifactPath = value
+            case "--tokenizer-artifact":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --tokenizer-artifact value") }
+                tokenizerArtifactPath = value
+            case "--lora-adapter":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --lora-adapter value") }
+                loraAdapterPath = value
             case "--output-dir":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --output-dir value") }
                 outputDir = value
@@ -180,6 +246,8 @@ private enum CLIError: Error, CustomStringConvertible {
 
 private struct SpikeE3Envelope: Decodable {
     var modelID: String
+    var loraAdapterID: String?
+    var loraCheckpointID: String?
     var results: [SpikeE3CaseResult]
 
     static func load(url: URL) throws -> SpikeE3Envelope {
