@@ -128,6 +128,18 @@ _Avoid_: 纯横切全层做完才验, 未完成 C1 就纵切
 运行时 demo 表现分层：L1 精做可改态设备，L2 对已听懂的座舱控制语义做通用 mock 兜底，L3 对当前范围外领域优雅延后，L4 做安全拒识。
 _Avoid_: 全集都精做 UI, 听不懂就失败
 
+**value 四件套**:
+value 的语义编码范式 `{ref, direct, offset, type}`，把"调多少/调到哪"分解成可执行语义。type 枚举 `EXP`(模糊经验)/`SPOT`(具体值)/`PERCENT`(百分比)，是 C1 协议表 + 12 归一化动作原语对参数值的统一表达。LoRA 慢路要学的是「自然说法 → value 四件套」的语义映射，不是抽字面数字。
+_Avoid_: 把 argument_value 当抽字面数字, 脱离 value.type 谈参数处理
+
+**抠槽**:
+从用户自然说法里抽取具体参数值填进 value 的 offset（`SPOT`/`PERCENT` 类），如"调到26度"→`offset=26 type=SPOT`、"车窗开到50%"→`offset=50 type=PERCENT`。是语义处理动作之一。
+_Avoid_: 把抠槽等同于正则抽数字, 忽略 type 分流
+
+**逆规整**:
+把模糊感受词逆向映射回规整的 value 四件套（`EXP` 类），如"有点冷/凉飕飕"→`increase_by_exp(offset_enum=LITTLE)`、"有点热"→`decrease_by_exp`。是 demo 不丢脸的泛化核心——模糊说→规整动作，靠 LoRA + 协议表 `trigger_zh` 学，不靠堆规则穷举感受词。
+_Avoid_: 把逆规整当字面匹配, 用规则穷举感受词
+
 ## 已标记歧义
 
 **全集**:

@@ -5,6 +5,8 @@
 
 ## 调研 / teardown 文档（一行一条 + 何时读 / 哪个 change 用）
 
+> 🔑 **起手必读置顶(非 research,但置此醒目)**:`../baseline-semantic-protocol-2026-06-19.md` **MASTER 头** + `../../contracts/semantic-function-contract.jsonl` = **吃透 3990 语义范式(value 四件套/抠槽-逆规整/114→12/L1L2L3/FC 分流),永不重读金钥匙 xlsx**(🔴终结重读契约,磊哥 2026-06-20「第五次还忘」定)。
+
 | 文档 | 是什么 | 何时读（应用点） |
 |---|---|---|
 | `2026-06-19-architecture-validity-deepdive.md` | 6 流证据：1.7B 不镜像 8B，走反转架构（规则+窄域LoRA单跳FC+code编排+受限解码）；信心~92% | 起任何 C-change / 质疑架构 / 写 SRD 时 |

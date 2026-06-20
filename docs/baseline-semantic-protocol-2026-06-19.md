@@ -1,8 +1,29 @@
-# 座舱语义协议基座 — 深度消化 + MAformac 内化方案
+# 🔑 3990 语义协议范式 MASTER（金钥匙表内化 · 权威已确认）
 
-> **状态**:基座消化记录 + 内化方案(待磊哥拍方向)。2026-06-19。
-> **红线**:4 张源表是某车厂一手料(`~/Downloads/`),**只读参考,不进仓、不入训练集**。本文档只抽象**通用语义工程协议范式**(value 四件套 / 归一化动作编码 / 二次交互矩阵等),不复制任何客户标识/车型/具体语料原文。
-> **来源**:① `公版语义四级功能协议表-编辑版`(基座,25 sheet)② `多语种公版语义四级展开V1`(多语种同构)③ `车控功能打点表`(优先级+DS)④ `上下文二次交互功能清单`(多轮)。
+> **状态(2026-06-20 升权威)**:**权威已确认**。C1 `semantic-function-contract` 已 codegen 全集 archived → `openspec/specs/`;本文 = 金钥匙表「公版语义四级功能协议表-编辑版.xlsx」的语义范式终极内化。原 §0–§7 为 2026-06-19 消化时的方案稿(部分"待拍"已被 C1/C2 archive 落定),保留作详细范式;以本 MASTER 头为准。
+>
+> ## 🔴 终结重读契约（磊哥 2026-06-20 定，根治"第五次还忘"）
+> **读本 MASTER 头 + `contracts/semantic-function-contract.jsonl`(3990 行全集)= 吃透 3990,永不重读 xlsx**——除非源快照(`source-snapshot-manifest`)变更。MASTER 管"范式怎么读",jsonl 管"全集 3990 条逐行",两者合起来=完整。**禁止再人肉翻 `~/Downloads/*.xlsx` 求证已知范式**(那是反复读还忘的根)。
+>
+> ## 全景速查（一次读完=拿到骨架）
+> - **规模**:25 sheet(域);C1 全集 **3990 源行** = airControl 178 / carControl 2656 / cmd 1156(媒体/导航/电话等 22 域为二期 MCP,P1 只 codegen 这 3 域)。
+> - **语义四级**:一级功能(域,如 airControl=空调)→ 二级功能组(on_off_ac)→ 三级动作(open_ac)→ **四级功能带协议赋值**(`打开[<direction#空调温区>]空调`,含槽位占位)。
+> - **31 列 → C1 jsonl 字段映射**(关键列):
+>   - col6 四级功能带协议赋值 → 槽位模板 · col8 NLU协议 → `ds_protocol` · col9 NLU取值范围 → `range`
+>   - col20 示例说法 → `example_utterance`(脱敏 hash) · **col21 功能类型编码 → `action_code`**(=114 编码) · col22 泛化句式槽映射 → slot 关系
+>   - **col23/24/25 = L1/L2/L3 句式 → 三层路由泛化语料一手源**(L1 精确指令/L2 模糊/L3 更松,是 LoRA 训练 + 三层路由分级的根)
+>   - **col30/31 = FC模糊说/FC自由说(是/否)→ `fc_flags{fuzzy,free}`**(=intent-routing 分流分类依据:否→规则快路;是→慢路 FC 泛化)
+> - **114 功能类型编码 → 12 归一化动作原语**(动作归一化=灵魂,非每设备一个平铺 tool)。高频原语:`set_mode 709 / power_on 553 / power_off 551 / adjust_to_number 448 / by_percent 333 / increase_by_exp 252 / decrease_by_exp 188 / adjust_to_max 142 / adjust_to_min 142 / adjust_to_gear 128`,每个有 `_position_` 位置变体。
+> - **value 四件套 `{ref,direct,offset,type}`**(参数规划核心,定义见 §2②):type 分布 = **EXP 734(逆规整,模糊"有点冷"→increase_by_exp) / SPOT 459(抠槽,"调到26度"→offset=26) / PERCENT 373("车窗50%")**。**抠槽=从话抽具体值(SPOT/PERCENT);逆规整=模糊感受词→规整 offset_enum(EXP)**(见 CONTEXT.md 术语)。
+> - **二次交互矩阵**(多轮金钥匙,源④):首轮 intent → 可继承槽 → 次轮 intent + 省略说法 → C1 `second_turn_refs` sidecar(C4 消费)。
+>
+> ## 起手必读(防失忆三道闸)
+> 本 MASTER 进 CLAUDE §4/§9 起手必读 + MEMORY 架构组 + INDEX 置顶。**新 session 起手读本 MASTER = 不用翻 xlsx**。
+>
+> ---
+>
+> **红线**:4 张源表是某车厂一手料(`~/Downloads/` + 冻结快照),**只读参考,不进仓、不入训练集**。本文档只抽象**通用语义工程协议范式**,不复制任何客户标识/车型/具体语料原文。
+> **来源**:① `公版语义四级功能协议表-编辑版`(★金钥匙,25 sheet)② `多语种公版语义四级展开V1`(多语种同构)③ `车控功能打点表`(优先级+DS)④ `上下文二次交互功能清单`(多轮)。
 
 ## 0. 先认错(根因)
 我此前 4 次被要求"仔细看",每次都在二手简化的 `contracts/capabilities.yaml` 上接着推(change2/3/must-pass),**从没逐 sheet 读这 4 张一手基座**。结果把一个被我自己简化坏的契约当事实源,还把"我有点冷→设26度""+2度"这种**拍脑袋值**当设计。根因 = happy-path + 凭二手料拍脑袋 + 进舒适圈。本文档是把基座真正吃透后的重做基础。
