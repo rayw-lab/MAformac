@@ -11,6 +11,9 @@
 | `2026-06-19-home-llm-teardown.md` | home-llm **runtime 工程**：单发旋钮/三层防御解析/双向单位归一化/KV预热/三重白名单/GBNF | **C3 execution + C7 voice 实装**（DemoGuard/GBNF/单发） |
 | `2026-06-19-home-llm-teardown-data.md` | home-llm **C5 LoRA 数据配方**：5类样本/模板随机参数/distractor/train_on_turn masking/配比 | **C5 LoRA 实装**（数据生成） |
 | `2026-06-19-asr-alignment-research.md` | ASR 选型(sherpa+Paraformer>Whisper)+对齐(拼音fuzzy/LoRA音近)+**跨厂商二审修正(热词transducer-only/D14改)** | **C7 voice 实装** + D14 决策 |
+| `2026-06-20-mastra-teardown-workflow-eval-trace.md` | Mastra workflow/eval/trace 形态拆解：冻结图、TrajectoryExpectation、scorer pipeline、span 树；只借形态，不进 runtime | **C4 路由 / C6 bench / C3-C6 trace** 解冻或写设计时 |
+| `2026-06-20-pi-teardown-collaboration-layer.md` | Pi 协作层拆解：append-only handoff、七段 compaction、工具前后 hook、headless 状态行；只进长任务规范 | **长任务 handoff / 派单 / 子审计规范** |
+| `../优化待讨论-吸收内化措施38项-2026-06-20.md` | 38 项吸收措施 + Q1-Q6 grill 结论 + #39/#40 + 三刀落地顺序 | **C3-C7 任一 change 解冻前**，作为 adopt/backlog 总入口 |
 
 ## §1 应用机制（怎么在未来 session 落地，不靠纯 grep）
 1. **MEMORY.md 指针**（每 session 自动加载）→ 知道这些 doc 存在 + 一句话要点。
