@@ -71,6 +71,16 @@ public struct C3ExecutionPipeline: Sendable {
             throw ToolExecutionError.semanticInvalid("unknown_device_or_primitive")
         }
 
+        // L1 primitive gate (gap#3 / design E7):device 在 L1 allowlist 内时,只有 reviewed primitives
+        // 才能走 L1 精做执行。合法 C1 但非 reviewed 的 primitive(如 ac_temperature.increase_by_number)
+        // 不得被当 L1 静默执行,deny 让其在全系统中改走 L2。
+        if let entry = allowlist.entry(device: frame.device),
+           !entry.primitives.isEmpty,
+           !entry.primitives.contains(frame.actionPrimitive) {
+            traceLogger.recordGuard(traceID: frame.traceID, message: "primitive_not_in_l1_allowlist", attributes: TraceAttributes(guardReason: "primitive_not_in_l1_allowlist"))
+            throw ToolExecutionError.guardDenied("primitive_not_in_l1_allowlist")
+        }
+
         if semanticRow.clarifyTag == "implicit", !intentConfirmedProvider() {
             traceLogger.recordGuard(traceID: frame.traceID, message: "intent_not_confirmed", attributes: TraceAttributes(guardReason: "intent_not_confirmed"))
             throw ToolExecutionError.guardDenied("intent_not_confirmed")
