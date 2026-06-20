@@ -17,7 +17,7 @@
 | 14-repo teardown + Qwen3.5-2B 可行性 + synthesis | **committed 31edafc → push origin/main** | git |
 | C4 三层路由/短时记忆 · C5 LoRA 数据 · C7 离线语音 | **未起（待解冻）** | — |
 
-**新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**往后第一优先不是扩 C6、不是急训 LoRA，而是 P1-A C5 数据门 + P1-B Qwen spike 并行；P1-C train 必须等两门都过。**
+**新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**P1-A C5 数据门 ✅V-PASS + P1-B Qwen spike ✅(守 1.7B) 已收口 push `846e40c`；P1-C train 仍 blocked——差 masking 数据生成 + 训练环境(Mac 无 N 卡)，需 grill；模型已定训 Qwen3-1.7B。**
 
 ---
 
@@ -119,15 +119,16 @@
 
 **P0 收尾**：补完 → `openspec archive define-vehicle-tool-bench`（实跑 + `git status` 对账，§30）→ C6 真 done。**顺手清债**：C3 `tasks` 补勾 → archive `define-execution-contract`。
 
-### 🟡 P1 — C5 数据门（C6 archive 后）+ Qwen spike（并行）
+### 🟡 P1 — C5 数据门 + Qwen spike（并行）
 
+> **Status 2026-06-20 晚（push origin/main `846e40c`）**：P1-A ✅ **V-PASS** · P1-B ✅ **done=BLOCKED（守 1.7B）** · P1-C ⚠️ **仍 blocked**（差 masking 数据生成 + 训练环境，需 grill）。两单单工作树并行、文件域不重叠、各拆 clean commit + CC 二层对抗审计*2（P1-A CLEAR / P1-B CLEAR+修 VL 披露 BLOCKER-1）。
 > C5：Pocock S1→S4 · OpenSpec 新 change · Superpowers brainstorming HARD-GATE + TDD · Pi codex 长跑 before/after 门。
 
-| 项 | 做什么 | harness |
+| 项 | 状态 | 结果 / 前置 |
 |---|---|---|
-| **P1-A C5 数据门（先门后训，模型无关，可先做）** | `verification_receipt`：`row_count / bucket_counts / format_contract_version(#39 qwen-tool-call-format) / tool_call_format_pass_rate=1.0 / split_whitelist / parent_semantic_overlap=0 / must_not_train_violations=0` + masking 三形态（train_on_turn / arg-token / function masking）。tau2 train/test/base split(base=train∪test，C6 跑 base，test=held-out)。failure→`propose_fix(auto_apply:false)` 喂增广**永不自动改权重** | OpenSpec 新 change C5 propose（design 引 teardown-data 配方 + tau2 split）· Mastra（无 runtime，纯数据配方） |
-| **P1-B Qwen3.5-2B S1/S2 spike（与 P0/P1-A 并行，gate 在 train 前）** | **S1**(命门)：直读 `mlx-swift-lm` tool parser 源码 + 实采（multiline/empty/tool-output/parser smoke），断言收 `.toolCall` 非 `.chunk`。**S2**：iPhone 真机 GDN 版 TTFT/decode/RAM。S1+S2 过→训 2B、1.7B fallback；S1 不过(parser 硬墙)→守 1.7B | Pocock S5 diagnose · Superpowers systematic-debugging · spike 报告含「测了/没测哪些 failure mode」入 docs/research |
-| **P1-C LoRA train（等 P1-A 数据门过 + P1-B spike 定模型）** | 训 spike 选定模型；same C6 harness diff，base vs LoRA with fingerprints（P0-2 补的权重 hash 锁住） | Mastra scorer pipeline 复用 C6 · TDD per-checkpoint 选最优防过拟合 |
+| **P1-A C5 数据门** | ✅ **V-PASS** | `define-lora-data-gate` + C5DataGate validator + receipt(3670 行:train2320/heldout1200/must_pass30/quar120;must_not_train=0/parent_overlap 真 0 字段级 lineage/C6 42+12 trap 零进 train/validator exit65 真阻断/digest 可复算/raw 只读)。⚠️ **masking_coverage 全 false**(未实现 masking 三形态)=P1-C 硬前置未完 |
+| **P1-B Qwen spike** | ✅ **BLOCKED** | S1 真采(mlx-swift-lm 3.31.3→xmlFunction):**Qwen3.5-2B 8/11=72.7% 全面劣于 1.7B baseline 9/11=81.8%**(漏触发"屏幕太暗"/否定 trap);S2 无真机 blocked_env;artifact 实为 **VL 多模态**(借文本塔)。decision=守 1.7B,s1_only_candidate。**模型已定=训 Qwen3-1.7B** |
+| **P1-C LoRA train** | ⚠️ **仍 blocked** | **两前置须 grill 拍**:① **masking 数据生成**(P1-A masking_coverage→true:train_on_turn/arg-token/function masking,Hammer/GOAT 配方,防死记 3HIGH 之一)② **训练环境未定**(unsloth 要 CUDA,Mac M5 无 N 卡→云 GPU or mlx-lm 本机 LoRA,须联网搜证)。模型=1.7B 已定;train=same C6 harness diff + 权重 fingerprint(P0-2)锁 |
 
 ### 🟢 P2 — C4 + C7 propose 解冻（C5 第一轮 checkpoint 后 / 可并行设计）
 
@@ -216,7 +217,7 @@ pass^k / run_repetitions 多跑方差（base/边界 case N≥5，temp=0）+ fail
    └─🎨 H7 UI/UE 重评 ── C7 后 / S6 演示包前
 ```
 
-**起手第一步**：P1-A C5 数据门 + P1-B Qwen spike 并行。P1-C LoRA train 仍等数据门过 + spike 定模型后再启动。
+**起手第一步**：**P1-C 启动评估 grill**（P1-A ✅V-PASS / P1-B ✅守 1.7B 已 push `846e40c`）— 拍 ① masking 数据生成 ② 训练环境（Mac M5 无 N 卡，云 GPU or mlx-lm 本机）。两前置过才训 Qwen3-1.7B LoRA。P2 C4/C7 在 C5 第一轮 checkpoint 后解冻。
 
 ---
 
