@@ -1,0 +1,14 @@
+[transformers] PyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
+Loading configuration file Reports/c5-remediation-wave-20260621T2013-pr3-full/prepare-final-v3/mlx-lora-config.yaml
+MAformac C5 repo training loop (mlx-lm=0.31.1, grad_clip_norm=1.0, clip_disabled=True, stock_update_inside_compile=True)
+Loading pretrained model
+Loading datasets
+Training
+Trainable parameters: 1.013% (17.433M/1720.575M)
+Starting training..., iters: 4
+Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.13s/it]Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.13s/it]
+Iter 1: Val loss 5.336, Val took 1.145s
+Calculating loss...:   0%|          | 0/1 [00:00<?, ?it/s]Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.28s/it]Calculating loss...: 100%|██████████| 1/1 [00:01<00:00,  1.28s/it]
+Iter 4: Val loss 5.659, Val took 1.286s
+Iter 4: Train loss 5.540, Learning Rate 0.000e+00, It/sec 0.211, Tokens/sec 76.529, Trained Tokens 1451, Peak mem 11.398 GB, Grad Norm Preclip 236.280701
+Saved final weights to Reports/c5-pr2pr4pr5-20260621T235213/pr2-2b-stock-semantics-smoke/adapters/adapters.safetensors.

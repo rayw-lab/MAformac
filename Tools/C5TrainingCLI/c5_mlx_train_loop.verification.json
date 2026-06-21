@@ -1,0 +1,12 @@
+{
+  "source_state": "verified",
+  "script_sha256": "5400641044144746f8d4ddc424b8b49f66e650e6511d94843ccd64f12895e0f7",
+  "verification_status": "pass",
+  "verification_ref": "Reports/c5-pr2pr4pr5-20260621T235213/pr2-2b-equivalence/evidence-summary.md",
+  "clip_proof_ref": "Reports/c5-pr2pr4pr5-20260621T235213/pr2-2a-clip-enabled/evidence-summary.md",
+  "audit_refs": [
+    "Reports/c5-pr2pr4pr5-20260621T235213/audits/codex-audit-pr2-2a-clip-enabled-r1.md",
+    "Reports/c5-pr2pr4pr5-20260621T235213/audits/codex-audit-pr2-2b-equivalence-r1.md"
+  ],
+  "verified_at": "2026-06-22T00:34:00+08:00"
+}

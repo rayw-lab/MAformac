@@ -1,0 +1,126 @@
+{
+  "receipt_version": "c5-pr5-parity-vpass.v1",
+  "generated_at": "2026-06-21T18:49:07Z",
+  "verdict": "PARITY_VPASS_BLOCKED_BY_C6_HARD_FAIL",
+  "candidate_signing_status": "not_signed_c6_hard_fail_tool_surface_mismatch",
+  "upstream_c6_gate": {
+    "receipt_path": "Reports/c5-pr2pr4pr5-20260621T235213/pr5-5c-c6-eval/c6-eval-receipt.json",
+    "receipt_sha256": "2167fa80f9839bc55da226df4f723f3e319f2ae7aeb7b757c025c1a65bcefd4e",
+    "verdict": "C6_HARD_FAIL_BLOCKED",
+    "lora_positive_expected_tool_hits": "0/34",
+    "lora_observed_tool_names": [
+      "tool_call"
+    ],
+    "training_outer_tool_names": [
+      "tool_call_frame"
+    ],
+    "c6_expected_tool_names": [
+      "query_cabin_comfort",
+      "set_cabin_ac",
+      "set_cabin_ambient_light",
+      "set_cabin_fan",
+      "set_cabin_screen_brightness",
+      "set_cabin_window"
+    ],
+    "blocking_diagnosis": "training_eval_tool_surface_mismatch_and_positive_action_collapse"
+  },
+  "candidate_training_reference": {
+    "training_run_receipt_path": "Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-training/c5-training-run-receipt.json",
+    "training_run_receipt_sha256": "6ef33358a48ee060be4abf726d585bb4a5865995f8d3da55f68f4b8854fa3f56",
+    "prepare_receipt_path": "Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/c5-training-receipt.json",
+    "prepare_receipt_sha256": "4b9221774e983a93888f9ab054cc866875b63d2014f4e8b35ac89cd15d90df8e",
+    "training_status": "train_health_pass",
+    "scale": 20,
+    "rank": 16,
+    "final_adapter_sha256": "a8b5a50ca08bd3f96b37411f40718568625606985935d09d18eedd88e45b86fc"
+  },
+  "dynamic_fused_quantized_parity": {
+    "status": "blocked_not_run",
+    "blocking_gate": "c6_eval_verdict=C6_HARD_FAIL_BLOCKED",
+    "reason": "Candidate failed the upstream model-quality C6 release gate before parity. Running dynamic/fused/quantized parity would not restore ToolCallExact, IrrelAcc, or must-pass status and would risk creating a misleading secondary readiness signal.",
+    "required_after_fix": [
+      "reconcile training target tool surface with C6/runtime parser surface",
+      "retrain or introduce a scored bridge",
+      "rerun C6 base-vs-LoRA under the same harness",
+      "only then compare dynamic adapter, fused bf16, and fused quantized or endpoint behavior on the same sample sets"
+    ],
+    "deltas_recorded": null,
+    "failure_receipt": [
+      "dynamic_fused_quantized_parity_not_run_because_c6_failed",
+      "model_quality_vpass_blocked_before_parity"
+    ]
+  },
+  "endpoint_tokenizer_byte_parity": {
+    "status": "blocked_not_run",
+    "blocking_gates": [
+      "c6_eval_verdict=C6_HARD_FAIL_BLOCKED",
+      "no_target_physical_device_receipt"
+    ],
+    "reason": "Endpoint byte parity cannot sign endpoint readiness without a model-quality candidate and target physical device evidence. Mac-only and simulator-only evidence are explicitly insufficient.",
+    "training_render_bytes_digest": null,
+    "endpoint_render_bytes_digest": null,
+    "render_source": null,
+    "exact_match_status": "not_evaluated",
+    "failure_receipt": [
+      "endpoint_tokenizer_byte_parity_not_run_because_c6_failed",
+      "endpoint_tokenizer_byte_parity_not_run_without_physical_target"
+    ]
+  },
+  "vpass_split": {
+    "model_quality_vpass": {
+      "status": "blocked",
+      "blocking_gates": [
+        "c6_hard_fail",
+        "positive_action_toolcall_exact_collapse",
+        "training_eval_tool_surface_mismatch",
+        "dynamic_fused_quantized_parity_not_run"
+      ],
+      "mac_c6_evidence_path": "Reports/c5-pr2pr4pr5-20260621T235213/pr5-5c-c6-eval/c6-eval-receipt.json"
+    },
+    "physical_endpoint_vpass": {
+      "status": "blocked",
+      "blocking_gates": [
+        "model_quality_vpass_blocked",
+        "endpoint_tokenizer_byte_parity_not_run",
+        "no_target_physical_device_receipt"
+      ],
+      "device_probe": {
+        "xctrace_command": "xcrun xctrace list devices",
+        "xctrace_physical_devices_observed": [
+          "王磊的MacBook Pro (96363CC7-7B5F-5428-A5A7-7874CAAD56B6)"
+        ],
+        "xctrace_target_ios_device_observed": false,
+        "simctl_command": "xcrun simctl list devices available",
+        "simulators_observed": true,
+        "simulator_evidence_policy": "insufficient_for_physical_endpoint_vpass"
+      }
+    }
+  },
+  "gptpro_final_audit": {
+    "status": "pending",
+    "required_before_candidate_signing": true,
+    "same_source_codex_audits_are_insufficient_for_signing": true
+  },
+  "task_status": {
+    "4.1_dynamic_fused_quantized_parity": "blocked_open",
+    "4.2_endpoint_tokenizer_byte_parity": "blocked_open",
+    "4.3_two_layer_vpass_status": "recorded_blocked",
+    "4.4_subagent_audit": "pending",
+    "4.5_gptpro_final_audit": "pending"
+  },
+  "failure_receipt": [
+    "parity_vpass_blocked_by_c6_hard_fail",
+    "candidate_not_signed",
+    "model_quality_vpass_blocked",
+    "physical_endpoint_vpass_blocked",
+    "no_physical_target_device_receipt"
+  ],
+  "residual_gates": [
+    "fix_training_eval_tool_surface_mismatch",
+    "rerun_c6_after_tool_surface_fix",
+    "complete_semantic_near_neighbor_proof",
+    "run_dynamic_fused_quantized_parity_after_c6_pass",
+    "run_endpoint_tokenizer_byte_parity_on_target_after_model_quality_pass",
+    "run_gptpro_final_audit_before_any_candidate_signing"
+  ]
+}

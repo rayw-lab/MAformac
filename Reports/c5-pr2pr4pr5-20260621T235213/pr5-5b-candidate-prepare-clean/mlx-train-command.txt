@@ -1,0 +1,19 @@
+/opt/homebrew/opt/python@3.13/bin/python3.13 \
+  /Users/wanglei/workspace/MAformac/Tools/C5TrainingCLI/c5_mlx_train_loop.py \
+  --train \
+  --model /Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/qwen3-1_7b-training-tokenizer-patched \
+  --data /Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/mlx-data \
+  --config /Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/mlx-lora-config.yaml \
+  --mask-prompt \
+  --num-layers -1 \
+  --batch-size 4 \
+  --grad-accumulation-steps 4 \
+  --iters 600 \
+  --learning-rate 0.0001 \
+  --seed 0 \
+  --max-seq-length 1024 \
+  --grad-clip-norm 1.0 \
+  --nonfinite-fallback-lr 5e-5 \
+  --metrics-jsonl /Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/metrics.jsonl \
+  --source-snapshot-output /Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/c5_mlx_train_loop.snapshot.py \
+  --adapter-path /Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare-clean/adapters-rank16

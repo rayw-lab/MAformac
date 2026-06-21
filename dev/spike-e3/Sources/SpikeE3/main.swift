@@ -47,6 +47,21 @@ private struct SpikeRunner {
         }
         let resolvedToolCallFormat = formatName(modelContext.configuration.toolCallFormat)
         print("Model loaded; resolvedToolCallFormat=\(resolvedToolCallFormat)")
+        var loraAdapterConfigNormalization: LoRAAdapterConfigNormalization?
+        if let loraAdapterPath = options.loraAdapterPath {
+            let adapterURL = URL(fileURLWithPath: loraAdapterPath, isDirectory: true)
+            let normalized = try normalizedLoRAAdapterDirectory(
+                originalAdapterURL: adapterURL,
+                outputDir: outputDir,
+                model: modelContext.model
+            )
+            loraAdapterConfigNormalization = normalized.normalization
+            let adapter = try LoRAContainer.from(directory: normalized.adapterURL)
+            try adapter.load(into: modelContext.model)
+            print(
+                "Loaded LoRA adapter path=\(adapterURL.path) effectivePath=\(normalized.adapterURL.path) id=\(options.loraAdapterID) checkpoint=\(options.loraCheckpointID) rank=\(adapter.configuration.loraParameters.rank) scale=\(adapter.configuration.loraParameters.scale)"
+            )
+        }
 
         let loadedCases = try options.casesJSONL.map(loadC6Cases(from:)) ?? sampleCases
         let limitedCases = Array(loadedCases.prefix(options.limit ?? loadedCases.count))
@@ -71,6 +86,10 @@ private struct SpikeRunner {
             mlxSwiftLMTag: mlxSwiftLMTag,
             requestedToolCallFormat: options.toolCallFormatMode,
             resolvedToolCallFormat: resolvedToolCallFormat,
+            loraAdapterID: options.loraAdapterPath == nil ? nil : options.loraAdapterID,
+            loraCheckpointID: options.loraAdapterPath == nil ? nil : options.loraCheckpointID,
+            loraAdapterPath: options.loraAdapterPath,
+            loraAdapterConfigNormalization: loraAdapterConfigNormalization,
             snapshotTime: snapshotTime,
             totalCases: results.count,
             summary: summary,
@@ -170,6 +189,9 @@ private struct RunOptions {
     var outputDir = "Reports"
     var casesJSONL: String?
     var repeatCount = 1
+    var loraAdapterPath: String?
+    var loraAdapterID = ""
+    var loraCheckpointID = ""
 
     init(arguments: [String]) throws {
         var iterator = arguments.dropFirst().makeIterator()
@@ -199,11 +221,24 @@ private struct RunOptions {
                 if let value = iterator.next(), let count = Int(value) {
                     repeatCount = max(1, count)
                 }
+            case "--lora-adapter-path":
+                if let value = iterator.next() {
+                    loraAdapterPath = value
+                }
+            case "--lora-adapter-id":
+                if let value = iterator.next() {
+                    loraAdapterID = value
+                }
+            case "--lora-checkpoint-id":
+                if let value = iterator.next() {
+                    loraCheckpointID = value
+                }
             default:
                 break
             }
         }
         _ = try resolvedToolCallFormat()
+        try validateLoRAOptions()
     }
 
     func resolvedToolCallFormat() throws -> ToolCallFormat? {
@@ -218,17 +253,89 @@ private struct RunOptions {
             throw SpikeError.invalidToolCallFormat(toolCallFormatMode)
         }
     }
+
+    func validateLoRAOptions() throws {
+        if loraAdapterPath == nil && (!loraAdapterID.isEmpty || !loraCheckpointID.isEmpty) {
+            throw SpikeError.incompleteLoRAOptions("--lora-adapter-path is required when LoRA identifiers are provided")
+        }
+        if loraAdapterPath != nil && (loraAdapterID.isEmpty || loraCheckpointID.isEmpty) {
+            throw SpikeError.incompleteLoRAOptions("--lora-adapter-id and --lora-checkpoint-id are required with --lora-adapter-path")
+        }
+    }
 }
 
 private enum SpikeError: Error, CustomStringConvertible {
     case invalidToolCallFormat(String)
+    case incompleteLoRAOptions(String)
+    case invalidLoRAAdapterConfig(String)
 
     var description: String {
         switch self {
         case .invalidToolCallFormat(let value):
             return "invalid --tool-call-format \(value); expected json, xml_function, or auto"
+        case .incompleteLoRAOptions(let value):
+            return "invalid LoRA options: \(value)"
+        case .invalidLoRAAdapterConfig(let value):
+            return "invalid LoRA adapter config: \(value)"
         }
     }
+}
+
+private struct LoRAAdapterConfigNormalization: Codable, Sendable {
+    let status: String
+    let originalAdapterPath: String
+    let effectiveAdapterPath: String
+    let originalNumLayers: Int
+    let normalizedNumLayers: Int
+    let reason: String
+}
+
+private func normalizedLoRAAdapterDirectory(
+    originalAdapterURL: URL,
+    outputDir: URL,
+    model: any LanguageModel
+) throws -> (adapterURL: URL, normalization: LoRAAdapterConfigNormalization?) {
+    let configURL = originalAdapterURL.appending(component: "adapter_config.json")
+    let data = try Data(contentsOf: configURL)
+    guard var root = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+        throw SpikeError.invalidLoRAAdapterConfig("adapter_config.json is not an object")
+    }
+    let originalNumLayers = root["num_layers"] as? Int
+    guard let originalNumLayers, originalNumLayers < 0 else {
+        return (originalAdapterURL, nil)
+    }
+    guard let loraModel = model as? LoRAModel else {
+        throw SpikeError.invalidLoRAAdapterConfig("num_layers=\(originalNumLayers) requires a LoRAModel-compatible base")
+    }
+    let normalizedNumLayers = loraModel.loraLayers.count
+    guard normalizedNumLayers > 0 else {
+        throw SpikeError.invalidLoRAAdapterConfig("LoRAModel exposed no loraLayers")
+    }
+    root["num_layers"] = normalizedNumLayers
+    let normalizedDir = outputDir.appending(component: "normalized-lora-adapter", directoryHint: .isDirectory)
+    try FileManager.default.createDirectory(at: normalizedDir, withIntermediateDirectories: true)
+    let normalizedConfigData = try JSONSerialization.data(
+        withJSONObject: root,
+        options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+    )
+    try normalizedConfigData.write(to: normalizedDir.appending(component: "adapter_config.json"), options: .atomic)
+    let originalWeightsURL = originalAdapterURL.appending(component: "adapters.safetensors")
+    let normalizedWeightsURL = normalizedDir.appending(component: "adapters.safetensors")
+    if FileManager.default.fileExists(atPath: normalizedWeightsURL.path) {
+        try FileManager.default.removeItem(at: normalizedWeightsURL)
+    }
+    try FileManager.default.createSymbolicLink(at: normalizedWeightsURL, withDestinationURL: originalWeightsURL)
+    return (
+        normalizedDir,
+        LoRAAdapterConfigNormalization(
+            status: "normalized",
+            originalAdapterPath: originalAdapterURL.path,
+            effectiveAdapterPath: normalizedDir.path,
+            originalNumLayers: originalNumLayers,
+            normalizedNumLayers: normalizedNumLayers,
+            reason: "MLX Python adapter_config uses num_layers=-1 for all layers; MLX Swift LoRAContainer requires a non-negative suffix length."
+        )
+    )
 }
 
 private func formatName(_ format: ToolCallFormat?) -> String {
@@ -656,6 +763,10 @@ private struct ResultEnvelope: Codable, Sendable {
     let mlxSwiftLMTag: String
     let requestedToolCallFormat: String
     let resolvedToolCallFormat: String
+    let loraAdapterID: String?
+    let loraCheckpointID: String?
+    let loraAdapterPath: String?
+    let loraAdapterConfigNormalization: LoRAAdapterConfigNormalization?
     let snapshotTime: String
     let totalCases: Int
     let summary: Summary
@@ -723,6 +834,9 @@ private func renderReport(_ envelope: ResultEnvelope) -> String {
     mlx-swift-lm: \(envelope.mlxSwiftLMTag)
     requested_tool_call_format: \(envelope.requestedToolCallFormat)
     resolved_tool_call_format: \(envelope.resolvedToolCallFormat)
+    lora_adapter_id: \(envelope.loraAdapterID ?? "none")
+    lora_checkpoint_id: \(envelope.loraCheckpointID ?? "none")
+    lora_adapter_config_normalization: \(envelope.loraAdapterConfigNormalization?.status ?? "none")
     snapshot_time: \(envelope.snapshotTime)
     cases: \(envelope.totalCases) total = \(summary.positiveCount) positive + \(summary.negativeCount) negative
     decision: \(summary.decision)
@@ -760,6 +874,6 @@ private func renderReport(_ envelope: ResultEnvelope) -> String {
     - `toolCallFormat` requested=\(envelope.requestedToolCallFormat), resolved=\(envelope.resolvedToolCallFormat).
     - `additionalContext["enable_thinking"] = false`; `<think>` in chunks is recorded as `thinkLeak`.
     - Samples are derived from `contracts/capabilities.yaml` 8 active capabilities and project restraint/OOD seeds; no model-generated samples are used.
-    - This is a base-model spike only. No LoRA training, no main app integration, no real vehicle control.
+    - This is an isolated SpikeE3 model-eval harness. It may run base-only or a LoRA adapter when explicit LoRA args are provided; no main app integration or real vehicle control is exercised.
     """
 }

@@ -65,7 +65,8 @@ let package = Package(
             path: "Tools/C5TrainingCLI",
             exclude: [
                 "c5_mlx_train_loop.py",
-                "c5_mask_offset_fixture.py"
+                "c5_mask_offset_fixture.py",
+                "c5_mlx_train_loop.verification.json"
             ]
         )
     ]

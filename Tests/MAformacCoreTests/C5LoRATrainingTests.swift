@@ -288,6 +288,299 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(actionSamples.contains { ($0.messages.first { $0.role == "user" }?.content ?? "").contains("primitive=") })
     }
 
+    func testFormalTrainingBlocksUnverifiedTrainingLoopSource() {
+        let seeds = routeBalancedSeeds(prefix: "unverified")
+        let initial = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true
+            )
+        )
+        let artifact = passingOffsetArtifact(for: initial.samples)
+        let records = generatedRecords(for: initial.samples.filter { !$0.expectedToolCalls.isEmpty })
+
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                offsetTokenArtifact: artifact,
+                generatedUtteranceRecords: records
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.environment.trainingLoopSourceState, "tracked_unverified")
+        XCTAssertEqual(prepared.receipt.status, "blocked")
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("training_loop_source_unverified"))
+    }
+
+    func testVerifiedTrainingLoopSourceUnblocksFormalTrainingGate() {
+        let seeds = routeBalancedSeeds(prefix: "verified")
+        let verifiedEnvironment = verifiedEnvironment()
+        let initial = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment
+            )
+        )
+        let artifact = passingOffsetArtifact(for: initial.samples)
+        let records = generatedRecords(for: initial.samples.filter { !$0.expectedToolCalls.isEmpty })
+
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment,
+                offsetTokenArtifact: artifact,
+                generatedUtteranceRecords: records
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.environment.trainingLoopSourceState, "verified")
+        XCTAssertEqual(prepared.receipt.environment.trainingLoopVerificationStatus, "pass")
+        XCTAssertFalse(prepared.receipt.failureReceipt.contains("training_loop_source_unverified"))
+        XCTAssertEqual(prepared.receipt.status, "trainable_v0_ready")
+    }
+
+    func testTrainingMethodContractAuthorityUsesArchivedMethodContract() {
+        let seeds = routeBalancedSeeds(prefix: "method-authority")
+        let verifiedEnvironment = verifiedEnvironment()
+        let initial = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment
+            )
+        )
+
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment,
+                offsetTokenArtifact: passingOffsetArtifact(for: initial.samples),
+                generatedUtteranceRecords: generatedRecords(for: initial.samples.filter { !$0.expectedToolCalls.isEmpty })
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.trainingMethodContractAuthority.status, "pass")
+        XCTAssertEqual(
+            prepared.receipt.trainingMethodContractAuthority.activeMethodSpecPath,
+            "openspec/specs/lora-training/spec.md"
+        )
+        XCTAssertEqual(
+            prepared.receipt.trainingMethodContractAuthority.archivedChangePath,
+            "openspec/changes/archive/2026-06-21-define-lora-training"
+        )
+        XCTAssertNotNil(prepared.receipt.trainingMethodContractAuthority.activeMethodSpecSHA256)
+        XCTAssertNotNil(prepared.receipt.trainingMethodContractAuthority.archivedMethodSpecSHA256)
+        XCTAssertTrue(prepared.receipt.sourceRefs.contains("openspec/specs/lora-training/spec.md"))
+        XCTAssertTrue(prepared.receipt.sourceRefs.contains("openspec/changes/archive/2026-06-21-define-lora-training"))
+        XCTAssertFalse(prepared.receipt.sourceRefs.contains("openspec/changes/define-lora-training/specs/lora-training/spec.md:3-164"))
+        XCTAssertEqual(prepared.receipt.status, "trainable_v0_ready")
+    }
+
+    func testTrainingMethodContractAuthorityFailsClosedWhenArchiveAuthorityIsMissing() {
+        let authority = C5TrainingMethodContractAuthority.evaluate(
+            activeMethodSpecPath: "/tmp/maformac-missing-active-spec-\(UUID().uuidString).md",
+            archivedChangePath: "/tmp/maformac-missing-archive-\(UUID().uuidString)",
+            archivedMethodSpecPath: "/tmp/maformac-missing-archived-spec-\(UUID().uuidString).md"
+        )
+
+        XCTAssertEqual(authority.status, "fail")
+        XCTAssertTrue(authority.failureReceipt.contains("active_training_method_spec_missing"))
+        XCTAssertTrue(authority.failureReceipt.contains("archived_define_lora_training_change_missing"))
+        XCTAssertTrue(authority.failureReceipt.contains("archived_training_method_spec_missing"))
+        XCTAssertNil(authority.activeMethodSpecSHA256)
+        XCTAssertNil(authority.archivedMethodSpecSHA256)
+    }
+
+    func testFirstCandidateScaleAuthorityDefaultsTo20AndBlocksLegacy32() {
+        let config = C5MLXLoRAConfig.rank16Mainline()
+        XCTAssertEqual(config.scale, 20)
+        XCTAssertTrue(config.renderYAML.contains("scale: 20.0"))
+        XCTAssertEqual(C5ScaleAuthorityResolution.evaluate(observedScale: config.scale).status, "pass")
+
+        var legacyScaleConfig = config
+        legacyScaleConfig.scale = 32
+        let seeds = routeBalancedSeeds(prefix: "scale-authority")
+        let initial = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment()
+            )
+        )
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                mlxConfig: legacyScaleConfig,
+                environment: verifiedEnvironment(),
+                offsetTokenArtifact: passingOffsetArtifact(for: initial.samples),
+                generatedUtteranceRecords: generatedRecords(for: initial.samples.filter { !$0.expectedToolCalls.isEmpty })
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.mlxConfig.scale, 32)
+        XCTAssertEqual(prepared.receipt.scaleAuthorityResolution.status, "fail")
+        XCTAssertEqual(prepared.receipt.scaleAuthorityResolution.deferredABScales, [32])
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("scale_authority_mismatch"))
+        XCTAssertEqual(prepared.receipt.status, "blocked")
+    }
+
+    func testOffsetArtifactAuthorityRequiresApprovedDigestUnlessRegeneratedSamePath() {
+        let seeds = routeBalancedSeeds(prefix: "offset-authority")
+        let initial = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment()
+            )
+        )
+        var artifact = passingOffsetArtifact(for: initial.samples)
+        artifact.artifactSHA256 = "wrong-digest"
+        let records = generatedRecords(for: initial.samples.filter { !$0.expectedToolCalls.isEmpty })
+
+        let mismatched = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment(),
+                offsetTokenArtifact: artifact,
+                expectedOffsetArtifactSHA256: C5OffsetArtifactAuthority.approvedFinalV3SHA256,
+                generatedUtteranceRecords: records
+            )
+        )
+        XCTAssertEqual(mismatched.receipt.offsetFixture.status, "pass")
+        XCTAssertEqual(mismatched.receipt.offsetArtifactAuthority.status, "fail")
+        XCTAssertEqual(mismatched.receipt.offsetArtifactAuthority.authorityMode, "unapproved")
+        XCTAssertTrue(mismatched.receipt.failureReceipt.contains("offset_artifact_mismatch"))
+        XCTAssertEqual(mismatched.receipt.status, "blocked")
+
+        artifact.artifactPath = "/tmp/pr5/offset-fixture/mlx-mask-offset-fixture.json"
+        let regenerated = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment(),
+                offsetTokenArtifact: artifact,
+                expectedOffsetArtifactSHA256: C5OffsetArtifactAuthority.approvedFinalV3SHA256,
+                allowRegeneratedOffsetArtifact: true,
+                generatedUtteranceRecords: records
+            )
+        )
+        XCTAssertEqual(regenerated.receipt.offsetArtifactAuthority.status, "pass")
+        XCTAssertEqual(regenerated.receipt.offsetArtifactAuthority.authorityMode, "regenerated_same_path")
+        XCTAssertTrue(regenerated.receipt.offsetArtifactAuthority.samePathRegenerationObserved)
+        XCTAssertFalse(regenerated.receipt.failureReceipt.contains("offset_artifact_mismatch"))
+    }
+
+    func testCandidateDataQualityGateBlocksDiversityCapAndAmbiguousDuplicates() {
+        let seeds = routeBalancedSeeds(prefix: "quality")
+        let initial = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment()
+            )
+        )
+        let duplicateRecords = generatedRecords(for: initial.samples.filter { !$0.expectedToolCalls.isEmpty })
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 100,
+                devSelectionRows: 0,
+                usesTrainingTokenizerPatch: true,
+                environment: verifiedEnvironment(),
+                offsetTokenArtifact: passingOffsetArtifact(for: initial.samples),
+                requireCandidateDataQualityGate: true,
+                generatedUtteranceRecords: duplicateRecords
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.candidateDataQualityGate.status, "fail")
+        XCTAssertTrue(prepared.receipt.candidateDataQualityGate.uniqueUtteranceRatio < 0.80)
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("variant_diversity_check_failed"))
+        XCTAssertEqual(prepared.receipt.status, "blocked")
+
+        let actionSamples = initial.samples.filter { !$0.expectedToolCalls.isEmpty }
+        let capFailure = C5CandidateDataQualityGate.evaluate(
+            samples: actionSamples,
+            maxVariantsPerSeed: 0,
+            epochs: 3,
+            lineageParentOverlap: 0
+        )
+        XCTAssertEqual(capFailure.capStatus, "fail")
+        XCTAssertTrue(capFailure.failureReceipt.contains("per_seed_variant_cap_exceeded"))
+
+        var conflicting = Array(actionSamples.prefix(2))
+        XCTAssertEqual(conflicting.count, 2)
+        let sharedUser = conflicting[0].messages.first { $0.role == "user" }!.content
+        conflicting[1].messages = conflicting[1].messages.map { message in
+            message.role == "user" ? C5TrainingMessage(role: "user", content: sharedUser) : message
+        }
+        conflicting[1].promptDistractorToolIDs = conflicting[0].promptDistractorToolIDs
+        let ambiguous = C5CandidateDataQualityGate.evaluate(
+            samples: conflicting,
+            maxVariantsPerSeed: 8,
+            epochs: 3,
+            lineageParentOverlap: 0
+        )
+        XCTAssertEqual(ambiguous.ambiguousDuplicateCount, 1)
+        XCTAssertTrue(ambiguous.failureReceipt.contains("ambiguous_duplicate"))
+    }
+
     func testGeneratedRecordCandidateParentIsRecomputedFromFinalUtteranceAndToolCall() {
         let seeds = [semanticSeed(id: "cloud-parent-row", fuzzy: true, free: false)]
         let initial = C5TrainingDatasetBuilder().build(
@@ -403,7 +696,7 @@ final class C5LoRATrainingTests: XCTestCase {
     func testMLXConfigUsesScaleAndExcludesEmbeddings() {
         let config = C5MLXLoRAConfig.rank16Mainline()
 
-        XCTAssertEqual(config.scale, 32)
+        XCTAssertEqual(config.scale, 20)
         XCTAssertEqual(config.learningRate, 0.0001)
         XCTAssertEqual(config.optimizer, "adamw")
         XCTAssertEqual(config.weightDecay, 0.01)
@@ -417,6 +710,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(config.renderYAML.contains("optimizer: adamw"))
         XCTAssertTrue(config.renderYAML.contains("weight_decay: 0.01"))
         XCTAssertTrue(config.renderYAML.contains("grad_clip_norm: 1.0"))
+        XCTAssertTrue(config.renderYAML.contains("scale: 20.0"))
         XCTAssertTrue(config.renderYAML.contains("training_loop: maformac_c5_repo_loop_mlx_lm_0_31_1"))
         XCTAssertTrue(config.renderYAML.contains("learning_rate: 0.0001"))
         XCTAssertEqual(config.lrScheduleStepUnit, "optimizer_update")
@@ -606,6 +900,21 @@ final class C5LoRATrainingTests: XCTestCase {
                 candidateParentSemanticID: "external_untrusted_\(C6Hash.sha256Hex(Data(sample.sampleID.utf8)).prefix(16))"
             )
         }
+    }
+
+    private func routeBalancedSeeds(prefix: String) -> [C5SemanticSeed] {
+        (0..<70).map { semanticSeed(id: "\(prefix)-l2-\($0)", fuzzy: true, free: false) }
+            + (0..<10).map { semanticSeed(id: "\(prefix)-l3-\($0)", fuzzy: false, free: true) }
+            + (0..<30).map { semanticSeed(id: "\(prefix)-l1-\($0)", fuzzy: false, free: false) }
+    }
+
+    private func verifiedEnvironment() -> C5TrainingEnvironment {
+        C5TrainingEnvironment.defaultPrepare(
+            trainingLoopSourceState: "verified",
+            trainingLoopSourceSHA256: "loop-sha",
+            trainingLoopVerificationStatus: "pass",
+            trainingLoopVerificationRef: "Reports/c5-pr2pr4pr5-20260621T235213/pr2-2b-equivalence/evidence-summary.md"
+        )
     }
 
     private func writeJSONL<T: Encodable>(_ values: [T], to url: URL) throws {

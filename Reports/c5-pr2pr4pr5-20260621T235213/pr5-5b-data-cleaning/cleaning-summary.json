@@ -1,0 +1,14 @@
+{
+  "ambiguous_group_count": 40,
+  "clean_jsonl": "Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-data-cleaning/generated-utterances-pr5-clean.jsonl",
+  "clean_record_count": 4418,
+  "clean_sha256": "009d1017740fe266d66485a7d325476de795e522e59c1534e3ec4463a9cac858",
+  "judge_result_reuse_for_modified_text": false,
+  "manual_utterance_edits": 0,
+  "removal_policy": "remove_all_records_in_same_user_target_prompt_context_groups_with_conflicting_expected_tool_call_signatures",
+  "removed_record_count": 82,
+  "source_jsonl": "Reports/c5-remediation-wave-20260621T2013-pr3-full/generated-utterances-final.jsonl",
+  "source_record_count": 4500,
+  "source_sha256": "46a3601856bacd975076817b988835ea9d5bd1f90d021246c1b4de0617dda604",
+  "status": "cleaned"
+}

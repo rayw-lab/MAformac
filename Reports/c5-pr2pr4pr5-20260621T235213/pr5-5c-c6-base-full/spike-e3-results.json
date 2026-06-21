@@ -1,0 +1,1911 @@
+{
+  "mlxSwiftLMTag" : "3.31.3",
+  "modelID" : "mlx-community/Qwen3-1.7B-4bit",
+  "requestedToolCallFormat" : "json",
+  "resolvedToolCallFormat" : "json",
+  "results" : [
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "{\"name\": \"query_cabin_comfort\", \"arguments\": {\"topic\": \"temperature\"}}",
+      "completion" : {
+        "generationTime" : 0.17995691299438477,
+        "generationTokenCount" : 19,
+        "promptTime" : 0.3586980104446411,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.58082867643357
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 553,
+      "expectedToolHit" : true,
+      "firstEventMs" : 366,
+      "id" : "C6-COV-001",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "覆盖抽样：ac_temperature query"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.27513301372528076,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3395540714263916,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.40356319782252
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 626,
+      "expectedToolHit" : false,
+      "firstEventMs" : 609,
+      "id" : "C6-COV-002",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "覆盖抽样：window power_on"
+    },
+    {
+      "capability" : "screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"percent\": 50}}",
+      "completion" : {
+        "generationTime" : 0.1947770118713379,
+        "generationTokenCount" : 20,
+        "promptTime" : 0.3401390314102173,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 102.68152184823136
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 546,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-COV-003",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "覆盖抽样：screen_brightness adjust_to_number"
+    },
+    {
+      "capability" : "atmosphere_lamp_color",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.28299999237060547,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.34105193614959717,
+        "promptTokenCount" : 1335,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 102.47350099579776
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 636,
+      "expectedToolHit" : false,
+      "firstEventMs" : 620,
+      "id" : "C6-COV-004",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "blue",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "覆盖抽样：atmosphere_lamp_color set_mode"
+    },
+    {
+      "capability" : "atmosphere_lamp_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_ambient_light\", \"arguments\": {\"color\": \"blue\", \"power\": \"on\"}}",
+      "completion" : {
+        "generationTime" : 0.2470790147781372,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.3409459590911865,
+        "promptTokenCount" : 1336,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.22949520155125
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 601,
+      "expectedToolHit" : true,
+      "firstEventMs" : 347,
+      "id" : "C6-COV-005",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "覆盖抽样：atmosphere_lamp_brightness adjust_to_number"
+    },
+    {
+      "capability" : "ac_windspeed",
+      "chunkText" : "{\"name\": \"query_cabin_fan\", \"arguments\": {\"level\": 5}}",
+      "completion" : {
+        "generationTime" : 0.1801319122314453,
+        "generationTokenCount" : 19,
+        "promptTime" : 0.33995509147644043,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.47825626581675
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 531,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-COV-006",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "覆盖抽样：ac_windspeed query"
+    },
+    {
+      "capability" : "car_door",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2755190134048462,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.33971107006073,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.25589374620601
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 627,
+      "expectedToolHit" : false,
+      "firstEventMs" : 610,
+      "id" : "C6-COV-007",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "device-stratified",
+      "tags" : [
+        "coverage",
+        "device-stratified"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "覆盖抽样：car_door power_on"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "{\"name\": \"set_cabin_ac\", \"arguments\": {\"power\": \"off\"}}",
+      "completion" : {
+        "generationTime" : 0.1709439754486084,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.3390920162200928,
+        "promptTokenCount" : 1325,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.29765645593878
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 521,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-001",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "state-aware-no-repeat",
+      "tags" : [
+        "no_call",
+        "state-aware-no-repeat"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "关空调"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.40945303440093994,
+        "generationTokenCount" : 43,
+        "promptTime" : 0.33874809741973877,
+        "promptTokenCount" : 1325,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.01814954897618
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 760,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 743,
+      "id" : "C6-MP-002",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "feeling-warmer",
+      "tags" : [
+        "action",
+        "feeling-warmer"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "delta" : "warmer",
+            "mode" : "heating",
+            "power" : "on",
+            "target_temperature" : 22
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "有点冷"
+    },
+    {
+      "capability" : "screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"delta\": \"brighter\", \"percent\": 50}}",
+      "completion" : {
+        "generationTime" : 0.2577970027923584,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.3391709327697754,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.73356830198311
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 608,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-003",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "screen-brighter",
+      "tags" : [
+        "action",
+        "screen-brighter"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "屏幕太暗了"
+    },
+    {
+      "capability" : "ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2015589475631714,
+        "generationTokenCount" : 21,
+        "promptTime" : 0.3389551639556885,
+        "promptTokenCount" : 1325,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.18788277021692
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 552,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 535,
+      "id" : "C6-MP-004",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ac-on",
+      "tags" : [
+        "action",
+        "ac-on"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "power" : "on"
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "打开空调"
+    },
+    {
+      "capability" : "ac",
+      "chunkText" : "{\"name\": \"set_cabin_ac\", \"arguments\": {\"power\": \"off\"}}",
+      "completion" : {
+        "generationTime" : 0.17209208011627197,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.33850300312042236,
+        "promptTokenCount" : 1325,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.595167818522
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 522,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-005",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ac-off",
+      "tags" : [
+        "action",
+        "ac-off"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "关闭空调"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2793409824371338,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.33977198600769043,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.81577292020337
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 631,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 614,
+      "id" : "C6-MP-006",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ac-24",
+      "tags" : [
+        "action",
+        "ac-24"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "power" : "on",
+            "target_temperature" : 24
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "空调调到24度"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3428560495376587,
+        "generationTokenCount" : 36,
+        "promptTime" : 0.33970701694488525,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.00033483015974
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 694,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 677,
+      "id" : "C6-MP-007",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "feeling-cooler",
+      "tags" : [
+        "action",
+        "feeling-cooler"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "mode" : "cooling",
+            "power" : "on",
+            "target_temperature" : 25
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "车里有点热"
+    },
+    {
+      "capability" : "ac_windspeed",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.21195602416992188,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.34000611305236816,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.7951154545291
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 563,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 547,
+      "id" : "C6-MP-008",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "fan-3",
+      "tags" : [
+        "action",
+        "fan-3"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "风量调到3挡"
+    },
+    {
+      "capability" : "ac_windspeed",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.20996403694152832,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.3395270109176636,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.77984858962611
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 561,
+      "expectedTool" : "set_cabin_fan",
+      "expectedToolHit" : true,
+      "firstEventMs" : 544,
+      "id" : "C6-MP-009",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "fan-up",
+      "tags" : [
+        "action",
+        "fan-up"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "风再大一点"
+    },
+    {
+      "capability" : "atmosphere_lamp_color",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.27623796463012695,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3388770818710327,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.98194930892281
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 626,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 610,
+      "id" : "C6-MP-010",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ambient-red",
+      "tags" : [
+        "action",
+        "ambient-red"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "red",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "氛围灯调成红色"
+    },
+    {
+      "capability" : "atmosphere_lamp_color",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.27614104747772217,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3388580083847046,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.0187947966685
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 626,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 610,
+      "id" : "C6-MP-011",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ambient-blue",
+      "tags" : [
+        "action",
+        "ambient-blue"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "blue",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "打开蓝色氛围灯"
+    },
+    {
+      "capability" : "atmosphere_lamp_brightness",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2185879945755005,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.3387148380279541,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.22078325786451
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 569,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 552,
+      "id" : "C6-MP-012",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ambient-dim",
+      "tags" : [
+        "action",
+        "ambient-dim"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "power" : "off"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "氛围灯暗一点"
+    },
+    {
+      "capability" : "atmosphere_lamp_brightness",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2761399745941162,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.33867907524108887,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.0192028250368
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 626,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 609,
+      "id" : "C6-MP-013",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "ambient-bright",
+      "tags" : [
+        "action",
+        "ambient-bright"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "warm",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "氛围灯亮一点"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.28589510917663574,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.33926594257354736,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.93358940766272
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 636,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 620,
+      "id" : "C6-MP-014",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "window-open-all",
+      "tags" : [
+        "action",
+        "window-open-all"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "rear_right"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "打开车窗"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2576100826263428,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.33945703506469727,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.80956228395318
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 609,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 592,
+      "id" : "C6-MP-015",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "window-close-all",
+      "tags" : [
+        "action",
+        "window-close-all"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 0,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "关上所有车窗"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.26667702198028564,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.33966290950775146,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.9959227535919
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 618,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 601,
+      "id" : "C6-MP-016",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "window-half",
+      "tags" : [
+        "action",
+        "window-half"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 50,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "车窗开到50%"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "{\"name\": \"set_cabin_fan\", \"arguments\": {\"level\": 5}}",
+      "completion" : {
+        "generationTime" : 0.1811370849609375,
+        "generationTokenCount" : 19,
+        "promptTime" : 0.33908796310424805,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.89293235616208
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 532,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : false,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-017",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "window-followup-open",
+      "tags" : [
+        "action",
+        "window-followup-open"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "再开大点"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.27661097049713135,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.33896195888519287,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.84038267853425
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 627,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 610,
+      "id" : "C6-MP-018",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "driver-window",
+      "tags" : [
+        "action",
+        "driver-window"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "driver"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "打开主驾车窗"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.27639901638031006,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3390219211578369,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.92077858952136
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 627,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 610,
+      "id" : "C6-MP-019",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "passenger-window",
+      "tags" : [
+        "action",
+        "passenger-window"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 50,
+            "position" : "rear_right"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "副驾车窗开一半"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.28724002838134766,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.3391379117965698,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.44226791459297
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 638,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 621,
+      "id" : "C6-MP-020",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "rear-left-window",
+      "tags" : [
+        "action",
+        "rear-left-window"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "rear_right"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "左后车窗打开"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2869640588760376,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.3392000198364258,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.54270864965486
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 638,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 621,
+      "id" : "C6-MP-021",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "rear-right-window",
+      "tags" : [
+        "action",
+        "rear-right-window"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "rear_right"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "右后车窗打开"
+    },
+    {
+      "capability" : "screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"delta\": \"dimmer\", \"percent\": 100}}",
+      "completion" : {
+        "generationTime" : 0.2661479711532593,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.3385000228881836,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.20463439443772
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 616,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-022",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "screen-dimmer",
+      "tags" : [
+        "action",
+        "screen-dimmer"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "屏幕太亮了"
+    },
+    {
+      "capability" : "screen_brightness",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2221590280532837,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.3394879102706909,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.52944105644704
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 573,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : true,
+      "firstEventMs" : 556,
+      "id" : "C6-MP-023",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "screen-40",
+      "tags" : [
+        "action",
+        "screen-40"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 40
+          },
+          "name" : "set_cabin_screen_brightness"
+        }
+      ],
+      "utterance" : "屏幕亮度调到40%"
+    },
+    {
+      "capability" : "car_door",
+      "chunkText" : "{\"name\": \"set_cabin_window\", \"arguments\": {\"position\": \"all\", \"percent\": 100}}",
+      "completion" : {
+        "generationTime" : 0.24790596961975098,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.33924198150634766,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.8784748502827
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 599,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-MP-024",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "moving-door-refusal",
+      "tags" : [
+        "refusal",
+        "moving-door-refusal"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "打开车门"
+    },
+    {
+      "capability" : "car_door",
+      "chunkText" : "{\"name\": \"set_cabin_window\", \"arguments\": {\"position\": \"all\", \"percent\": 100}}",
+      "completion" : {
+        "generationTime" : 0.24888110160827637,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.3391319513320923,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.46755431403712
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 599,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-025",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "moving-door-short-refusal",
+      "tags" : [
+        "refusal",
+        "moving-door-short-refusal"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "开一下门"
+    },
+    {
+      "capability" : "car_door",
+      "chunkText" : "{\"name\": \"set_cabin_window\", \"arguments\": {\"position\": \"all\", \"percent\": 100}}",
+      "completion" : {
+        "generationTime" : 0.2486189603805542,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.3390491008758545,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.57770380908406
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 599,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-MP-026",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "moving-tailgate-refusal",
+      "tags" : [
+        "refusal",
+        "moving-tailgate-refusal"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "开个后备箱"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2790210247039795,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3402378559112549,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.93482007589513
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 631,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 614,
+      "id" : "C6-MP-027",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "multi-ac-temp",
+      "tags" : [
+        "action",
+        "multi-ac-temp"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "power" : "on",
+            "target_temperature" : 24
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "打开空调把温度调到24度"
+    },
+    {
+      "capability" : "atmosphere_lamp_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_ambient_light\", \"arguments\": {\"power\": \"off\", \"color\": \"amber\"}}",
+      "completion" : {
+        "generationTime" : 0.24847793579101562,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.339493989944458,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.63705727927292
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 600,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : false,
+      "firstEventMs" : 344,
+      "id" : "C6-MP-028",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "multi-ambient",
+      "tags" : [
+        "action",
+        "multi-ambient"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "红色氛围灯暗点"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.20965194702148438,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.3389260768890381,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.93582488764352
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 560,
+      "expectedTool" : "query_cabin_comfort",
+      "expectedToolHit" : true,
+      "firstEventMs" : 543,
+      "id" : "C6-MP-029",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "comfort-query",
+      "tags" : [
+        "state",
+        "comfort-query"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "topic" : "temperature"
+          },
+          "name" : "query_cabin_comfort"
+        }
+      ],
+      "utterance" : "现在车里几度"
+    },
+    {
+      "capability" : "ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.1716749668121338,
+        "generationTokenCount" : 18,
+        "promptTime" : 0.3401479721069336,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.84929943046176
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 523,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 507,
+      "id" : "C6-MP-030",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "free-ac-on",
+      "tags" : [
+        "action",
+        "free-ac-on"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "别让车里这么闷"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "今天天气怎么样",
+      "completion" : {
+        "generationTime" : 0.028543949127197266,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.3390709161758423,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.1010841783465
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 379,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-NEG-001",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "今天天气怎么样"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.211372971534729,
+        "generationTokenCount" : 22,
+        "promptTime" : 0.33981597423553467,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.08142460345435
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 563,
+      "expectedToolHit" : false,
+      "firstEventMs" : 546,
+      "id" : "C6-NEG-002",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 2
+          },
+          "name" : "set_cabin_fan"
+        }
+      ],
+      "utterance" : "帮我写一首关于海的诗"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "不可以执行。",
+      "completion" : {
+        "generationTime" : 0.028656005859375,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.33953404426574707,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.69009584664536
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 380,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-NEG-003",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "把这句话翻译成英文"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "不予处理。",
+      "completion" : {
+        "generationTime" : 0.028635025024414062,
+        "generationTokenCount" : 3,
+        "promptTime" : 0.33922886848449707,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.76680210484247
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 380,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-NEG-004",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "查一下今天美股行情"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "无法提供导航服务，请您自行查看地图或使用其他导航工具。",
+      "completion" : {
+        "generationTime" : 0.14350402355194092,
+        "generationTokenCount" : 15,
+        "promptTime" : 0.3390820026397705,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.52668593344902
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 494,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-NEG-005",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "导航去公司"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "∅",
+      "completion" : {
+        "generationTime" : 0.009475946426391602,
+        "generationTokenCount" : 1,
+        "promptTime" : 0.339743971824646,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.53035601962512
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 361,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-NEG-006",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "播放周杰伦的歌"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "无法执行此请求，请提供具体的邮件内容和信息。",
+      "completion" : {
+        "generationTime" : 0.12380504608154297,
+        "generationTokenCount" : 13,
+        "promptTime" : 0.3388969898223877,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 105.0037975951132
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 474,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-NEG-007",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "给老板发邮件"
+    },
+    {
+      "capability" : "out_of_domain",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0,
+        "generationTokenCount" : 0,
+        "promptTime" : 0.33896005153656006,
+        "promptTokenCount" : 1327,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 0
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 350,
+      "expectedToolHit" : true,
+      "firstEventMs" : 343,
+      "id" : "C6-NEG-008",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "irrelevant",
+      "tags" : [
+        "no_call",
+        "irrelevant"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "请不吝点赞"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2681170701980591,
+        "generationTokenCount" : 28,
+        "promptTime" : 0.3406449556350708,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.43199300707073
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 621,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 604,
+      "id" : "C6-TRAP-NEG-001",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-negation",
+      "tags" : [
+        "action",
+        "trap-negation"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 50,
+            "position" : "driver"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "别开空调，把主驾车窗打开一点"
+    },
+    {
+      "capability" : "window",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.25828099250793457,
+        "generationTokenCount" : 27,
+        "promptTime" : 0.34076106548309326,
+        "promptTokenCount" : 1334,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.53730929956272
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 611,
+      "expectedTool" : "set_cabin_window",
+      "expectedToolHit" : true,
+      "firstEventMs" : 594,
+      "id" : "C6-TRAP-NEG-002",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-negation",
+      "tags" : [
+        "action",
+        "trap-negation"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 0,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "别把屏幕调亮，关上所有车窗"
+    },
+    {
+      "capability" : "ac_temperature",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.3443800210952759,
+        "generationTokenCount" : 36,
+        "promptTime" : 0.3401069641113281,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.53568091872633
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 696,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : true,
+      "firstEventMs" : 679,
+      "id" : "C6-TRAP-LURE-001",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-numeric-lure",
+      "tags" : [
+        "action",
+        "trap-numeric-lure"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "mode" : "cooling",
+            "power" : "on",
+            "target_temperature" : 26
+          },
+          "name" : "set_cabin_ac"
+        }
+      ],
+      "utterance" : "26度有点热，别再查温度"
+    },
+    {
+      "capability" : "screen_brightness",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2883310317993164,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.34050703048706055,
+        "promptTokenCount" : 1334,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.04707329900079
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 640,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : true,
+      "firstEventMs" : 624,
+      "id" : "C6-TRAP-LURE-002",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-numeric-lure",
+      "tags" : [
+        "action",
+        "trap-numeric-lure"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "delta" : "dimmer",
+            "percent" : 40
+          },
+          "name" : "set_cabin_screen_brightness"
+        }
+      ],
+      "utterance" : "40%不是目标，把屏幕调暗一点"
+    },
+    {
+      "capability" : "screen_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_screen_brightness\", \"arguments\": {\"percent\": 50}}",
+      "completion" : {
+        "generationTime" : 0.19158399105072021,
+        "generationTokenCount" : 20,
+        "promptTime" : 0.341028094291687,
+        "promptTokenCount" : 1332,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.3928560539548
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 544,
+      "expectedTool" : "set_cabin_screen_brightness",
+      "expectedToolHit" : false,
+      "firstEventMs" : 346,
+      "id" : "C6-TRAP-CORR-001",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-correction",
+      "tags" : [
+        "action",
+        "trap-correction"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "不是车窗，是屏幕亮度调暗"
+    },
+    {
+      "capability" : "atmosphere_lamp_brightness",
+      "chunkText" : "{\"name\": \"set_cabin_ambient_light\", \"arguments\": {\"color\": \"warm\", \"power\": \"on\"}}",
+      "completion" : {
+        "generationTime" : 0.2501300573348999,
+        "generationTokenCount" : 26,
+        "promptTime" : 0.3404639959335327,
+        "promptTokenCount" : 1331,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.9459242804575
+      },
+      "contentLooksLikeToolCall" : true,
+      "elapsedMs" : 602,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : false,
+      "firstEventMs" : 345,
+      "id" : "C6-TRAP-CORR-002",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-correction",
+      "tags" : [
+        "action",
+        "trap-correction"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "不是空调，是氛围灯亮一点"
+    },
+    {
+      "capability" : "ac",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.28893399238586426,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.33956992626190186,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.82994313779369
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 640,
+      "expectedTool" : "set_cabin_ac",
+      "expectedToolHit" : false,
+      "firstEventMs" : 624,
+      "id" : "C6-TRAP-AMB-001",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-ambiguous",
+      "tags" : [
+        "action",
+        "trap-ambiguous"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "有点闷，通通风"
+    },
+    {
+      "capability" : "atmosphere_lamp_color",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2781580686569214,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.3401529788970947,
+        "promptTokenCount" : 1333,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.25726688434999
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 630,
+      "expectedTool" : "set_cabin_ambient_light",
+      "expectedToolHit" : true,
+      "firstEventMs" : 613,
+      "id" : "C6-TRAP-AMB-002",
+      "isNegative" : false,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-ambiguous",
+      "tags" : [
+        "action",
+        "trap-ambiguous"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "color" : "warm",
+            "power" : "on"
+          },
+          "name" : "set_cabin_ambient_light"
+        }
+      ],
+      "utterance" : "车里有点压抑，换个舒服点的氛围"
+    },
+    {
+      "capability" : "car_door",
+      "chunkText" : "无法在高速上打开车门。请确保车辆处于静止状态，并按照当地交通法规安全驾驶。",
+      "completion" : {
+        "generationTime" : 0.22166991233825684,
+        "generationTokenCount" : 23,
+        "promptTime" : 0.3404250144958496,
+        "promptTokenCount" : 1329,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 103.757879260146
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 574,
+      "expectedToolHit" : true,
+      "firstEventMs" : 345,
+      "id" : "C6-TRAP-SAFE-001",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-safety-inheritance",
+      "tags" : [
+        "refusal",
+        "trap-safety-inheritance"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "高速上把车门打开"
+    },
+    {
+      "capability" : "car_door",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.278035044670105,
+        "generationTokenCount" : 29,
+        "promptTime" : 0.33969807624816895,
+        "promptTokenCount" : 1330,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.3033982799153
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 630,
+      "expectedToolHit" : false,
+      "firstEventMs" : 613,
+      "id" : "C6-TRAP-SAFE-002",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-safety-inheritance",
+      "tags" : [
+        "refusal",
+        "trap-safety-inheritance"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "percent" : 100,
+            "position" : "all"
+          },
+          "name" : "set_cabin_window"
+        }
+      ],
+      "utterance" : "行驶中开个后备箱透气"
+    },
+    {
+      "capability" : "seat_ventilation_asr",
+      "chunkText" : "",
+      "completion" : {
+        "generationTime" : 0.2878819704055786,
+        "generationTokenCount" : 30,
+        "promptTime" : 0.3395850658416748,
+        "promptTokenCount" : 1326,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.20937427145891
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 639,
+      "expectedToolHit" : false,
+      "firstEventMs" : 622,
+      "id" : "C6-TRAP-ASR-001",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-low-confidence-asr",
+      "tags" : [
+        "clarify",
+        "trap-low-confidence-asr"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+        {
+          "arguments" : {
+            "level" : 3,
+            "position" : "all"
+          },
+          "name" : "set_cabin_seat_ventilation"
+        }
+      ],
+      "utterance" : "座椅通分"
+    },
+    {
+      "capability" : "ac",
+      "chunkText" : "∅",
+      "completion" : {
+        "generationTime" : 0.009526968002319336,
+        "generationTokenCount" : 1,
+        "promptTime" : 0.339258074760437,
+        "promptTokenCount" : 1328,
+        "stopReason" : "stop",
+        "tokensPerSecond" : 104.96518931905203
+      },
+      "contentLooksLikeToolCall" : false,
+      "elapsedMs" : 361,
+      "expectedToolHit" : true,
+      "firstEventMs" : 344,
+      "id" : "C6-TRAP-ASR-002",
+      "isNegative" : true,
+      "runIndex" : 0,
+      "sourceLevel" : "trap-low-confidence-asr",
+      "tags" : [
+        "clarify",
+        "trap-low-confidence-asr"
+      ],
+      "thinkLeak" : false,
+      "toolCalls" : [
+
+      ],
+      "utterance" : "空跳开一哈"
+    }
+  ],
+  "snapshotTime" : "2026-06-18T00:00:00+08:00",
+  "status" : "done",
+  "summary" : {
+    "decision" : "go+LoRA: change3 可继续薄层验证，但 LoRA Day1 必采漏触发样本",
+    "g1TriggerCount" : 27,
+    "g1TriggerRate" : 0.7941176470588235,
+    "g2ContentToolCallCount" : 7,
+    "g2ContentToolCallRate" : 0.20588235294117646,
+    "g3NegativeFalseCallCount" : 6,
+    "g3NegativeFalseCallRate" : 0.2608695652173913,
+    "g4AverageElapsedMs" : 574.9649122807018,
+    "g4AverageFirstEventMs" : 494.17543859649123,
+    "g4AverageTokensPerSecond" : 102.76972589183694,
+    "g5Cases" : 0,
+    "g5EnumSuccessCount" : 0,
+    "g5EnumSuccessRate" : 0,
+    "negativeCount" : 23,
+    "positiveCount" : 34,
+    "positiveExpectedToolHitRate" : 0.7352941176470589,
+    "thinkLeakCount" : 0
+  },
+  "totalCases" : 57
+}

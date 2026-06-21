@@ -55,6 +55,10 @@ struct C5TrainingCLI {
             modelOverride: patchedModelDir.path,
             generatedAt: generatedAt,
             environment: environment,
+            expectedOffsetArtifactSHA256: options.expectedOffsetArtifactSHA256,
+            allowRegeneratedOffsetArtifact: options.allowRegeneratedOffsetArtifact,
+            requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
+            requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
             generatedUtteranceRecords: generatedUtterances
         )
         let builder = C5TrainingDatasetBuilder()
@@ -88,6 +92,10 @@ struct C5TrainingCLI {
             generatedAt: generatedAt,
             environment: environment,
             offsetTokenArtifact: offsetArtifact,
+            expectedOffsetArtifactSHA256: options.expectedOffsetArtifactSHA256,
+            allowRegeneratedOffsetArtifact: options.allowRegeneratedOffsetArtifact,
+            requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
+            requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
             generatedUtteranceRecords: generatedUtterances
         )
         prepared = builder.build(
@@ -154,6 +162,7 @@ struct C5TrainingCLI {
           --grad-clip-norm \(config.gradClipNorm) \\
           --nonfinite-fallback-lr 5e-5 \\
           --metrics-jsonl \(outputDir.appendingPathComponent("metrics.jsonl").path) \\
+          --source-snapshot-output \(outputDir.appendingPathComponent("c5_mlx_train_loop.snapshot.py").path) \\
           --adapter-path \(outputDir.appendingPathComponent("adapters-rank16").path)
         """
     }
@@ -185,10 +194,31 @@ struct C5TrainingCLI {
         - offset_fixture: \(receipt.offsetFixture.status)
         - offset_fixture_artifact: \(receipt.offsetFixture.tokenArtifact?.artifactPath ?? "missing")
         - offset_fixture_artifact_sha256: \(receipt.offsetFixture.tokenArtifact?.artifactSHA256 ?? "missing")
+        - offset_artifact_authority: \(receipt.offsetArtifactAuthority.status)
+        - offset_artifact_authority_mode: \(receipt.offsetArtifactAuthority.authorityMode)
+        - offset_artifact_authority_approved_sha256: \(receipt.offsetArtifactAuthority.approvedArtifactSHA256 ?? "missing")
+        - offset_artifact_authority_observed_sha256: \(receipt.offsetArtifactAuthority.observedArtifactSHA256 ?? "missing")
+        - offset_artifact_authority_observed_path: \(receipt.offsetArtifactAuthority.observedArtifactPath ?? "missing")
+        - offset_artifact_same_path_regeneration_required: \(receipt.offsetArtifactAuthority.samePathRegenerationRequired)
+        - offset_artifact_same_path_regeneration_observed: \(receipt.offsetArtifactAuthority.samePathRegenerationObserved)
         - generator_orchestration: \(receipt.generatorOrchestration.status)
         - validator_layer1: \(receipt.validatorSummary.layer1RuleStatus)
         - validator_layer2: \(receipt.validatorSummary.layer2SemanticStatus)
         - lineage_reassignment: \(receipt.lineageSummary.candidateSemanticReassignmentStatus)
+        - scale_authority: \(receipt.scaleAuthorityResolution.status)
+        - scale_first_candidate: \(receipt.scaleAuthorityResolution.firstCandidateScale)
+        - scale_observed: \(receipt.scaleAuthorityResolution.observedScale)
+        - scale_source_ref: \(receipt.scaleAuthorityResolution.sourceRef)
+        - scale_deferred_ab: \(receipt.scaleAuthorityResolution.deferredABScales.map { String($0) }.joined(separator: ", "))
+        - candidate_data_quality: \(receipt.candidateDataQualityGate.status)
+        - candidate_max_variants_per_seed: \(receipt.candidateDataQualityGate.maxVariantsPerSeed)
+        - candidate_max_observed_variants_per_seed: \(receipt.candidateDataQualityGate.maxObservedVariantsPerSeed)
+        - candidate_variant_cap: \(receipt.candidateDataQualityGate.capStatus)
+        - candidate_diversity: \(receipt.candidateDataQualityGate.diversityStatus)
+        - candidate_unique_utterance_ratio: \(String(format: "%.4f", receipt.candidateDataQualityGate.uniqueUtteranceRatio))
+        - candidate_ambiguous_duplicate_count: \(receipt.candidateDataQualityGate.ambiguousDuplicateCount)
+        - candidate_lineage_parent_overlap: \(receipt.candidateDataQualityGate.lineageParentOverlap)
+        - candidate_epoch_exposure_max: \(receipt.candidateDataQualityGate.epochExposureMax)
         - masking_coverage: train_on_turn=\(receipt.maskingCoverage.trainOnTurn), function_name=\(receipt.maskingCoverage.functionName), argument_name=\(receipt.maskingCoverage.argumentName), argument_value=\(receipt.maskingCoverage.argumentValue)
         - diagnostic_verdict: \(receipt.generalizationDiagnostic.diagnosticVerdict)
         - fuse_parity_gate: \(receipt.fuseParityGate.status)
@@ -229,6 +259,10 @@ struct C5TrainingCLI {
         - base_model_commit_sha: \(receipt.environment.baseModelCommitSHA)
         - repo_commit_sha: \(receipt.environment.repoCommitSHA)
         - gradient_clip_status: \(receipt.environment.gradientClipStatus)
+        - training_loop_source_state: \(receipt.environment.trainingLoopSourceState)
+        - training_loop_source_sha256: \(receipt.environment.trainingLoopSourceSHA256)
+        - training_loop_verification_status: \(receipt.environment.trainingLoopVerificationStatus)
+        - training_loop_verification_ref: \(receipt.environment.trainingLoopVerificationRef)
 
         ## Training curve
         - metrics_jsonl_ref: \(receipt.trainingCurve.metricsJSONLRef)
@@ -243,6 +277,7 @@ struct C5TrainingCLI {
 
     private static func buildEnvironment(repoRoot: URL, baseModelDir: URL, modelID: String, seed: Int) -> C5TrainingEnvironment {
         let versions = pythonPackageVersions()
+        let verification = trainingLoopVerification(repoRoot: repoRoot)
         return C5TrainingEnvironment(
             seed: seed,
             mlxVersion: versions["mlx", default: "unknown"],
@@ -254,8 +289,47 @@ struct C5TrainingCLI {
             baseModelCommitSHA: baseModelDir.lastPathComponent,
             repoCommitSHA: capture("/usr/bin/git", ["rev-parse", "HEAD"], cwd: repoRoot.path) ?? "unknown",
             trainingBackend: "maformac_c5_repo_loop_mlx_lm_0_31_1",
-            gradientClipStatus: "implemented_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5"
+            gradientClipStatus: verification.sourceState == "verified"
+                ? "verified_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5"
+                : "tracked_unverified_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5",
+            trainingLoopSourceState: verification.sourceState,
+            trainingLoopSourceSHA256: verification.scriptSHA256,
+            trainingLoopVerificationStatus: verification.status,
+            trainingLoopVerificationRef: verification.ref
         )
+    }
+
+    private struct TrainingLoopVerificationMarker: Decodable {
+        var sourceState: String
+        var scriptSHA256: String
+        var verificationStatus: String
+        var verificationRef: String
+
+        enum CodingKeys: String, CodingKey {
+            case sourceState = "source_state"
+            case scriptSHA256 = "script_sha256"
+            case verificationStatus = "verification_status"
+            case verificationRef = "verification_ref"
+        }
+    }
+
+    private static func trainingLoopVerification(repoRoot: URL) -> (sourceState: String, scriptSHA256: String, status: String, ref: String) {
+        let script = repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
+        let actualSHA = (try? C6Hash.fileHash(url: script)) ?? "missing"
+        let markerURL = repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.verification.json")
+        guard
+            let markerData = try? Data(contentsOf: markerURL),
+            let marker = try? JSONDecoder().decode(TrainingLoopVerificationMarker.self, from: markerData)
+        else {
+            return ("tracked_unverified", actualSHA, "missing_verification_marker", "missing")
+        }
+        guard marker.scriptSHA256 == actualSHA else {
+            return ("tracked_unverified", actualSHA, "verification_marker_sha_mismatch", marker.verificationRef)
+        }
+        guard marker.sourceState == "verified", marker.verificationStatus == "pass" else {
+            return ("tracked_unverified", actualSHA, marker.verificationStatus, marker.verificationRef)
+        }
+        return ("verified", actualSHA, "pass", marker.verificationRef)
     }
 
     private static func generateMaskOffsetArtifact(
@@ -414,11 +488,14 @@ private struct Options {
     var maskingStage: C5MaskingStage
     var baseModelDir: URL
     var generatedUtterancesURL: URL?
+    var expectedOffsetArtifactSHA256: String?
+    var allowRegeneratedOffsetArtifact: Bool
+    var requireCandidateDataQualityGate: Bool
+    var requireGeneratedUtteranceRecords: Bool
 
     init(arguments: [String]) throws {
-        guard arguments.count >= 2 else {
-            throw CLIError.usage("usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH]")
-        }
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances]"
+        guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
         outputDir = repoRoot.appendingPathComponent("Reports/c5-lora-training").path
@@ -427,6 +504,10 @@ private struct Options {
         maskingStage = .trainableV0
         baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
         generatedUtterancesURL = nil
+        expectedOffsetArtifactSHA256 = nil
+        allowRegeneratedOffsetArtifact = false
+        requireCandidateDataQualityGate = false
+        requireGeneratedUtteranceRecords = false
         var iterator = arguments.dropFirst(2).makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -451,6 +532,15 @@ private struct Options {
             case "--generated-utterances":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --generated-utterances value") }
                 generatedUtterancesURL = URL(fileURLWithPath: value)
+            case "--expected-offset-artifact-sha256":
+                guard let value = iterator.next(), !value.isEmpty else { throw CLIError.usage("missing --expected-offset-artifact-sha256 value") }
+                expectedOffsetArtifactSHA256 = value
+            case "--allow-regenerated-offset-artifact":
+                allowRegeneratedOffsetArtifact = true
+            case "--require-candidate-data-quality":
+                requireCandidateDataQualityGate = true
+            case "--require-generated-utterances":
+                requireGeneratedUtteranceRecords = true
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }

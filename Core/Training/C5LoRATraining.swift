@@ -348,6 +348,10 @@ public struct C5TrainingEnvironment: Codable, Equatable, Sendable {
     public var repoCommitSHA: String
     public var trainingBackend: String
     public var gradientClipStatus: String
+    public var trainingLoopSourceState: String
+    public var trainingLoopSourceSHA256: String
+    public var trainingLoopVerificationStatus: String
+    public var trainingLoopVerificationRef: String
 
     enum CodingKeys: String, CodingKey {
         case seed
@@ -361,6 +365,10 @@ public struct C5TrainingEnvironment: Codable, Equatable, Sendable {
         case repoCommitSHA = "repo_commit_sha"
         case trainingBackend = "training_backend"
         case gradientClipStatus = "gradient_clip_status"
+        case trainingLoopSourceState = "training_loop_source_state"
+        case trainingLoopSourceSHA256 = "training_loop_source_sha256"
+        case trainingLoopVerificationStatus = "training_loop_verification_status"
+        case trainingLoopVerificationRef = "training_loop_verification_ref"
     }
 
     public init(
@@ -374,7 +382,11 @@ public struct C5TrainingEnvironment: Codable, Equatable, Sendable {
         baseModelCommitSHA: String,
         repoCommitSHA: String,
         trainingBackend: String,
-        gradientClipStatus: String
+        gradientClipStatus: String,
+        trainingLoopSourceState: String,
+        trainingLoopSourceSHA256: String,
+        trainingLoopVerificationStatus: String,
+        trainingLoopVerificationRef: String
     ) {
         self.seed = seed
         self.mlxVersion = mlxVersion
@@ -387,10 +399,23 @@ public struct C5TrainingEnvironment: Codable, Equatable, Sendable {
         self.repoCommitSHA = repoCommitSHA
         self.trainingBackend = trainingBackend
         self.gradientClipStatus = gradientClipStatus
+        self.trainingLoopSourceState = trainingLoopSourceState
+        self.trainingLoopSourceSHA256 = trainingLoopSourceSHA256
+        self.trainingLoopVerificationStatus = trainingLoopVerificationStatus
+        self.trainingLoopVerificationRef = trainingLoopVerificationRef
     }
 
-    public static func defaultPrepare(baseModel: String = "mlx-community/Qwen3-1.7B-4bit") -> C5TrainingEnvironment {
-        C5TrainingEnvironment(
+    public static func defaultPrepare(
+        baseModel: String = "mlx-community/Qwen3-1.7B-4bit",
+        trainingLoopSourceState: String = "tracked_unverified",
+        trainingLoopSourceSHA256: String = "unknown_at_prepare_time",
+        trainingLoopVerificationStatus: String = "missing",
+        trainingLoopVerificationRef: String = "missing"
+    ) -> C5TrainingEnvironment {
+        let clipStatus = trainingLoopSourceState == "verified" && trainingLoopVerificationStatus == "pass"
+            ? "verified_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5"
+            : "tracked_unverified_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5"
+        return C5TrainingEnvironment(
             seed: 0,
             mlxVersion: "unknown_at_prepare_time",
             mlxLMVersion: "unknown_at_prepare_time",
@@ -401,8 +426,16 @@ public struct C5TrainingEnvironment: Codable, Equatable, Sendable {
             baseModelCommitSHA: "unknown_at_prepare_time",
             repoCommitSHA: "unknown_at_prepare_time",
             trainingBackend: "maformac_c5_repo_loop_mlx_lm_0_31_1",
-            gradientClipStatus: "implemented_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5"
+            gradientClipStatus: clipStatus,
+            trainingLoopSourceState: trainingLoopSourceState,
+            trainingLoopSourceSHA256: trainingLoopSourceSHA256,
+            trainingLoopVerificationStatus: trainingLoopVerificationStatus,
+            trainingLoopVerificationRef: trainingLoopVerificationRef
         )
+    }
+
+    public var trainingLoopVerifiedForFormalTraining: Bool {
+        trainingLoopSourceState == "verified" && trainingLoopVerificationStatus == "pass" && !trainingLoopSourceSHA256.isEmpty
     }
 }
 
@@ -433,6 +466,177 @@ public struct C5TrainingCurveReceipt: Codable, Equatable, Sendable {
     )
 }
 
+public struct C5TrainingMethodContractAuthority: Codable, Equatable, Sendable {
+    public static let activeMethodSpecPath = "openspec/specs/lora-training/spec.md"
+    public static let archivedDefineTrainingChangePath = "openspec/changes/archive/2026-06-21-define-lora-training"
+    public static let archivedDefineTrainingSpecPath = "openspec/changes/archive/2026-06-21-define-lora-training/specs/lora-training/spec.md"
+
+    public var status: String
+    public var activeMethodSpecPath: String
+    public var activeMethodSpecSHA256: String?
+    public var archivedChangePath: String
+    public var archivedMethodSpecPath: String
+    public var archivedMethodSpecSHA256: String?
+    public var failureReceipt: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case activeMethodSpecPath = "active_method_spec_path"
+        case activeMethodSpecSHA256 = "active_method_spec_sha256"
+        case archivedChangePath = "archived_change_path"
+        case archivedMethodSpecPath = "archived_method_spec_path"
+        case archivedMethodSpecSHA256 = "archived_method_spec_sha256"
+        case failureReceipt = "failure_receipt"
+    }
+
+    public static func evaluate(
+        activeMethodSpecPath: String = C5TrainingMethodContractAuthority.activeMethodSpecPath,
+        archivedChangePath: String = C5TrainingMethodContractAuthority.archivedDefineTrainingChangePath,
+        archivedMethodSpecPath: String = C5TrainingMethodContractAuthority.archivedDefineTrainingSpecPath,
+        fileManager: FileManager = .default
+    ) -> C5TrainingMethodContractAuthority {
+        let activeSpecSHA = sha256IfPresent(path: activeMethodSpecPath)
+        let archivedSpecSHA = sha256IfPresent(path: archivedMethodSpecPath)
+        var failures: [String] = []
+        if activeSpecSHA == nil {
+            failures.append("active_training_method_spec_missing")
+        }
+        var isDirectory: ObjCBool = false
+        if !fileManager.fileExists(atPath: archivedChangePath, isDirectory: &isDirectory) || !isDirectory.boolValue {
+            failures.append("archived_define_lora_training_change_missing")
+        }
+        if archivedSpecSHA == nil {
+            failures.append("archived_training_method_spec_missing")
+        }
+        return C5TrainingMethodContractAuthority(
+            status: failures.isEmpty ? "pass" : "fail",
+            activeMethodSpecPath: activeMethodSpecPath,
+            activeMethodSpecSHA256: activeSpecSHA,
+            archivedChangePath: archivedChangePath,
+            archivedMethodSpecPath: archivedMethodSpecPath,
+            archivedMethodSpecSHA256: archivedSpecSHA,
+            failureReceipt: failures
+        )
+    }
+
+    private static func sha256IfPresent(path: String) -> String? {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)) else {
+            return nil
+        }
+        return C6Hash.sha256Hex(data)
+    }
+}
+
+public struct C5ScaleAuthorityResolution: Codable, Equatable, Sendable {
+    public var status: String
+    public var firstCandidateScale: Double
+    public var observedScale: Double
+    public var sourceRef: String
+    public var deferredABScales: [Double]
+    public var failureReceipt: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case firstCandidateScale = "first_candidate_scale"
+        case observedScale = "observed_scale"
+        case sourceRef = "source_ref"
+        case deferredABScales = "deferred_ab_scales"
+        case failureReceipt = "failure_receipt"
+    }
+
+    public static func evaluate(observedScale: Double, firstCandidateScale: Double = 20) -> C5ScaleAuthorityResolution {
+        let matches = abs(observedScale - firstCandidateScale) < 0.000001
+        return C5ScaleAuthorityResolution(
+            status: matches ? "pass" : "fail",
+            firstCandidateScale: firstCandidateScale,
+            observedScale: observedScale,
+            sourceRef: "docs/p1c-training-grill-decisions.md:61",
+            deferredABScales: [32],
+            failureReceipt: matches ? [] : ["scale_authority_mismatch"]
+        )
+    }
+}
+
+public struct C5CandidateDataQualityGate: Codable, Equatable, Sendable {
+    public var status: String
+    public var maxVariantsPerSeed: Int
+    public var maxObservedVariantsPerSeed: Int
+    public var capStatus: String
+    public var diversityStatus: String
+    public var uniqueUtteranceRatio: Double
+    public var ambiguousDuplicateCount: Int
+    public var lineageParentOverlap: Int
+    public var epochExposureMax: Int
+    public var failureReceipt: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case maxVariantsPerSeed = "max_variants_per_seed"
+        case maxObservedVariantsPerSeed = "max_observed_variants_per_seed"
+        case capStatus = "cap_status"
+        case diversityStatus = "diversity_status"
+        case uniqueUtteranceRatio = "unique_utterance_ratio"
+        case ambiguousDuplicateCount = "ambiguous_duplicate_count"
+        case lineageParentOverlap = "lineage_parent_overlap"
+        case epochExposureMax = "epoch_exposure_max"
+        case failureReceipt = "failure_receipt"
+    }
+
+    public static func evaluate(
+        samples: [C5TrainingSample],
+        maxVariantsPerSeed: Int,
+        epochs: Int,
+        lineageParentOverlap: Int
+    ) -> C5CandidateDataQualityGate {
+        let actionSamples = samples.filter { !$0.expectedToolCalls.isEmpty }
+        let variantsBySeed = Dictionary(grouping: actionSamples, by: \.augmentationParentID).mapValues(\.count)
+        let maxObserved = variantsBySeed.values.max() ?? 0
+        let userUtterances = actionSamples.map { sample in
+            sample.messages.first { $0.role == "user" }?.content.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        }
+        let uniqueUtteranceRatio = actionSamples.isEmpty ? 1.0 : Double(Set(userUtterances).count) / Double(actionSamples.count)
+        let groupedByUtteranceAndPromptContext = Dictionary(grouping: samples) { sample in
+            let user = sample.messages.first { $0.role == "user" }?.content.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let targetToolPresent = sample.noCall?.targetToolPresent ?? true
+            let distractors = sample.promptDistractorToolIDs.sorted().joined(separator: ",")
+            return "\(user)|target_tool_present=\(targetToolPresent)|distractors=\(distractors)"
+        }
+        let ambiguousDuplicateCount = groupedByUtteranceAndPromptContext.values.filter { group in
+            let signatures = Set(group.map { sample in
+                sample.expectedToolCalls.isEmpty ? "NO_TOOL" : sample.expectedToolCallSignature
+            })
+            return group.count > 1 && signatures.count > 1
+        }.count
+        let capOK = maxObserved <= maxVariantsPerSeed
+        let diversityOK = uniqueUtteranceRatio >= 0.80
+        var failures: [String] = []
+        if !capOK {
+            failures.append("per_seed_variant_cap_exceeded")
+        }
+        if !diversityOK {
+            failures.append("variant_diversity_check_failed")
+        }
+        if ambiguousDuplicateCount > 0 {
+            failures.append("ambiguous_duplicate")
+        }
+        if lineageParentOverlap > 0 {
+            failures.append("lineage_parent_overlap")
+        }
+        return C5CandidateDataQualityGate(
+            status: failures.isEmpty ? "pass" : "fail",
+            maxVariantsPerSeed: maxVariantsPerSeed,
+            maxObservedVariantsPerSeed: maxObserved,
+            capStatus: capOK ? "pass" : "fail",
+            diversityStatus: diversityOK ? "pass" : "fail",
+            uniqueUtteranceRatio: uniqueUtteranceRatio,
+            ambiguousDuplicateCount: ambiguousDuplicateCount,
+            lineageParentOverlap: lineageParentOverlap,
+            epochExposureMax: maxObserved * epochs,
+            failureReceipt: failures
+        )
+    }
+}
+
 public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var targetPositiveRows: Int
     public var devSelectionRows: Int
@@ -442,11 +646,16 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var maskingStage: C5MaskingStage
     public var usesTrainingTokenizerPatch: Bool
     public var modelOverride: String?
+    public var mlxConfig: C5MLXLoRAConfig
     public var generatedAt: String
     public var environment: C5TrainingEnvironment
     public var trainingCurve: C5TrainingCurveReceipt
     public var endpointTokenizerParity: C5EndpointTokenizerParityGate
     public var offsetTokenArtifact: C5MaskOffsetTokenArtifact?
+    public var expectedOffsetArtifactSHA256: String?
+    public var allowRegeneratedOffsetArtifact: Bool
+    public var requireCandidateDataQualityGate: Bool
+    public var requireGeneratedUtteranceRecords: Bool
     public var generatedUtteranceRecords: [C5GeneratedUtteranceRecord]
 
     public init(
@@ -458,11 +667,16 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         maskingStage: C5MaskingStage = .trainableV0,
         usesTrainingTokenizerPatch: Bool = false,
         modelOverride: String? = nil,
+        mlxConfig: C5MLXLoRAConfig = .rank16Mainline(),
         generatedAt: String = "1970-01-01T00:00:00Z",
         environment: C5TrainingEnvironment = .defaultPrepare(),
         trainingCurve: C5TrainingCurveReceipt = .preparePlanned,
         endpointTokenizerParity: C5EndpointTokenizerParityGate = .blockedMissingEndpointRender(),
         offsetTokenArtifact: C5MaskOffsetTokenArtifact? = nil,
+        expectedOffsetArtifactSHA256: String? = nil,
+        allowRegeneratedOffsetArtifact: Bool = false,
+        requireCandidateDataQualityGate: Bool = false,
+        requireGeneratedUtteranceRecords: Bool = false,
         generatedUtteranceRecords: [C5GeneratedUtteranceRecord] = []
     ) {
         self.targetPositiveRows = targetPositiveRows
@@ -473,11 +687,16 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.maskingStage = maskingStage
         self.usesTrainingTokenizerPatch = usesTrainingTokenizerPatch
         self.modelOverride = modelOverride
+        self.mlxConfig = mlxConfig
         self.generatedAt = generatedAt
         self.environment = environment
         self.trainingCurve = trainingCurve
         self.endpointTokenizerParity = endpointTokenizerParity
         self.offsetTokenArtifact = offsetTokenArtifact
+        self.expectedOffsetArtifactSHA256 = expectedOffsetArtifactSHA256
+        self.allowRegeneratedOffsetArtifact = allowRegeneratedOffsetArtifact
+        self.requireCandidateDataQualityGate = requireCandidateDataQualityGate
+        self.requireGeneratedUtteranceRecords = requireGeneratedUtteranceRecords
         self.generatedUtteranceRecords = generatedUtteranceRecords
     }
 }
@@ -703,6 +922,76 @@ public struct C5MaskOffsetFixture: Codable, Equatable, Sendable {
     }
 }
 
+public struct C5OffsetArtifactAuthority: Codable, Equatable, Sendable {
+    public static let approvedFinalV3SHA256 = "c71ffb059610b337cd22350f9883eadb699c2d0d825bcd38b8cdf2752420a1a9"
+
+    public var status: String
+    public var authorityMode: String
+    public var approvedArtifactSHA256: String?
+    public var observedArtifactSHA256: String?
+    public var observedArtifactPath: String?
+    public var samePathRegenerationRequired: Bool
+    public var samePathRegenerationObserved: Bool
+    public var failureReceipt: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case authorityMode = "authority_mode"
+        case approvedArtifactSHA256 = "approved_artifact_sha256"
+        case observedArtifactSHA256 = "observed_artifact_sha256"
+        case observedArtifactPath = "observed_artifact_path"
+        case samePathRegenerationRequired = "same_path_regeneration_required"
+        case samePathRegenerationObserved = "same_path_regeneration_observed"
+        case failureReceipt = "failure_receipt"
+    }
+
+    public static func notConfigured(offsetFixture: C5MaskOffsetFixture) -> C5OffsetArtifactAuthority {
+        C5OffsetArtifactAuthority(
+            status: "not_configured",
+            authorityMode: "not_configured",
+            approvedArtifactSHA256: nil,
+            observedArtifactSHA256: offsetFixture.tokenArtifact?.artifactSHA256,
+            observedArtifactPath: offsetFixture.tokenArtifact?.artifactPath,
+            samePathRegenerationRequired: false,
+            samePathRegenerationObserved: false,
+            failureReceipt: []
+        )
+    }
+
+    public static func evaluate(
+        offsetFixture: C5MaskOffsetFixture,
+        approvedArtifactSHA256: String = approvedFinalV3SHA256,
+        allowRegeneratedSamePathArtifact: Bool = false
+    ) -> C5OffsetArtifactAuthority {
+        let artifact = offsetFixture.tokenArtifact
+        let observedSHA = artifact?.artifactSHA256
+        let observedPath = artifact?.artifactPath
+        let samePathObserved = observedPath?.hasSuffix("offset-fixture/mlx-mask-offset-fixture.json") == true
+        var failures: [String] = []
+
+        if offsetFixture.status != "pass" {
+            failures.append("offset_fixture_failed")
+        }
+
+        let exactApproved = observedSHA == approvedArtifactSHA256
+        let regeneratedSamePath = allowRegeneratedSamePathArtifact && samePathObserved && !(observedSHA ?? "").isEmpty
+        if !exactApproved && !regeneratedSamePath {
+            failures.append("offset_artifact_mismatch")
+        }
+
+        return C5OffsetArtifactAuthority(
+            status: failures.isEmpty ? "pass" : "fail",
+            authorityMode: exactApproved ? "approved_final_v3" : (regeneratedSamePath ? "regenerated_same_path" : "unapproved"),
+            approvedArtifactSHA256: approvedArtifactSHA256,
+            observedArtifactSHA256: observedSHA,
+            observedArtifactPath: observedPath,
+            samePathRegenerationRequired: allowRegeneratedSamePathArtifact && !exactApproved,
+            samePathRegenerationObserved: samePathObserved,
+            failureReceipt: Array(Set(failures)).sorted()
+        )
+    }
+}
+
 public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
     public var model: String
     public var fineTuneType: String
@@ -878,7 +1167,7 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             fineTuneType: "lora",
             numLayers: -1,
             rank: 16,
-            scale: 32,
+            scale: 20,
             dropout: 0,
             learningRate: 0.0001,
             lrSchedule: "cosine",
@@ -1369,8 +1658,12 @@ public struct C5TrainingReceipt: Codable, Equatable, Sendable {
     public var maskingStageCounts: [String: Int]
     public var maskingCoverage: C5MaskingCoverage
     public var acceptanceStage: C5AcceptanceStage
+    public var trainingMethodContractAuthority: C5TrainingMethodContractAuthority
     public var offsetFixture: C5MaskOffsetFixture
+    public var offsetArtifactAuthority: C5OffsetArtifactAuthority
     public var mlxConfig: C5MLXLoRAConfig
+    public var scaleAuthorityResolution: C5ScaleAuthorityResolution
+    public var candidateDataQualityGate: C5CandidateDataQualityGate
     public var generatorOrchestration: C5GeneratorOrchestrationReceipt
     public var validatorSummary: C5ValidatorSummary
     public var lineageSummary: C5LineageSummary
@@ -1404,8 +1697,12 @@ public struct C5TrainingReceipt: Codable, Equatable, Sendable {
         case maskingStageCounts = "masking_stage_counts"
         case maskingCoverage = "masking_coverage"
         case acceptanceStage = "acceptance_stage"
+        case trainingMethodContractAuthority = "training_method_contract_authority"
         case offsetFixture = "offset_fixture"
+        case offsetArtifactAuthority = "offset_artifact_authority"
         case mlxConfig = "mlx_config"
+        case scaleAuthorityResolution = "scale_authority_resolution"
+        case candidateDataQualityGate = "candidate_data_quality_gate"
         case generatorOrchestration = "generator_orchestration"
         case validatorSummary = "validator_summary"
         case lineageSummary = "lineage_summary"
@@ -1697,12 +1994,31 @@ public struct C5TrainingDatasetBuilder: Sendable {
             argumentValue: samples.contains { $0.masking.argumentValue },
             trainOnTurn: samples.contains { $0.masking.trainOnTurn }
         )
+        var mlxConfig = options.mlxConfig
+        if let modelOverride = options.modelOverride {
+            mlxConfig.model = modelOverride
+        }
         let offsetFixture = C5MaskOffsetFixture.validate(
             samples: samples,
             usesTrainingTokenizerPatch: options.usesTrainingTokenizerPatch,
             tokenArtifact: options.offsetTokenArtifact,
-            expectedTokenizerModelID: options.modelOverride ?? C5MLXLoRAConfig.rank16Mainline().model
+            expectedTokenizerModelID: mlxConfig.model
         )
+        let scaleAuthority = C5ScaleAuthorityResolution.evaluate(observedScale: mlxConfig.scale)
+        let offsetArtifactAuthority = options.expectedOffsetArtifactSHA256 != nil || options.allowRegeneratedOffsetArtifact
+            ? C5OffsetArtifactAuthority.evaluate(
+                offsetFixture: offsetFixture,
+                approvedArtifactSHA256: options.expectedOffsetArtifactSHA256 ?? C5OffsetArtifactAuthority.approvedFinalV3SHA256,
+                allowRegeneratedSamePathArtifact: options.allowRegeneratedOffsetArtifact
+            )
+            : C5OffsetArtifactAuthority.notConfigured(offsetFixture: offsetFixture)
+        let candidateDataQuality = C5CandidateDataQualityGate.evaluate(
+            samples: samples,
+            maxVariantsPerSeed: options.maxVariantsPerSeed,
+            epochs: mlxConfig.epochs,
+            lineageParentOverlap: dataGateReceipt.trainParentSemanticOverlap
+        )
+        let trainingMethodAuthority = C5TrainingMethodContractAuthority.evaluate()
         var hardFailures: [String] = []
         if dataGateReceipt.status == "blocked" {
             hardFailures.append("data_gate_blocked")
@@ -1713,8 +2029,25 @@ public struct C5TrainingDatasetBuilder: Sendable {
         if offsetFixture.status != "pass" && options.maskingStage != .smokeOnly {
             hardFailures.append("offset_fixture_failed")
         }
+        if options.maskingStage != .smokeOnly && offsetArtifactAuthority.status == "fail" {
+            for failure in offsetArtifactAuthority.failureReceipt where !hardFailures.contains(failure) {
+                hardFailures.append(failure)
+            }
+        }
         if !(0.05...0.10).contains(rehearsalRatio) {
             hardFailures.append("rule_l1_rehearsal_ratio_outside_5_10_percent")
+        }
+        if options.maskingStage != .smokeOnly && !options.environment.trainingLoopVerifiedForFormalTraining {
+            hardFailures.append("training_loop_source_unverified")
+        }
+        if options.maskingStage != .smokeOnly && trainingMethodAuthority.status != "pass" {
+            hardFailures.append(contentsOf: trainingMethodAuthority.failureReceipt)
+        }
+        if options.maskingStage != .smokeOnly && scaleAuthority.status != "pass" {
+            hardFailures.append(contentsOf: scaleAuthority.failureReceipt)
+        }
+        if options.requireCandidateDataQualityGate && candidateDataQuality.status != "pass" {
+            hardFailures.append(contentsOf: candidateDataQuality.failureReceipt)
         }
         let generatorOrchestration = buildGeneratorOrchestrationReceipt(samples: samples)
         let validatorSummary = buildValidatorSummary(dataGateReceipt: dataGateReceipt, offsetFixture: offsetFixture, samples: samples)
@@ -1754,7 +2087,9 @@ public struct C5TrainingDatasetBuilder: Sendable {
             sourceRefs: [
                 "docs/p1c-training-grill-decisions.md:103-408",
                 "docs/research/2026-06-21-c5-generator-selection-probe.md:37-54",
-                "openspec/changes/define-lora-training/specs/lora-training/spec.md:3-164",
+                C5TrainingMethodContractAuthority.activeMethodSpecPath,
+                C5TrainingMethodContractAuthority.archivedDefineTrainingChangePath,
+                C5TrainingMethodContractAuthority.archivedDefineTrainingSpecPath,
                 "openspec/changes/define-lora-data-gate/specs/lora-data-gate/spec.md:3-105",
                 "Core/Bench/C5DataGate.swift:242-406",
                 "mlx_lm/tuner/datasets.py:57-75",
@@ -1770,14 +2105,15 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 "deterministic_semantic_protocol_v1 is a Step2 dry-run source only; it cannot satisfy Q13 multi-source cloud generation or Q14 semantic judge",
                 "C6 release gate remains final-only; this receipt cannot claim model-quality V-PASS without a real C6 diff",
                 "Mac behavior parity and true-device candidate V-PASS are reported separately",
-                "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity"
+                "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
+                "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training"
             ],
             physicalFields: [
                 "route_tier_source", "route_tier", "utterance_source", "value_strategy", "masking_stage", "train_eligible",
                 "generator_model_id", "generator_call_id", "semantic_judge_model_id", "semantic_judge_call_id", "prompt_hash",
                 "augmentation_parent_id", "lineage_group_id", "split_origin", "candidate_dedupe_group_id", "expected_tool_call_signature",
-                "counterfactual_pair_id", "acceptance_stage", "generator_orchestration", "validator_summary", "lineage_summary",
-                "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity"
+                "counterfactual_pair_id", "acceptance_stage", "training_method_contract_authority", "offset_artifact_authority", "generator_orchestration", "validator_summary", "lineage_summary",
+                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity"
             ],
             failureReceipt: hardFailures + formalStep2Failures,
             rowCount: samples.count,
@@ -1794,8 +2130,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
             maskingStageCounts: maskingStageCounts,
             maskingCoverage: coverage,
             acceptanceStage: acceptanceStage,
+            trainingMethodContractAuthority: trainingMethodAuthority,
             offsetFixture: offsetFixture,
-            mlxConfig: .rank16Mainline(model: options.modelOverride ?? "mlx-community/Qwen3-1.7B-4bit"),
+            offsetArtifactAuthority: offsetArtifactAuthority,
+            mlxConfig: mlxConfig,
+            scaleAuthorityResolution: scaleAuthority,
+            candidateDataQualityGate: candidateDataQuality,
             generatorOrchestration: generatorOrchestration,
             validatorSummary: validatorSummary,
             lineageSummary: lineageSummary,
@@ -1952,8 +2292,11 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 guard !usedVariantKeys.contains(key) else {
                     continue
                 }
-                usedVariantKeys.insert(key)
                 let generated = generatedByKey[key]
+                if options.requireGeneratedUtteranceRecords && generated == nil {
+                    continue
+                }
+                usedVariantKeys.insert(key)
                 result.append(makePositiveSample(seed: seed, variant: variant, ordinal: sampleOffset + result.count, maskingStage: options.maskingStage, generatedRecord: generated))
             }
             variant += 1

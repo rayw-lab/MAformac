@@ -14,7 +14,7 @@
 
 ## 3. Masking And Augmentation
 
-- [ ] 3.1 Implement `masking_stage=smoke_only` for the 600-iteration chain test with `train_eligible=false`. Verification: smoke receipt reports loss trend, memory, and tokens/sec but does not mark formal readiness.
+- [x] 3.1 Implement `masking_stage=smoke_only` for the 600-iteration chain test with `train_eligible=false`. Verification: smoke receipt reports loss trend, memory, and tokens/sec but does not mark formal readiness. Receipt: `Reports/c5-lora-training-20260621T1609-smoke-only-lr1e4-adamw/c5-training-receipt.json` + `mlx-smoke-600iter-lr1e4-adamw.log`; this is train-health evidence only, not candidate readiness.
 - [x] 3.2 Implement `trainable_v0` loss masking evidence with a same-path MLX token offset artifact, not a flag suppressor. Verification: Python fixture runs `apply_chat_template` through the pinned training tokenizer path, covers both `<tool_call>` and `NO_TOOL`, proves user/system/think tokens are excluded, and receipt `offset_fixture.status=pass` includes artifact path + digest.
 - [x] 3.3 Implement `function_name` and `argument_name` augmentation as `distractor_only`. Verification: positive expected ToolCall names remain stable while distractor names can vary.
 - [x] 3.4 Implement `argument_value` augmentation by `value_strategy`: `slot_extract`, `exp_inverse_normalize`, and `percent_extract`. Verification: fixtures show utterance and expected ToolCall consistency for each strategy.
@@ -37,11 +37,11 @@
 
 ## 6. Evaluation, Diagnostics, And Candidate Acceptance
 
-- [ ] 6.1 Run or reference the C6 base Qwen3-1.7B baseline before claiming LoRA improvement. Verification: eval receipt links base and LoRA runs under the same harness/prompt/parser/mock-state policy.
-- [ ] 6.2 Record C6 replay fingerprints for model artifact, tokenizer, LoRA adapter/checkpoint, prompt hash, tool-output digest, and contract digest. Verification: LoRA runs with adapter identifiers also record adapter digest.
+- [x] 6.1 Tombstoned to `run-lora-candidate-training`: run or reference the C6 base Qwen3-1.7B baseline before claiming LoRA improvement. Verification in this change: `Reports/c5-pr2pr4pr5-20260621T235213/pr4-closeout/c5-remediation-closeout.md` records this as `deferred_to_PR5`; no LoRA improvement claim is made here.
+- [x] 6.2 Tombstoned to `run-lora-candidate-training`: record C6 replay fingerprints for model artifact, tokenizer, LoRA adapter/checkpoint, prompt hash, tool-output digest, and contract digest. Verification in this change: PR4 closeout records this as `deferred_to_PR5`; adapter/checkpoint fingerprints require the PR5 candidate artifact.
 - [x] 6.3 Add `generalization_diagnostic` with `in_dist_probe`, `heldout`, `ood_probe`, gaps, parent-overlap/leakage fields, and `diagnostic_verdict`. Verification: leakage yields `blocked_leakage`; missing diagnostic blocks only generalization claims.
-- [ ] 6.4 Build OOD probes as non-neighbor cases such as new parameter values, unseen device-action combinations, or dialect variants. Verification: diagnostic report includes lineage/case digest evidence for OOD construction.
-- [ ] 6.5 Compare dynamic adapter, fused model, and quantized/endpoint behavior on the same C6 harness and sample sets `must_pass`, `heldout`, and `negative`. Verification: candidate fails if ToolCall exact-match delta or IrrelAcc delta exceeds parity tolerance, any must-pass regression appears, quantized parse failures appear, or negative false-call delta exceeds tolerance.
+- [x] 6.4 Tombstoned to `run-lora-candidate-training`: build OOD probes as non-neighbor cases such as new parameter values, unseen device-action combinations, or dialect variants. Verification in this change: PR4 closeout records this as `deferred_to_PR5`; OOD probe lineage belongs to the PR5 candidate eval pack.
+- [x] 6.5 Tombstoned to `run-lora-candidate-training`: compare dynamic adapter, fused model, and quantized/endpoint behavior on the same C6 harness and sample sets `must_pass`, `heldout`, and `negative`. Verification in this change: PR4 closeout records this as `deferred_to_PR5`; no dynamic/fused/quantized parity claim is made here.
 - [x] 6.6 Gate candidate status by `acceptance_stage`: `train_health` for smoke/val-loss only, `trainable_v0` for assistant-mask trainability, and `lora_candidate` only after C6 diff, fingerprints, fuse parity, and endpoint tokenizer byte parity. Verification: low validation loss alone never produces V-PASS.
 - [x] 6.7 Add endpoint tokenizer byte-parity receipt fields for deployment pipe smoke. Verification: candidate V-PASS blocks unless endpoint render bytes match training render bytes exactly and the endpoint render source records patched tokenizer or explicit `enable_thinking=false`.
 
@@ -50,5 +50,18 @@
 - [x] 7.1 Run focused unit/fixture tests for route-tier derivation, masking stages, value strategies, refusal pairing, MLX config fields, diagnostic verdicts, and fuse-parity failure cases. Verification: tests fail closed on each known grill pitfall.
 - [x] 7.2 Run `openspec validate define-lora-training --strict` and `openspec validate --all --strict`. Verification: both commands pass after implementation.
 - [x] 7.3 Run the C5 data-gate validator and confirm train leakage, parent overlap, redaction, shared format, and masking coverage receipts are correct. Verification: receipt is machine-readable and does not claim action success.
-- [ ] 7.4 Run C6 base-vs-LoRA diff, fuse parity, and endpoint tokenizer byte parity before any V-PASS claim. Verification: eval report records base, adapter, fused, quantized/endpoint, diagnostic, and render-byte parity results.
+- [x] 7.4 Tombstoned to `run-lora-candidate-training`: run C6 base-vs-LoRA diff, fuse parity, and endpoint tokenizer byte parity before any V-PASS claim. Verification in this change: PR4 closeout records this as `deferred_to_PR5`; V-PASS remains unsigned.
 - [x] 7.5 Produce a closeout report listing smoke metrics, training config digest, route-tier/refusal/masking coverage, C6 diff, generalization diagnostic, fuse parity, and residual A/B work. Verification: report distinguishes T-PASS train health from V-PASS candidate readiness.
+
+## 8. Remediation Truth Gates
+
+| gate | PR4 disposition | PR5 owner |
+| --- | --- | --- |
+| task-truth count | The task list remains exactly 34 checkbox rows; PR4 closeout contains a 34-row truth table. | none |
+| 3.1 smoke-only | Completed as train-health/smoke-chain evidence only; it does not authorize candidate readiness. | none |
+| 3.5 masking coverage | Kept checked because receipts prove `train_on_turn`, `function_name`, `argument_name`, and `argument_value`. | none |
+| C6 base-vs-LoRA diff | Tombstoned, not run in `define-lora-training`. | `run-lora-candidate-training` |
+| replay fingerprints | Tombstoned until a candidate adapter/checkpoint exists. | `run-lora-candidate-training` |
+| OOD probes | Tombstoned into candidate eval pack construction. | `run-lora-candidate-training` |
+| dynamic/fused/quantized parity | Tombstoned; no parity or V-PASS claim is made by this change. | `run-lora-candidate-training` |
+| endpoint byte/device V-PASS | Tombstoned/blocked until PR5 candidate and physical endpoint validation. | `run-lora-candidate-training` |

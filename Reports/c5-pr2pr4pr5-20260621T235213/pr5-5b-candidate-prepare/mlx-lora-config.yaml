@@ -1,0 +1,38 @@
+# mlx-lm lr_schedule steps are optimizer updates, not micro-iterations.
+# training_iterations: 600
+# grad_accumulation_steps: 4
+# optimizer_update_steps: 150
+model: '/Users/wanglei/workspace/MAformac/Reports/c5-pr2pr4pr5-20260621T235213/pr5-5b-candidate-prepare/qwen3-1_7b-training-tokenizer-patched'
+fine_tune_type: lora
+num_layers: -1
+batch_size: 4
+grad_accumulation_steps: 4
+optimizer: adamw
+optimizer_config:
+  adamw:
+    weight_decay: 0.01
+seed: 0
+grad_clip_norm: 1.0
+training_loop: maformac_c5_repo_loop_mlx_lm_0_31_1
+learning_rate: 0.0001
+lr_schedule:
+  name: cosine_decay
+  arguments:
+    - 0.0001
+    - 150
+    - 1e-05
+  warmup: 12
+  warmup_init: 0.0
+max_seq_length: 1024
+lora_parameters:
+  rank: 16
+  dropout: 0.0
+  scale: 20.0
+  keys:
+    - self_attn.q_proj
+    - self_attn.k_proj
+    - self_attn.v_proj
+    - self_attn.o_proj
+    - mlp.gate_proj
+    - mlp.up_proj
+    - mlp.down_proj
