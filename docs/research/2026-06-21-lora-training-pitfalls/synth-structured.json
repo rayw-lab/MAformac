@@ -1,0 +1,184 @@
+{
+  "executive_summary": "对 MAformac C5（Qwen3-1.7B-4bit / mlx-lm 0.31.1 / M5 32GB / 中文车控 FC LoRA）当前训练实况，最关键结论是 loss 发散的根因已被两条本机 smoke 日志【实测坐实，无需推测】：smoke-only-schedule 在 LR 爬到 1.00e-04 时（iter30）train loss 降到 1.069（优秀、证明数据完全可学），随后 LR 继续爬到峰值 2.00e-04（iter60→70）loss 暴涨到 17.5；r9 常数 2e-4 无 warmup 则 iter80 炸到 32.0。即 LR=2e-4 是压垮点、1e-4 是甜区——这把\"loss 发散\"从模糊问题降为单旋钮问题，首要动作是把峰值 LR 降到 1e-4（甚至更保守 5e-5）。第二层真威胁是结构性的：stock mlx-lm 0.31.1 训练循环【没有任何梯度裁剪】（多路独立核实），一旦尖刺无保险丝，所以即便降 LR 也要在 C5TrainingCLI 训练循环手动加 clip_grad_norm(max_norm≈1.0) 作熔断。第三层是【数据是退化的 dry-run deterministic 协议串】（generator 全 configured=false、status=dry_run_only）——当前 smoke 的任何 loss 数字都不能当模型质量信号，正式训练必须等云多源真口语 generator 接入，且 held-out 必按\"换说法/没见过 arg 值/按 bug_id 分层\"切才能判泛化。端侧最大未知是【4bit base fuse + 再量化会静默掉 adapter 行为】（mlx-lm #654 多次复现）+ train/serve enable_thinking/chat_template parity，这两条是端侧真机 V-PASS 的硬门，绝不能用 Mac 训练态推断。被多路证据明确判为 paper-tiger 的有：内存/OOM/M5 性能（实测 peak 仅 12.2GB / 32GB，无关发散）、target_modules 用全 7 个（这是正解不是风险，别退回 attn-only）、rank16 太小（单跳 FC 够用）。",
+  "maformac_current_risks": [
+    {
+      "risk": "loss 发散根因 = 峰值 LR=2e-4 过冲（实测铁证：smoke-only-schedule iter30@LR1.00e-04 train loss=1.069 优秀，iter60 LR 爬到峰值 2.00e-04→iter70 暴涨 17.5；r9 常数 2e-4 iter80 炸 32.0）。判断：LR=2e-4 是压垮点、1e-4 是甜区，与内存/4bit/数据无关。建议动作=正式训练把峰值 LR 降到 1e-4（对齐 Qwen3 官方推荐 + 本机 iter30 已实证 1e-4 健康），若仍尖刺再降 5e-5；保留 cosine+warmup。这是 #1 杠杆。",
+      "evidence_source": "本机日志 Reports/c5-lora-training-20260621T1455-smoke-only-schedule/mlx-smoke-only-600.log（iter30 loss=1.069@LR1e-4, iter70=17.540@LR2e-4）+ Reports/.../1245-r9/mlx-smoke-600.log（iter80=32.0 常数2e-4）；Lens1 https://github.com/QwenLM/Qwen3/discussions/1301（Qwen3 推荐1e-4）；Lens2 https://thinkingmachines.ai/blog/lora/",
+      "severity": "HIGH",
+      "action": "正式训练 config learning_rate: 0.0002 → 0.0001（首选，本机已证健康）；保留 lr_schedule=cosine + warmup。vs 现状=better（现状 2e-4 实测必炸，1e-4 实测 iter30 达 1.069）。"
+    },
+    {
+      "risk": "stock mlx-lm 0.31.1 训练循环无梯度裁剪——尖刺无熔断，一旦某步梯度过大即雪崩到 32（r9 实测）。即便降 LR 仍是脆弱点。",
+      "evidence_source": "Lens2/Lens4/Lens6 多路独立核 mlx_lm/tuner/trainer.py step() 无 clip_grad_norm 调用、TrainingArgs 无 grad_clip 字段（https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/tuner/trainer.py）；MLX 核心库有 mx.optimizers.clip_grad_norm（#1040）但 trainer 不调",
+      "severity": "HIGH",
+      "action": "在 Tools/C5TrainingCLI 训练循环手动插 clip_grad_norm(grads, max_norm=1.0) 再 optimizer.update，并取返回的 total_norm 打点（免费拿到发散前兆）。注意 MLX 的 clip_grad_norm 对 NaN/Inf 行为异于 PyTorch，需单独 finite 检查。vs 现状=better（现状无熔断）。"
+    },
+    {
+      "risk": "当前 smoke 用的是退化 dry-run deterministic 协议串（device×primitive×value 模板渲染，非真口语中文变体），generator 全 configured=false、status=dry_run_only。后果：smoke 任何 loss 数字都不能当模型质量信号；用它正式训练=训出模板格式专家，客户现场换说法（L2-L5 模糊，正是 LoRA 唯一该练的）会崩。",
+      "evidence_source": "本机 receipt generator_orchestration.status=dry_run_only / sources[].configured=False / augmentation_engine=deterministic_semantic_protocol_dry_run（Reports/c5-lora-training-20260621T1455-smoke-only-schedule/c5-training-receipt.json）；Lens5/Lens7 https://arxiv.org/pdf/2511.01490（paraphrase 掉11-19%）/ https://arxiv.org/html/2506.19262v2（越小模型越吃多样性）",
+      "severity": "HIGH",
+      "action": "正式训练必须先接云多源 generator（hermes_glm 主 + 跨厂商语义判）产真口语变体；smoke loss 收敛也绝不当 V-PASS；同步修占位符渲染 bug（user slots=position → assistant 不能 emit 字面 <position>）。vs 现状=better（现状数据无泛化信号）。"
+    },
+    {
+      "risk": "masking train_on_turn=false（本机 receipt 实证，smoke-only-schedule 那条）——loss 算在整条序列（含模板 user 串 + 空 think 块），抬高 loss 基线并干扰收敛判读，且是 3HIGH 防死记的 loss-mask 形态未实装。注意：stock mlx-lm 单区间 mask 物理上只能 mask 整个 prompt 前缀，做不到 arg-token 级 mask；MAformac 的 function/arg masking 实为【受约束数据增广 distractor_only】走数据侧，不是 token-level loss mask。",
+      "evidence_source": "本机 receipt masking_coverage.train_on_turn=false（smoke-only-schedule）；Lens5 核 mlx_lm/tuner/trainer.py:75-88 default_loss 单连续区间 mask + datasets.py:57-77 offset；Lens7 https://arxiv.org/pdf/2510.12218（GOAT arg-token mask 防死记最有效）",
+      "severity": "MEDIUM",
+      "action": "正式训练确认 train_on_turn loss-mask 真生效（走 return_assistant_tokens_mask，loss 只覆盖 ToolCall span）；文档明确注释 argument_value masking=true 指【数据增广已实装】非【token mask 已实装】，防后人误判。vs 现状=better（现状 loss 算全序列）。"
+    },
+    {
+      "risk": "warmup 单位错配：warmup_steps=48 是按训练步算，但 lr_schedule 按 optimizer_update 走（grad_accum=4）→ rendered_warmup_steps=12 个 update、rendered_schedule_decay_steps=150。实际只 warmup 12 个 update 就冲到峰值 = LR 太快达峰即炸（与 LR 过高叠加）。",
+      "evidence_source": "本机 receipt mlx_config.rendered_warmup_steps=12 / optimizer_update_steps=150 / warmup_steps=48 / grad_accumulation_steps=4（已正确处理单位换算逻辑，但 warmup 占比偏少）；Lens1/Lens2 同源",
+      "severity": "MEDIUM",
+      "action": "正式训练把 warmup 按 optimizer-update 单位重算，确保 warmup 占总 update ~5-8% 且 ≥几十个 update（当前 12 偏少，配合降 LR 让爬升更缓）。codex apply 时打印实际 LR 曲线确认 warmup 末到峰值。vs 现状=better。"
+    },
+    {
+      "risk": "4bit base fuse + 端侧再量化会静默掉 adapter 学到的 FC 行为（mlx-lm #654/#832/#1058 反复复现，Mac val loss 完全看不出），威胁端侧 iPhone 8GB 部署诚实性。叠加 train/serve enable_thinking + chat_template 跨引擎（mlx Python jinja vs mlx-swift C++ minijinja）不一致放大掉点。",
+      "evidence_source": "Lens1/Lens5/Lens6/Lens7 https://github.com/ml-explore/mlx-lm/issues/654 / #1058（前20token对后发散）/ https://kaitchup.substack.com/p/dont-merge-your-lora-adapter-into（merge-into-4bit 静默掉10-30%）；closeout 已自标 dynamic_fused_quantized_three_way_parity_not_run",
+      "severity": "HIGH",
+      "action": "端侧落地前必跑三路 parity（dynamic adapter vs fused bf16 vs fused 4bit）同 C6 harness 同 greedy 对比 ToolCallExact+IrrelAcc，掉点>阈值即 BLOCKER；mlx-swift 实跑 dump 实际 prompt 字符串逐字节比对训练态（尤其 <think>\\n\\n</think> 空白）；写进端侧真机 V-PASS 门，不能用 Mac 态代替。vs 现状=unknown（未跑，必须真机实测）。"
+    },
+    {
+      "risk": "4bit base 自动走 QLoRA、dora_rank8_secondary 实际是 QDoRA（4bit 灰区，未实测不可断言收益）；且 rank32_confirmation 若固定 alpha=32，有效缩放从 rank16 的 2.0 掉到 1.0 被稀释，极可能得出'rank32 不如 rank16'的假结论（实为缩放问题）。",
+      "evidence_source": "Lens3 https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md（量化 model 自动 QLoRA）/ https://arxiv.org/abs/2312.03732（rsLoRA 缩放表）/ https://arxiv.org/pdf/2505.21895（低bit QDoRA 崩）",
+      "severity": "MEDIUM",
+      "action": "receipt/handoff 如实标训练类型=QLoRA（非 LoRA），base-vs-LoRA 对照口径才准；secondary 实验非主线、必同 harness 多跑报 std；rank32 实验要么 alpha 同步→64 保持缩放2.0、要么开 rsLoRA(√r)才公平。vs 现状=unknown。"
+    },
+    {
+      "risk": "零正则化：dropout=0 + 默认 optimizer=adam（无 weight_decay），与高 LR + 无裁剪叠加是完整发散配方。",
+      "evidence_source": "本机 receipt mlx_config.dropout=0；Lens2 mlx_lm/lora.py:46 默认 optimizer=adam（非 adamw）；https://unsloth.ai/docs/.../lora-hyperparameters-guide（FC 微调常用 dropout=0 + weight_decay=0.01）",
+      "severity": "MEDIUM",
+      "action": "optimizer 从 adam 切 adamw + weight_decay=0.01（mlx-lm 原生支持，无需改训练循环）；dropout 保持 0（短训练 dropout 不可靠，weight_decay 更优）。这条与降 LR 配合是最稳组合。vs 现状=better。"
+    },
+    {
+      "risk": "无 held-out 泛化诊断 + mlx-lm 不自动 seed/不自动 load-best-checkpoint。后果：base-vs-LoRA 任何'提升'此刻不能算泛化提升（可能死记）；多跑 std 无基准；steps_per_eval=200 在 600 步只 eval~3 次抓不到 val 拐点；默认拿到 last 而非 best adapter。",
+      "evidence_source": "Lens4 核 mlx-lm trainer 不调 mx.random.seed（https://github.com/ml-explore/mlx/issues/1919）+ 无 load_best_model_at_end；closeout generalization diagnostic=blocked_missing；Lens7 https://arxiv.org/html/2508.04117v2（over-memorization）",
+      "severity": "MEDIUM",
+      "action": "CLI 入口显式 mx.random.seed/np.random.seed/random.seed，SEED 写进 receipt；正式训练 steps_per_eval 调密到每 50-100 步、按 dev_selection val_loss 选 best checkpoint（自己比 metrics.jsonl，非取 last）；held-out 按三轴切、报 train/val perplexity gap。vs 现状=better。"
+    }
+  ],
+  "monitoring_checklist": [
+    "train_loss 每 steps_per_report(建议10步)：健康=平滑下降；异常信号=单调上升≥3个eval点 或 单步跳2-10x后不回落（持续发散，指回LR）。阈值参考：本机 iter30@LR1e-4 应在 ~1.0-1.5；若 LR达峰时跳到>10 即LR过高。",
+    "val_loss 每 steps_per_eval（正式训练调密到每50-100步，非默认200）：必须与train_loss同步下降；val回升而train继续降=过拟合，立即早停取更早checkpoint；val明显低于train+dropout=0=查LR上冲非过拟合。",
+    "learning_rate 逐iter：确认warmup末真到峰值（防#2617/#985），峰值不超过设定（建议1e-4）；本机日志显示正常爬升1.667e-05→1e-4(iter30)→2e-4(iter60)。",
+    "grad_norm（自加，clip前的total_norm）：最重要的发散前兆——突然spike常先于loss变NaN；初始>5e7或持续飙升=数据regime/LR问题，停。",
+    "NaN/Inf 检查：smoke/train_health pass判据物理化为'all loss/grad finite'，任何NaN/Inf即fail（不是loss下降才pass）。",
+    "peak_mem 逐步：本机基线12.2-12.3GB/32GB；设阈值告警，若按iter数缓涨(#1406/#738泄漏)→开--grad-checkpoint；正式长跑3epoch比smoke 600步更易暴露泄漏。",
+    "it/sec & tokens/sec：本机基线0.13-0.19 it/sec / 50-65 tokens/sec；DoRA secondary预期再降~20%，排期留余量。",
+    "trained_tokens：核对与预期(样本数×seq长×已过步数)一致，防数据加载异常。",
+    "held-out FC指标（正式训练）：ToolCallExact + IrrelAcc(独立报，≥目标，防被FC总分掩盖) + 通用能力回归探针(防灾难遗忘)；base vs LoRA 同seed同greedy多跑报std。",
+    "train.jsonl token长度分布(接真数据后)：tokenize统计max/p95/p99 vs max_seq_length=1024，确认assistant的<tool_call>不被截断（当前dry-run 3工具+短prompt安全，真口语+全schema需复核）。"
+  ],
+  "recording_standard": [
+    "seed：CLI入口显式 mx.random.seed(SEED)+np.random.seed(SEED)+random.seed(SEED)（mlx-lm trainer不自动seed），SEED写进receipt的environment段。",
+    "environment段（receipt当前缺，必补）：{seed, mlx_version, mlx_lm_version, transformers_version, hardware:'Mac17,2/M5/32GB/applegpu', dtype, base_model_hub+commit_sha}。pin mlx-lm==0.31.1 + transformers版本写进requirements lock（防mlx-lm>=0.31强耦合transformers>=5.0的依赖坑）。",
+    "config-hash + data-digest：config内容hash + train.jsonl内容digest写进receipt（当前已有promptHash/sourceRefs file:line血缘，保持）。",
+    "training_curve段（receipt当前缺，必补）：metrics.jsonl路径指针（用on_train/val_loss_report回调把逐步loss/LR/grad_norm/peak_mem写Reports/<ts>/metrics.jsonl作一手观测）+ best_checkpoint_step + best_checkpoint_val_metric + 选best的依据。",
+    "checkpoint：留best(按val指标，非last——mlx-lm不自动load-best需自己比metrics.jsonl)+last(崩溃恢复)，其余prune；用.safetensors；命名带step/val_metric；exact resume还需存RNG state+optimizer state。",
+    "offset/parity fixture断言：dump一条训练样本的token+label_mask，断言<think>\\n\\n</think>段mask=0、trained_span=tool_call、assistant content有\\n\\n前缀；做成CI自动测试（防B1 patch升级后静默失效）。",
+    "训练类型如实标=QLoRA（base 4bit自动走QLoRA），dora_secondary标=QDoRA——base-vs-LoRA对照口径才准（§28一手源）。",
+    "可复现标准：接受Apple Silicon GPU reduction非确定→bit-exact不可得，复现定义为'val_loss/ToolCallExact在容差内一致'非'数值完全相同'。",
+    "generator血缘：正式训练每条样本记generator来源(claude/hermes_glm/gptpro/codex)+ generatorCallID + lineageGroupID（receipt已有此结构），便于事后按源排查记忆/污染。",
+    "实验追踪工具：solo离线轻治理默认mlx-lm原生回调→metrics.jsonl+matplotlib画曲线（零新依赖）；要横向比多run(LR sweep/rank16 vs rank32 vs dora8)再引Trackio(本地SQLite, import as wandb改一行, 不违离线红线)；绝不上mlflow/wandb cloud。"
+  ],
+  "generalization_lessons": [
+    "held-out必按三轴切：(1)换说法=held-out query是训练里没出现的口语变体；(2)没见过的arg值=held-out槽值不在训练值集合；(3)按bug_id整组分层=12000bug按id划train/held-out，绝不句级随机切（同bug不同句会跨集泄漏，held-out高分仍是死记）。",
+    "arg-token+function masking是防记忆化最有效单一手段（GOAT一手论文坐实）——MAformac 3HIGH的masking决策是对的不是过度治理，必须保留；但分清train_on_turn=真loss-mask，function/arg=受约束数据增广(distractor_only,正例device×primitive×value语义不动,只动负例)。",
+    "数据多样性>数量：越小的模型越吃多样性（124M正相关/1B居中/8B反相关，1.7B吃多样性收益大）；模板渲染串训出'模板格式专家'，正式训练必须用真口语变体；宁可2000条多样样本不要5000条模板克隆。",
+    "argument_value按value.type分流：SPOT抠槽随机化值+同步改query / EXP逆规整感受词变体 / PERCENT——确保模型从结构而非具体值推断（含中文arg值如城市名/实体是最易被记的token）。",
+    "distractor进的是候选function列表（让模型学辨别），不只数据集级混入；IrrelAcc≥20%独立负样本是必须项（base无LoRA已0.789 hard_fail，LoRA训完IrrelAcc可能不升反降，Hammer反向权衡），held-out独立报不被FC准确率掩盖。",
+    "epochs=3是LoRA合理上沿但必须val早停（train loss对小数据无信息量，记忆与泛化产生相同train曲线，只有val/held-out loss能区分）；正式训练eval调密、val回升即停取best。",
+    "加通用能力回归探针（少量非车控QA/instruction）作灾难遗忘哨兵——三层路由下LoRA只练L2-L5、L1走规则，遗忘影响可能小但须实测；rehearsal_ratio从0.075提到0.1-0.15（业界5-20%下限）作防遗忘第一旋钮。",
+    "正式训练后做一次memorization排查：哪些样本train loss极低=被记死，移除最同质的~10%反而提升泛化（防device×primitive×value笛卡尔产同质洪水拖累）。",
+    "LoRA冻结base'forget less'是优势——与MAformac'规则吃80%、LoRA碰20%'架构天然契合，保住base的L1规则+中文能力；但rank/LR/epoch堆高仍会触发遗忘，守rank16/alpha32(=2r业界默认)、别用高LR补低alpha。",
+    "端侧train/serve parity是隐性泛化杀手：enable_thinking空think块+chat_template跨引擎(mlx Python jinja vs mlx-swift minijinja)+fuse 4bit三条叠加，只能靠端侧实跑一条FC逐字节比对tokenization抓（active probe非config check），不能用Mac态推断。"
+  ],
+  "grill_ammo": [
+    {
+      "topic": "峰值 LR 该不该从 2e-4 降到 1e-4（loss 发散直接修法）",
+      "options": "A=维持2e-4 / B=降到1e-4 / C=降到5e-5（更保守）",
+      "recommend": "⭐B=降到1e-4。本机smoke-only-schedule已实测铁证：iter30@LR1.00e-04 train loss=1.069（优秀），iter60 LR爬到峰值2.00e-04→iter70暴涨17.5。1e-4是甜区、2e-4是压垮点，且对齐Qwen3官方推荐。",
+      "quant": "1e-4实测iter30达1.069 vs 2e-4实测iter80炸32.0；r9常数2e-4 val 4.473→6.381退化。降LR是#1杠杆，单旋钮。"
+    },
+    {
+      "topic": "是否在 C5TrainingCLI 训练循环手动加梯度裁剪（stock mlx-lm 无熔断）",
+      "options": "A=不加（靠降LR避开）/ B=加clip_grad_norm(max_norm=1.0)+打total_norm / C=升级到带grad_clip的mlx-lm-lora fork",
+      "recommend": "⭐B=加clip_grad_norm(max_norm=1.0)。stock mlx-lm 0.31.1训练循环零梯度裁剪（多路核实），降LR后仍是脆弱点；加裁剪=熔断保险丝+免费拿到total_norm发散前兆。C换fork增迁移面违轻治理。",
+      "quant": "r9实测无裁剪下loss雪崩到32；max_norm=1.0是LLM训练de-facto标准(QLoRA论文0.3)；侵入约5行训练循环代码。"
+    },
+    {
+      "topic": "smoke loss 发散要不要现在 panic 改配方",
+      "options": "A=当训练失败、大改超参 / B=认定是dry-run数据+LR双因、只降LR+加裁剪+等真数据 / C=完全忽略",
+      "recommend": "⭐B。smoke跑的是dry-run deterministic串（receipt status=dry_run_only），loss数字不是配方信号；但已实测LR过冲是真因，所以只动LR+裁剪+optimizer(adamw+wd0.01)三件套，别为dry-run loss大改rank/target/epoch。",
+      "quant": "同一份数据iter30已达1.069证明可学；generator全configured=false，真口语数据接入后还要再调一轮，现在过度调参=用退化数据调。"
+    },
+    {
+      "topic": "rank/target_modules/epochs 当前 config 要不要动",
+      "options": "A=全维持(rank16/全7模块/3epoch) / B=升rank32 / C=砍target到attn-only省显存",
+      "recommend": "⭐A=全维持。rank16对单跳FC是平衡默认；全7模块(attn+MLP)是LoRA Without Regret+QLoRA公认正解(attn-only全面劣于含MLP)；3epoch配val早停合理。发散根因在LR不在这三项，别动。",
+      "quant": "Trainable 1.013%(17.4M)正常；peak 12.2GB/32GB有余量不需砍target；rank32若固定alpha32缩放从2.0掉1.0反而劣（假结论陷阱）。"
+    },
+    {
+      "topic": "optimizer 用 adam 还是 adamw+weight_decay",
+      "options": "A=维持默认adam(无正则) / B=切adamw+weight_decay=0.01",
+      "recommend": "⭐B=切adamw+weight_decay=0.01。当前dropout=0+adam=零正则，与高LR+无裁剪叠加是完整发散配方；adamw是mlx-lm原生支持(无需改训练循环)、对小数据FC更稳。dropout保持0(短训练dropout不可靠)。",
+      "quant": "MLX AdamW默认weight_decay=0.01；低成本(改config一行)高价值，与降LR配合是最稳组合。"
+    },
+    {
+      "topic": "端侧 fuse 4bit parity 何时验、怎么验",
+      "options": "A=Mac训练态val好就签端侧V-PASS / B=端侧真机三路parity实测后才签 / C=端侧动态加载adapter不fuse（绕过#654）",
+      "recommend": "⭐B（必做）+ C作fuse掉点时的fallback。#654 merge-into-4bit静默掉10-30%且Mac val看不出，端侧V-PASS必须真机三路(dynamic/fused bf16/fused 4bit)同harness对比ToolCallExact+IrrelAcc+逐字节比对prompt。无真机=该项blocked不能签。",
+      "quant": "#654/#1058反复复现(前20token对后发散)；closeout已自标three_way_parity_not_run；这是P1-C两V-PASS之间最大未知。"
+    },
+    {
+      "topic": "masking train_on_turn 正式训练要不要实装真 loss-mask",
+      "options": "A=维持smoke的train_on_turn=false(算全序列) / B=实装真loss-mask只算ToolCall span",
+      "recommend": "⭐B=实装真loss-mask。本机receipt实证smoke那条train_on_turn=false(loss算全序列含模板user串+空think块,抬高基线干扰判读)；正式训练走return_assistant_tokens_mask只覆盖ToolCall span，这是3HIGH防死记的loss-mask形态。",
+      "quant": "stock mlx单区间mask只能mask整prompt前缀；多轮样本须拍平单轮+validator硬断言末条=目标assistant。"
+    },
+    {
+      "topic": "DoRA secondary（实为 QDoRA）值不值得作实验",
+      "options": "A=drop(轻治理) / B=保留作secondary A/B但不当主线、必同harness多跑报std / C=当主线",
+      "recommend": "⭐B=保留作secondary不当主线。base 4bit→DoRA实为QDoRA(4bit灰区未实测不可断言)，文献收益多~1%且非FC任务，训练慢~20%；保留对照可以但禁凭Answer.AI 4bit结论外推到中文FC。",
+      "quant": "QDoRA 4bit介于'理论更好'与'极低bit崩溃'灰区；secondary排期按3-5x单次成本估(主线+dora慢20%+rank32显存翻倍)。"
+    },
+    {
+      "topic": "实验追踪/记录工具选型",
+      "options": "A=mlx-lm原生回调→metrics.jsonl+matplotlib / B=Trackio(本地SQLite,import as wandb) / C=wandb/mlflow cloud",
+      "recommend": "⭐A默认(零新依赖够solo复盘)，要横向比多run(LR sweep/rank对比)再加B。C违离线红线+cloud上传阻塞训练，drop。同时receipt补environment段(seed/mlx版本/dtype/硬件)+training_curve段(metrics.jsonl指针/best-checkpoint依据)。",
+      "quant": "Trackio 2025-08发布近期活跃<3000行可hack;mlx-lm原生emit 7指标(loss/LR/throughput/peak_mem)+回调key已确认,缺grad_norm需自加。"
+    }
+  ],
+  "pre_mortem_consolidated": {
+    "tiger": [
+      "峰值 LR=2e-4 过冲是 loss 发散主因【已实测坐实非推测】：smoke-only-schedule iter30@LR1.00e-04 loss=1.069、iter60 LR达峰2.00e-04→iter70=17.5；r9常数2e-4→iter80=32.0。验证清单已满足（两条本机日志对照）。动作=降峰值LR到1e-4（本机已证健康），仍尖刺降5e-5。",
+      "stock mlx-lm 0.31.1 训练循环无梯度裁剪（多路独立 grep trainer.py step() 零 clip_grad_norm + TrainingArgs 无 grad_clip 字段）——发散无熔断必雪崩。动作=C5TrainingCLI 训练循环手动 clip_grad_norm(max_norm=1.0)+打 total_norm。",
+      "dry-run deterministic 同质模板串无泛化信号（receipt status=dry_run_only/generator全configured=false）——用它正式训必死记模板格式、客户换说法崩。动作=必接云多源真口语 generator 再正式训，smoke loss 不当质量信号。",
+      "4bit base fuse+端侧再量化静默掉 FC 行为（#654/#832/#1058 反复复现，Mac val loss 看不出）+ train/serve enable_thinking/chat_template 跨引擎(mlx Python jinja vs mlx-swift minijinja)不一致——威胁端侧诚实性。动作=端侧三路parity实测+逐字节比对prompt，写进真机V-PASS门。",
+      "无 held-out 就宣称提升=死记假象（diagnostic blocked_missing）。动作=held-out按'换说法+没见过arg值+按bug_id分层'切、报train/val perplexity gap；IrrelAcc 反向权衡（Hammer，base无LoRA已0.789 hard_fail）须独立报不被FC总分掩盖。",
+      "零正则（dropout=0+默认adam无weight_decay）+高LR+无裁剪三连=完整发散配方。动作=切adamw+weight_decay0.01。",
+      "stock mlx-lm 单区间 mask 只训最后一条 assistant turn，命中 second_turn_refs 多轮——中间轮 loss=0 学不到。动作=多轮样本拍平成单轮（每个二次交互拆独立单轮），validator 硬断言末条恒为目标assistant。",
+      "1.7B+FC JSON格式+rank16/alpha32+3epoch落在灾难性遗忘高风险区（Qwen2.5-1.5B 实测rank16/alpha32仍严重遗忘）。动作=C6 diff加'base原能力退化'轴做哨兵、rehearsal可从0.075提到0.1-0.15。"
+    ],
+    "paper_tiger": [
+      "内存/OOM/M5性能瓶颈——实测peak仅12.2GB/32GB，no_oom/no_nan，it/sec稳定0.13-0.19；#1206崩的是Qwen3.5-9B新架构，1.7B不命中。loss发散与内存无关，别在这找根因。",
+      "4bit base数值灾难性发散——研究指真低精度发散'不会恢复'，而r9 loss 32→回落4.7恢复了+no_nan_or_inf，是LR借的可恢复不稳，4bit训练路本身稳（QLoRA标准范式）。",
+      "smoke loss高=数据学不会/配方坏——同一份数据iter30@LR1e-4已达1.069证明完全可学；4.68是高LR没收敛干净的产物。smoke跑的是dry-run串本就不该期待收敛（拿错尺子量错东西）。",
+      "target_modules全7个太激进/退回attn-only更稳——多路强证据(QLoRA/Biderman2024/ThinkingMachines/Amazon)一致显示attn-only在结构化FC全面劣于含MLP，全7模块是正解，退回反伤FC质量。这是已做对的项，守住别动。",
+      "rank16太小需升rank32——单跳FC（架构铁律L2-L5单跳映射）rank16是平衡默认，只有多跳推理FC才需rank≥32。真瓶颈是数据多样性不是rank。",
+      "rsLoRA/PiSSA/LoRA+更先进该上——对rank16小模型主线全不命中：rsLoRA只rank≥32有用、PiSSA需SVD+mlx不原生、LoRA+是大宽度渐近论。新≠强，守标准LoRA。",
+      "mlx-lm LR调度bug #2617(cosine在warmup提前衰减)——已修于MLX 0.17.1，0.31.1大概率不受影响；5分钟打印实际LR曲线坐实即可（本机日志已显示warmup正常爬升1.667e-05→1e-4→2e-4）。",
+      "train loss收尾4.71高于val4.68看似异常——经典过拟合是train降val升；train>val常是正则训练期生效/半epoch测量偏移/小数据split噪声+模板val集恰好更干净，dropout=0下更可能是LR上冲产物，非过拟合。"
+    ],
+    "elephant": [
+      "smoke loss数字本身无诊断价值——它是'链路跑通'烟测不是'配方对不对'判据，把dry-run smoke loss当配方信号去调超参=南辕北辙。该做的是验链路+offset/parity fixture正确+加clip/降LR，不是盯loss调参。",
+      "receipt缺environment段(seed/mlx库精确版本/dtype/硬件)和training_curve段(metrics.jsonl指针/best-checkpoint依据)——血缘字段(promptHash/sourceRefs)很全但'怎么复现这次训练'的运行态记录是空的，有what没how-to-rerun。",
+      "masking三形态里只有train_on_turn是真loss-mask，function/arg masking是受约束数据增广走数据侧（stock mlx物理做不到arg-token级mask）——文档若混淆会让后人在'为何mask没生效'空耗。",
+      "B1 tokenizer patch在mlx-lm升级时极脆——改的是ChatDataset loss-mask offset，下次pip升级可能静默失效/冲突。须做成自动断言测试(dump一条样本断言think段mask=0、trained_span=tool_call)纳入CI，否则升级后空think又漏进loss无人察觉。",
+      "端侧mlx-swift推理的enable_thinking行为必须与训练patch逐位一致(mlx-swift-lm #154 部分模型模板不honor enable_thinking)——Mac python验过≠端侧mlx-swift过，只能靠端侧实跑一条FC比对tokenization抓（active probe非config check）。",
+      "fuse掉点+template跨引擎+空think+4bit再量化是一条'误差累积链'非独立坑——每条单看可接受，叠起端侧可能从'Mac训练态优秀'掉到'iPhone演示态翻车'，P1-C两个V-PASS之间这条链是最大未知。",
+      "Qwen3模型版本(2504 vs 2507+)决定enable_thinking patch是否该存在——若base实为2507+系则空think块逻辑作废、B1 patch可能多余有害；需先grep坐实mlx-community/Qwen3-1.7B-4bit底模版本（本机模板已确认含enable_thinking=false分支注入<think>\\n\\n</think>，倾向2504系，但需核eos_token=<|im_end|>非base的<|endoftext|>）。",
+      "同质模板样本是'最被记忆的10%'反而拖累泛化（移除最被记忆10%反提升Pass@1）——device×primitive×value若笛卡尔渲染产同质洪水。已定'加权采样非笛卡尔积'方向对，正式训练后做一次memorization排查下采样最同质的。",
+      "rehearsal_ratio=0.075偏低于业界5-20%下限——若C6 diff发现base能力退化，第一调节旋钮是提rehearsal到0.1-0.15而非降LoRA强度。"
+    ]
+  }
+}
