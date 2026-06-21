@@ -240,7 +240,7 @@ public struct C5ProposedFix: Codable, Equatable, Sendable {
 }
 
 public struct C5DataGateValidator: Sendable {
-    public static let splitWhitelist = ["train", "heldout", "must_pass", "c6_base", "quarantine"]
+    public static let splitWhitelist = ["train", "heldout", "must_pass", "c6_base", "dev_selection", "quarantine"]
 
     public init() {}
 
@@ -252,7 +252,7 @@ public struct C5DataGateValidator: Sendable {
         let protectedCaseIDs = Set(c6Cases.filter { $0.tags.mustPass || $0.tags.mustNotTrain }.map(\.caseID))
         let protectedParents = Set(c6Cases.filter { $0.tags.mustPass || $0.tags.mustNotTrain }.flatMap(\.sourceRefs.semanticContractIDs))
         let normalized = candidates.map { NormalizedCandidate(candidate: $0, split: normalizedSplit($0)) }
-        let nonTrainParents = Set(normalized.filter { $0.split != "train" && $0.split != "quarantine" }.compactMap(\.candidate.parentSemanticID))
+        let nonTrainParents = Set(normalized.filter { $0.split != "train" && $0.split != "dev_selection" && $0.split != "quarantine" }.compactMap(\.candidate.parentSemanticID))
             .union(protectedParents)
         let trainOverlapParents = Set(normalized.filter { $0.split == "train" }.compactMap(\.candidate.parentSemanticID))
             .intersection(nonTrainParents)
@@ -345,7 +345,11 @@ public struct C5DataGateValidator: Sendable {
     }
 
     public func renderMarkdown(_ receipt: C5DataGateReceipt) -> String {
-        """
+        let suggestions = receipt.proposedFix.suggestions.isEmpty ? "[]" : receipt.proposedFix.suggestions.joined(separator: "; ")
+        let failures = receipt.failureReceipt.isEmpty
+            ? "none"
+            : receipt.failureReceipt.map { "- [\($0.severity)] \($0.sampleID) split=\($0.split) bucket=\($0.bucket) reason=\($0.reason)" }.joined(separator: "\n")
+        return """
         # C5 data gate receipt
 
         status: \(receipt.status)
@@ -374,10 +378,10 @@ public struct C5DataGateValidator: Sendable {
 
         ## Proposed fix
         - auto_apply: \(receipt.proposedFix.autoApply)
-        - suggestions: \(receipt.proposedFix.suggestions.joined(separator: "; "))
+        - suggestions: \(suggestions)
 
         ## Failures
-        \(receipt.failureReceipt.map { "- [\($0.severity)] \($0.sampleID) split=\($0.split) bucket=\($0.bucket) reason=\($0.reason)" }.joined(separator: "\n"))
+        \(failures)
         """
     }
 
@@ -397,6 +401,9 @@ public struct C5DataGateValidator: Sendable {
         }
         if value == "c6_base" {
             return "c6_base"
+        }
+        if value == "dev_selection" || value == "checkpoint_selection" {
+            return "dev_selection"
         }
         return "quarantine"
     }

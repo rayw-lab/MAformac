@@ -1,0 +1,45 @@
+{
+  "bucket_counts" : {
+    "dev_selection" : 400,
+    "train" : 4556
+  },
+  "detected_parent_semantic_overlap_count" : 0,
+  "failure_receipt" : [
+
+  ],
+  "format_contract_version" : "630281ed49f2acb7a04a1823909fd907031b7ba29d606e88f326c1e0bb93d53b",
+  "generated_at" : "2026-06-21T05:19:43Z",
+  "masking_coverage" : {
+    "argument_name" : true,
+    "argument_value" : true,
+    "function_name" : true,
+    "train_on_turn" : true
+  },
+  "must_not_train_violations" : 0,
+  "proposed_fix" : {
+    "auto_apply" : false,
+    "suggestions" : [
+
+    ]
+  },
+  "quarantine_count" : 0,
+  "receipt_version" : "c5-data-gate.v1",
+  "redaction_status" : "pass",
+  "row_count" : 4956,
+  "source_authorization_status" : "authorized_c1_semantic_contract",
+  "source_snapshot_digest" : "b71f610d4928880c8143f35982255edcbe879d6f2640024632c2f8c0be763c0f",
+  "split_whitelist" : [
+    "train",
+    "heldout",
+    "must_pass",
+    "c6_base",
+    "dev_selection",
+    "quarantine"
+  ],
+  "status" : "data_gate_ready",
+  "tool_call_format_failures" : [
+
+  ],
+  "tool_call_format_pass" : 4100,
+  "train_parent_semantic_overlap" : 0
+}

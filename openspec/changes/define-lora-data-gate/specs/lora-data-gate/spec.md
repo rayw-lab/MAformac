@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Data gate SHALL classify every C5 candidate before training
-C5 data gate SHALL classify each candidate sample into exactly one bucket: `train`, `heldout`, `must_pass`, `c6_base`, or `quarantine`. A sample SHALL be eligible for training only when its split is explicitly `train`, it is not marked `must_not_train`, it has no train-blocking overlap, it passes the shared Qwen tool-call format contract, and it passes redaction checks. Missing split metadata SHALL fail closed into `quarantine`.
+C5 data gate SHALL classify each candidate sample into exactly one bucket: `train`, `heldout`, `must_pass`, `c6_base`, `dev_selection`, or `quarantine`. A sample SHALL be eligible for training only when its split is explicitly `train`, it is not marked `must_not_train`, it has no train-blocking overlap, it passes the shared Qwen tool-call format contract, and it passes redaction checks. Missing split metadata SHALL fail closed into `quarantine`. `dev_selection` samples SHALL be excluded from training and protected release/gold buckets; they exist only for checkpoint selection.
 
 #### Scenario: Explicit train candidate is allowed only after all gates
 - **GIVEN** a candidate with `split=train`
@@ -14,6 +14,13 @@ C5 data gate SHALL classify each candidate sample into exactly one bucket: `trai
 - **WHEN** the data gate validates the candidate
 - **THEN** the candidate is classified as `quarantine`
 - **AND** the receipt records a failure reason for the sample
+
+#### Scenario: Dev-selection split is non-training selection data
+- **GIVEN** a candidate with `split=dev_selection`
+- **WHEN** the data gate validates the candidate
+- **THEN** the receipt records it in the `dev_selection` bucket
+- **AND** it is not train-eligible
+- **AND** it is not treated as heldout, C6 base, must-pass, or release-gate gold data
 
 ### Requirement: C6 must-pass and gold cases SHALL be training禁入
 C5 data gate SHALL read the C6 bench identity set and SHALL treat every C6 `must_pass`, gold, or `must_not_train` case as training禁入. Any candidate in `train` whose source identity, case identity, or parent semantic identity matches this training禁入 set SHALL increment `must_not_train_violations` and SHALL make the data gate fail.

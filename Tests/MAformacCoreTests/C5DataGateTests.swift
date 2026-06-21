@@ -60,6 +60,18 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertEqual(receipt.toolCallFormatPass, 1)
     }
 
+    func testDevSelectionIsWhitelistedAndDoesNotProtectParentOverlap() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-001","split":"train","bucket":"semantic_protocol_augmented","case_id":"C5-TRAIN-001","parent_semantic_id":"parent:shared","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"tool_call_frame","arguments":{"device":"ac","action_primitive":"power_on"}}}
+        {"sample_id":"C5-DEV-001","split":"dev_selection","bucket":"dev_selection","case_id":"C5-DEV-001","parent_semantic_id":"parent:shared","must_not_train":true,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"tool_call_frame","arguments":{"device":"ac","action_primitive":"power_on"}}}
+        """)
+
+        XCTAssertEqual(receipt.status, "data_gate_ready")
+        XCTAssertEqual(receipt.bucketCounts["dev_selection"], 1)
+        XCTAssertEqual(receipt.trainParentSemanticOverlap, 0)
+        XCTAssertTrue(receipt.splitWhitelist.contains("dev_selection"))
+    }
+
     private func makeReceipt(
         c6Cases: [C6BenchCase] = [],
         jsonl: String

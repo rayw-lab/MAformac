@@ -75,6 +75,9 @@ struct C5DataGateCLI {
         if path.contains("/datasets/acceptance/") {
             return "must_pass"
         }
+        if path.contains("/datasets/dev_selection/") {
+            return "dev_selection"
+        }
         if path.contains("/datasets/future/") {
             return "quarantine"
         }
