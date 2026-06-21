@@ -17,7 +17,7 @@
 | 14-repo teardown + Qwen3.5-2B 可行性 + synthesis | **committed 31edafc → push origin/main** | git |
 | C4 三层路由/短时记忆 · C5 LoRA 数据 · C7 离线语音 | **未起（待解冻）** | — |
 
-**新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**P1-A C5 数据门 ✅V-PASS + P1-B Qwen spike ✅(守 1.7B) 已收口 push `846e40c`；P1-C train 仍 blocked——差 masking 数据生成 + 训练环境(Mac 无 N 卡)，需 grill；模型已定训 Qwen3-1.7B。**
+**新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**P1-A/B 收口 push `846e40c`；2026-06-21 P1-C grill Q11-Q18 收口 + C5 apply 派单就绪(hermes GLM-5.2 异源 + subagent CC 双审,2 BLOCKER[B1 enable_thinking offset 过冲 / B2 dev_selection 撞 spec.md:4]已修为显式非自主);模型训 Qwen3-1.7B;真机无 iPhone8GB(在旁可用,端侧 V-PASS 必真机)→ P1-C 拆两 V-PASS(模型质量 Mac 可达/端侧真机);下一步=派 codex 自主实装(派单 `~/workspace/raw/05-Projects/MAformac/dispatches/2026-06-21-c5-lora-training-apply-dispatch.md` + handoff `2026-06-21-p1c-grill-closeout-c5-apply-dispatch.md`)。**
 
 ---
 
