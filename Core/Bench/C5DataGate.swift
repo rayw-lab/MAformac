@@ -6,6 +6,7 @@ public struct C5DataGateCandidate: Decodable, Sendable {
     public var bucket: String
     public var caseID: String?
     public var parentSemanticID: String?
+    public var candidateParentSemanticID: String?
     public var mustNotTrain: Bool
     public var sourceAuthorization: String?
     public var inputText: String
@@ -21,6 +22,7 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         case datasetBucket = "dataset_bucket"
         case caseID = "case_id"
         case parentSemanticID = "parent_semantic_id"
+        case candidateParentSemanticID = "candidate_parent_semantic_id"
         case parentID = "parent_id"
         case scenarioFamilyID = "scenario_family_id"
         case mustNotTrain = "must_not_train"
@@ -41,6 +43,7 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         bucket: String,
         caseID: String?,
         parentSemanticID: String?,
+        candidateParentSemanticID: String? = nil,
         mustNotTrain: Bool,
         sourceAuthorization: String?,
         inputText: String,
@@ -54,6 +57,7 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         self.bucket = bucket
         self.caseID = caseID
         self.parentSemanticID = parentSemanticID
+        self.candidateParentSemanticID = candidateParentSemanticID
         self.mustNotTrain = mustNotTrain
         self.sourceAuthorization = sourceAuthorization
         self.inputText = inputText
@@ -85,6 +89,7 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         self.parentSemanticID = try container.decodeIfPresent(String.self, forKey: .parentSemanticID)
             ?? container.decodeIfPresent(String.self, forKey: .parentID)
             ?? container.decodeIfPresent(String.self, forKey: .scenarioFamilyID)
+        self.candidateParentSemanticID = try container.decodeIfPresent(String.self, forKey: .candidateParentSemanticID)
         self.mustNotTrain = try container.decodeIfPresent(Bool.self, forKey: .mustNotTrain) ?? false
         self.sourceAuthorization = try container.decodeIfPresent(String.self, forKey: .sourceAuthorization)
         self.inputText = try container.decodeIfPresent(String.self, forKey: .inputZh)
@@ -96,6 +101,10 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         self.hasActionToolCall = !(expectedToolCalls ?? []).isEmpty || toolCall != nil
         self.hasSharedWrapper = explicitWrapper || assistantText.contains("<tool_call>")
         self.masking = (try container.decodeIfPresent(C5MaskingFlags.self, forKey: .masking)) ?? C5MaskingFlags()
+    }
+
+    public var overlapParentSemanticID: String? {
+        candidateParentSemanticID ?? parentSemanticID
     }
 }
 
@@ -252,9 +261,9 @@ public struct C5DataGateValidator: Sendable {
         let protectedCaseIDs = Set(c6Cases.filter { $0.tags.mustPass || $0.tags.mustNotTrain }.map(\.caseID))
         let protectedParents = Set(c6Cases.filter { $0.tags.mustPass || $0.tags.mustNotTrain }.flatMap(\.sourceRefs.semanticContractIDs))
         let normalized = candidates.map { NormalizedCandidate(candidate: $0, split: normalizedSplit($0)) }
-        let nonTrainParents = Set(normalized.filter { $0.split != "train" && $0.split != "dev_selection" && $0.split != "quarantine" }.compactMap(\.candidate.parentSemanticID))
+        let nonTrainParents = Set(normalized.filter { $0.split != "train" && $0.split != "dev_selection" && $0.split != "quarantine" }.compactMap(\.candidate.overlapParentSemanticID))
             .union(protectedParents)
-        let trainOverlapParents = Set(normalized.filter { $0.split == "train" }.compactMap(\.candidate.parentSemanticID))
+        let trainOverlapParents = Set(normalized.filter { $0.split == "train" }.compactMap(\.candidate.overlapParentSemanticID))
             .intersection(nonTrainParents)
         var failures: [C5DataGateFailure] = []
         var formatFailures: [C5DataGateFailure] = []
@@ -270,11 +279,11 @@ public struct C5DataGateValidator: Sendable {
                 mustNotTrainViolations += 1
                 failures.append(failure(candidate, split: item.split, reason: "must_not_train_candidate_in_train", severity: "P0"))
             }
-            if item.split == "train", let parent = candidate.parentSemanticID, trainOverlapParents.contains(parent) {
+            if item.split == "train", let parent = candidate.overlapParentSemanticID, trainOverlapParents.contains(parent) {
                 failures.append(failure(candidate, split: item.split, reason: "train_parent_semantic_overlap", severity: "P1"))
             }
-            if item.split == "train" && candidate.parentSemanticID == nil {
-                failures.append(failure(candidate, split: item.split, reason: "missing_parent_semantic_id_for_train", severity: "P1"))
+            if item.split == "train" && candidate.overlapParentSemanticID == nil {
+                failures.append(failure(candidate, split: item.split, reason: "missing_candidate_parent_semantic_id_for_train", severity: "P1"))
             }
             if item.split == "train" && candidate.hasActionToolCall {
                 if candidate.hasSharedWrapper {
@@ -308,7 +317,7 @@ public struct C5DataGateValidator: Sendable {
             && context.sourceAuthorizationStatus.contains("authorized")
             && !candidates.isEmpty
         let hardTrainOverlap = normalized.filter {
-            $0.split == "train" && ($0.candidate.parentSemanticID.map(trainOverlapParents.contains) == true)
+            $0.split == "train" && ($0.candidate.overlapParentSemanticID.map(trainOverlapParents.contains) == true)
         }.count
         let status: String
         if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty {
@@ -418,7 +427,7 @@ public struct C5DataGateValidator: Sendable {
             caseID: candidate.caseID,
             split: split,
             bucket: candidate.bucket,
-            parentSemanticID: candidate.parentSemanticID,
+            parentSemanticID: candidate.overlapParentSemanticID ?? candidate.parentSemanticID,
             reason: reason,
             severity: severity
         )

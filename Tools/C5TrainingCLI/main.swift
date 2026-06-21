@@ -30,25 +30,35 @@ struct C5TrainingCLI {
         try createTrainingTokenizerPatch(sourceDir: options.baseModelDir, outputDir: patchedModelDir)
         let semanticText = try read(repoRoot, "contracts/semantic-function-contract.jsonl")
         let seeds = try decodeJSONL(semanticText, as: C5SemanticSeed.self)
+        let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))
         let formatDigest = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
         let semanticDigest = C6Hash.sha256Hex(Data(semanticText.utf8))
         let generatedAt = isoNow()
+        let environment = buildEnvironment(
+            repoRoot: repoRoot,
+            baseModelDir: options.baseModelDir,
+            modelID: patchedModelDir.path,
+            seed: 0
+        )
         let context = C5DataGateRunContext(
             sourceSnapshotDigest: semanticDigest,
             sourceAuthorizationStatus: "authorized_c1_semantic_contract",
             formatContractVersion: formatDigest,
             generatedAt: generatedAt
         )
-        let buildOptions = C5TrainingBuildOptions(
+        var buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
-            generatedAt: generatedAt
+            generatedAt: generatedAt,
+            environment: environment,
+            generatedUtteranceRecords: generatedUtterances
         )
-        let prepared = C5TrainingDatasetBuilder().build(
+        let builder = C5TrainingDatasetBuilder()
+        var prepared = builder.build(
             seeds: seeds,
             c6Cases: c6Cases,
             dataGateContext: context,
@@ -60,8 +70,37 @@ struct C5TrainingCLI {
         try FileManager.default.createDirectory(at: mlxDir, withIntermediateDirectories: true)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        try writeJSONL(prepared.samples, encoder: encoder, url: samplesDir.appendingPathComponent("c5-training-samples.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "train" && $0.trainEligible }.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("train.jsonl"))
+        let samplesURL = samplesDir.appendingPathComponent("c5-training-samples.jsonl")
+        try writeJSONL(prepared.samples, encoder: encoder, url: samplesURL)
+        let offsetArtifactURL = outputDir.appendingPathComponent("offset-fixture/mlx-mask-offset-fixture.json")
+        let offsetArtifact = try generateMaskOffsetArtifact(
+            repoRoot: repoRoot,
+            modelDir: patchedModelDir,
+            samplesURL: samplesURL,
+            outputURL: offsetArtifactURL
+        )
+        buildOptions = C5TrainingBuildOptions(
+            targetPositiveRows: options.targetPositiveRows,
+            devSelectionRows: options.devSelectionRows,
+            maskingStage: options.maskingStage,
+            usesTrainingTokenizerPatch: true,
+            modelOverride: patchedModelDir.path,
+            generatedAt: generatedAt,
+            environment: environment,
+            offsetTokenArtifact: offsetArtifact,
+            generatedUtteranceRecords: generatedUtterances
+        )
+        prepared = builder.build(
+            seeds: seeds,
+            c6Cases: c6Cases,
+            dataGateContext: context,
+            options: buildOptions
+        )
+        try writeJSONL(prepared.samples, encoder: encoder, url: samplesURL)
+        let trainRecords = prepared.samples.filter { sample in
+            sample.split == "train" && (sample.trainEligible || options.maskingStage == .smokeOnly)
+        }
+        try writeJSONL(trainRecords.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("train.jsonl"))
         try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
         try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.prefix(128).map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
         let prettyEncoder = JSONEncoder()
@@ -69,10 +108,10 @@ struct C5TrainingCLI {
         try prettyEncoder.encode(prepared.receipt).write(to: outputDir.appendingPathComponent("c5-training-receipt.json"))
         try renderMarkdown(receipt: prepared.receipt).write(to: outputDir.appendingPathComponent("c5-training-receipt.md"), atomically: true, encoding: .utf8)
         try prepared.receipt.mlxConfig.renderYAML.write(to: outputDir.appendingPathComponent("mlx-lora-config.yaml"), atomically: true, encoding: .utf8)
-        try renderTrainCommand(outputDir: outputDir, config: prepared.receipt.mlxConfig).write(to: outputDir.appendingPathComponent("mlx-train-command.txt"), atomically: true, encoding: .utf8)
+        try renderTrainCommand(repoRoot: repoRoot, outputDir: outputDir, config: prepared.receipt.mlxConfig).write(to: outputDir.appendingPathComponent("mlx-train-command.txt"), atomically: true, encoding: .utf8)
         print("wrote \(outputDir.appendingPathComponent("c5-training-receipt.json").path)")
         print("wrote \(outputDir.appendingPathComponent("mlx-data/train.jsonl").path)")
-        print("status=\(prepared.receipt.status) rows=\(prepared.receipt.rowCount) train_eligible=\(prepared.receipt.trainEligibleCount) dev_selection=\(prepared.receipt.devSelectionCount) refusal_ratio=\(String(format: "%.3f", prepared.receipt.refusalRatioObserved))")
+        print("status=\(prepared.receipt.status) rows=\(prepared.receipt.rowCount) train_eligible=\(prepared.receipt.trainEligibleCount) smoke_chain_records=\(prepared.receipt.smokeChainRecordCount) dev_selection=\(prepared.receipt.devSelectionCount) refusal_ratio=\(String(format: "%.3f", prepared.receipt.refusalRatioObserved))")
         if prepared.receipt.status == "blocked" {
             exit(65)
         }
@@ -96,9 +135,10 @@ struct C5TrainingCLI {
         try (lines.joined(separator: "\n") + "\n").write(to: url, atomically: true, encoding: .utf8)
     }
 
-    private static func renderTrainCommand(outputDir: URL, config: C5MLXLoRAConfig) -> String {
+    private static func renderTrainCommand(repoRoot: URL, outputDir: URL, config: C5MLXLoRAConfig) -> String {
         """
-        /Users/wanglei/Library/Python/3.13/bin/mlx_lm.lora \\
+        /opt/homebrew/opt/python@3.13/bin/python3.13 \\
+          \(repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path) \\
           --train \\
           --model \(config.model) \\
           --data \(outputDir.appendingPathComponent("mlx-data").path) \\
@@ -109,7 +149,11 @@ struct C5TrainingCLI {
           --grad-accumulation-steps \(config.gradAccumulationSteps) \\
           --iters 600 \\
           --learning-rate \(config.learningRate) \\
+          --seed \(config.seed) \\
           --max-seq-length \(config.maxSeqLength) \\
+          --grad-clip-norm \(config.gradClipNorm) \\
+          --nonfinite-fallback-lr 5e-5 \\
+          --metrics-jsonl \(outputDir.appendingPathComponent("metrics.jsonl").path) \\
           --adapter-path \(outputDir.appendingPathComponent("adapters-rank16").path)
         """
     }
@@ -126,6 +170,7 @@ struct C5TrainingCLI {
         ## Data
         - row_count: \(receipt.rowCount)
         - train_eligible_count: \(receipt.trainEligibleCount)
+        - smoke_chain_record_count: \(receipt.smokeChainRecordCount)
         - dev_selection_count: \(receipt.devSelectionCount)
         - route_tier_counts: \(receipt.routeTierCounts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: ", "))
         - masking_stage_counts: \(receipt.maskingStageCounts.sorted { $0.key < $1.key }.map { "\($0.key)=\($0.value)" }.joined(separator: ", "))
@@ -138,6 +183,8 @@ struct C5TrainingCLI {
         ## Gates
         - data_gate_status: \(receipt.dataGateReceipt.status)
         - offset_fixture: \(receipt.offsetFixture.status)
+        - offset_fixture_artifact: \(receipt.offsetFixture.tokenArtifact?.artifactPath ?? "missing")
+        - offset_fixture_artifact_sha256: \(receipt.offsetFixture.tokenArtifact?.artifactSHA256 ?? "missing")
         - generator_orchestration: \(receipt.generatorOrchestration.status)
         - validator_layer1: \(receipt.validatorSummary.layer1RuleStatus)
         - validator_layer2: \(receipt.validatorSummary.layer2SemanticStatus)
@@ -145,10 +192,174 @@ struct C5TrainingCLI {
         - masking_coverage: train_on_turn=\(receipt.maskingCoverage.trainOnTurn), function_name=\(receipt.maskingCoverage.functionName), argument_name=\(receipt.maskingCoverage.argumentName), argument_value=\(receipt.maskingCoverage.argumentValue)
         - diagnostic_verdict: \(receipt.generalizationDiagnostic.diagnosticVerdict)
         - fuse_parity_gate: \(receipt.fuseParityGate.status)
+        - fuse_toolcall_exact_delta_pp: \(String(format: "%.4f", receipt.fuseParityGate.toolCallExactDeltaPP))
+        - fuse_IrrelAcc_delta_pp: \(receipt.fuseParityGate.irrelAccDeltaPP.map { String(format: "%.4f", $0) } ?? "missing")
+        - endpoint_tokenizer_parity: \(receipt.endpointTokenizerParity.status)
+        - endpoint_render_source: \(receipt.endpointTokenizerParity.endpointRenderSource)
+        - endpoint_byte_parity: \(receipt.endpointTokenizerParity.byteParity)
+        - endpoint_first_mismatch_byte: \(receipt.endpointTokenizerParity.firstMismatchByte.map(String.init) ?? "none")
+
+        ## Config
+        - model: \(receipt.mlxConfig.model)
+        - fine_tune_type: \(receipt.mlxConfig.fineTuneType)
+        - rank: \(receipt.mlxConfig.rank)
+        - scale: \(receipt.mlxConfig.scale)
+        - optimizer: \(receipt.mlxConfig.optimizer)
+        - weight_decay: \(receipt.mlxConfig.weightDecay)
+        - grad_clip_norm: \(receipt.mlxConfig.gradClipNorm)
+        - training_loop: \(receipt.mlxConfig.trainingLoop)
+        - learning_rate: \(receipt.mlxConfig.learningRate)
+        - lr_schedule: \(receipt.mlxConfig.lrSchedule)
+        - lr_schedule_step_unit: \(receipt.mlxConfig.lrScheduleStepUnit)
+        - schedule_decay_steps: \(receipt.mlxConfig.scheduleDecaySteps)
+        - warmup_steps: \(receipt.mlxConfig.warmupSteps)
+        - optimizer_update_steps: \(receipt.mlxConfig.optimizerUpdateSteps)
+        - rendered_schedule_decay_steps: \(receipt.mlxConfig.renderedScheduleDecaySteps)
+        - rendered_warmup_steps: \(receipt.mlxConfig.renderedWarmupSteps)
+        - max_seq_length: \(receipt.mlxConfig.maxSeqLength)
+        - keys: \(receipt.mlxConfig.keys.joined(separator: ", "))
+
+        ## Environment
+        - seed: \(receipt.environment.seed)
+        - mlx_version: \(receipt.environment.mlxVersion)
+        - mlx_lm_version: \(receipt.environment.mlxLMVersion)
+        - transformers_version: \(receipt.environment.transformersVersion)
+        - hardware: \(receipt.environment.hardware)
+        - dtype: \(receipt.environment.dtype)
+        - base_model_commit_sha: \(receipt.environment.baseModelCommitSHA)
+        - repo_commit_sha: \(receipt.environment.repoCommitSHA)
+        - gradient_clip_status: \(receipt.environment.gradientClipStatus)
+
+        ## Training curve
+        - metrics_jsonl_ref: \(receipt.trainingCurve.metricsJSONLRef)
+        - training_log_ref: \(receipt.trainingCurve.trainingLogRef)
+        - best_checkpoint_policy: \(receipt.trainingCurve.bestCheckpointPolicy)
+        - note: \(receipt.trainingCurve.note)
 
         ## Failure receipt
         \(receipt.failureReceipt.map { "- \($0)" }.joined(separator: "\n"))
         """
+    }
+
+    private static func buildEnvironment(repoRoot: URL, baseModelDir: URL, modelID: String, seed: Int) -> C5TrainingEnvironment {
+        let versions = pythonPackageVersions()
+        return C5TrainingEnvironment(
+            seed: seed,
+            mlxVersion: versions["mlx", default: "unknown"],
+            mlxLMVersion: versions["mlx_lm", default: "unknown"],
+            transformersVersion: versions["transformers", default: "unknown"],
+            hardware: hardwareDescription(),
+            dtype: "bf16_lora_on_4bit_base",
+            baseModel: modelID,
+            baseModelCommitSHA: baseModelDir.lastPathComponent,
+            repoCommitSHA: capture("/usr/bin/git", ["rev-parse", "HEAD"], cwd: repoRoot.path) ?? "unknown",
+            trainingBackend: "maformac_c5_repo_loop_mlx_lm_0_31_1",
+            gradientClipStatus: "implemented_repo_loop_clip_grad_norm_max_1.0_nonfinite_stop_fallback_lr_5e-5"
+        )
+    }
+
+    private static func generateMaskOffsetArtifact(
+        repoRoot: URL,
+        modelDir: URL,
+        samplesURL: URL,
+        outputURL: URL
+    ) throws -> C5MaskOffsetTokenArtifact {
+        let script = repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mask_offset_fixture.py")
+        let output = run(
+            "/opt/homebrew/opt/python@3.13/bin/python3.13",
+            [
+                script.path,
+                "--model", modelDir.path,
+                "--samples-jsonl", samplesURL.path,
+                "--output", outputURL.path
+            ],
+            cwd: repoRoot.path
+        )
+        guard output.status == 0 else {
+            throw CLIError.usage("offset fixture generation failed: \(output.stderr)\(output.stdout)")
+        }
+        let data = try Data(contentsOf: outputURL)
+        var artifact = try JSONDecoder().decode(C5MaskOffsetTokenArtifact.self, from: data)
+        artifact.artifactSHA256 = try C6Hash.fileHash(url: outputURL)
+        return artifact
+    }
+
+    private static func run(_ executable: String, _ arguments: [String], cwd: String? = nil) -> (status: Int32, stdout: String, stderr: String) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+        if let cwd {
+            process.currentDirectoryURL = URL(fileURLWithPath: cwd, isDirectory: true)
+        }
+        let stdout = Pipe()
+        let stderr = Pipe()
+        process.standardOutput = stdout
+        process.standardError = stderr
+        do {
+            try process.run()
+            process.waitUntilExit()
+            let stdoutData = stdout.fileHandleForReading.readDataToEndOfFile()
+            let stderrData = stderr.fileHandleForReading.readDataToEndOfFile()
+            return (
+                process.terminationStatus,
+                String(decoding: stdoutData, as: UTF8.self),
+                String(decoding: stderrData, as: UTF8.self)
+            )
+        } catch {
+            return (127, "", "\(error)")
+        }
+    }
+
+    private static func pythonPackageVersions() -> [String: String] {
+        let script = """
+        import importlib.metadata as m
+        for name in ["mlx", "mlx-lm", "transformers"]:
+            try:
+                print(f"{name}={m.version(name)}")
+            except Exception:
+                print(f"{name}=unknown")
+        """
+        guard let output = capture("/opt/homebrew/opt/python@3.13/bin/python3.13", ["-c", script]) else {
+            return [:]
+        }
+        var versions: [String: String] = [:]
+        for line in output.split(whereSeparator: \.isNewline) {
+            let parts = line.split(separator: "=", maxSplits: 1).map(String.init)
+            guard parts.count == 2 else { continue }
+            let key = parts[0] == "mlx-lm" ? "mlx_lm" : parts[0]
+            versions[key] = parts[1]
+        }
+        return versions
+    }
+
+    private static func hardwareDescription() -> String {
+        let model = capture("/usr/sbin/sysctl", ["-n", "hw.model"]) ?? "unknown_model"
+        let cpu = capture("/usr/sbin/sysctl", ["-n", "machdep.cpu.brand_string"]) ?? "unknown_cpu"
+        let memBytes = capture("/usr/sbin/sysctl", ["-n", "hw.memsize"]) ?? "unknown_mem"
+        return "\(model); \(cpu); mem_bytes=\(memBytes)"
+    }
+
+    private static func capture(_ executable: String, _ arguments: [String], cwd: String? = nil) -> String? {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: executable)
+        process.arguments = arguments
+        if let cwd {
+            process.currentDirectoryURL = URL(fileURLWithPath: cwd, isDirectory: true)
+        }
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = Pipe()
+        do {
+            try process.run()
+            process.waitUntilExit()
+            guard process.terminationStatus == 0 else {
+                return nil
+            }
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            return String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        } catch {
+            return nil
+        }
     }
 
     private static func isoNow() -> String {
@@ -202,10 +413,11 @@ private struct Options {
     var devSelectionRows: Int
     var maskingStage: C5MaskingStage
     var baseModelDir: URL
+    var generatedUtterancesURL: URL?
 
     init(arguments: [String]) throws {
         guard arguments.count >= 2 else {
-            throw CLIError.usage("usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH]")
+            throw CLIError.usage("usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH]")
         }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -214,6 +426,7 @@ private struct Options {
         devSelectionRows = 400
         maskingStage = .trainableV0
         baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
+        generatedUtterancesURL = nil
         var iterator = arguments.dropFirst(2).makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -235,6 +448,9 @@ private struct Options {
             case "--base-model-dir":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --base-model-dir value") }
                 baseModelDir = URL(fileURLWithPath: value, isDirectory: true)
+            case "--generated-utterances":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --generated-utterances value") }
+                generatedUtterancesURL = URL(fileURLWithPath: value)
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }

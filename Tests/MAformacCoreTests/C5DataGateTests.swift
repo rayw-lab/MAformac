@@ -40,6 +40,29 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "train_parent_semantic_overlap" })
     }
 
+    func testCandidateParentSemanticOverlapInTrainFailsEvenWhenSeedParentIsSafe() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-001","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-001","parent_semantic_id":"parent:seed.safe","candidate_parent_semantic_id":"parent:protected","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        {"sample_id":"C5-HELDOUT-001","split":"heldout","bucket":"heldout_test","case_id":"C5-HELDOUT-001","parent_semantic_id":"parent:protected","must_not_train":true,"input_zh":"空调打开"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertEqual(receipt.trainParentSemanticOverlap, 1)
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "train_parent_semantic_overlap" && $0.parentSemanticID == "parent:protected" })
+    }
+
+    func testCandidateParentSemanticIDOverridesSeedParentForOverlap() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-001","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-001","parent_semantic_id":"parent:seed.shared","candidate_parent_semantic_id":"parent:candidate.reassigned","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        {"sample_id":"C5-HELDOUT-001","split":"heldout","bucket":"heldout_test","case_id":"C5-HELDOUT-001","parent_semantic_id":"parent:seed.shared","must_not_train":true,"input_zh":"空调打开"}
+        """)
+
+        XCTAssertEqual(receipt.status, "data_gate_ready")
+        XCTAssertEqual(receipt.detectedParentSemanticOverlapCount, 0)
+        XCTAssertEqual(receipt.trainParentSemanticOverlap, 0)
+        XCTAssertFalse(receipt.failureReceipt.contains { $0.reason == "train_parent_semantic_overlap" })
+    }
+
     func testBareJSONTrainActionFailsFormatGate() throws {
         let receipt = try makeReceipt(jsonl: """
         {"sample_id":"C5-BAD-FORMAT","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-BAD-FORMAT","parent_semantic_id":"parent:bad.format","must_not_train":false,"input_zh":"打开空调","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"messages":[{"role":"assistant","content":"{\\"name\\":\\"set_cabin_ac\\",\\"arguments\\":{\\"power\\":\\"on\\"}}"}]}

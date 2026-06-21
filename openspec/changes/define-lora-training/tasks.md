@@ -15,10 +15,11 @@
 ## 3. Masking And Augmentation
 
 - [ ] 3.1 Implement `masking_stage=smoke_only` for the 600-iteration chain test with `train_eligible=false`. Verification: smoke receipt reports loss trend, memory, and tokens/sec but does not mark formal readiness.
-- [x] 3.2 Implement assistant-turn loss masking using assistant-token masks for `trainable_v0`. Verification: fixture proves user/system/prompt tokens are excluded and assistant turns are included.
+- [x] 3.2 Implement `trainable_v0` loss masking evidence with a same-path MLX token offset artifact, not a flag suppressor. Verification: Python fixture runs `apply_chat_template` through the pinned training tokenizer path, covers both `<tool_call>` and `NO_TOOL`, proves user/system/think tokens are excluded, and receipt `offset_fixture.status=pass` includes artifact path + digest.
 - [x] 3.3 Implement `function_name` and `argument_name` augmentation as `distractor_only`. Verification: positive expected ToolCall names remain stable while distractor names can vary.
 - [x] 3.4 Implement `argument_value` augmentation by `value_strategy`: `slot_extract`, `exp_inverse_normalize`, and `percent_extract`. Verification: fixtures show utterance and expected ToolCall consistency for each strategy.
 - [x] 3.5 Promote to `masking_complete_v1` only after assistant masks, distractor-only name augmentation, and value-type augmentation are all present. Verification: `masking_coverage` records `train_on_turn`, `function_name`, `argument_name`, and `argument_value`.
+- [x] 3.6 Recompute generated-sample `candidate_parent_semantic_id` from final user utterance plus rendered ToolCall signature, not source artifact IDs. Verification: duplicate utterance+ToolCall candidates collide, source-side generated parent IDs are ignored for gate authority, and data-gate overlap consumes the recomputed field.
 
 ## 4. Refusal And No-Call Data
 
@@ -31,7 +32,7 @@
 
 - [x] 5.1 Generate the MLX LoRA config using `scale` as the governing scale field and no PEFT `alpha` authority. Verification: config inspection shows `scale` and no `alpha`-based scaling.
 - [x] 5.2 Explicitly list LoRA target projection keys: attention q/k/v/o projections and MLP gate/up/down projections. Verification: config does not target tied embeddings.
-- [x] 5.3 Use Qwen3-1.7B as the base model line, `--num-layers -1`, rank16 mainline, lr 2e-4 cosine, warmup 5-10%, 2-3 epochs, batch4 x grad_accum4, bf16 train, and max sequence length starting at 1024 or data P95. Verification: config receipt records each selected value.
+- [x] 5.3 Use Qwen3-1.7B as the base model line, `--num-layers -1`, rank16 mainline, peak lr 1e-4 cosine, warmup 5-10%, AdamW weight_decay=0.01, 2-3 epochs, batch4 x grad_accum4, bf16 train, and max sequence length starting at 1024 or data P95. Verification: config receipt records each selected value and cites the 2e-4 smoke loss spike as rejected.
 - [x] 5.4 Keep rank32 and DoRA rank8 as secondary A/B after smoke, not blockers for the first rank16 candidate. Verification: task receipt distinguishes mainline from optional experiments.
 
 ## 6. Evaluation, Diagnostics, And Candidate Acceptance
@@ -40,13 +41,14 @@
 - [ ] 6.2 Record C6 replay fingerprints for model artifact, tokenizer, LoRA adapter/checkpoint, prompt hash, tool-output digest, and contract digest. Verification: LoRA runs with adapter identifiers also record adapter digest.
 - [x] 6.3 Add `generalization_diagnostic` with `in_dist_probe`, `heldout`, `ood_probe`, gaps, parent-overlap/leakage fields, and `diagnostic_verdict`. Verification: leakage yields `blocked_leakage`; missing diagnostic blocks only generalization claims.
 - [ ] 6.4 Build OOD probes as non-neighbor cases such as new parameter values, unseen device-action combinations, or dialect variants. Verification: diagnostic report includes lineage/case digest evidence for OOD construction.
-- [ ] 6.5 Compare dynamic adapter and fused model on the same C6 harness and sample sets `must_pass`, `heldout`, and `negative`. Verification: candidate fails if ToolCall exact-match delta exceeds parity tolerance or any must-pass regression appears.
-- [x] 6.6 Gate candidate status by `acceptance_stage`: `train_health` for smoke/val-loss only, `trainable_v0` for assistant-mask trainability, and `lora_candidate` only after C6 diff, fingerprints, and fuse parity. Verification: low validation loss alone never produces V-PASS.
+- [ ] 6.5 Compare dynamic adapter, fused model, and quantized/endpoint behavior on the same C6 harness and sample sets `must_pass`, `heldout`, and `negative`. Verification: candidate fails if ToolCall exact-match delta or IrrelAcc delta exceeds parity tolerance, any must-pass regression appears, quantized parse failures appear, or negative false-call delta exceeds tolerance.
+- [x] 6.6 Gate candidate status by `acceptance_stage`: `train_health` for smoke/val-loss only, `trainable_v0` for assistant-mask trainability, and `lora_candidate` only after C6 diff, fingerprints, fuse parity, and endpoint tokenizer byte parity. Verification: low validation loss alone never produces V-PASS.
+- [x] 6.7 Add endpoint tokenizer byte-parity receipt fields for deployment pipe smoke. Verification: candidate V-PASS blocks unless endpoint render bytes match training render bytes exactly and the endpoint render source records patched tokenizer or explicit `enable_thinking=false`.
 
 ## 7. Verification And Closeout
 
 - [x] 7.1 Run focused unit/fixture tests for route-tier derivation, masking stages, value strategies, refusal pairing, MLX config fields, diagnostic verdicts, and fuse-parity failure cases. Verification: tests fail closed on each known grill pitfall.
 - [x] 7.2 Run `openspec validate define-lora-training --strict` and `openspec validate --all --strict`. Verification: both commands pass after implementation.
 - [x] 7.3 Run the C5 data-gate validator and confirm train leakage, parent overlap, redaction, shared format, and masking coverage receipts are correct. Verification: receipt is machine-readable and does not claim action success.
-- [ ] 7.4 Run C6 base-vs-LoRA diff and fuse parity before any V-PASS claim. Verification: eval report records base, adapter, fused, and diagnostic results.
+- [ ] 7.4 Run C6 base-vs-LoRA diff, fuse parity, and endpoint tokenizer byte parity before any V-PASS claim. Verification: eval report records base, adapter, fused, quantized/endpoint, diagnostic, and render-byte parity results.
 - [x] 7.5 Produce a closeout report listing smoke metrics, training config digest, route-tier/refusal/masking coverage, C6 diff, generalization diagnostic, fuse parity, and residual A/B work. Verification: report distinguishes T-PASS train health from V-PASS candidate readiness.

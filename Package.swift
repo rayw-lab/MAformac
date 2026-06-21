@@ -62,7 +62,11 @@ let package = Package(
         .executableTarget(
             name: "C5TrainingCLI",
             dependencies: ["MAformacCore"],
-            path: "Tools/C5TrainingCLI"
+            path: "Tools/C5TrainingCLI",
+            exclude: [
+                "c5_mlx_train_loop.py",
+                "c5_mask_offset_fixture.py"
+            ]
         )
     ]
 )

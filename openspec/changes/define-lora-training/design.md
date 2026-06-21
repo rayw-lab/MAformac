@@ -58,12 +58,12 @@ Alternative rejected: Hammer-style full randomization of all function and argume
 
 ### Q4: `train_on_turn` uses assistant-token masking and three masking stages
 
-Decision: formal training uses `return_assistant_tokens_mask`; all assistant turns in multi-turn formatted data are eligible for loss, while prompt/user tokens are masked out. The staged receipt fields are:
+Decision: formal `trainable_v0` data uses the pinned `mlx-lm==0.31.1` `ChatDataset.process` path with stock `--mask-prompt`: full tokens come from `tokenizer.apply_chat_template(messages, tools=...)`, and the trained span starts after `apply_chat_template(messages[:-1], tools=..., add_generation_prompt=True)`. C5 must attach a Python-generated token artifact from that exact path before `offset_fixture.status=pass`; a Swift string-level prefix check or a `usesTrainingTokenizerPatch` flag alone is not evidence. The artifact must cover both action samples and paired `NO_TOOL` refusal samples, prove the trained span starts at `<tool_call>` / `NO_TOOL` while excluding user, system, and think-block tokens, record a `tokenizer_model_id` equal to the training model/tokenizer path, and expose a receipt-side digest that verifies the side artifact file. The staged receipt fields are:
 
 | `masking_stage` | Meaning | `train_eligible` |
 | --- | --- | --- |
 | `smoke_only` | stock `--mask-prompt` path for 600-iteration loss/memory/tok-s smoke only | false |
-| `trainable_v0` | assistant-token mask fixture passed | true |
+| `trainable_v0` | same-path MLX token offset fixture passed | true |
 | `masking_complete_v1` | assistant mask plus function/argument distractor-only augmentation plus value-type augmentation | true |
 
 The receipt also records the four masking/augmentation flags that C5 tracks:
@@ -75,7 +75,7 @@ masking_flags.argument_name
 masking_flags.argument_value
 ```
 
-Rationale: the grill identified stock single-offset prompt masking as unsafe for formal multi-turn training because it can drop middle assistant turns. Smoke remains useful, but cannot set `masking_coverage` true or support formal C5 conclusions.
+Rationale: the grill identified stock single-offset prompt masking as unsafe for formal multi-turn training because it can drop middle assistant turns. The current C5 training cut is single-turn, so a same-path token offset artifact is acceptable for `trainable_v0`; multi-turn assistant-token masks remain a later requirement before followup training. Smoke remains useful, but cannot set `train_eligible=true` or support formal C5 conclusions.
 
 ### Q5: `route_tier` is derived from normalized `fc_flags`, not `exec_tier`
 
@@ -101,7 +101,7 @@ Rationale: the old C1 bug made `fc_flags` unusable; HEAD `073cdac` fixes that pr
 ### Q6: First training cut is single-turn; followup waits for C4
 
 Decision: first C5 trainable data uses only:
-- `utterance_source=single_turn_col20_seed`
+- `utterance_source=semantic_protocol_seed`
 - `utterance_source=llm_augmented`
 
 Followup sidecar transitions remain an incremental phase after C4:
@@ -135,8 +135,10 @@ Mainline:
 - rank16 first
 - rank32 confirmation group after smoke
 - DoRA rank8 secondary A/B, not blocking first candidate
-- learning rate 2e-4 with cosine schedule
+- peak learning rate 1e-4 with cosine schedule, after smoke logs showed 2e-4 causes a loss spike
 - warmup 5-10%
+- AdamW with weight_decay=0.01
+- repo-owned MLX loop pinned to mlx-lm 0.31.1, with grad_norm_preclip finite check and clip_grad_norm(max_norm=1.0) before optimizer update
 - 2-3 epochs, checkpoint chosen before overfit turn
 - batch4 x grad_accum4 baseline
 - bf16 train -> fuse -> quantize
@@ -207,7 +209,9 @@ Decision: C5 records `acceptance_stage`:
 | `trainable_v0` | assistant-mask fixture passed and candidate can be trained |
 | `lora_candidate` | C6 base-vs-LoRA diff, replay fingerprints, and fuse parity passed; eligible for V-PASS |
 
-`fuse_parity_gate` compares dynamic adapter against fused model on the same C6 harness and the same sample sets: `must_pass`, `heldout`, and `negative`. Candidate fails if ToolCallExact delta exceeds 2 percentage points or any must-pass regression appears.
+`fuse_parity_gate` compares dynamic adapter against fused and quantized/endpoint behavior on the same C6 harness and the same sample sets: `must_pass`, `heldout`, and `negative`. Candidate fails if ToolCallExact delta exceeds 2 percentage points, IrrelAcc delta exceeds 2 percentage points, negative false-call delta exceeds tolerance, quantized parse failures appear, or any must-pass regression appears. The IrrelAcc delta check is symmetric: a fused/quantized run that drops from 0.95 to 0.91 still fails parity even though it remains above the absolute 0.90 C6 threshold.
+
+`endpoint_tokenizer_parity` is a separate candidate gate. Deployment pipe smoke must dump rendered training bytes and rendered endpoint bytes and record whether the endpoint used the patched tokenizer artifact or an explicit `enable_thinking=false` render path. The byte comparison is exact and includes any empty `<think>\n\n</think>` block. Missing endpoint bytes or a mismatch blocks endpoint candidate V-PASS; the training-side tokenizer patch does not prove mlx-swift parity by itself.
 
 Rationale: low validation loss is not evidence that the fused endpoint artifact behaves like the adapter. The C6 replay fingerprint fields already exist to make base/adapter/fused comparisons attributable.
 
@@ -218,7 +222,7 @@ The first apply implementation should emit the following shape or an equivalent 
 ```text
 route_tier_source = fc_flags_normalized
 route_tier        = rule_l1 | fc_l2 | fc_l3
-utterance_source  = single_turn_col20_seed | llm_augmented
+utterance_source  = semantic_protocol_seed | llm_augmented
 value_strategy    = slot_extract | exp_inverse_normalize | percent_extract
 masking_stage     = smoke_only | trainable_v0 | masking_complete_v1
 train_eligible    = bool
@@ -234,12 +238,18 @@ distractor_tool_ids
 no_call_reason
 expected_tool_calls
 
+candidate_parent_semantic_id
+seed_parent_semantic_id
+candidate_canonical_semantic_id
+expected_tool_call_signature
+
 refusal_ratio_target
 refusal_ratio_hard_cap
 
 acceptance_stage
 generalization_diagnostic
 fuse_parity_gate
+endpoint_tokenizer_parity
 ```
 
 Followup-after-C4 adds:
@@ -251,6 +261,8 @@ committed_focus_frame
 rewritten_query
 expected_single_hop_toolcall
 ```
+
+Candidate semantic reassignment is local gate authority, not a field trusted from generator output. Generated utterance records may carry a source-side `candidate_parent_semantic_id` for traceability, but the builder recomputes the gate key from the final user utterance plus rendered assistant ToolCall signature. This makes the key collision-capable: duplicate natural utterance plus identical ToolCall signature maps to the same candidate parent, while `seed_parent_semantic_id` remains lineage-only and cannot be used as train-eligibility authority. A per-record, per-generator, per-variant, or sample-id-derived parent key is invalid because it makes parent-overlap receipts uncollidable and weakens the data gate.
 
 ## Architecture Decisions
 
