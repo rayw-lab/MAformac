@@ -1,956 +1,957 @@
 {
-  "zone_synchronization_mode": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "ac_heating_mode": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "ac_set_interface": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "ac_wind_direction": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "ac_temperature": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "airoutlet_direction": {
-    "family": "空调",
-    "status": "definite"
-  },
   "ac": {
-    "family": "空调",
-    "status": "definite"
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
   "ac_cooling_mode": {
-    "family": "空调",
-    "status": "definite"
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "airoutlet": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "dehumidification_mode": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "defog_mode": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "defrost_mode": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "ac_windspeed": {
-    "family": "空调",
-    "status": "definite"
+  "ac_heating_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
   "ac_mode": {
-    "family": "空调",
-    "status": "definite"
-  },
-  "seat_leg_support": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_heat_temperature": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_backrest": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_ventilation": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_heat_mode": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_belt_heat": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_folding_lock": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_belt_comfort_adjuster": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_flank": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_memory_bind": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "comfortable_entry_exit": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_ventilation_windspeed": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_cushion": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_massage_time": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_massage_force": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_adjustment_set_interface": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_memory": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_position_adjustment": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_massage": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_massage_mode": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_belt_vibration_alert": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_position": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_shoulder_support": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_belt_heat_temperature": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_rhythm_mode": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_heat": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_ventilation_mode": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_feet_support": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_mode": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "seat_lumbar_support": {
-    "family": "座椅",
-    "status": "definite"
-  },
-  "remote_control_window": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "window_curtain": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "window": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "window_ventilation_mode": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "back_window": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "window_lock": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "automatic_window_opening": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "automatic_window_closing": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "window_breathe_mode": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "window_slide": {
-    "family": "车窗",
-    "status": "definite"
-  },
-  "door_height": {
-    "family": "车门",
-    "status": "definite"
-  },
-  "door": {
-    "family": "车门",
-    "status": "definite"
-  },
-  "door_speed": {
-    "family": "车门",
-    "status": "definite"
-  },
-  "vehicle_refrigerator_door": {
-    "family": "车门",
-    "status": "definite"
-  },
-  "maximum_of_door_opening": {
-    "family": "车门",
-    "status": "definite"
-  },
-  "car_door": {
-    "family": "车门",
-    "status": "definite"
-  },
-  "light_sensor": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "light_expression": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "atmosphere_lamp": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "light_adjustment_set_interface": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_out_car_lamp_mode": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "leading_vehicle_distance_light_reminder_sensitivity": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_in_car_lamp": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_out_car_lamp": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "button_brightness": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "backlight": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "atmosphere_lamp_mode": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_in_car_lamp_color_temperature": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "light_game": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "the_lighting_start_switch": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_out_car_lamp_angle": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "light_theme": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_in_car_lamp_brightness": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "atmosphere_lamp_color": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "automatic_theme_switching": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "atmosphere_lamp_brightness": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_out_car_lamp_time": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "light_show": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "atmosphere_lamp_change_speed": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "continue_light_show": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "designative_in_car_lamp_time": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "backlight_brightness": {
-    "family": "灯光氛围",
-    "status": "definite"
-  },
-  "screen_brightness_mode": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_direction": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_recording": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_auto_rotate": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "exchange_cross_screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_color_mode": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_brightness_synchronization_mode": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_rotate": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_saver": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_to_direction": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "same_screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_navigation_lighting_effect": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "instrument_show_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "split_screen_min": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_brightness": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "exchange_same_screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "copy_same_screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "split_screen": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "copy_cross_screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "rotate_screen": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_cleaning": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_display_mode": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "hud_display_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_module_zoom_out": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "split_screen_max": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "cross_screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "rotate_screen_to_direction": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_content": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "screen_module_zoom_in": {
-    "family": "屏幕",
-    "status": "definite"
-  },
-  "volume_unmute": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "volume_gradually_in_and_out": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "eq": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "current_volume": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "best_listening_position": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "driving_sound_wave": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "eq_mode": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "volume": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "driving_sound_wave_mode": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "loundness": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "sound_zone_mode": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "volume_mode": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "audio_output_device": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "low_quality_audio_source_repair": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "sound_set_interface": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "noise_volume_compensation": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "driving_sound_wave_volume": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "auto_volume_reduction": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "volume_external_playback_mode": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "wind_reduction": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "volume_mute": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "volume_banlance": {
-    "family": "音量",
-    "status": "definite"
-  },
-  "wiper": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "wiper_mode": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "wiper_set_interface": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "wiper_wash": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "wiper_sensitivity": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "wiper_speed": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "wiper_maintenance": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "the_rain_sensor": {
-    "family": "雨刮",
-    "status": "definite"
-  },
-  "sunroof_breathe_mode": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunroof_tilt": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunroof_heat_mode": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunshade_slide": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunshade": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunroof_slide": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunroof_ventilation_mode": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "sunroof": {
-    "family": "天窗遮阳帘",
-    "status": "definite"
-  },
-  "fragrance_mode": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "fragrance_set_interface": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "fragrance_time": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "fragrance_intensity": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "amount_of_fragrance": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "mode_of_fragrance": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "fragrance": {
-    "family": "香氛",
-    "status": "definite"
-  },
-  "windshield_heating": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "挡风玻璃加热=除雾子系统，倾向空调"
-  },
-  "interior_heat": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "内部加热，可能是座椅加热或空调暖风"
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "ac_set_interface": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "ac_temperature": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "ac_wind_direction": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "ac_windspeed": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
   "air_clean": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "空气净化=空调子系统"
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "cabin_disinfect": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "座舱消毒=空调子系统"
+  "airoutlet": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "humidifier": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "加湿器=空调子系统"
+  "airoutlet_direction": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "amount_of_fragrance": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "atmosphere_lamp": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "atmosphere_lamp_brightness": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "atmosphere_lamp_change_speed": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "atmosphere_lamp_color": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "atmosphere_lamp_mode": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "automatic_theme_switching": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "automatic_window_closing": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "automatic_window_opening": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "back_window": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "blocking_glass": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
   },
   "blower_delay_shutdown": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "吹风机延迟关闭=空调风机"
-  },
-  "ventilation_system": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "通风系统=空调 or 独立"
-  },
-  "timed_ventilation": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "定时通风=空调 or 独立"
-  },
-  "timed_ventilation_interval": {
-    "family": "空调",
-    "status": "disputed",
-    "reason": "定时通风间隔=空调 or 独立"
-  },
-  "headrest_direction": {
-    "family": "座椅",
-    "status": "disputed",
-    "reason": "头枕方向调节=座椅子系统；磊哥说跳过头枕"
-  },
-  "headrest_direction_adjust": {
-    "family": "座椅",
-    "status": "disputed",
-    "reason": "头枕方向调节=座椅子系统"
-  },
-  "headrest_direction_ear_slice_adjust": {
-    "family": "座椅",
-    "status": "disputed",
-    "reason": "头枕耳片方向调节=座椅子系统"
-  },
-  "headrest_ear_slice_direction": {
-    "family": "座椅",
-    "status": "disputed",
-    "reason": "头枕耳片方向=座椅子系统"
-  },
-  "doors_windows_locks_set_interface": {
-    "family": "车门",
-    "status": "disputed",
-    "reason": "门窗锁一体接口，归车门 or 车窗"
-  },
-  "lock_mode": {
-    "family": "车门",
-    "status": "disputed",
-    "reason": "锁模式=车门"
-  },
-  "unlock_mode": {
-    "family": "车门",
-    "status": "disputed",
-    "reason": "解锁模式=车门"
-  },
-  "child_lock": {
-    "family": "车门",
-    "status": "disputed",
-    "reason": "儿童锁=车门"
-  },
-  "central_lock": {
-    "family": "车门",
-    "status": "disputed",
-    "reason": "中控锁=车门"
-  },
-  "dimming_glass_top": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "调光玻璃顶=灯光 or 天窗"
-  },
-  "dimming_glass_top_transparency": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "调光玻璃顶透光度=灯光 or 天窗"
-  },
-  "dimming_glass_top_brightness": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "调光玻璃顶亮度=灯光 or 天窗"
-  },
-  "dimming_glass_top_mode": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "调光玻璃顶模式=灯光 or 天窗"
-  },
-  "dimming_glass_top_color": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "调光玻璃顶颜色=灯光 or 天窗"
-  },
-  "stream_rearview_mirror_brightness": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "流媒体后视镜亮度=灯光 or 屏幕"
-  },
-  "headliner": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "车顶=天窗 or 灯光(车顶灯)"
-  },
-  "illuminated_luggage_rack": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "发光行李架=灯光"
-  },
-  "luminous_luggage_rack_color": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "发光行李架颜色=灯光"
-  },
-  "luminous_luggage_rack_brightness": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "发光行李架亮度=灯光"
-  },
-  "turnsignal_frequency": {
-    "family": "灯光氛围",
-    "status": "disputed",
-    "reason": "转向灯频率=灯光"
-  },
-  "hud": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD=屏幕(抬头显示)"
-  },
-  "hud_brightness": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD亮度=屏幕"
-  },
-  "hud_height": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD高度=屏幕"
-  },
-  "hud_inclination": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD倾斜=屏幕"
-  },
-  "hud_display_mode": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD显示模式=屏幕"
-  },
-  "hud_configuration": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD配置=屏幕"
-  },
-  "hud_position_distance": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD位置距离=屏幕"
-  },
-  "hud_position_transversely": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD位置横向=屏幕"
-  },
-  "hud_set_interface": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "HUD设置接口=屏幕"
-  },
-  "steering_wheel_adjust_hud": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "方向盘调HUD=屏幕"
-  },
-  "desktop_mode": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "桌面模式=屏幕(UI)"
-  },
-  "theme": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "主题=屏幕(UI)"
-  },
-  "theme_type": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "主题类型=屏幕(UI)"
-  },
-  "download_theme": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "下载主题=屏幕(UI)"
-  },
-  "wallpaper": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "壁纸=屏幕(UI)"
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
   "blue_ray_filtering": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "蓝光过滤=屏幕"
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
   },
-  "system_font_size": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "系统字体大小=屏幕(UI)"
+  "breathe_system": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "touch_switch": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "触摸开关=屏幕(UI)"
+  "cabin_disinfect": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "gesture_recognitton": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "手势识别=屏幕(UI)"
+  "car_door": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
   },
-  "touch_screen": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "触摸屏=屏幕"
+  "car_film_transparency": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
   },
-  "dropdown_menu": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "下拉菜单=屏幕(UI)"
+  "central_lock": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
   },
-  "back_to_homepage": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "回主页=屏幕(UI)"
+  "child_lock": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
   },
-  "folder": {
-    "family": "屏幕",
-    "status": "disputed",
-    "reason": "文件夹=屏幕(UI)"
+  "comfortable_entry_exit": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
   },
-  "acoustics_mode": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "声学模式=音量 or 独立"
+  "continue_light_show": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
   },
-  "speak_speed": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "语速=TTS参数，非车控音量"
+  "current_volume": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
   },
-  "anc": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "主动降噪=音量 or 独立"
+  "defog_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "speaker": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "扬声器=音量硬件"
+  "defrost_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   },
-  "speaker_property": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "扬声器属性=音量硬件"
+  "dehumidification_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "designative_in_car_lamp": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_in_car_lamp_brightness": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_in_car_lamp_color_temperature": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_in_car_lamp_time": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_out_car_lamp": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_out_car_lamp_angle": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_out_car_lamp_mode": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "designative_out_car_lamp_time": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "desktop_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "dimming_glass_top": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "dimming_glass_top_brightness": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "dimming_glass_top_color": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "dimming_glass_top_mode": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "dimming_glass_top_transparency": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "display_brightness_set_interface": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "door": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "door_height": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "door_speed": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "download_theme": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "electric_tailgate_switch": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "engine_hood": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "fragrance": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "fragrance_intensity": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "fragrance_mode": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "fragrance_set_interface": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "fragrance_time": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "fuel_tank_cap": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "glove_compartment": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "glove_compartment_password": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "headliner": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
   },
   "headrest_audio_system": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "头枕音响=音量子系统；磊哥说跳过头枕"
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
   },
   "headrest_audio_system_mode": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "头枕音响模式=音量；磊哥说跳过头枕"
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "headrest_direction": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "headrest_direction_adjust": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "headrest_direction_ear_slice_adjust": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
   },
   "headrest_directional_broadcast": {
-    "family": "音量",
-    "status": "disputed",
-    "reason": "头枕定向广播=音量；磊哥说跳过头枕"
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
   },
-  "nozzle_heat": {
-    "family": "雨刮",
-    "status": "disputed",
-    "reason": "喷嘴加热=雨刮(除冰)"
+  "headrest_ear_slice_direction": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
   },
-  "nozzle_heat_mode": {
-    "family": "雨刮",
-    "status": "disputed",
-    "reason": "喷嘴加热模式=雨刮"
+  "humidifier": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "illuminated_luggage_rack": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "instrument_screen_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "landscape_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "light_expression": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "light_game": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "light_sensor": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "light_show": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "light_theme": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "lock_mode": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "loop_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "loundness": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "luminous_luggage_rack_brightness": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "luminous_luggage_rack_color": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "maximum_of_door_opening": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "mode_of_fragrance": {
+    "family": "fragrance",
+    "family_zh": "香氛",
+    "scope": "demo"
+  },
+  "noise_volume_compensation": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "noise_volume_compensation_to_gearpeed": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "other_personalize_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "remote_control_window": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "rotate_screen": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "rotate_screen_to_direction": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_auto_rotate": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_brightness": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_brightness_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_brightness_synchronization_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_cleaning": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_color_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_content": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_direction": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_display_mode": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_module_zoom_in": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_module_zoom_out": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_navigation_lighting_effect": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_recording": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_rotate": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_saver": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "screen_to_direction": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "seat_adjustment_set_interface": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_backrest": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_belt_comfort_adjuster": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_belt_heat": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_belt_heat_temperature": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_belt_vibration_alert": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_cushion": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_feet_support": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_flank": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_folding_lock": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_heat": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_heat_mode": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_heat_temperature": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_leg_support": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_lumbar_support": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_massage": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_massage_force": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_massage_mode": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_massage_time": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_memory": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_memory_bind": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_mode": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_position": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_position_adjustment": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_rhythm_mode": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_shoulder_support": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_ventilation": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_ventilation_mode": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "seat_ventilation_windspeed": {
+    "family": "seat",
+    "family_zh": "座椅",
+    "scope": "demo"
+  },
+  "split_screen": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "split_screen_max": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "split_screen_min": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "sunroof": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunroof_breathe_mode": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunroof_heat_mode": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunroof_slide": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunroof_tilt": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunroof_ventilation_mode": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunshade": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "sunshade_slide": {
+    "family": "sunroof",
+    "family_zh": "天窗遮阳帘",
+    "scope": "demo"
+  },
+  "tailgate": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "tailgate_height": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "tailgate_height_to_highest": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "tailgate_height_to_lowest": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "tailgate_opening_upper_limit": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "tailgate_sensing": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "the_lighting_start_switch": {
+    "family": "light",
+    "family_zh": "灯光氛围",
+    "scope": "demo"
+  },
+  "the_rain_sensor": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "theme": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "theme_type": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "timed_ventilation": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "timed_ventilation_interval": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "touch_screen": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "unlock_mode": {
+    "family": "door",
+    "family_zh": "车门",
+    "scope": "demo"
+  },
+  "ventilation_system": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "volume": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "volume_banlance": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "volume_external_playback_mode": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "volume_gradually_in_and_out": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "volume_mode": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "volume_mute": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "volume_unmute": {
+    "family": "volume",
+    "family_zh": "音量",
+    "scope": "demo"
+  },
+  "wallpaper": {
+    "family": "screen",
+    "family_zh": "屏幕",
+    "scope": "demo"
+  },
+  "wind_reduction": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
+  },
+  "window": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "window_breathe_mode": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "window_curtain": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "window_lock": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "window_slide": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "window_ventilation_mode": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "windshield_heating": {
+    "family": "window",
+    "family_zh": "车窗",
+    "scope": "demo"
+  },
+  "wiper": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "wiper_maintenance": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "wiper_mode": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "wiper_sensitivity": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "wiper_set_interface": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "wiper_speed": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "wiper_wash": {
+    "family": "wiper",
+    "family_zh": "雨刮",
+    "scope": "demo"
+  },
+  "zone_synchronization_mode": {
+    "family": "ac",
+    "family_zh": "空调",
+    "scope": "demo"
   }
 }
