@@ -139,7 +139,7 @@
 ### U11-U31 待续批（GRILL-MASTER R2-G4~R3-G11，默认 ⭐ 待逐条确认）
 | U | GRILL-MASTER | 议题 | ⭐默认（GRILL-MASTER）| 状态 | 挂 Q |
 |---|---|---|---|---|---|
-| U11 | R2-G4 | base 暗底色值 | ⭐放宽 `#0a0b12`（散光 30-60%，近纯黑+高饱和 cyan halation 高危）| 🔴待续批 | Q32 |
+| U11 | R2-G4 | base 暗底色值 | 🔴 **D2#2 复议上抬 `#121212` 软黑**（原 ⭐`#0a0b12` 近纯黑+高饱和 cyan halation 锁死，盲评 catch 撞飞书白皮书「太丑看不清」同根因；散光 30-60% 不变，辉光雾降 `.10-.14`）| ✅ tokens.md 已改 | Q32 |
 | U12 | R2-G5 | XcodeGen 薄壳 | ⭐现在做 → 🔴 **U12 降 P1**（CTX：仓内已有 xcodeproj+2 app target，非缺整个壳）| 🟡修正待确认 | Q33 |
 | U13 | R2-G6 | 卡片网格首屏 | ⭐只 5-8 张高频其余亮起 → 🔴 **U13 按 10 族 `family_card_id`**（非 191 格/非旧 102，CTX）| 🟡修正待确认 | Q31 |
 | U14 | R2-G7 | Mac 宽窗布局 | ⭐AnyLayout 并排，不用 SplitView（宽屏摊大饼/SplitView 破单屏沉浸）| 🔴待续批 | Q32 |
@@ -162,6 +162,34 @@
 | U31 | R3-G11 | 接真模型才能定 | （清单非投票）真实 TTFA/think tag 形态/thermal 曲线/shader 有效性/stopSpeaking delegate = 第四轮实证锚点 → CTX：**spike 实证项不拍** | 🟡待续批 | Q36/Q38 |
 
 > **U-续批纪律（CTX U1-U31 关键拍板）**：U5 Metal 一期做 / U6 补麦克风 key+memory entitlement（非缺整个 plist，仓内已有 xcodeproj+2 app target）/ U8 演示编排并入 demo-golden-run 不单独 change / U10·U27 状态四态分开（clarify/unsupported/safety/crash，消费 DemoVisualState 7 态）/ U12 XcodeGen 降 P1 / U13 卡片按 10 族 family_card_id / U19 iOS18 API 必 `#available` / U28 中文 TTS 锁普通话（iOS18 confirmed/iOS26 preflight）/ U30 MeshGradient 必 `#available` / U31 spike 实证项不拍。
+
+### D1-D7 视觉/聚焦/数据/双端/动效/炸场深度 grill 决策晶体（2026-06-23，二次深 grill + 盲评复议 + A2 影响确认）
+
+> 一手 SSOT = `docs/grill-tournament/uiue-d1-d6-grill.md`（每 D = CC 5×⭐ + Codex 5Q×2 物理化 + 主线程辩证 check）；盲评复议 = `docs/loop-competition/uiue-grill-scoring/final-list.md`（30 决策 C1-C30 × 3 轮盲打分，15 agents/3.1M tok）。本表 = 决策晶体索引（结论 + 出处），不复制正文。U1-U31 是 GRILL-MASTER R1-R3 一轮；**D1-D7 是其上的二次深 grill**（聚焦 10 族 + 7 态消费 + 双端 + 炸场）。
+> 🔴 **A2 影响口径（A2 已结束，code-only）**：A2 = generic frame→D-domain 具名工具 surface 对齐 + 命名清债，**不碰 UIUE 视觉/聚焦/炸场**。30 决策中只 **数据层 C2/C8/C11** 命中 A2 产物（D-domain surface / family-device-allowlist / state-cells 字段）；视觉/聚焦/双端/动效/炸场（C1/C3-C7/C9-C30 大部）A2 不碰，全待 **UIUE 链路 A** 实装。
+
+| D | 议题 | ✅决策晶体 | 关键 grill 产出（C↔决策）| A2 影响（code-only，已结束）|
+|---|---|---|---|---|
+| D1 | 开机/多调用编排 | boot_phase 7 态 enum + MultiCallSequencer(stagger_delay_ms=220) + MAX_CONCURRENT_HIGHLIGHTS=1 + VisualStateTransport + validation_gate(D5 gated, ripple ungate 回写) | C5 全景常驻不抽屉(solid) / C2 多意图序列化非并发(strong 22.5) / C3 开场 dim 族微光(weak) | C2 多意图消费源 = A2 `generated/D_domain.tools.*`（已产）+ `d_domain_ir_map.json`；FastPathIntentEngine 仍 1 意图（"打开空调"），多意图待 UIUE 消费 surface + 后端扩 |
+| D2 | 展开/聚焦 | ExpandTrigger enum + FocusController 单点 + ExpansionAnimation(默认 opacityScale, gated matchedGeometry) + MAX_CONCURRENT_EXPANSIONS=1 | C10 折叠+角标(keep) / C8 子 device 优先级(keep) / C7 展开布局 / C9 展开并发(weak) / 🔴 prerequisite family_priority.json | **C8 数据源已就位**：A2 产 `generated/family-device-allowlist.json`（10 族含 device_count+intent_count+**row_count**，如 ac 族 25device/68intent/212row）→ demo 用 row_count 作高频代理（见复议 #7） |
+| D3 | 卡片渲染/value.type | ui_value_type 派生字段(state-cells，**数据 type≠UI value.type**) + @ViewBuilder 穷尽 switch + GPUBudgetCoordinator + FamilyCardLayout | C12 原生控件(strong 21.7) / C11 enum+switch 非 AnyView(solid) / C13 GPU 错峰(keep) / C3 分发实现(weak, AnyView 性能需 spike) | 🔴 **C11 待 UIUE 补派生字段**：A2 `state-cells.yaml` 有 type/unit/execution_range，**无 ui_value_type**（UIUE 加）；命名清债 A2 部分完成（`ac.power` 新命名 7 处，**残留 2 处 `hvac.*`** 待清） |
+| D4 | 双端 demo | 🔴 Mac+iPhone **两独立纯端侧 demo 实例**（iPhone 脱机独立全功能接语音）；TransportKind{none,bonjour}（删 sharedFile 镜像） | 磊哥纠正推翻镜像（D1.Q1.4 SUPERSEDED-BY D4）/ C17 Bonjour 机制(solid) / C16 竖屏内容(weak) / C4 双独立 | A2 不碰；两端共享 A2 的 D-domain IR + state-cells（端态自包含，无后端） |
+| D5 | 状态切换动效 | matchedGeometry 状态切换(macOS 可用，现 passed) vs 跨栈 zoom(unavailable)；Grid 非 LazyVGrid；promotion_criteria 5 条；ripple↔gate ungate 解循环依赖 | C21 matchedGeometry 不用 zoom(strong 均分 23.2，facts 峰值 25@round-03) / C22 Grid(strong) / C25 gated upgrade(solid) / C23 opacityScale 兜底(keep) | 🔴 **C22 待 UIUE 改**：`ContentView:40` 仍 `LazyVGrid(.adaptive(minimum:160))`（A2 不碰视觉，UIUE 改 Grid 固定列） |
+| D6 | 炸场/降级 | shader-inventory + wow-choreography 4 段 + tts-policy + **双通道降级**（关键态用颜色/数值/图标承载，动画只锦上添花） | 🔴 C30 稳>炸(strong 23.3，升横切) / C28 TTS 视觉先行(strong) / C26 shader fallback(strong) / C29 断网 morph(keep) / Codex catch CC 3 处 claim-vs-reality | A2 不碰 |
+| **D7（新增，盲评 GAP-2）** | **7 态逐态视觉消费** | 🔴 **DemoVisualState 7 态各自正面渲染**（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown），**四态分开**（clarify 琥珀 ≠ unsupported 灰 ≠ safety 红 ≠ crash 灰）；消费 trace guardReason/readbackResult | 盲评 GAP-2：grill 漏「7 态逐态视觉」单独决策（ContentView:122 头号现役债）；tokens.md §2 已落 7 态色映射（待磊哥审冻结） | 🔴 **D7 头号待 UIUE 补**：`ContentView:122/:126` 仍 `cell.visualState == .satisfied ? green : gray`（7 态压绿/灰二值）；A2 不碰视觉，UIUE 链路 A 补全 7 态穷尽 switch |
+
+**11 复议调整确认（磊哥 2026-06-23，盲评 final-list §A-E → 磊哥拍，全部「根据 A2 结束进展确认」）**：
+1. **演示介质灵活**（盲评 GAP-1 投屏 banding）：磊哥定 = iPhone 真机（纯端侧）**或** Mac iOS 模拟器（Retina）都能演、都一样 → **Retina/真机本身规避 1920×1080 投影 8bit banding**，**不死磕「现场必有线 HDMI」单独决策**；若确需外接投屏才走有线 + dither + 字号下限兜底（非默认门）。
+2. **base 上抬 #121212**（盲评 GAP-C halation 锁死，撞飞书白皮书「太丑看不清」同根因）：✅ 已改 `tokens.md`（软黑 + 辉光雾降一档 `.10-.14`）。
+3. **补 D7 7 态逐态视觉消费**（盲评 GAP-2）：✅ 上表 D7 新增。
+4. **voice 撤录音兜底 + 保 U28 preflight**（盲评 C28 + 磊哥记忆纠正）：🔴 claim-vs-reality 诚实纠正——磊哥记忆「延迟很低/嵌入/兜底不需要」与决策原文有出入：U22 实为 **immediate-ack 掩盖术**（端侧难达 300ms 真低延迟，visual ack 把 1000ms 体感压到 500ms）；U28 是 **premium 普通话 voice preflight**（identifier 锁 + 启动预检，**非 bundle 嵌入音色**）。**录音兜底撤掉**（磊哥对，U28 preflight 替代），但**保留 preflight 确认 voice 离线就绪**——干净客户机 zh-CN voice 未下载 → 断网哑火打脸「断网也能跑」，preflight 是这层保险。
+5. **C21 matchedGeometry macOS 可用已坐实**（A2 已结束）：A2 是 code-only 不碰 SwiftUI 动效 API；C21 选 matchedGeometry（非跨栈 zoom，zoom macOS unavailable，WebSearch 坐实）是 Mac 唯一可行解，UIUE 实装时按 D5 promotion_criteria gated upgrade。
+6. **C19/C20 双屏冗余并入 C4**（盲评 better-exists 10.x）：D4 双屏决策合并为 C4(双独立)+C16(竖屏内容)+C17(Bonjour)，删 C19/C20 同义复述。
+7. **C8 用 family-device-allowlist `row_count` 作高频代理**（盲评 C8 无数据源）：A2 已产 `generated/family-device-allowlist.json` 含 row_count，demo 按 row_count 排序作高频代理（产品约定收窄），量产 priority 字段砍。
+8. **C13/C24 魔法数字标 ESTIMATE**（盲评 claim-vs-reality 第8坑）：GPU~50% / 320·220ms 标 ESTIMATE 进 tokens 单源，A2 后 spike Instruments 实测坐实。
+9. **C18 759pt safe-area 比例分配**（盲评泛化）：别硬编 759/120/440/80，用 GeometryReader safe-area 比例。
+10. **C30 稳>炸升横切纪律**（盲评升格，撞「不崩」北极星）：C30 从平级候选升为整组「稳定优先」横切纪律。
+11. **C13/C30 GPU 错峰合并**（盲评）：合并为一条（C30 含 thermal watchdog 更完整）。
 
 ---
 
