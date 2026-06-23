@@ -666,6 +666,62 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(Set(summary.evalRuns.map(\.loraAdapterDigest)), [""])
     }
 
+    // MARK: - S5 D-domain 迁移回归 + C5/C6 同源 parity(防 0/34 换皮)
+
+    private func repoRootURL() -> URL {
+        URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+    }
+
+    // Cut-1+2+4: 迁后全 mustPass dataset 经 irMap gold-replay 自洽(D-domain 名 normalize→IR→state 全对)
+    func testGoldReplayPassesForMigratedDDomainDataset() throws {
+        let generator = try makeGenerator()
+        let cases = try generator.generate()
+        let validation = generator.validate(cases)
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRootURL())
+        let report = C6GoldVerifier().report(cases: cases, stateCells: generator.stateCells, validation: validation, irMap: irMap)
+        XCTAssertEqual(report.goldReplayFailCount, 0, "迁后 D-domain mustPass 全 gold-replay pass(state 经 irMap normalize)")
+        XCTAssertEqual(report.status, "pass")
+    }
+
+    // 反证 irMap 是命门: 不串 irMap → D-domain 名落 logUnclassified→[] → state 塌 → gold-replay fail。
+    // 用 MP-004(open_ac: ac.power off→on, 默认 off ≠ expected on, 非 no-op)证 state 真未演化。
+    func testGoldReplayFailsWithoutIRMapProvingThreadingIsLoadBearing() throws {
+        let generator = try makeGenerator()
+        let cases = try generator.generate().filter { $0.caseID == "C6-MP-004" }   // open_ac → ac.power:on
+        let report = C6GoldVerifier().report(cases: cases, stateCells: generator.stateCells, validation: goldValidation(caseCount: 1))  // 无 irMap
+        XCTAssertGreaterThan(report.goldReplayFailCount, 0, "无 irMap → D-domain 名 normalize 落空 → state 塌(证 irMap 线穿是命门, fail-closed 非静默假绿)")
+    }
+
+    // 命名空间 parity: 全 mustPass expected 工具名 ∈ 562 D-domain catalog → 与 C5 训练同源命名空间(防 0/34 换皮)
+    func testAllMustPassToolNamesAreInDDomainCatalog() throws {
+        let generator = try makeGenerator()
+        let cases = try generator.generate().filter { $0.tags.mustPass && !$0.expectNoCall }
+        let catalogNames = Set(try ToolContractCompiler.loadDDomainCatalog(repoRoot: repoRootURL()).map(\.function.name))
+        for c in cases {
+            for call in c.expectedToolCalls {
+                XCTAssertTrue(catalogNames.contains(call.name), "C6 expected 工具名 \(call.name)(\(c.caseID)) ∈ 562 D-domain catalog(C5 训练同源命名空间)")
+            }
+        }
+    }
+
+    // BLOCKER 3 parity 命门: C5 emit 与 C6 expected 对同 number intent 用同一值键(temperature 非 value), 防训了 value=24 评了 temperature=24
+    func testC5C6ValueKeyParityForNumberIntent() throws {
+        let catalog = try ToolContractCompiler.loadDDomainCatalog(repoRoot: repoRootURL())
+        let entry = try XCTUnwrap(catalog.first { $0.function.name == "adjust_ac_temperature_to_number" })
+        guard case let .object(params) = entry.function.parameters, case let .object(props)? = params["properties"] else {
+            return XCTFail("schema missing properties")
+        }
+        // schema 值键=temperature(非 value)→ C5 dDomainToolCallArguments emit 数字进 temperature 键(S4 只 emit schema 键)
+        XCTAssertTrue(props.keys.contains("temperature"), "adjust_ac_temperature_to_number 值键=temperature")
+        XCTAssertFalse(props.keys.contains("value"), "ac_temperature 用 temperature 键不用 value")
+        // C6 expected(jsonl) 同键 temperature → C5/C6 同源
+        let mp006 = try XCTUnwrap(try makeGenerator().generate().first { $0.caseID == "C6-MP-006" })
+        let call = try XCTUnwrap(mp006.expectedToolCalls.first)
+        XCTAssertEqual(call.name, "adjust_ac_temperature_to_number")
+        XCTAssertNotNil(call.arguments["temperature"], "C6 expected 用 temperature 键(与 C5 emit 同源, 防 0/34 换皮)")
+        XCTAssertNil(call.arguments["value"], "C6 expected 不用 value 键")
+    }
+
     private func goldValidation(caseCount: Int) -> C6DatasetValidation {
         C6DatasetValidation(
             caseCount: caseCount,

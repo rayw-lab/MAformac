@@ -232,7 +232,9 @@ public enum ToolContractNormalizer {
 
     // value_types 单值定 type; 多值/空按 value 参数派生(SPOT/PERCENT→direct, EXP→offset, 空→STATE)。
     private static func buildValue(_ entry: DDomainIRMapEntry, arguments: [String: String]) -> ContractValue {
-        let valueArg = arguments["value"] ?? ""
+        // value 形态值键异构(S1 derive_arg_schema): screen/window 用 value / ac_temperature 用 temperature / ac_windspeed 用 fanSpeed。
+        // C5/C6 同源(同 renderer)→ 两侧用同键; normalizer 扩读保证数字进 IR value(S5 Cut-4 parity 命门)。
+        let valueArg = arguments["value"] ?? arguments["temperature"] ?? arguments["fanSpeed"] ?? ""
         let vtype: String
         if entry.valueTypes.count == 1, !entry.valueTypes[0].isEmpty {
             vtype = entry.valueTypes[0]
@@ -508,7 +510,8 @@ public enum ToolContractStateApplier {
     }
 
     private static func targetNumber(_ ir: ToolContractIR) -> String? {
-        firstNumberLike(ir.value.direct, ir.value.offset, ir.slots["percent"], ir.slots["target_temperature"], ir.slots["level"])
+        // slots 键异构(D-domain): temperature/fanSpeed(ac 族) + percent/target_temperature/level(旧 set_cabin strangler)(S5 Cut-4)。
+        firstNumberLike(ir.value.direct, ir.value.offset, ir.slots["percent"], ir.slots["target_temperature"], ir.slots["level"], ir.slots["temperature"], ir.slots["fanSpeed"])
     }
 
     private static func isOn(_ action: String, value: ContractValue) -> Bool {
@@ -542,16 +545,17 @@ public enum ToolContractStateApplier {
     }
 
     private static func windowKeys(for position: String) -> [String] {
+        // 英文(旧 set_cabin strangler) + 中文(D-domain catalog position enum, C5/C6 同源)双支持(S5 Cut-4)。
         switch position {
-        case "driver":
+        case "driver", "主驾":
             return ["window.position[主驾]"]
-        case "passenger":
+        case "passenger", "副驾":
             return ["window.position[副驾]"]
-        case "rear_left":
+        case "rear_left", "左后":
             return ["window.position[左后]"]
-        case "rear_right":
+        case "rear_right", "右后":
             return ["window.position[右后]"]
-        default:
+        default:   // all / 全车 / 其他 → 全车 4 位
             return ["window.position[主驾]", "window.position[副驾]", "window.position[左后]", "window.position[右后]"]
         }
     }

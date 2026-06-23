@@ -21,7 +21,7 @@ GENERATED_DOMAIN := \
 	generated/strangler_map.json \
 	generated/rendered_tools_text
 
-.PHONY: verify verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section diff test clean-venv
+.PHONY: verify verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -29,11 +29,17 @@ GENERATED_DOMAIN := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section diff test
+verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface diff test
 
 # pG1 §35 文档级联 cross-section（基线文档组段间一致性, 纯 stdlib 不需 venv/raw）
 verify-cross-section:
 	$(PYTHON_BOOTSTRAP) scripts/cross_section_check.py
+
+# S5: D-domain surface drift 硬门(0/34 根因=C6 expected 工具名漂移出 catalog 无硬门捕获)。
+# surface_consistency: C6 expected 工具名 ⊆ 562 D-domain catalog; verify_gold: 57 case 工具名(含 alt)全在 surface。
+verify-surface: .venv/.deps.stamp
+	$(PYTHON) scripts/surface_consistency.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
+	$(PYTHON) scripts/verify_gold.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
 
 # source-free: 只校验已提交产物(JSONL/YAML/coverage/state-cells/manifest)自洽与引用,
 # 不依赖 raw xlsx 快照(别人 clone 仓无 snapshot 也能验契约). verify-refs 只读 manifest+committed, 不读源表.

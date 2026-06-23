@@ -20,7 +20,7 @@ import sys
 def main():
     cwd = os.getcwd()
     cases_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(cwd, "contracts", "c6-bench-cases.jsonl")
-    tools_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(cwd, "generated", "D_domain.tools.json")
+    tools_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(cwd, "generated", "D_domain.tools.demo.json")
 
     with open(tools_path, encoding="utf-8") as f:
         surface = {t.get("function", {}).get("name") for t in json.load(f)}

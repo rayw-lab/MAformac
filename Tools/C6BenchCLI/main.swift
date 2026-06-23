@@ -98,7 +98,8 @@ struct C6BenchCLI {
             loraAdapterDigest: loraAdapterDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
-            stateCells: generator.stateCells
+            stateCells: generator.stateCells,
+            irMap: try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot)   // S5 Cut-2: D-domain 名 normalize→state
         )
         let caseByID = Dictionary(uniqueKeysWithValues: cases.map { ($0.caseID, $0) })
         var runCounters: [String: Int] = [:]
@@ -138,7 +139,9 @@ struct C6BenchCLI {
         let cases = try C6DatasetCodec().decodeJSONL(datasetText)
         let generator = try makeGenerator(repoRoot: repoRoot)
         let validation = generator.validate(cases)
-        let report = C6GoldVerifier().report(cases: cases, stateCells: generator.stateCells, validation: validation)
+        // S5 Cut-2: D-domain 名经 irMap normalize→IR→state; fail-closed(加载失败抛, 不 fallback 空 map 致 D-domain 静默落 strangler 假绿)。
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot)
+        let report = C6GoldVerifier().report(cases: cases, stateCells: generator.stateCells, validation: validation, irMap: irMap)
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let encoder = JSONEncoder()
