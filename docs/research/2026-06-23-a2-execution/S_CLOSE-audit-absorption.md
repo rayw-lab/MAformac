@@ -27,6 +27,24 @@
 8. **DemoVehicleStateStore 旧 key/新 C2 key 混放清债**（GLM P3，S3 INDEX 已记 DEFERRED）。
 9. **demo/full catalog 语义文档化**（GPT Pro P2）：demo=完整训练/评测 surface(562 schema)；full=skeleton OOS/拒识白名单(1538)。本轮 P0 修已在 CLI 注释 + fail-fast 错误消息明示，可补 docs 显式说明。
 
+## 3b. 第二批已修（三审计 P1/P2 收口，commit 927e276 +）
+| finding | 来源 | 修法 |
+|---|---|---|
+| qwen-tool-call-format.yaml stale TODO | Codex P1-2 | 改机器可校验引用 generated catalog(tool_catalog/ir_map/full_skeleton), 去「scripts 硬编码旧6」stale 注释 |
+| make verify 不含 swift test | Codex P2 | +`verify-all`(swift test + make verify 聚合) |
+| 根目录 stray pr_audit_3.md + Reports exclude warning | Codex P2 | 清 stray + Reports/.gitkeep(.gitignore `Reports/*` 仅保 .gitkeep, clean checkout 无 Invalid Exclude) |
+| sanitized intent 无回归 | Codex P2 | +`scripts/test_tool_name_sanitize.py`(snake_case gate, demo562/full1538 全合法 + set_ibooster_mode) |
+| requiresStateDelta `!query_` 名前缀 | GPT Pro+GLM P2 | IR-based(normalize→primitive≠query, irMap robust, 空回退名前缀); 57/57 不破 |
+| CLI base model/python 硬编码路径 | GLM P2 | 环境变量 MAFORMAC_BASE_MODEL_DIR/MAFORMAC_PYTHON(fallback 保默认) |
+
+## 3c. DEFERRED P2/P3（honest steelman，非偷懒；retrain-c5/后续独立立项）
+- **sameFamilyDistractors 预建 index**（GPT Pro+GLM+Codex 三标，但 **= 可优化非 broken**）：A2 NOT训 只跑测试规模(1-20 样本)，实跑 4500 样本 × O(562 log562) ≈ <1s 非瓶颈；threading 穿热路径签名风险 > marginal 收益 → retrain-c5 大规模生成前优化。
+- **deviceCellMap codegen**（GLM P2）：🔴 **无 codegen 源** —— state-cells.yaml 注释明示「cell 与 D-domain 工具映射**独立**」(:14)，device→cell 是语义手映射非派生；codegen 需先加 device↔cell linkage(更大改)。24 entries 测试覆盖(testDeviceCellMapAllValuesExistInStateCells)+稳定 → DEFER。
+- **C5LoRATraining.swift 拆分**（GPT Pro P2）：maintainability 非 correctness；2600 行单文件拆 Renderer/Builder/Gates/Config/Receipts = 合并前大重构风险 > 收益 → retrain-c5 重构期做。
+- **ToolContractJSONRenderer 自写 escaping → JSONEncoder**（GPT Pro P2）：输入是 catalog 工具 schema(snake_case 名 + 中文 enum, 无任意 user 控制字符)，控制字符风险理论性；renderedToolsText 已有测试 → DEFER。
+- **DemoVehicleStateStore 旧 key/新 C2 key 混放**（GLM P3，S3 INDEX 已记）：UI 读取层清债，bigger，非 A2 surface → DEFER。
+- **旧 generated/D_domain.tools.json(6 strangler) historical banner**（Codex P2）：qwen yaml 已明示 tool_catalog=demo.json(canonical 单源)，旧 6 仅 strangler 守现状 → 后续加 banner。
+
 ## 4. 三角分诊洞察（cross-vendor 真值，沉淀 heavy-work 坑点库）
 - **GPT Pro 与 GLM-5.2 findings 不同集**：GPT Pro 独抓 P0(`--scope full` 解码崩)，GLM 独抓 P1-2(direct clamp)，**both 共识 P1(dDomain miss fallback)** —— 三者全实跑坐实真 bug。→ **cross-vendor 双审不是冗余, 是覆盖面并集**（不同模型抓不同盲点）；单审会漏（GPT Pro 漏 clamp / GLM 漏 scope full）。
 - **两审计都正确守 A2 边界**（未把 DEFERRED/base hard_fail 当 bug）—— extra-instruction(A2 边界说明)起效，防云审计误判 code-only 范畴。
