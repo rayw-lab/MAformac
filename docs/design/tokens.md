@@ -1,6 +1,6 @@
 ---
 type: visual-ssot-tokens
-status: DRAFT v1（CC0 起草；色/字/间/动效 = 锁 scheme1 一手 + U11/U2 拍板；7 态色 = CC0 基于 scheme1 色板 + U10 四态语义设计，**待磊哥审后冻结**）
+status: 语义分类 FROZEN v1.0（2026-06-24 磊哥审签：7 态↔色彩语义角色映射冻结，spec ui-presentation R1 引此为准）/ hex 值 DRAFT（实渲微调后复核冻结，见 §2）；色/字/间/动效 = 锁 scheme1 一手 + U11/U2 拍板
 date: 2026-06-23
 owner: UIUE 链路A（worktree uiue/visual-ssot-state-consume）
 source:
@@ -49,7 +49,7 @@ note: 🔴 **agent 生成任何 UI 前必读本文 + INDEX**。色值/字号/间
 ## 2. DemoVisualState 7 态色映射（🔴 U10 四态必分开，现万能红字混=翻车）
 
 > 消费源 = `Core/State/DemoVehicleStateStore.swift:17-25`（7 态枚举，A2 不碰此枚举）。U10（grill §3:124）：clarify/unsupported/safety_refusal/crash **四态分开**。
-> ⚠️ **本表 7 态色 = CC0 基于 scheme1 色板 + U10 语义设计，待磊哥审后冻结**（scheme1 概念稿只给了 on/off/offline 三态，未映射全 7 态）。
+> ✅ **语义分类 FROZEN v1.0（2026-06-24 磊哥审签）**：7 态↔语义角色映射冻结（normal/satisfied/changing + 四态分开：clarify 琥珀 / unsupported 灰锁 / safety 红 / crash 中性灰），spec `ui-presentation` R1 引此「色彩语义分类」为准。⚠️ **hex 值仍 DRAFT**（实渲微调后复核冻结，见 §status）——scheme1 概念稿只给 on/off/offline 三态，全 7 态语义由 U10 + CC0 设计、磊哥审签。
 
 | visualState | 语义 | 色 token | 视觉 | 为什么这色 |
 |---|---|---|---|---|
