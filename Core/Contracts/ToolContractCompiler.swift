@@ -368,125 +368,109 @@ public enum ToolContractStateApplier {
     public static func apply(
         toolCalls: [C6ToolCall],
         to preState: [String: String],
-        stateCells: StateCellContractLookup
+        stateCells: StateCellContractLookup,
+        irMap: [String: DDomainIRMapEntry] = [:]
     ) -> [String: String] {
         var state = preState
         for call in toolCalls {
-            for ir in ToolContractNormalizer.normalize(call) {
+            for ir in ToolContractNormalizer.normalize(call, irMap: irMap) {
                 apply(ir, state: &state, stateCells: stateCells)
             }
         }
         return state
     }
 
+    // device → C2 cell id 映射(demo-positive 7 device; S3 扩 191 逐族纳入)。
+    private static let deviceCellMap: [String: String] = [
+        "ac": "ac.power",
+        "ac_temperature": "ac.temp_setpoint",
+        "ac_windspeed": "ac.fan_speed",
+        "window": "window.position",
+        "screen_brightness": "screen.brightness",
+        "atmosphere_lamp_color": "ambient.color",
+        "atmosphere_lamp_brightness": "ambient.brightness",
+    ]
+
+    // data-driven: device→cell, 从 cell 元数据(execution_range/exp_step/default/scope/depends_on)派生 state 写入,
+    // 替旧 8 个硬编码 applyXxx(cell SSOT enforce, claim-vs-reality 铁律1: 边界/步长/初值不在代码重复一份)。
     private static func apply(_ ir: ToolContractIR, state: inout [String: String], stateCells: StateCellContractLookup) {
-        switch ir.device {
-        case "ac":
-            applyAC(ir, state: &state)
-        case "ac_temperature":
-            applyTemperature(ir, state: &state)
-        case "ac_windspeed":
-            applyFan(ir, state: &state)
-        case "window":
-            applyWindow(ir, state: &state)
-        case "screen_brightness":
-            applyScreen(ir, state: &state)
-        case "atmosphere_lamp_color":
-            applyAmbientColor(ir, state: &state, stateCells: stateCells)
-        case "atmosphere_lamp_brightness":
-            applyAmbientBrightness(ir, state: &state)
-        default:
+        guard let cellID = deviceCellMap[ir.device] else {
+            logUnmapped(ir.device)  // 未映射 device 不静默吞(S3 扩 191 逐族纳入)
             return
         }
-    }
-
-    private static func applyAC(_ ir: ToolContractIR, state: inout [String: String]) {
-        if isOff(ir.actionPrimitive, value: ir.value) {
-            state["ac.power"] = "off"
-        } else if isOn(ir.actionPrimitive, value: ir.value) {
-            state["ac.power"] = "on"
-        }
-    }
-
-    private static func applyTemperature(_ ir: ToolContractIR, state: inout [String: String]) {
-        if let target = targetNumber(ir) {
-            state["ac.temp_setpoint[主驾]"] = target
-            state["ac.power"] = "on"
+        guard let cell = stateCells.cell(id: cellID) else {
+            logUnmapped(cellID)
             return
         }
-        let current = Int(state["ac.temp_setpoint[主驾]"] ?? "24") ?? 24
-        if ir.actionPrimitive == "increase_by_exp" {
-            state["ac.temp_setpoint[主驾]"] = String(current + 2)
-            state["ac.power"] = "on"
-        } else if ir.actionPrimitive == "decrease_by_exp" {
-            state["ac.temp_setpoint[主驾]"] = String(current - 2)
-            state["ac.power"] = "on"
-        }
-    }
-
-    private static func applyFan(_ ir: ToolContractIR, state: inout [String: String]) {
-        if let target = targetNumber(ir) {
-            state["ac.fan_speed[主驾]"] = target
-            return
-        }
-        let current = Int(state["ac.fan_speed[主驾]"] ?? "1") ?? 1
-        if ir.actionPrimitive == "increase_by_exp" {
-            state["ac.fan_speed[主驾]"] = String(min(10, current + 1))
-        } else if ir.actionPrimitive == "decrease_by_exp" {
-            state["ac.fan_speed[主驾]"] = String(max(1, current - 1))
-        }
-    }
-
-    private static func applyWindow(_ ir: ToolContractIR, state: inout [String: String]) {
-        let percent: String
-        if let target = targetNumber(ir) {
-            percent = target
-        } else if isOff(ir.actionPrimitive, value: ir.value) {
-            percent = "0"
-        } else if ir.actionPrimitive == "increase_by_exp" {
-            let current = Int(state["window.position[主驾]"] ?? "0") ?? 0
-            percent = String(min(100, current + 20))
-        } else if ir.actionPrimitive == "decrease_by_exp" {
-            let current = Int(state["window.position[主驾]"] ?? "0") ?? 0
-            percent = String(max(0, current - 20))
+        if cell.type == "enum" {
+            applyEnumCell(ir, cellID: cellID, cell: cell, state: &state, stateCells: stateCells)
         } else {
-            percent = "100"
-        }
-        for key in windowKeys(for: ir.slots["position"] ?? "all") {
-            state[key] = percent
+            applyNumericCell(ir, cellID: cellID, cell: cell, state: &state)
         }
     }
 
-    private static func applyScreen(_ ir: ToolContractIR, state: inout [String: String]) {
-        if let target = targetNumber(ir) {
-            state["screen.brightness[中控屏]"] = target
-            return
-        }
-        let current = Int(state["screen.brightness[中控屏]"] ?? "70") ?? 70
-        if ir.actionPrimitive == "increase_by_exp" {
-            state["screen.brightness[中控屏]"] = String(min(100, current + 10))
-        } else if ir.actionPrimitive == "decrease_by_exp" {
-            state["screen.brightness[中控屏]"] = String(max(0, current - 10))
-        }
-    }
-
-    private static func applyAmbientColor(_ ir: ToolContractIR, state: inout [String: String], stateCells: StateCellContractLookup) {
+    // enum cell(ac.power power_on/off; ambient.color set_mode 别名/off)。
+    private static func applyEnumCell(
+        _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition,
+        state: inout [String: String], stateCells: StateCellContractLookup
+    ) {
         if isOff(ir.actionPrimitive, value: ir.value) {
-            state["ambient.color"] = "off"
-            return
-        }
-        if let color = firstNonEmpty(ir.value.direct, ir.value.offset, ir.slots["color"]) {
-            state["ambient.color"] = c2ColorValue(for: color, stateCells: stateCells)
+            state[cellID] = "off"
+        } else if isOn(ir.actionPrimitive, value: ir.value) {
+            state[cellID] = "on"
+        } else if let raw = firstNonEmpty(ir.value.direct, ir.value.offset, ir.slots["color"]) {
+            state[cellID] = c2ColorValue(for: raw, stateCells: stateCells)
         }
     }
 
-    private static func applyAmbientBrightness(_ ir: ToolContractIR, state: inout [String: String]) {
-        let current = Int(state["ambient.brightness[面发光氛围灯]"] ?? "70") ?? 70
-        if ir.actionPrimitive == "increase_by_exp" {
-            state["ambient.brightness[面发光氛围灯]"] = String(min(100, current + 10))
+    // numeric cell: target 直写 / exp ±expStepLittle clamp executionRange / scope 区位(window 多区位) / depends_on 联动。
+    private static func applyNumericCell(
+        _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition, state: inout [String: String]
+    ) {
+        let baseScope = cell.scope.first ?? ""
+        let currentKey = baseScope.isEmpty ? cellID : "\(cellID)[\(baseScope)]"
+        let writeKeys = ir.device == "window"
+            ? windowKeys(for: ir.slots["position"] ?? "all")
+            : [currentKey]
+        let initial = Int(cell.defaultValue ?? "") ?? 0
+        let newValue: String?
+        if let target = targetNumber(ir) {
+            newValue = target                                       // 绝对 target 直写(复现旧, 不 clamp)
+        } else if isOff(ir.actionPrimitive, value: ir.value) {
+            newValue = String(cell.executionRange?.min ?? 0)        // power_off → 下界(window 0)
+        } else if ir.actionPrimitive == "increase_by_exp" {
+            let current = Int(state[currentKey] ?? "") ?? initial
+            newValue = String(clampUpper(current + (cell.expStepLittle ?? 0), cell.executionRange))
         } else if ir.actionPrimitive == "decrease_by_exp" {
-            state["ambient.brightness[面发光氛围灯]"] = String(max(0, current - 10))
+            let current = Int(state[currentKey] ?? "") ?? initial
+            newValue = String(clampLower(current - (cell.expStepLittle ?? 0), cell.executionRange))
+        } else if ir.device == "window" {
+            newValue = String(cell.executionRange?.max ?? 100)      // window power_on 无 target → 全开(复现旧)
+        } else {
+            newValue = nil
         }
+        guard let value = newValue else { return }
+        for key in writeKeys {
+            state[key] = value
+        }
+        for dependency in cell.dependsOn {                          // 写 cell 激活依赖(ac.temp_setpoint→ac.power=on)
+            state[dependency] = "on"
+        }
+    }
+
+    private static func clampUpper(_ value: Int, _ range: ExecutionRange?) -> Int {
+        guard let range else { return value }
+        return min(range.max, value)
+    }
+
+    private static func clampLower(_ value: Int, _ range: ExecutionRange?) -> Int {
+        guard let range else { return value }
+        return max(range.min, value)
+    }
+
+    private static func logUnmapped(_ name: String) {
+        let message = "[ToolContractStateApplier] unmapped device/cell: \(name)\n"
+        FileHandle.standardError.write(message.data(using: .utf8) ?? Data())
     }
 
     private static func targetNumber(_ ir: ToolContractIR) -> String? {

@@ -65,6 +65,7 @@ devices:
           extreme: {MAX: 32, MIN: 18}              # "调到最高/最低"
         state_kinds: [empty, known, unknown]
         depends_on: [ac.power]
+        default: 24                                # S2 cut3: StateApplier data-driven 初值(替旧硬编码 24)
         readback_zh: "{温区}空调温度{值}度"
       - id: ac.mode
         display_zh: 空调模式
@@ -81,6 +82,7 @@ devices:
         source_kind: c2_demo_decision
         exp_step: {little: 1}
         state_kinds: [empty, known, unknown]
+        default: 1                                 # S2 cut3: data-driven 初值(替旧硬编码 1)
         readback_zh: "{温区}空调风量{值}挡"
     readback_cell_group: [ac.power, ac.temp_setpoint, ac.mode, ac.fan_speed]
 
@@ -98,6 +100,7 @@ devices:
         exp_step: {little: 20}                      # "开大点/关小点" = ±20%(协议 _little)
         gear_map: {"1挡": 25, "2挡": 50, "3挡": 75, "4挡": 100}  # 协议双轨(挡↔%), 映射=C2 决策
         state_kinds: [empty, known, unknown]
+        default: 0                                 # S2 cut3: data-driven 初值(替旧硬编码 0)
         readback_zh: "{位置}车窗开度{值}%"
       - id: window.motion
         display_zh: 车窗运动态
@@ -132,6 +135,7 @@ devices:
         exp_step:                                 # 映射协议一手 offset token(§28)
           little: 10                              # "调亮/暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
         state_kinds: [empty, known, unknown]
+        default: 70                                # S2 cut3: data-driven 初值(替旧硬编码 70)
         readback_zh: "{屏幕}亮度{值}%"
         # 炸点(模糊金例, 真实 bug 命中): "屏幕太暗了 → 调亮"(纯陈述→动作)
     readback_cell_group: [screen.brightness]
@@ -158,6 +162,7 @@ devices:
         exp_step:                                 # 映射协议一手 offset token(§28)
           little: 10                              # "调暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
         state_kinds: [empty, known, unknown]
+        default: 70                                # S2 cut3: data-driven 初值(替旧硬编码 70)
         readback_zh: "{氛围灯}亮度{值}%"
     readback_cell_group: [ambient.color, ambient.brightness]
 

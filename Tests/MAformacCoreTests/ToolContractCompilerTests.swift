@@ -90,7 +90,51 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertTrue(irs.isEmpty)
     }
 
+    // MARK: - cut3 StateApplier data-driven (cell-driven applyGeneric, parity 等价旧硬编码)
+
+    func testStateApplierDataDrivenEndToEndDDomainTool() throws {
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        // 端到端 cut1→cut2→cut3: D-domain 工具名→normalize(irMap)→IR→data-driven apply→state delta
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "adjust_ac_temperature_to_number", arguments: ["value": "24"])],
+            to: [:], stateCells: stateCells, irMap: irMap)
+        XCTAssertEqual(state["ac.temp_setpoint[主驾]"], "24")
+        XCTAssertEqual(state["ac.power"], "on", "depends_on 联动(cell-driven): 调温度自动开空调")
+    }
+
+    func testStateApplierExpStepFromCellMetadata() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        // increase_by_exp 用 cell.exp_step.little(screen 10) + clamp executionRange, 非硬编码
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["delta": "brighter"])],
+            to: ["screen.brightness[中控屏]": "70"], stateCells: stateCells)
+        XCTAssertEqual(state["screen.brightness[中控屏]"], "80", "cell-driven expStep 10: 70+10")
+    }
+
+    func testStateApplierDefaultFromCellMetadata() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        // 无 pre-state, increase 用 cell.default 初值(fan default 1), 非硬编码 1
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "set_cabin_fan", arguments: ["delta": "stronger"])],
+            to: [:], stateCells: stateCells)
+        XCTAssertEqual(state["ac.fan_speed[主驾]"], "2", "cell-driven default 1: 1+1")
+    }
+
+    func testStateApplierUnmappedDeviceNoWrite() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        // 未映射 device(seat_heat, S3 才扩) → 不写 state(quarantine, logUnmapped 非静默吞)
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat", "action_primitive": "power_on"])],
+            to: ["x": "y"], stateCells: stateCells)
+        XCTAssertEqual(state, ["x": "y"], "未映射 device 不写 state(S3 扩 191 逐族纳入)")
+    }
+
     // MARK: - helpers
+
+    private func stateCellsYAML() throws -> String {
+        try String(contentsOf: repoRoot().appendingPathComponent("contracts/state-cells.yaml"), encoding: .utf8)
+    }
 
     private func toolNames(_ schemas: [[String: JSONValue]]) -> [String] {
         schemas.compactMap { schema in
