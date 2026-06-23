@@ -30,6 +30,12 @@ struct C5TrainingCLI {
         try createTrainingTokenizerPatch(sourceDir: options.baseModelDir, outputDir: patchedModelDir)
         let semanticText = try read(repoRoot, "contracts/semantic-function-contract.jsonl")
         let seeds = try decodeJSONL(semanticText, as: C5SemanticSeed.self)
+        // paradigm §1 D-domain catalog 注入(scope demo=562 / full=1538; surface=frame→空 catalog = legacy 回退)。
+        let dDomainCatalog: [DDomainToolEntry] = try {
+            guard options.surface == .dDomain else { return [] }
+            let file = options.scope == .full ? "generated/D_domain.tools.full.json" : "generated/D_domain.tools.demo.json"
+            return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: repoRoot.appendingPathComponent(file)))
+        }()
         let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))
         let formatDigest = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
@@ -62,7 +68,10 @@ struct C5TrainingCLI {
             allowRegeneratedOffsetArtifact: options.allowRegeneratedOffsetArtifact,
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
-            generatedUtteranceRecords: generatedUtterances
+            generatedUtteranceRecords: generatedUtterances,
+            scope: options.scope,
+            surface: options.surface,
+            dDomainCatalog: dDomainCatalog
         )
         let builder = C5TrainingDatasetBuilder()
         var prepared = builder.build(
@@ -102,7 +111,10 @@ struct C5TrainingCLI {
             allowRegeneratedOffsetArtifact: options.allowRegeneratedOffsetArtifact,
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
-            generatedUtteranceRecords: generatedUtterances
+            generatedUtteranceRecords: generatedUtterances,
+            scope: options.scope,
+            surface: options.surface,
+            dDomainCatalog: dDomainCatalog
         )
         prepared = builder.build(
             seeds: seeds,
@@ -500,9 +512,11 @@ private struct Options {
     var requireCandidateDataQualityGate: Bool
     var requireGeneratedUtteranceRecords: Bool
     var thetaAlphaPositiveOnly: Bool
+    var scope: C5TrainingScope
+    var surface: C5TrainingSurface
 
     init(arguments: [String]) throws {
-        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only]"
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only] [--scope demo|full] [--surface d_domain|frame]"
         guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -517,6 +531,8 @@ private struct Options {
         requireCandidateDataQualityGate = false
         requireGeneratedUtteranceRecords = false
         thetaAlphaPositiveOnly = false
+        scope = .demo
+        surface = .dDomain
         var iterator = arguments.dropFirst(2).makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -552,6 +568,12 @@ private struct Options {
                 requireGeneratedUtteranceRecords = true
             case "--theta-alpha-positive-only":
                 thetaAlphaPositiveOnly = true
+            case "--scope":
+                guard let value = iterator.next(), let parsed = C5TrainingScope(rawValue: value) else { throw CLIError.usage("invalid --scope value (demo|full)") }
+                scope = parsed
+            case "--surface":
+                guard let value = iterator.next(), let parsed = C5TrainingSurface(rawValue: value) else { throw CLIError.usage("invalid --surface value (d_domain|frame)") }
+                surface = parsed
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }

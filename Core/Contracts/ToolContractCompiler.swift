@@ -97,13 +97,22 @@ public struct ToolContractCompiler: Sendable {
     }
 }
 
-// D-domain 具名工具目录条目(解码 generated/D_domain.tools.demo.json; _ir/_domain/_sg 多余键 Codable 忽略)。
-public struct DDomainToolEntry: Codable, Sendable {
+// D-domain 具名工具目录条目(解码 generated/D_domain.tools.demo.json; _domain=family/_sg=device 供 S4 同族 distractor)。
+public struct DDomainToolEntry: Codable, Equatable, Sendable {
     public let type: String
     public let function: DDomainFunction
+    public let domain: String?   // _domain (family, S4 同族 distractor 回退)
+    public let sg: String?       // _sg (device, S4 同设备 distractor 优先)
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case function
+        case domain = "_domain"
+        case sg = "_sg"
+    }
 }
 
-public struct DDomainFunction: Codable, Sendable {
+public struct DDomainFunction: Codable, Equatable, Sendable {
     public let name: String
     public let description: String
     public let parameters: JSONValue

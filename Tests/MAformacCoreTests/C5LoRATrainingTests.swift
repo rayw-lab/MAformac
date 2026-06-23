@@ -884,6 +884,119 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(pass.thinkBlockParity)
     }
 
+    // MARK: - A2 S4 D-domain surface(paradigm §1: name=intent, value 形态编码进名, 同族 distractor, removedToolID 真删)
+
+    private func a2RepoRoot() -> URL {
+        URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+    }
+
+    private func loadDemoCatalog() throws -> [DDomainToolEntry] {
+        try ToolContractCompiler.loadDDomainCatalog(repoRoot: a2RepoRoot())   // 562 demo D-domain 具名工具
+    }
+
+    private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", valueType: String = "EXP") -> C5SemanticSeed {
+        let json = """
+        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"\(intent)","intent":"\(intent)","service":"x","exec_tier":"L2","fc_flags":{"fuzzy":false,"free":false},"slot_keys":["device"],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"x","source_sheet":"x","source_row_no":1,"range":""}
+        """
+        return try! JSONDecoder().decode(C5SemanticSeed.self, from: Data(json.utf8))
+    }
+
+    // cut1+cut2: surface=.dDomain → name=seed.intent(D-domain), tools=目标具名工具+同族 distractor, 无 generic frame
+    func testDDomainSurfaceEmitsIntentAsToolNameNotFrame() throws {
+        let catalog = try loadDemoCatalog()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],   // intent=open_ac ∈ 562
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let positive = prepared.samples.first { $0.split == "train" }
+        XCTAssertEqual(positive?.expectedToolCalls.first?.name, "open_ac", "cut1: name=seed.intent(D-domain 具名工具)")
+        let toolNames = (positive?.tools ?? []).compactMap { functionName($0) }
+        XCTAssertTrue(toolNames.contains("open_ac"), "cut2: 目标 D-domain 工具在 tools surface")
+        XCTAssertFalse(toolNames.contains("tool_call_frame"), "surface=.dDomain 不渲 generic frame")
+        XCTAssertFalse(toolNames.contains(where: { $0.hasPrefix("irrelevant_") }), "distractor 改同族 D-domain, 非 irrelevant 占位")
+    }
+
+    // cut2: 同族 distractor ∈ 562 catalog(非 irrelevant 占位), 不含目标自身
+    func testDDomainDistractorsAreRealCatalogToolsSameFamily() throws {
+        let catalog = try loadDemoCatalog()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let positive = prepared.samples.first { $0.split == "train" }
+        let distractorNames = positive?.promptDistractorToolIDs ?? []
+        XCTAssertFalse(distractorNames.isEmpty, "有同族 distractor")
+        let catalogNames = Set(catalog.map(\.function.name))
+        XCTAssertTrue(distractorNames.allSatisfy { catalogNames.contains($0) }, "distractor ∈ 562 D-domain catalog(非 irrelevant 占位)")
+        XCTAssertFalse(distractorNames.contains("open_ac"), "distractor 不含目标工具自身")
+    }
+
+    // cut1: 值形态工具 emit value arg; device/action_primitive 不 emit(编码进名); arg 键 ∈ schema(additionalProperties:false)
+    func testDDomainEmitsValueArgAndOnlySchemaKeys() throws {
+        let catalog = try loadDemoCatalog()
+        let seed = rawSeed(id: "scr-1", intent: "adjust_blue_ray_filtering_to_gear", device: "blue_ray_filtering", valueType: "PERCENT")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let call = prepared.samples.first { $0.split == "train" }?.expectedToolCalls.first
+        XCTAssertEqual(call?.name, "adjust_blue_ray_filtering_to_gear")
+        let args = call?.arguments ?? [:]
+        XCTAssertNotNil(args["value"], "值形态工具 emit value arg(S1 derive_arg_schema 统一命名 value)")
+        XCTAssertNil(args["device"], "device 不 emit(编码进工具名)")
+        XCTAssertNil(args["action_primitive"], "action 不 emit(编码进工具名)")
+        let entry = catalog.first { $0.function.name == "adjust_blue_ray_filtering_to_gear" }!
+        let props = try toolProperties(C5TrainingRenderer.dDomainToolSchema(entry))
+        for key in args.keys {
+            XCTAssertTrue(props.keys.contains(key), "emit arg \(key) ∈ tool schema properties(additionalProperties:false 合规)")
+        }
+    }
+
+    // cut4: scope=.demo → 562 allowlist 过滤 562 外 intent
+    func testDDomainScopeDemoFiltersOutOfCatalogIntents() throws {
+        let catalog = try loadDemoCatalog()
+        let inSeed = semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")   // intent=open_ac ∈ 562
+        let outSeed = rawSeed(id: "x-1", intent: "nonexistent_intent_zzz", device: "navi")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [inSeed, outSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 20, devSelectionRows: 0, includeNoCallCounterfactuals: false, scope: .demo, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let names = Set(prepared.samples.compactMap { $0.expectedToolCalls.first?.name })
+        XCTAssertTrue(names.contains("open_ac"), "562 内 intent 保留")
+        XCTAssertFalse(names.contains("nonexistent_intent_zzz"), "scope=.demo 过滤 562 外 intent(unsupported 兜底走别处)")
+    }
+
+    // cut5: no-call 反事实物理删目标工具(非只 metadata 声称) + 活样本 targetToolPresent=false(修 446 假删灾难 variant)
+    func testDDomainNoCallCounterfactualPhysicallyRemovesTargetTool() throws {
+        let catalog = try loadDemoCatalog()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 8, devSelectionRows: 0, refusalRatioTarget: 0.3, refusalRatioHardCap: 0.5, includeNoCallCounterfactuals: true, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let noCall = prepared.samples.first { $0.noCall != nil }
+        XCTAssertNotNil(noCall, "生成 no-call 反事实")
+        let removed = noCall?.noCall?.removedToolID ?? ""
+        XCTAssertEqual(removed, "open_ac", "cut5: removedToolID=被移除的 D-domain 目标工具名(非硬编码 tool_call_frame)")
+        let toolNames = (noCall?.tools ?? []).compactMap { functionName($0) }
+        XCTAssertFalse(toolNames.contains(removed), "cut5 真删: 目标工具物理不在 tools(非只 metadata removedToolID 声称)")
+        XCTAssertEqual(noCall?.noCall?.targetToolPresent, false, "活样本: targetToolPresent=false 与产物一致(claim-vs-reality 铁律1)")
+    }
+
+    // 向后兼容: 空 catalog(默认无注入)→ frame legacy 回退(strangler 旧 surface 保留)
+    func testFrameSurfaceBackwardCompatWhenCatalogEmpty() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false)
+        )
+        let positive = prepared.samples.first { $0.split == "train" }
+        XCTAssertEqual(positive?.expectedToolCalls.first?.name, "tool_call_frame", "空 catalog → frame legacy(向后兼容, strangler)")
+    }
+
     private func semanticSeed(
         id: String,
         fuzzy: Bool,

@@ -68,6 +68,18 @@ public enum C5AcceptanceStage: String, Codable, Sendable {
     case loraCandidate = "lora_candidate"
 }
 
+// 训练样本覆盖范围(paradigm §1 D-domain): demo=10 族 562 intent allowlist / full=全集 1538 intent。
+public enum C5TrainingScope: String, Codable, CaseIterable, Sendable {
+    case demo
+    case full
+}
+
+// model-visible 训练 surface 形态: dDomain=具名工具(name=intent, value 形态编码进名) / frame=旧 generic tool_call_frame(strangler 保留, retrain 全迁后删)。
+public enum C5TrainingSurface: String, Codable, CaseIterable, Sendable {
+    case dDomain = "d_domain"
+    case frame
+}
+
 public struct C5FCFlags: Codable, Equatable, Sendable {
     public var fuzzy: Bool
     public var free: Bool
@@ -666,6 +678,10 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var requireCandidateDataQualityGate: Bool
     public var requireGeneratedUtteranceRecords: Bool
     public var generatedUtteranceRecords: [C5GeneratedUtteranceRecord]
+    // paradigm §1 D-domain surface(S4): scope=10 族 562 / full 全集; surface=具名工具/frame strangler; dDomainCatalog 由 CLI 注入(空→frame legacy 回退)。
+    public var scope: C5TrainingScope
+    public var surface: C5TrainingSurface
+    public var dDomainCatalog: [DDomainToolEntry]
 
     public init(
         targetPositiveRows: Int = 4_500,
@@ -687,7 +703,10 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         allowRegeneratedOffsetArtifact: Bool = false,
         requireCandidateDataQualityGate: Bool = false,
         requireGeneratedUtteranceRecords: Bool = false,
-        generatedUtteranceRecords: [C5GeneratedUtteranceRecord] = []
+        generatedUtteranceRecords: [C5GeneratedUtteranceRecord] = [],
+        scope: C5TrainingScope = .demo,
+        surface: C5TrainingSurface = .dDomain,
+        dDomainCatalog: [DDomainToolEntry] = []
     ) {
         self.targetPositiveRows = targetPositiveRows
         self.devSelectionRows = devSelectionRows
@@ -709,6 +728,22 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.requireCandidateDataQualityGate = requireCandidateDataQualityGate
         self.requireGeneratedUtteranceRecords = requireGeneratedUtteranceRecords
         self.generatedUtteranceRecords = generatedUtteranceRecords
+        self.scope = scope
+        self.surface = surface
+        self.dDomainCatalog = dDomainCatalog
+    }
+}
+
+// A2 cut3: 自然中文话术 generator 接口预留(数据通路不变, generatedUtteranceRecords 仍是消费入口)。
+// DeterministicPlaceholderGenerator nil-stub = A2 边界(不实装云 generator/不生成语料); 实装 DEFERRED retrain-c5。
+public protocol C5NaturalUtteranceGenerator: Sendable {
+    func utterance(forContractRowID contractRowID: String, variant: Int) -> String?
+}
+
+public struct DeterministicPlaceholderGenerator: C5NaturalUtteranceGenerator {
+    public init() {}
+    public func utterance(forContractRowID contractRowID: String, variant: Int) -> String? {
+        nil  // A2 nil-stub: 不调云 generator/不生成语料(DEFERRED); 返 nil → makePositiveSample 走本地确定性话术
     }
 }
 
@@ -1957,6 +1992,95 @@ public enum C5TrainingRenderer {
     public static func toolCallFrameToolSchema(seeds: [C5SemanticSeed]) -> [[String: JSONValue]] {
         ToolContractCompiler(seeds: seeds).frameToolSchema
     }
+
+    // MARK: - A2 cut1/cut2 D-domain 具名工具 surface 渲染
+
+    // 单个 D-domain 具名工具 schema(name=intent, parameters 来自 S1 catalog; 复用 ToolContractCompiler.dDomainToolSchemas 等价渲染)。
+    public static func dDomainToolSchema(_ entry: DDomainToolEntry) -> [String: JSONValue] {
+        [
+            "type": .string(entry.type),
+            "function": .object([
+                "name": .string(entry.function.name),
+                "description": .string(entry.function.description),
+                "parameters": entry.function.parameters
+            ])
+        ]
+    }
+
+    // tool schema 属性键→enum 值([] = 自由字符串)。供 dDomainToolCallArguments 保证 additionalProperties:false 合规。
+    private static func dDomainPropertyEnums(_ entry: DDomainToolEntry) -> [String: [String]] {
+        guard case let .object(params) = entry.function.parameters,
+              case let .object(props)? = params["properties"] else {
+            return [:]
+        }
+        var out: [String: [String]] = [:]
+        for (key, schema) in props {
+            if case let .object(s) = schema, case let .array(enumVals)? = s["enum"] {
+                out[key] = enumVals.compactMap { if case let .string(v) = $0 { return v }; return nil }
+            } else {
+                out[key] = []
+            }
+        }
+        return out
+    }
+
+    // D-domain 工具调用 arguments: device/action 已编码进工具名(不 emit); 只 emit catalog schema 属性内的键(防 additionalProperties:false 违规)。
+    // value 形态值统一命名 "value"(S1 derive_arg_schema:133); slot 槽走 slotAssignments(非法 enum 成员→取合法值, 确定性)。
+    public static func dDomainToolCallArguments(
+        seed: C5SemanticSeed,
+        value: C5ContractValue,
+        slotAssignments: [String: String],
+        toolEntry: DDomainToolEntry,
+        variant: Int
+    ) -> [String: JSONValue] {
+        let propertyEnums = dDomainPropertyEnums(toolEntry)
+        var args: [String: JSONValue] = [:]
+        // value 形态 arg(210/562 具名工具有此键): 填增广后的值(offset 优先, 否则 direct)
+        if propertyEnums.keys.contains("value") {
+            let valueText = value.offset.isEmpty ? value.direct : value.offset
+            if !valueText.isEmpty && !isPlaceholderLiteral(valueText) {
+                args["value"] = .string(valueText)
+            }
+        }
+        // slot 参数: device/action_primitive 为 frame 内部字段(编码进名), 不 emit; 只 emit schema 内键
+        for (key, assigned) in slotAssignments where key != "device" && key != "action_primitive" {
+            guard let enums = propertyEnums[key] else { continue }   // 不在 tool schema → drop(additionalProperties:false 安全)
+            guard !assigned.isEmpty, !isPlaceholderLiteral(assigned) else { continue }
+            if enums.isEmpty || enums.contains(assigned) {
+                args[key] = .string(assigned)
+            } else {
+                args[key] = .string(enums[variant % enums.count])   // 非法 enum 值→取合法成员(确定性, 非 hashValue)
+            }
+        }
+        return args
+    }
+
+    // 同族 distractor: 优先同 device(_sg)→同 family(_domain)→其他; K 个; 替 distractorToolSchemas 占位(irrelevant_navigation/music)。不渲全 562(token 爆)。
+    public static func sameFamilyDistractors(
+        target: DDomainToolEntry,
+        catalog: [DDomainToolEntry],
+        variant: Int,
+        count: Int = 3
+    ) -> (ids: [String], schemas: [[String: JSONValue]]) {
+        let pool = catalog.filter { $0.function.name != target.function.name }
+        guard !pool.isEmpty else { return ([], []) }
+        let sameDevice = pool.filter { $0.sg == target.sg }.sorted { $0.function.name < $1.function.name }
+        let sameFamily = pool.filter { $0.sg != target.sg && $0.domain == target.domain }.sorted { $0.function.name < $1.function.name }
+        let others = pool.filter { $0.domain != target.domain }.sorted { $0.function.name < $1.function.name }
+        let ranked = sameDevice + sameFamily + others
+        var picked: [DDomainToolEntry] = []
+        var idx = variant % ranked.count
+        var guardCounter = 0
+        while picked.count < min(count, ranked.count) && guardCounter < ranked.count * 2 {
+            let entry = ranked[idx % ranked.count]
+            if !picked.contains(where: { $0.function.name == entry.function.name }) {
+                picked.append(entry)
+            }
+            idx += 1
+            guardCounter += 1
+        }
+        return (picked.map(\.function.name), picked.map(dDomainToolSchema))
+    }
 }
 
 public struct C5TrainingDatasetBuilder: Sendable {
@@ -2251,7 +2375,17 @@ public struct C5TrainingDatasetBuilder: Sendable {
     }
 
     private func buildPositiveSamples(seeds: [C5SemanticSeed], options: C5TrainingBuildOptions) -> [C5TrainingSample] {
-        let eligible = seeds.filter { !$0.device.isEmpty && !$0.actionPrimitive.isEmpty }
+        // paradigm §1 scope: demo→10 族 562 intent allowlist(seed.intent ∈ catalog names); 空 catalog→不过滤(frame legacy 向后兼容)
+        let catalogNames = Set(options.dDomainCatalog.map(\.function.name))
+        let scopedSeeds: [C5SemanticSeed]
+        switch options.scope {
+        case .demo:
+            scopedSeeds = catalogNames.isEmpty ? seeds : seeds.filter { catalogNames.contains($0.intent) }
+        case .full:
+            scopedSeeds = seeds
+        }
+        let catalogByName = Dictionary(options.dDomainCatalog.map { ($0.function.name, $0) }, uniquingKeysWith: { first, _ in first })
+        let eligible = scopedSeeds.filter { !$0.device.isEmpty && !$0.actionPrimitive.isEmpty }
         let grouped = Dictionary(grouping: eligible, by: \.routeTier)
         var generatedByKey: [String: C5GeneratedUtteranceRecord] = [:]
         for record in options.generatedUtteranceRecords {
@@ -2264,12 +2398,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let ruleTarget = max(1, Int(Double(options.targetPositiveRows) * 0.075))
         let fcTarget = max(0, options.targetPositiveRows - ruleTarget)
         var samples: [C5TrainingSample] = []
-        samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, sampleOffset: samples.count))
-        samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, sampleOffset: samples.count))
-        samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
         if samples.count < options.targetPositiveRows {
             let remaining = options.targetPositiveRows - samples.count
-            samples.append(contentsOf: variants(from: eligible, target: remaining, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, sampleOffset: samples.count))
+            samples.append(contentsOf: variants(from: eligible, target: remaining, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
         }
         return Array(samples.prefix(options.targetPositiveRows))
     }
@@ -2280,6 +2414,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
         options: C5TrainingBuildOptions,
         generatedByKey: [String: C5GeneratedUtteranceRecord],
         usedVariantKeys: inout Set<String>,
+        catalogByName: [String: DDomainToolEntry],
         sampleOffset: Int = 0
     ) -> [C5TrainingSample] {
         guard !seeds.isEmpty, target > 0 else {
@@ -2299,7 +2434,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     continue
                 }
                 usedVariantKeys.insert(key)
-                result.append(makePositiveSample(seed: seed, variant: variant, ordinal: sampleOffset + result.count, maskingStage: options.maskingStage, generatedRecord: generated))
+                result.append(makePositiveSample(seed: seed, variant: variant, ordinal: sampleOffset + result.count, maskingStage: options.maskingStage, generatedRecord: generated, surface: options.surface, catalog: options.dDomainCatalog, catalogByName: catalogByName))
             }
             variant += 1
         }
@@ -2338,10 +2473,16 @@ public struct C5TrainingDatasetBuilder: Sendable {
             sample.splitOrigin = "paired_counterfactual_from_train"
             sample.bucket = "paired_counterfactual_refusal"
             sample.expectedToolCalls = []
+            // cut5 真删(claim-vs-reality 铁律1, 修 446 假删灾难 variant): 被移除的目标工具 = positive 的 expectedToolCalls 工具名,
+            // 从 sample.tools 物理删该工具(非只写 metadata removedToolID)。removedName 兼容 frame(tool_call_frame)/D-domain(intent)。
+            let removedName = positive.expectedToolCalls.first?.name ?? "tool_call_frame"
+            sample.tools = positive.tools.filter { Self.toolSchemaName($0) != removedName }
+            // 活样本断言: removedName 真不在 tools(targetToolPresent=false 与产物一致, 防 metadata 假声称)
+            let targetStillPresent = sample.tools.contains { Self.toolSchemaName($0) == removedName }
             sample.noCall = C5NoCallMetadata(
                 counterfactualPairID: positive.sampleID,
-                targetToolPresent: false,
-                removedToolID: "tool_call_frame",
+                targetToolPresent: targetStillPresent,
+                removedToolID: removedName,
                 distractorToolIDs: positive.promptDistractorToolIDs,
                 noCallReason: "paired_counterfactual_removed_target_tool"
             )
@@ -2350,24 +2491,56 @@ public struct C5TrainingDatasetBuilder: Sendable {
         }
     }
 
+    // tool schema dict → function.name(供 cut5 真删比对; nil = 非标准 schema)。
+    private static func toolSchemaName(_ schema: [String: JSONValue]) -> String? {
+        guard case let .object(function)? = schema["function"],
+              case let .string(name)? = function["name"] else {
+            return nil
+        }
+        return name
+    }
+
     private func makePositiveSample(
         seed: C5SemanticSeed,
         variant: Int,
         ordinal: Int,
         maskingStage: C5MaskingStage,
-        generatedRecord: C5GeneratedUtteranceRecord?
+        generatedRecord: C5GeneratedUtteranceRecord?,
+        surface: C5TrainingSurface,
+        catalog: [DDomainToolEntry],
+        catalogByName: [String: DDomainToolEntry]
     ) -> C5TrainingSample {
         let valueAugmentation = C5TrainingRenderer.augmentValue(seed: seed, variant: variant)
         let slotAssignments = C5TrainingRenderer.slotAssignments(seed: seed, variant: variant, value: valueAugmentation.value)
-        let call = C5TrainingToolCall(name: "tool_call_frame", arguments: C5TrainingRenderer.toolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments))
+        // paradigm §1 surface 分流: dDomain→具名工具(name=intent, value 形态编码进名) / frame→旧 generic(strangler 保留)。
+        // 空 catalog = frame legacy 向后兼容(静默); catalog 非空但 intent 缺失 = 铁律5 fail-loud(scope filter 应已 prevent)。
+        let call: C5TrainingToolCall
+        let resolvedTools: [[String: JSONValue]]
+        let distractorIDs: [String]
+        let resolvedEntry: DDomainToolEntry? = (surface == .dDomain && !catalog.isEmpty) ? catalogByName[seed.intent] : nil
+        if surface == .dDomain, !catalog.isEmpty, let entry = resolvedEntry {
+            call = C5TrainingToolCall(
+                name: seed.intent,
+                arguments: C5TrainingRenderer.dDomainToolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments, toolEntry: entry, variant: variant)
+            )
+            let distractors = C5TrainingRenderer.sameFamilyDistractors(target: entry, catalog: catalog, variant: variant)
+            resolvedTools = [C5TrainingRenderer.dDomainToolSchema(entry)] + distractors.schemas
+            distractorIDs = distractors.ids
+        } else {
+            if surface == .dDomain, !catalog.isEmpty {
+                FileHandle.standardError.write(Data("S4_DDOMAIN_MISS intent=\(seed.intent) not in catalog(\(catalog.count)) — fail-loud, scope filter should prevent\n".utf8))
+            }
+            call = C5TrainingToolCall(name: "tool_call_frame", arguments: C5TrainingRenderer.toolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments))
+            let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
+            resolvedTools = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed]) + distractors.schemas
+            distractorIDs = distractors.ids
+        }
         let renderedToolCall = C5TrainingRenderer.renderToolCall(call)
         let assistant = "\n\n" + renderedToolCall
         let localUtterance = C5TrainingRenderer.renderUserUtterance(seed: seed, variant: variant, valueText: valueAugmentation.utteranceValueText, slotAssignments: slotAssignments)
         let utterance = generatedRecord?.utterance ?? localUtterance
         let promptHash = generatedRecord?.promptHash.isEmpty == false ? generatedRecord?.promptHash ?? "" : C6Hash.sha256Hex(Data(utterance.utf8))
         let candidateParentSemanticID = C5TrainingRenderer.candidateParentSemanticID(userUtterance: utterance, renderedToolCall: renderedToolCall)
-        let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
-        let toolCallFrameSchema = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed])
         return C5TrainingSample(
             sampleID: "c5-train-\(String(format: "%05d", ordinal + 1))",
             split: "train",
@@ -2389,8 +2562,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
             maskingStage: maskingStage,
             trainEligible: maskingStage.trainEligible,
             masking: C5MaskingFlags(
-                functionName: !distractors.ids.isEmpty,
-                argumentName: !distractors.ids.isEmpty,
+                functionName: !distractorIDs.isEmpty,
+                argumentName: !distractorIDs.isEmpty,
                 argumentValue: valueAugmentation.didAugment,
                 trainOnTurn: maskingStage != .smokeOnly
             ),
@@ -2405,10 +2578,10 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 C5TrainingMessage(role: "user", content: utterance),
                 C5TrainingMessage(role: "assistant", content: assistant)
             ],
-            tools: toolCallFrameSchema + distractors.schemas,
+            tools: resolvedTools,
             expectedToolCalls: [call],
             noCall: nil,
-            promptDistractorToolIDs: distractors.ids
+            promptDistractorToolIDs: distractorIDs
         )
     }
 }
