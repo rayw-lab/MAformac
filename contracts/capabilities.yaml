@@ -1,3 +1,15 @@
+# ⚠️ HISTORICAL / v1-B-frame-archived（2026-06-23 文档级联，范式翻案）
+# 现行权威 = contracts/semantic-function-contract.jsonl（C1 SSOT，3990 源行级全集）
+#   + docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md（surface 范式权威）。
+# 本文件的 8 个能力（cabin.ac 等）+ tool_schema 名（set_cabin_ac / set_cabin_window 等）= 旧 B-frame 式手写示范，
+#   不是 model-visible surface 的最终形态。范式翻案后：
+#   - model-visible surface = D-domain 具名工具（value 形态编码进工具名，如 adjust_ac_temperature_to_max / _to_number / _by_exp / query_ac_temperature）；
+#     generic frame（tool_call_frame）作 surface 已否决（paradigm §1-§2）。
+#   - canonical IR 仍 device × action_primitive × value（B-frame 式），即「对模型像 D-domain 具名工具，对系统像 device×action IR」。
+#   - D-domain 具名工具目录由 A2 从 semantic-function-contract.jsonl codegen 派生（替 scripts/gen_tool_contract.py 现硬编码 6 工具名）；
+#     工具数未拍待 value-form 实算（10 族 = 191 device / 562 intent / 2159 行 / 54.1%，但 562=intent 非工具数；
+#       source: docs/research/2026-06-22-mvp-10family-device-boundary.md:39（2159/3990=54.1%）+ paradigm §14:228-231；562 = 磊哥 2026-06-23 终拍权威，534 系列已废）。
+# 保留本文件作旧 surface 示范 / eval refs / voice aliases 溯源，勿当权威 surface 派生源。升级目标见 paradigm §15-§17。
 version: 1
 state: active
 source_of_truth: contracts/capabilities.yaml
@@ -5,6 +17,7 @@ notes:
   - "MAformac Phase1 MVP vehicle capability contract."
   - "This file is the single manually maintained source for tool schemas, UI cards, eval refs, trace schema, voice aliases, and LoRA labels."
   - "Generated Swift types and tool_schemas.json are owned by later changes."
+  - "⚠️ HISTORICAL v1-B-frame: tool_schema 名为旧 B-frame 示范；model-visible surface 已翻案为 D-domain 具名工具（见文件头 banner + paradigm §1-§2）。"
 
 supersedes:
   - id: 03-openspec-input

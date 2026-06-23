@@ -4,6 +4,11 @@
 > 本篇回答唯一问题:**这 38 个肩膀,具体怎么拼成一个能跑的端侧 MasterAgent demo。**
 > 生成日期:2026-06-17 · 边界:全文「某车厂」,无客户名/报价/密钥。
 
+> 🔴 **范式演进 banner（2026-06-23 文档级联，finding round-04 补三改点；本文 2026-06-17 早于范式翻案，装配思想仍有效，但下三点须以新权威为准）**：
+> 1. **surface 层演进（generic frame → D-domain 具名工具）**：model-visible surface 已从 generic `tool_call_frame{device,action,value}` 翻案为 **D-domain 具名工具**（value 形态编码进工具名，如 `adjust_ac_temperature_to_max`/`_to_number`/`_by_exp`/`query_ac_temperature`）；generic frame 作 surface 已否决（1.7B 判定面爆炸，θ-α 0/23 根因）。canonical IR 仍 device×action_primitive×value（「对模型像 D-domain 具名工具，对系统像 device×action IR」）。权威 = `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md §1-§2`。
+> 2. **训练/eval/runtime surface 三处同源 enforce（TRN2 议题）**：D-domain 工具 surface 必从上游 A2 codegen **单一源派生**到训练面 / eval(C6) 面 / runtime 推理面，三处异源是 C5 `0/34` 灾难根因（Q05）；不得三处各写一套 surface。
+> 3. **10 族演示 scope 三层边界**：① runtime 演示层 = MVP 10 族（191 device / 562 intent / 2159 行 / 全集 54.1%，空调/座椅/车窗/车门/灯光氛围/屏幕/音量/雨刮/天窗遮阳/香氛，HUD 不做）② 10 族内模糊说靠 LoRA 泛化（implicit 慢路）③ 族外（480 device / 976 intent / 1831 行）走 `unsupported` 优雅兜底，不追全集泛化。LoRA 训练 = 10 族 562 scope **不训全集 3990**（A3 已拍）。口径权威 = `CONTEXT.md` 口径权威表 + `grill-decisions-master.md §0`。
+
 ---
 
 ## 0. 核心认知:38 个不是都进 App,分三类

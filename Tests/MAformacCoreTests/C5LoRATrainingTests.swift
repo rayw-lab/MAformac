@@ -7,6 +7,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(C5RouteTier.derive(fuzzy: true, free: false), .fcL2)
         XCTAssertEqual(C5RouteTier.derive(fuzzy: false, free: true), .fcL3)
         XCTAssertEqual(C5RouteTier.derive(fuzzy: true, free: true), .fcL3)
+        XCTAssertEqual(C5RouteTier.derive(fuzzy: false, free: false, valueType: "EXP"), .ruleL1)
     }
 
     func testBuilderKeepsExecutionTierSeparateFromRouteTier() {
@@ -20,7 +21,56 @@ final class C5LoRATrainingTests: XCTestCase {
 
         XCTAssertEqual(prepared.samples[0].routeTier, .fcL3)
         XCTAssertEqual(prepared.samples[0].executionTier, "L1")
-        XCTAssertEqual(prepared.samples[0].routeTierSource, "fc_flags_normalized")
+        XCTAssertEqual(prepared.samples[0].routeTierSource, "route_deriver_v2_fc_flags_value_type")
+    }
+
+    func testToolCallPayloadRendersNameBeforeArgumentsButKeepsArgumentsCanonical() {
+        let first = C5TrainingToolCall(
+            name: "tool_call_frame",
+            arguments: ["z": .string("last"), "a": .string("first")]
+        )
+        let second = C5TrainingToolCall(
+            name: "tool_call_frame",
+            arguments: ["a": .string("first"), "z": .string("last")]
+        )
+
+        let rendered = C5TrainingRenderer.renderToolCall(first)
+
+        XCTAssertEqual(rendered, "<tool_call>{\"name\":\"tool_call_frame\",\"arguments\":{\"a\":\"first\",\"z\":\"last\"}}</tool_call>")
+        XCTAssertEqual(rendered, C5TrainingRenderer.renderToolCall(second))
+    }
+
+    func testToolContractCompilerDerivesEnumsFromSemanticSeeds() throws {
+        let seeds = [
+            semanticSeed(id: "ac-row", fuzzy: true, free: false, device: "ac", actionPrimitive: "power_on", valueType: "EXP"),
+            semanticSeed(id: "window-row", fuzzy: false, free: false, device: "window", actionPrimitive: "by_percent", slotKeys: ["position"], valueType: "PERCENT")
+        ]
+        let tool = try XCTUnwrap(ToolContractCompiler(seeds: seeds).frameToolSchema.first)
+        let properties = try toolProperties(tool)
+
+        XCTAssertEqual(propertyEnum(properties, "device"), ["ac", "window"])
+        XCTAssertEqual(propertyEnum(properties, "action_primitive"), ["by_percent", "power_on"])
+        XCTAssertEqual(propertyEnum(properties, "value.type"), ["EXP", "PERCENT"])
+        XCTAssertNotNil(properties["position"])
+    }
+
+    func testTrainingSampleUsesSeedLocalContractDerivedSchema() throws {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(id: "ac-row", fuzzy: true, free: false, device: "ac", actionPrimitive: "power_on", valueType: "EXP"),
+                semanticSeed(id: "window-row", fuzzy: false, free: false, device: "window", actionPrimitive: "by_percent", slotKeys: ["position"], valueType: "PERCENT")
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 2, devSelectionRows: 0)
+        )
+        let tool = try XCTUnwrap(prepared.samples.first?.tools.first { functionName($0) == "tool_call_frame" })
+        let properties = try toolProperties(tool)
+
+        XCTAssertEqual(propertyEnum(properties, "device").count, 1)
+        XCTAssertEqual(propertyEnum(properties, "action_primitive").count, 1)
+        XCTAssertEqual(propertyEnum(properties, "value.type").count, 1)
+        XCTAssertLessThan(prepared.samples[0].tools.description.count, 25_000)
     }
 
     func testBuilderProducesRequiredMetadataAndRuleRehearsalRatio() {
@@ -41,7 +91,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(prepared.receipt.failureReceipt.contains("candidate_semantic_reassignment_not_run"))
         XCTAssertGreaterThanOrEqual(prepared.receipt.rehearsalRatio, 0.05)
         XCTAssertLessThanOrEqual(prepared.receipt.rehearsalRatio, 0.10)
-        XCTAssertTrue(prepared.samples.allSatisfy { $0.routeTierSource == "fc_flags_normalized" })
+        XCTAssertTrue(prepared.samples.allSatisfy { $0.routeTierSource == "route_deriver_v2_fc_flags_value_type" })
         XCTAssertTrue(prepared.samples.allSatisfy { !$0.generatorModelID.isEmpty })
         XCTAssertTrue(prepared.samples.allSatisfy { !$0.augmentationParentID.isEmpty })
         XCTAssertTrue(prepared.samples.allSatisfy { !$0.lineageGroupID.isEmpty })
@@ -176,6 +226,33 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(noCalls.allSatisfy { $0.split == "train" })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.targetToolPresent == false })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.counterfactualPairID.isEmpty == false })
+    }
+
+    func testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors() {
+        let seeds = (0..<40).map { semanticSeed(id: "theta-alpha-\($0)", fuzzy: true, free: false) }
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 40,
+                devSelectionRows: 0,
+                refusalRatioTarget: 0,
+                refusalRatioHardCap: 0,
+                includeNoCallCounterfactuals: false
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.refusalRatioTarget, 0)
+        XCTAssertEqual(prepared.receipt.refusalRatioHardCap, 0)
+        XCTAssertEqual(prepared.receipt.refusalRatioObserved, 0)
+        XCTAssertEqual(prepared.receipt.noCallCounterfactualCount, 0)
+        XCTAssertFalse(prepared.samples.contains { $0.assistantPayload.contains("NO_TOOL") })
+        XCTAssertTrue(prepared.samples.allSatisfy { !$0.expectedToolCalls.isEmpty })
+        XCTAssertTrue(prepared.samples.allSatisfy { $0.noCall == nil })
+        XCTAssertGreaterThan(prepared.receipt.promptDistractorCount, 0)
+        XCTAssertTrue(prepared.samples.contains { $0.promptDistractorToolIDs.contains { $0.hasPrefix("irrelevant_navigation_") } })
+        XCTAssertTrue(prepared.receipt.frameSurfaced.contains("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows"))
     }
 
     func testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan() {
@@ -812,7 +889,10 @@ final class C5LoRATrainingTests: XCTestCase {
         fuzzy: Bool,
         free: Bool,
         execTier: String = "L2",
+        device: String = "ac",
+        actionPrimitive: String = "power_on",
         slotKeys: [String] = ["device"],
+        valueType: String = "EXP",
         range: String = "",
         semanticSlots: [String: String] = [:]
     ) -> C5SemanticSeed {
@@ -828,9 +908,44 @@ final class C5LoRATrainingTests: XCTestCase {
             dsProtocol = ",\"ds_protocol\":{\"semantic\":{\"slots\":{\(encodedSlots)}}}"
         }
         let json = """
-        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"ac","action_primitive":"power_on","action_code":"open_ac","intent":"open_ac","service":"airControl","exec_tier":"\(execTier)","fc_flags":{"fuzzy":\(fuzzy),"free":\(free)},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"EXP"},"source_domain":"airControl","source_sheet":"airControl","source_row_no":1,"range":"\(range)"\(dsProtocol)}
+        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"open_ac","intent":"open_ac","service":"airControl","exec_tier":"\(execTier)","fc_flags":{"fuzzy":\(fuzzy),"free":\(free)},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"airControl","source_sheet":"airControl","source_row_no":1,"range":"\(range)"\(dsProtocol)}
         """
         return try! JSONDecoder().decode(C5SemanticSeed.self, from: Data(json.utf8))
+    }
+
+    private func toolProperties(_ tool: [String: JSONValue]) throws -> [String: JSONValue] {
+        guard case let .object(function)? = tool["function"],
+              case let .object(parameters)? = function["parameters"],
+              case let .object(properties)? = parameters["properties"] else {
+            XCTFail("tool schema missing function.parameters.properties")
+            return [:]
+        }
+        return properties
+    }
+
+    private func functionName(_ tool: [String: JSONValue]) -> String? {
+        guard case let .object(function)? = tool["function"],
+              case let .string(name)? = function["name"] else {
+            return nil
+        }
+        return name
+    }
+
+    private func propertyEnum(_ properties: [String: JSONValue], _ key: String) -> [String] {
+        guard case let .object(schema)? = properties[key],
+              case let .array(values)? = schema["enum"] else {
+            return []
+        }
+        return jsonStringArray(values)
+    }
+
+    private func jsonStringArray(_ values: [JSONValue]) -> [String] {
+        values.compactMap { value in
+            guard case let .string(text) = value else {
+                return nil
+            }
+            return text
+        }
     }
 
     private func context() -> C5DataGateRunContext {

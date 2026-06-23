@@ -50,6 +50,9 @@ struct C5TrainingCLI {
         var buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
+            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
+            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
+            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -86,6 +89,9 @@ struct C5TrainingCLI {
         buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
+            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
+            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
+            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -140,7 +146,8 @@ struct C5TrainingCLI {
         let lines = try values.map { value in
             String(decoding: try encoder.encode(value), as: UTF8.self)
         }
-        try (lines.joined(separator: "\n") + "\n").write(to: url, atomically: true, encoding: .utf8)
+        let payload = lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n"
+        try payload.write(to: url, atomically: true, encoding: .utf8)
     }
 
     private static func renderTrainCommand(repoRoot: URL, outputDir: URL, config: C5MLXLoRAConfig) -> String {
@@ -492,9 +499,10 @@ private struct Options {
     var allowRegeneratedOffsetArtifact: Bool
     var requireCandidateDataQualityGate: Bool
     var requireGeneratedUtteranceRecords: Bool
+    var thetaAlphaPositiveOnly: Bool
 
     init(arguments: [String]) throws {
-        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances]"
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only]"
         guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -508,6 +516,7 @@ private struct Options {
         allowRegeneratedOffsetArtifact = false
         requireCandidateDataQualityGate = false
         requireGeneratedUtteranceRecords = false
+        thetaAlphaPositiveOnly = false
         var iterator = arguments.dropFirst(2).makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -541,6 +550,8 @@ private struct Options {
                 requireCandidateDataQualityGate = true
             case "--require-generated-utterances":
                 requireGeneratedUtteranceRecords = true
+            case "--theta-alpha-positive-only":
+                thetaAlphaPositiveOnly = true
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }

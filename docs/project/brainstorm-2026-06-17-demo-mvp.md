@@ -1,5 +1,8 @@
 # MAformac Demo MVP 脑暴记录（2026-06-17）
 
+> ⚠️ **HISTORICAL 快照（2026-06-17）—— 文档级联 banner（2026-06-23）**
+> 本文是立项早期 Demo MVP 脑暴过程记录历史快照（已收敛进 `define-demo-mvp-contract`，后被 C1/C2 契约 SSOT 重构 supersede）。范式翻案后（generic frame → D-domain 具名工具）+ 口径终拍 562，本文涉及的能力路线 / 口径数字部分已过期。**活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md`。正文保留供溯源，勿据此推进。
+
 > `superpowers:brainstorming` 主持,持续追加。收敛后 → `/opsx:propose define-demo-mvp-contract`(S1 建项契约)。
 > 这是脑暴**过程记录**(Q&A + 锁定结论 + 待答),不是最终 spec。
 

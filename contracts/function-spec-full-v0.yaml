@@ -1,4 +1,8 @@
 # MAformac 功能清单 v0 — ⚠️ 参考模板(reference_template),【非 C1 SSOT】
+# ⚠️ HISTORICAL / 过期(文档级联 2026-06-23): 本手工样板平铺仍反映旧 generic-frame 形态。
+#   范式翻案后 model-visible surface = D-domain 具名工具(generic frame 否决),
+#   见 docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md。
+#   仅保留作 codegen schema 参考,勿据此推进 surface;活基线 = CLAUDE.md §9。
 # DO_NOT_USE_AS_C1_SOURCE_OF_TRUTH — C1 真源 = contracts/semantic-function-contract.jsonl
 #   (define-c1c2-contract,源行级全集 JSONL,从冻结快照 codegen 派生 + make verify 守护)。
 #   本文件仅手工样板(空调+座椅),供 codegen schema 设计参考,不作权威、不作覆盖率证明。

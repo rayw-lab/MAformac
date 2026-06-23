@@ -1,5 +1,7 @@
 # SRD — MAformac 三层意图路由架构（事实源 · 防失忆锚点）
 
+> ⚠️ **v2 pending CAS2 grill（2026-06-23 文档级联）**：本文**意图路由三层架构（快路/意图收缩/慢路）仍有效**，但**model-visible surface 已翻案**——慢路 Qwen+LoRA 吐的不再是 generic frame `tool_call_frame{device,action,value}`，而是 **D-domain 具名工具**（value 形态编码进工具名）。canonical IR 仍是 `device × action_primitive × value`（「对模型像 D-domain 具名工具，对系统像 device×action IR」）。本文新增 §1.4「surface framing」+ §5.2「canonical IR / surface / runtime tier 三层模型」记录翻案。surface 落地细节（工具数实算、具名工具目录、受限解码白名单）**待 CAS2 grill 收口** + A2 代码重构落地，本文届时回写。范式权威 = `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`（§1-§17）。
+>
 > **本文地位（最高）**：MAformac demo「大脑」的**架构事实源**。每个新 session **起手必读**（CLAUDE.md §9 已挂指针 + memory `maformac-three-layer-routing-architecture` 指向本文）。
 > **为什么存在**：CC 反复重新理解又反复丢失这套架构（磊哥 2026-06-19「你连续多次失忆」）。架构落成持久权威文档，结构性止血。
 > **OpenSpec 对应**：本文 = `define-intent-routing` change 的 design.md 源 + 全局 SRD（SRD≈specs+capabilities.yaml，ARCH≈design）。**改架构必走 openspec change + 回写本文**。
@@ -59,6 +61,24 @@
 
 ---
 
+## 1.4 Surface framing（模型吐什么 · 范式翻案 2026-06-23）
+
+> ⚠️ **范式翻案（generic frame 否决 → D-domain 具名工具）**。源：第4源真实座舱量产 ground-truth（`docs/research/2026-06-22-top-fc-skill-table-teardown/`，2045 active 具名工具）。权威 = `grill-decisions-amend-paradigm-tool-surface.md §1-§2`。
+
+慢路 Qwen3-1.7B+LoRA **吐的是 D-domain 具名工具调用**，**不是** generic frame `tool_call_frame{device, action, value}`：
+
+| 维度 | ❌ 旧（generic frame，已否决） | ✅ 新（D-domain 具名工具） |
+|---|---|---|
+| 模型吐什么 | 单一 `tool_call_frame{device, action, value}`，value 形态塞进 action 参数枚举 | **具名工具**，value 形态（最值/绝对/相对/查询 × SPOT/EXP）**编码进工具名**（如 `adjust_ac_temperature_to_max` / `_to_number` / `_by_exp` / `query_ac_temperature`） |
+| 判定面 | 单工具内决策 `device×action×value.type×offset` = **判定面爆炸**（θ-α 0/23 根因：1.7B 学不会） | 选对工具即选对 value 形态 → **判定面拆小**，误吸率降 |
+| 受限解码 | GBNF 只能约束 value 字段，约束弱 | 端侧只挂炸场子集工具名 → GBNF 白名单约束强、误吸≈0 |
+
+**为什么 surface 翻案但架构没变**：①「**对模型像 D-domain 具名工具，对系统像 device×action IR**」——模型吐具名工具名，runtime 解析回 canonical IR `device×action_primitive×value`（C1 契约源）执行 mock 端态。② 三层意图路由（快路/意图收缩/慢路）**与 surface 形态正交**——L1 走规则快路、L2-L5 走慢路的分流不变，变的只是**慢路模型吐的格式**（具名工具 vs generic frame）。③ θ-α `0/23` 灾难根因 = generic frame 判定面爆炸（不是路由架构错），D-domain 具名工具是其技术内核解药（详见 §5.2 + paradigm §3）。
+
+🔴 **工具数未拍**：D-domain 具名工具数 = value-form 实算结果（待 CAS2 grill + value-form 实算）；**562 = 10 族 intent 数，非工具数**（10 族 = 191 device / 562 intent / 2159 源行 / 占全集 54.1%；族外 = 480 device / 976 intent / 1831 行）。口径权威 = `grill-decisions-amend-paradigm-tool-surface.md §14`（磊哥 2026-06-23 终拍 562；旧 534/2086/52.3% 系列全废）+ `docs/grill-tournament/cascade-inventory.md §0`。任何文档写「工具数」前必标 `[TBD-工具数待 value-form 实算]`，禁把 562/intent 数当工具数。
+
+---
+
 ## 2. 意图收缩（Intent Narrowing）= 路由心脏
 
 > **一句话定义（一手 wiki）**：意图收缩是**主动拒识路由机制**——通过后处理脚本/小模型，让传统 NLU 在感受词/场景词/模糊说法上**主动弃权**（标 `clarifyTag=implicit`、置信度打 0），**拒掉后路由给慢路 FC**，并带原始说法上下文。
@@ -69,6 +89,11 @@
 3. "收缩"结果 = **流量路由**（引导到 FC，带上下文），不是简单丢弃。
 
 **为什么模糊说法不能堆规则**（磊哥反复强调"多一字少一字"）：感受词/场景词变种**指数级膨胀**（每语种/年龄/方言新说法），扩规则语料**边际成本过高、永远追不上长尾**。正解 = **收缩 NLU 命中、交给会泛化的 Qwen+LoRA**。这就是 demo 的核心价值，也是为什么 **LoRA 必做**。
+
+> 🔴 **泛化范围 = 10 族内泛化 + 族外 unsupported（2026-06-23 翻案，非"兜底全集"）**：慢路 Qwen+LoRA 的泛化目标 = **MVP 10 族内**（空调/座椅/车窗/车门/灯光氛围/屏幕/音量/雨刮/天窗遮阳/香氛）的模糊说→具名工具映射；**族外（10 族之外的设备/能力）走 `unsupported` 优雅兜底**，不追全集 671 device / 3990 行的泛化鲁棒性。
+> - **演示约定收窄输入（最省一刀，磊哥 2026-06-22 终拍）**：现场只说 10 族 + 提前和客户沟通好 → **演示约定直接消除全集泛化兜底需求**（不说族外 → 技术只需 10 族稳定命中）。比任何泛化兜底都强。
+> - **两层 scope（防混层，🔴 2026-06-23 A3 翻案修正，原「训练锚全集」违 A3 已废）**：① **runtime 演示层 = MVP 10 族**（demo 炸场 + C6 测 + 端侧具名工具精做 + 族外 unsupported）；② **LoRA 训练层 = 10 族 562 intent scope**（按 `scope_tier` 拆四类数据：compact positive / unsupported / safety / followup），**不训全集 3990**（A3 已拍：10 族不训全集，族外 unsupported 拒识）。全集 3990 是 canonical IR 派生源 + value-form 模糊说法变体来源，**非训练 scope 本身**。cite: `grill-decisions-amend-paradigm-tool-surface.md §13.A3:126` / `§16:216` / `grill-decisions-master.md §4.1:163` + memory `maformac-l1-vs-training-scope`（⚠️ 勿引 paradigm §6:58/:82 stale「训练全集泛化」，已被 §16:216 supersede）。
+> - clarifyTag 对应：10 族内模糊说 → `implicit`（慢路 FC）；族外可识别但不挂载 → `unsupported` 兜底；危险动作 → `rejected`/安全门（§7）。
 
 **双轨实现**（一手 wiki）：
 - **路径 A 规则后处理**：感受词表（冷/热/闷/吵…约 120 基础词 + 2000 变形）命中即标 implicit。头部说法准≥95%，长尾≤60%。
@@ -114,7 +139,7 @@
 |---|---|---|
 | ⚡ **快路** | 传统 NLU（L1） | 端侧规则 NLU，秒回，mock 执行 |
 | 🔍 **意图收缩 router** | 意图收缩层 | **规则关键词 + embedding 语义路由（22MB/CPU/ms 级），不用 LLM 当 router**；决策快/慢 + 落域 + 拒识 |
-| 🧠 **慢路** | FC（**非 MA**） | **Qwen3-1.7B+LoRA 只产【单跳 ToolCallFrame】+ 窄域"模糊说→意图"映射**（L2-L4）；**受限解码保格式** |
+| 🧠 **慢路** | FC（**非 MA**） | **Qwen3-1.7B+LoRA 只产【单跳调用】+ 窄域"模糊说→意图"映射**（L2-L4）；**受限解码保格式**。🔴 **surface 形态 = D-domain 具名工具**（2026-06-23 翻案，非旧 generic frame `tool_call_frame`，详见 §1.4/§5.2）——"单跳"（single-call，无 agent loop，§12 gate）不变，变的是模型吐的格式 |
 | 🧩 **编排/多步/安全/三态** | ~~MasterAgent~~ → **code** | **DialogueState/state machine + 安全五门 + 三态判断 全在确定性 code，不在模型**（受约束优化，非模型多步推理） |
 
 - ⚠️ **纠正（深度验证 2026-06-19）**：原写"1.7B 演 FC+MA"是**过度索取**——6 流证据证明 1.7B 做不了编排/多步（编排器容量=系统瓶颈，需 70B+）。**1.7B 只当"执行手"（单跳 FC + 模糊映射），"编排脑"移到 code。**
@@ -150,6 +175,24 @@
 
 ---
 
+## 5.2 范式三层模型（canonical IR / model-visible surface / runtime tier · 2026-06-23）
+
+> ⚠️ **范式翻案定稿**。权威 = `grill-decisions-amend-paradigm-tool-surface.md §2`（codex 方向，磊哥同意）。三层分层是为**防混层**——GLM 曾把「① IR = device×action」误推成「② surface 必 generic frame」。
+
+| 层 | 定什么 | 内容 | 状态 |
+|---|---|---|---|
+| **① Canonical IR**（内部表示，系统侧） | runtime 内部如何表示一个能力调用 | `device × action_primitive × value{ref, direct, offset, type}`（从 3990 契约派生；raw Taxonomy「原子能力」就是这层；C1 `semantic-function-contract.jsonl` = SSOT） | ✅ 定（IR 仍是 device×action，**未翻案**） |
+| **② Model-visible surface**（模型吐什么，模型侧） | LoRA 训练 + 慢路推理时模型实际输出的格式 | **D-domain 具名工具**（value 形态编码进工具名，第4源真实座舱坐实；generic frame `tool_call_frame` 作 surface **否决**） | ✅ 坐实（**翻案点**） |
+| **③ Runtime tier**（能执行多少，演示侧） | demo 端侧实际挂载/执行的范围 | MVP **10 族** `mock_execute`（卡片亮暗+TTS）/ 10 族外可识别 `recognized_noop_or_refuse`（unsupported 兜底）/ 越界 `unsupported`；危险动作走安全门 | ✅ 分层（MVP 边界） |
+
+**三层关系链（一句话）**：模型吐 ② D-domain 具名工具名 → runtime 解析回 ① canonical IR（device×action×value）→ 在 ③ runtime tier 内 mock 执行（10 族）或 unsupported 兜底（族外）。「**对模型像 D-domain 具名工具，对系统像 device×action IR，对演示像 10 族 mock 卡片**」。
+
+**与三层意图路由的关系**：①②③ 是 **surface/IR/执行的范式分层**，与 §1 的**三层意图路由（快路/意图收缩/慢路）正交**——前者管「模型吐什么格式、系统怎么表示、demo 执行多少」，后者管「哪些走规则秒回、哪些走 Qwen 慢思考」。慢路（§1 L2-L5）吐的就是 ② D-domain 具名工具；快路（§1 L1）走规则直接产 ① canonical IR（不碰模型、不经 surface）。
+
+**θ-α `0/23` 根因映射（paradigm §3）**：generic frame 让 1.7B 在单工具内决策 `device×action×value 形态` = 判定面爆炸 → 学不会 → 坍缩。② D-domain 具名工具拆小判定面 = θ-α 灾难的技术内核解药（选对工具即选对 value 形态）。
+
+---
+
 ## 6. 与契约层（C1/C2/L1allowlist/risk-policy）的关系
 
 | 契约产物 | 角色 | 与路由架构关系 |
@@ -160,7 +203,7 @@
 | `demo-scenarios.yaml` | **路由 aware showcase** | ⚠️ 每幕必标 **路由路径(快规则/慢Qwen) + clarifyTag + 落域 + 维度**；变体=LoRA/C6 种子，非匹配白名单 |
 | `risk-policy.yaml` | 安全门 | 行驶禁动作(R2 refuse_explain) + 二次确认(R1) |
 
-> **L1allowlist 范围 ≠ 模型训练泛化范围**（memory `maformac-l1-vs-training-scope`）：L1 暂定~5设备是 runtime 表现层；模型吃全集 3990 大范围泛化（C5 LoRA）。
+> **scope 别混（memory `maformac-l1-vs-training-scope` + 🔴 2026-06-23 A3 翻案修正，原「训练层=全集 3990」违 A3 已废）**：① **L1allowlist 精做范围**（runtime 快路精演，暂定~5 设备）⊂ ② **runtime 演示层 = LoRA 训练层 = MVP 10 族 562 intent scope**（端侧具名工具挂载 + C6 测 + 族外 unsupported，191 device / 562 intent / 2159 行 / 全集 54.1%；训练按 `scope_tier` 拆四类数据 compact positive/unsupported/safety/followup，**不训全集 3990**——A3 已拍 10 族不训全集）。**L1 ≠ 10 族**——L1 逐级收窄于 10 族；全集 3990 是 canonical IR 派生源 + value-form 模糊说法变体来源，**非训练 scope**。口径权威见 §1.4（562/2159/54.1%，磊哥 2026-06-23 终拍）；A3 cite `grill-decisions-amend-paradigm-tool-surface.md §13.A3:126` / `§16:216`。
 
 ---
 

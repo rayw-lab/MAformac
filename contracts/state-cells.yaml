@@ -6,6 +6,14 @@
 # 脱敏: 仅座舱通用语义, 不含敏感商业或个人信息
 # 范围: 中文 only（华氏度/多语种暂搁, magnet 2026-06-19 定）
 # ---------------------------------------------------------------------------
+# 🔴 surface 边界（2026-06-23 范式翻案级联，paradigm §1-§2）:
+#   - execution_range / readback 权威属 C2(本文件)，与 model-visible surface 形态【正交】(本文件不定 surface)。
+#   - model-visible surface = D-domain 具名工具（value 形态编码进工具名），非 generic frame tool_call_frame。
+#   - canonical IR = device × action_primitive × value（B-frame 式，本文件 cell 即 IR 层端态）；
+#     即「对模型像 D-domain 具名工具，对系统像 device×action IR」。state cell 不随 surface 形态变。
+#   - cell 与 D-domain 工具映射独立: 一个 D-domain 工具（如 adjust_ac_temperature_to_number）写本文件某 cell（ac.temp_setpoint），
+#     execution_range 仍以本文件为唯一权威，工具名不携带边界。D-domain 工具目录由 A2 从 C1 jsonl codegen 派生。
+# ---------------------------------------------------------------------------
 meta:
   scope: zh-only
   # source_kind 防"三份权威漂移"(C1语义 / C2执行 / 旧样板)
@@ -32,6 +40,8 @@ devices:
   air_conditioner:
     display_zh: 空调
     service: airControl
+    # D-domain 映射(2026-06-23 范式级联): 本 device 的 cell 对应 D-domain 具名工具的 ac_temperature/ac_windspeed 等设备维度;
+    #   工具名(如 adjust_ac_temperature_to_number)由 A2 从 C1 codegen, execution_range 仍以本文件 cell 为唯一权威。
     state_cells:
       - id: ac.power
         display_zh: 空调开关

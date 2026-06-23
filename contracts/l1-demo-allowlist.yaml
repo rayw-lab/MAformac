@@ -5,6 +5,14 @@
 # 粒度: device + primitive + execution_range_cell(→C2)+ required_state_cell_groups + required_followup_transitions
 # device/primitive 对齐 C1 jsonl 实际值(§28 已核); transition_id 一手绑定(§28 已核存在+语义)
 # ---------------------------------------------------------------------------
+# 🔴 D-domain surface 映射(2026-06-23 范式翻案级联, paradigm §1-§2):
+#   本表 (device, primitive) 对 = canonical IR 维度(device×action_primitive); 不是 generic frame tool_call_frame 的参数。
+#   model-visible surface = D-domain 具名工具(value 形态编码进工具名): 同一 device 的不同 primitive 映射到不同具名工具,
+#     例 ac_temperature.adjust_to_number → adjust_ac_temperature_to_number; ac_temperature.increase_by_exp → raise_ac_temperature_by_exp。
+#   即「对模型像 D-domain 具名工具(选对工具=选对 value 形态), 对系统像 device×action IR」。
+#   具名工具目录由 A2 从 C1 jsonl codegen 派生(替 scripts/gen_tool_contract.py 现硬编码 6 工具名); 工具数未拍待 value-form 实算。
+#   allowlist_pending_c2 段同理: C2 cell 补齐后, 该 device primitive 集对应的 D-domain 工具进端侧炸场子集挂载白名单。
+# ---------------------------------------------------------------------------
 meta:
   review_status: reviewed
   reviewed_by: magnet

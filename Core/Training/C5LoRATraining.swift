@@ -6,11 +6,19 @@ public enum C5RouteTier: String, Codable, CaseIterable, Sendable {
     case fcL3 = "fc_l3"
 
     public static func derive(fuzzy: Bool, free: Bool) -> C5RouteTier {
+        derive(fuzzy: fuzzy, free: free, valueType: "")
+    }
+
+    public static func derive(fuzzy: Bool, free: Bool, valueType: String) -> C5RouteTier {
+        let normalizedValueType = valueType.uppercased()
         if free {
             return .fcL3
         }
         if fuzzy {
             return .fcL2
+        }
+        if normalizedValueType == "FREE" {
+            return .fcL3
         }
         return .ruleL1
     }
@@ -184,7 +192,7 @@ public struct C5SemanticSeed: Decodable, Equatable, Sendable {
     }
 
     public var routeTier: C5RouteTier {
-        C5RouteTier.derive(fuzzy: fcFlags.fuzzy, free: fcFlags.free)
+        C5RouteTier.derive(fuzzy: fcFlags.fuzzy, free: fcFlags.free, valueType: value.type)
     }
 
     public var valueStrategy: C5ValueStrategy {
@@ -642,6 +650,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var devSelectionRows: Int
     public var refusalRatioTarget: Double
     public var refusalRatioHardCap: Double
+    public var includeNoCallCounterfactuals: Bool
     public var maxVariantsPerSeed: Int
     public var maskingStage: C5MaskingStage
     public var usesTrainingTokenizerPatch: Bool
@@ -663,6 +672,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         devSelectionRows: Int = 400,
         refusalRatioTarget: Double = 0.10,
         refusalRatioHardCap: Double = 0.20,
+        includeNoCallCounterfactuals: Bool = true,
         maxVariantsPerSeed: Int = 8,
         maskingStage: C5MaskingStage = .trainableV0,
         usesTrainingTokenizerPatch: Bool = false,
@@ -683,6 +693,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.devSelectionRows = devSelectionRows
         self.refusalRatioTarget = refusalRatioTarget
         self.refusalRatioHardCap = refusalRatioHardCap
+        self.includeNoCallCounterfactuals = includeNoCallCounterfactuals
         self.maxVariantsPerSeed = maxVariantsPerSeed
         self.maskingStage = maskingStage
         self.usesTrainingTokenizerPatch = usesTrainingTokenizerPatch
@@ -1722,9 +1733,9 @@ public struct C5PreparedTrainingDataset: Equatable, Sendable {
 
 public enum C5TrainingRenderer {
     public static func renderToolCall(_ call: C5TrainingToolCall) -> String {
-        let payload = C5CanonicalJSONObject.render([
-            "name": .string(call.name),
-            "arguments": .object(call.arguments)
+        let payload = C5CanonicalJSONObject.renderOrdered([
+            ("name", .string(call.name)),
+            ("arguments", .object(call.arguments))
         ])
         return "<tool_call>\(payload)</tool_call>"
     }
@@ -1940,26 +1951,11 @@ public enum C5TrainingRenderer {
     }
 
     public static var toolCallFrameToolSchema: [[String: JSONValue]] {
-        [[
-            "type": .string("function"),
-            "function": .object([
-                "name": .string("tool_call_frame"),
-                "description": .string("Emit exactly one MAformac single-hop ToolCallFrame for offline mock vehicle control."),
-                "parameters": .object([
-                    "type": .string("object"),
-                    "additionalProperties": .bool(true),
-                    "required": .array([.string("device"), .string("action_primitive")]),
-                    "properties": .object([
-                        "device": .object(["type": .string("string")]),
-                        "action_primitive": .object(["type": .string("string")]),
-                        "value.ref": .object(["type": .string("string")]),
-                        "value.direct": .object(["type": .string("string")]),
-                        "value.offset": .object(["type": .string("string")]),
-                        "value.type": .object(["type": .string("string")])
-                    ])
-                ])
-            ])
-        ]]
+        ToolContractCompiler(seeds: []).frameToolSchema
+    }
+
+    public static func toolCallFrameToolSchema(seeds: [C5SemanticSeed]) -> [[String: JSONValue]] {
+        ToolContractCompiler(seeds: seeds).frameToolSchema
     }
 }
 
@@ -1974,7 +1970,9 @@ public struct C5TrainingDatasetBuilder: Sendable {
     ) -> C5PreparedTrainingDataset {
         let positiveSamples = buildPositiveSamples(seeds: seeds, options: options)
         let positiveWithDev = assignDevSelection(samples: positiveSamples, count: options.devSelectionRows)
-        let noCalls = buildNoCallSamples(from: positiveWithDev.filter { $0.split == "train" }, options: options)
+        let noCalls = options.includeNoCallCounterfactuals
+            ? buildNoCallSamples(from: positiveWithDev.filter { $0.split == "train" }, options: options)
+            : []
         let samples = positiveWithDev + noCalls
         let dataGateReceipt = C5DataGateValidator().receipt(
             candidates: samples.map(\.dataGateCandidate),
@@ -2080,6 +2078,17 @@ public struct C5TrainingDatasetBuilder: Sendable {
             leakageViolations: dataGateReceipt.mustNotTrainViolations
         )
         let parity = C5FuseParityGate.evaluate(C5FuseParityInput(dynamicToolCallExact: 0, fusedToolCallExact: 0, quantizedIrrelAcc: 0))
+        var frameSurfaced = [
+            "dev_selection is a checkpoint-selection split, not heldout or release gold",
+            "deterministic_semantic_protocol_v1 is a Step2 dry-run source only; it cannot satisfy Q13 multi-source cloud generation or Q14 semantic judge",
+            "C6 release gate remains final-only; this receipt cannot claim model-quality V-PASS without a real C6 diff",
+            "Mac behavior parity and true-device candidate V-PASS are reported separately",
+            "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
+            "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training"
+        ]
+        if !options.includeNoCallCounterfactuals || options.refusalRatioTarget == 0 {
+            frameSurfaced.append("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows")
+        }
         let receipt = C5TrainingReceipt(
             receiptVersion: "c5-lora-training.v1",
             generatedAt: options.generatedAt,
@@ -2100,14 +2109,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 "stock mlx-lm training has no enable_thinking injection point in tuner datasets path",
                 "assistant content uses double-newline prefix so stock mask offset trains the tool_call span instead of swallowing its first bytes"
             ],
-            frameSurfaced: [
-                "dev_selection is a checkpoint-selection split, not heldout or release gold",
-                "deterministic_semantic_protocol_v1 is a Step2 dry-run source only; it cannot satisfy Q13 multi-source cloud generation or Q14 semantic judge",
-                "C6 release gate remains final-only; this receipt cannot claim model-quality V-PASS without a real C6 diff",
-                "Mac behavior parity and true-device candidate V-PASS are reported separately",
-                "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
-                "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training"
-            ],
+            frameSurfaced: frameSurfaced,
             physicalFields: [
                 "route_tier_source", "route_tier", "utterance_source", "value_strategy", "masking_stage", "train_eligible",
                 "generator_model_id", "generator_call_id", "semantic_judge_model_id", "semantic_judge_call_id", "prompt_hash",
@@ -2325,7 +2327,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
     }
 
     private func buildNoCallSamples(from trainPositives: [C5TrainingSample], options: C5TrainingBuildOptions) -> [C5TrainingSample] {
-        guard !trainPositives.isEmpty else {
+        guard !trainPositives.isEmpty, options.refusalRatioTarget > 0, options.refusalRatioHardCap > 0 else {
             return []
         }
         let targetCount = Int((Double(trainPositives.count) * options.refusalRatioTarget / (1 - options.refusalRatioTarget)).rounded())
@@ -2348,7 +2350,13 @@ public struct C5TrainingDatasetBuilder: Sendable {
         }
     }
 
-    private func makePositiveSample(seed: C5SemanticSeed, variant: Int, ordinal: Int, maskingStage: C5MaskingStage, generatedRecord: C5GeneratedUtteranceRecord?) -> C5TrainingSample {
+    private func makePositiveSample(
+        seed: C5SemanticSeed,
+        variant: Int,
+        ordinal: Int,
+        maskingStage: C5MaskingStage,
+        generatedRecord: C5GeneratedUtteranceRecord?
+    ) -> C5TrainingSample {
         let valueAugmentation = C5TrainingRenderer.augmentValue(seed: seed, variant: variant)
         let slotAssignments = C5TrainingRenderer.slotAssignments(seed: seed, variant: variant, value: valueAugmentation.value)
         let call = C5TrainingToolCall(name: "tool_call_frame", arguments: C5TrainingRenderer.toolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments))
@@ -2359,6 +2367,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let promptHash = generatedRecord?.promptHash.isEmpty == false ? generatedRecord?.promptHash ?? "" : C6Hash.sha256Hex(Data(utterance.utf8))
         let candidateParentSemanticID = C5TrainingRenderer.candidateParentSemanticID(userUtterance: utterance, renderedToolCall: renderedToolCall)
         let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
+        let toolCallFrameSchema = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed])
         return C5TrainingSample(
             sampleID: "c5-train-\(String(format: "%05d", ordinal + 1))",
             split: "train",
@@ -2372,7 +2381,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             candidateCanonicalSemanticID: seed.canonicalSemanticID,
             candidateDedupeGroupID: seed.dedupeGroupID,
             expectedToolCallSignature: C6Hash.sha256Hex(Data(renderedToolCall.utf8)),
-            routeTierSource: "fc_flags_normalized",
+            routeTierSource: "route_deriver_v2_fc_flags_value_type",
             routeTier: seed.routeTier,
             executionTier: seed.execTier,
             utteranceSource: generatedRecord == nil ? .singleTurnSeed : .llmAugmented,
@@ -2396,7 +2405,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 C5TrainingMessage(role: "user", content: utterance),
                 C5TrainingMessage(role: "assistant", content: assistant)
             ],
-            tools: C5TrainingRenderer.toolCallFrameToolSchema + distractors.schemas,
+            tools: toolCallFrameSchema + distractors.schemas,
             expectedToolCalls: [call],
             noCall: nil,
             promptDistractorToolIDs: distractors.ids
@@ -2409,6 +2418,13 @@ private enum C5CanonicalJSONObject {
         let keys = object.keys.sorted()
         let body = keys.map { key in
             "\"\(escape(key))\":\(renderValue(object[key] ?? .null))"
+        }.joined(separator: ",")
+        return "{\(body)}"
+    }
+
+    static func renderOrdered(_ pairs: [(String, JSONValue)]) -> String {
+        let body = pairs.map { key, value in
+            "\"\(escape(key))\":\(renderValue(value))"
         }.joined(separator: ",")
         return "{\(body)}"
     }

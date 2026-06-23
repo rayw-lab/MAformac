@@ -1,6 +1,0 @@
-{
-  "rule": "S2 accepts only true iPhone/iOS device GDN metrics; simulators and Mac are not accepted.",
-  "source_log": "Reports/qwen35-2b-spike-20260620-192146/xctrace-devices-s2.log",
-  "status": "blocked_env_no_true_iphone",
-  "true_ios_devices": []
-}

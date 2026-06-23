@@ -1,8 +1,20 @@
 # Qwen tool-call 格式单一源（#39，Q2 磊哥定）
 # C3 runtime 已在 dev/spike-e3 锁定 mlx-swift-lm .json format；
 # C5 训练样本生成与 C6 bench harness 只引用本文件，禁各写一套，防 train/runtime/bench silent 失真。
+# ---------------------------------------------------------------------------
+# 🔴 D-domain surface（2026-06-23 范式翻案级联，paradigm §1-§2 + §14）:
+#   - model-visible surface = D-domain 具名工具（value 形态编码进工具名），非 generic frame tool_call_frame。
+#   - thinking: false（enable_thinking=false）与 surface 形态无关——无论 generic frame 还是 D-domain 具名工具，
+#     端侧都关 thinking 直出 tool_call wrapper；surface 翻案不改本 wrapper/thinking 约定。
+#   - tools 字段（端侧挂载的 D-domain 具名工具全集）= A2 codegen 产出后回填，[TBD-工具数待 value-form 实算]
+#     （10 族 = 191 device / 562 intent，但 562=intent 非工具数；562 = 磊哥 2026-06-23 终拍，source: paradigm §14:228）。
+#     现 scripts/gen_tool_contract.py 仍硬编码 6 旧 B-frame 工具名（set_cabin_ac 等），A2 后改 codegen 全量 D-domain 目录。
+#   - parser extraction（runtime_parser: json）需对 D-domain 工具名做白名单约束（受限解码 GBNF 只吐挂载 ~炸场子集），
+#     extraction 规则随 tools 字段一并由 A2 落定。
+# ---------------------------------------------------------------------------
 model_family: qwen3
 runtime_parser: json
 thinking: false
 wrapper: tool_call
 arguments_shape: json_object
+# tools: [TBD-A2 codegen D-domain 具名工具目录回填; 工具数待 value-form 实算, 禁编数字]
