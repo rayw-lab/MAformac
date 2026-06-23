@@ -129,3 +129,11 @@
 6. **claim-vs-reality「标 modify ≠ 已 modify」(执行维度,第10变体)**:inventory 标 `verdict=modify`(声称要改)vs 执行 phase 实际没改(CONTEXT/integration-blueprint 仍旧版)= 声称层 vs 事实层脱节,审计 catch。→ 执行后加「inventory 标改 vs git diff 实改」对账 gate(loopaudit 收敛定律 ② 同源)。
 
 7. **🟢 主线程亲核 > 信 workflow loopaudit(STOPPED 后下钻发现核心已干净)**:megarun loopaudit 报 STOPPED@4,主线程亲核发现 r4 的 3 执行 gap 实际已被 round-04 补执行、paradigm §14/§15 已标废口径边注、562 全仓权威 —— **STOPPED 部分是审计员误报标废 context**。→ workflow 审计结论(尤同 family + 出过 bug)**主线程必下钻亲核**:STOPPED 不等于真有那么多未解(不假 clean 双向:也不假 STOPPED)。
+
+## H. A2 代码重构 ultracode 执行教训(2026-06-23, code-only 范式对齐长跑)
+
+1. **🔴 局部豁免扩大成整体豁免(漏 ultracode 审计线,磊哥两次 catch)**:派单 §I.2 分级「S0 口径=主线程亲手」是【执行线】的局部豁免,我把它扩大成「整个 S0 step 不用 ultracode 编排」→ 漏了派单 §D 要求的【审计线 subagent】(每 step 独立线:执行线 + 审计线 + 主线程亲核 + step gate 是整体合取)。磊哥「为啥没启动 ultracode workflow / 派单很明显要求」两次 catch。→ **派单 step 模式是整体合取,某条线豁免(执行线主线程亲手)≠ 整个 step 豁免编排;审计线/主线程亲核每 step 必在,不因执行线亲手而省**。元层 = 「A 维度局部豁免」被惯性扩成「所有维度豁免」,与 claim-vs-reality「派生表征当一手」同源(把「执行线分级」当「step 编排整体分级」)。
+
+2. **🟡 审计线 subagent 必后台跑(run_in_background=true)**:派审计线 Agent 前台跑,主线程干等 340s 浪费(磊哥 catch「前台卡着浪费效率」)。审计线本就与执行/主线程亲核【并进】,该 background → 主线程并行做亲核/下一步准备,Agent 完成再收 verdict。→ **凡「并行于主线程」的 subagent(审计线/独立调研)一律 run_in_background=true,只有「主线程必须等其结果才能继续」才前台**。
+
+3. **🔴 口径精确分类用「多重约束自验证」锁定成员(S0 191 allowlist 方法论)**:671 device 物理化成 10 族 191 explicit allowlist,用每族 (device,intent,行) **三重约束**自验证——三数同时对齐权威(191/562/2159 + 族外 480/976/1831)的概率极低,故三数全 match = 成员高置信正确(远比只对齐 device count 可靠;count 对但行差 = 成员错的强信号,如空调「个性化」=other_personalize_mode 漏选致行差 14)。方法:boundary §1 语义规则 → explicit allowlist → 三数迭代收敛(哪族 off 看 diff 精确换成员)+ fail-closed 脚本(sum≠191/562/2159 拒 emit)防 jsonl 漂移。→ **口径精确分类(易「count 对成员错」)必用多重正交约束自验证锁定,物理化成可机械复算脚本(SSOT=手写 allowlist + fail-closed 验证),不留手工清单**。这块主线程亲手(不派 finder)是对的——精确分类派 finder 各分各的会不一致(claim-vs-reality 避编造)。
