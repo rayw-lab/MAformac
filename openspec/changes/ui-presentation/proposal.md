@@ -1,5 +1,5 @@
 > ⚠️ DRAFT SKELETON（2026-06-23 起草，标 DRAFT 待人审 propose）
-> 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。
+> 本 change：proposal/design/tasks 已填实；specs delta 已填实（4 Req / 23 Scenario，`openspec validate --strict` 绿，2026-06-24 磊哥 agree）。Why/What Changes 指向已拍决策。
 > **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码。** 决策权威源见下。
 >
 > 🟢 **非 DEFERRED（区别于 `define-demo-golden-run-and-voice`）**：本 change = **UIUE 链路 A 前端视觉/状态消费契约**，是与 A2/LoRA（链路 B）**并行活跃**的轨（worktree `uiue/visual-ssot-state-consume`），**不延后**。A2 只产 D-domain 后端 surface，本 change 管「看得见摸得着」那一层。Fork2 已拍：UIUE 视觉/卡片/7 态消费**拆独立 capability**（非塞进 demo-golden-run）。

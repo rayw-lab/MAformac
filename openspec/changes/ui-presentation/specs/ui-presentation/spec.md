@@ -1,57 +1,160 @@
 <!--
-DRAFT SKELETON (2026-06-23) — delta 占位待补，人审定 propose 时细化 Requirement/Scenario。
-本 delta ADDED 新 capability `ui-presentation`（target: openspec/specs/ui-presentation/spec.md，new_file）。
-方向锚（grill-master §3 D1-D7 + U1-U31 + 11 复议 + design.md AD-1~AD-7）：
-  - AD-1 7 态穷尽 switch + 四态分开（U10/D7）。
-  - AD-2 ui_value_type 派生 + enum+switch 非 AnyView（D3/U26）。
-  - AD-3 Grid + matchedGeometry gated（D5）。
-  - AD-5 双端两独立实例 + TransportKind{none,bonjour}（D4）。
-  - AD-6 Liquid Glass surface_role + tokens base #121212（U2/U7/U11）。
-消费端态枚举 DemoVisualState（DemoVehicleStateStore:17-25），不碰模型/LoRA。
+PROPOSE-READY (2026-06-24) — Scenario 已填实（磊哥拍 A：晶体化 D1-D7 已拍决策，不引入新决策；CC0）。
+本 delta ADDED 新 capability `ui-presentation`（target: openspec/specs/ui-presentation/spec.md, new_file）。
+边界：只消费端态枚举 DemoVisualState（Core/State/DemoVehicleStateStore.swift:17-25）+ UI 消费侧派生，不碰模型/LoRA/producer 契约。
+色值：引 docs/design/tokens.md §2 的「色彩语义分类」（satisfied/changing/clarify/unsupported/safety/crash 语义角色），不锁具体 hex（hex 留 Phase 3 实渲微调冻结）。
+方向锚：grill-master §3 D1-D7 + U1-U31 + 11 复议 + design.md AD-1~AD-7。
 -->
 
 ## ADDED Requirements
 
 ### Requirement: ContentView SHALL render all 7 DemoVisualState cases distinctly with four-state separation
 
-UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown）穷尽 `@ViewBuilder switch`，每态独立渲染分支；SHALL NOT 用 `== .satisfied ? a : b` 把 7 态压成二值；四态 SHALL 分开渲染（`blocked_with_alternative` 琥珀 clarify ≠ `blocked_hard` 灰 unsupported ≠ `unsafe` 红 safety ≠ `unknown` 灰 crash）；色值 SHALL 从 `docs/design/tokens.md §2` 取。
+UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown）穷尽 `@ViewBuilder switch`，每态独立渲染分支；SHALL NOT 用 `== .satisfied ? a : b` 把 7 态压成二值，SHALL NOT 用 `default:` 兜底吞态；四态 SHALL 分开渲染（`blocked_with_alternative` 琥珀 clarify ≠ `blocked_hard` 灰 unsupported ≠ `unsafe` 红 safety ≠ `unknown` 灰 crash）；色彩语义 SHALL 从 `docs/design/tokens.md §2` 取（语义分类，不锁 hex）。
 
-> DRAFT 占位 — Requirement/Scenario 待人审 propose 时按 grill-master §3 D7 + design.md AD-1 填实。
+#### Scenario: normal renders dim idle card
+- **GIVEN** 一张卡片 `visualState == .normal`
+- **WHEN** ContentView 渲染该卡片
+- **THEN** 渲染为「灰蓝静默」（tokens.md §2 `normal` 语义：未激活中性），无辉光、无脉冲、无告警色
 
-#### Scenario: seven states render distinctly (placeholder)
-- **GIVEN** DRAFT 骨架（占位 Scenario，待 propose 填实）
-- **WHEN** 人审定 propose
-- **THEN** 在此填实 Scenario（7 态各有可区分视觉、clarify 不渲成 red、unsupported 不渲成 crash、消费 guardReason/readbackResult）
+#### Scenario: satisfied renders glow breathing card
+- **GIVEN** `visualState == .satisfied`
+- **WHEN** 渲染
+- **THEN** 渲染「青紫辉光 + 呼吸动效」（tokens.md §2 `satisfied` 语义：已激活强调）
+- **AND** 视觉区别于 `changing` 的不停脉冲（呼吸=稳定已完成，脉冲=执行中）
 
-### Requirement: card rendering SHALL derive ui_value_type and use static enum switch
+#### Scenario: changing renders pulsing card
+- **GIVEN** `visualState == .changing`
+- **WHEN** 渲染
+- **THEN** 渲染「cyan 脉冲」（tokens.md §2 `changing` 语义：执行中过渡）
+- **AND** 表达「正在执行」而非「已完成」，不与 `satisfied` 坍缩
 
-卡片渲染 SHALL 用 `ui_value_type`（数据 `type` 的派生字段，数据 type≠UI value.type）经 `enum + switch` 穷尽渲染；SHALL NOT 用 `AnyView`；卡片 SHALL 按 10 族 `family_card_id` 布局（非 191 格）；高频排序 SHALL 用 `generated/family-device-allowlist.json` 的 `row_count`（产品约定收窄）。
+#### Scenario: blocked_with_alternative renders amber clarify, never red or crash
+- **GIVEN** `visualState == .blocked_with_alternative`（clarify 智能澄清，demo 卖点）
+- **WHEN** 渲染
+- **THEN** 渲染「琥珀提示」（tokens.md §2 clarify 语义色）
+- **AND** SHALL NOT 渲染成 `unsafe` 的红 或 `unknown`(crash) 的灰错误 —— clarify 是卖点不是错误
 
-> DRAFT 占位 — 待 propose 时按 design.md AD-2 + C8/C11 复议填实（ui_value_type 候选 dial/toggle/stepper/percent/badge 的派生规则 + spike 实测 AnyView 性能）。
+#### Scenario: blocked_hard renders gray lock unsupported, never red
+- **GIVEN** `visualState == .blocked_hard`（unsupported 优雅拒识）
+- **WHEN** 渲染
+- **THEN** 渲染「灰锁」（tokens.md §2 unsupported 语义）
+- **AND** SHALL NOT 渲染成红 或 琥珀 —— 不支持是优雅拒识，不是告警/澄清
 
-#### Scenario: cards render via ui_value_type switch (placeholder)
-- **GIVEN** DRAFT 骨架
-- **WHEN** 人审定 propose
-- **THEN** 在此填实 Scenario（ui_value_type 派生映射、enum switch 穷尽、10 族布局、row_count 排序）
+#### Scenario: unsafe renders red safety boundary as the only red state
+- **GIVEN** `visualState == .unsafe`（安全门拒识）
+- **WHEN** 渲染
+- **THEN** 渲染「警示红描边」（tokens.md §2 safety 语义）
+- **AND** 红 SHALL 仅用于此态——安全门是唯一该用红的态
+
+#### Scenario: unknown renders neutral gray crash, distinct from unsafe
+- **GIVEN** `visualState == .unknown`（crash/真错误）
+- **WHEN** 渲染
+- **THEN** 渲染「中性灰 + 错误图标」（tokens.md §2 crash 语义）
+- **AND** SHALL NOT 渲染成 `unsafe` 的安全红 —— 系统错误区别于安全拒识
+
+#### Scenario: exhaustive switch, no default fallback, no binary collapse
+- **GIVEN** ContentView 消费 `DemoVisualState`
+- **WHEN** 编译与渲染
+- **THEN** 用穷尽 `@ViewBuilder switch`，7 态各有独立 case 分支
+- **AND** SHALL NOT 有 `default:` 兜底吞态，SHALL NOT 用 `== .satisfied ? a : b` 把 7 态压成二值
+
+#### Scenario: four result states are pairwise visually distinct
+- **GIVEN** clarify(`blocked_with_alternative`) / unsupported(`blocked_hard`) / safety(`unsafe`) / crash(`unknown`) 四个结果态
+- **WHEN** 渲染
+- **THEN** 四态两两视觉可区分（琥珀 ≠ 灰锁 ≠ 红 ≠ 中性灰）
+- **AND** SHALL NOT 任意两态坍缩到同一渲染
+
+#### Scenario: consume trace fields for reason text
+- **GIVEN** store 提供 `guardReason` / `readbackResult`
+- **WHEN** 渲染 clarify/unsupported/safety 态的提示文案
+- **THEN** UI 消费 `guardReason`/`readbackResult` 呈现原因，SHALL NOT 硬编码文案
+
+### Requirement: card value rendering SHALL derive ui_value_type on the consumer side and use a static enum switch
+
+卡片值渲染 SHALL 在 UI 消费侧从 `ui_value_type`（enum: dial/toggle/stepper/percent/badge）派生显示形态，SHALL NOT 解析 unit string（如 "℃"/"档"/"%"）决定渲染；SHALL 用 `enum + switch(ui_value_type)` 穷尽渲染，SHALL NOT 用 `AnyView`；卡片 SHALL 按 10 族 `family_card_id` 布局（非 191 格）。本 capability 是消费契约，SHALL NOT 要求 producer/contract 新增字段。
+
+#### Scenario: ui_value_type derived on consumer side without reading unit string
+- **GIVEN** 一张 state cell（含 value + unit 原始数据）
+- **WHEN** UI 决定渲染形态
+- **THEN** 从消费侧 `ui_value_type` enum 派生显示形态，SHALL NOT 解析 unit string 决定渲染
+- **AND** 派生逻辑在 ContentView 上层消费侧，producer/契约不被本 capability 约束、不新增字段
+
+#### Scenario: each ui_value_type has a dedicated render branch
+- **GIVEN** `ui_value_type ∈ {dial, toggle, stepper, percent, badge}`
+- **WHEN** 渲染卡片值
+- **THEN** 每个 ui_value_type 有独立渲染分支（dial=环形仪表连续值 / toggle=开关 / stepper=档位 / percent=百分比 / badge=状态徽章）
+
+#### Scenario: static enum switch, no AnyView
+- **GIVEN** 卡片值渲染
+- **WHEN** 编译
+- **THEN** 用 `enum + switch(ui_value_type)` 保静态类型与高效 diff
+- **AND** SHALL NOT 用 `AnyView`（破类型 diff / 渲染慢）
+
+#### Scenario: cards laid out by 10-family family_card_id with row_count ordering
+- **GIVEN** 10 族卡片
+- **WHEN** 布局排序
+- **THEN** 卡片按 10 族 `family_card_id` 布局（非 191 格 / 非旧 102）
+- **AND** 高频排序用 `generated/family-device-allowlist.json` 的 `row_count`（A2 产物，UIUE rebase main 读；产品约定收窄，不引入量产 priority 字段）
 
 ### Requirement: layout and transitions SHALL use Grid and macOS-available matchedGeometry with availability guards
 
-布局 SHALL 用 `Grid` 固定列（非 `LazyVGrid(.adaptive)`）；状态切换动效 SHALL 用 `matchedGeometryEffect`（macOS 可用）而非 `navigationTransition.zoom`（macOS unavailable）；`matchedGeometry` SHALL 作 gated upgrade（默认 `opacityScale` 兜底，按 promotion_criteria 升级）；iOS18 API（含 MeshGradient）SHALL 用 `#available` + iOS17 fallback。
+布局 SHALL 用 `Grid` 固定列（SHALL NOT 用 `LazyVGrid(.adaptive)`）；状态切换动效 SHALL 用 `matchedGeometryEffect`（macOS 可用）而非 `navigationTransition.zoom`（macOS unavailable）；`matchedGeometryEffect` SHALL 作 gated upgrade（默认 `opacityScale` 兜底，按 promotion_criteria 升级）；iOS18 API（含 MeshGradient/glassEffect）SHALL 用 `#available` + iOS17 fallback，SHALL NOT 裸 require iOS18。
 
-> DRAFT 占位 — 待 propose 时按 design.md AD-3 + D5 promotion_criteria 5 条填实。
+#### Scenario: fixed-column Grid, not adaptive LazyVGrid
+- **GIVEN** 卡片网格布局
+- **WHEN** 布局
+- **THEN** 用 `Grid` 固定列
+- **AND** SHALL NOT 用 `LazyVGrid(.adaptive(...))`（避免列数随窗口漂移破视觉稳定）
 
-#### Scenario: Grid layout and gated transition (placeholder)
-- **GIVEN** DRAFT 骨架
-- **WHEN** 人审定 propose
-- **THEN** 在此填实 Scenario（Grid 固定列、matchedGeometry gated、availability 守卫、低端机 opacityScale 兜底）
+#### Scenario: matchedGeometry as gated upgrade with opacityScale fallback
+- **GIVEN** 状态切换动效
+- **WHEN** 默认渲染
+- **THEN** 默认用 `opacityScale` 兜底动画
+- **AND** `matchedGeometryEffect` 仅作 gated upgrade，按 promotion_criteria 满足才升级；低端机/低电量回落 opacityScale，态仍可读
 
-### Requirement: presentation SHALL run as two independent on-device instances with token-driven visuals
+#### Scenario: iOS18 APIs guarded by #available with iOS17 fallback
+- **GIVEN** iOS18 API（含 MeshGradient / glassEffect）
+- **WHEN** 渲染
+- **THEN** 一律 `#available` 守卫 + iOS17 fallback
+- **AND** SHALL NOT 裸 require iOS18（iOS17 设备走 fallback 不崩）
 
-demo SHALL 作 Mac + iPhone 两独立纯端侧实例（iPhone 脱机独立全功能）；transport SHALL 为 `TransportKind { none, bonjour }`（无 sharedFile 镜像）；视觉值 SHALL 只从 `docs/design/tokens.md` 取（base `#121212`，禁手填 hex）；Liquid Glass SHALL 只用功能层 `control_glass`（mic/顶栏），内容卡 SHALL 用 `content_glow` 自研 glow（非 system glass）。
+#### Scenario: navigationTransition.zoom not used because macOS unavailable
+- **GIVEN** 跨视图缩放过渡需求
+- **WHEN** 选 API
+- **THEN** 用 macOS 可用的 `matchedGeometryEffect`
+- **AND** SHALL NOT 用 `navigationTransition.zoom`（macOS unavailable）
 
-> DRAFT 占位 — 待 propose 时按 design.md AD-5/AD-6 + D4 + U2/U7/U11 填实。
+### Requirement: presentation SHALL run as two independent on-device instances with token-driven visuals and functional-layer-only Liquid Glass
 
-#### Scenario: two independent instances, token-driven (placeholder)
-- **GIVEN** DRAFT 骨架
-- **WHEN** 人审定 propose
-- **THEN** 在此填实 Scenario（iPhone 脱机独立演示、TransportKind 切换、视觉值单源 tokens、Liquid Glass 仅功能层）
+demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实例，iPhone 脱机独立全功能；transport SHALL 为 `TransportKind { none, bonjour }`（无 sharedFile 镜像）；两端核心展示语义（7 态 + 卡片）SHALL 统一、SHALL NOT 为 macOS 单独豁免（动效/glass 层按 `#available` 双通道降级非豁免）；视觉值 SHALL 只从 `docs/design/tokens.md` 取（色彩语义分类，禁手填 hex）；Liquid Glass SHALL 只用功能层 `control_glass`（mic/顶栏），内容卡 SHALL 用 `content_glow` 自研 glow。
+
+#### Scenario: both macOS and iOS targets render all 7 states (core semantics not waived)
+- **GIVEN** macOS target (MAformacMac) AND iOS target (MAformacIOS)
+- **WHEN** 各自渲染
+- **THEN** 两端都渲染全 7 态 + 卡片核心展示语义
+- **AND** SHALL NOT 为 macOS 单独豁免某态/某卡片（双端展示语义统一）
+
+#### Scenario: motion and glass degrade per #available as dual-channel, not core waiver
+- **GIVEN** 平台 API 差异（MeshGradient/glassEffect/matchedGeometry 可用性按平台/版本不同）
+- **WHEN** 某 API 在某端不可用
+- **THEN** 动效/glass 层按 `#available` 双通道降级（颜色/数值/图标承载态，动画锦上添花），态语义仍可读
+- **AND** 这是双通道降级，SHALL NOT 当作核心展示语义豁免
+
+#### Scenario: iPhone runs standalone offline
+- **GIVEN** iPhone 实例
+- **WHEN** 断网 / 无 Mac
+- **THEN** iPhone 脱机独立全功能（端态自包含），transport = `TransportKind { none, bonjour }`，无 sharedFile 镜像
+- **AND** `bonjour` 仅可选联动，非脱机独立的必需依赖
+
+#### Scenario: visual values come from tokens semantic classes, not hardcoded hex
+- **GIVEN** 任一视觉渲染
+- **WHEN** 取色/字/间距
+- **THEN** 只从 `docs/design/tokens.md` 取（引「色彩语义分类」：satisfied/changing/clarify/unsupported/safety/crash 语义角色）
+- **AND** SHALL NOT 在 view 里手填 hex；具体 hex 由 tokens.md 单源提供，Phase 3 实渲可微调冻结，本 spec 不锁死 hex
+
+#### Scenario: Liquid Glass only on functional control layer
+- **GIVEN** Liquid Glass 用法
+- **WHEN** 决定 surface_role
+- **THEN** 仅功能层 `control_glass`（mic 按钮/顶栏）用 Liquid Glass，内容卡用 `content_glow`（自研 cyan/violet glow，非 system glass）
+- **AND** SHALL NOT 用全局主题开关式 glass（内容层 glass = 整屏糊 + HIG 违规 + 旧机发热）

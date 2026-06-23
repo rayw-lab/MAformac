@@ -244,6 +244,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MAformac;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MAformac 需要使用麦克风进行车控语音演示（端侧离线）";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "MAformac 需要使用语音识别将语音指令转为车控操作（端侧离线，不上传）";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -270,6 +272,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MAformac;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MAformac 需要使用麦克风进行车控语音演示（端侧离线）";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "MAformac 需要使用语音识别将语音指令转为车控操作（端侧离线，不上传）";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -297,6 +301,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MAformac;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MAformac 需要使用麦克风进行车控语音演示（端侧离线）";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "MAformac 需要使用语音识别将语音指令转为车控操作（端侧离线，不上传）";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -327,6 +333,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MAformac;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MAformac 需要使用麦克风进行车控语音演示（端侧离线）";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "MAformac 需要使用语音识别将语音指令转为车控操作（端侧离线，不上传）";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
