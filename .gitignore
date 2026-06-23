@@ -56,7 +56,9 @@ __pycache__/
 .claude/settings.local.json
 
 # 脏区清理 2026-06-23: θ-α 失败run 2.8G + 工具临时(不入仓; 失败锚点 0/23 已在 grill-decisions 文档)
-Reports/
+# Reports/* 忽略所有 runtime 报告, 仅保 .gitkeep(SwiftPM exclude 解析, 防 clean checkout Invalid Exclude warning)
+Reports/*
+!Reports/.gitkeep
 .playwright-mcp/
 .dispatch/
 .cc-connect/

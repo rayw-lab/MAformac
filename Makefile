@@ -21,7 +21,7 @@ GENERATED_DOMAIN := \
 	generated/strangler_map.json \
 	generated/rendered_tools_text
 
-.PHONY: verify verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface diff test clean-venv
+.PHONY: verify verify-all swift-test verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -30,6 +30,13 @@ GENERATED_DOMAIN := \
 	touch .venv/.deps.stamp
 
 verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface diff test
+
+# Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
+# verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
+verify-all: verify swift-test
+
+swift-test:
+	swift test
 
 # pG1 §35 文档级联 cross-section（基线文档组段间一致性, 纯 stdlib 不需 venv/raw）
 verify-cross-section:
@@ -49,6 +56,7 @@ verify-generated: .venv/.deps.stamp verify-refs test
 test: .venv/.deps.stamp
 	$(PYTHON) scripts/test_quarantine.py
 	$(PYTHON) scripts/test_fc_flags.py
+	$(PYTHON) scripts/test_tool_name_sanitize.py
 
 verify-source: .venv/.deps.stamp
 	$(PYTHON) scripts/freeze_snapshot.py --check

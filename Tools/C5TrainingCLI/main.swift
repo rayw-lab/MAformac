@@ -170,7 +170,7 @@ struct C5TrainingCLI {
 
     private static func renderTrainCommand(repoRoot: URL, outputDir: URL, config: C5MLXLoRAConfig) -> String {
         """
-        /opt/homebrew/opt/python@3.13/bin/python3.13 \\
+        \(pythonExecutable) \\
           \(repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path) \\
           --train \\
           --model \(config.model) \\
@@ -365,7 +365,7 @@ struct C5TrainingCLI {
     ) throws -> C5MaskOffsetTokenArtifact {
         let script = repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mask_offset_fixture.py")
         let output = run(
-            "/opt/homebrew/opt/python@3.13/bin/python3.13",
+            pythonExecutable,
             [
                 script.path,
                 "--model", modelDir.path,
@@ -381,6 +381,11 @@ struct C5TrainingCLI {
         var artifact = try JSONDecoder().decode(C5MaskOffsetTokenArtifact.self, from: data)
         artifact.artifactSHA256 = try C6Hash.fileHash(url: outputURL)
         return artifact
+    }
+
+    // GLM 审计 P2: python 解释器路径改环境变量 MAFORMAC_PYTHON(可移植), fallback 保留本机 homebrew python3.13。
+    private static var pythonExecutable: String {
+        ProcessInfo.processInfo.environment["MAFORMAC_PYTHON"] ?? "/opt/homebrew/opt/python@3.13/bin/python3.13"
     }
 
     private static func run(_ executable: String, _ arguments: [String], cwd: String? = nil) -> (status: Int32, stdout: String, stderr: String) {
@@ -418,7 +423,7 @@ struct C5TrainingCLI {
             except Exception:
                 print(f"{name}=unknown")
         """
-        guard let output = capture("/opt/homebrew/opt/python@3.13/bin/python3.13", ["-c", script]) else {
+        guard let output = capture(pythonExecutable, ["-c", script]) else {
             return [:]
         }
         var versions: [String: String] = [:]
@@ -530,7 +535,9 @@ private struct Options {
         targetPositiveRows = 4_500
         devSelectionRows = 400
         maskingStage = .trainableV0
-        baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
+        // GLM 审计 P2: 本机 base model 路径改环境变量(可移植), fallback 保留默认(本机 HF cache)。
+        let defaultBaseModel = "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e"
+        baseModelDir = URL(fileURLWithPath: ProcessInfo.processInfo.environment["MAFORMAC_BASE_MODEL_DIR"] ?? defaultBaseModel, isDirectory: true)
         generatedUtterancesURL = nil
         expectedOffsetArtifactSHA256 = nil
         allowRegeneratedOffsetArtifact = false
