@@ -8,6 +8,12 @@ GENERATED_CONTRACTS := \
 	contracts/function-spec-full.yaml \
 	contracts/semantic-coverage-report.md
 
+# generated/ domain 产物(A2 S0+): family allowlist + flat device-map; 显式纳入 diff gate(补 generated/ 裸奔漏点).
+# S1 D-domain 具名工具目录产物后续追加此变量.
+GENERATED_DOMAIN := \
+	generated/family-device-allowlist.json \
+	generated/10-family-device-map.json
+
 .PHONY: verify verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
@@ -37,6 +43,7 @@ verify-source: .venv/.deps.stamp
 regen: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_c1.py
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
+	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
 
 regen-tool-contract: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
@@ -48,7 +55,7 @@ verify-refs: .venv/.deps.stamp
 HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml
 
 diff:
-	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(HANDWRITTEN_CONTRACTS) scripts Makefile
+	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(GENERATED_DOMAIN) $(HANDWRITTEN_CONTRACTS) scripts Makefile
 
 clean-venv:
 	rm -rf .venv
