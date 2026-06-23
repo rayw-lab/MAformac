@@ -44,6 +44,11 @@
 - **ToolContractJSONRenderer 自写 escaping → JSONEncoder**（GPT Pro P2）：输入是 catalog 工具 schema(snake_case 名 + 中文 enum, 无任意 user 控制字符)，控制字符风险理论性；renderedToolsText 已有测试 → DEFER。
 - **DemoVehicleStateStore 旧 key/新 C2 key 混放**（GLM P3，S3 INDEX 已记）：UI 读取层清债，bigger，非 A2 surface → DEFER。
 - **旧 generated/D_domain.tools.json(6 strangler) historical banner**（Codex P2）：qwen yaml 已明示 tool_catalog=demo.json(canonical 单源)，旧 6 仅 strangler 守现状 → 后续加 banner。
+  - 🔴 **消歧（subagent 审计 catch，防 paper-tiger 误读）**：absorption「不再硬编码 6 旧 B-frame」指**消费方**——C5 CLI(:43)/compiler(:29) 实读 `demo.json`(562)；`gen_tool_contract.py`(:72/:190) **仍保留 set_cabin_ac 等 6 硬编码，但只写 `D_domain.tools.json`(6 个, 无 runtime 消费)**，是 strangler 守现状（retrain-c5/全迁后删）。canonical 消费者全读 demo.json(562)，yaml 描述与代码事实一致, 非 bug。
+
+## 3d. subagent CC 审计 verdict（2026-06-23, HEAD 8d6161c, 实跑坐实）
+**CLEAR**（无 BLOCK 无 REVISION）。7 项修复全实跑坐实正确 + 无新 bug；DEFERRED 4 条 steelman 全成立非偷懒（grep 坐实 deviceCellMap state-cells:14「映射独立」无源 + distractor「可优化非broken」）；配方零碰（git diff 全 A2 无超参改）+ A2 边界 code-only（无训练/评测执行引入）严守；swift test 146/0(3 skip=其他 change owned 占位 pre-existing) + make verify exit0 + verify-gold 57/57 + working tree clean(regen 幂等)。
+- 🟡 elephant（pre-existing/post-A2，A2 边界内可接受）：① swift test 依赖本机 base model + homebrew python(C5LoRATrainingTests:713-746)→ make verify-all 在他人机/CI swift-test 段会非确定性失败；XCTSkipUnless = retrain-c5 立项真前置（已记 §3c #5）② irMap `query_cabin_comfort` 走 switch 显式 case(不在 ir_map.json)，未来迁进 irMap 需同步删 switch 防双路径(strangler 删除清单语义内)。
 
 ## 4. 三角分诊洞察（cross-vendor 真值，沉淀 heavy-work 坑点库）
 - **GPT Pro 与 GLM-5.2 findings 不同集**：GPT Pro 独抓 P0(`--scope full` 解码崩)，GLM 独抓 P1-2(direct clamp)，**both 共识 P1(dDomain miss fallback)** —— 三者全实跑坐实真 bug。→ **cross-vendor 双审不是冗余, 是覆盖面并集**（不同模型抓不同盲点）；单审会漏（GPT Pro 漏 clamp / GLM 漏 scope full）。
