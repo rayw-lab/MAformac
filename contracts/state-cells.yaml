@@ -168,7 +168,7 @@ devices:
 
 # ===== S3 横铺 6 族(座椅/车门/音量/雨刮/天窗遮阳/香氛, 范式同 ac/window; 6 族代表 cell 非191全集)=====
 # 数据源: jsonl service 路由实算(seat/door/wiper/sunroof/fragrance=carControl, volume=cmd) + 范围真值
-#   座椅档 0-3(CLAUDE.md:80/function-spec:61-63, 旧16-30/0-5拍错) / percent 类 0-100(同 window.position 口径)。
+#   座椅档 0-3(CLAUDE.md §4 范围真值, 旧16-30/0-5拍错) / percent 类 0-100(同 window.position 口径)。
 # 191 全量 cell = DEFERRED(随 retrain-c5/rebuild-c6); S3 只建 demo-positive 代表 cell 让 C6 base 跑得动。
 
   seat:
@@ -180,7 +180,7 @@ devices:
         type: int
         unit: gear
         scope: [主驾, 副驾, 左后, 右后, 全车]
-        execution_range: {min: 0, max: 3, step: 1}   # 0-3 真值(CLAUDE.md:80/function-spec:61)
+        execution_range: {min: 0, max: 3, step: 1}   # 0-3 真值(CLAUDE.md §4 范围真值)
         source_kind: c2_demo_decision
         exp_step: {little: 1}
         state_kinds: [empty, known, unknown]
