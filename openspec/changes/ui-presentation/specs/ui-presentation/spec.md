@@ -99,7 +99,7 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 
 ### Requirement: layout and transitions SHALL use Grid and macOS-available matchedGeometry with availability guards
 
-布局 SHALL 用 `Grid` 固定列（SHALL NOT 用 `LazyVGrid(.adaptive)`）；状态切换动效 SHALL 用 `matchedGeometryEffect`（macOS 可用）而非 `navigationTransition.zoom`（macOS unavailable）；`matchedGeometryEffect` SHALL 作 gated upgrade（默认 `opacityScale` 兜底，按 promotion_criteria 升级）；iOS18 API（含 MeshGradient/glassEffect）SHALL 用 `#available` + iOS17 fallback，SHALL NOT 裸 require iOS18。
+布局 SHALL 用 `Grid` 固定列（SHALL NOT 用 `LazyVGrid(.adaptive)`）；状态切换动效 SHALL 用 `matchedGeometryEffect`（macOS 可用）而非 `navigationTransition.zoom`（macOS unavailable）；`matchedGeometryEffect` SHALL 作 gated upgrade（默认 `opacityScale` 兜底，按 promotion_criteria 升级）。demo App target deployment 锁 **iOS26/macOS26**，MeshGradient(iOS18)/glassEffect(iOS26)/matchedGeometry(iOS14) 引入版本均 ≤ deployment，故 SHALL NOT 加 `#available` 版本守卫；`navigationTransition.zoom`（macOS unavailable）SHALL 用**平台守卫 `#if !os(macOS)`**（非版本守卫，因 macOS 缺该类型）。
 
 #### Scenario: fixed-column Grid, not adaptive LazyVGrid
 - **GIVEN** 卡片网格布局
@@ -113,11 +113,11 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 - **THEN** 默认用 `opacityScale` 兜底动画
 - **AND** `matchedGeometryEffect` 仅作 gated upgrade，按 promotion_criteria 满足才升级；低端机/低电量回落 opacityScale，态仍可读
 
-#### Scenario: iOS18 APIs guarded by #available with iOS17 fallback
-- **GIVEN** iOS18 API（含 MeshGradient / glassEffect）
-- **WHEN** 渲染
-- **THEN** 一律 `#available` 守卫 + iOS17 fallback
-- **AND** SHALL NOT 裸 require iOS18（iOS17 设备走 fallback 不崩）
+#### Scenario: locked to iOS26/macOS26 — version guards dropped, platform/a11y guards kept
+- **GIVEN** demo App target deployment = iOS26/macOS26（Package.swift Core 仍 v17/v14 隔离）
+- **WHEN** 用 MeshGradient / glassEffect / matchedGeometry
+- **THEN** SHALL NOT 加 `#available(iOS 17/18, *)` 版本守卫（deployment 已 ≥ 各 API 引入版本）
+- **AND** `navigationTransition.zoom` SHALL 用 `#if !os(macOS)` 平台守卫（非版本）；ReduceMotion/低电量 SHALL 保留双通道（a11y 非版本守卫）
 
 #### Scenario: navigationTransition.zoom not used because macOS unavailable
 - **GIVEN** 跨视图缩放过渡需求
@@ -127,7 +127,7 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 
 ### Requirement: presentation SHALL run as two independent on-device instances with token-driven visuals and functional-layer-only Liquid Glass
 
-demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实例，iPhone 脱机独立全功能；transport SHALL 为 `TransportKind { none, bonjour }`（无 sharedFile 镜像）；两端核心展示语义（7 态 + 卡片）SHALL 统一、SHALL NOT 为 macOS 单独豁免（动效/glass 层按 `#available` 双通道降级非豁免）；视觉值 SHALL 只从 `docs/design/tokens.md` 取（色彩语义分类，禁手填 hex）；Liquid Glass SHALL 只用功能层 `control_glass`（mic/顶栏），内容卡 SHALL 用 `content_glow` 自研 glow。
+demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实例，iPhone 脱机独立全功能；transport SHALL 为 `TransportKind { none, bonjour }`（无 sharedFile 镜像）；两端核心展示语义（7 态 + 卡片）SHALL 统一、SHALL NOT 为 macOS 单独豁免（动效/glass 层按 ReduceMotion/低电量**双通道降级 = a11y 非版本豁免**；平台差异 API 如 `navigationTransition.zoom` 用 `#if !os(macOS)` 平台守卫）；视觉值 SHALL 只从 `docs/design/tokens.md` 取（色彩语义分类，禁手填 hex）；Liquid Glass SHALL 只用功能层 `control_glass`（mic/顶栏，Apple 官方：floats above the content layer），内容卡 SHALL 用 `content_glow` 自研 glow（Apple 官方：Don't use Liquid Glass in the content layer）；例外 = 内容层 transient 交互控件（slider/toggle）激活时 MAY 用 glass（Apple 官方点名正确用法）。
 
 #### Scenario: both macOS and iOS targets render all 7 states (core semantics not waived)
 - **GIVEN** macOS target (MAformacMac) AND iOS target (MAformacIOS)
@@ -135,11 +135,11 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **THEN** 两端都渲染全 7 态 + 卡片核心展示语义
 - **AND** SHALL NOT 为 macOS 单独豁免某态/某卡片（双端展示语义统一）
 
-#### Scenario: motion and glass degrade per #available as dual-channel, not core waiver
-- **GIVEN** 平台 API 差异（MeshGradient/glassEffect/matchedGeometry 可用性按平台/版本不同）
-- **WHEN** 某 API 在某端不可用
-- **THEN** 动效/glass 层按 `#available` 双通道降级（颜色/数值/图标承载态，动画锦上添花），态语义仍可读
-- **AND** 这是双通道降级，SHALL NOT 当作核心展示语义豁免
+#### Scenario: motion degrades via ReduceMotion/low-power dual-channel, not core waiver
+- **GIVEN** ReduceMotion / 低电量模式开启，或平台差异 API（`navigationTransition.zoom` macOS unavailable）
+- **WHEN** 动效不可用/被禁
+- **THEN** 关键态用颜色/数值/图标承载（双通道），动画只锦上添花，态语义仍可读
+- **AND** 这是 a11y/平台降级，SHALL NOT 当核心展示语义豁免；锁 iOS26 后无版本 fallback 分支
 
 #### Scenario: iPhone runs standalone offline
 - **GIVEN** iPhone 实例
@@ -157,4 +157,5 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **GIVEN** Liquid Glass 用法
 - **WHEN** 决定 surface_role
 - **THEN** 仅功能层 `control_glass`（mic 按钮/顶栏）用 Liquid Glass，内容卡用 `content_glow`（自研 cyan/violet glow，非 system glass）
-- **AND** SHALL NOT 用全局主题开关式 glass（内容层 glass = 整屏糊 + HIG 违规 + 旧机发热）
+- **AND** SHALL NOT 用全局主题开关式 glass（内容层 glass = 整屏糊 + HIG 违规）
+- **AND** 例外：内容层 transient 交互控件（slider/toggle）激活时 MAY 用 glass（Apple 官方点名正确用法，车控温度滑块/风量 toggle 适用）

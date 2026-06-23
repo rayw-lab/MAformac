@@ -89,7 +89,7 @@ note: 🔴 **agent 生成任何 UI 前必读本文 + INDEX**。色值/字号/间
 
 | role | 用途 | 实现 |
 |---|---|---|
-| `control_glass` | **mic 按钮 / 顶栏**（功能层 Liquid Glass） | iOS18 `.glassEffect()` + iOS17 fallback `.ultraThinMaterial` |
+| `control_glass` | **mic 按钮 / 顶栏**（功能层 Liquid Glass，Apple: floats above content layer） | **iOS26 `.glassEffect()`**（demo 锁 iOS26/macOS26，无需 `#available`/fallback；oracle2 坐实 glassEffect=iOS26 非 iOS18） |
 | `content_glow` | **内容卡片**（自研 glow，**非** system glass） | 自研 cyan/violet box-shadow glow（scheme1:49-53），iOS26 system glass 旧机卡顿发热 |
 
 🔴 U2 铁律（grill §3:116）：Liquid Glass **只**用 `control_glass`（mic/顶栏），内容卡用 `content_glow` 自研。**禁全局主题开关式** glass（内容层用 glass = 整屏糊 + HIG 违规 + 旧机发热，见 hig-rules T5）。
