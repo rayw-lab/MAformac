@@ -1,0 +1,7692 @@
+[
+  {
+    "domain": "cmd",
+    "name": "add_countdown",
+    "sg": "countdown"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_360_look_around_visual_angle",
+    "sg": "360_look_around_visual_angle"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_temperature_no_value",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_temperature_to_exp",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_temperature_to_max",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_temperature_to_min",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_temperature_to_number",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_wind_direction_to_value",
+    "sg": "ac_wind_direction"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_windspeed_no_value",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_windspeed_to_exp",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_windspeed_to_max",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_windspeed_to_min",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_ac_windspeed_to_number",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "adjust_airoutlet_direction_to_value",
+    "sg": "airoutlet_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_alc_sensitivity_to_gear",
+    "sg": "alc_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_brightness_no_value",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_brightness_to_gear",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_brightness_to_max",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_brightness_to_min",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_brightness_to_number",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_change_speed_to_gear",
+    "sg": "atmosphere_lamp_change_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_change_speed_to_max",
+    "sg": "atmosphere_lamp_change_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_atmosphere_lamp_change_speed_to_min",
+    "sg": "atmosphere_lamp_change_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_auto_headlight_sensitivity_to_gear",
+    "sg": "auto_headlight_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_auto_headlight_sensitivity_to_max",
+    "sg": "auto_headlight_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_auto_headlight_sensitivity_to_min",
+    "sg": "auto_headlight_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_auto_headlight_sensitivity_to_number",
+    "sg": "auto_headlight_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_backlight_brightness_to_gear",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_backlight_brightness_to_max",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_backlight_brightness_to_min",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_backlight_brightness_to_number",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_blind_spot_detection_sensitivity_to_gear",
+    "sg": "blind_spot_detection_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_blue_ray_filtering_to_gear",
+    "sg": "blue_ray_filtering"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_button_brightness_no_value",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_button_brightness_to_gear",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_button_brightness_to_max",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_button_brightness_to_min",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_button_brightness_to_number",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_console_position_little",
+    "sg": "console_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_console_position_to_extremum",
+    "sg": "console_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_following_interval_to_gear",
+    "sg": "cruise_following_interval"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_following_interval_to_max",
+    "sg": "cruise_following_interval"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_following_interval_to_min",
+    "sg": "cruise_following_interval"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_following_interval_to_mode",
+    "sg": "cruise_following_interval_to_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_following_interval_to_number",
+    "sg": "cruise_following_interval"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_speed_to_max",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_speed_to_min",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_cruise_speed_to_number",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_brightness_to_gear",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_brightness_to_max",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_brightness_to_min",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_brightness_to_number",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_color_temperature_to_gear",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_color_temperature_to_max",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_color_temperature_to_min",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_color_temperature_to_number",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_time_to_max",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_time_to_min",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_in_car_lamp_time_to_number",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_angle_to_gear",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_angle_to_max",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_angle_to_min",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_angle_to_number",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_time_to_max",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_time_to_min",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_designative_out_car_lamp_time_to_number",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_brightness_to_max",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_brightness_to_min",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_brightness_to_number",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_transparency_to_gear",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_transparency_to_max",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_transparency_to_min",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_dimming_glass_top_transparency_to_number",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_door_height_to_gear",
+    "sg": "door_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_door_to_number",
+    "sg": "door"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_driving_sound_wave_volume_to_highest",
+    "sg": "driving_sound_wave_volume_to_highest"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_driving_sound_wave_volume_to_lowest",
+    "sg": "driving_sound_wave_volume_to_lowest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_electric_tail_wing_angle_to_number",
+    "sg": "electric_tail_wing_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_electric_tail_wing_height_to_number",
+    "sg": "electric_tail_wing_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_energy_recuperation_level_to_gear",
+    "sg": "energy_recuperation_level"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_energy_recuperation_level_to_max",
+    "sg": "energy_recuperation_level"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_energy_recuperation_level_to_min",
+    "sg": "energy_recuperation_level"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_energy_recuperation_level_to_number",
+    "sg": "energy_recuperation_level"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_eq_to_max",
+    "sg": "eq"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_eq_to_min",
+    "sg": "eq"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_eq_to_number",
+    "sg": "eq"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_fragrance_intensity_to_gear",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_fragrance_intensity_to_max",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_fragrance_intensity_to_min",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_fragrance_intensity_to_number",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headliner_to_gear",
+    "sg": "headliner"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headliner_to_number",
+    "sg": "headliner"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headrest_direction_by_number",
+    "sg": "headrest_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headrest_direction_little",
+    "sg": "headrest_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headrest_direction_to_number",
+    "sg": "headrest_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headrest_ear_slice_direction_by_number",
+    "sg": "headrest_ear_slice_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headrest_ear_slice_direction_little",
+    "sg": "headrest_ear_slice_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_headrest_ear_slice_direction_to_number",
+    "sg": "headrest_ear_slice_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_brightness_to_gear",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_brightness_to_max",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_brightness_to_min",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_brightness_to_number",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_height_to_gear",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_height_to_max",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_height_to_min",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_height_to_number",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_inclination_little",
+    "sg": "hud_inclination"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_inclination_to_extremum",
+    "sg": "hud_inclination"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_inclination_to_number",
+    "sg": "hud_inclination"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_position_distance",
+    "sg": "hud_position_distance"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_position_distance_to_extremum",
+    "sg": "hud_position_distance"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_position_transversely",
+    "sg": "hud_position_transversely"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_hud_position_transversely_to_extremum",
+    "sg": "hud_position_transversely"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_interior_heat_to_gear",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_interior_heat_to_max",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_interior_heat_to_min",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_interior_heat_to_number",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_ldws_sensitivity_to_gear",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_ldws_sensitivity_to_max",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_ldws_sensitivity_to_min",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_ldws_sensitivity_to_number",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_leading_vehicle_distance_light_reminder_sensitivity_to_gear",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_leading_vehicle_distance_light_reminder_sensitivity_to_max",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_leading_vehicle_distance_light_reminder_sensitivity_to_min",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_leading_vehicle_distance_light_reminder_sensitivity_to_number",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_limit_speed_to_number",
+    "sg": "limit_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_monitor_sensitivity_to_gear",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_monitor_sensitivity_to_max",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_monitor_sensitivity_to_min",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_monitor_sensitivity_to_number",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_noise_volume_compensation_to_gearpeed_to_gear",
+    "sg": "noise_volume_compensation_to_gearpeed"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_noise_volume_compensation_to_max",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_noise_volume_compensation_to_min",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_noise_volume_compensation_to_number",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_predictive_collision_warning_level_to_max",
+    "sg": "predictive_collision_warning_level"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_predictive_collision_warning_level_to_min",
+    "sg": "predictive_collision_warning_level"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_rearview_mirror_direction",
+    "sg": "rearview_mirror_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_rearview_mirror_direction_to_extremum",
+    "sg": "rearview_mirror_direction"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_screen_brightness_to_gear",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_screen_brightness_to_max",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_screen_brightness_to_min",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_screen_brightness_to_number",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_backrest_by_number",
+    "sg": "seat_backrest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_backrest_little",
+    "sg": "seat_backrest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_backrest_to_extremum",
+    "sg": "seat_backrest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_backrest_to_number",
+    "sg": "seat_backrest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_belt_heat_temperature_to_exp",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_belt_heat_temperature_to_max",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_belt_heat_temperature_to_min",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_belt_heat_temperature_to_number",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_cushion_by_number",
+    "sg": "seat_cushion"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_cushion_little",
+    "sg": "seat_cushion"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_cushion_to_extremum",
+    "sg": "seat_cushion"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_cushion_to_number",
+    "sg": "seat_cushion"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_feet_support_by_number",
+    "sg": "seat_feet_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_feet_support_little",
+    "sg": "seat_feet_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_feet_support_to_extremum",
+    "sg": "seat_feet_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_feet_support_to_number",
+    "sg": "seat_feet_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_flank_little",
+    "sg": "seat_flank"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_flank_to_extremum",
+    "sg": "seat_flank"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_heat_temperature_to_gear",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_heat_temperature_to_max",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_heat_temperature_to_min",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_heat_temperature_to_number",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_leg_support_by_number",
+    "sg": "seat_leg_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_leg_support_little",
+    "sg": "seat_leg_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_leg_support_to_extremum",
+    "sg": "seat_leg_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_leg_support_to_number",
+    "sg": "seat_leg_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_lumbar_support_by_number",
+    "sg": "seat_lumbar_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_lumbar_support_little",
+    "sg": "seat_lumbar_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_lumbar_support_to_extremum",
+    "sg": "seat_lumbar_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_lumbar_support_to_number",
+    "sg": "seat_lumbar_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_force_to_gear",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_force_to_max",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_force_to_min",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_force_to_number",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_time_to_max",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_time_to_min",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_massage_time_to_number",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_position_by_number",
+    "sg": "seat_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_position_little",
+    "sg": "seat_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_position_to_extremum",
+    "sg": "seat_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_position_to_number",
+    "sg": "seat_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_rhythm_mode_to_gear",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_rhythm_mode_to_max",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_rhythm_mode_to_min",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_rhythm_mode_to_number",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_shoulder_support_by_number",
+    "sg": "seat_shoulder_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_shoulder_support_little",
+    "sg": "seat_shoulder_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_shoulder_support_to_extremum",
+    "sg": "seat_shoulder_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_shoulder_support_to_number",
+    "sg": "seat_shoulder_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_ventilation_windspeed_to_gear",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_ventilation_windspeed_to_max",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_ventilation_windspeed_to_min",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_seat_ventilation_windspeed_to_number",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_soc_target_to_gear",
+    "sg": "soc_target"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_soc_target_to_max",
+    "sg": "soc_target"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_soc_target_to_min",
+    "sg": "soc_target"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_soc_target_to_number",
+    "sg": "soc_target"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_speak_speed_to_gear",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_speak_speed_to_max",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_speak_speed_to_min",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_speak_speed_to_number",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_steering_wheel_direction",
+    "sg": "steering_wheel_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_steering_wheel_direction_to_extremum",
+    "sg": "steering_wheel_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_steering_wheel_heating_to_gear",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_steering_wheel_heating_to_max",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_steering_wheel_heating_to_min",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_steering_wheel_heating_to_number",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_stream_rearview_mirror_brightness_to_gear",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_stream_rearview_mirror_brightness_to_max",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_stream_rearview_mirror_brightness_to_min",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_stream_rearview_mirror_brightness_to_number",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_suspension_height_to_bottom",
+    "sg": "suspension_height_to_bottom"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_suspension_height_to_gear",
+    "sg": "suspension_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_suspension_height_to_number",
+    "sg": "suspension_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_suspension_height_to_top",
+    "sg": "suspension_height_to_top"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_suspension_to_hardest",
+    "sg": "suspension_to_hardest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_suspension_to_softest",
+    "sg": "suspension_to_softest"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_system_font_size",
+    "sg": "system_font_size"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_tailgate_height_to_highest",
+    "sg": "tailgate_height_to_highest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_tailgate_height_to_lowest",
+    "sg": "tailgate_height_to_lowest"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_tailgate_height_to_number",
+    "sg": "tailgate_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_tired_detection_sensitivity_to_gear",
+    "sg": "tired_detection_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_turnsignal_frequency_to_number",
+    "sg": "turnsignal_frequency"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_vehicle_refrigerator_temperature_to_gear",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_vehicle_refrigerator_temperature_to_max",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_vehicle_refrigerator_temperature_to_min",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_vehicle_refrigerator_temperature_to_number",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_volume_to_gear",
+    "sg": "volume"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_volume_to_max",
+    "sg": "volume"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_volume_to_min",
+    "sg": "volume"
+  },
+  {
+    "domain": "cmd",
+    "name": "adjust_volume_to_number",
+    "sg": "volume"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_sensitivity_to_gear",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_sensitivity_to_max",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_sensitivity_to_min",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_sensitivity_to_number",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_speed_to_gear",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_speed_to_max",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_speed_to_min",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "adjust_wiper_speed_to_number",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_adjust_speed_to_number",
+    "sg": "autopilot_adjust_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_cancel_change_lane",
+    "sg": "autopilot_cancel_change_lane"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_cancel_memory_lane",
+    "sg": "autopilot_cancel_memory_lane"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_cancel_memory_lane_speed",
+    "sg": "autopilot_cancel_memory_lane_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_cancel_pull_over",
+    "sg": "autopilot_cancel_pull_over"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_cancel_steering",
+    "sg": "autopilot_cancel_steering"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_change_lane_to_direction",
+    "sg": "autopilot_change_lane_to_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_close_reasoning_panel",
+    "sg": "autopilot_close_reasoning_panel"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_designated_type_vehicle",
+    "sg": "autopilot_designated_type_vehicle"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_drive_away_special_lane",
+    "sg": "autopilot_drive_away_special_lane"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_drive_backward",
+    "sg": "autopilot_drive_backward"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_drive_forward",
+    "sg": "autopilot_drive_forward"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_give_way",
+    "sg": "autopilot_give_way"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_highway_entrance_selection",
+    "sg": "autopilot_highway_entrance_selection"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_lower_speed_little",
+    "sg": "autopilot_lower_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_memory_lane",
+    "sg": "autopilot_memory_lane"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_memory_lane_acceleration",
+    "sg": "autopilot_memory_lane_acceleration"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_memory_lane_deceleration",
+    "sg": "autopilot_memory_lane_deceleration"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_memory_lane_speed",
+    "sg": "autopilot_memory_lane_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_open_bay_to_bay",
+    "sg": "autopilot_open_bay_to_bay"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_open_reasoning_panel",
+    "sg": "autopilot_open_reasoning_panel"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_overtake",
+    "sg": "autopilot_overtake"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_pull_over",
+    "sg": "autopilot_pull_over"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_pull_over_to_designated_spot",
+    "sg": "autopilot_pull_over_to_designated_spot"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_raise_speed_little",
+    "sg": "autopilot_raise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_steering_front_specific_poi",
+    "sg": "autopilot_steering_front_specific_poi"
+  },
+  {
+    "domain": "carControl",
+    "name": "autopilot_steering_with_specific_local",
+    "sg": "autopilot_steering_with_specific_local"
+  },
+  {
+    "domain": "cmd",
+    "name": "back_the_charging_map",
+    "sg": "back_the_charging_map"
+  },
+  {
+    "domain": "cmd",
+    "name": "back_to_homepage",
+    "sg": "back_to_homepage"
+  },
+  {
+    "domain": "cmd",
+    "name": "bind_account",
+    "sg": "bind_account"
+  },
+  {
+    "domain": "cmd",
+    "name": "buy_insurance",
+    "sg": "buy_insurance"
+  },
+  {
+    "domain": "cmd",
+    "name": "check_bluetooth_device_info",
+    "sg": "bluetooth_device_info"
+  },
+  {
+    "domain": "cmd",
+    "name": "check_bluetooth_history_connect_device",
+    "sg": "bluetooth_history_connect_device"
+  },
+  {
+    "domain": "cmd",
+    "name": "check_coupon",
+    "sg": "coupon"
+  },
+  {
+    "domain": "cmd",
+    "name": "check_points",
+    "sg": "points"
+  },
+  {
+    "domain": "cmd",
+    "name": "clean_up_memory",
+    "sg": "clean_up_memory"
+  },
+  {
+    "domain": "cmd",
+    "name": "clear_notification_message",
+    "sg": "clear_notification_message"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_360_look_around",
+    "sg": "360_look_around"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_360_look_around_visual_angle",
+    "sg": "360_look_around_visual_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_abnormal_vehicle_condition_alert",
+    "sg": "abnormal_vehicle_condition_alert"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_ac",
+    "sg": "ac"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_ac_cooling_mode",
+    "sg": "ac_cooling_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_ac_heating_mode",
+    "sg": "ac_heating_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_ac_set_interface",
+    "sg": "ac_set_interface"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_ac_wind_direction_to_value",
+    "sg": "ac_wind_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_accelerator_anti_false_step",
+    "sg": "accelerator_anti_false_step"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_account_list",
+    "sg": "account_list"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_acoustics_mode",
+    "sg": "acoustics_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_aeb",
+    "sg": "aeb"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_agile_steering",
+    "sg": "agile_steering"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_air_clean",
+    "sg": "air_clean"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_airbag",
+    "sg": "airbag"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_airoutlet",
+    "sg": "airoutlet"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_airoutlet_direction_to_value",
+    "sg": "airoutlet_direction"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_al_qibla_reminder",
+    "sg": "al_qibla_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_album",
+    "sg": "album"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_alc",
+    "sg": "alc"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_alc_confirm",
+    "sg": "alc_confirm"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_anc",
+    "sg": "anc"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_antilocked_braking_system",
+    "sg": "antilocked_braking_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_app_account_association",
+    "sg": "app_account_association"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_application_management_set_interface",
+    "sg": "application_management_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_assisted_drive",
+    "sg": "assisted_drive"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_assisted_park_set_interface",
+    "sg": "assisted_park_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_atmosphere_lamp",
+    "sg": "atmosphere_lamp"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_auto_hold",
+    "sg": "auto_hold"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_auto_sync_contact",
+    "sg": "auto_sync_contact"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_auto_volume_reduction",
+    "sg": "auto_volume_reduction"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_automatic_theme_switching",
+    "sg": "automatic_theme_switching"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_automatic_time_zone",
+    "sg": "automatic_time_zone"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_automatic_turn_on_panoramic_imaging_mode",
+    "sg": "automatic_turn_on_panoramic_imaging_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_automatic_window_closing",
+    "sg": "automatic_window_closing"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_automatic_window_opening",
+    "sg": "automatic_window_opening"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_b_call",
+    "sg": "b_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_back_row_detection",
+    "sg": "back_row_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_back_window",
+    "sg": "back_window"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_backlight",
+    "sg": "backlight"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_battery_temperature_preheating_reminder",
+    "sg": "battery_temperature_preheating_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_best_listening_position",
+    "sg": "best_listening_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_blind_spot_detection",
+    "sg": "blind_spot_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_blind_spot_detection_reminder_method",
+    "sg": "blind_spot_detection_reminder_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_blind_spot_image_quality_enhancement",
+    "sg": "blind_spot_image_quality_enhancement"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_blind_spot_imaging",
+    "sg": "blind_spot_imaging"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_blocking_glass",
+    "sg": "blocking_glass"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_blower_delay_shutdown",
+    "sg": "blower_delay_shutdown"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_blue_ray_filtering",
+    "sg": "blue_ray_filtering"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_bluetooth",
+    "sg": "bluetooth"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_bluetooth_auto_connect",
+    "sg": "bluetooth_auto_connect"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_bluetooth_founded_switch",
+    "sg": "bluetooth_founded_switch"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_bluetooth_headset",
+    "sg": "bluetooth_headset"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_breathe_system",
+    "sg": "breathe_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_cabin_disinfect",
+    "sg": "cabin_disinfect"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_call_broadcast",
+    "sg": "call_broadcast"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_call_detection",
+    "sg": "call_detection"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_calls_auto_answer",
+    "sg": "calls_auto_answer"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_calls_auto_reject",
+    "sg": "calls_auto_reject"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_calls_mute",
+    "sg": "calls_mute"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_camera",
+    "sg": "camera"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_car_connectivity",
+    "sg": "car_connectivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_car_door",
+    "sg": "car_door"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_car_film_transparency",
+    "sg": "car_film_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_car_seek_mode",
+    "sg": "car_seek_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_central_lock",
+    "sg": "central_lock"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_charge_discharge_set_interface",
+    "sg": "charge_discharge_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_charging_gun_anti_theft_mode",
+    "sg": "charging_gun_anti_theft_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_charging_gun_auto_unlock",
+    "sg": "charging_gun_auto_unlock"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_charging_mode",
+    "sg": "charging_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_charging_port",
+    "sg": "charging_port"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_chassis_lift_function",
+    "sg": "chassis_lift_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_child_lock",
+    "sg": "child_lock"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_chitchat",
+    "sg": "chitchat"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_collision_warning",
+    "sg": "collision_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_comfortable_entry_exit",
+    "sg": "comfortable_entry_exit"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_comfortable_park",
+    "sg": "comfortable_park"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_contact_privacy_mode",
+    "sg": "contact_privacy_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_cross_traffic_brake",
+    "sg": "cross_traffic_brake"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_cruise_broadcast",
+    "sg": "cruise_broadcast"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_cruise_system",
+    "sg": "cruise_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_cta",
+    "sg": "cta"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_customize_button_function",
+    "sg": "customize_button_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_danger_action_detection_reminder",
+    "sg": "danger_action_detection_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_dash_cam",
+    "sg": "dash_cam"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_data_usage_alert_function",
+    "sg": "data_usage_alert_function"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_defog_mode",
+    "sg": "defog_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_defrost_mode",
+    "sg": "defrost_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_dehumidification_mode",
+    "sg": "dehumidification_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_departure_reminder_system",
+    "sg": "departure_reminder_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_designated_function",
+    "sg": "designated_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_designative_in_car_lamp",
+    "sg": "designative_in_car_lamp"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_designative_out_car_lamp",
+    "sg": "designative_out_car_lamp"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_desktop_map_priority_display",
+    "sg": "desktop_map_priority_display"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_desktop_mode",
+    "sg": "desktop_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_dialect_auto_switching",
+    "sg": "dialect_auto_switching"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_dialog_style",
+    "sg": "dialog_style"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_differential_lock",
+    "sg": "differential_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_dimming_glass_top",
+    "sg": "dimming_glass_top"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_dimming_glass_top_mode",
+    "sg": "dimming_glass_top_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_display_brightness_set_interface",
+    "sg": "display_brightness_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_distraction_detection",
+    "sg": "distraction_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_dms",
+    "sg": "dms"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_door_by_number",
+    "sg": "door"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_door_little",
+    "sg": "door"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_doors_windows_locks_set_interface",
+    "sg": "doors_windows_locks_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_driver_assistance_set_interface",
+    "sg": "driver_assistance_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driver_behavior_detection",
+    "sg": "driver_behavior_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driver_state_warn",
+    "sg": "driver_state_warn"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driving_data_collect",
+    "sg": "driving_data_collect"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driving_entertainment_restriction",
+    "sg": "driving_entertainment_restriction"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driving_habits",
+    "sg": "driving_habits"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driving_lock_screen",
+    "sg": "driving_lock_screen"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driving_mode",
+    "sg": "driving_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_driving_mode_memory",
+    "sg": "driving_mode_memory"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_driving_mode_set_interface",
+    "sg": "driving_mode_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_driving_sound_wave",
+    "sg": "driving_sound_wave"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_dropdown_menu",
+    "sg": "dropdown_menu"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_dst",
+    "sg": "dst"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_dynamic_traffic_scene_display",
+    "sg": "dynamic_traffic_scene_display"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_e_call",
+    "sg": "e_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_electric_side_pedal",
+    "sg": "electric_side_pedal"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_electric_tail_wing",
+    "sg": "electric_tail_wing"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_electric_tailgate_switch",
+    "sg": "electric_tailgate_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_electronic_brake",
+    "sg": "electronic_brake"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_emergency_record",
+    "sg": "emergency_record"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_energy_consumption_curve",
+    "sg": "energy_consumption_curve"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_energy_consumption_set_interface",
+    "sg": "energy_consumption_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_energy_flow_chart",
+    "sg": "energy_flow_chart"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_energy_information",
+    "sg": "energy_information"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_energy_management_mode",
+    "sg": "energy_management_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_energy_recuperation",
+    "sg": "energy_recuperation"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_energy_recuperation_mode",
+    "sg": "energy_recuperation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_engine_hood",
+    "sg": "engine_hood"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_eps_associated_with_driving_mode",
+    "sg": "eps_associated_with_driving_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_eps_mode",
+    "sg": "eps_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_eq",
+    "sg": "eq"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_eq_mode",
+    "sg": "eq_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_esc",
+    "sg": "esc"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_etc",
+    "sg": "etc"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_expression_identify",
+    "sg": "expression_identify"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_exterior_voice",
+    "sg": "exterior_voice"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_external_discharge",
+    "sg": "external_discharge"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_external_voice_interaction",
+    "sg": "external_voice_interaction"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_face_id_start_car",
+    "sg": "face_id_start_car"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_face_recognition",
+    "sg": "face_recognition"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_fastener_reminder",
+    "sg": "fastener_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_fault_reporting",
+    "sg": "fault_reporting"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_feedback",
+    "sg": "feedback"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_folder",
+    "sg": "folder"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_fortify_reminder",
+    "sg": "fortify_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_fragrance",
+    "sg": "fragrance"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_fragrance_set_interface",
+    "sg": "fragrance_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_fuel_tank_cap",
+    "sg": "fuel_tank_cap"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_gaze_viewcmd",
+    "sg": "gaze_viewcmd"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_gaze_wakeup",
+    "sg": "gaze_wakeup"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_gesture_photography",
+    "sg": "gesture_photography"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_gesture_recognitton",
+    "sg": "gesture_recognitton"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_glove_compartment",
+    "sg": "glove_compartment"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_glove_compartment_password",
+    "sg": "glove_compartment_password"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_goods_forget_reminder",
+    "sg": "goods_forget_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_haptics",
+    "sg": "haptics"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_hd_quality_calls",
+    "sg": "hd_quality_calls"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_headliner",
+    "sg": "headliner"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_headrest_audio_system",
+    "sg": "headrest_audio_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_headrest_directional_broadcast",
+    "sg": "headrest_directional_broadcast"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_hotspot",
+    "sg": "hotspot"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_hud",
+    "sg": "hud"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_hud_display_content",
+    "sg": "hud_display_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_hud_display_mode",
+    "sg": "hud_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_hud_set_interface",
+    "sg": "hud_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_humidifier",
+    "sg": "humidifier"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_i_call",
+    "sg": "i_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_idle_stop_start",
+    "sg": "idle_stop_start"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_illuminated_luggage_rack",
+    "sg": "illuminated_luggage_rack"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_image_dress_up_interface",
+    "sg": "image_dress_up_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_immediate_charging",
+    "sg": "immediate_charging"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_in_car_communication",
+    "sg": "in_car_communication"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_instrument_show_content",
+    "sg": "instrument_show_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_intelligent_assistants_set_interface",
+    "sg": "intelligent_assistants_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_drive",
+    "sg": "intelligent_drive"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_drive_broadcast",
+    "sg": "intelligent_drive_broadcast"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_driving_style",
+    "sg": "intelligent_driving_style"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_park_space_push",
+    "sg": "intelligent_park_space_push"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_power_off",
+    "sg": "intelligent_power_off"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_power_on",
+    "sg": "intelligent_power_on"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_intelligent_start_stop",
+    "sg": "intelligent_start_stop"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_interconnection_set_interface",
+    "sg": "interconnection_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_interior_heat",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_keep_idle_stop_start_preference",
+    "sg": "keep_idle_stop_start_preference"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_kids_forget_reminder",
+    "sg": "kids_forget_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_landscape_mode",
+    "sg": "landscape_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_lane_centering_assist",
+    "sg": "lane_centering_assist"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_lane_change_voice_reminder",
+    "sg": "lane_change_voice_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_lane_keep",
+    "sg": "lane_keep"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_lane_keep_method",
+    "sg": "lane_keep_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_ldws",
+    "sg": "ldws"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_ldws_sensitivity_mode",
+    "sg": "ldws_sensitivity_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_light_adjustment_set_interface",
+    "sg": "light_adjustment_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_light_expression",
+    "sg": "light_expression"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_light_game",
+    "sg": "light_game"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_light_sensor",
+    "sg": "light_sensor"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_light_show",
+    "sg": "light_show"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_light_theme",
+    "sg": "light_theme"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_llm",
+    "sg": "llm"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_lock_mode",
+    "sg": "lock_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_login_auto_update_car_statu",
+    "sg": "login_auto_update_car_statu"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_loop_mode",
+    "sg": "loop_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_loundness",
+    "sg": "loundness"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_low_battery_reminder",
+    "sg": "low_battery_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_low_quality_audio_source_repair",
+    "sg": "low_quality_audio_source_repair"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_maintenance_reminder",
+    "sg": "maintenance_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_media_center",
+    "sg": "media_center"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_message_push_reminder",
+    "sg": "message_push_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_mileage_display_content",
+    "sg": "mileage_display_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_mobile_data",
+    "sg": "mobile_data"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_monitor",
+    "sg": "monitor"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_monitor_mode",
+    "sg": "monitor_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_monitor_video",
+    "sg": "monitor_video"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_multi_party_call",
+    "sg": "multi_party_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_nfc",
+    "sg": "nfc"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_night_vision",
+    "sg": "night_vision"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_noa",
+    "sg": "noa"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_noise_volume_compensation",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_notification_center",
+    "sg": "notification_center"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_nozzle_heat",
+    "sg": "nozzle_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_obstacle_detection",
+    "sg": "obstacle_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_off_road_thermal_management",
+    "sg": "off_road_thermal_management"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_oil_consumption",
+    "sg": "oil_consumption"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_oil_consumption_test",
+    "sg": "oil_consumption_test"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_oms",
+    "sg": "oms"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_one_shot",
+    "sg": "one_shot"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_organism_forget_reminder",
+    "sg": "organism_forget_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_organism_monitor",
+    "sg": "organism_monitor"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_other_personalize_mode",
+    "sg": "other_personalize_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_other_set_interface",
+    "sg": "other_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_overspeed_alarm",
+    "sg": "overspeed_alarm"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_overspeed_alarm_method",
+    "sg": "overspeed_alarm_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_panoramic_imaging_set_interface",
+    "sg": "panoramic_imaging_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_park_function",
+    "sg": "park_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_park_sensor",
+    "sg": "park_sensor"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_parking_photography",
+    "sg": "parking_photography"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_parking_voice_reminder",
+    "sg": "parking_voice_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_partition_call",
+    "sg": "partition_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_pedal_assist_mode",
+    "sg": "pedal_assist_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_pedestrian_safety_assistance",
+    "sg": "pedestrian_safety_assistance"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_personal_center",
+    "sg": "personal_center"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_pgs",
+    "sg": "pgs"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_pm25",
+    "sg": "pm25"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_pop_up",
+    "sg": "pop_up"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_power_mode",
+    "sg": "power_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_power_retention",
+    "sg": "power_retention"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_predictive_collision_warning",
+    "sg": "predictive_collision_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_pretensioner_seat_belt",
+    "sg": "pretensioner_seat_belt"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_proactive_broadcast",
+    "sg": "proactive_broadcast"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_proactive_care",
+    "sg": "proactive_care"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_push_notifications",
+    "sg": "push_notifications"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_quick_login",
+    "sg": "quick_login"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_ready",
+    "sg": "ready"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_rear_seat_phone_switch",
+    "sg": "rear_seat_phone_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_rear_wheel_steering_system",
+    "sg": "rear_wheel_steering_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_rearview_mirror_mode",
+    "sg": "rearview_mirror_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_remote_control_window",
+    "sg": "remote_control_window"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_repairs_and_maintenance_set_interface",
+    "sg": "repairs_and_maintenance_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_reverse_car_image",
+    "sg": "reverse_car_image"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_safe_drive_warning",
+    "sg": "safe_drive_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_safe_driving_mode",
+    "sg": "safe_driving_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_save_driving_preference",
+    "sg": "save_driving_preference"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_scene_mode",
+    "sg": "scene_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_scene_mode_set_interface",
+    "sg": "scene_mode_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_scheduled_charging",
+    "sg": "scheduled_charging"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen",
+    "sg": "screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_auto_rotate",
+    "sg": "screen_auto_rotate"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_brightness_mode",
+    "sg": "screen_brightness_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_brightness_synchronization_mode",
+    "sg": "screen_brightness_synchronization_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_cleaning",
+    "sg": "screen_cleaning"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_color_mode",
+    "sg": "screen_color_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_content",
+    "sg": "screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_display_mode",
+    "sg": "screen_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_navigation_lighting_effect",
+    "sg": "screen_navigation_lighting_effect"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_screen_saver",
+    "sg": "screen_saver"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_seat_adjustment_set_interface",
+    "sg": "seat_adjustment_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_belt_comfort_adjuster",
+    "sg": "seat_belt_comfort_adjuster"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_belt_heat",
+    "sg": "seat_belt_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_belt_vibration_alert",
+    "sg": "seat_belt_vibration_alert"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_folding_lock",
+    "sg": "seat_folding_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_heat",
+    "sg": "seat_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_heat_mode",
+    "sg": "seat_heat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_leg_support",
+    "sg": "seat_leg_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_massage",
+    "sg": "seat_massage"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_massage_mode",
+    "sg": "seat_massage_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_mode",
+    "sg": "seat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_ventilation",
+    "sg": "seat_ventilation"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_seat_ventilation_mode",
+    "sg": "seat_ventilation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sight_bright_screen",
+    "sg": "sight_bright_screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_simultaneous_dialogue",
+    "sg": "simultaneous_dialogue"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_single_pedal_mode",
+    "sg": "single_pedal_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_smart_key_set_interface",
+    "sg": "smart_key_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_smoke_detection",
+    "sg": "smoke_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_soc_mode",
+    "sg": "soc_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_sound_set_interface",
+    "sg": "sound_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_sound_source_location",
+    "sg": "sound_source_location"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_sound_zone_mode",
+    "sg": "sound_zone_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_speed_following",
+    "sg": "speed_following"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_speed_limit",
+    "sg": "speed_limit"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_speed_limit_information",
+    "sg": "speed_limit_information"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_speed_limit_trigger_mode",
+    "sg": "speed_limit_trigger_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_split_screen",
+    "sg": "split_screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_startup_auto_playing",
+    "sg": "startup_auto_playing"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_startup_reminder",
+    "sg": "startup_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_startup_welcome_message",
+    "sg": "startup_welcome_message"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_adjust_hud",
+    "sg": "steering_wheel_adjust_hud"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_auto_return",
+    "sg": "steering_wheel_auto_return"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_heating",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_position",
+    "sg": "steering_wheel_position"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_steering_wheel_set_interface",
+    "sg": "steering_wheel_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_shake",
+    "sg": "steering_wheel_shake"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_unaligned_remind",
+    "sg": "steering_wheel_unaligned_remind"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_steering_wheel_ventilation",
+    "sg": "steering_wheel_ventilation"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_breathe_mode",
+    "sg": "sunroof_breathe_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_by_number",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_heat_mode",
+    "sg": "sunroof_heat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_little",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_tilt",
+    "sg": "sunroof_tilt"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_to_number",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunroof_ventilation_mode",
+    "sg": "sunroof_ventilation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunshade",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunshade_by_number",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunshade_little",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_sunshade_to_number",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_suspension_mode",
+    "sg": "suspension_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_system_debugging_mode",
+    "sg": "system_debugging_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_system_set_interface",
+    "sg": "system_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_system_update",
+    "sg": "system_update"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_tachograph_set_interface",
+    "sg": "tachograph_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tailgate",
+    "sg": "tailgate"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tailgate_sensing",
+    "sg": "tailgate_sensing"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_take_photo",
+    "sg": "take_photo"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_take_photo_delay",
+    "sg": "take_photo_delay"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_task_manager",
+    "sg": "task_manager"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_the_brake_interface",
+    "sg": "the_brake_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_the_charging_map",
+    "sg": "the_charging_map"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_the_energy_boundary",
+    "sg": "the_energy_boundary"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_the_external_charging_reminder",
+    "sg": "the_external_charging_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_the_external_charging_reminder_set_interface",
+    "sg": "the_external_charging_reminder_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_the_lighting_start_switch",
+    "sg": "the_lighting_start_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_the_rain_sensor",
+    "sg": "the_rain_sensor"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_theme_type",
+    "sg": "theme_type"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_time_synchronization",
+    "sg": "time_synchronization"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_timed_ventilation",
+    "sg": "timed_ventilation"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tire_pressure_calibration",
+    "sg": "tire_pressure_calibration"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tired_detection",
+    "sg": "tired_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tlc",
+    "sg": "tlc"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_touch_screen",
+    "sg": "touch_screen"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tpms",
+    "sg": "tpms"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_transparent_chassis",
+    "sg": "transparent_chassis"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_tsr",
+    "sg": "tsr"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_unlock_mode",
+    "sg": "unlock_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_user_manual",
+    "sg": "user_manual"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_vehicle_check",
+    "sg": "vehicle_check"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_vehicle_model",
+    "sg": "vehicle_model"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_vehicle_power_switch",
+    "sg": "vehicle_power_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_vehicle_refrigerator",
+    "sg": "vehicle_refrigerator"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_vehicle_refrigerator_door",
+    "sg": "vehicle_refrigerator_door"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_vehicle_refrigerator_mode",
+    "sg": "vehicle_refrigerator_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_vehicle_screen_mirroring",
+    "sg": "vehicle_screen_mirroring"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_vehicle_set_interface",
+    "sg": "vehicle_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_vehicle_system",
+    "sg": "vehicle_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_ventilation_system",
+    "sg": "ventilation_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_viewcmd",
+    "sg": "viewcmd"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_virtual_avatar",
+    "sg": "virtual_avatar"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_voice_assistant",
+    "sg": "voice_assistant"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_voice_wake",
+    "sg": "voice_wake"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_voiceprint_recognition",
+    "sg": "voiceprint_recognition"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_volume_banlance",
+    "sg": "volume_banlance"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_volume_external_playback_mode",
+    "sg": "volume_external_playback_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_volume_gradually_in_and_out",
+    "sg": "volume_gradually_in_and_out"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_volume_mode",
+    "sg": "volume_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_wake_up_prompt",
+    "sg": "wake_up_prompt"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_wakeup_free",
+    "sg": "wakeup_free"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_wifi",
+    "sg": "wifi"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_wind_reduction",
+    "sg": "wind_reduction"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_breathe_mode",
+    "sg": "window_breathe_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_by_number",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_curtain",
+    "sg": "window_curtain"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_little",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_lock",
+    "sg": "window_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_to_number",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_window_ventilation_mode",
+    "sg": "window_ventilation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_windshield_heating",
+    "sg": "windshield_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_wiper",
+    "sg": "wiper"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_wiper_maintenance",
+    "sg": "wiper_maintenance"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_wiper_set_interface",
+    "sg": "wiper_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_wiper_wash",
+    "sg": "wiper_wash"
+  },
+  {
+    "domain": "carControl",
+    "name": "close_wireless_charging_for_phone",
+    "sg": "wireless_charging_for_phone"
+  },
+  {
+    "domain": "cmd",
+    "name": "close_zero_shot",
+    "sg": "zero_shot"
+  },
+  {
+    "domain": "airControl",
+    "name": "close_zone_synchronization_mode",
+    "sg": "zone_synchronization_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "collect_parking_space",
+    "sg": "collect_parking_space"
+  },
+  {
+    "domain": "cmd",
+    "name": "connect_bluetooth",
+    "sg": "bluetooth"
+  },
+  {
+    "domain": "cmd",
+    "name": "connect_bluetooth_headset",
+    "sg": "bluetooth_headset"
+  },
+  {
+    "domain": "cmd",
+    "name": "connect_wifi",
+    "sg": "wifi"
+  },
+  {
+    "domain": "cmd",
+    "name": "continue_countdown_time",
+    "sg": "continue_countdown_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "continue_light_show",
+    "sg": "continue_light_show"
+  },
+  {
+    "domain": "cmd",
+    "name": "copy_cross_screen_content",
+    "sg": "copy_cross_screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "copy_same_screen_content",
+    "sg": "copy_same_screen_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "create_parking_route",
+    "sg": "create_parking_route"
+  },
+  {
+    "domain": "cmd",
+    "name": "delete_countdown",
+    "sg": "countdown"
+  },
+  {
+    "domain": "cmd",
+    "name": "delete_dash_cam",
+    "sg": "dash_cam"
+  },
+  {
+    "domain": "cmd",
+    "name": "delete_face_recognition",
+    "sg": "face_recognition"
+  },
+  {
+    "domain": "cmd",
+    "name": "delete_matched_bluetooth_device",
+    "sg": "matched_bluetooth_device"
+  },
+  {
+    "domain": "carControl",
+    "name": "delete_parking_space",
+    "sg": "parking_space"
+  },
+  {
+    "domain": "carControl",
+    "name": "delete_seat_memory",
+    "sg": "seat_memory"
+  },
+  {
+    "domain": "cmd",
+    "name": "delete_theme",
+    "sg": "theme"
+  },
+  {
+    "domain": "cmd",
+    "name": "detection_system_update",
+    "sg": "detection_system_update"
+  },
+  {
+    "domain": "carControl",
+    "name": "disable_line_of_sight_tracking",
+    "sg": "line_of_sight_tracking"
+  },
+  {
+    "domain": "cmd",
+    "name": "disconnect_bluetooth",
+    "sg": "bluetooth"
+  },
+  {
+    "domain": "cmd",
+    "name": "disconnect_bluetooth_headset",
+    "sg": "bluetooth_headset"
+  },
+  {
+    "domain": "cmd",
+    "name": "disconnect_hotspot",
+    "sg": "hotspot"
+  },
+  {
+    "domain": "cmd",
+    "name": "disconnect_wifi",
+    "sg": "wifi"
+  },
+  {
+    "domain": "cmd",
+    "name": "download_system_update",
+    "sg": "download_system_update"
+  },
+  {
+    "domain": "cmd",
+    "name": "download_theme",
+    "sg": "download_theme"
+  },
+  {
+    "domain": "cmd",
+    "name": "enable_automatic_theme_switching",
+    "sg": "automatic_theme_switching"
+  },
+  {
+    "domain": "carControl",
+    "name": "enable_line_of_sight_tracking",
+    "sg": "line_of_sight_tracking"
+  },
+  {
+    "domain": "carControl",
+    "name": "end_charging",
+    "sg": "end_charging"
+  },
+  {
+    "domain": "cmd",
+    "name": "energy_consumption_reset",
+    "sg": "energy_consumption_reset"
+  },
+  {
+    "domain": "carControl",
+    "name": "enlarge_stream_rearview_mirror_image_little",
+    "sg": "enlarge_stream_rearview_mirror_image"
+  },
+  {
+    "domain": "cmd",
+    "name": "exchange_cross_screen_content",
+    "sg": "exchange_cross_screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "exchange_same_screen_content",
+    "sg": "exchange_same_screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "exit_login",
+    "sg": "login"
+  },
+  {
+    "domain": "cmd",
+    "name": "exit_registration",
+    "sg": "registration"
+  },
+  {
+    "domain": "carControl",
+    "name": "finish_creating_parking_route",
+    "sg": "finish_creating_parking_route"
+  },
+  {
+    "domain": "carControl",
+    "name": "fold_rearview_mirror",
+    "sg": "rearview_mirror"
+  },
+  {
+    "domain": "cmd",
+    "name": "fold_screen",
+    "sg": "screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "format_dash_cam",
+    "sg": "format_dash_cam"
+  },
+  {
+    "domain": "carControl",
+    "name": "hard_suspension_little",
+    "sg": "hard_suspension"
+  },
+  {
+    "domain": "carControl",
+    "name": "headrest_direction_adjust_to_extremum",
+    "sg": "headrest_direction_adjust"
+  },
+  {
+    "domain": "carControl",
+    "name": "headrest_direction_ear_slice_adjust_to_extremum",
+    "sg": "headrest_direction_ear_slice_adjust"
+  },
+  {
+    "domain": "airControl",
+    "name": "lock_ac",
+    "sg": "ac"
+  },
+  {
+    "domain": "carControl",
+    "name": "lock_charging_gun",
+    "sg": "charging_gun"
+  },
+  {
+    "domain": "carControl",
+    "name": "lock_door",
+    "sg": "door"
+  },
+  {
+    "domain": "carControl",
+    "name": "lock_parking_space_lock",
+    "sg": "parking_space_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "lock_refrigerator_child_lock",
+    "sg": "refrigerator_child_lock"
+  },
+  {
+    "domain": "cmd",
+    "name": "lock_screen",
+    "sg": "screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "lock_touch_switch",
+    "sg": "touch_switch"
+  },
+  {
+    "domain": "cmd",
+    "name": "login_personal_center",
+    "sg": "login_personal_center"
+  },
+  {
+    "domain": "cmd",
+    "name": "logon_personal_center",
+    "sg": "logon_personal_center"
+  },
+  {
+    "domain": "airControl",
+    "name": "lower_ac_temperature_by_exp",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "lower_ac_temperature_by_number",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "lower_ac_windspeed_by_exp",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "lower_ac_windspeed_by_number",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_atmosphere_lamp_brightness_by_number",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_atmosphere_lamp_brightness_little",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_atmosphere_lamp_change_speed_little",
+    "sg": "atmosphere_lamp_change_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_auto_headlight_sensitivity_little",
+    "sg": "auto_headlight_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_backlight_brightness_by_number",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_backlight_brightness_little",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_button_brightness_by_number",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_button_brightness_little",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_cruise_following_time_interval_little",
+    "sg": "cruise_following_time_interval"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_cruise_speed_by_number",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_cruise_speed_little",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_in_car_lamp_brightness_by_number",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_in_car_lamp_brightness_little",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_in_car_lamp_color_temperature_by_number",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_in_car_lamp_color_temperature_little",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_in_car_lamp_time_by_number",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_in_car_lamp_time_little",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_out_car_lamp_angle_by_number",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_out_car_lamp_angle_little",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_out_car_lamp_time_by_number",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_designative_out_car_lamp_time_little",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_dimming_glass_top_brightness_by_number",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_dimming_glass_top_brightness_little",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_dimming_glass_top_transparency_by_number",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_dimming_glass_top_transparency_little",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_driving_sound_wave_volume",
+    "sg": "driving_sound_wave_volume"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_electric_tail_wing_angle_little",
+    "sg": "electric_tail_wing_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_electric_tail_wing_height_little",
+    "sg": "electric_tail_wing_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_energy_recuperation_level_little",
+    "sg": "energy_recuperation_level"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_eq_by_exp",
+    "sg": "eq"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_eq_by_number",
+    "sg": "eq"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_fragrance_intensity_by_number",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_fragrance_intensity_little",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_headliner_little",
+    "sg": "headliner"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_hud_brightness_by_number",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_hud_brightness_little",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_hud_height_by_number",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_hud_height_little",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_hud_inclination_by_number",
+    "sg": "hud_inclination"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_interior_heat_by_number",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_interior_heat_little",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_ldws_sensitivity_by_number",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_ldws_sensitivity_little",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_leading_vehicle_distance_light_reminder_sensitivity_by_number",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_leading_vehicle_distance_light_reminder_sensitivity_little",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_limit_speed_little",
+    "sg": "limit_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_luminous_luggage_rack_brightness_little",
+    "sg": "luminous_luggage_rack_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_monitor_sensitivity_by_number",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_monitor_sensitivity_little",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_noise_volume_compensation_by_number",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_noise_volume_compensation_little",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_parking_speed_little",
+    "sg": "parking_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_pedal_assist_sensitivity_little",
+    "sg": "pedal_assist_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_predictive_collision_warning_level_little",
+    "sg": "predictive_collision_warning_level"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_screen_brightness_by_number",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_screen_brightness_little",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_belt_heat_temperature_by_exp",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_belt_heat_temperature_by_number",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_heat_temperature_by_number",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_heat_temperature_little",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_massage_force_by_number",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_massage_force_little",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_massage_time_by_number",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_massage_time_little",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_rhythm_mode_by_number",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_rhythm_mode_little",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_ventilation_windspeed_by_number",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_seat_ventilation_windspeed_little",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_soc_target_little",
+    "sg": "soc_target"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_soc_target_value_by_number",
+    "sg": "soc_target_value"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_speak_speed_by_number",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_speak_speed_little",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_steering_wheel_heating_by_number",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_steering_wheel_heating_little",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_stream_rearview_mirror_brightness_by_number",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_stream_rearview_mirror_brightness_little",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_suspension_little",
+    "sg": "suspension"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_tailgate_height_by_number",
+    "sg": "tailgate_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_tailgate_height_little",
+    "sg": "tailgate_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_vehicle_refrigerator_temperature_by_number",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_vehicle_refrigerator_temperature_little",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_volume_by_number",
+    "sg": "volume"
+  },
+  {
+    "domain": "cmd",
+    "name": "lower_volume_little",
+    "sg": "volume"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_wiper_sensitivity_by_number",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_wiper_sensitivity_little",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_wiper_speed_by_number",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "lower_wiper_speed_little",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "modify_bluetooth_name",
+    "sg": "modify_bluetooth_name"
+  },
+  {
+    "domain": "cmd",
+    "name": "move_cross_screen_content",
+    "sg": "cross_screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "move_same_screen_content",
+    "sg": "same_screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "move_screen_direction_to_extremum",
+    "sg": "screen_direction"
+  },
+  {
+    "domain": "cmd",
+    "name": "move_screen_to_direction",
+    "sg": "screen_to_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_360_look_around",
+    "sg": "360_look_around"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_abnormal_vehicle_condition_alert",
+    "sg": "abnormal_vehicle_condition_alert"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_ac",
+    "sg": "ac"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_ac_cooling_mode",
+    "sg": "ac_cooling_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_ac_heating_mode",
+    "sg": "ac_heating_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_ac_set_interface",
+    "sg": "ac_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_accelerator_anti_false_step",
+    "sg": "accelerator_anti_false_step"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_account_list",
+    "sg": "account_list"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_acoustics_mode",
+    "sg": "acoustics_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_aeb",
+    "sg": "aeb"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_agile_steering",
+    "sg": "agile_steering"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_air_clean",
+    "sg": "air_clean"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_airbag",
+    "sg": "airbag"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_airoutlet",
+    "sg": "airoutlet"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_al_qibla_reminder",
+    "sg": "al_qibla_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_album",
+    "sg": "album"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_alc",
+    "sg": "alc"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_alc_confirm",
+    "sg": "alc_confirm"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_anc",
+    "sg": "anc"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_antilocked_braking_system",
+    "sg": "antilocked_braking_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_app_account_association",
+    "sg": "app_account_association"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_application_management_set_interface",
+    "sg": "application_management_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_assisted_drive",
+    "sg": "assisted_drive"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_assisted_park_set_interface",
+    "sg": "assisted_park_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_atmosphere_lamp",
+    "sg": "atmosphere_lamp"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_auto_hold",
+    "sg": "auto_hold"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_auto_sync_contact",
+    "sg": "auto_sync_contact"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_auto_volume_reduction",
+    "sg": "auto_volume_reduction"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_automatic_time_zone",
+    "sg": "automatic_time_zone"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_automatic_turn_on_panoramic_imaging_mode",
+    "sg": "automatic_turn_on_panoramic_imaging_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_automatic_window_closing",
+    "sg": "automatic_window_closing"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_automatic_window_opening",
+    "sg": "automatic_window_opening"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_b_call",
+    "sg": "b_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_back_row_detection",
+    "sg": "back_row_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_back_window",
+    "sg": "back_window"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_backlight",
+    "sg": "backlight"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_battery_temperature_preheating_reminder",
+    "sg": "battery_temperature_preheating_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_best_listening_position",
+    "sg": "best_listening_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_blind_spot_detection",
+    "sg": "blind_spot_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_blind_spot_image_quality_enhancement",
+    "sg": "blind_spot_image_quality_enhancement"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_blind_spot_imaging",
+    "sg": "blind_spot_imaging"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_blocking_glass",
+    "sg": "blocking_glass"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_blower_delay_shutdown",
+    "sg": "blower_delay_shutdown"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_blue_ray_filtering",
+    "sg": "blue_ray_filtering"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_bluetooth",
+    "sg": "bluetooth"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_bluetooth_auto_connect",
+    "sg": "bluetooth_auto_connect"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_bluetooth_founded_switch",
+    "sg": "bluetooth_founded_switch"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_bluetooth_headset",
+    "sg": "bluetooth_headset"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_breathe_system",
+    "sg": "breathe_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_cabin_disinfect",
+    "sg": "cabin_disinfect"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_call_broadcast",
+    "sg": "call_broadcast"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_call_detection",
+    "sg": "call_detection"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_calls_auto_answer",
+    "sg": "calls_auto_answer"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_calls_auto_reject",
+    "sg": "calls_auto_reject"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_calls_mute",
+    "sg": "calls_mute"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_camera",
+    "sg": "camera"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_car_connectivity",
+    "sg": "car_connectivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_car_door",
+    "sg": "car_door"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_car_film_transparency",
+    "sg": "car_film_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_car_seek_mode",
+    "sg": "car_seek_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_central_lock",
+    "sg": "central_lock"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_charge_discharge_set_interface",
+    "sg": "charge_discharge_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_charging_gun_anti_theft_mode",
+    "sg": "charging_gun_anti_theft_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_charging_gun_auto_unlock",
+    "sg": "charging_gun_auto_unlock"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_charging_mode",
+    "sg": "charging_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_charging_port",
+    "sg": "charging_port"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_chassis_lift_function",
+    "sg": "chassis_lift_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_child_lock",
+    "sg": "child_lock"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_chitchat",
+    "sg": "chitchat"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_collision_warning",
+    "sg": "collision_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_comfortable_entry_exit",
+    "sg": "comfortable_entry_exit"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_comfortable_park",
+    "sg": "comfortable_park"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_contact_privacy_mode",
+    "sg": "contact_privacy_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_cross_traffic_brake",
+    "sg": "cross_traffic_brake"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_cruise_broadcast",
+    "sg": "cruise_broadcast"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_cruise_system",
+    "sg": "cruise_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_cta",
+    "sg": "cta"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_customize_button_function",
+    "sg": "customize_button_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_danger_action_detection_reminder",
+    "sg": "danger_action_detection_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_dash_cam",
+    "sg": "dash_cam"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_data_usage_alert_function",
+    "sg": "data_usage_alert_function"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_defog_mode",
+    "sg": "defog_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_defrost_mode",
+    "sg": "defrost_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_dehumidification_mode",
+    "sg": "dehumidification_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_departure_reminder_system",
+    "sg": "departure_reminder_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_designated_function",
+    "sg": "designated_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_designative_in_car_lamp",
+    "sg": "designative_in_car_lamp"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_designative_out_car_lamp",
+    "sg": "designative_out_car_lamp"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_desktop_map_priority_display",
+    "sg": "desktop_map_priority_display"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_dialect_auto_switching",
+    "sg": "dialect_auto_switching"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_differential_lock",
+    "sg": "differential_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_dimming_glass_top",
+    "sg": "dimming_glass_top"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_display_brightness_set_interface",
+    "sg": "display_brightness_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_distraction_detection",
+    "sg": "distraction_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_dms",
+    "sg": "dms"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_door_by_number",
+    "sg": "door"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_door_little",
+    "sg": "door"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_doors_windows_locks_set_interface",
+    "sg": "doors_windows_locks_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_driver_assistance_set_interface",
+    "sg": "driver_assistance_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driver_behavior_detection",
+    "sg": "driver_behavior_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driver_state_warn",
+    "sg": "driver_state_warn"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driving_data_collect",
+    "sg": "driving_data_collect"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driving_entertainment_restriction",
+    "sg": "driving_entertainment_restriction"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driving_habits",
+    "sg": "driving_habits"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driving_lock_screen",
+    "sg": "driving_lock_screen"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driving_mode",
+    "sg": "driving_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_driving_mode_memory",
+    "sg": "driving_mode_memory"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_driving_mode_set_interface",
+    "sg": "driving_mode_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_driving_sound_wave",
+    "sg": "driving_sound_wave"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_dropdown_menu",
+    "sg": "dropdown_menu"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_dst",
+    "sg": "dst"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_dynamic_traffic_scene_display",
+    "sg": "dynamic_traffic_scene_display"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_e_call",
+    "sg": "e_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_electric_side_pedal",
+    "sg": "electric_side_pedal"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_electric_tail_wing",
+    "sg": "electric_tail_wing"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_electric_tailgate_switch",
+    "sg": "electric_tailgate_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_electronic_brake",
+    "sg": "electronic_brake"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_emergency_record",
+    "sg": "emergency_record"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_energy_consumption_curve",
+    "sg": "energy_consumption_curve"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_energy_consumption_set_interface",
+    "sg": "energy_consumption_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_energy_flow_chart",
+    "sg": "energy_flow_chart"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_energy_information",
+    "sg": "energy_information"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_energy_management_mode",
+    "sg": "energy_management_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_energy_recuperation",
+    "sg": "energy_recuperation"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_engine_hood",
+    "sg": "engine_hood"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_eps_associated_with_driving_mode",
+    "sg": "eps_associated_with_driving_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_eps_mode",
+    "sg": "eps_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_eq",
+    "sg": "eq"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_esc",
+    "sg": "esc"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_etc",
+    "sg": "etc"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_expression_identify",
+    "sg": "expression_identify"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_exterior_voice",
+    "sg": "exterior_voice"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_external_discharge",
+    "sg": "external_discharge"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_external_voice_interaction",
+    "sg": "external_voice_interaction"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_face_id_start_car",
+    "sg": "face_id_start_car"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_face_recognition",
+    "sg": "face_recognition"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_fastener_reminder",
+    "sg": "fastener_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_fault_reporting",
+    "sg": "fault_reporting"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_feedback",
+    "sg": "feedback"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_folder",
+    "sg": "folder"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_fortify_reminder",
+    "sg": "fortify_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_fragrance",
+    "sg": "fragrance"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_fragrance_set_interface",
+    "sg": "fragrance_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_fuel_tank_cap",
+    "sg": "fuel_tank_cap"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_gaze_viewcmd",
+    "sg": "gaze_viewcmd"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_gaze_wakeup",
+    "sg": "gaze_wakeup"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_gesture_photography",
+    "sg": "gesture_photography"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_gesture_recognitton",
+    "sg": "gesture_recognitton"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_glove_compartment",
+    "sg": "glove_compartment"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_glove_compartment_password",
+    "sg": "glove_compartment_password"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_goods_forget_reminder",
+    "sg": "goods_forget_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_haptics",
+    "sg": "haptics"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_hd_quality_calls",
+    "sg": "hd_quality_calls"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_headliner",
+    "sg": "headliner"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_headrest_audio_system",
+    "sg": "headrest_audio_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_headrest_directional_broadcast",
+    "sg": "headrest_directional_broadcast"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_hotspot",
+    "sg": "hotspot"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_hud",
+    "sg": "hud"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_hud_display_content",
+    "sg": "hud_display_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_hud_display_mode",
+    "sg": "hud_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_hud_set_interface",
+    "sg": "hud_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_humidifier",
+    "sg": "humidifier"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_i_call",
+    "sg": "i_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_idle_stop_start",
+    "sg": "idle_stop_start"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_illuminated_luggage_rack",
+    "sg": "illuminated_luggage_rack"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_image_dress_up_interface",
+    "sg": "image_dress_up_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_immediate_charging",
+    "sg": "immediate_charging"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_in_car_communication",
+    "sg": "in_car_communication"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_instrument_show_content",
+    "sg": "instrument_show_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_intelligent_assistants_set_interface",
+    "sg": "intelligent_assistants_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_drive",
+    "sg": "intelligent_drive"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_drive_broadcast",
+    "sg": "intelligent_drive_broadcast"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_driving_style",
+    "sg": "intelligent_driving_style"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_park_space_push",
+    "sg": "intelligent_park_space_push"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_power_off",
+    "sg": "intelligent_power_off"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_power_on",
+    "sg": "intelligent_power_on"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_intelligent_start_stop",
+    "sg": "intelligent_start_stop"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_interconnection_set_interface",
+    "sg": "interconnection_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_interior_heat",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_keep_idle_stop_start_preference",
+    "sg": "keep_idle_stop_start_preference"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_kids_forget_reminder",
+    "sg": "kids_forget_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_landscape_mode",
+    "sg": "landscape_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_lane_centering_assist",
+    "sg": "lane_centering_assist"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_lane_change_voice_reminder",
+    "sg": "lane_change_voice_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_lane_keep",
+    "sg": "lane_keep"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_ldws",
+    "sg": "ldws"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_light_adjustment_set_interface",
+    "sg": "light_adjustment_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_light_expression",
+    "sg": "light_expression"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_light_game",
+    "sg": "light_game"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_light_sensor",
+    "sg": "light_sensor"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_light_show",
+    "sg": "light_show"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_light_theme",
+    "sg": "light_theme"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_llm",
+    "sg": "llm"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_lock_mode",
+    "sg": "lock_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_login_auto_update_car_statu",
+    "sg": "login_auto_update_car_statu"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_loop_mode",
+    "sg": "loop_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_loundness",
+    "sg": "loundness"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_low_battery_reminder",
+    "sg": "low_battery_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_low_quality_audio_source_repair",
+    "sg": "low_quality_audio_source_repair"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_maintenance_reminder",
+    "sg": "maintenance_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_media_center",
+    "sg": "media_center"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_message_push_reminder",
+    "sg": "message_push_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_mobile_data",
+    "sg": "mobile_data"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_monitor",
+    "sg": "monitor"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_monitor_video",
+    "sg": "monitor_video"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_multi_party_call",
+    "sg": "multi_party_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_nfc",
+    "sg": "nfc"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_night_vision",
+    "sg": "night_vision"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_noa",
+    "sg": "noa"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_noise_volume_compensation",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_notification_center",
+    "sg": "notification_center"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_nozzle_heat",
+    "sg": "nozzle_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_obstacle_detection",
+    "sg": "obstacle_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_off_road_thermal_management",
+    "sg": "off_road_thermal_management"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_oil_consumption",
+    "sg": "oil_consumption"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_oil_consumption_test",
+    "sg": "oil_consumption_test"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_oms",
+    "sg": "oms"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_one_shot",
+    "sg": "one_shot"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_organism_forget_reminder",
+    "sg": "organism_forget_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_organism_monitor",
+    "sg": "organism_monitor"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_other_personalize_mode",
+    "sg": "other_personalize_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_other_set_interface",
+    "sg": "other_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_overspeed_alarm",
+    "sg": "overspeed_alarm"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_panoramic_imaging_set_interface",
+    "sg": "panoramic_imaging_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_park_function",
+    "sg": "park_function"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_park_sensor",
+    "sg": "park_sensor"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_parking_photography",
+    "sg": "parking_photography"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_parking_voice_reminder",
+    "sg": "parking_voice_reminder"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_partition_call",
+    "sg": "partition_call"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_pedal_assist_mode",
+    "sg": "pedal_assist_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_pedestrian_safety_assistance",
+    "sg": "pedestrian_safety_assistance"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_personal_center",
+    "sg": "personal_center"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_pgs",
+    "sg": "pgs"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_pm25",
+    "sg": "pm25"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_pop_up",
+    "sg": "pop_up"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_power_mode",
+    "sg": "power_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_power_retention",
+    "sg": "power_retention"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_predictive_collision_warning",
+    "sg": "predictive_collision_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_pretensioner_seat_belt",
+    "sg": "pretensioner_seat_belt"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_proactive_broadcast",
+    "sg": "proactive_broadcast"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_proactive_care",
+    "sg": "proactive_care"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_push_notifications",
+    "sg": "push_notifications"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_quick_login",
+    "sg": "quick_login"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_ready",
+    "sg": "ready"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_rear_seat_phone_switch",
+    "sg": "rear_seat_phone_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_rear_wheel_steering_system",
+    "sg": "rear_wheel_steering_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_rearview_mirror_mode",
+    "sg": "rearview_mirror_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_remote_control_window",
+    "sg": "remote_control_window"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_repairs_and_maintenance_set_interface",
+    "sg": "repairs_and_maintenance_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_reverse_car_image",
+    "sg": "reverse_car_image"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_safe_drive_warning",
+    "sg": "safe_drive_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_safe_driving_mode",
+    "sg": "safe_driving_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_save_driving_preference",
+    "sg": "save_driving_preference"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_scene_mode",
+    "sg": "scene_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_scene_mode_set_interface",
+    "sg": "scene_mode_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_scheduled_charging",
+    "sg": "scheduled_charging"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen",
+    "sg": "screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen_auto_rotate",
+    "sg": "screen_auto_rotate"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen_brightness_mode",
+    "sg": "screen_brightness_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen_brightness_synchronization_mode",
+    "sg": "screen_brightness_synchronization_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen_cleaning",
+    "sg": "screen_cleaning"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen_navigation_lighting_effect",
+    "sg": "screen_navigation_lighting_effect"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_screen_saver",
+    "sg": "screen_saver"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_seat_adjustment_set_interface",
+    "sg": "seat_adjustment_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_belt_comfort_adjuster",
+    "sg": "seat_belt_comfort_adjuster"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_belt_heat",
+    "sg": "seat_belt_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_belt_vibration_alert",
+    "sg": "seat_belt_vibration_alert"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_folding_lock",
+    "sg": "seat_folding_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_heat",
+    "sg": "seat_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_heat_mode",
+    "sg": "seat_heat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_leg_support",
+    "sg": "seat_leg_support"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_massage",
+    "sg": "seat_massage"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_massage_mode",
+    "sg": "seat_massage_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_mode",
+    "sg": "seat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_ventilation",
+    "sg": "seat_ventilation"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_seat_ventilation_mode",
+    "sg": "seat_ventilation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sight_bright_screen",
+    "sg": "sight_bright_screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_simultaneous_dialogue",
+    "sg": "simultaneous_dialogue"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_single_pedal_mode",
+    "sg": "single_pedal_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_smart_key_set_interface",
+    "sg": "smart_key_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_smoke_detection",
+    "sg": "smoke_detection"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_sound_recording",
+    "sg": "sound_recording"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_sound_set_interface",
+    "sg": "sound_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_sound_source_location",
+    "sg": "sound_source_location"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_speed_following",
+    "sg": "speed_following"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_speed_limit",
+    "sg": "speed_limit"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_speed_limit_information",
+    "sg": "speed_limit_information"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_split_screen",
+    "sg": "split_screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_startup_auto_playing",
+    "sg": "startup_auto_playing"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_startup_reminder",
+    "sg": "startup_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_startup_welcome_message",
+    "sg": "startup_welcome_message"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_adjust_hud",
+    "sg": "steering_wheel_adjust_hud"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_auto_return",
+    "sg": "steering_wheel_auto_return"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_heating",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_position",
+    "sg": "steering_wheel_position"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_steering_wheel_set_interface",
+    "sg": "steering_wheel_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_shake",
+    "sg": "steering_wheel_shake"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_unaligned_remind",
+    "sg": "steering_wheel_unaligned_remind"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_steering_wheel_ventilation",
+    "sg": "steering_wheel_ventilation"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof_breathe_mode",
+    "sg": "sunroof_breathe_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof_by_number",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof_heat_mode",
+    "sg": "sunroof_heat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof_little",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof_to_number",
+    "sg": "sunroof"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunroof_ventilation_mode",
+    "sg": "sunroof_ventilation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunshade",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunshade_by_number",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunshade_little",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_sunshade_to_number",
+    "sg": "sunshade"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_suspension_mode",
+    "sg": "suspension_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_system_debugging_mode",
+    "sg": "system_debugging_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_system_set_interface",
+    "sg": "system_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_system_update",
+    "sg": "system_update"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_tachograph_set_interface",
+    "sg": "tachograph_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tailgate",
+    "sg": "tailgate"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tailgate_sensing",
+    "sg": "tailgate_sensing"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_take_photo_delay",
+    "sg": "take_photo_delay"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_task_manager",
+    "sg": "task_manager"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_the_brake_interface",
+    "sg": "the_brake_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_the_charging_map",
+    "sg": "the_charging_map"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_the_energy_boundary",
+    "sg": "the_energy_boundary"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_the_external_charging_reminder",
+    "sg": "the_external_charging_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_the_external_charging_reminder_set_interface",
+    "sg": "the_external_charging_reminder_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_the_lighting_start_switch",
+    "sg": "the_lighting_start_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_the_rain_sensor",
+    "sg": "the_rain_sensor"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_theme_type",
+    "sg": "theme_type"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_time_synchronization",
+    "sg": "time_synchronization"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_timed_ventilation",
+    "sg": "timed_ventilation"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tire_pressure_calibration",
+    "sg": "tire_pressure_calibration"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tired_detection",
+    "sg": "tired_detection"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tlc",
+    "sg": "tlc"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_touch_screen",
+    "sg": "touch_screen"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tpms",
+    "sg": "tpms"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_transparent_chassis",
+    "sg": "transparent_chassis"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_tsr",
+    "sg": "tsr"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_unlock_mode",
+    "sg": "unlock_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_user_manual",
+    "sg": "user_manual"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_vehicle_check",
+    "sg": "vehicle_check"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_vehicle_model",
+    "sg": "vehicle_model"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_vehicle_power_switch",
+    "sg": "vehicle_power_switch"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_vehicle_refrigerator",
+    "sg": "vehicle_refrigerator"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_vehicle_refrigerator_door",
+    "sg": "vehicle_refrigerator_door"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_vehicle_refrigerator_mode",
+    "sg": "vehicle_refrigerator_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_vehicle_screen_mirroring",
+    "sg": "vehicle_screen_mirroring"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_vehicle_set_interface",
+    "sg": "vehicle_set_interface"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_vehicle_system",
+    "sg": "vehicle_system"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_ventilation_system",
+    "sg": "ventilation_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_viewcmd",
+    "sg": "viewcmd"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_virtual_avatar",
+    "sg": "virtual_avatar"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_voice_assistant",
+    "sg": "voice_assistant"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_voice_wake",
+    "sg": "voice_wake"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_voiceprint_recognition",
+    "sg": "voiceprint_recognition"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_volume_banlance",
+    "sg": "volume_banlance"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_volume_external_playback_mode",
+    "sg": "volume_external_playback_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_volume_gradually_in_and_out",
+    "sg": "volume_gradually_in_and_out"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_wake_up_prompt",
+    "sg": "wake_up_prompt"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_wakeup_free",
+    "sg": "wakeup_free"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_wifi",
+    "sg": "wifi"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_wind_reduction",
+    "sg": "wind_reduction"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_breathe_mode",
+    "sg": "window_breathe_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_by_number",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_curtain",
+    "sg": "window_curtain"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_little",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_lock",
+    "sg": "window_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_to_number",
+    "sg": "window"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_window_ventilation_mode",
+    "sg": "window_ventilation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_windshield_heating",
+    "sg": "windshield_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_wiper",
+    "sg": "wiper"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_wiper_maintenance",
+    "sg": "wiper_maintenance"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_wiper_set_interface",
+    "sg": "wiper_set_interface"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_wiper_wash",
+    "sg": "wiper_wash"
+  },
+  {
+    "domain": "carControl",
+    "name": "open_wireless_charging_for_phone",
+    "sg": "wireless_charging_for_phone"
+  },
+  {
+    "domain": "cmd",
+    "name": "open_zero_shot",
+    "sg": "zero_shot"
+  },
+  {
+    "domain": "airControl",
+    "name": "open_zone_synchronization_mode",
+    "sg": "zone_synchronization_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "order_query",
+    "sg": "order_query"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_car_door",
+    "sg": "car_door"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_charging",
+    "sg": "charging"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_console_moving",
+    "sg": "console_moving"
+  },
+  {
+    "domain": "cmd",
+    "name": "pause_countdown_time",
+    "sg": "countdown_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_light_show",
+    "sg": "light_show"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_park_in",
+    "sg": "park_in"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_park_out",
+    "sg": "park_out"
+  },
+  {
+    "domain": "cmd",
+    "name": "pause_screen_recording",
+    "sg": "screen_recording"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_seat_mode",
+    "sg": "seat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_seat_position_adjustment",
+    "sg": "seat_position_adjustment"
+  },
+  {
+    "domain": "cmd",
+    "name": "pause_sound_recording",
+    "sg": "sound_recording"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_sunroof_slide",
+    "sg": "sunroof_slide"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_sunshade_slide",
+    "sg": "sunshade_slide"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_tailgate",
+    "sg": "tailgate"
+  },
+  {
+    "domain": "cmd",
+    "name": "pause_take_video",
+    "sg": "take_video"
+  },
+  {
+    "domain": "carControl",
+    "name": "pause_window_slide",
+    "sg": "window_slide"
+  },
+  {
+    "domain": "cmd",
+    "name": "picture_zoom_in_by_exp",
+    "sg": "picture_zoom_in"
+  },
+  {
+    "domain": "cmd",
+    "name": "picture_zoom_out_by_exp",
+    "sg": "picture_zoom_out"
+  },
+  {
+    "domain": "airControl",
+    "name": "query_ac_temperature",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "query_ac_windspeed",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "query_amount_of_fragrance",
+    "sg": "amount_of_fragrance"
+  },
+  {
+    "domain": "cmd",
+    "name": "query_current_volume",
+    "sg": "current_volume"
+  },
+  {
+    "domain": "carControl",
+    "name": "query_mode_of_fragrance",
+    "sg": "mode_of_fragrance"
+  },
+  {
+    "domain": "airControl",
+    "name": "raise_ac_temperature_by_exp",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "raise_ac_temperature_by_number",
+    "sg": "ac_temperature"
+  },
+  {
+    "domain": "airControl",
+    "name": "raise_ac_windspeed_by_exp",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "airControl",
+    "name": "raise_ac_windspeed_by_number",
+    "sg": "ac_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_atmosphere_lamp_brightness_by_number",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_atmosphere_lamp_brightness_little",
+    "sg": "atmosphere_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_atmosphere_lamp_change_speed_little",
+    "sg": "atmosphere_lamp_change_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_auto_headlight_sensitivity_little",
+    "sg": "auto_headlight_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_backlight_brightness_by_number",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_backlight_brightness_little",
+    "sg": "backlight_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_button_brightness_by_number",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_button_brightness_little",
+    "sg": "button_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_cruise_following_time_interval_little",
+    "sg": "cruise_following_time_interval"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_cruise_speed_by_number",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_cruise_speed_little",
+    "sg": "cruise_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_in_car_lamp_brightness_by_number",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_in_car_lamp_brightness_little",
+    "sg": "designative_in_car_lamp_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_in_car_lamp_color_temperature_by_number",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_in_car_lamp_color_temperature_little",
+    "sg": "designative_in_car_lamp_color_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_in_car_lamp_time_by_number",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_in_car_lamp_time_little",
+    "sg": "designative_in_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_out_car_lamp_angle_by_number",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_out_car_lamp_angle_little",
+    "sg": "designative_out_car_lamp_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_out_car_lamp_time_by_number",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_designative_out_car_lamp_time_little",
+    "sg": "designative_out_car_lamp_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_dimming_glass_top_brightness_by_gear",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_dimming_glass_top_brightness_by_number",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_dimming_glass_top_brightness_little",
+    "sg": "dimming_glass_top_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_dimming_glass_top_transparency_by_number",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_dimming_glass_top_transparency_little",
+    "sg": "dimming_glass_top_transparency"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_driving_sound_wave_volume",
+    "sg": "driving_sound_wave_volume"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_electric_tail_wing_angle_little",
+    "sg": "electric_tail_wing_angle"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_electric_tail_wing_height_little",
+    "sg": "electric_tail_wing_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_energy_recuperation_level_little",
+    "sg": "energy_recuperation_level"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_eq_by_exp",
+    "sg": "eq"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_eq_by_number",
+    "sg": "eq"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_fragrance_intensity_by_number",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_fragrance_intensity_little",
+    "sg": "fragrance_intensity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_headliner_little",
+    "sg": "headliner"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_hud_brightness_by_number",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_hud_brightness_little",
+    "sg": "hud_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_hud_height_by_number",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_hud_height_little",
+    "sg": "hud_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_hud_inclination_by_number",
+    "sg": "hud_inclination"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_interior_heat_by_number",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_interior_heat_little",
+    "sg": "interior_heat"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_ldws_sensitivity_by_number",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_ldws_sensitivity_little",
+    "sg": "ldws_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_leading_vehicle_distance_light_reminder_sensitivity_by_number",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_leading_vehicle_distance_light_reminder_sensitivity_little",
+    "sg": "leading_vehicle_distance_light_reminder_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_limit_speed_little",
+    "sg": "limit_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_luminous_luggage_rack_brightness_little",
+    "sg": "luminous_luggage_rack_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_monitor_sensitivity_by_number",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_monitor_sensitivity_little",
+    "sg": "monitor_sensitivity"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_noise_volume_compensation_by_number",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_noise_volume_compensation_little",
+    "sg": "noise_volume_compensation"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_parking_speed_little",
+    "sg": "parking_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_pedal_assist_sensitivity_little",
+    "sg": "pedal_assist_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_predictive_collision_warning_level_little",
+    "sg": "predictive_collision_warning_level"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_screen_brightness_by_number",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_screen_brightness_little",
+    "sg": "screen_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_belt_heat_temperature_by_exp",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_belt_heat_temperature_by_number",
+    "sg": "seat_belt_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_heat_temperature_by_number",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_heat_temperature_little",
+    "sg": "seat_heat_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_massage_force_by_number",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_massage_force_little",
+    "sg": "seat_massage_force"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_massage_time_by_number",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_massage_time_little",
+    "sg": "seat_massage_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_rhythm_mode_by_number",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_rhythm_mode_little",
+    "sg": "seat_rhythm_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_ventilation_windspeed_by_number",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_seat_ventilation_windspeed_little",
+    "sg": "seat_ventilation_windspeed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_soc_target_little",
+    "sg": "soc_target"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_soc_target_value_by_number",
+    "sg": "soc_target_value"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_speak_speed_by_number",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_speak_speed_little",
+    "sg": "speak_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_steering_wheel_heating_by_number",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_steering_wheel_heating_little",
+    "sg": "steering_wheel_heating"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_stream_rearview_mirror_brightness_by_number",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_stream_rearview_mirror_brightness_little",
+    "sg": "stream_rearview_mirror_brightness"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_suspension_little",
+    "sg": "suspension"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_tailgate_height_by_number",
+    "sg": "tailgate_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_tailgate_height_little",
+    "sg": "tailgate_height"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_vehicle_refrigerator_temperature_by_number",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_vehicle_refrigerator_temperature_little",
+    "sg": "vehicle_refrigerator_temperature"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_volume_by_number",
+    "sg": "volume"
+  },
+  {
+    "domain": "cmd",
+    "name": "raise_volume_little",
+    "sg": "volume"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_wiper_sensitivity_by_number",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_wiper_sensitivity_little",
+    "sg": "wiper_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_wiper_speed_by_number",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "raise_wiper_speed_little",
+    "sg": "wiper_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "reduce_stream_rearview_mirror_image_little",
+    "sg": "reduce_stream_rearview_mirror_image"
+  },
+  {
+    "domain": "cmd",
+    "name": "reduce_system_font_size",
+    "sg": "reduce_system_font_size"
+  },
+  {
+    "domain": "cmd",
+    "name": "reset_cumulative_mileage",
+    "sg": "cumulative_mileage"
+  },
+  {
+    "domain": "carControl",
+    "name": "reset_hud_configuration",
+    "sg": "hud_configuration"
+  },
+  {
+    "domain": "carControl",
+    "name": "reset_maintenance_info",
+    "sg": "maintenance_info"
+  },
+  {
+    "domain": "cmd",
+    "name": "reset_network_settings",
+    "sg": "network_settings"
+  },
+  {
+    "domain": "cmd",
+    "name": "reset_screen_direction",
+    "sg": "screen_direction"
+  },
+  {
+    "domain": "cmd",
+    "name": "restart_vehicle_system",
+    "sg": "restart_vehicle_system"
+  },
+  {
+    "domain": "cmd",
+    "name": "restore_factory_set",
+    "sg": "restore_factory_set"
+  },
+  {
+    "domain": "cmd",
+    "name": "rotate_screen_to_direction",
+    "sg": "rotate_screen_to_direction"
+  },
+  {
+    "domain": "cmd",
+    "name": "rotate_screen_to_extremum",
+    "sg": "rotate_screen"
+  },
+  {
+    "domain": "carControl",
+    "name": "save_rearview_mirror_direction",
+    "sg": "rearview_mirror_direction"
+  },
+  {
+    "domain": "carControl",
+    "name": "save_seat_mode",
+    "sg": "seat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "save_steering_wheel_position",
+    "sg": "steering_wheel_position"
+  },
+  {
+    "domain": "cmd",
+    "name": "screen_module_zoom_in",
+    "sg": "screen_module_zoom_in"
+  },
+  {
+    "domain": "cmd",
+    "name": "screen_module_zoom_out",
+    "sg": "screen_module_zoom_out"
+  },
+  {
+    "domain": "cmd",
+    "name": "screen_rotate",
+    "sg": "screen_rotate"
+  },
+  {
+    "domain": "cmd",
+    "name": "search_bluetooth_device",
+    "sg": "bluetooth_device"
+  },
+  {
+    "domain": "carControl",
+    "name": "seat_memory_bind",
+    "sg": "seat_memory_bind"
+  },
+  {
+    "domain": "carControl",
+    "name": "select_parking_space",
+    "sg": "parking_space"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_ibooster_mode",
+    "sg": "ibooster_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_audio_output_device",
+    "sg": "audio_output_device"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_blind_spot_detection_reminder_method",
+    "sg": "blind_spot_detection_reminder_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_capacity_display_unit",
+    "sg": "capacity_display_unit"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_car_character",
+    "sg": "car_character"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_car_search_method",
+    "sg": "car_search_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_car_search_time",
+    "sg": "car_search_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_charging_limit_to_number",
+    "sg": "charging_limit"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_charging_warm_end_time",
+    "sg": "charging_warm_end_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_charging_warm_keeping_time",
+    "sg": "charging_warm_keeping_time"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_continuous_dialogue_time",
+    "sg": "continuous_dialogue_time"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_countdown_time",
+    "sg": "countdown_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_customize_button_function",
+    "sg": "customize_button_function"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_date_display_format",
+    "sg": "date_display_format"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_default_app",
+    "sg": "default_app"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_defense_method",
+    "sg": "defense_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_desktop_mode",
+    "sg": "desktop_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_dialog_style",
+    "sg": "dialog_style"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_dimming_glass_top_color",
+    "sg": "dimming_glass_top_color"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_dimming_glass_top_mode",
+    "sg": "dimming_glass_top_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_distance_display_unit",
+    "sg": "distance_display_unit"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_distance_for_collision_warning",
+    "sg": "distance_for_collision_warning"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_door_speed_to_gear",
+    "sg": "door_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_door_speed_to_number",
+    "sg": "door_speed"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_driving_sound_wave_mode",
+    "sg": "driving_sound_wave_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_electricity_consumption_unit",
+    "sg": "electricity_consumption_unit"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_energy_recuperation_mode",
+    "sg": "energy_recuperation_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_eq_mode",
+    "sg": "eq_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_esc_mode",
+    "sg": "esc_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_exterior_voice_content",
+    "sg": "exterior_voice_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_face_recognition",
+    "sg": "face_recognition"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_fragrance_time",
+    "sg": "fragrance_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_glove_compartment_password",
+    "sg": "glove_compartment_password"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_headrest_audio_system_mode",
+    "sg": "headrest_audio_system_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_hotspot_band",
+    "sg": "hotspot_band"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_hotspot_name",
+    "sg": "hotspot_name"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_hotspot_password",
+    "sg": "hotspot_password"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_hotspot_password_unvisible",
+    "sg": "hotspot_password_unvisible"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_hotspot_password_visible",
+    "sg": "hotspot_password_visible"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_instrument_screen_mode",
+    "sg": "instrument_screen_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_lane_keep_method",
+    "sg": "lane_keep_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_ldws_sensitivity_mode",
+    "sg": "ldws_sensitivity_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_lock_prompt_method",
+    "sg": "lock_prompt_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_login_validity",
+    "sg": "login_validity"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_low_battery_reminder_method",
+    "sg": "low_battery_reminder_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_luminous_luggage_rack_color",
+    "sg": "luminous_luggage_rack_color"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_maintenance_reminder_distance",
+    "sg": "maintenance_reminder_distance"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_maintenance_reminder_time",
+    "sg": "maintenance_reminder_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_maximum_of_door_opening_to_number",
+    "sg": "maximum_of_door_opening"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_mileage_display_content",
+    "sg": "mileage_display_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_monitor_alarm_method",
+    "sg": "monitor_alarm_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_monitor_mode",
+    "sg": "monitor_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_nozzle_heat_mode",
+    "sg": "nozzle_heat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_overspeed_alarm_method",
+    "sg": "overspeed_alarm_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_parking_speed_to_gear",
+    "sg": "parking_speed"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_pedal_assist_mode",
+    "sg": "pedal_assist_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_pedal_assist_sensitivity_to_number",
+    "sg": "pedal_assist_sensitivity"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_pedestrian_low_speed_sound_content",
+    "sg": "pedestrian_low_speed_sound_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_pedestrian_safety_assistance_mode",
+    "sg": "pedestrian_safety_assistance_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_power_display_unit",
+    "sg": "power_display_unit"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_predictive_collision_warning_level_to_gear",
+    "sg": "predictive_collision_warning_level"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_pressure_unit",
+    "sg": "pressure_unit"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_range_display_mode",
+    "sg": "range_display_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_refrigerator_continuous_working_time",
+    "sg": "refrigerator_continuous_working_time"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_ringtone",
+    "sg": "ringtone"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_scheduled_charging_time",
+    "sg": "scheduled_charging_time"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_screen_color_mode",
+    "sg": "screen_color_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_screen_display_mode",
+    "sg": "screen_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_screen_saver",
+    "sg": "screen_saver"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_soc_mode",
+    "sg": "soc_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_sound_zone_mode",
+    "sg": "sound_zone_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_speaker_property",
+    "sg": "speaker_property"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_speed_deviation_value_for_overspeed_alarm",
+    "sg": "speed_deviation_value_for_overspeed_alarm"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_speed_deviation_value_for_speed_limit",
+    "sg": "speed_deviation_value_for_speed_limit"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_speed_limit_method",
+    "sg": "speed_limit_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_speed_limit_trigger_mode",
+    "sg": "speed_limit_trigger_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_steering_wheel_custom_button",
+    "sg": "steering_wheel_custom_button"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_system_language",
+    "sg": "system_language"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_system_tense",
+    "sg": "system_tense"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_tailgate_opening_upper_limit",
+    "sg": "tailgate_opening_upper_limit"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_take_photo_delay_time",
+    "sg": "take_photo_delay_time"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_take_video_time",
+    "sg": "take_video_time"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_temperature_unit",
+    "sg": "temperature_unit"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_the_external_charging_reminder",
+    "sg": "the_external_charging_reminder"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_theme",
+    "sg": "theme"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_time_zone",
+    "sg": "time_zone"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_timed_ventilation_interval",
+    "sg": "timed_ventilation_interval"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_touch_switch_delayed_time",
+    "sg": "touch_switch_delayed_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "set_tsr_alarm_method",
+    "sg": "tsr_alarm_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_vehicle_color",
+    "sg": "vehicle_color"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_vehicle_transmission_mode",
+    "sg": "vehicle_transmission_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_virtual_avatar",
+    "sg": "virtual_avatar"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_volume_mode",
+    "sg": "volume_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_wallpaper",
+    "sg": "wallpaper"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_wifi_band",
+    "sg": "wifi_band"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_wifi_password_unvisible",
+    "sg": "wifi_password_unvisible"
+  },
+  {
+    "domain": "cmd",
+    "name": "set_wifi_password_visible",
+    "sg": "wifi_password_visible"
+  },
+  {
+    "domain": "carControl",
+    "name": "soft_suspension_little",
+    "sg": "soft_suspension"
+  },
+  {
+    "domain": "cmd",
+    "name": "split_screen_max",
+    "sg": "split_screen_max"
+  },
+  {
+    "domain": "cmd",
+    "name": "split_screen_min",
+    "sg": "split_screen_min"
+  },
+  {
+    "domain": "carControl",
+    "name": "stall_car",
+    "sg": "stall_car"
+  },
+  {
+    "domain": "carControl",
+    "name": "start_car",
+    "sg": "car"
+  },
+  {
+    "domain": "carControl",
+    "name": "start_charging",
+    "sg": "charging"
+  },
+  {
+    "domain": "cmd",
+    "name": "start_countdown_time",
+    "sg": "countdown_time"
+  },
+  {
+    "domain": "carControl",
+    "name": "start_park_in",
+    "sg": "park_in"
+  },
+  {
+    "domain": "carControl",
+    "name": "start_park_out",
+    "sg": "park_out"
+  },
+  {
+    "domain": "cmd",
+    "name": "start_screen_recording",
+    "sg": "screen_recording"
+  },
+  {
+    "domain": "carControl",
+    "name": "steering_wheel_heating_mode",
+    "sg": "steering_wheel_heating_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "stop_screen_recording",
+    "sg": "screen_recording"
+  },
+  {
+    "domain": "cmd",
+    "name": "stop_sound_recording",
+    "sg": "sound_recording"
+  },
+  {
+    "domain": "cmd",
+    "name": "stop_take_video",
+    "sg": "take_video"
+  },
+  {
+    "domain": "carControl",
+    "name": "sunroof_tilt",
+    "sg": "sunroof_tilt"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_360_look_around_visual_angle",
+    "sg": "360_look_around_visual_angle"
+  },
+  {
+    "domain": "airControl",
+    "name": "switch_ac_mode",
+    "sg": "ac_mode"
+  },
+  {
+    "domain": "airControl",
+    "name": "switch_ac_wind_direction",
+    "sg": "ac_wind_direction"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_acoustics_mode",
+    "sg": "acoustics_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_atmosphere_lamp_color",
+    "sg": "atmosphere_lamp_color"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_atmosphere_lamp_mode",
+    "sg": "atmosphere_lamp_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_battery_life_display_mode",
+    "sg": "battery_life_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_best_listening_position",
+    "sg": "best_listening_position"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_blind_spot_detection_reminder_method",
+    "sg": "blind_spot_detection_reminder_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_bluetooth",
+    "sg": "bluetooth"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_camera",
+    "sg": "camera"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_car_character",
+    "sg": "car_character"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_date_display_format",
+    "sg": "date_display_format"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_designative_out_car_lamp_mode",
+    "sg": "designative_out_car_lamp_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_desktop_mode",
+    "sg": "desktop_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_dialog_style",
+    "sg": "dialog_style"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_dimming_glass_top_color",
+    "sg": "dimming_glass_top_color"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_dimming_glass_top_mode",
+    "sg": "dimming_glass_top_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_direction_of_pull_over",
+    "sg": "direction_of_pull_over"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_driving_habits",
+    "sg": "driving_habits"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_driving_mode",
+    "sg": "driving_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_driving_sound_wave_mode",
+    "sg": "driving_sound_wave_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_energy_recuperation_mode",
+    "sg": "energy_recuperation_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_eps_mode",
+    "sg": "eps_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_eq_mode",
+    "sg": "eq_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_esc_mode",
+    "sg": "esc_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_fragrance_mode",
+    "sg": "fragrance_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_headrest_audio_system_mode",
+    "sg": "headrest_audio_system_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_hotspot_band",
+    "sg": "hotspot_band"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_hud_display_content",
+    "sg": "hud_display_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_hud_display_mode",
+    "sg": "hud_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_instrument_show_content",
+    "sg": "instrument_show_content"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_intelligent_driving_style",
+    "sg": "intelligent_driving_style"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_lane_keep_method",
+    "sg": "lane_keep_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_ldws_sensitivity_mode",
+    "sg": "ldws_sensitivity_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_light_expression",
+    "sg": "light_expression"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_light_show",
+    "sg": "light_show"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_light_theme",
+    "sg": "light_theme"
+  },
+  {
+    "domain": "airControl",
+    "name": "switch_loop_mode",
+    "sg": "loop_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_luminous_luggage_rack_color",
+    "sg": "luminous_luggage_rack_color"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_mileage_display_content",
+    "sg": "mileage_display_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_mileage_display_mode",
+    "sg": "mileage_display_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_overspeed_alarm_method",
+    "sg": "overspeed_alarm_method"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_parking_space",
+    "sg": "parking_space"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_pedal_assist_mode",
+    "sg": "pedal_assist_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_power_mode",
+    "sg": "power_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_ringtone",
+    "sg": "ringtone"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_scene_mode",
+    "sg": "scene_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_screen_color_mode",
+    "sg": "screen_color_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_screen_content",
+    "sg": "screen_content"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_screen_display_mode",
+    "sg": "screen_display_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_screen_saver",
+    "sg": "screen_saver"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_seat_heat_mode",
+    "sg": "seat_heat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_seat_massage_mode",
+    "sg": "seat_massage_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_seat_mode",
+    "sg": "seat_mode"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_seat_ventilation_mode",
+    "sg": "seat_ventilation_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_sound_zone_mode",
+    "sg": "sound_zone_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_speaker",
+    "sg": "speaker"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_split_screen",
+    "sg": "split_screen"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_suspension_mode",
+    "sg": "suspension_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_theme",
+    "sg": "theme"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_tsr_alarm_method",
+    "sg": "tsr_alarm_method"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_vehicle_color",
+    "sg": "vehicle_color"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_vehicle_refrigerator_mode",
+    "sg": "vehicle_refrigerator_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_vehicle_transmission_mode",
+    "sg": "vehicle_transmission_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_virtual_avatar",
+    "sg": "virtual_avatar"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_volume_mode",
+    "sg": "volume_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_wallpaper",
+    "sg": "wallpaper"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_wifi",
+    "sg": "wifi"
+  },
+  {
+    "domain": "cmd",
+    "name": "switch_wifi_band",
+    "sg": "wifi_band"
+  },
+  {
+    "domain": "carControl",
+    "name": "switch_wiper_mode",
+    "sg": "wiper_mode"
+  },
+  {
+    "domain": "cmd",
+    "name": "system_font_size_to_number",
+    "sg": "system_font_size"
+  },
+  {
+    "domain": "cmd",
+    "name": "take_photo",
+    "sg": "take_photo"
+  },
+  {
+    "domain": "cmd",
+    "name": "take_screenshot",
+    "sg": "take_screenshot"
+  },
+  {
+    "domain": "cmd",
+    "name": "take_sound_recording",
+    "sg": "take_sound_recording"
+  },
+  {
+    "domain": "cmd",
+    "name": "take_video",
+    "sg": "take_video"
+  },
+  {
+    "domain": "cmd",
+    "name": "unbind_account",
+    "sg": "unbind_account"
+  },
+  {
+    "domain": "carControl",
+    "name": "unfold_rearview_mirror",
+    "sg": "rearview_mirror"
+  },
+  {
+    "domain": "cmd",
+    "name": "unfold_screen",
+    "sg": "screen"
+  },
+  {
+    "domain": "airControl",
+    "name": "unlock_ac",
+    "sg": "ac"
+  },
+  {
+    "domain": "carControl",
+    "name": "unlock_charging_gun",
+    "sg": "charging_gun"
+  },
+  {
+    "domain": "carControl",
+    "name": "unlock_door",
+    "sg": "door"
+  },
+  {
+    "domain": "carControl",
+    "name": "unlock_parking_space_lock",
+    "sg": "parking_space_lock"
+  },
+  {
+    "domain": "carControl",
+    "name": "unlock_refrigerator_child_lock",
+    "sg": "refrigerator_child_lock"
+  },
+  {
+    "domain": "cmd",
+    "name": "unlock_screen",
+    "sg": "screen"
+  },
+  {
+    "domain": "cmd",
+    "name": "unlock_touch_switch",
+    "sg": "touch_switch"
+  },
+  {
+    "domain": "cmd",
+    "name": "upload_log",
+    "sg": "upload_log"
+  },
+  {
+    "domain": "cmd",
+    "name": "use_item_card",
+    "sg": "use_item_card"
+  },
+  {
+    "domain": "cmd",
+    "name": "view_system_information",
+    "sg": "view_system_information"
+  },
+  {
+    "domain": "cmd",
+    "name": "view_system_unread_message",
+    "sg": "view_system_unread_message"
+  },
+  {
+    "domain": "cmd",
+    "name": "volume_mute",
+    "sg": "volume_mute"
+  },
+  {
+    "domain": "cmd",
+    "name": "volume_unmute",
+    "sg": "volume_unmute"
+  }
+]
