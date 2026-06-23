@@ -109,6 +109,18 @@ public struct DDomainFunction: Codable, Sendable {
     public let parameters: JSONValue
 }
 
+// D-domain 工具名→IR 映射条目(解码 generated/d_domain_ir_map.json; S1 codegen 产, Normalizer 消费支持 562 具名工具)。
+public struct DDomainIRMapEntry: Codable, Sendable {
+    public let device: String
+    public let irPrimitives: [String]
+    public let valueTypes: [String]
+    enum CodingKeys: String, CodingKey {
+        case device
+        case irPrimitives = "ir_primitives"
+        case valueTypes = "value_types"
+    }
+}
+
 public struct ToolContractIR: Equatable, Sendable {
     public var sourceToolName: String
     public var device: String
@@ -135,7 +147,17 @@ public struct ToolContractIR: Equatable, Sendable {
 }
 
 public enum ToolContractNormalizer {
-    public static func normalize(_ call: C6ToolCall) -> [ToolContractIR] {
+    // D-domain 工具名→IR 映射加载(generated/ 被 Package.swift exclude, 走 repoRoot 文件加载)。
+    public static func loadIRMap(repoRoot: URL) throws -> [String: DDomainIRMapEntry] {
+        let url = repoRoot.appendingPathComponent("generated/d_domain_ir_map.json")
+        return try JSONDecoder().decode([String: DDomainIRMapEntry].self, from: Data(contentsOf: url))
+    }
+
+    public static func normalize(_ call: C6ToolCall, irMap: [String: DDomainIRMapEntry] = [:]) -> [ToolContractIR] {
+        // 优先 D-domain 具名工具名查表(562); 旧 surface(frame + 6 set_cabin_*) strangler 保留, S4/S5 迁后删。
+        if let entry = irMap[call.name] {
+            return normalizeDDomain(call, entry: entry)
+        }
         switch call.name {
         case "tool_call_frame":
             return normalizeFrame(call)
@@ -160,8 +182,73 @@ public enum ToolContractNormalizer {
                 )
             ]
         default:
+            // 未知工具名不静默吞(claim-vs-reality 铁律1: 防 D-domain 工具名拼错/ir_map 漏条目被悄悄吞=假绿)。
+            logUnclassified(call.name)
             return []
         }
+    }
+
+    // D-domain 具名工具名→canonical IR(device×action×value); ir_map(S1 codegen)提供 device + 候选 primitive + value_types。
+    private static func normalizeDDomain(_ call: C6ToolCall, entry: DDomainIRMapEntry) -> [ToolContractIR] {
+        let primitive = resolvePrimitive(entry, arguments: call.arguments)
+        let value = buildValue(entry, arguments: call.arguments)
+        let reserved: Set<String> = ["name", "value", "value.type"]
+        let slots = call.arguments.filter { !reserved.contains($0.key) }
+        return [
+            ToolContractIR(
+                sourceToolName: call.name,
+                device: entry.device,
+                actionPrimitive: primitive,
+                slots: slots,
+                value: value,
+                rawArguments: call.arguments
+            )
+        ]
+    }
+
+    // multi-primitive(134/562)用 value 参数格式消歧; 单值直取。
+    private static func resolvePrimitive(_ entry: DDomainIRMapEntry, arguments: [String: String]) -> String {
+        guard entry.irPrimitives.count > 1 else {
+            return entry.irPrimitives.first ?? ""
+        }
+        let valueArg = arguments["value"] ?? arguments.values.first { Int($0) != nil || $0.contains("%") } ?? ""
+        if valueArg.contains("%") {
+            return entry.irPrimitives.first { $0.contains("percent") } ?? entry.irPrimitives[0]
+        }
+        if Int(valueArg) != nil {
+            return entry.irPrimitives.first { $0.contains("to_number") } ?? entry.irPrimitives[0]
+        }
+        return entry.irPrimitives.first { $0.contains("exp") || $0.contains("gear") } ?? entry.irPrimitives[0]
+    }
+
+    // value_types 单值定 type; 多值/空按 value 参数派生(SPOT/PERCENT→direct, EXP→offset, 空→STATE)。
+    private static func buildValue(_ entry: DDomainIRMapEntry, arguments: [String: String]) -> ContractValue {
+        let valueArg = arguments["value"] ?? ""
+        let vtype: String
+        if entry.valueTypes.count == 1, !entry.valueTypes[0].isEmpty {
+            vtype = entry.valueTypes[0]
+        } else if valueArg.contains("%") {
+            vtype = "PERCENT"
+        } else if Int(valueArg) != nil {
+            vtype = "SPOT"
+        } else if entry.valueTypes.contains("EXP") {
+            vtype = "EXP"
+        } else {
+            vtype = "STATE"
+        }
+        switch vtype {
+        case "SPOT", "PERCENT":
+            return ContractValue(direct: valueArg, type: vtype)
+        case "EXP":
+            return ContractValue(offset: valueArg, type: vtype)
+        default:
+            return ContractValue(type: vtype)
+        }
+    }
+
+    private static func logUnclassified(_ name: String) {
+        let message = "[ToolContractNormalizer] unclassified tool name: \(name)\n"
+        FileHandle.standardError.write(message.data(using: .utf8) ?? Data())
     }
 
     private static func normalizeFrame(_ call: C6ToolCall) -> [ToolContractIR] {
