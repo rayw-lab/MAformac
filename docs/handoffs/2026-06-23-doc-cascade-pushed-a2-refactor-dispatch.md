@@ -20,7 +20,7 @@
 - 🔴 **训练 + 后端开发 DEFERRED 延后不排期**（C5 数据生成·C5 实际重训·C6 四层门·C6 评测验证模型性能·demo-golden-run·voice ASR/TTS·受限解码 vendor → A2 之后独立重新立项）。
 - **A2 只绑 `migrate-d-domain-tool-surface` change**（code-only）；`retrain-c5`/`rebuild-c6`/`golden-run` 标 DEFERRED（其 code-only surface 改随 A2，训练/评测/数据延后）。
 - 磊哥定：**CC 主窗口主持 + 全程 `/goal` 自驱 + ultracode（每 step 派 workflow + 主线程亲核 + subagent 审并行 + loopaudit 收口），不派 codex 长跑**。
-- 派单 v2 = `~/workspace/raw/05-Projects/MAformac/dispatches/2026-06-23-a2-code-refactor-cc-ultracode-dispatch.md`（融 enforce 现状/简化方案/A2 大纲 6 步/磊哥派单习惯 + **已并入 codex(3 P1+2 P2) + GLM-5.2(0 P0P1+3 P2) 双源审计 findings**）。
+- 派单 v2 = `docs/dispatches/2026-06-23-a2-code-refactor-cc-ultracode-dispatch.md`（融 enforce 现状/简化方案/A2 大纲 6 步/磊哥派单习惯 + **已并入 codex(3 P1+2 P2) + GLM-5.2(0 P0P1+3 P2) 双源审计 findings**）。
 - 6 步依赖序（code-only）：[0] 口径锚定 + **scope_tier/allowlist manifest 落盘**（codex P1-2 硬前置，当前 JSONL 无此字段）→ [1] Python codegen 产 D-domain → [2] ToolContractCompiler 消费 → [3] state-cells/executor/命名清债 → [4-code] C5 样本生成器 **surface 改**（预留接口，不生成语料/不训）→ [5-code] C6 bench expected **迁 surface** + 跑 base 验格式（不评性能；parity gate 重定义 = 结构回归门，模型性能 parity 延后）。
 
 ## 起手第一步（新 session/A2 主窗口）
