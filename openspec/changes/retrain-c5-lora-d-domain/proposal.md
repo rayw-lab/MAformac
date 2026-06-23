@@ -1,6 +1,8 @@
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
 > 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。
 > **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码、不跑训练。** 决策权威源见下。
+>
+> 🔴🔴 **DEFERRED 延后（磊哥 2026-06-23「训练 + 后端开发延后」决策）**：本 change 的【训练 / 数据生成 / 评测】部分**延后不排期，A2 之后独立重新立项**。**仅 §2.1「训练样本 surface 翻案 → D-domain」(code-only) 属 A2、随 `migrate-d-domain-tool-surface` 完成**；§2.2 四类自然中文数据生成 / §3 实际重训(跑权重) / §4 C6 候选评测 = **DEFERRED**。A2 阶段 C5 样本生成器代码**只预留 D-domain shape 接口**——不生成语料、不调云 generator、不跑 judge、不实际重训。
 
 ## Why
 

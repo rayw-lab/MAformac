@@ -415,6 +415,8 @@ C5 ≡ §15 TRN8 / E2 ≡ §15 CAS1（CAS1 列清单→E2 执行）/ F1 safety_r
 
 > ultracode 8 路 finder + 综合官（9 agent / 1.1M tok / 936s）盘点 C1→C2→C3→C5→C6 全链路 + 业内代码质量 + Swift/mlx codegen + A2 真实范围。**完整归档 → `docs/research/2026-06-22-a2-codebase-audit/`**（README 亲核版 + lens1-8 一手档 + codex-checks + INDEX；transcript 最一手归档仓外 raw `-transcripts/`）。主线程已 python 复算口径 + gh api 核 star。
 
+> 🔴🔴 **A2 边界澄清（磊哥 2026-06-23 校准 + 延后升级，盘点正文不改，本边注覆盖范围定性）**：A2 = **code-only 范式对齐**——把代码改成说 D-domain + 编译/`swift test`/`make verify` 绿，**终点落老 C5 LoRA 训练之前，不训练 / 不评测模型性能 / 不生成语料**。下方依赖序 **[4] 仅"C5 样本生成器 surface 代码改"(预留接口) 属 A2**（§2.2 数据生成 / 实际重训 = DEFERRED）；**[5] 仅"C6 bench expected 迁 surface + 跑 base 验格式"属 A2**（四层门 / 跑 LoRA 评性能 = DEFERRED）；[6] parity gate 在 A2 = **结构回归门**（compiler 单测 + swift test + make verify + C6 跑 base，非模型性能门，性能 parity 延后）。**A2 只绑 `migrate-d-domain-tool-surface` change**；`retrain-c5`/`rebuild-c6`/`define-demo-golden-run-and-voice` 标 DEFERRED（训练/数据/评测/四层门/demo/voice/受限解码 = A2 之后独立重新立项）。执行 = 另一 CC 窗口 ultracode+/goal。派单 = `~/workspace/raw/05-Projects/MAformac/dispatches/2026-06-23-a2-code-refactor-cc-ultracode-dispatch.md`。
+
 ### A2 = 重型重构（坐实，非补丁）
 - 范围：~14-16 文件（复用升级 8 / 重写 4-5 / 新建 2-3）、~1500-2500 行净改 + 生成物 diff 另计。
 - 本质：model-visible surface 范式（generic frame `tool_call_frame` → D-domain 具名工具）是 C1 编译器核心 + 训练样本 + bench 期望三处共同输入，连带 state cells/执行映射/命名清债 = 磊哥「立项至今大部分代码改」量级。

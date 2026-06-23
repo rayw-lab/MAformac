@@ -1,6 +1,8 @@
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
 > 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。
 > **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码。** 决策权威源见下。
+>
+> 🔴🔴 **DEFERRED 延后（磊哥 2026-06-23「训练 + 后端开发延后」决策）**：本 change 的【四层评测门 / 实际评测验证模型性能】部分**延后不排期，A2 之后独立重新立项**。**仅 §2「expected_tool_calls 迁 D-domain 具名工具」(code-only) 属 A2、随 `migrate-d-domain-tool-surface` 完成**；§3 四层评测门(Q41 各独立 scorer) / 跑 LoRA 实际评测验证 = **DEFERRED**。A2 阶段 C6 只【跑 base 验格式/链路对齐 D-domain】(archive-check verify-gold pass) + freeze A2-before baseline receipt，**不评 LoRA 模型性能、不建四层门**；模型性能 parity 抽样轴/阈值待 grill Q06。
 
 ## Why
 
