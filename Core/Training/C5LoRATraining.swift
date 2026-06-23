@@ -2434,7 +2434,10 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     continue
                 }
                 usedVariantKeys.insert(key)
-                result.append(makePositiveSample(seed: seed, variant: variant, ordinal: sampleOffset + result.count, maskingStage: options.maskingStage, generatedRecord: generated, surface: options.surface, catalog: options.dDomainCatalog, catalogByName: catalogByName))
+                // P1 fail-closed: makePositiveSample 对 dDomain intent miss 返 nil(skip 不污染 frame); compactMap 过滤。
+                if let sample = makePositiveSample(seed: seed, variant: variant, ordinal: sampleOffset + result.count, maskingStage: options.maskingStage, generatedRecord: generated, surface: options.surface, catalog: options.dDomainCatalog, catalogByName: catalogByName) {
+                    result.append(sample)
+                }
             }
             variant += 1
         }
@@ -2509,16 +2512,20 @@ public struct C5TrainingDatasetBuilder: Sendable {
         surface: C5TrainingSurface,
         catalog: [DDomainToolEntry],
         catalogByName: [String: DDomainToolEntry]
-    ) -> C5TrainingSample {
+    ) -> C5TrainingSample? {
         let valueAugmentation = C5TrainingRenderer.augmentValue(seed: seed, variant: variant)
         let slotAssignments = C5TrainingRenderer.slotAssignments(seed: seed, variant: variant, value: valueAugmentation.value)
         // paradigm §1 surface 分流: dDomain→具名工具(name=intent, value 形态编码进名) / frame→旧 generic(strangler 保留)。
-        // 空 catalog = frame legacy 向后兼容(静默); catalog 非空但 intent 缺失 = 铁律5 fail-loud(scope filter 应已 prevent)。
         let call: C5TrainingToolCall
         let resolvedTools: [[String: JSONValue]]
         let distractorIDs: [String]
-        let resolvedEntry: DDomainToolEntry? = (surface == .dDomain && !catalog.isEmpty) ? catalogByName[seed.intent] : nil
-        if surface == .dDomain, !catalog.isEmpty, let entry = resolvedEntry {
+        if surface == .dDomain, !catalog.isEmpty {
+            // 🔴 P1(GPT Pro+GLM 审计共识): catalog 非空但 intent 缺失 = 铁律5 fail-CLOSED(skip 返 nil, 不 fallback frame 污染 A2 surface);
+            // scope filter 已保证命中, 此分支是 defensive。旧实现 stderr+frame fallback 会让 dDomain 调用者误以为产 D-domain 实混入 frame。
+            guard let entry = catalogByName[seed.intent] else {
+                FileHandle.standardError.write(Data("S4_DDOMAIN_MISS intent=\(seed.intent) not in catalog(\(catalog.count)) — fail-closed skip(不 fallback frame), scope filter should prevent\n".utf8))
+                return nil
+            }
             call = C5TrainingToolCall(
                 name: seed.intent,
                 arguments: C5TrainingRenderer.dDomainToolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments, toolEntry: entry, variant: variant)
@@ -2527,9 +2534,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             resolvedTools = [C5TrainingRenderer.dDomainToolSchema(entry)] + distractors.schemas
             distractorIDs = distractors.ids
         } else {
-            if surface == .dDomain, !catalog.isEmpty {
-                FileHandle.standardError.write(Data("S4_DDOMAIN_MISS intent=\(seed.intent) not in catalog(\(catalog.count)) — fail-loud, scope filter should prevent\n".utf8))
-            }
+            // frame legacy(catalog 空 OR surface=.frame): strangler 向后兼容(唯一 frame 入口, 非 dDomain miss fallback)
             call = C5TrainingToolCall(name: "tool_call_frame", arguments: C5TrainingRenderer.toolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments))
             let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
             resolvedTools = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed]) + distractors.schemas

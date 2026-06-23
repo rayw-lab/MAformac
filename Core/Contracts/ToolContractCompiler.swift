@@ -471,7 +471,13 @@ public enum ToolContractStateApplier {
         let initial = Int(cell.defaultValue ?? "") ?? 0
         let newValue: String?
         if let target = targetNumber(ir) {
-            newValue = target                                       // 绝对 target 直写(复现旧, 不 clamp)
+            // 🔴 P1-2(GLM 审计): direct target clamp 到 executionRange(与 C3 runtime range check + exp 路径一致, 防越界写 state)。
+            // 非数字 target(枚举/模式)保持原值; 有 range 时双向 clamp 到 [min,max]。
+            if let targetInt = Int(target), cell.executionRange != nil {
+                newValue = String(clampLower(clampUpper(targetInt, cell.executionRange), cell.executionRange))
+            } else {
+                newValue = target
+            }
         } else if isOff(ir.actionPrimitive, value: ir.value) {
             newValue = String(cell.executionRange?.min ?? 0)        // power_off → 下界(window 0)
         } else if ir.actionPrimitive == "increase_by_exp" {

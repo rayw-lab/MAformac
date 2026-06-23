@@ -24,17 +24,23 @@ struct C5TrainingCLI {
 
     private static func prepare(_ options: Options) throws {
         let repoRoot = options.repoRoot
+        // 🔴 P0(GPT Pro 审计) fail-fast-first: full.json 是 skeleton([name,domain,sg] 无 function/parameters schema), 不能解码成
+        // [DDomainToolEntry]; C5 D-domain 训练只用 demo(562 完整 schema), full(1538 skeleton)= OOS/拒识白名单非训练面。
+        // 在任何昂贵工作(tokenizer patch 需 base model)前先校验, 给清晰错误而非 decode crash。
+        if options.surface == .dDomain, options.scope != .demo {
+            throw CLIError.usage("--scope full 是 skeleton(OOS/拒识白名单, 无完整 schema), 不支持 C5 D-domain 训练; 用 --scope demo(562 完整 schema)。full 全覆盖训练 = DEFERRED(retrain-c5)。")
+        }
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let patchedModelDir = outputDir.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
         try createTrainingTokenizerPatch(sourceDir: options.baseModelDir, outputDir: patchedModelDir)
         let semanticText = try read(repoRoot, "contracts/semantic-function-contract.jsonl")
         let seeds = try decodeJSONL(semanticText, as: C5SemanticSeed.self)
-        // paradigm §1 D-domain catalog 注入(scope demo=562 / full=1538; surface=frame→空 catalog = legacy 回退)。
+        // paradigm §1 D-domain catalog 注入(demo=562 完整 schema; surface=frame→空 catalog = legacy 回退)。
+        // scope 已在 prepare 起手 fail-fast 校验(只 demo), 此处直读 demo.json。
         let dDomainCatalog: [DDomainToolEntry] = try {
             guard options.surface == .dDomain else { return [] }
-            let file = options.scope == .full ? "generated/D_domain.tools.full.json" : "generated/D_domain.tools.demo.json"
-            return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: repoRoot.appendingPathComponent(file)))
+            return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")))
         }()
         let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))

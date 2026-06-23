@@ -1015,6 +1015,22 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(noCall?.noCall?.targetToolPresent, false, "活样本: targetToolPresent=false 与产物一致(claim-vs-reality 铁律1)")
     }
 
+    // 🔴 P1(GPT Pro+GLM 审计共识)闭合: surface=.dDomain + catalog 非空 + intent miss → fail-closed skip(不 fallback frame 污染 A2 surface)
+    func testDDomainCatalogMissIsFailClosedNotFrameFallback() throws {
+        let catalog = try loadDemoCatalog()
+        // scope=.full 不过滤 → miss-intent seed 到达 makePositiveSample; surface=.dDomain + catalog 非空 → 走 fail-closed 分支
+        let inSeed = semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")   // intent=open_ac ∈ 562
+        let missSeed = rawSeed(id: "miss-1", intent: "nonexistent_intent_zzz", device: "navi")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [inSeed, missSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 20, devSelectionRows: 0, includeNoCallCounterfactuals: false, scope: .full, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let names = Set(prepared.samples.flatMap { $0.expectedToolCalls.map(\.name) })
+        XCTAssertTrue(names.contains("open_ac"), "in-catalog intent 产 D-domain sample")
+        XCTAssertFalse(names.contains("nonexistent_intent_zzz"), "miss intent 不产样本(fail-closed skip)")
+        XCTAssertFalse(names.contains("tool_call_frame"), "🔴 miss intent 不 fallback frame(P1 fail-closed, 不污染 A2 surface, 非旧 stderr+frame)")
+    }
+
     // 向后兼容: 空 catalog(默认无注入)→ frame legacy 回退(strangler 旧 surface 保留)
     func testFrameSurfaceBackwardCompatWhenCatalogEmpty() {
         let prepared = C5TrainingDatasetBuilder().build(
