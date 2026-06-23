@@ -8,11 +8,18 @@ GENERATED_CONTRACTS := \
 	contracts/function-spec-full.yaml \
 	contracts/semantic-coverage-report.md
 
-# generated/ domain 产物(A2 S0+): family allowlist + flat device-map; 显式纳入 diff gate(补 generated/ 裸奔漏点).
-# S1 D-domain 具名工具目录产物后续追加此变量.
+# generated/ domain 产物(A2 S0+S1): family allowlist + flat device-map + D-domain 具名工具目录(两层 scope)
+# + 旧 surface(B_frame/D_domain.tools 守现状 S2 删) + strangler map; 全显式纳入 diff gate(补 generated/ 裸奔漏点).
 GENERATED_DOMAIN := \
 	generated/family-device-allowlist.json \
-	generated/10-family-device-map.json
+	generated/10-family-device-map.json \
+	generated/B_frame.frame_schema.json \
+	generated/D_domain.tools.json \
+	generated/D_domain.tools.demo.json \
+	generated/D_domain.tools.full.json \
+	generated/d_domain_ir_map.json \
+	generated/strangler_map.json \
+	generated/rendered_tools_text
 
 .PHONY: verify verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section diff test clean-venv
 
@@ -42,8 +49,8 @@ verify-source: .venv/.deps.stamp
 
 regen: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_c1.py
-	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
 	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
+	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
 
 regen-tool-contract: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
