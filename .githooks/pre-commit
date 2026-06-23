@@ -4,8 +4,11 @@
 # 当前 repo 默认 hooksPath 未指向此目录 → 本 hook 不生效，建好待启用。
 set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
-checker="$ROOT/Tools/checks/check-no-binary-visualstate.sh"
-if [ -x "$checker" ]; then
-  "$checker" || exit 1
-fi
+for checker in \
+  "$ROOT/Tools/checks/check-no-binary-visualstate.sh" \
+  "$ROOT/Tools/checks/check-platform-vs-version-guard.sh"; do
+  if [ -x "$checker" ]; then
+    "$checker" || exit 1
+  fi
+done
 exit 0
