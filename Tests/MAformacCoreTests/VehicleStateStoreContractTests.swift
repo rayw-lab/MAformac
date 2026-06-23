@@ -9,7 +9,7 @@ final class VehicleStateStoreContractTests: XCTestCase {
 
         let legacyMVPKeys: Set<String> = [
             "fan.speed",
-            "hvac.ac",
+            "ac.power",
             "hvac.temperature",
             "lighting.ambient",
             "screen.brightness",
@@ -24,9 +24,9 @@ final class VehicleStateStoreContractTests: XCTestCase {
     func testSuccessfulMockTransitionUsesSatisfiedVisualState() {
         let store = DemoVehicleStateStore()
 
-        _ = store.applyMockTransition(DemoMockTransition(key: "hvac.ac", desiredValue: "on"))
+        _ = store.applyMockTransition(DemoMockTransition(key: "ac.power", desiredValue: "on"))
 
-        XCTAssertEqual(store.cell(for: "hvac.ac")?.actualValue, "on")
-        XCTAssertEqual(store.cell(for: "hvac.ac")?.visualState, .satisfied)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.power")?.visualState, .satisfied)
     }
 }

@@ -380,8 +380,10 @@ public enum ToolContractStateApplier {
         return state
     }
 
-    // device → C2 cell id 映射(demo-positive 7 device; S3 扩 191 逐族纳入)。
-    private static let deviceCellMap: [String: String] = [
+    // device → C2 cell id 单一 SSOT 映射(S2 5 族 + S3 6 族 = 10 族 demo-positive); C3ExecutionPipeline 复用此单源
+    // 消除三处 device→cell 平行硬编码分叉(claim-vs-reality 铁律1)。191 全量 + codegen 派生 = DEFERRED(随 retrain-c5/rebuild-c6)。
+    public static let deviceCellMap: [String: String] = [
+        // S2 5 族(空调/车窗/屏幕/氛围灯)
         "ac": "ac.power",
         "ac_temperature": "ac.temp_setpoint",
         "ac_windspeed": "ac.fan_speed",
@@ -389,6 +391,29 @@ public enum ToolContractStateApplier {
         "screen_brightness": "screen.brightness",
         "atmosphere_lamp_color": "ambient.color",
         "atmosphere_lamp_brightness": "ambient.brightness",
+        // S3 座椅
+        "seat_heat_temperature": "seat.heat_level",
+        "seat_ventilation_windspeed": "seat.vent_level",
+        "seat_massage_force": "seat.massage_force",
+        "seat_backrest": "seat.backrest_angle",
+        // S3 车门
+        "car_door": "door.car_door",
+        "central_lock": "door.central_lock",
+        "child_lock": "door.child_lock",
+        "tailgate_height": "door.tailgate_height",
+        // S3 音量
+        "volume": "volume.level",
+        "volume_mute": "volume.mute",
+        // S3 雨刮
+        "wiper": "wiper.power",
+        "wiper_speed": "wiper.speed",
+        // S3 天窗遮阳
+        "sunroof": "sunroof.position",
+        "sunroof_slide": "sunroof.motion",
+        "sunshade": "sunshade.position",
+        // S3 香氛
+        "fragrance": "fragrance.power",
+        "fragrance_intensity": "fragrance.intensity",
     ]
 
     // data-driven: device→cell, 从 cell 元数据(execution_range/exp_step/default/scope/depends_on)派生 state 写入,

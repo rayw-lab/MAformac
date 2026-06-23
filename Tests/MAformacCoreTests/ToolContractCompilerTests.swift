@@ -130,6 +130,31 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertEqual(state, ["x": "y"], "未映射 device 不写 state(S3 扩 191 逐族纳入)")
     }
 
+    // MARK: - S3 deviceCellMap 扩 6 族 (每 value cellID 在 state-cells 存在 + 6 族不落 unmapped)
+
+    func testDeviceCellMapAllValuesExistInStateCells() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        for (device, cellID) in ToolContractStateApplier.deviceCellMap {
+            XCTAssertNotNil(stateCells.cell(id: cellID), "deviceCellMap[\(device)]=\(cellID) 不在 state-cells(会 logUnmapped 不写 state)")
+        }
+        XCTAssertEqual(ToolContractStateApplier.deviceCellMap.count, 24, "S2 7 族 + S3 17 = 24 device→cell 单源映射")
+    }
+
+    func testS3FamilyDeviceWritesStateNotUnmapped() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        // seat_heat_temperature adjust_to_number → seat.heat_level[主驾] (S3 族 cell-driven 写 state, 非 unmapped)
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat_temperature", "action_primitive": "adjust_to_number", "value.direct": "2"])],
+            to: [:], stateCells: stateCells)
+        XCTAssertEqual(state["seat.heat_level[主驾]"], "2", "seat 族 deviceCellMap+cell-driven 写 state")
+    }
+
+    func testC3ExecutionCellReusesDeviceCellMapSingleSource() throws {
+        // C3 executionCellID 复用 deviceCellMap 单源, fix 旧 switch 缺 ac_windspeed
+        XCTAssertEqual(ToolContractStateApplier.deviceCellMap["ac_windspeed"], "ac.fan_speed")
+        XCTAssertEqual(ToolContractStateApplier.deviceCellMap["seat_heat_temperature"], "seat.heat_level")
+    }
+
     // MARK: - helpers
 
     private func stateCellsYAML() throws -> String {

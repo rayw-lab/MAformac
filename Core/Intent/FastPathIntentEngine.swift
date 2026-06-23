@@ -18,7 +18,7 @@ public struct FastPathIntentEngine: Sendable {
             capabilityID: "vehicle.ac.toggle",
             toolName: "set_vehicle_control",
             arguments: [
-                "state_key": "hvac.ac",
+                "state_key": "ac.power",
                 "target_state": "on"
             ],
             surfacePolicy: .primaryPanel

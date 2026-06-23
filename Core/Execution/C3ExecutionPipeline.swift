@@ -157,22 +157,9 @@ public struct C3ExecutionPipeline: Sendable {
         if let entry = allowlist.entry(device: frame.device) {
             return entry.executionRangeCell
         }
-        switch frame.device {
-        case "ac_temperature":
-            return "ac.temp_setpoint"
-        case "window":
-            return "window.position"
-        case "screen_brightness":
-            return "screen.brightness"
-        case "atmosphere_lamp_brightness":
-            return "ambient.brightness"
-        case "atmosphere_lamp_color":
-            return "ambient.color"
-        case "ac":
-            return "ac.power"
-        default:
-            return nil
-        }
+        // 复用 ToolContractStateApplier.deviceCellMap 单一 SSOT(消除 C3 switch / S2 deviceCellMap / allowlist
+        // 三处 device→cell 平行硬编码分叉, claim-vs-reality 铁律1; 并 fix C3 旧 switch 缺 ac_windspeed)。
+        return ToolContractStateApplier.deviceCellMap[frame.device]
     }
 
     private func targetKeys(for frame: ToolCallFrame, cell: StateCellDefinition) throws -> [String] {

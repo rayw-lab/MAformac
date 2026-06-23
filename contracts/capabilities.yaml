@@ -123,7 +123,7 @@ capabilities:
     execution:
       connector: local
       mock_behavior: update_mock_state
-      state_cell: hvac.ac
+      state_cell: ac.power
       related_state_cells:
         - hvac.temperature
       idempotent: true

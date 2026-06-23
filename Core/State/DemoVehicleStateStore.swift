@@ -147,7 +147,6 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "ambient.color", actualValue: "白"),
             DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
             DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P"),
-            DemoVehicleStateCell(key: "hvac.ac", actualValue: "off"),
             DemoVehicleStateCell(key: "hvac.temperature", actualValue: "24"),
             DemoVehicleStateCell(key: "seat.driver.heat", actualValue: "off"),
             DemoVehicleStateCell(key: "seat.driver.ventilation", actualValue: "0"),
@@ -163,10 +162,6 @@ public final class DemoVehicleStateStore {
         case ("ac.power", "on"):
             return "空调已打开"
         case ("ac.power", "off"):
-            return "空调已关闭"
-        case ("hvac.ac", "on"):
-            return "空调已打开"
-        case ("hvac.ac", "off"):
             return "空调已关闭"
         default:
             return "\(cell.key) 当前为 \(cell.actualValue)"
