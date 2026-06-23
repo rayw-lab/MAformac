@@ -894,11 +894,40 @@ final class C5LoRATrainingTests: XCTestCase {
         try ToolContractCompiler.loadDDomainCatalog(repoRoot: a2RepoRoot())   // 562 demo D-domain 具名工具
     }
 
-    private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", valueType: String = "EXP") -> C5SemanticSeed {
+    private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", valueType: String = "EXP", slotKeys: [String] = ["device"]) -> C5SemanticSeed {
+        let encodedSlotKeys = slotKeys.map { "\"\($0)\"" }.joined(separator: ",")
         let json = """
-        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"\(intent)","intent":"\(intent)","service":"x","exec_tier":"L2","fc_flags":{"fuzzy":false,"free":false},"slot_keys":["device"],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"x","source_sheet":"x","source_row_no":1,"range":""}
+        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"\(intent)","intent":"\(intent)","service":"x","exec_tier":"L2","fc_flags":{"fuzzy":false,"free":false},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"x","source_sheet":"x","source_row_no":1,"range":""}
         """
         return try! JSONDecoder().decode(C5SemanticSeed.self, from: Data(json.utf8))
+    }
+
+    // 🔴 S5 审计 P1-1 闭合: C5/C6 值键 parity 第三腿(emit 侧)。matcher 是 surface-string 字面键比对 →
+    // C5 emit 侧对异构值键(ac_temperature→temperature / ac_windspeed→fanSpeed, 非 value)必须实产同键,
+    // 否则训了 value=24 评了 temperature=24 = 0/N 换皮(S4 emit 测只覆盖 value 键工具, 漏异构键)。
+    func testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents() throws {
+        let catalog = try loadDemoCatalog()
+        // ac_temperature number: 真实 contract slot_keys=[adjustment_mode, temperature](value.type 空, 数字走 temperature 槽非 value)
+        let tempSeed = rawSeed(id: "ac-temp-1", intent: "adjust_ac_temperature_to_number", device: "ac_temperature", actionPrimitive: "adjust_to_number", valueType: "", slotKeys: ["adjustment_mode", "temperature"])
+        let tempPrepared = C5TrainingDatasetBuilder().build(
+            seeds: [tempSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let tempCall = tempPrepared.samples.first { $0.split == "train" }?.expectedToolCalls.first
+        XCTAssertEqual(tempCall?.name, "adjust_ac_temperature_to_number")
+        XCTAssertNotNil(tempCall?.arguments["temperature"], "C5 emit ac_temperature number 用 temperature 键(与 C6 expected 同源, matcher 字面比对)")
+        XCTAssertNil(tempCall?.arguments["value"], "C5 emit 不用 value 键(ac_temperature 值键是 temperature, 防 0/N 换皮)")
+
+        // ac_windspeed number: 真实 contract slot_keys=[fanSpeed]
+        let fanSeed = rawSeed(id: "ac-fan-1", intent: "adjust_ac_windspeed_to_number", device: "ac_windspeed", actionPrimitive: "adjust_to_number", valueType: "", slotKeys: ["fanSpeed"])
+        let fanPrepared = C5TrainingDatasetBuilder().build(
+            seeds: [fanSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let fanCall = fanPrepared.samples.first { $0.split == "train" }?.expectedToolCalls.first
+        XCTAssertEqual(fanCall?.name, "adjust_ac_windspeed_to_number")
+        XCTAssertNotNil(fanCall?.arguments["fanSpeed"], "C5 emit ac_windspeed number 用 fanSpeed 键(与 C6 expected 同源)")
+        XCTAssertNil(fanCall?.arguments["value"], "C5 emit 不用 value 键(ac_windspeed 值键是 fanSpeed)")
     }
 
     // cut1+cut2: surface=.dDomain → name=seed.intent(D-domain), tools=目标具名工具+同族 distractor, 无 generic frame

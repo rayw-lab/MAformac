@@ -59,5 +59,12 @@ finder 内部分歧：lens1(scoring-path) 推 IR-normalize matcher(B)；其余 4
 
 > **数字源（主线程 python 实跑核实，cite-verify）**：set_ 前缀 19/562、multi-primitive(ir_primitives>1) 134/562、迁移名 18/19 ∈ catalog（query_cabin_comfort MISSING）—— 复现：`python3` 遍历 `generated/D_domain.tools.demo.json`(562) + `generated/d_domain_ir_map.json`。file:line 用 `Core/Bench/C6VehicleToolBench.swift` / `Core/Contracts/ToolContractCompiler.swift` 简写。`0/34` = 历史 C5 PR5 灾难锚（项目既有）。
 
+## 7b. S5 审计线 verdict（2026-06-23, superpowers:code-reviewer 异源对抗审 + 实跑）
+**NEEDS-REVISION → 已闭合**（无 P0 BLOCK；配方零碰/名空间 parity/A2 边界 NOT 评性能/irMap fail-closed 全 ✅ 实跑坐实；swift test 144→145/0、verify-gold 57/57、make verify exit 0 实跑绿）。
+- **P1-1 已闭合**：C5/C6 值键 parity 原只测 2/3 腿（catalog schema 腿 + C6 jsonl 腿），漏 **C5 emit 侧异构键（temperature/fanSpeed）实产断言**。matcher 是 surface-string 字面键比对 → 漏这腿 = retrain 时 0/N 换皮复发点。**闭合** = 加 `testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents`（C5LoRATrainingTests）：真实 contract slot_keys 坐实 ac_temperature 含 temperature / ac_windspeed 含 fanSpeed（value.type 空，数字走异构槽非 value）→ build surface=.dDomain 实跑断言 emit `temperature`/`fanSpeed` 键、非 `value` 键。**测过 = parity 三腿全坐实**（非声称）。
+- **P2-1 已收**：requiresStateDelta 黑名单假设（非 query_=state-mutating）加注释，依赖 562 catalog 当前只读前缀只有 query_；未来加 get_/show_ 须回看（Core/Bench/C6VehicleToolBench.swift:901）。
+- **P2-2 已收**：migrate_c6_trap_to_d_domain.py 加幂等守护（jsonl 已含 C6-TRAP- → exit 1 阻断重复 append）。
+- paper-tiger（实测安全）：irMap 默认 [:] 向后兼容不致 D-domain 静默假绿（负证测 testGoldReplayFailsWithoutIRMap 主动证 state 塌→fail）。
+
 ## 8. 一手档指针（仓外 raw）
 `~/workspace/raw/05-Projects/MAformac/research/2026-06-23-a2-s5-c6-bench/`：`w1o909no1.output.json`(最一手) + `transcript-wf_de99753a-a42/`(15 files) + `README-synth-spec.md`(综合官全 spec) + `lens-*.md`(6 finder full_markdown)

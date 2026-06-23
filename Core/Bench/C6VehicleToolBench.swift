@@ -901,6 +901,8 @@ public struct C6GoldVerifier: Sendable {
     private func requiresStateDelta(_ candidate: GoldCandidate) -> Bool {
         // D-domain: 含非 query 工具调用 = state-mutating action → 必须有非空 state delta(gold 自检守护)。
         // 旧 hasPrefix("set_") 对 D-domain 名(动词 open_/adjust_/raise_/lower_/switch_) 失效; query_ 前缀=只读不改 state。
+        // ⚠️ 黑名单假设(S5 审计 P2-1): 「非 query_ = state-mutating」依赖 562 catalog 当前只读前缀只有 query_;
+        // 未来若加非 query_ 开头的只读工具(get_/show_) 须回看此判据(改白名单或查 IR primitive 是否 state-mutating)。
         !candidate.expectNoCall && candidate.expectedToolCalls.contains { !$0.name.hasPrefix("query_") }
     }
 }

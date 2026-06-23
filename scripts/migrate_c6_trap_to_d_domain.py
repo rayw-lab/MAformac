@@ -83,10 +83,20 @@ def main() -> int:
     parser.add_argument("--jsonl", default="contracts/c6-bench-cases.jsonl")
     args = parser.parse_args()
 
+    # 幂等守护(S5 审计 P2-2): 目标 jsonl 已含 C6-TRAP- → append 会重复; 报错要求先 git checkout/generate。
+    current = open(args.jsonl, encoding="utf-8").read()
+    if "C6-TRAP-" in current:
+        print(
+            "ERROR: %s 已含 C6-TRAP- 行, append 会重复。先 `swift run C6BenchCLI generate` 重物化 45 case "
+            "(不含 trap), 再跑本脚本。" % args.jsonl,
+            file=sys.stderr,
+        )
+        return 1
+
     if args.old_from_git:
         old = subprocess.run(["git", "show", "HEAD:contracts/c6-bench-cases.jsonl"], capture_output=True, text=True).stdout
     else:
-        old = open(args.jsonl, encoding="utf-8").read()
+        old = current
 
     trap = [json.loads(l) for l in old.splitlines() if l.strip() and json.loads(l)["case_id"].startswith("C6-TRAP-")]
     for c in trap:
