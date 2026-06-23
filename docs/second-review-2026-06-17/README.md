@@ -1,5 +1,8 @@
 # MAformac 二次调研校准包
 
+> ⚠️ **HISTORICAL 快照（2026-06-17）—— 文档级联 banner（2026-06-23）**
+> 本目录（00-source-ledger ~ 07-roadmap + README，9 文件）是立项早期二次调研校准包历史快照。范式翻案后（generic frame → D-domain 具名工具，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`）+ 口径终拍 562 + 契约 SSOT 全量重构，本包涉及的 surface 形态 / 口径数字 / 路线部分已过期。**活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/roadmap-2026-06-20-from-c6-done.md`。正文保留供溯源，勿据此推进。
+
 生成日期：2026-06-17
 
 范围：以 Claude Code 基于 38 个参考 repo 和深聊沉淀出的 5 份材料为主基座，补一层官方源、源码级证据、子任务审计结果和 MAformac demo 边界校准。本文档包不是最终 PRD/SRD，也不是代码架构定稿；它是下一步建项和拍板的证据底座。

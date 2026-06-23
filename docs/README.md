@@ -4,13 +4,17 @@
 > **北极星**:方案经理给客户演示用,客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑。
 > **形态**:纯端侧(iOS/macOS)、离线、Qwen3-1.7B + LoRA 大脑(0.6B 仅作真机吃紧时的轻量备选)、mock 车控、可插拔多技能(Phase1 车控 → 导航/音乐/外卖 via MCP)。
 
-> ⚠️ **路线 v3 新基线(2026-06-20,以此为准)**:C1/C2、C3 execution、C6 vehicle-tool-bench 均已 archived → `openspec/specs/`;C6 base Qwen3-1.7B 无 LoRA hard_fail 0.789 是 C5 提升判据。**推进路线以 `docs/roadmap-2026-06-20-from-c6-done.md` 为唯一事实源**(五件套 harness 骨架 + P0-P2 执行序 + 7 HIGH 已拍;P0 archive closeout 已回写)。契约/决策全料以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` 为准;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
+> 🔴🔴 **范式翻案 + 决策统一(2026-06-22~23,最新基线,优先于下方 v3)**:① **范式翻案** —— model-visible surface 从 generic frame(`tool_call_frame`)否决 → **D-domain 具名工具**(value 形态编码进工具名);canonical IR 仍 device×action(「对模型像具名工具,对系统像 device×action IR」);工具数未拍待 value-form 实算(**562=intent 非工具数**)。范式权威 = ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`(§1-§17:翻案/三层模型/demo 特性/多语种/21 主议题全收口/A2 盘点)。② **口径终拍(磊哥 2026-06-23 亲拍 562 终结纠结)**:10 族 = **191 device / 562 intent / 2159 行 / 54.1%**;族外 480 device / 976 intent / 1831 行;全集 3990 行 / 671 device / 1538 unique intent。**534 / 2086 / 52.3% / 族外 1004 / 1904 系列全废,禁再引**。③ **范式三层模型**:canonical IR(device×action×value) / surface(D-domain 具名工具) / runtime(MVP 10 族:空调/座椅/车窗/车门/灯光氛围/屏幕/音量/雨刮/天窗遮阳/香氛,HUD 不做;mock,族外 unsupported)。④ **决策统一索引**:`docs/grill-tournament/final-grill-list.md`(41 题运行清单)+ paradigm §1-§17(拍板清单)+ UIUE 31 条(`raw/.../2026-06-22-uiue-ultracode/GRILL-MASTER.md`)同源。
+>
+> ⚠️ **路线 v3 新基线(2026-06-20,surface 已被上方范式翻案演进,IR/路线骨架仍有效)**:C1/C2、C3 execution、C6 vehicle-tool-bench 均已 archived → `openspec/specs/`;C6 base Qwen3-1.7B 无 LoRA hard_fail 0.789 是 C5 提升判据。**推进路线以 `docs/roadmap-2026-06-20-from-c6-done.md` 为唯一事实源**(五件套 harness 骨架 + P0-P2 执行序 + 7 HIGH 已拍;P0 archive closeout 已回写)。契约/决策全料以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` 为准;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
 
 ## ⭐ 当前权威文档(v3 新基线,2026-06-20,以此为准)
 
 | 文档 | 是什么 |
 |---|---|
-| ⭐`docs/roadmap-2026-06-20-from-c6-done.md` | **新基线推进事实源**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图) — **必读第一** |
+| ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` | **范式 + surface 权威 SSOT**(§1-§17:generic frame 否决→D-domain 具名工具/canonical IR 仍 device×action/三层模型/demo 取巧特性/口径终拍 562/21 主议题全收口/A2 盘点) — **范式翻案权威** |
+| `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |
+| ⭐`docs/roadmap-2026-06-20-from-c6-done.md` | **新基线推进事实源**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — **必读第一** |
 | `CLAUDE.md` (§9) | 项目宪法 + 新基线指针 + 下一步 P1 |
 | `docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA 慢路 + §12 实装锚点) |
 | `docs/research/INDEX.md` | 调研/teardown 索引 + 应用机制(架构验证6流/home-llm深拆/ASR选型/C5配方/C6评测) |
@@ -49,8 +53,9 @@
 ## Decisions 状态总览(D1–D37 + Q1–Q15)
 
 - 🔒 **D1–D37 全锁**(D20/D30/D35/D37 已于 2026-06-17 拍板;权威见 `CLAUDE.md §5`)。
-- **v2 重审(2026-06-19)**:D16 端态 8→102 原子能力 P0 子集 / D30 adopt unsloth+Hammer+xLAM / D35 全集覆盖率双轴 bench / D37 risk-policy 单源 / **D14 ASR→sherpa-onnx 中文主+WhisperKit fallback+ASRBackend(跨厂商二审改)**。范围真值:空调 18-32℃ / 风量 1-10 档(旧 16-30/0-5 拍错)。
+- **v2 重审(2026-06-19)**:D16 端态 8→102 原子能力 P0 子集 / D30 adopt unsloth+Hammer+xLAM / D35 全集覆盖率双轴 bench / D37 risk-policy 单源 / **D14 ASR→系统 SFSpeechRecognizer 主(demo 取巧 on-device 离线)+sherpa-onnx/WhisperKit fallback(不砍)+ASRBackend 抽象(已 amend:sherpa 主→系统主,见 `docs/grill-tournament/grill-decisions-master.md:203` §4.6 + U28)**。范围真值:空调 18-32℃ / 风量 1-10 档(旧 16-30/0-5 拍错)。
 - **Q1–Q15** = C1/C2 契约脑暴定稿(见 grill/ADR)。
+- **T2 决策统一(2026-06-22~23)**:范式翻案(generic frame→D-domain 具名工具)+ 口径终拍 562 + demo 取巧 10 族,见 paradigm §1-§17(拍板权威)+ `docs/grill-tournament/final-grill-list.md`(41 题运行清单)+ UIUE 31 条(`raw/.../2026-06-22-uiue-ultracode/GRILL-MASTER.md`)。
 
 > ⛔ 下方「下一步候选 ABC / 基座内化进行中」为 v1 历史快照,**已 supersede**(当前路线见 `CLAUDE.md §9` + 上方权威文档表)。
 
@@ -59,7 +64,7 @@
 - 主线模型 = Qwen3-1.7B + LoRA(0.6B 仅作轻量备选;FoundationModels 因不可微调出局,留逃生口)
 - 规则吃 80% 高频车控,LLM 只碰 20% 模糊/跨域;**LoRA 必做**,只练「模糊说→跨域映射」
 - 端状态**自包含** = UI 卡片亮暗 + TTS 模拟(无外部系统方);执行=改卡片态+播报
-- 文本先行(开发顺序)+ ASR 必交付;**ASR = sherpa-onnx 中文(Paraformer/SenseVoice)主 + WhisperKit fallback + ASRBackend 抽象**(D14 v2,2026-06-19 跨厂商二审改);barge-in 首版按钮打断,VAD 二期
+- 文本先行(开发顺序)+ ASR 必交付;**ASR = 系统 SFSpeechRecognizer 主(demo 取巧 on-device 离线)+ sherpa-onnx/WhisperKit fallback(不砍,要开发)+ ASRBackend 抽象**(🔴 D14 已 amend:sherpa 主→系统主,见 `docs/grill-tournament/grill-decisions-master.md:203` §4.6 + U28;旧 Paraformer≫Whisper 中文抗噪依据降为 fallback 选型理由保留);barge-in 首版按钮打断,VAD 二期
 - 安全/记忆/barge-in 是 38-repo 盲区,需自建
 
 ## 边界声明
@@ -67,6 +72,8 @@
 全部抽象自真实座舱项目资料 + 38 参考 repo。**全文「某车厂」,无真实客户名/报价/密钥/PII/对内禁外传原文。**
 
 ## 下一步候选(待磊哥定方向)
+
+> ⚠️ SUPERSEDED(2026-06-23 文档级联):本段为 **v1 历史快照**,方向已早决——现行推进事实源 = `docs/grill-tournament/grill-decisions-master.md`(grill SSOT,Q22 终拍单源) + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`(范式权威);C1/C2/C3/C6 均已 archived,断点 = C5 recovery(范式翻案 D-domain surface),见 `CLAUDE.md §9`。`docs/roadmap-2026-06-20-from-c6-done.md` 已标 **historical(Q22)**,仅供五件套 harness 骨架溯源,勿当现行推进事实源。下方 ABC 仅供溯源,勿据此推进。
 
 - **A) 敲核心契约** ⭐:`tools.json`(八大垂域)+ `DialogueState` schema + `Capability/Tool` 协议落成实际文件——是骨架与 spike 的输入,护城河
 - B) 出项目骨架:SwiftUI + AgentCore 目录结构 + 空协议文件

@@ -7,6 +7,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(C5RouteTier.derive(fuzzy: true, free: false), .fcL2)
         XCTAssertEqual(C5RouteTier.derive(fuzzy: false, free: true), .fcL3)
         XCTAssertEqual(C5RouteTier.derive(fuzzy: true, free: true), .fcL3)
+        XCTAssertEqual(C5RouteTier.derive(fuzzy: false, free: false, valueType: "EXP"), .ruleL1)
     }
 
     func testBuilderKeepsExecutionTierSeparateFromRouteTier() {
@@ -20,7 +21,56 @@ final class C5LoRATrainingTests: XCTestCase {
 
         XCTAssertEqual(prepared.samples[0].routeTier, .fcL3)
         XCTAssertEqual(prepared.samples[0].executionTier, "L1")
-        XCTAssertEqual(prepared.samples[0].routeTierSource, "fc_flags_normalized")
+        XCTAssertEqual(prepared.samples[0].routeTierSource, "route_deriver_v2_fc_flags_value_type")
+    }
+
+    func testToolCallPayloadRendersNameBeforeArgumentsButKeepsArgumentsCanonical() {
+        let first = C5TrainingToolCall(
+            name: "tool_call_frame",
+            arguments: ["z": .string("last"), "a": .string("first")]
+        )
+        let second = C5TrainingToolCall(
+            name: "tool_call_frame",
+            arguments: ["a": .string("first"), "z": .string("last")]
+        )
+
+        let rendered = C5TrainingRenderer.renderToolCall(first)
+
+        XCTAssertEqual(rendered, "<tool_call>{\"name\":\"tool_call_frame\",\"arguments\":{\"a\":\"first\",\"z\":\"last\"}}</tool_call>")
+        XCTAssertEqual(rendered, C5TrainingRenderer.renderToolCall(second))
+    }
+
+    func testToolContractCompilerDerivesEnumsFromSemanticSeeds() throws {
+        let seeds = [
+            semanticSeed(id: "ac-row", fuzzy: true, free: false, device: "ac", actionPrimitive: "power_on", valueType: "EXP"),
+            semanticSeed(id: "window-row", fuzzy: false, free: false, device: "window", actionPrimitive: "by_percent", slotKeys: ["position"], valueType: "PERCENT")
+        ]
+        let tool = try XCTUnwrap(ToolContractCompiler(seeds: seeds).frameToolSchema.first)
+        let properties = try toolProperties(tool)
+
+        XCTAssertEqual(propertyEnum(properties, "device"), ["ac", "window"])
+        XCTAssertEqual(propertyEnum(properties, "action_primitive"), ["by_percent", "power_on"])
+        XCTAssertEqual(propertyEnum(properties, "value.type"), ["EXP", "PERCENT"])
+        XCTAssertNotNil(properties["position"])
+    }
+
+    func testTrainingSampleUsesSeedLocalContractDerivedSchema() throws {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(id: "ac-row", fuzzy: true, free: false, device: "ac", actionPrimitive: "power_on", valueType: "EXP"),
+                semanticSeed(id: "window-row", fuzzy: false, free: false, device: "window", actionPrimitive: "by_percent", slotKeys: ["position"], valueType: "PERCENT")
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 2, devSelectionRows: 0)
+        )
+        let tool = try XCTUnwrap(prepared.samples.first?.tools.first { functionName($0) == "tool_call_frame" })
+        let properties = try toolProperties(tool)
+
+        XCTAssertEqual(propertyEnum(properties, "device").count, 1)
+        XCTAssertEqual(propertyEnum(properties, "action_primitive").count, 1)
+        XCTAssertEqual(propertyEnum(properties, "value.type").count, 1)
+        XCTAssertLessThan(prepared.samples[0].tools.description.count, 25_000)
     }
 
     func testBuilderProducesRequiredMetadataAndRuleRehearsalRatio() {
@@ -41,7 +91,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(prepared.receipt.failureReceipt.contains("candidate_semantic_reassignment_not_run"))
         XCTAssertGreaterThanOrEqual(prepared.receipt.rehearsalRatio, 0.05)
         XCTAssertLessThanOrEqual(prepared.receipt.rehearsalRatio, 0.10)
-        XCTAssertTrue(prepared.samples.allSatisfy { $0.routeTierSource == "fc_flags_normalized" })
+        XCTAssertTrue(prepared.samples.allSatisfy { $0.routeTierSource == "route_deriver_v2_fc_flags_value_type" })
         XCTAssertTrue(prepared.samples.allSatisfy { !$0.generatorModelID.isEmpty })
         XCTAssertTrue(prepared.samples.allSatisfy { !$0.augmentationParentID.isEmpty })
         XCTAssertTrue(prepared.samples.allSatisfy { !$0.lineageGroupID.isEmpty })
@@ -176,6 +226,33 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(noCalls.allSatisfy { $0.split == "train" })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.targetToolPresent == false })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.counterfactualPairID.isEmpty == false })
+    }
+
+    func testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors() {
+        let seeds = (0..<40).map { semanticSeed(id: "theta-alpha-\($0)", fuzzy: true, free: false) }
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: seeds,
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 40,
+                devSelectionRows: 0,
+                refusalRatioTarget: 0,
+                refusalRatioHardCap: 0,
+                includeNoCallCounterfactuals: false
+            )
+        )
+
+        XCTAssertEqual(prepared.receipt.refusalRatioTarget, 0)
+        XCTAssertEqual(prepared.receipt.refusalRatioHardCap, 0)
+        XCTAssertEqual(prepared.receipt.refusalRatioObserved, 0)
+        XCTAssertEqual(prepared.receipt.noCallCounterfactualCount, 0)
+        XCTAssertFalse(prepared.samples.contains { $0.assistantPayload.contains("NO_TOOL") })
+        XCTAssertTrue(prepared.samples.allSatisfy { !$0.expectedToolCalls.isEmpty })
+        XCTAssertTrue(prepared.samples.allSatisfy { $0.noCall == nil })
+        XCTAssertGreaterThan(prepared.receipt.promptDistractorCount, 0)
+        XCTAssertTrue(prepared.samples.contains { $0.promptDistractorToolIDs.contains { $0.hasPrefix("irrelevant_navigation_") } })
+        XCTAssertTrue(prepared.receipt.frameSurfaced.contains("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows"))
     }
 
     func testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan() {
@@ -807,12 +884,173 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(pass.thinkBlockParity)
     }
 
+    // MARK: - A2 S4 D-domain surface(paradigm §1: name=intent, value 形态编码进名, 同族 distractor, removedToolID 真删)
+
+    private func a2RepoRoot() -> URL {
+        URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+    }
+
+    private func loadDemoCatalog() throws -> [DDomainToolEntry] {
+        try ToolContractCompiler.loadDDomainCatalog(repoRoot: a2RepoRoot())   // 562 demo D-domain 具名工具
+    }
+
+    private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", valueType: String = "EXP", slotKeys: [String] = ["device"]) -> C5SemanticSeed {
+        let encodedSlotKeys = slotKeys.map { "\"\($0)\"" }.joined(separator: ",")
+        let json = """
+        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"\(intent)","intent":"\(intent)","service":"x","exec_tier":"L2","fc_flags":{"fuzzy":false,"free":false},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"x","source_sheet":"x","source_row_no":1,"range":""}
+        """
+        return try! JSONDecoder().decode(C5SemanticSeed.self, from: Data(json.utf8))
+    }
+
+    // 🔴 S5 审计 P1-1 闭合: C5/C6 值键 parity 第三腿(emit 侧)。matcher 是 surface-string 字面键比对 →
+    // C5 emit 侧对异构值键(ac_temperature→temperature / ac_windspeed→fanSpeed, 非 value)必须实产同键,
+    // 否则训了 value=24 评了 temperature=24 = 0/N 换皮(S4 emit 测只覆盖 value 键工具, 漏异构键)。
+    func testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents() throws {
+        let catalog = try loadDemoCatalog()
+        // ac_temperature number: 真实 contract slot_keys=[adjustment_mode, temperature](value.type 空, 数字走 temperature 槽非 value)
+        let tempSeed = rawSeed(id: "ac-temp-1", intent: "adjust_ac_temperature_to_number", device: "ac_temperature", actionPrimitive: "adjust_to_number", valueType: "", slotKeys: ["adjustment_mode", "temperature"])
+        let tempPrepared = C5TrainingDatasetBuilder().build(
+            seeds: [tempSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let tempCall = tempPrepared.samples.first { $0.split == "train" }?.expectedToolCalls.first
+        XCTAssertEqual(tempCall?.name, "adjust_ac_temperature_to_number")
+        XCTAssertNotNil(tempCall?.arguments["temperature"], "C5 emit ac_temperature number 用 temperature 键(与 C6 expected 同源, matcher 字面比对)")
+        XCTAssertNil(tempCall?.arguments["value"], "C5 emit 不用 value 键(ac_temperature 值键是 temperature, 防 0/N 换皮)")
+
+        // ac_windspeed number: 真实 contract slot_keys=[fanSpeed]
+        let fanSeed = rawSeed(id: "ac-fan-1", intent: "adjust_ac_windspeed_to_number", device: "ac_windspeed", actionPrimitive: "adjust_to_number", valueType: "", slotKeys: ["fanSpeed"])
+        let fanPrepared = C5TrainingDatasetBuilder().build(
+            seeds: [fanSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let fanCall = fanPrepared.samples.first { $0.split == "train" }?.expectedToolCalls.first
+        XCTAssertEqual(fanCall?.name, "adjust_ac_windspeed_to_number")
+        XCTAssertNotNil(fanCall?.arguments["fanSpeed"], "C5 emit ac_windspeed number 用 fanSpeed 键(与 C6 expected 同源)")
+        XCTAssertNil(fanCall?.arguments["value"], "C5 emit 不用 value 键(ac_windspeed 值键是 fanSpeed)")
+    }
+
+    // cut1+cut2: surface=.dDomain → name=seed.intent(D-domain), tools=目标具名工具+同族 distractor, 无 generic frame
+    func testDDomainSurfaceEmitsIntentAsToolNameNotFrame() throws {
+        let catalog = try loadDemoCatalog()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],   // intent=open_ac ∈ 562
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let positive = prepared.samples.first { $0.split == "train" }
+        XCTAssertEqual(positive?.expectedToolCalls.first?.name, "open_ac", "cut1: name=seed.intent(D-domain 具名工具)")
+        let toolNames = (positive?.tools ?? []).compactMap { functionName($0) }
+        XCTAssertTrue(toolNames.contains("open_ac"), "cut2: 目标 D-domain 工具在 tools surface")
+        XCTAssertFalse(toolNames.contains("tool_call_frame"), "surface=.dDomain 不渲 generic frame")
+        XCTAssertFalse(toolNames.contains(where: { $0.hasPrefix("irrelevant_") }), "distractor 改同族 D-domain, 非 irrelevant 占位")
+    }
+
+    // cut2: 同族 distractor ∈ 562 catalog(非 irrelevant 占位), 不含目标自身
+    func testDDomainDistractorsAreRealCatalogToolsSameFamily() throws {
+        let catalog = try loadDemoCatalog()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let positive = prepared.samples.first { $0.split == "train" }
+        let distractorNames = positive?.promptDistractorToolIDs ?? []
+        XCTAssertFalse(distractorNames.isEmpty, "有同族 distractor")
+        let catalogNames = Set(catalog.map(\.function.name))
+        XCTAssertTrue(distractorNames.allSatisfy { catalogNames.contains($0) }, "distractor ∈ 562 D-domain catalog(非 irrelevant 占位)")
+        XCTAssertFalse(distractorNames.contains("open_ac"), "distractor 不含目标工具自身")
+    }
+
+    // cut1: 值形态工具 emit value arg; device/action_primitive 不 emit(编码进名); arg 键 ∈ schema(additionalProperties:false)
+    func testDDomainEmitsValueArgAndOnlySchemaKeys() throws {
+        let catalog = try loadDemoCatalog()
+        let seed = rawSeed(id: "scr-1", intent: "adjust_blue_ray_filtering_to_gear", device: "blue_ray_filtering", valueType: "PERCENT")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let call = prepared.samples.first { $0.split == "train" }?.expectedToolCalls.first
+        XCTAssertEqual(call?.name, "adjust_blue_ray_filtering_to_gear")
+        let args = call?.arguments ?? [:]
+        XCTAssertNotNil(args["value"], "值形态工具 emit value arg(S1 derive_arg_schema 统一命名 value)")
+        XCTAssertNil(args["device"], "device 不 emit(编码进工具名)")
+        XCTAssertNil(args["action_primitive"], "action 不 emit(编码进工具名)")
+        let entry = catalog.first { $0.function.name == "adjust_blue_ray_filtering_to_gear" }!
+        let props = try toolProperties(C5TrainingRenderer.dDomainToolSchema(entry))
+        for key in args.keys {
+            XCTAssertTrue(props.keys.contains(key), "emit arg \(key) ∈ tool schema properties(additionalProperties:false 合规)")
+        }
+    }
+
+    // cut4: scope=.demo → 562 allowlist 过滤 562 外 intent
+    func testDDomainScopeDemoFiltersOutOfCatalogIntents() throws {
+        let catalog = try loadDemoCatalog()
+        let inSeed = semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")   // intent=open_ac ∈ 562
+        let outSeed = rawSeed(id: "x-1", intent: "nonexistent_intent_zzz", device: "navi")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [inSeed, outSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 20, devSelectionRows: 0, includeNoCallCounterfactuals: false, scope: .demo, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let names = Set(prepared.samples.compactMap { $0.expectedToolCalls.first?.name })
+        XCTAssertTrue(names.contains("open_ac"), "562 内 intent 保留")
+        XCTAssertFalse(names.contains("nonexistent_intent_zzz"), "scope=.demo 过滤 562 外 intent(unsupported 兜底走别处)")
+    }
+
+    // cut5: no-call 反事实物理删目标工具(非只 metadata 声称) + 活样本 targetToolPresent=false(修 446 假删灾难 variant)
+    func testDDomainNoCallCounterfactualPhysicallyRemovesTargetTool() throws {
+        let catalog = try loadDemoCatalog()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 8, devSelectionRows: 0, refusalRatioTarget: 0.3, refusalRatioHardCap: 0.5, includeNoCallCounterfactuals: true, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let noCall = prepared.samples.first { $0.noCall != nil }
+        XCTAssertNotNil(noCall, "生成 no-call 反事实")
+        let removed = noCall?.noCall?.removedToolID ?? ""
+        XCTAssertEqual(removed, "open_ac", "cut5: removedToolID=被移除的 D-domain 目标工具名(非硬编码 tool_call_frame)")
+        let toolNames = (noCall?.tools ?? []).compactMap { functionName($0) }
+        XCTAssertFalse(toolNames.contains(removed), "cut5 真删: 目标工具物理不在 tools(非只 metadata removedToolID 声称)")
+        XCTAssertEqual(noCall?.noCall?.targetToolPresent, false, "活样本: targetToolPresent=false 与产物一致(claim-vs-reality 铁律1)")
+    }
+
+    // 🔴 P1(GPT Pro+GLM 审计共识)闭合: surface=.dDomain + catalog 非空 + intent miss → fail-closed skip(不 fallback frame 污染 A2 surface)
+    func testDDomainCatalogMissIsFailClosedNotFrameFallback() throws {
+        let catalog = try loadDemoCatalog()
+        // scope=.full 不过滤 → miss-intent seed 到达 makePositiveSample; surface=.dDomain + catalog 非空 → 走 fail-closed 分支
+        let inSeed = semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")   // intent=open_ac ∈ 562
+        let missSeed = rawSeed(id: "miss-1", intent: "nonexistent_intent_zzz", device: "navi")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [inSeed, missSeed], c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 20, devSelectionRows: 0, includeNoCallCounterfactuals: false, scope: .full, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let names = Set(prepared.samples.flatMap { $0.expectedToolCalls.map(\.name) })
+        XCTAssertTrue(names.contains("open_ac"), "in-catalog intent 产 D-domain sample")
+        XCTAssertFalse(names.contains("nonexistent_intent_zzz"), "miss intent 不产样本(fail-closed skip)")
+        XCTAssertFalse(names.contains("tool_call_frame"), "🔴 miss intent 不 fallback frame(P1 fail-closed, 不污染 A2 surface, 非旧 stderr+frame)")
+    }
+
+    // 向后兼容: 空 catalog(默认无注入)→ frame legacy 回退(strangler 旧 surface 保留)
+    func testFrameSurfaceBackwardCompatWhenCatalogEmpty() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false)
+        )
+        let positive = prepared.samples.first { $0.split == "train" }
+        XCTAssertEqual(positive?.expectedToolCalls.first?.name, "tool_call_frame", "空 catalog → frame legacy(向后兼容, strangler)")
+    }
+
     private func semanticSeed(
         id: String,
         fuzzy: Bool,
         free: Bool,
         execTier: String = "L2",
+        device: String = "ac",
+        actionPrimitive: String = "power_on",
         slotKeys: [String] = ["device"],
+        valueType: String = "EXP",
         range: String = "",
         semanticSlots: [String: String] = [:]
     ) -> C5SemanticSeed {
@@ -828,9 +1066,44 @@ final class C5LoRATrainingTests: XCTestCase {
             dsProtocol = ",\"ds_protocol\":{\"semantic\":{\"slots\":{\(encodedSlots)}}}"
         }
         let json = """
-        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"ac","action_primitive":"power_on","action_code":"open_ac","intent":"open_ac","service":"airControl","exec_tier":"\(execTier)","fc_flags":{"fuzzy":\(fuzzy),"free":\(free)},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"EXP"},"source_domain":"airControl","source_sheet":"airControl","source_row_no":1,"range":"\(range)"\(dsProtocol)}
+        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"open_ac","intent":"open_ac","service":"airControl","exec_tier":"\(execTier)","fc_flags":{"fuzzy":\(fuzzy),"free":\(free)},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"airControl","source_sheet":"airControl","source_row_no":1,"range":"\(range)"\(dsProtocol)}
         """
         return try! JSONDecoder().decode(C5SemanticSeed.self, from: Data(json.utf8))
+    }
+
+    private func toolProperties(_ tool: [String: JSONValue]) throws -> [String: JSONValue] {
+        guard case let .object(function)? = tool["function"],
+              case let .object(parameters)? = function["parameters"],
+              case let .object(properties)? = parameters["properties"] else {
+            XCTFail("tool schema missing function.parameters.properties")
+            return [:]
+        }
+        return properties
+    }
+
+    private func functionName(_ tool: [String: JSONValue]) -> String? {
+        guard case let .object(function)? = tool["function"],
+              case let .string(name)? = function["name"] else {
+            return nil
+        }
+        return name
+    }
+
+    private func propertyEnum(_ properties: [String: JSONValue], _ key: String) -> [String] {
+        guard case let .object(schema)? = properties[key],
+              case let .array(values)? = schema["enum"] else {
+            return []
+        }
+        return jsonStringArray(values)
+    }
+
+    private func jsonStringArray(_ values: [JSONValue]) -> [String] {
+        values.compactMap { value in
+            guard case let .string(text) = value else {
+                return nil
+            }
+            return text
+        }
     }
 
     private func context() -> C5DataGateRunContext {

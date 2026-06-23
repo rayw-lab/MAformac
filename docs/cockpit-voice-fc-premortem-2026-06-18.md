@@ -1,5 +1,8 @@
 # 座舱语音 Function Call 原理调研 + Pre-Mortem（2026-06-18）
 
+> ⚠️ **HISTORICAL 快照（2026-06-18）—— 文档级联 banner（2026-06-23）**
+> 本文是座舱语音 FC 原理早期调研历史快照。范式翻案后（generic frame `tool_call_frame` 否决 → D-domain 具名工具，第4源真实座舱 TOP 技能表 ground-truth，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`），本文涉及的 FC surface 形态已演进。**活基线** = `CLAUDE.md §9` + paradigm-tool-surface + `docs/srd-three-layer-intent-routing.md`。正文保留供溯源（FC 原理 + pre-mortem 坑点仍有参考价值），勿据此推进 surface。
+
 > **多路调研存档**：scout（本机 raw 座舱材料，只读抽象）+ oracle（联网 WebSearch + 1 claude subagent，**未派 Codex/GPT Pro**，符合 `pre-mortem-reflex`）。三方互证（本机 raw + 联网论文 + 磊哥真实语料）理解座舱语音 FC 原理,为 change3（execution）+ 新 change `define-intent-routing` 提供设计依据。
 
 ---

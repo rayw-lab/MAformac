@@ -2,6 +2,54 @@
 
 MAformac 是本地座舱语音控制 demo 助手。本文只记录领域术语边界，避免后续 OpenSpec 重构时混淆范围、契约、运行时和演示精修。
 
+> 🔴 **本文状态（2026-06-23 文档级联，finding round-04 补三章）**：原 2026-06-20 版只有【术语】段，缺范式翻案/D-domain surface/口径/grill 索引/T0-T6 分层。本轮补「① 口径权威 ② Grill 权威索引 ③ T0-T6 文件分层」三章（术语段保持，范式翻案只翻 model-visible surface，IR 层 device×action 术语不变）。
+
+## 口径权威（磊哥 2026-06-23 终拍，写任何数字前以此为准）
+
+> 全仓唯一权威口径，level-set 三层 scope。源 = `docs/grill-tournament/grill-decisions-master.md §0 口径权威表`（废口径单一权威清单，引用前指回它，防分叉）+ `grill-decisions-amend-paradigm-tool-surface.md §14:224`（磊哥亲拍）。
+
+| 量 | 权威值 | 说明 |
+|---|---|---|
+| 全集 | **3990 行 / 671 device / 1538 unique intent** | source: `contracts/semantic-function-contract.jsonl`（C1 SSOT 源行级全集）|
+| 10 族 | **191 device / 562 intent / 2159 行（全集 54.1%）** | MVP 10 族（空调/座椅/车窗/车门/灯光氛围/屏幕/音量/雨刮/天窗遮阳/香氛，HUD 不做）explicit-allowlist；boundary `docs/research/2026-06-22-mvp-10family-device-boundary.md:3` |
+| 族外 | **480 device / 976 intent / 1831 行** | 10 族之外，runtime 走 `unsupported` 优雅兜底 |
+| 工具数 | **未拍，待 value-form 实算** | 562 是 intent 非工具数；派单当工具数 = 口径错全链路 |
+
+> 🔴 **废口径（禁引）**：534 / 2086 / 52.3% / 族外 1004 / 1904（534=A1-A9 后 GLM execute_code 移出若干边界 intent，磊哥不纠结、亲拍 562 终结）；30-60 当工具数；2045（量产 TOP 表真值非 demo）；tool_call_frame / set_cabin / B-frame surface（旧 model-visible surface 已否决）。废口径权威定义见 master §0。
+
+> **三层 scope 别混（A3 翻案后）**：① **L1allowlist 精做范围**（runtime 快路精演，暂定~5 设备）⊂ ② **runtime 演示层 = LoRA 训练层 = MVP 10 族 562 intent scope**（端侧具名工具挂载 + C6 测 + 族外 unsupported；训练按 `scope_tier` 拆四类数据 compact positive/unsupported/safety/followup，**不训全集 3990** —— A3 已拍 10 族不训全集）。全集 3990 = canonical IR 派生源 + value-form 模糊说法变体来源，**非训练 scope**。
+
+## Grill 权威索引（grill SSOT 路由，2026-06-23）
+
+> 重大决策推进事实源已统一到 grill 文档组（Q22：roadmap-2026-06-20 已标 historical，新单源 = grill SSOT）。起手按此索引找权威。
+
+| 主题 | 权威文档 |
+|---|---|
+| **grill SSOT（口径/Q01-Q41/UIUE U1-U31/拍板映射）** | `docs/grill-tournament/grill-decisions-master.md` |
+| **范式 + surface（generic frame 否决 → D-domain 具名工具/三层模型/demo 取巧/21 议题收口/A2 盘点）** | `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` |
+| **文档级联总账（范式翻案 + 口径统一全仓回写）** | `docs/grill-tournament/cascade-inventory.md` |
+| **10 族 device 边界归属（A1-A9 裁决 + 562 推导）** | `docs/research/2026-06-22-mvp-10family-device-boundary.md` |
+| **C5 recovery（0/34 灾难 + θ-train）** | `docs/c5-recovery-2026-06-22/grill-decisions.md` |
+| **A2 代码盘点（D-domain 重构落地依据，派单前必读）** | `docs/research/2026-06-22-a2-codebase-audit/README.md` |
+
+## 范式翻案（model-visible surface，2026-06-23）
+
+> **三层模型**（GLM 混层已纠）：① **canonical IR** = device × action_primitive × value（系统侧不变）② **model-visible surface** = D-domain 具名工具（value 形态编码进工具名，如 `adjust_ac_temperature_to_max` / `_to_number` / `_by_exp` / `query_ac_temperature`）；generic frame（`tool_call_frame`）作 surface **已否决**（1.7B 判定面爆炸，θ-α 0/23 根因）③ **runtime MVP 10 族**（mock / 族外 unsupported）。「对模型像 D-domain 具名工具，对系统像 device×action IR」。落地 = A2 重型重构（C1→C2→C3→C5→C6 全链路 incremental），权威依据 = paradigm §1-§17 + A2 audit README。
+
+## T0-T6 文件分层（文档级联机械账本，2026-06-23）
+
+> 完整逐文件 verdict 见 `docs/grill-tournament/cascade-inventory.md §2`。grill 期只改 T1 contracts + T2 grill-decisions，别动 archived specs（MODIFY 走正式 change）。
+
+| Tier | 含义 | 起手关系 |
+|---|---|---|
+| **T0** | 活基线（新 session 起手读）| `CLAUDE.md` / `docs/README.md` / `docs/srd-three-layer-intent-routing.md` / `docs/baseline-semantic-protocol-2026-06-19.md`(MASTER) / 本文 `CONTEXT.md` / `docs/integration-blueprint.md` |
+| **T1** | 契约 SSOT | `contracts/*.{jsonl,yaml}` + `openspec/specs/*` + 新 OpenSpec change skeleton（DRAFT 待人审 propose）|
+| **T2** | 决策逐条标状态 | C1 Q1-Q10 oracle + paradigm-amend（活决策源）|
+| **T3** | grill SSOT 统一 | grill-tournament 文档组 |
+| **T4** | UIUE + voice 落档 | `docs/research/2026-06-22-uiue-ultracode` + voice/golden-run 新 spec |
+| **T5** | 历史快照（批量 banner）| handoffs / dispatches / second-review（PENDING）|
+| **T6** | 脏区清理 | `_parked` 确认 + 废文件 banner |
+
 ## 术语
 
 **生成式全集（甲档）**:

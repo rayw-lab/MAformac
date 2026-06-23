@@ -16,10 +16,10 @@ final class WalkingSkeletonTests: XCTestCase {
 
         let readback = try await skeleton.handle(text: "打开空调")
 
-        XCTAssertEqual(readback.key, "hvac.ac")
+        XCTAssertEqual(readback.key, "ac.power")
         XCTAssertEqual(readback.actualValue, "on")
-        XCTAssertEqual(store.cell(for: "hvac.ac")?.actualValue, "on")
-        XCTAssertEqual(store.cell(for: "hvac.ac")?.visualState, .satisfied)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.power")?.visualState, .satisfied)
         XCTAssertEqual(speaker.spokenTexts, ["空调已打开"])
         XCTAssertEqual(traceLogger.entries.map(\.stage), [.decode, .plan, .guard, .execute, .readback])
     }

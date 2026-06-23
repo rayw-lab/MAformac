@@ -1,5 +1,10 @@
 # MAformac Roadmap — 新基线 2026-06-20（C6 done 起点）
 
+> ## 🟢 surface 翻案 + progress SSOT 状态 banner（2026-06-23 文档级联）
+> **本 roadmap 仍是当前推进事实源**(新 roadmap-2026-06-23 待 §15 GOV/CAS/TRN/UIX 35 议题 grill 收口后再写);但**两点已演进,据此推进**:
+> 1. **surface 翻案**:本文涉及的 `tool_call_frame` / generic frame 形态已**否决**(θ-α LoRA 全面塌缩 = action 轴 base 10/23→lora **0/23**,根因=1.7B 单工具判定面爆炸;source `docs/c5-recovery-2026-06-22/grill-decisions.md:120-123`),model-visible surface 改 **D-domain 具名工具**(canonical IR 仍 device×action,「对模型像具名工具,对系统像 IR」)。范式权威 = `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`;C5 recovery 推进事实源 = `docs/c5-recovery-2026-06-22/grill-decisions.md`(本 roadmap 的 C5/P1-C 旧定性以 recovery 为准)。
+> 2. **口径(磊哥 2026-06-23 终拍)**:10 族 **191 device / 562 intent / 2159 行(54.1%)**;族外 480 device / 976 intent / 1831 行(source `docs/research/2026-06-22-mvp-10family-device-boundary.md:39` + paradigm §14)。**🔴 D-domain 工具数未拍**(562=intent 非工具数,待 value-form 实算)= **A2 派单前置门**(见 §3 H3 注)。
+>
 > **此文是「此时此刻」往后的唯一推进事实源**。把三刀 / 38 项 / 14-repo synthesis / Qwen 可行性 / 磊哥评审全部收敛成一条从 **C6 apply done** 起步的清晰路线；2026-06-20 archive closeout 后，P0 已收口，当前入口是 P1-A C5 数据门 + P1-B Qwen spike。
 > **方法论骨架 = 项目五件套 harness（OpenSpec + Pocock + Superpowers + Pi + Mastra）的精髓**（§1），后续每个 C-change 照此推进。
 > 配套读：`docs/research/2026-06-20-eval-memory-deepdive-synthesis.md`（吸纳意见全料）+ `CLAUDE.md`（宪法）+ `docs/srd-three-layer-intent-routing.md`（架构）。
@@ -93,7 +98,8 @@
 |---|---|---|---|
 | **H1** | Qwen3.5-2B 升主力 | **条件升级**：先 S1 parser + S2 iPhone GDN TTFT，**不先训 LoRA** | ⚠️ 纠偏：spike **必须在 C5 LoRA train 之前收口**（它定训哪个模型）；与 P0/P1 数据门**并行**，gate 在 train 前。S1+S2 过→训 2B；S1 不过→训 1.7B 守主力 |
 | **H2** | 短时记忆落 C4 | **落 C4 DialogueState，不新建层**；补 `session_ttl=300 / focus_ttl=90` 两层 | C4 = `DialogueStateStore + FollowupResolver`，加载现成 `contracts/semantic-followup-transitions.jsonl`（已 verified 存在）；不建 DB 不上向量 |
-| **H3** | C6.1 时机 | **C6.1 接收，但先做 C5 前置修复；NIT1/NIT3/trap/verify_gold 不能等二期** | ⚠️ 状态更新：base 已跑出 hard_fail，「等 base 真跑」已过时 → 现在是 **P0 收尾**（这 4 项），见 §4-P0 |
+| **H3** | C6.1 时机 | **C6.1 接收，但先做 C5 前置修复；NIT1/NIT3/trap/verify_gold 不能等二期** | ⚠️ 状态更新：base 已跑出 hard_fail，「等 base 真跑」已过时 → 现在是 **P0 收尾**（P0-1/P0-2/P0-3/P0-4，已 archive closeout），见 §4-P0 |
+| **A2-门** | D-domain 工具数实算 | **A2 重构派单前置门**（2026-06-23 补，范式翻案后） | 🔴 model-visible surface 改 D-domain 具名工具后,**工具数必先 value-form 实算**(671 device × 原语 × value 形态 → 若干具名工具;562=intent 非工具数,不可当工具数)。未实算前 contracts/spec/派单的「工具数」字段一律写 `[TBD-工具数待 value-form 实算]`,禁编。阻塞:`qwen-tool-call-format.yaml` tools 字段 / `function-spec-full.yaml` 重派生 / `c6-bench-cases.jsonl` expected_tool_calls 迁移。权威 = paradigm §14 G2 / final-grill-list Q01 |
 | **H4** | C5 先数据门 vs 先训 | **先数据门，升为阻塞**（receipt/split/masking/must_not_train=0） | 数据门**模型无关**可先做；train 等数据门过 + Qwen spike 定模型 |
 | **H5** | C7 打断 | **按钮首版（D13），写史合同首版即上、加硬** | 按钮打断可简化，写史合同不可简化：首版即记 `tts_committed_text / interrupted / played_until_offset / history_commit_boundary`；raw ASR 只入 trace 非权威态 |
 | **H6** | judge + 多正解进金标 | **进**：judge 不洗白硬门 + 金标带 alternative+quality | ⚠️ 纠偏拆分：**金标带 alternatives（acceptable 集）+ superset 匹配 提前到 P0**（防 trap 冤杀）；**quality 四档分级 + 数值容差 matcher override 留 C6.1** |
@@ -217,7 +223,9 @@ pass^k / run_repetitions 多跑方差（base/边界 case N≥5，temp=0）+ fail
    └─🎨 H7 UI/UE 重评 ── C7 后 / S6 演示包前
 ```
 
-**起手第一步**：**P1-C 启动评估 grill**（P1-A ✅V-PASS / P1-B ✅守 1.7B 已 push `846e40c`）— 拍 ① masking 数据生成 ② 训练环境（Mac M5 无 N 卡，云 GPU or mlx-lm 本机）。两前置过才训 Qwen3-1.7B LoRA。P2 C4/C7 在 C5 第一轮 checkpoint 后解冻。
+> 🟢 **surface 翻案补注(2026-06-23,依赖图 surface 演进)**:图中 P0-1 `renderReadback(SSOT)` 与 P1-C/C6 的 `expected_tool_calls` 在范式翻案后,**工具调用帧 surface 来源 = D-domain 具名工具集**(非 generic `tool_call_frame`),canonical IR 仍 device×action。D-domain 工具契约来源声明 = `contracts/qwen-tool-call-format.yaml`(tools 字段,A2 后填,工具数 [TBD 待 value-form 实算]) + paradigm §1-§2/§15-§17;`c6-bench-cases.jsonl` expected_tool_calls 待 A2 迁移到 D-domain 工具名。readback 走方案 P(端 renderer)的决策权威 = `docs/c5-recovery-2026-06-22/grill-decisions.md`(ε 已拍 P)。
+
+**起手第一步**：**P1-C 启动评估 grill**（P1-A ✅V-PASS / P1-B ✅守 1.7B 已 push `846e40c`）— 拍 ① masking 数据生成 ② 训练环境（Mac M5 无 N 卡，云 GPU or mlx-lm 本机）。两前置过才训 Qwen3-1.7B LoRA。P2 C4/C7 在 C5 第一轮 checkpoint 后解冻。**⚠️ C5/P1-C 旧定性已被 c5-recovery 框架 supersede（PR5 0/34 灾难后），以 `docs/c5-recovery-2026-06-22/grill-decisions.md` 为准。**
 
 ---
 

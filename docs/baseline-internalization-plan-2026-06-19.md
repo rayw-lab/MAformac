@@ -1,5 +1,8 @@
 # 巨型语义协议表 → MAformac 内化方案 + Roadmap + 冻结决策整改清单
 
+> ⚠️ **HISTORICAL 快照（2026-06-19）—— 文档级联 banner（2026-06-23）**
+> 本文是基座内化方案的早期历史快照，其内化范式已沉淀进权威 MASTER（`docs/baseline-semantic-protocol-2026-06-19.md`）+ 契约 SSOT（`contracts/semantic-function-contract.jsonl`）。范式翻案后（generic frame → D-domain 具名工具，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`）+ 口径终拍 562，本文涉及的 surface 形态 / 口径数字部分已过期。**活基线** = `CLAUDE.md §9` + 上述 MASTER + jsonl。正文保留供溯源，勿据此推进。
+
 > **定位**:回答磊哥"业内怎么处理这种巨型表格 + MAformac 怎么内化",产出 ① 方案建议 ② 实施 roadmap(codex 执行,CC 思考)③ 哪些冻结决策要整改。
 > **方法**:`/pre-mortem` scout(raw 某车厂一手做法)+ oracle(业内通用 + prior art,进行中)。
 > **红线**:抽象通用工程范式,不复制客户标识/原文语料;源表只读不进仓。

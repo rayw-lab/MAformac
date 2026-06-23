@@ -10,6 +10,15 @@
 #    规则只兜 80% 高频明确指令（见 CLAUDE.md §4「规则 vs 模型」）。
 #    —— 若把本 demo 做成规则查表, 现场换个说法即崩, 毫无意义（magnet 2026-06-19 定）。
 # ---------------------------------------------------------------------------
+# 🔴 D-domain surface + clarifyTag（2026-06-23 范式翻案级联, paradigm §1-§2）:
+#   - 各幕 beats[].c1_ref 是 canonical IR（device × primitive），是工具调用的【系统侧】表示。
+#   - model-visible surface = D-domain 具名工具（value 形态编码进工具名）: 每幕「期望 ToolCall」在 C6/runtime
+#     最终映射到 D-domain 具名工具名（如 scene2 open_ac+adjust_to_number → open_ac / adjust_ac_temperature_to_number）。
+#     ⚠️ expected_tool_calls 的 D-domain 工具名重写 = A2 codegen 任务（从 C1 jsonl 派生 tool 名后回填 C6 bench cases），
+#        本文件保持 c1_ref(device×primitive IR) 不变, 不在此手写工具名（防第二套手写 SSOT）。
+#   - clarifyTag 路由: c1_ref.clarify_tag=explicit 走规则快路(L1, 不调模型); implicit/ambiguous 走慢路(Qwen+LoRA)。
+#     D-domain surface 只在慢路（模型吐具名工具）出现; L1 快路直接 device×action 下发, 不经模型 surface。
+# ---------------------------------------------------------------------------
 meta:
   review_status: reviewed
   reviewed_by: magnet

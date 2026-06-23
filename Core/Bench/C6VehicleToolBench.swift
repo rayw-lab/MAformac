@@ -355,35 +355,35 @@ public struct C6DatasetGenerator: Sendable {
         ]
         let specs: [CaseSpec] = [
             CaseSpec("C6-MP-001", "scene1", "ac_temperature", "query", "关空调", [], true, ["ac.power": "off"], [], .implicit, .noCall, ["ac.power"], "state-aware-no-repeat"),
-            CaseSpec("C6-MP-002", "scene1", "ac_temperature", "increase_by_exp", "有点冷", [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])], false, ["ac.power": "on", "ac.temp_setpoint[主驾]": "26"], ["空调", "26"], .implicit, .action, ["ac.power", "ac.temp_setpoint"], "feeling-warmer"),
-            CaseSpec("C6-MP-003", "scene1", "screen_brightness", "increase_by_exp", "屏幕太暗了", [C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["delta": "brighter"])], false, ["screen.brightness[中控屏]": "80"], ["屏幕", "80"], .implicit, .action, ["screen.brightness"], "screen-brighter"),
-            CaseSpec("C6-MP-004", "scene2", "ac", "power_on", "打开空调", [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])], false, ["ac.power": "on"], ["空调"], .implicit, .action, ["ac.power"], "ac-on"),
-            CaseSpec("C6-MP-005", "scene2", "ac", "power_off", "关闭空调", [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "off"])], false, ["ac.power": "off"], ["空调"], .implicit, .action, ["ac.power"], "ac-off"),
-            CaseSpec("C6-MP-006", "scene2", "ac_temperature", "adjust_to_number", "空调调到24度", [C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "24"])], false, ["ac.temp_setpoint[主驾]": "24"], ["24"], .implicit, .action, ["ac.temp_setpoint"], "ac-24"),
-            CaseSpec("C6-MP-007", "scene2", "ac_temperature", "decrease_by_exp", "车里有点热", [C6ToolCall(name: "set_cabin_ac", arguments: ["delta": "cooler"])], false, ["ac.temp_setpoint[主驾]": "22"], ["22"], .implicit, .action, ["ac.temp_setpoint"], "feeling-cooler"),
-            CaseSpec("C6-MP-008", "scene2", "ac_windspeed", "adjust_to_number", "风量调到3挡", [C6ToolCall(name: "set_cabin_fan", arguments: ["level": "3"])], false, ["ac.fan_speed[主驾]": "3"], ["3"], .implicit, .action, ["ac.fan_speed"], "fan-3"),
-            CaseSpec("C6-MP-009", "scene2", "ac_windspeed", "increase_by_exp", "风再大一点", [C6ToolCall(name: "set_cabin_fan", arguments: ["delta": "stronger"])], false, ["ac.fan_speed[主驾]": "2"], ["2"], .implicit, .action, ["ac.fan_speed"], "fan-up"),
-            CaseSpec("C6-MP-010", "scene2", "atmosphere_lamp_color", "set_mode", "氛围灯调成红色", [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "red"])], false, ["ambient.color": "红"], ["氛围灯", "红"], .implicit, .action, ["ambient.color"], "ambient-red"),
-            CaseSpec("C6-MP-011", "scene2", "atmosphere_lamp_color", "set_mode", "打开蓝色氛围灯", [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "blue"])], false, ["ambient.color": "蓝"], ["氛围灯", "蓝"], .implicit, .action, ["ambient.color"], "ambient-blue"),
-            CaseSpec("C6-MP-012", "scene2", "atmosphere_lamp_brightness", "decrease_by_exp", "氛围灯暗一点", [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["brightness_delta": "dimmer"])], false, ["ambient.brightness[面发光氛围灯]": "60"], ["氛围灯", "60"], .implicit, .action, ["ambient.brightness"], "ambient-dim"),
-            CaseSpec("C6-MP-013", "scene2", "atmosphere_lamp_brightness", "increase_by_exp", "氛围灯亮一点", [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["brightness_delta": "brighter"])], false, ["ambient.brightness[面发光氛围灯]": "80"], ["氛围灯", "80"], .implicit, .action, ["ambient.brightness"], "ambient-bright"),
-            CaseSpec("C6-MP-014", "scene3", "window", "power_on", "打开车窗", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "all", "percent": "100"])], false, ["window.position[主驾]": "100", "window.position[副驾]": "100", "window.position[左后]": "100", "window.position[右后]": "100"], ["车窗"], .implicit, .action, ["window.position"], "window-open-all"),
-            CaseSpec("C6-MP-015", "scene3", "window", "power_off", "关上所有车窗", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "all", "percent": "0"])], false, ["window.position[主驾]": "0", "window.position[副驾]": "0", "window.position[左后]": "0", "window.position[右后]": "0"], ["车窗"], .implicit, .action, ["window.position"], "window-close-all"),
-            CaseSpec("C6-MP-016", "scene3", "window", "by_percent", "车窗开到50%", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "all", "percent": "50"])], false, ["window.position[主驾]": "50"], ["50"], .implicit, .action, ["window.position"], "window-half"),
-            CaseSpec("C6-MP-017", "scene3", "window", "increase_by_exp", "再开大点", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "all", "delta": "more_open"])], false, ["window.position[主驾]": "20"], ["20"], .implicit, .action, ["window.position"], "window-followup-open"),
-            CaseSpec("C6-MP-018", "scene4", "window", "power_on", "打开主驾车窗", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "100"])], false, ["window.position[主驾]": "100"], ["主驾", "车窗"], .implicit, .action, ["window.position"], "driver-window"),
-            CaseSpec("C6-MP-019", "scene4", "window", "by_percent", "副驾车窗开一半", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "passenger", "percent": "50"])], false, ["window.position[副驾]": "50"], ["副驾", "50"], .implicit, .action, ["window.position"], "passenger-window"),
-            CaseSpec("C6-MP-020", "scene4", "window", "power_on", "左后车窗打开", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "rear_left", "percent": "100"])], false, ["window.position[左后]": "100"], ["左后"], .implicit, .action, ["window.position"], "rear-left-window"),
-            CaseSpec("C6-MP-021", "scene4", "window", "power_on", "右后车窗打开", [C6ToolCall(name: "set_cabin_window", arguments: ["position": "rear_right", "percent": "100"])], false, ["window.position[右后]": "100"], ["右后"], .implicit, .action, ["window.position"], "rear-right-window"),
-            CaseSpec("C6-MP-022", "scene1", "screen_brightness", "decrease_by_exp", "屏幕太亮了", [C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["delta": "dimmer"])], false, ["screen.brightness[中控屏]": "60"], ["屏幕", "60"], .implicit, .action, ["screen.brightness"], "screen-dimmer"),
-            CaseSpec("C6-MP-023", "scene1", "screen_brightness", "by_percent", "屏幕亮度调到40%", [C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["percent": "40"])], false, ["screen.brightness[中控屏]": "40"], ["40"], .implicit, .action, ["screen.brightness"], "screen-40"),
+            CaseSpec("C6-MP-002", "scene1", "ac_temperature", "increase_by_exp", "有点冷", [C6ToolCall(name: "raise_ac_temperature_by_exp", arguments: [:])], false, ["ac.power": "on", "ac.temp_setpoint[主驾]": "26"], ["空调", "26"], .implicit, .action, ["ac.power", "ac.temp_setpoint"], "feeling-warmer"),
+            CaseSpec("C6-MP-003", "scene1", "screen_brightness", "increase_by_exp", "屏幕太暗了", [C6ToolCall(name: "raise_screen_brightness_little", arguments: [:])], false, ["screen.brightness[中控屏]": "80"], ["屏幕", "80"], .implicit, .action, ["screen.brightness"], "screen-brighter"),
+            CaseSpec("C6-MP-004", "scene2", "ac", "power_on", "打开空调", [C6ToolCall(name: "open_ac", arguments: [:])], false, ["ac.power": "on"], ["空调"], .implicit, .action, ["ac.power"], "ac-on"),
+            CaseSpec("C6-MP-005", "scene2", "ac", "power_off", "关闭空调", [C6ToolCall(name: "close_ac", arguments: [:])], false, ["ac.power": "off"], ["空调"], .implicit, .action, ["ac.power"], "ac-off"),
+            CaseSpec("C6-MP-006", "scene2", "ac_temperature", "adjust_to_number", "空调调到24度", [C6ToolCall(name: "adjust_ac_temperature_to_number", arguments: ["temperature": "24"])], false, ["ac.temp_setpoint[主驾]": "24"], ["24"], .implicit, .action, ["ac.temp_setpoint"], "ac-24"),
+            CaseSpec("C6-MP-007", "scene2", "ac_temperature", "decrease_by_exp", "车里有点热", [C6ToolCall(name: "lower_ac_temperature_by_exp", arguments: [:])], false, ["ac.temp_setpoint[主驾]": "22"], ["22"], .implicit, .action, ["ac.temp_setpoint"], "feeling-cooler"),
+            CaseSpec("C6-MP-008", "scene2", "ac_windspeed", "adjust_to_number", "风量调到3挡", [C6ToolCall(name: "adjust_ac_windspeed_to_number", arguments: ["fanSpeed": "3"])], false, ["ac.fan_speed[主驾]": "3"], ["3"], .implicit, .action, ["ac.fan_speed"], "fan-3"),
+            CaseSpec("C6-MP-009", "scene2", "ac_windspeed", "increase_by_exp", "风再大一点", [C6ToolCall(name: "raise_ac_windspeed_by_exp", arguments: [:])], false, ["ac.fan_speed[主驾]": "2"], ["2"], .implicit, .action, ["ac.fan_speed"], "fan-up"),
+            CaseSpec("C6-MP-010", "scene2", "atmosphere_lamp_color", "set_mode", "氛围灯调成红色", [C6ToolCall(name: "switch_atmosphere_lamp_color", arguments: ["value": "红"])], false, ["ambient.color": "红"], ["氛围灯", "红"], .implicit, .action, ["ambient.color"], "ambient-red"),
+            CaseSpec("C6-MP-011", "scene2", "atmosphere_lamp_color", "set_mode", "打开蓝色氛围灯", [C6ToolCall(name: "switch_atmosphere_lamp_color", arguments: ["value": "蓝"])], false, ["ambient.color": "蓝"], ["氛围灯", "蓝"], .implicit, .action, ["ambient.color"], "ambient-blue"),
+            CaseSpec("C6-MP-012", "scene2", "atmosphere_lamp_brightness", "decrease_by_exp", "氛围灯暗一点", [C6ToolCall(name: "lower_atmosphere_lamp_brightness_little", arguments: [:])], false, ["ambient.brightness[面发光氛围灯]": "60"], ["氛围灯", "60"], .implicit, .action, ["ambient.brightness"], "ambient-dim"),
+            CaseSpec("C6-MP-013", "scene2", "atmosphere_lamp_brightness", "increase_by_exp", "氛围灯亮一点", [C6ToolCall(name: "raise_atmosphere_lamp_brightness_little", arguments: [:])], false, ["ambient.brightness[面发光氛围灯]": "80"], ["氛围灯", "80"], .implicit, .action, ["ambient.brightness"], "ambient-bright"),
+            CaseSpec("C6-MP-014", "scene3", "window", "power_on", "打开车窗", [C6ToolCall(name: "open_window", arguments: ["position": "全车"])], false, ["window.position[主驾]": "100", "window.position[副驾]": "100", "window.position[左后]": "100", "window.position[右后]": "100"], ["车窗"], .implicit, .action, ["window.position"], "window-open-all"),
+            CaseSpec("C6-MP-015", "scene3", "window", "power_off", "关上所有车窗", [C6ToolCall(name: "close_window", arguments: ["position": "全车"])], false, ["window.position[主驾]": "0", "window.position[副驾]": "0", "window.position[左后]": "0", "window.position[右后]": "0"], ["车窗"], .implicit, .action, ["window.position"], "window-close-all"),
+            CaseSpec("C6-MP-016", "scene3", "window", "by_percent", "车窗开到50%", [C6ToolCall(name: "open_window_to_number", arguments: ["position": "全车", "value": "50"])], false, ["window.position[主驾]": "50"], ["50"], .implicit, .action, ["window.position"], "window-half"),
+            CaseSpec("C6-MP-017", "scene3", "window", "increase_by_exp", "再开大点", [C6ToolCall(name: "open_window_little", arguments: ["position": "全车"])], false, ["window.position[主驾]": "20"], ["20"], .implicit, .action, ["window.position"], "window-followup-open"),
+            CaseSpec("C6-MP-018", "scene4", "window", "power_on", "打开主驾车窗", [C6ToolCall(name: "open_window", arguments: ["position": "主驾"])], false, ["window.position[主驾]": "100"], ["主驾", "车窗"], .implicit, .action, ["window.position"], "driver-window"),
+            CaseSpec("C6-MP-019", "scene4", "window", "by_percent", "副驾车窗开一半", [C6ToolCall(name: "open_window_to_number", arguments: ["position": "副驾", "value": "50"])], false, ["window.position[副驾]": "50"], ["副驾", "50"], .implicit, .action, ["window.position"], "passenger-window"),
+            CaseSpec("C6-MP-020", "scene4", "window", "power_on", "左后车窗打开", [C6ToolCall(name: "open_window", arguments: ["position": "左后"])], false, ["window.position[左后]": "100"], ["左后"], .implicit, .action, ["window.position"], "rear-left-window"),
+            CaseSpec("C6-MP-021", "scene4", "window", "power_on", "右后车窗打开", [C6ToolCall(name: "open_window", arguments: ["position": "右后"])], false, ["window.position[右后]": "100"], ["右后"], .implicit, .action, ["window.position"], "rear-right-window"),
+            CaseSpec("C6-MP-022", "scene1", "screen_brightness", "decrease_by_exp", "屏幕太亮了", [C6ToolCall(name: "lower_screen_brightness_little", arguments: [:])], false, ["screen.brightness[中控屏]": "60"], ["屏幕", "60"], .implicit, .action, ["screen.brightness"], "screen-dimmer"),
+            CaseSpec("C6-MP-023", "scene1", "screen_brightness", "by_percent", "屏幕亮度调到40%", [C6ToolCall(name: "adjust_screen_brightness_to_number", arguments: ["value": "40"])], false, ["screen.brightness[中控屏]": "40"], ["40"], .implicit, .action, ["screen.brightness"], "screen-40"),
             CaseSpec("C6-MP-024", "scene5", "car_door", "power_on", "打开车门", [], true, ["vehicle.speed": "30"], ["行驶中"], .rejected, .refusal, ["vehicle.speed", "vehicle.gear"], "moving-door-refusal", ["door_open_while_moving"], ["vehicle.speed": "30", "vehicle.gear": "D"]),
             CaseSpec("C6-MP-025", "scene5", "car_door", "power_on", "开一下门", [], true, ["vehicle.speed": "30"], ["行驶中"], .rejected, .refusal, ["vehicle.speed", "vehicle.gear"], "moving-door-short-refusal", ["door_open_while_moving"], ["vehicle.speed": "30", "vehicle.gear": "D"]),
             CaseSpec("C6-MP-026", "scene5", "car_door", "power_on", "开个后备箱", [], true, ["vehicle.speed": "30"], ["行驶中"], .rejected, .refusal, ["vehicle.speed", "vehicle.gear"], "moving-tailgate-refusal", ["door_open_while_moving"], ["vehicle.speed": "30", "vehicle.gear": "D"]),
-            CaseSpec("C6-MP-027", "scene2", "ac_temperature", "adjust_to_number", "打开空调把温度调到24度", [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "target_temperature": "24"])], false, ["ac.power": "on", "ac.temp_setpoint[主驾]": "24"], ["空调", "24"], .implicit, .action, ["ac.power", "ac.temp_setpoint"], "multi-ac-temp"),
-            CaseSpec("C6-MP-028", "scene2", "atmosphere_lamp_brightness", "decrease_by_exp", "红色氛围灯暗点", [C6ToolCall(name: "set_cabin_ambient_light", arguments: ["power": "on", "color": "red", "brightness_delta": "dimmer"])], false, ["ambient.color": "红", "ambient.brightness[面发光氛围灯]": "60"], ["红", "60"], .implicit, .action, ["ambient.color", "ambient.brightness"], "multi-ambient"),
-            CaseSpec("C6-MP-029", "scene1", "ac_temperature", "query", "现在车里几度", [C6ToolCall(name: "query_cabin_comfort", arguments: ["topic": "temperature"])], false, [:], ["温度"], .implicit, .state, ["ac.temp_setpoint"], "comfort-query"),
-            CaseSpec("C6-MP-030", "scene1", "ac", "power_on", "别让车里这么闷", [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])], false, ["ac.power": "on"], ["空调"], .implicit, .action, ["ac.power"], "free-ac-on")
+            CaseSpec("C6-MP-027", "scene2", "ac_temperature", "adjust_to_number", "打开空调把温度调到24度", [C6ToolCall(name: "adjust_ac_temperature_to_number", arguments: ["temperature": "24"])], false, ["ac.power": "on", "ac.temp_setpoint[主驾]": "24"], ["空调", "24"], .implicit, .action, ["ac.power", "ac.temp_setpoint"], "multi-ac-temp"),
+            CaseSpec("C6-MP-028", "scene2", "atmosphere_lamp_brightness", "decrease_by_exp", "红色氛围灯暗点", [C6ToolCall(name: "switch_atmosphere_lamp_color", arguments: ["value": "红"]), C6ToolCall(name: "lower_atmosphere_lamp_brightness_little", arguments: [:])], false, ["ambient.color": "红", "ambient.brightness[面发光氛围灯]": "60"], ["红", "60"], .implicit, .action, ["ambient.color", "ambient.brightness"], "multi-ambient"),
+            CaseSpec("C6-MP-029", "scene1", "ac_temperature", "query", "现在车里几度", [C6ToolCall(name: "query_ac_temperature", arguments: [:])], false, [:], ["温度"], .implicit, .state, ["ac.temp_setpoint"], "comfort-query"),
+            CaseSpec("C6-MP-030", "scene1", "ac", "power_on", "别让车里这么闷", [C6ToolCall(name: "open_ac", arguments: [:])], false, ["ac.power": "on"], ["空调"], .implicit, .action, ["ac.power"], "free-ac-on")
         ]
         return try specs.map { try makeCase($0, defaultState: defaultState, mustPass: true) }
     }
@@ -755,12 +755,13 @@ public struct C6GoldVerifier: Sendable {
     public func verify(
         cases: [C6BenchCase],
         stateCells: StateCellContractLookup,
-        validation: C6DatasetValidation
+        validation: C6DatasetValidation,
+        irMap: [String: DDomainIRMapEntry] = [:]
     ) -> [C6GoldVerificationResult] {
         let sourceRefsPass = validation.unresolvedSourceRefCount == 0
         return cases.flatMap { item in
             candidates(for: item).map { candidate in
-                verify(caseID: item.caseID, candidate: candidate, preState: item.preState, stateCells: stateCells, sourceRefsPass: sourceRefsPass)
+                verify(caseID: item.caseID, candidate: candidate, preState: item.preState, stateCells: stateCells, sourceRefsPass: sourceRefsPass, irMap: irMap)
             }
         }
     }
@@ -768,9 +769,10 @@ public struct C6GoldVerifier: Sendable {
     public func report(
         cases: [C6BenchCase],
         stateCells: StateCellContractLookup,
-        validation: C6DatasetValidation
+        validation: C6DatasetValidation,
+        irMap: [String: DDomainIRMapEntry] = [:]
     ) -> C6GoldVerificationReport {
-        let results = verify(cases: cases, stateCells: stateCells, validation: validation)
+        let results = verify(cases: cases, stateCells: stateCells, validation: validation, irMap: irMap)
         let caseIDs = Set(cases.map(\.caseID))
         let passingCaseIDs = Set(results.filter(\.goldReplayPass).map(\.caseID))
         let failingCaseCount = caseIDs.subtracting(passingCaseIDs).count
@@ -825,15 +827,16 @@ public struct C6GoldVerifier: Sendable {
         candidate: GoldCandidate,
         preState: [String: String],
         stateCells: StateCellContractLookup,
-        sourceRefsPass: Bool
+        sourceRefsPass: Bool,
+        irMap: [String: DDomainIRMapEntry] = [:]
     ) -> C6GoldVerificationResult {
         let toolCallPass = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: candidate.expectedToolCalls)
             && (!candidate.expectNoCall || candidate.expectedToolCalls.isEmpty)
-        let finalState = C6MockStateApplier.apply(toolCalls: candidate.expectedToolCalls, to: preState, stateCells: stateCells)
+        let finalState = C6MockStateApplier.apply(toolCalls: candidate.expectedToolCalls, to: preState, stateCells: stateCells, irMap: irMap)
         let stateDeltaMatches = candidate.expectedStateDelta.allSatisfy { key, value in
             finalState[key] == value
         }
-        let stateDeltaPass = stateDeltaMatches && (!requiresStateDelta(candidate) || !candidate.expectedStateDelta.isEmpty)
+        let stateDeltaPass = stateDeltaMatches && (!requiresStateDelta(candidate, irMap: irMap) || !candidate.expectedStateDelta.isEmpty)
         let readbackApplicable = !candidate.expectNoCall
             && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
         let readbackPass: Bool
@@ -895,8 +898,18 @@ public struct C6GoldVerifier: Sendable {
         }
     }
 
-    private func requiresStateDelta(_ candidate: GoldCandidate) -> Bool {
-        !candidate.expectNoCall && candidate.expectedToolCalls.contains { $0.name.hasPrefix("set_") }
+    private func requiresStateDelta(_ candidate: GoldCandidate, irMap: [String: DDomainIRMapEntry]) -> Bool {
+        // 🔴 IR-based 判据(GPT Pro+GLM 审计 P2): normalize 每个 expected call → 含非 query primitive = state-mutating
+        // action → 必须有非空 state delta(gold 自检守护)。比旧 hasPrefix("query_") 黑名单更 robust(不依赖名前缀约定)。
+        // irMap 命中走 IR primitive(D-domain); set_cabin/frame 走 normalize switch; 未知(irs 空)回退名前缀(legacy 兼容)。
+        guard !candidate.expectNoCall else { return false }
+        return candidate.expectedToolCalls.contains { call in
+            let irs = ToolContractNormalizer.normalize(call, irMap: irMap)
+            if irs.isEmpty {
+                return !call.name.hasPrefix("query_")
+            }
+            return irs.contains { $0.actionPrimitive != "query" }
+        }
     }
 }
 
@@ -910,6 +923,8 @@ public struct C6BenchRunner: Sendable {
     public var loraCheckpointID: String
     public var loraAdapterDigest: String
     public var stateCells: StateCellContractLookup
+    // D-domain 名→IR 映射(S5 Cut-2); 默认 [:] 向后兼容(set_cabin_*/frame 走 strangler), CLI/测试注入 loadIRMap 后 D-domain 名可 normalize→state。
+    public var irMap: [String: DDomainIRMapEntry]
 
     public init(
         qwenToolCallFormatVersion: String,
@@ -920,7 +935,8 @@ public struct C6BenchRunner: Sendable {
         loraAdapterDigest: String = "",
         loraAdapterID: String = "",
         loraCheckpointID: String = "",
-        stateCells: StateCellContractLookup
+        stateCells: StateCellContractLookup,
+        irMap: [String: DDomainIRMapEntry] = [:]
     ) {
         self.qwenToolCallFormatVersion = qwenToolCallFormatVersion
         self.contractDigest = contractDigest
@@ -931,10 +947,11 @@ public struct C6BenchRunner: Sendable {
         self.loraCheckpointID = loraCheckpointID
         self.loraAdapterDigest = loraAdapterDigest
         self.stateCells = stateCells
+        self.irMap = irMap
     }
 
     public func evaluate(case benchCase: C6BenchCase, output: C6RuntimeOutput, runIndex: Int = 0) throws -> C6EvalRun {
-        let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells)
+        let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells, irMap: irMap)
         let candidateResults = goldCandidates(for: benchCase).map { candidate in
             evaluate(candidate: candidate, output: output, finalState: finalState)
         }
@@ -1153,124 +1170,14 @@ public enum C6ToolCallMatcher {
 }
 
 public enum C6MockStateApplier {
+    // irMap 默认 [:] 向后兼容(set_cabin_*/frame 走 strangler switch); D-domain 名经 irMap normalize→IR→state(S5 Cut-2)。
     public static func apply(
         toolCalls: [C6ToolCall],
         to preState: [String: String],
-        stateCells: StateCellContractLookup
+        stateCells: StateCellContractLookup,
+        irMap: [String: DDomainIRMapEntry] = [:]
     ) -> [String: String] {
-        var state = preState
-        for call in toolCalls {
-            switch call.name {
-            case "set_cabin_ac":
-                applyAC(call.arguments, state: &state)
-            case "set_cabin_window":
-                applyWindow(call.arguments, state: &state)
-            case "set_cabin_screen_brightness":
-                applyScreen(call.arguments, state: &state)
-            case "set_cabin_ambient_light":
-                applyAmbient(call.arguments, state: &state, stateCells: stateCells)
-            case "set_cabin_fan":
-                applyFan(call.arguments, state: &state)
-            default:
-                continue
-            }
-        }
-        return state
-    }
-
-    private static func applyAC(_ args: [String: String], state: inout [String: String]) {
-        if let power = args["power"], power != "unchanged" {
-            state["ac.power"] = power
-        }
-        if let temp = args["target_temperature"] {
-            state["ac.temp_setpoint[主驾]"] = temp
-        }
-        if let delta = args["delta"], delta != "none" {
-            let current = Int(state["ac.temp_setpoint[主驾]"] ?? "24") ?? 24
-            state["ac.temp_setpoint[主驾]"] = String(delta == "warmer" ? current + 2 : current - 2)
-            state["ac.power"] = "on"
-        }
-    }
-
-    private static func applyWindow(_ args: [String: String], state: inout [String: String]) {
-        let percent: String
-        if let explicit = args["percent"] {
-            percent = explicit
-        } else if args["delta"] == "more_open" {
-            let current = Int(state["window.position[主驾]"] ?? "0") ?? 0
-            percent = String(min(100, current + 20))
-        } else {
-            percent = "100"
-        }
-        let keys = windowKeys(for: args["position"] ?? "all")
-        for key in keys {
-            state[key] = percent
-        }
-    }
-
-    private static func applyScreen(_ args: [String: String], state: inout [String: String]) {
-        if let percent = args["percent"] {
-            state["screen.brightness[中控屏]"] = percent
-            return
-        }
-        let current = Int(state["screen.brightness[中控屏]"] ?? "70") ?? 70
-        if args["delta"] == "brighter" {
-            state["screen.brightness[中控屏]"] = String(min(100, current + 10))
-        } else if args["delta"] == "dimmer" {
-            state["screen.brightness[中控屏]"] = String(max(0, current - 10))
-        }
-    }
-
-    private static func applyAmbient(_ args: [String: String], state: inout [String: String], stateCells: StateCellContractLookup) {
-        if let color = args["color"] {
-            state["ambient.color"] = c2ColorValue(for: color, stateCells: stateCells)
-        } else if args["power"] == "off" {
-            state["ambient.color"] = "off"
-        }
-        let current = Int(state["ambient.brightness[面发光氛围灯]"] ?? "70") ?? 70
-        if args["brightness_delta"] == "dimmer" {
-            state["ambient.brightness[面发光氛围灯]"] = String(max(0, current - 10))
-        } else if args["brightness_delta"] == "brighter" {
-            state["ambient.brightness[面发光氛围灯]"] = String(min(100, current + 10))
-        }
-    }
-
-    private static func applyFan(_ args: [String: String], state: inout [String: String]) {
-        if let level = args["level"] {
-            state["ac.fan_speed[主驾]"] = level
-        } else if args["delta"] == "stronger" {
-            let current = Int(state["ac.fan_speed[主驾]"] ?? "1") ?? 1
-            state["ac.fan_speed[主驾]"] = String(min(10, current + 1))
-        }
-    }
-
-    private static func windowKeys(for position: String) -> [String] {
-        switch position {
-        case "driver":
-            return ["window.position[主驾]"]
-        case "passenger":
-            return ["window.position[副驾]"]
-        case "rear_left":
-            return ["window.position[左后]"]
-        case "rear_right":
-            return ["window.position[右后]"]
-        default:
-            return ["window.position[主驾]", "window.position[副驾]", "window.position[左后]", "window.position[右后]"]
-        }
-    }
-
-    private static func c2ColorValue(for value: String, stateCells: StateCellContractLookup) -> String {
-        let aliases = [
-            "red": "红",
-            "blue": "蓝",
-            "cool": "蓝",
-            "warm": "橙",
-            "amber": "橙",
-            "white": "白",
-        ]
-        let candidate = aliases[value] ?? value
-        let allowed = stateCells.cell(id: "ambient.color")?.values ?? []
-        return allowed.contains(candidate) ? candidate : value
+        ToolContractStateApplier.apply(toolCalls: toolCalls, to: preState, stateCells: stateCells, irMap: irMap)
     }
 }
 
@@ -1485,7 +1392,8 @@ public enum C6Hash {
             "contracts/semantic-function-contract.jsonl",
             "contracts/state-cells.yaml",
             "contracts/c6-bench-cases.jsonl",
-            "contracts/qwen-tool-call-format.yaml"
+            "contracts/qwen-tool-call-format.yaml",
+            "generated/d_domain_ir_map.json"   // S5: D-domain 名→IR 映射是 bench 行为依赖, 纳入指纹防 stale gate 失守
         ] {
             if path == "contracts/c6-bench-cases.jsonl" {
                 data.append(Data(datasetText.utf8))

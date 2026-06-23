@@ -1,5 +1,8 @@
 # define-voice-contract Pre-Mortem(2026-06-18)
 
+> ⚠️ **HISTORICAL 快照（2026-06-18）—— 文档级联 banner（2026-06-23）**
+> 本文是语音契约早期 pre-mortem 历史快照（对应 change 已 PARKED，待 C7 rebase）。ASR 选型已演进：D14 二审改 sherpa-onnx 中文主 + WhisperKit fallback + ASRBackend 抽象（见 `docs/research/2026-06-19-asr-alignment-research.md`）；UIUE 拍板系统 ASR（SFSpeechRecognizer）主（见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`）。**活基线** = `CLAUDE.md §9` + ASR research + voice 落档。正文保留供溯源（8 tiger 坑点仍有参考价值），勿据此推进选型。
+
 > pre-mortem 首战产物(scout 本机 GitNexus/voice-pipeline/reports/02 + oracle CC subagent 14 路 WebSearch + 一手 GitHub issue 核实)。供 `define-voice-contract`(change 4)propose 时填 design Risks + tasks。机制见 `~/.claude/skills/learned/pre-mortem.md`。
 >
 > **磊哥拍板(2026-06-18)**:① 演示机 = iPhone **15 Pro Max(8GB)** → OOM tiger 化解,支持矩阵锁 8GB+,6GB 标准版出矩阵。② **先做出来、性能指标(800ms/拟人)后续优化**;但**功能性坑(让链路跑不通的)仍 MVP 必防**(不是指标)。

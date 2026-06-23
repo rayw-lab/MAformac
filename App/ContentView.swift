@@ -106,7 +106,7 @@ private struct VehicleStateCard: View {
 
     private var title: String {
         switch cell.key {
-        case "hvac.ac": return "空调"
+        case "ac.power": return "空调"
         case "hvac.temperature": return "温度"
         case "seat.driver.heat": return "座椅加热"
         case "seat.driver.ventilation": return "座椅通风"

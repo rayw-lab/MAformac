@@ -116,6 +116,8 @@ public struct StateCellDefinition: Equatable, Sendable {
     public var gearMap: [String: Int]
     public var extremeMap: [String: Int]
     public var readbackTemplate: String?
+    public var defaultValue: String?      // cell 初值(S2 cut3: StateApplier data-driven 从 cell 取初值替硬编码 24/70 等)
+    public var dependsOn: [String]        // 联动依赖 cell(写本 cell 时激活依赖, 如 ac.temp_setpoint→ac.power=on)
 
     public init(
         id: String,
@@ -127,7 +129,9 @@ public struct StateCellDefinition: Equatable, Sendable {
         expStepLittle: Int? = nil,
         gearMap: [String: Int] = [:],
         extremeMap: [String: Int] = [:],
-        readbackTemplate: String? = nil
+        readbackTemplate: String? = nil,
+        defaultValue: String? = nil,
+        dependsOn: [String] = []
     ) {
         self.id = id
         self.type = type
@@ -139,6 +143,8 @@ public struct StateCellDefinition: Equatable, Sendable {
         self.gearMap = gearMap
         self.extremeMap = extremeMap
         self.readbackTemplate = readbackTemplate
+        self.defaultValue = defaultValue
+        self.dependsOn = dependsOn
     }
 }
 
@@ -263,6 +269,10 @@ public struct StateCellContractLookup: Sendable {
                 current?.gearMap = parseIntMap(after: "gear_map:", in: trimmed)
             } else if trimmed.hasPrefix("readback_zh: ") {
                 current?.readbackTemplate = cleanValue(String(trimmed.dropFirst("readback_zh: ".count)))
+            } else if trimmed.hasPrefix("default: ") {
+                current?.defaultValue = cleanValue(String(trimmed.dropFirst("default: ".count)))
+            } else if trimmed.hasPrefix("depends_on: ") {
+                current?.dependsOn = parseArray(after: "depends_on:", in: trimmed)
             }
         }
         finishCurrent()

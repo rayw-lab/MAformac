@@ -1,3 +1,6 @@
+> ⛔ **PARKED（2026-06-19）+ SUPERSEDED（范式翻案 2026-06-22）—— 文档级联确认（2026-06-23）**
+> 本 change 已 PARKED（见 `openspec/changes/_parked/README.md`：二分→三层 + 意图收缩 `clarifyTag`，强依赖新契约 C1/C2，物理移出 `changes/` 根防误 apply）。范式翻案后 generic-frame intent-routing 已被 supersede：三层路由现重定在 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md §4`（model-visible surface = D-domain 具名工具）。**不删、不 apply**，待 C1/C2 archive 后按新契约 rebase 为 C4；设计资产保留供溯源。
+
 ## Why
 
 真实座舱语音是**三层**(规则 NLU / FC 快思考泛化 / 慢思考),MAformac 现有「规则快路径 + LLM 慢路径」**二分漏掉中间 FC 快思考泛化层**(单意图 + 读端状态生成增量,如「我有点冷」读当前温度升温、「大海颜色」→氛围灯色值,NLU 查表做不了但仍快路径,不进 2.5s 慢思考)。本 change 补三层分流 + 端状态参与 + 横切(多模指代/多意图/短期指代),让 demo「懂场景 / 懂安全 / 懂状态」——这是 demo 的装逼核心。经 4 轮 cross-agent grill + pre-mortem(9 坑)收敛,全料见 `docs/intent-routing-explore-2026-06-18.md` + `docs/cockpit-voice-fc-premortem-2026-06-18.md`。

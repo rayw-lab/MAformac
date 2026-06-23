@@ -1,5 +1,9 @@
 # MAformac 调研归档（2026-06-17）
 
+> ⚠️ **HISTORICAL 快照（2026-06-17）—— 文档级联 banner（2026-06-23）**
+> 本文是立项早期（前三轮 GitHub 调研 + 路线讨论 + 多 domain 基座）历史快照。范式翻案后（generic frame `tool_call_frame` 否决 → D-domain 具名工具，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`）+ 口径终拍 562（10 族 191 device / 562 intent / 2159 行 / 54.1%），本文涉及的 surface 形态 / 口径数字 / 8 能力扁平路线部分已过期。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/roadmap-2026-06-20-from-c6-done.md`。正文保留供溯源，勿据此推进。
+
 > 归档人：Claude (Opus 4.8) · 应磊哥要求存档前三轮 GitHub 调研 + 路线图讨论 + 多 domain 基座架构。
 > 项目定义：**一个端侧（macOS/iOS）多技能 AI Agent 平台**，Phase 1 只做「车控车设」，后续扩展导航（amap MCP）/ 音乐（音乐 API）/ 外卖（瑞幸 MCP）。
 > 主用途：**方案经理给客户做便携销售演示**（替代把样车开到现场）。北极星 = 客户现场 5 分钟内：听懂中文、反应快、不崩、看着惊艳、断网也能跑。

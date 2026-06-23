@@ -24,12 +24,24 @@ struct C5TrainingCLI {
 
     private static func prepare(_ options: Options) throws {
         let repoRoot = options.repoRoot
+        // 🔴 P0(GPT Pro 审计) fail-fast-first: full.json 是 skeleton([name,domain,sg] 无 function/parameters schema), 不能解码成
+        // [DDomainToolEntry]; C5 D-domain 训练只用 demo(562 完整 schema), full(1538 skeleton)= OOS/拒识白名单非训练面。
+        // 在任何昂贵工作(tokenizer patch 需 base model)前先校验, 给清晰错误而非 decode crash。
+        if options.surface == .dDomain, options.scope != .demo {
+            throw CLIError.usage("--scope full 是 skeleton(OOS/拒识白名单, 无完整 schema), 不支持 C5 D-domain 训练; 用 --scope demo(562 完整 schema)。full 全覆盖训练 = DEFERRED(retrain-c5)。")
+        }
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let patchedModelDir = outputDir.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
         try createTrainingTokenizerPatch(sourceDir: options.baseModelDir, outputDir: patchedModelDir)
         let semanticText = try read(repoRoot, "contracts/semantic-function-contract.jsonl")
         let seeds = try decodeJSONL(semanticText, as: C5SemanticSeed.self)
+        // paradigm §1 D-domain catalog 注入(demo=562 完整 schema; surface=frame→空 catalog = legacy 回退)。
+        // scope 已在 prepare 起手 fail-fast 校验(只 demo), 此处直读 demo.json。
+        let dDomainCatalog: [DDomainToolEntry] = try {
+            guard options.surface == .dDomain else { return [] }
+            return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")))
+        }()
         let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))
         let formatDigest = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
@@ -50,6 +62,9 @@ struct C5TrainingCLI {
         var buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
+            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
+            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
+            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -59,7 +74,10 @@ struct C5TrainingCLI {
             allowRegeneratedOffsetArtifact: options.allowRegeneratedOffsetArtifact,
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
-            generatedUtteranceRecords: generatedUtterances
+            generatedUtteranceRecords: generatedUtterances,
+            scope: options.scope,
+            surface: options.surface,
+            dDomainCatalog: dDomainCatalog
         )
         let builder = C5TrainingDatasetBuilder()
         var prepared = builder.build(
@@ -86,6 +104,9 @@ struct C5TrainingCLI {
         buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
+            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
+            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
+            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -96,7 +117,10 @@ struct C5TrainingCLI {
             allowRegeneratedOffsetArtifact: options.allowRegeneratedOffsetArtifact,
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
-            generatedUtteranceRecords: generatedUtterances
+            generatedUtteranceRecords: generatedUtterances,
+            scope: options.scope,
+            surface: options.surface,
+            dDomainCatalog: dDomainCatalog
         )
         prepared = builder.build(
             seeds: seeds,
@@ -140,12 +164,13 @@ struct C5TrainingCLI {
         let lines = try values.map { value in
             String(decoding: try encoder.encode(value), as: UTF8.self)
         }
-        try (lines.joined(separator: "\n") + "\n").write(to: url, atomically: true, encoding: .utf8)
+        let payload = lines.isEmpty ? "" : lines.joined(separator: "\n") + "\n"
+        try payload.write(to: url, atomically: true, encoding: .utf8)
     }
 
     private static func renderTrainCommand(repoRoot: URL, outputDir: URL, config: C5MLXLoRAConfig) -> String {
         """
-        /opt/homebrew/opt/python@3.13/bin/python3.13 \\
+        \(pythonExecutable) \\
           \(repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path) \\
           --train \\
           --model \(config.model) \\
@@ -340,7 +365,7 @@ struct C5TrainingCLI {
     ) throws -> C5MaskOffsetTokenArtifact {
         let script = repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mask_offset_fixture.py")
         let output = run(
-            "/opt/homebrew/opt/python@3.13/bin/python3.13",
+            pythonExecutable,
             [
                 script.path,
                 "--model", modelDir.path,
@@ -356,6 +381,11 @@ struct C5TrainingCLI {
         var artifact = try JSONDecoder().decode(C5MaskOffsetTokenArtifact.self, from: data)
         artifact.artifactSHA256 = try C6Hash.fileHash(url: outputURL)
         return artifact
+    }
+
+    // GLM 审计 P2: python 解释器路径改环境变量 MAFORMAC_PYTHON(可移植), fallback 保留本机 homebrew python3.13。
+    private static var pythonExecutable: String {
+        ProcessInfo.processInfo.environment["MAFORMAC_PYTHON"] ?? "/opt/homebrew/opt/python@3.13/bin/python3.13"
     }
 
     private static func run(_ executable: String, _ arguments: [String], cwd: String? = nil) -> (status: Int32, stdout: String, stderr: String) {
@@ -393,7 +423,7 @@ struct C5TrainingCLI {
             except Exception:
                 print(f"{name}=unknown")
         """
-        guard let output = capture("/opt/homebrew/opt/python@3.13/bin/python3.13", ["-c", script]) else {
+        guard let output = capture(pythonExecutable, ["-c", script]) else {
             return [:]
         }
         var versions: [String: String] = [:]
@@ -492,9 +522,12 @@ private struct Options {
     var allowRegeneratedOffsetArtifact: Bool
     var requireCandidateDataQualityGate: Bool
     var requireGeneratedUtteranceRecords: Bool
+    var thetaAlphaPositiveOnly: Bool
+    var scope: C5TrainingScope
+    var surface: C5TrainingSurface
 
     init(arguments: [String]) throws {
-        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances]"
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only] [--scope demo|full] [--surface d_domain|frame]"
         guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -502,12 +535,17 @@ private struct Options {
         targetPositiveRows = 4_500
         devSelectionRows = 400
         maskingStage = .trainableV0
-        baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
+        // GLM 审计 P2: 本机 base model 路径改环境变量(可移植), fallback 保留默认(本机 HF cache)。
+        let defaultBaseModel = "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e"
+        baseModelDir = URL(fileURLWithPath: ProcessInfo.processInfo.environment["MAFORMAC_BASE_MODEL_DIR"] ?? defaultBaseModel, isDirectory: true)
         generatedUtterancesURL = nil
         expectedOffsetArtifactSHA256 = nil
         allowRegeneratedOffsetArtifact = false
         requireCandidateDataQualityGate = false
         requireGeneratedUtteranceRecords = false
+        thetaAlphaPositiveOnly = false
+        scope = .demo
+        surface = .dDomain
         var iterator = arguments.dropFirst(2).makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -541,6 +579,14 @@ private struct Options {
                 requireCandidateDataQualityGate = true
             case "--require-generated-utterances":
                 requireGeneratedUtteranceRecords = true
+            case "--theta-alpha-positive-only":
+                thetaAlphaPositiveOnly = true
+            case "--scope":
+                guard let value = iterator.next(), let parsed = C5TrainingScope(rawValue: value) else { throw CLIError.usage("invalid --scope value (demo|full)") }
+                scope = parsed
+            case "--surface":
+                guard let value = iterator.next(), let parsed = C5TrainingSurface(rawValue: value) else { throw CLIError.usage("invalid --surface value (d_domain|frame)") }
+                surface = parsed
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }

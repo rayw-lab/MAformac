@@ -1,5 +1,8 @@
 # define-execution-contract Pre-Mortem(2026-06-18)
 
+> ⚠️ **HISTORICAL 快照（2026-06-18）—— 文档级联 banner（2026-06-23）**
+> 本文是 C3 执行契约早期 pre-mortem 历史快照（C3 已 archive → `openspec/specs/tool-execution/`）。范式翻案后（generic frame `tool_call_frame` 否决 → D-domain 具名工具，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`），本文涉及的工具调用帧 surface 形态已演进。**活基线** = `CLAUDE.md §9` + `openspec/specs/tool-execution/spec.md`。正文保留供溯源（pre-mortem 坑点仍有参考价值），勿据此推进 surface。
+
 > pre-mortem 第二战产物(scout `qwen3-engineering-notes`/GitNexus/Codex 02/Step1 + oracle CC subagent **直读 `mlx-swift-lm` 源码** + GitHub issue 实证)。供 change3 实装**直读源码锚点**。机制见 `~/.claude/skills/learned/pre-mortem.md`。
 >
 > **磊哥拍板(2026-06-18)**:E1 = adopt 上游薄层 ✅;E3 = spike 起手 ✅。

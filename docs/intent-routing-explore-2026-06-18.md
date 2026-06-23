@@ -1,5 +1,8 @@
 # define-intent-routing — Explore 笔记（grill 累积,2026-06-18）
 
+> ⚠️ **HISTORICAL 快照（2026-06-18）—— 文档级联 banner（2026-06-23）**
+> 本文是 intent-routing 早期 explore 笔记（对应 change 已 PARKED，见 `openspec/changes/_parked/README.md`）。三层路由现重定在 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md §4`；范式翻案后 generic-frame intent-routing 已被 supersede（→ D-domain 具名工具）。**活基线** = `CLAUDE.md §9` + `docs/srd-three-layer-intent-routing.md`。正文保留供溯源，勿据此推进。
+
 > brainstorming grill-first 进行中,逐项聊透,**未到 propose**(agree before build)。cross-agent grill 模式:Claude 出问题 → 另一窗口(Codex 系)answer → Claude 辩证吸收。完整三层原理见 `docs/cockpit-voice-fc-premortem-2026-06-18.md`。
 
 ## ✅ 已定（grill #1：判定机制）

@@ -6,6 +6,14 @@
 # 脱敏: 仅座舱通用语义, 不含敏感商业或个人信息
 # 范围: 中文 only（华氏度/多语种暂搁, magnet 2026-06-19 定）
 # ---------------------------------------------------------------------------
+# 🔴 surface 边界（2026-06-23 范式翻案级联，paradigm §1-§2）:
+#   - execution_range / readback 权威属 C2(本文件)，与 model-visible surface 形态【正交】(本文件不定 surface)。
+#   - model-visible surface = D-domain 具名工具（value 形态编码进工具名），非 generic frame tool_call_frame。
+#   - canonical IR = device × action_primitive × value（B-frame 式，本文件 cell 即 IR 层端态）；
+#     即「对模型像 D-domain 具名工具，对系统像 device×action IR」。state cell 不随 surface 形态变。
+#   - cell 与 D-domain 工具映射独立: 一个 D-domain 工具（如 adjust_ac_temperature_to_number）写本文件某 cell（ac.temp_setpoint），
+#     execution_range 仍以本文件为唯一权威，工具名不携带边界。D-domain 工具目录由 A2 从 C1 jsonl codegen 派生。
+# ---------------------------------------------------------------------------
 meta:
   scope: zh-only
   # source_kind 防"三份权威漂移"(C1语义 / C2执行 / 旧样板)
@@ -32,6 +40,8 @@ devices:
   air_conditioner:
     display_zh: 空调
     service: airControl
+    # D-domain 映射(2026-06-23 范式级联): 本 device 的 cell 对应 D-domain 具名工具的 ac_temperature/ac_windspeed 等设备维度;
+    #   工具名(如 adjust_ac_temperature_to_number)由 A2 从 C1 codegen, execution_range 仍以本文件 cell 为唯一权威。
     state_cells:
       - id: ac.power
         display_zh: 空调开关
@@ -55,6 +65,7 @@ devices:
           extreme: {MAX: 32, MIN: 18}              # "调到最高/最低"
         state_kinds: [empty, known, unknown]
         depends_on: [ac.power]
+        default: 24                                # S2 cut3: StateApplier data-driven 初值(替旧硬编码 24)
         readback_zh: "{温区}空调温度{值}度"
       - id: ac.mode
         display_zh: 空调模式
@@ -71,6 +82,7 @@ devices:
         source_kind: c2_demo_decision
         exp_step: {little: 1}
         state_kinds: [empty, known, unknown]
+        default: 1                                 # S2 cut3: data-driven 初值(替旧硬编码 1)
         readback_zh: "{温区}空调风量{值}挡"
     readback_cell_group: [ac.power, ac.temp_setpoint, ac.mode, ac.fan_speed]
 
@@ -88,6 +100,7 @@ devices:
         exp_step: {little: 20}                      # "开大点/关小点" = ±20%(协议 _little)
         gear_map: {"1挡": 25, "2挡": 50, "3挡": 75, "4挡": 100}  # 协议双轨(挡↔%), 映射=C2 决策
         state_kinds: [empty, known, unknown]
+        default: 0                                 # S2 cut3: data-driven 初值(替旧硬编码 0)
         readback_zh: "{位置}车窗开度{值}%"
       - id: window.motion
         display_zh: 车窗运动态
@@ -122,6 +135,7 @@ devices:
         exp_step:                                 # 映射协议一手 offset token(§28)
           little: 10                              # "调亮/暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
         state_kinds: [empty, known, unknown]
+        default: 70                                # S2 cut3: data-driven 初值(替旧硬编码 70)
         readback_zh: "{屏幕}亮度{值}%"
         # 炸点(模糊金例, 真实 bug 命中): "屏幕太暗了 → 调亮"(纯陈述→动作)
     readback_cell_group: [screen.brightness]
@@ -148,8 +162,241 @@ devices:
         exp_step:                                 # 映射协议一手 offset token(§28)
           little: 10                              # "调暗一点"=increase/decrease_by_exp offset=LITTLE → demo ±10%
         state_kinds: [empty, known, unknown]
+        default: 70                                # S2 cut3: data-driven 初值(替旧硬编码 70)
         readback_zh: "{氛围灯}亮度{值}%"
     readback_cell_group: [ambient.color, ambient.brightness]
+
+# ===== S3 横铺 6 族(座椅/车门/音量/雨刮/天窗遮阳/香氛, 范式同 ac/window; 6 族代表 cell 非191全集)=====
+# 数据源: jsonl service 路由实算(seat/door/wiper/sunroof/fragrance=carControl, volume=cmd) + 范围真值
+#   座椅档 0-3(CLAUDE.md §4 范围真值, 旧16-30/0-5拍错) / percent 类 0-100(同 window.position 口径)。
+# 191 全量 cell = DEFERRED(随 retrain-c5/rebuild-c6); S3 只建 demo-positive 代表 cell 让 C6 base 跑得动。
+
+  seat:
+    display_zh: 座椅
+    service: carControl
+    state_cells:
+      - id: seat.heat_level
+        display_zh: 座椅加热
+        type: int
+        unit: gear
+        scope: [主驾, 副驾, 左后, 右后, 全车]
+        execution_range: {min: 0, max: 3, step: 1}   # 0-3 真值(CLAUDE.md §4 范围真值)
+        source_kind: c2_demo_decision
+        exp_step: {little: 1}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "{位置}座椅加热{值}挡"
+      - id: seat.vent_level
+        display_zh: 座椅通风
+        type: int
+        unit: gear
+        scope: [主驾, 副驾, 左后, 右后, 全车]
+        execution_range: {min: 0, max: 3, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 1}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "{位置}座椅通风{值}挡"
+      - id: seat.massage_force
+        display_zh: 座椅按摩强度
+        type: int
+        unit: gear
+        execution_range: {min: 0, max: 3, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 1}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "座椅按摩强度{值}挡"
+      - id: seat.massage_mode
+        display_zh: 座椅按摩模式
+        type: enum
+        values: [波浪模式, 蛇形模式, 蝶形模式, 舒缓模式, 松弛模式, 全身伸展模式]   # 协议 mode 取常用 6, 余走 L2
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "座椅按摩{值}"
+      - id: seat.backrest_angle
+        display_zh: 座椅靠背
+        type: int
+        unit: percent
+        scope: [主驾, 副驾]
+        execution_range: {min: 0, max: 100, step: 1}   # 协议无硬边界→0-100(同 window 口径)
+        source_kind: c2_demo_decision
+        exp_step: {little: 10}
+        state_kinds: [empty, known, unknown]
+        default: 50
+        readback_zh: "{位置}座椅靠背{值}%"
+    readback_cell_group: [seat.heat_level, seat.vent_level, seat.massage_force, seat.massage_mode, seat.backrest_angle]
+
+  door:
+    display_zh: 车门
+    service: carControl
+    state_cells:
+      - id: door.car_door
+        display_zh: 车门
+        type: enum
+        values: [open, closed, opening, closing, paused]   # action OPEN/CLOSE + pause_function(motion 合一)
+        default: closed
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "{位置}车门{已打开|已关闭}"
+        # ★ 安全门炸点: 行驶中(vehicle.speed>0)开车门→R0 拒识(safety_cells.vehicle.speed)
+      - id: door.central_lock
+        display_zh: 中控锁
+        type: enum
+        values: [locked, unlocked]
+        default: locked
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "中控锁{已上锁|已解锁}"
+      - id: door.child_lock
+        display_zh: 儿童锁
+        type: enum
+        values: [locked, unlocked]
+        default: unlocked
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "儿童锁{已上锁|已解锁}"
+      - id: door.tailgate_height
+        display_zh: 尾门开度
+        type: int
+        unit: percent
+        execution_range: {min: 0, max: 100, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 20}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "尾门开度{值}%"
+    readback_cell_group: [door.car_door, door.central_lock, door.child_lock, door.tailgate_height]
+
+  volume:
+    display_zh: 音量
+    service: cmd                                  # ⚠️ jsonl 实算 cmd(非 carControl)
+    state_cells:
+      - id: volume.level
+        display_zh: 音量
+        type: int
+        unit: percent
+        execution_range: {min: 0, max: 100, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 10}
+        state_kinds: [empty, known, unknown]
+        default: 30
+        readback_zh: "音量{值}%"
+      - id: volume.mute
+        display_zh: 静音
+        type: enum
+        values: [muted, unmuted]
+        default: unmuted
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "{已静音|已取消静音}"
+      - id: volume.mode
+        display_zh: 音效模式
+        type: enum
+        values: [现代, 复古, 经典, 禅心, 盈润]      # 协议一手枚举全收
+        state_kinds: [empty, known, unknown]
+        source_kind: protocol_reference
+        readback_zh: "音效模式{值}"
+    readback_cell_group: [volume.level, volume.mute, volume.mode]
+
+  wiper:
+    display_zh: 雨刮
+    service: carControl
+    state_cells:
+      - id: wiper.power
+        display_zh: 雨刮开关
+        type: enum
+        values: [on, off]
+        default: off
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "雨刮{已打开|已关闭}"
+      - id: wiper.speed
+        display_zh: 雨刮速度
+        type: int
+        unit: gear
+        scope: [前, 后, 前后]
+        execution_range: {min: 1, max: 4, step: 1}   # 协议无硬边界 demo 拍 1-4
+        source_kind: c2_demo_decision
+        exp_step: {little: 1}
+        state_kinds: [empty, known, unknown]
+        default: 1
+        readback_zh: "{位置}雨刮速度{值}挡"
+      - id: wiper.mode
+        display_zh: 雨刮模式
+        type: enum
+        values: [手动模式, 自动模式, 间歇模式, 点刮模式, 倒车联动模式]   # 协议一手 5 模式全收
+        state_kinds: [empty, known, unknown]
+        source_kind: protocol_reference
+        readback_zh: "雨刮{值}"
+    readback_cell_group: [wiper.power, wiper.speed, wiper.mode]
+
+  sunroof:
+    display_zh: 天窗遮阳帘
+    service: carControl
+    state_cells:
+      - id: sunroof.position
+        display_zh: 天窗开度
+        type: int
+        unit: percent
+        scope: [前排, 后排, 全车]
+        execution_range: {min: 0, max: 100, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 20}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "{位置}天窗开度{值}%"
+      - id: sunroof.motion
+        display_zh: 天窗运动态
+        type: enum
+        values: [opening, closing, stopped, paused]   # sunroof_slide pause→运动态
+        default: stopped
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "天窗{值}"
+      - id: sunshade.position
+        display_zh: 遮阳帘开度
+        type: int
+        unit: percent
+        scope: [前排, 后排, 全车]
+        execution_range: {min: 0, max: 100, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 20}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "{位置}遮阳帘开度{值}%"
+    readback_cell_group: [sunroof.position, sunroof.motion, sunshade.position]
+
+  fragrance:
+    display_zh: 香氛
+    service: carControl                           # jsonl carControl:30/cmd:2 → 主 carControl
+    state_cells:
+      - id: fragrance.power
+        display_zh: 香氛开关
+        type: enum
+        values: [on, off]
+        default: off
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "香氛{已打开|已关闭}"
+      - id: fragrance.mode
+        display_zh: 香氛模式
+        type: enum
+        values: [若云模式, 白茶模式, 琥珀模式, 花园模式, 宁静模式, 清新模式]   # 协议 17 模式取常用 6
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "香氛{值}"
+      - id: fragrance.intensity
+        display_zh: 香氛浓度
+        type: int
+        unit: gear
+        execution_range: {min: 0, max: 3, step: 1}
+        source_kind: c2_demo_decision
+        exp_step: {little: 1}
+        state_kinds: [empty, known, unknown]
+        default: 0
+        readback_zh: "香氛浓度{值}挡"
+    readback_cell_group: [fragrance.power, fragrance.mode, fragrance.intensity]
 
 # ===== 场景所需 cell（scenario_required）=====
 # demo-scenarios.yaml(magnet reviewed)5 幕已写: 涉及 cell 全部落在 device_cells(ac/window/screen/ambient)

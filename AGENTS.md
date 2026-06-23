@@ -18,7 +18,7 @@ MAformac = 纯端侧(macOS/iOS)、离线、Qwen3 小模型 + LoRA 的车控**方
 
 - **推进 = OpenSpec SDD**:`/opsx:propose` 起 change → `specs/`(行为契约,事实源)→ `design` → `tasks` → `archive`;**agree before build**(spec 对齐前不写实现)。
 - **边界红线**:源料(真实座舱项目 + repo 研究)**只抽象、绝不复制**真实客户名(一律「某车厂」)/ 报价成本 / 密钥 PII / 标注「禁止外传/对内」的原文。RAW 与下载目录只读,不进仓、不入训练集。
-- **技术锁定**:Qwen3-1.7B + LoRA(0.6B 备选,`LLMBackend` 可换)/ 全 mock 车控(UI 卡片亮暗 + TTS)/ 规则吃 80% · LLM 碰 20% · LoRA 必做 / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS。
+- **技术锁定**:Qwen3-1.7B + LoRA(0.6B 备选,`LLMBackend` 可换)/ **端状态 mock 车控**(执行端=UI 卡片亮暗 + TTS 反馈;**音频/ASR/LLM/指令/安全检查都是真实的**,只车控执行端不真控车)/ 规则吃 80% · LLM 碰 20% · LoRA 必做 / 安全检查是代码不是 prompt / 验收以读回 mock 态为准 / 错误用枚举 / 工具 ≤10 参数 ≤5 / Python 库零进 iOS。
 - **决策 D1–D37 已锁**(见 `docs/tech-baseline-from-raw.md §12` + `supplement §17`)。
 - **模式**:solo / demo-tool 轻治理——能取巧的运行时灵活取巧,但 LoRA / 安全门控 / 能力治理不省。
 

@@ -1,8 +1,24 @@
 # Qwen tool-call 格式单一源（#39，Q2 磊哥定）
 # C3 runtime 已在 dev/spike-e3 锁定 mlx-swift-lm .json format；
 # C5 训练样本生成与 C6 bench harness 只引用本文件，禁各写一套，防 train/runtime/bench silent 失真。
+# ---------------------------------------------------------------------------
+# 🔴 D-domain surface（2026-06-23 范式翻案级联，paradigm §1-§2 + §14；A2 已落地）:
+#   - model-visible surface = D-domain 具名工具（value 形态编码进工具名），非 generic frame tool_call_frame。
+#   - thinking: false（enable_thinking=false）与 surface 形态无关——无论 generic frame 还是 D-domain 具名工具，
+#     端侧都关 thinking 直出 tool_call wrapper；surface 翻案不改本 wrapper/thinking 约定。
+#   - tools 字段不在本文件 inline（避免 562 重复维护）；改为**机器可校验引用** generated codegen 产物（下方
+#     tool_catalog / ir_map）。A2(S1)已让 scripts/gen_tool_contract.py 产全量 D-domain 目录（562 demo / 1538 full skeleton），
+#     C5 训练 emit + C6 bench expected + compiler renderedToolsText 全派生 demo catalog（不再硬编码 6 旧 B-frame）。
+#     10 族 = 191 device / 562 intent（562=intent 非工具数；磊哥 2026-06-23 终拍，source: paradigm §14:228）。
+#   - parser extraction（runtime_parser: json）对 D-domain 工具名做白名单约束（受限解码 GBNF 只吐挂载 ~炸场子集）=
+#     受限解码 vendor DEFERRED（retrain-c5/端侧）；extraction 规则随该步落定。
+# ---------------------------------------------------------------------------
 model_family: qwen3
 runtime_parser: json
 thinking: false
 wrapper: tool_call
 arguments_shape: json_object
+# D-domain 工具集合 = 机器可校验引用（单源，禁各写一套；verify-surface 校验 C6 expected ⊆ tool_catalog）:
+tool_catalog: generated/D_domain.tools.demo.json   # 562 demo 具名工具完整 schema(type/function/parameters)
+ir_map: generated/d_domain_ir_map.json             # 562 工具名→canonical IR(device×action×value_types)
+tool_catalog_full_skeleton: generated/D_domain.tools.full.json  # 1538 全集 skeleton(name/domain/sg, OOS/拒识白名单非训练面; 完整 schema 全覆盖训练=DEFERRED)

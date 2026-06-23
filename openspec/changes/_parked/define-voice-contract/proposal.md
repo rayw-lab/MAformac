@@ -1,3 +1,6 @@
+> ⛔ **PARKED（2026-06-19）—— 文档级联确认（2026-06-23）**
+> 本 change 已 PARKED（见 `openspec/changes/_parked/README.md`：🟢 高可复用，整体复用，物理移出 `changes/` 根防误 apply）。ASR 选型已演进：D14 二审改 sherpa-onnx 中文主 + WhisperKit fallback + ASRBackend 抽象；UIUE 拍板系统 ASR（SFSpeechRecognizer）主（见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/research/2026-06-19-asr-alignment-research.md`）——本文「WhisperKit ASR」前提已演进。**不删、不 apply**，待 C1/C2 archive 后按新契约 rebase 为 C7；设计资产保留供溯源。
+
 ## Why
 
 ASR / TTS 是 MVP 必交付项(车控 + ASR + TTS + LoRA)。`define-voice-contract` 锁语音链路行为契约:WhisperKit 中文车控 ASR + `SpeechTextNormalizer` 归一化 + AVSpeech TTS + push-to-talk 状态机。pre-mortem(`docs/voice-pre-mortem-2026-06-18.md`)已搜出 8 个 tiger(promptTokens 返回空 / 松手丢尾 / 短指令幻觉 / ANE 卡死 / AVSpeech 机械音 / 首响吃预算 / 录播冲突 / 6GB OOM),分两层落本 change(**功能坑进 MVP / 性能指标后续优化**,磊哥拍板)。

@@ -1,5 +1,8 @@
 # C5/C6 LoRA 训练-评测 7-repo adopt 选型研究(2026-06-19)
 
+> ⚠️ **HISTORICAL 快照（2026-06-19）—— 文档级联 banner（2026-06-23）**
+> 本文是 LoRA 训练-评测 7-repo adopt 选型早期研究历史快照（设计资产）。C5 训练后续经 P1-C grill + recovery grill + θ-α 根因 + 范式翻案大幅演进（generic frame → D-domain 具名工具，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`）。**活基线** = `CLAUDE.md §9` + `docs/c5-recovery-2026-06-22/grill-decisions.md` + roadmap。正文保留供溯源（adopt 方法学仍有参考价值），勿据此推进。
+
 > 7 个 CC subagent 各 clone 1 repo + pre-mortem 深入读代码(§28 不妄断)。clone 只读参考在 `~/workspace/raw/05-Projects/MAformac/lora-repo-research/`(不进仓)。本表是综合产出(设计资产,进仓供 C5/C6 rebase 用)。
 > 数据三源全用:**3990 协议 + 12000 真实座舱 bug + raw intake**。
 

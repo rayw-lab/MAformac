@@ -33,6 +33,7 @@ let package = Package(
                 "contracts",
                 "dev",
                 "docs",
+                "generated",
                 "openspec",
                 "prototypes",
                 "referencerepo",

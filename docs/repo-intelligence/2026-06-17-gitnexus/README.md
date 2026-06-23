@@ -1,5 +1,8 @@
 # GitNexus 参考仓库图谱分析总览
 
+> ⚠️ **HISTORICAL 快照（2026-06-17）—— 文档级联 banner（2026-06-23）**
+> 本目录（01-index ~ 04-query + README，5 文件）是立项早期参考仓图谱分析历史快照。范式翻案 + 契约 SSOT 重构后部分结论已过期。**活基线** = `CLAUDE.md §9` + `docs/srd-three-layer-intent-routing.md` + `docs/roadmap-2026-06-20-from-c6-done.md`。正文保留供溯源（repo 索引仍有参考价值），勿据此推进。
+
 状态: `T-PASS` for 36 indexed repos, `T-PARTIAL` for 3 timeout repos  
 日期: 2026-06-17  
 范围: `/Users/wanglei/workspace/MAformac/referencerepo/repos/`

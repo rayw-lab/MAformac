@@ -1,0 +1,74 @@
+[
+  {
+    "function": {
+      "description": "D-domain vehicle-control surface derived from the semantic contract.",
+      "name": "query_cabin_comfort",
+      "parameters": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "type": "function"
+  },
+  {
+    "function": {
+      "description": "D-domain vehicle-control surface derived from the semantic contract.",
+      "name": "set_cabin_ac",
+      "parameters": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "type": "function"
+  },
+  {
+    "function": {
+      "description": "D-domain vehicle-control surface derived from the semantic contract.",
+      "name": "set_cabin_ambient_light",
+      "parameters": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "type": "function"
+  },
+  {
+    "function": {
+      "description": "D-domain vehicle-control surface derived from the semantic contract.",
+      "name": "set_cabin_fan",
+      "parameters": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "type": "function"
+  },
+  {
+    "function": {
+      "description": "D-domain vehicle-control surface derived from the semantic contract.",
+      "name": "set_cabin_screen_brightness",
+      "parameters": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "type": "function"
+  },
+  {
+    "function": {
+      "description": "D-domain vehicle-control surface derived from the semantic contract.",
+      "name": "set_cabin_window",
+      "parameters": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "type": "function"
+  }
+]

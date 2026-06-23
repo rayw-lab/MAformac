@@ -1,5 +1,12 @@
 # 🔑 3990 语义协议范式 MASTER（金钥匙表内化 · 权威已确认）
 
+> ## 🟢 surface 翻案 banner（2026-06-23 文档级联，范式翻案后补）
+> **本文档定的是 canonical IR 层（device × action-primitive × value 四件套），IR 层【不变、仍是权威】。**
+> 但 **model-visible surface（模型看到的工具调用形态）已翻案**:旧 generic frame `tool_call_frame{device,action,value}` 已**否决**(1.7B 单工具判定面爆炸学不会,见 θ-α 0/23 根因),改 **D-domain 具名工具**(value 形态编码进工具名,如 `adjust_ac_temperature_to_max`)。
+> - **分层口诀**:「**对模型像 D-domain 具名工具,对系统像 device×action IR**」。surface 是从本文档 IR **派生**的,surface 层规范【不在本文档】,权威 = `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md §1-§2`。
+> - **本文档读法**:value 四件套 / 114→12 归一化原语 / position-direction / FC 分流 / 二次交互矩阵 全部**继续有效**(它们是 IR 层,surface 工具名是 IR 的渲染产物)。
+> - **口径(磊哥 2026-06-23 终拍 = 全仓唯一权威)**:全集 3990 行 / 671 device / 1538 unique intent;10 族 **191 device / 562 intent / 2159 行(54.1%)**;族外 480 device / 976 intent / 1831 行。旧 534/2086/52.3%/族外 1004/1904 系列**全废**。**🔴 D-domain 工具数未拍**(562=intent 非工具数,待 value-form 实算,写占位 [TBD] 禁编)。
+>
 > **状态(2026-06-20 升权威)**:**权威已确认**。C1 `semantic-function-contract` 已 codegen 全集 archived → `openspec/specs/`;本文 = 金钥匙表「公版语义四级功能协议表-编辑版.xlsx」的语义范式终极内化。原 §0–§7 为 2026-06-19 消化时的方案稿(部分"待拍"已被 C1/C2 archive 落定),保留作详细范式;以本 MASTER 头为准。
 >
 > ## 🔴 终结重读契约（磊哥 2026-06-20 定，根治"第五次还忘"）
@@ -87,6 +94,7 @@ DS 协议形态:`{"service":..,"intent":..,"semantic":{"slots":{...}}}`。
 - 一个 `adjust_value` 族 tool 携带 `{action_code, device, value:{ref,direct,offset,type}, position}`,而非 8 个 `set_cabin_*`。
 - 或保留按设备分 tool,但每个 tool 的参数升级为 value 四件套 + 区分 by_number/by_exp/to_number/to_max 的 intent 子类。
 - `contracts/capabilities.yaml` 升级:每能力补 `value_schema`(ref/direct/offset/type 取值)+ `range`(从基座 col17 取真值)+ `action_codes`(该设备支持的归一化编码集)+ `positions`。
+- 🟢 **surface 翻案补注(2026-06-23)**:以上 §4.A/B 描述的是 **IR/code 层**(仍有效)。**model-visible surface 已翻案** = 不给模型 generic frame,而是把 `device + action_primitive(+value 形态)` 编码进 **D-domain 具名工具名**(如 `adjust_ac_temperature_to_number` / `raise_ac_temperature_by_exp`)。同一条 IR(device×action×value)对系统不变,只是模型看到的工具表是具名工具集。**D-domain 工具数 = [TBD 待 value-form 实算]**(671 device × 原语 × value 形态 → 若干具名工具,不等于 562 intent)。surface 生成器 + 工具名空间规范见 paradigm §1-§2/§15-§17。
 
 **B. 参数规划层**(intent-routing FC 层的核心):
 - 绝对(to_number,ZERO)→ 直接赋值;相对(by_number,CUR)→ 读端态 ± offset;经验(by_exp,LITTLE/MORE,EXP)→ 读端态 ± **执行层步长表**(demo 定:温度±1、风速±1挡…);极值(to_max/min)→ 端态置 range 边界。

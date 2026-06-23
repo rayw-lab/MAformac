@@ -1,5 +1,8 @@
 # MAformac 技术架构基座 补充篇 v0.2
 
+> ⚠️ **HISTORICAL 快照（2026-06-18）—— 文档级联 banner（2026-06-23）**
+> 本文是早期技术基座补充篇历史快照（与 `tech-baseline-from-raw.md` v0.1 配套，后者已带 banner）。范式翻案后（generic frame `tool_call_frame` 否决 → D-domain 具名工具，见 `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`）+ 口径终拍 562，本文涉及的 surface 形态 / 口径数字部分已过期。**活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md`。正文保留供溯源，勿据此推进。
+
 > 本篇是《技术架构基座 v0.1》(`tech-baseline-from-raw.md`, 444 行) 的增量补充，只补 v0.1 没有或薄弱的 4 块，**不重复 v0.1 已有内容**。
 > 与 v0.1 衔接：凡引用 v0.1 章节均写明「v0.1 §N」。v0.1 已覆盖 7 层架构 (§3)、Tool schema/FC 四级 (§4/§6)、快慢路由+三态推荐 (§7)、DialogueState (§8)、barge-in (§9)、repo 映射 (§10)、eval (§11)、D1-D18 (§12)。本篇不再展开这些。
 > 边界声明：全文「某车厂」，无真实客户名/报价/商业条款/密钥/PII/对内禁外传原文；仅保留架构 / 语义 / 协议 / 字段结构。
