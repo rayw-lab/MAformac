@@ -5,19 +5,29 @@ public struct ToolContractCompiler: Sendable {
     public var actionPrimitives: [String]
     public var valueTypes: [String]
     public var slotKeys: [String]
+    // D-domain 具名工具目录(S1 codegen generated/D_domain.tools.demo.json 注入); 默认空保持向后兼容。
+    public var dDomainCatalog: [DDomainToolEntry]
 
-    public init(rows: [SemanticContractRow]) {
+    public init(rows: [SemanticContractRow], dDomainCatalog: [DDomainToolEntry] = []) {
         self.devices = Self.unique(rows.map(\.device))
         self.actionPrimitives = Self.unique(rows.map(\.actionPrimitive))
         self.valueTypes = Self.unique(rows.map { $0.value.type })
         self.slotKeys = Self.unique(rows.flatMap(\.slotKeys))
+        self.dDomainCatalog = dDomainCatalog
     }
 
-    public init(seeds: [C5SemanticSeed]) {
+    public init(seeds: [C5SemanticSeed], dDomainCatalog: [DDomainToolEntry] = []) {
         self.devices = Self.unique(seeds.map(\.device))
         self.actionPrimitives = Self.unique(seeds.map(\.actionPrimitive))
         self.valueTypes = Self.unique(seeds.map { $0.value.type })
         self.slotKeys = Self.unique(seeds.flatMap(\.slotKeys))
+        self.dDomainCatalog = dDomainCatalog
+    }
+
+    // D-domain 具名工具目录加载(generated/ 被 Package.swift exclude, 走 repoRoot 文件加载, 仿 C6 :1381)。
+    public static func loadDDomainCatalog(repoRoot: URL) throws -> [DDomainToolEntry] {
+        let url = repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")
+        return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: url))
     }
 
     public var frameToolSchema: [[String: JSONValue]] {
@@ -37,17 +47,23 @@ public struct ToolContractCompiler: Sendable {
     }
 
     public var dDomainToolSchemas: [[String: JSONValue]] {
-        dDomainSurfaceNames().map { name in
-            functionSchema(
-                name: name,
-                description: "D-domain vehicle-control surface derived from the semantic contract."
-            )
+        dDomainCatalog.map { entry in
+            [
+                "type": .string(entry.type),
+                "function": .object([
+                    "name": .string(entry.function.name),
+                    "description": .string(entry.function.description),
+                    "parameters": entry.function.parameters
+                ])
+            ]
         }
     }
 
+    // model-visible surface = 只渲 D-domain 具名工具(562); generic frame 已从 surface 显式移除(paradigm §1)。
+    // frameToolSchema 物理保留供 C5 训练 surface(strangler, S4 迁后删)。
     public var renderedToolsText: String {
         ToolContractJSONRenderer.render([
-            "tools": .array((frameToolSchema + dDomainToolSchemas).map { .object($0) })
+            "tools": .array(dDomainToolSchemas.map { .object($0) })
         ])
     }
 
@@ -68,42 +84,6 @@ public struct ToolContractCompiler: Sendable {
         return properties
     }
 
-    private func dDomainSurfaceNames() -> [String] {
-        var names: Set<String> = []
-        if devices.contains("ac") || devices.contains("ac_temperature") {
-            names.insert("set_cabin_ac")
-            names.insert("query_cabin_comfort")
-        }
-        if devices.contains("ac_windspeed") {
-            names.insert("set_cabin_fan")
-        }
-        if devices.contains("window") {
-            names.insert("set_cabin_window")
-        }
-        if devices.contains("screen_brightness") {
-            names.insert("set_cabin_screen_brightness")
-        }
-        if devices.contains("atmosphere_lamp_color") || devices.contains("atmosphere_lamp_brightness") {
-            names.insert("set_cabin_ambient_light")
-        }
-        return names.sorted()
-    }
-
-    private func functionSchema(name: String, description: String) -> [String: JSONValue] {
-        [
-            "type": .string("function"),
-            "function": .object([
-                "name": .string(name),
-                "description": .string(description),
-                "parameters": .object([
-                    "type": .string("object"),
-                    "additionalProperties": .bool(true),
-                    "properties": .object([:])
-                ])
-            ])
-        ]
-    }
-
     private func enumStringSchema(values: [String]) -> JSONValue {
         var object: [String: JSONValue] = ["type": .string("string")]
         if !values.isEmpty {
@@ -115,6 +95,18 @@ public struct ToolContractCompiler: Sendable {
     private static func unique(_ values: [String]) -> [String] {
         Array(Set(values.filter { !$0.isEmpty })).sorted()
     }
+}
+
+// D-domain 具名工具目录条目(解码 generated/D_domain.tools.demo.json; _ir/_domain/_sg 多余键 Codable 忽略)。
+public struct DDomainToolEntry: Codable, Sendable {
+    public let type: String
+    public let function: DDomainFunction
+}
+
+public struct DDomainFunction: Codable, Sendable {
+    public let name: String
+    public let description: String
+    public let parameters: JSONValue
 }
 
 public struct ToolContractIR: Equatable, Sendable {
