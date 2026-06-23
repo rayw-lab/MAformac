@@ -5,7 +5,9 @@ A2 S1（D-domain 具名工具目录，2026-06-23）：
 - model-visible surface 从 generic frame `tool_call_frame` 迁到 D-domain 具名工具（工具名 = intent 字段，
   device+action 动词+value 形态后缀已编码进名，对标真实座舱「intent==工具名」范式）。
 - 🔴 frame_schema()/d_domain_tools()（旧 6 硬编码）S1 **守现状不删**（canonical IR 仍 device×action，
-  ToolContractNormalizer frame→IR 拆分 + verify_gold 旧 surface 依赖；S2 全迁后统一删，strangler 防大爆炸）。
+  ToolContractNormalizer frame→IR 拆分 + verify_gold 旧 surface 依赖；S4/S5 全迁后统一删，strangler 防大爆炸）。
+  注: S2 已迁 Swift ToolContractCompiler model-visible surface→D-domain; 本脚本 Python frame_schema/d_domain_tools
+  及其产物 B_frame.frame_schema.json/D_domain.tools.json/rendered_tools_text 仍含旧 surface(无 runtime 消费, strangler 留到 S4/S5)。
 - 新增 D-domain catalog：两层 scope（demo=10族 562 完整 schema / full=全集 1538 三级骨架），单一投影核派生。
 - fail-closed 自验证：scope 工具数/口径 ≠ family-device-allowlist.json#caliber 拒写盘。
 
@@ -31,7 +33,7 @@ def string_schema(values=None):
 
 
 # ----------------------------------------------------------------------------
-# 旧 surface（S1 守现状，S2 删）—— generic frame + 6 硬编码具名工具
+# 旧 surface（S1 守现状，S4/S5 全迁后删）—— generic frame + 6 硬编码具名工具
 # ----------------------------------------------------------------------------
 def frame_schema(rows):
     slot_keys = unique(key for row in rows for key in row.get("slot_keys", []))
@@ -271,7 +273,7 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 旧 surface（守现状 S2 删）
+    # 旧 surface（守现状 S4/S5 全迁后删）
     b_frame = frame_schema(rows)
     d_domain = d_domain_tools(rows)
     write_json(output_dir / "B_frame.frame_schema.json", b_frame)
