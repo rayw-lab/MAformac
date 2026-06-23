@@ -57,3 +57,12 @@ R1 seed→tool 映射歧义（已证伪 paper-tiger，seed.intent 直取）/ R2 
 
 ## 7. 一手档指针（仓外 raw）
 `~/workspace/raw/05-Projects/MAformac/research/2026-06-23-a2-s4-c5-surface/`：`whas6ypkp.output.json` + journal/agent jsonl + `lens1-6.md` + `README-synth-spec.md`
+
+## 8. S4 审计线 verdict（2026-06-23, superpowers:code-reviewer 异源对抗审, commit 4b634b5）
+**CLEAR** — 无 P0/P1。10 claim 逐条亲核全过：配方字节级零碰（rank16Mainline struct 1052-1260 在所有 diff hunk 外）/ removedToolID 物理真删（:2497 filter 非 no-op, targetToolPresent :2499 实测非硬编码）/ A2 边界零越界（grep URLSession/Process/mlx_lm/judge 零命中）/ 562 filter（catalog 实测 562 unique）/ additionalProperties:false 合规（demo 562 全 0 required, drop 可选键不违）/ 140 测试 0fail + make verify exit 0。
+
+### 🔴 DEFERRED（审计 paper-tiger，retrain-c5 训练保真前确认，A2 不动 = NOT训范畴）
+1. **部分 demo 工具 schema 有 `device` 属性但被 dDomainToolCallArguments 无条件 drop**（Core/Training/C5LoRATraining.swift:2046 `key != "device" && key != "action_primitive"`；实测计数复现命令：`python3 -c "import json;c=json.load(open('generated/D_domain.tools.demo.json'));print(sum('device' in e['function']['parameters'].get('properties',{}) for e in c))"` → 当前快照计 41，required 数组计 0）：为防 frame device 值（"ac"）误填进子设备 enum（如 open_ac 的 {AC,空调,风扇}），当前无条件 drop `device` 键 → 这 41 工具的训练样本永不填 schema 声明的 device 子枚举（vestigial）。**A2 不违规**（0 required，shape 合法），但训练保真上模型学不到该子枚举。retrain-c5 修法：device 子枚举槽改名（S1 codegen）或按合法 enum 成员填（非 frame device）。**A2 边界=NOT训，不动**。
+2. **power-on intent（open_ac 类）emit `{}` 空 args**：无 value 属性 + slot_keys=['device'] 被 drop → 空对象。D-domain 范式语义正确（工具名即全意图），paper-tiger 不动。
+3. **C5NaturalUtteranceGenerator/DeterministicPlaceholderGenerator 死接口**（:743-747 定义未 wire）：符合 cut3「nil-stub 预留」spec，retrain-c5 实装云 generator 时接通。
+4. **frame strangler 双轨**（surface=.frame + 空 catalog 两向后兼容路径）：retrain-c5 全迁后物理删 frameToolSchema/toolCallArguments/tool_call_frame case（INDEX §5 已跟踪）。
