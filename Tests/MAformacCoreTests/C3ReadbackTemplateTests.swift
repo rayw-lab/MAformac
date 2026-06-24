@@ -58,6 +58,43 @@ final class C3ReadbackTemplateTests: XCTestCase {
         XCTAssertEqual(windowReadback.spokenText, "主驾车窗开度30%")
     }
 
+    @MainActor
+    func testOmittedWindowReadbackElidesDefaultDriverScopeButCarriesOrigin() throws {
+        let pipeline = try makePipeline()
+        let store = DemoVehicleStateStore()
+        let frame = ToolCallFrame.fixture(
+            device: "window",
+            actionPrimitive: "power_on",
+            value: ContractValue(),
+            stateRevision: 0
+        )
+
+        let result = try pipeline.execute(frame, store: store, traceLogger: InMemoryTraceLogger())
+        let readback = try XCTUnwrap(result.readbacks.first { $0.key == "window.position[主驾]" })
+
+        XCTAssertEqual(readback.scopeOrigin, .defaulted)
+        XCTAssertEqual(readback.spokenText, "车窗开度100%")
+    }
+
+    @MainActor
+    func testExplicitDriverWindowReadbackKeepsDriverTextAndOrigin() throws {
+        let pipeline = try makePipeline()
+        let store = DemoVehicleStateStore()
+        let frame = ToolCallFrame.fixture(
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            value: ContractValue(),
+            stateRevision: 0
+        )
+
+        let result = try pipeline.execute(frame, store: store, traceLogger: InMemoryTraceLogger())
+        let readback = try XCTUnwrap(result.readbacks.first { $0.key == "window.position[主驾]" })
+
+        XCTAssertEqual(readback.scopeOrigin, .explicit)
+        XCTAssertEqual(readback.spokenText, "主驾车窗开度100%")
+    }
+
     private func makePipeline() throws -> C3ExecutionPipeline {
         let semantic = try SemanticContractLookup(jsonl: readRepoFile("contracts/semantic-function-contract.jsonl"))
         let stateCells = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
