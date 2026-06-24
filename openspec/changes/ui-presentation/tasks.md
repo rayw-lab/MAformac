@@ -31,7 +31,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 3.3 ✅apply 消费 trace `guardReason`/`readbackResult`（spec R1；`Core/Trace/TraceLogger.swift:37-38` 已有字段）。
 - [x] 3.4 ✅apply `#if DEBUG` 7 态 gallery 视图（2.5a）+ force-state **launch argument**（`-forceVisualState <态>`，ProcessInfo.arguments）—— 🔴 修正：实现用 launch arg 非 URL scheme（GENERATE_INFOPLIST_FILE=YES 下 CFBundleURLTypes 难设，launch arg 同目的更简，App/DebugGallery.swift）。
 - [ ] 3.5 `Availability.swift`（2.4）随本 Phase zoom/ReduceMotion 用到时建（仅平台守卫+a11y，无版本守卫）。
-- [ ] 3.6 🔴 **启用 pre-commit gate**（2.6+2.7）：D7 改完（ContentView 无 binary + 无 `#available(iOS17/18)`）→ `git config core.hooksPath .githooks` + 验两脚本绿 + 故意写回各验 exit 1。
+- [x] 3.6 ✅ **启用 pre-commit gate**（2.6+2.7，2026-06-24 审计 P1-1 修）：`git config core.hooksPath .githooks` 已挂；两 gate PASS；回归验证坐实 = staged 二值 → check-no-binary exit 1 拦。D7 已改完（ContentView 无 binary + 无 `#available(iOS17/18)`）。
 - [ ] 3.7 5-gate 验收 + hex 冻结：simctl 出 14 张满屏单态 → 磊哥审美 5 gate（任一态 FAIL=返工非小瑕疵）→ hex DRAFT→FROZEN（2.8 留尾）。
 
 ## 4. 卡片渲染（Phase 4，部分依赖 A2 产物）
