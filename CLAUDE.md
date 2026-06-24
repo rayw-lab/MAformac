@@ -62,8 +62,15 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 | `openspec/changes/` | 进行中变更;`_parked/` = 旧 7-change 暂缓(见其 README) |
 | `contracts/semantic-function-contract.jsonl` *(C1 建)* | **唯一契约源**(源行级全集;`function-spec-full.yaml`/规则/LoRA/bench 皆生成物) |
 | `docs/handoffs/` | session 交接(收工 ≤ 40 行) |
+| `Tools/skills/` *(symlink `.claude/skills/`)* | **MAformac 沉淀技能**(2026-06-24 起);索引 + 组合替代见 `Tools/skills/INDEX.md` |
 
 > `docs/` 放**设计资产**(相对稳定);`openspec/` 放**活的推进事实源**(随 archive 生长)。互补不重复。
+
+### 技能沉淀与验证门(2026-06-24,superpowers v6.0.3)
+
+- **沉淀技能** `Tools/skills/`(symlink 到 `.claude/skills/`,source 在 Tools/):4 BUILD = `archive-research-pack` / `verify-external-claims` / `doc-cascade-sweep` / `closeout-receipt-writer`(用 superpowers `writing-skills` 的 TDD-for-skills 法建,baseline 取 production 实证)。**通用流程直接用 superpowers v6**(`writing-plans` / `subagent-driven-development` / `test-driven-development` / `verification-before-completion` / `using-git-worktrees`;plugin `superpowers@claude-plugins-official` **6.0.3** enabled)。索引 + adopt 组合替代链路 = ⭐`Tools/skills/INDEX.md`。
+- 🔴 **make-verify-gate = 已自动化,不做 skill**:改 `contracts/` / codegen / spec 后**必跑** `make verify`(verify-source→regen→verify-refs→verify-cross-section→verify-surface→diff→test)或 `make verify-all`(+`swift test`)——mechanical fail-closed 门(claim-vs-reality 机械化),非文档技能。
+- **maformac-onboard = 起手读链**(本文件顶部 + §9 已定),不另做 skill。
 
 ## 4. 技术栈 & 架构（已锁,改动走 openspec change + 入 decisions）
 
