@@ -223,31 +223,37 @@ struct VehicleCardDisplay: Identifiable, Equatable {
     ) -> VehicleCardDisplay {
         let primaryBase = FamilyPrimaryCellMapper.primaryCellBase(for: family)
         let primaryCells = familyCells.filter { ScopedStateKey($0.key).base == primaryBase }
-        // 主 cell 缺失（族激活但主 cell 未现，force-state 边界）→ 退用族内最新 cell
-        let source = primaryCells.isEmpty ? familyCells : primaryCells
-        let representativeBase = primaryCells.isEmpty
-            ? ScopedStateKey(source.max(by: { $0.revision < $1.revision })!.key).base
-            : primaryBase
+        let isDegraded = primaryCells.isEmpty   // 主 cell 缺失（族激活但主 cell 未现，force-state 边界）
+        let source = isDegraded ? familyCells : primaryCells
         // 复用现有 scope 聚合（individualDisplay/aggregateDisplay）出主 cell display（含 dim/emphasized/范围词角标）
         let primary = displays(from: source, catalog: catalog, reasons: reasons).first
-        // 族态 occupancy：族卡态 = 族内所有 cell dominant
+        // 族态 occupancy：族卡态 = 族内所有 cell dominant（语音点亮哪族哪族变）
         let familyState = dominantVisualState(familyCells.map(\.visualState))
-        // 族名 + scope 前缀：从 primary.title 减 baseTitle 提取（复用聚合判定，不重写规则）
-        let baseTitle = catalog.displayTitle(for: representativeBase)
-        let primaryTitle = primary?.title ?? family.displayName
-        let scopePrefix = primaryTitle.hasSuffix(baseTitle) ? String(primaryTitle.dropLast(baseTitle.count)) : ""
+        // 🔴 P1-1 修（审计 catch）：actualBase 从 primary.accessibilityKey 反解，保证 title/baseTitle/value/badge **同源一个 device**。
+        // 退化多 base 时，旧 representativeBase(max-rev) 与 primary(displays().first 按 id 序) 会选不同 base → title 取 A 设备语义、value 取 B 设备值（串味）。
+        let actualBase = primary.map { ScopedStateKey($0.accessibilityKey).base } ?? primaryBase
         let value = primary?.valueText ?? "—"
+        // 族名 + scope 前缀：**非退化才提取**（退化=主 cell 缺失边界，不强求 scope 前缀，避免非主 cell 的 scope 串成 "尾门车门"）
+        let title: String
+        if isDegraded {
+            title = family.displayName
+        } else {
+            let baseTitle = catalog.displayTitle(for: actualBase)
+            let primaryTitle = primary?.title ?? family.displayName
+            let scopePrefix = primaryTitle.hasSuffix(baseTitle) ? String(primaryTitle.dropLast(baseTitle.count)) : ""
+            title = scopePrefix + family.displayName
+        }
         return VehicleCardDisplay(
             id: "family|\(family.rawValue)",
-            title: scopePrefix + family.displayName,
+            title: title,
             valueText: value,
             scopeBadge: primary?.scopeBadge,
             visualState: familyState,
             revision: familyCells.map(\.revision).max() ?? 0,
             accessibilityKey: "family.\(family.rawValue)",
-            reason: familyCells.compactMap { reasons($0.key) }.first,
+            reason: primary?.reason ?? familyCells.compactMap { reasons($0.key) }.first,  // P2-1：reason 同源主 cell
             familyCardID: family,
-            badgeStyle: badgeRenderStyle(forBase: representativeBase, value: value)
+            badgeStyle: badgeRenderStyle(forBase: actualBase, value: value)
         )
     }
 

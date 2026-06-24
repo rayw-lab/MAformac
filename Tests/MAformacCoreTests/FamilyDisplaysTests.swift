@@ -151,4 +151,57 @@ final class FamilyDisplaysTests: XCTestCase {
             XCTAssertNotNil(fams[f.allowlistKey], "family \(f) 的 allowlistKey \(f.allowlistKey) 不在 allowlist")
         }
     }
+
+    // 🔴 P1-2（审计补测）：退化分支（主 cell 缺失）单 base → 用族名不串 scope（修 "尾门车门"）
+    func testDegradedFamilyUsesFamilyNameNoScopeSmear() {
+        let displays = VehicleCardDisplay.familyDisplays(
+            from: [DemoVehicleStateCell(key: "door.tailgate_height[尾门]", actualValue: "80", revision: 1, visualState: .changing)],
+            catalog: .load()
+        )
+        let door = displays.first { $0.familyCardID == .door }
+        XCTAssertEqual(door?.title, "车门", "退化分支不把非主 cell 的 scope(尾门) 串成 title")
+        XCTAssertEqual(door?.visualState, .changing)
+        XCTAssertEqual(door?.valueText, "80%", "value 来自 tailgate_height（percent），与 title 同族")
+    }
+
+    // 🔴 P1-1/P1-2（审计补测）：退化 + 多 base 同 revision → title/value 必同源单一 device（不混搭）
+    func testDegradedMultiBaseTitleAndValueSameDevice() {
+        let displays = VehicleCardDisplay.familyDisplays(
+            from: [
+                DemoVehicleStateCell(key: "door.tailgate_height[尾门]", actualValue: "80", revision: 1, visualState: .satisfied),
+                DemoVehicleStateCell(key: "door.child_lock[副驾]", actualValue: "on", revision: 1, visualState: .satisfied)
+            ],
+            catalog: .load()
+        )
+        let door = displays.first { $0.familyCardID == .door }
+        XCTAssertEqual(door?.title, "车门", "退化用族名，不串某个 device 的 scope")
+        XCTAssertTrue(door?.valueText == "80%" || door?.valueText == "开",
+                      "value=\(door?.valueText ?? "nil") 必来自 door 族单一 device（非跨 device 混搭）")
+    }
+
+    // 🔴 P1-2（审计补测）：occupancy dominant 高优先级态——unsafe 压过 satisfied
+    func testOccupancyUnsafePriorityOverSatisfied() {
+        let displays = VehicleCardDisplay.familyDisplays(
+            from: [
+                DemoVehicleStateCell(key: "ac.power", actualValue: "on", revision: 1, visualState: .unsafe),
+                DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1, visualState: .satisfied)
+            ],
+            catalog: .load()
+        )
+        XCTAssertEqual(displays.first { $0.familyCardID == .ac }?.visualState, .unsafe,
+                       "族态 dominant：unsafe 优先级高于 satisfied")
+    }
+
+    // 🔴 P1-2（审计补测）：occupancy changing(执行中) 压过 satisfied(已完成)
+    func testOccupancyChangingPriorityOverSatisfied() {
+        let displays = VehicleCardDisplay.familyDisplays(
+            from: [
+                DemoVehicleStateCell(key: "ac.power", actualValue: "on", revision: 1, visualState: .changing),
+                DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1, visualState: .satisfied)
+            ],
+            catalog: .load()
+        )
+        XCTAssertEqual(displays.first { $0.familyCardID == .ac }?.visualState, .changing,
+                       "族态 dominant：changing 优先级高于 satisfied")
+    }
 }
