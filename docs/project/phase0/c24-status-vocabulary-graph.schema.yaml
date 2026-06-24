@@ -1,0 +1,64 @@
+meta:
+  id: C24_status_vocabulary_graph
+  title: "Directed status vocabulary graph skeleton"
+  status: skeleton_only
+  phase0_order: 7
+  artifact_kind: status_graph_schema
+  owner: acceptance_and_closeout_governance
+  source_refs:
+    - docs/grill-tournament/grill-decisions-master.md
+    - docs/lessons-learned.md
+    - docs/loop-competition/2026-06-24-phase0-grill/final-list.md
+
+boundary:
+  skeleton_only: true
+  reason: "Concrete implications wait for C09/C10/C18/C19/C20/C22 evidence semantics."
+  scan_scope_for_future_verification:
+    - active_handoffs
+    - active_closeouts
+    - active_receipts
+  do_not_scan_as_failures:
+    - historical_snapshots
+    - archived_audit_transcripts
+    - quoted_old_failures
+
+status_ids_seed:
+  - data_ready
+  - train_health
+  - lora_candidate
+  - g6c_diagnostic
+  - c6_model_quality
+  - endpoint_candidate
+  - demo_golden_ready
+  - T_PASS
+  - V_PASS
+  - S_PASS
+  - U_PASS
+
+required_fields_per_status:
+  - status_id
+  - definition
+  - evidence_required
+  - allowed_claims
+  - forbidden_claim_patterns
+  - implies
+  - not_implies
+  - blocks
+  - blocked_by
+  - owner
+  - receipt_fields
+
+graph_rules:
+  - implication_is_directed_not_symmetric
+  - no_status_may_imply_endpoint_candidate_without_endpoint_evidence
+  - c6_model_quality_must_not_imply_v_pass
+  - train_health_must_not_imply_model_quality
+  - demo_golden_ready_must_not_imply_uiue_acceptance_without_state_contract
+  - historical_10_23_anchor_must_not_be_active_candidate_gate
+
+entries: []
+
+validation_rules:
+  - every_active_pass_claim_must_reference_one_status_id
+  - forbidden_claim_patterns_apply_only_to_active_docs
+  - not_implies_edges_must_be_explicit_for_common_fake_green_paths

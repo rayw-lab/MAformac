@@ -50,7 +50,7 @@ Codex 可连续跑 20h、质量高——但**长跑必须有 harness 防跑偏**
 
 - **Claude → Codex**:交付 openspec change(proposal+specs+design+tasks),tasks 必须细到 Codex 可独立执行;前端原型/视觉稿随附。
 - **Codex → 审**:产出走 GitHub PR → GPT Pro 云端 connector 审计 + Claude 二审 → 磊哥拍板。
-- **跨 vendor 审计**:Codex 一审(boundary)+ Claude/GPT Pro 二审(catch 同 model bias),如本仓 `docs/second-review-2026-06-17/` 即 Codex 对 Claude 的二审范例。
+- **跨 vendor 审计**:Codex 一审(boundary)+ Claude/GPT Pro 二审(catch 同 model bias),如本仓 `docs/second-review-2026-06-17/` 即 Codex 对 Claude 的二审范例。Codex subagent 审计只能算 same-vendor pre-check; 高风险 gate/signoff 必须明确是否完成异源/反框审计,或记录磊哥 waiver。
 - **状态同步**:重大决策入 `docs/decisions.md`;跨 session 靠 `docs/handoffs/`。
 
 ## 4.5 长任务开发规范(Pi 形态吸收 #34-38,模板级,不引入 runtime/DB/hook 系统)
@@ -93,7 +93,7 @@ Superpowers 按工程纪律执行、验证、收口
 
 **MAformac 推荐流水线**:
 1. 模糊想法:`pocock` 分诊 + `openspec-explore` 拆问题(+ `superpowers:brainstorming` 设计探索)
-2. 方向清楚:`/opsx:propose <change>` 生成 proposal / design / tasks / specs
+2. 方向清楚:`/opsx:propose <change>` 生成 proposal / design / tasks / specs；AD 级决策进 `design.md` Architecture Decisions, `tasks.md` 只放执行步骤与证据 artifact
 3. 实现:`/opsx:apply <change>` + 按需叠加 Superpowers(TDD / 调试 / 验证)
 4. 做完:`openspec-sync-specs` 合 delta 回主规格 → `openspec-archive-change` 归档
 5. 涉分支 / PR:Superpowers 收口类(verification / finishing-branch)+ GPT Pro 云端审

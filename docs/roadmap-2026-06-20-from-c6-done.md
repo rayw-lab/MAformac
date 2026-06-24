@@ -1,11 +1,15 @@
 # MAformac Roadmap — 新基线 2026-06-20（C6 done 起点）
 
-> ## 🟢 surface 翻案 + progress SSOT 状态 banner（2026-06-23 文档级联）
-> **本 roadmap 仍是当前推进事实源**(新 roadmap-2026-06-23 待 §15 GOV/CAS/TRN/UIX 35 议题 grill 收口后再写);但**两点已演进,据此推进**:
+> ## Historical Banner（2026-06-24 Phase 0 disposition）
+> 本 roadmap 保留 **C6 done 起点、五件套 harness、P0/P1/P2 历史执行序与 file:line 证据价值**,但**不再是 live roadmap / progress SSOT**,也不再是「唯一推进事实源」。当前推进请以 `CLAUDE.md §9`、`docs/grill-tournament/grill-decisions-master.md`、`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`、`docs/project/phase0/`、以及 active OpenSpec changes 为准。
+> 本文件内关于 `tool_call_frame`、generic frame、P1-C 训练、旧 C5 数据门/bench 进入条件、或 demo/voice 进入条件的内容,若与 Phase 0 gate / A2 后路线 / active OpenSpec draft 冲突,一律按后者处理。
+
+> ## 🟢 surface 翻案 + historical status banner（2026-06-23 文档级联）
+> **本 roadmap 已转为 historical / provenance source**(新 roadmap-2026-06-23 待 §15 GOV/CAS/TRN/UIX 35 议题 grill 收口后再写);但**两点已演进,据此推进**:
 > 1. **surface 翻案**:本文涉及的 `tool_call_frame` / generic frame 形态已**否决**(θ-α LoRA 全面塌缩 = action 轴 base 10/23→lora **0/23**,根因=1.7B 单工具判定面爆炸;source `docs/c5-recovery-2026-06-22/grill-decisions.md:120-123`),model-visible surface 改 **D-domain 具名工具**(canonical IR 仍 device×action,「对模型像具名工具,对系统像 IR」)。范式权威 = `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`;C5 recovery 推进事实源 = `docs/c5-recovery-2026-06-22/grill-decisions.md`(本 roadmap 的 C5/P1-C 旧定性以 recovery 为准)。
 > 2. **口径(磊哥 2026-06-23 终拍)**:10 族 **191 device / 562 intent / 2159 行(54.1%)**;族外 480 device / 976 intent / 1831 行(source `docs/research/2026-06-22-mvp-10family-device-boundary.md:39` + paradigm §14)。**🔴 D-domain 工具数未拍**(562=intent 非工具数,待 value-form 实算)= **A2 派单前置门**(见 §3 H3 注)。
 >
-> **此文是「此时此刻」往后的唯一推进事实源**。把三刀 / 38 项 / 14-repo synthesis / Qwen 可行性 / 磊哥评审全部收敛成一条从 **C6 apply done** 起步的清晰路线；2026-06-20 archive closeout 后，P0 已收口，当前入口是 P1-A C5 数据门 + P1-B Qwen spike。
+> **历史原文说明**:下方原文曾在 2026-06-20 作为「此时此刻」往后的推进事实源。2026-06-22~24 的 C5 事故复盘、范式翻案、A2 收口与 Phase 0 gate 已 supersede 其 live-roadmap 身份；下方路线仅作溯源,不得直接据此开训练/评测/demo/voice。
 > **方法论骨架 = 项目五件套 harness（OpenSpec + Pocock + Superpowers + Pi + Mastra）的精髓**（§1），后续每个 C-change 照此推进。
 > 配套读：`docs/research/2026-06-20-eval-memory-deepdive-synthesis.md`（吸纳意见全料）+ `CLAUDE.md`（宪法）+ `docs/srd-three-layer-intent-routing.md`（架构）。
 > 一手 file:line 锚点均已 verified（2026-06-20，§28/§30）；标「评审引用」者 = 待该 change 实装时再核。
@@ -22,7 +26,7 @@
 | 14-repo teardown + Qwen3.5-2B 可行性 + synthesis | **committed 31edafc → push origin/main** | git |
 | C4 三层路由/短时记忆 · C5 LoRA 数据 · C7 离线语音 | **未起（待解冻）** | — |
 
-**新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**P1-A/B 收口 push `846e40c`；2026-06-21 P1-C grill Q11-Q18 收口 + C5 apply 派单就绪(hermes GLM-5.2 异源 + subagent CC 双审,2 BLOCKER[B1 enable_thinking offset 过冲 / B2 dev_selection 撞 spec.md:4]已修为显式非自主);模型训 Qwen3-1.7B;真机无 iPhone8GB(在旁可用,端侧 V-PASS 必真机)→ P1-C 拆两 V-PASS(模型质量 Mac 可达/端侧真机);下一步=派 codex 自主实装(派单 `~/workspace/raw/05-Projects/MAformac/dispatches/2026-06-21-c5-lora-training-apply-dispatch.md` + handoff `2026-06-21-p1c-grill-closeout-c5-apply-dispatch.md`)。**
+**历史原文新基线一句话**：能跑的链路（C1→C2→C3→C6）都已 archive 入 `openspec/specs/`，且 C6 已用诚实 hard_fail 标定了「LoRA 要证明什么」。**P1-A/B 收口 push `846e40c`；2026-06-21 P1-C grill Q11-Q18 收口 + C5 apply 派单就绪(hermes GLM-5.2 异源 + subagent CC 双审,2 BLOCKER[B1 enable_thinking offset 过冲 / B2 dev_selection 撞 spec.md:4]已修为显式非自主);模型训 Qwen3-1.7B;真机无 iPhone8GB(在旁可用,端侧 V-PASS 必真机)→ P1-C 拆两 V-PASS(模型质量 Mac 可达/端侧真机);当时记录了旧 Codex 实装派单(已 superseded,禁止按此启动;派单 `~/workspace/raw/05-Projects/MAformac/dispatches/2026-06-21-c5-lora-training-apply-dispatch.md` + handoff `2026-06-21-p1c-grill-closeout-c5-apply-dispatch.md`)。**
 
 ---
 
@@ -225,8 +229,8 @@ pass^k / run_repetitions 多跑方差（base/边界 case N≥5，temp=0）+ fail
 
 > 🟢 **surface 翻案补注(2026-06-23,依赖图 surface 演进)**:图中 P0-1 `renderReadback(SSOT)` 与 P1-C/C6 的 `expected_tool_calls` 在范式翻案后,**工具调用帧 surface 来源 = D-domain 具名工具集**(非 generic `tool_call_frame`),canonical IR 仍 device×action。D-domain 工具契约来源声明 = `contracts/qwen-tool-call-format.yaml`(tools 字段,A2 后填,工具数 [TBD 待 value-form 实算]) + paradigm §1-§2/§15-§17;`c6-bench-cases.jsonl` expected_tool_calls 待 A2 迁移到 D-domain 工具名。readback 走方案 P(端 renderer)的决策权威 = `docs/c5-recovery-2026-06-22/grill-decisions.md`(ε 已拍 P)。
 
-**起手第一步**：**P1-C 启动评估 grill**（P1-A ✅V-PASS / P1-B ✅守 1.7B 已 push `846e40c`）— 拍 ① masking 数据生成 ② 训练环境（Mac M5 无 N 卡，云 GPU or mlx-lm 本机）。两前置过才训 Qwen3-1.7B LoRA。P2 C4/C7 在 C5 第一轮 checkpoint 后解冻。**⚠️ C5/P1-C 旧定性已被 c5-recovery 框架 supersede（PR5 0/34 灾难后），以 `docs/c5-recovery-2026-06-22/grill-decisions.md` 为准。**
+**历史起手第一步（禁止按此直接启动）**：**P1-C 启动评估 grill**（P1-A ✅V-PASS / P1-B ✅守 1.7B 已 push `846e40c`）— 拍 ① masking 数据生成 ② 训练环境（Mac M5 无 N 卡，云 GPU or mlx-lm 本机）。两前置过才训 Qwen3-1.7B LoRA。P2 C4/C7 在 C5 第一轮 checkpoint 后解冻。**⚠️ C5/P1-C 旧定性已被 c5-recovery 框架 supersede（PR5 0/34 灾难后），以 `docs/c5-recovery-2026-06-22/grill-decisions.md` 为准。**
 
 ---
 
-> 维护：本 roadmap 是活文档。每个 P 阶段推进 / HIGH 再拍 / 坑点命中 → 立即回写本文件 + `CLAUDE.md §9` 指针 + memory（CLAUDE §8 级联）。append-only handoff 记每阶段收尾。
+> Historical maintenance note: 本 roadmap 曾是活文档;2026-06-24 起不再作为 live update target。后续推进请回写 `CLAUDE.md §9` 指向的当前权威、`docs/project/phase0/`、active OpenSpec changes 与 append-only handoff。

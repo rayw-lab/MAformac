@@ -1,0 +1,74 @@
+meta:
+  id: C06_runtime_outcome_enum_skeleton
+  title: "Runtime/outcome/refusal/readback enum skeleton"
+  status: skeleton_only
+  phase0_order: 6
+  artifact_kind: enum_skeleton_schema
+  owner: runtime_trace_and_eval_contracts
+  source_refs:
+    - docs/srd-three-layer-intent-routing.md
+    - Core/Execution/C3ExecutionPipeline.swift
+    - Core/Bench/C6VehicleToolBench.swift
+    - docs/loop-competition/2026-06-24-phase0-grill/final-list.md
+
+boundary:
+  skeleton_only: true
+  reason: "Concrete downstream value domains wait for C09/C10/C13-C22."
+  not_allowed_now:
+    - freeze_c6_thresholds
+    - freeze_endpoint_evidence_values
+    - freeze_demo_golden_ids
+    - force_failure_class_training_policy
+
+enum_groups:
+  route_tier:
+    status: placeholder
+    values: []
+  model_visible_surface:
+    status: placeholder
+    values: []
+  runtime_scope:
+    status: placeholder
+    values: []
+  execution_outcome:
+    status: placeholder
+    values: []
+  refusal_kind:
+    status: placeholder
+    values: []
+  readback_result:
+    status: placeholder
+    values: []
+  parser_failure_kind:
+    status: placeholder
+    values: []
+  safety_reason:
+    status: placeholder
+    values: []
+
+required_fields_per_value:
+  - id
+  - definition
+  - owner_layer
+  - emitted_by
+  - consumed_by
+  - example
+  - not_equivalent_to
+  - downstream_placeholder_refs
+
+downstream_placeholders:
+  - C09_failure_error_recovery
+  - C10_already_state_state_noop
+  - C13_held_out_axes
+  - C14_mid_training_gate
+  - C18_c6_layer_scoring
+  - C19_endpoint_evidence
+  - C20_parser_repair_policy
+  - C21_state_card_patch
+  - C22_demo_golden_ids
+
+validation_rules:
+  - no_value_may_claim_v_pass_equivalence
+  - already_state_must_not_be_collapsed_into_unsupported_or_safety
+  - parser_failure_must_not_be_collapsed_into_model_quality_failure
+  - readback_result_must_distinguish_renderer_from_model_output

@@ -1,0 +1,77 @@
+meta:
+  id: C05_pocock_stage_matrix
+  title: "Pocock stage matrix and forbidden next actions"
+  status: skeleton
+  phase0_order: 4
+  artifact_kind: stage_gate_manifest_schema
+  owner: mainline_governance
+  source_refs:
+    - CLAUDE.md
+    - docs/project/collaboration-and-roles.md
+    - openspec/changes
+    - docs/research/2026-06-23-a2-post-roadmap-audit-vs-home-llm.md
+
+boundary:
+  purpose: "Prevent Phase 0 decisions from being mistaken for implementation permission."
+  no_pr_template_enforcement: true
+  not_permission_for:
+    - apply_training
+    - claim_v_pass
+    - run_real_model_quality_eval
+    - execute_demo_golden_run
+
+stage_enum:
+  - intake
+  - grill
+  - design
+  - spec
+  - propose_ready
+  - apply_ready
+  - apply_in_progress
+  - archive_ready
+  - archived
+  - historical
+  - deferred
+
+forbidden_next_action_enum:
+  - start_retrain
+  - run_base_recalibration
+  - compare_lora_candidate
+  - freeze_data_recipe_values
+  - claim_endpoint_ready
+  - claim_v_pass
+  - execute_demo_golden_run
+  - merge_uiue_mainline
+  - edit_archived_spec_directly
+
+required_fields:
+  - workstream_id
+  - current_stage
+  - entry_evidence
+  - exit_evidence
+  - carrier_kind
+  - openspec_carrier_path
+  - forbidden_next_action
+  - allowed_next_action
+  - owner
+  - verification
+
+entries: []
+
+seed_workstreams:
+  - id: retrain-c5-lora-d-domain
+    carrier_kind: active_openspec_change
+    openspec_carrier_path: openspec/changes/retrain-c5-lora-d-domain
+  - id: rebuild-c6-four-layer-bench
+    carrier_kind: active_openspec_change
+    openspec_carrier_path: openspec/changes/rebuild-c6-four-layer-bench
+  - id: endpoint-parity
+    carrier_kind: not_yet_assigned
+    openspec_carrier_path: TBD
+  - id: demo-golden-run-entry
+    carrier_kind: active_openspec_change
+    openspec_carrier_path: openspec/changes/define-demo-golden-run-and-voice
+  - id: uiue-state-consumption
+    carrier_kind: future_branch_ref
+    openspec_carrier_path: uiue/visual-ssot-state-consume
+    current_doc_evidence: docs/uiue-roadmap-2026-06-23-draft.md

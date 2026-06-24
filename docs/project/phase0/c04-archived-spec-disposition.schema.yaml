@@ -1,0 +1,69 @@
+meta:
+  id: C04_archived_spec_disposition
+  title: "Archived OpenSpec spec disposition after D-domain and four-layer C6"
+  status: skeleton
+  phase0_order: 3
+  artifact_kind: openspec_disposition_manifest_schema
+  owner: openspec_governance
+  source_refs:
+    - openspec/specs
+    - docs/grill-tournament/grill-decisions-master.md
+    - docs/loop-competition/2026-06-24-phase0-grill/final-list.md
+
+boundary:
+  scan_scope: "All openspec/specs/*/spec.md files, not only C1/C3/C6."
+  granularity: Requirement_or_Scenario
+  not_permission_for:
+    - direct_edit_archived_specs_without_change
+    - silent_behavior_change
+
+disposition_enum:
+  - no_change
+  - modify_via_openspec_change
+  - new_change_required
+  - docs_cleanup_only
+  - deprecated_or_historical_note
+
+required_fields:
+  - spec_path
+  - requirement_id
+  - scenario_id
+  - current_behavior_text
+  - impacted_by
+  - disposition
+  - evidence_file_line
+  - proposed_change_carrier
+  - legacy_collision_targets
+  - supersedes_or_conflicts_with_change_paths
+  - owner
+  - blocking_if_unresolved
+
+entries: []
+
+scan_seed:
+  - openspec/specs/demo-experience/spec.md
+  - openspec/specs/lora-training/spec.md
+  - openspec/specs/scenario-state-protocol/spec.md
+  - openspec/specs/semantic-function-contract/spec.md
+  - openspec/specs/tool-execution/spec.md
+  - openspec/specs/vehicle-capabilities/spec.md
+  - openspec/specs/vehicle-tool-bench/spec.md
+
+legacy_collision_targets_seed:
+  - path: openspec/specs/lora-training/spec.md
+    reason: "Archived main spec name can be mistaken for new retrain-c5 contract authority."
+  - path: openspec/changes/archive/2026-06-21-define-lora-training
+    reason: "Archived change contains historical lora-training deltas and archive-time semantics."
+  - path: openspec/changes/run-lora-candidate-training
+    reason: "Active carrier with LoRA training language must not be confused with retrain-c5 D-domain proposal."
+  - path: openspec/changes/define-lora-data-gate
+    reason: "Active data-gate carrier is prerequisite/context, not retrain authorization."
+  - path: openspec/changes/_parked/define-lora-pipeline
+    reason: "Parked legacy LoRA pipeline must remain historical."
+
+validation_rules:
+  - every_archived_spec_file_must_be_scanned
+  - every_behavior_change_must_have_change_carrier
+  - no_change_requires_evidence
+  - docs_cleanup_only_must_not_hide_observable_behavior_change
+  - lora_training_collision_targets_must_be_explicitly_classified_before_retrain_c5_propose

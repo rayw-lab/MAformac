@@ -6,7 +6,7 @@
 
 > 🔴🔴 **范式翻案 + 决策统一(2026-06-22~23,最新基线,优先于下方 v3)**:① **范式翻案** —— model-visible surface 从 generic frame(`tool_call_frame`)否决 → **D-domain 具名工具**(value 形态编码进工具名);canonical IR 仍 device×action(「对模型像具名工具,对系统像 device×action IR」);工具数未拍待 value-form 实算(**562=intent 非工具数**)。范式权威 = ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`(§1-§17:翻案/三层模型/demo 特性/多语种/21 主议题全收口/A2 盘点)。② **口径终拍(磊哥 2026-06-23 亲拍 562 终结纠结)**:10 族 = **191 device / 562 intent / 2159 行 / 54.1%**;族外 480 device / 976 intent / 1831 行;全集 3990 行 / 671 device / 1538 unique intent。**534 / 2086 / 52.3% / 族外 1004 / 1904 系列全废,禁再引**。③ **范式三层模型**:canonical IR(device×action×value) / surface(D-domain 具名工具) / runtime(MVP 10 族:空调/座椅/车窗/车门/灯光氛围/屏幕/音量/雨刮/天窗遮阳/香氛,HUD 不做;mock,族外 unsupported)。④ **决策统一索引**:`docs/grill-tournament/final-grill-list.md`(41 题运行清单)+ paradigm §1-§17(拍板清单)+ UIUE 31 条(`raw/.../2026-06-22-uiue-ultracode/GRILL-MASTER.md`)同源。
 >
-> ⚠️ **路线 v3 新基线(2026-06-20,surface 已被上方范式翻案演进,IR/路线骨架仍有效)**:C1/C2、C3 execution、C6 vehicle-tool-bench 均已 archived → `openspec/specs/`;C6 base Qwen3-1.7B 无 LoRA hard_fail 0.789 是 C5 提升判据。**推进路线以 `docs/roadmap-2026-06-20-from-c6-done.md` 为唯一事实源**(五件套 harness 骨架 + P0-P2 执行序 + 7 HIGH 已拍;P0 archive closeout 已回写)。契约/决策全料以 `CLAUDE.md §9` + `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` 为准;本文以下「Decisions 待拍 / 下一步候选 ABC / 基座内化"进行中"」段为 **v1 历史快照,已 supersede**。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
+> ⚠️ **路线 v3 历史基线(2026-06-20,surface 已被上方范式翻案演进,IR/路线骨架仍有溯源价值)**:C1/C2、C3 execution、C6 vehicle-tool-bench 均已 archived → `openspec/specs/`;C6 base Qwen3-1.7B 无 LoRA hard_fail 0.789 是 C5 提升判据。`docs/roadmap-2026-06-20-from-c6-done.md` 已是 **historical / provenance source**,不再是唯一推进事实源或必读第一。当前推进事实源以 `CLAUDE.md §9` 指向的 grill SSOT、范式权威、级联账本、Phase 0 manifests、active OpenSpec drafts 为准。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
 
 ## ⭐ 当前权威文档(v3 新基线,2026-06-20,以此为准)
 
@@ -14,8 +14,10 @@
 |---|---|
 | ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` | **范式 + surface 权威 SSOT**(§1-§17:generic frame 否决→D-domain 具名工具/canonical IR 仍 device×action/三层模型/demo 取巧特性/口径终拍 562/21 主议题全收口/A2 盘点) — **范式翻案权威** |
 | `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |
-| ⭐`docs/roadmap-2026-06-20-from-c6-done.md` | **新基线推进事实源**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — **必读第一** |
+| `docs/roadmap-2026-06-20-from-c6-done.md` | **historical / provenance source**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — 只作溯源,不作当前路线事实源 |
 | `CLAUDE.md` (§9) | 项目宪法 + 新基线指针 + 下一步 P1 |
+| `docs/project/phase0/` | **Phase 0 route-control manifests**(authority/stage/decision/status/gate materialization; not runtime contracts; filled docs must carry status/retire metadata) |
+| `docs/superpowers/plans/` | **implementation plans only**(Superpowers 执行计划; not SSOT; must carry authority/retire metadata) |
 | `docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA 慢路 + §12 实装锚点) |
 | `docs/research/INDEX.md` | 调研/teardown 索引 + 应用机制(架构验证6流/home-llm深拆/ASR选型/C5配方/C6评测) |
 | `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` | C1/C2 决策全料(Q1–Q15) |

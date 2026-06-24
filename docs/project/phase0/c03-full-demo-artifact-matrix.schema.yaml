@@ -1,0 +1,77 @@
+meta:
+  id: C03_full_demo_artifact_matrix
+  title: "Full/demo artifact matrix and generated proof"
+  status: skeleton
+  phase0_order: 2
+  artifact_kind: generated_surface_manifest_schema
+  owner: codegen_and_contract_tooling
+  source_refs:
+    - scripts/gen_tool_contract.py
+    - Makefile
+    - generated/D_domain.tools.demo.json
+    - generated/D_domain.tools.full.json
+    - docs/research/2026-06-23-a2-execution/S1-audit-1.md
+
+boundary:
+  current_state: "A2 already generates demo and full D-domain artifacts and includes generated domain files in the diff gate."
+  missing_proof:
+    - demo_subset_of_full
+    - explicit_artifact_matrix
+    - consumer_by_scope
+  not_permission_for:
+    - full_scope_training
+    - full_scope_runtime_mounting
+
+scope_enum:
+  - demo
+  - full
+
+required_fields:
+  - scope
+  - source_contract
+  - source_snapshot_id
+  - source_digest
+  - intent_count
+  - device_count
+  - row_count
+  - derivation_command
+  - generated_files
+  - schema_depth
+  - intended_consumers
+  - forbidden_consumers
+  - diff_gate_paths
+  - subset_relation
+  - subset_key
+  - proof_artifact_path
+  - fail_fast_on
+  - verification_command
+  - verification_exit_code
+
+entries: []
+
+expected_checks:
+  - id: demo_subset_of_full
+    description: "Every demo tool name must exist in full."
+    status: placeholder
+    required_proof_fields:
+      - subset_key
+      - proof_artifact_path
+      - verification_exit_code
+  - id: same_source_contract
+    description: "Both scopes derive from the same semantic-function-contract snapshot."
+    status: placeholder
+    required_proof_fields:
+      - source_snapshot_id
+      - source_digest
+  - id: generated_in_diff_gate
+    description: "All load-bearing generated artifacts are included in Makefile diff gate."
+    status: placeholder
+    required_proof_fields:
+      - diff_gate_paths
+      - proof_artifact_path
+  - id: full_training_fail_fast
+    description: "Full skeleton is not silently accepted as full training schema."
+    status: placeholder
+    required_proof_fields:
+      - fail_fast_on
+      - verification_exit_code

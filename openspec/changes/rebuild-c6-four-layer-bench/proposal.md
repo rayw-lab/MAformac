@@ -1,5 +1,5 @@
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
-> 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。
+> 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，design.md 承载 Architecture Decisions，specs delta 占位待补，tasks 待细化。
 > **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码。** 决策权威源见下。
 >
 > 🔴🔴 **DEFERRED 延后（磊哥 2026-06-23「训练 + 后端开发延后」决策）**：本 change 的【四层评测门 / 实际评测验证模型性能】部分**延后不排期，A2 之后独立重新立项**。**仅 §2「expected_tool_calls 迁 D-domain 具名工具」(code-only) 属 A2、随 `migrate-d-domain-tool-surface` 完成**；§3 四层评测门(Q41 各独立 scorer) / 跑 LoRA 实际评测验证 = **DEFERRED**。A2 阶段 C6 只【跑 base 验格式/链路对齐 D-domain】(archive-check verify-gold pass) + freeze A2-before baseline receipt，**不评 LoRA 模型性能、不建四层门**；模型性能 parity 抽样轴/阈值待 grill Q06。
@@ -29,6 +29,19 @@ C6 vehicle-tool-bench 现 expected_tool_calls 用旧 generic frame `tool_call_fr
 - **base-vs-LoRA 同 harness**：同 prompt/parser/mock-state/scoring/replay fingerprints；C6 release final-only，不用于 checkpoint selection。
 - spec MODIFY：`vehicle-tool-bench`（四层门 + D-domain expected_tool_calls + base hard_fail 0.789 锚）。
 
+## Phase 0 Decisions Required Before Apply
+
+This draft depends on user review of D1-D9 from `docs/research/2026-06-24-lora-zero-failure-deepdive/decisions-and-grill-ammo.md` plus D10 `already_state/state-noop` classification where it touches status/readback semantics.
+
+- D-domain base recalibration is a future comparison anchor task, not permission to run recalibration during Phase 0.
+- C6 model-quality evidence does not imply endpoint readiness, demo-golden readiness, V-PASS, S-PASS, or U-PASS.
+- Codex subagent audit is same-vendor pre-check only. R-L17 high-stakes signoff requires explicitly deframing heterogeneous review or a recorded user waiver.
+- Real model-quality evaluation, endpoint-ready claims, voice, and demo-golden execution remain deferred until gate tasks are accepted.
+
+## Design/Task Layering
+
+Architecture Decisions are recorded in `design.md` as `AD-C6-*`. `tasks.md` only carries executable checklist items, evidence artifacts, and validation steps that implement those decisions.
+
 ## Capabilities
 
 ### New Capabilities
@@ -56,6 +69,7 @@ C6 vehicle-tool-bench 现 expected_tool_calls 用旧 generic frame `tool_call_fr
 - `openspec validate rebuild-c6-four-layer-bench --strict` + `--all --strict` pass。
 - `c6-bench-cases.jsonl` expected_tool_calls 全为 D-domain 具名工具，无 `tool_call_frame` 残留；`archive-check verify-gold` pass。
 - 四层门各独立计分（golden 100% 硬门 / demo_fuzz / unsupported / safety），无互相冒充。
+- Architecture Decisions for R-L04/R-L05/R-L11/R-L17, D-domain base anchor semantics, and status boundaries exist in `design.md`; `tasks.md` references those ADs rather than carrying the decision source alone.
 - action hard_pass 按 case schema 字段拆（base 10/23 硬锚），非整体 7/57。
 - readback 走方案 P（端 renderer，eval 不计 hard_pass）；clarify 全保留计 hard_pass。
 - base-vs-LoRA 同 harness（prompt/parser/mock-state/scoring/replay fingerprints digest 一致）。

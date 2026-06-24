@@ -1,0 +1,101 @@
+meta:
+  id: C02_C01_authority_matrix
+  title: "Post-A2 authority matrix and historical banner closeout"
+  status: skeleton
+  phase0_order: 1
+  artifact_kind: governance_manifest_schema
+  owner: mainline_governance
+  source_refs:
+    - docs/loop-competition/2026-06-24-phase0-grill/acceptance-archive.md
+    - docs/loop-competition/2026-06-24-phase0-grill/final-list.md
+    - docs/grill-tournament/grill-decisions-master.md
+
+boundary:
+  lives_under: docs/project/phase0
+  must_not_live_under: contracts
+  reason: "This is route/source authority, not runtime behavior contract."
+  not_permission_for:
+    - retrain
+    - model_eval
+    - endpoint_ready_claim
+    - demo_golden_run
+
+role_enum:
+  - current_entrypoint_and_constitution
+  - doc_map
+  - decision_ssot
+  - surface_authority
+  - doc_inventory
+  - decision_pack
+  - pre_propose_checklist
+  - future_contract_carrier
+  - historical
+  - branch_consumer
+
+required_fields:
+  - path
+  - reference_kind
+  - role
+  - allowed_claims
+  - forbidden_claims
+  - banner_action
+  - superseded_by
+  - effective_from
+  - owner
+  - verification
+
+seed_targets:
+  - path: CLAUDE.md
+    reference_kind: current_file
+    expected_role: current_entrypoint_and_constitution
+    required_action: verify_pointer_consistency
+  - path: docs/README.md
+    reference_kind: current_file
+    expected_role: doc_map
+    required_action: demote_stale_live_roadmap_language_if_present
+  - path: docs/roadmap-2026-06-20-from-c6-done.md
+    reference_kind: current_file
+    expected_role: historical
+    required_action: ensure_banner_points_to_current_authorities
+  - path: docs/c5-recovery-2026-06-22/roadmap.md
+    reference_kind: current_file
+    expected_role: historical
+    required_action: add_or_update_historical_banner
+  - path: docs/research/2026-06-23-a2-post-roadmap-audit-vs-home-llm.md
+    reference_kind: current_file
+    expected_role: decision_pack
+    required_action: preserve_pre_propose_checklist_boundary
+  - path: docs/grill-tournament/grill-decisions-master.md
+    reference_kind: current_file
+    expected_role: decision_ssot
+    required_action: preserve_as_grill_decision_authority
+  - path: docs/grill-tournament/cascade-inventory.md
+    reference_kind: current_file
+    expected_role: doc_inventory
+    required_action: preserve_as_inventory_not_decision_ssot
+  - path: openspec/changes/retrain-c5-lora-d-domain
+    reference_kind: current_file_or_directory
+    expected_role: future_contract_carrier
+    required_action: keep_draft_until_propose
+  - path: openspec/changes/rebuild-c6-four-layer-bench
+    reference_kind: current_file_or_directory
+    expected_role: future_contract_carrier
+    required_action: keep_draft_until_propose
+  - path: docs/uiue-roadmap-2026-06-23-draft.md
+    reference_kind: current_file
+    expected_role: branch_consumer
+    required_action: document_current_uiue_plan_without_mainline_blocker_promotion
+  - path: uiue/visual-ssot-state-consume
+    reference_kind: future_branch_ref
+    expected_role: branch_consumer
+    required_action: consume_stable_state_and_golden_contracts_only
+
+entries: []
+
+validation_rules:
+  - every_seed_target_has_exactly_one_entry_before_phase0_close
+  - historical_docs_must_not_claim_live_progress_ssot
+  - decision_pack_docs_must_not_claim_live_fact_source
+  - future_contract_carrier_must_not_be_treated_as_archived_spec
+  - branch_consumer_must_not_define_mainline_state_or_c6_ids
+  - future_branch_ref_must_not_be_required_to_exist_in_current_worktree

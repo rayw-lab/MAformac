@@ -1,0 +1,56 @@
+meta:
+  id: C07_decision_lifecycle_manifest
+  title: "Touched D1-D37 and MASTER decision lifecycle manifest"
+  status: skeleton
+  phase0_order: 5
+  artifact_kind: decision_lifecycle_manifest_schema
+  owner: decision_governance
+  source_refs:
+    - CLAUDE.md
+    - docs/grill-tournament/grill-decisions-master.md
+    - docs/baseline-semantic-protocol-2026-06-19.md
+
+boundary:
+  scope: "Only decisions touched by D-domain, four-layer C6, endpoint policy, state/golden interface, or status vocabulary."
+  do_not_bulk_reopen_d1_to_d37: true
+  not_permission_for:
+    - rewriting_all_historical_decisions
+    - silently_mutating_locked_decisions
+
+impact_enum:
+  - touched
+  - untouched
+  - unknown_needs_grep
+
+status_enum:
+  - keep
+  - modify
+  - superseded
+  - defer
+  - historical_anchor
+  - needs_user_decision
+
+required_fields:
+  - decision_id
+  - old_claim
+  - impact
+  - new_status
+  - evidence_file_line
+  - cascade_files
+  - blocking_if_unresolved
+  - proposed_action
+
+priority_seed_decisions:
+  - D14
+  - D16
+  - D30
+  - D35
+  - D37
+
+entries: []
+
+validation_rules:
+  - every_touched_decision_requires_evidence
+  - untouched_decisions_must_not_be_reworded
+  - master_protocol_changes_must_preserve_canonical_ir_authority
+  - d_domain_surface_changes_must_be_marked_as_surface_not_ir_replacement

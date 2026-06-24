@@ -1,5 +1,5 @@
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
-> 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。
+> 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，design.md 承载 Architecture Decisions，specs delta 占位待补，tasks 待细化。
 > **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码、不跑训练。** 决策权威源见下。
 >
 > 🔴🔴 **DEFERRED 延后（磊哥 2026-06-23「训练 + 后端开发延后」决策）**：本 change 的【训练 / 数据生成 / 评测】部分**延后不排期，A2 之后独立重新立项**。**仅 §2.1「训练样本 surface 翻案 → D-domain」(code-only) 属 A2、随 `migrate-d-domain-tool-surface` 完成**；§2.2 四类自然中文数据生成 / §3 实际重训(跑权重) / §4 C6 候选评测 = **DEFERRED**。A2 阶段 C5 样本生成器代码**只预留 D-domain shape 接口**——不生成语料、不调云 generator、不跑 judge、不实际重训。
@@ -29,6 +29,21 @@ C5 LoRA PR5 通宵 wave candidate `0/23`（action hard_pass 真口径 base 10/23
 - **单语中文 LoRA**：多语种走协议转换复用非重训（印证交付手册语言无关协议层）。
 - spec MODIFY：`lora-training`（sample_shape → D-domain；samples expected_tool_calls → D-domain 具名工具）。
 
+## Phase 0 Decisions Required Before Apply
+
+This draft depends on user review of D1-D9 from `docs/research/2026-06-24-lora-zero-failure-deepdive/decisions-and-grill-ammo.md` plus D10 `already_state/state-noop` classification from the Phase 0 decision pack.
+
+- Failure/error-recovery is not silently dropped; D7 records whether the full chain is cut or a minimal seed is retained.
+- `already_state` is not collapsed into unsupported or safety refusal; D10 records whether code/readback renderer or model training owns it.
+- Data ratios and general Chinese mix are hypotheses until spike receipts exist.
+- `train_health`, loss health, and training receipts do not imply `model_quality`, `lora_candidate`, `endpoint_candidate`, V-PASS, or demo readiness. A candidate remains `UNSIGNED/BLOCKED` until C6 model-quality gates and required human reviews pass.
+- Codex subagent audit is same-vendor pre-check only. R-L17 high-stakes signoff requires explicitly deframing heterogeneous review or a recorded user waiver.
+- Training, real evaluation, endpoint-ready claims, voice, and demo-golden execution remain deferred until gate tasks are accepted.
+
+## Design/Task Layering
+
+Architecture Decisions are recorded in `design.md` as `AD-C5-*`. `tasks.md` only carries executable checklist items, evidence artifacts, and validation steps that implement those decisions.
+
 ## Capabilities
 
 ### New Capabilities
@@ -56,6 +71,7 @@ C5 LoRA PR5 通宵 wave candidate `0/23`（action hard_pass 真口径 base 10/23
 - `openspec validate retrain-c5-lora-d-domain --strict` + `--all --strict` pass。
 - 训练样本 expected_tool_calls 全为 D-domain 具名工具，无 `tool_call_frame` 残留。
 - 训练 surface digest == 上游 A2 codegen surface digest（训/eval/runtime 三处单源 parity）。
+- Architecture Decisions for R-L09/R-L02/R-L03/R-L05/R-L07/R-L11/R-L17 and status boundaries exist in `design.md`; `tasks.md` references those ADs rather than carrying the decision source alone.
 - 四类数据（正样本/unsupported/safety/followup）覆盖 10 族 562 intent scope；scope_tier 计数对齐 G4。
 - candidate C6 action hard_pass 相对 base 10/23 不退化（最低门）→ 目标提升（防 0/23 复发）。
 - 训练 receipt 记 scale=20 / LR 1e-4 / verified loop SHA / clip 指标 / nonfinite 检查 / masking 覆盖。

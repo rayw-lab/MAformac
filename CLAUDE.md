@@ -52,6 +52,8 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 | `AGENTS.md` | Codex 入口(路由到 CLAUDE.md) |
 | `docs/README.md` | 文档地图(短入口) |
 | `docs/project/collaboration-and-roles.md` | **协作分工 + 三工具协作(§7)** |
+| `docs/project/phase0/` | **Phase 0 route-control manifests**(authority/stage/decision/status/gate materialization; not runtime contracts; must carry retire/expiry metadata once filled) |
+| `docs/superpowers/plans/` | Superpowers implementation plans(执行计划,not SSOT; plans must say authority=`implementation_plan_not_ssot` and define retire/expiry trigger) |
 | `docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md` + `docs/adr/0001-*` + `CONTEXT.md` | **C1/C2 决策全料**(Q1–Q15 + oracle + 领域语言) |
 | `docs/research-archive-*.md` / `tech-baseline-*` / `integration-blueprint.md` | P0 调研/基座/蓝图(部分被 v2 supersede,见各文件标注) |
 | `openspec/config.yaml` | 项目上下文 + artifact 硬规则(propose 防漂移,已 v2) |
