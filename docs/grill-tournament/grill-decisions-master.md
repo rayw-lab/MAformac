@@ -242,6 +242,17 @@
 
 **净 grill 价值（cite-verify > codex 半小时前判断）**：codex 说 DA1 必补 γ，cite-verify 翻盘 = 主流程 `DemoWalkingSkeleton` **guard deny 走 `throw`→errorText 红字（非 unsafe 态）+ 只产 satisfied/normal 2 态 + guardReason nil** → DA1 接不存在的源（返工）；真补强 = DA0 执行→7 态映射（Phase 5）。**D7 视觉层 ✅（7 态能渲 + force-state 演），但执行层主流程只 2 态 + deny 异常红字 = D7 契约主流程未落地 → DA0 Phase 5 接。**
 
+### E 组 Phase 5 思考链路 orb + DA0 grill（E0-E8，2026-06-24，grill-with-docs engineering-contract mode）
+
+> grill SSOT 单源（Q22）：E 组落本文件，**不另起第二份 decisions log**（skill adapt）。每决策 = physical landing + pre-mortem + evidence + frame-break。逐题脑暴进行中（E0-E2 已拍，E3-E8 待）。
+
+| E | 议题 | ✅决策晶体（physical landing）| evidence + pre-mortem + frame-break |
+|---|---|---|---|
+| **E0** | Phase 5 这批范围 | **思考链路 orb + DA0**（不依赖 voice/default_scope）；**voice ASR/TTS 音频 DEFERRED**（独立 change）；**炸场剧本（氛围灯/座椅/水波/断网）后续** | 磊哥选 ① 起 Phase 5 思考链路 orb+DA0 |
+| **E1** | orb 实现选型 | 🔴 **自建多层 MeshGradient orb（全 SwiftUI 原生）**：①多层 MeshGradient（底深空青紫慢漂 + 中 think 脉冲光晕 + 顶高光斑）②breathing `spring(response:1.8,damping:0.7)` 微缩放 0.95↔1.05 ③hanlin-ai `LoadingGradientText:24-67` 思考文字流光 ④可选 `Canvas` 原生微粒子（think 漂/调用内聚）。**零 metasidd/Orb / 零 Inferno** | evidence: U30 原文 `hig-rules:56`「自建 MeshGradient + siri-orb 全 stale 别引」/ `gh metasidd/Orb pushedAt 2024-11-11`=19月stale（github-first 淘汰）/ `gh Inferno`「Metal shaders @twostraws」（非 GLM 说的 Daniel Saidi 粒子库，Metal shader 撞 U30 GPU 限氛围层）。frame-break: 接受 GLM「要高级」（demo 北极星惊艳 orb 不省），否 GLM Inferno 粒子（身份错+撞U30）+ ⭐4++ adopt metasidd（stale）|
+| **E2** | 思考链路 phase 机 | 🔴 **事件驱动掩盖术（非计时）**：`ThinkingPhase { analyzing, handoff }` 事件驱动；orb think analyzing 演出**掩盖后端**（慢漂移沉思 + 文案绑场景宏）→ **后端 10 族卡片开始 changing 跳动（`cardsDidStartChanging` 事件）= 结束信号** → handoff（orb think→speak + 切 TTS 显示 readback 文字 + 卡片 satisfied）。**3s=虚数体感锚非固定**（后端快则短/慢则持续掩盖，最小 analyzing ~1s guard 防瞬切）。orb 用 U30 四态 think+speak。**TTS 显示=orb speak 态+readback 文字（voice 音频 DEFERRED）** | evidence: U22 immediate-ack 掩盖术（grill-master U22）/ 磊哥事件驱动洞察（本会话）。🔴 **frame-break**: 我+GLM+codex 三方 cross-agent 全在「定时演出」frame（GLM ⭐4' 1.2+0.8+1.0=3s 仍计时）；**磊哥 orthogonal viewpoint 破框=事件驱动**（后端 ready 即切）= skill「cross-vendor 互核不破共享 frame，只正交视角破」实证。辩证收 GLM: 吸收节奏非匀速+handoff，否 calling 固定段（计时 frame 产物），CC catch 自己凭印象引 D8.3（claim-vs-reality）。pre-mortem: 🐯 后端 `cardsDidStartChanging` 事件需可靠 / 📄「3s 虚数不可控」=paper（事件驱动+1s guard 可控）/ 🐘 后端瞬 ready<1s 太快没思考感→最小 1s guard。🟡 待确认: 最小 analyzing ~1s / 文案绑场景宏（首批 4 宏 narration 强制+后续默认，GLM E2-D）|
+| **E3-E8** | 触发判定/场景宏/DA0 deny→态/reason→态映射/guardReason 接线/时序整合 | 🔴 待 grill | E3 触发(NLU 边界) / E4 场景宏(范式 G6 4 宏) / E5-E7 DA0(skeleton deny→态非throw+reason映射+guardReason填) / E8 整合 |
+
 ---
 
 ## §4 已拍决策晶体表（不可推翻，索引正文权威）
