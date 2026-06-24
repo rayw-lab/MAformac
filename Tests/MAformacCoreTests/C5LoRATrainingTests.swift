@@ -149,7 +149,7 @@ final class C5LoRATrainingTests: XCTestCase {
 
     func testSlotPlaceholdersAreRenderedAsConcreteValuesInUserAndAssistant() {
         let prepared = C5TrainingDatasetBuilder().build(
-            seeds: [semanticSeed(id: "slot-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾|左前")],
+            seeds: [semanticSeed(id: "slot-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾|左后")],
             c6Cases: [],
             dataGateContext: context(),
             options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
@@ -162,6 +162,63 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(assistant.contains("\"position\":\"主驾\""))
         XCTAssertFalse(user.contains("<position>"))
         XCTAssertFalse(assistant.contains("<position>"))
+    }
+
+    func testOmittedWindowTrainingTargetOmitsPositionScope() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(
+                    id: "omitted-window-row",
+                    fuzzy: true,
+                    free: false,
+                    device: "window",
+                    actionPrimitive: "power_on",
+                    slotKeys: [],
+                    range: ""
+                )
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 4, devSelectionRows: 0)
+        )
+
+        let rendered = prepared.samples.map(\.assistantPayload).joined(separator: "\n")
+        XCTAssertFalse(rendered.contains("\"position\""))
+        XCTAssertFalse(rendered.contains("左前"))
+        XCTAssertFalse(rendered.contains("右前"))
+        XCTAssertFalse(rendered.contains("后排"))
+    }
+
+    func testExplicitScopeCandidatesDeriveFromC2Vocabulary() throws {
+        let stateCells = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
+        let scopeCandidates = C5ScopeCandidateCatalog.scopeCandidatesBySlot(from: stateCells)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(
+                    id: "slot-row",
+                    fuzzy: true,
+                    free: false,
+                    slotKeys: ["position"],
+                    range: ""
+                )
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 12,
+                devSelectionRows: 0,
+                scopeCandidatesBySlot: scopeCandidates
+            )
+        )
+
+        let rendered = prepared.samples.map(\.assistantPayload).joined(separator: "\n")
+        XCTAssertTrue(rendered.contains("\"position\":\"主驾\""))
+        XCTAssertTrue(rendered.contains("\"position\":\"副驾\""))
+        XCTAssertTrue(rendered.contains("\"position\":\"左后\""))
+        XCTAssertTrue(rendered.contains("\"position\":\"右后\""))
+        XCTAssertFalse(rendered.contains("\"position\":\"左前\""))
+        XCTAssertFalse(rendered.contains("\"position\":\"右前\""))
+        XCTAssertFalse(rendered.contains("\"position\":\"后排\""))
     }
 
     func testFixedSemanticSlotsOverrideFallbackWhenRangeIsAbsent() {
@@ -888,6 +945,11 @@ final class C5LoRATrainingTests: XCTestCase {
 
     private func a2RepoRoot() -> URL {
         URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+    }
+
+    private func readRepoFile(_ relativePath: String) throws -> String {
+        let url = a2RepoRoot().appendingPathComponent(relativePath)
+        return try String(contentsOf: url, encoding: .utf8)
     }
 
     private func loadDemoCatalog() throws -> [DDomainToolEntry] {

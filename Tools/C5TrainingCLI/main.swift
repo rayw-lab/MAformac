@@ -44,6 +44,8 @@ struct C5TrainingCLI {
         }()
         let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))
+        let stateCells = try StateCellContractLookup(yaml: read(repoRoot, "contracts/state-cells.yaml"))
+        let scopeCandidatesBySlot = C5ScopeCandidateCatalog.scopeCandidatesBySlot(from: stateCells)
         let formatDigest = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
         let semanticDigest = C6Hash.sha256Hex(Data(semanticText.utf8))
         let generatedAt = isoNow()
@@ -77,7 +79,8 @@ struct C5TrainingCLI {
             generatedUtteranceRecords: generatedUtterances,
             scope: options.scope,
             surface: options.surface,
-            dDomainCatalog: dDomainCatalog
+            dDomainCatalog: dDomainCatalog,
+            scopeCandidatesBySlot: scopeCandidatesBySlot
         )
         let builder = C5TrainingDatasetBuilder()
         var prepared = builder.build(
@@ -120,7 +123,8 @@ struct C5TrainingCLI {
             generatedUtteranceRecords: generatedUtterances,
             scope: options.scope,
             surface: options.surface,
-            dDomainCatalog: dDomainCatalog
+            dDomainCatalog: dDomainCatalog,
+            scopeCandidatesBySlot: scopeCandidatesBySlot
         )
         prepared = builder.build(
             seeds: seeds,
