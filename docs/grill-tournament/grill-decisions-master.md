@@ -199,7 +199,7 @@
 
 | D8.x | 议题 | ✅决策晶体 | grill 辩证产出 |
 |---|---|---|---|
-| **D8.1** | 默认主驾不澄清（磊哥拍核心） | **区域 scope 用户没指定 → 默认值直接执行（satisfied），绝不弹 clarify 澄清打断**。10 族全量泛化：座位[空调/座椅/车窗]→主驾 / 屏类→中控屏 / 前后[雨刮/天窗遮阳]→前·前排 / 灯类/音量/香氛→全局。demo 手机演示，端到端流畅第一 | 核源 main:state-cells.yaml 全 10 族 scope（空调温度/风量·座椅加热/通风/靠背·车窗 = 座位 scope；屏幕含主副驾屏；雨刮前后；天窗前后排）；scope 默认值【执行逻辑】= NLU/Core（非 UIUE），UIUE 只展示默认态 |
+| **D8.1** | 默认主驾不澄清（磊哥拍核心） | **区域 scope 用户没指定 → 默认值直接执行（satisfied），绝不弹 clarify 澄清打断**。🔴 **per-cell 默认值单源 = state-cells `default_scope` 字段（G25 SSOT，后端 demo_default_scope change 建）；下列为决策举例非权威值（防第二份 SSOT 漂移=裂缝④，claim-vs-reality 铁律1）**：座位[空调/座椅/车窗]→主驾 / 屏类→中控屏 / 前后[雨刮/天窗遮阳]→前·前排 / 灯类/音量/香氛→全局。demo 手机演示，端到端流畅第一 | 核源 main:state-cells.yaml 全 10 族 scope（空调温度/风量·座椅加热/通风/靠背·车窗 = 座位 scope；屏幕含主副驾屏；雨刮前后；天窗前后排）；scope 默认值【执行逻辑 + per-cell `default_scope` 字段】= NLU/Core/契约（非 UIUE），UIUE **读 `default_scope` 展示**默认态 |
 | **D8.2** | clarify(`blocked_with_alternative`) = demo 少用态 | **能自动替代就 satisfied+提示（不 block）；真歧义走 orb；blocked_with_alternative 主线几乎不触发**。本义 = 某张【已确定卡】操作 blocked+替代（非对话级歧义）。force-state 展示示例 = **「空调调到16度」→「最低18℃，已调到18」**（值超范围+替代，卡片级，非区域，琥珀态）+ LoRA 训练覆盖 | CC 辩证 catch GLM-B「打开→开什么」其实是【对话级歧义=orb】非卡片态；"请再说一次"(无替代)更像 unknown 非 blocked_with_alternative；demo「不打断」下超范围倾向自动 clamp satisfied → 此态主线极少用（磊哥「保留备用」精确成立） |
 | **D8.3** | L3+ 思考链路（假 COT）= 对话级 orb `think` 态 | **「思考中→调用中→方案」是对话级 orb 演出（还没确定动哪张卡），不是任何卡片态 → DemoVisualState 7 态一个不动**。前端假 COT(~3s) + 场景宏确定性查表[demo]/LoRA[后续]。归 **Phase 5 orb TimelineView 四态 idle/`think`/speak/listen** | 核源 hig-rules:56 orb 已定 `think` 态（思考链路精确落点，非 IOU）；演绎 catch CC上轮⭐A+GLM⭐C（都把思考演出塞卡片 changing）错位——思考时未定卡=对话级；价值=可视化三层路由(L1秒回/L3+演思考) |
 | **D8.4** | 触摸交互 = 极简查看（P1=B） | **卡片只读状态展示（非手动控制器）；点卡→高亮+tooltip，无调节逻辑**。demo 语音主线（北极星），触摸防"死图片"感。🟡待磊哥确认现场戳卡习惯（会戳→B落实/纯语音→可简化A） | CC catch GLM-A④「触摸=手机主交互」过度——MAformac=语音车控演示，卡片非控制器 |
@@ -211,6 +211,17 @@
 - **B 思考链路演出**（对话级 orb，Phase 5 后续）：B1 orb think 假 COT phase 机(~3s) / B2 多变文案 / B3 手机视觉占位 / B4 接 NLU L3+ 信号 / B5 兜底态展示
 - **C clarify 态**（少用，已定）：C1 枚举保留主线少用 / C2 D7 示例「调到16度→18度」
 - **D 多轮/读回展示**（承接 Core）：D1 继承展示("再调高"继承主驾) / D2 读回展示("现在多少度"读默认)
+
+**🔴 `default_scope` 单一 SSOT 收口（G25，磊哥 2026-06-24 拍字段名 `default_scope`）+ 待对齐裂缝（claim-vs-reality SSOT 失守镜像）**：
+
+> 根 = claim-vs-reality 铁律1：「默认 scope」真相散在多处各自硬编码 → SSOT 失守。**收口 = state-cells.yaml 每个有 scope 的 cell 加 `default_scope` 字段，C3/Compiler/C6/C5 + UIUE 全派生此单一源**，不再各自硬编码。
+
+- **后端三处裂缝（codex 找，G14/G15/G17 修）**：C3:174 omitted→全车 / Compiler:466,553 window omitted→全车(真bug)+其他族 scope.first(偶然对齐脆弱) / C6:370,372,373 金标 position=全车(016/017 还 position全车但 state主驾内部矛盾)。+ C5LoRATraining:1898 position 随机含全车 + 枚举[左前/右前/后排] vs C2[左后/右后]不同源(G26 双bug)。
+- **CC 增补三处裂缝（UIUE/跨层视角，codex 后端三处之外）**：
+  - **裂缝④ D8.1 手写 per-cell 默认表 = 第二份 SSOT**（CC 自引，最讽刺：防漂移的 grill 文档自造漂移源）→ ✅ 已修：D8.1/AD-8.1 标「举例非权威值，读 state-cells `default_scope`」。
+  - **裂缝⑤ readback `{位置}` / UIUE 卡片 A3 角标 / TTS 三处「默认 scope 是否显式呈现」未同源**（codex G18 只管 readback 占位，漏卡片+TTS 一致）→ 定单一规则（默认 scope 三处都省略 / 非默认都显式），三处派生。🟡 待后端 readback 策略定。
+  - **裂缝⑥ 全车 fan-out（后端 N cell）vs UIUE `MAX_CONCURRENT_HIGHLIGHTS=1`(D8.5) / A2 聚合卡 矛盾**（codex G13 保留 fan-out 没定前端表征）→ 显式全车 fan-out 前端三选一：⭐聚合 1 卡(A2) / stagger 级联 N 卡(D1) / 同时 N 卡(违反单点高亮)。🟡 待拍。
+- **UIUE 消费（G28，G22 不进后端 blocker）**：ui-presentation **读 state-cells `default_scope`** 渲染默认 scope 卡片（非全车 fan-out）；合流 rebase main 拿 `default_scope` 字段。change 归属（独立 `define-demo-default-scope` vs 并入 retrain-c5/rebuild-c6 前置 gate）= G24 待拍。
 
 ---
 

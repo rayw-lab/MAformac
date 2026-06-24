@@ -8,6 +8,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 ## 1. 前置依赖
 
 - [ ] 1.1 确认 A2（`migrate-d-domain-tool-surface`）已并 main（✅ PR#3 fd2220b）/ UIUE worktree rebase main 拿 A2 产物（`generated/family-device-allowlist.json` / state-cells 10 族）。**仅 Phase 4 需要**（Phase 1b/3 不依赖）。
+- [ ] 1.3 🔴 **新交汇契约 `default_scope`（G25，磊哥拍字段名）**：后端 state-cells.yaml 每个有 scope 的 cell 加 `default_scope` 字段（C3/Compiler/C6/C5 + UIUE 全派生单一 SSOT）→ UIUE rebase main 拿到后**读 `default_scope`** 渲染默认 scope 卡片（G28）。change 归属 = G24 待拍（独立 `define-demo-default-scope` vs 并入 retrain-c5/rebuild-c6 前置 gate）。**仅 Phase 4 卡片需要**（G22：UIUE 不进后端 blocker）。
 - [x] 1.2 视觉 SSOT 三件套已落（`docs/design/{tokens.md,hig-liquid-glass-rules.md,INDEX.md}`，base #121212）✅ done。
 
 ## 2. 工程前置硬门（Phase 1b，U6 demo-blocker，❌不依赖 A2）
@@ -57,9 +58,9 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 ## 7. D8 默认主驾 + L3+ 思考链路 + 交互边界（2026-06-24 grill 收口，grill-master §3 D8）
 
 ### 7.A 默认主驾展示（卡片层纯 UIUE，部分依赖 A2 scope 数据）
-- [ ] 7.A1 卡片默认锚定默认 scope 态（不渲「请选区域」空态；座位→主驾 / 屏类→中控屏 / 前后→前·前排）
-- [ ] 7.A2 多 scope 聚合卡（「全车」= 1 张聚合 + 标记，不分裂多卡）｜依赖 A2 scope 数据
-- [ ] 7.A3 非默认 scope 角标（「副驾」小标记，区别默认主驾）
+- [ ] 7.A1 卡片默认锚定 **per-cell `default_scope` 态**（🔴 读 state-cells `default_scope` G25 SSOT，**非手写**；座位→主驾/屏→中控/前后→前排 = 举例非权威，防裂缝④）；不渲「请选区域」空态
+- [ ] 7.A2 多 scope 聚合卡（显式「全车」才 fan-out；🔴 **裂缝⑥ 待拍**：全车 fan-out N cell 前端表征 = ⭐聚合 1 卡 / stagger 级联 N 卡(D1) / 同时 N 卡(违反 MAX_CONCURRENT_HIGHLIGHTS=1 D8.5)）｜依赖 A2 scope 数据
+- [ ] 7.A3 非默认 scope 角标（「副驾」小标记）；🔴 **裂缝⑤ 待对齐**：readback `{位置}` / 卡片角标 / TTS 三处「默认 scope 是否显式」必同源（默认都省略/非默认都显式）
 
 ### 7.B 思考链路演出（对话级 orb `think` 态，Phase 5 后续，**不在本 change 实装**）
 - [ ] 7.B1 orb `think` 假 COT phase 机（思考中→调用中→方案，~3s）｜对话级非卡片态
