@@ -108,10 +108,57 @@ spec.md:83 / R2 锁「10 族 family_card 全景常驻」，但 producer 0 字段
 - 🔴 **value.type 在 4a vs 4b 的归属**（Task5 审计 frame-check，防 spec R2 「each ui_value_type has dedicated render branch (dial=环形仪表…)」claim-vs-reality drift）：**4a 摘要卡消费 `ui_value_type` 做【值文本格式化】**（`UIValueTypeMapper.valueText`：dial→`24℃` / percent→`80%` / stepper→`2挡` / toggle→`开/关` / badge→色块 swatch），**at-a-glance 文本形态**；spec R2 Scenario 的【图形控件视觉形态】（dial=Gauge 环形仪表 / toggle=开关图形 / stepper=分段控件）= **4b 展开卡**（AD-11 二级模型，摘要层族卡空间不够）。spec ADDED capability 在 **4c archive 时完整满足**（incremental apply：4a 摘要文本形态 / 4b 异构图形控件 / 4c 错峰）。
 
 - 🔴 **三屏分层归属**（磊哥 2026-06-25「10 族在三层架构下方，思考好布局」）：10 族 family_card Grid = 深空辉光三屏分层的**下方车控层**（语音 orb 顶 / 对话流中 / 车控卡片下，`docs/design/tokens.md`/`INDEX.md` visual-ssot）。4a 卡片层布局须**预留上方**给 Phase 5 orb + 对话流（当前 `commandBar` 临时输入，Phase 5 换 orb+语音）；**不做成顶满屏卡片墙**（防 Phase 5 布局返工）。
-- 🔴 **竖屏三屏空间分配「动态非固定三等分」**（磊哥 2026-06-25 pre-mortem：iPhone 竖屏 ~874pt，10 族 2 列×5 行 ~390pt，叠 orb~220+对话流~240=850pt 顶满挤压）→ Phase 5 实装按 **orb 四态弹性伸缩**（与 Phase 5 orb idle/think/speak/listen 语义对齐）：
-  - **idle 待命**：orb 收为顶部小球/底部 mic（~80pt），车控层主体 ~70%，10 族全景常驻一眼看全（保 spec「全景常驻不空屏」）。
-  - **语音交互（think/speak）**：orb 放大顶 ~220pt + 对话流浮现中 ~200pt + 车控层下沉底部 ~45%（ScrollView 内滚 + **激活族自动滚入视野+高亮**=「语音点亮哪族哪族变」延伸）。
-  - 横屏（macOS 5 列/iPad 4 列）宽屏无挤压，三屏可分区。**4a 不实装 orb**（agree-before-build，Phase 5 grill 细化收缩/下沉比例）；4a 车控层本身（10 族常驻+Grid+scope/态/炸场）已验证正确。
+- ✅ **竖屏三屏空间分配 = 6-lens ultracode 调研已收口（2026-06-25，承接 D1-D6+8-lens，零推翻 grill）**，方案见 **AD-12**：核心 = 外层固定三 zone（D4 orb120/content440/mic80，Phase 5 落）+ content zone **固定全景 idle（守 spatial memory）+ 活跃族原地放大成 hero 不物理重排 + ScrollViewReader 自动滚激活族入视野**（优于物理置顶零重排破坏）。我之前自拍的「动态分配」被调研修正为「固定全景 + hero 放大」。**4a 车控层（10 族常驻+Grid+scope/态/炸场）经 6 路一致确认与 grill 全对齐（Grid 双端统一非分歧）**；三 zone/活跃置顶/触发聚焦归 Phase 5（4a 不实装 orb）。调研全档 `docs/research/2026-06-25-portrait-interaction/`。
+
+## AD-12 Phase 4 全体竖屏全局 iOS 交互设计（2026-06-25，6-lens ultracode 承接 D1-D6+8-lens，零推翻）
+
+> 承接 D1-D8 + DA0-DA8 + E0-E8 已 grill 框架，6-lens 调研补全局 iOS 交互 + 深化竖屏。全档 `docs/research/2026-06-25-portrait-interaction/`（README 综合官 + lens1-6 一手 + synth-structured.json）。**6 路一致：零推翻已锁决策，新调研全映射到已锁决策的实装细化。**
+
+### 一、骨架不变（已 grill 锁，承接巩固）
+全景常驻 10 族 + 触发聚焦（D1）/ 二级下钻（D2）/ value.type 穷尽 switch（D3）/ Mac+iPhone 双独立（D4）/ opacityScale 默认+mge gated（D5）/ wow 4 段（D6）/ scope SSOT + 裂缝④⑤⑥（D8）/ 事件驱动 orb 三屏联动（E0-E8）。
+
+### 二、竖屏布局（深化 D4，Phase 5 落）
+- **外层固定三 zone**：orb 120 / content 440 / mic 80，VStack `.frame(height:)` 禁 GeometryReader（D4 锁）；态切套 `geometryGroup()`(iOS17/macOS14) 防子视图抖；mic bar `safeAreaInset(.bottom)` 钉 home indicator 上 + `ignoresSafeArea(.bottom)` 填手势条。
+- **content zone 内层 = 固定全景 idle + 活跃族原地放大 hero（bento spatial-weight）**：守 spatial memory（固定 placement 建 mental map），活跃族放大成 hero **不移位**（优于物理置顶，零重排破坏）；竖屏 2 列放不下 10 族常驻 → 配 **ScrollViewReader 自动滚激活族入视野**（`onChange(activeFamily){ withAnimation{ proxy.scrollTo(family.rawValue, anchor:.center) } }`，`DispatchQueue.main.async` 延一帧避同帧 layout jump，卡 id 锚 `family.rawValue` 跨 scope 稳定=滑移非重建）。🔴 **修正我之前自拍的「动态分配」**（被调研改为「固定全景+hero 放大」）。
+
+### 三、全局手势（三层定调，承接 D2 voice 主 tap 辅；HMI 学术共识 gesture 不 scale）
+- **tap = 聚焦/激活（主）**：走 D2 `FocusController.expand(family,trigger:.tap)` 单入口；scroll 内必 `.onTapGesture`（非 simultaneousGesture 干扰滚动）。
+- **long-press = 操作员调试快捷（辅，客户不见，maximumDistance 调小防误触）** / **swipe/drag/pinch = 全禁绑值调节**（连续值交语音，触摸无免视觉优势+增疲劳+抢语音控制权）/ 竖滚只用 ScrollView 自带。
+- **barge-in（U21）**：新输入调用点直接改 state（不只靠 delegate，didCancel 静默不触发）+ `stopSpeaking(at:.immediate)`。
+
+### 四、微交互编排（端侧独有，单 trigger 同步）
+- **单 trigger 同驱三层**：`visualState→satisfied` 一处变更同时触发 `symbolEffect(.bounce)`（态图标 discrete）+ `numericText`（4a 已对）+ `sensoryFeedback(.success/.impact(.soft))`（触感，仅 iPhone 真机；Mac/iPad 静默靠颜色/数值/图标双通道）。
+- **symbolEffect 按态**：satisfied→.bounce / changing→.pulse(indefinite) / unsafe→无动效靠红描边 / `.wiggle` 禁常驻；don't-over-animate（每效果答「marks what moment」答不出砍）。
+- **多步动效分流**：boot reveal/wow 4 段 = `phaseAnimator(trigger:)`（离散全属性齐动）；orb 四态多维 = `keyframeAnimator`/`TimelineView`（E1 已锁）。sequencer 220ms 单驱动法（单点串行 schedule，ease-out 快起慢收）。
+
+### 五、层级（竖屏聚焦展开，Phase 4b/4c）
+- **ZStack overlay + 显式稳定 zIndex（不用 sheet/presentationDetents）**：sheet 系统模态打断对话流 + 盖 orb 三屏（759pt 紧张）；ZStack 原地放大保三屏常驻可见；展开卡 zIndex 显式高于 grid（动态 add/remove SwiftUI 会画错）。
+- **单层 ultraThinMaterial dim/blur（禁逐卡 blur）**：blur 矩形插 grid 与聚焦卡之间（中间 zIndex），`blur_radius:12`（D2 锁）+ Reduce Transparency→`solid_overlay:0.65`。
+- **mge gated upgrade（D5）**：默认 opacityScale；mge 在 ZStack overlay 两端（isSource 显式 + mge 必在 .frame 之前 + 对称渲染）；🔴 `navigationTransition.zoom` macOS **unavailable（编译错）必 `#if !os(macOS)`**。
+
+### 六、三屏联动（E0-E8 事件驱动官方路径，Phase 5）
+`@Observable` 单源 store + `phaseAnimator(trigger:)`/`withAnimation`（事件回调内）：`store.cardsDidStartChanging` 一信号 → orb think→speak + 10 族卡 stagger 高亮并行（非 timer）。orb 四态 ↔ 卡片高亮同步（2026 多模态 VUI 标配，HA Voice Satellite 对标）。think 两语义：analyzing（持续到事件，掩盖后端场景宏）/ 安全拒识（固定 ~1.0s phaseAnimator 单次）。orb 主体自建 MeshGradient（零第三方/零 Metal），思考文字流光 adopt hanlin-ai LoadingGradientText。
+
+### 七、对 Phase 4a 已实装影响（synth task_4a_impact，全自动 CC 自决）
+- **全 keep**：FamilyCardIDMapper/FamilyPrimaryCellMapper/familyDisplays/BadgeRenderStyle/occupancy/scope 聚合/Grid 双端统一/numericText/ambient 色块/enforce gate/14 张截图——6 路确认与 grill 全对齐，执行态完成。
+- **minor_adjust@4b（非 4a 回炉）**：① breathe `repeatForever`→`TimelineView(.animation(paused:))` sin 驱动 + 生命周期 pause（lens5/8 catch offscreen 不停 + shadow 逐帧贵；4a 已守 glowActive gate 压低风险，故 4b 硬化非回炉，tokens motion.breathe 3.4s 不变只换机制）② scope badge `.caption2` 9pt 投屏可读性进 5-gate 人工 checklist（不进 pre-commit）。
+- **defer Phase 5**：深空三屏 VStack（临时占位）→ D4 三 zone（依赖 orb/mic 未实装）/ 活跃置顶 ScrollViewReader（依赖 content zone）/ 触发聚焦展开（4b/4c）。
+
+### 八、cite-verify TODO（主线程亲核，4b/Phase5 实装前核）
+- `symbolEffect/breathe repeatForever offscreen 不 pause ~30% CPU`（lens5/8 估值，驱动 breathe→TimelineView，4b 前 Instruments 实测坐实）。
+- ✅ `metasidd/Orb 422★ pushedAt 2024-11-11(19月 stale)` + `CherryHQ/hanlin-ai 230★ 2026-05-31 活跃`（2026-06-25 主线程 gh 坐实，synth 421/229 准确未编造）→ orb 自建 MeshGradient 非引第三方 holds，adopt hanlin LoadingGradientText OK。
+- `iOS26.1 Menu 进 GlassEffectContainer break morph`（驱动 Phase 5 orb 容器禁嵌，核 26.0 vs 26.1 行为差）。
+
+### 九、用户演绎体验审计收口（subagent CC，2026-06-25，verdict=CONDITIONAL-PASS）
+工程层 SOLID（实跑非假绿），呈现语义层 catch「代码/高清图看不出、只客户现场视角才暴露」的真缺口，辩证收：
+- ✅ **P0-1 4a 修**：占位卡「未激活」（客户读成 demo 没做完撞惊艳门）→「**待命**」（10 系统就绪态）。`UIValueTypeMapper.placeholderDisplay` + 测试。
+- ✅ **P0-2 4a 修**：补真实冷启动截图（`Reports/uiue-phase4a-proof/ios-coldstart-real.png`，无 force-state）——验证真实开场非「满屏灰broken」（待命骨架+值全显），**惊艳开场归 Phase 5 boot reveal**（idle 态「静默≠死灰」由 boot reveal/微辉光承载，本 AD §二 content zone idle）。
+- ✅ **P1-2 4a 修**：scope dim 角标 `caption2` 9pt→`caption.semibold`+细边框+提对比（投屏可读，**裂缝⑤「淡」量化 = 淡≠隐形**，弱于 emphasized 但可辨）。
+- 🔴 **P1-1 升级 + 4a 台本约定**：竖屏 2 列低排位族（如香氛 row_count32 在第 5 行）激活滚出视野客户跟丢 = **Phase 5 头号 spike**（ScrollViewReader 自动滚 vs 固定全景 spatial memory 在 2 列竖屏张力真实，调研 §二已识别）；🔴 **4a/4b 演示台本先约定「首屏可见族优先演」**（与「现场只说 10 族」轻治理同源，进一步收窄首屏前 6 族），不赌客户跟滚找；Phase 5 spike 定降级保底（激活临时置顶 vs 台本约定）。
+- 🔒 **P1-3 steelman 不自改，上抛磊哥/AD-1 review**：blocked_hard 灰锁🔒 客户易误读「坏了/锁死」非「智能拒识」——但**撞 D7 FROZEN 色映射**（tokens §2 磊哥审签 灰=unsupported，改琥珀撞 clarify）→ 色不自改；icon（🔒→ℹ️？）/reason 文案（更助手感）可议，待磊哥拍。
+- ⏳ **P1-4/P2-2 defer 4b**：changing 视觉强度（一闪而过客户跟不上执行）/ ambient 红色块增强（偏小偏淡）。
+- 📝 **P2-1/P2-3/P2-4 记录**：force-state 脚手架 normal/satisfied 大图坍缩（README 措辞已修）/ readback 占上方 Phase 5 三 zone 解 / 默认淡角标 vs 非默认 title scope 呈现不一致（grill 裂缝⑤已锁）。
+- **方法论**：force-state 14 张是「满屏丰富视觉」5-gate 脚手架，**不代表真实台本时刻**（真实冷启动/单族激活/低排位滚动从未被 force-state 截图验证）→ 补 cold-start 真实截图（claim-vs-reality 第10变体：脚手架图≠用户真实看到）。
 
 ## 不做（demo 轻治理 / DEFERRED 边界）
 
