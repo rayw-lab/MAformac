@@ -57,6 +57,7 @@ devices:
         type: int
         unit: celsius
         scope: [主驾, 副驾, 左后, 右后, 全车]      # 协议 38 温区 → demo 精做 5, 余走 L2
+        default_scope: 主驾
         execution_range: {min: 18, max: 32, step: 1}
         source_kind: c2_demo_decision
         exp_step:                                  # 经验值映射协议一手 offset token(§28)
@@ -78,6 +79,7 @@ devices:
         type: int
         unit: gear
         scope: [主驾, 副驾, 全车]
+        default_scope: 主驾
         execution_range: {min: 1, max: 10, step: 1}  # magnet 拍: 对齐端态打点口径(非协议一手)
         source_kind: c2_demo_decision
         exp_step: {little: 1}
@@ -95,6 +97,7 @@ devices:
         type: int
         unit: percent
         scope: [主驾, 副驾, 左后, 右后, 全车]      # 协议 32 position → demo 精做 5
+        default_scope: 主驾
         execution_range: {min: 0, max: 100, step: 1}  # 0=全关(值, 非独立态)
         source_kind: c2_demo_decision
         exp_step: {little: 20}                      # "开大点/关小点" = ±20%(协议 _little)
@@ -130,6 +133,7 @@ devices:
         type: int
         unit: percent                             # 协议 by_percent offset=<百分比>; 协议无硬边界 → demo 用百分比口径
         scope: [中控屏, 仪表屏, 主驾屏, 副驾屏, 全车屏]  # 协议 screen_type 43 屏 → demo 精做 5, 余走 L2(§28: screen_type 一手枚举取子集)
+        default_scope: 中控屏
         execution_range: {min: 0, max: 100, step: 1}  # c2_demo_decision: 协议无硬边界(range_authority_note); 同 window.position 百分比口径
         source_kind: c2_demo_decision
         exp_step:                                 # 映射协议一手 offset token(§28)
@@ -157,6 +161,7 @@ devices:
         type: int
         unit: percent                             # 协议 by_percent offset=<百分比>; 协议无硬边界 → demo 用百分比口径
         scope: [面发光氛围灯, 轮廓氛围灯, 门板氛围灯, 仪表板氛围灯, 中央通道氛围灯]  # 协议 name= 5 类(§28 一手), demo 全收
+        default_scope: 面发光氛围灯
         execution_range: {min: 0, max: 100, step: 1}  # c2_demo_decision: 协议无硬边界(range_authority_note); 百分比口径
         source_kind: c2_demo_decision
         exp_step:                                 # 映射协议一手 offset token(§28)
@@ -180,6 +185,7 @@ devices:
         type: int
         unit: gear
         scope: [主驾, 副驾, 左后, 右后, 全车]
+        default_scope: 主驾
         execution_range: {min: 0, max: 3, step: 1}   # 0-3 真值(CLAUDE.md §4 范围真值)
         source_kind: c2_demo_decision
         exp_step: {little: 1}
@@ -191,6 +197,7 @@ devices:
         type: int
         unit: gear
         scope: [主驾, 副驾, 左后, 右后, 全车]
+        default_scope: 主驾
         execution_range: {min: 0, max: 3, step: 1}
         source_kind: c2_demo_decision
         exp_step: {little: 1}
@@ -219,6 +226,7 @@ devices:
         type: int
         unit: percent
         scope: [主驾, 副驾]
+        default_scope: 主驾
         execution_range: {min: 0, max: 100, step: 1}   # 协议无硬边界→0-100(同 window 口径)
         source_kind: c2_demo_decision
         exp_step: {little: 10}
@@ -316,6 +324,7 @@ devices:
         type: int
         unit: gear
         scope: [前, 后, 前后]
+        default_scope: 前
         execution_range: {min: 1, max: 4, step: 1}   # 协议无硬边界 demo 拍 1-4
         source_kind: c2_demo_decision
         exp_step: {little: 1}
@@ -340,6 +349,7 @@ devices:
         type: int
         unit: percent
         scope: [前排, 后排, 全车]
+        default_scope: 前排
         execution_range: {min: 0, max: 100, step: 1}
         source_kind: c2_demo_decision
         exp_step: {little: 20}
@@ -359,6 +369,7 @@ devices:
         type: int
         unit: percent
         scope: [前排, 后排, 全车]
+        default_scope: 前排
         execution_range: {min: 0, max: 100, step: 1}
         source_kind: c2_demo_decision
         exp_step: {little: 20}
