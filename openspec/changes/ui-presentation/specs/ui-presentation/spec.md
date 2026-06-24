@@ -166,3 +166,38 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **THEN** 仅功能层 `control_glass`（mic 按钮/顶栏）用 Liquid Glass，内容卡用 `content_glow`（自研 cyan/violet glow，非 system glass）
 - **AND** SHALL NOT 用全局主题开关式 glass（内容层 glass = 整屏糊 + HIG 违规）
 - **AND** 例外：内容层 transient 交互控件（slider/toggle）激活时 MAY 用 glass（Apple 官方点名正确用法，车控温度滑块/风量 toggle 适用）
+
+### Requirement: card SHALL consume per-cell default_scope and render scope per the single display rule
+
+卡片 SHALL 读 per-cell `default_scope`（G25 SSOT 字段，磊哥拍字段名）锚定默认 scope 态，SHALL NOT 手写默认值（防裂缝④第二份 SSOT），SHALL NOT 渲染「请选区域」空态；scope 呈现 SHALL 遵循**单一规则**：默认 scope = 淡显角标（低对比）/ 非默认 scope = 显式呈现；显式全车 fan-out SHALL 渲染 **1 聚合卡 + 范围 badge**（不分裂 N 张，不违反 `MAX_CONCURRENT_HIGHLIGHTS=1`）；多轮叠加 scope SHALL 升级聚合成范围词；卡片 / TTS / readback 三处 scope 呈现 SHALL 同源（裂缝⑤）。本 Requirement 依赖后端 `default_scope` 字段（Phase 4，UIUE rebase main 拿到后 apply）。
+
+> 文档先行（agree-before-build B 流程）：本 Requirement = Phase 4 契约，Scenario 现在锁定，代码 apply 待后端 `default_scope`/fan-out 落 main（防返工）。决策源 = grill-master §3 D8 裂缝小节（⑤B淡显/⑥c badge/④a聚合，2026-06-24 用户故事全拍）+ design AD-8.7。
+
+#### Scenario: default scope renders dim badge (裂缝⑤ B 淡显)
+- **GIVEN** 区域 scope cell 用户未指定（如「打开车窗」→ 读 `default_scope`=主驾）
+- **WHEN** 渲染卡片
+- **THEN** 渲染「车窗 100%」+ **淡角标「主驾」**（低对比，客户知范围但不打断）
+- **AND** SHALL NOT 完全省略（客户分不清主驾/全车）、SHALL NOT 默认就显式啰嗦；卡片/TTS/readback 三处同源（默认都淡显）
+
+#### Scenario: explicit non-default scope renders explicit (副驾)
+- **GIVEN** 用户显式非默认 scope（如「打开副驾车窗」）
+- **WHEN** 渲染
+- **THEN** 卡片「副驾车窗 100%」+ TTS「副驾车窗已打开」+ readback「副驾车窗开度100%」三处**都显式「副驾」**
+
+#### Scenario: explicit all-vehicle fan-out renders one aggregate card with range badge (裂缝⑥ c)
+- **GIVEN** 用户显式全车（如「打开全车车窗」，后端 fan-out N cell）
+- **WHEN** 渲染
+- **THEN** 渲染 **1 张聚合卡 + 「全车」范围 badge**（青标签）
+- **AND** SHALL NOT 分裂成 N 张卡、SHALL NOT 违反 `MAX_CONCURRENT_HIGHLIGHTS=1`（聚合 1 卡 = 单点高亮）
+
+#### Scenario: multi-turn scope accumulation upgrades to range word (故事④ a)
+- **GIVEN** 「打开车窗」(主驾) 后「副驾也打开」(G20 显式二轮 passthrough)
+- **WHEN** 渲染
+- **THEN** 卡片**升级聚合成范围词**「前排车窗 100%」（跟全车聚合同逻辑）
+- **AND** SHALL NOT 渲成主驾/副驾双角标（多 scope 都聚合成范围词，视觉一致）
+
+#### Scenario: default_scope consumed from SSOT, not hardcoded (裂缝④)
+- **GIVEN** 卡片决定默认 scope
+- **WHEN** 取默认值
+- **THEN** 读 state-cells `default_scope`（G25 单一 SSOT）
+- **AND** SHALL NOT 在 UIUE 手写 per-cell 默认表（座位→主驾等仅决策举例非权威值）
