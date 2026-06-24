@@ -198,3 +198,7 @@
    - **排序稳定性**:常驻骨架顺序必须**固定**(按 `family-device-allowlist.json row_count` / `FamilyCardID` enum 序),**不按 revision 降序**(现有 `displays()` 按 revision 降序排,常驻骨架若沿用=激活族跳到前面破「常驻」视觉)。
    - **族态 occupancy**:主 cell=`ac.temp_setpoint`,但「打开空调」动 `ac.power` → 若族卡态只盯主 cell=族卡死寂。族卡 `visualState` 须 = 族内**所有 cell 的 dominant 态**(复用 `dominantVisualState` helper),value/title 仍取主 cell;否则「语音点亮哪族哪族变态」失效。
    - **占位卡安全**:占位卡无 scope → `scopeBadge=nil` 不走聚合分支;占位 `normal` 态 `breathing=false` 不掉帧(10 卡同屏只激活族 breathe,paper-tiger F-LB3/T1 解除)。
+
+4. **🟡 macOS 窗口截图 claim-vs-reality 两连坑(Quartz key + owner 显示名)**:窗口隔离截图(`screencapture -l <CGWindowID>` 只抓 app 窗口不抓下层=隐私安全,memory `macos-gui-screenshot-privacy`)需先拿 CGWindowID。两次「无窗口」失败:① 凭印象用 `w.get('kCGWindowWidth')` 过滤——**实际 bounds 在 `kCGWindowBounds.Width` 子字典**,顶层无此 key → 永远 0 不命中;② owner filter `=='MAformacMac'`——**实际 `kCGWindowOwnerName` 是显示名 `MAformac`(非 target 名 MAformacMac)**。→ **Quartz/CG API 字段名 + owner 显示名必先打印实际值核(诊断 dump `CGWindowListCopyWindowInfo(kCGWindowListOptionAll)` 全字段),别凭印象拼 key**;窗口截图前先 `getwin` dump 一次看真实 owner/bounds 结构。iOS 走 `simctl io screenshot`(隔离干净无此坑)。
+
+5. **🔴 竖屏三屏分层空间挤压(磊哥 pre-mortem,记 AD-11 防 Phase 5 返工)**:三屏分层(orb 顶/对话流中/车控卡片下)在 iPhone 竖屏 ~874pt 空间紧张——10 族 2 列×5 行 ~390pt + orb~220 + 对话流~240 = 850pt 顶满,10 族被压矮或要滚 → 撞「全景常驻一眼看全」。**修法(Phase 5)= 动态非固定三等分**:idle 态 orb 收小球(车控主体 ~70% 看全景)/ think-speak 态 orb 放大顶+对话流浮现+车控下沉底部 ~45%(ScrollView 内滚+激活族自动滚入视野高亮)。横屏(Mac 5列/iPad 4列)无挤压。**元规则:多区域垂直堆叠布局,设计时先算各区 pt 高度和 vs 屏高,超屏=动态弹性伸缩非固定均分;4a 车控层本身正确,三屏分配是 Phase 5 实装点(agree-before-build,Phase 5 grill 细化比例)。**

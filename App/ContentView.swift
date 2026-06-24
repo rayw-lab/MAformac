@@ -66,7 +66,8 @@ struct ContentView: View {
             if let errorText {
                 Text(errorText).font(.caption).foregroundStyle(DesignTokens.safetyRed)
             }
-            ForEach(Array(traceLogger.entries.enumerated()), id: \.offset) { _, entry in
+            // 限近 6 条防 append-only trace 溢出顶出下方车控 grid（Task5 审计 P2-3；Phase 5 对话流套 ScrollView 完整化）
+            ForEach(Array(traceLogger.entries.suffix(6).enumerated()), id: \.offset) { _, entry in
                 Text("\(entry.stage.rawValue): \(entry.message)")
                     .font(.caption.monospaced())
                     .foregroundStyle(DesignTokens.inkDim)

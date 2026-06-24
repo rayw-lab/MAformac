@@ -100,15 +100,14 @@ struct DemoVisualStateGallery: View {
     var body: some View {
         ZStack {
             DeepSpaceBackground()
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("DemoVisualState 7 态 gallery（DEBUG 内循环，非 5-gate）")
-                        .font(.headline)
-                        .foregroundStyle(DesignTokens.inkPrimary)
-                    VehicleCardsGrid(displays: displays)
-                }
-                .padding(24)
+            // P2-2（Task5 审计）：VehicleCardsGrid 已自带 ScrollView，外层不再套 ScrollView（防嵌套滚动冲突）
+            VStack(alignment: .leading, spacing: 14) {
+                Text("DemoVisualState 7 态 gallery（DEBUG 内循环，非 5-gate）")
+                    .font(.headline)
+                    .foregroundStyle(DesignTokens.inkPrimary)
+                VehicleCardsGrid(displays: displays)
             }
+            .padding(24)
         }
         .frame(minWidth: 760, minHeight: 560)
     }

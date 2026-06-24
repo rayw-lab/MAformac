@@ -105,7 +105,13 @@ spec.md:83 / R2 锁「10 族 family_card 全景常驻」，但 producer 0 字段
 
 4a 摘要层（10 族 family_card 全景常驻 Grid + 每族主 cell at-a-glance + scope 角标 + 7 态 + 占位卡）→ 4b 展开层（触发聚焦 + value.type 异构控件 + 族内 composite）→ 4c 错峰。摘要层不放完整 slider/picker（族卡空间不够，local F10）。
 
+- 🔴 **value.type 在 4a vs 4b 的归属**（Task5 审计 frame-check，防 spec R2 「each ui_value_type has dedicated render branch (dial=环形仪表…)」claim-vs-reality drift）：**4a 摘要卡消费 `ui_value_type` 做【值文本格式化】**（`UIValueTypeMapper.valueText`：dial→`24℃` / percent→`80%` / stepper→`2挡` / toggle→`开/关` / badge→色块 swatch），**at-a-glance 文本形态**；spec R2 Scenario 的【图形控件视觉形态】（dial=Gauge 环形仪表 / toggle=开关图形 / stepper=分段控件）= **4b 展开卡**（AD-11 二级模型，摘要层族卡空间不够）。spec ADDED capability 在 **4c archive 时完整满足**（incremental apply：4a 摘要文本形态 / 4b 异构图形控件 / 4c 错峰）。
+
 - 🔴 **三屏分层归属**（磊哥 2026-06-25「10 族在三层架构下方，思考好布局」）：10 族 family_card Grid = 深空辉光三屏分层的**下方车控层**（语音 orb 顶 / 对话流中 / 车控卡片下，`docs/design/tokens.md`/`INDEX.md` visual-ssot）。4a 卡片层布局须**预留上方**给 Phase 5 orb + 对话流（当前 `commandBar` 临时输入，Phase 5 换 orb+语音）；**不做成顶满屏卡片墙**（防 Phase 5 布局返工）。
+- 🔴 **竖屏三屏空间分配「动态非固定三等分」**（磊哥 2026-06-25 pre-mortem：iPhone 竖屏 ~874pt，10 族 2 列×5 行 ~390pt，叠 orb~220+对话流~240=850pt 顶满挤压）→ Phase 5 实装按 **orb 四态弹性伸缩**（与 Phase 5 orb idle/think/speak/listen 语义对齐）：
+  - **idle 待命**：orb 收为顶部小球/底部 mic（~80pt），车控层主体 ~70%，10 族全景常驻一眼看全（保 spec「全景常驻不空屏」）。
+  - **语音交互（think/speak）**：orb 放大顶 ~220pt + 对话流浮现中 ~200pt + 车控层下沉底部 ~45%（ScrollView 内滚 + **激活族自动滚入视野+高亮**=「语音点亮哪族哪族变」延伸）。
+  - 横屏（macOS 5 列/iPad 4 列）宽屏无挤压，三屏可分区。**4a 不实装 orb**（agree-before-build，Phase 5 grill 细化收缩/下沉比例）；4a 车控层本身（10 族常驻+Grid+scope/态/炸场）已验证正确。
 
 ## 不做（demo 轻治理 / DEFERRED 边界）
 
