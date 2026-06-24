@@ -919,6 +919,28 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(summary.denominatorReport.layerCaseIDs["safety"], ["C6-SAFETY-001"])
     }
 
+    func testSummaryStatusIsConstructionReportNotThresholdAcceptance() throws {
+        let runner = try makeRunner()
+        let negative = C6BenchCase.fixture(
+            caseID: "C6-NEG-THRESHOLD-001",
+            bucket: .noCall,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: [:],
+            readbackContains: [],
+            clarifyTag: .rejected
+        )
+        let falsePositive = try runner.evaluate(case: negative, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ]))
+
+        let summary = runner.summarize(cases: [negative], runs: [falsePositive], validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(summary.status, "local_construction_report")
+        XCTAssertEqual(summary.IrrelAccThreshold, 0.9)
+        XCTAssertEqual(summary.IrrelAcc, 0)
+    }
+
     func testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex() throws {
         let runner = try makeRunner()
         let generator = try makeGenerator()

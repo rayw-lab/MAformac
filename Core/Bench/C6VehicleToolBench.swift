@@ -1353,8 +1353,8 @@ public struct C6BenchRunner: Sendable {
         let negativeRuns = runs.filter { negativeIDs.contains($0.caseID) }
         let negativePassCount = negativeRuns.filter { !$0.gateResult.failureClasses.contains(.noCall) }.count
         let irrelAcc = negativeRuns.isEmpty ? 0 : Double(negativePassCount) / Double(negativeRuns.count)
-        let threshold = 0.9
-        let scenarioIDs = Set(cases.compactMap(\.tags.scenarioID))
+        // Compatibility field only. Rebuild-C6 construction status is not an acceptance threshold.
+        let legacyIrrelAccThreshold = 0.9
         let scenarioCaseIDs = Set(cases.filter { $0.tags.scenarioID != nil }.map(\.caseID))
         let scenarioRuns = runs.filter { scenarioCaseIDs.contains($0.caseID) }
         let scenarioPass = scenarioRuns.filter { !$0.gateResult.hardFailed }.count
@@ -1379,9 +1379,7 @@ public struct C6BenchRunner: Sendable {
                 elapsedVarianceMs: C6Stats.variance(elapsed)
             )
         }
-        let status = hardFailures == 0 && irrelAcc >= threshold && validation.isValid && scenarioIDs.count >= 5
-            ? "pass"
-            : "hard_fail"
+        let status = "local_construction_report"
         return C6Summary(
             status: status,
             modelID: modelID,
@@ -1395,7 +1393,7 @@ public struct C6BenchRunner: Sendable {
             totalCases: cases.count,
             totalRuns: runs.count,
             IrrelAcc: irrelAcc,
-            IrrelAccThreshold: threshold,
+            IrrelAccThreshold: legacyIrrelAccThreshold,
             contractCoverageScore: coverageScore,
             scenarioScore: scenarioScore,
             hardFailureCount: hardFailures,

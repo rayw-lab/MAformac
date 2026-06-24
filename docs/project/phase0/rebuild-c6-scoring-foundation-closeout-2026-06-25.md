@@ -2,7 +2,7 @@
 
 ## Verdict
 
-status: local-pass
+status: external-pass-with-absorbed-fixes
 proof_class:
 - local_static_contract
 - local_unit
@@ -13,7 +13,7 @@ optional_baseline_check:
 
 This is not C6 acceptance, not model-quality evaluation, not retrain-C5, not golden-run, not voice, not endpoint readiness, not UIUE merge, and not R-L17 candidate signoff.
 
-External audit status: local-pass pending GPT Pro external audit.
+External audit status: GPT Pro PASS_WITH_FIXES received; P0 empty; P1 fixes absorbed locally in follow-up commits.
 
 ## Scope
 
@@ -46,12 +46,32 @@ Deferred to later long-runs:
 
 | Command | Exit | Evidence |
 |---|---:|---|
-| `swift test --filter C6VehicleToolBenchTests` | 0 | `Reports/rebuild-c6-scoring-foundation-20260624T173024Z/VERIFY.md` |
-| `swift test --filter ToolContractCompilerTests` | 0 | `Reports/rebuild-c6-scoring-foundation-20260624T173024Z/VERIFY.md` |
-| `make verify-surface` | 0 | `Reports/rebuild-c6-scoring-foundation-20260624T173024Z/VERIFY.md` |
-| `openspec validate rebuild-c6-four-layer-bench --strict` | 0 | `Reports/rebuild-c6-scoring-foundation-20260624T173024Z/VERIFY.md` |
-| `openspec validate --all --strict` | 0 | `Reports/rebuild-c6-scoring-foundation-20260624T173024Z/VERIFY.md` |
-| `git diff --check` | 0 | `Reports/rebuild-c6-scoring-foundation-20260624T173024Z/VERIFY.md` |
+| `swift test --filter C6VehicleToolBenchTests` | 0 | `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md` |
+| `swift test --filter ToolContractCompilerTests` | 0 | `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md` |
+| `make verify-surface` | 0 | `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md` |
+| `openspec validate rebuild-c6-four-layer-bench --strict` | 0 | `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md` |
+| `openspec validate --all --strict` | 0 | `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md` |
+| `git diff --check` | 0 | `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md` |
+
+Tracked branch-source evidence excerpt: `docs/project/phase0/rebuild-c6-scoring-foundation-evidence-excerpt-2026-06-25.md`.
+
+## GPT Pro Verdict Handling
+
+verdict: PASS_WITH_FIXES
+source: `docs/project/phase0/rebuild-c6-scoring-foundation-gptpro-audit-2026-06-25.md`
+
+P0:
+- none
+
+P1:
+- P1-1: Closeout evidence was not complete in branch source truth because it pointed only to ignored `Reports/.../VERIFY.md`.
+- P1-2: Legacy thresholded `summary.status` could be mistaken for C6 acceptance.
+
+absorption:
+- P1-1: added tracked evidence excerpt with high-signal stdout snippets and exit codes for every L3 local gate.
+- P1-2: changed `C6Summary.status` to `local_construction_report` and added a regression test proving it is not threshold-driven; `IrrelAccThreshold` remains a compatibility field only.
+
+final_external_audit_status: external-pass-with-absorbed-fixes
 
 ## Subagent Audits
 
@@ -62,6 +82,7 @@ Deferred to later long-runs:
 | Phase 1C | PASS | Selector shell only; thresholds/base anchors remain deferred. |
 | Phase 2 | PASS | Audit did not certify Phase 3 C6 consumption or any model/runtime acceptance. |
 | Phase 3 | PASS | `C6GoldVerifier` still uses `.readback` for deterministic gold validation, not runtime model failure classes. |
+| GPT Pro P1 absorption | PASS_WITH_FIXES before final staging | Content and code fixes passed; auditor required exact-path Git tracking for the evidence excerpt and GPT Pro report copy before final claim. |
 
 ## UIUE Impact
 
@@ -72,7 +93,7 @@ Reason: diff from `6751be4942ebba079abb3e80c5e827c79fb43a77` to `47b9300` includ
 ## Residual Risk
 
 - Current C6 JSONL rows may still lack explicit `behavior_class`; D-domain shape migration remains deferred.
-- Legacy `IrrelAcc` remains for compatibility but is not an active four-layer acceptance gate.
+- Legacy `IrrelAcc` and `IrrelAccThreshold` remain for compatibility but are not active four-layer acceptance gates and no longer drive `C6Summary.status`.
 - Thresholds, base anchors, candidate comparison, and model-quality acceptance remain unauthorized.
 - `local_shape_no_model_baseline_unchanged` means surface shape was checked as an unchanged-baseline guard only; D-domain C6 JSONL shape migration remains deferred.
-- GPT Pro external audit has not returned yet; this branch must remain `local-pass pending external audit` until PASS or PASS_WITH_FIXES with P0/P1 absorbed.
+- GPT Pro returned PASS_WITH_FIXES. P0 was empty. P1 fixes are absorbed in branch source truth and covered by command evidence.
