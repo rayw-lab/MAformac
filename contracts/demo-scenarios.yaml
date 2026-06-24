@@ -109,13 +109,13 @@ scenes:
         intent_class: 开车窗
         c1_ref: {device: window, primitive: power_on}
         utterance_variants: ["打开车窗", "把车窗开开", "开一下窗户"]
-        expected_behavior: 车窗开到默认开度
+        expected_behavior: default_scope=主驾, 主驾车窗开到默认开度
       - turn: 2
         intent_class: 继承对象继续调            # 记忆: 继承上轮 window.position
         c1_ref: {device: window, primitive: by_percent}
         followup_transition: trans_1dfefae41fa915f5     # open_window→open_window_little(继承 position)
         utterance_variants: ["开大点", "再开大些", "拉大一点", "再大点"]
-        expected_behavior: 在上轮开度基础上 +20%（继承 window.position, 见 state-cells exp_step.little）
+        expected_behavior: 继承上轮 defaulted 主驾 window.position, 在上轮开度基础上 +20%（见 state-cells exp_step.little）
         expected_readback_zh: 车窗已开大
 
   - id: scene4
@@ -124,7 +124,7 @@ scenes:
     dimensions: [快FC泛化]
     initial_state: {window.position: 0}
     beats:
-      - intent_class: 指定车窗位置泛化           # scope fan-out: 协议 5 精做区, 未逐一训练
+      - intent_class: 指定车窗位置泛化           # explicit scope: 协议 5 精做区, 未逐一训练
         dimension: 快FC泛化
         c1_ref: {device: window, primitive: power_on}
         state_cell: window.position           # scope: [主驾,副驾,左后,右后,全车]

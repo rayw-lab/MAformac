@@ -70,7 +70,7 @@ allowlist:
     required_followup_transitions:
       - trans_1dfefae41fa915f5           # open_window→open_window_little(inherit position)="打开车窗...开大点"
     炸点说法:
-      - "打开主驾车窗(position fan-out 泛化)"
+      - "打开车窗(default_scope=主驾) / 打开主驾车窗(explicit position 泛化)"
       - "打开到30%(spec) / 开大点(经验+记忆继承position)← trans_1dfefae41fa915f5"
 
 # ============================================================================

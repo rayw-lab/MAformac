@@ -24,6 +24,33 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertTrue(noCall.expectedToolCalls.isEmpty)
     }
 
+    func testDefaultScopeWindowCasesSeparateOmittedAndFanout() throws {
+        let cases = try makeGenerator().generate()
+        let mp014 = try XCTUnwrap(cases.first { $0.caseID == "C6-MP-014" })
+        let mp015 = try XCTUnwrap(cases.first { $0.caseID == "C6-MP-015" })
+        let mp016 = try XCTUnwrap(cases.first { $0.caseID == "C6-MP-016" })
+        let mp017 = try XCTUnwrap(cases.first { $0.caseID == "C6-MP-017" })
+
+        XCTAssertEqual(mp014.inputZh, "打开车窗")
+        XCTAssertNil(mp014.expectedToolCalls.first?.arguments["position"])
+        XCTAssertEqual(mp014.expectedStateDelta, ["window.position[主驾]": "100"])
+
+        XCTAssertEqual(mp015.inputZh, "关上所有车窗")
+        XCTAssertEqual(mp015.expectedToolCalls.first?.arguments["position"], "全车")
+        XCTAssertEqual(Set(mp015.expectedStateDelta.keys), Set([
+            "window.position[主驾]",
+            "window.position[副驾]",
+            "window.position[左后]",
+            "window.position[右后]"
+        ]))
+
+        XCTAssertNil(mp016.expectedToolCalls.first?.arguments["position"])
+        XCTAssertEqual(mp016.expectedStateDelta, ["window.position[主驾]": "50"])
+
+        XCTAssertNil(mp017.expectedToolCalls.first?.arguments["position"])
+        XCTAssertEqual(mp017.expectedStateDelta, ["window.position[主驾]": "20"])
+    }
+
     func testDatasetCodecDefaultsMissingAlternativesToEmptyArray() throws {
         let jsonl = """
         {"case_id":"C6-OLD-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off"},"input_zh":"打开空调","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none"}
@@ -37,7 +64,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
     func testDatasetCodecDecodesAcceptableAlternative() throws {
         let jsonl = """
-        {"case_id":"C6-ALT-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off","window.position[主驾]":"0"},"input_zh":"有点闷","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none","alternatives":[{"id":"open_driver_window","expected_tool_calls":[{"name":"set_cabin_window","arguments":{"position":"driver","percent":"20"}}],"expect_no_call":false,"expected_state_delta":{"window.position[主驾]":"20"},"readback_assertion":{"contains":["主驾","20"]},"clarify_tag":"implicit","failure_class":"none","quality":"acceptable","reason":"通风是闷热表达的可接受车控解"}]}
+        {"case_id":"C6-ALT-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off","window.position[主驾]":"0"},"input_zh":"有点闷","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none","alternatives":[{"id":"open_driver_window","expected_tool_calls":[{"name":"set_cabin_window","arguments":{"position":"主驾","percent":"20"}}],"expect_no_call":false,"expected_state_delta":{"window.position[主驾]":"20"},"readback_assertion":{"contains":["主驾","20"]},"clarify_tag":"implicit","failure_class":"none","quality":"acceptable","reason":"通风是闷热表达的可接受车控解"}]}
         """
 
         let item = try XCTUnwrap(try C6DatasetCodec().decodeJSONL(jsonl).first)
@@ -89,7 +116,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
         let extra = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"]),
-            C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "50"])
+            C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "50"])
         ]))
         XCTAssertTrue(extra.gateResult.failureClasses.contains(.toolCall))
 
@@ -115,7 +142,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
             alternatives: [
                 C6GoldAlternative(
                     id: "open_driver_window",
-                    expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])],
+                    expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "20"])],
                     expectNoCall: false,
                     expectedStateDelta: ["window.position[主驾]": "20"],
                     readbackAssertion: C6ReadbackAssertion(contains: ["主驾", "20"]),
@@ -128,7 +155,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         )
 
         let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])
+            C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "20"])
         ], text: "主驾车窗已打开到20%"))
 
         XCTAssertFalse(result.gateResult.hardFailed)
@@ -166,7 +193,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         let preState = ["window.position[主驾]": "0", "screen.brightness[中控屏]": "70"]
         let state = C6MockStateApplier.apply(
             toolCalls: [
-                C6ToolCall(name: "tool_call_frame", arguments: ["device": "window", "action_primitive": "by_percent", "position": "driver", "value.direct": "50", "value.type": "PERCENT"]),
+                C6ToolCall(name: "tool_call_frame", arguments: ["device": "window", "action_primitive": "by_percent", "position": "主驾", "value.direct": "50", "value.type": "PERCENT"]),
                 C6ToolCall(name: "tool_call_frame", arguments: ["device": "screen_brightness", "action_primitive": "by_percent", "value.direct": "40", "value.type": "PERCENT"])
             ],
             to: preState,
@@ -182,7 +209,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         let alternatives = ["degraded", "unknown"].map { quality in
             C6GoldAlternative(
                 id: "alt-\(quality)",
-                expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])],
+                expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "20"])],
                 expectNoCall: false,
                 expectedStateDelta: ["window.position[主驾]": "20"],
                 readbackAssertion: C6ReadbackAssertion(contains: ["主驾", "20"]),
@@ -201,7 +228,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         )
 
         let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])
+            C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "20"])
         ], text: "主驾车窗已打开到20%"))
 
         XCTAssertTrue(result.gateResult.hardFailed)
@@ -283,7 +310,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
             alternatives: [
                 C6GoldAlternative(
                     id: "open_driver_window",
-                    expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "20"])],
+                    expectedToolCalls: [C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "20"])],
                     expectNoCall: false,
                     expectedStateDelta: ["window.position[主驾]": "20"],
                     readbackAssertion: C6ReadbackAssertion(contains: ["主驾", "20"]),
@@ -532,7 +559,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         )
 
         let hardFailed = try runner.evaluate(case: refusal, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_window", arguments: ["position": "driver", "percent": "100"])
+            C6ToolCall(name: "set_cabin_window", arguments: ["position": "主驾", "percent": "100"])
         ]))
         XCTAssertNil(hardFailed.gateResult.judge)
 
