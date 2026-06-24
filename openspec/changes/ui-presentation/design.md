@@ -92,7 +92,7 @@ AD-1~AD-8 全拍；Phase 4 契约（AD-8.7 scope 呈现）文档先行，代码 
 spec.md:83 / R2 锁「10 族 family_card 全景常驻」，但 producer 0 字段（`contracts/state-cells.yaml` 无 `family_card_id`）→ 消费侧从 `cell.key` 前缀派生（同 `ui_value_type` 派生纪律，不写回 yaml / 不给 Core struct 加字段）。
 
 - `enum FamilyCardID: String, CaseIterable { ac, seat, window, screen, ambient, door, volume, wiper, sunroofShade, fragrance }`（10 控制族）+ `FamilyCardIDMapper.familyCardID(forBase:) -> FamilyCardID?` 穷尽 switch，**optional 返回**（`vehicle.*` 车辆仪表 + 未知 base → `nil`，禁 `default→.ac` 静默错归；P0-1 审计 catch + claim-vs-reality 核 `DemoVehicleStateStore.swift:181` vehicle.speed/gear 在 presentationCells）。
-- 🔴 **10 族全景常驻（遍历 allCases，非从 cells 反推）**：`familyDisplays` **遍历 `FamilyCardID.allCases`(10)**，每族查 `presentationCells` 属该族的 cells——有 → 主 cell 摘要态（AD-10）；**无 → `CardAppearance.normal` 占位卡**（族显示名 + 未激活灰态）。冷启动 10 族骨架常驻（spec「全景常驻」），语音点亮哪族哪族变态。**claim-vs-reality**：A2 `defaultCells()` 现只 5-6 族有 cell（过滤 vehicle 后 5：ac/window/screen/ambient/seat），从 `presentationCells` 反推=空屏不惊艳（lens 已否决纯动态浮现作主形态）→ Presentation 层补全到 spec 要的 10 族（**不碰 Core/State store**，守 A2 边界）。
+- 🔴 **10 族全景常驻（遍历固定序，非从 cells 反推）**：`familyDisplays` **遍历 `FamilyCardID.displayOrder`（= allCases 10 族全覆盖 + row_count 降序排，codex 跨厂商审 P2 纠：代码用 displayOrder 非 allCases，二者覆盖同 10 族）**，每族查 `presentationCells` 属该族的 cells——有 → 主 cell 摘要态（AD-10）；**无 → `CardAppearance.normal` 占位卡**（族显示名 +「待命」就绪态，体验审计 P0-1 改自「未激活」）。冷启动 10 族骨架常驻（spec「全景常驻」），语音点亮哪族哪族变态。**claim-vs-reality**：A2 `defaultCells()` 现只 5-6 族有 cell（过滤 vehicle 后 5：ac/window/screen/ambient/seat），从 `presentationCells` 反推=空屏不惊艳（lens 已否决纯动态浮现作主形态）→ Presentation 层补全到 spec 要的 10 族（**不碰 Core/State store**，守 A2 边界）。
 - **族排序固定**（常驻骨架稳定性，pre-mortem elephant）：按 `generated/family-device-allowlist.json` `row_count` 降序（C8 高频代理）兜底 `FamilyCardID` enum 序，**不按 `revision` 降序**（现有 `displays()` 按 revision 排，常驻骨架沿用=激活族跳位破「常驻」视觉）。
 
 ## AD-10 族卡摘要主 cell（FamilyPrimaryCellMapper）+ 族态 occupancy 聚合（Phase 4a）
@@ -159,6 +159,13 @@ spec.md:83 / R2 锁「10 族 family_card 全景常驻」，但 producer 0 字段
 - ⏳ **P1-4/P2-2 defer 4b**：changing 视觉强度（一闪而过客户跟不上执行）/ ambient 红色块增强（偏小偏淡）。
 - 📝 **P2-1/P2-3/P2-4 记录**：force-state 脚手架 normal/satisfied 大图坍缩（README 措辞已修）/ readback 占上方 Phase 5 三 zone 解 / 默认淡角标 vs 非默认 title scope 呈现不一致（grill 裂缝⑤已锁）。
 - **方法论**：force-state 14 张是「满屏丰富视觉」5-gate 脚手架，**不代表真实台本时刻**（真实冷启动/单族激活/低排位滚动从未被 force-state 截图验证）→ 补 cold-start 真实截图（claim-vs-reality 第10变体：脚手架图≠用户真实看到）。
+
+### 十、codex 跨厂商终审收口（OpenAI vs Anthropic，2026-06-25，verdict=V-CONDITIONAL）
+gptpro 异源审屏幕锁屏卡死 + hermes-xhigh 端点挂/hermes-doubao async 不可取 → codex(OpenAI CLI 不依赖屏幕) 兜底真 cross-vendor。**无 P0**；claim-vs-reality a/b/c/d 全成立（codex python 实算 displayOrder=row_count 降序 sum=2159 / 复用 displays():230 不重写 / vehicle→nil / 10族主cell）。
+- ✅ **P2 已修**：design.md 说遍历 allCases 实际 displayOrder（已纠 AD-9，二者覆盖同 10 族非功能 bug）。
+- 🔴 **P1（跨厂商独抓 Claude 同家族盲点，真 finding 亲核坐实）= state-cells.yaml 未 bundle 化**：`StateCellPresentationCatalog.loadStateCellsYAML()`（`UIValueTypeMapper.swift:395`）bundle 查不到（**打包 .app Resources phase 空 `files=()`（pbxproj:158）+ SPM exclude contracts（Package.swift:21）→ 真无 yaml**）→ 退 `#filePath`(`:404`) host 源路径。**Mac/模拟器（demo 主路径，lens1 ⭐Mac主设备）工作**（#filePath 在 host 解析）；**真 iPhone standalone（D4 加分）该路径不存在 → catalog 空 → `defaultScope=nil` → 裂缝⑤淡显退化成全 scope 进 title + `aggregateScopeLabel=nil` 无全车/前排聚合**。Claude 3 轮聚焦 Presentation 逻辑 + 跑 swift test(用 #filePath dev 态)，**隐式认为 dev/模拟器=真机发布态**，codex 从 Package.swift+pbxproj 两线交叉坐实真 P1。
+  - **辩证收（steelman defer）**：① **pre-existing**（前任孤立模块 loadStateCellsYAML，非本次 4a 回归）② **demo 主路径 Mac/模拟器工作**（CLAUDE §4 Mac主/iPhone加分 + lens1 ⭐Mac主设备）③ **修需碰共享 Xcode infra（pbxproj bundling）或 codegen typed catalog 管线**，全自动磊哥睡时不擅动 ④ **属打包/部署关注**（Phase 6 现场 SOP / shipping，iPhone standalone target）。
+  - **fix path（待磊哥/打包阶段，修后升 V-PASS）**：① app target Resources phase 加 `contracts/state-cells.yaml`（bundle 化）**或** ② codegen typed Swift catalog（编译进 Core/Presentation，零运行时文件依赖，最 robust，对齐 SSOT codegen 纪律）③ 加 bundle 存在性测试/pre-commit grep pbxproj 防回归。**真机 demo 前必修**（否则 iPhone 脱机 scope 呈现退化）。
 
 ## 不做（demo 轻治理 / DEFERRED 边界）
 
