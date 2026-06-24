@@ -723,6 +723,41 @@ final class C6VehicleToolBenchTests: XCTestCase {
         }
     }
 
+    func testSummaryReportsExternalLayerAndBehaviorClassSeparately() throws {
+        let runner = try makeRunner()
+        let safety = C6BenchCase.fixture(
+            bucket: .refusal,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: ["vehicle.speed": "30"],
+            readbackContains: ["行驶中"],
+            clarifyTag: .rejected,
+            preState: ["vehicle.speed": "30", "vehicle.gear": "D"],
+            sourceRefs: C6SourceRefs(riskRuleIDs: ["door_open_while_moving"]),
+            behaviorClass: .refusalSafetyOrPolicy
+        )
+        let already = C6BenchCase.fixture(
+            bucket: .noCall,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: [],
+            clarifyTag: .implicit,
+            preState: ["ac.power": "on"],
+            behaviorClass: .alreadyStateNoop
+        )
+
+        let runs = try [
+            runner.evaluate(case: safety, output: C6RuntimeOutput(toolCalls: [], text: "行驶中不能开门"), runIndex: 0),
+            runner.evaluate(case: already, output: C6RuntimeOutput(toolCalls: [], text: ""), runIndex: 1)
+        ]
+        let summary = runner.summarize(cases: [safety, already], runs: runs, validation: goldValidation(caseCount: 2))
+
+        XCTAssertEqual(summary.behaviorClassStats.first { $0.behaviorClass == .refusalSafetyOrPolicy }?.caseCount, 1)
+        XCTAssertEqual(summary.behaviorClassStats.first { $0.behaviorClass == .alreadyStateNoop }?.caseCount, 1)
+        XCTAssertEqual(summary.externalLayerStats.first { $0.layer == .safety }?.caseCount, 1)
+    }
+
     func testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex() throws {
         let runner = try makeRunner()
         let generator = try makeGenerator()

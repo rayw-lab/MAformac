@@ -269,6 +269,28 @@ public enum C6CaseBehaviorClassResolver {
     }
 }
 
+public enum C6ExternalLayer: String, Codable, CaseIterable, Equatable, Sendable {
+    case golden
+    case demoFuzz = "demo_fuzz"
+    case unsupported
+    case safety
+}
+
+public enum C6ExternalLayerSelector {
+    public static func layer(for item: C6BenchCase) -> C6ExternalLayer {
+        if !item.sourceRefs.riskRuleIDs.isEmpty || item.behaviorClass == .refusalSafetyOrPolicy {
+            return .safety
+        }
+        if item.behaviorClass == .refusalNoAvailableTool {
+            return .unsupported
+        }
+        if item.tags.bucket == .coverage || item.tags.sampleKind.contains("coverage") || item.tags.sampleKind.contains("fuzz") {
+            return .demoFuzz
+        }
+        return .golden
+    }
+}
+
 public struct C6DatasetValidation: Equatable, Sendable {
     public var caseCount: Int
     public var negativeRatio: Double
@@ -685,6 +707,34 @@ public struct C6PerCaseStats: Codable, Equatable, Sendable {
     }
 }
 
+public struct VehicleToolBehaviorClassStats: Codable, Equatable, Sendable {
+    public var behaviorClass: VehicleToolBehaviorClass
+    public var caseCount: Int
+    public var runCount: Int
+    public var hardFailureCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case behaviorClass = "behavior_class"
+        case caseCount = "case_count"
+        case runCount = "run_count"
+        case hardFailureCount = "hard_failure_count"
+    }
+}
+
+public struct C6ExternalLayerStats: Codable, Equatable, Sendable {
+    public var layer: C6ExternalLayer
+    public var caseCount: Int
+    public var runCount: Int
+    public var hardFailureCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case layer
+        case caseCount = "case_count"
+        case runCount = "run_count"
+        case hardFailureCount = "hard_failure_count"
+    }
+}
+
 public struct C6Summary: Codable, Equatable, Sendable {
     public var status: String
     public var modelID: String
@@ -703,6 +753,8 @@ public struct C6Summary: Codable, Equatable, Sendable {
     public var scenarioScore: Double
     public var hardFailureCount: Int
     public var noToolFalsePositiveCount: Int
+    public var behaviorClassStats: [VehicleToolBehaviorClassStats]
+    public var externalLayerStats: [C6ExternalLayerStats]
     public var perCaseStats: [C6PerCaseStats]
     public var evalRuns: [C6EvalRun]
 
@@ -724,6 +776,8 @@ public struct C6Summary: Codable, Equatable, Sendable {
         case scenarioScore = "scenario_score"
         case hardFailureCount = "hard_failure_count"
         case noToolFalsePositiveCount = "no_tool_false_positive_count"
+        case behaviorClassStats = "behavior_class_stats"
+        case externalLayerStats = "external_layer_stats"
         case perCaseStats = "per_case_stats"
         case evalRuns = "eval_runs"
     }
@@ -1253,6 +1307,8 @@ public struct C6BenchRunner: Sendable {
         let coverageScore = min(1.0, representedRatio)
         let hardFailures = runs.filter(\.gateResult.hardFailed).count
         let falsePositiveCount = runs.map(\.gateResult.noToolFalsePositiveCount).reduce(0, +)
+        let behaviorStats = Self.behaviorClassStats(cases: cases, runsByCase: runsByCase)
+        let layerStats = Self.externalLayerStats(cases: cases, runsByCase: runsByCase)
         let perCase = runsByCase.keys.sorted().map { caseID in
             let items = runsByCase[caseID] ?? []
             let hardPasses = items.map { $0.gateResult.hardFailed ? 0.0 : 1.0 }
@@ -1287,9 +1343,51 @@ public struct C6BenchRunner: Sendable {
             scenarioScore: scenarioScore,
             hardFailureCount: hardFailures,
             noToolFalsePositiveCount: falsePositiveCount,
+            behaviorClassStats: behaviorStats,
+            externalLayerStats: layerStats,
             perCaseStats: perCase,
             evalRuns: runs.sorted { ($0.caseID, $0.runID) < ($1.caseID, $1.runID) }
         )
+    }
+
+    private static func behaviorClassStats(
+        cases: [C6BenchCase],
+        runsByCase: [String: [C6EvalRun]]
+    ) -> [VehicleToolBehaviorClassStats] {
+        let grouped = Dictionary(grouping: cases.compactMap { item -> (VehicleToolBehaviorClass, C6BenchCase)? in
+            guard let behaviorClass = C6CaseBehaviorClassResolver.resolve(item) else {
+                return nil
+            }
+            return (behaviorClass, item)
+        }, by: { $0.0 })
+
+        return grouped.keys.sorted { $0.rawValue < $1.rawValue }.map { behaviorClass in
+            let items = grouped[behaviorClass]?.map(\.1) ?? []
+            let runs = items.flatMap { runsByCase[$0.caseID] ?? [] }
+            return VehicleToolBehaviorClassStats(
+                behaviorClass: behaviorClass,
+                caseCount: items.count,
+                runCount: runs.count,
+                hardFailureCount: runs.filter(\.gateResult.hardFailed).count
+            )
+        }
+    }
+
+    private static func externalLayerStats(
+        cases: [C6BenchCase],
+        runsByCase: [String: [C6EvalRun]]
+    ) -> [C6ExternalLayerStats] {
+        let grouped = Dictionary(grouping: cases, by: { C6ExternalLayerSelector.layer(for: $0) })
+        return grouped.keys.sorted { $0.rawValue < $1.rawValue }.map { layer in
+            let items = grouped[layer] ?? []
+            let runs = items.flatMap { runsByCase[$0.caseID] ?? [] }
+            return C6ExternalLayerStats(
+                layer: layer,
+                caseCount: items.count,
+                runCount: runs.count,
+                hardFailureCount: runs.filter(\.gateResult.hardFailed).count
+            )
+        }
     }
 
     private func clarifyGateMatches(
