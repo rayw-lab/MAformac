@@ -14,6 +14,8 @@ FORBIDDEN = [
     (ROOT / "Core" / "Execution" / "C3ExecutionPipeline.swift", re.compile(r'\?\?\s*"全车"')),
     (ROOT / "Core" / "Contracts" / "ToolContractCompiler.swift", re.compile(r"scope\.first")),
     (ROOT / "Core" / "Contracts" / "ToolContractCompiler.swift", re.compile(r'\?\?\s*"all"')),
+    (ROOT / "Core" / "Contracts" / "ToolContractCompiler.swift", re.compile(r"try\?\s*C2ScopeResolver\.resolve")),
+    (ROOT / "Core" / "Contracts" / "ToolContractCompiler.swift", re.compile(r"ScopeResolution\(keys:\s*\[cellID\]")),
 ]
 
 

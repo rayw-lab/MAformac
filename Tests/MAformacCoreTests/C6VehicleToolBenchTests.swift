@@ -51,6 +51,32 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(mp017.expectedStateDelta, ["window.position[主驾]": "20"])
     }
 
+    func testDefaultScopeWindowGoldVerificationCarriesScopeOriginEvidence() throws {
+        let generator = try makeGenerator()
+        let cases = try generator.generate()
+        let stateCells = try makeStateCells()
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRootURL())
+        let targetCases = cases.filter { ["C6-MP-014", "C6-MP-015"].contains($0.caseID) }
+
+        let report = C6GoldVerifier().report(
+            cases: targetCases,
+            stateCells: stateCells,
+            validation: generator.validate(cases),
+            irMap: irMap
+        )
+
+        let omittedResult = report.results.first { result in
+            result.caseID == "C6-MP-014" && result.candidateID == "primary"
+        }
+        let fanoutResult = report.results.first { result in
+            result.caseID == "C6-MP-015" && result.candidateID == "primary"
+        }
+        let omitted = try XCTUnwrap(omittedResult)
+        let fanout = try XCTUnwrap(fanoutResult)
+        XCTAssertEqual(omitted.scopeOriginEvidence["window.position[主驾]"], "defaulted")
+        XCTAssertEqual(Set(fanout.scopeOriginEvidence.values), ["fanout"])
+    }
+
     func testDatasetCodecDefaultsMissingAlternativesToEmptyArray() throws {
         let jsonl = """
         {"case_id":"C6-OLD-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off"},"input_zh":"打开空调","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none"}
@@ -816,12 +842,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
     }
 
     private func readRepoFile(_ relativePath: String) throws -> String {
-        let testFile = URL(fileURLWithPath: #filePath)
-        let repoRoot = testFile
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        return try String(contentsOf: repoRoot.appendingPathComponent(relativePath), encoding: .utf8)
+        try String(contentsOf: repoRootURL().appendingPathComponent(relativePath), encoding: .utf8)
     }
 
     private func missingReadbackStateCells() throws -> StateCellContractLookup {

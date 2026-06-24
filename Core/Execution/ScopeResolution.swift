@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ScopeOrigin: String, Equatable, Sendable {
+public enum ScopeOrigin: String, Codable, Equatable, Sendable {
     case defaulted
     case explicit
     case fanout
