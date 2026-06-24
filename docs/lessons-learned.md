@@ -185,3 +185,5 @@
 13. **🟡 C6 expected delta 要区分“主期望 final value”和 C2 dependency side-effect**:空调温度写入会按 C2 `depends_on` 同步打开 `ac.power`;若 C6 exact delta 粗暴要求“只改 expectedStateDelta keys”,会把合法 dependency 当 unexpected mutation。→ **exact delta gate 要允许 C2 声明的 dependency side-effect,但 readback/expected delta 不必把每个 dependency 都当主期望;否则会逼 JSONL 写伪读回。**
 
 14. **🟡 SwiftPM helper 卡死不能扩成“测试失败”或“验证通过”**:本轮多次 filtered test/direct xctest 卡在 `swiftpm-xctest-helper`;清理 helper + serial rerun 后 focused tests 正常过。→ **SwiftPM 卡死只算 infra interruption,不算 pass/fail;最终 receipt 只记录成功复跑的原命令和 log,并避免并行 SwiftPM 测试。**
+
+15. **🟡 source-free CI 里的本机 fixture 测试要显式 skip,不能红也不能假装覆盖**:GitHub runner 无 `/Users/wanglei/.cache/huggingface/...` 和 Homebrew python@3.13,`testPythonMaskOffsetFixtureRunsTrainingTokenizerPath` 在 CI 红,但这是本机 tokenizer integration proof 缺 fixture,不是 default_scope 代码失败。→ **依赖本机模型/cache/raw 的测试用 `XCTSkip` 明确环境缺失;CI proof boundary 写清 source-free,本地有 fixture 的 `verify-all` 继续跑真路径。**
