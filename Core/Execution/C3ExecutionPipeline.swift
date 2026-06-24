@@ -28,6 +28,11 @@ public struct C2ReadbackVerifier: Sendable {
     }
 }
 
+private struct PlannedTransition: Equatable {
+    var transition: DemoMockTransition
+    var scopeOrigin: ScopeOrigin?
+}
+
 public struct C3ExecutionPipeline: Sendable {
     public var semantic: SemanticContractLookup
     public var stateCells: StateCellContractLookup
@@ -103,19 +108,25 @@ public struct C3ExecutionPipeline: Sendable {
         }
 
         let transitions = try planTransitions(for: frame, store: store)
-        traceLogger.recordPlan(traceID: frame.traceID, message: transitions.map { "\($0.key)=\($0.desiredValue)" }.joined(separator: ","))
+        traceLogger.recordPlan(
+            traceID: frame.traceID,
+            message: transitions.map { "\($0.transition.key)=\($0.transition.desiredValue)" }.joined(separator: ",")
+        )
         traceLogger.recordGuard(traceID: frame.traceID, message: "allow", attributes: TraceAttributes(guardReason: "allow"))
 
         var readbacks: [DemoActionReadback] = []
-        for transition in transitions {
+        for planned in transitions {
+            let transition = planned.transition
             let applied = store.applyMockTransition(transition)
             traceLogger.recordExecute(traceID: frame.traceID, message: "\(applied.key)=\(applied.actualValue)")
             var verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
+            verified.scopeOrigin = planned.scopeOrigin
             // gap#5:播报优先消费 C2 readback_zh 模板,而非 store 硬编码兜底。
             if let rendered = stateCells.renderReadback(
                 stateKey: transition.key,
                 scope: scope(forKey: transition.key),
-                value: verified.actualValue
+                value: verified.actualValue,
+                scopeOrigin: planned.scopeOrigin
             ) {
                 verified.spokenText = rendered
             }
@@ -131,7 +142,7 @@ public struct C3ExecutionPipeline: Sendable {
     }
 
     @MainActor
-    private func planTransitions(for frame: ToolCallFrame, store: DemoVehicleStateStore) throws -> [DemoMockTransition] {
+    private func planTransitions(for frame: ToolCallFrame, store: DemoVehicleStateStore) throws -> [PlannedTransition] {
         guard let cellID = executionCellID(for: frame) else {
             throw ToolExecutionError.semanticInvalid("no_execution_cell")
         }
@@ -139,16 +150,23 @@ public struct C3ExecutionPipeline: Sendable {
             throw ToolExecutionError.semanticInvalid("missing_c2_cell:\(cellID)")
         }
 
-        var transitions: [DemoMockTransition] = []
+        var transitions: [PlannedTransition] = []
         if frame.device == "ac_temperature",
            frame.actionPrimitive != "query",
            store.cell(for: "ac.power")?.actualValue != "on" {
-            transitions.append(DemoMockTransition(key: "ac.power", desiredValue: "on"))
+            transitions.append(PlannedTransition(
+                transition: DemoMockTransition(key: "ac.power", desiredValue: "on"),
+                scopeOrigin: nil
+            ))
         }
 
-        for key in try targetKeys(for: frame, cell: cell) {
+        let resolution = try C2ScopeResolver.resolve(frame: frame, cell: cell)
+        for key in resolution.keys {
             let desiredValue = try normalizeValue(frame: frame, cell: cell, key: key, store: store)
-            transitions.append(DemoMockTransition(key: key, desiredValue: desiredValue))
+            transitions.append(PlannedTransition(
+                transition: DemoMockTransition(key: key, desiredValue: desiredValue),
+                scopeOrigin: resolution.origin
+            ))
         }
         return transitions
     }
@@ -160,32 +178,6 @@ public struct C3ExecutionPipeline: Sendable {
         // 复用 ToolContractStateApplier.deviceCellMap 单一 SSOT(消除 C3 switch / S2 deviceCellMap / allowlist
         // 三处 device→cell 平行硬编码分叉, claim-vs-reality 铁律1; 并 fix C3 旧 switch 缺 ac_windspeed)。
         return ToolContractStateApplier.deviceCellMap[frame.device]
-    }
-
-    private func targetKeys(for frame: ToolCallFrame, cell: StateCellDefinition) throws -> [String] {
-        guard !cell.scope.isEmpty else {
-            return [cell.id]
-        }
-
-        let requested = frame.slots["direction"]
-            ?? frame.slots["position"]
-            ?? frame.slots["screen_type"]
-            ?? frame.slots["name"]
-            ?? "全车"
-
-        if requested == "全车" {
-            return cell.scope
-                .filter { $0 != "全车" && !$0.hasSuffix("屏") && !$0.hasSuffix("氛围灯") }
-                .map { scopedKey(cell.id, scope: $0) }
-        }
-        guard cell.scope.contains(requested) else {
-            throw ToolExecutionError.semanticInvalid("slot_out_of_scope")
-        }
-        return [scopedKey(cell.id, scope: requested)]
-    }
-
-    private func scopedKey(_ cellID: String, scope: String) -> String {
-        "\(cellID)[\(scope)]"
     }
 
     /// 从 scoped mock key(如 `ac.temp_setpoint[主驾]`)提取 scope 段;无 scope 返回 nil。

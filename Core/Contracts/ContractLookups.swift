@@ -170,7 +170,7 @@ public struct StateCellContractLookup: Sendable {
     /// mock state key 形如 `ac.temp_setpoint[主驾]` → 取 base cell id 查模板,把 scope/value 填入占位符。
     /// 模板占位符按 C2 现状有 `{温区}/{位置}/{屏幕}/{氛围灯}`(均代表 scope)与 `{值}`;
     /// enum 形如 `空调{已打开|已关闭}` 由调用方传 enum 渲染。无模板时返回 nil,交回调用方走兜底。
-    public func renderReadback(stateKey: String, scope: String?, value: String) -> String? {
+    public func renderReadback(stateKey: String, scope: String?, value: String, scopeOrigin: ScopeOrigin? = nil) -> String? {
         let baseID = stateKey.contains("[") ? String(stateKey.prefix(while: { $0 != "[" })) : stateKey
         guard let cell = cellsByID[baseID], let template = cell.readbackTemplate else {
             return nil

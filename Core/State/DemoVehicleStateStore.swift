@@ -74,12 +74,20 @@ public struct DemoActionReadback: Equatable, Sendable {
     public var actualValue: String
     public var revision: Int
     public var spokenText: String
+    public var scopeOrigin: ScopeOrigin?
 
-    public init(key: String, actualValue: String, revision: Int, spokenText: String) {
+    public init(
+        key: String,
+        actualValue: String,
+        revision: Int,
+        spokenText: String,
+        scopeOrigin: ScopeOrigin? = nil
+    ) {
         self.key = key
         self.actualValue = actualValue
         self.revision = revision
         self.spokenText = spokenText
+        self.scopeOrigin = scopeOrigin
     }
 }
 
