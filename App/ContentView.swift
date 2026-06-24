@@ -38,7 +38,7 @@ struct ContentView: View {
 
     private var vehicleCards: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 12)], spacing: 12) {
-            ForEach(store.cells) { cell in
+            ForEach(store.presentationCells) { cell in
                 VehicleStateCard(cell: cell)
             }
         }
@@ -105,17 +105,45 @@ private struct VehicleStateCard: View {
     }
 
     private var title: String {
-        switch cell.key {
+        let parts = scopedParts(for: cell.key)
+        switch parts.base {
         case "ac.power": return "空调"
-        case "hvac.temperature": return "温度"
-        case "seat.driver.heat": return "座椅加热"
-        case "seat.driver.ventilation": return "座椅通风"
-        case "window.driver": return "车窗"
-        case "lighting.ambient": return "氛围灯"
-        case "screen.brightness": return "屏幕亮度"
-        case "fan.speed": return "风量"
+        case "ac.temp_setpoint": return scopedTitle(parts.scope, suffix: "空调温度")
+        case "ac.fan_speed": return scopedTitle(parts.scope, suffix: "空调风量")
+        case "window.position": return scopedTitle(parts.scope, suffix: "车窗")
+        case "screen.brightness": return scopedTitle(parts.scope, suffix: "屏幕亮度")
+        case "ambient.brightness": return scopedTitle(parts.scope, suffix: "氛围灯亮度")
+        case "ambient.color": return "氛围灯颜色"
+        case "seat.heat_level": return scopedTitle(parts.scope, suffix: "座椅加热")
+        case "seat.vent_level": return scopedTitle(parts.scope, suffix: "座椅通风")
+        case "seat.backrest_angle": return scopedTitle(parts.scope, suffix: "座椅靠背")
+        case "wiper.power": return "雨刮"
+        case "wiper.speed": return scopedTitle(parts.scope, suffix: "雨刮速度")
+        case "sunroof.position": return scopedTitle(parts.scope, suffix: "天窗")
+        case "sunshade.position": return scopedTitle(parts.scope, suffix: "遮阳帘")
+        case "vehicle.speed": return "车速"
+        case "vehicle.gear": return "挡位"
         default: return cell.key
         }
+    }
+
+    private func scopedTitle(_ scope: String?, suffix: String) -> String {
+        guard let scope, !scope.isEmpty else {
+            return suffix
+        }
+        return "\(scope)\(suffix)"
+    }
+
+    private func scopedParts(for key: String) -> (base: String, scope: String?) {
+        guard let open = key.firstIndex(of: "["),
+              let close = key.firstIndex(of: "]"),
+              open < close else {
+            return (key, nil)
+        }
+        return (
+            String(key[..<open]),
+            String(key[key.index(after: open)..<close])
+        )
     }
 
     private var background: Color {

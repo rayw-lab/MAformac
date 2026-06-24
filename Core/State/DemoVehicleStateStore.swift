@@ -104,6 +104,10 @@ public final class DemoVehicleStateStore {
         cellsByKey.values.sorted { $0.key < $1.key }
     }
 
+    public var presentationCells: [DemoVehicleStateCell] {
+        cells.filter { !Self.legacyDisplayCompatibilityKeys.contains($0.key) }
+    }
+
     public var currentRevision: Int {
         cellsByKey.values.map(\.revision).max() ?? 0
     }
@@ -139,6 +143,16 @@ public final class DemoVehicleStateStore {
         cellsByKey = Dictionary(uniqueKeysWithValues: Self.defaultCells().map { ($0.key, $0) })
     }
 
+    public static let legacyDisplayCompatibilityKeys: Set<String> = [
+        "hvac.temperature",
+        "seat.driver.heat",
+        "seat.driver.ventilation",
+        "window.driver",
+        "lighting.ambient",
+        "screen.brightness",
+        "fan.speed"
+    ]
+
     public static func defaultCells() -> [DemoVehicleStateCell] {
         [
             DemoVehicleStateCell(key: "ac.power", actualValue: "off"),
@@ -146,6 +160,7 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "ac.temp_setpoint[副驾]", actualValue: "24"),
             DemoVehicleStateCell(key: "ac.temp_setpoint[左后]", actualValue: "24"),
             DemoVehicleStateCell(key: "ac.temp_setpoint[右后]", actualValue: "24"),
+            DemoVehicleStateCell(key: "ac.fan_speed[主驾]", actualValue: "1"),
             DemoVehicleStateCell(key: "window.position[主驾]", actualValue: "0"),
             DemoVehicleStateCell(key: "window.position[副驾]", actualValue: "0"),
             DemoVehicleStateCell(key: "window.position[左后]", actualValue: "0"),
@@ -153,6 +168,9 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "screen.brightness[中控屏]", actualValue: "70"),
             DemoVehicleStateCell(key: "ambient.brightness[面发光氛围灯]", actualValue: "70"),
             DemoVehicleStateCell(key: "ambient.color", actualValue: "白"),
+            DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "0"),
+            DemoVehicleStateCell(key: "seat.vent_level[主驾]", actualValue: "0"),
+            DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "50"),
             DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
             DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P"),
             DemoVehicleStateCell(key: "hvac.temperature", actualValue: "24"),
