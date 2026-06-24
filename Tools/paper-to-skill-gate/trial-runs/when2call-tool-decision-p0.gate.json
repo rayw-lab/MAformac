@@ -1,0 +1,106 @@
+{
+  "schema_version": "paper-to-skill-gate.v1",
+  "generated_at": "2026-06-24T08:36:17Z",
+  "paper": {
+    "title": "When2Call: When (not) to Call Tools",
+    "paper_type": "benchmark/training-data",
+    "year": 2025,
+    "venue": "NAACL 2025 / arXiv",
+    "arxiv_id": "2504.18851",
+    "identity_confidence": "live_verified"
+  },
+  "sources": [
+    {
+      "label": "arXiv abstract",
+      "url": "https://arxiv.org/abs/2504.18851",
+      "evidence_type": "paper",
+      "notes": "Live web verified paper identity."
+    },
+    {
+      "label": "Official repo",
+      "url": "https://github.com/NVIDIA/When2Call",
+      "evidence_type": "official_repo",
+      "notes": "GitHub metadata checked with gh repo view."
+    },
+    {
+      "label": "Local code clone",
+      "url": "Tools/paper-to-skill-gate/paper-repos/When2Call",
+      "evidence_type": "local_code",
+      "notes": "Local HEAD ecc8d42."
+    }
+  ],
+  "official_repo": {
+    "status": "cloned",
+    "repo": "NVIDIA/When2Call",
+    "url": "https://github.com/NVIDIA/When2Call",
+    "stars": 64,
+    "pushed_at": "2025-04-29T00:12:04Z",
+    "local_path": "Tools/paper-to-skill-gate/paper-repos/When2Call",
+    "local_head": "ecc8d42",
+    "code_mapping_status": "CODE_CONFIRMED"
+  },
+  "reference_repo_influences": [
+    "paper2code: classified four behavior labels and wrapper adaptation as implementation-relevant facts.",
+    "DeepPaperNote: report separates benchmark claim from MAformac C6 absorption.",
+    "MinerU-Document-Explorer: future batch index can retrieve this benchmark alongside BFCL/ACEBench.",
+    "paper-qa: contested metric claims should use source-grounded QA before proposal.",
+    "MinerU: PDF/OCR fallback retained if full paper section locators are needed.",
+    "docling-mcp: conversion/cache model remains available for future structured source extraction."
+  ],
+  "algorithm_traits": [
+    "Four-way tool decision labels",
+    "SFT and preference-tuning data formats",
+    "Synthetic refusal and missing-parameter generation",
+    "Tool hallucination metric for no-tool cannot-answer cases"
+  ],
+  "maformac_insertion_points": [
+    {
+      "path": "Core/Bench/C6VehicleToolBench.swift",
+      "lane": "rebuild_c6",
+      "recommendation": "Map direct/tool_call/request_for_info/cannot_answer to explicit C6 buckets and failure classes.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "contracts/c6-bench-cases.jsonl",
+      "lane": "rebuild_c6",
+      "recommendation": "Future cases should cover missing required parameter, no available tool, and irrelevant tool distractors.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Core/Training/C5LoRATraining.swift",
+      "lane": "retrain_c5",
+      "recommendation": "Track negative/clarify/refusal ratios separately from positive tool exact-match.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Tools/C5TrainingCLI/c5_mlx_train_loop.py",
+      "lane": "retrain_c5",
+      "recommendation": "Do not smuggle preference optimization into the current SFT loop.",
+      "proof_class": "local_static_teardown"
+    }
+  ],
+  "openspec_candidates": [
+    "Future C6 requirement: evaluation SHALL report no-call/refusal/clarify/tool-call separately.",
+    "Future C5 design note: preference data is an escape hatch, not current SFT training scope."
+  ],
+  "deliverables": [
+    "Tools/paper-to-skill-gate/trial-runs/when2call-tool-decision-p0.md",
+    "Tools/paper-to-skill-gate/trial-runs/when2call-tool-decision-p0.gate.json"
+  ],
+  "gate": {
+    "status": "rebuild_c6_input",
+    "proof_class": ["web_verified", "local_static_teardown", "schema_validated", "not_executed"],
+    "rationale": "Directly improves C6 negative/clarification/refusal taxonomy and guards against tool hallucination.",
+    "stop_conditions": [
+      "No DPO/RPO execution.",
+      "No direct import of upstream wrappers.",
+      "No judge-only final proof.",
+      "Do not collapse clarification and refusal into one negative class."
+    ]
+  },
+  "residual_risks": [
+    "Repo is not highly starred and was last pushed in 2025.",
+    "Full paper numeric claims were not page-locator extracted.",
+    "Preference optimization requires separate training proposal."
+  ]
+}

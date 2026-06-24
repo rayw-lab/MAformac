@@ -1,0 +1,100 @@
+{
+  "schema_version": "paper-to-skill-gate.v1",
+  "generated_at": "2026-06-24T08:36:17Z",
+  "paper": {
+    "title": "Optimizing Small Language Models for In-Vehicle Function-Calling",
+    "paper_type": "method/deployment",
+    "year": 2025,
+    "venue": "FITML@NeurIPS 2024 / arXiv",
+    "arxiv_id": "2501.02342",
+    "identity_confidence": "live_verified"
+  },
+  "sources": [
+    {
+      "label": "arXiv abstract",
+      "url": "https://arxiv.org/abs/2501.02342",
+      "evidence_type": "paper",
+      "notes": "Live web verified paper identity and abstract."
+    },
+    {
+      "label": "arXiv HTML",
+      "url": "https://arxiv.org/html/2501.02342v1",
+      "evidence_type": "paper",
+      "notes": "OCR/structured extraction candidate for later deep pass."
+    }
+  ],
+  "official_repo": {
+    "status": "no_official_repo_found",
+    "repo": "",
+    "url": "",
+    "stars": null,
+    "pushed_at": null,
+    "local_path": "",
+    "local_head": null,
+    "code_mapping_status": "NO_REPO"
+  },
+  "reference_repo_influences": [
+    "paper2code: ambiguity audit separates specified vehicle function calling from unspecified MAformac runtime parity.",
+    "DeepPaperNote: report keeps paper proof and MAformac absorption separate.",
+    "MinerU-Document-Explorer: later PDF/OCR pass should preserve sections/tables before proposal citation.",
+    "paper-qa: contested claims should be rerun as citation-grounded QA before load-bearing OpenSpec text.",
+    "MinerU: paper-only group is explicitly OCR-ready if PDF extraction is needed.",
+    "docling-mcp: lightweight document conversion fallback remains valid for future structured extraction."
+  ],
+  "algorithm_traits": [
+    "In-vehicle SLM function calling",
+    "Edge deployment pressure",
+    "Compression/quantization/pruning context",
+    "Paper-only until official implementation repo is found"
+  ],
+  "maformac_insertion_points": [
+    {
+      "path": "Core/Training/C5LoRATraining.swift",
+      "lane": "retrain_c5",
+      "recommendation": "Use as domain pressure for explicit vehicle D-domain training surface; no training authorization.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Core/Contracts/ToolContractCompiler.swift",
+      "lane": "tool_surface",
+      "recommendation": "Compare vehicle-function surface to concrete D-domain rendered tools; do not import gRPC assumptions.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Core/Bench/C6VehicleToolBench.swift",
+      "lane": "rebuild_c6",
+      "recommendation": "Future C6 cases should distinguish vehicle action success from generic assistant text.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Core/Execution/C3ExecutionPipeline.swift",
+      "lane": "runtime_execution",
+      "recommendation": "Keep MAformac guard/readback proof local; paper does not authorize runtime bypass.",
+      "proof_class": "local_static_teardown"
+    }
+  ],
+  "openspec_candidates": [
+    "Future OpenSpec note: in-vehicle SLM function-calling absorption checklist for C5/C6.",
+    "Future design note: compression/pruning is out of current Qwen3+LoRA mainline unless separately proposed."
+  ],
+  "deliverables": [
+    "Tools/paper-to-skill-gate/trial-runs/in-vehicle-function-calling-p0.md",
+    "Tools/paper-to-skill-gate/trial-runs/in-vehicle-function-calling-p0.gate.json"
+  ],
+  "gate": {
+    "status": "retrain_c5_input",
+    "proof_class": ["web_verified", "local_static_teardown", "schema_validated", "not_executed"],
+    "rationale": "Strongest domain-fit paper, but paper-only and model/runtime mismatch prevent immediate adoption.",
+    "stop_conditions": [
+      "No LoRA training.",
+      "No C6 rewrite.",
+      "No runtime latency or product proof claim.",
+      "Rerun official-repo branch if a repo is later found."
+    ]
+  },
+  "residual_risks": [
+    "Full PDF section/page locator not yet extracted.",
+    "No official repo was verified.",
+    "Phi-3 compression assumptions may not transfer to Qwen3/MLX."
+  ]
+}
