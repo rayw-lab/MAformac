@@ -67,9 +67,10 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 - **AND** SHALL NOT 任意两态坍缩到同一渲染
 
 #### Scenario: consume trace fields for reason text
-- **GIVEN** store 提供 `guardReason` / `readbackResult`
-- **WHEN** 渲染 clarify/unsupported/safety 态的提示文案
-- **THEN** UI 消费 `guardReason`/`readbackResult` 呈现原因，SHALL NOT 硬编码文案
+- **GIVEN** store 提供 reason（来源 = 统一 `reasons:[String:String]` @Observable map，cell 无 reason 字段符 DA1；E 组 E7）
+- **WHEN** 渲染 clarify/unsupported/safety/crash 态的提示文案
+- **THEN** UI 消费 `store.reason(for: cell.key)` 呈现原因（VehicleStateCard.reason），SHALL NOT 硬编码文案
+- **AND** reason **主承载 guardReason（blocked 态原因）**；satisfied 的 readback 归 **orb（E2 handoff）非卡片**（E 组 E7）。DA0 deny→态来源 = store `applyGuardBlock`（E5）+ reason→态映射（E6）= **Phase 5 执行链路接入**（详见 grill-master §3 E 组）
 
 #### Scenario: zone scope defaults to driver, no clarify interruption (D8.1)
 - **GIVEN** 区域 scope 功能点（空调温度/座椅/车窗等，main:state-cells.yaml scope=[主驾,副驾,...]）用户未指定区域

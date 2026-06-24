@@ -54,6 +54,8 @@ GlassEffectContainer { micButton.glassEffect(); statusBadge.glassEffect() }
 ## 2. 语音 orb / MeshGradient（U30，氛围层）
 
 - 🔴 **orb 核心 = native MeshGradient**（iOS18 ≤ 26，**直接用无 `#available`**）（U30）。第三方 siri-orb repo 全 stale，别引；自建 MeshGradient + TimelineView 四态（idle/think/speak/listen）。
+- 🔴 **E1 orb 实现（grill E 组 2026-06-24，全 SwiftUI 原生，零第三方球体/零 Metal）**：①**多层 MeshGradient**（底深空青紫慢漂 + 中 think 脉冲光晕 + 顶高光斑，DesignTokens glow.cyan/violet）②**breathing 物理** `spring(response:1.8,damping:0.7)` 微缩放 0.95↔1.05 ③**思考文字流光** adopt hanlin-ai `LoadingGradientText:24-67`（TimelineView 流光改深空青）④可选 `Canvas` 原生微粒子（think 漂/调用内聚）。**零 metasidd/Orb**（`pushedAt 2024-11-11`=19月 stale，github-first 淘汰）/**零 Inferno**（twostraws Metal fragment shader，撞 U30 shader 仅氛围层，非 orb 主体）。
+- 🔴 **E8 think 两语义（事件驱动，非计时）**：① **思考链路 think**（L3+「困了」）= **掩盖后端动态**（analyzing 演出掩盖场景宏处理 → 后端 10 族卡片 changing 跳动 `cardsDidStartChanging` = handoff 信号 → orb think→speak，3s 虚数非固定）② **安全拒识 think**（force「行驶开门」）= **演出固定 ~1.0s**（guard mock 即时，纯演「检测行驶状态」）。**barge-in 打断连续 L1**（U21，新输入打断旧 speak）。orb speak readback 与卡片 stagger 级联并行。权威 = grill-master §3 E 组。
 - 🔴 **shader（`.layerEffect`/Metal）仅氛围层**（U30）：layerEffect 最贵，与 mlx 抢 GPU 掉吞吐。orb 主体 MeshGradient，shader 只点缀。
 
 ```swift
