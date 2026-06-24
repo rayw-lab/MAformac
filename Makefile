@@ -21,7 +21,7 @@ GENERATED_DOMAIN := \
 	generated/strangler_map.json \
 	generated/rendered_tools_text
 
-.PHONY: verify verify-all swift-test verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface diff test clean-venv
+.PHONY: verify verify-all swift-test verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface verify-default-scope diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -29,7 +29,7 @@ GENERATED_DOMAIN := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface diff test
+verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-default-scope diff test
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
@@ -47,6 +47,11 @@ verify-cross-section:
 verify-surface: .venv/.deps.stamp
 	$(PYTHON) scripts/surface_consistency.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
 	$(PYTHON) scripts/verify_gold.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
+
+verify-default-scope: .venv/.deps.stamp
+	$(PYTHON) scripts/check_default_scope_ssot.py
+	$(PYTHON) scripts/check_c5_c2_scope_parity.py
+	$(PYTHON) scripts/check_scope_origin_single_source.py
 
 # source-free: 只校验已提交产物(JSONL/YAML/coverage/state-cells/manifest)自洽与引用,
 # 不依赖 raw xlsx 快照(别人 clone 仓无 snapshot 也能验契约). verify-refs 只读 manifest+committed, 不读源表.
