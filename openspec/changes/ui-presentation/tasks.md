@@ -64,10 +64,11 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 7.A3 scope 呈现 ✅**裂缝⑤拍 B 淡显**：**默认 scope = 淡显角标**（「车窗 100%」+ 淡「主驾」低对比，知范围不打断）/ **非默认（副驾/全车）= 三处显式**；卡片角标 / readback `{位置}` / TTS 三处同源（默认淡显非省略）
 - [ ] 7.A4 多轮叠加 scope ✅**用户故事④拍 a 升级聚合**：「打开车窗」→「副驾也打开」→ 卡片升级聚合成范围词「前排车窗」（非双角标，跟全车聚合同逻辑）｜D1 继承 + G20 passthrough
 
-### 7.B 思考链路演出（对话级 orb `think` 态，Phase 5 后续，**不在本 change 实装**）
-- [ ] 7.B1 orb `think` 假 COT phase 机（思考中→调用中→方案，~3s）｜对话级非卡片态
-- [ ] 7.B2 多变文案序列 / 7.B3 手机视觉占位 / 7.B4 接 NLU L3+ 信号触发 / 7.B5 兜底态展示
-- 归属：Phase 5 orb TimelineView idle/`think`/speak/listen（hig-rules:56 已留位）；demo 场景宏即时（范式§175），后续真 LoRA 用 γ（3s 固定+规则兜底）
+### 7.B 思考链路演出（对话级 orb `think` 态，Phase 5 后续，**不在本 change 实装**）—— 🔴 **E 组 grill 收口（E0-E8，详见 grill-master §3 E 组）**
+- [ ] 7.B1 orb `think` 假 COT **事件驱动**（E2 非计时：analyzing 掩盖后端→**后端卡片跳动 `cardsDidStartChanging` 事件**=handoff→speak readback，3s 虚数）｜对话级非卡片态
+- [ ] 7.B2 orb 实现 E1（自建多层 MeshGradient+breathing+hanlin 文字+可选 Canvas 粒子，零 metasidd/零 Inferno）/ 7.B3 think 两语义 E8（思考链路掩盖动态 vs 安全拒识演出固定 1.0s）/ 7.B4 触发 E3（Core SceneMacroMatcher→macro_id 信号+force 长按 orb 1.5s+L1 listen 微亮+barge-in U21）/ 7.B5 场景宏 E4（首批4宏+narration 2字段+trigger_tags 10同义词，Core scenario-macros.yaml）
+- 🔴 **DA0 deny→态 E5-E7**（执行链路，Phase 5）：store `applyGuardBlock(key:String,态,reason)` 非throw + reason→态映射 E6 + 统一 `reasons` map E7 + `systemFailure` 真异常；**主流程 DemoFastPathGuard 占位（只演打开空调），安全拒识 deny 体系要扩 guard 接 C3**
+- 归属：思考链路 orb+SceneMacroMatcher=Core/Features+UIUE（Phase 5）；DA0 deny→态影响本 change R1（7态消费+reason）；voice 音频/炸场 DEFERRED
 
 ### 7.C clarify 态（少用，已定）
 - [x] 7.C1 clarify 枚举保留、主线少用 ✅（D7 7 态含 blocked_with_alternative）
