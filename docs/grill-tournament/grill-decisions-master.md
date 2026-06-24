@@ -224,6 +224,24 @@
   - **用户故事④ 多轮叠加 scope ✅拍（a 升级聚合）**：「打开车窗」(主驾)→「副驾也打开」(G20 显式二轮) → 卡片**升级聚合成范围词**（「前排车窗 100%」，跟全车聚合同逻辑），非双角标。视觉一致：多 scope 都聚合成范围词（前排/全车）。
 - **UIUE 消费（G28，G22 不进后端 blocker）**：ui-presentation **读 state-cells `default_scope`** 渲染默认 scope 卡片（非全车 fan-out）；合流 rebase main 拿 `default_scope` 字段。**change 归属 ✅拍：独立 `define-demo-default-scope` change**（G24，磊哥 2026-06-24 拍——default_scope 跨 C3/Compiler/C6/C5/UIUE 多方依赖，独立 change 单一职责），UIUE tasks 依赖此 change。
 
+### D7 补强 grill 清单（DA0-DA8，2026-06-24，D7 收尾打磨 + cite-verify 翻盘 codex DA1）
+
+> D7（7 态视觉消费）已 apply（commit 6a3e3f9）+ 审计 CLEAR。进 Phase 4 前 grill D7 补强。CC ⭐ + cite-verify + codex/磊哥辩证。🔴 **DA1 cite-verify 翻盘**：codex 说「接 traceLogger.guardReason」必补 γ，核源发现主流程无 guardReason 源（见 DA0）→ 真补强是 DA0 执行链路（**没核源就按 codex 写 = 返工**）。
+
+| DA | 补强点 | cite | 决策（磊哥 2026-06-24 全拍） |
+|---|---|---|---|
+| **DA0** | 主流程执行→7 态映射 | `DemoWalkingSkeleton:34-40` guard `.deny`→`throw`（非 set unsafe 态）/ `store:119` 只 `satisfied`/`normal` / `:36,38` recordGuard `message:` 不填 `guardReason`（nil）/ ContentView guard deny→`errorText` 红字（绕过 7 态卡片）= **D7 spec R1「安全拒识不渲红字」主流程未落地** | 🔴 **归 Phase 5 demo 链路（A）**：D7 收视觉层（force-state 已演 7 态）；DA0 执行→态链路（deny→`unsafe` 态非异常 + guard reason→对应态 + 填 `guardReason` 属性 + ContentView 去 guard-deny 红字）跟主流程智能态（思考链路 orb / 安全拒识触发）一起 Phase 5 接 |
+| ~~DA1~~ | 接 reason | = **DA0 子集**（DA0 填 guardReason 后 reason 自然有源；现 guardReason nil 接不了）| 并入 DA0 |
+| ~~DA2~~ | 低电量双通道 | onAppear 只 guard reduceMotion | 🔪 **砍**（磊哥「低电量不考虑」；ReduceMotion 双通道 D7 已有）|
+| **DA3** | snapshot 自动回归 | tasks 3.4，现 simctl 手动 | 🟡 待 spike（ImageRenderer 能否截 `.shadow` glow，5min；不能则 simctl 自动化）|
+| **DA4** | normal vs blocked_hard 同 bg | `DesignTokens:51,67` 同 `inkDim2.opacity(0.10)` | 🟡 5-gate hex 冻结时 normal bg 提亮一档（无障碍：border+icon 对色弱不够）|
+| **DA5** | macOS 端 7 态截图 | 现只 iOS sim 截 | 🔴 **现补失败→降级**（2026-06-24）：macOS GUI 截图在**磊哥工作屏幕**跑 = `screencapture -R<bounds>` 时序不稳（app 没起全/被盖时截到**下层飞书窗口=磊哥隐私**，逐张 Read catch，未入仓）。R4 双端证据降级 = ① macOS app `BUILD SUCCEEDED`（已验，证 macOS 端编译）② 同源 SwiftUI + DesignTokens（iOS 已截 7 态，macOS 渲染同源）③ 1 态 unsafe 截对（证 macOS 能渲）。**完整 macOS 7 态截图留干净屏幕环境补**（现场彩排/独立屏/iOS-only 模拟器，**不在磊哥工作屏跑 GUI 截图**）|
+| **DA6** | tokens.md↔DesignTokens 单源 | DesignTokens 硬编 hex vs tokens.md DRAFT（两份=裂缝④同类）| 🟡 5-gate 后：⭐**手动同步+标注主从**（tokens.md 权威，DesignTokens 标「派生禁手改」）+ cross-check 脚本（grep hex 一致），**不 codegen**（demo 轻治理）|
+| **DA7** | hvac 命名债 | `ContentView:143` title `hvac.*` | 🟢 Phase 4/A2 交汇收（tasks 4.5）|
+| **DA8** | 空 store 边界态 | `store.cells` 空时显示？ | 🔪 砍（demo 现场不会空）|
+
+**净 grill 价值（cite-verify > codex 半小时前判断）**：codex 说 DA1 必补 γ，cite-verify 翻盘 = 主流程 `DemoWalkingSkeleton` **guard deny 走 `throw`→errorText 红字（非 unsafe 态）+ 只产 satisfied/normal 2 态 + guardReason nil** → DA1 接不存在的源（返工）；真补强 = DA0 执行→7 态映射（Phase 5）。**D7 视觉层 ✅（7 态能渲 + force-state 演），但执行层主流程只 2 态 + deny 异常红字 = D7 契约主流程未落地 → DA0 Phase 5 接。**
+
 ---
 
 ## §4 已拍决策晶体表（不可推翻，索引正文权威）
