@@ -10,7 +10,7 @@ PROPOSE-READY (2026-06-24) — Scenario 已填实（磊哥拍 A：晶体化 D1-D
 
 ### Requirement: ContentView SHALL render all 7 DemoVisualState cases distinctly with four-state separation
 
-UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown）穷尽 `@ViewBuilder switch`，每态独立渲染分支；SHALL NOT 用 `== .satisfied ? a : b` 把 7 态压成二值，SHALL NOT 用 `default:` 兜底吞态；四态 SHALL 分开渲染（`blocked_with_alternative` 琥珀 clarify ≠ `blocked_hard` 灰 unsupported ≠ `unsafe` 红 safety ≠ `unknown` 灰 crash）；色彩语义 SHALL 从 `docs/design/tokens.md §2` 取（语义分类，不锁 hex）。
+UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown）**穷尽 switch**（实现自由：值 switch 如 `CardAppearance.of()` / `@ViewBuilder` view-switch 均可，**SHALL 无 default 吞态**=编译器强制穷尽），每态独立渲染分支；SHALL NOT 用 `== .satisfied ? a : b` 把 7 态压成二值，SHALL NOT 用 `default:` 兜底吞态；四态 SHALL 分开渲染（`blocked_with_alternative` 琥珀 clarify ≠ `blocked_hard` 灰 unsupported ≠ `unsafe` 红 safety ≠ `unknown` 灰 crash）；色彩语义 SHALL 从 `docs/design/tokens.md §2` 取（语义分类，不锁 hex）。
 
 #### Scenario: normal renders dim idle card
 - **GIVEN** 一张卡片 `visualState == .normal`
@@ -57,7 +57,7 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 #### Scenario: exhaustive switch, no default fallback, no binary collapse
 - **GIVEN** ContentView 消费 `DemoVisualState`
 - **WHEN** 编译与渲染
-- **THEN** 用穷尽 `@ViewBuilder switch`，7 态各有独立 case 分支
+- **THEN** 用穷尽 switch（值 switch `CardAppearance.of()` 或 `@ViewBuilder`，无 default），7 态各有独立 case 分支
 - **AND** SHALL NOT 有 `default:` 兜底吞态，SHALL NOT 用 `== .satisfied ? a : b` 把 7 态压成二值
 
 #### Scenario: four result states are pairwise visually distinct

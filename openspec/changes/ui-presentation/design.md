@@ -11,7 +11,7 @@ AD-1~AD-8 全拍；Phase 4 契约（AD-8.7 scope 呈现）文档先行，代码 
 
 ## AD-1 状态消费：7 态穷尽 switch（D7 头号刀）
 
-**决策**：`ContentView` 用 `@ViewBuilder` 对 `DemoVisualState` 7 态**穷尽 switch**，每态独立渲染分支，**禁** `== .satisfied ? a : b` 二值压缩。
+**决策**：`ContentView` 对 `DemoVisualState` 7 态**穷尽 switch**，每态独立渲染分支，**禁** `== .satisfied ? a : b` 二值压缩。实现 = `DesignTokens.swift CardAppearance.of()` **值 switch**（`func -> CardAppearance`，无 default 编译器强制穷尽）+ view 消费 appearance（非 @ViewBuilder view-switch，穷尽性等价；spec R1 措辞不锁实现）。
 
 - **7 态**：`normal`（灰蓝静默）/ `satisfied`（青紫辉光呼吸）/ `changing`（cyan 脉冲）/ `blocked_with_alternative`（🟡琥珀 clarify）/ `blocked_hard`（灰锁 unsupported）/ `unsafe`（🔴红描边 safety）/ `unknown`（灰 crash）。
 - **🔴 四态分开铁律**（U10）：clarify（琥珀）≠ unsupported（灰）≠ safety（红）≠ crash（灰）；**clarify/unsupported 是 demo 卖点（智能拒识），绝不渲成 unsafe/crash 的红**。色值单源 = `docs/design/tokens.md §2`。

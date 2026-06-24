@@ -28,8 +28,8 @@ D1-D7 二次深 grill（CC 5×⭐ + Codex 物理化 + 辩证 check）+ 30 决策
 > 以下指向已拍决策，**具体逐文件改法 = 各 Phase 落地 + `docs/grill-tournament/grill-decisions-master.md §3` 决策晶体的 A2 影响列**。
 
 - **新建 `ui-presentation` capability**：`openspec/specs/ui-presentation`，吸收 D1-D7 + U1-U31 视觉/状态消费决策。
-- **🔴 D7 7 态逐态视觉消费（头号刀）**：`ContentView` 绿/灰二值 → `DemoVisualState` 7 态穷尽 `@ViewBuilder switch`；**四态分开**（`blocked_with_alternative` 琥珀 clarify ≠ `blocked_hard` 灰 unsupported ≠ `unsafe` 红 safety ≠ `unknown` 灰 crash）；消费 trace `guardReason/readbackResult`。
-- **D3 卡片渲染 value.type 派生**（U26）：`state-cells.yaml` 加 `ui_value_type` 派生字段（数据 type≠UI value.type）；`enum + switch(ui_value_type)` 穷尽渲染（**非 AnyView**）；FamilyCardLayout 按 10 族 `family_card_id`（U13，非 191 格）。
+- **🔴 D7 7 态逐态视觉消费（头号刀）**：`ContentView` 绿/灰二值 → `DemoVisualState` 7 态**穷尽 switch**（实现 = `CardAppearance.of()` 值 switch + view 消费 appearance，无 default 吞态，编译器强制穷尽）；**四态分开**（`blocked_with_alternative` 琥珀 clarify ≠ `blocked_hard` 灰 unsupported ≠ `unsafe` 红 safety ≠ `unknown` 灰 crash）；消费 trace `guardReason/readbackResult`。
+- **D3 卡片渲染 value.type 消费侧派生**（U26）：`ui_value_type` 在 **UI 消费侧从 `cell.key` 派生**（数据 type≠UI value.type；**不写回 `state-cells.yaml`、不给 Core struct 加字段**，对齐 design AD-2 / spec R2 consumer-side，防裂缝④第二份 SSOT）；`enum + switch(ui_value_type)` 穷尽渲染（**非 AnyView**）；FamilyCardLayout 按 10 族 `family_card_id`（U13，非 191 格）。
 - **D5 状态切换动效 + 布局**：`Grid` 固定列（**非 `LazyVGrid(.adaptive)`**，C22）；`matchedGeometry` 状态切换（macOS 可用，非跨栈 zoom）按 promotion_criteria 5 条 gated upgrade（默认 opacityScale 兜底）。
 - **D1 多调用编排**：boot_phase 7 态 enum + MultiCallSequencer(stagger_delay_ms=220) + MAX_CONCURRENT_HIGHLIGHTS=1 + VisualStateTransport。
 - **D4 双端**：Mac+iPhone 两独立纯端侧 demo 实例（iPhone 脱机独立全功能接语音）；TransportKind{none,bonjour}（删 sharedFile 镜像）。
