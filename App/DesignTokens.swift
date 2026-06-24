@@ -20,6 +20,23 @@ enum DesignTokens {
     // MARK: 功能 / 语义态色（tokens.md §1.3 + §2）
     static let stateOffline = Color(hex24: 0xFFB13C)  // 琥珀 = clarify（非红）
     static let safetyRed = Color(hex24: 0xFF5C6C)     // safety（唯一红）
+
+    // MARK: 氛围灯色板（tokens.md §1.4，ambient.color 炸场色块；view 经此取，禁手填 hex）
+    /// `ambient.color` 枚举色名 → 色块 Color（深空暗底上 vivid 高对比）。
+    static func ambientColor(named name: String) -> Color {
+        switch name {
+        case "白", "白色": return Color(hex24: 0xEDEFF5)
+        case "红", "红色": return Color(hex24: 0xFF4D6D)
+        case "橙", "橙色": return Color(hex24: 0xFFB13C)
+        case "黄", "黄色": return Color(hex24: 0xFFD23C)
+        case "绿", "绿色": return Color(hex24: 0x3CE0A0)
+        case "青", "青色": return Color(hex24: 0x00E5FF)
+        case "蓝", "蓝色": return Color(hex24: 0x1AA6FF)
+        case "紫", "紫色": return Color(hex24: 0x7B5CFF)
+        case "粉", "粉色": return Color(hex24: 0xFF7AC6)
+        default: return Color(hex24: 0x7B5CFF)  // 回落 glow.violet
+        }
+    }
 }
 
 extension Color {

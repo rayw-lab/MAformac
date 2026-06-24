@@ -46,6 +46,22 @@ note: 🔴 **agent 生成任何 UI 前必读本文 + INDEX**。色值/字号/间
 | `bubble.user` | `linear(135deg, #1aa6ff → #5f2bff)` | 用户对话气泡 | scheme1:59 |
 | `bubble.ai` | `rgba(255,255,255,.06)` + 边 `.08` | AI 对话气泡 | scheme1:60 |
 
+### 1.4 氛围灯色板（ambient.color 炸场，Phase 4a，CC0 设计 + 磊哥「浅色高对比」）
+> 氛围灯 family card 的 `BadgeRenderStyle.colorSwatch` 渲染色块 + 卡边光；高饱和高对比（深空暗底上 vivid 色块=炸场视觉）。色名 = state-cells `ambient.color` 枚举值；view 经 `DesignTokens.ambientColor(named:)` 取，禁手填 hex。
+
+| 色名 | 值 | 备注 |
+|---|---|---|
+| 白 / 白色 | `#EDEFF5` | 暖白（非纯白防 halation） |
+| 红 / 红色 | `#FF4D6D` | vivid 红（区别 safety #FF5C6C 描边语义） |
+| 橙 / 橙色 | `#FFB13C` | = state.offline 琥珀 |
+| 黄 / 黄色 | `#FFD23C` | |
+| 绿 / 绿色 | `#3CE0A0` | 青绿 |
+| 青 / 青色 | `#00E5FF` | = glow.cyan |
+| 蓝 / 蓝色 | `#1AA6FF` | scheme1 bubble 蓝 |
+| 紫 / 紫色 | `#7B5CFF` | = glow.violet |
+| 粉 / 粉色 | `#FF7AC6` | |
+| 默认/未知 | `#7B5CFF` | 回落 glow.violet |
+
 ## 2. DemoVisualState 7 态色映射（🔴 U10 四态必分开，现万能红字混=翻车）
 
 > 消费源 = `Core/State/DemoVehicleStateStore.swift:17-25`（7 态枚举，A2 不碰此枚举）。U10（grill §3:124）：clarify/unsupported/safety_refusal/crash **四态分开**。
