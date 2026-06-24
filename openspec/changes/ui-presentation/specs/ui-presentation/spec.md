@@ -29,11 +29,12 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 - **THEN** 渲染「cyan 脉冲」（tokens.md §2 `changing` 语义：执行中过渡）
 - **AND** 表达「正在执行」而非「已完成」，不与 `satisfied` 坍缩
 
-#### Scenario: blocked_with_alternative renders amber clarify, never red or crash
-- **GIVEN** `visualState == .blocked_with_alternative`（clarify 智能澄清，demo 卖点）
+#### Scenario: blocked_with_alternative renders amber clarify (card-level blocked+alternative, demo 少用态)
+- **GIVEN** `visualState == .blocked_with_alternative`（**卡片级 blocked+替代**，如「空调调到16度」超 min18 → 「最低18℃，已调到18」；D8.2 demo 少用态：能自动替代即 satisfied，此态主线几乎不触发）
 - **WHEN** 渲染
-- **THEN** 渲染「琥珀提示」（tokens.md §2 clarify 语义色）
+- **THEN** 渲染「琥珀提示」（tokens.md §2 clarify 语义色）+ 替代值/原因（消费 guardReason/readbackResult）
 - **AND** SHALL NOT 渲染成 `unsafe` 的红 或 `unknown`(crash) 的灰错误 —— clarify 是卖点不是错误
+- **AND** SHALL NOT 用于区域歧义（D8.1 区域默认主驾不澄清）或对话级歧义（「打开」开什么 → orb `think` 层非卡片态）
 
 #### Scenario: blocked_hard renders gray lock unsupported, never red
 - **GIVEN** `visualState == .blocked_hard`（unsupported 优雅拒识）
@@ -69,6 +70,12 @@ UI SHALL 对 `DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_al
 - **GIVEN** store 提供 `guardReason` / `readbackResult`
 - **WHEN** 渲染 clarify/unsupported/safety 态的提示文案
 - **THEN** UI 消费 `guardReason`/`readbackResult` 呈现原因，SHALL NOT 硬编码文案
+
+#### Scenario: zone scope defaults to driver, no clarify interruption (D8.1)
+- **GIVEN** 区域 scope 功能点（空调温度/座椅/车窗等，main:state-cells.yaml scope=[主驾,副驾,...]）用户未指定区域
+- **WHEN** 渲染卡片
+- **THEN** 卡片默认锚定默认 scope 态（座位→主驾 / 屏类→中控屏 / 前后→前·前排），渲染 satisfied/changing
+- **AND** SHALL NOT 渲「请选区域」空态/占位，SHALL NOT 弹 clarify 澄清打断（scope 默认值执行逻辑 = NLU/Core，UIUE 只展示默认态）
 
 ### Requirement: card value rendering SHALL derive ui_value_type on the consumer side and use a static enum switch
 

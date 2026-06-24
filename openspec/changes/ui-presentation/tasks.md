@@ -53,3 +53,31 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 6.3 视觉值全从 DesignTokens/tokens.md 取（grep 无硬编 hex）；无 `#available(iOS17/18)` 版本守卫—— `check-platform-vs-version-guard.sh` 机械保证。
 - [ ] 6.4 5-gate：simctl 14 张满屏单态（**非 gallery 缩略**，gallery 只内循环）→ 磊哥审美 5 gate 全 PASS。
 - [ ] 6.5 spec ADDED `ui-presentation` 经 `openspec validate --strict`（✅ 2026-06-24 绿）。
+
+## 7. D8 默认主驾 + L3+ 思考链路 + 交互边界（2026-06-24 grill 收口，grill-master §3 D8）
+
+### 7.A 默认主驾展示（卡片层纯 UIUE，部分依赖 A2 scope 数据）
+- [ ] 7.A1 卡片默认锚定默认 scope 态（不渲「请选区域」空态；座位→主驾 / 屏类→中控屏 / 前后→前·前排）
+- [ ] 7.A2 多 scope 聚合卡（「全车」= 1 张聚合 + 标记，不分裂多卡）｜依赖 A2 scope 数据
+- [ ] 7.A3 非默认 scope 角标（「副驾」小标记，区别默认主驾）
+
+### 7.B 思考链路演出（对话级 orb `think` 态，Phase 5 后续，**不在本 change 实装**）
+- [ ] 7.B1 orb `think` 假 COT phase 机（思考中→调用中→方案，~3s）｜对话级非卡片态
+- [ ] 7.B2 多变文案序列 / 7.B3 手机视觉占位 / 7.B4 接 NLU L3+ 信号触发 / 7.B5 兜底态展示
+- 归属：Phase 5 orb TimelineView idle/`think`/speak/listen（hig-rules:56 已留位）；demo 场景宏即时（范式§175），后续真 LoRA 用 γ（3s 固定+规则兜底）
+
+### 7.C clarify 态（少用，已定）
+- [x] 7.C1 clarify 枚举保留、主线少用 ✅（D7 7 态含 blocked_with_alternative）
+- [ ] 7.C2 D7 force-state 示例改「调到16度→最低18℃」（值超范围+替代，去区域「主驾还是全车」）
+
+### 7.D 多轮/读回展示（承接 Core 结果，UIUE 只展示）
+- [ ] 7.D1 多轮继承展示（「再调高」继承默认主驾态，不弹区域）
+- [ ] 7.D2 状态读回展示（「现在多少度」读默认主驾值）
+
+### 🚫 7.E 边界外（非 UIUE，归其他分支，不在本 change）
+- TTS 话术 scope 省略/明示 = Core readback `{温区}` 模板 + voice 分支（DEFERRED）
+- scope 默认值填槽 = NLU/Core ｜ 多轮继承范围/记忆性 = DialogueState（3 轮范式）
+- 触摸调节 = 砍（卡片只读非控制器）｜ L3+ 触发判定 = NLU ｜ LoRA 超时兜底逻辑 = Core
+
+### 7.F 待磊哥确认
+- [ ] 7.F1 P1 触摸：现场戳卡习惯（会戳→B 极简查看落实 / 纯语音→可简化 A）
