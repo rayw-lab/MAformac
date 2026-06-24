@@ -104,6 +104,16 @@ The behavior-class taxonomy SHALL be a shared source for C5 data observed counts
 - **THEN** all three consumers use the same behavior-class source or an explicitly reconciled mapping
 - **AND** no consumer invents a private no-effect or no-call taxonomy
 
+### Requirement: Apply/execution SHALL emit bounded applied-write facts
+Apply/execution SHALL emit descriptive applied-write facts through the shared state-apply result when the bounded producer subtask is implemented. Each applied write SHALL include state key, before value, after value, scope origin, and write kind. Numeric direct writes, enum direct writes, and dependency side-effect writes SHALL all be visible. Apply/execution SHALL remain throwing on failure, SHALL NOT collect soft errors as a substitute for failure, and SHALL NOT receive C6 expected-state sets.
+
+#### Scenario: Producer facts are descriptive and apply-owned
+- **GIVEN** apply/execution applies a tool call that writes state
+- **WHEN** the shared state-apply result is returned
+- **THEN** every actual numeric, enum, and dependency write is recorded as an applied-write fact
+- **AND** apply/execution still throws on failed apply instead of returning a soft-error result
+- **AND** the applied-write facts do not include C6 expected-state sets or C6 scoring results
+
 ### Requirement: Replay facts SHALL consume apply-layer applied writes
 C6 replay SHALL consume apply/execution evidence for applied writes when available. Applied writes SHALL be descriptive facts containing state key, before value, after value, scope origin, and write kind. C6 SHALL derive unexpected mutation keys by comparing applied/final state to case expectations and allowed dependency side effects. Apply/execution SHALL NOT receive C6 expected-state sets in order to compute C6 scoring outputs.
 

@@ -35,7 +35,7 @@ R-L11 is an architecture decision. pass^k, hardPassVariance, layer denominators,
 
 R-L17 evidence must include human-owner participation, at least one heterogeneous judge outside the Claude-family, and a record of the R5 top-failing C6 drilldown plus R7 final route signoff under `docs/project/phase0/r-l17-human-review-evidence/`.
 
-A same-vendor Codex/Claude check is a pre-check only. A four-model "consistent pass" signal does not certify route or candidate signoff. If any judge disagrees, the route escalates to human-owner review rather than majority vote.
+Default same-vendor self-checks are pre-checks only. The current route-only R7 signoff explicitly accepts the GLM audit plus Codex/OpenAI review trace for route construction; this does not sign the candidate. A four-model "consistent pass" signal does not certify route or candidate signoff. If any judge disagrees, the route escalates to human-owner review rather than majority vote.
 
 ### AD-C6-006: C6 model quality does not imply endpoint or demo readiness
 
@@ -70,6 +70,8 @@ Prompts, model outputs, seeds, model artifacts, tokenizer digests, and LoRA adap
 ### AD-C6-010: Apply diagnostics are upstream facts, not C6-owned runtime logic
 
 `StateApplyDiagnostics` belongs to the apply/execution layer as an extension of `ToolContractStateApplyResult` / `applyWithEvidence`. Rebuild-C6 may consume applied-write evidence, but it must not implement a private apply engine or duplicate apply semantics.
+
+This carrier may coordinate a bounded upstream producer subtask that extends `ToolContractStateApplyResult` with `appliedWrites` and makes `applyWithEvidence` populate those descriptive facts. That subtask is owned as apply/execution-layer producer work carried by this OpenSpec change, not as C6 runtime or scorer logic. It must not change existing throw-on-failure semantics, scope resolution policy, or apply policy.
 
 Minimum applied-write evidence is descriptive: state key, before value, after value, scope origin, and write kind (`direct` or `dependency`). `noop` is not a write kind. Enum writes map to `direct`; dependency side effects map to `dependency`.
 

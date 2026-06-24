@@ -41,7 +41,11 @@ Unchecked future tasks are not apply authorization. This draft does not authoriz
 - [ ] 3.7 Define readback plan P: model hard-pass excludes renderer readback; `verify-gold` keeps deterministic C2 renderer readback validity; clarify/refusal text evidence still counts when asserted. AD: `AD-C6-008`.
 - [ ] 3.8 Define receipt fields for readback split: `model_hard_pass_basis`, `readback_applicable`, `readback_match`, and `readback_excluded_from_model_hard_pass`. AD: `AD-C6-008`.
 - [ ] 3.9 Define the contract bundle manifest and fingerprint over contract inputs. Preserve existing per-run prompt/output/model/artifact digests as separate fields. AD: `AD-C6-009`.
-- [ ] 3.10 Consume apply-layer applied-write evidence when available. Rebuild-C6 must not own implementation of `ToolContractStateApplier.appliedWrites` or a private apply engine. AD: `AD-C6-010`.
+- [ ] 3.9a Bounded upstream producer subtask: extend `ToolContractStateApplyResult` with `appliedWrites: [StateWrite]` as apply/execution-layer evidence carried by this change. AD: `AD-C6-010`.
+- [ ] 3.9b Make `applyWithEvidence` emit numeric direct, enum direct, and dependency writes with state key, before value, after value, scope origin, and `writeKind`. AD: `AD-C6-010`.
+- [ ] 3.9c Keep apply failure fail-closed: `applyWithEvidence` still throws on failure and must not return soft error collections as partial-pass evidence. AD: `AD-C6-010`.
+- [ ] 3.9d Keep C6 as consumer: do not pass C6 expected-state sets into `applyWithEvidence`; C6 derives `unexpectedMutationKeys` from applied/final state versus expectations. AD: `AD-C6-010`.
+- [ ] 3.10 Consume apply-layer applied-write evidence when available. C6 runtime/scorer code must not own the producer logic or a private apply engine; producer code belongs in apply/execution via §3.9a-d. AD: `AD-C6-010`.
 - [ ] 3.11 Derive `unexpectedMutationKeys` in C6 replay from applied/final state versus expected keys and allowed dependency side effects. Do not pass C6 expected-state sets into `applyWithEvidence`. AD: `AD-C6-010`.
 - [ ] 3.12 Enforce sign-or-block for pass^k, hardPassVariance, missing grader evidence, missing layer evidence, or receipt inconsistencies. AD: `AD-C6-004`.
 - [ ] 3.13 Keep R-L17 route/candidate signoff as manual governance evidence in `docs/project/phase0/r-l17-human-review-evidence/`; do not add C24/runtime enums for those verdicts. Reserve future placeholder `add-route-verdict-verify-guard` for a lightweight bypass guard, but do not implement it here. AD: `AD-C6-005`.
@@ -59,3 +63,4 @@ Unchecked future tasks are not apply authorization. This draft does not authoriz
 - [ ] 5.2 Do not modify Swift, C6 JSONL, Qwen tool format, model/data artifacts, or voice files during documentation absorption.
 - [ ] 5.3 Do not import raw cockpit/customer text, PII, secrets, or "internal only" source material into bench cases.
 - [ ] 5.4 Do not claim UIUE is merged or R-L17 is closed without live git/PR/state proof and the required human-owner evidence.
+- [ ] 5.5 Apply-layer changes are limited to the §3.9a-d bounded upstream producer subtask. Any change beyond applied-write fact shape, such as new apply policy, soft errors, plan/validate/apply split, C6-private scorer logic, or `ScopedStateKey` struct promotion, requires a new accepted carrier or a new explicit grill decision.

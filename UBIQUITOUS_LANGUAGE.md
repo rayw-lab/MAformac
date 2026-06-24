@@ -9,7 +9,8 @@
 | **Candidate Signoff Verdict** | A later human-signed quality decision required before C6 acceptance, C5 candidate promotion, golden-run, or readiness claims. | Route verdict, training approval, C6 pass |
 | **Human Owner** | The accountable human reviewer who reads first-hand evidence and records the final high-stakes route or candidate decision. | Majority voter, final model judge |
 | **Heterogeneous Judge** | A reviewer outside the Claude-family frame who performs an independent deframing audit. | More agents, same-vendor review, rubber-stamp judge |
-| **Same-Vendor Pre-Check** | A useful Codex or Claude review that can find defects but does not count toward heterogeneous R-L17 signoff. | Cross-frame review, R-L17 proof |
+| **Default Same-Vendor Self-Check** | A useful same-family or self-frame review that can find defects but does not count as heterogeneous signoff unless explicitly accepted by the human owner with an independent audit trace. | Cross-frame review, R-L17 proof |
+| **Codex/OpenAI Independent Review** | A non-Claude-family review trace that may count as a second source only when the human owner explicitly accepts it and pairs it with an independent audit such as GLM. | Default pre-check, automatic R-L17 proof |
 | **Consistent-PASS Signal** | A multi-reviewer agreement that no obvious objection was found, not a substitute for human-owner review. | Certification, approval, signoff |
 
 ## C6 and C5 sequencing
@@ -27,7 +28,11 @@
 | **Stringly Scoped Key** | The existing `cellID[scope]` scoped-state-key representation emitted by `C2ScopeResolver.scopedKey()`. It is acceptable for the minimum C6 replay foundation unless concrete parser drift defects require a struct. | Missing scoped key, mandatory struct |
 | **No-Effect Reason** | The reason a correct case causes no state mutation, sourced from the same behavior-class SSOT used by C5 data receipts, C6 denominators, and apply/execution no-effect reasoning. | Third no-call taxonomy, C6-only label, apply-local enum |
 | **Apply Diagnostics** | Execution-layer diagnostics produced with state application evidence, extending `ToolContractStateApplyResult`; C6 consumes them instead of inventing apply semantics. | C6 diagnostics, scorer patch, second runtime |
-| **Applied Write** | A descriptive apply-layer record of one state write: state key, before value, after value, and scope origin. | Planned effect, expected mutation |
+| **Bounded Upstream Producer Subtask** | A narrow apply/execution-layer producer task carried by the rebuild-C6 carrier only to emit applied-write facts required by C6 replay. | C6-owned producer, standalone harden-spine, hidden implementation expansion |
+| **Apply Producer** | The apply/execution code path that emits descriptive facts about actual state writes. | C6 scorer, replay engine, planner |
+| **C6 Consumer** | The C6 replay code path that reads apply facts and derives scoring outputs without changing apply semantics. | Apply producer, second runtime |
+| **Carrier Carve-Out** | An explicit OpenSpec exception that permits a bounded upstream task inside the current carrier without changing the ownership layer. | Scope creep, oral exception, implementation shortcut |
+| **Applied Write** | A descriptive apply-layer record of one state write: state key, before value, after value, scope origin, and write kind. | Planned effect, expected mutation |
 | **Write Kind** | The apply-layer source of an applied write: `direct` for target-cell writes and `dependency` for `depends_on` side effects. | Noop, behavior class, planner reason |
 | **Unexpected Mutation Keys** | C6-derived replay comparison output: applied or final-state keys that are not allowed by the case's expected delta and dependency policy. | Apply-layer diagnostics, applier errors |
 | **Behavior-Class Taxonomy** | The shared C5/C6/apply source for tool call, clarify, unsupported refusal, safety refusal, and already-state no-op classes. C5 uses it for observed data counts, C6 for denominators/selectors, and apply/execution no-effect reasoning consumes it instead of inventing a local enum. | C6-only no-effect enum, apply-local no-effect enum, negative bucket |
@@ -57,12 +62,15 @@
 - A **Route Deframing Verdict** belongs to the **R-L17 Deframing Gate** and can unlock only `rebuild-c6` construction work.
 - A **Candidate Signoff Verdict** belongs to the **R-L17 Deframing Gate** and is required before C6 acceptance, C5 candidate promotion, golden-run, or readiness claims.
 - A **Heterogeneous Judge** complements the **Human Owner** but does not replace the **Human Owner**.
-- A **Same-Vendor Pre-Check** may inform a **Route Deframing Verdict**, but it cannot satisfy the heterogeneous review requirement.
+- A **Default Same-Vendor Self-Check** may inform a **Route Deframing Verdict**, but it cannot satisfy heterogeneous review by default.
+- A **Codex/OpenAI Independent Review** can count as a second source only when the **Human Owner** explicitly accepts it with a separate audit trace; it is not automatic proof.
 - **Historical Failure Evidence** can feed **Rebuild-C6 Mainline** design without making **Rebuild-C6 Mainline** a prerequisite of the route verdict.
 - An **Embedded Runtime Spine** is part of **Rebuild-C6 Mainline**, not a standalone architecture track.
 - A **C6 Replay Fact Bundle** reuses **Slim Target Resolution** and **Stringly Scoped Key** in the minimum foundation; it does not require a standalone **Contract Replay Engine** first.
 - A **No-Effect Reason** must reuse the **Behavior-Class Taxonomy**; it must not become a third taxonomy beside C5 `data_class_observed_count`, C6 `C6Bucket` / selector denominators, and apply no-effect reasoning.
 - **Apply Diagnostics** are produced by the apply/execution layer and consumed by **Rebuild-C6 Mainline**. They are not rebuild-C6 private scorer logic.
+- A **Carrier Carve-Out** may carry a **Bounded Upstream Producer Subtask** without making C6 the **Apply Producer**.
+- An **Apply Producer** emits facts. A **C6 Consumer** derives replay results from those facts.
 - An **Applied Write** is descriptive evidence. **Unexpected Mutation Keys** are derived by C6 replay, because only C6 has the expected-state set.
 - **Write Kind** labels the source of visible writes only. It cannot compensate for missing evidence; numeric direct, enum direct, and dependency writes must all emit **Applied Write** records.
 - A **Contract Bundle Fingerprint** identifies the contract input set. It must preserve component digests and must not absorb per-run prompt/output hashes or model artifact digests.
@@ -82,6 +90,8 @@
 > **Domain expert:** "Only **Rebuild-C6 Mainline** construction. **Candidate Signoff Verdict** is still required before C6 acceptance or C5 retraining claims."
 > **Dev:** "Should we add C24 statuses for these two verdicts?"
 > **Domain expert:** "No. They are **Governance Signoff**, not runtime outcome status."
+> **Dev:** "Can rebuild-C6 implement **Applied Write** production?"
+> **Domain expert:** "Only through a **Carrier Carve-Out** for a **Bounded Upstream Producer Subtask**. The code remains the **Apply Producer** in apply/execution, and C6 remains the **C6 Consumer**."
 
 ## Flagged ambiguities
 
@@ -100,5 +110,7 @@
 - "rebuild-c6" was ambiguous between building the yardstick and comparing a LoRA candidate. Use **C6 Construction Lane** for the former and **Candidate Comparison Lane** for the latter.
 - "teardown" was ambiguous between static evidence and executed validation. Use **Local Static Teardown** only for static inspection evidence.
 - "base anchor" was ambiguous between old failure evidence and a future active threshold. Use **Historical Base Anchor** or **Future D-Domain Base Anchor Design** explicitly.
-- "审计" was ambiguous between **Same-Vendor Pre-Check**, **Heterogeneous Judge**, and **Human Owner** review. Name the review lane.
+- "审计" was ambiguous between **Default Same-Vendor Self-Check**, **Codex/OpenAI Independent Review**, **Heterogeneous Judge**, and **Human Owner** review. Name the review lane.
 - "status" was ambiguous between runtime outcome status and manual governance verdict. Use **Governance Signoff** for R-L17 route/candidate decisions.
+- "own producer" was ambiguous between OpenSpec carrier coordination and C6 runtime ownership. Use **Carrier Carve-Out** for the former and reserve **Apply Producer** for apply/execution code.
+- "upstream subtask" was ambiguous until Q5.1. Use **Bounded Upstream Producer Subtask** only for `appliedWrites`; any broader apply policy or planner work needs a new accepted carrier.

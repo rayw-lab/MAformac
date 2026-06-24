@@ -560,7 +560,7 @@ These Q4 decisions close the OpenSpec-absorption grill. They are route-control d
 | Q4.5 | ACCEPT + require one SSOT name | `behavior_class` cannot coexist indefinitely with `C6Bucket`, C5 data-count labels, or apply no-effect labels as separate SSOT names. | First construction task must include SSOT naming decision across C5 `data_class_observed_count`, C6 `C6Bucket` / selector denominators, and apply `no_effect_reason`: either rename `C6Bucket` to `BehaviorClass`, or leave `C6Bucket` as deprecated/typealias/mapped legacy with a deletion window. No selectors, thresholds, active anchors, or apply no-effect labels before this reconciliation. |
 | Q4.6 | ACCEPT + one SHALL group | Readback plan P should be one coherent spec requirement, not four scattered SHALLs. | Spec delta SHALL state model hard-pass must not include readback; verify-gold must keep C2 renderer readback validity; clarify/refusal text evidence still counts when asserted. Receipt-schema fields include `model_hard_pass_basis`, `readback_applicable`, `readback_match`, and `readback_excluded_from_model_hard_pass`. |
 | Q4.7 | ACCEPT + make versioned manifest concrete | `contract_bundle_fingerprint` must be a versioned component manifest, not raw byte concatenation or a second opaque hash. | Manifest shape: ordered list of `{component_id, version, content_digest}`; fixed `component_id` enum includes C1 contract, C2 renderer/state cells, C6 cases, Qwen tool format, and D-domain IR map; `fingerprint = sha256(canonicalize(manifest))`; exclude prompts, outputs, seeds, model artifacts. |
-| Q4.8 | ACCEPT + boundary correction | `appliedWrites` producer work belongs to apply/execution, not C6 implementation. Rebuild-C6 may reference it as an upstream dependency and consume it, but must not own the producer implementation task. | `design.md` records producer/consumer boundary. `tasks.md` may include a C6 consumer task and an external dependency/checkpoint, but not "implement `ToolContractStateApplier.appliedWrites`" as rebuild-C6-owned work. Producer lands in a future apply-layer carrier or equivalent upstream contract. |
+| Q4.8 | ACCEPT + boundary correction, superseded by Q5.1 carve-out | `appliedWrites` producer work belongs to apply/execution, not C6 runtime/scorer implementation. Rebuild-C6 may consume it and may carry a bounded upstream producer subtask only when the carrier explicitly says the code lands in apply/execution and does not create a private C6 apply engine. | `design.md` records producer/consumer boundary and the Q5.1 bounded upstream producer carve-out. `tasks.md` may include §3.9a-d apply/execution producer tasks plus C6 consumer tasks, but C6 runtime/scorer must not own producer logic. |
 | Q4.9 | ACCEPT + whitelist verify-gold shape-only | First rebuild-C6 closeout can use local documentation/static proof only. `verify-gold` is allowed only as shape/contract replay verification, not model-quality evaluation. | Allowed proof classes: `local` OpenSpec validation, `local_static_teardown`, static/receipt review, and `archive-check verify-gold` only if no model is run and it checks contract/shape/D-domain expected-tool validity. Forbidden: C6 acceptance, model run, base recalibration, endpoint, mobile/true-device, demo-golden, V-PASS. |
 | Q4.10 | ACCEPT + name bypass-guard placeholder | R-L17 route/candidate verdicts enter tasks as manual signoff checkpoints, not runtime enums. The future lightweight guard needs a named placeholder to avoid being forgotten. | Add manual signoff task references to R7 fields. Do not add C24 enums. Reserve placeholder change name `add-route-verdict-verify-guard` for the future make-verify bypass guard; do not implement it in this lane. |
 | Q4.11 | ACCEPT + fixed reconfirm symbol list | Implementation must reconfirm the target worktree and load-bearing APIs because Q3 file:lines were from `a9ce7cf` while `origin/main` had later UIUE commits. | Before implementation: record branch/HEAD/origin-main, then `rg` current HEAD for `ScopeOrigin`, `ScopeResolution.keys`, `ScopeResolution.resolvedScopes`, `C2ScopeResolver.scopedKey()`, and `ToolContractStateApplier.applyWithEvidence`. If any symbol moved/renamed/disappeared, halt and re-grill. |
@@ -579,8 +579,8 @@ These pointers satisfy Q4.15 for Q3/Q4 rows. They do not retire this ledger as a
 |---|---|---|
 | Q3.1 C6 Replay Foundation Reuses PR4 Facts Plus Four Deltas | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/proposal.md#What-Changes`, `openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-007-Behavior-class-taxonomy-is-shared-across-C5-C6-and-apply`, `openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-008-Readback-plan-P-splits-renderer-evidence-from-model-hard-pass`, `openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-009-Contract-bundle-fingerprint-is-a-versioned-component-manifest`, `openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic` |
 | Q3.2 Delta Ownership Is Three-Layer, Not Default-Scope vs Rebuild-C6 | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-007-Behavior-class-taxonomy-is-shared-across-C5-C6-and-apply`, `openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction` |
-| Q3.3 Apply Diagnostics Are Applied Writes, Not A Planner | Absorbed as C6 consumer boundary; producer implementation remains upstream apply/execution work. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-facts-SHALL-consume-apply-layer-applied-writes`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic` for full planner/runtime ownership inside C6 |
-| Q3.4 `write_kind=direct|dependency`, But Evidence Coverage Comes First | Absorbed as boundary and dependency; producer implementation remains upstream apply/execution work. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-facts-SHALL-consume-apply-layer-applied-writes`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic` for `noop` as write kind or C6-owned producer task |
+| Q3.3 Apply Diagnostics Are Applied Writes, Not A Planner | Absorbed as C6 consumer boundary plus Q5.1 bounded upstream producer carve-out; producer code remains apply/execution work. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Apply-execution-SHALL-emit-bounded-applied-write-facts`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-facts-SHALL-consume-apply-layer-applied-writes`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic` for full planner/runtime ownership inside C6 |
+| Q3.4 `write_kind=direct|dependency`, But Evidence Coverage Comes First | Absorbed as boundary, dependency, and Q5.1 bounded upstream producer carve-out; producer code remains apply/execution work. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Apply-execution-SHALL-emit-bounded-applied-write-facts`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-facts-SHALL-consume-apply-layer-applied-writes`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic` for `noop` as write kind or C6-private producer/runtime task |
 | Q3.5 `contract_bundle_fingerprint` Is A Component Manifest, Not A Second Opaque Hash | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-009-Contract-bundle-fingerprint-is-a-versioned-component-manifest`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-fingerprint-SHALL-be-recorded-per-eval-run` |
 | Q3.6 Readback Exclusion Is A Hard-Pass Basis Split, Not Readback Deletion | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-008-Readback-plan-P-splits-renderer-evidence-from-model-hard-pass`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Readback-gate-SHALL-reuse-C2-readback-templates`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Four-deterministic-hard-gates-SHALL-decide-release-blocking` |
 
@@ -595,7 +595,7 @@ These pointers satisfy Q4.15 for Q3/Q4 rows. They do not retire this ledger as a
 | Q4.5 BehaviorClass SSOT Name | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-007-Behavior-class-taxonomy-is-shared-across-C5-C6-and-apply`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Behavior-class-taxonomy-SHALL-be-shared-across-C5-C6-and-apply` |
 | Q4.6 Readback Plan P SHALL Group | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-008-Readback-plan-P-splits-renderer-evidence-from-model-hard-pass`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Readback-gate-SHALL-reuse-C2-readback-templates` |
 | Q4.7 Contract Bundle Manifest | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-009-Contract-bundle-fingerprint-is-a-versioned-component-manifest`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-fingerprint-SHALL-be-recorded-per-eval-run` |
-| Q4.8 AppliedWrites Producer/Consumer Boundary | Absorbed as boundary; producer implementation remains upstream. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-facts-SHALL-consume-apply-layer-applied-writes`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction` for C6-owned producer implementation |
+| Q4.8 AppliedWrites Producer/Consumer Boundary | Absorbed as boundary and superseded by Q5.1 carve-out; producer implementation remains apply/execution work carried by this carrier only as a bounded upstream producer subtask. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-010-Apply-diagnostics-are-upstream-facts-not-C6-owned-runtime-logic`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Apply-execution-SHALL-emit-bounded-applied-write-facts`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Replay-facts-SHALL-consume-apply-layer-applied-writes`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction` for C6-private producer logic, private apply engine, planner runtime, or soft-error apply path |
 | Q4.9 Proof Class / Verify-Gold Shape Only | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-011-Documentation-absorption-uses-local-static-proof-only`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-C6-SHALL-provide-deterministic-gold-self-verification`, `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md#Requirement-Documentation-absorption-SHALL-keep-proof-class-boundaries-explicit` |
 | Q4.10 R-L17 Manual Signoff / Bypass Placeholder | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-005-R-L17-is-a-manual-route-candidate-governance-gate`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#1-Construction-Preconditions`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#3-Four-Layer-Bench-Construction`; `rejected_in: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-005-R-L17-is-a-manual-route-candidate-governance-gate` for runtime enum treatment |
 | Q4.11 Baseline / Load-Bearing API Reconfirm | Absorbed. | `superseded_by: openspec/changes/rebuild-c6-four-layer-bench/design.md#AD-C6-012-Implementation-must-reconfirm-baseline-and-load-bearing-APIs`, `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#1-Construction-Preconditions` |
@@ -625,12 +625,12 @@ Non-blocking mild issues recorded by human review:
 | M2 | Q4.5 SSOT naming appears as construction task §3.4 rather than §1 precondition. | Resolved by `openspec/changes/rebuild-c6-four-layer-bench/tasks.md#1-Construction-Preconditions` item 1.5, which gates selector/threshold/anchor/apply no-effect freeze on the BehaviorClass SSOT naming/reconciliation task. |
 | M3 | Future `tool-surface-retrieval-spike` carrier does not exist for Q2.5 spike table. | Non-blocking because Q2.5 row rejects current rebuild-C6 construction ownership; add owner when a spike carrier is proposed. |
 
-R-L17 remains `pending` / `unsigned`. This human review approves documentation absorption closeout only; it does not close route deframing, candidate signoff, C6 acceptance, training, golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
+At the time of this human review, R-L17 remained `pending` / `unsigned`. This was superseded on 2026-06-25 by `docs/project/phase0/r-l17-human-review-evidence/R7-final-route-deframing-signoff.md`, which signed route-only construction and kept `candidate_signoff_verdict: unsigned`. The review did not close candidate signoff, C6 acceptance, training, golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
 
 ### Q4 Cross-Cutting Corrections
 
 1. Do not create third names/carriers/anchors: no third SSOT name for behavior class, no standalone candidate-comparison change, no vague third base-anchor term.
-2. Do not put apply-layer producer tasks into rebuild-C6. Rebuild-C6 consumes `appliedWrites`; apply/execution produces them.
+2. Do not put apply-layer producer logic into C6 runtime/scorer code. Q5.1 permits only a bounded upstream producer subtask carried by this OpenSpec change, with code landing in apply/execution and C6 consuming `appliedWrites`.
 3. Give the future R-L17 bypass guard a searchable placeholder: `add-route-verdict-verify-guard`, but do not implement it now.
 4. Treat paper `local_static_teardown` as static evidence only. Teardown proof and packet schema validation can support absorption design, but they are not executed validation, C6 acceptance, or model-quality evidence.
 
@@ -639,3 +639,162 @@ R-L17 remains `pending` / `unsigned`. This human review approves documentation a
 Q4 is closed for pre-code discussion purposes.
 
 Next artifact: a documentation-only OpenSpec absorption edit to `openspec/changes/rebuild-c6-four-layer-bench` that applies Q4.1-Q4.15. That edit must stay within documentation paths, keep the validation whitelist above, and must not run or imply C6 acceptance, D-domain base recalibration, C5 training, golden-run, voice, endpoint readiness, or R-L17 closure.
+
+## Q5.1 Decision: AppliedWrites Producer Needs A Carrier Carve-Out Before Implementation
+
+Status: `ACCEPT_WITH_STRUCTURAL_FIX`.
+
+Decision:
+
+`rebuild-c6-four-layer-bench` may carry the minimum apply/execution producer work required to make §3.10/§3.11 executable, but only as a bounded upstream producer subtask. The carrier owns the coordination and acceptance boundary; the code must land in apply/execution (`ToolContractStateApplyResult` / `applyWithEvidence`) and C6 remains a consumer. This is not permission for C6 runtime/scorer code to own producer logic, implement a private apply engine, add soft apply errors, or change apply policy.
+
+Verification check:
+
+- `openspec/changes/rebuild-c6-four-layer-bench/design.md:70-76` already said apply diagnostics are upstream facts and that C6 derives `unexpectedMutationKeys`.
+- `openspec/changes/rebuild-c6-four-layer-bench/tasks.md:44-45` previously had consumer tasks but no producer task.
+- `openspec/changes/rebuild-c6-four-layer-bench/specs/vehicle-tool-bench/spec.md:107-114` previously made C6 consume applied writes but did not explicitly make the producer task executable.
+- `Core/Contracts/ToolContractCompiler.swift:398-445` currently returns only `state` and `scopeOriginEvidence`; `appliedWrites` does not exist yet.
+- `Core/Contracts/ToolContractCompiler.swift:502-504` enum writes currently return no evidence, while `Core/Contracts/ToolContractCompiler.swift:585-591` numeric direct writes return only state key / scope origin and omit dependency writes.
+
+Discovery check:
+
+The hidden bug in the naive answer was not whether C6 needs `appliedWrites`; it does. The bug was the ownership frame: calling the producer work an "upstream subtask" without changing the carrier would leave documents saying "C6 must not own producer implementation" while implementation did exactly that. This is the same claim-vs-reality failure class as the 0/34 fake-green history.
+
+Physical landing:
+
+1. `design.md` AD-C6-010 records a bounded upstream producer carve-out and states the code lands in apply/execution, not C6 runtime/scorer.
+2. `tasks.md` §3.9a-d records the producer work before §3.10/§3.11 consumer work.
+3. `tasks.md` §5.5 bounds apply-layer changes to applied-write fact shape and bans new apply policy, soft errors, plan/validate/apply split, C6-private scorer logic, and `ScopedStateKey` struct promotion without new authorization.
+4. `spec.md` adds a producer requirement: apply/execution emits bounded applied-write facts for numeric direct, enum direct, and dependency writes; apply remains throwing and does not receive C6 expected-state sets.
+5. This ledger supersedes the too-broad Q4.8 wording while preserving the rejection of C6-private producer/runtime ownership.
+
+Tiger:
+
+- If the carrier does not explicitly include §3.9a-d, the implementation PR will look like it silently expanded route-only construction scope.
+- If the code lands in C6 instead of apply/execution, C6 becomes a second runtime and violates AD-C6-010.
+- If `errors` are collected instead of thrown, apply returns to fail-open behavior and recreates the fake-green failure mode.
+- If dependency writes remain invisible, `unexpectedMutationKeys` will either falsely blame allowed side effects or miss real side-effect bugs.
+
+Paper-tiger:
+
+- A separate micro-carrier is not necessary here. The work is small, bounded, and required to make the existing rebuild-C6 consumer contract executable.
+- Carrying the producer subtask in this carrier does not mean C6 owns apply semantics, as long as producer code lands in apply/execution and C6 receives only facts.
+
+Elephant:
+
+- The biggest risk is not field shape; it is proof-class drift. A future implementation can pass unit tests and still be outside route scope if it changes apply policy. Therefore §5.5 must be treated as an implementation stop condition, not a style note.
+
+## Q5 Pending Grill Backlog
+
+These are the remaining pre-implementation questions. They are listed together for global dependency visibility; each still needs decision-quality grill before the relevant code work starts.
+
+| ID | Question | Why it matters | Recommended default |
+|---|---|---|---|
+| Q5.2 | What is the physical `BehaviorClass` SSOT shape: rename `C6Bucket`, add `BehaviorClass` with legacy mapping, or keep both? | `C6Bucket.coverage` is not a behavior class, while `no_call` and `refusal` are too coarse. A direct rename may pollute behavior taxonomy with coverage/reporting concepts. | Add `BehaviorClass` as the SSOT and map/deprecate `C6Bucket`; do not rename directly until coverage/reporting is separated. |
+| Q5.3 | Should `C2ScopeResolver.scopedKey()` become a public/shared helper? | C6 may need stable scoped expected keys, but exposing private helpers can prematurely freeze stringly API. | Expose a narrowly named shared helper only if implementation needs to generate scoped keys outside `ScopeResolution`; otherwise consume materialized keys. |
+| Q5.4 | How far should selector/denominator mechanics go before active thresholds or base anchors? | Selector code is needed for the four layers, but thresholds and D-domain base recalibration are still forbidden. | Freeze classification and denominators; do not freeze active thresholds, old 10/23 as current gate, or D-domain base anchor runs. |
+| Q5.5 | What exact `StateWrite` schema is allowed? | Field optionality and Codable/Sendable compatibility affect receipts and tests; before value may be absent for new keys. | `stateKey`, `beforeValue?`, `afterValue`, `scopeOrigin?`, `writeKind`; no behavior class, no planner reason, no expected keys. |
+| Q5.6 | What is the source of allowed dependency side effects for `unexpectedMutationKeys`? | C6 needs to distinguish legitimate `depends_on` writes from real unexpected mutations without passing expectations into apply. | Source allowed side effects from state-cell `dependsOn` plus applied-write `writeKind=dependency`; C6 derives comparison after apply. |
+| Q5.7 | How should readback plan P change `failureClasses` and hard-pass calculation? | Current C6 appends `.readback` to failures, making readback part of hard fail. That conflicts with model-hard-pass exclusion. | Split model-hard-pass failures from renderer readback fields; keep readback in gold validity / renderer evidence, not model `hardFailed`. |
+| Q5.8 | What is the compatibility plan for `contract_bundle_fingerprint` versus existing `contractDigest`? | Receipts already require `contractDigest`; changing it blindly breaks compatibility or hides component identity. | Add versioned manifest and bundle hash while preserving old per-run fields; alias only with explicit receipt-version migration. |
+| Q5.9 | What is the D-domain expected-tool migration boundary for `contracts/c6-bench-cases.jsonl`? | C6 cases already mostly use D-domain tools, but coverage/no-call/refusal rows and generated artifacts need shape proof without model runs. | Use static catalog/IR-map checks and `verify-gold` shape-only; no C6 acceptance or base recalibration. |
+| Q5.10 | What reporting shape separates external layers from internal behavior classes? | External `golden/demo_fuzz/unsupported/safety` and internal behavior classes answer different questions; merging them recreates aggregate masking. | Emit two axes: external layer results and internal behavior-class denominators, with sign-or-block if any hard layer evidence is missing. |
+| Q5.11 | What validation gates are allowed for implementation closeout? | Q4 whitelist was for documentation absorption only; implementation needs tests, but still must avoid model-quality/eval claims. | Allow Swift/unit/static contract checks and shape-only `verify-gold`; forbid model runs, training, base recalibration, golden-run, voice, endpoint readiness, and V/S/U-PASS. |
+| Q5.12 | What UIUE intersection requires recheck before C6 implementation closeout? | UIUE is isolated, but presentation/default-scope/readback metadata can collide with C6 receipts if shared contracts move. | Recheck only if UIUE touches `Core/State/`, `contracts/`, `generated/`, shared C3-C6 contracts, golden IDs, or readback/presentation receipt fields. |
+| Q5.13 | How should commits and OpenSpec stages be partitioned? | Mixing docs carve-out, implementation, and validation receipts makes later audit hard and risks fake-green. | Keep at least three receipts: docs carve-out, implementation diff, validation/closeout; do not archive until accepted implementation evidence exists. |
+
+## Q5 Batch Triage: Branching Questions Are Implementation Entry Gates
+
+Status: `ACCEPT_WITH_CORRECTIONS`.
+
+Source reviewed: `/Users/wanglei/.codex/attachments/e0575f40-1ec3-46d9-a777-123530eae146/pasted-text.txt`.
+
+Verdict:
+
+`rebuild-c6` route-only construction can continue, but Q5.2-Q5.13 are not ordinary implementation backlog items. They are implementation-entry branch seals. Code work must not start in an affected area until the relevant branch seal is either accepted here or explicitly deferred with a stop condition.
+
+Current evidence verified against repo state:
+
+- `tasks.md:35-49` contains the current construction tasks for external layers, behavior classes, selectors, readback, fingerprint, bounded upstream producer, applied-write consumption, and `unexpectedMutationKeys`.
+- `tasks.md:62-66` contains the current red lines, including the Q5.1 §3.9a-d bounded producer limit.
+- `design.md:44-54` makes behavior taxonomy shared across C5/C6/apply and requires `C6Bucket` reconciliation before selectors, thresholds, or active anchors.
+- `design.md:56-60` states readback plan P: model hard-pass excludes renderer readback while verify-gold keeps renderer validity.
+- `design.md:62-68` states `contract_bundle_fingerprint` is a versioned component manifest and excludes per-run prompt/output/model identity.
+- `design.md:70-78` records the Q5.1 bounded upstream producer carve-out and C6 consumer boundary.
+- `spec.md:107-124` separates apply/execution producer facts from C6 replay consumption and prohibits C6 expected-state sets in apply.
+- `Core/Bench/C6VehicleToolBench.swift:25-32` still has legacy `C6Bucket` values including `coverage`, `no_call`, and `refusal`.
+- `Core/Bench/C6VehicleToolBench.swift:1196-1210` still appends `.readback` to `failureClasses` and computes `hardFailed` from all failures, so readback currently remains in hard-pass basis.
+- `Core/Bench/C6VehicleToolBench.swift:1218-1222` still computes a negative/no-call aggregate through `expectNoCall || C6Bucket.noCall || C6Bucket.refusal`, which is exactly the no-call collapse risk Q5.2/Q5.10 must remove.
+- `Core/Contracts/ToolContractCompiler.swift:398-405` still has no `appliedWrites`; `:502-504` makes enum writes invisible; `:588-591` writes dependencies but omits them from evidence.
+- `Core/Bench/C6VehicleToolBench.swift:795-823` currently allows dependency keys from expected-state keys, not from actual applied-write provenance; Q5.6 must replace or constrain that with applied facts.
+
+Corrections to the source verdict:
+
+1. Q5.2's proposed Swift type name `C6BehaviorClass` is too C6-owned for a taxonomy that must be shared by C5, C6, and apply. The canonical JSON/receipt field remains `behavior_class`. The preferred shared code type is `BehaviorClass` or `VehicleToolBehaviorClass`. If implementation temporarily names a C6-local type, it cannot be called the SSOT and must have a migration note.
+2. Q5.6 must account for current code that already has dependency allowance in `C6StateDeltaComparator.expectedKeysIncludingDependencies`. The new rule must not simply add another allowance path; it must bind allowed dependency writes to apply facts and state-cell `dependsOn`, or the old final-state-only allowance remains over-broad.
+3. Q5.11's implementation whitelist supersedes the documentation-absorption whitelist only for implementation closeout. It still does not authorize C6 acceptance, base recalibration, model evaluation, training, golden-run, voice, endpoint readiness, or V/S/U-PASS.
+
+Priority classification:
+
+| Priority | Items | Meaning |
+|---|---|---|
+| P0 branch seals before affected code | Q5.2, Q5.4, Q5.5, Q5.6, Q5.7, Q5.9, Q5.10, Q5.11 | Must be decided before code in taxonomy/selectors/apply evidence/readback/JSONL/closeout proof areas. |
+| P1 closeout/coordination gates | Q5.8, Q5.12, Q5.13 | Can proceed with implementation boundaries, but closeout must prove compatibility, UIUE non-intersection, and staged commit topology. |
+| Conditional | Q5.3 | Do not publicize scoped-key helper unless implementation proves that C6/tests must generate scoped keys and cannot consume materialized `ScopeResolution.keys`. |
+
+Accepted execution order:
+
+1. Q5.2 BehaviorClass SSOT.
+2. Q5.10 two-axis reporting: external layers and internal behavior classes.
+3. Q5.4 selector/denominator depth without active thresholds or base anchors.
+4. Q5.5 `StateWrite` schema.
+5. Q5.6 dependency side-effect provenance.
+6. Q5.7 readback plan P hard-pass split.
+7. Q5.8 contract bundle compatibility.
+8. Q5.9 D-domain JSONL migration boundary.
+9. Q5.11 implementation validation proof classes.
+10. Q5.12 UIUE recheck triggers.
+11. Q5.13 commit/OpenSpec stage partition.
+12. Q5.3 scoped-key public helper only if triggered by implementation evidence.
+
+Decision table:
+
+| ID | Disposition | Accepted decision | Required physical landing | Red lines |
+|---|---|---|---|---|
+| Q5.2 | ACCEPT_WITH_NAMING_CORRECTION | Add shared `BehaviorClass` / `VehicleToolBehaviorClass` as SSOT; keep `behavior_class` as the external field; keep `C6Bucket` as legacy/import/report mapping. | New shared behavior taxonomy with five values; mapping from `C6Bucket` must allow `nil` for `coverage`; selectors must not use `C6Bucket.no_call/refusal` as SSOT. | No `coverage` in behavior class; no `C6Bucket.no_call` as `already_state_noop`; no `refusal` bucket without unsupported/safety split. |
+| Q5.3 | DEFER_CONDITIONAL | Do not publicize `scopedKey()` by default. | If triggered, expose a narrow helper such as `scopedStateKey(cellID:scope:)`; otherwise consume materialized `ScopeResolution.keys`. | No broad public API for private helper; no repeated hand-built `cellID[scope]`. |
+| Q5.4 | ACCEPT | Freeze classification and denominator mechanics only. | Emit external layer denominators and behavior-class denominators; sign-or-block missing evidence. | No active pass threshold, old 10/23 current gate, D-domain base recalibration, model run, or C6 acceptance. |
+| Q5.5 | ACCEPT | `StateWrite` is descriptive only. | `stateKey`, `beforeValue?`, `afterValue`, `scopeOrigin?`, `writeKind`; default `appliedWrites: []` compatibility. | No `noop` write kind, behavior class, no-effect reason, planner reason, expected keys, or errors array. |
+| Q5.6 | ACCEPT_WITH_CURRENT_CODE_CAVEAT | Dependency side effects come from state-cell `dependsOn` plus applied-write provenance. | Apply emits `writeKind=.dependency`; C6 validates dependency writes against the direct cell's `dependsOn` rather than passing expected sets into apply. | Do not allow all dependency writes by label alone; do not let old expected-key dependency expansion remain the only guard. |
+| Q5.7 | ACCEPT | Split model hard-pass failures from renderer/readback evidence. | `modelFailureClasses`; renderer/readback fields such as `readback_applicable`, `readback_match`, `readback_excluded_from_model_hard_pass`; verify-gold keeps renderer validity. | `.readback` must not make model `hardFailed=true`; readback must not be deleted. |
+| Q5.8 | ACCEPT | Add versioned component manifest and bundle hash without replacing existing run fields. | `contract_bundle_fingerprint.schema_version`, `component_digests`, `bundle_hash`; preserve `contract_digest`, prompt/output/model/tokenizer/adapter digests. | Do not include prompt, output, seeds, model artifacts, tokenizer artifacts, or LoRA adapter artifacts in the bundle. |
+| Q5.9 | ACCEPT | D-domain JSONL migration is shape-only construction. | Static catalog/IR-map checks plus shape-only `verify-gold`; no raw/customer source text. | No C6 acceptance, model run, base recalibration, retrain-C5 data generation, golden-run, or raw source import. |
+| Q5.10 | ACCEPT | Reporting is two-axis. | `external_layer_results[]` for release-blocking layers and `behavior_class_results[]` for SSOT/diagnostic classes. | No single enum for layer+behavior; no aggregate pass masking hard-layer failure. |
+| Q5.11 | ACCEPT | Implementation closeout may use local static/unit/shape-no-model proof only. | OpenSpec validation, `git diff --check`, targeted Swift/unit tests, static schema/catalog checks, shape-only no-model verify-gold, receipt consistency checks. | No model-quality evaluation, training, base recalibration, golden-run, voice, endpoint readiness, V/S/U-PASS, or C6 acceptance claims. |
+| Q5.12 | ACCEPT | UIUE recheck is narrow and live. | Recheck live UIUE git/diff only if shared state/contracts/generated/golden/readback/presentation receipt surfaces are touched or cited. | No UIUE dispatch/PR/GPT audit as mainline proof; no blanket UIUE blocker for visual-only work. |
+| Q5.13 | ACCEPT | Separate decision docs, implementation, and validation closeout. | Minimum three commits/receipts: docs decision, implementation, validation closeout; recommended five-stage split for producer/C6/JSONL/validation. | No giant mixed commit; no archive before implementation evidence; no §4 candidate comparison in construction stage. |
+
+Cross-cutting teardown:
+
+- "Implementation backlog" is the wrong frame. These are branch seals that decide which code paths are safe to touch.
+- "Local unit pass" is not C6 acceptance. Unit/static/shape-no-model proof may close implementation tasks, but cannot sign candidate quality.
+- "Shape-only verify-gold" is not model-quality proof. It can validate contract/catalog/IR/readback shape only.
+- "Two axes" is not report polish. It is the anti-aggregate-masking mechanism: external layer failures block release claims; behavior-class denominators prevent no-call collapse.
+- "C6BehaviorClass" is an attractive but misleading name if it is treated as the shared taxonomy SSOT. The shared term must not imply C6 ownership.
+
+Hard stop list:
+
+1. `C6Bucket.no_call` treated as `already_state_noop`.
+2. `C6Bucket.refusal` not split into unsupported and safety.
+3. `coverage` added to behavior class.
+4. C6 private apply engine.
+5. `applyWithEvidence` returns soft errors as partial evidence.
+6. `StateWriteKind.noop`.
+7. C6 expected sets passed into apply.
+8. `.readback` affects model `hardFailed`.
+9. `contract_bundle_fingerprint` includes prompt/output/model artifacts.
+10. Shape-only `verify-gold` recorded as C6 acceptance.
+11. Implementation closeout runs model eval, training, or base recalibration.
+12. UIUE PR/dispatch used as mainline merge proof.
+13. Docs/code/validation mixed into one giant commit.
+14. Route-only signoff expanded to retrain-C5, candidate comparison, golden-run, voice, endpoint, or readiness claims.
