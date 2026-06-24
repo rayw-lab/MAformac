@@ -1,14 +1,14 @@
 ---
-status: route_deframing_prep_not_signoff
+status: superseded_by_route_only_signoff
 artifact_kind: r_l17_route_deframing_prep
 authority: preparation_receipt_not_pass
 review_lane: human_owner_plus_heterogeneous_judge
-route_deframing_verdict: pending
+route_deframing_verdict: signed_route_only_in_R7
 candidate_signoff_verdict: unsigned
 proof_class:
   - local
   - local_static_teardown
-retire_trigger: "Retire after R7 final route deframing signoff is completed or this prep is superseded."
+retire_trigger: "Retire after R7 route-only signoff is archived or superseded by candidate signoff."
 expires: "2026-07-15"
 ---
 
@@ -18,13 +18,13 @@ expires: "2026-07-15"
 
 Prepare the R-L17 route-deframing review after `rebuild-c6-four-layer-bench` documentation absorption.
 
-This file is not R-L17 signoff. It does not close route deframing, candidate signoff, C6 acceptance, C5 training, golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
+This file is not R-L17 signoff. It was superseded by the route-only signoff in `R7-final-route-deframing-signoff.md`. Candidate signoff, C6 acceptance, C5 training, golden-run, voice, endpoint readiness, UIUE merge, and V/S/U-PASS remain closed.
 
 ## Current Route Question
 
 Should MAformac proceed from documentation absorption into `rebuild-c6-four-layer-bench` construction first, with `retrain-c5-lora-d-domain` and candidate comparison kept downstream?
 
-Current prepared answer: yes, pending R-L17 route signoff and OpenSpec propose acceptance.
+Current answer: yes for route-only construction scope. R7 signed `route_deframing_verdict: signed_route_only`; OpenSpec propose/apply authorization is still separate.
 
 The route remains:
 
@@ -49,20 +49,21 @@ rebuild-c6 construction -> retrain-c5 candidate -> rebuild-c6 candidate comparis
 | Gate | Current State | Evidence | Verdict |
 |---|---|---|---|
 | G1 D1-D10 verdicts accepted | Accepted. | `docs/project/phase0/phase0-d1-d10-user-decision-record.md` and `docs/project/phase0/phase0-d1-d10-closeout.md` | ready |
-| G2 R1-R7 artifacts complete | Not complete. R1-R7 are mostly evidence stubs. | `docs/project/phase0/r-l17-human-review-evidence/R1-first-50-sample-read.md` through `R7-final-route-deframing-signoff.md` | pending |
-| G3 heterogeneous deframing audit exists | GLM PASS input received. Human owner must decide whether this satisfies G3 or whether another non-Claude-family judge is required. | `heterogeneous-deframing-audit-glm-2026-06-25.md` | received_pending_human_owner |
-| G4 consistent PASS did not bypass human review | Guarded in docs; not yet human signed. | `R7-final-route-deframing-signoff.md` | pending |
-| G5 disagreements escalated to human owner | Procedure exists; no final review yet. | `README.md` and `R7-final-route-deframing-signoff.md` | pending |
+| G2 R1-R7 artifacts complete | Partial for route-only. R1-R6 remain feed-forward/historical evidence; full first-hand evidence remains required before candidate signoff. | `R7-final-route-deframing-signoff.md` | partial_for_route_only |
+| G3 heterogeneous deframing audit exists | GLM PASS accepted by human owner for route-only. Codex/OpenAI is accepted as the second non-Claude-family source, so candidate signoff does not require an additional heterogeneous judge solely for source diversity. | `heterogeneous-deframing-audit-glm-2026-06-25.md` | pass_for_route_only_scope |
+| G4 consistent PASS did not bypass human review | Human owner signed route-only; model agreement did not substitute for R7. | `R7-final-route-deframing-signoff.md` | pass_for_route_only |
+| G5 disagreements escalated to human owner | GLM audit reported no blocking findings for route-only; future candidate-stage disagreements escalate to human owner. | `README.md` and `R7-final-route-deframing-signoff.md` | pass_for_route_only |
 
 ## Required Next Inputs For R7
 
-Before R7 can be signed, collect:
+Before candidate signoff can be signed, collect:
 
-1. Human-owner review notes for the documentation closeout and Q4.15 row-level pointers.
-2. Human-owner decision on whether the GLM heterogeneous PASS satisfies G3 or whether another non-Claude-family judge is required. Same-vendor Codex/Claude pre-checks remain useful but insufficient.
-3. A decision on whether R1-R6 must be fully populated before route signoff, or whether route signoff can explicitly limit itself to "documentation-to-construction route" while leaving candidate signoff unsigned.
-4. Any disagreement table from the heterogeneous judge, with human-owner resolution.
-5. Confirmation that route signoff unlocks only rebuild-C6 construction, not C6 acceptance, retrain-C5, candidate comparison, golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
+1. Full first-hand R1-R6 evidence or an accepted superseding evidence pack.
+2. Completed rebuild-C6 construction evidence.
+3. A signed retrain-C5 candidate.
+4. Any candidate-stage disagreement table, with human-owner resolution.
+5. Explicit run authorization.
+6. Confirmation that candidate signoff scope does not imply golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
 
 ## UIUE Phase4A Impact Check
 
@@ -88,7 +89,7 @@ Intersection to recheck later:
 
 Use a non-Claude-family judge. The judge should assume the route is wrong until proven otherwise.
 
-Current status: one GLM audit has been received and archived in `heterogeneous-deframing-audit-glm-2026-06-25.md`. Reuse the prompt below only if the human owner asks for another heterogeneous judge.
+Current status: GLM audit has been received and archived in `heterogeneous-deframing-audit-glm-2026-06-25.md`; Codex/OpenAI is accepted as the second non-Claude-family source. Reuse the prompt below only if the human owner asks for another heterogeneous judge or if the candidate scope materially changes.
 
 ```text
 You are an R-L17 heterogeneous deframing judge for MAformac.

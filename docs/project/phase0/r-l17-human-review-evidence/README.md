@@ -16,7 +16,7 @@ R-L17 is a deframing gate, not a same-vendor multi-agent vote. More agents with 
 |---|---|---|
 | Human owner | Required for high-stakes signoff and any disagreement. | Yes |
 | Heterogeneous judge | At least one independent deframing audit outside the Claude-family. Prefer non-GPT-family when available. | Yes |
-| Codex/Claude same-vendor checks | Useful pre-checks only. | No |
+| Codex/OpenAI independent review | Counts only when explicitly accepted by the human owner and paired with a non-Claude-family audit trace. Default Codex/Claude self-checks remain pre-checks only. | Conditional |
 
 ## G1-G5 Pass Criteria
 
@@ -40,8 +40,10 @@ Any missing G1-G5 item leaves R-L17 `UNSIGNED` and keeps retrain-c5, rebuild-c6,
 | R4 | `R4-refusal-already-state-home-llm-comparison.md` | Refusal/already_state comparison against home-llm evidence. |
 | R5 | `R5-top-failing-c6-case-drilldown.md` | Top failing C6 cases drilled down case-by-case. |
 | R6 | `R6-generated-utterance-drift-review.md` | Generated utterance drift and generator self-preference review. |
-| R7 | `R7-final-route-deframing-signoff.md` | Human-owner final route decision and heterogeneous deframing summary. |
+| R7 | `R7-final-route-deframing-signoff.md` | Human-owner route-only signoff for rebuild-C6 construction; candidate signoff remains unsigned. |
 | Heterogeneous audit input | `heterogeneous-deframing-audit-glm-2026-06-25.md` | GLM non-Claude-family route deframing audit input for G3; not human-owner signoff. |
+
+Current route-only signoff accepts GLM plus Codex/OpenAI as the heterogeneous review trace. Candidate signoff therefore does not require an additional judge solely for source diversity, but it still requires candidate artifacts, construction evidence, explicit run authorization, and human-owner signoff.
 
 ## Non-Goals
 
