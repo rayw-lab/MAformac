@@ -31,11 +31,14 @@ C6 vehicle-tool-bench 现 expected_tool_calls 用旧 generic frame `tool_call_fr
 
 ## Phase 0 Decisions Required Before Apply
 
-This draft depends on user review of D1-D9 from `docs/research/2026-06-24-lora-zero-failure-deepdive/decisions-and-grill-ammo.md` plus D10 `already_state/state-noop` classification where it touches status/readback semantics.
+The D1-D10 user decisions are accepted in `docs/project/phase0/phase0-d1-d10-user-decision-record.md`. This removes the pending user-decision gate only; it does not authorize D-domain base recalibration, model-quality evaluation, endpoint-ready claims, voice, or demo-golden execution.
 
+- D1: four-layer denominators derive from case schema fields. Old base 10/23 is historical evidence until a D-domain base rerun is separately authorized.
+- D2: C6 sample runners support iter50/100/150 C5 behavior-generation gates, but C6 release cases are not checkpoint-selection oracles.
 - D-domain base recalibration is a future comparison anchor task, not permission to run recalibration during Phase 0.
 - C6 model-quality evidence does not imply endpoint readiness, demo-golden readiness, V-PASS, S-PASS, or U-PASS.
-- Codex subagent audit is same-vendor pre-check only. R-L17 high-stakes signoff requires explicitly deframing heterogeneous review or a recorded user waiver.
+- D10 `already_state` touches status/readback semantics and must remain distinct from unsupported and safety refusal.
+- Codex/Claude same-vendor audits are pre-check only. R-L17 high-stakes signoff requires G1-G5: D1-D10 accepted, R1-R7 evidence files, at least one heterogeneous deframing audit, no four-model consistent-PASS bypass, and human-owner escalation for any judge disagreement.
 - Real model-quality evaluation, endpoint-ready claims, voice, and demo-golden execution remain deferred until gate tasks are accepted.
 
 ## Design/Task Layering

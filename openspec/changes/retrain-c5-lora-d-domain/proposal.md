@@ -31,13 +31,17 @@ C5 LoRA PR5 通宵 wave candidate `0/23`（action hard_pass 真口径 base 10/23
 
 ## Phase 0 Decisions Required Before Apply
 
-This draft depends on user review of D1-D9 from `docs/research/2026-06-24-lora-zero-failure-deepdive/decisions-and-grill-ammo.md` plus D10 `already_state/state-noop` classification from the Phase 0 decision pack.
+The D1-D10 user decisions are accepted in `docs/project/phase0/phase0-d1-d10-user-decision-record.md`. This removes the pending user-decision gate only; it does not authorize data generation, training, model-quality evaluation, endpoint-ready claims, voice, or demo-golden execution.
 
-- Failure/error-recovery is not silently dropped; D7 records whether the full chain is cut or a minimal seed is retained.
-- `already_state` is not collapsed into unsupported or safety refusal; D10 records whether code/readback renderer or model training owns it.
-- Data ratios and general Chinese mix are hypotheses until spike receipts exist.
+- D2: mid-training behavior gate runs at iter50/100/150 with `continue/human_pause/early_stop/blocked`; it is behavior-generation evidence, not val-loss evidence.
+- D3: four-class ratio starts as positive 20 / unsupported 6 / safety 3 / followup 2, about 15.4% negative, and remains a hypothesis until spike evidence finds the over-refusal bend.
+- D4: SFT first and DPO deferred; reopen DPO only if SFT plus natural Chinese data still leaves seven demo-critical refusal cases at 0/7.
+- D6: general Chinese mix starts at 10-15% and requires a Chinese regression gate against raw Qwen3-1.7B; candidate degradation greater than 5% is `UNSIGNED`.
+- D7: failure/error-recovery cuts full HA-style chains and keeps only minimal parser-failure seeds with loss-masked failure turns.
+- D10: `already_state` is an independent fifth state class. Default owner is C3 plus readback renderer; model training only learns answer wording unless C6 evidence shows natural-language `already_state` FN >20%.
+- D3/D6/D7 must run on the same candidate ID; D2/D3/D6/D7 evidence remains `UNSIGNED` until physical receipts exist.
 - `train_health`, loss health, and training receipts do not imply `model_quality`, `lora_candidate`, `endpoint_candidate`, V-PASS, or demo readiness. A candidate remains `UNSIGNED/BLOCKED` until C6 model-quality gates and required human reviews pass.
-- Codex subagent audit is same-vendor pre-check only. R-L17 high-stakes signoff requires explicitly deframing heterogeneous review or a recorded user waiver.
+- Codex/Claude same-vendor audits are pre-check only. R-L17 high-stakes signoff requires G1-G5: D1-D10 accepted, R1-R7 evidence files, at least one heterogeneous deframing audit, no four-model consistent-PASS bypass, and human-owner escalation for any judge disagreement.
 - Training, real evaluation, endpoint-ready claims, voice, and demo-golden execution remain deferred until gate tasks are accepted.
 
 ## Design/Task Layering
@@ -71,7 +75,7 @@ Architecture Decisions are recorded in `design.md` as `AD-C5-*`. `tasks.md` only
 - `openspec validate retrain-c5-lora-d-domain --strict` + `--all --strict` pass。
 - 训练样本 expected_tool_calls 全为 D-domain 具名工具，无 `tool_call_frame` 残留。
 - 训练 surface digest == 上游 A2 codegen surface digest（训/eval/runtime 三处单源 parity）。
-- Architecture Decisions for R-L09/R-L02/R-L03/R-L05/R-L07/R-L11/R-L17 and status boundaries exist in `design.md`; `tasks.md` references those ADs rather than carrying the decision source alone.
+- Architecture Decisions for R-L09/R-L02/R-L03/R-L05/R-L07/R-L11/R-L17, D6 general Chinese regression, D10 already_state, and status boundaries exist in `design.md`; `tasks.md` references those ADs rather than carrying the decision source alone.
 - 四类数据（正样本/unsupported/safety/followup）覆盖 10 族 562 intent scope；scope_tier 计数对齐 G4。
 - candidate C6 action hard_pass 相对 base 10/23 不退化（最低门）→ 目标提升（防 0/23 复发）。
 - 训练 receipt 记 scale=20 / LR 1e-4 / verified loop SHA / clip 指标 / nonfinite 检查 / masking 覆盖。

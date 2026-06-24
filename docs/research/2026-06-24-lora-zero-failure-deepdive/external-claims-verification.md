@@ -73,16 +73,18 @@
 
 ## 18 路高频 arxiv ID 核验（主线程 WebSearch 2026-06-24，抽样 top 高频，18 路共引 80+ ID）
 
-| arxiv ID | 出现路数 | 标题 | 真伪 | 对决策的支撑 |
-|---|---|---|---|---|
-| **2602.04998** | **11 路** | Learning Rate Matters: Vanilla LoRA May Suffice for LLM Fine-tuning (2026-02) | ✅ 真实 | 🔴 **守 rank16Mainline 最强背书**：系统重评 9 个 LoRA 变体 vs vanilla，证明调好 LR 后 vanilla LoRA competitive，新变体优势多来自 baseline 调参不足。直接支撑 L13/L14「PEFT 新结构=escape-hatch 不动主线」|
-| 2507.02825 | 4 路 | ABC: Best Practices for Rigorous Agentic Benchmarks (2025-07) | ✅ 真实 | 0/34 同根铁证：明文「TAU-bench counts empty responses as successful」「误差 up to 100%」。L04 引用准确 |
-| 2506.20856 | 6 路 | Leaner Training, Lower Leakage: Memorization in LoRA FT (2025-06) | ✅ 真实 | LoRA vs full FT，LoRA 显著降 memorization。支撑 L08/L10「用 LoRA 不 Full FT」|
-| 2604.17073 | 5 路 | Abstain-R1: Calibrated Abstention via Verifiable RL (2026-04, 3B) | ✅ 真实 | 🔴 **支撑 L12「拒识该 DPO/RL」**：RLVR 做 abstention+post-refusal clarification，3B 模型，正对 7 个 demo-critical 拒识 case |
-| 2504.18851 | 5 路 | When2Call: When (not) to Call Tools (NAACL 2025, NVIDIA) | ✅ 真实 | 4-class abstention + **RPO 偏好优化比 fine-tuning 改进大**。又一证据支撑 L12 拒识用偏好优化 |
-| **2603.03203** | **5 路** | — | 🔴🔴 **WebSearch 搜不到（疑似编造/typo）** | **5 路引用一个搜不到的 ID = finder 编造高发点 catch**。不可作 load-bearing 证据，综合官/propose 引用前必复核（可能 2603 vs 2606 typo）|
+> 🔴 **口径修正（claim-vs-reality 第8坑自纠，2026-06-24）**：下表「出现」列原误标「N 路」，实为 `grep | uniq -c` 的**出现次数**（同一 lens 文件内多次 ≠ 多路 finder）。已改为「文件(lens) × 次数」准确口径。影响：2602.04998 实为 lens13/14 两路（非"11 路广泛引用"）；2603.03203 实为 lens08 **单路**内 5 次（=单路 finder 编造，非跨路传播）。结论（真伪/支撑）不变。
 
-→ 核验结论：抽样 6 个高频中 **5 真实+引用准确，1 个（2603.03203）疑似编造**（5 路引用搜不到）。**防编造 catch 价值兑现**——18 路 80+ ID 不可能全真。其余未抽样的 70+ ID，propose 引用任一前必 WebSearch 复核（ultracode 横切纪律7：finder 高发编造精确 ID 安到多处）。
-→ 🔴 **两个 load-bearing 正面发现**：① 2602.04998（11 路）是守 rank16Mainline 的核心理论背书；② Abstain-R1(2604.17073)+When2Call(2504.18851) 双证据支撑「拒识/澄清类需偏好优化非纯 SFT」(L12 新 insight 外部坐实)。
+| arxiv ID | 出现(文件×次) | 标题 | 真伪 | 对决策的支撑 |
+|---|---|---|---|---|
+| **2602.04998** | **lens13/14 · 11次** | Learning Rate Matters: Vanilla LoRA May Suffice for LLM Fine-tuning (2026-02) | ✅ 真实 | 🔴 **守 rank16Mainline 最强背书**：系统重评 9 个 LoRA 变体 vs vanilla，证明调好 LR 后 vanilla LoRA competitive，新变体优势多来自 baseline 调参不足。直接支撑 L13/L14「PEFT 新结构=escape-hatch 不动主线」|
+| 2507.02825 | lens04 · 4次 | ABC: Best Practices for Rigorous Agentic Benchmarks (2025-07) | ✅ 真实 | 0/34 同根铁证：明文「TAU-bench counts empty responses as successful」「误差 up to 100%」。L04 引用准确 |
+| 2506.20856 | lens08 · 6次 | Leaner Training, Lower Leakage: Memorization in LoRA FT (2025-06) | ✅ 真实 | LoRA vs full FT，LoRA 显著降 memorization。支撑 L08/L10「用 LoRA 不 Full FT」|
+| 2604.17073 | lens12 · 5次 | Abstain-R1: Calibrated Abstention via Verifiable RL (2026-04, 3B) | ✅ 真实 | 🔴 **支撑 L12「拒识该 DPO/RL」**：RLVR 做 abstention+post-refusal clarification，3B 模型，正对 7 个 demo-critical 拒识 case |
+| 2504.18851 | lens04/07/12 · 5次 | When2Call: When (not) to Call Tools (NAACL 2025, NVIDIA) | ✅ 真实 | 4-class abstention + **RPO 偏好优化比 fine-tuning 改进大**。又一证据支撑 L12 拒识用偏好优化 |
+| **2603.03203** | **lens08 · 5次** | — | 🔴🔴 **WebSearch 搜不到（疑似编造/typo）** | **lens08 单路 finder 内引 5 次一个搜不到的 ID = 单路编造高发 catch**。不可作 load-bearing 证据，propose 引用前必复核（可能 2603 vs 2606 typo）|
+
+→ 核验结论：抽样 6 个高频中 **5 真实+引用准确，1 个（2603.03203）疑似编造**（lens08 单路内 5 次引用、搜不到）。**防编造 catch 价值兑现**——18 路 80+ ID 不可能全真。其余未抽样的 70+ ID，propose 引用任一前必 WebSearch 复核（ultracode 横切纪律7：finder 高发编造精确 ID）。
+→ 🔴 **两个 load-bearing 正面发现**：① 2602.04998（lens13/14）是守 rank16Mainline 的核心理论背书；② Abstain-R1(2604.17073)+When2Call(2504.18851) 双证据支撑「拒识/澄清类需偏好优化非纯 SFT」(L12 新 insight 外部坐实)。
 
 **Sources**: [Learning Rate Matters 2602.04998](https://arxiv.org/abs/2602.04998) · [ABC 2507.02825](https://arxiv.org/abs/2507.02825) · [Leaner Training 2506.20856](https://arxiv.org/abs/2506.20856) · [Abstain-R1 2604.17073](https://arxiv.org/abs/2604.17073) · [When2Call 2504.18851](https://arxiv.org/abs/2504.18851) · [NLoRA arxiv 2502.14482](https://arxiv.org/abs/2502.14482) · [NLoRA ACL](https://aclanthology.org/2025.findings-emnlp.72/) · [Stiefel-LoRA arxiv 2508.17901](https://arxiv.org/abs/2508.17901) · [Stiefel ACL](https://aclanthology.org/2025.findings-emnlp.1143/) · [CorDA arxiv 2406.05223](https://arxiv.org/abs/2406.05223) · [CorDA github](https://github.com/iboing/CorDA)（均 WebSearch 2026-06-24 核）

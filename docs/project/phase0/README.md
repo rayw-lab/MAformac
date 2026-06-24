@@ -37,17 +37,27 @@ These files are not implementation, not OpenSpec archive, and not permission to 
 
 - `docs/superpowers/plans/2026-06-24-phase0-d1-d10-openspec-gates.md` is the current implementation plan for converting D1-D10 and stop-the-train gates into OpenSpec-ready design/tasks. It is not a source of truth and must be retired or superseded after closeout.
 - `docs/superpowers/plans/2026-06-24-phase0-d1-d10-openspec-gates-audit.md` is a same-vendor Codex pre-check record, not the R-L17 heterogeneous deframing review.
+- Baseline status: accepted as baseline with open items, not final baseline. D1-D10 user decisions are accepted; R-L17 heterogeneous deframing, OpenSpec proposal acceptance, physical evidence gates, and UIUE worktree pinning remain visible blockers for execution or readiness claims.
 
 ## D1-D10 Gate Pack
 
-- `d1-d10-lora-zero-failure-decision-pack.md` lists D1-D9 plus D10 `already_state/state-noop` for user review. Defaults are recommendations only.
-- `phase0-d1-d10-user-decision-record.md` is the only local record for user verdict status. Pending rows block accepted gate policy.
+- `d1-d10-lora-zero-failure-decision-pack.md` lists the accepted D1-D9 plus D10 `already_state/state-noop` user verdicts.
+- `d1-d10-fast-pick-verdict-2026-06-24.md` archives the fast-pick table, cross-decision discipline, default-scope constraints, and extra stop-the-train gates used to clear the D1-D10 pending gate.
+- `phase0-d1-d10-user-decision-record.md` is the only local record for user verdict status. Its `pending_user_decision` list is currently empty.
 - `stop-the-train-openspec-carrier-map.md` preserves the original first-tier R-L09/R-L02/R-L03/R-L05/R-L04/R-L07/R-L17/R-L11 rows and maps them into OpenSpec draft carriers.
+- `r-l17-human-review-evidence/` contains R-L17 deframing evidence templates. R-L17 remains unsigned until G1-G5 pass; same-vendor Codex/Claude reviews are pre-check only.
 - `c5-recovery-roadmap-disposition.md` records which roadmaps are historical versus live carriers.
-- `phase0-d1-d10-closeout.md` records current closeout status; it is partial until user verdicts and heterogeneous review are done.
+- `phase0-d1-d10-closeout.md` records current closeout status; it is accepted for D1-D10 user decisions but still partial until heterogeneous review and OpenSpec carriers are accepted.
 - `phase0-d1-d10-cascade-audit-codex-2026-06-24.md` records the Codex same-vendor cascade pre-check and main-thread absorption.
+
+## Demo Default Scope Gate Pack
+
+- `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` records the accepted G01-G28 default-scope grill decisions.
+- Scope: non-UIUE mainline C2/C3/C5/C6/readback/demo-scenario semantics. G28 is retained as a UIUE merge check only, not a mainline blocker unless state/C3-C6/golden contracts conflict.
+- This pack is separate from D1-D10. It must become an OpenSpec carrier before implementation, and it blocks retrain-c5/rebuild-c6 acceptance until the default_scope semantics are physically implemented and verified.
+- UIUE worktree pinning: external worktree `/Users/wanglei/workspace/MAformac-uiue`, expected HEAD `f1096d7` as of 2026-06-24. If HEAD differs, reconfirm AD-8.1/AD-8.7 before citing UIUE file:line evidence.
 
 ## Current State
 
-- Status: skeletons created; D1-D10 route-control pack materialized as draft pending user decision; OpenSpec design/tasks rewritten as draft carriers.
-- Next step: get or record D1-D10 user verdicts, then run heterogeneous/deframing review before any high-stakes signoff or apply-ready claim.
+- Status: skeletons created; D1-D10 route-control pack accepted by user verdict; default-scope G01-G28 decisions accepted and recorded; OpenSpec design/tasks remain draft carriers.
+- Next step: convert accepted default-scope G01-G28 into an OpenSpec change with design/tasks/spec deltas before retrain-c5/rebuild-c6/demo-golden-run.

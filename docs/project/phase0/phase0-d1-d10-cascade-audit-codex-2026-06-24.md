@@ -16,13 +16,13 @@ This audit was performed by a Codex subagent on 2026-06-24. It is same-vendor pr
 
 Original subagent verdict: CLEAR_WITH_FIXES.
 
-Main-thread absorption status: fixes absorbed as route-control baseline; D1-D10 verdicts remain pending.
+Main-thread absorption status: fixes absorbed as route-control baseline; D1-D10 user verdicts accepted on 2026-06-24; R-L17 remains open.
 
 ## Findings And Absorption
 
 | Finding | Severity | Absorption |
 |---|---|---|
-| D1-D10 full-file cascade docs missing; cannot claim full cascade complete. | P1 | Added decision pack, user decision record, carrier map, roadmap disposition, and partial closeout. All are pending, not accepted gate policy. |
+| D1-D10 full-file cascade docs missing; cannot claim full cascade complete. | P1 | Added decision pack, user decision record, carrier map, roadmap disposition, and partial closeout. D1-D10 verdicts are now accepted, but OpenSpec carrier acceptance and R-L17 remain open. |
 | Old roadmap text still had jump-read live instructions. | P2 | Added historical-instruction markers to the C5 recovery roadmap and the 2026-06-20 roadmap. |
 | C5/C6 tasks contained future execution rows without local no-authorization boundary. | P2 | Added Phase 0 boundary notes at the top of both active `tasks.md` files. |
 | `.DS_Store` files exist under docs. | optional | `.gitignore` already ignores `.DS_Store`; do not stage them. |
@@ -33,6 +33,6 @@ The audit found no authorization of training, real model-quality evaluation, end
 
 ## Required Follow-Up
 
-- Obtain user verdicts for D1-D10 or keep all downstream gate language labeled `draft pending user decision`.
-- Run a heterogeneous/deframing review before any high-stakes R-L17 signoff.
+- Keep D1-D10 user-verdict status aligned with `phase0-d1-d10-user-decision-record.md`; if any row reopens to pending, downstream gate language must revert to `draft pending user decision`.
+- Run a heterogeneous/deframing review before any high-stakes R-L17 signoff. R-L17 remains open; this same-vendor pre-check is not an acceptable substitute.
 - Refresh verification commands before commit.

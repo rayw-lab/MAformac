@@ -33,12 +33,37 @@ enum_groups:
   execution_outcome:
     status: placeholder
     values: []
+    seed_values:
+      - id: already_state
+        status: accepted_seed
+        definition: "State-noop outcome when the requested vehicle state is already true or cannot produce a meaningful state delta because the relevant system is already off."
+        owner_layer: C3_and_readback_renderer
+        not_equivalent_to:
+          - unsupported
+          - safety_refusal
+          - success_with_state_delta
+          - clarify
+        downstream_placeholder_refs:
+          - C10_already_state_state_noop
+          - C22_demo_golden_ids
   refusal_kind:
     status: placeholder
     values: []
   readback_result:
     status: placeholder
     values: []
+    seed_values:
+      - id: already_state_readback
+        status: accepted_seed
+        definition: "Renderer-owned natural-language response for an already_state outcome; may use templates but does not make the model own state truth."
+        owner_layer: readback_renderer
+        not_equivalent_to:
+          - model_refusal
+          - unsupported_readback
+          - safety_refusal_readback
+        downstream_placeholder_refs:
+          - C10_already_state_state_noop
+          - C24_status_vocabulary_graph
   parser_failure_kind:
     status: placeholder
     values: []

@@ -1,5 +1,5 @@
 ---
-status: partial_draft_closeout
+status: accepted_user_decisions_partial_closeout
 artifact_kind: phase0_closeout
 authority: closeout_record_not_ssot
 retire_trigger: "Retire after D1-D10 are accepted/rejected by user verdict and OpenSpec carriers are either accepted, superseded, or archived."
@@ -10,7 +10,9 @@ expires: "2026-07-15"
 
 ## Verdict
 
-Partial closeout only. The baseline cascade has been materialized enough to prevent old-roadmap and task-checkbox drift, but D1-D10 remain pending user verdicts. Therefore the active OpenSpec gate rewrites are still draft pending user decision, not accepted gate policy.
+Partial closeout with D1-D10 user decisions accepted. The baseline cascade has been materialized enough to prevent old-roadmap and task-checkbox drift, and the D1-D10 user-decision gate is no longer pending. The remaining blockers are R-L17 heterogeneous deframing, OpenSpec proposal acceptance, physical evidence gates, and later implementation/validation.
+
+Closeout hard rule: if `phase0-d1-d10-user-decision-record.md` later regains a non-empty `pending_user_decision` list or any verdict row contains `| pending |`, this file must revert to a pending closeout status. A passing `openspec validate --all --strict` result is necessary structural evidence only; it is not permission to mark Phase 0 complete.
 
 ## Completed In This Pass
 
@@ -30,10 +32,23 @@ Partial closeout only. The baseline cascade has been materialized enough to prev
 
 | Item | Status | Blocking effect |
 |---|---|---|
-| D1-D10 user verdicts | pending | Blocks accepted gate policy and apply-ready claims. |
-| Heterogeneous deframing review | pending | Blocks R-L17 high-stakes signoff. |
+| D1-D10 user verdicts | accepted | Unblocks Phase 0 decision pending gate only; does not authorize execution. |
+| R-L17 G1 D1-D10 user verdicts | accepted | Satisfies only the user-verdict prerequisite. |
+| R-L17 G2 R1-R7 evidence files | pending | Blocks R-L17 high-stakes signoff. Evidence stubs live under `r-l17-human-review-evidence/`. |
+| R-L17 G3 heterogeneous deframing audit | pending | Blocks R-L17 high-stakes signoff; Codex/Claude same-vendor pre-check is not enough. |
+| R-L17 G4 consistent-PASS deframing | pending | Blocks route signoff if four-model agreement bypasses human-owner review. |
+| R-L17 G5 disagreement escalation | pending | Blocks route signoff if any judge disagreement is resolved by majority vote rather than human-owner review. |
 | Filled manifests from the seven skeleton schemas | pending | Blocks full Phase 0 materialization claim. |
 | OpenSpec proposal acceptance | pending | Blocks any apply/training/evaluation launch. |
+
+## Mechanical Gate Check
+
+```bash
+rg -n "\| pending \|" docs/project/phase0/phase0-d1-d10-user-decision-record.md && exit 65 || true
+rg -n "pending_user_decision:" docs/project/phase0 openspec/changes/retrain-c5-lora-d-domain openspec/changes/rebuild-c6-four-layer-bench
+```
+
+If the first command finds any pending row, do not describe this closeout as accepted-user-decisions. Even with no pending rows, do not describe Phase 0 as complete until the other open items above are closed.
 
 ## Verification Ledger
 
@@ -52,7 +67,7 @@ Result: pass. `openspec validate --all --strict` reported 13 passed, 0 failed; `
 
 This closeout may be committed as a route-control baseline only. It must not be described as:
 
-- D1-D10 accepted.
+- R-L17 complete.
 - Phase 0 fully complete.
 - retrain-c5 apply-ready.
 - rebuild-c6 apply-ready.

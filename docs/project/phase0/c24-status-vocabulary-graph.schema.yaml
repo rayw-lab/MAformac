@@ -30,6 +30,7 @@ status_ids_seed:
   - c6_model_quality
   - endpoint_candidate
   - demo_golden_ready
+  - already_state_noop
   - T_PASS
   - V_PASS
   - S_PASS
@@ -55,8 +56,41 @@ graph_rules:
   - train_health_must_not_imply_model_quality
   - demo_golden_ready_must_not_imply_uiue_acceptance_without_state_contract
   - historical_10_23_anchor_must_not_be_active_candidate_gate
+  - already_state_noop_must_not_imply_unsupported_or_safety
 
-entries: []
+entries:
+  - status_id: already_state_noop
+    status: accepted_seed
+    definition: "State-noop outcome/readback status for requests where the requested state is already achieved or the controlled subsystem is already off."
+    evidence_required:
+      - C3_or_state_renderer_determines_current_state
+      - readback_template_distinguishes_already_state
+      - no_state_delta_or_no_meaningful_delta_is_expected
+    allowed_claims:
+      - state_noop_handled
+      - renderer_can_explain_current_state
+    forbidden_claim_patterns:
+      - unsupported_device
+      - safety_refusal
+      - model_quality_pass
+      - endpoint_ready
+    implies: []
+    not_implies:
+      - unsupported
+      - safety_refusal
+      - c6_model_quality
+      - endpoint_candidate
+      - demo_golden_ready
+    blocks: []
+    blocked_by:
+      - C10_already_state_state_noop_not_defined
+    owner: C3_and_readback_renderer
+    receipt_fields:
+      - state_cell_id
+      - current_state
+      - requested_state
+      - scope_origin
+      - readback_template_id
 
 validation_rules:
   - every_active_pass_claim_must_reference_one_status_id

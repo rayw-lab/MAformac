@@ -8,6 +8,7 @@ incremental，禁大爆炸。
 
 - [ ] 1.1 确认 `migrate-d-domain-tool-surface` 已 archive（D-domain 工具名可引用）。
 - [ ] 1.2 确认 `rebuild-c6-four-layer-bench` must_pass + c6_case_id_derived 可关联。
+- [ ] 1.3 确认 `define-demo-default-scope` 已 proposed/validated before freezing golden-run IDs, readback text, `scope_origin` policy, or UIUE scene tags.
 
 ## 2. demo-golden-run capability（new）
 
@@ -15,6 +16,7 @@ incremental，禁大爆炸。
 - [ ] 2.2 炸场 case 锁 10 族（现场不脱靶）；未建 state cell 步禁进 golden（U9/Q37）。
 - [ ] 2.3 demo 脚本占位符 → 真实话术单源（demo-experience-script-placeholders.md 14 处补全 → golden-run SSOT）。
 - [ ] 2.4 K_abs = required must_pass step count（F3 DEFERRED 不拍数，解冻后推）。
+- [ ] 2.5 D10 `already_state` dedicated case：add one state-noop golden seed before freezing IDs. Example shape: user asks a temperature/status utterance while `ac.power=off`; renderer answers that the AC is already off and temperature is unavailable/unchanged. This case must assert `already_state` separately from unsupported, safety, success, and clarify, and must carry `scope_origin` metadata.
 
 ## 3. UIUE 落契约
 

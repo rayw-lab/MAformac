@@ -1,6 +1,6 @@
 # Grill Decisions Master — 统一 grill decision SSOT
 
-> **as-of**: 2026-06-23
+> **as-of**: 2026-06-24
 > **生产官**: grill-decisions-master SSOT 生产官（subagent）
 > **一手源**: `docs/grill-tournament/final-grill-list.md`（锦标赛 41 题）+ `docs/grill-tournament/ledger.md`（Q→source 映射）+ `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`（§13-§18 已拍 + UIUE U1-U10）+ `~/workspace/raw/05-Projects/MAformac/research/2026-06-22-uiue-ultracode/GRILL-MASTER.md`（UIUE 31 条 R1-R3）。
 
@@ -101,6 +101,19 @@
 - **→A2合同**（4，不再 grill）：Q01 / Q02 / Q05 / Q39。
 - **🟡部分**（方向已拍，物理化/续批待 grill）：Q06 / Q17 / Q19 / Q23 / Q25 / Q26 / Q28 / Q29 / Q30 / Q31 / Q32 / Q34 / Q35 / Q37 / Q38 / Q40。
 - **🔴待grill**（纯待，15）：Q04 / Q07 / Q08 / Q09 / Q10 / Q11 / Q12 / Q14 / Q16 / Q18 / Q20 / Q21 / Q24 / Q27 / Q36。（Q15=CAS1 已执行→移出待 grill 池，见上「✅已执行」+ §5 CAS 表）
+
+### §2.1 Demo Default Scope G01-G28（2026-06-24 已拍）
+
+- Accepted decision pack: `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md`.
+- Boundary: this is a post-A2, non-UIUE mainline decision pack for omitted scope/default_scope semantics across C2/C3/C5/C6/readback/demo-scenarios. It does not rewrite Q01-Q41 and does not reopen D1-D10.
+- Core verdict: omitted scope must resolve through explicit C2 `default_scope`, not `全车`/`all` and not YAML `scope.first`; explicit `全车` remains fan-out; G28 is retained only as a UIUE merge check.
+
+### §2.2 Phase 0 D10 `already_state/state-noop`（2026-06-24 已拍）
+
+- Pointer: `docs/project/phase0/d1-d10-lora-zero-failure-decision-pack.md` and `docs/project/phase0/phase0-d1-d10-user-decision-record.md`.
+- Status: accepted human-reviewed user verdict, not execution authorization.
+- Boundary: `already_state` / state-noop is an independent fifth state class, peer to unsupported, safety refusal, success, and clarify. Default owner is C3 + readback renderer; training only learns natural-language answer templates unless C6 evidence shows natural-language `already_state` false-negative rate above 20%.
+- Route rule: D10 must not be hidden inside D1-D9 or the default-scope G01-G28 pack. It remains a separate Phase 0 decision and must be reflected in C06/C24 skeletons plus one future demo-golden-run case.
 
 ---
 

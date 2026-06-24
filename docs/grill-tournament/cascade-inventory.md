@@ -10,6 +10,8 @@
 > 🔴 **工具数未拍待 value-form 实算（562=intent 非工具数，派单当工具数=口径错全链路）**。
 > **🔴 废口径（claim-vs-reality 第10变体，禁再引）—— 废口径【权威定义】单一清单 = `grill-decisions-master.md §0 口径权威表`（禁在本文复制其权威定义）**。废口径的权威定义只在 master §0 表格物理存在一处；本文不另建第二份权威表，引用废口径定性前一律指回 master §0（兑现 Q22 + §35 SSOT 单一化，消除「本处随之同步」的手工同步义务 = drift-waiting 反模式；finding 2026-06-23 第四轮）。**注（finding round-01）**：下文 §4.3 是【回写操作映射表】（污染出现位置→修正动作），非废口径权威源——其列举的废口径数值仅作「在哪出现、改成什么」的操作锚，权威定性以 master §0 为准；§4.3 不是「再内联列举一份权威表」。
 
+> 🟡 **2026-06-24 addendum — Demo default-scope G01-G28**: New accepted decision pack = `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md`. Scope = non-UIUE mainline omitted-scope/default_scope semantics across C2 `state-cells.yaml`, C3 execution, `ToolContractStateApplier`, C5 training renderer, C6 bench/gold JSONL, readback renderer, demo scenarios, tests, and OpenSpec carriers. It is **post-A2 semantic debt** and must be implemented before retrain-c5/rebuild-c6 acceptance. UIUE is only a G28 merge check unless state/C3-C6/golden contracts conflict.
+
 ---
 
 ## 1. Executive
