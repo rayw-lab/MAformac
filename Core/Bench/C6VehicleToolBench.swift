@@ -735,6 +735,16 @@ public struct C6ExternalLayerStats: Codable, Equatable, Sendable {
     }
 }
 
+public struct C6DenominatorReport: Codable, Equatable, Sendable {
+    public var unresolvedBehaviorClassCaseIDs: [String]
+    public var layerCaseIDs: [String: [String]]
+
+    enum CodingKeys: String, CodingKey {
+        case unresolvedBehaviorClassCaseIDs = "unresolved_behavior_class_case_ids"
+        case layerCaseIDs = "layer_case_ids"
+    }
+}
+
 public struct C6Summary: Codable, Equatable, Sendable {
     public var status: String
     public var modelID: String
@@ -747,6 +757,8 @@ public struct C6Summary: Codable, Equatable, Sendable {
     public var contractDigest: String
     public var totalCases: Int
     public var totalRuns: Int
+    // Legacy compatibility field. Rebuild-C6 construction reports per-layer stats in
+    // `externalLayerStats`; active thresholds and base anchors remain deferred.
     public var IrrelAcc: Double
     public var IrrelAccThreshold: Double
     public var contractCoverageScore: Double
@@ -755,6 +767,7 @@ public struct C6Summary: Codable, Equatable, Sendable {
     public var noToolFalsePositiveCount: Int
     public var behaviorClassStats: [VehicleToolBehaviorClassStats]
     public var externalLayerStats: [C6ExternalLayerStats]
+    public var denominatorReport: C6DenominatorReport
     public var perCaseStats: [C6PerCaseStats]
     public var evalRuns: [C6EvalRun]
 
@@ -778,6 +791,7 @@ public struct C6Summary: Codable, Equatable, Sendable {
         case noToolFalsePositiveCount = "no_tool_false_positive_count"
         case behaviorClassStats = "behavior_class_stats"
         case externalLayerStats = "external_layer_stats"
+        case denominatorReport = "denominator_report"
         case perCaseStats = "per_case_stats"
         case evalRuns = "eval_runs"
     }
@@ -1309,6 +1323,7 @@ public struct C6BenchRunner: Sendable {
         let falsePositiveCount = runs.map(\.gateResult.noToolFalsePositiveCount).reduce(0, +)
         let behaviorStats = Self.behaviorClassStats(cases: cases, runsByCase: runsByCase)
         let layerStats = Self.externalLayerStats(cases: cases, runsByCase: runsByCase)
+        let denominatorReport = Self.denominatorReport(cases: cases)
         let perCase = runsByCase.keys.sorted().map { caseID in
             let items = runsByCase[caseID] ?? []
             let hardPasses = items.map { $0.gateResult.hardFailed ? 0.0 : 1.0 }
@@ -1345,6 +1360,7 @@ public struct C6BenchRunner: Sendable {
             noToolFalsePositiveCount: falsePositiveCount,
             behaviorClassStats: behaviorStats,
             externalLayerStats: layerStats,
+            denominatorReport: denominatorReport,
             perCaseStats: perCase,
             evalRuns: runs.sorted { ($0.caseID, $0.runID) < ($1.caseID, $1.runID) }
         )
@@ -1388,6 +1404,20 @@ public struct C6BenchRunner: Sendable {
                 hardFailureCount: runs.filter(\.gateResult.hardFailed).count
             )
         }
+    }
+
+    private static func denominatorReport(cases: [C6BenchCase]) -> C6DenominatorReport {
+        let unresolvedBehaviorClassCaseIDs = cases
+            .filter { C6CaseBehaviorClassResolver.resolve($0) == nil && $0.tags.bucket != .coverage }
+            .map(\.caseID)
+            .sorted()
+        let layerCaseIDs = Dictionary(grouping: cases, by: { C6ExternalLayerSelector.layer(for: $0).rawValue })
+            .mapValues { items in items.map(\.caseID).sorted() }
+
+        return C6DenominatorReport(
+            unresolvedBehaviorClassCaseIDs: unresolvedBehaviorClassCaseIDs,
+            layerCaseIDs: layerCaseIDs
+        )
     }
 
     private func clarifyGateMatches(
