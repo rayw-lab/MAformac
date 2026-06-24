@@ -19,6 +19,7 @@
 | `long_run_slice` | Long-run 2 of 2 for rebuild-C6 construction-lane closeout |
 | `local_ends_at` | Contract bundle identity, explicit D-domain C6 case shape, local closeout |
 | `external_audit_gate` | Push GitHub branch after local closeout, then request GPT Pro audit before external-pass claim |
+| `human_authorization` | Accepted in this plan update: user explicitly authorized Phase 4 code and wants the dispatch file to carry the authorization so another window can run uninterrupted |
 | `retire_trigger` | Retire or supersede after GPT Pro verdict is absorbed into tracked closeout, or after a newer implementation plan explicitly supersedes this file |
 | `expiry_trigger` | Expires if OpenSpec `rebuild-c6-four-layer-bench` construction/comparison topology changes, if route-only R-L17 status changes, or if implementation starts from a different audited baseline without updating L0 |
 
@@ -31,6 +32,28 @@
 - Harness cannot be downgraded: phase subagent audits and final GPT Pro audit are hard gates.
 - GPT-5.5/Codex has broad implementation authority inside route boundaries. Suggested names and snippets are target shapes, not paste contracts.
 - Every phase starts with a short pre-mortem and records lessons immediately in `VERIFY.md`.
+
+---
+
+## Human Authorization For Execution
+
+This tracked plan file carries the human OpenSpec propose/apply authorization for Long-run 2 construction-lane execution.
+
+磊哥 explicitly clarified after the first plan commit:
+
+> "我授权了呀。。。哎 好烦哦 请你开启Phase 4 代码"
+
+and then clarified the intended carrier:
+
+> "我意思 我授权了 你在派单文件改一下 不需要你执行。你的派单文件要能不间断跑。"
+
+Interpretation:
+
+- This plan update is the tracked authorization evidence for another Codex window to execute the plan without stopping on the stale `docs/CURRENT.md` `unlocked_not_yet_closed` row.
+- Do not create a separate authorization file solely to unblock execution.
+- Do not edit `docs/CURRENT.md` solely to unblock execution; it is router-only and may lag this implementation plan.
+- If a newer tracked governance file explicitly revokes or narrows this authorization, the newer governance file wins.
+- Authorization remains construction-lane only: Phase 4, Phase 5, Phase 6, L4 audit preparation, and closeout under this plan. It does not authorize retrain-C5, C6 acceptance, D-domain base recalibration, §4 candidate comparison, model-quality evaluation, golden-run, voice, endpoint, UIUE merge, R-L17 candidate signoff, or V/S/U-PASS.
 
 ---
 
@@ -310,7 +333,9 @@ Expected:
 Run:
 
 ```bash
-rg -n "OpenSpec propose review.*accepted|propose/apply authorization.*accepted|accepted_for_apply|construction apply authorized|human.*accept.*rebuild-c6" \
+rg -n "Human Authorization For Execution|human_authorization|我授权了|派单文件改一下|不间断跑" \
+  docs/superpowers/plans/2026-06-25-rebuild-c6-identity-shape-closeout.md
+rg -n "OpenSpec propose review.*accepted|propose/apply authorization.*accepted|accepted_for_apply|construction apply authorized|human.*accept.*rebuild-c6|unlocked_not_yet_closed" \
   docs/CURRENT.md \
   docs/project/phase0 \
   openspec/changes/rebuild-c6-four-layer-bench
@@ -318,9 +343,10 @@ rg -n "OpenSpec propose review.*accepted|propose/apply authorization.*accepted|a
 
 Expected:
 
-- A tracked file explicitly records that human OpenSpec propose/apply authorization is accepted for `rebuild-c6-four-layer-bench` construction.
-- If evidence is absent or only says `unlocked_not_yet_closed`, stop before Phase 4 and report `BLOCKED: missing human OpenSpec propose/apply authorization evidence`.
-- OpenSpec validation alone is not sufficient authorization to implement.
+- This tracked plan file records the human authorization and is sufficient to proceed into Phase 4 when no newer tracked governance file revokes it.
+- A stale router-only `docs/CURRENT.md` row that still says `unlocked_not_yet_closed` does not block execution by itself, because this plan update supersedes that row for this long-run.
+- If evidence is absent from this tracked plan, or if a newer tracked governance file explicitly revokes/narrows authorization, stop before Phase 4 and report `BLOCKED: missing or superseded human OpenSpec propose/apply authorization evidence`.
+- OpenSpec validation alone is not sufficient authorization; this plan's human authorization section plus R-L17 route-only evidence are the authorization basis.
 
 ---
 
@@ -625,7 +651,7 @@ proof_class:
 
 It must also state:
 
-- OpenSpec propose/apply authorization evidence: `<tracked file:line or commit>`, or `BLOCKED` if missing.
+- OpenSpec propose/apply authorization evidence: this plan's `Human Authorization For Execution` section with file:line or commit, or a newer tracked authorization file; report `BLOCKED` only if that evidence is absent or superseded by a newer revocation.
 - not C6 acceptance;
 - not model-quality evaluation;
 - not candidate comparison;
