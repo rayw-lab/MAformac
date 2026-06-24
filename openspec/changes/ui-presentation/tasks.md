@@ -1,6 +1,7 @@
 <!--
-PROPOSE-READY (2026-06-24) — proposal/design/tasks/spec 已填实，磊哥 agree + 锁 iOS26/macOS26 拍 A（pre-mortem 坐实）。
+PROPOSE-ACTIVE (2026-06-24, 磊哥拍 B 严格 OpenSpec·文档先行防返工) — proposal/design/tasks/spec 已填实(5 Req/29 Scenario, validate 绿)。锁 iOS26/macOS26(那轮拍 A, pre-mortem 坐实)。
 依赖序：本 change = UIUE 前端，依赖 migrate-d-domain([1] A2 已并 main PR#3) 但不依赖 LoRA 训练。
+apply 状态: Phase 1b ✅done / Phase 3 D7 已 apply(commit 6a3e3f9 追认) / Phase 4 契约文档先行, 代码 apply 待后端 default_scope 落 main。
 incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/uiue-roadmap-2026-06-23.md。
 锁 iOS26 决策 + pre-mortem 一手见 docs/research/2026-06-24-ios26-lock-d7-premortem/。
 -->
@@ -17,18 +18,18 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 2.2 **App target deployment 锁 iOS26/macOS26** ✅ done（2026-06-24）：pbxproj 4 config IPHONEOS=26.0 / MACOSX=26.0；**Package.swift 留 `.iOS(.v17)/.macOS(.v14)` 不动**（Core/CLI portable，加强3 隔离）。**isolation spike receipt**（一次性验，非 pre-commit，[[precommit-triage-recurring-vs-spike]]）：`xcodebuild -showBuildSettings -scheme MAformacIOS|grep IPHONEOS_DEPLOYMENT_TARGET`=26.0 / `-scheme MAformacMac|grep MACOSX_`=26.0 / Package.swift=v17/v14。pre-mortem 坐实 Xcode26 SPM thread 81601 是 deprecation 警告非声明改写=paper-tiger，隔离安全；🔴 **别在 Core Package.swift 塞全局 warnings-as-errors**（swift#84379/spm#9517）。
 - [ ] 2.3 entitlements（`increased-memory-limit`）**DEFERRED → 模型集成时**（iOS jetsam 要它，但模型未集成 + CODE_SIGN_ENTITLEMENTS 需 provisioning，现加引签名风险）。
 - [ ] 2.4 `Availability.swift` **锁 iOS26 后版本守卫不需要**（MeshGradient iOS18/glassEffect iOS26/matchedGeometry iOS14 均 ≤ deployment 26）→ 仅封装 **平台守卫**（`navigationTransition.zoom` 用 `#if !os(macOS)`）+ **ReduceMotion/低电量双通道**（a11y 非版本）。随 Phase 3 用到时建。
-- [ ] 2.5 截图管线（替代旧 snapshot baseline）：🔴 **ImageRenderer 不可用**（截不出 Liquid Glass/material/blur，Apple 官方：Core Animation 合成不进 raster，oracle4 坐实）→ 用 `simctl` 启动整 app 截图。分层（磊哥拍 ①）：**(a) `#if DEBUG` 7 态 gallery 视图**（一屏 7 态，D7 内循环用，simctl 截 2 张/端快速 iterate）+ **(b) `#if DEBUG` force-state URL scheme**（`maformac://debug/force-state/<态>`）→ `simctl openurl` 一行一态，**14 张满屏单态（mac7+iOS7）供 5-gate 验收**。
-- [ ] 2.6 🔴 **补强1 pre-commit gate `Tools/checks/check-no-binary-visualstate.sh`** ✅ 建好未启用（启用时机=3.6 D7 改完后）。
-- [ ] 2.7 🔴 **加强2 pre-commit gate `Tools/checks/check-platform-vs-version-guard.sh`**（建，反复违反风险 [[precommit-triage-recurring-vs-spike]]）：`git grep -nE '#available\(iOS (17|18)' -- 'App/'` 命中即 exit 1（锁 iOS26 后不该有版本守卫）；白名单允许 `#if !os(macOS)` / `if reduceMotion` / `isReduceMotionEnabled`（a11y/平台非版本）。同 2.6 暂不启用 hooksPath，并入 3.6 启用。
+- [x] 2.5 截图管线 ✅ done（D7 建 gallery+force-state simctl）—— （替代旧 snapshot baseline）：🔴 **ImageRenderer 不可用**（截不出 Liquid Glass/material/blur，Apple 官方：Core Animation 合成不进 raster，oracle4 坐实）→ 用 `simctl` 启动整 app 截图。分层（磊哥拍 ①）：**(a) `#if DEBUG` 7 态 gallery 视图**（一屏 7 态，D7 内循环用，simctl 截 2 张/端快速 iterate）+ **(b) `#if DEBUG` force-state URL scheme**（`maformac://debug/force-state/<态>`）→ `simctl openurl` 一行一态，**14 张满屏单态（mac7+iOS7）供 5-gate 验收**。
+- [x] 2.6 🔴 **补强1 pre-commit gate `Tools/checks/check-no-binary-visualstate.sh`** ✅ 建好未启用（启用时机=3.6 D7 改完后）。
+- [x] 2.7 🔴 **加强2 pre-commit gate `Tools/checks/check-platform-vs-version-guard.sh`**（建，反复违反风险 [[precommit-triage-recurring-vs-spike]]）：`git grep -nE '#available\(iOS (17|18)' -- 'App/'` 命中即 exit 1（锁 iOS26 后不该有版本守卫）；白名单允许 `#if !os(macOS)` / `if reduceMotion` / `isReduceMotionEnabled`（a11y/平台非版本）。同 2.6 暂不启用 hooksPath，并入 3.6 启用。
 - [x] 2.8 🔴 **补强3 tokens §2 语义分类审签冻结** ✅ 2026-06-24 磊哥审签（琥珀=clarify/灰锁=unsupported/红=safety/中性灰=crash），`tokens.md:3` 语义分类 FROZEN v1.0；hex 仍 DRAFT，Phase 3 实渲后复核（3.7）。
 
-## 3. ui-presentation capability — 状态消费（Phase 3，🔴 D7 头号刀；force-state URL scheme 同批次）
+## 3. ui-presentation capability — 状态消费（Phase 3，🔴 D7 头号刀 ✅已 apply commit 6a3e3f9；force-state launch arg 同批次）
 
-- [ ] 3.0 `App/DesignTokens.swift`：Swift 镜像 tokens.md（色/字/动效 token + 7 态 `CardAppearance` 穷尽 switch），view 只从此取（禁手填 hex，spec R4）。
-- [ ] 3.1 `ContentView` 绿/灰二值（`:122/:126`）→ `DemoVisualState` 7 态穷尽 `@ViewBuilder switch`（spec R1，无 default 兜底）。
-- [ ] 3.2 四态分开（clarify 琥珀 / unsupported 灰锁 / safety 红 / crash 中性灰），色值从 `DesignTokens`（镜像 tokens.md §2）。
-- [ ] 3.3 消费 trace `guardReason`/`readbackResult`（spec R1；`Core/Trace/TraceLogger.swift:37-38` 已有字段）。
-- [ ] 3.4 `#if DEBUG` 7 态 gallery 视图（2.5a）+ force-state URL scheme handler（2.5b，CFBundleURLTypes + onOpenURL）。
+- [x] 3.0 ✅apply(6a3e3f9) `App/DesignTokens.swift`：Swift 镜像 tokens.md（色/字/动效 token + 7 态 `CardAppearance` 穷尽 switch），view 只从此取（禁手填 hex，spec R4）。
+- [x] 3.1 ✅apply `ContentView` 绿/灰二值（`:122/:126`）→ `DemoVisualState` 7 态穷尽 `@ViewBuilder switch`（spec R1，无 default 兜底）。
+- [x] 3.2 ✅apply 四态分开（clarify 琥珀 / unsupported 灰锁 / safety 红 / crash 中性灰），色值从 `DesignTokens`（镜像 tokens.md §2）。
+- [x] 3.3 ✅apply 消费 trace `guardReason`/`readbackResult`（spec R1；`Core/Trace/TraceLogger.swift:37-38` 已有字段）。
+- [x] 3.4 ✅apply `#if DEBUG` 7 态 gallery 视图（2.5a）+ force-state **launch argument**（`-forceVisualState <态>`，ProcessInfo.arguments）—— 🔴 修正：实现用 launch arg 非 URL scheme（GENERATE_INFOPLIST_FILE=YES 下 CFBundleURLTypes 难设，launch arg 同目的更简，App/DebugGallery.swift）。
 - [ ] 3.5 `Availability.swift`（2.4）随本 Phase zoom/ReduceMotion 用到时建（仅平台守卫+a11y，无版本守卫）。
 - [ ] 3.6 🔴 **启用 pre-commit gate**（2.6+2.7）：D7 改完（ContentView 无 binary + 无 `#available(iOS17/18)`）→ `git config core.hooksPath .githooks` + 验两脚本绿 + 故意写回各验 exit 1。
 - [ ] 3.7 5-gate 验收 + hex 冻结：simctl 出 14 张满屏单态 → 磊哥审美 5 gate（任一态 FAIL=返工非小瑕疵）→ hex DRAFT→FROZEN（2.8 留尾）。
@@ -70,7 +71,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 7.C clarify 态（少用，已定）
 - [x] 7.C1 clarify 枚举保留、主线少用 ✅（D7 7 态含 blocked_with_alternative）
-- [ ] 7.C2 D7 force-state 示例改「调到16度→最低18℃」（值超范围+替代，去区域「主驾还是全车」）
+- [x] 7.C2 ✅done D7 force-state 示例改「调到16度→最低18℃」（值超范围+替代，去区域「主驾还是全车」）
 
 ### 7.D 多轮/读回展示（承接 Core 结果，UIUE 只展示）
 - [ ] 7.D1 多轮继承展示（「再调高」继承默认主驾态，不弹区域）

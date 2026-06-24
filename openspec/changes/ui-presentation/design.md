@@ -1,7 +1,7 @@
 <!--
-DRAFT SKELETON (2026-06-23) — 技术设计/ARCH 决策（=实现侧 design.md，区别于项目根 docs/design/ 视觉 SSOT）。
-本档承接 D1-D7 grill 决策晶体 + U1-U31，是 ui-presentation capability 的实现架构锚。
-人审定 propose 时按此细化 spec.md Scenario + tasks 逐项。
+PROPOSE-ACTIVE (2026-06-24, 磊哥拍 B 严格 OpenSpec) — 技术设计/ARCH 决策（=实现侧 design.md，区别于项目根 docs/design/ 视觉 SSOT）。
+承接 D1-D8 grill 决策晶体 + U1-U31 + 用户故事 grill（裂缝④⑤⑥），是 ui-presentation capability 的实现架构锚。
+AD-1~AD-8 全拍；Phase 4 契约（AD-8.7 scope 呈现）文档先行，代码 apply 待后端 default_scope。
 -->
 
 # ui-presentation 技术设计（Architecture Decisions）

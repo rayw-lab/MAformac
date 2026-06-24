@@ -1,6 +1,6 @@
-> ⚠️ DRAFT SKELETON（2026-06-23 起草，标 DRAFT 待人审 propose）
-> 本 change：proposal/design/tasks 已填实；specs delta 已填实（4 Req / 23 Scenario，`openspec validate --strict` 绿，2026-06-24 磊哥 agree）。Why/What Changes 指向已拍决策。
-> **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码。** 决策权威源见下。
+> 🟢 **PROPOSE-ACTIVE（2026-06-24，磊哥拍 B 严格 OpenSpec：文档先行防返工）**：proposal/design/tasks/spec 已填实（**5 Req / 29 Scenario**，`openspec validate --strict` 绿）。Phase 4 契约（R5 default_scope 消费 + 裂缝⑤⑥④）**文档先行**写定，代码 apply 待后端 `default_scope` 落 main（防返工）。
+> 🔴 **apply 状态（claim-vs-reality）**：Phase 1b 工程前置 ✅ done（mic/speech/deployment 锁 iOS26/2 gate/tokens 冻结/截图管线）；**Phase 3 D7 7 态消费已 apply（commit `6a3e3f9`，追认——你"开始D7"=口头 agree 在正式 propose 前）**；Phase 4 卡片 apply 待后端。
+> **守 agree-before-build：Phase 4 代码 apply 前请磊哥审 spec → agree。** 决策权威源见下。
 >
 > 🟢 **非 DEFERRED（区别于 `define-demo-golden-run-and-voice`）**：本 change = **UIUE 链路 A 前端视觉/状态消费契约**，是与 A2/LoRA（链路 B）**并行活跃**的轨（worktree `uiue/visual-ssot-state-consume`），**不延后**。A2 只产 D-domain 后端 surface，本 change 管「看得见摸得着」那一层。Fork2 已拍：UIUE 视觉/卡片/7 态消费**拆独立 capability**（非塞进 demo-golden-run）。
 
@@ -36,8 +36,9 @@ D1-D7 二次深 grill（CC 5×⭐ + Codex 物理化 + 辩证 check）+ 30 决策
 - **U2 Liquid Glass surface_role**：`control_glass`（mic/顶栏功能层）/ `content_glow`（内容卡自研 glow 非 system glass）；禁全局主题开关式 glass。
 - **U7 native SwiftUI translation**：保 scheme1 深空辉光方向 ≠ 保现状代码；视觉值只从 tokens.md 取（base #121212）。
 - **C8 高频代理**：卡片优先级用 A2 产 `generated/family-device-allowlist.json` 的 `row_count`（产品约定收窄，量产 priority 字段砍）。
-- spec ADDED：`ui-presentation`（新 capability）。
+- **🔴 D8 默认主驾 + default_scope 消费（R5，2026-06-24 grill 收口）**：卡片读 per-cell `default_scope`（G25 SSOT）锚定默认 scope（座位→主驾等），不弹区域 clarify；scope 呈现单一规则（默认淡显角标 / 非默认显式 / 全车 fan-out 聚合卡+badge / 多轮升级聚合范围词），卡片·TTS·readback 三处同源。依赖后端 `default_scope` 字段（独立 `define-demo-default-scope` change）。
+- spec ADDED：`ui-presentation`（新 capability，5 Req / 29 Scenario）。
 
 ## Capabilities
 
-- **ui-presentation**（new）：UIUE 视觉/状态消费契约 SSOT — DemoVisualState 7 态消费 + 卡片 value.type 渲染 + Liquid Glass surface_role + 视觉 token 约束 + 双端展示 + 多调用编排。
+- **ui-presentation**（new）：UIUE 视觉/状态消费契约 SSOT — DemoVisualState 7 态消费 + 卡片 value.type 渲染 + **default_scope 消费与 scope 呈现（默认主驾/淡显/聚合）** + Liquid Glass surface_role + 视觉 token 约束 + 双端展示 + 多调用编排。
