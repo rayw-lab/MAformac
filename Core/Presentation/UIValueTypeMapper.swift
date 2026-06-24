@@ -196,12 +196,13 @@ struct VehicleCardDisplay: Identifiable, Equatable {
         }
     }
 
-    /// 无 cell 族 → `normal` 占位卡（族名 + 未激活，10 族骨架常驻；scopeBadge nil 不走聚合）。
+    /// 无 cell 族 → `normal` 占位卡（族名 +「待命」就绪态，10 族骨架常驻；scopeBadge nil 不走聚合）。
+    /// 🔴 体验审计 P0-1：「未激活」客户读成「demo 没做完」撞惊艳门 → 改「待命」（10 系统就绪非 5 没做）。
     private static func placeholderDisplay(for family: FamilyCardID) -> VehicleCardDisplay {
         VehicleCardDisplay(
             id: "family|\(family.rawValue)",
             title: family.displayName,
-            valueText: "未激活",
+            valueText: "待命",
             scopeBadge: nil,
             visualState: .normal,
             revision: 0,

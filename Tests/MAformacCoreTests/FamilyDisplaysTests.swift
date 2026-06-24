@@ -30,7 +30,7 @@ final class FamilyDisplaysTests: XCTestCase {
         let displays = VehicleCardDisplay.familyDisplays(from: [], catalog: .load())
         XCTAssertEqual(displays.count, 10)
         XCTAssertTrue(displays.allSatisfy { $0.visualState == .normal }, "空输入应全 normal 占位")
-        XCTAssertTrue(displays.allSatisfy { $0.valueText == "未激活" })
+        XCTAssertTrue(displays.allSatisfy { $0.valueText == "待命" }, "占位卡显「待命」就绪态（体验审计 P0-1，非「未激活」）")
         XCTAssertEqual(Set(displays.compactMap { $0.familyCardID }), Set(FamilyCardID.allCases))
     }
 
@@ -42,7 +42,7 @@ final class FamilyDisplaysTests: XCTestCase {
         )
         let fragrance = displays.first { $0.familyCardID == .fragrance }
         XCTAssertEqual(fragrance?.title, "香氛")
-        XCTAssertEqual(fragrance?.valueText, "未激活")
+        XCTAssertEqual(fragrance?.valueText, "待命")
         XCTAssertEqual(fragrance?.visualState, .normal)
         XCTAssertNil(fragrance?.scopeBadge)
     }

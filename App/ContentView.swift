@@ -245,15 +245,23 @@ struct VehicleStateCard: View {
     }
 
     // scope 角标（content_glow 标准 material/色，非 glass）：dim=淡显主驾 / emphasized=青标签全车
+    // 🔴 体验审计 P1-2：caption2 9pt 投屏看不清落空裂缝⑤初衷 → caption semibold + 提对比 + 细边框（淡≠隐形，仍弱于 emphasized）。
     private func scopeBadgeView(_ badge: ScopeBadge) -> some View {
-        Text(badge.text)
-            .font(.caption2.weight(.medium))
-            .padding(.horizontal, 6).padding(.vertical, 2)
+        let emphasized = badge.style == .emphasized
+        return Text(badge.text)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 7).padding(.vertical, 2)
             .background(
-                badge.style == .emphasized ? DesignTokens.glowCyan.opacity(0.20) : DesignTokens.inkDim2.opacity(0.14),
+                emphasized ? DesignTokens.glowCyan.opacity(0.22) : DesignTokens.inkDim2.opacity(0.30),
                 in: Capsule()
             )
-            .foregroundStyle(badge.style == .emphasized ? DesignTokens.glowCyan : DesignTokens.inkDim)
+            .foregroundStyle(emphasized ? DesignTokens.glowCyan : DesignTokens.inkDim)
+            .overlay(
+                Capsule().strokeBorder(
+                    (emphasized ? DesignTokens.glowCyan : DesignTokens.inkDim2).opacity(0.5),
+                    lineWidth: 0.5
+                )
+            )
     }
 
     private func updateBreathe() {
