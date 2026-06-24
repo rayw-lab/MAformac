@@ -199,6 +199,15 @@ def verify_state_cells() -> str:
         bad = set(sk) - state_kinds_set
         if bad:
             raise C1Error(f"state-cells: {cid} state_kinds mixes non-lifecycle values {sorted(bad)}")
+        scope = cell.get("scope") or []
+        default_scope = cell.get("default_scope")
+        if scope:
+            if not isinstance(default_scope, str) or not default_scope:
+                raise C1Error(f"state-cells: scoped cell {cid} missing default_scope")
+            if default_scope not in scope:
+                raise C1Error(f"state-cells: {cid} default_scope {default_scope!r} not in scope {scope!r}")
+        elif "default_scope" in cell:
+            raise C1Error(f"state-cells: unscoped cell {cid} must not declare default_scope")
         ctype = cell["type"]
         if ctype == "int":
             rng = cell.get("execution_range")

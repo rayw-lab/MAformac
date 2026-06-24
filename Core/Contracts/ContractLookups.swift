@@ -111,6 +111,7 @@ public struct StateCellDefinition: Equatable, Sendable {
     public var unit: String?
     public var values: [String]
     public var scope: [String]
+    public var defaultScope: String?
     public var executionRange: ExecutionRange?
     public var expStepLittle: Int?
     public var gearMap: [String: Int]
@@ -125,6 +126,7 @@ public struct StateCellDefinition: Equatable, Sendable {
         unit: String? = nil,
         values: [String] = [],
         scope: [String] = [],
+        defaultScope: String? = nil,
         executionRange: ExecutionRange? = nil,
         expStepLittle: Int? = nil,
         gearMap: [String: Int] = [:],
@@ -138,6 +140,7 @@ public struct StateCellDefinition: Equatable, Sendable {
         self.unit = unit
         self.values = values
         self.scope = scope
+        self.defaultScope = defaultScope
         self.executionRange = executionRange
         self.expStepLittle = expStepLittle
         self.gearMap = gearMap
@@ -252,6 +255,8 @@ public struct StateCellContractLookup: Sendable {
                 current?.values = parseArray(after: "values:", in: trimmed)
             } else if trimmed.hasPrefix("scope: ") {
                 current?.scope = parseArray(after: "scope:", in: trimmed)
+            } else if trimmed.hasPrefix("default_scope: ") {
+                current?.defaultScope = cleanValue(String(trimmed.dropFirst("default_scope: ".count)))
             } else if trimmed.hasPrefix("execution_range: ") {
                 if let map = inlineMap(after: "execution_range:", in: trimmed),
                    let min = Int(map["min"] ?? ""),

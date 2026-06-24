@@ -40,6 +40,45 @@ final class C3ContractLookupTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(lookup.cell(id: "ambient.brightness")).expStepLittle, 10)
     }
 
+    func testScopedStateCellsExposeDefaultScopeFromC2() throws {
+        let lookup = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
+
+        XCTAssertEqual(lookup.cell(id: "ac.temp_setpoint")?.defaultScope, "主驾")
+        XCTAssertEqual(lookup.cell(id: "ac.fan_speed")?.defaultScope, "主驾")
+        XCTAssertEqual(lookup.cell(id: "window.position")?.defaultScope, "主驾")
+        XCTAssertEqual(lookup.cell(id: "screen.brightness")?.defaultScope, "中控屏")
+        XCTAssertEqual(lookup.cell(id: "ambient.brightness")?.defaultScope, "面发光氛围灯")
+        XCTAssertEqual(lookup.cell(id: "seat.heat_level")?.defaultScope, "主驾")
+        XCTAssertEqual(lookup.cell(id: "seat.vent_level")?.defaultScope, "主驾")
+        XCTAssertEqual(lookup.cell(id: "seat.backrest_angle")?.defaultScope, "主驾")
+        XCTAssertEqual(lookup.cell(id: "wiper.speed")?.defaultScope, "前")
+        XCTAssertEqual(lookup.cell(id: "sunroof.position")?.defaultScope, "前排")
+        XCTAssertEqual(lookup.cell(id: "sunshade.position")?.defaultScope, "前排")
+    }
+
+    func testDefaultScopeMustBeInsideScope() throws {
+        let yaml = """
+        meta:
+          source_kind_enum: [c2_demo_decision]
+          state_kinds_vocab: [stable]
+          c1_c2_closure: {status: deferred}
+        devices:
+          window:
+            state_cells:
+              - id: window.position
+                type: int
+                source_kind: c2_demo_decision
+                state_kinds: [stable]
+                scope: [主驾, 副驾]
+                default_scope: 左后
+                execution_range: {min: 0, max: 100, step: 1}
+        """
+
+        let lookup = try StateCellContractLookup(yaml: yaml)
+        let cell = try XCTUnwrap(lookup.cell(id: "window.position"))
+        XCTAssertFalse(cell.scope.contains(cell.defaultScope ?? ""))
+    }
+
     func testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty() throws {
         let semantic = try SemanticContractLookup(jsonl: readRepoFile("contracts/semantic-function-contract.jsonl"))
         let risk = try RiskPolicyLookup(yaml: readRepoFile("contracts/risk-policy.yaml"))
