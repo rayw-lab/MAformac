@@ -155,3 +155,21 @@
 11. **🔴 审计 finding 辩证 check(谨慎迎合):真 finding 实跑坐实修 / 项目决策 steelman / DEFERRED honest + subagent 仲裁**:磊哥「谨慎迎合」+「P2 全修但任务要完美」。我的处理:(a) **真 finding 亲核坐实再修**(P0 `--scope full` 我实跑 `DecodingError` 坐实才修,非盲信);(b) **项目决策 steelman 不盲从**(三审计都建议加 CI,但项目 D1 决策=`make verify` 替 CI 轻治理 → steelman 守住,只加 `verify-all` 聚合不引 CI infra);(c) **DEFERRED 要 honest 非偷懒**(distractor index=可优化非broken+NOT训不跑大规模 / deviceCellMap codegen=亲核 grep `state-cells:14`「映射独立」坐实**无 codegen 源** / C5 拆分=risky 大重构)→ 写吸收档逐条 rationale;(d) **派 subagent CC 审计仲裁 DEFERRED 真伪**(它 grep 坐实「无源」+「可优化非broken」= defer 成立非偷懒,verdict CLEAR)。→ **多审计修复 = 真 finding 修 + 项目决策 steelman + DEFERRED honest rationale + 异源仲裁;别盲信全修(过度工程)也别懒 defer(偷懒),靠亲核 + 异源裁**。与 maformac-internal-demo-audit-filter(每 finding 问「对内部 demo+轻治理成立吗」)同源。
 
 12. **🟡 `.gitignore` `!dir/` un-ignore 整个目录坑 + Reports/.gitkeep SwiftPM exclude 解**:修 SwiftPM `Invalid Exclude Reports: File not found` warning(clean checkout Reports gitignored 不存在),我加 `!Reports/` + `Reports/.gitkeep` → **`!Reports/` 误 un-ignore 整个 Reports 目录**,所有 runtime 报告(c5-lora-training 等十几个)暴露成 untracked。修法:`Reports/*` + `!Reports/.gitkeep`(忽略目录内所有,仅保 .gitkeep)。→ **`.gitignore` 保留空目录用 `dir/*` + `!dir/.gitkeep`,不用 `!dir/`(后者 un-ignore 整个目录)**;SwiftPM exclude 不存在路径的 warning = 提交 `.gitkeep` 占位解。
+
+## I. default_scope apply 长跑教训(2026-06-24, C2/C3/C5/C6 apply + R1/R2 审计)
+
+1. **🔴 resolver 错误不能用 `try?` 吞掉再写 base cell**:default_scope state applier 一度 `try? C2ScopeResolver.resolve(...) ?? ScopeResolution(keys:[cellID])`,导致 `position=后排` 这种 out-of-scope scope 被吞成 `window.position=100` base-cell 写入。R1 抓出后补红测和机械门。→ **任何 scope resolver / contract resolver 错误必须 fail-closed(no-write 或显式错误),不能 fallback 到 unscoped base key;机械门要 grep 禁 `try? resolver` + `ScopeResolution(keys:[cellID])` 这类假兜底。**
+
+2. **🔴 ScopeOrigin 单源不是“全仓出现几次字符串”**:三道门最初只合并文件数 `scopeOrigin` 次数,但 C6 verifier/eval result 没有 `scope_origin_evidence`,receipt 却声称 single-source pass。R1 抓出后改成 C6 gold/eval result 携带 `scope_origin_evidence`,并由 `C2ScopeResolver` 计算。→ **单源门要逐 consumer 断言 typed origin 被消费,尤其 verifier/receipt/UIUE handoff metadata 这类证据面;全局字符串计数只能当 smoke,不能当 proof。**
+
+3. **🔴 receipt 声明生成链路时,生成命令本身也必须入 evidence**:C6 JSONL 确实从 `Core/Bench/C6VehicleToolBench.swift` 生成并补 trap migration,但初版 receipt 只记录测试/make/OpenSpec,没记录 `swift run C6BenchCLI generate` 和 `migrate_c6_trap_to_d_domain.py --old-from-git` 的 exit/log/hash。→ **claim_boundaries 里写“由 source+trap migration 生成”时,commands[] 必须有对应生成日志、exit_code、sha256;否则是 claim-vs-reality 漏证。**
+
+4. **🟡 `Reports/*` 默认忽略,receipt 要么 force-add,要么放可追踪路径**:本轮 receipt/log 落在 `Reports/default-scope-apply-*`,被 `.gitignore:Reports/*` 忽略;R1 指出“本地有 receipt”不等于“repo durable evidence”。→ **需要提交的 receipt 不能只存在被 ignore 的目录;若项目约定继续放 Reports,必须 `git add -f Reports/<run>/receipt.json` 和必要日志,并在 stage 前用 `git check-ignore -v` 确认。**
+
+5. **🟡 `make verify` 的 diff 门要求干净 tracked tree,dirty 状态下跑会假失败**:R1 修复后直接跑 `make verify`,失败在 `diff` 目标,原因是未提交的 scripts/Makefile/Core diff,不是测试或生成物错误。→ **含 `git diff --exit-code` 的 verify 要在相关 tracked 改动 commit 后作为最终门跑;dirty 阶段只跑 focused tests/机械门,不要把 diff 门失败误判成实现失败,也不能把 dirty verify 写成 pass。**
+
+6. **🟡 SwiftPM test helper 被中断后可能 orphan/stuck,清 `.build` 比继续等更可靠**:本轮多次中断 `swift test` 后留下 `swiftpm-xctest-helper` orphan,后续 `--filter`/`--list-tests` 卡在 helper launch。清理 orphan 后 `swift package clean` 重建,同一单测恢复 12s 内通过。→ **测试异常长时间无输出时先查 `ps` 的 swiftpm-xctest-helper;若是中断遗留,kill orphan + `swift package clean`,再原样重跑 hard gate,不要把 workaround pass 冒充原命令 pass。**
+
+7. **🟡 research/tooling 目录可能含嵌套 `.git`、node_modules 和 pack,不能 `git add -f` 整包推**:`Tools/paper-to-skill-gate/` 有本轮需要推的轻量 research artifacts,但内部 reference clones 有 `.git/objects`、`node_modules`、PDF/PPTX 大文件,目录自身 `.gitignore` 已把 clone 内容隔离。→ **推 research 目录先 `find -name .git` + `du -sh` + 大文件 scan;只 stage README/SKILL/schema/script/trial-runs 等轻量可审计产物,不要把 clone pack/node_modules 当 research evidence 强推入仓。**
+
+8. **🟢 R1/R2 审计要接受“receipt/claim 风险”类 finding,不是只看代码**:R1 没抓 P0,但抓出 4 个 P1,其中 3 个是 receipt durability、C6 生成日志、ScopeOrigin 证据面问题,不全是 runtime bug。→ **apply closeout 的 subagent 审计 prompt 必须覆盖代码、测试、机械门、receipt、ignored/staged 状态和 claim boundaries;主线程吸收后再 R2,否则容易把 local-pass 写成 fake green。**

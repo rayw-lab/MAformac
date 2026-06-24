@@ -167,6 +167,26 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertEqual(state["window.position[右后]"], "100")
     }
 
+    func testStateApplierRejectsOutOfScopeWindowWithoutBaseCellFallback() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        let preState: [String: String] = [
+            "window.position[主驾]": "0",
+            "window.position[副驾]": "0"
+        ]
+
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "open_window", arguments: ["position": "后排"])],
+            to: preState,
+            stateCells: stateCells,
+            irMap: irMap
+        )
+
+        XCTAssertEqual(state["window.position[主驾]"], "0")
+        XCTAssertEqual(state["window.position[副驾]"], "0")
+        XCTAssertNil(state["window.position"], "invalid scope must not fall back to unscoped base cell")
+    }
+
     func testStateApplierUnmappedDeviceNoWrite() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         // 未映射 device(seat_heat, S3 才扩) → 不写 state(quarantine, logUnmapped 非静默吞)

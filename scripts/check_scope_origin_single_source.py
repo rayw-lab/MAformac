@@ -6,13 +6,12 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-REQUIRED = [
-    ROOT / "Core" / "Execution" / "ScopeResolution.swift",
-    ROOT / "Core" / "Execution" / "C3ExecutionPipeline.swift",
-    ROOT / "Core" / "Contracts" / "ContractLookups.swift",
-    ROOT / "Core" / "State" / "DemoVehicleStateStore.swift",
-    ROOT / "Core" / "Bench" / "C6VehicleToolBench.swift",
-]
+SCOPE_RESOLUTION = ROOT / "Core" / "Execution" / "ScopeResolution.swift"
+C3_PIPELINE = ROOT / "Core" / "Execution" / "C3ExecutionPipeline.swift"
+READBACK = ROOT / "Core" / "Contracts" / "ContractLookups.swift"
+STATE_STORE = ROOT / "Core" / "State" / "DemoVehicleStateStore.swift"
+C6_BENCH = ROOT / "Core" / "Bench" / "C6VehicleToolBench.swift"
+REQUIRED = [SCOPE_RESOLUTION, C3_PIPELINE, READBACK, STATE_STORE, C6_BENCH]
 FORBIDDEN_RECOMPUTE = [
     (ROOT / "Core" / "Contracts" / "ContractLookups.swift", re.compile(r'scope\s*==\s*"主驾"')),
     (ROOT / "Core" / "Execution" / "C3ExecutionPipeline.swift", re.compile(r'scope\s*==\s*"主驾"')),
@@ -25,14 +24,21 @@ def fail(message: str) -> None:
 
 
 def main() -> None:
-    combined = "\n".join(path.read_text(encoding="utf-8") for path in REQUIRED)
-    if "enum ScopeOrigin" not in combined:
+    texts = {path: path.read_text(encoding="utf-8") for path in REQUIRED}
+    combined = "\n".join(texts.values())
+    if "enum ScopeOrigin" not in texts[SCOPE_RESOLUTION]:
         fail("ScopeOrigin enum missing")
     for case_name in ("case defaulted", "case explicit", "case fanout"):
-        if case_name not in combined:
+        if case_name not in texts[SCOPE_RESOLUTION]:
             fail(f"ScopeOrigin missing {case_name}")
-    if combined.count("scopeOrigin") < 4:
-        fail("scopeOrigin is not threaded through execution/readback")
+    if texts[C3_PIPELINE].count("scopeOrigin") < 2:
+        fail("C3 execution does not carry typed scopeOrigin")
+    if "scopeOrigin: ScopeOrigin?" not in texts[READBACK]:
+        fail("readback does not consume typed ScopeOrigin")
+    if "scopeOriginEvidence" not in texts[C6_BENCH] or "scope_origin_evidence" not in texts[C6_BENCH]:
+        fail("C6 verifier/eval evidence does not expose scope_origin_evidence")
+    if "C2ScopeResolver.resolve" not in texts[C6_BENCH]:
+        fail("C6 scope-origin evidence does not reuse C2ScopeResolver")
     for path, pattern in FORBIDDEN_RECOMPUTE:
         text = path.read_text(encoding="utf-8")
         for lineno, line in enumerate(text.splitlines(), 1):

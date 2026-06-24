@@ -577,6 +577,7 @@ public struct C6GateResult: Codable, Equatable, Sendable {
     public var hardFailed: Bool
     public var failureClasses: [C6FailureClass]
     public var judge: C6JudgeScore?
+    public var scopeOriginEvidence: [String: String]
 
     enum CodingKeys: String, CodingKey {
         case toolCallSetMatch = "tool_call_set_match"
@@ -587,6 +588,7 @@ public struct C6GateResult: Codable, Equatable, Sendable {
         case hardFailed = "hard_failed"
         case failureClasses = "failure_classes"
         case judge
+        case scopeOriginEvidence = "scope_origin_evidence"
     }
 }
 
@@ -715,6 +717,7 @@ public struct C6GoldVerificationResult: Codable, Equatable, Sendable {
     public var sourceRefsPass: Bool
     public var goldReplayPass: Bool
     public var failureClasses: [C6FailureClass]
+    public var scopeOriginEvidence: [String: String]
 
     enum CodingKeys: String, CodingKey {
         case caseID = "case_id"
@@ -728,6 +731,7 @@ public struct C6GoldVerificationResult: Codable, Equatable, Sendable {
         case sourceRefsPass = "source_refs_pass"
         case goldReplayPass = "gold_replay_pass"
         case failureClasses = "failure_classes"
+        case scopeOriginEvidence = "scope_origin_evidence"
     }
 }
 
@@ -746,6 +750,62 @@ public struct C6GoldVerificationReport: Codable, Equatable, Sendable {
         case goldReplayPassCount = "gold_replay_pass_count"
         case goldReplayFailCount = "gold_replay_fail_count"
         case results
+    }
+}
+
+fileprivate enum C6ScopeOriginEvidence {
+    static func derive(
+        toolCalls: [C6ToolCall],
+        stateDelta: [String: String],
+        stateCells: StateCellContractLookup,
+        irMap: [String: DDomainIRMapEntry]
+    ) -> [String: String] {
+        let normalizedIRs = toolCalls.flatMap { ToolContractNormalizer.normalize($0, irMap: irMap) }
+        guard !normalizedIRs.isEmpty else {
+            return [:]
+        }
+
+        var evidence: [String: String] = [:]
+        for stateKey in stateDelta.keys.sorted() {
+            let parts = splitStateKey(stateKey)
+            guard parts.scope != nil,
+                  let cell = stateCells.cell(id: parts.baseID),
+                  !cell.scope.isEmpty else {
+                continue
+            }
+            for ir in normalizedIRs where ToolContractStateApplier.deviceCellMap[ir.device] == parts.baseID {
+                let frame = ToolCallFrame(
+                    traceID: "c6-scope-origin",
+                    agentID: "vehicle-control",
+                    capabilityID: "cabin.\(ir.device)",
+                    toolName: "vehicle_control",
+                    device: ir.device,
+                    actionPrimitive: ir.actionPrimitive,
+                    slots: ir.slots,
+                    value: ir.value,
+                    stateRevision: 0,
+                    candidateSource: .upstreamToolCall
+                )
+                guard let resolution = try? C2ScopeResolver.resolve(frame: frame, cell: cell),
+                      resolution.keys.contains(stateKey) else {
+                    continue
+                }
+                evidence[stateKey] = resolution.origin.rawValue
+                break
+            }
+        }
+        return evidence
+    }
+
+    private static func splitStateKey(_ key: String) -> (baseID: String, scope: String?) {
+        guard let open = key.firstIndex(of: "[") else {
+            return (key, nil)
+        }
+        let scopeStart = key.index(after: open)
+        guard let close = key[scopeStart...].firstIndex(of: "]") else {
+            return (key, nil)
+        }
+        return (String(key[..<open]), String(key[scopeStart..<close]))
     }
 }
 
@@ -837,6 +897,12 @@ public struct C6GoldVerifier: Sendable {
             finalState[key] == value
         }
         let stateDeltaPass = stateDeltaMatches && (!requiresStateDelta(candidate, irMap: irMap) || !candidate.expectedStateDelta.isEmpty)
+        let scopeOriginEvidence = C6ScopeOriginEvidence.derive(
+            toolCalls: candidate.expectedToolCalls,
+            stateDelta: candidate.expectedStateDelta,
+            stateCells: stateCells,
+            irMap: irMap
+        )
         let readbackApplicable = !candidate.expectNoCall
             && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
         let readbackPass: Bool
@@ -885,7 +951,8 @@ public struct C6GoldVerifier: Sendable {
             clarifyPass: clarifyPass,
             sourceRefsPass: sourceRefsPass,
             goldReplayPass: failures.isEmpty,
-            failureClasses: failures
+            failureClasses: failures,
+            scopeOriginEvidence: scopeOriginEvidence
         )
     }
 
@@ -1024,6 +1091,12 @@ public struct C6BenchRunner: Sendable {
         let stateMatch = candidate.expectedStateDelta.allSatisfy { key, value in
             finalState[key] == value
         }
+        let scopeOriginEvidence = C6ScopeOriginEvidence.derive(
+            toolCalls: output.toolCalls,
+            stateDelta: candidate.expectedStateDelta,
+            stateCells: stateCells,
+            irMap: irMap
+        )
         let readbackApplicable = !candidate.expectNoCall
             && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
         let readbackMatch = readbackApplicable && C6ReadbackRenderer.matches(
@@ -1067,7 +1140,8 @@ public struct C6BenchRunner: Sendable {
             clarifyMatch: clarifyMatch,
             hardFailed: !failures.isEmpty,
             failureClasses: failures,
-            judge: nil
+            judge: nil,
+            scopeOriginEvidence: scopeOriginEvidence
         )
     }
 

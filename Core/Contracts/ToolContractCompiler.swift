@@ -472,8 +472,13 @@ public enum ToolContractStateApplier {
             stateRevision: 0,
             candidateSource: .upstreamToolCall
         )
-        let resolution = (try? C2ScopeResolver.resolve(frame: resolutionFrame, cell: cell))
-            ?? ScopeResolution(keys: [cellID], resolvedScopes: [], origin: .explicit)
+        let resolution: ScopeResolution
+        do {
+            resolution = try C2ScopeResolver.resolve(frame: resolutionFrame, cell: cell)
+        } catch {
+            logUnmapped("\(cellID).scope")
+            return
+        }
         let currentKey = resolution.keys.first ?? cellID
         let writeKeys = resolution.keys
         let initial = Int(cell.defaultValue ?? "") ?? 0
