@@ -39,6 +39,7 @@ Current audited state:
 1. Commit the Phase -1 closeout, route-board update, carrier D2 route-matrix fix, same-vendor apply-plan audit record, and apply plan together.
 2. Execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md` in order: C2 -> C3 -> state applier -> readback -> C5 -> C6 -> tests/gates.
 3. Keep C5, C6, golden-run, and UIUE as downstream consumers of `define-demo-default-scope`. They must depend on it, not redefine default-scope semantics.
+5. If `define-demo-default-scope` is accepted, execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md`; keep this route board router-only and put evidence in receipts, tests, and OpenSpec closeout files.
 
 ## Do Not Do
 
