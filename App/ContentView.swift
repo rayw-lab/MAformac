@@ -80,30 +80,65 @@ struct ContentView: View {
     }
 }
 
-private struct VehicleStateCard: View {
+struct VehicleStateCard: View {
     let cell: DemoVehicleStateCell
+    /// blocked 态原因文案（来自 trace `guardReason`/`readbackResult`，spec R1 §3.3）；nil = 不显示。
+    var reason: String? = nil
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var breathe = false
+
+    // 7 态视觉外观（穷尽 switch，禁二值/禁 default —— DesignTokens.CardAppearance.of）
+    private var appearance: CardAppearance { CardAppearance.of(cell.visualState) }
+    private var glowActive: Bool { appearance.breathing || appearance.pulsing }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.headline)
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(DesignTokens.inkPrimary)
+                Spacer(minLength: 0)
+                if let icon = appearance.icon {
+                    Image(systemName: icon)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(appearance.border)
+                }
+            }
             Text(cell.actualValue)
                 .font(.title2.weight(.semibold))
+                .foregroundStyle(DesignTokens.inkPrimary)
+            if let reason {
+                Text(reason)
+                    .font(.caption)
+                    .foregroundStyle(DesignTokens.inkDim)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             Text("rev \(cell.revision)")
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DesignTokens.inkDim2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(background)
+        .background(appearance.background)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .strokeBorder(borderColor, lineWidth: 1)
+                .strokeBorder(appearance.border, lineWidth: glowActive ? 1.5 : 1)
+        }
+        // 呼吸/脉冲辉光：ReduceMotion/低电量 → 静态辉光（双通道，态靠 颜色/边框/图标 承载）
+        .shadow(color: glowActive ? appearance.border.opacity(0.5) : .clear,
+                radius: glowActive ? (breathe ? 16 : 8) : 0)
+        .onAppear {
+            guard !reduceMotion, glowActive else { return }
+            withAnimation(.easeInOut(duration: appearance.pulsing ? 0.9 : 3.4)
+                .repeatForever(autoreverses: true)) { breathe = true }
         }
         .accessibilityIdentifier("vehicle-card-\(cell.key)")
+        .accessibilityLabel("\(title) \(cell.actualValue) \(accessibilityState)")
     }
 
+    // 标题与 scope 解析（main scoped-state：key 形如 `base[scope]`，D-domain 全集）
     private var title: String {
         let parts = scopedParts(for: cell.key)
         switch parts.base {
@@ -146,12 +181,17 @@ private struct VehicleStateCard: View {
         )
     }
 
-    private var background: Color {
-        cell.visualState == .satisfied ? Color.green.opacity(0.18) : Color.gray.opacity(0.10)
-    }
-
-    private var borderColor: Color {
-        cell.visualState == .satisfied ? .green : .gray.opacity(0.35)
+    // a11y 态文案（四态分开，与视觉双通道）
+    private var accessibilityState: String {
+        switch cell.visualState {
+        case .normal: "未激活"
+        case .satisfied: "已满足"
+        case .changing: "执行中"
+        case .blocked_with_alternative: "需澄清"
+        case .blocked_hard: "不支持"
+        case .unsafe: "安全拦截"
+        case .unknown: "错误"
+        }
     }
 }
 
