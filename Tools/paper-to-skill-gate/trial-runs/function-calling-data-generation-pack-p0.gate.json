@@ -1,0 +1,131 @@
+{
+  "schema_version": "paper-to-skill-gate.v1",
+  "generated_at": "2026-06-24T08:36:17Z",
+  "paper": {
+    "title": "P0 Pack: Function-Calling Data Generation",
+    "paper_type": "paper_pack",
+    "year": 2025,
+    "venue": "arXiv / NeurIPS / ACL",
+    "identity_confidence": "live_verified"
+  },
+  "sources": [
+    {
+      "label": "APIGen arXiv",
+      "url": "https://arxiv.org/abs/2406.18518",
+      "evidence_type": "paper",
+      "notes": "Automated verifiable function-calling data generation."
+    },
+    {
+      "label": "ToolACE arXiv",
+      "url": "https://arxiv.org/abs/2409.00920",
+      "evidence_type": "paper",
+      "notes": "Agentic tool-learning data generation."
+    },
+    {
+      "label": "Hammer arXiv",
+      "url": "https://arxiv.org/abs/2410.04587",
+      "evidence_type": "paper",
+      "notes": "On-device function calling via function masking."
+    },
+    {
+      "label": "Magnet arXiv",
+      "url": "https://arxiv.org/abs/2503.07826",
+      "evidence_type": "paper",
+      "notes": "Multi-turn tool-use trajectory synthesis via graph translation."
+    },
+    {
+      "label": "xLAM local code",
+      "url": "Tools/paper-to-skill-gate/paper-repos/xLAM",
+      "evidence_type": "local_code",
+      "notes": "Local HEAD a88aa3a."
+    },
+    {
+      "label": "Hammer local code",
+      "url": "Tools/paper-to-skill-gate/paper-repos/Hammer",
+      "evidence_type": "local_code",
+      "notes": "Local HEAD ff415d9."
+    }
+  ],
+  "official_repo": {
+    "status": "not_applicable",
+    "repo": "multi-paper-pack",
+    "url": "",
+    "stars": null,
+    "pushed_at": null,
+    "local_path": "",
+    "local_head": null,
+    "code_mapping_status": "UNSPECIFIED"
+  },
+  "reference_repo_influences": [
+    "paper2code: pack report classifies APIGen/ToolACE/Hammer/Magnet by specified vs paper-only vs code-confirmed.",
+    "DeepPaperNote: source manifest keeps multiple papers and repos separated.",
+    "MinerU-Document-Explorer: pack can later become indexed multi-paper explorer corpus.",
+    "paper-qa: cross-paper QA is needed before selecting data ratios as load-bearing policy.",
+    "MinerU: PDF extraction is the right next pass for exact table/algorithm locators.",
+    "docling-mcp: conversion fallback supports pack-level document ingestion."
+  ],
+  "algorithm_traits": [
+    "Synthetic function-calling data generation",
+    "Data verification before training",
+    "Function masking and irrelevance augmentation",
+    "Multi-turn trajectory synthesis",
+    "LoRA/QLoRA framework references are not MAformac training permission"
+  ],
+  "maformac_insertion_points": [
+    {
+      "path": "Core/Training/C5LoRATraining.swift",
+      "lane": "retrain_c5",
+      "recommendation": "Extend candidate data quality gate for diversity, variants, lineage, and negative composition.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Tools/C5TrainingCLI/c5_mlx_train_loop.py",
+      "lane": "retrain_c5",
+      "recommendation": "Keep current MLX SFT substrate; upstream DeepSpeed/LLaMA-Factory is not adopted.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Core/Contracts/ToolContractCompiler.swift",
+      "lane": "tool_surface",
+      "recommendation": "Use D-domain concrete tools as synthetic data schema source.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "generated/D_domain.tools.demo.json",
+      "lane": "tool_surface",
+      "recommendation": "Future generator should sample from generated tool catalog and record source snapshot.",
+      "proof_class": "local_static_teardown"
+    },
+    {
+      "path": "Core/Bench/C6VehicleToolBench.swift",
+      "lane": "rebuild_c6",
+      "recommendation": "Generated positives must be paired with irrelevance/no-call/clarify counterexamples.",
+      "proof_class": "local_static_teardown"
+    }
+  ],
+  "openspec_candidates": [
+    "Future C5 design: generator SHALL record source snapshot digest, parent overlap, and negative ratio.",
+    "Future C5 design: function masking MAY be tested only after tool-surface mismatch is closed."
+  ],
+  "deliverables": [
+    "Tools/paper-to-skill-gate/trial-runs/function-calling-data-generation-pack-p0.md",
+    "Tools/paper-to-skill-gate/trial-runs/function-calling-data-generation-pack-p0.gate.json"
+  ],
+  "gate": {
+    "status": "retrain_c5_input",
+    "proof_class": ["web_verified", "local_static_teardown", "schema_validated", "not_executed"],
+    "rationale": "Highest-value source group for C5 data generation design, but must remain gated and proposal-only.",
+    "stop_conditions": [
+      "No trainer execution.",
+      "No DeepSpeed/LLaMA-Factory adoption.",
+      "No private/raw customer data generation.",
+      "No generated data without leakage and lineage gates."
+    ]
+  },
+  "residual_risks": [
+    "Pack-level official_repo is intentionally not_applicable: xLAM and Hammer local-code evidence applies only to their own claims, not to ToolACE or Magnet.",
+    "ToolACE and Magnet have not been code-confirmed in this pass.",
+    "xLAM repo working tree shows interrupted-clone dirtiness but local code files and HEAD are readable.",
+    "Exact data ratio choices still need MAformac-specific spike."
+  ]
+}
