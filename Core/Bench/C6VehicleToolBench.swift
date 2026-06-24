@@ -622,6 +622,11 @@ public struct C6GateResult: Codable, Equatable, Sendable {
     public var clarifyMatch: Bool
     public var hardFailed: Bool
     public var failureClasses: [C6FailureClass]
+    public var modelHardFailed: Bool
+    public var readbackHardFailed: Bool
+    public var appliedWrites: [StateWrite]
+    public var dependencyWriteKeys: [String]
+    public var unexpectedMutationKeys: [String]
     public var judge: C6JudgeScore?
     public var scopeOriginEvidence: [String: String]
 
@@ -633,6 +638,11 @@ public struct C6GateResult: Codable, Equatable, Sendable {
         case clarifyMatch = "clarify_match"
         case hardFailed = "hard_failed"
         case failureClasses = "failure_classes"
+        case modelHardFailed = "model_hard_failed"
+        case readbackHardFailed = "readback_hard_failed"
+        case appliedWrites = "applied_writes"
+        case dependencyWriteKeys = "dependency_write_keys"
+        case unexpectedMutationKeys = "unexpected_mutation_keys"
         case judge
         case scopeOriginEvidence = "scope_origin_evidence"
     }
@@ -884,35 +894,61 @@ fileprivate enum C6StateDeltaComparator {
         }
     }
 
-    static func matchesExpectedFinalValuesWithoutUnexpectedDelta(
-        expected: [String: String],
-        preState: [String: String],
-        finalState: [String: String],
-        stateCells: StateCellContractLookup
-    ) -> Bool {
-        let expectedValuesMatch = expected.allSatisfy { key, value in
+    static func expectedFinalValuesMatch(expected: [String: String], finalState: [String: String]) -> Bool {
+        expected.allSatisfy { key, value in
             finalState[key] == value
         }
-        let expectedKeys = expectedKeysIncludingDependencies(expected.keys, stateCells: stateCells)
-        let unexpectedDelta = actualDelta(preState: preState, finalState: finalState).filter { key, _ in
-            !expectedKeys.contains(key)
-        }
-        return expectedValuesMatch && unexpectedDelta.isEmpty
     }
 
-    private static func expectedKeysIncludingDependencies(
-        _ keys: Dictionary<String, String>.Keys,
+    static func preconditionMatch(expected: [String: String], preState: [String: String]) -> Bool {
+        expected.allSatisfy { key, value in
+            preState[key] == value
+        }
+    }
+}
+
+public enum C6AppliedWriteComparator {
+    public static func unexpectedMutationKeys(
+        expected: [String: String],
+        writes: [StateWrite],
+        stateCells: StateCellContractLookup
+    ) -> [String] {
+        let expectedKeys = Set(expected.keys)
+        let allowedDependencyKeys = allowedDependencyKeys(forExpectedKeys: expectedKeys, stateCells: stateCells)
+        return writes
+            .filter { write in
+                if expectedKeys.contains(write.stateKey) {
+                    return false
+                }
+                if write.writeKind == .dependency && allowedDependencyKeys.contains(write.stateKey) {
+                    return false
+                }
+                return true
+            }
+            .map(\.stateKey)
+            .sorted()
+    }
+
+    public static func dependencyWriteKeys(_ writes: [StateWrite]) -> [String] {
+        writes
+            .filter { $0.writeKind == .dependency }
+            .map(\.stateKey)
+            .sorted()
+    }
+
+    private static func allowedDependencyKeys(
+        forExpectedKeys expectedKeys: Set<String>,
         stateCells: StateCellContractLookup
     ) -> Set<String> {
-        var result = Set(keys)
-        for key in keys {
+        var keys: Set<String> = []
+        for key in expectedKeys {
             let baseID = splitStateKey(key).baseID
             guard let cell = stateCells.cell(id: baseID) else {
                 continue
             }
-            result.formUnion(cell.dependsOn)
+            keys.formUnion(cell.dependsOn)
         }
-        return result
+        return keys
     }
 
     private static func splitStateKey(_ key: String) -> (baseID: String, scope: String?) {
@@ -924,12 +960,6 @@ fileprivate enum C6StateDeltaComparator {
             return (String(key[..<open]), nil)
         }
         return (String(key[..<open]), String(key[scopeStart..<close]))
-    }
-
-    static func preconditionMatch(expected: [String: String], preState: [String: String]) -> Bool {
-        expected.allSatisfy { key, value in
-            preState[key] == value
-        }
     }
 }
 
@@ -1032,12 +1062,14 @@ public struct C6GoldVerifier: Sendable {
                 stateApplyPass = false
             }
             scopeOriginEvidence = applyResult.scopeOriginEvidence
-            stateDeltaMatches = stateApplyPass && C6StateDeltaComparator.matchesExpectedFinalValuesWithoutUnexpectedDelta(
+            let unexpectedMutationKeys = C6AppliedWriteComparator.unexpectedMutationKeys(
                 expected: candidate.expectedStateDelta,
-                preState: preState,
-                finalState: applyResult.state,
+                writes: applyResult.appliedWrites,
                 stateCells: stateCells
             )
+            stateDeltaMatches = stateApplyPass
+                && C6StateDeltaComparator.expectedFinalValuesMatch(expected: candidate.expectedStateDelta, finalState: applyResult.state)
+                && unexpectedMutationKeys.isEmpty
         }
         let stateDeltaPass = stateDeltaMatches && (!requiresStateDelta(candidate, irMap: irMap) || !candidate.expectedStateDelta.isEmpty)
         let scopeOriginPass = candidate.expectNoCall || C6ScopeOriginEvidence.coversScopedDelta(
@@ -1162,17 +1194,8 @@ public struct C6BenchRunner: Sendable {
     }
 
     public func evaluate(case benchCase: C6BenchCase, output: C6RuntimeOutput, runIndex: Int = 0) throws -> C6EvalRun {
-        let applyResult: ToolContractStateApplyResult
-        let stateApplyPass: Bool
-        do {
-            applyResult = try C6MockStateApplier.applyWithEvidence(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells, irMap: irMap)
-            stateApplyPass = true
-        } catch {
-            applyResult = ToolContractStateApplyResult(state: benchCase.preState)
-            stateApplyPass = false
-        }
         let candidateResults = goldCandidates(for: benchCase).map { candidate in
-            evaluate(candidate: candidate, output: output, preState: benchCase.preState, applyResult: applyResult, stateApplyPass: stateApplyPass)
+            evaluate(candidate: candidate, output: output, preState: benchCase.preState)
         }
         var gate = candidateResults.first { !$0.hardFailed } ?? candidateResults[0]
         gate.judge = gate.hardFailed ? nil : C6Judge.score(case: benchCase, text: output.text)
@@ -1236,20 +1259,35 @@ public struct C6BenchRunner: Sendable {
     private func evaluate(
         candidate: GoldCandidate,
         output: C6RuntimeOutput,
-        preState: [String: String],
-        applyResult: ToolContractStateApplyResult,
-        stateApplyPass: Bool
+        preState: [String: String]
     ) -> C6GateResult {
         let toolMatch = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: output.toolCalls)
         let noToolFalsePositiveCount = candidate.expectNoCall ? output.toolCalls.count : 0
+        let applyResult: ToolContractStateApplyResult
+        let stateApplyPass: Bool
+        if candidate.expectNoCall {
+            applyResult = ToolContractStateApplyResult(state: preState)
+            stateApplyPass = true
+        } else {
+            do {
+                applyResult = try C6MockStateApplier.applyWithEvidence(toolCalls: output.toolCalls, to: preState, stateCells: stateCells, irMap: irMap)
+                stateApplyPass = true
+            } catch {
+                applyResult = ToolContractStateApplyResult(state: preState)
+                stateApplyPass = false
+            }
+        }
+        let appliedWrites = candidate.expectNoCall ? [] : applyResult.appliedWrites
+        let unexpectedMutationKeys = candidate.expectNoCall ? [] : C6AppliedWriteComparator.unexpectedMutationKeys(
+            expected: candidate.expectedStateDelta,
+            writes: appliedWrites,
+            stateCells: stateCells
+        )
         let stateMatch = candidate.expectNoCall
             ? C6StateDeltaComparator.preconditionMatch(expected: candidate.expectedStateDelta, preState: preState)
-            : stateApplyPass && C6StateDeltaComparator.matchesExpectedFinalValuesWithoutUnexpectedDelta(
-                expected: candidate.expectedStateDelta,
-                preState: preState,
-                finalState: applyResult.state,
-                stateCells: stateCells
-            )
+            : stateApplyPass
+                && C6StateDeltaComparator.expectedFinalValuesMatch(expected: candidate.expectedStateDelta, finalState: applyResult.state)
+                && unexpectedMutationKeys.isEmpty
         let scopeOriginEvidence = candidate.expectNoCall ? [:] : applyResult.scopeOriginEvidence
         let scopeOriginMatch = candidate.expectNoCall || C6ScopeOriginEvidence.coversScopedDelta(
             scopeOriginEvidence,
@@ -1272,25 +1310,24 @@ public struct C6BenchRunner: Sendable {
             output: output
         )
 
-        var failures: [C6FailureClass] = []
+        var modelFailures: [C6FailureClass] = []
         if output.parserFailure {
-            failures.append(.parser)
+            modelFailures.append(.parser)
         }
         if !candidate.expectNoCall, !toolMatch {
-            failures.append(.toolCall)
+            modelFailures.append(.toolCall)
         }
         if noToolFalsePositiveCount > 0 {
-            failures.append(.noCall)
+            modelFailures.append(.noCall)
         }
         if !stateMatch || !scopeOriginMatch {
-            failures.append(.stateDelta)
-        }
-        if readbackApplicable && !readbackMatch {
-            failures.append(.readback)
+            modelFailures.append(.stateDelta)
         }
         if !clarifyMatch {
-            failures.append(candidate.clarifyTag == .rejected ? .refusal : .clarify)
+            modelFailures.append(candidate.clarifyTag == .rejected ? .refusal : .clarify)
         }
+        let modelHardFailed = !modelFailures.isEmpty
+        let readbackHardFailed = readbackApplicable && !readbackMatch
 
         return C6GateResult(
             toolCallSetMatch: toolMatch,
@@ -1298,8 +1335,13 @@ public struct C6BenchRunner: Sendable {
             stateDeltaMatch: stateMatch,
             readbackMatch: readbackMatch,
             clarifyMatch: clarifyMatch,
-            hardFailed: !failures.isEmpty,
-            failureClasses: failures,
+            hardFailed: modelHardFailed,
+            failureClasses: modelFailures,
+            modelHardFailed: modelHardFailed,
+            readbackHardFailed: readbackHardFailed,
+            appliedWrites: appliedWrites,
+            dependencyWriteKeys: C6AppliedWriteComparator.dependencyWriteKeys(appliedWrites),
+            unexpectedMutationKeys: unexpectedMutationKeys,
             judge: nil,
             scopeOriginEvidence: scopeOriginEvidence
         )

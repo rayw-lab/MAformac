@@ -430,22 +430,96 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertFalse(result.failureClasses.contains(.readback))
     }
 
+    func testC6StateDeltaUsesAppliedWriteProvenanceForDependencyWrites() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "24"])],
+            expectedStateDelta: ["ac.temp_setpoint[主驾]": "24"],
+            readbackContains: ["24"],
+            preState: ["ac.power": "off", "ac.temp_setpoint[主驾]": "22"],
+            behaviorClass: .toolCall
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "24"])
+        ], text: "主驾空调已设为24度"))
+
+        XCTAssertTrue(result.gateResult.stateDeltaMatch)
+        XCTAssertTrue(result.gateResult.appliedWrites.contains { $0.stateKey == "ac.power" && $0.writeKind == .dependency })
+        XCTAssertTrue(result.gateResult.dependencyWriteKeys.contains("ac.power"))
+        XCTAssertTrue(result.gateResult.unexpectedMutationKeys.isEmpty)
+    }
+
+    func testC6UnexpectedMutationFailsWhenWriteIsNeitherExpectedNorDependency() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: [:],
+            readbackContains: ["空调"],
+            preState: ["ac.power": "off"],
+            behaviorClass: .toolCall
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"))
+
+        XCTAssertFalse(result.gateResult.stateDeltaMatch)
+        XCTAssertTrue(result.gateResult.failureClasses.contains(.stateDelta))
+        XCTAssertEqual(result.gateResult.unexpectedMutationKeys, ["ac.power"])
+    }
+
+    func testC6RejectsDependencyWriteNotDeclaredByExpectedStateCell() throws {
+        let writes = [
+            StateWrite(stateKey: "ambient.color", beforeValue: "白", afterValue: "红", writeKind: .dependency)
+        ]
+
+        let unexpected = C6AppliedWriteComparator.unexpectedMutationKeys(
+            expected: ["ac.temp_setpoint[主驾]": "24"],
+            writes: writes,
+            stateCells: try makeStateCells()
+        )
+
+        XCTAssertEqual(unexpected, ["ambient.color"])
+    }
+
+    func testReadbackMismatchDoesNotSetModelHardFailed() throws {
+        let runner = try makeRunner()
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"],
+            behaviorClass: .toolCall
+        )
+
+        let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "ac.power=on"))
+
+        XCTAssertTrue(result.gateResult.stateDeltaMatch)
+        XCTAssertFalse(result.gateResult.readbackMatch)
+        XCTAssertFalse(result.gateResult.modelHardFailed)
+        XCTAssertTrue(result.gateResult.readbackHardFailed)
+        XCTAssertEqual(result.gateResult.failureClasses.filter { $0 == .readback }, [])
+    }
+
     func testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese() throws {
         let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
-            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])],
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "26"])],
             expectedStateDelta: ["ac.temp_setpoint[主驾]": "26"],
             readbackContains: ["主驾", "26"]
         )
 
         let machineString = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])
+            C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "26"])
         ], text: "ac.temp_setpoint[主驾]=26"))
         XCTAssertFalse(machineString.gateResult.readbackMatch)
-        XCTAssertTrue(machineString.gateResult.failureClasses.contains(.readback))
+        XCTAssertTrue(machineString.gateResult.readbackHardFailed)
+        XCTAssertEqual(machineString.gateResult.failureClasses.filter { $0 == .readback }, [])
 
         let chineseReadback = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])
+            C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "26"])
         ], text: "主驾空调已设为26度"))
         XCTAssertTrue(chineseReadback.gateResult.readbackMatch)
         XCTAssertFalse(chineseReadback.gateResult.hardFailed)
@@ -463,7 +537,8 @@ final class C6VehicleToolBenchTests: XCTestCase {
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
         ], text: "空调已关闭"))
         XCTAssertFalse(wrongBranch.gateResult.readbackMatch)
-        XCTAssertTrue(wrongBranch.gateResult.failureClasses.contains(.readback))
+        XCTAssertTrue(wrongBranch.gateResult.readbackHardFailed)
+        XCTAssertEqual(wrongBranch.gateResult.failureClasses.filter { $0 == .readback }, [])
 
         let rightBranch = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
@@ -486,7 +561,8 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
         XCTAssertTrue(result.gateResult.stateDeltaMatch)
         XCTAssertFalse(result.gateResult.readbackMatch)
-        XCTAssertTrue(result.gateResult.failureClasses.contains(.readback))
+        XCTAssertTrue(result.gateResult.readbackHardFailed)
+        XCTAssertEqual(result.gateResult.failureClasses.filter { $0 == .readback }, [])
     }
 
     func testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided() throws {
@@ -504,7 +580,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         let emptyText = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [], text: ""))
         XCTAssertTrue(emptyText.gateResult.hardFailed)
         XCTAssertTrue(emptyText.gateResult.failureClasses.contains(.refusal))
-        XCTAssertFalse(emptyText.gateResult.failureClasses.contains(.readback))
+        XCTAssertEqual(emptyText.gateResult.failureClasses.filter { $0 == .readback }, [])
 
         let refusalText = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [], text: "行驶中不能开门"))
         XCTAssertFalse(refusalText.gateResult.hardFailed)
@@ -513,17 +589,18 @@ final class C6VehicleToolBenchTests: XCTestCase {
     func testReadbackGateRejectsNegatedTokenMatch() throws {
         let runner = try makeRunner()
         let caseItem = C6BenchCase.fixture(
-            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])],
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "26"])],
             expectedStateDelta: ["ac.temp_setpoint[主驾]": "26"],
             readbackContains: ["主驾", "26"]
         )
 
         let result = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
-            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "delta": "warmer"])
+            C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "26"])
         ], text: "主驾空调不是26度"))
 
         XCTAssertFalse(result.gateResult.readbackMatch)
-        XCTAssertTrue(result.gateResult.failureClasses.contains(.readback))
+        XCTAssertTrue(result.gateResult.readbackHardFailed)
+        XCTAssertEqual(result.gateResult.failureClasses.filter { $0 == .readback }, [])
     }
 
     func testNoCallCaseDoesNotReportFakeReadbackPass() throws {
@@ -559,7 +636,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
         XCTAssertTrue(result.gateResult.stateDeltaMatch)
         XCTAssertFalse(result.gateResult.readbackMatch)
-        XCTAssertFalse(result.gateResult.failureClasses.contains(.readback))
+        XCTAssertEqual(result.gateResult.failureClasses.filter { $0 == .readback }, [])
         XCTAssertFalse(result.gateResult.hardFailed)
     }
 
