@@ -78,6 +78,61 @@ final class C3ExecutionPipelineTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "window.position[右后]")?.actualValue, "30")
     }
 
+    func testOmittedWindowScopeResolvesToC2DefaultScope() throws {
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "window.position"))
+        let frame = ToolCallFrame.fixture(device: "window", actionPrimitive: "power_on", stateRevision: 0)
+
+        let resolution = try C2ScopeResolver.resolve(frame: frame, cell: cell)
+
+        XCTAssertEqual(resolution.origin, .defaulted)
+        XCTAssertEqual(resolution.keys, ["window.position[主驾]"])
+        XCTAssertEqual(resolution.resolvedScopes, ["主驾"])
+    }
+
+    func testExplicitAllWindowScopeFansOut() throws {
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "window.position"))
+        let frame = ToolCallFrame.fixture(device: "window", actionPrimitive: "power_on", slots: ["position": "全车"], stateRevision: 0)
+
+        let resolution = try C2ScopeResolver.resolve(frame: frame, cell: cell)
+
+        XCTAssertEqual(resolution.origin, .fanout)
+        XCTAssertEqual(Set(resolution.keys), Set([
+            "window.position[主驾]",
+            "window.position[副驾]",
+            "window.position[左后]",
+            "window.position[右后]"
+        ]))
+    }
+
+    func testExplicitDriverScopeRemainsExplicit() throws {
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "window.position"))
+        let frame = ToolCallFrame.fixture(device: "window", actionPrimitive: "power_on", slots: ["position": "主驾"], stateRevision: 0)
+
+        let resolution = try C2ScopeResolver.resolve(frame: frame, cell: cell)
+
+        XCTAssertEqual(resolution.origin, .explicit)
+        XCTAssertEqual(resolution.keys, ["window.position[主驾]"])
+    }
+
+    @MainActor
+    func testPipelineOmittedWindowScopeUsesC2DefaultAndCarriesOrigin() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let frame = ToolCallFrame.fixture(device: "window", actionPrimitive: "power_on", stateRevision: 0)
+
+        let result = try pipeline.execute(frame, store: store, traceLogger: InMemoryTraceLogger())
+
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "100")
+        XCTAssertEqual(store.cell(for: "window.position[副驾]")?.actualValue, "0")
+        XCTAssertEqual(store.cell(for: "window.position[左后]")?.actualValue, "0")
+        XCTAssertEqual(store.cell(for: "window.position[右后]")?.actualValue, "0")
+        let readback = try XCTUnwrap(result.readbacks.first { $0.key == "window.position[主驾]" })
+        XCTAssertEqual(readback.scopeOrigin, .defaulted)
+    }
+
     @MainActor
     func testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues() throws {
         let store = DemoVehicleStateStore()
