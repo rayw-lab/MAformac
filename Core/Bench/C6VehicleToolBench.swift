@@ -754,47 +754,23 @@ public struct C6GoldVerificationReport: Codable, Equatable, Sendable {
 }
 
 fileprivate enum C6ScopeOriginEvidence {
-    static func derive(
-        toolCalls: [C6ToolCall],
+    static func coversScopedDelta(
+        _ evidence: [String: String],
         stateDelta: [String: String],
-        stateCells: StateCellContractLookup,
-        irMap: [String: DDomainIRMapEntry]
-    ) -> [String: String] {
-        let normalizedIRs = toolCalls.flatMap { ToolContractNormalizer.normalize($0, irMap: irMap) }
-        guard !normalizedIRs.isEmpty else {
-            return [:]
-        }
-
-        var evidence: [String: String] = [:]
-        for stateKey in stateDelta.keys.sorted() {
+        stateCells: StateCellContractLookup
+    ) -> Bool {
+        for stateKey in stateDelta.keys {
             let parts = splitStateKey(stateKey)
             guard parts.scope != nil,
                   let cell = stateCells.cell(id: parts.baseID),
                   !cell.scope.isEmpty else {
                 continue
             }
-            for ir in normalizedIRs where ToolContractStateApplier.deviceCellMap[ir.device] == parts.baseID {
-                let frame = ToolCallFrame(
-                    traceID: "c6-scope-origin",
-                    agentID: "vehicle-control",
-                    capabilityID: "cabin.\(ir.device)",
-                    toolName: "vehicle_control",
-                    device: ir.device,
-                    actionPrimitive: ir.actionPrimitive,
-                    slots: ir.slots,
-                    value: ir.value,
-                    stateRevision: 0,
-                    candidateSource: .upstreamToolCall
-                )
-                guard let resolution = try? C2ScopeResolver.resolve(frame: frame, cell: cell),
-                      resolution.keys.contains(stateKey) else {
-                    continue
-                }
-                evidence[stateKey] = resolution.origin.rawValue
-                break
+            guard evidence[stateKey] != nil else {
+                return false
             }
         }
-        return evidence
+        return true
     }
 
     private static func splitStateKey(_ key: String) -> (baseID: String, scope: String?) {
@@ -806,6 +782,62 @@ fileprivate enum C6ScopeOriginEvidence {
             return (key, nil)
         }
         return (String(key[..<open]), String(key[scopeStart..<close]))
+    }
+}
+
+fileprivate enum C6StateDeltaComparator {
+    static func actualDelta(preState: [String: String], finalState: [String: String]) -> [String: String] {
+        finalState.filter { key, value in
+            preState[key] != value
+        }
+    }
+
+    static func matchesExpectedFinalValuesWithoutUnexpectedDelta(
+        expected: [String: String],
+        preState: [String: String],
+        finalState: [String: String],
+        stateCells: StateCellContractLookup
+    ) -> Bool {
+        let expectedValuesMatch = expected.allSatisfy { key, value in
+            finalState[key] == value
+        }
+        let expectedKeys = expectedKeysIncludingDependencies(expected.keys, stateCells: stateCells)
+        let unexpectedDelta = actualDelta(preState: preState, finalState: finalState).filter { key, _ in
+            !expectedKeys.contains(key)
+        }
+        return expectedValuesMatch && unexpectedDelta.isEmpty
+    }
+
+    private static func expectedKeysIncludingDependencies(
+        _ keys: Dictionary<String, String>.Keys,
+        stateCells: StateCellContractLookup
+    ) -> Set<String> {
+        var result = Set(keys)
+        for key in keys {
+            let baseID = splitStateKey(key).baseID
+            guard let cell = stateCells.cell(id: baseID) else {
+                continue
+            }
+            result.formUnion(cell.dependsOn)
+        }
+        return result
+    }
+
+    private static func splitStateKey(_ key: String) -> (baseID: String, scope: String?) {
+        guard let open = key.firstIndex(of: "[") else {
+            return (key, nil)
+        }
+        let scopeStart = key.index(after: open)
+        guard let close = key[scopeStart...].firstIndex(of: "]") else {
+            return (String(key[..<open]), nil)
+        }
+        return (String(key[..<open]), String(key[scopeStart..<close]))
+    }
+
+    static func preconditionMatch(expected: [String: String], preState: [String: String]) -> Bool {
+        expected.allSatisfy { key, value in
+            preState[key] == value
+        }
     }
 }
 
@@ -892,16 +924,34 @@ public struct C6GoldVerifier: Sendable {
     ) -> C6GoldVerificationResult {
         let toolCallPass = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: candidate.expectedToolCalls)
             && (!candidate.expectNoCall || candidate.expectedToolCalls.isEmpty)
-        let finalState = C6MockStateApplier.apply(toolCalls: candidate.expectedToolCalls, to: preState, stateCells: stateCells, irMap: irMap)
-        let stateDeltaMatches = candidate.expectedStateDelta.allSatisfy { key, value in
-            finalState[key] == value
+        let stateDeltaMatches: Bool
+        let scopeOriginEvidence: [String: String]
+        if candidate.expectNoCall {
+            stateDeltaMatches = C6StateDeltaComparator.preconditionMatch(expected: candidate.expectedStateDelta, preState: preState)
+            scopeOriginEvidence = [:]
+        } else {
+            let stateApplyPass: Bool
+            let applyResult: ToolContractStateApplyResult
+            do {
+                applyResult = try C6MockStateApplier.applyWithEvidence(toolCalls: candidate.expectedToolCalls, to: preState, stateCells: stateCells, irMap: irMap)
+                stateApplyPass = true
+            } catch {
+                applyResult = ToolContractStateApplyResult(state: preState)
+                stateApplyPass = false
+            }
+            scopeOriginEvidence = applyResult.scopeOriginEvidence
+            stateDeltaMatches = stateApplyPass && C6StateDeltaComparator.matchesExpectedFinalValuesWithoutUnexpectedDelta(
+                expected: candidate.expectedStateDelta,
+                preState: preState,
+                finalState: applyResult.state,
+                stateCells: stateCells
+            )
         }
         let stateDeltaPass = stateDeltaMatches && (!requiresStateDelta(candidate, irMap: irMap) || !candidate.expectedStateDelta.isEmpty)
-        let scopeOriginEvidence = C6ScopeOriginEvidence.derive(
-            toolCalls: candidate.expectedToolCalls,
+        let scopeOriginPass = candidate.expectNoCall || C6ScopeOriginEvidence.coversScopedDelta(
+            scopeOriginEvidence,
             stateDelta: candidate.expectedStateDelta,
-            stateCells: stateCells,
-            irMap: irMap
+            stateCells: stateCells
         )
         let readbackApplicable = !candidate.expectNoCall
             && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
@@ -910,13 +960,15 @@ public struct C6GoldVerifier: Sendable {
            let outputText = C6ReadbackRenderer.goldReplayOutputText(
             delta: candidate.expectedStateDelta,
             assertion: candidate.readbackAssertion,
-            stateCells: stateCells
+            stateCells: stateCells,
+            scopeOriginEvidence: scopeOriginEvidence
            ) {
             readbackPass = C6ReadbackRenderer.matches(
                 delta: candidate.expectedStateDelta,
                 assertion: candidate.readbackAssertion,
                 outputText: outputText,
-                stateCells: stateCells
+                stateCells: stateCells,
+                scopeOriginEvidence: scopeOriginEvidence
             )
         } else {
             readbackPass = false
@@ -927,7 +979,7 @@ public struct C6GoldVerifier: Sendable {
         if !toolCallPass {
             failures.append(candidate.expectNoCall ? .noCall : .toolCall)
         }
-        if !stateDeltaPass {
+        if !stateDeltaPass || !scopeOriginPass {
             failures.append(.stateDelta)
         }
         if readbackApplicable && !readbackPass {
@@ -1018,9 +1070,17 @@ public struct C6BenchRunner: Sendable {
     }
 
     public func evaluate(case benchCase: C6BenchCase, output: C6RuntimeOutput, runIndex: Int = 0) throws -> C6EvalRun {
-        let finalState = C6MockStateApplier.apply(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells, irMap: irMap)
+        let applyResult: ToolContractStateApplyResult
+        let stateApplyPass: Bool
+        do {
+            applyResult = try C6MockStateApplier.applyWithEvidence(toolCalls: output.toolCalls, to: benchCase.preState, stateCells: stateCells, irMap: irMap)
+            stateApplyPass = true
+        } catch {
+            applyResult = ToolContractStateApplyResult(state: benchCase.preState)
+            stateApplyPass = false
+        }
         let candidateResults = goldCandidates(for: benchCase).map { candidate in
-            evaluate(candidate: candidate, output: output, finalState: finalState)
+            evaluate(candidate: candidate, output: output, preState: benchCase.preState, applyResult: applyResult, stateApplyPass: stateApplyPass)
         }
         var gate = candidateResults.first { !$0.hardFailed } ?? candidateResults[0]
         gate.judge = gate.hardFailed ? nil : C6Judge.score(case: benchCase, text: output.text)
@@ -1084,18 +1144,25 @@ public struct C6BenchRunner: Sendable {
     private func evaluate(
         candidate: GoldCandidate,
         output: C6RuntimeOutput,
-        finalState: [String: String]
+        preState: [String: String],
+        applyResult: ToolContractStateApplyResult,
+        stateApplyPass: Bool
     ) -> C6GateResult {
         let toolMatch = C6ToolCallMatcher.matches(expected: candidate.expectedToolCalls, actual: output.toolCalls)
         let noToolFalsePositiveCount = candidate.expectNoCall ? output.toolCalls.count : 0
-        let stateMatch = candidate.expectedStateDelta.allSatisfy { key, value in
-            finalState[key] == value
-        }
-        let scopeOriginEvidence = C6ScopeOriginEvidence.derive(
-            toolCalls: output.toolCalls,
+        let stateMatch = candidate.expectNoCall
+            ? C6StateDeltaComparator.preconditionMatch(expected: candidate.expectedStateDelta, preState: preState)
+            : stateApplyPass && C6StateDeltaComparator.matchesExpectedFinalValuesWithoutUnexpectedDelta(
+                expected: candidate.expectedStateDelta,
+                preState: preState,
+                finalState: applyResult.state,
+                stateCells: stateCells
+            )
+        let scopeOriginEvidence = candidate.expectNoCall ? [:] : applyResult.scopeOriginEvidence
+        let scopeOriginMatch = candidate.expectNoCall || C6ScopeOriginEvidence.coversScopedDelta(
+            scopeOriginEvidence,
             stateDelta: candidate.expectedStateDelta,
-            stateCells: stateCells,
-            irMap: irMap
+            stateCells: stateCells
         )
         let readbackApplicable = !candidate.expectNoCall
             && (!candidate.expectedStateDelta.isEmpty || !candidate.readbackAssertion.contains.isEmpty)
@@ -1103,7 +1170,8 @@ public struct C6BenchRunner: Sendable {
             delta: candidate.expectedStateDelta,
             assertion: candidate.readbackAssertion,
             outputText: output.text,
-            stateCells: stateCells
+            stateCells: stateCells,
+            scopeOriginEvidence: scopeOriginEvidence
         )
         let clarifyMatch = clarifyGateMatches(
             clarifyTag: candidate.clarifyTag,
@@ -1122,7 +1190,7 @@ public struct C6BenchRunner: Sendable {
         if noToolFalsePositiveCount > 0 {
             failures.append(.noCall)
         }
-        if !stateMatch {
+        if !stateMatch || !scopeOriginMatch {
             failures.append(.stateDelta)
         }
         if readbackApplicable && !readbackMatch {
@@ -1250,8 +1318,17 @@ public enum C6MockStateApplier {
         to preState: [String: String],
         stateCells: StateCellContractLookup,
         irMap: [String: DDomainIRMapEntry] = [:]
-    ) -> [String: String] {
-        ToolContractStateApplier.apply(toolCalls: toolCalls, to: preState, stateCells: stateCells, irMap: irMap)
+    ) throws -> [String: String] {
+        try ToolContractStateApplier.apply(toolCalls: toolCalls, to: preState, stateCells: stateCells, irMap: irMap)
+    }
+
+    public static func applyWithEvidence(
+        toolCalls: [C6ToolCall],
+        to preState: [String: String],
+        stateCells: StateCellContractLookup,
+        irMap: [String: DDomainIRMapEntry] = [:]
+    ) throws -> ToolContractStateApplyResult {
+        try ToolContractStateApplier.applyWithEvidence(toolCalls: toolCalls, to: preState, stateCells: stateCells, irMap: irMap)
     }
 }
 
@@ -1261,14 +1338,19 @@ public enum C6ReadbackRenderer {
         var tokens: [String]
     }
 
-    private static func render(delta: [String: String], stateCells: StateCellContractLookup, fallbackText: String) -> String {
+    private static func render(
+        delta: [String: String],
+        stateCells: StateCellContractLookup,
+        fallbackText: String,
+        scopeOriginEvidence: [String: String] = [:]
+    ) -> String {
         guard !delta.isEmpty else {
             return fallbackText
         }
         let rendered = delta
             .compactMap { key, value -> String? in
                 let parts = splitStateKey(key)
-                return stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value)
+                return stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value, scopeOrigin: scopeOrigin(for: key, in: scopeOriginEvidence))
             }
             .sorted()
             .joined(separator: " ")
@@ -1278,7 +1360,8 @@ public enum C6ReadbackRenderer {
     fileprivate static func goldReplayOutputText(
         delta: [String: String],
         assertion: C6ReadbackAssertion,
-        stateCells: StateCellContractLookup
+        stateCells: StateCellContractLookup,
+        scopeOriginEvidence: [String: String] = [:]
     ) -> String? {
         guard !delta.isEmpty else {
             let tokens = uniqueNonEmpty(assertion.contains)
@@ -1290,7 +1373,7 @@ public enum C6ReadbackRenderer {
                 guard stateCells.cell(id: parts.baseID)?.readbackTemplate != nil else {
                     return nil
                 }
-                return stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value)
+                return stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value, scopeOrigin: scopeOrigin(for: key, in: scopeOriginEvidence))
             }
             .sorted()
             .joined(separator: " ")
@@ -1301,7 +1384,8 @@ public enum C6ReadbackRenderer {
         delta: [String: String],
         assertion: C6ReadbackAssertion,
         outputText: String,
-        stateCells: StateCellContractLookup
+        stateCells: StateCellContractLookup,
+        scopeOriginEvidence: [String: String] = [:]
     ) -> Bool {
         let trimmedOutput = outputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedOutput.isEmpty else {
@@ -1324,7 +1408,7 @@ public enum C6ReadbackRenderer {
             return tokens.allSatisfy { trimmedOutput.contains($0) }
         }
 
-        guard let expectedReadbacks = expectedReadbacks(delta: delta, stateCells: stateCells) else {
+        guard let expectedReadbacks = expectedReadbacks(delta: delta, stateCells: stateCells, scopeOriginEvidence: scopeOriginEvidence) else {
             return false
         }
         return expectedReadbacks.allSatisfy { expected in
@@ -1334,19 +1418,20 @@ public enum C6ReadbackRenderer {
 
     private static func expectedReadbacks(
         delta: [String: String],
-        stateCells: StateCellContractLookup
+        stateCells: StateCellContractLookup,
+        scopeOriginEvidence: [String: String] = [:]
     ) -> [ExpectedReadback]? {
         var expected: [ExpectedReadback] = []
         for (key, value) in delta {
             let parts = splitStateKey(key)
             guard let cell = stateCells.cell(id: parts.baseID),
-                  let rendered = stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value),
+                  let rendered = stateCells.renderReadback(stateKey: parts.baseID, scope: parts.scope, value: value, scopeOrigin: scopeOrigin(for: key, in: scopeOriginEvidence)),
                   let template = cell.readbackTemplate else {
                 return nil
             }
             expected.append(ExpectedReadback(
                 rendered: rendered,
-                tokens: tokens(from: template, cell: cell, scope: parts.scope, value: value, rendered: rendered)
+                tokens: tokens(from: template, cell: cell, scope: parts.scope, value: value, rendered: rendered, scopeOrigin: scopeOrigin(for: key, in: scopeOriginEvidence))
             ))
         }
         return expected
@@ -1357,7 +1442,8 @@ public enum C6ReadbackRenderer {
         cell: StateCellDefinition,
         scope: String?,
         value: String,
-        rendered: String
+        rendered: String,
+        scopeOrigin: ScopeOrigin?
     ) -> [String] {
         if cell.type == "enum" {
             return [rendered]
@@ -1378,6 +1464,10 @@ public enum C6ReadbackRenderer {
             tokens.append(contentsOf: normalizedStaticTokens(from: fragment))
         }
         return uniqueNonEmpty(tokens)
+    }
+
+    private static func scopeOrigin(for stateKey: String, in evidence: [String: String]) -> ScopeOrigin? {
+        evidence[stateKey].flatMap(ScopeOrigin.init(rawValue:))
     }
 
     private static func normalizedStaticTokens(from fragment: String) -> [String] {

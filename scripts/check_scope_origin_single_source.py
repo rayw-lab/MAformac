@@ -11,10 +11,12 @@ C3_PIPELINE = ROOT / "Core" / "Execution" / "C3ExecutionPipeline.swift"
 READBACK = ROOT / "Core" / "Contracts" / "ContractLookups.swift"
 STATE_STORE = ROOT / "Core" / "State" / "DemoVehicleStateStore.swift"
 C6_BENCH = ROOT / "Core" / "Bench" / "C6VehicleToolBench.swift"
-REQUIRED = [SCOPE_RESOLUTION, C3_PIPELINE, READBACK, STATE_STORE, C6_BENCH]
+TOOL_COMPILER = ROOT / "Core" / "Contracts" / "ToolContractCompiler.swift"
+REQUIRED = [SCOPE_RESOLUTION, C3_PIPELINE, READBACK, STATE_STORE, C6_BENCH, TOOL_COMPILER]
 FORBIDDEN_RECOMPUTE = [
     (ROOT / "Core" / "Contracts" / "ContractLookups.swift", re.compile(r'scope\s*==\s*"主驾"')),
     (ROOT / "Core" / "Execution" / "C3ExecutionPipeline.swift", re.compile(r'scope\s*==\s*"主驾"')),
+    (ROOT / "Core" / "Bench" / "C6VehicleToolBench.swift", re.compile(r"C2ScopeResolver\.resolve")),
 ]
 
 
@@ -37,8 +39,8 @@ def main() -> None:
         fail("readback does not consume typed ScopeOrigin")
     if "scopeOriginEvidence" not in texts[C6_BENCH] or "scope_origin_evidence" not in texts[C6_BENCH]:
         fail("C6 verifier/eval evidence does not expose scope_origin_evidence")
-    if "C2ScopeResolver.resolve" not in texts[C6_BENCH]:
-        fail("C6 scope-origin evidence does not reuse C2ScopeResolver")
+    if "applyWithEvidence" not in texts[TOOL_COMPILER] or "applyWithEvidence" not in texts[C6_BENCH]:
+        fail("C6 scope-origin evidence must consume ToolContractStateApplier.applyWithEvidence")
     for path, pattern in FORBIDDEN_RECOMPUTE:
         text = path.read_text(encoding="utf-8")
         for lineno, line in enumerate(text.splitlines(), 1):

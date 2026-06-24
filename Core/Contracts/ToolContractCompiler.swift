@@ -372,20 +372,77 @@ public enum ToolContractNormalizer {
     }
 }
 
+public enum ToolContractStateApplyError: Error, Equatable, Sendable, CustomStringConvertible {
+    case unclassifiedTool(String)
+    case unmappedDevice(String)
+    case missingStateCell(String)
+    case scopeResolutionFailed(cellID: String, reason: String)
+    case unsupportedStateMutation(device: String, primitive: String, cellID: String)
+
+    public var description: String {
+        switch self {
+        case .unclassifiedTool(let name):
+            return "unclassified_tool:\(name)"
+        case .unmappedDevice(let device):
+            return "unmapped_device:\(device)"
+        case .missingStateCell(let cellID):
+            return "missing_state_cell:\(cellID)"
+        case .scopeResolutionFailed(let cellID, let reason):
+            return "scope_resolution_failed:\(cellID):\(reason)"
+        case .unsupportedStateMutation(let device, let primitive, let cellID):
+            return "unsupported_state_mutation:\(device).\(primitive):\(cellID)"
+        }
+    }
+}
+
+public struct ToolContractStateApplyResult: Equatable, Sendable {
+    public var state: [String: String]
+    public var scopeOriginEvidence: [String: String]
+
+    public init(state: [String: String], scopeOriginEvidence: [String: String] = [:]) {
+        self.state = state
+        self.scopeOriginEvidence = scopeOriginEvidence
+    }
+}
+
+private struct ToolContractStateWriteEvidence {
+    var stateKey: String
+    var scopeOrigin: ScopeOrigin?
+}
+
 public enum ToolContractStateApplier {
     public static func apply(
         toolCalls: [C6ToolCall],
         to preState: [String: String],
         stateCells: StateCellContractLookup,
         irMap: [String: DDomainIRMapEntry] = [:]
-    ) -> [String: String] {
+    ) throws -> [String: String] {
+        try applyWithEvidence(toolCalls: toolCalls, to: preState, stateCells: stateCells, irMap: irMap).state
+    }
+
+    public static func applyWithEvidence(
+        toolCalls: [C6ToolCall],
+        to preState: [String: String],
+        stateCells: StateCellContractLookup,
+        irMap: [String: DDomainIRMapEntry] = [:]
+    ) throws -> ToolContractStateApplyResult {
         var state = preState
+        var scopeOriginEvidence: [String: String] = [:]
         for call in toolCalls {
-            for ir in ToolContractNormalizer.normalize(call, irMap: irMap) {
-                apply(ir, state: &state, stateCells: stateCells)
+            let irs = ToolContractNormalizer.normalize(call, irMap: irMap)
+            guard !irs.isEmpty else {
+                throw ToolContractStateApplyError.unclassifiedTool(call.name)
+            }
+            for ir in irs {
+                let writes = try apply(ir, state: &state, stateCells: stateCells)
+                for write in writes {
+                    if let scopeOrigin = write.scopeOrigin {
+                        scopeOriginEvidence[write.stateKey] = scopeOrigin.rawValue
+                    }
+                }
             }
         }
-        return state
+        return ToolContractStateApplyResult(state: state, scopeOriginEvidence: scopeOriginEvidence)
     }
 
     // device → C2 cell id 单一 SSOT 映射(S2 5 族 + S3 6 族 = 10 族 demo-positive); C3ExecutionPipeline 复用此单源
@@ -426,19 +483,27 @@ public enum ToolContractStateApplier {
 
     // data-driven: device→cell, 从 cell 元数据(execution_range/exp_step/default/scope/depends_on)派生 state 写入,
     // 替旧 8 个硬编码 applyXxx(cell SSOT enforce, claim-vs-reality 铁律1: 边界/步长/初值不在代码重复一份)。
-    private static func apply(_ ir: ToolContractIR, state: inout [String: String], stateCells: StateCellContractLookup) {
+    private static func apply(
+        _ ir: ToolContractIR,
+        state: inout [String: String],
+        stateCells: StateCellContractLookup
+    ) throws -> [ToolContractStateWriteEvidence] {
         guard let cellID = deviceCellMap[ir.device] else {
-            logUnmapped(ir.device)  // 未映射 device 不静默吞(S3 扩 191 逐族纳入)
-            return
+            logUnmapped(ir.device)
+            throw ToolContractStateApplyError.unmappedDevice(ir.device)
         }
         guard let cell = stateCells.cell(id: cellID) else {
             logUnmapped(cellID)
-            return
+            throw ToolContractStateApplyError.missingStateCell(cellID)
+        }
+        if ir.actionPrimitive == "query" {
+            return []
         }
         if cell.type == "enum" {
-            applyEnumCell(ir, cellID: cellID, cell: cell, state: &state, stateCells: stateCells)
+            try applyEnumCell(ir, cellID: cellID, cell: cell, state: &state, stateCells: stateCells)
+            return []
         } else {
-            applyNumericCell(ir, cellID: cellID, cell: cell, state: &state)
+            return try applyNumericCell(ir, cellID: cellID, cell: cell, state: &state)
         }
     }
 
@@ -446,20 +511,26 @@ public enum ToolContractStateApplier {
     private static func applyEnumCell(
         _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition,
         state: inout [String: String], stateCells: StateCellContractLookup
-    ) {
+    ) throws {
         if isOff(ir.actionPrimitive, value: ir.value) {
             state[cellID] = "off"
         } else if isOn(ir.actionPrimitive, value: ir.value) {
             state[cellID] = "on"
         } else if let raw = firstNonEmpty(ir.value.direct, ir.value.offset, ir.slots["color"]) {
             state[cellID] = c2ColorValue(for: raw, stateCells: stateCells)
+        } else {
+            throw ToolContractStateApplyError.unsupportedStateMutation(
+                device: ir.device,
+                primitive: ir.actionPrimitive,
+                cellID: cellID
+            )
         }
     }
 
     // numeric cell: target 直写 / exp ±expStepLittle clamp executionRange / scope 区位(window 多区位) / depends_on 联动。
     private static func applyNumericCell(
         _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition, state: inout [String: String]
-    ) {
+    ) throws -> [ToolContractStateWriteEvidence] {
         let resolutionFrame = ToolCallFrame(
             traceID: "state-applier",
             agentID: "vehicle-control",
@@ -477,7 +548,7 @@ public enum ToolContractStateApplier {
             resolution = try C2ScopeResolver.resolve(frame: resolutionFrame, cell: cell)
         } catch {
             logUnmapped("\(cellID).scope")
-            return
+            throw ToolContractStateApplyError.scopeResolutionFailed(cellID: cellID, reason: String(describing: error))
         }
         let currentKey = resolution.keys.first ?? cellID
         let writeKeys = resolution.keys
@@ -504,13 +575,20 @@ public enum ToolContractStateApplier {
         } else {
             newValue = nil
         }
-        guard let value = newValue else { return }
+        guard let value = newValue else {
+            throw ToolContractStateApplyError.unsupportedStateMutation(
+                device: ir.device,
+                primitive: ir.actionPrimitive,
+                cellID: cellID
+            )
+        }
         for key in writeKeys {
             state[key] = value
         }
         for dependency in cell.dependsOn {                          // 写 cell 激活依赖(ac.temp_setpoint→ac.power=on)
             state[dependency] = "on"
         }
+        return writeKeys.map { ToolContractStateWriteEvidence(stateKey: $0, scopeOrigin: resolution.origin) }
     }
 
     private static func clampUpper(_ value: Int, _ range: ExecutionRange?) -> Int {

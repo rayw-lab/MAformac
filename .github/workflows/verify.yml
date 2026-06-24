@@ -1,0 +1,60 @@
+name: Verify
+
+"on":
+  pull_request:
+  push:
+    branches:
+      - main
+      - "codex/**"
+
+jobs:
+  verify:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          swift --version
+          python3 --version
+
+      - name: Run source-free verification gates
+        run: make verify-ci
+
+      - name: Check whitespace
+        run: git diff --check
+
+      - name: Write head-bound CI receipt
+        run: |
+          dirty_worktree=false
+          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+            dirty_worktree=true
+          fi
+          cat > "$RUNNER_TEMP/verify-ci-receipt.json" <<JSON
+          {
+            "receipt_id": "verify-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}",
+            "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "change_id": "define-demo-default-scope",
+            "proof_class": "ci_source_free",
+            "head_commit": "${GITHUB_SHA}",
+            "dirty_worktree": ${dirty_worktree},
+            "commands": [
+              "make verify-ci",
+              "git diff --check"
+            ],
+            "claim_boundaries": [
+              "source-free CI proof only",
+              "local make verify-all receipt remains required for raw snapshot bound proof",
+              "no_training_no_c6_acceptance_no_golden_no_voice_no_uiue_merge"
+            ]
+          }
+          JSON
+          shasum -a 256 "$RUNNER_TEMP/verify-ci-receipt.json"
+
+      - name: Upload CI receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-ci-receipt
+          path: ${{ runner.temp }}/verify-ci-receipt.json

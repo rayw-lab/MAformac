@@ -173,3 +173,15 @@
 7. **🟡 research/tooling 目录可能含嵌套 `.git`、node_modules 和 pack,不能 `git add -f` 整包推**:`Tools/paper-to-skill-gate/` 有本轮需要推的轻量 research artifacts,但内部 reference clones 有 `.git/objects`、`node_modules`、PDF/PPTX 大文件,目录自身 `.gitignore` 已把 clone 内容隔离。→ **推 research 目录先 `find -name .git` + `du -sh` + 大文件 scan;只 stage README/SKILL/schema/script/trial-runs 等轻量可审计产物,不要把 clone pack/node_modules 当 research evidence 强推入仓。**
 
 8. **🟢 R1/R2 审计要接受“receipt/claim 风险”类 finding,不是只看代码**:R1 没抓 P0,但抓出 4 个 P1,其中 3 个是 receipt durability、C6 生成日志、ScopeOrigin 证据面问题,不全是 runtime bug。→ **apply closeout 的 subagent 审计 prompt 必须覆盖代码、测试、机械门、receipt、ignored/staged 状态和 claim boundaries;主线程吸收后再 R2,否则容易把 local-pass 写成 fake green。**
+
+9. **🔴 P0 可以是合并证据链,不是只看代码安全漏洞**:两份 GPT Pro 报告都没发现 CRITICAL/secret/RCE,但窗口2把“当前 head clean receipt + GitHub CI/status 缺失”升为 P0 合并门。我第一反应容易把 P0 只理解成代码域安全事故。→ **merge gate 的 P0 要按证明链判断:旧 head/dirty receipt + 无 CI run = 不可 merge,即使代码 P1 已修;P0/P1 需要按 domain vs merge-evidence 两条轴分类。**
+
+10. **🔴 跨 grill 线冲突不能盲吸收单份审计建议**:GPT Pro 基于旧 C3 test 推“defaulted scope 完全 elide 主驾”,但 UIUE AD-8.7 已拍“默认 scope 淡显、非完全省略”,理由是客户要分清主驾/全车。若按 GPT 原建议改 domain readback,会撞 UIUE 已拍策略。→ **审计建议进入实现前先查相邻 worktree/决策线;同一字段跨 C3/C6/UIUE 时,用更具体且最新的 grill 决策裁剪建议,并把偏离审计原建议写进吸收记录。**
+
+11. **🔴 机械门名称不能大于真实覆盖范围(C5/C2 parity window-only 活样本)**:`check_c5_c2_scope_parity.py` 名字叫 C5/C2 parity,实际只读 `window.position`;即使 C5 代码改成 device-aware,脚本仍会放过“回到 window-only”的假绿。→ **每个 gate 名称要配 coverage audit:若叫全量 parity,脚本必须枚举全量或至少 fail 当 only-window;否则把 gate 重命名为 window smoke,不要用宽名制造信心。**
+
+12. **🟡 CI 不能偷跑本机 raw 依赖,也不能沉默降级**:`make verify-all` 包含 `freeze_snapshot.py --check`,读取 `~/workspace/raw/.../source-snapshots`;GitHub runner 没这些 raw 文件。直接把 `make verify-all` 放 Actions 会红;在 CI 里偷偷 skip `verify-source` 又是假绿。→ **CI 要显式建 source-free target(如 `verify-ci`)并写明 proof boundary;完整 raw-bound proof 仍由本地 head-bound receipt 跑 `make verify-all`。**
+
+13. **🟡 C6 expected delta 要区分“主期望 final value”和 C2 dependency side-effect**:空调温度写入会按 C2 `depends_on` 同步打开 `ac.power`;若 C6 exact delta 粗暴要求“只改 expectedStateDelta keys”,会把合法 dependency 当 unexpected mutation。→ **exact delta gate 要允许 C2 声明的 dependency side-effect,但 readback/expected delta 不必把每个 dependency 都当主期望;否则会逼 JSONL 写伪读回。**
+
+14. **🟡 SwiftPM helper 卡死不能扩成“测试失败”或“验证通过”**:本轮多次 filtered test/direct xctest 卡在 `swiftpm-xctest-helper`;清理 helper + serial rerun 后 focused tests 正常过。→ **SwiftPM 卡死只算 infra interruption,不算 pass/fail;最终 receipt 只记录成功复跑的原命令和 log,并避免并行 SwiftPM 测试。**

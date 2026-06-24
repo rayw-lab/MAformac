@@ -193,14 +193,14 @@ final class C6VehicleToolBenchTests: XCTestCase {
     func testContractApplierNormalizesDAndBFramesToSameStateDelta() throws {
         let stateCells = try makeStateCells()
         let preState = ["ac.power": "off", "ac.temp_setpoint[主驾]": "22"]
-        let dDomain = C6MockStateApplier.apply(
+        let dDomain = try C6MockStateApplier.apply(
             toolCalls: [
                 C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on", "target_temperature": "24"])
             ],
             to: preState,
             stateCells: stateCells
         )
-        let bFrame = C6MockStateApplier.apply(
+        let bFrame = try C6MockStateApplier.apply(
             toolCalls: [
                 C6ToolCall(name: "tool_call_frame", arguments: ["device": "ac", "action_primitive": "power_on", "value.offset": "on", "value.type": "STATE"]),
                 C6ToolCall(name: "tool_call_frame", arguments: ["device": "ac_temperature", "action_primitive": "adjust_to_number", "value.direct": "24", "value.type": "SPOT"])
@@ -217,7 +217,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
     func testContractApplierAcceptsBFrameWindowAndScreenSurfaces() throws {
         let stateCells = try makeStateCells()
         let preState = ["window.position[主驾]": "0", "screen.brightness[中控屏]": "70"]
-        let state = C6MockStateApplier.apply(
+        let state = try C6MockStateApplier.apply(
             toolCalls: [
                 C6ToolCall(name: "tool_call_frame", arguments: ["device": "window", "action_primitive": "by_percent", "position": "主驾", "value.direct": "50", "value.type": "PERCENT"]),
                 C6ToolCall(name: "tool_call_frame", arguments: ["device": "screen_brightness", "action_primitive": "by_percent", "value.direct": "40", "value.type": "PERCENT"])
