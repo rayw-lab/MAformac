@@ -35,9 +35,9 @@ verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section v
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
 verify-all: verify swift-test
 
-# GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source。
-# verify-ci 保留 source-free 的生成/引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: .venv/.deps.stamp regen verify-refs verify-cross-section verify-surface verify-default-scope diff test swift-test
+# GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
+# verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
+verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-default-scope diff test swift-test
 
 swift-test:
 	swift test
