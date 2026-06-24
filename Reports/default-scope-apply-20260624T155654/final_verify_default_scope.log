@@ -1,0 +1,9 @@
+$ make verify-default-scope
+.venv/bin/python scripts/check_default_scope_ssot.py
+default-scope-ssot: pass
+.venv/bin/python scripts/check_c5_c2_scope_parity.py
+c5-c2-scope-parity: pass
+.venv/bin/python scripts/check_scope_origin_single_source.py
+scope-origin-single-source: pass
+
+exit_code=0

@@ -1,0 +1,104 @@
+$ swift test --filter C5LoRATrainingTests
+[0/1] Planning build
+Building for debugging...
+[0/8] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.82s)
+Test Suite 'Selected tests' started at 2026-06-24 16:51:55.654.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-24 16:51:55.654.
+Test Suite 'C5LoRATrainingTests' started at 2026-06-24 16:51:55.654.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderKeepsExecutionTierSeparateFromRouteTier]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderKeepsExecutionTierSeparateFromRouteTier]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderProducesRequiredMetadataAndRuleRehearsalRatio]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderProducesRequiredMetadataAndRuleRehearsalRatio]' passed (0.024 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents]' passed (0.110 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testCandidateDataQualityGateBlocksDiversityCapAndAmbiguousDuplicates]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testCandidateDataQualityGateBlocksDiversityCapAndAmbiguousDuplicates]' passed (0.047 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainCatalogMissIsFailClosedNotFrameFallback]' started.
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainCatalogMissIsFailClosedNotFrameFallback]' passed (0.110 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainDistractorsAreRealCatalogToolsSameFamily]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainDistractorsAreRealCatalogToolsSameFamily]' passed (0.104 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainEmitsValueArgAndOnlySchemaKeys]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainEmitsValueArgAndOnlySchemaKeys]' passed (0.107 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainNoCallCounterfactualPhysicallyRemovesTargetTool]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainNoCallCounterfactualPhysicallyRemovesTargetTool]' passed (0.107 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainScopeDemoFiltersOutOfCatalogIntents]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainScopeDemoFiltersOutOfCatalogIntents]' passed (0.103 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainSurfaceEmitsIntentAsToolNameNotFrame]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainSurfaceEmitsIntentAsToolNameNotFrame]' passed (0.097 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testEndpointTokenizerParityRequiresByteExactEndpointRender]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testEndpointTokenizerParityRequiresByteExactEndpointRender]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testExplicitScopeCandidatesDeriveFromC2Vocabulary]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testExplicitScopeCandidatesDeriveFromC2Vocabulary]' passed (0.007 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFirstCandidateScaleAuthorityDefaultsTo20AndBlocksLegacy32]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFirstCandidateScaleAuthorityDefaultsTo20AndBlocksLegacy32]' passed (0.047 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFixedSemanticSlotsOverrideFallbackWhenRangeIsAbsent]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFixedSemanticSlotsOverrideFallbackWhenRangeIsAbsent]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFormalTrainingBlocksUnverifiedTrainingLoopSource]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFormalTrainingBlocksUnverifiedTrainingLoopSource]' passed (0.046 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFrameSurfaceBackwardCompatWhenCatalogEmpty]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFrameSurfaceBackwardCompatWhenCatalogEmpty]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneralizationDiagnosticAndFuseParityFailClosed]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneralizationDiagnosticAndFuseParityFailClosed]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedNaturalChineseRecordsDriveGeneratorJudgeAndLineageReceipts]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedNaturalChineseRecordsDriveGeneratorJudgeAndLineageReceipts]' passed (0.019 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedRecordCandidateParentIsRecomputedFromFinalUtteranceAndToolCall]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedRecordCandidateParentIsRecomputedFromFinalUtteranceAndToolCall]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testMLXConfigUsesScaleAndExcludesEmbeddings]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testMLXConfigUsesScaleAndExcludesEmbeddings]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testNoCallCounterfactualsArePairedAndCapped]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testNoCallCounterfactualsArePairedAndCapped]' passed (0.010 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetArtifactAuthorityRequiresApprovedDigestUnlessRegeneratedSamePath]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetArtifactAuthorityRequiresApprovedDigestUnlessRegeneratedSamePath]' passed (0.067 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetFixtureRequiresTrueTokenArtifactEvenWhenTokenizerPatchFlagIsSet]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetFixtureRequiresTrueTokenArtifactEvenWhenTokenizerPatchFlagIsSet]' passed (0.028 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOmittedWindowTrainingTargetOmitsPositionScope]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOmittedWindowTrainingTargetOmitsPositionScope]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testPythonMaskOffsetFixtureRunsTrainingTokenizerPath]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testPythonMaskOffsetFixtureRunsTrainingTokenizerPath]' passed (1.432 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testReceiptSummarizesMaskingCompleteStage]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testReceiptSummarizesMaskingCompleteStage]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testRouteTierDerivesFromNormalizedFCFlagsWithFreeTakingPrecedence]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testRouteTierDerivesFromNormalizedFCFlagsWithFreeTakingPrecedence]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSampleIDsStayUniqueAcrossRouteTierBatchesAndDevSelectionIsExact]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSampleIDsStayUniqueAcrossRouteTierBatchesAndDevSelectionIsExact]' passed (0.027 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSlotPlaceholdersAreRenderedAsConcreteValuesInUserAndAssistant]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSlotPlaceholdersAreRenderedAsConcreteValuesInUserAndAssistant]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSmokeOnlyStageIsChainDataButNotTrainEligible]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSmokeOnlyStageIsChainDataButNotTrainEligible]' passed (0.022 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors]' passed (0.010 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolCallPayloadRendersNameBeforeArgumentsButKeepsArgumentsCanonical]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolCallPayloadRendersNameBeforeArgumentsButKeepsArgumentsCanonical]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolContractCompilerDerivesEnumsFromSemanticSeeds]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolContractCompilerDerivesEnumsFromSemanticSeeds]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityFailsClosedWhenArchiveAuthorityIsMissing]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityFailsClosedWhenArchiveAuthorityIsMissing]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityUsesArchivedMethodContract]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityUsesArchivedMethodContract]' passed (0.047 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingSampleUsesSeedLocalContractDerivedSchema]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingSampleUsesSeedLocalContractDerivedSchema]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testVerifiedTrainingLoopSourceUnblocksFormalTrainingGate]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testVerifiedTrainingLoopSourceUnblocksFormalTrainingGate]' passed (0.046 seconds).
+Test Suite 'C5LoRATrainingTests' passed at 2026-06-24 16:51:58.283.
+	 Executed 38 tests, with 0 failures (0 unexpected) in 2.626 (2.628) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-24 16:51:58.283.
+	 Executed 38 tests, with 0 failures (0 unexpected) in 2.626 (2.628) seconds
+Test Suite 'Selected tests' passed at 2026-06-24 16:51:58.283.
+	 Executed 38 tests, with 0 failures (0 unexpected) in 2.626 (2.629) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+exit_code=0

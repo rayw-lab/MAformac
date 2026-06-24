@@ -1,0 +1,102 @@
+$ swift test --filter C6VehicleToolBenchTests
+[0/1] Planning build
+Building for debugging...
+[0/8] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.75s)
+Test Suite 'Selected tests' started at 2026-06-24 16:51:59.467.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-24 16:51:59.468.
+Test Suite 'C6VehicleToolBenchTests' started at 2026-06-24 16:51:59.468.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails]' passed (0.005 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAllMustPassToolNamesAreInDDomainCatalog]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAllMustPassToolNamesAreInDDomainCatalog]' passed (0.442 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testC5C6ValueKeyParityForNumberIntent]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testC5C6ValueKeyParityForNumberIntent]' passed (0.458 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testClarifyAndRefusalCorrectnessBlocksWrongAction]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testClarifyAndRefusalCorrectnessBlocksWrongAction]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierAcceptsBFrameWindowAndScreenSurfaces]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierAcceptsBFrameWindowAndScreenSurfaces]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierNormalizesDAndBFramesToSameStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierNormalizesDAndBFramesToSameStateDelta]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDecodesAcceptableAlternative]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDecodesAcceptableAlternative]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDefaultsMissingAlternativesToEmptyArray]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDefaultsMissingAlternativesToEmptyArray]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetGenerationCarriesSchemaRefsNegativeRatioAndMustNotTrain]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetGenerationCarriesSchemaRefsNegativeRatioAndMustNotTrain]' passed (0.344 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowCasesSeparateOmittedAndFanout]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowCasesSeparateOmittedAndFanout]' passed (0.342 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowGoldVerificationCarriesScopeOriginEvidence]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowGoldVerificationCarriesScopeOriginEvidence]' passed (0.342 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDegradedAndUnknownAlternativesDoNotSatisfyHardGates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDegradedAndUnknownAlternativesDoNotSatisfyHardGates]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testExpectNoCallGateCountsFalsePositive]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testExpectNoCallGateCountsFalsePositive]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFileHashChangesWhenFileContentChanges]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFileHashChangesWhenFileContentChanges]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFormatDigestChangesWhenFormatFileContentChanges]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFormatDigestChangesWhenFormatFileContentChanges]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayFailsWithoutIRMapProvingThreadingIsLoadBearing]' started.
+[ToolContractNormalizer] unclassified tool name: open_ac
+[ToolContractNormalizer] unclassified tool name: open_ac
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayFailsWithoutIRMapProvingThreadingIsLoadBearing]' passed (0.320 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayPassesForMigratedDDomainDataset]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayPassesForMigratedDDomainDataset]' passed (0.359 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierHappyPathReplaysPrimaryGold]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierHappyPathReplaysPrimaryGold]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierTreatsAcceptableAlternativeAsCaseValid]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierTreatsAcceptableAlternativeAsCaseValid]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testLoRAIdentifierRequiresAdapterDigest]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testLoRAIdentifierRequiresAdapterDigest]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingModelArtifactDigestFailsFingerprintGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingModelArtifactDigestFailsFingerprintGate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingTokenizerDigestFailsFingerprintGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingTokenizerDigestFailsFingerprintGate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallCaseDoesNotReportFakeReadbackPass]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallCaseDoesNotReportFakeReadbackPass]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallPreconditionStateDoesNotInvokeReadbackGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallPreconditionStateDoesNotInvokeReadbackGate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsNegatedTokenMatch]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsNegatedTokenMatch]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateUsesEnumBranchFromStateCellTemplate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateUsesEnumBranchFromStateCellTemplate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReplayFingerprintRecordsArtifactDigestsAsRequiredFields]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReplayFingerprintRecordsArtifactDigestsAsRequiredFields]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testStateDeltaAndReadbackAreSeparateHardGates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testStateDeltaAndReadbackAreSeparateHardGates]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex]' passed (0.338 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives]' passed (0.314 seconds).
+Test Suite 'C6VehicleToolBenchTests' passed at 2026-06-24 16:52:02.784.
+	 Executed 40 tests, with 0 failures (0 unexpected) in 3.314 (3.316) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-24 16:52:02.784.
+	 Executed 40 tests, with 0 failures (0 unexpected) in 3.314 (3.316) seconds
+Test Suite 'Selected tests' passed at 2026-06-24 16:52:02.784.
+	 Executed 40 tests, with 0 failures (0 unexpected) in 3.314 (3.317) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+exit_code=0

@@ -1,0 +1,61 @@
+$ swift test --filter ToolContractCompilerTests
+[0/1] Planning build
+Building for debugging...
+[0/8] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.68s)
+Test Suite 'Selected tests' started at 2026-06-24 16:51:54.021.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-24 16:51:54.022.
+Test Suite 'ToolContractCompilerTests' started at 2026-06-24 16:51:54.022.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testC3ExecutionCellReusesDeviceCellMapSingleSource]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testC3ExecutionCellReusesDeviceCellMapSingleSource]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDDomainSurfaceConsumesCatalogNotHardcoded]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDDomainSurfaceConsumesCatalogNotHardcoded]' passed (0.117 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDeviceCellMapAllValuesExistInStateCells]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDeviceCellMapAllValuesExistInStateCells]' passed (0.004 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testEmptyCatalogProducesEmptySurface]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testEmptyCatalogProducesEmptySurface]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testFrameSchemaKeptForStrangler]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testFrameSchemaKeptForStrangler]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testLoadDDomainCatalogProduces562Tools]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testLoadDDomainCatalogProduces562Tools]' passed (0.104 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainMultiPrimitiveDisambiguation]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainMultiPrimitiveDisambiguation]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainSinglePrimitive]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainSinglePrimitive]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeOldSurfaceStranglerKept]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeOldSurfaceStranglerKept]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeUnknownToolReturnsEmpty]' started.
+[ToolContractNormalizer] unclassified tool name: nonexistent_tool_xyz
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeUnknownToolReturnsEmpty]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testRenderedToolsTextOnlyDDomainNoGenericFrame]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testRenderedToolsTextOnlyDDomainNoGenericFrame]' passed (0.146 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testS3FamilyDeviceWritesStateNotUnmapped]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testS3FamilyDeviceWritesStateNotUnmapped]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDataDrivenEndToEndDDomainTool]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDataDrivenEndToEndDDomainTool]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDefaultFromCellMetadata]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDefaultFromCellMetadata]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierExpStepFromCellMetadata]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierExpStepFromCellMetadata]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierFansOutOnlyForExplicitCollectionAlias]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierFansOutOnlyForExplicitCollectionAlias]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierRejectsOutOfScopeWindowWithoutBaseCellFallback]' started.
+[ToolContractStateApplier] unmapped device/cell: window.position.scope
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierRejectsOutOfScopeWindowWithoutBaseCellFallback]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUnmappedDeviceNoWrite]' started.
+[ToolContractStateApplier] unmapped device/cell: seat_heat
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUnmappedDeviceNoWrite]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUsesC2DefaultScopeForOmittedWindow]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUsesC2DefaultScopeForOmittedWindow]' passed (0.003 seconds).
+Test Suite 'ToolContractCompilerTests' passed at 2026-06-24 16:51:54.417.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.394 (0.396) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-24 16:51:54.417.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.394 (0.396) seconds
+Test Suite 'Selected tests' passed at 2026-06-24 16:51:54.417.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.394 (0.396) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+exit_code=0
