@@ -10,7 +10,7 @@ expires: "2026-07-15"
 
 ## Verdict
 
-Partial closeout with D1-D10 user decisions accepted. The baseline cascade has been materialized enough to prevent old-roadmap and task-checkbox drift, and the D1-D10 user-decision gate is no longer pending. The remaining blockers are R-L17 heterogeneous deframing, OpenSpec proposal acceptance, physical evidence gates, and later implementation/validation.
+Partial closeout with D1-D10 user decisions accepted. The baseline cascade has been materialized enough to prevent old-roadmap and task-checkbox drift, and the D1-D10 user-decision gate is no longer pending. `define-demo-default-scope` Phase -1 carrier is accepted for apply, and its apply-plan same-vendor pre-check has been absorbed. The remaining blockers are R-L17 heterogeneous deframing, non-default-scope OpenSpec proposal acceptance, physical evidence gates, and later implementation/validation.
 
 Closeout hard rule: if `phase0-d1-d10-user-decision-record.md` later regains a non-empty `pending_user_decision` list or any verdict row contains `| pending |`, this file must revert to a pending closeout status. A passing `openspec validate --all --strict` result is necessary structural evidence only; it is not permission to mark Phase 0 complete.
 
@@ -39,7 +39,8 @@ Closeout hard rule: if `phase0-d1-d10-user-decision-record.md` later regains a n
 | R-L17 G4 consistent-PASS deframing | pending | Blocks route signoff if four-model agreement bypasses human-owner review. |
 | R-L17 G5 disagreement escalation | pending | Blocks route signoff if any judge disagreement is resolved by majority vote rather than human-owner review. |
 | Filled manifests from the seven skeleton schemas | pending | Blocks full Phase 0 materialization claim. |
-| OpenSpec proposal acceptance | pending | Blocks any apply/training/evaluation launch. |
+| OpenSpec proposal acceptance | partial | `define-demo-default-scope` is accepted for apply; retrain-c5, rebuild-c6, golden-run, and R-L17-related acceptance remain pending and still block training/evaluation/readiness claims. |
+| Default-scope apply plan | pre-check absorbed | `default-scope-apply-plan-audit-codex-2026-06-24.md`; physical implementation still not started. |
 
 ## Mechanical Gate Check
 

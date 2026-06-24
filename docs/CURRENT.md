@@ -3,9 +3,9 @@ status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
 updated: 2026-06-24
-last_verified_base_commit: 1143b50
+last_verified_base_commit: 6763e8a
 branch: main
-expires_when: "define-demo-default-scope is committed/pushed and either accepted for apply or superseded by a newer route board."
+expires_when: "default-scope apply closeout lands or this route board is superseded by a newer route board."
 ---
 
 # CURRENT — MAformac Current Route Board
@@ -15,15 +15,15 @@ expires_when: "define-demo-default-scope is committed/pushed and either accepted
 
 ## Current Phase
 
-Post-A2 / Phase -1: materialize `define-demo-default-scope` as the standalone OpenSpec carrier for accepted G01-G28 demo default-scope decisions.
+Post-A2 / default-scope apply authorized: Phase -1 carrier materialization is accepted for apply, but physical implementation has not started.
 
 Current audited state:
 
 - Main repo branch: `main`.
-- Main repo base at audit: `1143b50`.
+- Main repo base at audit: `6763e8a`.
 - Active draft carrier: `openspec/changes/define-demo-default-scope/`.
 - OpenSpec validation at audit: `openspec validate define-demo-default-scope --strict` pass; `openspec validate --all --strict` pass with 14 passed, 0 failed.
-- This phase is documentation/OpenSpec-only. It does not authorize implementation, training, C6 acceptance, endpoint claims, demo-golden-run, voice, or UIUE merge.
+- Phase -1 carrier scope is documentation/OpenSpec-only and is accepted for apply. The next implementation must follow `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. Same-vendor plan pre-check returned `CLEAR_WITH_FIXES`, and fixes are absorbed in the plan. This still does not authorize training, C6 acceptance, endpoint claims, demo-golden-run, voice, or UIUE merge.
 
 ## Read First
 
@@ -36,10 +36,9 @@ Current audited state:
 
 ## Do Now
 
-1. If the Phase -1 carrier and this route board are not yet committed/pushed, commit and push them first.
-2. Human-review `define-demo-default-scope` as the single carrier for omitted/explicit/fan-out scope behavior.
-3. Keep C5, C6, golden-run, and UIUE as downstream consumers of this carrier. They must depend on it, not redefine default-scope semantics.
-4. After acceptance, start a separate apply plan for C2 `default_scope` implementation and physical evidence gates.
+1. Commit the Phase -1 closeout, route-board update, carrier D2 route-matrix fix, same-vendor apply-plan audit record, and apply plan together.
+2. Execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md` in order: C2 -> C3 -> state applier -> readback -> C5 -> C6 -> tests/gates.
+3. Keep C5, C6, golden-run, and UIUE as downstream consumers of `define-demo-default-scope`. They must depend on it, not redefine default-scope semantics.
 
 ## Do Not Do
 
@@ -54,12 +53,13 @@ Current audited state:
 
 | Blocker | Status | Required Next Evidence |
 |---|---|---|
-| `define-demo-default-scope` acceptance | draft carrier | OpenSpec proposal review, then apply authorization if accepted. |
+| `define-demo-default-scope` acceptance | accepted for apply | Carrier remains active until implementation is applied and archived. |
 | Physical default-scope implementation | not started | C2 `default_scope` schema/validation, C3 target resolution, state applier, readback metadata, C5/C6/golden dependencies, tests. |
 | `scope.first` / `?? "全车"` / `?? "all"` debt | pre-implementation evidence only | Record grep evidence, then prove removal or explicit bridging in apply closeout. |
 | Legacy UI state keys | pre-implementation evidence only | Prove scoped-key read path or one-way compatibility adapter before default-scope apply closeout. |
 | C5/C2 scope candidate parity | open apply gate | C5 fallback/rendered scope candidates must derive from C2 `scope/default_scope`; no hardcoded second vocabulary. |
 | Scope-origin single source | open apply gate | A typed `ScopeOrigin` or equivalent closed source must feed readback/TTS/verifier/UIUE metadata; no per-channel recomputation. |
+| Apply plan audit | same-vendor pre-check absorbed | `docs/project/phase0/default-scope-apply-plan-audit-codex-2026-06-24.md`; this does not close R-L17. |
 | R-L17 heterogeneous deframing | open G2-G5 | Evidence files under `docs/project/phase0/r-l17-human-review-evidence/`; same-vendor reviews remain pre-check only. |
 | UIUE reconfirm | external dirty reference | Reconfirm UIUE HEAD and file evidence after mainline `default_scope` contract stabilizes. |
 
@@ -71,11 +71,11 @@ Current external reference at audit:
 
 - Worktree: `/Users/wanglei/workspace/MAformac-uiue`
 - Branch: `uiue/visual-ssot-state-consume`
-- HEAD: `34044e1`
+- HEAD: `17f2af1`
 - Dirty file: `openspec/changes/ui-presentation/proposal.md`
 - Latest visible progress: UIUE proposal text now claims spec agreed, Phase 1b engineering preflight done, Phase 3 D7 seven-state consumption applied and audited, and Phase 4 card/default-scope consumption waiting for backend `default_scope` on main.
 
-This is not mainline evidence. Record it as `external_reference_unverified_current_head=34044e1` until a separate UIUE reconfirm pass reads the current files and pins the expected merge contract.
+This is not mainline evidence. Record it as `external_reference_unverified_current_head=17f2af1` until a separate UIUE reconfirm pass reads the current files and pins the expected merge contract.
 
 ## Current Carrier Summary
 
