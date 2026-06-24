@@ -54,6 +54,7 @@ __pycache__/
 # 代码在用户级 ~/.claude/scripts/；项目仓只放数据/契约/脚本，不放 hook 注册
 .claude/hooks/
 .claude/settings.local.json
+.claude/settings.local.json.bak-*
 
 # 脏区清理 2026-06-23: θ-α 失败run 2.8G + 工具临时(不入仓; 失败锚点 0/23 已在 grill-decisions 文档)
 # Reports/* 忽略所有 runtime 报告, 仅保 .gitkeep(SwiftPM exclude 解析, 防 clean checkout Invalid Exclude warning)
