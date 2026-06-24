@@ -187,3 +187,14 @@
 14. **🟡 SwiftPM helper 卡死不能扩成“测试失败”或“验证通过”**:本轮多次 filtered test/direct xctest 卡在 `swiftpm-xctest-helper`;清理 helper + serial rerun 后 focused tests 正常过。→ **SwiftPM 卡死只算 infra interruption,不算 pass/fail;最终 receipt 只记录成功复跑的原命令和 log,并避免并行 SwiftPM 测试。**
 
 15. **🟡 source-free CI 里的本机 fixture 测试要显式 skip,不能红也不能假装覆盖**:GitHub runner 无 `/Users/wanglei/.cache/huggingface/...` 和 Homebrew python@3.13,`testPythonMaskOffsetFixtureRunsTrainingTokenizerPath` 在 CI 红,但这是本机 tokenizer integration proof 缺 fixture,不是 default_scope 代码失败。→ **依赖本机模型/cache/raw 的测试用 `XCTSkip` 明确环境缺失;CI proof boundary 写清 source-free,本地有 fixture 的 `verify-all` 继续跑真路径。**
+
+## J. UIUE Phase 4a 卡片 scope 呈现长跑教训(2026-06-25, CC ultracode 自驱)
+
+1. **🔴 「默认 5 族卡」当诚实终态接受 = catch 不彻底(下钻发现 gap ≠ gap 就是终态)**:claim-vs-reality 下钻 `DemoVehicleStateStore.defaultCells()` runtime,发现 `presentationCells` 过滤 vehicle 后只 5 族有 cell(ac/window/screen/ambient/seat;计划/审计写的「12 base prefix / 默认 10 族」不准)。我把「默认 5 族卡」标注为「诚实 4a 态」**当终态接受**。磊哥纠:这是**要处理的设计点**——spec.md:83 + UIUE 调研 5 路要「10 族 family_card **全景常驻**」,lens 明确否决纯动态浮现作主形态(冷启动空屏不惊艳)。**根因**:下钻到 runtime 比计划/审计深是对的,但下钻后**把「数据层现状」误当「呈现层终态」**——A2 数据层 `defaultCells` 只产 5-6 族是现状,不代表 Presentation 层该只渲 5 族。→ **修法**:Presentation 层补全 10 族骨架(不碰 Core/State store,守 A2 边界):`familyDisplays` **遍历 `FamilyCardID.allCases`(10)** 而非从 cells 反推;无 cell 族渲 `CardAppearance.normal` 占位卡(族名 + 未激活灰态),语音点亮哪族哪族变态。**元规则:下钻发现「数据层只给 X」时,问「本呈现/消费层该不该补全到 spec 要的 Y」,别把上游现状当本层终态。**
+
+2. **🔴 10 族卡片是三层架构「下方车控层」,不是全屏卡片墙(布局要预留上方)**:磊哥点「10 族是在三层架构下方哈,思考好布局」。深空辉光三屏分层 = 语音 orb 顶 / 对话流中 / **车控卡片下**(tokens.md/INDEX `visual-ssot`)。4a 卡片 Grid 是**下层**,布局必须预留上方给 Phase 5 orb + 对话流(当前 commandBar 是临时输入,Phase 5 换 orb+语音)。→ **4a 不做成顶满屏卡片墙;ContentView 布局留分层结构(卡片在下方区域),AD-11 锚定三屏分层归属防 Phase 5 返工。**
+
+3. **🐘 pre-mortem 连带发现(10 族常驻骨架设计点,Opus 内联 pre-mortem + MLX-Outil 网格 teardown,磊哥点名 /pre-mortem+teardown 解)**:
+   - **排序稳定性**:常驻骨架顺序必须**固定**(按 `family-device-allowlist.json row_count` / `FamilyCardID` enum 序),**不按 revision 降序**(现有 `displays()` 按 revision 降序排,常驻骨架若沿用=激活族跳到前面破「常驻」视觉)。
+   - **族态 occupancy**:主 cell=`ac.temp_setpoint`,但「打开空调」动 `ac.power` → 若族卡态只盯主 cell=族卡死寂。族卡 `visualState` 须 = 族内**所有 cell 的 dominant 态**(复用 `dominantVisualState` helper),value/title 仍取主 cell;否则「语音点亮哪族哪族变态」失效。
+   - **占位卡安全**:占位卡无 scope → `scopeBadge=nil` 不走聚合分支;占位 `normal` 态 `breathing=false` 不掉帧(10 卡同屏只激活族 breathe,paper-tiger F-LB3/T1 解除)。

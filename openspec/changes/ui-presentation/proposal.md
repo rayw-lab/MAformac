@@ -42,3 +42,14 @@ D1-D7 二次深 grill（CC 5×⭐ + Codex 物理化 + 辩证 check）+ 30 决策
 ## Capabilities
 
 - **ui-presentation**（new）：UIUE 视觉/状态消费契约 SSOT — DemoVisualState 7 态消费 + 卡片 value.type 渲染 + **default_scope 消费与 scope 呈现（默认主驾/淡显/聚合）** + Liquid Glass surface_role + 视觉 token 约束 + 双端展示 + 多调用编排。
+
+## Files to modify（Phase 4a 卡片 scope 呈现摘要层，2026-06-25）
+
+- `openspec/changes/ui-presentation/design.md`（AD-9/10/11 + 纠 AD-2 stale 路径）
+- `Core/Presentation/FamilyCardIDMapper.swift`（new — device base→10 族派生，optional 返回，AD-9）
+- `Core/Presentation/FamilyPrimaryCellMapper.swift`（new — 族→主 cell base，AD-10）
+- `Core/Presentation/UIValueTypeMapper.swift`（加 `familyCardID` + `badgeStyle: BadgeRenderStyle` + `familyDisplays(from:catalog:)` 10 族常驻；复用 scope 聚合:54-129 不重写）
+- `App/ContentView.swift`（vehicleCards `LazyVGrid`→`Grid` 渲 familyDisplays + scope 角标 + numericText + breathe + ambient 色块；三屏分层下层布局）
+- `App/DebugGallery.swift`（force-state gallery 同步 family_card）
+- `Tools/checks/check-contentview-uses-display-catalog.sh`（new — 接线 enforce gate，strip 注释 + 验真调用）
+- `Tests/MAformacCoreTests/{FamilyCardIDMapperTests,FamilyPrimaryCellMapperTests}.swift`（new）+ 扩 `VehicleCardDisplayTests.swift`

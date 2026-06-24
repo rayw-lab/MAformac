@@ -24,7 +24,7 @@ AD-1~AD-8 全拍；Phase 4 契约（AD-8.7 scope 呈现）文档先行，代码 
 
 🔴 **2026-06-24 级联修正（producer→consumer）+ 签名 cite-verify 纠正**：原文「`ui_value_type` 是 `state-cells.yaml` 数据 `type` 的派生字段」=producer 侧，与 spec.md 锁的 consumer 侧矛盾，已改。**且消费侧渲染的 `DemoVehicleStateCell`（`App/ContentView.swift:90` `VehicleStateCard.cell`）无 `type/values/unit` 字段**（仅 key/actualValue(String)/desiredValue/availability/timestamp/source/revision/visualState；`type/values/unit` 是 `contracts/state-cells.yaml` 的 producer 字段）→ 消费侧派生源 = **`cell.key`**（稳定语义键，不读 unit string）。
 
-- **物理化**：`App/Rendering/UIValueTypeMapper.swift`，签名 `func uiValueType(for cell: DemoVehicleStateCell) -> UIValueType`，从 `cell.key` 派生（如 `ac.temp_setpoint`→`.dial` / `ac.power`→`.toggle` / `ac.fan_speed`→`.stepper` / `window.driver`→`.percent` / 多值 enum→`.badge`）；**不写回 `contracts/state-cells.yaml`，不给 `DemoVehicleStateCell`（Core/producer 域）加字段**。
+- **物理化**：`Core/Presentation/UIValueTypeMapper.swift`（🔴 2026-06-25 纠 stale 路径 `App/Rendering/`→实际 `Core/Presentation/`，可单测 MAformacCore；Core/Presentation 与 Core/State 同 module，「禁碰 Core/State」是目录约定非 build 隔离），签名 `func uiValueType(for cell: DemoVehicleStateCell) -> UIValueType`，从 `cell.key` 派生（如 `ac.temp_setpoint`→`.dial` / `ac.power`→`.toggle` / `ac.fan_speed`→`.stepper` / `window.driver`→`.percent` / 多值 enum→`.badge`）；**不写回 `contracts/state-cells.yaml`，不给 `DemoVehicleStateCell`（Core/producer 域）加字段**。
 - `enum UIValueType { dial, toggle, stepper, percent, badge }`（消费侧 Swift enum，非模型/非 contract）。
 - key→UIValueType 映射表（10 族全集）+ 单测（各族 key × UIValueType 映射断言）填充留 **Phase 4**（rebase main 拿 A2 的 10 族 key 后；本 worktree 现 state-cells.yaml 仅 4 族）。
 - **理由**：AnyView 破类型 diff → SwiftUI 渲染慢；enum+switch 保静态类型 + diff 高效（C11 solid / C12 strong 印证）。
@@ -86,6 +86,26 @@ AD-1~AD-8 全拍；Phase 4 契约（AD-8.7 scope 呈现）文档先行，代码 
   - **裂缝⑥ 全车 fan-out = c 聚合卡+badge**：显式全车（"打开全车车窗"，后端 fan-out 4 cell）= **1 聚合卡（不分裂 4 张）+「全车」范围 badge**（青标签，范围一眼可见）。聚合 1 卡=单点，**不违反** D8.5 `MAX_CONCURRENT_HIGHLIGHTS=1`。
   - **用户故事④ 多轮叠加 = a 升级聚合**：「打开车窗」(主驾)→「副驾也打开」(G20 显式二轮 passthrough) = 卡片**升级聚合成范围词**「前排车窗 100%」（非主驾/副驾双角标，跟全车聚合同逻辑：多 scope 都聚合成范围词 前排/全车，视觉一致）。
   - 实现锚：UIValueTypeMapper 旁加 scope 呈现派生（读 `default_scope` 判默认/非默认 → 淡角标/显式/聚合 badge）；**Phase 4 卡片 + 后端 readback 策略同源**（裂缝⑤）。
+
+## AD-9 family_card_id 消费侧派生（FamilyCardIDMapper）+ 10 族全景常驻（Phase 4a，2026-06-25）
+
+spec.md:83 / R2 锁「10 族 family_card 全景常驻」，但 producer 0 字段（`contracts/state-cells.yaml` 无 `family_card_id`）→ 消费侧从 `cell.key` 前缀派生（同 `ui_value_type` 派生纪律，不写回 yaml / 不给 Core struct 加字段）。
+
+- `enum FamilyCardID: String, CaseIterable { ac, seat, window, screen, ambient, door, volume, wiper, sunroofShade, fragrance }`（10 控制族）+ `FamilyCardIDMapper.familyCardID(forBase:) -> FamilyCardID?` 穷尽 switch，**optional 返回**（`vehicle.*` 车辆仪表 + 未知 base → `nil`，禁 `default→.ac` 静默错归；P0-1 审计 catch + claim-vs-reality 核 `DemoVehicleStateStore.swift:181` vehicle.speed/gear 在 presentationCells）。
+- 🔴 **10 族全景常驻（遍历 allCases，非从 cells 反推）**：`familyDisplays` **遍历 `FamilyCardID.allCases`(10)**，每族查 `presentationCells` 属该族的 cells——有 → 主 cell 摘要态（AD-10）；**无 → `CardAppearance.normal` 占位卡**（族显示名 + 未激活灰态）。冷启动 10 族骨架常驻（spec「全景常驻」），语音点亮哪族哪族变态。**claim-vs-reality**：A2 `defaultCells()` 现只 5-6 族有 cell（过滤 vehicle 后 5：ac/window/screen/ambient/seat），从 `presentationCells` 反推=空屏不惊艳（lens 已否决纯动态浮现作主形态）→ Presentation 层补全到 spec 要的 10 族（**不碰 Core/State store**，守 A2 边界）。
+- **族排序固定**（常驻骨架稳定性，pre-mortem elephant）：按 `generated/family-device-allowlist.json` `row_count` 降序（C8 高频代理）兜底 `FamilyCardID` enum 序，**不按 `revision` 降序**（现有 `displays()` 按 revision 排，常驻骨架沿用=激活族跳位破「常驻」视觉）。
+
+## AD-10 族卡摘要主 cell（FamilyPrimaryCellMapper）+ 族态 occupancy 聚合（Phase 4a）
+
+二级模型摘要层每族显 1 主状态 cell（信息量优先，AD-11）：ac→`temp_setpoint` / seat→`heat_level` / window→`position` / screen→`brightness` / ambient→`color` / volume→`level` / wiper→`power` / door→`central_lock` / sunroofShade→`position` / fragrance→`power`。独立 SSOT（`FamilyPrimaryCellMapper.primaryCellBase(for:)` 穷尽 switch，不复用 readback[0]——ac readback[0]=power 但主 cell=temp_setpoint，顺序不一致）。
+
+- 🔴 **族态 occupancy 聚合**（pre-mortem elephant）：族卡 `title`/`valueText`/`scopeBadge` 取主 cell base 的现有 display（**复用 `individualDisplay`/`aggregateDisplay`:54-129 不重写**，含 scope 角标 dim/emphasized/范围词），但族卡 `visualState` = 族内**所有 cell 的 `dominantVisualState`**——否则「打开空调」动 `ac.power`（satisfied）而主 cell `temp_setpoint`（normal）→ 族卡死寂。**族态看全族（任意 cell 激活族卡亮），value/title 看主 cell**。
+
+## AD-11 二级摘要+展开模型（调研 5 路锁）+ 三屏分层下层（Phase 4a）
+
+4a 摘要层（10 族 family_card 全景常驻 Grid + 每族主 cell at-a-glance + scope 角标 + 7 态 + 占位卡）→ 4b 展开层（触发聚焦 + value.type 异构控件 + 族内 composite）→ 4c 错峰。摘要层不放完整 slider/picker（族卡空间不够，local F10）。
+
+- 🔴 **三屏分层归属**（磊哥 2026-06-25「10 族在三层架构下方，思考好布局」）：10 族 family_card Grid = 深空辉光三屏分层的**下方车控层**（语音 orb 顶 / 对话流中 / 车控卡片下，`docs/design/tokens.md`/`INDEX.md` visual-ssot）。4a 卡片层布局须**预留上方**给 Phase 5 orb + 对话流（当前 `commandBar` 临时输入，Phase 5 换 orb+语音）；**不做成顶满屏卡片墙**（防 Phase 5 布局返工）。
 
 ## 不做（demo 轻治理 / DEFERRED 边界）
 
