@@ -277,7 +277,7 @@ struct VehicleStateCard: View {
     // a11y 态文案（七态分开，与视觉双通道）
     private var a11yState: String {
         switch display.visualState {
-        case .normal: "未激活"
+        case .normal: "待命"   // P2-7（gptpro 审）：与占位 valueText「待命」同步，防 VoiceOver 说「待命」却态「未激活」矛盾
         case .satisfied: "已满足"
         case .changing: "执行中"
         case .blocked_with_alternative: "需澄清"

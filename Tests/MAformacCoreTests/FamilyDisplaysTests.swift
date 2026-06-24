@@ -204,4 +204,34 @@ final class FamilyDisplaysTests: XCTestCase {
         XCTAssertEqual(displays.first { $0.familyCardID == .ac }?.visualState, .changing,
                        "族态 dominant：changing 优先级高于 satisfied")
     }
+
+    // 🔴 P0（codex/gptpro 跨厂商 catch）：wiper 前+后 应聚合「前后」非泛化「全车」
+    func testWiperFrontRearAggregatesToFrontRearNotAllCar() {
+        let displays = VehicleCardDisplay.displays(
+            from: [
+                DemoVehicleStateCell(key: "wiper.speed[前]", actualValue: "2", revision: 1),
+                DemoVehicleStateCell(key: "wiper.speed[后]", actualValue: "2", revision: 1)
+            ],
+            catalog: .load()
+        )
+        XCTAssertEqual(displays.count, 1)
+        XCTAssertEqual(displays[0].accessibilityKey, "wiper.speed[前后]",
+                       "wiper[前]+[后] 应聚合集合词「前后」(contract scope)，非硬编码「全车」")
+    }
+
+    // 🔴 P0（跨厂商 catch）：screen 全部物理屏应聚合「全车屏」非「全车」
+    func testScreenAllScreensAggregatesToAllScreensNotAllCar() {
+        let displays = VehicleCardDisplay.displays(
+            from: [
+                DemoVehicleStateCell(key: "screen.brightness[中控屏]", actualValue: "80", revision: 1),
+                DemoVehicleStateCell(key: "screen.brightness[仪表屏]", actualValue: "80", revision: 1),
+                DemoVehicleStateCell(key: "screen.brightness[主驾屏]", actualValue: "80", revision: 1),
+                DemoVehicleStateCell(key: "screen.brightness[副驾屏]", actualValue: "80", revision: 1)
+            ],
+            catalog: .load()
+        )
+        XCTAssertEqual(displays.count, 1)
+        XCTAssertEqual(displays[0].accessibilityKey, "screen.brightness[全车屏]",
+                       "screen 全屏应聚合集合词「全车屏」，非硬编码「全车」")
+    }
 }

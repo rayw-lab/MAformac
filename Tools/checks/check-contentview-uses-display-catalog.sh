@@ -30,6 +30,11 @@ if printf '%s\n' "$CODE" | grep -qE 'LazyVGrid'; then
   echo "❌ [contentview-wiring] ContentView 仍有 LazyVGrid（spec C22 要求 Grid 固定列非 adaptive）"
   fail=1
 fi
+# 3) familyDisplays 必须被 VehicleCardsGrid 真消费（防算了 unused var 不渲染=死代码假绿，gptpro 跨厂商审 P1-3）
+if ! printf '%s\n' "$CODE" | grep -qE 'VehicleCardsGrid\(displays:'; then
+  echo "❌ [contentview-wiring] familyDisplays 未被 VehicleCardsGrid(displays:) 真消费（计算了但未渲染=假绿）"
+  fail=1
+fi
 
-[ "$fail" -eq 0 ] && echo "✅ [contentview-wiring] ContentView 真调用 familyDisplays(from: + Grid 固定列（无 LazyVGrid）"
+[ "$fail" -eq 0 ] && echo "✅ [contentview-wiring] ContentView 真调用 familyDisplays(from: + VehicleCardsGrid 真消费 + Grid 固定列（无 LazyVGrid）"
 exit "$fail"

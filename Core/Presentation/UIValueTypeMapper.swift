@@ -331,9 +331,12 @@ struct StateCellPresentationCatalog {
         let unique = Set(scopes)
         guard unique.count > 1 else { return nil }
 
+        // 🔴 P0 修（codex/gptpro 跨厂商 catch）：集合词从 contract scope 列表取，非硬编码「全车」。
+        // 旧逻辑对全 executable 一律返「全车」→ wiper[前,后]误成「全车」(应「前后」)、screen 全屏误成「全车」(应「全车屏」)。
+        let collectionWord = (scopesByBase[base] ?? []).first { Self.collectionScopes.contains($0) } ?? "全车"
         let executable = Set((scopesByBase[base] ?? []).filter { !Self.collectionScopes.contains($0) })
         if !executable.isEmpty, unique == executable {
-            return "全车"
+            return collectionWord
         }
         if unique == Set(["主驾", "副驾"]) {
             return "前排"
@@ -342,7 +345,7 @@ struct StateCellPresentationCatalog {
             return "后排"
         }
         if unique == Set(["前排", "后排"]) {
-            return "全车"
+            return collectionWord
         }
         return nil
     }
