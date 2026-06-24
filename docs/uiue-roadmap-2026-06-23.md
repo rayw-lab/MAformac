@@ -149,10 +149,13 @@ pre-mortem §一 的实查结果，我归到一张「能不能起跑」的表：
 
 > producer 已 ready，这步只补 consumer，**消费的是端态枚举不是 D-domain 工具名，所以不等 A2**。
 
-- **U10 头号刀**：`ContentView.swift:121-127` 绿/灰二值 → 消费 `DemoVisualState` 7 态（`DemoVehicleStateStore.swift:17-25`）+ trace guardReason/readbackResult
-- **状态四态分开**（U10/U27）：clarify / unsupported / safety_refusal / crash —— 现万能红字把"拒识（卖点）"和"真崩"渲成一坨 = 翻车
+- **U10 头号刀**：`ContentView.swift:121-127` 绿/灰二值 → 消费 `DemoVisualState` 7 态（`DemoVehicleStateStore.swift:17-25`）+ trace guardReason/readbackResult ✅ **D7 已落（2026-06-24，simctl 7 态满屏单态视觉验证通过）**
+- **状态四态分开**（U10/U27）：clarify / unsupported / safety_refusal / crash —— 现万能红字把"拒识（卖点）"和"真崩"渲成一坨 = 翻车 ✅ D7 已落（琥珀≠灰锁≠红≠中性灰）
+- 🔴 **D8.1 默认主驾不澄清**（2026-06-24 磊哥拍）：区域 scope 用户没指定 → 默认主驾直接执行（satisfied），**绝不弹 clarify 打断**。10 族泛化（座位→主驾/屏类→中控屏/前后→前·前排）。**卡片默认锚定默认 scope 态，不渲"请选区域"空态**（A1-A3）。scope 默认值【执行逻辑】= NLU/Core（非 UIUE）。
+- 🔴 **D8.2 clarify(`blocked_with_alternative`) = demo 少用态**：能自动替代就 satisfied+提示（不 block）；force-state 示例「调到16度→最低18℃」（值超范围+替代，卡片级非区域）；主线几乎不触发。
+- 🔴 **D8.4 触摸 = 极简查看（卡片只读非控制器）**：点卡高亮+tooltip 无调节（待磊哥确认戳卡习惯）。
 - **三屏 native 落地**（README §六）：语音 orb（MeshGradient 自建）/ 对话流（adopt LocalLLMClient 气泡）/ 卡片网格骨架
-- 每个 view 建 snapshot baseline
+- 每个 view 建 simctl 截图基线（🔴 ImageRenderer 截不出 Liquid Glass，必走 simctl 启动整 app；7 态 gallery 内循环 + force-state 14 张满屏单态 5-gate）
 
 ## Phase 4 — 卡片网格细节（⏳**等链路 B**：state-cells 10 族 + D-domain 工具数）
 
@@ -163,6 +166,8 @@ pre-mortem §一 的实查结果，我归到一张「能不能起跑」的表：
 ## Phase 5 — 语音 UI + 炸场剧本 + adopt 全量（不降级核心）
 
 - 语音态机（@Observable VoiceState 五态）+ barge-in **PTT 物理打断**（U21）+ TTFA **掩盖术 immediate ack**（U22）+ 中文 TTS **锁普通话 premium**（U28）+ orb **核心 MeshGradient**（U30，shader 仅氛围层）
+- 🔴 **D8.3 L3+ 思考链路（假 COT）= orb `think` 态**（2026-06-24 拍）：orb TimelineView 四态 idle/`think`/speak/listen 的 **think 态承载** L3+ 复杂推理演出（「我有点困了」→「思考中…→调用中…→为您开窗通风」~3s）。**对话级 orb 演出，非卡片态（DemoVisualState 7 态不动）**。前端假 COT + 场景宏确定性查表（demo，范式§175）/ LoRA 学真 COT（后续）。可视化三层路由（L1 秒回不演 / L3+ 演思考）。待办 B1-B5（多变文案/手机视觉占位/接 NLU L3+ 信号/兜底态展示）。
+- **多卡时序守 D1 级联**（D8.5）：「困了→多动作」走 stagger 220ms 快速渐次 + MAX_CONCURRENT_HIGHLIGHTS=1（不同时炸，已 grill 拍）。LoRA 超时（demo 场景宏即时无此问题；后续真 LoRA 用 γ 3s 固定+规则兜底）。
 - 炸场剧本：氛围灯开场 golden step（U4）/ 座椅多维联动 / **Metal 水波（U5 你改的一期做，非二期）** / 断网高潮 morph + 「100%端侧·0网络」徽章
 - **adopt 全量吸收**（star>1000 不降级）：见第三节清单
 - golden-run **合同回放**部分 ⏳等 `demo-golden-run.v1.yaml`（F3/链路 B）

@@ -193,6 +193,27 @@
 
 ---
 
+### D8 默认主驾 + L3+ 思考链路 + 交互边界 grill 决策晶体（2026-06-24，磊哥拍 + CC/GLM 辩证演绎 + 核源 cite-verify）
+
+> 一手 = 本会话 grill（磊哥关键决策「默认主驾不打断」→ CC 演绎全量识别 → GLM-A 6维度/GLM-B 语义分诊 → CC 辩证 catch + 核源）。**核源修正 3 处声称**（见 D8.6）。本轮在 D7（7态消费）之上聚焦【交互流：默认主驾不澄清 + L3+ 思考链路归属 + 触摸/多卡/clarify 边界】。
+
+| D8.x | 议题 | ✅决策晶体 | grill 辩证产出 |
+|---|---|---|---|
+| **D8.1** | 默认主驾不澄清（磊哥拍核心） | **区域 scope 用户没指定 → 默认值直接执行（satisfied），绝不弹 clarify 澄清打断**。10 族全量泛化：座位[空调/座椅/车窗]→主驾 / 屏类→中控屏 / 前后[雨刮/天窗遮阳]→前·前排 / 灯类/音量/香氛→全局。demo 手机演示，端到端流畅第一 | 核源 main:state-cells.yaml 全 10 族 scope（空调温度/风量·座椅加热/通风/靠背·车窗 = 座位 scope；屏幕含主副驾屏；雨刮前后；天窗前后排）；scope 默认值【执行逻辑】= NLU/Core（非 UIUE），UIUE 只展示默认态 |
+| **D8.2** | clarify(`blocked_with_alternative`) = demo 少用态 | **能自动替代就 satisfied+提示（不 block）；真歧义走 orb；blocked_with_alternative 主线几乎不触发**。本义 = 某张【已确定卡】操作 blocked+替代（非对话级歧义）。force-state 展示示例 = **「空调调到16度」→「最低18℃，已调到18」**（值超范围+替代，卡片级，非区域，琥珀态）+ LoRA 训练覆盖 | CC 辩证 catch GLM-B「打开→开什么」其实是【对话级歧义=orb】非卡片态；"请再说一次"(无替代)更像 unknown 非 blocked_with_alternative；demo「不打断」下超范围倾向自动 clamp satisfied → 此态主线极少用（磊哥「保留备用」精确成立） |
+| **D8.3** | L3+ 思考链路（假 COT）= 对话级 orb `think` 态 | **「思考中→调用中→方案」是对话级 orb 演出（还没确定动哪张卡），不是任何卡片态 → DemoVisualState 7 态一个不动**。前端假 COT(~3s) + 场景宏确定性查表[demo]/LoRA[后续]。归 **Phase 5 orb TimelineView 四态 idle/`think`/speak/listen** | 核源 hig-rules:56 orb 已定 `think` 态（思考链路精确落点，非 IOU）；演绎 catch CC上轮⭐A+GLM⭐C（都把思考演出塞卡片 changing）错位——思考时未定卡=对话级；价值=可视化三层路由(L1秒回/L3+演思考) |
+| **D8.4** | 触摸交互 = 极简查看（P1=B） | **卡片只读状态展示（非手动控制器）；点卡→高亮+tooltip，无调节逻辑**。demo 语音主线（北极星），触摸防"死图片"感。🟡待磊哥确认现场戳卡习惯（会戳→B落实/纯语音→可简化A） | CC catch GLM-A④「触摸=手机主交互」过度——MAformac=语音车控演示，卡片非控制器 |
+| **D8.5** | 多卡时序 = 守 D1 级联 | **守 D1（stagger 220ms 快速渐次「唰唰唰」+ MAX_CONCURRENT_HIGHLIGHTS=1 序列化非并发），不推翻同时炸** | 核源 catch GLM 新增「同时炸场」撞已拍 D1/AD-4（C2 strong 22.5）；steelman：渐次比同时高级+不乱+有炸场感（220ms 标 ESTIMATE 待 spike） |
+| **D8.6** | UIUE 边界 + 核源 3 修正 | **UIUE 的活 = ① 卡片默认主驾展示 ② 思考链路 orb 演出(后续) ③ clarify 少用态 ④ 多轮/读回展示**。**边界外(非UIUE)**：TTS话术省略=Core readback `{温区}`模板+voice DEFERRED / scope填槽=NLU / 继承范围记忆=DialogueState(3轮) / 触摸调节=砍 / L3+触发=NLU / LoRA超时兜底=Core | 核源 catch GLM 3 声称：①Phase5 真有(非IOU,orb think 已留位) ②P4 撞已定 D1 级联 ③P5 demo 场景宏即时无超时(范式§175,γ 是后续真LoRA事) |
+
+**UIUE 分支待办全景（A/B/C/D 分层，落 roadmap/tasks）**：
+- **A 默认主驾展示**（卡片层纯 UIUE）：A1 卡片默认锚定默认 scope 态(不渲"请选区域"空态) / A2 多 scope 聚合卡(不分裂) / A3 非默认 scope 角标
+- **B 思考链路演出**（对话级 orb，Phase 5 后续）：B1 orb think 假 COT phase 机(~3s) / B2 多变文案 / B3 手机视觉占位 / B4 接 NLU L3+ 信号 / B5 兜底态展示
+- **C clarify 态**（少用，已定）：C1 枚举保留主线少用 / C2 D7 示例「调到16度→18度」
+- **D 多轮/读回展示**（承接 Core）：D1 继承展示("再调高"继承主驾) / D2 读回展示("现在多少度"读默认)
+
+---
+
 ## §4 已拍决策晶体表（不可推翻，索引正文权威）
 
 > 这些是【已 grill 收口 / 磊哥拍板 / 转合同】的决策晶体。本表是索引（结论 + 正文出处），不复制正文。
