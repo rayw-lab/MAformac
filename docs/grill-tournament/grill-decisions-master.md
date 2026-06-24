@@ -224,6 +224,8 @@
   - **用户故事④ 多轮叠加 scope ✅拍（a 升级聚合）**：「打开车窗」(主驾)→「副驾也打开」(G20 显式二轮) → 卡片**升级聚合成范围词**（「前排车窗 100%」，跟全车聚合同逻辑），非双角标。视觉一致：多 scope 都聚合成范围词（前排/全车）。
 - **UIUE 消费（G28，G22 不进后端 blocker）**：ui-presentation **读 state-cells `default_scope`** 渲染默认 scope 卡片（非全车 fan-out）；合流 rebase main 拿 `default_scope` 字段。**change 归属 ✅拍：独立 `define-demo-default-scope` change**（G24，磊哥 2026-06-24 拍——default_scope 跨 C3/Compiler/C6/C5/UIUE 多方依赖，独立 change 单一职责），UIUE tasks 依赖此 change。
 
+> 🔴 **Phase 4 实装 grill（CC 接手从 0 重做，2026-06-24）→ 一手 `docs/grill-tournament/uiue-phase4-grill-decisions.md`**：D7（7态）+ D8 裂缝⑤⑥④ 的实装收口。**P4-D1 ⭐C''** = 三阶段 ui-presentation incremental apply（4a 接线+scope角标+低风险炸场 numericText/breathe｜4b value.type 控件 spike｜4c 聚焦暂缓）+ pre-commit `displays(from:)` gate + 14 force-state artifact。🔴 **辩证 catch（codex-answer-grill two-layer）**：4a UIUE 渲染**落 ui-presentation**（消费契约，spec 已锁 value.type+scope 角标），define-demo-default-scope 是其**依赖（后端产 default_scope 字段）非落点**——codex 曾混淆「依赖 vs 落点」+ 误判「value.type 没锁需新建 change」；正解**不新建 change**。背景：前任接线工作树未提交被 reset 丢失（git 不可恢复），CC 接手重做。
+
 ### D7 补强 grill 清单（DA0-DA8，2026-06-24，D7 收尾打磨 + cite-verify 翻盘 codex DA1）
 
 > D7（7 态视觉消费）已 apply（commit 6a3e3f9）+ 审计 CLEAR。进 Phase 4 前 grill D7 补强。CC ⭐ + cite-verify + codex/磊哥辩证。🔴 **DA1 cite-verify 翻盘**：codex 说「接 traceLogger.guardReason」必补 γ，核源发现主流程无 guardReason 源（见 DA0）→ 真补强是 DA0 执行链路（**没核源就按 codex 写 = 返工**）。
