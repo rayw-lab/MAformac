@@ -1,50 +1,61 @@
 <!--
-DRAFT SKELETON (2026-06-23) — tasks 占位待细化，人审定 propose 时展开为可验收逐项。
-依赖序：本 change = A2 [5] C6 MP/coverage/readback，依赖 migrate-d-domain([1] codegen) + retrain-c5(candidate)。
-incremental，禁大爆炸。
+DRAFT TASKS (2026-06-24 Q1-Q4 文档吸收版)
+
+Topology:
+- §2/§3 = C6 Construction Lane. It does not depend on a retrain-C5 candidate.
+- §4 = Candidate Comparison Lane. It requires a signed retrain-C5 candidate and explicit run authorization.
+
+Unchecked future tasks are not apply authorization. This draft does not authorize D-domain base recalibration, C6 acceptance, model-quality evaluation, training, endpoint-ready claims, demo-golden-run, voice, UIUE merge, or R-L17 closure.
 -->
 
-> Phase 0 boundary: unchecked future tasks are not apply authorization. D1-D10 user verdicts are accepted in `docs/project/phase0/phase0-d1-d10-user-decision-record.md`, but this draft remains non-executable until OpenSpec propose acceptance, R-L17 handling, and physical evidence gates are recorded. It does not authorize D-domain base recalibration, real model-quality evaluation, endpoint-ready claims, demo-golden-run, voice, or UIUE merge.
+## 0. Documentation Absorption Closeout
 
-## 1. 前置依赖
+- [ ] 0.1 Validate docs-only absorption with `openspec validate rebuild-c6-four-layer-bench --strict`.
+- [ ] 0.2 Validate workspace OpenSpec consistency with `openspec validate --all --strict`.
+- [ ] 0.3 Run `git diff --check`.
+- [ ] 0.4 Confirm the diff touches only documentation/ledger/OpenSpec paths for this absorption and does not modify Swift, C6 JSONL, Qwen tool format, model artifacts, training data, or voice files.
 
-- [ ] 1.1 确认 `migrate-d-domain-tool-surface` 已 archive（D-domain surface + 工具数实算）。
-- [ ] 1.2 确认 `retrain-c5-lora-d-domain` candidate 可引用（做 base-vs-LoRA diff）。
+## 1. Construction Preconditions
 
-## 2. expected_tool_calls 迁 D-domain（[5]）
+- [ ] 1.1 Reconfirm target branch, `HEAD`, and `origin/main` before implementation. Q3 line numbers are evidence anchors, not current API proof.
+- [ ] 1.2 Reconfirm load-bearing symbols in current `origin/main`: `ScopeOrigin`, `ScopeResolution.keys`, `ScopeResolution.resolvedScopes`, `C2ScopeResolver.scopedKey()`, and `ToolContractStateApplier.applyWithEvidence`. Halt and re-grill if semantics moved or disappeared. AD: `AD-C6-012`.
+- [ ] 1.3 Confirm D-domain surface/default-scope status at current baseline before regenerating or freezing any C6 gold data. Do not redefine default-scope semantics inside this change.
+- [ ] 1.4 Confirm R-L17 route-deframing status before apply/implementation. Route signoff may unlock construction only; candidate signoff remains separate. AD: `AD-C6-005`.
+- [ ] 1.5 Confirm the BehaviorClass SSOT naming/reconciliation task is scheduled before any selector, active threshold, active base anchor, or apply no-effect label can be frozen. The concrete naming decision remains in §3.3-§3.4. AD: `AD-C6-007`.
 
-- [ ] 2.1 `qwen-tool-call-format.yaml` 定义 D-domain 工具名集合 + 字段映射（DRAFT 待细化）。
-- [ ] 2.2 `c6-bench-cases.jsonl` 57 行迁 D-domain 具名工具（migration，`tool_call_frame`→真实工具名）+ P0-3 陷阱样本确认。验证：`archive-check verify-gold` pass。
-- [ ] 2.3 expected_tool_calls 从旧 6 工具扩到 10 族炸场子集。
+## 2. D-Domain Expected-Tool Construction
 
-## 3. 四层评测门（Q41）
+- [ ] 2.1 Define C6 expected-tool semantics in terms of D-domain named tools, not generic `tool_call_frame`.
+- [ ] 2.2 Map C6 release/trap cases to D-domain named tools and schema-valid arguments without copying raw/customer source text.
+- [ ] 2.3 Verify expected-tool migration shape only with an authorized contract/shape check such as `archive-check verify-gold` when no model is run. This is not C6 acceptance. AD: `AD-C6-011`.
+- [ ] 2.4 Keep C6 release cases final-only and unavailable for checkpoint selection. AD: `AD-C6-003`.
 
-- [ ] 3.1 golden 100% 硬门 / demo_fuzz / unsupported / safety 各独立门（DRAFT 待细化各门 scorer）。验证：四层独立计分，无互相冒充。
-- [ ] 3.2 action hard_pass 按 case schema 字段拆（mp_positive_action n=23，base 10/23 硬锚）。
-- [ ] 3.3 readback 走方案 P（端 renderer renderReadback SSOT，eval 删 readback 不计 hard_pass，gold 不改）。
-- [ ] 3.4 clarify 全保留计 hard_pass（安全拒识澄清 = demo 灵魂）。
-- [ ] 3.5.G1 R-L04/D1 denominator gate：golden、demo_fuzz、unsupported、safety、action、clarify、readback denominator 必须从 case schema fields 派生；拒绝 aggregate pass-rate 替代；旧 base 10/23 标 historical，不能当 active D-domain gate。AD：`AD-C6-001`。
-- [ ] 3.5.G2 D-domain base anchor：旧 10/23 只作 historical failure evidence；新 D-domain base anchor 仅定义 future comparison semantics，本 Phase 0 不授权运行 recalibration。AD：`AD-C6-002`。
-- [ ] 3.5.G3 R-L05/D2 sampling support：暴露 C6 第一/第二层 sample runner，供 retrain-c5 iter50/100/150 behavior-generation gate 使用；C6 release cases 不得用作 checkpoint selection oracle。AD：`AD-C6-003`。
-- [ ] 3.5.G4 R-L11 anti-fake-green enforcement：声明 pass^k 或 hardPassVariance 时必须 enforce；grader failure 保持 unsigned。AD：`AD-C6-004`。
-- [ ] 3.5.G5 R-L17 human review evidence：R-L17 status remains `UNSIGNED` until G1-G5 are all satisfied: D1-D10 verdicts accepted, R1-R7 evidence files exist, at least one heterogeneous deframing audit exists, four-model consistent PASS has not bypassed human review, and any judge disagreement is escalated to human-owner review. Codex/Claude same-vendor checks are pre-check only. AD：`AD-C6-005`。
-- [ ] 3.5.G5a R-L17 R1 first-50 sample read：C6-linked training/eval sample rows in the first-50 review must include row ids, expected call/no-call, and verdict in `docs/project/phase0/r-l17-human-review-evidence/R1-first-50-sample-read.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G5b R-L17 R2 loss-mask print review：C6 signoff must cite the loss-mask artifact when interpreting no-call/refusal/already_state evidence; record in `R2-loss-mask-print-review.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G5c R-L17 R3 train-eval template byte diff：C6 scorer/readback comparisons must cite byte-diff evidence rather than prose equivalence; record in `R3-train-eval-template-byte-diff.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G5d R-L17 R4 refusal/already_state comparison：C6 status/readback semantics for refusal and already_state must cite home-llm comparison evidence; record in `R4-refusal-already-state-home-llm-comparison.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G5e R-L17 R5 top-failing C6 drilldown：top failing cases and denominator construction must be drilled down case-by-case; identify strict-judge false negative vs true model failure; record in `R5-top-failing-c6-case-drilldown.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G5f R-L17 R6 generated utterance drift：C6 fuzz/drift cases must cite generated utterance drift review before being used as signoff evidence; record in `R6-generated-utterance-drift-review.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G5g R-L17 R7 final route signoff：final C6 route signoff requires human-owner review of first-hand case/file evidence; four-model consistent PASS is not sufficient. Record in `R7-final-route-deframing-signoff.md`。AD：`AD-C6-005`。
-- [ ] 3.5.G6 Default-scope dependency gate：`define-demo-default-scope` must be proposed and validated before default-scope gold is regenerated or frozen. `C6-MP-014/016/017` and any omitted-window cases must not encode missing scope as `全车`; C6 must depend on the carrier rather than redefining default-scope behavior. AD：`AD-C6-DS-001`。
+## 3. Four-Layer Bench Construction
 
-## 4. base-vs-LoRA 同 harness
+- [ ] 3.1 Define four independent external layers: `golden`, `demo_fuzz`, `unsupported`, and `safety`. Aggregate pass rate must not hide any red hard layer. AD: `AD-C6-001`.
+- [ ] 3.2 Define the five internal behavior classes: `tool_call`, `clarify_missing_slot`, `refusal_no_available_tool`, `refusal_safety_or_policy`, and `already_state_noop`. Do not add `direct_no_call` for in-scope cockpit-control commands. AD: `AD-C6-007`.
+- [ ] 3.3 Reconcile C5 `data_class_observed_count`, C6 `C6Bucket` / selector denominators, apply/execution `no_effect_reason`, and external four-layer reporting to one behavior-class source before executable selectors, active thresholds, or active base anchors are frozen. AD: `AD-C6-007`.
+- [ ] 3.4 Decide the SSOT naming shape: either rename `C6Bucket` to `BehaviorClass`, or leave `C6Bucket` as deprecated/typealias/mapped legacy with a deletion window. AD: `AD-C6-007`.
+- [ ] 3.5 Derive layer denominators from case schema fields and behavior classification. `C6Bucket.no_call` must not be treated as `already_state_noop`, and broad `refusal` must split unsupported from safety. AD: `AD-C6-001`, `AD-C6-007`.
+- [ ] 3.6 Define `future_d_domain_base_anchor_design` as deferred comparison semantics only. Do not run D-domain base recalibration and do not use old generic-frame 10/23 as an active D-domain threshold. AD: `AD-C6-002`.
+- [ ] 3.7 Define readback plan P: model hard-pass excludes renderer readback; `verify-gold` keeps deterministic C2 renderer readback validity; clarify/refusal text evidence still counts when asserted. AD: `AD-C6-008`.
+- [ ] 3.8 Define receipt fields for readback split: `model_hard_pass_basis`, `readback_applicable`, `readback_match`, and `readback_excluded_from_model_hard_pass`. AD: `AD-C6-008`.
+- [ ] 3.9 Define the contract bundle manifest and fingerprint over contract inputs. Preserve existing per-run prompt/output/model/artifact digests as separate fields. AD: `AD-C6-009`.
+- [ ] 3.10 Consume apply-layer applied-write evidence when available. Rebuild-C6 must not own implementation of `ToolContractStateApplier.appliedWrites` or a private apply engine. AD: `AD-C6-010`.
+- [ ] 3.11 Derive `unexpectedMutationKeys` in C6 replay from applied/final state versus expected keys and allowed dependency side effects. Do not pass C6 expected-state sets into `applyWithEvidence`. AD: `AD-C6-010`.
+- [ ] 3.12 Enforce sign-or-block for pass^k, hardPassVariance, missing grader evidence, missing layer evidence, or receipt inconsistencies. AD: `AD-C6-004`.
+- [ ] 3.13 Keep R-L17 route/candidate signoff as manual governance evidence in `docs/project/phase0/r-l17-human-review-evidence/`; do not add C24/runtime enums for those verdicts. Reserve future placeholder `add-route-verdict-verify-guard` for a lightweight bypass guard, but do not implement it here. AD: `AD-C6-005`.
 
-- [ ] 4.1 同 prompt/parser/mock-state/scoring/replay fingerprints；C6 release final-only 不用于 checkpoint selection。
-- [ ] 4.2 base hard_fail 0.789 锚保留（LoRA 提升诚实锚点不洗白）。
-- [ ] 4.3 C6 状态边界：C6 model-quality evidence 不得推出 endpoint readiness、demo-golden readiness、V-PASS、S-PASS 或 U-PASS。AD：`AD-C6-006`。
+## 4. Candidate Comparison Lane
 
-## 5. 验证与收口
+- [ ] 4.1 Local precondition: a signed `retrain-c5-lora-d-domain` candidate exists and the comparison run is explicitly authorized.
+- [ ] 4.2 Compare base and candidate with the same prompt, parser, mock-state, scoring, replay fingerprint, and contract bundle semantics.
+- [ ] 4.3 Report C6 model-quality evidence without promoting it to endpoint readiness, demo-golden readiness, V-PASS, S-PASS, or U-PASS. AD: `AD-C6-006`.
+- [ ] 4.4 Keep comparison final-only. Do not use release cases as checkpoint-selection oracle. AD: `AD-C6-003`.
 
-- [ ] 5.1 `openspec validate rebuild-c6-four-layer-bench --strict` + `--all --strict` pass。
-- [ ] 5.2 填实 vehicle-tool-bench spec Purpose（现 TBD）。
-- [ ] 5.3 红线检查：无原文语料/PII 进 bench cases。
+## 5. Red Lines
+
+- [ ] 5.1 Do not run training, C6 acceptance, D-domain base recalibration, golden-run, voice, endpoint readiness, or model-quality evaluation unless a later accepted task explicitly authorizes that proof class.
+- [ ] 5.2 Do not modify Swift, C6 JSONL, Qwen tool format, model/data artifacts, or voice files during documentation absorption.
+- [ ] 5.3 Do not import raw cockpit/customer text, PII, secrets, or "internal only" source material into bench cases.
+- [ ] 5.4 Do not claim UIUE is merged or R-L17 is closed without live git/PR/state proof and the required human-owner evidence.

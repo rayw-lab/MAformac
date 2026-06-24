@@ -187,3 +187,11 @@
 14. **🟡 SwiftPM helper 卡死不能扩成“测试失败”或“验证通过”**:本轮多次 filtered test/direct xctest 卡在 `swiftpm-xctest-helper`;清理 helper + serial rerun 后 focused tests 正常过。→ **SwiftPM 卡死只算 infra interruption,不算 pass/fail;最终 receipt 只记录成功复跑的原命令和 log,并避免并行 SwiftPM 测试。**
 
 15. **🟡 source-free CI 里的本机 fixture 测试要显式 skip,不能红也不能假装覆盖**:GitHub runner 无 `/Users/wanglei/.cache/huggingface/...` 和 Homebrew python@3.13,`testPythonMaskOffsetFixtureRunsTrainingTokenizerPath` 在 CI 红,但这是本机 tokenizer integration proof 缺 fixture,不是 default_scope 代码失败。→ **依赖本机模型/cache/raw 的测试用 `XCTSkip` 明确环境缺失;CI proof boundary 写清 source-free,本地有 fixture 的 `verify-all` 继续跑真路径。**
+
+## J. rebuild-c6 文档吸收前置教训(2026-06-24, Q1-Q4 grill closeout)
+
+1. **🔴 文档吸收前先对齐 `origin/main`,不要把新路线落在旧分支上**:Q1-Q4 账本最初叠在 `a9ce7cf` 分支,而 `origin/main` 已到 `c1e7d58`。若直接按旧 file:line 改 OpenSpec,会把 UIUE/main 后续状态和非 UIUE 路线混成一个假当前态。→ **任何跨 handoff/PR 后的 OpenSpec 吸收,先 `git fetch` + 记录 `origin/main` SHA + 从最新 main 开新分支,旧账本只能当 evidence anchor,不能当当前 API/行号真态。**
+
+2. **🔴 SSOT 必须列全消费者,不能只列当前争论里最显眼的两个名字**:Q4.5 起初只说 `behavior_class` vs `C6Bucket`,但 Q2/Q3 已经让同一 taxonomy 同时服务 C5 `data_class_observed_count`、C6 denominators/selectors、apply `no_effect_reason`。只修 C6 两个名字,apply 或 C5 仍会私建分类。→ **定义 shared taxonomy 时显式列 producer/consumer: C5 数据计数、C6 分母/selector、apply no-effect reasoning;任何少列一个消费者的"SSOT"都是潜在双源。**
+
+3. **🟡 static teardown 只能支撑文档设计,不能升格成验证通过**:paper/code teardown 能证明"应该怎样设计"和"哪些路径有风险",不能证明 C6 acceptance、模型质量、base recalibration 或 demo readiness。→ **OpenSpec 文档吸收的 proof class 只写 `local`/`local_static_teardown`;验证白名单只用 OpenSpec validation 和 `git diff --check`,不得把 teardown 证据写成 golden-run、C6 pass、V-PASS 或 readiness。**

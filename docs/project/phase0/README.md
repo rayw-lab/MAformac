@@ -49,6 +49,8 @@ These files are not implementation, not OpenSpec archive, and not permission to 
 - `c5-recovery-roadmap-disposition.md` records which roadmaps are historical versus live carriers.
 - `phase0-d1-d10-closeout.md` records current closeout status; it is accepted for D1-D10 user decisions but still partial until heterogeneous review and OpenSpec carriers are accepted.
 - `phase0-d1-d10-cascade-audit-codex-2026-06-24.md` records the Codex same-vendor cascade pre-check and main-thread absorption.
+- `rebuild-c6-documentation-absorption-closeout-2026-06-24.md` records the documentation-only closeout for `rebuild-c6-four-layer-bench`. It is approved for human OpenSpec propose review, not apply/implementation.
+- `r-l17-human-review-evidence/route-deframing-prep-2026-06-24.md` prepares R-L17 route deframing and the heterogeneous judge prompt. It is not route signoff.
 
 ## Demo Default Scope Gate Pack
 

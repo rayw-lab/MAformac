@@ -41,6 +41,7 @@ Any missing G1-G5 item leaves R-L17 `UNSIGNED` and keeps retrain-c5, rebuild-c6,
 | R5 | `R5-top-failing-c6-case-drilldown.md` | Top failing C6 cases drilled down case-by-case. |
 | R6 | `R6-generated-utterance-drift-review.md` | Generated utterance drift and generator self-preference review. |
 | R7 | `R7-final-route-deframing-signoff.md` | Human-owner final route decision and heterogeneous deframing summary. |
+| Heterogeneous audit input | `heterogeneous-deframing-audit-glm-2026-06-25.md` | GLM non-Claude-family route deframing audit input for G3; not human-owner signoff. |
 
 ## Non-Goals
 
