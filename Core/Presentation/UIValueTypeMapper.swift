@@ -18,6 +18,14 @@ struct ScopeBadge: Equatable {
     var style: ScopeBadgeStyle
 }
 
+/// 卡片值二级 badge 渲染形态（spec.md:83 禁 AnyView → enum 穷尽 switch）。
+/// `colorSwatch` = ambient.color 炸场色块；`mode` = 枚举模式（如 massage_mode）；`plain` = 普通值。
+enum BadgeRenderStyle: Equatable {
+    case plain
+    case colorSwatch(String)  // 关联色名（白/红色...），消费侧映射 Color 染卡
+    case mode(String)         // 关联模式名
+}
+
 struct VehicleCardDisplay: Identifiable, Equatable {
     var id: String
     var title: String
@@ -27,6 +35,10 @@ struct VehicleCardDisplay: Identifiable, Equatable {
     var revision: Int
     var accessibilityKey: String
     var reason: String?
+    /// 10 族归属（`familyDisplays` 设；device 级 `displays()` 输出留 nil）。
+    var familyCardID: FamilyCardID? = nil
+    /// 值二级 badge 形态（ambient 色块 / mode / plain）。
+    var badgeStyle: BadgeRenderStyle = .plain
 
     static func displays(
         from cells: [DemoVehicleStateCell],
@@ -157,6 +169,95 @@ struct VehicleCardDisplay: Identifiable, Equatable {
             }
         }
         return .normal
+    }
+
+    // MARK: - 10 族全景常驻摘要层（AD-9/10/11）
+
+    /// 10 族 family_card 全景常驻摘要：遍历 `FamilyCardID.displayOrder`(10) 固定序，每族 1 卡。
+    /// 有 cell → 主 cell 摘要 + 族级 dominant 态 + scope 角标；无 cell → `normal` 占位（冷启动不空屏）。
+    /// `vehicle.*`/未知 base 经 `FamilyCardIDMapper` 返 nil 被过滤（P0-1，不创建第 11 族）。
+    /// 与 `displays()`（device 级）正交：摘要层是消费侧二级模型，不改 `displays()` 行为。
+    static func familyDisplays(
+        from cells: [DemoVehicleStateCell],
+        catalog: StateCellPresentationCatalog = .shared,
+        reasons: (String) -> String? = { _ in nil }
+    ) -> [VehicleCardDisplay] {
+        var cellsByFamily: [FamilyCardID: [DemoVehicleStateCell]] = [:]
+        for cell in cells {
+            guard let family = FamilyCardIDMapper.familyCardID(forBase: ScopedStateKey(cell.key).base) else { continue }
+            cellsByFamily[family, default: []].append(cell)
+        }
+        return FamilyCardID.displayOrder.map { family in
+            let familyCells = cellsByFamily[family] ?? []
+            guard !familyCells.isEmpty else {
+                return placeholderDisplay(for: family)
+            }
+            return summaryDisplay(for: family, familyCells: familyCells, catalog: catalog, reasons: reasons)
+        }
+    }
+
+    /// 无 cell 族 → `normal` 占位卡（族名 + 未激活，10 族骨架常驻；scopeBadge nil 不走聚合）。
+    private static func placeholderDisplay(for family: FamilyCardID) -> VehicleCardDisplay {
+        VehicleCardDisplay(
+            id: "family|\(family.rawValue)",
+            title: family.displayName,
+            valueText: "未激活",
+            scopeBadge: nil,
+            visualState: .normal,
+            revision: 0,
+            accessibilityKey: "family.\(family.rawValue)",
+            reason: nil,
+            familyCardID: family,
+            badgeStyle: .plain
+        )
+    }
+
+    /// 有 cell 族 → 主 cell 摘要 + 族级 dominant 态。
+    /// title/value/scopeBadge 复用主 cell 现有 `displays()` scope 聚合（**不重写** :54-129）；
+    /// title = scope 前缀（从主 display 提取）+ 族名；visualState = 族内 dominant（occupancy，语音点亮哪族哪族变）。
+    private static func summaryDisplay(
+        for family: FamilyCardID,
+        familyCells: [DemoVehicleStateCell],
+        catalog: StateCellPresentationCatalog,
+        reasons: (String) -> String?
+    ) -> VehicleCardDisplay {
+        let primaryBase = FamilyPrimaryCellMapper.primaryCellBase(for: family)
+        let primaryCells = familyCells.filter { ScopedStateKey($0.key).base == primaryBase }
+        // 主 cell 缺失（族激活但主 cell 未现，force-state 边界）→ 退用族内最新 cell
+        let source = primaryCells.isEmpty ? familyCells : primaryCells
+        let representativeBase = primaryCells.isEmpty
+            ? ScopedStateKey(source.max(by: { $0.revision < $1.revision })!.key).base
+            : primaryBase
+        // 复用现有 scope 聚合（individualDisplay/aggregateDisplay）出主 cell display（含 dim/emphasized/范围词角标）
+        let primary = displays(from: source, catalog: catalog, reasons: reasons).first
+        // 族态 occupancy：族卡态 = 族内所有 cell dominant
+        let familyState = dominantVisualState(familyCells.map(\.visualState))
+        // 族名 + scope 前缀：从 primary.title 减 baseTitle 提取（复用聚合判定，不重写规则）
+        let baseTitle = catalog.displayTitle(for: representativeBase)
+        let primaryTitle = primary?.title ?? family.displayName
+        let scopePrefix = primaryTitle.hasSuffix(baseTitle) ? String(primaryTitle.dropLast(baseTitle.count)) : ""
+        let value = primary?.valueText ?? "—"
+        return VehicleCardDisplay(
+            id: "family|\(family.rawValue)",
+            title: scopePrefix + family.displayName,
+            valueText: value,
+            scopeBadge: primary?.scopeBadge,
+            visualState: familyState,
+            revision: familyCells.map(\.revision).max() ?? 0,
+            accessibilityKey: "family.\(family.rawValue)",
+            reason: familyCells.compactMap { reasons($0.key) }.first,
+            familyCardID: family,
+            badgeStyle: badgeRenderStyle(forBase: representativeBase, value: value)
+        )
+    }
+
+    /// 值二级 badge 形态（穷尽，禁 AnyView）：`ambient.color`→色块 / `seat.massage_mode`→模式 / 余 plain。
+    private static func badgeRenderStyle(forBase base: String, value: String) -> BadgeRenderStyle {
+        switch base {
+        case "ambient.color": return .colorSwatch(value)
+        case "seat.massage_mode": return .mode(value)
+        default: return .plain
+        }
     }
 }
 

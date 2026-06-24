@@ -32,3 +32,50 @@ enum FamilyCardIDMapper {
         }
     }
 }
+
+// MARK: - 族元数据（family card 标题 + 排序 + allowlist 桥接）
+
+extension FamilyCardID {
+    /// 族中文显示名（family card 标题）。源 = `generated/family-device-allowlist.json` `zh`，
+    /// 消费侧适配：allowlist `light`/灯光氛围 → 设备前缀 `ambient` → 「氛围灯」；`sunroof`/天窗遮阳帘 → 「天窗遮阳」。
+    var displayName: String {
+        switch self {
+        case .ac: return "空调"
+        case .seat: return "座椅"
+        case .window: return "车窗"
+        case .screen: return "屏幕"
+        case .ambient: return "氛围灯"
+        case .door: return "车门"
+        case .volume: return "音量"
+        case .wiper: return "雨刮"
+        case .sunroofShade: return "天窗遮阳"
+        case .fragrance: return "香氛"
+        }
+    }
+
+    /// A2 allowlist 族 key（消费侧 `FamilyCardID` → allowlist key 桥；2 处命名差异：
+    /// `ambient`(设备前缀) ↔ `light`(allowlist 族) / `sunroofShade`(合并族) ↔ `sunroof`(allowlist 族)）。
+    var allowlistKey: String {
+        switch self {
+        case .ambient: return "light"
+        case .sunroofShade: return "sunroof"
+        default: return rawValue
+        }
+    }
+
+    /// family card 常驻骨架显示序 = allowlist `row_count` 降序（C8 高频代理，verified 2026-06-25）。
+    /// 静态序（不运行时读 JSON 防 hot-path IO），由 `FamilyDisplaysTests.testDisplayOrderMatchesAllowlistRowCountSource`
+    /// 对 allowlist 源做一致性 enforce（A2 改 row_count → 测试红 → 更新此序）。
+    static let displayOrder: [FamilyCardID] = [
+        .seat,         // row_count 696
+        .ambient,      // light 468
+        .ac,           // 212
+        .screen,       // 205
+        .volume,       // 153
+        .door,         // 129
+        .sunroofShade, // sunroof 102
+        .window,       // 82
+        .wiper,        // 80
+        .fragrance     // 32
+    ]
+}
