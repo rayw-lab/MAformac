@@ -80,6 +80,23 @@ public enum C5TrainingSurface: String, Codable, CaseIterable, Sendable {
     case frame
 }
 
+public enum C5ScopeCandidateCatalog {
+    public static func scopeCandidatesBySlot(from stateCells: StateCellContractLookup) -> [String: [String]] {
+        var result: [String: [String]] = [:]
+        if let window = stateCells.cell(id: "window.position") {
+            result["position"] = window.scope
+            result["direction"] = window.scope
+        }
+        if let screen = stateCells.cell(id: "screen.brightness") {
+            result["screen_type"] = screen.scope
+        }
+        if let ambient = stateCells.cell(id: "ambient.brightness") {
+            result["name"] = ambient.scope
+        }
+        return result
+    }
+}
+
 public struct C5FCFlags: Codable, Equatable, Sendable {
     public var fuzzy: Bool
     public var free: Bool
@@ -682,6 +699,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var scope: C5TrainingScope
     public var surface: C5TrainingSurface
     public var dDomainCatalog: [DDomainToolEntry]
+    public var scopeCandidatesBySlot: [String: [String]]
 
     public init(
         targetPositiveRows: Int = 4_500,
@@ -706,7 +724,8 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         generatedUtteranceRecords: [C5GeneratedUtteranceRecord] = [],
         scope: C5TrainingScope = .demo,
         surface: C5TrainingSurface = .dDomain,
-        dDomainCatalog: [DDomainToolEntry] = []
+        dDomainCatalog: [DDomainToolEntry] = [],
+        scopeCandidatesBySlot: [String: [String]] = [:]
     ) {
         self.targetPositiveRows = targetPositiveRows
         self.devSelectionRows = devSelectionRows
@@ -731,6 +750,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.scope = scope
         self.surface = surface
         self.dDomainCatalog = dDomainCatalog
+        self.scopeCandidatesBySlot = scopeCandidatesBySlot
     }
 }
 
@@ -1818,7 +1838,12 @@ public enum C5TrainingRenderer {
         return "cand_sem_\(digest)"
     }
 
-    public static func toolCallArguments(seed: C5SemanticSeed, value: C5ContractValue, slotAssignments: [String: String]) -> [String: JSONValue] {
+    public static func toolCallArguments(
+        seed: C5SemanticSeed,
+        value: C5ContractValue,
+        slotAssignments: [String: String],
+        scopeCandidatesBySlot: [String: [String]] = [:]
+    ) -> [String: JSONValue] {
         var args: [String: JSONValue] = [
             "device": .string(seed.device),
             "action_primitive": .string(seed.actionPrimitive),
@@ -1833,25 +1858,44 @@ public enum C5TrainingRenderer {
             if key == "device" || key == "action_primitive" {
                 continue
             }
-            args[key] = .string(slotAssignments[key, default: fallbackSlotValue(key: key, seed: seed, variant: 0)])
+            args[key] = .string(slotAssignments[key, default: fallbackSlotValue(
+                key: key,
+                seed: seed,
+                variant: 0,
+                scopeCandidatesBySlot: scopeCandidatesBySlot
+            )])
         }
         return args
     }
 
-    public static func slotAssignments(seed: C5SemanticSeed, variant: Int, value: C5ContractValue) -> [String: String] {
+    public static func slotAssignments(
+        seed: C5SemanticSeed,
+        variant: Int,
+        value: C5ContractValue,
+        scopeCandidatesBySlot: [String: [String]] = [:]
+    ) -> [String: String] {
         var assignments: [String: String] = [:]
         let rangeMap = parseRange(seed.range)
         for key in seed.slotKeys {
+            let c2ScopeCandidates = scopeCandidates(for: key, in: scopeCandidatesBySlot)
             if key == "device" {
                 assignments[key] = seed.device
             } else if key == "action_primitive" {
                 assignments[key] = seed.actionPrimitive
             } else if let fixed = fixedSemanticSlotValue(seed.semanticSlots[key]) {
                 assignments[key] = fixed
+            } else if isScopeLikeSlot(key), !c2ScopeCandidates.isEmpty {
+                assignments[key] = c2ScopeCandidates[variant % c2ScopeCandidates.count]
             } else if let values = rangeMap[key], !values.isEmpty {
                 assignments[key] = values[variant % values.count]
             } else {
-                assignments[key] = fallbackSlotValue(key: key, seed: seed, variant: variant, value: value)
+                assignments[key] = fallbackSlotValue(
+                    key: key,
+                    seed: seed,
+                    variant: variant,
+                    value: value,
+                    scopeCandidatesBySlot: scopeCandidatesBySlot
+                )
             }
         }
         return assignments
@@ -1892,11 +1936,17 @@ public enum C5TrainingRenderer {
         value.hasPrefix("<") && value.hasSuffix(">")
     }
 
-    private static func fallbackSlotValue(key: String, seed: C5SemanticSeed, variant: Int, value: C5ContractValue = C5ContractValue()) -> String {
+    private static func fallbackSlotValue(
+        key: String,
+        seed: C5SemanticSeed,
+        variant: Int,
+        value: C5ContractValue = C5ContractValue(),
+        scopeCandidatesBySlot: [String: [String]] = [:]
+    ) -> String {
         let normalized = key.lowercased()
         let candidates: [String]
-        if normalized.contains("position") || normalized.contains("direction") {
-            candidates = ["主驾", "副驾", "左前", "右前", "后排", "全车"]
+        if isScopeLikeSlot(key) {
+            candidates = scopeCandidates(for: key, in: scopeCandidatesBySlot)
         } else if normalized.contains("color") {
             candidates = ["蓝色", "暖白", "红色", "紫色"]
         } else if normalized.contains("mode") {
@@ -1914,7 +1964,20 @@ public enum C5TrainingRenderer {
         } else {
             candidates = ["\(key)_value_\((variant % 4) + 1)"]
         }
-        return candidates[variant % candidates.count]
+        return candidates.isEmpty ? "\(key)_value_\((variant % 4) + 1)" : candidates[variant % candidates.count]
+    }
+
+    private static func isScopeLikeSlot(_ key: String) -> Bool {
+        let normalized = key.lowercased()
+        return normalized.contains("position")
+            || normalized.contains("direction")
+            || normalized.contains("screen_type")
+            || normalized.contains("name")
+    }
+
+    private static func scopeCandidates(for key: String, in scopeCandidatesBySlot: [String: [String]]) -> [String] {
+        let normalized = key.lowercased()
+        return scopeCandidatesBySlot[key] ?? scopeCandidatesBySlot[normalized] ?? []
     }
 
     public static func augmentValue(seed: C5SemanticSeed, variant: Int) -> C5ValueAugmentation {
@@ -2435,7 +2498,17 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 }
                 usedVariantKeys.insert(key)
                 // P1 fail-closed: makePositiveSample 对 dDomain intent miss 返 nil(skip 不污染 frame); compactMap 过滤。
-                if let sample = makePositiveSample(seed: seed, variant: variant, ordinal: sampleOffset + result.count, maskingStage: options.maskingStage, generatedRecord: generated, surface: options.surface, catalog: options.dDomainCatalog, catalogByName: catalogByName) {
+                if let sample = makePositiveSample(
+                    seed: seed,
+                    variant: variant,
+                    ordinal: sampleOffset + result.count,
+                    maskingStage: options.maskingStage,
+                    generatedRecord: generated,
+                    surface: options.surface,
+                    catalog: options.dDomainCatalog,
+                    catalogByName: catalogByName,
+                    scopeCandidatesBySlot: options.scopeCandidatesBySlot
+                ) {
                     result.append(sample)
                 }
             }
@@ -2511,10 +2584,16 @@ public struct C5TrainingDatasetBuilder: Sendable {
         generatedRecord: C5GeneratedUtteranceRecord?,
         surface: C5TrainingSurface,
         catalog: [DDomainToolEntry],
-        catalogByName: [String: DDomainToolEntry]
+        catalogByName: [String: DDomainToolEntry],
+        scopeCandidatesBySlot: [String: [String]]
     ) -> C5TrainingSample? {
         let valueAugmentation = C5TrainingRenderer.augmentValue(seed: seed, variant: variant)
-        let slotAssignments = C5TrainingRenderer.slotAssignments(seed: seed, variant: variant, value: valueAugmentation.value)
+        let slotAssignments = C5TrainingRenderer.slotAssignments(
+            seed: seed,
+            variant: variant,
+            value: valueAugmentation.value,
+            scopeCandidatesBySlot: scopeCandidatesBySlot
+        )
         // paradigm §1 surface 分流: dDomain→具名工具(name=intent, value 形态编码进名) / frame→旧 generic(strangler 保留)。
         let call: C5TrainingToolCall
         let resolvedTools: [[String: JSONValue]]
@@ -2535,7 +2614,15 @@ public struct C5TrainingDatasetBuilder: Sendable {
             distractorIDs = distractors.ids
         } else {
             // frame legacy(catalog 空 OR surface=.frame): strangler 向后兼容(唯一 frame 入口, 非 dDomain miss fallback)
-            call = C5TrainingToolCall(name: "tool_call_frame", arguments: C5TrainingRenderer.toolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments))
+            call = C5TrainingToolCall(
+                name: "tool_call_frame",
+                arguments: C5TrainingRenderer.toolCallArguments(
+                    seed: seed,
+                    value: valueAugmentation.value,
+                    slotAssignments: slotAssignments,
+                    scopeCandidatesBySlot: scopeCandidatesBySlot
+                )
+            )
             let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
             resolvedTools = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed]) + distractors.schemas
             distractorIDs = distractors.ids
