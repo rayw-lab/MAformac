@@ -7,8 +7,9 @@
 ## 起手三步(任何 agent)
 
 1. 读 **`CLAUDE.md`**(项目定位 / 推进方法论 / 技术栈 / 边界 / 决策)
-2. 读 **`docs/README.md`**(文档地图)
-3. 读最近 **`docs/handoffs/`**(若有)
+2. 读 **`docs/CURRENT.md`**(当前路由牌,非 SSOT;只用于判断当前该读什么/做什么/禁止什么)
+3. 读 **`docs/README.md`**(文档地图)
+4. 读最近 **`docs/handoffs/`**(若有)
 
 ## 一句话项目
 

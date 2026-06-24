@@ -62,6 +62,10 @@ D6 is an accepted architecture decision. Start with 10-15% general Chinese mix i
 
 At least one non-tool-call task must be included to prove the model does not route every ordinary Chinese instruction into a tool call. Do not add English MMLU, knowledge-cutoff fact checking, or specialized Chinese domains such as medical/legal content to this demo gate.
 
+### AD-C5-DS-001: Default-scope carrier blocks C5 data generation and retrain
+
+`retrain-c5-lora-d-domain` SHALL depend on `define-demo-default-scope` for omitted-scope target rendering, C2-derived scope candidates, and scope-origin readback boundaries. C5 targets for omitted-scope utterances SHALL NOT invent `position=全车`, SHALL NOT hardcode a separate scope candidate list, and SHALL NOT redefine default-scope semantics inside this change.
+
 ## User Decision Gate
 
 D1-D10 are accepted in `docs/project/phase0/phase0-d1-d10-user-decision-record.md`. This removes the pending user-decision gate, but this change remains non-executable until OpenSpec propose acceptance, R-L17 handling, and physical evidence gates are satisfied.

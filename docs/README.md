@@ -12,6 +12,7 @@
 
 | 文档 | 是什么 |
 |---|---|
+| `docs/CURRENT.md` | **当前路由牌(router only,not SSOT)**:新窗口先看当前阶段/下一步/禁止动作/活跃 blockers;若与 CLAUDE/OpenSpec/grill 冲突则作废并更新 |
 | ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` | **范式 + surface 权威 SSOT**(§1-§17:generic frame 否决→D-domain 具名工具/canonical IR 仍 device×action/三层模型/demo 取巧特性/口径终拍 562/21 主议题全收口/A2 盘点) — **范式翻案权威** |
 | `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |
 | `docs/roadmap-2026-06-20-from-c6-done.md` | **historical / provenance source**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — 只作溯源,不作当前路线事实源 |

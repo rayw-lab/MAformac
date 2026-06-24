@@ -35,6 +35,7 @@ incremental，禁大爆炸。
 - [ ] 3.5.G5e R-L17 R5 top-failing C6 drilldown：top failing cases and denominator construction must be drilled down case-by-case; identify strict-judge false negative vs true model failure; record in `R5-top-failing-c6-case-drilldown.md`。AD：`AD-C6-005`。
 - [ ] 3.5.G5f R-L17 R6 generated utterance drift：C6 fuzz/drift cases must cite generated utterance drift review before being used as signoff evidence; record in `R6-generated-utterance-drift-review.md`。AD：`AD-C6-005`。
 - [ ] 3.5.G5g R-L17 R7 final route signoff：final C6 route signoff requires human-owner review of first-hand case/file evidence; four-model consistent PASS is not sufficient. Record in `R7-final-route-deframing-signoff.md`。AD：`AD-C6-005`。
+- [ ] 3.5.G6 Default-scope dependency gate：`define-demo-default-scope` must be proposed and validated before default-scope gold is regenerated or frozen. `C6-MP-014/016/017` and any omitted-window cases must not encode missing scope as `全车`; C6 must depend on the carrier rather than redefining default-scope behavior. AD：`AD-C6-DS-001`。
 
 ## 4. base-vs-LoRA 同 harness
 

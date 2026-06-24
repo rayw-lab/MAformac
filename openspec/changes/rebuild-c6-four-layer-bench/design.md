@@ -34,6 +34,10 @@ R-L17 C6 evidence must include human-owner participation, at least one heterogen
 
 C6 evidence does not imply endpoint readiness, demo-golden readiness, V-PASS, S-PASS, or U-PASS. Readback renderer evidence remains separate from model hard-pass evidence.
 
+### AD-C6-DS-001: Default-scope carrier blocks C6 gold rebuild
+
+`rebuild-c6-four-layer-bench` SHALL depend on `define-demo-default-scope` before omitted-scope gold is regenerated or frozen. C6 SHALL NOT encode omitted `打开车窗` as all-window fan-out, SHALL distinguish omitted default, explicit non-default, and explicit fan-out, and SHALL NOT redefine default-scope semantics inside this change.
+
 ## User Decision Gate
 
 D1-D10 are accepted in `docs/project/phase0/phase0-d1-d10-user-decision-record.md`. This removes the pending user-decision gate, but this change remains non-executable until OpenSpec propose acceptance, R-L17 handling, and physical evidence gates are satisfied.

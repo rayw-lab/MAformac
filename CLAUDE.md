@@ -8,7 +8,7 @@ updated: 2026-06-24
 
 # MAformac — 项目宪法
 
-> 项目入口与规矩。新 session 起手**先读本文件 → `docs/README.md` → `docs/project/collaboration-and-roles.md` → 最近 `docs/handoffs/`** 即恢复上下文。细节指向 `docs/`,本文件只放"宪法级"约定。
+> 项目入口与规矩。新 session 起手**先读本文件 → `docs/CURRENT.md`(当前路由牌,非SSOT) → `docs/README.md` → `docs/project/collaboration-and-roles.md` → 最近 `docs/handoffs/`** 即恢复上下文。细节指向 `docs/`,本文件只放"宪法级"约定。
 > 🔴 **经常看 `docs/lessons-learned.md`(持续维护的坑点 & 教训,每遇坑/纠错就追加)——起手必读、动手前回看,别重蹈已记录的坑。**
 
 ## 1. 这是什么（北极星）
@@ -50,6 +50,7 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 |---|---|
 | `CLAUDE.md` | 本文件,项目宪法 |
 | `AGENTS.md` | Codex 入口(路由到 CLAUDE.md) |
+| `docs/CURRENT.md` | **当前路由牌**(router only,not SSOT;只写当前阶段/下一步/禁止动作/活跃 blockers;phase transition 必须更新或过期) |
 | `docs/README.md` | 文档地图(短入口) |
 | `docs/project/collaboration-and-roles.md` | **协作分工 + 三工具协作(§7)** |
 | `docs/project/phase0/` | **Phase 0 route-control manifests**(authority/stage/decision/status/gate materialization; not runtime contracts; must carry retire/expiry metadata once filled) |

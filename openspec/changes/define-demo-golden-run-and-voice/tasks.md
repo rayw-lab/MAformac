@@ -8,7 +8,7 @@ incremental，禁大爆炸。
 
 - [ ] 1.1 确认 `migrate-d-domain-tool-surface` 已 archive（D-domain 工具名可引用）。
 - [ ] 1.2 确认 `rebuild-c6-four-layer-bench` must_pass + c6_case_id_derived 可关联。
-- [ ] 1.3 确认 `define-demo-default-scope` 已 proposed/validated before freezing golden-run IDs, readback text, `scope_origin` policy, or UIUE scene tags.
+- [ ] 1.3 Confirm `define-demo-default-scope` is proposed and validated before freezing golden-run IDs, C6 case IDs, readback text, `scope_origin` policy, fan-out aggregate labels, or UIUE scene tags. This task depends on the default-scope carrier and must not redefine omitted-scope behavior inside golden-run/voice.
 
 ## 2. demo-golden-run capability（new）
 
