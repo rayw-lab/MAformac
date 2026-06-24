@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# .githooks/pre-commit — UIUE（2026-06-24）
-# 启用方式: git config core.hooksPath .githooks  （Phase 3 D7 改造完成后再启用，见 tasks 3.6）
-# 当前 repo 默认 hooksPath 未指向此目录 → 本 hook 不生效，建好待启用。
+# .githooks/pre-commit — UIUE（2026-06-24；2026-06-25 Phase 4a 接线门并入）
+# 已启用: `git config core.hooksPath .githooks` 生效（Phase 3 D7 commit 6a3e3f9 起），本 hook 每 commit 跑。
 set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 for checker in \
   "$ROOT/Tools/checks/check-no-binary-visualstate.sh" \
-  "$ROOT/Tools/checks/check-platform-vs-version-guard.sh"; do
+  "$ROOT/Tools/checks/check-platform-vs-version-guard.sh" \
+  "$ROOT/Tools/checks/check-contentview-uses-display-catalog.sh"; do
   if [ -x "$checker" ]; then
     "$checker" || exit 1
   fi
