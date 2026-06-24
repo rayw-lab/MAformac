@@ -791,7 +791,13 @@ final class C5LoRATrainingTests: XCTestCase {
     func testPythonMaskOffsetFixtureRunsTrainingTokenizerPath() throws {
         let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
         let baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
-        XCTAssertTrue(FileManager.default.fileExists(atPath: baseModelDir.appendingPathComponent("tokenizer_config.json").path), "missing local Qwen3 tokenizer fixture")
+        guard FileManager.default.fileExists(atPath: baseModelDir.appendingPathComponent("tokenizer_config.json").path) else {
+            throw XCTSkip("missing local Qwen3 tokenizer fixture; source-free CI skips this local integration proof")
+        }
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for tokenizer fixture")
+        }
 
         let seeds = (0..<40).map { semanticSeed(id: "python-artifact-row-\($0)", fuzzy: true, free: false) }
         let initial = C5TrainingDatasetBuilder().build(
@@ -812,7 +818,7 @@ final class C5LoRATrainingTests: XCTestCase {
         try writeJSONL(initial.samples, to: samplesURL)
 
         let result = runProcess(
-            executable: "/opt/homebrew/opt/python@3.13/bin/python3.13",
+            executable: pythonExecutable,
             arguments: [
                 repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mask_offset_fixture.py").path,
                 "--model", modelDir.path,
