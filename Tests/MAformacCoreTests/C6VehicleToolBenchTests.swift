@@ -88,6 +88,57 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(cases[0].alternatives, [])
     }
 
+    func testDatasetCodecDecodesExplicitBehaviorClass() throws {
+        let jsonl = """
+        {"case_id":"C6-BC-001","behavior_class":"already_state_noop","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"no_call","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"on"},"input_zh":"打开空调","expected_tool_calls":[],"expect_no_call":true,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":[]},"clarify_tag":"implicit","failure_class":"none"}
+        """
+
+        let item = try XCTUnwrap(try C6DatasetCodec().decodeJSONL(jsonl).first)
+
+        XCTAssertEqual(item.behaviorClass, .alreadyStateNoop)
+    }
+
+    func testNoCallBucketDoesNotImplyAlreadyStateNoop() throws {
+        let item = C6BenchCase.fixture(
+            bucket: .noCall,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: [:],
+            readbackContains: [],
+            clarifyTag: .rejected
+        )
+
+        XCTAssertNil(C6CaseBehaviorClassResolver.resolve(item))
+    }
+
+    func testCoverageBucketDoesNotMapToBehaviorClass() throws {
+        let item = C6BenchCase.fixture(
+            bucket: .coverage,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: [:],
+            readbackContains: [],
+            clarifyTag: .ambiguous
+        )
+
+        XCTAssertNil(C6CaseBehaviorClassResolver.resolve(item))
+    }
+
+    func testSafetyRefusalResolvesOnlyFromRiskRuleEvidence() throws {
+        let item = C6BenchCase.fixture(
+            bucket: .refusal,
+            expectedToolCalls: [],
+            expectNoCall: true,
+            expectedStateDelta: ["vehicle.speed": "30"],
+            readbackContains: ["行驶中"],
+            clarifyTag: .rejected,
+            preState: ["vehicle.speed": "30", "vehicle.gear": "D"],
+            sourceRefs: C6SourceRefs(riskRuleIDs: ["door_open_while_moving"])
+        )
+
+        XCTAssertEqual(C6CaseBehaviorClassResolver.resolve(item), .refusalSafetyOrPolicy)
+    }
+
     func testDatasetCodecDecodesAcceptableAlternative() throws {
         let jsonl = """
         {"case_id":"C6-ALT-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off","window.position[主驾]":"0"},"input_zh":"有点闷","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none","alternatives":[{"id":"open_driver_window","expected_tool_calls":[{"name":"set_cabin_window","arguments":{"position":"主驾","percent":"20"}}],"expect_no_call":false,"expected_state_delta":{"window.position[主驾]":"20"},"readback_assertion":{"contains":["主驾","20"]},"clarify_tag":"implicit","failure_class":"none","quality":"acceptable","reason":"通风是闷热表达的可接受车控解"}]}
@@ -869,11 +920,17 @@ private extension C6BenchCase {
             "ac.power": "off",
             "screen.brightness[中控屏]": "70"
         ],
-        alternatives: [C6GoldAlternative] = []
+        alternatives: [C6GoldAlternative] = [],
+        sourceRefs: C6SourceRefs = C6SourceRefs(
+            semanticContractIDs: ["c1_fixture"],
+            stateCellIDs: ["ac.power"],
+            scenarioIDs: ["scene1"]
+        ),
+        behaviorClass: VehicleToolBehaviorClass? = nil
     ) -> C6BenchCase {
         C6BenchCase(
             caseID: "C6-FIXTURE-001",
-            sourceRefs: C6SourceRefs(semanticContractIDs: ["c1_fixture"], stateCellIDs: ["ac.power"], scenarioIDs: ["scene1"]),
+            sourceRefs: sourceRefs,
             tags: C6CaseTags(bucket: bucket, mustPass: true, mustNotTrain: true, contractDevice: "fixture", scenarioID: "scene1", sampleKind: "fixture"),
             preState: preState,
             inputZh: "fixture",
@@ -883,7 +940,8 @@ private extension C6BenchCase {
             readbackAssertion: C6ReadbackAssertion(contains: readbackContains),
             clarifyTag: clarifyTag,
             failureClass: .none,
-            alternatives: alternatives
+            alternatives: alternatives,
+            behaviorClass: behaviorClass
         )
     }
 }

@@ -168,6 +168,7 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
     public var clarifyTag: C6ClarifyTag
     public var failureClass: C6FailureClass
     public var alternatives: [C6GoldAlternative]
+    public var behaviorClass: VehicleToolBehaviorClass?
 
     enum CodingKeys: String, CodingKey {
         case caseID = "case_id"
@@ -182,6 +183,7 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         case clarifyTag = "clarify_tag"
         case failureClass = "failure_class"
         case alternatives
+        case behaviorClass = "behavior_class"
     }
 
     public init(
@@ -196,7 +198,8 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         readbackAssertion: C6ReadbackAssertion,
         clarifyTag: C6ClarifyTag,
         failureClass: C6FailureClass,
-        alternatives: [C6GoldAlternative] = []
+        alternatives: [C6GoldAlternative] = [],
+        behaviorClass: VehicleToolBehaviorClass? = nil
     ) {
         self.caseID = caseID
         self.sourceRefs = sourceRefs
@@ -210,6 +213,7 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         self.clarifyTag = clarifyTag
         self.failureClass = failureClass
         self.alternatives = alternatives
+        self.behaviorClass = behaviorClass
     }
 
     public init(from decoder: Decoder) throws {
@@ -226,6 +230,7 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         self.clarifyTag = try container.decode(C6ClarifyTag.self, forKey: .clarifyTag)
         self.failureClass = try container.decode(C6FailureClass.self, forKey: .failureClass)
         self.alternatives = try container.decodeIfPresent([C6GoldAlternative].self, forKey: .alternatives) ?? []
+        self.behaviorClass = try container.decodeIfPresent(VehicleToolBehaviorClass.self, forKey: .behaviorClass)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -242,6 +247,25 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         try container.encode(clarifyTag, forKey: .clarifyTag)
         try container.encode(failureClass, forKey: .failureClass)
         try container.encode(alternatives, forKey: .alternatives)
+        try container.encodeIfPresent(behaviorClass, forKey: .behaviorClass)
+    }
+}
+
+public enum C6CaseBehaviorClassResolver {
+    public static func resolve(_ item: C6BenchCase) -> VehicleToolBehaviorClass? {
+        if let behaviorClass = item.behaviorClass {
+            return behaviorClass
+        }
+        if !item.expectedToolCalls.isEmpty && !item.expectNoCall {
+            return .toolCall
+        }
+        if item.tags.bucket != .coverage && item.clarifyTag == .ambiguous && item.expectedToolCalls.isEmpty {
+            return .clarifyMissingSlot
+        }
+        if item.expectNoCall && !item.sourceRefs.riskRuleIDs.isEmpty {
+            return .refusalSafetyOrPolicy
+        }
+        return nil
     }
 }
 
