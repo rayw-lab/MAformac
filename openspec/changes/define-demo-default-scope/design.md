@@ -36,6 +36,8 @@ Trace: G06, G25.
 
 Every scoped C2 state cell that participates in demo execution SHALL define `default_scope`. Runtime code SHALL NOT infer omitted scope from YAML order, `scope.first`, `all`, or `全车`.
 
+Apply closeout SHALL include a mechanical SSOT gate scoped to default-resolution paths: omitted-scope resolution and state application SHALL NOT use fallback expressions such as `scope.first`, `?? "全车"`, or `?? "all"`. Explicit `全车` and accepted collection aliases remain legal fan-out inputs; the gate MUST NOT ban legitimate explicit collection tokens. C2 validation SHALL fail if a scoped demo-execution cell lacks `default_scope` or if `default_scope` is not a member of that cell's `scope`.
+
 ### AD-DS-002: Missing, explicit, and fan-out scopes are different states
 
 Trace: G04, G05, G12.
@@ -46,7 +48,7 @@ Missing scope SHALL resolve to the cell's `default_scope`. Explicit non-default 
 
 Trace: G18; UIUE intersection is `external_reference_unverified_current_head=34044e1`.
 
-The system SHALL track whether scope was `defaulted`, `explicit`, or `fanout`. Internal state assertions SHALL keep scoped keys. Presentation SHALL receive structured `scope_origin`, `resolved_scope`, and `presentation_scope_policy` metadata. Channel renderers MAY choose low-emphasis, compact, or elided default-scope wording, but SHALL preserve explicit non-default scope and explicit fan-out.
+The system SHALL track whether scope was `defaulted`, `explicit`, or `fanout`. Scope origin SHALL be produced once at target resolution as a typed value, such as a `ScopeOrigin` enum or equivalent closed type, and propagated to downstream consumers. Readback, TTS/readback policy, verifier evidence, and UIUE presentation SHALL consume that shared typed origin rather than recomputing origin from visible text, string matching, or independent `"主驾"` checks. Internal state assertions SHALL keep scoped keys. Presentation SHALL receive structured `scope_origin`, `resolved_scope`, and `presentation_scope_policy` metadata. Channel renderers MAY choose low-emphasis, compact, or elided default-scope wording, but SHALL preserve explicit non-default scope and explicit fan-out.
 
 ### AD-DS-004: UIUE low-emphasis is channel policy, not SSOT
 
@@ -72,6 +74,8 @@ Trace: G23.
 
 Legacy keys such as `hvac.temperature`, `seat.driver.heat`, `window.driver`, `lighting.ambient`, `screen.brightness`, and `fan.speed` SHALL NOT remain a second UI state source after `default_scope` lands. The implementation SHALL explicitly choose the scoped C2 key path for presentation or define a one-way compatibility adapter. Tests SHALL assert that default-scope actions do not leave demo UI presentation reading stale legacy keys.
 
+Apply closeout evidence SHALL include both legacy-key and scoped-key reads. A grep that merely records legacy keys is not sufficient; the closeout must prove that presentation reads the scoped source of truth or a one-way adapter from scoped C2 state.
+
 ### AD-DS-008: Collection aliases are closed
 
 Trace: G05.
@@ -84,17 +88,25 @@ Trace: G18, G27.
 
 Omitted scope is a target-resolution concern after a candidate exists. `clarify_tag=explicit` plus omitted scope may use fast path and then resolve through `default_scope`. `clarify_tag=implicit` may route through Qwen+LoRA and return a D-domain tool call without a scope slot; after the slow-path candidate is accepted, C3 still resolves omitted scope through `default_scope`. `clarify_tag=ambiguous` or unsupported scope wording SHALL clarify/reject rather than default silently.
 
+### AD-DS-010: C5 scope candidates derive from C2
+
+Trace: G17, G26.
+
+C5 training target rendering and fallback scope candidates SHALL derive executable scopes from C2 `scope` and omitted-scope behavior from C2 `default_scope`. C5 SHALL NOT keep a hardcoded second scope vocabulary. Tool-call output arguments may only use executable C2 scope tokens or omit the scope when omission is intentional. Raw/source synonyms such as `左前` or `右前` may be accepted as input-language variants only if they canonicalize to C2 executable scopes before target rendering and parity checks.
+
 ## Risks / Trade-offs
 
 - [Risk] Default-scope semantics get copied into C5/C6/golden/UIUE and drift again. -> Mitigation: downstream draft changes only depend on this carrier and must not redefine omitted-scope behavior.
 - [Risk] UIUE drift gets laundered into mainline evidence. -> Mitigation: record only `external_reference_unverified_current_head=34044e1`, no UIUE file:line citation, no UIUE-ready claim.
 - [Risk] OpenSpec validation is mistaken for implementation readiness. -> Mitigation: proposal, design, and tasks explicitly preserve no-training/no-eval/no-golden/no-voice/no-UIUE boundaries.
 - [Risk] Channel policy gets mistaken for state truth. -> Mitigation: require structured scope metadata and keep scoped C2 state as the state assertion surface.
+- [Risk] Mechanical enforcement becomes over-broad and bans legitimate explicit `全车` fan-out. -> Mitigation: forbid fallback expressions and independent default-resolution paths, not explicit collection tokens.
+- [Risk] C5 fixture tests freeze a non-C2 scope vocabulary. -> Mitigation: require C5/C2 parity tests and canonicalization before target rendering.
 
 ## Migration Plan
 
 1. Accept this OpenSpec carrier before applying default-scope code changes.
-2. Implement C2 `default_scope`, C3 target resolution, state applier, readback metadata, C5 target rendering, C6 gold, and demo scenario updates in a later apply pass.
+2. Implement C2 `default_scope`, C3 target resolution, state applier, readback metadata, typed scope-origin propagation, C5 target rendering, C6 gold, and demo scenario updates in a later apply pass.
 3. Reconfirm UIUE current head and file evidence in a separate UIUE reconfirm pass before UIUE merge or file:line evidence use.
 
 ## Open Questions

@@ -32,7 +32,7 @@ When a tool call omits a scoped slot such as `position`, `direction`, `screen_ty
 
 ### Requirement: Scope origin SHALL be available to presentation
 
-The system SHALL make scope origin available to readback and UIUE presentation as `defaulted`, `explicit`, or `fanout`, together with the resolved scope and a presentation policy.
+The system SHALL make scope origin available to readback and UIUE presentation as `defaulted`, `explicit`, or `fanout`, together with the resolved scope and a presentation policy. Scope origin SHALL be produced once during target resolution and propagated as structured metadata; downstream channels SHALL NOT infer it independently from localized strings or rendered text.
 
 #### Scenario: Default scope is not interruption-heavy
 
@@ -49,6 +49,13 @@ The system SHALL make scope origin available to readback and UIUE presentation a
 - **THEN** `scope_origin` is `fanout`
 - **AND** `resolved_scope` identifies the collection scope such as `全车`
 - **AND** backend state remains per-cell.
+
+#### Scenario: Explicit driver scope is not rewritten as defaulted scope
+
+- **WHEN** the user explicitly says "打开主驾车窗"
+- **THEN** execution targets `window.position[主驾]`
+- **AND** `scope_origin` is `explicit`
+- **AND** channel renderers SHALL NOT treat this as an omitted/defaulted scope.
 
 ### Requirement: Omitted scope SHALL compose with clarifyTag routing
 
