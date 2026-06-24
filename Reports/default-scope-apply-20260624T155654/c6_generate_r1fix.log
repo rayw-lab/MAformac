@@ -1,0 +1,8 @@
+[0/1] Planning build
+Building for debugging...
+[0/3] Write swift-version--58304C5D6DBC2206.txt
+Build of product 'C6BenchCLI' complete! (1.48s)
+wrote /Users/wanglei/workspace/MAformac/contracts/c6-bench-cases.jsonl
+cases=45 negative_ratio=0.422 source_refs_unresolved=0 must_pass=30 represented_devices=9/671
+
+exit_code=0

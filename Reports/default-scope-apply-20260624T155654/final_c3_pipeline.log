@@ -1,0 +1,44 @@
+$ swift test --filter C3ExecutionPipelineTests
+[0/1] Planning build
+Building for debugging...
+[0/8] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (0.66s)
+Test Suite 'Selected tests' started at 2026-06-24 16:51:47.517.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-24 16:51:47.518.
+Test Suite 'C3ExecutionPipelineTests' started at 2026-06-24 16:51:47.518.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitAllWindowScopeFansOut]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitAllWindowScopeFansOut]' passed (0.289 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitDriverScopeRemainsExplicit]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitDriverScopeRemainsExplicit]' passed (0.284 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testFanoutWritesOnlyC2SupportedWindowScopes]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testFanoutWritesOnlyC2SupportedWindowScopes]' passed (0.318 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testImplicitCandidateRequiresIntentConfirmationHook]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testImplicitCandidateRequiresIntentConfirmationHook]' passed (0.312 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testOmittedWindowScopeResolvesToC2DefaultScope]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testOmittedWindowScopeResolvesToC2DefaultScope]' passed (0.296 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPendingFailedUnknownReadbackTextDoesNotClaimCompletion]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPendingFailedUnknownReadbackTextDoesNotClaimCompletion]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineOmittedWindowScopeUsesC2DefaultAndCarriesOrigin]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineOmittedWindowScopeUsesC2DefaultAndCarriesOrigin]' passed (0.301 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineRejectsStaleStateBeforeExecution]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineRejectsStaleStateBeforeExecution]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineTurnsOnACAndAppliesExpTemperatureFromC2Step]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineTurnsOnACAndAppliesExpTemperatureFromC2Step]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testReadbackVerifierFailsWhenActualStateDiffersFromExpected]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testReadbackVerifierFailsWhenActualStateDiffersFromExpected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testRiskPolicyDeniesMovingDoorFromIndependentPolicy]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testRiskPolicyDeniesMovingDoorFromIndependentPolicy]' passed (0.293 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues]' passed (0.312 seconds).
+Test Suite 'C3ExecutionPipelineTests' passed at 2026-06-24 16:51:50.482.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 2.961 (2.964) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-24 16:51:50.482.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 2.961 (2.964) seconds
+Test Suite 'Selected tests' passed at 2026-06-24 16:51:50.482.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 2.961 (2.965) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+exit_code=0

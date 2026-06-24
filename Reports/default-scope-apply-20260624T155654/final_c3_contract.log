@@ -1,0 +1,34 @@
+$ swift test --filter C3ContractLookupTests
+[0/1] Planning build
+Building for debugging...
+[0/8] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (1.32s)
+Test Suite 'Selected tests' started at 2026-06-24 16:51:45.565.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-24 16:51:45.566.
+Test Suite 'C3ContractLookupTests' started at 2026-06-24 16:51:45.566.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testDefaultScopeMustBeInsideScope]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testDefaultScopeMustBeInsideScope]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testL1AllowlistLookupClosesReviewedDevicesToC2Cells]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testL1AllowlistLookupClosesReviewedDevicesToC2Cells]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty]' passed (0.314 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testScopedStateCellsExposeDefaultScopeFromC2]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testScopedStateCellsExposeDefaultScopeFromC2]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupFindsC1RowsAndClarifyTags]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupFindsC1RowsAndClarifyTags]' passed (0.292 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupKeepsC1RiskOutOfDemoGuard]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupKeepsC1RiskOutOfDemoGuard]' passed (0.291 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testStateCellLookupReadsExecutionRangeExpStepScopeAndReadback]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testStateCellLookupReadsExecutionRangeExpStepScopeAndReadback]' passed (0.002 seconds).
+Test Suite 'C3ContractLookupTests' passed at 2026-06-24 16:51:46.472.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.905 (0.906) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-24 16:51:46.472.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.905 (0.906) seconds
+Test Suite 'Selected tests' passed at 2026-06-24 16:51:46.472.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.905 (0.907) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+exit_code=0

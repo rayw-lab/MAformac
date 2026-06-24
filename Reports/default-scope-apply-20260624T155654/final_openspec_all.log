@@ -1,0 +1,19 @@
+$ openspec validate --all --strict
+- Validating...
+✓ change/define-demo-default-scope
+✓ change/define-demo-golden-run-and-voice
+✓ change/define-lora-data-gate
+✓ spec/demo-experience
+✓ spec/lora-training
+✓ change/migrate-d-domain-tool-surface
+✓ change/rebuild-c6-four-layer-bench
+✓ change/retrain-c5-lora-d-domain
+✓ change/run-lora-candidate-training
+✓ spec/scenario-state-protocol
+✓ spec/semantic-function-contract
+✓ spec/tool-execution
+✓ spec/vehicle-capabilities
+✓ spec/vehicle-tool-bench
+Totals: 14 passed, 0 failed (14 items)
+
+exit_code=0

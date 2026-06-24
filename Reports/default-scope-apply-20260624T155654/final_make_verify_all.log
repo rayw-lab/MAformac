@@ -1,0 +1,527 @@
+$ make verify-all
+.venv/bin/python scripts/freeze_snapshot.py --check
+/Users/wanglei/workspace/MAformac/.venv/lib/python3.13/site-packages/openpyxl/worksheet/_reader.py:329: UserWarning: Data Validation extension is not supported and will be removed
+  warn(msg)
+snapshot_id=c1-2026-06-19-9b7e4b82
+source_rows=3990
+manifest=/Users/wanglei/workspace/MAformac/contracts/source-snapshot-manifest.yaml
+.venv/bin/python scripts/gen_c1.py
+/Users/wanglei/workspace/MAformac/.venv/lib/python3.13/site-packages/openpyxl/worksheet/_reader.py:329: UserWarning: Data Validation extension is not supported and will be removed
+  warn(msg)
+contract_rows=3990
+quarantined_rows=0
+canonical_semantics=3917
+followup_transition_rows=3123
+.venv/bin/python scripts/gen_family_allowlist.py --emit --output-dir generated
+OK  ac(空调): device 25/25 intent 68/68 行 212/212
+OK  seat(座椅): device 36/36 intent 126/126 行 696/696
+OK  window(车窗): device 11/11 intent 27/27 行 82/82
+OK  door(车门): device 21/21 intent 48/48 行 129/129
+OK  light(灯光氛围): device 29/29 intent 113/113 行 468/468
+OK  screen(屏幕): device 33/33 intent 75/75 行 205/205
+OK  volume(音量): device 11/11 intent 32/32 行 153/153
+OK  wiper(雨刮): device 8/8 intent 27/27 行 80/80
+OK  sunroof(天窗遮阳帘): device 10/10 intent 30/30 行 102/102
+OK  fragrance(香氛): device 7/7 intent 16/16 行 32/32
+OK  TOTAL: device 191/191 intent 562/562 行 2159/2159
+OK  OUT_OF_SCOPE: device 480/480 intent 976/976 行 1831/1831
+wrote generated/family-device-allowlist.json
+wrote generated/10-family-device-map.json (191 devices)
+.venv/bin/python scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
+D-domain catalog: demo=562 tools / full=1538 tools (demo sanitized=[], full sanitized=['set_Ibooster_mode']); 自洽门 PASS
+.venv/bin/python scripts/verify_refs.py
+schema=ok
+refs=ok
+ledger=ok
+range_conflicts=ok
+coverage=ok
+state_cells=ok (c1_c2_closure=active) l1_closure=ok (L1_rows=76)
+risk_policy=ok (levels=3)
+demo_scenarios=ok (beats=9, status=C6-seed)
+python3 scripts/cross_section_check.py
+{
+  "anchors_checked": [
+    "mp_positive_action"
+  ],
+  "baseline_files": [
+    "docs/c5-recovery-2026-06-22/8d-rootcause.md",
+    "docs/c5-recovery-2026-06-22/dispatch-prompt-to-codex.md",
+    "docs/c5-recovery-2026-06-22/exec-plan.md",
+    "docs/c5-recovery-2026-06-22/grill-checklist-30.md",
+    "docs/c5-recovery-2026-06-22/grill-decisions-amend-execution-gap-reconciliation.md",
+    "docs/c5-recovery-2026-06-22/grill-decisions-amend-g6c-design.md",
+    "docs/c5-recovery-2026-06-22/grill-decisions-amend-harness-audit-enforce.md",
+    "docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md",
+    "docs/c5-recovery-2026-06-22/grill-decisions-amend-theta-alpha-rootcause-grill.md",
+    "docs/c5-recovery-2026-06-22/grill-decisions.md",
+    "docs/c5-recovery-2026-06-22/roadmap.md",
+    "docs/roadmap-2026-06-20-from-c6-done.md",
+    "docs/grill-tournament/cascade-inventory.md",
+    "docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md",
+    "docs/grill-tournament/final-grill-list.md",
+    "docs/grill-tournament/grill-decisions-master.md",
+    "docs/grill-tournament/ledger.md"
+  ],
+  "caliber_anchors_checked": [
+    "10 族 device",
+    "10 族 intent",
+    "族外 intent"
+  ],
+  "caliber_violations": [],
+  "consistent": true,
+  "drifts": []
+}
+.venv/bin/python scripts/surface_consistency.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
+{"c6_surface": ["adjust_ac_temperature_to_number", "adjust_ac_windspeed_to_number", "adjust_screen_brightness_to_number", "close_ac", "close_window", "lower_ac_temperature_by_exp", "lower_atmosphere_lamp_brightness_little", "lower_screen_brightness_little", "open_ac", "open_window", "open_window_little", "open_window_to_number", "query_ac_temperature", "raise_ac_temperature_by_exp", "raise_ac_windspeed_by_exp", "raise_atmosphere_lamp_brightness_little", "raise_screen_brightness_little", "switch_atmosphere_lamp_color"], "consistent": true, "generated_surface": ["adjust_ac_temperature_no_value", "adjust_ac_temperature_to_exp", "adjust_ac_temperature_to_max", "adjust_ac_temperature_to_min", "adjust_ac_temperature_to_number", "adjust_ac_wind_direction_to_value", "adjust_ac_windspeed_no_value", "adjust_ac_windspeed_to_exp", "adjust_ac_windspeed_to_max", "adjust_ac_windspeed_to_min", "adjust_ac_windspeed_to_number", "adjust_airoutlet_direction_to_value", "adjust_atmosphere_lamp_brightness_no_value", "adjust_atmosphere_lamp_brightness_to_gear", "adjust_atmosphere_lamp_brightness_to_max", "adjust_atmosphere_lamp_brightness_to_min", "adjust_atmosphere_lamp_brightness_to_number", "adjust_atmosphere_lamp_change_speed_to_gear", "adjust_atmosphere_lamp_change_speed_to_max", "adjust_atmosphere_lamp_change_speed_to_min", "adjust_blue_ray_filtering_to_gear", "adjust_designative_in_car_lamp_brightness_to_gear", "adjust_designative_in_car_lamp_brightness_to_max", "adjust_designative_in_car_lamp_brightness_to_min", "adjust_designative_in_car_lamp_brightness_to_number", "adjust_designative_in_car_lamp_color_temperature_to_gear", "adjust_designative_in_car_lamp_color_temperature_to_max", "adjust_designative_in_car_lamp_color_temperature_to_min", "adjust_designative_in_car_lamp_color_temperature_to_number", "adjust_designative_in_car_lamp_time_to_max", "adjust_designative_in_car_lamp_time_to_min", "adjust_designative_in_car_lamp_time_to_number", "adjust_designative_out_car_lamp_angle_to_gear", "adjust_designative_out_car_lamp_angle_to_max", "adjust_designative_out_car_lamp_angle_to_min", "adjust_designative_out_car_lamp_angle_to_number", "adjust_designative_out_car_lamp_time_to_max", "adjust_designative_out_car_lamp_time_to_min", "adjust_designative_out_car_lamp_time_to_number", "adjust_dimming_glass_top_brightness_to_max", "adjust_dimming_glass_top_brightness_to_min", "adjust_dimming_glass_top_brightness_to_number", "adjust_dimming_glass_top_transparency_to_gear", "adjust_dimming_glass_top_transparency_to_max", "adjust_dimming_glass_top_transparency_to_min", "adjust_dimming_glass_top_transparency_to_number", "adjust_door_height_to_gear", "adjust_door_to_number", "adjust_fragrance_intensity_to_gear", "adjust_fragrance_intensity_to_max", "adjust_fragrance_intensity_to_min", "adjust_fragrance_intensity_to_number", "adjust_headliner_to_gear", "adjust_headliner_to_number", "adjust_headrest_direction_by_number", "adjust_headrest_direction_little", "adjust_headrest_direction_to_number", "adjust_headrest_ear_slice_direction_by_number", "adjust_headrest_ear_slice_direction_little", "adjust_headrest_ear_slice_direction_to_number", "adjust_noise_volume_compensation_to_gearpeed_to_gear", "adjust_noise_volume_compensation_to_max", "adjust_noise_volume_compensation_to_min", "adjust_noise_volume_compensation_to_number", "adjust_screen_brightness_to_gear", "adjust_screen_brightness_to_max", "adjust_screen_brightness_to_min", "adjust_screen_brightness_to_number", "adjust_seat_backrest_by_number", "adjust_seat_backrest_little", "adjust_seat_backrest_to_extremum", "adjust_seat_backrest_to_number", "adjust_seat_belt_heat_temperature_to_exp", "adjust_seat_belt_heat_temperature_to_max", "adjust_seat_belt_heat_temperature_to_min", "adjust_seat_belt_heat_temperature_to_number", "adjust_seat_cushion_by_number", "adjust_seat_cushion_little", "adjust_seat_cushion_to_extremum", "adjust_seat_cushion_to_number", "adjust_seat_feet_support_by_number", "adjust_seat_feet_support_little", "adjust_seat_feet_support_to_extremum", "adjust_seat_feet_support_to_number", "adjust_seat_flank_little", "adjust_seat_flank_to_extremum", "adjust_seat_heat_temperature_to_gear", "adjust_seat_heat_temperature_to_max", "adjust_seat_heat_temperature_to_min", "adjust_seat_heat_temperature_to_number", "adjust_seat_leg_support_by_number", "adjust_seat_leg_support_little", "adjust_seat_leg_support_to_extremum", "adjust_seat_leg_support_to_number", "adjust_seat_lumbar_support_by_number", "adjust_seat_lumbar_support_little", "adjust_seat_lumbar_support_to_extremum", "adjust_seat_lumbar_support_to_number", "adjust_seat_massage_force_to_gear", "adjust_seat_massage_force_to_max", "adjust_seat_massage_force_to_min", "adjust_seat_massage_force_to_number", "adjust_seat_massage_time_to_max", "adjust_seat_massage_time_to_min", "adjust_seat_massage_time_to_number", "adjust_seat_position_by_number", "adjust_seat_position_little", "adjust_seat_position_to_extremum", "adjust_seat_position_to_number", "adjust_seat_rhythm_mode_to_gear", "adjust_seat_rhythm_mode_to_max", "adjust_seat_rhythm_mode_to_min", "adjust_seat_rhythm_mode_to_number", "adjust_seat_shoulder_support_by_number", "adjust_seat_shoulder_support_little", "adjust_seat_shoulder_support_to_extremum", "adjust_seat_shoulder_support_to_number", "adjust_seat_ventilation_windspeed_to_gear", "adjust_seat_ventilation_windspeed_to_max", "adjust_seat_ventilation_windspeed_to_min", "adjust_seat_ventilation_windspeed_to_number", "adjust_tailgate_height_to_highest", "adjust_tailgate_height_to_lowest", "adjust_tailgate_height_to_number", "adjust_volume_to_gear", "adjust_volume_to_max", "adjust_volume_to_min", "adjust_volume_to_number", "adjust_wiper_sensitivity_to_gear", "adjust_wiper_sensitivity_to_max", "adjust_wiper_sensitivity_to_min", "adjust_wiper_sensitivity_to_number", "adjust_wiper_speed_to_gear", "adjust_wiper_speed_to_max", "adjust_wiper_speed_to_min", "adjust_wiper_speed_to_number", "close_ac", "close_ac_cooling_mode", "close_ac_heating_mode", "close_ac_set_interface", "close_ac_wind_direction_to_value", "close_air_clean", "close_airoutlet", "close_airoutlet_direction_to_value", "close_atmosphere_lamp", "close_automatic_theme_switching", "close_automatic_window_closing", "close_automatic_window_opening", "close_back_window", "close_blocking_glass", "close_blower_delay_shutdown", "close_blue_ray_filtering", "close_breathe_system", "close_cabin_disinfect", "close_car_door", "close_car_film_transparency", "close_central_lock", "close_child_lock", "close_comfortable_entry_exit", "close_defog_mode", "close_defrost_mode", "close_dehumidification_mode", "close_designative_in_car_lamp", "close_designative_out_car_lamp", "close_desktop_mode", "close_dimming_glass_top", "close_dimming_glass_top_mode", "close_display_brightness_set_interface", "close_door_by_number", "close_door_little", "close_electric_tailgate_switch", "close_engine_hood", "close_fragrance", "close_fragrance_set_interface", "close_fuel_tank_cap", "close_glove_compartment", "close_glove_compartment_password", "close_headliner", "close_headrest_audio_system", "close_headrest_directional_broadcast", "close_humidifier", "close_illuminated_luggage_rack", "close_landscape_mode", "close_light_expression", "close_light_game", "close_light_sensor", "close_light_show", "close_light_theme", "close_lock_mode", "close_loop_mode", "close_loundness", "close_noise_volume_compensation", "close_other_personalize_mode", "close_remote_control_window", "close_screen", "close_screen_auto_rotate", "close_screen_brightness_mode", "close_screen_brightness_synchronization_mode", "close_screen_cleaning", "close_screen_color_mode", "close_screen_content", "close_screen_display_mode", "close_screen_navigation_lighting_effect", "close_screen_saver", "close_seat_adjustment_set_interface", "close_seat_belt_comfort_adjuster", "close_seat_belt_heat", "close_seat_belt_vibration_alert", "close_seat_folding_lock", "close_seat_heat", "close_seat_heat_mode", "close_seat_leg_support", "close_seat_massage", "close_seat_massage_mode", "close_seat_mode", "close_seat_ventilation", "close_seat_ventilation_mode", "close_split_screen", "close_sunroof", "close_sunroof_breathe_mode", "close_sunroof_by_number", "close_sunroof_heat_mode", "close_sunroof_little", "close_sunroof_tilt", "close_sunroof_to_number", "close_sunroof_ventilation_mode", "close_sunshade", "close_sunshade_by_number", "close_sunshade_little", "close_sunshade_to_number", "close_tailgate", "close_tailgate_sensing", "close_the_lighting_start_switch", "close_the_rain_sensor", "close_theme_type", "close_timed_ventilation", "close_touch_screen", "close_unlock_mode", "close_ventilation_system", "close_volume_banlance", "close_volume_external_playback_mode", "close_volume_gradually_in_and_out", "close_volume_mode", "close_wind_reduction", "close_window", "close_window_breathe_mode", "close_window_by_number", "close_window_curtain", "close_window_little", "close_window_lock", "close_window_to_number", "close_window_ventilation_mode", "close_windshield_heating", "close_wiper", "close_wiper_maintenance", "close_wiper_set_interface", "close_wiper_wash", "close_zone_synchronization_mode", "continue_light_show", "delete_seat_memory", "delete_theme", "download_theme", "enable_automatic_theme_switching", "fold_screen", "headrest_direction_adjust_to_extremum", "headrest_direction_ear_slice_adjust_to_extremum", "lock_ac", "lock_door", "lock_screen", "lower_ac_temperature_by_exp", "lower_ac_temperature_by_number", "lower_ac_windspeed_by_exp", "lower_ac_windspeed_by_number", "lower_atmosphere_lamp_brightness_by_number", "lower_atmosphere_lamp_brightness_little", "lower_atmosphere_lamp_change_speed_little", "lower_designative_in_car_lamp_brightness_by_number", "lower_designative_in_car_lamp_brightness_little", "lower_designative_in_car_lamp_color_temperature_by_number", "lower_designative_in_car_lamp_color_temperature_little", "lower_designative_in_car_lamp_time_by_number", "lower_designative_in_car_lamp_time_little", "lower_designative_out_car_lamp_angle_by_number", "lower_designative_out_car_lamp_angle_little", "lower_designative_out_car_lamp_time_by_number", "lower_designative_out_car_lamp_time_little", "lower_dimming_glass_top_brightness_by_number", "lower_dimming_glass_top_brightness_little", "lower_dimming_glass_top_transparency_by_number", "lower_dimming_glass_top_transparency_little", "lower_fragrance_intensity_by_number", "lower_fragrance_intensity_little", "lower_headliner_little", "lower_luminous_luggage_rack_brightness_little", "lower_noise_volume_compensation_by_number", "lower_noise_volume_compensation_little", "lower_screen_brightness_by_number", "lower_screen_brightness_little", "lower_seat_belt_heat_temperature_by_exp", "lower_seat_belt_heat_temperature_by_number", "lower_seat_heat_temperature_by_number", "lower_seat_heat_temperature_little", "lower_seat_massage_force_by_number", "lower_seat_massage_force_little", "lower_seat_massage_time_by_number", "lower_seat_massage_time_little", "lower_seat_rhythm_mode_by_number", "lower_seat_rhythm_mode_little", "lower_seat_ventilation_windspeed_by_number", "lower_seat_ventilation_windspeed_little", "lower_tailgate_height_by_number", "lower_tailgate_height_little", "lower_volume_by_number", "lower_volume_little", "lower_wiper_sensitivity_by_number", "lower_wiper_sensitivity_little", "lower_wiper_speed_by_number", "lower_wiper_speed_little", "move_screen_direction_to_extremum", "move_screen_to_direction", "open_ac", "open_ac_cooling_mode", "open_ac_heating_mode", "open_ac_set_interface", "open_air_clean", "open_airoutlet", "open_atmosphere_lamp", "open_automatic_window_closing", "open_automatic_window_opening", "open_back_window", "open_blocking_glass", "open_blower_delay_shutdown", "open_blue_ray_filtering", "open_breathe_system", "open_cabin_disinfect", "open_car_door", "open_car_film_transparency", "open_central_lock", "open_child_lock", "open_comfortable_entry_exit", "open_defog_mode", "open_defrost_mode", "open_dehumidification_mode", "open_designative_in_car_lamp", "open_designative_out_car_lamp", "open_dimming_glass_top", "open_display_brightness_set_interface", "open_door_by_number", "open_door_little", "open_electric_tailgate_switch", "open_engine_hood", "open_fragrance", "open_fragrance_set_interface", "open_fuel_tank_cap", "open_glove_compartment", "open_glove_compartment_password", "open_headliner", "open_headrest_audio_system", "open_headrest_directional_broadcast", "open_humidifier", "open_illuminated_luggage_rack", "open_landscape_mode", "open_light_expression", "open_light_game", "open_light_sensor", "open_light_show", "open_light_theme", "open_lock_mode", "open_loop_mode", "open_loundness", "open_noise_volume_compensation", "open_other_personalize_mode", "open_remote_control_window", "open_screen", "open_screen_auto_rotate", "open_screen_brightness_mode", "open_screen_brightness_synchronization_mode", "open_screen_cleaning", "open_screen_navigation_lighting_effect", "open_screen_saver", "open_seat_adjustment_set_interface", "open_seat_belt_comfort_adjuster", "open_seat_belt_heat", "open_seat_belt_vibration_alert", "open_seat_folding_lock", "open_seat_heat", "open_seat_heat_mode", "open_seat_leg_support", "open_seat_massage", "open_seat_massage_mode", "open_seat_mode", "open_seat_ventilation", "open_seat_ventilation_mode", "open_split_screen", "open_sunroof", "open_sunroof_breathe_mode", "open_sunroof_by_number", "open_sunroof_heat_mode", "open_sunroof_little", "open_sunroof_to_number", "open_sunroof_ventilation_mode", "open_sunshade", "open_sunshade_by_number", "open_sunshade_little", "open_sunshade_to_number", "open_tailgate", "open_tailgate_sensing", "open_the_lighting_start_switch", "open_the_rain_sensor", "open_theme_type", "open_timed_ventilation", "open_touch_screen", "open_unlock_mode", "open_ventilation_system", "open_volume_banlance", "open_volume_external_playback_mode", "open_volume_gradually_in_and_out", "open_wind_reduction", "open_window", "open_window_breathe_mode", "open_window_by_number", "open_window_curtain", "open_window_little", "open_window_lock", "open_window_to_number", "open_window_ventilation_mode", "open_windshield_heating", "open_wiper", "open_wiper_maintenance", "open_wiper_set_interface", "open_wiper_wash", "open_zone_synchronization_mode", "pause_car_door", "pause_light_show", "pause_screen_recording", "pause_seat_mode", "pause_seat_position_adjustment", "pause_sunroof_slide", "pause_sunshade_slide", "pause_tailgate", "pause_window_slide", "query_ac_temperature", "query_ac_windspeed", "query_amount_of_fragrance", "query_current_volume", "query_mode_of_fragrance", "raise_ac_temperature_by_exp", "raise_ac_temperature_by_number", "raise_ac_windspeed_by_exp", "raise_ac_windspeed_by_number", "raise_atmosphere_lamp_brightness_by_number", "raise_atmosphere_lamp_brightness_little", "raise_atmosphere_lamp_change_speed_little", "raise_designative_in_car_lamp_brightness_by_number", "raise_designative_in_car_lamp_brightness_little", "raise_designative_in_car_lamp_color_temperature_by_number", "raise_designative_in_car_lamp_color_temperature_little", "raise_designative_in_car_lamp_time_by_number", "raise_designative_in_car_lamp_time_little", "raise_designative_out_car_lamp_angle_by_number", "raise_designative_out_car_lamp_angle_little", "raise_designative_out_car_lamp_time_by_number", "raise_designative_out_car_lamp_time_little", "raise_dimming_glass_top_brightness_by_gear", "raise_dimming_glass_top_brightness_by_number", "raise_dimming_glass_top_brightness_little", "raise_dimming_glass_top_transparency_by_number", "raise_dimming_glass_top_transparency_little", "raise_fragrance_intensity_by_number", "raise_fragrance_intensity_little", "raise_headliner_little", "raise_luminous_luggage_rack_brightness_little", "raise_noise_volume_compensation_by_number", "raise_noise_volume_compensation_little", "raise_screen_brightness_by_number", "raise_screen_brightness_little", "raise_seat_belt_heat_temperature_by_exp", "raise_seat_belt_heat_temperature_by_number", "raise_seat_heat_temperature_by_number", "raise_seat_heat_temperature_little", "raise_seat_massage_force_by_number", "raise_seat_massage_force_little", "raise_seat_massage_time_by_number", "raise_seat_massage_time_little", "raise_seat_rhythm_mode_by_number", "raise_seat_rhythm_mode_little", "raise_seat_ventilation_windspeed_by_number", "raise_seat_ventilation_windspeed_little", "raise_tailgate_height_by_number", "raise_tailgate_height_little", "raise_volume_by_number", "raise_volume_little", "raise_wiper_sensitivity_by_number", "raise_wiper_sensitivity_little", "raise_wiper_speed_by_number", "raise_wiper_speed_little", "reset_screen_direction", "rotate_screen_to_direction", "rotate_screen_to_extremum", "save_seat_mode", "screen_module_zoom_in", "screen_module_zoom_out", "screen_rotate", "seat_memory_bind", "set_desktop_mode", "set_dimming_glass_top_color", "set_dimming_glass_top_mode", "set_door_speed_to_gear", "set_door_speed_to_number", "set_fragrance_time", "set_glove_compartment_password", "set_headrest_audio_system_mode", "set_instrument_screen_mode", "set_luminous_luggage_rack_color", "set_maximum_of_door_opening_to_number", "set_screen_color_mode", "set_screen_display_mode", "set_screen_saver", "set_tailgate_opening_upper_limit", "set_theme", "set_timed_ventilation_interval", "set_volume_mode", "set_wallpaper", "split_screen_max", "split_screen_min", "start_screen_recording", "stop_screen_recording", "sunroof_tilt", "switch_ac_mode", "switch_ac_wind_direction", "switch_atmosphere_lamp_color", "switch_atmosphere_lamp_mode", "switch_designative_out_car_lamp_mode", "switch_desktop_mode", "switch_dimming_glass_top_color", "switch_dimming_glass_top_mode", "switch_fragrance_mode", "switch_headrest_audio_system_mode", "switch_light_expression", "switch_light_show", "switch_light_theme", "switch_loop_mode", "switch_luminous_luggage_rack_color", "switch_screen_color_mode", "switch_screen_content", "switch_screen_display_mode", "switch_screen_saver", "switch_seat_heat_mode", "switch_seat_massage_mode", "switch_seat_mode", "switch_seat_ventilation_mode", "switch_split_screen", "switch_theme", "switch_volume_mode", "switch_wallpaper", "switch_wiper_mode", "unfold_screen", "unlock_ac", "unlock_door", "unlock_screen", "volume_mute", "volume_unmute"], "missing_in_generated": []}
+.venv/bin/python scripts/verify_gold.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
+{"gold_apply_100": true, "total_cases": 57, "violation_count": 0, "violations": []}
+.venv/bin/python scripts/check_default_scope_ssot.py
+default-scope-ssot: pass
+.venv/bin/python scripts/check_c5_c2_scope_parity.py
+c5-c2-scope-parity: pass
+.venv/bin/python scripts/check_scope_origin_single_source.py
+scope-origin-single-source: pass
+git diff --exit-code -- contracts/source-snapshot-manifest.yaml contracts/semantic-function-contract.jsonl contracts/semantic-followup-transitions.jsonl contracts/semantic-quarantine.jsonl contracts/function-spec-full.yaml contracts/semantic-coverage-report.md generated/family-device-allowlist.json generated/10-family-device-map.json generated/B_frame.frame_schema.json generated/D_domain.tools.json generated/D_domain.tools.demo.json generated/D_domain.tools.full.json generated/d_domain_ir_map.json generated/strangler_map.json generated/rendered_tools_text contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml scripts Makefile
+.venv/bin/python scripts/test_quarantine.py
+  [PASS] valid 行: kind=valid reason=None
+  [PASS] merged-cell residual(全空残留行): kind=quarantine reason=empty_semantics
+  [PASS] 空语义(有功能名无 DS): kind=quarantine reason=empty_semantics
+  [PASS] malformed DS(坏 json): kind=quarantine reason=malformed
+  [PASS] 缺 service/intent(合法 json 但语义空): kind=quarantine reason=malformed
+
+test_quarantine=ok (脏行被 quarantine 分流, valid 不洗白)
+.venv/bin/python scripts/test_fc_flags.py
+  [PASS] fc_is_yes('是') actual=True expected=True
+  [PASS] fc_is_yes('否') actual=False expected=False
+  [PASS] fc_is_yes('') actual=False expected=False
+  [PASS] fc_is_yes(None) actual=False expected=False
+  [PASS] fc_is_yes(' 是 ') actual=True expected=True
+  [PASS] classify fuzzy "否" is false
+  [PASS] classify free "否" is false
+  [PASS] all-no row is explicit explicit
+  [PASS] "否" fuzzy hash remains traceable
+  [PASS] "否" free hash remains traceable
+  [PASS] empty fuzzy is false
+  [PASS] None free is false
+  [PASS] empty/None row is explicit explicit
+  [PASS] trimmed fuzzy "是" is true
+  [PASS] free "否" stays false when fuzzy is true
+  [PASS] fuzzy yes row is implicit implicit
+  [PASS] merged-filled yes row remains implicit implicit
+  [PASS] explicit "否" row after merged-filled yes is still false {'fuzzy': False, 'free': False, 'fuzzy_hash': '0c70665b6eb65f1aebf3b59f684ce52ed3473b2443ed4b4e0b815e2e9d66b8c2', 'free_hash': '0c70665b6eb65f1aebf3b59f684ce52ed3473b2443ed4b4e0b815e2e9d66b8c2'} explicit
+
+test_fc_flags=ok (FC 是/否/空/None/空白 normalization is correct)
+.venv/bin/python scripts/test_tool_name_sanitize.py
+  [PASS] set_Ibooster_mode → set_ibooster_mode(lower)
+  [PASS] already-snake_case 不改(was_sanitized=False)
+  [PASS] D_domain.tools.demo.json: 562 名全 snake_case 合法(非法=[])
+  [PASS] D_domain.tools.full.json: 1538 名全 snake_case 合法(非法=[])
+  [PASS] full catalog 含 set_ibooster_mode(sanitized)
+  [PASS] full catalog 不含 set_Ibooster_mode(原大写)
+
+test_tool_name_sanitize=ok (D-domain 工具名 snake_case sanitize 正确)
+swift test
+[0/1] Planning build
+Building for debugging...
+[0/8] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (1.11s)
+Test Suite 'All tests' started at 2026-06-24 16:53:26.581.
+Test Suite 'MAformacPackageTests.xctest' started at 2026-06-24 16:53:26.582.
+Test Suite 'C3AllowlistPrimitiveGateTests' started at 2026-06-24 16:53:26.582.
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceExecutesReviewedPrimitive]' started.
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceExecutesReviewedPrimitive]' passed (0.277 seconds).
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceRejectsNonReviewedPrimitive]' started.
+Test Case '-[MAformacCoreTests.C3AllowlistPrimitiveGateTests testAllowlistedDeviceRejectsNonReviewedPrimitive]' passed (0.267 seconds).
+Test Suite 'C3AllowlistPrimitiveGateTests' passed at 2026-06-24 16:53:27.126.
+	 Executed 2 tests, with 0 failures (0 unexpected) in 0.544 (0.544) seconds
+Test Suite 'C3ContractLookupTests' started at 2026-06-24 16:53:27.126.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testDefaultScopeMustBeInsideScope]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testDefaultScopeMustBeInsideScope]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testL1AllowlistLookupClosesReviewedDevicesToC2Cells]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testL1AllowlistLookupClosesReviewedDevicesToC2Cells]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testRiskPolicyLookupUsesIndependentForbiddenRuleWhenC1RiskIsEmpty]' passed (0.270 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testScopedStateCellsExposeDefaultScopeFromC2]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testScopedStateCellsExposeDefaultScopeFromC2]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupFindsC1RowsAndClarifyTags]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupFindsC1RowsAndClarifyTags]' passed (0.270 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupKeepsC1RiskOutOfDemoGuard]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testSemanticContractLookupKeepsC1RiskOutOfDemoGuard]' passed (0.267 seconds).
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testStateCellLookupReadsExecutionRangeExpStepScopeAndReadback]' started.
+Test Case '-[MAformacCoreTests.C3ContractLookupTests testStateCellLookupReadsExecutionRangeExpStepScopeAndReadback]' passed (0.005 seconds).
+Test Suite 'C3ContractLookupTests' passed at 2026-06-24 16:53:27.942.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.816 (0.816) seconds
+Test Suite 'C3DecodeCompletionMetaTests' started at 2026-06-24 16:53:27.942.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testDecodeInputDefaultsKeepBackwardCompatibleStringPath]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testDecodeInputDefaultsKeepBackwardCompatibleStringPath]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testLengthFinishReasonRejectsBeforeRepairEvenWithParseableJSON]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testLengthFinishReasonRejectsBeforeRepairEvenWithParseableJSON]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testMultipleToolCallCountRejectedAsMultipleFrames]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testMultipleToolCallCountRejectedAsMultipleFrames]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testStopFinishReasonWithSingleCallDecodesNormally]' started.
+Test Case '-[MAformacCoreTests.C3DecodeCompletionMetaTests testStopFinishReasonWithSingleCallDecodesNormally]' passed (0.000 seconds).
+Test Suite 'C3DecodeCompletionMetaTests' passed at 2026-06-24 16:53:27.943.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'C3ExecutionPipelineTests' started at 2026-06-24 16:53:27.943.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitAllWindowScopeFansOut]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitAllWindowScopeFansOut]' passed (0.272 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitDriverScopeRemainsExplicit]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testExplicitDriverScopeRemainsExplicit]' passed (0.270 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testFanoutWritesOnlyC2SupportedWindowScopes]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testFanoutWritesOnlyC2SupportedWindowScopes]' passed (0.269 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testImplicitCandidateRequiresIntentConfirmationHook]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testImplicitCandidateRequiresIntentConfirmationHook]' passed (0.267 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testOmittedWindowScopeResolvesToC2DefaultScope]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testOmittedWindowScopeResolvesToC2DefaultScope]' passed (0.272 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPendingFailedUnknownReadbackTextDoesNotClaimCompletion]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPendingFailedUnknownReadbackTextDoesNotClaimCompletion]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineOmittedWindowScopeUsesC2DefaultAndCarriesOrigin]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineOmittedWindowScopeUsesC2DefaultAndCarriesOrigin]' passed (0.273 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineRejectsStaleStateBeforeExecution]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineRejectsStaleStateBeforeExecution]' passed (0.270 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineTurnsOnACAndAppliesExpTemperatureFromC2Step]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testPipelineTurnsOnACAndAppliesExpTemperatureFromC2Step]' passed (0.270 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testReadbackVerifierFailsWhenActualStateDiffersFromExpected]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testReadbackVerifierFailsWhenActualStateDiffersFromExpected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testRiskPolicyDeniesMovingDoorFromIndependentPolicy]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testRiskPolicyDeniesMovingDoorFromIndependentPolicy]' passed (0.275 seconds).
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues]' started.
+Test Case '-[MAformacCoreTests.C3ExecutionPipelineTests testScreenAndAmbientValueNormalizationUseC2RangesAndAllowedValues]' passed (0.269 seconds).
+Test Suite 'C3ExecutionPipelineTests' passed at 2026-06-24 16:53:30.650.
+	 Executed 12 tests, with 0 failures (0 unexpected) in 2.706 (2.706) seconds
+Test Suite 'C3ParamShapeNormalizationTests' started at 2026-06-24 16:53:30.650.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testArrayShapedValueIsNotSilentlyDroppedButRejected]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testArrayShapedValueIsNotSilentlyDroppedButRejected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testScalarShapedValueIsNotSilentlyDroppedButRejected]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testScalarShapedValueIsNotSilentlyDroppedButRejected]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONSlotMapIsParsed]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONSlotMapIsParsed]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueObjectIsParsedAndNormalized]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueObjectIsParsedAndNormalized]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueStillEnforcesTypeEnum]' started.
+Test Case '-[MAformacCoreTests.C3ParamShapeNormalizationTests testStringifiedJSONValueStillEnforcesTypeEnum]' passed (0.000 seconds).
+Test Suite 'C3ParamShapeNormalizationTests' passed at 2026-06-24 16:53:30.651.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'C3ReadbackTemplateTests' started at 2026-06-24 16:53:30.651.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testACPowerReadbackResolvesEnumBranchFromC2Template]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testACPowerReadbackResolvesEnumBranchFromC2Template]' passed (0.268 seconds).
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testExplicitDriverWindowReadbackKeepsDriverTextAndOrigin]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testExplicitDriverWindowReadbackKeepsDriverTextAndOrigin]' passed (0.272 seconds).
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testOmittedWindowReadbackElidesDefaultDriverScopeButCarriesOrigin]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testOmittedWindowReadbackElidesDefaultDriverScopeButCarriesOrigin]' passed (0.310 seconds).
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testTemperatureReadbackUsesC2TemplateWithScopeAndValue]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testTemperatureReadbackUsesC2TemplateWithScopeAndValue]' passed (0.270 seconds).
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testWindowReadbackUsesC2PercentTemplate]' started.
+Test Case '-[MAformacCoreTests.C3ReadbackTemplateTests testWindowReadbackUsesC2PercentTemplate]' passed (0.300 seconds).
+Test Suite 'C3ReadbackTemplateTests' passed at 2026-06-24 16:53:32.071.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 1.420 (1.421) seconds
+Test Suite 'C3ToolCallFrameAndDecodeTests' started at 2026-06-24 16:53:32.071.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testContentFallbackIsDisabledByDefault]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testContentFallbackIsDisabledByDefault]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNoActionAndClarifyFramesAreAcceptedAsSingleFrame]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNoActionAndClarifyFramesAreAcceptedAsSingleFrame]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNonStreamingCompletionStripsThinkingAndParsesFencedJSONCandidate]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testNonStreamingCompletionStripsThinkingAndParsesFencedJSONCandidate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testRuntimeUnionAcceptsExactlyOneFrameAndRejectsMultiFrame]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testRuntimeUnionAcceptsExactlyOneFrameAndRejectsMultiFrame]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrictDecodeMapsUnknownEnumToSchemaInvalidWithoutCrash]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrictDecodeMapsUnknownEnumToSchemaInvalidWithoutCrash]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrongToolCallFrameCodableRoundTripKeepsC1C2Fields]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testStrongToolCallFrameCodableRoundTripKeepsC1C2Fields]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testThinkingLeakIsRecordedAsFailure]' started.
+Test Case '-[MAformacCoreTests.C3ToolCallFrameAndDecodeTests testThinkingLeakIsRecordedAsFailure]' passed (0.000 seconds).
+Test Suite 'C3ToolCallFrameAndDecodeTests' passed at 2026-06-24 16:53:32.073.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'C3TraceAttributesTests' started at 2026-06-24 16:53:32.073.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testGuardDeniedTraceRecordsGuardReasonAndNoFakeExecuteReadback]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testGuardDeniedTraceRecordsGuardReasonAndNoFakeExecuteReadback]' passed (0.281 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testParserRepairCandidateMarksRepairUsedInTrace]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testParserRepairCandidateMarksRepairUsedInTrace]' passed (0.271 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testSuccessfulExecutionRecordsStructuredAttributesAcrossFiveStages]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testSuccessfulExecutionRecordsStructuredAttributesAcrossFiveStages]' passed (0.269 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntriesCarryRunTreeFieldsWithoutChangingFiveStages]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntriesCarryRunTreeFieldsWithoutChangingFiveStages]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntryDecodesOldRecordsWithDefaultSpanKind]' started.
+Test Case '-[MAformacCoreTests.C3TraceAttributesTests testTraceEntryDecodesOldRecordsWithDefaultSpanKind]' passed (0.000 seconds).
+Test Suite 'C3TraceAttributesTests' passed at 2026-06-24 16:53:32.894.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.821 (0.821) seconds
+Test Suite 'C5DataGateTests' started at 2026-06-24 16:53:32.894.
+Test Case '-[MAformacCoreTests.C5DataGateTests testBareJSONTrainActionFailsFormatGate]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testBareJSONTrainActionFailsFormatGate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testC6MustPassInTrainFails]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testC6MustPassInTrainFails]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testCandidateParentSemanticIDOverridesSeedParentForOverlap]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testCandidateParentSemanticIDOverridesSeedParentForOverlap]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testCandidateParentSemanticOverlapInTrainFailsEvenWhenSeedParentIsSafe]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testCandidateParentSemanticOverlapInTrainFailsEvenWhenSeedParentIsSafe]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testCleanReceiptIsDataGateReady]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testCleanReceiptIsDataGateReady]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testDevSelectionIsWhitelistedAndDoesNotProtectParentOverlap]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testDevSelectionIsWhitelistedAndDoesNotProtectParentOverlap]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testLegacyRawCandidateSchemaDecodes]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testLegacyRawCandidateSchemaDecodes]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5DataGateTests testParentSemanticOverlapInTrainFails]' started.
+Test Case '-[MAformacCoreTests.C5DataGateTests testParentSemanticOverlapInTrainFails]' passed (0.000 seconds).
+Test Suite 'C5DataGateTests' passed at 2026-06-24 16:53:32.898.
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.004 (0.005) seconds
+Test Suite 'C5LoRATrainingTests' started at 2026-06-24 16:53:32.898.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderKeepsExecutionTierSeparateFromRouteTier]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderKeepsExecutionTierSeparateFromRouteTier]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderProducesRequiredMetadataAndRuleRehearsalRatio]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testBuilderProducesRequiredMetadataAndRuleRehearsalRatio]' passed (0.021 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testC5EmitsHeterogeneousValueKeyMatchingC6ForNumberIntents]' passed (0.100 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testCandidateDataQualityGateBlocksDiversityCapAndAmbiguousDuplicates]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testCandidateDataQualityGateBlocksDiversityCapAndAmbiguousDuplicates]' passed (0.045 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainCatalogMissIsFailClosedNotFrameFallback]' started.
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+S4_DDOMAIN_MISS intent=nonexistent_intent_zzz not in catalog(562) — fail-closed skip(不 fallback frame), scope filter should prevent
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainCatalogMissIsFailClosedNotFrameFallback]' passed (0.099 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainDistractorsAreRealCatalogToolsSameFamily]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainDistractorsAreRealCatalogToolsSameFamily]' passed (0.094 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainEmitsValueArgAndOnlySchemaKeys]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainEmitsValueArgAndOnlySchemaKeys]' passed (0.090 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainNoCallCounterfactualPhysicallyRemovesTargetTool]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainNoCallCounterfactualPhysicallyRemovesTargetTool]' passed (0.094 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainScopeDemoFiltersOutOfCatalogIntents]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainScopeDemoFiltersOutOfCatalogIntents]' passed (0.093 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainSurfaceEmitsIntentAsToolNameNotFrame]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testDDomainSurfaceEmitsIntentAsToolNameNotFrame]' passed (0.088 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testEndpointTokenizerParityRequiresByteExactEndpointRender]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testEndpointTokenizerParityRequiresByteExactEndpointRender]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testExplicitScopeCandidatesDeriveFromC2Vocabulary]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testExplicitScopeCandidatesDeriveFromC2Vocabulary]' passed (0.004 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFirstCandidateScaleAuthorityDefaultsTo20AndBlocksLegacy32]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFirstCandidateScaleAuthorityDefaultsTo20AndBlocksLegacy32]' passed (0.043 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFixedSemanticSlotsOverrideFallbackWhenRangeIsAbsent]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFixedSemanticSlotsOverrideFallbackWhenRangeIsAbsent]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFormalTrainingBlocksUnverifiedTrainingLoopSource]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFormalTrainingBlocksUnverifiedTrainingLoopSource]' passed (0.043 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFrameSurfaceBackwardCompatWhenCatalogEmpty]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testFrameSurfaceBackwardCompatWhenCatalogEmpty]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneralizationDiagnosticAndFuseParityFailClosed]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneralizationDiagnosticAndFuseParityFailClosed]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedNaturalChineseRecordsDriveGeneratorJudgeAndLineageReceipts]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedNaturalChineseRecordsDriveGeneratorJudgeAndLineageReceipts]' passed (0.017 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedRecordCandidateParentIsRecomputedFromFinalUtteranceAndToolCall]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testGeneratedRecordCandidateParentIsRecomputedFromFinalUtteranceAndToolCall]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testMLXConfigUsesScaleAndExcludesEmbeddings]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testMLXConfigUsesScaleAndExcludesEmbeddings]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testNoCallCounterfactualsArePairedAndCapped]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testNoCallCounterfactualsArePairedAndCapped]' passed (0.008 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetArtifactAuthorityRequiresApprovedDigestUnlessRegeneratedSamePath]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetArtifactAuthorityRequiresApprovedDigestUnlessRegeneratedSamePath]' passed (0.059 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetFixtureRequiresTrueTokenArtifactEvenWhenTokenizerPatchFlagIsSet]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOffsetFixtureRequiresTrueTokenArtifactEvenWhenTokenizerPatchFlagIsSet]' passed (0.028 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOmittedWindowTrainingTargetOmitsPositionScope]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testOmittedWindowTrainingTargetOmitsPositionScope]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testPythonMaskOffsetFixtureRunsTrainingTokenizerPath]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testPythonMaskOffsetFixtureRunsTrainingTokenizerPath]' passed (1.153 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testReceiptSummarizesMaskingCompleteStage]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testReceiptSummarizesMaskingCompleteStage]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testRouteTierDerivesFromNormalizedFCFlagsWithFreeTakingPrecedence]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testRouteTierDerivesFromNormalizedFCFlagsWithFreeTakingPrecedence]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSampleIDsStayUniqueAcrossRouteTierBatchesAndDevSelectionIsExact]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSampleIDsStayUniqueAcrossRouteTierBatchesAndDevSelectionIsExact]' passed (0.025 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSlotPlaceholdersAreRenderedAsConcreteValuesInUserAndAssistant]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSlotPlaceholdersAreRenderedAsConcreteValuesInUserAndAssistant]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSmokeOnlyStageIsChainDataButNotTrainEligible]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testSmokeOnlyStageIsChainDataButNotTrainEligible]' passed (0.021 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors]' passed (0.008 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolCallPayloadRendersNameBeforeArgumentsButKeepsArgumentsCanonical]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolCallPayloadRendersNameBeforeArgumentsButKeepsArgumentsCanonical]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolContractCompilerDerivesEnumsFromSemanticSeeds]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testToolContractCompilerDerivesEnumsFromSemanticSeeds]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityFailsClosedWhenArchiveAuthorityIsMissing]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityFailsClosedWhenArchiveAuthorityIsMissing]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityUsesArchivedMethodContract]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingMethodContractAuthorityUsesArchivedMethodContract]' passed (0.043 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingSampleUsesSeedLocalContractDerivedSchema]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testTrainingSampleUsesSeedLocalContractDerivedSchema]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testVerifiedTrainingLoopSourceUnblocksFormalTrainingGate]' started.
+Test Case '-[MAformacCoreTests.C5LoRATrainingTests testVerifiedTrainingLoopSourceUnblocksFormalTrainingGate]' passed (0.042 seconds).
+Test Suite 'C5LoRATrainingTests' passed at 2026-06-24 16:53:35.129.
+	 Executed 38 tests, with 0 failures (0 unexpected) in 2.228 (2.230) seconds
+Test Suite 'C6VehicleToolBenchTests' started at 2026-06-24 16:53:35.129.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAcceptableAlternativeCanSatisfyHardGatesWhenPrimaryFails]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAllMustPassToolNamesAreInDDomainCatalog]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testAllMustPassToolNamesAreInDDomainCatalog]' passed (0.364 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testC5C6ValueKeyParityForNumberIntent]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testC5C6ValueKeyParityForNumberIntent]' passed (0.362 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testClarifyAndRefusalCorrectnessBlocksWrongAction]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testClarifyAndRefusalCorrectnessBlocksWrongAction]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierAcceptsBFrameWindowAndScreenSurfaces]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierAcceptsBFrameWindowAndScreenSurfaces]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierNormalizesDAndBFramesToSameStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testContractApplierNormalizesDAndBFramesToSameStateDelta]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDecodesAcceptableAlternative]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDecodesAcceptableAlternative]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDefaultsMissingAlternativesToEmptyArray]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetCodecDefaultsMissingAlternativesToEmptyArray]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetGenerationCarriesSchemaRefsNegativeRatioAndMustNotTrain]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDatasetGenerationCarriesSchemaRefsNegativeRatioAndMustNotTrain]' passed (0.281 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowCasesSeparateOmittedAndFanout]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowCasesSeparateOmittedAndFanout]' passed (0.276 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowGoldVerificationCarriesScopeOriginEvidence]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDefaultScopeWindowGoldVerificationCarriesScopeOriginEvidence]' passed (0.285 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDegradedAndUnknownAlternativesDoNotSatisfyHardGates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testDegradedAndUnknownAlternativesDoNotSatisfyHardGates]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testExpectNoCallGateCountsFalsePositive]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testExpectNoCallGateCountsFalsePositive]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFileHashChangesWhenFileContentChanges]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFileHashChangesWhenFileContentChanges]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFormatDigestChangesWhenFormatFileContentChanges]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testFormatDigestChangesWhenFormatFileContentChanges]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayFailsWithoutIRMapProvingThreadingIsLoadBearing]' started.
+[ToolContractNormalizer] unclassified tool name: open_ac
+[ToolContractNormalizer] unclassified tool name: open_ac
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayFailsWithoutIRMapProvingThreadingIsLoadBearing]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayPassesForMigratedDDomainDataset]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldReplayPassesForMigratedDDomainDataset]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsMutatingToolWithoutExpectedStateDelta]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsStateChangingGoldWithoutC2ReadbackTemplate]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierFailsWhenToolCallsDoNotReachExpectedStateDelta]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierHappyPathReplaysPrimaryGold]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierHappyPathReplaysPrimaryGold]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierMarksNoCallReadbackNonApplicableInsteadOfPass]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierTreatsAcceptableAlternativeAsCaseValid]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testGoldVerifierTreatsAcceptableAlternativeAsCaseValid]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testJudgeSchemaOnlyRunsAfterHardGatesPassAndHasNoHardGateFields]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testLoRAIdentifierRequiresAdapterDigest]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testLoRAIdentifierRequiresAdapterDigest]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingModelArtifactDigestFailsFingerprintGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingModelArtifactDigestFailsFingerprintGate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingTokenizerDigestFailsFingerprintGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testMissingTokenizerDigestFailsFingerprintGate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallCaseDoesNotReportFakeReadbackPass]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallCaseDoesNotReportFakeReadbackPass]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallPreconditionStateDoesNotInvokeReadbackGate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testNoCallPreconditionStateDoesNotInvokeReadbackGate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsAssertionOnlyMatchWhenC2TemplateIsMissing]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsMachineStringAndAcceptsC2RenderedChinese]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsNegatedTokenMatch]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateRejectsNegatedTokenMatch]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateUsesEnumBranchFromStateCellTemplate]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReadbackGateUsesEnumBranchFromStateCellTemplate]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testRefusalGateRequiresTextEvidenceWhenAssertionIsProvided]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReplayFingerprintRecordsArtifactDigestsAsRequiredFields]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testReplayFingerprintRecordsArtifactDigestsAsRequiredFields]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testStateDeltaAndReadbackAreSeparateHardGates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testStateDeltaAndReadbackAreSeparateHardGates]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryKeepsCoverageAndScenarioAxesSeparateAndSupportsBaseLoRADiffIndex]' passed (0.278 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testSummaryRecordsArtifactDigestsAtTopLevelAndEachEvalRun]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testToolCallSetGateRejectsMissingExtraWrongArgumentsAndDuplicates]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives]' started.
+Test Case '-[MAformacCoreTests.C6VehicleToolBenchTests testTrackedDatasetDecodesValidatesTrapCasesAndAlternatives]' passed (0.269 seconds).
+Test Suite 'C6VehicleToolBenchTests' passed at 2026-06-24 16:53:37.848.
+	 Executed 40 tests, with 0 failures (0 unexpected) in 2.718 (2.720) seconds
+Test Suite 'CapabilityContractFileTests' started at 2026-06-24 16:53:37.848.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractDefinesEightReachableMvpCapabilities]' started.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractDefinesEightReachableMvpCapabilities]' passed (0.005 seconds).
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractIsFailClosedForSensitiveSourceLeakage]' started.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractIsFailClosedForSensitiveSourceLeakage]' passed (0.005 seconds).
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractMarksHistoricalDraftsSuperseded]' started.
+Test Case '-[MAformacCoreTests.CapabilityContractFileTests testCapabilityContractMarksHistoricalDraftsSuperseded]' passed (0.000 seconds).
+Test Suite 'CapabilityContractFileTests' passed at 2026-06-24 16:53:37.859.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.010 (0.011) seconds
+Test Suite 'DemoExperienceAcceptanceScaffoldTests' started at 2026-06-24 16:53:37.859.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testPendingStateDoesNotMasqueradeAsSuccessPlaceholderIsRunnable]' started.
+/Users/wanglei/workspace/MAformac/Tests/MAformacCoreTests/DemoExperienceAcceptanceScaffoldTests.swift:13: -[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testPendingStateDoesNotMasqueradeAsSuccessPlaceholderIsRunnable] : Test skipped - pending/failed/unknown readback assertions are owned by define-execution-contract.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testPendingStateDoesNotMasqueradeAsSuccessPlaceholderIsRunnable]' skipped (0.001 seconds).
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testReadbackMismatchAcceptanceMetricPlaceholderIsRunnable]' started.
+/Users/wanglei/workspace/MAformac/Tests/MAformacCoreTests/DemoExperienceAcceptanceScaffoldTests.swift:5: -[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testReadbackMismatchAcceptanceMetricPlaceholderIsRunnable] : Test skipped - readback mismatch=0 acceptance metric is owned by define-vehicle-tool-bench.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testReadbackMismatchAcceptanceMetricPlaceholderIsRunnable]' skipped (0.000 seconds).
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testUnsafeFalsePassAcceptanceMetricPlaceholderIsRunnable]' started.
+/Users/wanglei/workspace/MAformac/Tests/MAformacCoreTests/DemoExperienceAcceptanceScaffoldTests.swift:9: -[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testUnsafeFalsePassAcceptanceMetricPlaceholderIsRunnable] : Test skipped - Unsafe false pass=0 acceptance metric is owned by define-execution-contract.
+Test Case '-[MAformacCoreTests.DemoExperienceAcceptanceScaffoldTests testUnsafeFalsePassAcceptanceMetricPlaceholderIsRunnable]' skipped (0.000 seconds).
+Test Suite 'DemoExperienceAcceptanceScaffoldTests' passed at 2026-06-24 16:53:37.861.
+	 Executed 3 tests, with 3 tests skipped and 0 failures (0 unexpected) in 0.001 (0.001) seconds
+Test Suite 'ToolContractCompilerTests' started at 2026-06-24 16:53:37.861.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testC3ExecutionCellReusesDeviceCellMapSingleSource]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testC3ExecutionCellReusesDeviceCellMapSingleSource]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDDomainSurfaceConsumesCatalogNotHardcoded]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDDomainSurfaceConsumesCatalogNotHardcoded]' passed (0.089 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDeviceCellMapAllValuesExistInStateCells]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testDeviceCellMapAllValuesExistInStateCells]' passed (0.005 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testEmptyCatalogProducesEmptySurface]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testEmptyCatalogProducesEmptySurface]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testFrameSchemaKeptForStrangler]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testFrameSchemaKeptForStrangler]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testLoadDDomainCatalogProduces562Tools]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testLoadDDomainCatalogProduces562Tools]' passed (0.088 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainMultiPrimitiveDisambiguation]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainMultiPrimitiveDisambiguation]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainSinglePrimitive]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeDDomainSinglePrimitive]' passed (0.001 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeOldSurfaceStranglerKept]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeOldSurfaceStranglerKept]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeUnknownToolReturnsEmpty]' started.
+[ToolContractNormalizer] unclassified tool name: nonexistent_tool_xyz
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testNormalizeUnknownToolReturnsEmpty]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testRenderedToolsTextOnlyDDomainNoGenericFrame]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testRenderedToolsTextOnlyDDomainNoGenericFrame]' passed (0.127 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testS3FamilyDeviceWritesStateNotUnmapped]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testS3FamilyDeviceWritesStateNotUnmapped]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDataDrivenEndToEndDDomainTool]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDataDrivenEndToEndDDomainTool]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDefaultFromCellMetadata]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierDefaultFromCellMetadata]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierExpStepFromCellMetadata]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierExpStepFromCellMetadata]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierFansOutOnlyForExplicitCollectionAlias]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierFansOutOnlyForExplicitCollectionAlias]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierRejectsOutOfScopeWindowWithoutBaseCellFallback]' started.
+[ToolContractStateApplier] unmapped device/cell: window.position.scope
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierRejectsOutOfScopeWindowWithoutBaseCellFallback]' passed (0.003 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUnmappedDeviceNoWrite]' started.
+[ToolContractStateApplier] unmapped device/cell: seat_heat
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUnmappedDeviceNoWrite]' passed (0.002 seconds).
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUsesC2DefaultScopeForOmittedWindow]' started.
+Test Case '-[MAformacCoreTests.ToolContractCompilerTests testStateApplierUsesC2DefaultScopeForOmittedWindow]' passed (0.003 seconds).
+Test Suite 'ToolContractCompilerTests' passed at 2026-06-24 16:53:38.190.
+	 Executed 19 tests, with 0 failures (0 unexpected) in 0.329 (0.330) seconds
+Test Suite 'VehicleStateStoreContractTests' started at 2026-06-24 16:53:38.190.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testDefaultCellsMatchCapabilityMvpSet]' started.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testDefaultCellsMatchCapabilityMvpSet]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testPresentationCellsUseScopedC2KeysInsteadOfLegacyDisplayKeys]' started.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testPresentationCellsUseScopedC2KeysInsteadOfLegacyDisplayKeys]' passed (0.000 seconds).
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testSuccessfulMockTransitionUsesSatisfiedVisualState]' started.
+Test Case '-[MAformacCoreTests.VehicleStateStoreContractTests testSuccessfulMockTransitionUsesSatisfiedVisualState]' passed (0.000 seconds).
+Test Suite 'VehicleStateStoreContractTests' passed at 2026-06-24 16:53:38.191.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'WalkingSkeletonTests' started at 2026-06-24 16:53:38.191.
+Test Case '-[MAformacCoreTests.WalkingSkeletonTests testOpenAirConditionerFastPathUpdatesReadbackAndTrace]' started.
+Test Case '-[MAformacCoreTests.WalkingSkeletonTests testOpenAirConditionerFastPathUpdatesReadbackAndTrace]' passed (0.000 seconds).
+Test Suite 'WalkingSkeletonTests' passed at 2026-06-24 16:53:38.191.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-24 16:53:38.191.
+	 Executed 162 tests, with 3 tests skipped and 0 failures (0 unexpected) in 11.600 (11.609) seconds
+Test Suite 'All tests' passed at 2026-06-24 16:53:38.191.
+	 Executed 162 tests, with 3 tests skipped and 0 failures (0 unexpected) in 11.600 (11.609) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+
+exit_code=0
