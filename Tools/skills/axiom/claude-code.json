@@ -1,0 +1,130 @@
+{
+  "name": "axiom",
+  "version": "27.0.0-beta.9",
+  "description": "Battle-tested Claude Code skills, agents, and tools for modern xOS (iOS, iPadOS, macOS, watchOS, tvOS) development",
+  "author": "Charles Wiltgen",
+  "license": "MIT",
+  "commands": [
+    "./commands/analyze-crash.md",
+    "./commands/ask.md",
+    "./commands/audit.md",
+    "./commands/compare-traces.md",
+    "./commands/fix-build.md",
+    "./commands/health-check.md",
+    "./commands/optimize-build.md",
+    "./commands/profile.md",
+    "./commands/run-tests.md",
+    "./commands/screenshot.md",
+    "./commands/status.md",
+    "./commands/test-simulator.md",
+    "./commands/triage.md",
+    "./commands/console.md",
+    "./commands/ui.md"
+  ],
+  "skills": [
+    {
+      "name": "axiom-build",
+      "description": "Use when ANY iOS build fails, test crashes, Xcode misbehaves, or environment issue occurs before debugging code. Covers build failures, compilation errors, dependency conflicts, simulator problems, environment-first diagnostics."
+    },
+    {
+      "name": "axiom-testing",
+      "description": "Use when writing ANY test, debugging flaky tests, making tests faster, or asking about Swift Testing vs XCTest. Covers unit tests, UI tests, fast tests without simulator, async testing, test architecture."
+    },
+    {
+      "name": "axiom-swiftui",
+      "description": "Use when building, fixing, or improving ANY SwiftUI UI — views, navigation, layout, animations, performance, architecture, gestures, debugging, iOS 26 features."
+    },
+    {
+      "name": "axiom-data",
+      "description": "Use when working with ANY data persistence, database, storage, CloudKit, migration, or serialization. Covers SwiftData, Core Data, GRDB, SQLite, Realm, CloudKit sync, file storage, Codable, migrations."
+    },
+    {
+      "name": "axiom-concurrency",
+      "description": "Use when writing ANY code with async, actors, threads, or seeing ANY concurrency error. Covers Swift 6 concurrency, @MainActor, Sendable, data races, async/await patterns, performance optimization."
+    },
+    {
+      "name": "axiom-performance",
+      "description": "Use when app feels slow, memory grows, battery drains, or diagnosing ANY performance issue. Covers memory leaks, profiling, Instruments workflows, retain cycles, performance optimization."
+    },
+    {
+      "name": "axiom-networking",
+      "description": "Use when implementing or debugging ANY network connection, API call, or socket. Covers URLSession, Network.framework, NetworkConnection, deprecated APIs, connection diagnostics, structured concurrency networking."
+    },
+    {
+      "name": "axiom-integration",
+      "description": "Use when integrating ANY iOS system feature - Siri, Shortcuts, widgets, IAP, localization, privacy, alarms, calendar, reminders, contacts, background tasks, push notifications, timers. Covers App Intents, WidgetKit, StoreKit, EventKit, Contacts."
+    },
+    {
+      "name": "axiom-media",
+      "description": "Use when working with camera, photos, audio, haptics, ShazamKit, or Now Playing. Covers AVCaptureSession, PHPicker, PhotosPicker, AVFoundation, Core Haptics, audio recognition, MediaPlayer, CarPlay, MusicKit."
+    },
+    {
+      "name": "axiom-accessibility",
+      "description": "Use when fixing or auditing ANY accessibility issue — VoiceOver, Dynamic Type, color contrast, touch targets, WCAG compliance, App Store accessibility review."
+    },
+    {
+      "name": "axiom-ai",
+      "description": "Use when implementing ANY Apple Intelligence, on-device AI, or custom ML feature. Covers Foundation Models, @Generable, LanguageModelSession, CoreML conversion, MLTensor, quantization, iOS 26 AI integration."
+    },
+    {
+      "name": "axiom-vision",
+      "description": "Use when implementing ANY computer vision feature — image analysis, pose detection, person segmentation, subject lifting, text recognition, barcode scanning."
+    },
+    {
+      "name": "axiom-graphics",
+      "description": "Use when working with ANY GPU rendering, Metal, OpenGL migration, shaders, 3D content, RealityKit, AR, USD/USDZ files, or display performance. Covers Metal migration, shader conversion, RealityKit ECS, RealityView, USDKit, ProMotion."
+    },
+    {
+      "name": "axiom-games",
+      "description": "Use when building ANY 2D or 3D game with SpriteKit, SceneKit, or RealityKit, or adding touch controls or game controller support. Covers scene graphs, ECS, physics, actions, game loops, rendering, TouchController, GCController."
+    },
+    {
+      "name": "axiom-apple-docs",
+      "description": "Use when ANY question involves Apple framework APIs, Swift compiler errors, or Xcode-bundled documentation. Covers Liquid Glass, Swift 6.2 concurrency, Foundation Models, SwiftData, StoreKit, 32 Swift compiler diagnostics."
+    },
+    {
+      "name": "axiom-xcode-mcp",
+      "description": "Use when connecting to Xcode via MCP, using xcrun mcpbridge, launching agents from Xcode (run-agent), or working with ANY Xcode MCP tool (XcodeRead, BuildProject, RunTests, RenderPreview). Covers setup, tool reference, agent launch, troubleshooting."
+    },
+    {
+      "name": "axiom-shipping",
+      "description": "Use when preparing ANY app for submission, handling App Store rejections, writing appeals, or managing App Store Connect. Covers submission checklists, rejection troubleshooting, metadata, privacy manifests, age ratings, export compliance."
+    },
+    {
+      "name": "axiom-security",
+      "description": "Use when storing credentials securely, encrypting data, implementing passkeys, securing AI/agentic features against prompt injection, code signing, or managing certificates and provisioning profiles."
+    },
+    {
+      "name": "axiom-location",
+      "description": "Use when implementing location services, maps, geofencing, or debugging location/MapKit issues. Covers Core Location, CLMonitor, MapKit, annotations, directions."
+    },
+    {
+      "name": "axiom-design",
+      "description": "Use when making design decisions, implementing HIG patterns, Liquid Glass, SF Symbols, typography, or structuring app entry points and authentication flows."
+    },
+    {
+      "name": "axiom-uikit",
+      "description": "Use when bridging UIKit and SwiftUI, modernizing UIKit apps (scene lifecycle, resizability), debugging Auto Layout, Combine, TextKit, PencilKit, or UIKit animations."
+    },
+    {
+      "name": "axiom-swift",
+      "description": "Use when reviewing Swift code for modern idioms, working with noncopyable types, implementing drag and drop, adding debug deep links, or building for tvOS."
+    },
+    {
+      "name": "axiom-macos",
+      "description": "Use when building ANY macOS app — windows, menus, sandboxing, distribution, AppKit bridging or modernization (control events, state restoration, concentric corners), or macOS-specific SwiftUI patterns."
+    },
+    {
+      "name": "axiom-watchos",
+      "description": "Use when building ANY watchOS app — app structure, independent apps, Watch Connectivity, Smart Stack widgets, complications, controls, RelevanceKit, background tasks, ClockKit migration."
+    },
+    {
+      "name": "axiom-health",
+      "description": "Use when working with HealthKit, WorkoutKit, health data, workouts, or fitness features on iOS or watchOS. Covers permissions, queries, background delivery, custom workouts, multidevice coordination."
+    },
+    {
+      "name": "axiom-payments",
+      "description": "Use when accepting ANY real-world payment — Apple Pay, Wallet passes, Tap to Pay, Orders in Wallet. NOT in-app purchase / digital content (use axiom-integration). Covers entitlements, certs, signing, App Review payment rules."
+    }
+  ]
+}
