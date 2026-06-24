@@ -59,7 +59,7 @@ final class C3ReadbackTemplateTests: XCTestCase {
     }
 
     @MainActor
-    func testOmittedWindowReadbackElidesDefaultDriverScopeButCarriesOrigin() throws {
+    func testOmittedWindowReadbackKeepsDefaultDriverScopeAndCarriesOrigin() throws {
         let pipeline = try makePipeline()
         let store = DemoVehicleStateStore()
         let frame = ToolCallFrame.fixture(
@@ -73,7 +73,7 @@ final class C3ReadbackTemplateTests: XCTestCase {
         let readback = try XCTUnwrap(result.readbacks.first { $0.key == "window.position[主驾]" })
 
         XCTAssertEqual(readback.scopeOrigin, .defaulted)
-        XCTAssertEqual(readback.spokenText, "车窗开度100%")
+        XCTAssertEqual(readback.spokenText, "主驾车窗开度100%")
     }
 
     @MainActor

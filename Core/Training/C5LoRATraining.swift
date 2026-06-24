@@ -83,17 +83,45 @@ public enum C5TrainingSurface: String, Codable, CaseIterable, Sendable {
 public enum C5ScopeCandidateCatalog {
     public static func scopeCandidatesBySlot(from stateCells: StateCellContractLookup) -> [String: [String]] {
         var result: [String: [String]] = [:]
-        if let window = stateCells.cell(id: "window.position") {
-            result["position"] = window.scope
-            result["direction"] = window.scope
-        }
-        if let screen = stateCells.cell(id: "screen.brightness") {
-            result["screen_type"] = screen.scope
-        }
-        if let ambient = stateCells.cell(id: "ambient.brightness") {
-            result["name"] = ambient.scope
+        for (_, slots) in scopeCandidatesByDeviceSlot(from: stateCells) {
+            for (slot, values) in slots {
+                appendUnique(values, to: &result[slot, default: []])
+            }
         }
         return result
+    }
+
+    public static func scopeCandidatesByDeviceSlot(from stateCells: StateCellContractLookup) -> [String: [String: [String]]] {
+        var result: [String: [String: [String]]] = [:]
+        for (device, cellID) in ToolContractStateApplier.deviceCellMap.sorted(by: { $0.key < $1.key }) {
+            guard let cell = stateCells.cell(id: cellID), !cell.scope.isEmpty else {
+                continue
+            }
+            for slot in slotKeys(for: cellID) {
+                result[device, default: [:]][slot] = cell.scope
+            }
+        }
+        return result
+    }
+
+    private static func slotKeys(for cellID: String) -> [String] {
+        switch cellID {
+        case "screen.brightness":
+            return ["screen_type"]
+        case "ambient.brightness":
+            return ["name"]
+        case "ac.temp_setpoint", "ac.fan_speed":
+            return ["direction", "position"]
+        default:
+            return ["position", "direction"]
+        }
+    }
+
+    private static func appendUnique(_ values: [String], to target: inout [String]) {
+        var seen = Set(target)
+        for value in values where seen.insert(value).inserted {
+            target.append(value)
+        }
     }
 }
 
@@ -700,6 +728,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var surface: C5TrainingSurface
     public var dDomainCatalog: [DDomainToolEntry]
     public var scopeCandidatesBySlot: [String: [String]]
+    public var scopeCandidatesByDeviceSlot: [String: [String: [String]]]
 
     public init(
         targetPositiveRows: Int = 4_500,
@@ -725,7 +754,8 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         scope: C5TrainingScope = .demo,
         surface: C5TrainingSurface = .dDomain,
         dDomainCatalog: [DDomainToolEntry] = [],
-        scopeCandidatesBySlot: [String: [String]] = [:]
+        scopeCandidatesBySlot: [String: [String]] = [:],
+        scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
     ) {
         self.targetPositiveRows = targetPositiveRows
         self.devSelectionRows = devSelectionRows
@@ -751,6 +781,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.surface = surface
         self.dDomainCatalog = dDomainCatalog
         self.scopeCandidatesBySlot = scopeCandidatesBySlot
+        self.scopeCandidatesByDeviceSlot = scopeCandidatesByDeviceSlot
     }
 }
 
@@ -1842,7 +1873,8 @@ public enum C5TrainingRenderer {
         seed: C5SemanticSeed,
         value: C5ContractValue,
         slotAssignments: [String: String],
-        scopeCandidatesBySlot: [String: [String]] = [:]
+        scopeCandidatesBySlot: [String: [String]] = [:],
+        scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
     ) -> [String: JSONValue] {
         var args: [String: JSONValue] = [
             "device": .string(seed.device),
@@ -1862,7 +1894,8 @@ public enum C5TrainingRenderer {
                 key: key,
                 seed: seed,
                 variant: 0,
-                scopeCandidatesBySlot: scopeCandidatesBySlot
+                scopeCandidatesBySlot: scopeCandidatesBySlot,
+                scopeCandidatesByDeviceSlot: scopeCandidatesByDeviceSlot
             )])
         }
         return args
@@ -1872,12 +1905,18 @@ public enum C5TrainingRenderer {
         seed: C5SemanticSeed,
         variant: Int,
         value: C5ContractValue,
-        scopeCandidatesBySlot: [String: [String]] = [:]
+        scopeCandidatesBySlot: [String: [String]] = [:],
+        scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
     ) -> [String: String] {
         var assignments: [String: String] = [:]
         let rangeMap = parseRange(seed.range)
         for key in seed.slotKeys {
-            let c2ScopeCandidates = scopeCandidates(for: key, in: scopeCandidatesBySlot)
+            let c2ScopeCandidates = scopeCandidates(
+                for: key,
+                seed: seed,
+                in: scopeCandidatesBySlot,
+                deviceSlots: scopeCandidatesByDeviceSlot
+            )
             if key == "device" {
                 assignments[key] = seed.device
             } else if key == "action_primitive" {
@@ -1894,7 +1933,8 @@ public enum C5TrainingRenderer {
                     seed: seed,
                     variant: variant,
                     value: value,
-                    scopeCandidatesBySlot: scopeCandidatesBySlot
+                    scopeCandidatesBySlot: scopeCandidatesBySlot,
+                    scopeCandidatesByDeviceSlot: scopeCandidatesByDeviceSlot
                 )
             }
         }
@@ -1941,12 +1981,18 @@ public enum C5TrainingRenderer {
         seed: C5SemanticSeed,
         variant: Int,
         value: C5ContractValue = C5ContractValue(),
-        scopeCandidatesBySlot: [String: [String]] = [:]
+        scopeCandidatesBySlot: [String: [String]] = [:],
+        scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
     ) -> String {
         let normalized = key.lowercased()
         let candidates: [String]
         if isScopeLikeSlot(key) {
-            candidates = scopeCandidates(for: key, in: scopeCandidatesBySlot)
+            candidates = scopeCandidates(
+                for: key,
+                seed: seed,
+                in: scopeCandidatesBySlot,
+                deviceSlots: scopeCandidatesByDeviceSlot
+            )
         } else if normalized.contains("color") {
             candidates = ["蓝色", "暖白", "红色", "紫色"]
         } else if normalized.contains("mode") {
@@ -1975,8 +2021,18 @@ public enum C5TrainingRenderer {
             || normalized.contains("name")
     }
 
-    private static func scopeCandidates(for key: String, in scopeCandidatesBySlot: [String: [String]]) -> [String] {
+    private static func scopeCandidates(
+        for key: String,
+        seed: C5SemanticSeed,
+        in scopeCandidatesBySlot: [String: [String]],
+        deviceSlots: [String: [String: [String]]]
+    ) -> [String] {
         let normalized = key.lowercased()
+        if let byDevice = deviceSlots[seed.device],
+           let candidates = byDevice[key] ?? byDevice[normalized],
+           !candidates.isEmpty {
+            return candidates
+        }
         return scopeCandidatesBySlot[key] ?? scopeCandidatesBySlot[normalized] ?? []
     }
 
@@ -2507,7 +2563,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     surface: options.surface,
                     catalog: options.dDomainCatalog,
                     catalogByName: catalogByName,
-                    scopeCandidatesBySlot: options.scopeCandidatesBySlot
+                    scopeCandidatesBySlot: options.scopeCandidatesBySlot,
+                    scopeCandidatesByDeviceSlot: options.scopeCandidatesByDeviceSlot
                 ) {
                     result.append(sample)
                 }
@@ -2585,14 +2642,16 @@ public struct C5TrainingDatasetBuilder: Sendable {
         surface: C5TrainingSurface,
         catalog: [DDomainToolEntry],
         catalogByName: [String: DDomainToolEntry],
-        scopeCandidatesBySlot: [String: [String]]
+        scopeCandidatesBySlot: [String: [String]],
+        scopeCandidatesByDeviceSlot: [String: [String: [String]]]
     ) -> C5TrainingSample? {
         let valueAugmentation = C5TrainingRenderer.augmentValue(seed: seed, variant: variant)
         let slotAssignments = C5TrainingRenderer.slotAssignments(
             seed: seed,
             variant: variant,
             value: valueAugmentation.value,
-            scopeCandidatesBySlot: scopeCandidatesBySlot
+            scopeCandidatesBySlot: scopeCandidatesBySlot,
+            scopeCandidatesByDeviceSlot: scopeCandidatesByDeviceSlot
         )
         // paradigm §1 surface 分流: dDomain→具名工具(name=intent, value 形态编码进名) / frame→旧 generic(strangler 保留)。
         let call: C5TrainingToolCall
@@ -2620,7 +2679,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     seed: seed,
                     value: valueAugmentation.value,
                     slotAssignments: slotAssignments,
-                    scopeCandidatesBySlot: scopeCandidatesBySlot
+                    scopeCandidatesBySlot: scopeCandidatesBySlot,
+                    scopeCandidatesByDeviceSlot: scopeCandidatesByDeviceSlot
                 )
             )
             let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)

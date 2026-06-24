@@ -96,7 +96,7 @@ final class ToolContractCompilerTests: XCTestCase {
         let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         // 端到端 cut1→cut2→cut3: D-domain 工具名→normalize(irMap)→IR→data-driven apply→state delta
-        let state = ToolContractStateApplier.apply(
+        let state = try ToolContractStateApplier.apply(
             toolCalls: [C6ToolCall(name: "adjust_ac_temperature_to_number", arguments: ["value": "24"])],
             to: [:], stateCells: stateCells, irMap: irMap)
         XCTAssertEqual(state["ac.temp_setpoint[主驾]"], "24")
@@ -106,7 +106,7 @@ final class ToolContractCompilerTests: XCTestCase {
     func testStateApplierExpStepFromCellMetadata() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         // increase_by_exp 用 cell.exp_step.little(screen 10) + clamp executionRange, 非硬编码
-        let state = ToolContractStateApplier.apply(
+        let state = try ToolContractStateApplier.apply(
             toolCalls: [C6ToolCall(name: "set_cabin_screen_brightness", arguments: ["delta": "brighter"])],
             to: ["screen.brightness[中控屏]": "70"], stateCells: stateCells)
         XCTAssertEqual(state["screen.brightness[中控屏]"], "80", "cell-driven expStep 10: 70+10")
@@ -115,7 +115,7 @@ final class ToolContractCompilerTests: XCTestCase {
     func testStateApplierDefaultFromCellMetadata() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         // 无 pre-state, increase 用 cell.default 初值(fan default 1), 非硬编码 1
-        let state = ToolContractStateApplier.apply(
+        let state = try ToolContractStateApplier.apply(
             toolCalls: [C6ToolCall(name: "set_cabin_fan", arguments: ["delta": "stronger"])],
             to: [:], stateCells: stateCells)
         XCTAssertEqual(state["ac.fan_speed[主驾]"], "2", "cell-driven default 1: 1+1")
@@ -131,7 +131,7 @@ final class ToolContractCompilerTests: XCTestCase {
             "window.position[右后]": "0"
         ]
 
-        let state = ToolContractStateApplier.apply(
+        let state = try ToolContractStateApplier.apply(
             toolCalls: [C6ToolCall(name: "open_window", arguments: [:])],
             to: preState,
             stateCells: stateCells,
@@ -154,7 +154,7 @@ final class ToolContractCompilerTests: XCTestCase {
             "window.position[右后]": "0"
         ]
 
-        let state = ToolContractStateApplier.apply(
+        let state = try ToolContractStateApplier.apply(
             toolCalls: [C6ToolCall(name: "open_window", arguments: ["position": "全车"])],
             to: preState,
             stateCells: stateCells,
@@ -175,25 +175,32 @@ final class ToolContractCompilerTests: XCTestCase {
             "window.position[副驾]": "0"
         ]
 
-        let state = ToolContractStateApplier.apply(
-            toolCalls: [C6ToolCall(name: "open_window", arguments: ["position": "后排"])],
-            to: preState,
-            stateCells: stateCells,
-            irMap: irMap
-        )
-
-        XCTAssertEqual(state["window.position[主驾]"], "0")
-        XCTAssertEqual(state["window.position[副驾]"], "0")
-        XCTAssertNil(state["window.position"], "invalid scope must not fall back to unscoped base cell")
+        XCTAssertThrowsError(
+            try ToolContractStateApplier.apply(
+                toolCalls: [C6ToolCall(name: "open_window", arguments: ["position": "后排"])],
+                to: preState,
+                stateCells: stateCells,
+                irMap: irMap
+            )
+        ) { error in
+            guard case ToolContractStateApplyError.scopeResolutionFailed(let cellID, _) = error else {
+                return XCTFail("expected scopeResolutionFailed, got \(error)")
+            }
+            XCTAssertEqual(cellID, "window.position")
+        }
     }
 
     func testStateApplierUnmappedDeviceNoWrite() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
-        // 未映射 device(seat_heat, S3 才扩) → 不写 state(quarantine, logUnmapped 非静默吞)
-        let state = ToolContractStateApplier.apply(
-            toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat", "action_primitive": "power_on"])],
-            to: ["x": "y"], stateCells: stateCells)
-        XCTAssertEqual(state, ["x": "y"], "未映射 device 不写 state(S3 扩 191 逐族纳入)")
+        XCTAssertThrowsError(
+            try ToolContractStateApplier.apply(
+                toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat", "action_primitive": "power_on"])],
+                to: ["x": "y"],
+                stateCells: stateCells
+            )
+        ) { error in
+            XCTAssertEqual(error as? ToolContractStateApplyError, .unmappedDevice("seat_heat"))
+        }
     }
 
     // MARK: - S3 deviceCellMap 扩 6 族 (每 value cellID 在 state-cells 存在 + 6 族不落 unmapped)
@@ -209,7 +216,7 @@ final class ToolContractCompilerTests: XCTestCase {
     func testS3FamilyDeviceWritesStateNotUnmapped() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         // seat_heat_temperature adjust_to_number → seat.heat_level[主驾] (S3 族 cell-driven 写 state, 非 unmapped)
-        let state = ToolContractStateApplier.apply(
+        let state = try ToolContractStateApplier.apply(
             toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat_temperature", "action_primitive": "adjust_to_number", "value.direct": "2"])],
             to: [:], stateCells: stateCells)
         XCTAssertEqual(state["seat.heat_level[主驾]"], "2", "seat 族 deviceCellMap+cell-driven 写 state")

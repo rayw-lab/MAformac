@@ -176,7 +176,7 @@ public struct StateCellContractLookup: Sendable {
             return nil
         }
         var result = template
-        let renderedScope = shouldElide(scope: scope, origin: scopeOrigin, cell: cell) ? "" : (scope ?? "")
+        let renderedScope = scope ?? ""
         for placeholder in ["{温区}", "{位置}", "{屏幕}", "{氛围灯}", "{区域}", "{位}"] {
             result = result.replacingOccurrences(of: placeholder, with: renderedScope)
         }
@@ -184,10 +184,6 @@ public struct StateCellContractLookup: Sendable {
         // enum-branch 形式 `空调{已打开|已关闭}`:按 value 在 cell.values 中的位置选分支。
         result = Self.resolveEnumBranch(result, value: value, values: cell.values)
         return result.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private func shouldElide(scope: String?, origin: ScopeOrigin?, cell: StateCellDefinition) -> Bool {
-        origin == .defaulted && scope == cell.defaultScope
     }
 
     /// 把模板里的 `{分支A|分支B|...}` 按 value 在 enum values 列表中的索引展开。

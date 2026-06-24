@@ -192,12 +192,14 @@ final class C5LoRATrainingTests: XCTestCase {
     func testExplicitScopeCandidatesDeriveFromC2Vocabulary() throws {
         let stateCells = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
         let scopeCandidates = C5ScopeCandidateCatalog.scopeCandidatesBySlot(from: stateCells)
+        let deviceScopeCandidates = C5ScopeCandidateCatalog.scopeCandidatesByDeviceSlot(from: stateCells)
         let prepared = C5TrainingDatasetBuilder().build(
             seeds: [
                 semanticSeed(
                     id: "slot-row",
                     fuzzy: true,
                     free: false,
+                    device: "window",
                     slotKeys: ["position"],
                     range: ""
                 )
@@ -207,7 +209,8 @@ final class C5LoRATrainingTests: XCTestCase {
             options: C5TrainingBuildOptions(
                 targetPositiveRows: 12,
                 devSelectionRows: 0,
-                scopeCandidatesBySlot: scopeCandidates
+                scopeCandidatesBySlot: scopeCandidates,
+                scopeCandidatesByDeviceSlot: deviceScopeCandidates
             )
         )
 
@@ -219,6 +222,24 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(rendered.contains("\"position\":\"左前\""))
         XCTAssertFalse(rendered.contains("\"position\":\"右前\""))
         XCTAssertFalse(rendered.contains("\"position\":\"后排\""))
+    }
+
+    func testDeviceAwareScopeCandidatesCoverAllMappedScopedCells() throws {
+        let stateCells = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
+        let deviceScopeCandidates = C5ScopeCandidateCatalog.scopeCandidatesByDeviceSlot(from: stateCells)
+
+        XCTAssertEqual(deviceScopeCandidates["sunroof"]?["position"], ["前排", "后排", "全车"])
+        XCTAssertEqual(deviceScopeCandidates["seat_backrest"]?["position"], ["主驾", "副驾"])
+        XCTAssertEqual(deviceScopeCandidates["wiper_speed"]?["position"], ["前", "后", "前后"])
+
+        for (device, cellID) in ToolContractStateApplier.deviceCellMap {
+            guard let cell = stateCells.cell(id: cellID), !cell.scope.isEmpty else {
+                continue
+            }
+            let slots = try XCTUnwrap(deviceScopeCandidates[device], "\(device) should carry C2 scope candidates for \(cellID)")
+            let candidateUnion = Set(slots.values.flatMap { $0 })
+            XCTAssertEqual(candidateUnion, Set(cell.scope), "\(device) should derive scope candidates from \(cellID)")
+        }
     }
 
     func testFixedSemanticSlotsOverrideFallbackWhenRangeIsAbsent() {

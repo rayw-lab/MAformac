@@ -122,7 +122,14 @@ public final class DemoVehicleStateStore {
 
     @discardableResult
     public func applyMockTransition(_ transition: DemoMockTransition) -> DemoActionReadback {
-        var cell = cellsByKey[transition.key] ?? DemoVehicleStateCell(key: transition.key, actualValue: "unknown")
+        guard var cell = cellsByKey[transition.key] else {
+            return DemoActionReadback(
+                key: transition.key,
+                actualValue: "missing",
+                revision: currentRevision,
+                spokenText: "状态未定义"
+            )
+        }
         cell.desiredValue = transition.desiredValue
         cell.actualValue = transition.desiredValue
         cell.source = transition.source
