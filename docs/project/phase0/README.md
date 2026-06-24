@@ -54,10 +54,13 @@ These files are not implementation, not OpenSpec archive, and not permission to 
 
 - `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` records the accepted G01-G28 default-scope grill decisions.
 - Scope: non-UIUE mainline C2/C3/C5/C6/readback/demo-scenario semantics. G28 is retained as a UIUE merge check only, not a mainline blocker unless state/C3-C6/golden contracts conflict.
-- This pack is separate from D1-D10. It must become an OpenSpec carrier before implementation, and it blocks retrain-c5/rebuild-c6 acceptance until the default_scope semantics are physically implemented and verified.
-- UIUE worktree pinning: external worktree `/Users/wanglei/workspace/MAformac-uiue`, expected HEAD `f1096d7` as of 2026-06-24. If HEAD differs, reconfirm AD-8.1/AD-8.7 before citing UIUE file:line evidence.
+- This pack is separate from D1-D10. It has become the active OpenSpec carrier `openspec/changes/define-demo-default-scope/` and is accepted for apply. It still blocks retrain-c5/rebuild-c6 acceptance until the default_scope semantics are physically implemented and verified.
+- Phase -1 closeout: `phase-minus-one-default-scope-closeout.md`.
+- Apply plan: `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. This is a Superpowers implementation plan after Phase -1 closeout, not a Phase 0 route-control artifact. It is governed by Phase 0/G01-G28 decisions and retires after default-scope apply closeout.
+- Apply-plan audit: `default-scope-apply-plan-audit-codex-2026-06-24.md` records the Codex same-vendor pre-check (`CLEAR_WITH_FIXES`) and absorbed fixes. It does not close R-L17.
+- UIUE worktree pinning: external worktree `/Users/wanglei/workspace/MAformac-uiue`, current recorded HEAD `17f2af1` as of 2026-06-24. This remains an unverified external reference; reconfirm current UIUE files before citing UIUE file:line evidence.
 
 ## Current State
 
-- Status: skeletons created; D1-D10 route-control pack accepted by user verdict; default-scope G01-G28 decisions accepted and recorded; OpenSpec design/tasks remain draft carriers.
-- Next step: convert accepted default-scope G01-G28 into an OpenSpec change with design/tasks/spec deltas before retrain-c5/rebuild-c6/demo-golden-run.
+- Status: skeletons created; D1-D10 route-control pack accepted by user verdict; default-scope G01-G28 decisions accepted and materialized as an active OpenSpec carrier; default-scope apply is authorized, same-vendor plan audit is absorbed, but physical implementation has not started.
+- Next step: execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. Do not start retrain-c5, rebuild-c6 acceptance, demo-golden-run, voice, or UIUE merge before the physical default-scope apply gates pass.

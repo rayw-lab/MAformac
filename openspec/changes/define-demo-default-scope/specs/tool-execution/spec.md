@@ -81,3 +81,17 @@ Omitted scope is a target-resolution concern after a candidate exists. It SHALL 
 - **WHEN** no accepted executable candidate exists
 - **THEN** the system clarifies or rejects
 - **AND** it SHALL NOT use `default_scope` to bypass route ambiguity.
+
+#### Scenario: Rejected route does not default omitted scope
+
+- **GIVEN** a rejected route such as a safety refusal, unsupported request, or policy-denied vehicle command with omitted scope
+- **WHEN** the route is not accepted as an executable D-domain candidate
+- **THEN** the system SHALL NOT create a defaulted C2 state target
+- **AND** it SHALL NOT emit `scope_origin=defaulted` for a state change.
+
+#### Scenario: Passthrough route does not create scope metadata
+
+- **GIVEN** a passthrough response that is not a state-changing vehicle command
+- **WHEN** the response is delivered without C3 execution
+- **THEN** the system SHALL NOT infer `default_scope`
+- **AND** the response SHALL NOT claim `resolved_scope`, `scope_origin`, or state-applier evidence.

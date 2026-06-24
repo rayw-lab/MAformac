@@ -21,6 +21,10 @@ expires: "2026-07-15"
 
 **Status Update 2026-06-24:** Do not recreate the older pending D1-D10 template or reset `pending_user_decision`. If the decision record already exists with accepted verdicts, keep it as the authority and continue into Phase -1 / OpenSpec carrier work.
 
+**Status Update 2026-06-24 Later:** Phase -1 default-scope carrier materialization is accepted for apply. UIUE HEAD `f1096d7` in this historical plan is superseded by current unverified external reference `17f2af1`; do not use UIUE file:line evidence until a fresh UIUE reconfirm pass. Runtime implementation now belongs to `docs/superpowers/plans/2026-06-24-default-scope-apply.md`, not to this umbrella plan.
+
+**Status Update 2026-06-24 Closeout:** Default-scope apply-plan same-vendor pre-check returned `CLEAR_WITH_FIXES` and was absorbed in `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. Do not rerun Phase -1 from this umbrella plan unless the active carrier is superseded; use the apply plan for implementation.
+
 ---
 
 ## Scope And Non-Goals
@@ -62,7 +66,7 @@ The corrected route is:
 | tiger | UIUE visual backlog leaks back into mainline blockers. | Phase 0 C08 is conditional only at state/C3-C6/golden intersections. | Carrier map lists UIUE only as future consumer for stable IDs and state/golden contracts. |
 | tiger | Default-scope semantics get buried in C5/C6 tasks and UIUE implements a different meaning. | Accepted G01-G28 plus UIUE D8/G25/G24 decisions change C2/C3/C5/C6/readback/golden dependency order. | Phase -1 creates `define-demo-default-scope`; C5/C6/golden/UIUE reference it rather than each inventing scope behavior. |
 | tiger | UIUE "淡显" gets misread as TTS always saying `主驾`, reintroducing interruption-heavy UX. | Default-scope decision says no driver/passenger clarification for ordinary omitted-scope commands; UIUE wants low-emphasis scope visibility. | Phase -1 AD distinguishes structured scope metadata, UI badge presentation, TTS/readback text, explicit non-default scope, and explicit fan-out. |
-| tiger | UIUE external worktree drifts after being cited as evidence. | Main repo validation does not cover `/Users/wanglei/workspace/MAformac-uiue`. | Pin UIUE HEAD to `f1096d7` in Phase 0 docs and make HEAD drift trigger reconfirmation before using UIUE file:line evidence. |
+| tiger | UIUE external worktree drifts after being cited as evidence. | Main repo validation does not cover `/Users/wanglei/workspace/MAformac-uiue`. | Current unverified external reference is `17f2af1`; any UIUE file:line evidence requires a fresh reconfirm pass before use. |
 | paper-tiger | Training stack choice blocks Phase 0. | Overnight research L01 treats local `mlx-lm` capacity as likely adequate; training is not running in this phase. | Keep training-stack tiny receipt as a future retrain-c5 task, not a Phase 0 route blocker. |
 | paper-tiger | DPO or PEFT variants must be decided before task rewrite. | D4 and steelman keep SFT mainline and PEFT variants deferred. | Record DPO/DoRA/XGrammar as deferred or escape-hatch rows, not task blockers. |
 | elephant | Human review is asked for every row and becomes decision fatigue. | The user wants rigor but also asks for confidence and recommended拍法. | Use fast-pass defaults for low-dispute decisions, but still show each D row and isolate high-attention D2/D3/D6/D7/D10. |
@@ -178,11 +182,11 @@ rg -n "AD-8\\.1|AD-8\\.7|default_scope|淡显|fan-out|前排车窗|define-demo-d
 ```
 
 Expected:
-- The external UIUE worktree exists and its HEAD is `f1096d7`.
+- The external UIUE worktree exists. The historical expected HEAD was `f1096d7`; current route-board reference is `17f2af1` and remains unverified external evidence until reconfirmed.
 - Cite UIUE as external evidence, not as current main-branch evidence.
 - Expected hits include `ui-presentation/design.md:78`, `:84-88`, and `ui-presentation/tasks.md:11`, `:61-64`.
 - If the external worktree is unavailable, record UIUE decisions as `external_user_supplied_reference` and do not claim file:line evidence for them.
-- If the external UIUE HEAD is not `f1096d7`, stop and reconfirm UIUE evidence before copying AD-8.7 claims into mainline OpenSpec text.
+- If the external UIUE HEAD differs from the current accepted pin for that pass, stop and reconfirm UIUE evidence before copying AD-8.7 claims into mainline OpenSpec text.
 
 - [ ] **Step -1.2: Add the OpenSpec change skeleton**
 
@@ -312,7 +316,7 @@ Create `openspec/changes/define-demo-default-scope/tasks.md`:
 - [ ] 3.2 `openspec validate --all --strict` passes.
 - [ ] 3.3 `rg -n "scope.first|\\?\\? \\\"全车\\\"|\\?\\? \\\"all\\\"" Core contracts openspec docs/project docs/grill-tournament` is recorded as pre-implementation evidence, not claimed fixed.
 - [ ] 3.4 `rg -n "hvac.temperature|seat.driver.heat|seat.driver.ventilation|window.driver|lighting.ambient|screen.brightness|fan.speed" Core App Tests` is recorded as legacy-key pre-implementation evidence and later must be resolved before `default_scope` apply closeout.
-- [ ] 3.5 `test "$(git -C /Users/wanglei/workspace/MAformac-uiue rev-parse --short HEAD)" = "f1096d7"` passes before using UIUE file:line evidence.
+- [ ] 3.5 `git -C /Users/wanglei/workspace/MAformac-uiue rev-parse --short HEAD` is recorded before using UIUE file:line evidence; current route-board reference is `17f2af1`, but any file:line evidence still requires a fresh reconfirm pass.
 ```
 
 Create `openspec/changes/define-demo-default-scope/specs/tool-execution/spec.md`:

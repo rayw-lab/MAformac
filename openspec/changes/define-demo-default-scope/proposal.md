@@ -14,7 +14,7 @@ This must be its own OpenSpec change because the behavior crosses C2 state cells
 - Define readback/presentation metadata: `scope_origin`, `resolved_scope`, and channel-specific presentation policy.
 - Define apply-closeout enforcement gates for default-scope SSOT, C5/C2 scope-candidate parity, and single-source scope-origin propagation.
 - Define legacy unscoped demo-key disposition as a future implementation blocker, not a second state source.
-- Carry UIUE intersections only as external merge-check dependencies. Current UIUE evidence is downgraded to `external_reference_unverified_current_head=34044e1`; this proposal does not cite UIUE file:line evidence and does not claim UIUE alignment.
+- Carry UIUE intersections only as external merge-check dependencies. Current UIUE evidence is downgraded to `external_reference_unverified_current_head=17f2af1`; this proposal does not cite UIUE file:line evidence and does not claim UIUE alignment.
 
 ## Capabilities
 
@@ -42,7 +42,7 @@ This must be its own OpenSpec change because the behavior crosses C2 state cells
 - `openspec validate --all --strict` passes.
 - `define-demo-default-scope` owns the G01-G28 observable behavior carrier.
 - `retrain-c5-lora-d-domain`, `rebuild-c6-four-layer-bench`, and `define-demo-golden-run-and-voice` depend on this carrier instead of redefining default-scope semantics.
-- UIUE is recorded as `external_reference_unverified_current_head=34044e1` with G28 retained as a merge check only.
+- UIUE is recorded as `external_reference_unverified_current_head=17f2af1` with G28 retained as a merge check only.
 - A reviewer can see that apply closeout must prove the SSOT mechanically, not only record pre-implementation grep evidence.
 
 ## Non-Automated Success Signals

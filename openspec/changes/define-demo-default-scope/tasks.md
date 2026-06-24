@@ -15,7 +15,7 @@
 - [ ] 2.2 Rebuild C6 SHALL depend on this change for C6-MP-014/016/017 and any default-scope gold; C6 must not redefine default-scope behavior.
 - [ ] 2.3 Demo golden-run SHALL depend on this change before freezing golden-run IDs, readback text, `scope_origin` policy, C6 case IDs, or UIUE scene tags; golden-run must not redefine default-scope behavior.
 - [ ] 2.4 UIUE merge SHALL depend on this change only at state/C3-C6/golden intersections; UIUE visual work remains otherwise isolated.
-- [ ] 2.5 G28 remains a UIUE merge check. Current UIUE evidence is recorded as `external_reference_unverified_current_head=34044e1`; no UIUE file:line evidence or UIUE-ready claim may be made until a separate UIUE reconfirm pass.
+- [ ] 2.5 G28 remains a UIUE merge check. Current UIUE evidence is recorded as `external_reference_unverified_current_head=17f2af1`; no UIUE file:line evidence or UIUE-ready claim may be made until a separate UIUE reconfirm pass.
 - [ ] 2.6 C5 scope-candidate parity gate：C5 fallback candidates and rendered tool-call scope args must derive from C2 `scope` / `default_scope`, not a hardcoded list. Add or update tests so `window.position` candidate scopes match C2 executable scopes (`主驾`, `副驾`, `左后`, `右后`, `全车`) and any raw/source synonym such as `左前` canonicalizes before target rendering. This gate blocks C5 data generation and retrain until green. AD：`AD-DS-010`。
 
 ## 3. Verification
