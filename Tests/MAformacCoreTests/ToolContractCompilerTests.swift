@@ -121,6 +121,52 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertEqual(state["ac.fan_speed[主驾]"], "2", "cell-driven default 1: 1+1")
     }
 
+    func testStateApplierUsesC2DefaultScopeForOmittedWindow() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        let preState: [String: String] = [
+            "window.position[主驾]": "0",
+            "window.position[副驾]": "0",
+            "window.position[左后]": "0",
+            "window.position[右后]": "0"
+        ]
+
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "open_window", arguments: [:])],
+            to: preState,
+            stateCells: stateCells,
+            irMap: irMap
+        )
+
+        XCTAssertEqual(state["window.position[主驾]"], "100")
+        XCTAssertEqual(state["window.position[副驾]"], "0")
+        XCTAssertEqual(state["window.position[左后]"], "0")
+        XCTAssertEqual(state["window.position[右后]"], "0")
+    }
+
+    func testStateApplierFansOutOnlyForExplicitCollectionAlias() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        let preState: [String: String] = [
+            "window.position[主驾]": "0",
+            "window.position[副驾]": "0",
+            "window.position[左后]": "0",
+            "window.position[右后]": "0"
+        ]
+
+        let state = ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "open_window", arguments: ["position": "全车"])],
+            to: preState,
+            stateCells: stateCells,
+            irMap: irMap
+        )
+
+        XCTAssertEqual(state["window.position[主驾]"], "100")
+        XCTAssertEqual(state["window.position[副驾]"], "100")
+        XCTAssertEqual(state["window.position[左后]"], "100")
+        XCTAssertEqual(state["window.position[右后]"], "100")
+    }
+
     func testStateApplierUnmappedDeviceNoWrite() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         // 未映射 device(seat_heat, S3 才扩) → 不写 state(quarantine, logUnmapped 非静默吞)

@@ -302,10 +302,7 @@ public enum ToolContractNormalizer {
     }
 
     private static func normalizeWindow(_ call: C6ToolCall) -> [ToolContractIR] {
-        var slots = call.arguments
-        if slots["position"] == nil {
-            slots["position"] = "all"
-        }
+        let slots = call.arguments
         if let percent = call.arguments["percent"] {
             let action = percent == "0" ? "power_off" : (percent == "100" ? "power_on" : "by_percent")
             return [ir(call, device: "window", action: action, slots: slots, value: ContractValue(direct: percent, type: "PERCENT"))]
@@ -463,11 +460,22 @@ public enum ToolContractStateApplier {
     private static func applyNumericCell(
         _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition, state: inout [String: String]
     ) {
-        let baseScope = cell.scope.first ?? ""
-        let currentKey = baseScope.isEmpty ? cellID : "\(cellID)[\(baseScope)]"
-        let writeKeys = ir.device == "window"
-            ? windowKeys(for: ir.slots["position"] ?? "all")
-            : [currentKey]
+        let resolutionFrame = ToolCallFrame(
+            traceID: "state-applier",
+            agentID: "vehicle-control",
+            capabilityID: "cabin.\(ir.device)",
+            toolName: "vehicle_control",
+            device: ir.device,
+            actionPrimitive: ir.actionPrimitive,
+            slots: ir.slots,
+            value: ir.value,
+            stateRevision: 0,
+            candidateSource: .upstreamToolCall
+        )
+        let resolution = (try? C2ScopeResolver.resolve(frame: resolutionFrame, cell: cell))
+            ?? ScopeResolution(keys: [cellID], resolvedScopes: [], origin: .explicit)
+        let currentKey = resolution.keys.first ?? cellID
+        let writeKeys = resolution.keys
         let initial = Int(cell.defaultValue ?? "") ?? 0
         let newValue: String?
         if let target = targetNumber(ir) {
@@ -548,22 +556,6 @@ public enum ToolContractStateApplier {
             return value
         }
         return nil
-    }
-
-    private static func windowKeys(for position: String) -> [String] {
-        // 英文(旧 set_cabin strangler) + 中文(D-domain catalog position enum, C5/C6 同源)双支持(S5 Cut-4)。
-        switch position {
-        case "driver", "主驾":
-            return ["window.position[主驾]"]
-        case "passenger", "副驾":
-            return ["window.position[副驾]"]
-        case "rear_left", "左后":
-            return ["window.position[左后]"]
-        case "rear_right", "右后":
-            return ["window.position[右后]"]
-        default:   // all / 全车 / 其他 → 全车 4 位
-            return ["window.position[主驾]", "window.position[副驾]", "window.position[左后]", "window.position[右后]"]
-        }
     }
 
     private static func c2ColorValue(for value: String, stateCells: StateCellContractLookup) -> String {
