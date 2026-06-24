@@ -90,11 +90,11 @@ Omitted scope is a target-resolution concern after a candidate exists. The route
 
 | Route context | Candidate status | Scope behavior |
 |---|---|---|
-| fast | Accepted deterministic candidate | Resolve omitted scope through C2 `default_scope`. |
-| slow | Accepted Qwen+LoRA candidate | Resolve omitted scope through C2 `default_scope`; the model must not own a second defaulting policy. |
-| ambiguous | Candidate not accepted | Clarify before target resolution; do not default silently. |
-| rejected | Safety, unsupported, or policy-rejected candidate | Refuse or no-op; do not create a defaulted C2 state target. |
-| passthrough | Non-state-changing or out-of-domain response | Preserve passthrough result; do not create a state target, `resolved_scope`, or `scope_origin`. |
+| fast | accepted deterministic candidate | Resolve omitted scope through C2 `default_scope`. |
+| slow | accepted Qwen+LoRA candidate | Resolve omitted scope through C2 `default_scope`; the model must not own a second defaulting policy. |
+| ambiguous | candidate not accepted | Clarify before target resolution; do not default silently. |
+| rejected | safety, unsupported, or policy-rejected candidate | Refuse or no-op; do not create a defaulted C2 state target. |
+| passthrough | non-state-changing or out-of-domain response | Preserve passthrough result; do not create a state target, `resolved_scope`, or `scope_origin`. |
 
 The route layer may decide whether a candidate is accepted. Once accepted, target scope is resolved only by C2.
 
