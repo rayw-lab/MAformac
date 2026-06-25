@@ -132,4 +132,11 @@ gptpro（GPT Pro 网页）对 PR #6 出**产品架构意见**（8 点，`/Users/
 - ✅ **验收门**：swift test **221/0** · make verify-all exit0（契约门+gate+diff）· xcodebuild macOS+iOS SUCCEEDED · pre-commit 三门 · 5 spike 截图 Read 实查渲染（claim-vs-reality 非声称截图）。
 - 🔴 **§28 教训（lessons #10）**：ValueRangeMapper 先建重复 `ExecutionRange` 被 A2 已有 ambiguous catch → 回退委托。catalog 本身与 A2 `StateCellContractLookup` 重复（4a 遗留）记 design AD-13 phase matrix harden（上抛磊哥重构范围）。
 
-→ **4b/4c 执行态完成**，待整体异源审（codex rescue 非同源）+ push。
+→ **4b/4c 执行态完成 + codex 异源审收口**（V-HOLD(P1) → 辩证收 3 P1+2 P2 修 + 验证）：
+- **P1-2 stepper off-by-one**（真 bug + 测试帮凶）：stepCount `(max-min)/step`→`max`，activeSteps=round(clamp)；ac.fan_speed「1挡」原亮0格→修后**亮1格（spike 截图坐实）**+ 测试 9→10
+- **P1-1 sequencer cancellation 泄漏**：`try?` 吞→`try await`+`Task.isCancelled`（防 barge-in 旧 surface 泄漏）
+- **P1-3 numericValue 坏值回退0**→下界 fallback + 数据层一处归一 clamp
+- **P2-1 AD-12 文档 drift**（`expand(trigger:.tap)`→`toggle` 对齐实现）+ **P2-2 semantic 对齐测试**（mapping vs contract type 逐 base 机械化，gptpro 第6点同源）
+- **P2-3 defer**：codex 用错 scheme `MAformac`（实际 `MAformacMac/IOS`，我 build 实跑验证正确，非代码 bug）
+- 验收：swift test **222/0** · xcodebuild macOS+iOS SUCCEEDED · make verify-all exit0 · push `5b63ea1`。
+- 🔴 **合并粒度待磊哥**（PR #6 含 4a+4b+4c vs 拆 / CURRENT.md「Do not merge UIUE into mainline」+ default-scope reconfirm gated）。
