@@ -100,7 +100,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 8.A7 注意力优先级 + 次要族 fade（V8）+ V9 `FamilyIconMapper`（全 SF Symbols 契约存在性）
 
 ### 8.B context capsule diorama（spike-gated，SD24/25）
-- [ ] 8.B1 🔴 capsule route spike（真机：A 视频 loop vs C-lite，量帧率+观感，**U31 实证不预拍 / U30 砍重折射 shader**）
+- [ ] 8.B1 🔴 capsule route spike（🔴 **模拟器观感对比** A 视频 loop vs C-lite，量观感 + 像不像 anchor；**GPU/帧率真机验证 DEFERRED → 真机阶段**，磊哥 2026-06-25 拍「不真机用 iOS 模拟器」；模拟器不渲染 glass 折射/specular[paper-tiger]→route A 视频 photoreal 不打折/C-lite glass 质感打折；**U31 实证不预拍 / U30 砍重折射 shader**）
 - [ ] 8.B2 capsule 资产（route 定后：C-lite 分层 stills/CoreML 深度 或 A video loop）
 - [ ] 8.B3 `ContextCapsule` view（消费 bridge `context` 四维 + crossfade 切换 + **预加载防卡顿** + 图标在 capsule 外）
 - [ ] 8.B4 adopt Vortex（`.smoke` 尾气 / `.rain` 雨 / `.snow` 雪 / 星光）+ native `.glassEffect` 壳（守 U30，不在 always-on capsule 跑 Inferno 折射 shader）
