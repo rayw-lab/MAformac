@@ -13,6 +13,8 @@ uiue_head_live_verified: 9cf1af2b503af9f7980b7bffbce85914f8fcaf42
 proof_class: local_repo_doc_truth
 ---
 
+> ✅ **ANSWERED 2026-06-25**（doc-cascade-triage：本 amend 是 question/input `discussion_input_not_ssot`，历史态不改正文，加 banner 指现行权威）：RPB-01~53 已全决策（P0/P1/P2 + 补漏 RPB-14/08/51-53）→ `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md`；thin OpenSpec change **已创建 + strict valid + 磊哥 accepted** → `openspec/changes/define-runtime-presentation-bridge/`。本文「bridge not yet proposed / not yet accepted」是**提问时的历史态**，以 decisions doc + change 为当前权威。
+
 ## Purpose
 
 This amend file adds runtime-facing grill bullets for the UIUE commander. It is a companion to `docs/grill-checklist/UIUE-checklist.md` and the current UIUE design docs. It does not replace `docs/grill-tournament/grill-decisions-master.md`, OpenSpec, or any future Runtime-Presentation Bridge proposal.

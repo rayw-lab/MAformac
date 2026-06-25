@@ -6,7 +6,7 @@ artifact_kind: grill_freeze
 authority: uiue_grill_ssot_frozen
 created_at: 2026-06-25
 freeze_principle: 前面的决策若与后面冲突，前者标【作废 SUPERSEDED】，以后者为准
-inputs: [grill-decisions-master, storyboard SD1-SD24, RPB-01~53, landing-matrix, AD-1~14, V1-V12, CC*, G01-G28]
+inputs: [grill-decisions-master, storyboard SD1-SD25, RPB-01~53, landing-matrix, AD-1~14, V1-V12, CC*, G01-G28]
 ---
 
 > 磊哥 2026-06-25：全部 grill 先定档；前面的若与后面冲突，前面标作废。本文 = **UIUE grill 冻结快照 + 作废 registry**（claim-vs-reality §10 防段间分叉的机械门）。
@@ -36,7 +36,7 @@ inputs: [grill-decisions-master, storyboard SD1-SD24, RPB-01~53, landing-matrix,
 | 系列 | 权威源 | 状态 |
 |---|---|---|
 | 锦标赛 41 / D/E/U/Q / 范式 | `docs/grill-tournament/grill-decisions-master.md` + paradigm-amend | 冻结（旧534/B-frame 已作废 S9/S10）|
-| 用户故事演绎 SD1-SD24 | `docs/uiue-storyboard-grill-decisions.md` | 冻结（S1-S8 作废项见上）|
+| 用户故事演绎 SD1-SD25 | `docs/uiue-storyboard-grill-decisions.md` | 冻结（S1-S8 作废项见上）|
 | 视觉块 V1-V12 | SD18 + `tokens.md` §3.1/§6/§7/§8 | 冻结（V6 强制色 = S1 取代源）|
 | corner case CC* | SD18/19/20/21/22/23 | 冻结（CC-B2 = S3 作废 / C-ASR-fail = S4 作废）|
 | context capsule | SD24 | 冻结（= S2/S3 取代源）|

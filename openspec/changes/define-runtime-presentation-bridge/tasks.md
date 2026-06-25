@@ -22,7 +22,7 @@
 
 ## 4. Contract fields — snapshot
 
-- [ ] 4.1 Define `PresentationSnapshot` fields: `trace_id`, `cards`, `dialog_text`, `readbacks`, `scope_origin`, `voice_state`, `orb_state`, **`context_scene`**, and finite-enum `proof_class` with display caps and unknown-value fail-closed behavior.
+- [ ] 4.1 Define `PresentationSnapshot` fields: `trace_id`, `cards`, `dialog_text`, `readbacks`, `scope_origin`, `voice_state`, `orb_state`, **`context{vehicle:{speed,gear}, environment:{weather,time_period}}` 四维**（diorama composite，见 4.3；optional `resolved_scene`）, and finite-enum `proof_class` with display caps and unknown-value fail-closed behavior.
 - [ ] 4.2 Define the card schema: family id, cell id, title, value, unit, visual state, `scope_origin`, **`sibling_cells` (for semantic styling: cooling/heating mode + active-cell substitution)**, `active_cell`, reason, available actions, last update.
 - [ ] 4.3 Define `context` as **distinct dimensions** `vehicle{speed, gear}` + `environment{weather, time_period}` (NOT a single pre-resolved scene; the SD24 diorama capsule composites them, e.g. night⊕driving⊕rain layered) + force-context provenance; an optional `resolved_scene` name MAY be offered for convenience; weather/time are context inputs and display facts, not device cards.
 

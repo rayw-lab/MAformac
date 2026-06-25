@@ -189,7 +189,17 @@ TraceEnvelope         { traceID, eventID, requestText, normalizedIntent, guardRe
 
 ## carry-forward（未决/留 bridge，必抄进下个 UIUE closeout，不埋 prose）
 
-- **RPB-16 真多意图 splitter** = DEFERRED runtime backend（Phase4/5 用 sequencer+force-state；NLU splitter 独立立项）。
-- **RPB-01 边界 override** 措辞需在 SD 决策正文回写（SD7 放宽限「snapshot 消费 + 事件写入」非自由 mutate）。
-- **下一步**：P1 RPB-26~40 决策 + 落 thin `define-runtime-presentation-bridge` OpenSpec change（roadmap 已规划路径，bridge ≠ backend，守 thin 不碰实现）。
-- **proof cap**：本决策表只为契约讨论 + UIUE grill 收口，**不声称** C6/模型质量/retrain/golden-run/voice/endpoint/真机 V-PASS。
+> 🔄 **更新 2026-06-25**（A-1 accepted + P1/P2 done + bridge 创建 + A-2 文档先行后；原状态已 stale，下面是当前态）。
+
+**✅ 已 resolved（原 carry-forward 项）**：
+- P1 RPB-26~40 ✅ 决策完 / P2 RPB-41~50 ✅ 完（磊哥提示补）/ 补漏 RPB-51~53 ✅。
+- thin `define-runtime-presentation-bridge` OpenSpec change ✅ **已创建 + strict valid + 磊哥 accepted**（A-2 可消费 mock snapshot）。
+- RPB-01 边界 override ✅ 决策完（accept_contract：SD7 放宽限「snapshot 消费 + bridge 事件写入」非自由 store mutate；已落 ui-presentation **AD-14 §六边界**）。
+
+**🔴 仍未决 / DEFERRED（carry 到下个 closeout）**：
+- **RPB-16 真多意图 splitter** = DEFERRED runtime backend（Phase4/5 用 sequencer+force-state；NLU splitter 独立立项，post model gate）。
+- **scope_origin `missing` 第 4 值仲裁**：bridge AD-RPB-011 提议 `missing`，Core `ScopeOrigin` 仅 3 值（defaulted/explicit/fanout）→ mainline co-author 定（扩 enum or 删 bridge missing）。
+- **scope_origin presentation 消费未实装**：G18 淡显角标策略决了，`Core/Contracts/ContractLookups.swift` renderReadback 仍恒替换 scope → 待 default-scope apply（G01-G28 R-L17 blocker）+ A-2 8.A3/7.A3。
+- **bridge runtime 侧实装**：DEFERRED（mainline co-author review + post model gate）。
+
+**proof cap（standing）**：本决策表只为契约讨论 + UIUE grill 收口，**不声称** C6/模型质量/retrain/golden-run/voice/endpoint/真机 V-PASS。

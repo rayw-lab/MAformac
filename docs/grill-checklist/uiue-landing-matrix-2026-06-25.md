@@ -5,7 +5,7 @@ status: landing_matrix
 artifact_kind: confirmation_sweep
 authority: discussion_input_not_ssot
 created_at: 2026-06-25
-inputs: [docs/UIUE-checklist.md（234）, RPB-01~53, SD1-SD24, V1-V12, CC*, AD-1~14, G01-G28]
+inputs: [docs/UIUE-checklist.md（234）, RPB-01~53, SD1-SD25, V1-V12, CC*, AD-1~14, G01-G28]
 proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation + App + phase matrix）
 ---
 
@@ -21,10 +21,10 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 | **D1-D8**（交互）| 14 | — | D1/D2/D3/D5/D7 落 4a/4b/4c code | D8 部分 | D8.3 思考链路（Phase5）| — |
 | **E0-E8**（orb/事件驱动）| 9 | — | — | — | ✅ **全 Phase5**（orb 未 code）| — |
 | **U1-U31**（UIX）| 31 | — | U6/U10/U13/U26 落 code | 多数 待落 | U5/U24/U28（Metal/投屏/TTS=Phase5/voice）| — |
-| **SD1-SD24**（本 session 演绎）| 24 | — | 仅 4a/4b/4c 重叠部分 | 🔴 **几乎全 待落**（SD18-24 视觉块/corner case/context capsule）| — | V6 跟随系统→强制色 / C-ASR-fail 没听清→二分 |
+| **SD1-SD25**（本 session 演绎）| 25 | — | 仅 4a/4b/4c 重叠部分 | 🔴 **几乎全 待落**（SD18-25 视觉块/corner case/context capsule diorama）| — | V6 跟随系统→强制色 / C-ASR-fail 没听清→二分 |
 | **V1-V12**（视觉块）| 12 | — | — | 🔴 **全 待落**（tokens.md 是 design SSOT，DesignTokens.swift code 未更）| — | — |
 | **CC1-4 + CC-A/B/C**（corner case）| ~18 | — | — | 🔴 **全 待落**（UIValueTypeMapper 无 activeCell 逻辑）| CC-A5 多意图 runtime | — |
-| **RPB-01~53**（runtime bridge）| 53 | — | — | 🔴 **全 待落**（bridge change 未创建）| shared_bridge_contract 实装 DEFERRED | — |
+| **RPB-01~53**（runtime bridge）| 53 | ✅ `define-runtime-presentation-bridge` change（创建+strict valid+磊哥 accepted）| — | code 消费实装待 A-2 8.A | runtime 侧实装 DEFERRED | — |
 | **G01-G28**（default-scope）| 28 | `define-demo-default-scope`（proposal 提议）| — | 🔴 待 apply（Phase -1 R-L17 blocker）| — | — |
 | **锦标赛 R1-R5** | 41 | A2/范式落 specs+code（migrate-d-domain merged main）| A2 ✅ | — | C5/C6/voice 相关 | 旧534系列 |
 
@@ -45,8 +45,8 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 | **SD19/20/21 corner case + 制冷热 + gptPRO细节** | UIValueTypeMapper **无 activeCell/制冷热色/range bar/mode图标/fade** | ui-presentation（visual_only 部分）+ bridge（activeCell 数据）|
 | **SD22 层级滚动** | ContentView 无 z-stack/scroll inset/手动滚 flag/fade-by-active | ui-presentation |
 | **SD23 边界态**（mic-only/portrait/30字/ASR二分/族外）| ContentView **仍有 TextField**（未移除）；无 portrait lock | ui-presentation + bridge（ASR fail/族外 runtime event）|
-| **SD24 context capsule** | 顶栏未重构（品牌未去/图标未移角/无 ContextCapsule）| ui-presentation（呈现）+ bridge（context 数据 RPB-19）|
-| **RPB shared_bridge_contract**（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/event/snapshot/trace/card sibling schema）| bridge **未建**（4 对象 vocabulary 仅 roadmap 提议）| 🔴 **define-runtime-presentation-bridge change（新建，未创建）** |
+| **SD24/25 context capsule diorama** | 顶栏未重构（品牌未去/图标未移角/无 ContextCapsule）；route A vs C-lite 待 spike | ui-presentation 8.B（spike-gated）+ bridge（context 四维 数据）|
+| **RPB shared_bridge_contract**（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/event/snapshot/trace/card sibling/context 四维）| ✅ **bridge change 已建+strict valid+磊哥 accepted**（4 对象 vocabulary）；🔴 code 消费实装待 A-2 8.A | `define-runtime-presentation-bridge` change ✅ + A-2 8.A 消费 |
 | **G01-G28 default-scope** | proposal 提议，**未 apply**（Phase -1 R-L17 blocker）| define-demo-default-scope（apply 待 R-L17）|
 
 ## 四、DEFERRED（明确延后，不阻塞 demo 视觉收口）
@@ -61,10 +61,12 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 
 ## 六、② change 集 scoping（不止 define-runtime-presentation-bridge，磊哥点对）
 
-| change | 类型 | 装什么 | 状态 |
+> 🔄 **更新 2026-06-25**（A-1 创建+accepted + A-2 文档先行后；状态列已推进，原「待创建/待更新」stale）。
+
+| change | 类型 | 装什么 | 状态（2026-06-25 更新）|
 |---|---|---|---|
-| **ui-presentation**（已存在）| 更新 | SD18-24 visual_only（V1-V12/连续舞台/层级滚动/context capsule 呈现/corner case 视觉/边界态）→ AD-14+ + spec + tasks + DesignTokens/ContentView 实装 | 待更新 |
-| **define-runtime-presentation-bridge**（🔴 新建）| 新建 | RPB shared_bridge_contract（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/4对象 vocabulary/card sibling schema）| 待创建（roadmap 规划）|
+| **define-runtime-presentation-bridge**（新建）| 新建 | RPB shared_bridge_contract（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/4对象 vocabulary/card sibling/context 四维）| ✅ **已创建 + strict valid + 磊哥 accepted**（mainline runtime 实现 DEFERRED）|
+| **ui-presentation**（已存在）| 更新 | SD18-25 visual_only（V1-V12/连续舞台/层级滚动/context capsule 呈现/corner case/边界态）| ✅ **文档先行已更新**（AD-14 + tasks §8）；🔴 **DesignTokens/ContentView code 实装待做**（A-2 8.A，仍非连续舞台/仍有 TextField）|
 | **define-demo-default-scope**（已存在）| apply | G01-G28 | 待 apply（R-L17 blocker）|
 | retrain-c5 / rebuild-c6 / golden-run-voice（已存在）| DEFERRED | C5/C6/voice | post model gates |
 

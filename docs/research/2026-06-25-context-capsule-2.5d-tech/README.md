@@ -1,6 +1,6 @@
 # context capsule diorama — C 路线（2.5D hybrid）技术调研
 
-> 2026-06-25。磊哥定 capsule = 「活体迷你窗」diorama（车辆+环境 context 映射），走 C 路线（2.5D hybrid：photoreal still 切层 + SwiftUI parallax/粒子/crossfade）。本文 = C 依赖栈 + adopt 蓝本（github-first）+ pre-mortem + 图够不够。
+> 2026-06-25。磊哥定 capsule = 「活体迷你窗」diorama（车辆+环境 context 映射）。🔴 **route 不拍死**（原倾向 C/2.5D，U30 GPU 约束后改「**A 视频 loop vs C-lite 留 A-2 真机 spike**」，见 §route 重新权衡）。本文 = 依赖栈 + adopt 蓝本（github-first）+ pre-mortem + 图够不够 + teardown。
 > 来源：WebSearch 多路 + 项目内 grill 决策核（U5/U30/U31/E1）。
 
 ## C 路线依赖栈（组件 × 蓝本 × adopt 状态）

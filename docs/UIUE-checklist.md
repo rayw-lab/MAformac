@@ -18,10 +18,10 @@
 | **G01-G28** | 28 | demo default_scope（Phase -1 前置）| `demo-default-scope-grill-decisions-2026-06-24.md` | ✅ 已拍 |
 | **P4-D1/D2/D3 + 4a/4b/4c** | 6 | Phase 4 边界 + 实装收口 | `uiue-phase4-grill-decisions.md` | ✅ 已收口 |
 | **AD-1~AD-14** | 14 | ui-presentation 架构决策（design）| `openspec/changes/ui-presentation/design.md` | ✅（AD-14 待实装落）|
-| **SD1-SD20**（本 session）| 20 | 用户故事演绎 grill（场景/动效/视觉/corner case）| `uiue-storyboard-grill-decisions.md` | ✅ 已拍 |
+| **SD1-SD25**（本 session）| 25 | 用户故事演绎 grill（场景/动效/视觉/corner case/边界态/context capsule diorama）| `uiue-storyboard-grill-decisions.md` | ✅ 已拍 |
 | **V1-V12**（视觉块）| 12 | 间距/字体/圆角/glass容器/theme/连续舞台/注意力/图标/验收/duration/密度 | `uiue-storyboard SD18` + `tokens.md` | ✅ 已拍 |
-| **CC1-CC4 + CC-A/B/C** | ~18 | corner case（座椅盲区/部分deny/行驶态/clarify/制冷热色…）| `uiue-storyboard SD18/SD19/SD20` | ✅ 已拍 |
-| **合计** | **≈234** | — | — | 上百个 ✅ |
+| **CC1-CC4 + CC-A/B/C** | ~18 | corner case（座椅盲区/部分deny/行驶态/clarify/制冷热色…）| `uiue-storyboard SD18-25` | ✅ 已拍 |
+| **合计** | **≈240+**（SD22-25 + RPB 补漏 51-53 后增；≈ 非精确计数）| — | — | 上百个 ✅ |
 
 ---
 
