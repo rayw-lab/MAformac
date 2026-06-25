@@ -79,7 +79,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
     func testDatasetCodecDefaultsMissingAlternativesToEmptyArray() throws {
         let jsonl = """
-        {"case_id":"C6-OLD-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off"},"input_zh":"打开空调","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none"}
+        {"case_id":"C6-OLD-001","behavior_class":"tool_call","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off"},"input_zh":"打开空调","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none"}
         """
 
         let cases = try C6DatasetCodec().decodeJSONL(jsonl)
@@ -98,6 +98,50 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(item.behaviorClass, .alreadyStateNoop)
     }
 
+    func testTrackedDatasetRowsCarryExplicitBehaviorClass() throws {
+        let rows = try C6DatasetCodec().decodeJSONL(readRepoFile("contracts/c6-bench-cases.jsonl"))
+
+        XCTAssertFalse(rows.isEmpty)
+        XCTAssertTrue(rows.allSatisfy { $0.behaviorClass != nil })
+    }
+
+    func testTrackedDatasetBehaviorClassesMatchFiveClassTaxonomy() throws {
+        let rows = try C6DatasetCodec().decodeJSONL(readRepoFile("contracts/c6-bench-cases.jsonl"))
+        let classes = Set(rows.compactMap(\.behaviorClass))
+
+        XCTAssertEqual(classes, Set([
+            .toolCall,
+            .clarifyMissingSlot,
+            .refusalNoAvailableTool,
+            .refusalSafetyOrPolicy,
+            .alreadyStateNoop,
+        ]))
+    }
+
+    func testGeneratedDatasetRowsCarryExplicitBehaviorClass() throws {
+        let rows = try makeGenerator().generate()
+
+        XCTAssertFalse(rows.isEmpty)
+        XCTAssertTrue(rows.allSatisfy { $0.behaviorClass != nil })
+    }
+
+    func testDatasetValidationUsesBehaviorClassForNegativeRatio() throws {
+        var clarifyCoverage = C6BenchCase.fixture(
+            bucket: .coverage,
+            expectedToolCalls: [],
+            expectNoCall: false,
+            expectedStateDelta: [:],
+            readbackContains: [],
+            clarifyTag: .ambiguous,
+            sourceRefs: C6SourceRefs()
+        )
+        clarifyCoverage.behaviorClass = .clarifyMissingSlot
+
+        let validation = try makeGenerator().validate([clarifyCoverage])
+
+        XCTAssertEqual(validation.negativeRatio, 1)
+    }
+
     func testNoCallBucketDoesNotImplyAlreadyStateNoop() throws {
         let item = C6BenchCase.fixture(
             bucket: .noCall,
@@ -108,7 +152,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
             clarifyTag: .rejected
         )
 
-        XCTAssertNil(C6CaseBehaviorClassResolver.resolve(item))
+        XCTAssertEqual(C6CaseBehaviorClassResolver.resolve(item), .refusalNoAvailableTool)
     }
 
     func testCoverageBucketDoesNotMapToBehaviorClass() throws {
@@ -121,7 +165,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
             clarifyTag: .ambiguous
         )
 
-        XCTAssertNil(C6CaseBehaviorClassResolver.resolve(item))
+        XCTAssertEqual(C6CaseBehaviorClassResolver.resolve(item), .clarifyMissingSlot)
     }
 
     func testSafetyRefusalResolvesOnlyFromRiskRuleEvidence() throws {
@@ -141,7 +185,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
     func testDatasetCodecDecodesAcceptableAlternative() throws {
         let jsonl = """
-        {"case_id":"C6-ALT-001","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off","window.position[主驾]":"0"},"input_zh":"有点闷","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none","alternatives":[{"id":"open_driver_window","expected_tool_calls":[{"name":"set_cabin_window","arguments":{"position":"主驾","percent":"20"}}],"expect_no_call":false,"expected_state_delta":{"window.position[主驾]":"20"},"readback_assertion":{"contains":["主驾","20"]},"clarify_tag":"implicit","failure_class":"none","quality":"acceptable","reason":"通风是闷热表达的可接受车控解"}]}
+        {"case_id":"C6-ALT-001","behavior_class":"tool_call","source_refs":{"semantic_contract_ids":["c1_fixture"],"state_cell_ids":["ac.power"],"scenario_ids":["scene1"],"risk_rule_ids":[]},"tags":{"bucket":"action","must_pass":true,"must_not_train":true,"contract_device":"fixture","scenario_id":"scene1","sample_kind":"fixture"},"pre_state":{"ac.power":"off","window.position[主驾]":"0"},"input_zh":"有点闷","expected_tool_calls":[{"name":"set_cabin_ac","arguments":{"power":"on"}}],"expect_no_call":false,"expected_state_delta":{"ac.power":"on"},"readback_assertion":{"contains":["空调"]},"clarify_tag":"implicit","failure_class":"none","alternatives":[{"id":"open_driver_window","expected_tool_calls":[{"name":"set_cabin_window","arguments":{"position":"主驾","percent":"20"}}],"expect_no_call":false,"expected_state_delta":{"window.position[主驾]":"20"},"readback_assertion":{"contains":["主驾","20"]},"clarify_tag":"implicit","failure_class":"none","quality":"acceptable","reason":"通风是闷热表达的可接受车控解"}]}
         """
 
         let item = try XCTUnwrap(try C6DatasetCodec().decodeJSONL(jsonl).first)
@@ -972,7 +1016,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         let unresolved = C6BenchCase.fixture(
             caseID: "C6-UNRESOLVED-001",
             bucket: .noCall,
-            expectedToolCalls: [],
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
             expectNoCall: true,
             expectedStateDelta: [:],
             readbackContains: [],

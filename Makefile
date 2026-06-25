@@ -21,7 +21,7 @@ GENERATED_DOMAIN := \
 	generated/strangler_map.json \
 	generated/rendered_tools_text
 
-.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface verify-default-scope diff test clean-venv
+.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -29,7 +29,7 @@ GENERATED_DOMAIN := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-default-scope diff test
+verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
@@ -37,7 +37,7 @@ verify-all: verify swift-test
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-default-scope diff test swift-test
+verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test swift-test
 
 swift-test:
 	swift test
@@ -51,6 +51,9 @@ verify-cross-section:
 verify-surface: .venv/.deps.stamp
 	$(PYTHON) scripts/surface_consistency.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
 	$(PYTHON) scripts/verify_gold.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
+
+verify-c6-shape: .venv/.deps.stamp
+	$(PYTHON) scripts/check_c6_case_shape.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json
 
 verify-default-scope: .venv/.deps.stamp
 	$(PYTHON) scripts/check_default_scope_ssot.py
