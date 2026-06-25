@@ -63,13 +63,21 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 | `contracts/semantic-function-contract.jsonl` *(C1 建)* | **唯一契约源**(源行级全集;`function-spec-full.yaml`/规则/LoRA/bench 皆生成物) |
 | `docs/handoffs/` | session 交接(收工 ≤ 40 行) |
 | `Tools/skills/` *(symlink `.claude/skills/`)* | **MAformac 沉淀技能**(2026-06-24 起);索引 + 组合替代见 `Tools/skills/INDEX.md` |
+| `Tools/agent-platform-plugin-refs/` | **本机 iOS/macOS build 插件引用**:软链接到 Codex `build-ios-apps` / `build-macos-apps` 插件与 skills;做 SwiftUI、iOS、macOS、Liquid Glass、模拟器、性能或打包任务前先读 |
 
 > `docs/` 放**设计资产**(相对稳定);`openspec/` 放**活的推进事实源**(随 archive 生长)。互补不重复。
 
 ### 技能沉淀与验证门(2026-06-24,superpowers v6.0.3)
 
 - **沉淀技能** `Tools/skills/`(symlink 到 `.claude/skills/`,source 在 Tools/):4 BUILD = `archive-research-pack` / `verify-external-claims` / `doc-cascade-sweep` / `closeout-receipt-writer`(用 superpowers `writing-skills` 的 TDD-for-skills 法建,baseline 取 production 实证)。**通用流程直接用 superpowers v6**(`writing-plans` / `subagent-driven-development` / `test-driven-development` / `verification-before-completion` / `using-git-worktrees`;plugin `superpowers@claude-plugins-official` **6.0.3** enabled)。索引 + adopt 组合替代链路 = ⭐`Tools/skills/INDEX.md`。
+- **平台插件引用** `Tools/agent-platform-plugin-refs/`:本机软链接索引,不是项目源代码。后续前端/后端运行时/UIUE/视觉/打包相关 agent 起手应读取其中 `build-ios-apps-*` 和 `build-macos-apps-*` 的 `SKILL.md`/references,再写实现或评审。
 - 🔴 **make-verify-gate = 已自动化,不做 skill**:改 `contracts/` / codegen / spec 后**必跑** `make verify`(verify-source→regen→verify-refs→verify-cross-section→verify-surface→diff→test)或 `make verify-all`(+`swift test`)——mechanical fail-closed 门(claim-vs-reality 机械化),非文档技能。
+- 🔴 **项目 build / test 命令**(实证过,UIUE/前端实装验收用;主线已配 scheme + build 插件引用):
+  - **单测**:`swift test`(Core 单元测试,实证 222/0)。
+  - **本地验收门**:`make verify`(无 swift test) / `make verify-all`(= swift test + make verify,完整门,D1 决策本地替 CI)。
+  - **双端 build**:`xcodebuild -scheme **MAformacMac** -destination 'platform=macOS' build` / `xcodebuild -scheme **MAformacIOS** -destination 'platform=iOS Simulator,name=<sim>' build`——🔴 **scheme 是 `MAformacMac`/`MAformacIOS`,不是 `MAformac`**(codex 曾用错 scheme)。
+  - **iOS 模拟器 build+视觉验证**:`Tools/skills/ios-simulator-skill/scripts/build_and_test.py` + `simctl`(force-state 截图:launch arg `-forceVisualState <态>`,见 `App/DebugGallery.swift`)。
+  - **实装前先读** `Tools/agent-platform-plugin-refs/build-{ios,macos}-apps-skills/` 的 `swiftui-liquid-glass`/`liquid-glass`/`swiftui-ui-patterns`/`build-run-debug`/`ios-simulator-browser` SKILL.md(CLAUDE §73 纪律)。
 - **maformac-onboard = 起手读链**(本文件顶部 + §9 已定),不另做 skill。
 
 ## 4. 技术栈 & 架构（已锁,改动走 openspec change + 入 decisions）

@@ -30,9 +30,10 @@ Current audited state:
 1. `CLAUDE.md` — project constitution and highest routing rule.
 2. `docs/CURRENT.md` — this route board; expire and update it at phase transition.
 3. `docs/README.md` — document map.
-4. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
-5. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
-6. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
+4. `Tools/agent-platform-plugin-refs/README.md` — local iOS/macOS build plugin references for SwiftUI, Liquid Glass, simulator, performance, and packaging work.
+5. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
+6. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
+7. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
 
 ## Do Now
 
@@ -68,15 +69,16 @@ Current audited state:
 
 UIUE remains outside mainline blockers unless state, C3-C6, readback, golden-run IDs, or default-scope presentation contracts conflict.
 
-Current external reference at audit:
+Current UIUE-lane state (2026-06-25, updated):
 
 - Worktree: `/Users/wanglei/workspace/MAformac-uiue`
-- Branch: `uiue/visual-ssot-state-consume`
-- HEAD: `17f2af1`
-- Dirty file: `openspec/changes/ui-presentation/proposal.md`
-- Latest visible progress: UIUE proposal text now claims spec agreed, Phase 1b engineering preflight done, Phase 3 D7 seven-state consumption applied and audited, and Phase 4 card/default-scope consumption waiting for backend `default_scope` on main.
+- Branch: `uiue/phase4-default-scope-presentation`
+- HEAD: `9cf1af2`
+- Active UIUE work: visual/interaction grill closeout (SD18-24: 视觉块 V1-V12 + corner cases + 制冷热 + 层级滚动 + context capsule) in `docs/uiue-storyboard-grill-decisions.md`; grill freeze + supersession registry (S1-S10) in `docs/grill-checklist/uiue-grill-定档-2026-06-25.md`; landing matrix (234 grill 落地态) in `docs/grill-checklist/uiue-landing-matrix-2026-06-25.md`; runtime bridge grill decisions (RPB-01~53) in `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md`.
+- New OpenSpec change: `openspec/changes/define-runtime-presentation-bridge/` — **proposed; `openspec validate --strict` pass; contract-only; no Swift implementation; no runtime/voice/C6/endpoint/V·S·U-PASS readiness claims**. Authored in UIUE lane, fulfills parent roadmap Task 2, awaiting mainline co-authorship review (mainline MUST NOT create a second bridge change).
+- Next: A-2 = update `ui-presentation` change + DesignTokens/ContentView high-quality visual implementation (consumes bridge contract).
 
-This is not mainline evidence. Record it as `external_reference_unverified_current_head=17f2af1` until a separate UIUE reconfirm pass reads the current files and pins the expected merge contract.
+This is UIUE-lane state, not mainline evidence. Bridge recorded as `proposed_strict_valid_contract_only`; reconfirm at the contract intersection before mainline merge.
 
 ## Current Carrier Summary
 
