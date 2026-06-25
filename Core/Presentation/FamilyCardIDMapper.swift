@@ -6,7 +6,7 @@ import Foundation
 /// → 消费侧从 `cell.key` 前缀派生（同 `ui_value_type` 派生纪律，不写回 yaml / 不给 Core struct 加字段）。
 ///
 /// `allCases` 顺序 = 排序兜底（`family-device-allowlist.json row_count` 缺失时），常驻骨架稳定性依赖此固定序。
-enum FamilyCardID: String, CaseIterable, Equatable {
+enum FamilyCardID: String, CaseIterable, Equatable, Hashable {
     case ac, seat, window, screen, ambient, door, volume, wiper, sunroofShade, fragrance
 }
 

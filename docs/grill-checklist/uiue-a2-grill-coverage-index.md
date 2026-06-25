@@ -54,7 +54,7 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 
 | SD | 内容 | Phase | 状态 | 消减 |
 |---|---|---|---|---|
-| SD1 idle 全景开场 | P0 coldStart | ⬜ | - [ ] |
+| SD1 idle 全景开场 | P0 coldStart | ✅ | - [x] |
 | SD2 push-to-talk + 苹果 ASR | P2 mic dock UI（ASR backend ⏳voice）| 🟡 | - [ ] |
 | SD3 对话流 DialogueBubble | P2 | ⬜ | - [ ] |
 | SD4 氛围灯 3 动作 | P1 mapper + P2 卡片渐变 + **P5 炸场** | ⬜ | - [ ] |
@@ -119,7 +119,7 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 
 | RPB 组（覆盖 53 全集）| 内容 | Phase | 消减 |
 |---|---|---|---|
-| **RPB-01~08** 基础 vocabulary | snapshot / scope_origin 单源 / refusal class / proof class / 主线程不阻塞 / source⊥scope_origin（RPB-08）| P0 容器 | - [ ] |
+| **RPB-01~08** 基础 vocabulary | snapshot / scope_origin 单源 / refusal class / proof class / 主线程不阻塞 / source⊥scope_origin（RPB-08）| P0 容器 | - [x] |
 | **RPB-09~17** result 分类 | refusal(unsupported·safety RPB-09·10) / already_state_noop(RPB-14) / partial-deny(RPB-17·CC-A4) / splitter(RPB-16 ⏳DEFERRED) | P0 + P2 边界 + P3 mock | - [ ] |
 | **RPB-18~25** snapshot 字段/context/边界 | force-context 四维(RPB-19·AD-RPB-014) / think 事件门(RPB-21 ⏳Phase5) / voice·orb 边界(RPB-22·23) / 已落字段 | P0 + P4 force + ⏳Phase5 | - [ ] |
 | **RPB-26~40** P1 contract 字段 | snapshot card schema(RPB-30 + sibling·activeCell) / orb 状态源(RPB-33 ⏳Phase5) / 其余字段 | P0 容器 freeze + 消费各 Phase | - [ ] |
@@ -129,6 +129,8 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 | **RPB-53（追加）** think 两语义张力 | analyzing 事件驱动 vs 安全固定 1.0s | ⏳ Phase5 think | - [ ] |
 
 > RPB 全 53 项已在 `uiue-runtime-bridge-decisions-2026-06-25.md` one-id-one-row 决策完成；本文只做 A-2 执行分组消减。P0 一次 freeze vocabulary 容器（snapshot/result_kind 8 类/context 四维/proof_class/source·scope_origin）；code 消费按 Phase（sibling→P1/P2 制冷热·activeCell / force-context→P4 演绎控制台 / voice·orb·think·splitter→⏳Phase5/voice/post-model）。
+
+Phase 0 receipt: `docs/research/2026-06-25-a2-execution/phase-0-receipt.md`（TDD + full `swift test` + 双端 build；anchor pixel compare skipped because this phase has no UI delta）。
 
 ### 相关 U 系列（视觉/交互 → Phase；余已落/main/voice）
 
