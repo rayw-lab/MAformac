@@ -75,6 +75,7 @@ struct C6BenchCLI {
         let validation = generator.validate(cases)
         let qwenHash = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
         let contractDigest = try C6Hash.contractDigest(repoRoot: repoRoot, datasetText: datasetText)
+        let contractBundleFingerprint = try C6ContractBundleFingerprint.receipt(repoRoot: repoRoot, datasetText: datasetText)
         let envelope = try SpikeE3Envelope.load(url: URL(fileURLWithPath: modelResultsPath))
         let modelArtifactDigest = try artifactDigest(path: modelArtifactPath, flag: "--model-artifact")
         let tokenizerDigest = try artifactDigest(path: tokenizerArtifactPath, flag: "--tokenizer-artifact")
@@ -95,6 +96,7 @@ struct C6BenchCLI {
             modelID: envelope.modelID,
             modelArtifactDigest: modelArtifactDigest,
             tokenizerDigest: tokenizerDigest,
+            contractBundleFingerprint: contractBundleFingerprint,
             loraAdapterDigest: loraAdapterDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
@@ -202,6 +204,11 @@ struct C6BenchCLI {
         lora_adapter_digest: "\(summary.loraAdapterDigest)"
         qwen_tool_call_format_version: \(summary.qwenToolCallFormatVersion)
         contract_digest: \(summary.contractDigest)
+        contract_bundle_fingerprint:
+          schema_version: \(summary.contractBundleFingerprint.schemaVersion)
+          bundle_hash: \(summary.contractBundleFingerprint.bundleHash)
+          component_digests:
+        \(summary.contractBundleFingerprint.componentDigests.keys.sorted().map { "    - \($0): \(summary.contractBundleFingerprint.componentDigests[$0] ?? "")" }.joined(separator: "\n"))
 
         ## Dataset
         - cases: \(validation.caseCount)

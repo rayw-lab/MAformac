@@ -751,6 +751,99 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(run.contractDigest, "contract-digest")
     }
 
+    func testContractBundleFingerprintIsDeterministicAndOrdered() throws {
+        let unordered = Array(sampleContractBundleComponents().reversed())
+
+        let manifest = try C6ContractBundleFingerprint.manifest(components: unordered)
+        let reversed = Array(unordered.reversed())
+
+        XCTAssertEqual(manifest.manifestVersion, C6ContractBundleFingerprint.schemaVersion)
+        XCTAssertEqual(manifest.components.map(\.componentID), [
+            "c1.semantic_function_contract",
+            "c2.state_cells_renderer",
+            "c6.bench_cases",
+            "d_domain.demo_tool_catalog",
+            "d_domain.ir_map",
+            "qwen.tool_call_format"
+        ])
+        XCTAssertEqual(
+            try C6ContractBundleFingerprint.fingerprint(components: unordered),
+            try C6ContractBundleFingerprint.fingerprint(components: reversed)
+        )
+
+        let repoManifest = try C6ContractBundleFingerprint.manifest(
+            repoRoot: repoRootURL(),
+            datasetText: try readRepoFile("contracts/c6-bench-cases.jsonl")
+        )
+        XCTAssertEqual(repoManifest.components.map(\.componentID), [
+            "c1.semantic_function_contract",
+            "c2.state_cells_renderer",
+            "c6.bench_cases",
+            "d_domain.demo_tool_catalog",
+            "d_domain.ir_map",
+            "qwen.tool_call_format"
+        ])
+    }
+
+    func testContractBundleFingerprintChangesWhenComponentDigestChanges() throws {
+        let baseline = sampleContractBundleComponents()
+        let changed = sampleContractBundleComponents(overrides: ["c2.state_cells_renderer": "9999"])
+
+        XCTAssertNotEqual(
+            try C6ContractBundleFingerprint.fingerprint(components: baseline),
+            try C6ContractBundleFingerprint.fingerprint(components: changed)
+        )
+    }
+
+    func testEvalRunCarriesContractBundleFingerprintWithoutReplacingPerRunDigests() throws {
+        let runner = try makeRunner(contractBundleFingerprint: sampleContractBundleFingerprintRecord(bundleHash: "bundle-fingerprint"))
+        let caseItem = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+        let run = try runner.evaluate(case: caseItem, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开", samplingSeed: "9"), runIndex: 9)
+
+        XCTAssertEqual(run.contractBundleFingerprint.schemaVersion, C6ContractBundleFingerprint.schemaVersion)
+        XCTAssertEqual(run.contractBundleFingerprint.bundleHash, "bundle-fingerprint")
+        XCTAssertEqual(run.contractBundleFingerprint.componentDigests["c1.semantic_function_contract"], "1111")
+        XCTAssertEqual(run.promptHash, C6Hash.sha256Hex(Data(caseItem.inputZh.utf8)))
+        XCTAssertEqual(run.toolOutputDigest, C6Hash.sha256Hex(C6CanonicalJSON.encode([
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ])))
+        XCTAssertEqual(run.contractDigest, "contract-digest")
+        XCTAssertEqual(run.modelArtifactDigest, "model-digest")
+        XCTAssertEqual(run.tokenizerDigest, "tokenizer-digest")
+        XCTAssertEqual(run.loraAdapterDigest, "")
+    }
+
+    func testContractBundleFingerprintFailsClosedOnMissingComponent() throws {
+        let components = sampleContractBundleComponents(omitting: ["c2.state_cells_renderer"])
+
+        XCTAssertThrowsError(try C6ContractBundleFingerprint.manifest(components: components)) { error in
+            XCTAssertEqual(
+                error as? C6ContractBundleError,
+                .missingRequiredComponents(componentIDs: ["c2.state_cells_renderer"])
+            )
+        }
+    }
+
+    func testContractBundleFingerprintReceiptFailsClosedOnMissingComponent() throws {
+        let manifest = C6ContractBundleManifest(
+            manifestVersion: C6ContractBundleFingerprint.schemaVersion,
+            components: sampleContractBundleComponents(omitting: ["c2.state_cells_renderer"])
+        )
+
+        XCTAssertThrowsError(try C6ContractBundleFingerprint.receipt(manifest: manifest)) { error in
+            XCTAssertEqual(
+                error as? C6ContractBundleError,
+                .missingRequiredComponents(componentIDs: ["c2.state_cells_renderer"])
+            )
+        }
+    }
+
     func testLoRAIdentifierRequiresAdapterDigest() throws {
         let runner = try makeRunner(
             loraAdapterID: "adapter-a",
@@ -983,9 +1076,20 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(summary.modelArtifactDigest, "model-digest")
         XCTAssertEqual(summary.tokenizerDigest, "tokenizer-digest")
         XCTAssertEqual(summary.loraAdapterDigest, "")
+        XCTAssertEqual(summary.contractBundleFingerprint.schemaVersion, C6ContractBundleFingerprint.schemaVersion)
+        XCTAssertEqual(summary.contractBundleFingerprint.bundleHash, "contract-bundle-fingerprint")
+        XCTAssertEqual(summary.contractBundleFingerprint.componentDigests["c1.semantic_function_contract"], "1111")
         XCTAssertEqual(Set(summary.evalRuns.map(\.modelArtifactDigest)), ["model-digest"])
         XCTAssertEqual(Set(summary.evalRuns.map(\.tokenizerDigest)), ["tokenizer-digest"])
         XCTAssertEqual(Set(summary.evalRuns.map(\.loraAdapterDigest)), [""])
+        XCTAssertEqual(Set(summary.evalRuns.map(\.contractBundleFingerprint.bundleHash)), ["contract-bundle-fingerprint"])
+
+        let encoded = try JSONEncoder().encode(summary)
+        let json = String(decoding: encoded, as: UTF8.self)
+        XCTAssertTrue(json.contains("\"contract_bundle_fingerprint\""))
+        XCTAssertTrue(json.contains("\"schema_version\""))
+        XCTAssertTrue(json.contains("\"bundle_hash\""))
+        XCTAssertTrue(json.contains("\"component_digests\""))
     }
 
     // MARK: - S5 D-domain 迁移回归 + C5/C6 同源 parity(防 0/34 换皮)
@@ -1092,22 +1196,55 @@ final class C6VehicleToolBenchTests: XCTestCase {
     private func makeRunner(
         modelArtifactDigest: String = "model-digest",
         tokenizerDigest: String = "tokenizer-digest",
+        contractBundleFingerprint: C6ContractBundleFingerprintRecord? = nil,
         loraAdapterID: String = "",
         loraCheckpointID: String = "",
         loraAdapterDigest: String = "",
         stateCells: StateCellContractLookup? = nil
     ) throws -> C6BenchRunner {
-        C6BenchRunner(
+        let contractBundleFingerprint = try contractBundleFingerprint ?? sampleContractBundleFingerprintRecord(bundleHash: "contract-bundle-fingerprint")
+        return C6BenchRunner(
             qwenToolCallFormatVersion: "format-hash",
             contractDigest: "contract-digest",
             modelID: "base",
             modelArtifactDigest: modelArtifactDigest,
             tokenizerDigest: tokenizerDigest,
+            contractBundleFingerprint: contractBundleFingerprint,
             loraAdapterDigest: loraAdapterDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
             stateCells: try stateCells ?? StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
         )
+    }
+
+    private func sampleContractBundleFingerprintRecord(
+        bundleHash: String
+    ) throws -> C6ContractBundleFingerprintRecord {
+        var receipt = try C6ContractBundleFingerprint.receipt(components: sampleContractBundleComponents())
+        receipt.bundleHash = bundleHash
+        return receipt
+    }
+
+    private func sampleContractBundleComponents(
+        overrides: [String: String] = [:],
+        omitting: Set<String> = []
+    ) -> [C6ContractBundleComponent] {
+        let rows = [
+            ("c1.semantic_function_contract", "1111"),
+            ("c2.state_cells_renderer", "2222"),
+            ("c6.bench_cases", "3333"),
+            ("qwen.tool_call_format", "4444"),
+            ("d_domain.ir_map", "5555"),
+            ("d_domain.demo_tool_catalog", "6666")
+        ]
+        return rows.compactMap { componentID, defaultDigest in
+            guard !omitting.contains(componentID) else { return nil }
+            return C6ContractBundleComponent(
+                componentID: componentID,
+                version: "v1",
+                contentDigest: overrides[componentID] ?? defaultDigest
+            )
+        }
     }
 
     private func readRepoFile(_ relativePath: String) throws -> String {

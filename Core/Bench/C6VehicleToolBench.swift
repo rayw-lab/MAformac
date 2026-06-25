@@ -662,6 +662,7 @@ public struct C6EvalRun: Codable, Equatable, Sendable {
     public var samplingSeed: String
     public var toolOutputDigest: String
     public var contractDigest: String
+    public var contractBundleFingerprint: C6ContractBundleFingerprintRecord
     public var gateResult: C6GateResult
     public var elapsedMs: Int?
 
@@ -679,6 +680,7 @@ public struct C6EvalRun: Codable, Equatable, Sendable {
         case samplingSeed = "sampling_seed"
         case toolOutputDigest = "tool_output_digest"
         case contractDigest = "contract_digest"
+        case contractBundleFingerprint = "contract_bundle_fingerprint"
         case gateResult = "gate_result"
         case elapsedMs = "elapsed_ms"
     }
@@ -696,6 +698,7 @@ public struct C6EvalRun: Codable, Equatable, Sendable {
             && !samplingSeed.isEmpty
             && !toolOutputDigest.isEmpty
             && !contractDigest.isEmpty
+            && contractBundleFingerprint.hasRequiredFields
     }
 }
 
@@ -765,6 +768,7 @@ public struct C6Summary: Codable, Equatable, Sendable {
     public var loraAdapterDigest: String
     public var qwenToolCallFormatVersion: String
     public var contractDigest: String
+    public var contractBundleFingerprint: C6ContractBundleFingerprintRecord
     public var totalCases: Int
     public var totalRuns: Int
     // Legacy compatibility field. Rebuild-C6 construction reports per-layer stats in
@@ -791,6 +795,7 @@ public struct C6Summary: Codable, Equatable, Sendable {
         case loraAdapterDigest = "lora_adapter_digest"
         case qwenToolCallFormatVersion = "qwen_tool_call_format_version"
         case contractDigest = "contract_digest"
+        case contractBundleFingerprint = "contract_bundle_fingerprint"
         case totalCases = "total_cases"
         case totalRuns = "total_runs"
         case IrrelAcc
@@ -1162,6 +1167,7 @@ public struct C6BenchRunner: Sendable {
     public var modelID: String
     public var modelArtifactDigest: String
     public var tokenizerDigest: String
+    public var contractBundleFingerprint: C6ContractBundleFingerprintRecord
     public var loraAdapterID: String
     public var loraCheckpointID: String
     public var loraAdapterDigest: String
@@ -1175,6 +1181,7 @@ public struct C6BenchRunner: Sendable {
         modelID: String,
         modelArtifactDigest: String,
         tokenizerDigest: String,
+        contractBundleFingerprint: C6ContractBundleFingerprintRecord,
         loraAdapterDigest: String = "",
         loraAdapterID: String = "",
         loraCheckpointID: String = "",
@@ -1186,6 +1193,7 @@ public struct C6BenchRunner: Sendable {
         self.modelID = modelID
         self.modelArtifactDigest = modelArtifactDigest
         self.tokenizerDigest = tokenizerDigest
+        self.contractBundleFingerprint = contractBundleFingerprint
         self.loraAdapterID = loraAdapterID
         self.loraCheckpointID = loraCheckpointID
         self.loraAdapterDigest = loraAdapterDigest
@@ -1217,6 +1225,7 @@ public struct C6BenchRunner: Sendable {
             samplingSeed: output.samplingSeed,
             toolOutputDigest: actualDigest,
             contractDigest: contractDigest,
+            contractBundleFingerprint: contractBundleFingerprint,
             gateResult: gate,
             elapsedMs: output.elapsedMs
         )
@@ -1390,6 +1399,7 @@ public struct C6BenchRunner: Sendable {
             loraAdapterDigest: loraAdapterDigest,
             qwenToolCallFormatVersion: qwenToolCallFormatVersion,
             contractDigest: contractDigest,
+            contractBundleFingerprint: contractBundleFingerprint,
             totalCases: cases.count,
             totalRuns: runs.count,
             IrrelAcc: irrelAcc,
