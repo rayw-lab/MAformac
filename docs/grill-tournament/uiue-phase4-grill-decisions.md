@@ -122,3 +122,14 @@ gptpro（GPT Pro 网页）对 PR #6 出**产品架构意见**（8 点，`/Users/
 **4b 前防雷的硬收获（claim-vs-reality 实锤）**：gptpro 第 2 点「`default:.badge` 吞错」→ 核 state-cells 33 base 一手 type，**catch 真 bug `window.lock`（enum locked/unlocked 二值锁）被 `default` 静默吞成 badge，实为 toggle**——4b 做 toggle 图形控件时会「为什么车窗锁没开关控件」追查灾难。修法 = `UIValueTypeMapper.mapping` 33 base 显式字典 SSOT + `default→assertionFailure` + contract-driven 闭合测试（遍历 yaml 全 base 断言 isMapped）。验收：swift test 206/0 · make verify exit0 · gate 三场景自验（升级 grep 真 enforce 数据源）· xcodebuild 两端 SUCCEEDED。
 
 → **4a 收口完成（计划态+执行态双绿）**，进 4b（value.type 异构控件 + 座椅 composite + 触发聚焦），承接 P4-D1 4b 段 + P4-D2②座椅 + 真 P4-D3 已锁 opacity 默认+mge gated。
+
+## Phase 4b/4c 实装收口（2026-06-25，CC ultracode 自驱 spike-first，承接 grill 零自拍）
+
+**4b/4c 执行态完成**（commit `2a6bfe1`→`322e101`，4 task）：
+- ✅ **4b Task11 value.type 异构控件**：`ValueControlView` 5 类穷尽 switch 禁 AnyView（dial=`Gauge(.accessoryCircular)` 非 watchOS / percent=`Gauge(.accessoryCircularCapacity)` / stepper=分段条 / toggle / badge 二级 BadgeRenderStyle switch）+ `ValueRangeMapper`（execution_range **委托 A2 `StateCellContractLookup`** 单一 SSOT）。**spike-first 解除 P4-D1 tiger**（`-spikeControls` 截图实查 `.accessoryCircular` iOS 真渲染环形仪表 + Grid 不冲突，非 watchOS 编译错）。
+- ✅ **4b Task12+13 触发聚焦展开 + 座椅 composite**：`FocusController`（AD-4 单点聚焦 MAX=1）+ `ExpandedFamilyDisplay`（device composite，按 valueType 分组排序 → 座椅 stepper×3→percent→badge **行分3类 P4-D2②**）+ `ExpandedFamilyCard`（ContentView ZStack overlay 非 sheet + ultraThinMaterial dim + opacityScale 320ms D5默认 mge gated + 族卡 onTapGesture AD-12§三）。`-spikeExpanded` 截图实查座椅展开（环形/分段×3/容量环/模式胶囊 + dim blur + 态图标双通道）。
+- ✅ **4c Task14 多意图错峰**：`StaggerSchedule`（220ms 单点串行 schedule 可测）+ `MultiCallSequencer`（@Observable surfacedFamilies 依次 append）—— AD-4/AD-8.5/AD-12§四。`-spikeSequencer` 截 2 帧（中间态前3族亮/后7待命 vs 完成5亮）**实查证序列化错峰非同时炸**（D8.5 + 「稳>炸」北极星）。view 端到端错峰（多意图触发源）依赖 splitter runtime 链路（AD-4 锚，phase matrix）。
+- ✅ **验收门**：swift test **221/0** · make verify-all exit0（契约门+gate+diff）· xcodebuild macOS+iOS SUCCEEDED · pre-commit 三门 · 5 spike 截图 Read 实查渲染（claim-vs-reality 非声称截图）。
+- 🔴 **§28 教训（lessons #10）**：ValueRangeMapper 先建重复 `ExecutionRange` 被 A2 已有 ambiguous catch → 回退委托。catalog 本身与 A2 `StateCellContractLookup` 重复（4a 遗留）记 design AD-13 phase matrix harden（上抛磊哥重构范围）。
+
+→ **4b/4c 执行态完成**，待整体异源审（codex rescue 非同源）+ push。
