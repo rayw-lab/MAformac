@@ -67,6 +67,38 @@
 
 ---
 
+## 🔴 §grill 决策内联速查（不翻原文照此做，每 Phase 必守；anchor 与 grill 冲突 → grill 胜）
+
+> 🔴 **派单铁律**：grill 关键决策**内联于此**（rule `dispatch-inline-ssot-not-pointer`）——**别只看 anchor 图猜**（anchor 只是视觉质量下限取证标尺，grill 是产品定义）。每条带 file:line，深查去原文。
+
+### Phase 2 连续舞台 — 布局/视觉硬规则（🔴 最易凭 anchor 图猜错，逐条守）
+- 🔴 **平台分支布局（V12 `storyboard:328` + U14 `grill-master:145`，codex 已猜错过）**：
+  - **iPhone = 竖直三屏**：orb 顶 / 对话流中 / 车控下；2 列滚动 + active hero 放大。
+  - **Mac = 左右分栏**：左 orb+对话 / 右车控 **5×2 全景不滚动**；**AnyLayout 并排，禁 SplitView**（破单屏沉浸）；Mac resize 弹性 + min width 保 5×2（`storyboard:493`）。
+  - 🔴 **anchor / gptPRO 图是 centered = 参考，不改 centered，守左右分栏**（SD21 `:442`）。**别拿 iPhone 2 列硬套 macOS。**
+- **去品牌 + 顶栏（SD24 `:527/:547`）**：品牌「MAformac」**去掉** / 设置·刷新**右上 standalone**（不进 capsule）/ 左上空出 / 中间 ContextCapsule。
+- **mic dock（SD18 V7 `:335` + Z1 `:456`）**：72-80pt floating glass capsule，左状态点 / 中「按住说话」/ 右波形·mic symbol，按住扩张发光；z-top 钉底 + 车控 ScrollView 底 `contentInset = 72-80 + gap12`（末行卡滚到 dock 上方不被糊）。
+- **对话流（SD3 `:47/:51`）**：user 右气泡 / assistant 左气泡，ScrollView 累积 + `scrollTo(last)`。
+- **制冷热（SD20 `:414/:419/:433`）**：空调温度数值下 `LinearGradient` 渐变下划线，色由 `ac.mode` 驱动：**制冷→蓝(`#1AA6FF`/glow.cyan) / 制热→红(`#FF4D6D`) / auto→蓝红渐变**；mode 图标 ❄️蓝雪花/红热浪；接 `SemanticColorMapper`（每 mode 有色不落 default）；tokens §1 `semantic.cool/warm`；下划线辅助不抢主数值（V8）。
+- **氛围灯卡片渐变（SD4 `:70`）**：氛围灯卡 = 该色**渐变常驻**（非纯色块）；卡片=状态 / 边缘=炫反馈（Phase 5），不重复。
+- **层级滚动 SD22 / 注意力 fade V8 / tokens V1-12** → 见 §0 tokens.md + SD22。
+
+### Phase 4 演绎控制台（SD14 `:245/:246/:252/:253`）
+- 布局 = **控制中心式竖排模块卡**（常态/整车/环境/座舱 VStack，圆角+material+segmented 互斥）。
+- 常态运行卡：● 当前常态 + [查看全部≣]→`AllStateSheet`（33 base 按 10 族分组网格弹窗）+ [⟲ 一键复位]（=DemoReset，`NormalRunPreset`）。
+- 整车 segmented[静态/泊车/城市/高速]+挡位[P/R/N/D] / 环境 天气[晴/雨]+时段[白天/夜晚] **互斥单选**。
+- 视觉对齐 10 族卡 + iOS26 glass 功能层（SD15）；时段 ⊥ 主题正交。
+
+### Phase 5 氛围灯炸场（SD4 `:64/:69/:70`）
+- `AmbientEdgeBurst`：屏幕边缘 **8 色混合发光**（紫→紫金/红→红橙/青→青紫/绿→绿青/蓝→蓝青/白→白金/橙→橙金/黄→黄金）；**仅氛围灯指令触发**（idle 不显示）；执行成功瞬间闪烁 + **Canvas 粒子爆发 5s phaseAnimator → fade out**；`allowsHitTesting(false)`；守 U30（Canvas 非 layerEffect）。
+
+### Phase 6 capsule diorama（SD24/25 `:547`）
+- 「活体迷你窗」分层动画（天空/车/路/天气，偏左 2.5D）；读 context（vehicle.speed/weather/time_period，RPB-19/52）切场景；route A 视频 vs C-lite 模拟器 spike；图标在 capsule 外；动画 subtle/slow 低视觉重量不抢 orb/卡片（V8）。
+
+> Phase 0/1/3 的 grill 决策已细化进各 Task（bridge vocabulary / mapper 契约存在性 / 触控链 3.1a-d）。
+
+---
+
 ## heavy-work harness 管控（每 Phase）
 
 1. **每 Phase = 执行线 + Phase gate**。
