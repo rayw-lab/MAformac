@@ -84,4 +84,46 @@ final class VehicleCardDisplayTests: XCTestCase {
         XCTAssertNil(displays[0].scopeBadge)
         XCTAssertEqual(displays[0].accessibilityKey, "window.position[前排]")
     }
+
+    func testAcFamilyDisplayCarriesModeSiblingForThermalTint() {
+        let cards = VehicleCardDisplay.familyDisplays(
+            from: [
+                DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1),
+                DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷", revision: 1)
+            ],
+            catalog: StateCellPresentationCatalog.load()
+        )
+
+        let ac = cards.first { $0.familyCardID == .ac }
+        XCTAssertEqual(ac?.siblingCells.contains { $0.key == "ac.mode" }, true)
+    }
+
+    func testActiveCellOverridesPrimaryOnlyWhenFamilyIsNonNormal() {
+        let cards = VehicleCardDisplay.familyDisplays(
+            from: [
+                DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "0", revision: 1, visualState: .normal),
+                DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "30", revision: 2, visualState: .changing)
+            ],
+            activeCells: [.seat: "seat.backrest_angle[主驾]"],
+            catalog: StateCellPresentationCatalog.load()
+        )
+
+        let seat = cards.first { $0.familyCardID == .seat }
+        XCTAssertEqual(seat?.valueText, "30%")
+        XCTAssertEqual(seat?.visualState, .changing)
+    }
+
+    func testActiveCellDoesNotOverrideWhenFamilyIsNormal() {
+        let cards = VehicleCardDisplay.familyDisplays(
+            from: [
+                DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "0", revision: 1, visualState: .normal),
+                DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "30", revision: 1, visualState: .normal)
+            ],
+            activeCells: [.seat: "seat.backrest_angle[主驾]"],
+            catalog: StateCellPresentationCatalog.load()
+        )
+
+        let seat = cards.first { $0.familyCardID == .seat }
+        XCTAssertEqual(seat?.valueText, "0挡")
+    }
 }

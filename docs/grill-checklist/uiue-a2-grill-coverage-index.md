@@ -92,6 +92,12 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 | V10 可读性 hard gate（投屏）| **P7** | - [ ] V10 |
 | V12 Mac/iPhone 密度 | P2（Grid 固定列已实装）| - [ ] V12 |
 
+Phase 1 sub-checkpoints（receipt: `docs/research/2026-06-25-a2-execution/phase-1-receipt.md`；full visual rows stay unchecked until UI consumption + anchor gate）:
+- [x] SD20/P1 thermal tint mapper from `ac.mode` sibling cells.
+- [x] SD19/P1 activeCell + siblingCells carriage for family cards.
+- [x] SD4/P1 ambient 8-color burst gradient mapper.
+- [x] V9/P1 exhaustive 10-family SF Symbol mapper.
+
 ### CC 系列（~18 → Phase）
 
 | CC | Phase | 消减 |
@@ -131,6 +137,7 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 > RPB 全 53 项已在 `uiue-runtime-bridge-decisions-2026-06-25.md` one-id-one-row 决策完成；本文只做 A-2 执行分组消减。P0 一次 freeze vocabulary 容器（snapshot/result_kind 8 类/context 四维/proof_class/source·scope_origin）；code 消费按 Phase（sibling→P1/P2 制冷热·activeCell / force-context→P4 演绎控制台 / voice·orb·think·splitter→⏳Phase5/voice/post-model）。
 
 Phase 0 receipt: `docs/research/2026-06-25-a2-execution/phase-0-receipt.md`（TDD + full `swift test` + 双端 build；anchor pixel compare skipped because this phase has no UI delta）。
+Phase 1 receipt: `docs/research/2026-06-25-a2-execution/phase-1-receipt.md`（TDD + full `swift test` + SF Symbol probe + 双端 build；RPB-51 P1 slice done, full row remains open until visual consumption）。
 
 ### 相关 U 系列（视觉/交互 → Phase；余已落/main/voice）
 

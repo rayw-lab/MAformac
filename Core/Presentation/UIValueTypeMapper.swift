@@ -39,6 +39,10 @@ struct VehicleCardDisplay: Identifiable, Equatable {
     var familyCardID: FamilyCardID? = nil
     /// 值二级 badge 形态（ambient 色块 / mode / plain）。
     var badgeStyle: BadgeRenderStyle = .plain
+    /// Bridge-active cell key that currently drives the family card main value.
+    var activeCell: String? = nil
+    /// Same-family cells carried for semantic styling such as ac.mode cooling/heating.
+    var siblingCells: [DemoVehicleStateCell] = []
 
     static func displays(
         from cells: [DemoVehicleStateCell],
@@ -180,6 +184,7 @@ struct VehicleCardDisplay: Identifiable, Equatable {
     /// 与 `displays()`（device 级）正交：摘要层是消费侧二级模型，不改 `displays()` 行为。
     static func familyDisplays(
         from cells: [DemoVehicleStateCell],
+        activeCells: [FamilyCardID: String] = [:],
         catalog: StateCellPresentationCatalog = .shared,
         reasons: (String) -> String? = { _ in nil }
     ) -> [VehicleCardDisplay] {
@@ -193,7 +198,13 @@ struct VehicleCardDisplay: Identifiable, Equatable {
             guard !familyCells.isEmpty else {
                 return placeholderDisplay(for: family)
             }
-            return summaryDisplay(for: family, familyCells: familyCells, catalog: catalog, reasons: reasons)
+            return summaryDisplay(
+                for: family,
+                familyCells: familyCells,
+                activeCellKey: activeCells[family],
+                catalog: catalog,
+                reasons: reasons
+            )
         }
     }
 
@@ -210,7 +221,9 @@ struct VehicleCardDisplay: Identifiable, Equatable {
             accessibilityKey: "family.\(family.rawValue)",
             reason: nil,
             familyCardID: family,
-            badgeStyle: .plain
+            badgeStyle: .plain,
+            activeCell: nil,
+            siblingCells: []
         )
     }
 
@@ -220,17 +233,29 @@ struct VehicleCardDisplay: Identifiable, Equatable {
     private static func summaryDisplay(
         for family: FamilyCardID,
         familyCells: [DemoVehicleStateCell],
+        activeCellKey: String?,
         catalog: StateCellPresentationCatalog,
         reasons: (String) -> String?
     ) -> VehicleCardDisplay {
         let primaryBase = FamilyPrimaryCellMapper.primaryCellBase(for: family)
         let primaryCells = familyCells.filter { ScopedStateKey($0.key).base == primaryBase }
         let isDegraded = primaryCells.isEmpty   // 主 cell 缺失（族激活但主 cell 未现，force-state 边界）
-        let source = isDegraded ? familyCells : primaryCells
-        // 复用现有 scope 聚合（individualDisplay/aggregateDisplay）出主 cell display（含 dim/emphasized/范围词角标）
-        let primary = displays(from: source, catalog: catalog, reasons: reasons).first
         // 族态 occupancy：族卡态 = 族内所有 cell dominant（语音点亮哪族哪族变）
         let familyState = dominantVisualState(familyCells.map(\.visualState))
+        let activeSource = activeCellKey.flatMap { key in
+            familyCells.first { cell in
+                cell.key == key || ScopedStateKey(cell.key).base == key
+            }
+        }
+        let shouldUseActive = familyState != .normal && activeSource != nil
+        let source: [DemoVehicleStateCell]
+        if shouldUseActive, let activeSource {
+            source = [activeSource]
+        } else {
+            source = isDegraded ? familyCells : primaryCells
+        }
+        // 复用现有 scope 聚合（individualDisplay/aggregateDisplay）出主 cell display（含 dim/emphasized/范围词角标）
+        let primary = displays(from: source, catalog: catalog, reasons: reasons).first
         // 🔴 P1-1 修（审计 catch）：actualBase 从 primary.accessibilityKey 反解，保证 title/baseTitle/value/badge **同源一个 device**。
         // 退化多 base 时，旧 representativeBase(max-rev) 与 primary(displays().first 按 id 序) 会选不同 base → title 取 A 设备语义、value 取 B 设备值（串味）。
         let actualBase = primary.map { ScopedStateKey($0.accessibilityKey).base } ?? primaryBase
@@ -255,7 +280,9 @@ struct VehicleCardDisplay: Identifiable, Equatable {
             accessibilityKey: "family.\(family.rawValue)",
             reason: primary?.reason ?? familyCells.compactMap { reasons($0.key) }.first,  // P2-1：reason 同源主 cell
             familyCardID: family,
-            badgeStyle: badgeRenderStyle(forBase: actualBase, value: value)
+            badgeStyle: badgeRenderStyle(forBase: actualBase, value: value),
+            activeCell: shouldUseActive ? activeSource?.key : nil,
+            siblingCells: familyCells
         )
     }
 
