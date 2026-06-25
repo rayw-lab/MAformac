@@ -76,10 +76,8 @@ struct ValueControlView: View {
         }
     }
     private var activeSteps: Int {
-        let span = range.upperBound - range.lowerBound
-        guard span > 0 else { return 0 }
-        let ratio = (numericValue.clamped(to: range) - range.lowerBound) / span
-        return max(0, min(stepCount, Int((ratio * Double(stepCount)).rounded())))
+        // 🔴 codex P1-2 修：亮段 = 当前档位值(clamp+round)；段数=max → fan「1挡」亮1格 / seat「2挡」亮2格 / 「0挡」亮0格
+        max(0, min(stepCount, Int(numericValue.clamped(to: range).rounded())))
     }
 
     // toggle = 开关视觉（开/关 + 图标 + 色）

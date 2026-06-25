@@ -32,8 +32,13 @@ final class MultiCallSequencer {
     func surface(_ families: [FamilyCardID]) async {
         surfacedFamilies = []
         for (index, family) in families.enumerated() {
+            if Task.isCancelled { return }   // 🔴 codex P1-1：取消即退出，不继续 append（防 barge-in/reentrancy 旧 surface 泄漏）
             if index > 0 {
-                try? await Task.sleep(for: .milliseconds(StaggerSchedule.delayMs))
+                do {
+                    try await Task.sleep(for: .milliseconds(StaggerSchedule.delayMs))
+                } catch {
+                    return   // cancellation 抛出 → 退出（不用 try? 吞掉继续跑旧序列）
+                }
             }
             surfacedFamilies.append(family)
         }

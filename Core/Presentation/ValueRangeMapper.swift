@@ -5,8 +5,9 @@ import Foundation
 extension ExecutionRange {
     /// Gauge value 闭区间（Double；防 min>max 异常）。
     var closed: ClosedRange<Double> { Double(min)...Double(Swift.max(min, max)) }
-    /// stepper 离散档数（(max-min)/step；step≤0 返 0）。
-    var stepCount: Int { step > 0 ? (max - min) / step : 0 }
+    /// stepper 段数 = 上界 max（demo step=1 整数档：每档一格，min=0 时 0=空条 / min≥1 起始从第 1 格起）。
+    /// 🔴 codex P1-2 修：原 `(max-min)/step` 对非零起始 range 少一格（ac.fan_speed 1-10 → 9 格，「1挡」亮 0 格视觉错）。
+    var stepCount: Int { Swift.max(0, max) }
 }
 
 /// base → 控件数值范围（dial/percent/stepper 用）；从 contract `execution_range` 读 = 真 SSOT。

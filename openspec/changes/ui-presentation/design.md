@@ -122,7 +122,7 @@ spec.md:83 / R2 锁「10 族 family_card 全景常驻」，但 producer 0 字段
 - **content zone 内层 = 固定全景 idle + 活跃族原地放大 hero（bento spatial-weight）**：守 spatial memory（固定 placement 建 mental map），活跃族放大成 hero **不移位**（优于物理置顶，零重排破坏）；竖屏 2 列放不下 10 族常驻 → 配 **ScrollViewReader 自动滚激活族入视野**（`onChange(activeFamily){ withAnimation{ proxy.scrollTo(family.rawValue, anchor:.center) } }`，`DispatchQueue.main.async` 延一帧避同帧 layout jump，卡 id 锚 `family.rawValue` 跨 scope 稳定=滑移非重建）。🔴 **修正我之前自拍的「动态分配」**（被调研改为「固定全景+hero 放大」）。
 
 ### 三、全局手势（三层定调，承接 D2 voice 主 tap 辅；HMI 学术共识 gesture 不 scale）
-- **tap = 聚焦/激活（主）**：走 D2 `FocusController.expand(family,trigger:.tap)` 单入口；scroll 内必 `.onTapGesture`（非 simultaneousGesture 干扰滚动）。
+- **tap = 聚焦/激活（主）**：走 `FocusController.toggle(family)` 单入口（4b 实装选 toggle 语义=再点同族收起/点别族切换；codex P2-1 catch 原文 `expand(trigger:.tap)` 与实现不符已纠，typed trigger provenance 留 Phase 5 补）；scroll 内必 `.onTapGesture`（非 simultaneousGesture 干扰滚动）。
 - **long-press = 操作员调试快捷（辅，客户不见，maximumDistance 调小防误触）** / **swipe/drag/pinch = 全禁绑值调节**（连续值交语音，触摸无免视觉优势+增疲劳+抢语音控制权）/ 竖滚只用 ScrollView 自带。
 - **barge-in（U21）**：新输入调用点直接改 state（不只靠 delegate，didCancel 静默不触发）+ `stopSpeaking(at:.immediate)`。
 

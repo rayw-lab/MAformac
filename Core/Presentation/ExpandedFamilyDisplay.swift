@@ -55,8 +55,9 @@ struct ExpandedFamilyDisplay: Equatable {
         let valueType = UIValueTypeMapper.uiValueType(forBase: base)
         let range = ValueRangeMapper.range(forBase: base, catalog: catalog) ?? 0...1
         let stepCount = ValueRangeMapper.stepCount(forBase: base, catalog: catalog)
-        // 数值提取（dial/percent/stepper）：raw actualValue 取数字（"24"→24 / "on"/"波浪模式"→0 不用）
-        let numericValue = Double(cell.actualValue.filter { $0.isNumber || $0 == "." || $0 == "-" }) ?? 0
+        // 数值提取（dial/percent/stepper）+ 数据层一处归一 clamp（环/文本/段共用）。
+        // 🔴 codex P1-3：坏值/空串 fallback 下界（非 0，避免起始非0 range 越界绕路）；toggle/badge 不读 numericValue 无害。
+        let numericValue = (Double(cell.actualValue.filter { $0.isNumber || $0 == "." || $0 == "-" }) ?? range.lowerBound).clamped(to: range)
         // displayText / badgeStyle 复用 4a 摘要格式化（§28 不重复格式化逻辑）
         let displayText = VehicleCardDisplay.valueText(for: cell.actualValue, base: base, type: valueType)
         let isOn = ["on", "open", "unlocked", "unmuted"].contains(cell.actualValue)

@@ -23,11 +23,11 @@ final class ValueRangeMapperTests: XCTestCase {
         XCTAssertNil(ValueRangeMapper.range(forBase: "seat.massage_mode", catalog: catalog))
     }
 
-    // stepCount = (max-min)/step（座椅 0-3 → 3 档 / 风量 1-10 → 9 / 温度 18-32 → 14）
+    // stepCount = 段数 = 上界 max（🔴 codex P1-2 修：非零起始 range 不少格；fan 1-10→10 段 / seat 0-3→3 段 / wiper 1-4→4 段）
     func testStepCountFromContract() {
-        XCTAssertEqual(ValueRangeMapper.stepCount(forBase: "seat.heat_level", catalog: catalog), 3)
-        XCTAssertEqual(ValueRangeMapper.stepCount(forBase: "ac.fan_speed", catalog: catalog), 9)
-        XCTAssertEqual(ValueRangeMapper.stepCount(forBase: "ac.temp_setpoint", catalog: catalog), 14)
+        XCTAssertEqual(ValueRangeMapper.stepCount(forBase: "seat.heat_level", catalog: catalog), 3)   // 0-3 → 3 段
+        XCTAssertEqual(ValueRangeMapper.stepCount(forBase: "ac.fan_speed", catalog: catalog), 10)      // 1-10 → 10 段（原误算 9，「1挡」亮0格）
+        XCTAssertEqual(ValueRangeMapper.stepCount(forBase: "wiper.speed", catalog: catalog), 4)        // 1-4 → 4 段（非零起始验证）
     }
 
     // clamp 越界钳制（防 Gauge value 越界异常渲染）

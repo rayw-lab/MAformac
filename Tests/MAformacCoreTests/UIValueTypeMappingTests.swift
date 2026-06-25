@@ -43,4 +43,39 @@ final class UIValueTypeMappingTests: XCTestCase {
         XCTAssertEqual(UIValueTypeMapper.uiValueType(forBase: "door.car_door"), .badge, "5 态运动枚举→badge 非 toggle")
         XCTAssertEqual(UIValueTypeMapper.uiValueType(forBase: "vehicle.gear"), .badge, "只读仪表→badge")
     }
+
+    // 🔴 codex P2-2 + gptpro 第6点：mapping 与 contract `StateCellDefinition.type/unit/values` 语义对齐（机械化防第二份 SSOT 漂移）。
+    // 期望 UIValueType 从 contract 字段推导（int+celsius→dial / int+percent→percent / int+gear→stepper / enum 2值→toggle / enum 多值→badge / int 其它单位→badge 只读）。
+    func testMappingSemanticallyAlignedWithContract() throws {
+        let lookup = try StateCellContractLookup(yaml: loadStateCellsYAML())
+        XCTAssertGreaterThanOrEqual(lookup.cells.count, 30, "contract 未加载，语义对齐测试无法执行")
+        for def in lookup.cells {
+            guard let expected = expectedUIValueType(for: def) else { continue }
+            XCTAssertEqual(UIValueTypeMapper.uiValueType(forBase: def.id), expected,
+                           "base \(def.id)（type=\(def.type) unit=\(def.unit ?? "-") values=\(def.values.count)）映射应是 \(expected)，与 contract 语义不符=第二份 SSOT 漂移")
+        }
+    }
+
+    private func expectedUIValueType(for def: StateCellDefinition) -> UIValueType? {
+        switch def.type {
+        case "int":
+            switch def.unit {
+            case "celsius": return .dial
+            case "percent": return .percent
+            case "gear": return .stepper
+            default: return .badge   // kmh 等只读仪表
+            }
+        case "enum":
+            return def.values.count == 2 ? .toggle : .badge
+        default:
+            return nil
+        }
+    }
+
+    private func loadStateCellsYAML() throws -> String {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("contracts/state-cells.yaml")
+        return try String(contentsOf: url, encoding: .utf8)
+    }
 }

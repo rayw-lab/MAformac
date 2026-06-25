@@ -132,9 +132,10 @@ struct ValueControlsSpikeScreen: View {
                             ValueControlView(valueType: .percent, numericValue: 60, range: 0...100,
                                              stepCount: 0, displayText: "60%", isOn: false, badgeStyle: .plain)
                         }
-                        spikeCell("stepper 座椅加热") {
-                            ValueControlView(valueType: .stepper, numericValue: 2, range: 0...3,
-                                             stepCount: 3, displayText: "2挡", isOn: false, badgeStyle: .plain)
+                        spikeCell("stepper 风量1挡") {
+                            // codex P1-2 验：非零起始 range 1-10，「1挡」应亮 1 格（修复前 9 段亮 0 格）
+                            ValueControlView(valueType: .stepper, numericValue: 1, range: 1...10,
+                                             stepCount: 10, displayText: "1挡", isOn: false, badgeStyle: .plain)
                         }
                     }
                     GridRow {
