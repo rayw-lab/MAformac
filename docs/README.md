@@ -17,6 +17,7 @@
 | `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |
 | `docs/roadmap-2026-06-20-from-c6-done.md` | **historical / provenance source**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — 只作溯源,不作当前路线事实源 |
 | `CLAUDE.md` (§9) | 项目宪法 + 新基线指针 + 下一步 P1 |
+| `Tools/agent-platform-plugin-refs/README.md` + `.xcodebuildmcp/README.md` | **Codex iOS/macOS build 入口**:插件引用 + 本 worktree 默认 `build-ios-apps` profile。UIUE 固定 `MAformacIOS` + `iPhone 17 Pro Max`;新窗口先看这里再跑 `session_show_defaults` / `build_run_sim()` |
 | `docs/project/phase0/` | **Phase 0 route-control manifests**(authority/stage/decision/status/gate materialization; not runtime contracts; filled docs must carry status/retire metadata) |
 | `docs/superpowers/plans/` | **implementation plans only**(Superpowers 执行计划; not SSOT; must carry authority/retire metadata) |
 | `docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA 慢路 + §12 实装锚点) |

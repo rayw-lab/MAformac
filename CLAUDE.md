@@ -64,6 +64,7 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 | `docs/handoffs/` | session 交接(收工 ≤ 40 行) |
 | `Tools/skills/` *(symlink `.claude/skills/`)* | **MAformac 沉淀技能**(2026-06-24 起);索引 + 组合替代见 `Tools/skills/INDEX.md` |
 | `Tools/agent-platform-plugin-refs/` | **本机 iOS/macOS build 插件引用**:软链接到 Codex `build-ios-apps` / `build-macos-apps` 插件与 skills;做 SwiftUI、iOS、macOS、Liquid Glass、模拟器、性能或打包任务前先读 |
+| `.xcodebuildmcp/` | **本 worktree 的 Codex iOS build 默认项**:`config.yaml` 固化 `build-ios-apps` profile; `README.md` 写新窗口使用顺序。UIUE 默认 profile=`ios` → scheme=`MAformacIOS` → simulator=`iPhone 17 Pro Max` |
 
 > `docs/` 放**设计资产**(相对稳定);`openspec/` 放**活的推进事实源**(随 archive 生长)。互补不重复。
 
@@ -71,6 +72,7 @@ PRD/SRD/ARCH **映射到 OpenSpec artifact**(不另起):PRD≈proposal / SRD≈s
 
 - **沉淀技能** `Tools/skills/`(symlink 到 `.claude/skills/`,source 在 Tools/):4 BUILD = `archive-research-pack` / `verify-external-claims` / `doc-cascade-sweep` / `closeout-receipt-writer`(用 superpowers `writing-skills` 的 TDD-for-skills 法建,baseline 取 production 实证)。**通用流程直接用 superpowers v6**(`writing-plans` / `subagent-driven-development` / `test-driven-development` / `verification-before-completion` / `using-git-worktrees`;plugin `superpowers@claude-plugins-official` **6.0.3** enabled)。索引 + adopt 组合替代链路 = ⭐`Tools/skills/INDEX.md`。
 - **平台插件引用** `Tools/agent-platform-plugin-refs/`:本机软链接索引,不是项目源代码。后续前端/后端运行时/UIUE/视觉/打包相关 agent 起手应读取其中 `build-ios-apps-*` 和 `build-macos-apps-*` 的 `SKILL.md`/references,再写实现或评审。
+- **Codex iOS build 默认项**:本 worktree 已固化 `.xcodebuildmcp/config.yaml` + `.xcodebuildmcp/README.md`; 新 Codex 窗口先 `session_show_defaults`,若 profile 不是 `ios` 就 `session_use_defaults_profile({ profile: "ios" })`,然后 `build_run_sim()`。UIUE 默认 simulator 固定 `iPhone 17 Pro Max`; main worktree 用独立 simulator,不要共用同一台(同 bundle id 会互相覆盖)。
 - 🔴 **make-verify-gate = 已自动化,不做 skill**:改 `contracts/` / codegen / spec 后**必跑** `make verify`(verify-source→regen→verify-refs→verify-cross-section→verify-surface→diff→test)或 `make verify-all`(+`swift test`)——mechanical fail-closed 门(claim-vs-reality 机械化),非文档技能。
 - 🔴 **项目 build / test 命令**(实证过,UIUE/前端实装验收用;主线已配 scheme + build 插件引用):
   - **单测**:`swift test`(Core 单元测试,实证 222/0)。

@@ -31,9 +31,17 @@ Current audited state:
 2. `docs/CURRENT.md` — this route board; expire and update it at phase transition.
 3. `docs/README.md` — document map.
 4. `Tools/agent-platform-plugin-refs/README.md` — local iOS/macOS build plugin references for SwiftUI, Liquid Glass, simulator, performance, and packaging work.
-5. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
-6. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
-7. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
+5. `.xcodebuildmcp/README.md` — this worktree's persisted Codex `build-ios-apps` default profile and simulator assignment.
+6. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
+7. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
+8. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
+
+Local iOS build truth:
+
+- This worktree's persisted Codex `build-ios-apps` profile is `ios`.
+- Default iOS scheme is `MAformacIOS`.
+- Dedicated simulator is `iPhone 17 Pro Max`.
+- Main worktree must keep a different simulator because both worktrees share `lab.rayw.MAformac.ios`.
 
 ## Do Now
 
