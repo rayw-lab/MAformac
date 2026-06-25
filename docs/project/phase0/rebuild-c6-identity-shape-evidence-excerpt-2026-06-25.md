@@ -16,12 +16,12 @@ This file exists because `Reports/` is ignored scratch. It records branch-source
 exit_code: 0
 
 ```text
-Test Suite 'C6VehicleToolBenchTests' passed at 2026-06-25 08:49:31.854.
-         Executed 62 tests, with 0 failures (0 unexpected) in 3.199 (3.201) seconds
-Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-25 08:49:31.854.
-         Executed 62 tests, with 0 failures (0 unexpected) in 3.199 (3.201) seconds
-Test Suite 'Selected tests' passed at 2026-06-25 08:49:31.854.
-         Executed 62 tests, with 0 failures (0 unexpected) in 3.199 (3.202) seconds
+Test Suite 'C6VehicleToolBenchTests' passed at 2026-06-25 10:17:47.914.
+         Executed 67 tests, with 0 failures (0 unexpected) in 3.734 (3.737) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-25 10:17:47.914.
+         Executed 67 tests, with 0 failures (0 unexpected) in 3.734 (3.737) seconds
+Test Suite 'Selected tests' passed at 2026-06-25 10:17:47.914.
+         Executed 67 tests, with 0 failures (0 unexpected) in 3.734 (3.737) seconds
 ```
 
 ### `swift test --filter ToolContractCompilerTests`
@@ -29,12 +29,20 @@ Test Suite 'Selected tests' passed at 2026-06-25 08:49:31.854.
 exit_code: 0
 
 ```text
-Test Suite 'ToolContractCompilerTests' passed at 2026-06-25 08:49:33.110.
-         Executed 21 tests, with 0 failures (0 unexpected) in 0.362 (0.364) seconds
-Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-25 08:49:33.110.
-         Executed 21 tests, with 0 failures (0 unexpected) in 0.362 (0.364) seconds
-Test Suite 'Selected tests' passed at 2026-06-25 08:49:33.110.
-         Executed 21 tests, with 0 failures (0 unexpected) in 0.362 (0.364) seconds
+Test Suite 'ToolContractCompilerTests' passed at 2026-06-25 10:20:20.058.
+         Executed 21 tests, with 0 failures (0 unexpected) in 0.353 (0.354) seconds
+Test Suite 'MAformacPackageTests.xctest' passed at 2026-06-25 10:20:20.058.
+         Executed 21 tests, with 0 failures (0 unexpected) in 0.353 (0.354) seconds
+Test Suite 'Selected tests' passed at 2026-06-25 10:20:20.058.
+         Executed 21 tests, with 0 failures (0 unexpected) in 0.353 (0.354) seconds
+```
+
+### `.venv/bin/python scripts/test_check_c6_case_shape.py`
+
+exit_code: 0
+
+```text
+test_check_c6_case_shape=ok
 ```
 
 ### `python3 scripts/check_c6_case_shape.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json`
@@ -44,7 +52,7 @@ exit_code: 0
 ```text
 rows=57
 behavior_class_counts={"already_state_noop": 1, "clarify_missing_slot": 9, "refusal_no_available_tool": 8, "refusal_safety_or_policy": 5, "tool_call": 34}
-external_layer_candidate_counts={"clarify": 2, "demo_fuzz": 7, "golden": 35, "safety": 5, "unsupported": 8}
+shape_diagnostic_candidate_counts={"clarify": 2, "demo_fuzz": 7, "golden": 35, "safety": 5, "unsupported": 8}
 ```
 
 ### `make verify-surface`
@@ -111,4 +119,13 @@ high-signal:
 - tracked JSONL, decode, generator, and validation now all use explicit `behavior_class`.
 - `verify-c6-shape` is wired into the local `verify` gate.
 - checker remains source-free and UIUE stayed read-only.
-- `clarify` external candidate count is kept as plan-mandated diagnostic output, not runtime-layer SSOT.
+- `clarify` shape diagnostic count is kept as plan-mandated diagnostic output, not runtime-layer SSOT.
+
+### GPT Pro Absorption
+
+verdict: `PASS_WITH_FIXES_ABSORBED`
+
+high-signal:
+- GPT Pro reported no P0 across both rounds.
+- P1 no-call behavior / `expect_no_call` fake-green gap is now guarded in Python checker, Python regression tests, Swift validation, and legacy behavior resolver.
+- P2 duplicate/unknown/version manifest hardening and nil `behavior_class` encoding fail-closed behavior are covered by Swift tests.

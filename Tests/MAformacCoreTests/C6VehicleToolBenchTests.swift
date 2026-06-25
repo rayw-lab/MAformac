@@ -129,7 +129,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         var clarifyCoverage = C6BenchCase.fixture(
             bucket: .coverage,
             expectedToolCalls: [],
-            expectNoCall: false,
+            expectNoCall: true,
             expectedStateDelta: [:],
             readbackContains: [],
             clarifyTag: .ambiguous,
@@ -140,6 +140,46 @@ final class C6VehicleToolBenchTests: XCTestCase {
         let validation = try makeGenerator().validate([clarifyCoverage])
 
         XCTAssertEqual(validation.negativeRatio, 1)
+    }
+
+    func testDatasetValidationRejectsBehaviorClassExpectNoCallMismatch() throws {
+        var noCallMismatch = C6BenchCase.fixture(
+            bucket: .refusal,
+            expectedToolCalls: [],
+            expectNoCall: false,
+            expectedStateDelta: [:],
+            readbackContains: [],
+            clarifyTag: .rejected,
+            sourceRefs: C6SourceRefs()
+        )
+        noCallMismatch.behaviorClass = .refusalNoAvailableTool
+        let noCallValidation = try makeGenerator().validate([noCallMismatch])
+        XCTAssertEqual(noCallValidation.unresolvedSourceRefCount, 1)
+
+        var toolCallMismatch = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "open_ac", arguments: [:])],
+            expectNoCall: true,
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"],
+            sourceRefs: C6SourceRefs()
+        )
+        toolCallMismatch.behaviorClass = .toolCall
+        let toolCallValidation = try makeGenerator().validate([toolCallMismatch])
+        XCTAssertEqual(toolCallValidation.unresolvedSourceRefCount, 1)
+    }
+
+    func testDatasetCodecFailsClosedWhenEncodingMissingBehaviorClass() throws {
+        let item = C6BenchCase.fixture(
+            expectedToolCalls: [C6ToolCall(name: "open_ac", arguments: [:])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"]
+        )
+
+        XCTAssertThrowsError(try C6DatasetCodec().encodeJSONL([item])) { error in
+            guard case EncodingError.invalidValue = error else {
+                return XCTFail("expected EncodingError.invalidValue, got \(error)")
+            }
+        }
     }
 
     func testNoCallBucketDoesNotImplyAlreadyStateNoop() throws {
@@ -884,6 +924,55 @@ final class C6VehicleToolBenchTests: XCTestCase {
             XCTAssertEqual(
                 error as? C6ContractBundleError,
                 .missingRequiredComponents(componentIDs: ["c2.state_cells_renderer"])
+            )
+        }
+    }
+
+    func testContractBundleFingerprintFailsClosedOnDuplicateComponentID() throws {
+        var components = sampleContractBundleComponents()
+        components.append(C6ContractBundleComponent(
+            componentID: "c2.state_cells_renderer",
+            version: "v2",
+            contentDigest: "duplicate-digest"
+        ))
+
+        XCTAssertThrowsError(try C6ContractBundleFingerprint.receipt(components: components)) { error in
+            XCTAssertEqual(
+                error as? C6ContractBundleError,
+                .duplicateComponentIDs(componentIDs: ["c2.state_cells_renderer"])
+            )
+        }
+    }
+
+    func testContractBundleFingerprintFailsClosedOnUnexpectedComponentID() throws {
+        var components = sampleContractBundleComponents()
+        components.append(C6ContractBundleComponent(
+            componentID: "unexpected.contract",
+            version: "v1",
+            contentDigest: "unexpected-digest"
+        ))
+
+        XCTAssertThrowsError(try C6ContractBundleFingerprint.receipt(components: components)) { error in
+            XCTAssertEqual(
+                error as? C6ContractBundleError,
+                .unexpectedComponentIDs(componentIDs: ["unexpected.contract"])
+            )
+        }
+    }
+
+    func testContractBundleFingerprintFailsClosedOnUnsupportedManifestVersion() throws {
+        let manifest = C6ContractBundleManifest(
+            manifestVersion: "legacy_v0",
+            components: sampleContractBundleComponents()
+        )
+
+        XCTAssertThrowsError(try C6ContractBundleFingerprint.receipt(manifest: manifest)) { error in
+            XCTAssertEqual(
+                error as? C6ContractBundleError,
+                .unsupportedManifestVersion(
+                    expected: C6ContractBundleFingerprint.schemaVersion,
+                    actual: "legacy_v0"
+                )
             )
         }
     }

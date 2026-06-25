@@ -2,9 +2,10 @@
 
 ## Verdict
 
-status: local-pass-pending-gptpro
-final_external_audit_status: blocked-pending-gptpro
+status: external-pass-with-absorbed-fixes
+final_external_audit_status: external-pass-with-absorbed-fixes
 proof_class:
+- external_gptpro_review
 - local_static_contract
 - local_unit
 - local_shape_no_model
@@ -15,6 +16,10 @@ Authorization basis:
 - Live implementation started from `BASE_SHA=ebc7933ed96123818aa781c2bb317baf769cd32e`, which already carried the authorization wording commit `ebc7933`.
 
 This closeout is not C6 acceptance, not model-quality evaluation, not retrain-C5, not candidate comparison, not golden-run, not voice readiness, not endpoint readiness, not UIUE merge, and not R-L17 candidate signoff.
+
+External GPT Pro audit source:
+- `docs/project/phase0/rebuild-c6-identity-shape-gptpro-audit-2026-06-25.md`
+- `docs/project/phase0/rebuild-c6-identity-shape-gptpro-absorption-ledger-2026-06-25.md`
 
 ## Scope
 
@@ -50,9 +55,10 @@ Implementation commit range for this long-run local pass: `ebc7933..229e9b3`.
 
 | Command | Exit | Proof class | High-signal result |
 |---|---:|---|---|
-| `swift test --filter C6VehicleToolBenchTests` | 0 | `local_unit` | 62 tests passed, 0 failed. |
+| `swift test --filter C6VehicleToolBenchTests` | 0 | `local_unit` | 67 tests passed, 0 failed. |
 | `swift test --filter ToolContractCompilerTests` | 0 | `local_unit` | 21 tests passed, 0 failed. |
-| `python3 scripts/check_c6_case_shape.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json` | 0 | `local_shape_no_model` | `rows=57`; behavior class counts `34/9/8/5/1`; external candidate counts `35/7/8/5/2`. |
+| `.venv/bin/python scripts/test_check_c6_case_shape.py` | 0 | `local_shape_no_model` | GPT Pro P1 forged no-call regression rejected. |
+| `python3 scripts/check_c6_case_shape.py contracts/c6-bench-cases.jsonl generated/D_domain.tools.demo.json` | 0 | `local_shape_no_model` | `rows=57`; behavior class counts `34/9/8/5/1`; shape diagnostic counts `35/7/8/5/2`. |
 | `make verify-surface` | 0 | `local_shape_no_model` | `surface_consistency=true`; `verify_gold violation_count=0`. |
 | `openspec validate rebuild-c6-four-layer-bench --strict` | 0 | `local_static_contract` | change valid. |
 | `openspec validate --all --strict` | 0 | `local_static_contract` | 15 passed, 0 failed. |
@@ -68,6 +74,8 @@ Tracked command excerpts live in:
 | Phase 4 | `PASS_WITH_FIXES` | Absorbed manifest-visible receipt and fail-closed public-entry fixes before commit `728137a`. |
 | Phase 5 | `PASS_WITH_FIXES` | Absorbed generator/source-truth and local gate wiring fixes before commit `229e9b3`; kept `clarify` candidate count as plan-mandated diagnostic output. |
 | Phase 6 | `PASS_WITH_FIXES` | Read-only audit accepted the local-closeout bundle after wording cleanup; residual remains external GPT Pro gate only. |
+| GPT Pro external audit round 1 | `PASS_WITH_FIXES` | Reported no P0, one P1 no-call/`expect_no_call` fake-green gap, and P2 hardening/naming items. |
+| GPT Pro external audit round 2 | `PASS_WITH_FIXES` | Confirmed same P1 and added P2 duplicate manifest, optional encoding, and head-bound CI checks. |
 
 ## UIUE Impact
 
@@ -80,13 +88,13 @@ Reason:
 
 ## Residual Risk
 
-- GPT Pro external audit has not run yet. This closeout is local-pass only.
-- `verify-c6-shape` intentionally prints a diagnostic `clarify` candidate bucket in addition to the runtime four-layer selector. That is a plan-mandated diagnostic output, not an acceptance-layer SSOT.
+- This closeout remains scoped to Long-run 2 identity + behavior-shape construction evidence only; it is still not C6 acceptance or model-quality proof.
+- `verify-c6-shape` intentionally prints a diagnostic `clarify` candidate bucket in addition to the runtime four-layer selector, now under `shape_diagnostic_candidate_counts`. That is a plan-mandated diagnostic output, not an acceptance-layer SSOT.
 - Runtime bench code still retains compatibility helpers such as `C6CaseBehaviorClassResolver`; current tracked dataset/generator/validator paths are explicit, but compatibility paths remain as future tightening candidates.
 
 ## Next Action
 
-1. Commit this closeout bundle.
+1. Commit the GPT Pro absorption fixes and evidence.
 2. Push branch.
-3. GPT Pro audit request is tracked at `docs/project/phase0/rebuild-c6-identity-shape-gptpro-audit-request-2026-06-25.md`; live branch tip must be reconfirmed at audit dispatch time.
-4. Wait for GPT Pro verdict, absorb any P0/P1, and only then consider `external-pass` or `external-pass-with-absorbed-fixes`.
+3. Check head-bound GitHub CI for the pushed commit before claiming CI proof.
+4. Do not advance to retrain-C5, C6 acceptance, candidate comparison, model-quality evaluation, golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS without separate authorization.

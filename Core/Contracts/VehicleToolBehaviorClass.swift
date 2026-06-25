@@ -6,4 +6,8 @@ public enum VehicleToolBehaviorClass: String, Codable, CaseIterable, Equatable, 
     case refusalNoAvailableTool = "refusal_no_available_tool"
     case refusalSafetyOrPolicy = "refusal_safety_or_policy"
     case alreadyStateNoop = "already_state_noop"
+
+    public var requiresNoCall: Bool {
+        self != .toolCall
+    }
 }

@@ -118,8 +118,12 @@ def main() -> int:
                         f"{case_id}: already_state_noop requires pre_state[{key!r}] == expected_state_delta[{key!r}] ({pre_state[key]!r} != {expected_value!r})"
                     )
 
-        if expect_no_call and behavior_class not in NO_CALL_BEHAVIOR_CLASSES:
-            errors.append(f"{case_id}: expect_no_call=true cannot be the only success signal for behavior_class={behavior_class}")
+        if not isinstance(expect_no_call, bool):
+            errors.append(f"{case_id}: expect_no_call must be boolean, got {expect_no_call!r}")
+        elif behavior_class in NO_CALL_BEHAVIOR_CLASSES and expect_no_call is not True:
+            errors.append(f"{case_id}: {behavior_class} requires expect_no_call=true")
+        elif behavior_class == "tool_call" and expect_no_call is not False:
+            errors.append(f"{case_id}: tool_call requires expect_no_call=false")
 
         if expected_tool_calls == [] and behavior_class not in NO_CALL_BEHAVIOR_CLASSES:
             errors.append(f"{case_id}: expected_tool_calls=[] cannot collapse into behavior_class={behavior_class}")
@@ -143,7 +147,7 @@ def main() -> int:
 
     print(f"rows={len(rows)}")
     print("behavior_class_counts=" + json.dumps(dict(sorted(behavior_counts.items())), ensure_ascii=False, sort_keys=True))
-    print("external_layer_candidate_counts=" + json.dumps(dict(sorted(external_counts.items())), ensure_ascii=False, sort_keys=True))
+    print("shape_diagnostic_candidate_counts=" + json.dumps(dict(sorted(external_counts.items())), ensure_ascii=False, sort_keys=True))
 
     if errors:
         for error in errors:

@@ -63,6 +63,9 @@ public struct C6ContractBundleFingerprintRecord: Codable, Equatable, Sendable {
 public enum C6ContractBundleError: Error, Equatable, Sendable {
     case missingComponentDigest(componentID: String)
     case missingRequiredComponents(componentIDs: [String])
+    case duplicateComponentIDs(componentIDs: [String])
+    case unexpectedComponentIDs(componentIDs: [String])
+    case unsupportedManifestVersion(expected: String, actual: String)
 }
 
 public enum C6ContractBundleFingerprint {
@@ -129,15 +132,15 @@ public enum C6ContractBundleFingerprint {
         try validated(manifest: C6ContractBundleManifest(manifestVersion: schemaVersion, components: components))
     }
 
-    public static func fingerprint(repoRoot: URL, datasetText: String) throws -> String {
+    static func fingerprint(repoRoot: URL, datasetText: String) throws -> String {
         try fingerprint(manifest: manifest(repoRoot: repoRoot, datasetText: datasetText))
     }
 
-    public static func fingerprint(components: [C6ContractBundleComponent]) throws -> String {
+    static func fingerprint(components: [C6ContractBundleComponent]) throws -> String {
         try fingerprint(manifest: manifest(components: components))
     }
 
-    public static func fingerprint(manifest: C6ContractBundleManifest) throws -> String {
+    static func fingerprint(manifest: C6ContractBundleManifest) throws -> String {
         C6Hash.sha256Hex(C6CanonicalJSON.encode(try validated(manifest: manifest)))
     }
 
@@ -152,6 +155,23 @@ public enum C6ContractBundleFingerprint {
     }
 
     private static func validated(manifest: C6ContractBundleManifest) throws -> C6ContractBundleManifest {
+        guard manifest.manifestVersion == schemaVersion else {
+            throw C6ContractBundleError.unsupportedManifestVersion(
+                expected: schemaVersion,
+                actual: manifest.manifestVersion
+            )
+        }
+        let duplicates = duplicateComponentIDs(in: manifest.components)
+        guard duplicates.isEmpty else {
+            throw C6ContractBundleError.duplicateComponentIDs(componentIDs: duplicates)
+        }
+        let allowedComponentIDs = Set(requiredComponentIDs)
+        let unexpectedIDs = Set(manifest.components.map(\.componentID))
+            .subtracting(allowedComponentIDs)
+            .sorted()
+        guard unexpectedIDs.isEmpty else {
+            throw C6ContractBundleError.unexpectedComponentIDs(componentIDs: unexpectedIDs)
+        }
         let normalized = try manifest.components
             .map { component -> C6ContractBundleComponent in
                 guard !component.contentDigest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -170,7 +190,17 @@ public enum C6ContractBundleFingerprint {
         guard missingIDs.isEmpty else {
             throw C6ContractBundleError.missingRequiredComponents(componentIDs: missingIDs)
         }
-        let manifestVersion = manifest.manifestVersion.isEmpty ? schemaVersion : manifest.manifestVersion
-        return C6ContractBundleManifest(manifestVersion: manifestVersion, components: normalized)
+        return C6ContractBundleManifest(manifestVersion: manifest.manifestVersion, components: normalized)
+    }
+
+    private static func duplicateComponentIDs(in components: [C6ContractBundleComponent]) -> [String] {
+        var seen: Set<String> = []
+        var duplicates: Set<String> = []
+        for component in components {
+            if !seen.insert(component.componentID).inserted {
+                duplicates.insert(component.componentID)
+            }
+        }
+        return duplicates.sorted()
     }
 }

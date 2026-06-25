@@ -247,7 +247,16 @@ public struct C6BenchCase: Codable, Equatable, Sendable {
         try container.encode(clarifyTag, forKey: .clarifyTag)
         try container.encode(failureClass, forKey: .failureClass)
         try container.encode(alternatives, forKey: .alternatives)
-        try container.encodeIfPresent(behaviorClass, forKey: .behaviorClass)
+        guard let behaviorClass else {
+            throw EncodingError.invalidValue(
+                "nil",
+                EncodingError.Context(
+                    codingPath: [CodingKeys.behaviorClass],
+                    debugDescription: "C6BenchCase requires explicit behavior_class before encoding"
+                )
+            )
+        }
+        try container.encode(behaviorClass, forKey: .behaviorClass)
     }
 }
 
@@ -258,6 +267,9 @@ public enum C6CaseBehaviorClassResolver {
         }
         if !item.expectedToolCalls.isEmpty && !item.expectNoCall {
             return .toolCall
+        }
+        guard item.expectNoCall else {
+            return nil
         }
         if item.expectedToolCalls.isEmpty && !item.sourceRefs.riskRuleIDs.isEmpty {
             return .refusalSafetyOrPolicy
@@ -375,7 +387,12 @@ public struct C6DatasetGenerator: Sendable {
             unresolved += item.sourceRefs.riskRuleIDs.filter { !riskIDs.contains($0) }.count
         }
 
-        unresolved += cases.filter { $0.behaviorClass == nil }.count
+        unresolved += cases.filter { item in
+            guard let behaviorClass = item.behaviorClass else {
+                return true
+            }
+            return behaviorClass.requiresNoCall != item.expectNoCall
+        }.count
         let negativeCount = cases.filter { $0.behaviorClass.map { $0 != .toolCall } ?? false }.count
         let mustPass = cases.filter(\.tags.mustPass)
         let represented = Set(cases.compactMap { item -> String? in
