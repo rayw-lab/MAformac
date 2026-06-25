@@ -269,24 +269,46 @@ struct VehicleCardDisplay: Identifiable, Equatable {
 }
 
 enum UIValueTypeMapper {
+    /// base → UIValueType **显式映射单一 SSOT**（state-cells 全 base 闭合，禁 `default` 吞错）。
+    /// 🔴 `derivation-layer-discipline` 铁律1：`default` 不得同表「合法兜底」与「漏配吞错」。
+    /// 新增 state-cells base 必在此显式登记，否则 `FamilyDisplaysTests` contract 闭合测试 + `assertionFailure` 双拦。
+    /// 🔴 gptpro 跨厂商审第 2 点 catch：原 `default:.badge` 把 `window.lock`（enum locked/unlocked 二值锁，
+    ///    实为 `.toggle`）静默吞成 badge → 4b 做 toggle 图形控件时「为什么车窗锁没开关控件」追查灾难。
+    static let mapping: [String: UIValueType] = [
+        // dial — 温度环形仪表（int celsius）
+        "ac.temp_setpoint": .dial,
+        // percent — 开度百分比（int percent）
+        "window.position": .percent, "screen.brightness": .percent, "ambient.brightness": .percent,
+        "seat.backrest_angle": .percent, "door.tailgate_height": .percent, "volume.level": .percent,
+        "sunroof.position": .percent, "sunshade.position": .percent,
+        // stepper — 档位（int gear）
+        "ac.fan_speed": .stepper, "seat.heat_level": .stepper, "seat.vent_level": .stepper,
+        "seat.massage_force": .stepper, "wiper.speed": .stepper, "fragrance.intensity": .stepper,
+        // toggle — 二值开关（enum 2 values）
+        "ac.power": .toggle, "door.central_lock": .toggle, "door.child_lock": .toggle,
+        "volume.mute": .toggle, "fragrance.power": .toggle, "wiper.power": .toggle,
+        "window.lock": .toggle,   // 🔴 gptpro 第2点修：原 default 吞成 badge，实为二值锁 locked/unlocked
+        // badge — intentional allowlist（多值枚举模式 / RGB / 只读仪表 / 多态运动）
+        "ac.mode": .badge, "ambient.color": .badge, "seat.massage_mode": .badge,
+        "volume.mode": .badge, "wiper.mode": .badge, "fragrance.mode": .badge,
+        "door.car_door": .badge,        // 5 态运动枚举 open/closed/opening/closing/paused，非二值
+        "window.motion": .badge, "sunroof.motion": .badge,   // 运动态枚举
+        "vehicle.speed": .badge, "vehicle.gear": .badge,      // 只读仪表
+    ]
+
     static func uiValueType(for cell: DemoVehicleStateCell) -> UIValueType {
         uiValueType(forBase: ScopedStateKey(cell.key).base)
     }
 
     static func uiValueType(forBase base: String) -> UIValueType {
-        switch base {
-        case "ac.temp_setpoint":
-            return .dial
-        case "ac.power", "wiper.power", "door.central_lock", "door.child_lock", "volume.mute", "fragrance.power":
-            return .toggle
-        case "ac.fan_speed", "seat.heat_level", "seat.vent_level", "seat.massage_force", "wiper.speed", "fragrance.intensity":
-            return .stepper
-        case "window.position", "screen.brightness", "ambient.brightness", "seat.backrest_angle", "door.tailgate_height", "volume.level", "sunroof.position", "sunshade.position":
-            return .percent
-        default:
-            return .badge
-        }
+        if let type = mapping[base] { return type }
+        // 漏配信号（`derivation-layer-discipline` 铁律1）：dev/test 暴露未登记 base，生产 fallback 不 crash demo。
+        assertionFailure("Unmapped UIValueType base: \(base) — 必须在 UIValueTypeMapper.mapping 显式登记（控件类型）或列入 badge allowlist 或标 4b deferred")
+        return .badge
     }
+
+    /// contract-driven 闭合测试用：base 是否已显式登记（不触发 `assertionFailure`）。
+    static func isMapped(_ base: String) -> Bool { mapping[base] != nil }
 }
 
 struct ScopedStateKey: Equatable {
@@ -327,27 +349,12 @@ struct StateCellPresentationCatalog {
         defaultScopeByBase[base]
     }
 
-    func aggregateScopeLabel(base: String, scopes: [String]) -> String? {
-        let unique = Set(scopes)
-        guard unique.count > 1 else { return nil }
+    /// 该 catalog 已知的全 base（contract-driven 闭合测试源：遍历断言 `UIValueTypeMapper.isMapped`）。
+    var knownBases: Set<String> { Set(titlesByBase.keys) }
 
-        // 🔴 P0 修（codex/gptpro 跨厂商 catch）：集合词从 contract scope 列表取，非硬编码「全车」。
-        // 旧逻辑对全 executable 一律返「全车」→ wiper[前,后]误成「全车」(应「前后」)、screen 全屏误成「全车」(应「全车屏」)。
-        let collectionWord = (scopesByBase[base] ?? []).first { Self.collectionScopes.contains($0) } ?? "全车"
-        let executable = Set((scopesByBase[base] ?? []).filter { !Self.collectionScopes.contains($0) })
-        if !executable.isEmpty, unique == executable {
-            return collectionWord
-        }
-        if unique == Set(["主驾", "副驾"]) {
-            return "前排"
-        }
-        if unique == Set(["左后", "右后"]) {
-            return "后排"
-        }
-        if unique == Set(["前排", "后排"]) {
-            return collectionWord
-        }
-        return nil
+    func aggregateScopeLabel(base: String, scopes: [String]) -> String? {
+        // 聚合逻辑提取到 base-aware `ScopeAggregationResolver`（gptpro 第8点）；catalog 仅注入该 base 的 scope 域。
+        ScopeAggregationResolver.aggregateLabel(activeScopes: scopes, scopeDomain: scopesByBase[base] ?? [])
     }
 
     static func load() -> StateCellPresentationCatalog {
@@ -366,8 +373,6 @@ struct StateCellPresentationCatalog {
         defaultScopeByBase: [:],
         scopesByBase: [:]
     )
-
-    private static let collectionScopes: Set<String> = ["全车", "全车屏", "前后"]
 
     private func fallbackTitle(for base: String) -> String {
         switch base {

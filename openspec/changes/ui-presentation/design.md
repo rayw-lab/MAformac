@@ -167,6 +167,54 @@ gptpro 异源审屏幕锁屏卡死 + hermes-xhigh 端点挂/hermes-doubao async 
   - **辩证收（steelman defer）**：① **pre-existing**（前任孤立模块 loadStateCellsYAML，非本次 4a 回归）② **demo 主路径 Mac/模拟器工作**（CLAUDE §4 Mac主/iPhone加分 + lens1 ⭐Mac主设备）③ **修需碰共享 Xcode infra（pbxproj bundling）或 codegen typed catalog 管线**，全自动磊哥睡时不擅动 ④ **属打包/部署关注**（Phase 6 现场 SOP / shipping，iPhone standalone target）。
   - **fix path（待磊哥/打包阶段，修后升 V-PASS）**：① app target Resources phase 加 `contracts/state-cells.yaml`（bundle 化）**或** ② codegen typed Swift catalog（编译进 Core/Presentation，零运行时文件依赖，最 robust，对齐 SSOT codegen 纪律）③ 加 bundle 存在性测试/pre-commit grep pbxproj 防回归。**真机 demo 前必修**（否则 iPhone 脱机 scope 呈现退化）。
 
+## AD-13 UIUE = Presentation Contract 三层（gptpro 产品架构意见吸收，2026-06-25，磊哥定）
+
+> 一手 = gptpro 对 PR #6（Phase 4a）的产品架构意见（`/Users/wanglei/Downloads/gptpro意见.md`，8 点）。磊哥拍：能沉淀的沉淀（元认知 rule + 本 AD），第 5 点不采纳。元认知 rule = `~/.claude/rules/derivation-layer-discipline.md`（派生层/语义呈现层纪律）。
+
+### 一、核心论点：UIUE 是「语义呈现层」非「UI 改版」
+Phase 4a 起，UIUE 把 **C2 端态协议 + scope 语义 + 族级信息架构 + 演示叙事 + 视觉状态机** 压缩成秒懂界面——**这层错的不是 UI，是系统语义**。优先级 = **语义安全带（聚合 resolver / 穷尽 enforce / 契约闭合测试 / 数字单源）> 视觉动画 / 表现打磨**。心智从「画卡片」切到「固化一层 Derivation Contract」。
+
+### 二、三层 contract（正确抽象不是 View）
+```
+C2 DemoVehicleStateCell → Presentation Derivation → FamilyCardDisplay Model → SwiftUI Rendering
+  Derivation 层（消费侧派生器，本 AD 锚）：
+    B1 FamilyCardIDMapper        （device base → 10 族；vehicle.*→nil）   ✅ AD-9
+    B2 FamilyPrimaryCellMapper   （族 → 主 cell；第二份 SSOT）            ✅ AD-10 + 契约存在性测试
+    B3 UIValueTypeMapper         （base → 控件类型；mapping 字典闭合）     ✅ 闭合 hardening
+    B4 ScopeAggregationResolver  （base-aware scope 聚合）               ✅ 本次提取（gptpro 第8点）
+    B5 dominantVisualState       （族态 occupancy 聚合）                ✅ AD-10
+```
+
+### 三、gptpro 8 点吸收落地（逐点 + 状态，2026-06-25 收口）
+| # | gptpro 点 | 处置 | 落点 |
+|---|---|---|---|
+| 1 | scope 聚合 domain-aware（非硬编码全车） | ✅ 已修(数据驱动)+补 ambient/sunroof 测试 | `ScopeAggregationResolverTests`(11) + `FamilyDisplaysTests`(wiper/screen P0) |
+| 2 | `default:.badge` 吞错（4b Gauge 追查灾难） | ✅ mapping 字典 SSOT + `assertionFailure` + contract 闭合测试；🔴 **修出真 bug：`window.lock` 被 default 吞成 badge，实为 toggle** | `UIValueTypeMapper.mapping`(33 base) + `UIValueTypeMappingTests`(4) |
+| 3 | wiring gate 进 CI + 强 grep | ✅ 已进 CI(`verify-contentview-wiring`)+升级 grep `displays:familyDisplays` | `Makefile` + `check-contentview-uses-display-catalog.sh` |
+| 4 | claim 数字手写打架 | ✅ 收口统一 PR body/docs/handoff 从实跑核 | 收口 receipt |
+| 5 | 第三方 skills/vendor 拆 PR | 🔴 **不采纳（磊哥拍）**：仓 private(`rayw-lab/MAformac`+内网)，非外部供应链；solo demo 轻治理下拆 PR 增协调成本无收益 | — |
+| 6 | FamilyPrimaryCellMapper 第二 SSOT 静默漂移 | ✅ 契约存在性强测试（primary base ∈ yaml + isMapped + family 一致） | `FamilyPrimaryCellMapperTests`(+2) |
+| 7 | deferred 注释散落难追踪 | ✅ 建 phase matrix（下方四） | 本 AD §四 |
+| 8 | 下一刀补 ScopeAggregationResolver 非动画 | ✅ 已提取 base-aware resolver | `Core/Presentation/ScopeAggregationResolver.swift` |
+
+### 四、phase matrix（gptpro 第7点；deferred 单一处可查，防 reviewer 误判 deferred=缺失）
+| Capability | 4a | 4b | 4c | Phase5 |
+|---|---|---|---|---|
+| 10 族常驻 Grid | ✅ | harden | harden | harden |
+| value.type **文本格式化** | ✅ | — | — | — |
+| value.type **图形控件**（Gauge/toggle/stepper） | deferred | ✅ | harden | harden |
+| 座椅 composite（5 cell 行分 3 类） | deferred | ✅ | harden | harden |
+| 触发聚焦展开（ZStack overlay+opacityScale/mge） | deferred | ✅ | harden | harden |
+| scope 聚合（ScopeAggregationResolver） | ✅ | harden | harden | harden |
+| UIValueType 契约闭合 | ✅ | harden | — | — |
+| multi-intent stagger（220ms/MAX=1） | deferred | deferred | ✅ | event-driven |
+| orb 四态（idle/think/speak/listen） | deferred | deferred | deferred | ✅ |
+| 三 zone / 活跃置顶 ScrollViewReader | deferred | deferred | deferred | ✅ |
+| state-cells **bundle 化（真机 standalone）** | deferred（Mac/模拟器 #filePath OK） | — | — | 打包阶段 |
+
+### 五、元洞察（工程分水岭）
+继续按「UI 改版」做派生层 → 越做越玄学（聚合靠全局 if、控件靠 default 吞、deferred 靠记忆）；按「语义呈现层」做 → 撑得住 4b/4c/Phase5。**下一刀优先补派生器语义正确性，不是表现层动画**——本次 4a 收口正是先 hardening B3/B4 语义层（闭合+resolver）再进 4b 控件。
+
 ## 不做（demo 轻治理 / DEFERRED 边界）
 
 - ❌ 量产全链路（FC→NLU→DS→DM）/ 真车控 / 跨 session 视觉一致性纪律（demo=同一台 build）。

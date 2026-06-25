@@ -30,4 +30,25 @@ final class FamilyPrimaryCellMapperTests: XCTestCase {
             XCTAssertEqual(FamilyCardIDMapper.familyCardID(forBase: base), f, "主 cell \(base) 不归族 \(f)")
         }
     }
+
+    // 🔴 gptpro 第6点：第二份 SSOT 契约存在性——每族主 cell base 必存在于 state-cells.yaml。
+    // 防 A2 改/删 contract base 后，摘要层主 cell 引用幽灵 base 静默漂移（族卡退化无主 cell 不被发现）。
+    func testPrimaryCellBaseExistsInContract() {
+        let bases = StateCellPresentationCatalog.load().knownBases
+        XCTAssertGreaterThanOrEqual(bases.count, 30, "catalog 未加载，契约存在性测试无法执行")
+        for f in FamilyCardID.allCases {
+            let base = FamilyPrimaryCellMapper.primaryCellBase(for: f)
+            XCTAssertTrue(bases.contains(base),
+                          "族 \(f) 主 cell 「\(base)」不在 state-cells.yaml（A2 改契约后漂移？）")
+        }
+    }
+
+    // 🔴 gptpro 第6点：每族主 cell base 必显式映射 UIValueType（非 default unmapped fallback）。
+    func testPrimaryCellBaseIsExplicitlyTyped() {
+        for f in FamilyCardID.allCases {
+            let base = FamilyPrimaryCellMapper.primaryCellBase(for: f)
+            XCTAssertTrue(UIValueTypeMapper.isMapped(base),
+                          "族 \(f) 主 cell 「\(base)」未显式登记 UIValueType（会落 assertionFailure）")
+        }
+    }
 }

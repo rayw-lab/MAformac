@@ -30,9 +30,11 @@ if printf '%s\n' "$CODE" | grep -qE 'LazyVGrid'; then
   echo "❌ [contentview-wiring] ContentView 仍有 LazyVGrid（spec C22 要求 Grid 固定列非 adaptive）"
   fail=1
 fi
-# 3) familyDisplays 必须被 VehicleCardsGrid 真消费（防算了 unused var 不渲染=死代码假绿，gptpro 跨厂商审 P1-3）
-if ! printf '%s\n' "$CODE" | grep -qE 'VehicleCardsGrid\(displays:'; then
-  echo "❌ [contentview-wiring] familyDisplays 未被 VehicleCardsGrid(displays:) 真消费（计算了但未渲染=假绿）"
+# 3) familyDisplays 必须被 VehicleCardsGrid 真消费，且数据源必须【是 family model】（gptpro 跨厂商审第3点升级）。
+#    从「VehicleCardsGrid(displays: 出现」升到「displays: 实参 == familyDisplays」——
+#    防 grid 接了个非 family 数据源（device 级/空数组/别的 var）字符串出现但语义错的假绿。
+if ! printf '%s\n' "$CODE" | grep -qE 'VehicleCardsGrid\(displays:[[:space:]]*familyDisplays\)'; then
+  echo "❌ [contentview-wiring] VehicleCardsGrid 的 displays 数据源必须是 familyDisplays（10 族 model）——接别的源/未消费=假绿"
   fail=1
 fi
 
