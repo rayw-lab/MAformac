@@ -63,13 +63,13 @@ Each child plan must carry its own writable paths, validation gates, proof class
 Two GPT Pro audit reports were read for this patch:
 
 - Long-run 2 identity + behavior-shape audit: no P0; the P1/P2 checker, fingerprint, version, and diagnostic naming findings are already absorbed in the current repo and ledger.
-- Post-C6 architecture audit: no P0; this patch absorbs plan-level P1/P2 findings for head freshness, runtime-result vocabulary, `proof_class` display discipline, stale downstream task guards, and minimal iOS/macOS runtime boundaries.
+- Post-C6 architecture audit: no P0; the route/plan patch absorbed P1/P2 findings for head freshness, runtime-result vocabulary, `proof_class` display discipline, stale downstream task guards, and minimal iOS/macOS runtime boundaries.
 
-Code-level findings from the architecture audit are not executed by this parent-plan patch. They are target items for later child plans:
+Code-level findings from the architecture audit were later approved by the user and absorbed by a focused C6 bench/source-free guardrail patch. See `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md`.
 
-- `docs/superpowers/plans/2026-06-25-c6-acceptance-and-candidate-comparison.md`: `Tools/C6BenchCLI/main.swift` unknown result-id fail-closed behavior, expected case run coverage, `C6CanonicalJSON.encode` fail-closed behavior, and `contract_bundle_fingerprint.bundle_hash` component-version identity decision.
-- `docs/superpowers/plans/2026-06-25-c6-acceptance-and-candidate-comparison.md`: expand `scripts/test_check_c6_case_shape.py` coverage for already-state mismatch, missing risk IDs, clarify-tag checks, coverage/golden split, and unknown alternative tools.
-- `docs/project/phase0/*closeout*` templates or the relevant child-plan closeout: use `make verify-all` for full local Swift-inclusive proof and `make verify-ci` or GitHub Actions Verify for source-free CI proof; do not describe `make verify` as the full Swift gate.
+- Absorbed now: `Tools/C6BenchCLI/main.swift` unknown result-id fail-closed behavior, expected case run coverage, `C6CanonicalJSON.encode` fail-closed behavior, `contract_bundle_fingerprint.bundle_hash` component-version identity, and regression coverage for already-state mismatch, missing risk IDs, clarify-tag checks, coverage/golden split, and unknown alternative tools.
+- Still downstream: `docs/superpowers/plans/2026-06-25-c6-acceptance-and-candidate-comparison.md` must define and authorize actual C6 model-quality acceptance/comparison only after a signed candidate exists.
+- Closeout rule remains: use `make verify-all` for full local Swift-inclusive proof and `make verify-ci` or GitHub Actions Verify for source-free CI proof; do not describe `make verify` as the full Swift gate.
 
 ### Task 1: Route Baseline Synchronization
 
@@ -533,7 +533,7 @@ Create `docs/project/phase0/post-c6-roadmap-grill-ledger-2026-06-25.md` with the
 ## Inputs
 
 - Parent plan: `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`
-- GPT Pro architecture audit: pending until external verdict is tracked.
+- GPT Pro architecture audit: tracked in `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md`; use it as architecture-audit input, not as execution authorization for training/C6 acceptance/UIUE merge.
 
 ## Questions
 
@@ -592,8 +592,8 @@ Expected: all OpenSpec items pass and whitespace check exits 0.
 ## Final Route Summary
 
 1. Now: baseline docs plus this parent plan.
-2. External audit: ask GPT Pro to challenge downgrade risk and over-engineering risk.
-3. Next grill: accept or edit the parent route and bridge-first thesis using the audit verdict.
+2. External audit: GPT Pro challenged downgrade risk and over-engineering risk; route/plan and C6 bench/source-free P1/P2 fixes are absorbed in the tracked absorption ledger.
+3. Next grill: accept or edit the parent route and bridge-first thesis using the absorbed audit verdict.
 4. First contract: propose `define-runtime-presentation-bridge`.
 5. Model lane: C5 data/retrain/candidate only after entry gates.
 6. C6 lane: acceptance/comparison only after candidate signoff and explicit run authorization.

@@ -63,9 +63,15 @@ Receipts should make the split visible through fields such as `model_hard_pass_b
 
 `contract_bundle_fingerprint` is a bundle-level contract-input manifest, not a second opaque run hash and not a replacement for per-run identity fields.
 
-The manifest uses an ordered list of `{component_id, version, content_digest}` and computes `fingerprint = sha256(canonicalize(manifest))`. Fixed component IDs include C1 contract, C2 renderer/state cells, C6 cases, Qwen tool format, and D-domain IR map.
+The manifest uses an ordered list of `{component_id, version, content_digest}`. Receipt `bundle_hash` is computed from canonical JSON of `{schema_version, component_versions, component_digests}`, and JSON/Markdown summaries expose both version and digest maps. Fixed component IDs include C1 contract, C2 renderer/state cells, C6 cases, Qwen tool format, D-domain IR map, and the D-domain demo tool catalog.
 
 Prompts, model outputs, seeds, model artifacts, tokenizer digests, and LoRA adapter digests remain per-run identity or model-artifact fields. They must not be absorbed into the contract bundle fingerprint.
+
+Canonical JSON encoding for identity digests is throwing. Encoding failure is an infrastructure error and must not be converted to empty data.
+
+### AD-C6-009A: Summarize consumes complete known case envelopes only
+
+`C6BenchCLI summarize` must fail closed when a model-results envelope contains unknown result IDs or omits any expected C6 case ID. Partial or extra envelopes cannot produce C6 summary receipts because they can downgrade proof by silently shrinking denominator coverage.
 
 ### AD-C6-010: Apply diagnostics are upstream facts, not C6-owned runtime logic
 

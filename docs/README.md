@@ -15,6 +15,7 @@
 | `docs/CURRENT.md` | **当前路由牌(router only,not SSOT)**:新窗口先看当前阶段/下一步/禁止动作/活跃 blockers;若与 CLAUDE/OpenSpec/grill 冲突则作废并更新 |
 | `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` | **Post Long-run 2 parent roadmap**:bridge contract first, model/C6 next, full backend/UIUE connection later under child plans; implementation_plan_not_ssot |
 | `docs/project/phase0/post-c6-roadmap-gptpro-architecture-audit-request-2026-06-25.md` | **GPT Pro architecture audit request**: asks external review to challenge the post-C6 roadmap for downgrade risk and over-engineering risk |
+| `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md` | **Post-C6 architecture audit absorption ledger**: absorbed route/plan and C6 bench/source-free P1/P2 fixes; local proof only, not C6 acceptance/model-quality |
 | `docs/project/phase0/rebuild-c6-identity-shape-closeout-2026-06-25.md` + `docs/project/phase0/rebuild-c6-identity-shape-gptpro-absorption-ledger-2026-06-25.md` | **Long-run 2 closeout evidence**: `external-pass-with-absorbed-fixes` for rebuild-C6 identity + behavior-shape construction only; not C6 acceptance/model-quality/retrain/golden/voice/UIUE/V-PASS |
 | ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` | **范式 + surface 权威 SSOT**(§1-§17:generic frame 否决→D-domain 具名工具/canonical IR 仍 device×action/三层模型/demo 取巧特性/口径终拍 562/21 主议题全收口/A2 盘点) — **范式翻案权威** |
 | `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |

@@ -70,6 +70,7 @@ test: .venv/.deps.stamp
 	$(PYTHON) scripts/test_fc_flags.py
 	$(PYTHON) scripts/test_tool_name_sanitize.py
 	$(PYTHON) scripts/test_check_c6_case_shape.py
+	$(PYTHON) scripts/test_c6_bench_cli.py
 
 verify-source: .venv/.deps.stamp
 	$(PYTHON) scripts/freeze_snapshot.py --check

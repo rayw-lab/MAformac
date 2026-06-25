@@ -12,6 +12,8 @@ audit_verdicts:
 
 This ledger only covers Long-run 2 rebuild-C6 identity + behavior-shape local closeout. It is not C6 acceptance, not model-quality evaluation, not retrain-C5, not candidate comparison, not D-domain base recalibration, not golden-run, not voice or endpoint readiness, not UIUE merge, not R-L17 candidate signoff, and not V/S/U-PASS.
 
+Post-closeout architecture absorption note: a later focused patch further tightened `contract_bundle_fingerprint` by exposing `component_versions` and including component versions in `bundle_hash`. That follow-up is tracked in `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md`; it does not upgrade this Long-run 2 proof class.
+
 ## Finding Classification
 
 | ID | Severity | Source Lines | Disposition | Absorption |

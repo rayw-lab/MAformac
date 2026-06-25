@@ -879,6 +879,36 @@ final class C6VehicleToolBenchTests: XCTestCase {
         )
     }
 
+    func testContractBundleFingerprintBundleHashChangesWhenComponentVersionChanges() throws {
+        let baseline = try C6ContractBundleFingerprint.receipt(components: sampleContractBundleComponents())
+        var versionChanged = sampleContractBundleComponents()
+        let index = try XCTUnwrap(versionChanged.firstIndex { $0.componentID == "c2.state_cells_renderer" })
+        versionChanged[index].version = "v2"
+
+        let changed = try C6ContractBundleFingerprint.receipt(components: versionChanged)
+
+        XCTAssertNotEqual(baseline.bundleHash, changed.bundleHash)
+        XCTAssertEqual(baseline.componentDigests, changed.componentDigests)
+        XCTAssertEqual(changed.componentVersions["c2.state_cells_renderer"], "v2")
+    }
+
+    func testCanonicalJSONEncodeFailsClosedOnEncodingError() throws {
+        struct FailingEncodable: Encodable {
+            func encode(to encoder: Encoder) throws {
+                throw EncodingError.invalidValue(
+                    "fixture",
+                    EncodingError.Context(codingPath: encoder.codingPath, debugDescription: "intentional encoding failure")
+                )
+            }
+        }
+
+        XCTAssertThrowsError(try C6CanonicalJSON.encode(FailingEncodable())) { error in
+            guard case EncodingError.invalidValue = error else {
+                return XCTFail("expected EncodingError.invalidValue, got \(error)")
+            }
+        }
+    }
+
     func testEvalRunCarriesContractBundleFingerprintWithoutReplacingPerRunDigests() throws {
         let runner = try makeRunner(contractBundleFingerprint: sampleContractBundleFingerprintRecord(bundleHash: "bundle-fingerprint"))
         let caseItem = C6BenchCase.fixture(
@@ -892,9 +922,10 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
         XCTAssertEqual(run.contractBundleFingerprint.schemaVersion, C6ContractBundleFingerprint.schemaVersion)
         XCTAssertEqual(run.contractBundleFingerprint.bundleHash, "bundle-fingerprint")
+        XCTAssertEqual(run.contractBundleFingerprint.componentVersions["c1.semantic_function_contract"], "v1")
         XCTAssertEqual(run.contractBundleFingerprint.componentDigests["c1.semantic_function_contract"], "1111")
         XCTAssertEqual(run.promptHash, C6Hash.sha256Hex(Data(caseItem.inputZh.utf8)))
-        XCTAssertEqual(run.toolOutputDigest, C6Hash.sha256Hex(C6CanonicalJSON.encode([
+        XCTAssertEqual(run.toolOutputDigest, C6Hash.sha256Hex(try C6CanonicalJSON.encode([
             C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
         ])))
         XCTAssertEqual(run.contractDigest, "contract-digest")
@@ -1211,6 +1242,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(summary.loraAdapterDigest, "")
         XCTAssertEqual(summary.contractBundleFingerprint.schemaVersion, C6ContractBundleFingerprint.schemaVersion)
         XCTAssertEqual(summary.contractBundleFingerprint.bundleHash, "contract-bundle-fingerprint")
+        XCTAssertEqual(summary.contractBundleFingerprint.componentVersions["c1.semantic_function_contract"], "v1")
         XCTAssertEqual(summary.contractBundleFingerprint.componentDigests["c1.semantic_function_contract"], "1111")
         XCTAssertEqual(Set(summary.evalRuns.map(\.modelArtifactDigest)), ["model-digest"])
         XCTAssertEqual(Set(summary.evalRuns.map(\.tokenizerDigest)), ["tokenizer-digest"])
@@ -1222,6 +1254,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertTrue(json.contains("\"contract_bundle_fingerprint\""))
         XCTAssertTrue(json.contains("\"schema_version\""))
         XCTAssertTrue(json.contains("\"bundle_hash\""))
+        XCTAssertTrue(json.contains("\"component_versions\""))
         XCTAssertTrue(json.contains("\"component_digests\""))
     }
 

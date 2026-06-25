@@ -1239,7 +1239,7 @@ public struct C6BenchRunner: Sendable {
         }
         var gate = candidateResults.first { !$0.hardFailed } ?? candidateResults[0]
         gate.judge = gate.hardFailed ? nil : C6Judge.score(case: benchCase, text: output.text)
-        let actualDigest = C6Hash.sha256Hex(C6CanonicalJSON.encode(output.toolCalls))
+        let actualDigest = C6Hash.sha256Hex(try C6CanonicalJSON.encode(output.toolCalls))
         let promptHash = C6Hash.sha256Hex(Data(benchCase.inputZh.utf8))
         let runID = "c6-\(benchCase.caseID)-\(runIndex)"
 
@@ -1804,10 +1804,10 @@ public enum C6Hash {
 }
 
 public enum C6CanonicalJSON {
-    public static func encode<T: Encodable>(_ value: T) -> Data {
+    public static func encode<T: Encodable>(_ value: T) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return (try? encoder.encode(value)) ?? Data()
+        return try encoder.encode(value)
     }
 }
 

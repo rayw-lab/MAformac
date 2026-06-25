@@ -37,17 +37,25 @@ public struct C6ContractBundleFingerprintRecord: Codable, Equatable, Sendable {
     public var schemaVersion: String
     public var bundleHash: String
     public var componentDigests: [String: String]
+    public var componentVersions: [String: String]
 
     enum CodingKeys: String, CodingKey {
         case schemaVersion = "schema_version"
         case bundleHash = "bundle_hash"
         case componentDigests = "component_digests"
+        case componentVersions = "component_versions"
     }
 
-    public init(schemaVersion: String, bundleHash: String, componentDigests: [String: String]) {
+    public init(
+        schemaVersion: String,
+        bundleHash: String,
+        componentDigests: [String: String],
+        componentVersions: [String: String] = [:]
+    ) {
         self.schemaVersion = schemaVersion
         self.bundleHash = bundleHash
         self.componentDigests = componentDigests
+        self.componentVersions = componentVersions
     }
 
     public var hasRequiredFields: Bool {
@@ -55,7 +63,9 @@ public struct C6ContractBundleFingerprintRecord: Codable, Equatable, Sendable {
             && !bundleHash.isEmpty
             && C6ContractBundleFingerprint.requiredComponentIDs.allSatisfy { componentID in
                 guard let digest = componentDigests[componentID] else { return false }
+                guard let version = componentVersions[componentID] else { return false }
                 return !digest.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    && !version.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             }
     }
 }
@@ -117,14 +127,17 @@ public enum C6ContractBundleFingerprint {
     public static func receipt(manifest: C6ContractBundleManifest) throws -> C6ContractBundleFingerprintRecord {
         let validatedManifest = try validated(manifest: manifest)
         let componentDigests = Dictionary(uniqueKeysWithValues: validatedManifest.components.map { ($0.componentID, $0.contentDigest) })
-        let bundleHash = C6Hash.sha256Hex(C6CanonicalJSON.encode(BundleHashInput(
+        let componentVersions = Dictionary(uniqueKeysWithValues: validatedManifest.components.map { ($0.componentID, $0.version) })
+        let bundleHash = C6Hash.sha256Hex(try C6CanonicalJSON.encode(BundleHashInput(
             schemaVersion: validatedManifest.manifestVersion,
-            componentDigests: componentDigests
+            componentDigests: componentDigests,
+            componentVersions: componentVersions
         )))
         return C6ContractBundleFingerprintRecord(
             schemaVersion: validatedManifest.manifestVersion,
             bundleHash: bundleHash,
-            componentDigests: componentDigests
+            componentDigests: componentDigests,
+            componentVersions: componentVersions
         )
     }
 
@@ -141,16 +154,18 @@ public enum C6ContractBundleFingerprint {
     }
 
     static func fingerprint(manifest: C6ContractBundleManifest) throws -> String {
-        C6Hash.sha256Hex(C6CanonicalJSON.encode(try validated(manifest: manifest)))
+        C6Hash.sha256Hex(try C6CanonicalJSON.encode(try validated(manifest: manifest)))
     }
 
     private struct BundleHashInput: Codable, Sendable {
         var schemaVersion: String
         var componentDigests: [String: String]
+        var componentVersions: [String: String]
 
         enum CodingKeys: String, CodingKey {
             case schemaVersion = "schema_version"
             case componentDigests = "component_digests"
+            case componentVersions = "component_versions"
         }
     }
 

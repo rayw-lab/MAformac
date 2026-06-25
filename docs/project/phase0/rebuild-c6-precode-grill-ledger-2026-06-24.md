@@ -279,12 +279,20 @@ The initial framing implied current C6 only has scattered per-run digests and ne
 
 So the missing piece is not "add a bigger hash." The missing piece is a named, versioned component manifest that makes the contract input set auditable.
 
+> 2026-06-25 post-audit update: the implementation was tightened after GPT Pro architecture review. `bundle_hash` is now computed from canonical JSON of `{schema_version, component_versions, component_digests}`, and receipts expose `component_versions` beside `component_digests`. The component-digests-only examples below are historical precode shape notes, not the current identity rule.
+
 Minimum shape:
 
 ```yaml
 contract_bundle_fingerprint:
   schema_version: c6_contract_bundle_v1
-  bundle_hash: sha256(canonical_json(component_digests))
+  bundle_hash: sha256(canonical_json(schema_version + component_versions + component_digests))
+  component_versions:
+    semantic_function_contract_jsonl: v1
+    state_cells_yaml: v1
+    c6_bench_cases_jsonl: v1
+    qwen_tool_call_format_yaml: v1
+    d_domain_ir_map_json: v1
   component_digests:
     semantic_function_contract_jsonl: sha256(contracts/semantic-function-contract.jsonl)
     state_cells_yaml: sha256(contracts/state-cells.yaml)
@@ -327,7 +335,7 @@ Rules:
 
 1. Keep current per-run fields: do not remove `contract_digest`, `prompt_hash`, `tool_output_digest`, or artifact digests in the first rebuild-C6 proposal.
 2. Add bundle semantics as component-level metadata: each component digest must be visible in the receipt, not only the final aggregate hash.
-3. Compute `bundle_hash` from canonical JSON of `{schema_version, component_digests}`, not by ad hoc byte concatenation without component labels.
+3. Compute `bundle_hash` from canonical JSON of `{schema_version, component_versions, component_digests}`, not by ad hoc byte concatenation without component labels.
 4. Do not include model outputs, prompts, seeds, or artifact digests in the bundle.
 5. If `contract_digest` is later aliased to `bundle_hash`, that migration must be explicit and tests must keep old receipt compatibility or a clear receipt-version bump.
 
@@ -352,7 +360,15 @@ c6_contract_bundle_fingerprint_minimum:
   produce_in_rebuild_c6:
     - contract_bundle_fingerprint.schema_version
     - contract_bundle_fingerprint.bundle_hash
+    - contract_bundle_fingerprint.component_versions
     - contract_bundle_fingerprint.component_digests
+  component_versions:
+    required:
+      - semantic_function_contract_jsonl
+      - state_cells_yaml
+      - c6_bench_cases_jsonl
+      - qwen_tool_call_format_yaml
+      - d_domain_ir_map_json
   component_digests:
     required:
       - semantic_function_contract_jsonl
@@ -559,7 +575,7 @@ These Q4 decisions close the OpenSpec-absorption grill. They are route-control d
 | Q4.4 | ACCEPT + define documentation absorption | Documentation absorption can be prepared before implementation gates; apply/implementation still requires route gate and accepted proposal. | Allowed documentation paths: `proposal.md`, `design.md`, `tasks.md`, `specs/*.md`, ledgers. Forbidden paths in documentation absorption: `Core/Bench/**.swift`, `contracts/c6-bench-cases.jsonl`, `contracts/qwen-tool-call-format.yaml`, model/data artifacts. Allowed validation: OpenSpec validation and `git diff --check` only. |
 | Q4.5 | ACCEPT + require one SSOT name | `behavior_class` cannot coexist indefinitely with `C6Bucket`, C5 data-count labels, or apply no-effect labels as separate SSOT names. | First construction task must include SSOT naming decision across C5 `data_class_observed_count`, C6 `C6Bucket` / selector denominators, and apply `no_effect_reason`: either rename `C6Bucket` to `BehaviorClass`, or leave `C6Bucket` as deprecated/typealias/mapped legacy with a deletion window. No selectors, thresholds, active anchors, or apply no-effect labels before this reconciliation. |
 | Q4.6 | ACCEPT + one SHALL group | Readback plan P should be one coherent spec requirement, not four scattered SHALLs. | Spec delta SHALL state model hard-pass must not include readback; verify-gold must keep C2 renderer readback validity; clarify/refusal text evidence still counts when asserted. Receipt-schema fields include `model_hard_pass_basis`, `readback_applicable`, `readback_match`, and `readback_excluded_from_model_hard_pass`. |
-| Q4.7 | ACCEPT + make versioned manifest concrete | `contract_bundle_fingerprint` must be a versioned component manifest, not raw byte concatenation or a second opaque hash. | Manifest shape: ordered list of `{component_id, version, content_digest}`; fixed `component_id` enum includes C1 contract, C2 renderer/state cells, C6 cases, Qwen tool format, and D-domain IR map; `fingerprint = sha256(canonicalize(manifest))`; exclude prompts, outputs, seeds, model artifacts. |
+| Q4.7 | ACCEPT + make versioned manifest concrete | `contract_bundle_fingerprint` must be a versioned component manifest, not raw byte concatenation or a second opaque hash. | Manifest shape: ordered list of `{component_id, version, content_digest}`; fixed `component_id` enum includes C1 contract, C2 renderer/state cells, C6 cases, Qwen tool format, D-domain IR map, and D-domain demo tool catalog; `bundle_hash = sha256(canonical_json(schema_version, component_versions, component_digests))`; exclude prompts, outputs, seeds, model artifacts. |
 | Q4.8 | ACCEPT + boundary correction, superseded by Q5.1 carve-out | `appliedWrites` producer work belongs to apply/execution, not C6 runtime/scorer implementation. Rebuild-C6 may consume it and may carry a bounded upstream producer subtask only when the carrier explicitly says the code lands in apply/execution and does not create a private C6 apply engine. | `design.md` records producer/consumer boundary and the Q5.1 bounded upstream producer carve-out. `tasks.md` may include §3.9a-d apply/execution producer tasks plus C6 consumer tasks, but C6 runtime/scorer must not own producer logic. |
 | Q4.9 | ACCEPT + whitelist verify-gold shape-only | First rebuild-C6 closeout can use local documentation/static proof only. `verify-gold` is allowed only as shape/contract replay verification, not model-quality evaluation. | Allowed proof classes: `local` OpenSpec validation, `local_static_teardown`, static/receipt review, and `archive-check verify-gold` only if no model is run and it checks contract/shape/D-domain expected-tool validity. Forbidden: C6 acceptance, model run, base recalibration, endpoint, mobile/true-device, demo-golden, V-PASS. |
 | Q4.10 | ACCEPT + name bypass-guard placeholder | R-L17 route/candidate verdicts enter tasks as manual signoff checkpoints, not runtime enums. The future lightweight guard needs a named placeholder to avoid being forgotten. | Add manual signoff task references to R7 fields. Do not add C24 enums. Reserve placeholder change name `add-route-verdict-verify-guard` for the future make-verify bypass guard; do not implement it in this lane. |
@@ -719,7 +735,7 @@ Current evidence verified against repo state:
 - `tasks.md:62-66` contains the current red lines, including the Q5.1 §3.9a-d bounded producer limit.
 - `design.md:44-54` makes behavior taxonomy shared across C5/C6/apply and requires `C6Bucket` reconciliation before selectors, thresholds, or active anchors.
 - `design.md:56-60` states readback plan P: model hard-pass excludes renderer readback while verify-gold keeps renderer validity.
-- `design.md:62-68` states `contract_bundle_fingerprint` is a versioned component manifest and excludes per-run prompt/output/model identity.
+- `design.md:62-68` states `contract_bundle_fingerprint` is a versioned component manifest, includes component versions in bundle identity, and excludes per-run prompt/output/model identity.
 - `design.md:70-78` records the Q5.1 bounded upstream producer carve-out and C6 consumer boundary.
 - `spec.md:107-124` separates apply/execution producer facts from C6 replay consumption and prohibits C6 expected-state sets in apply.
 - `Core/Bench/C6VehicleToolBench.swift:25-32` still has legacy `C6Bucket` values including `coverage`, `no_call`, and `refusal`.
@@ -767,7 +783,7 @@ Decision table:
 | Q5.5 | ACCEPT | `StateWrite` is descriptive only. | `stateKey`, `beforeValue?`, `afterValue`, `scopeOrigin?`, `writeKind`; default `appliedWrites: []` compatibility. | No `noop` write kind, behavior class, no-effect reason, planner reason, expected keys, or errors array. |
 | Q5.6 | ACCEPT_WITH_CURRENT_CODE_CAVEAT | Dependency side effects come from state-cell `dependsOn` plus applied-write provenance. | Apply emits `writeKind=.dependency`; C6 validates dependency writes against the direct cell's `dependsOn` rather than passing expected sets into apply. | Do not allow all dependency writes by label alone; do not let old expected-key dependency expansion remain the only guard. |
 | Q5.7 | ACCEPT | Split model hard-pass failures from renderer/readback evidence. | `modelFailureClasses`; renderer/readback fields such as `readback_applicable`, `readback_match`, `readback_excluded_from_model_hard_pass`; verify-gold keeps renderer validity. | `.readback` must not make model `hardFailed=true`; readback must not be deleted. |
-| Q5.8 | ACCEPT | Add versioned component manifest and bundle hash without replacing existing run fields. | `contract_bundle_fingerprint.schema_version`, `component_digests`, `bundle_hash`; preserve `contract_digest`, prompt/output/model/tokenizer/adapter digests. | Do not include prompt, output, seeds, model artifacts, tokenizer artifacts, or LoRA adapter artifacts in the bundle. |
+| Q5.8 | ACCEPT | Add versioned component manifest and bundle hash without replacing existing run fields. | `contract_bundle_fingerprint.schema_version`, `component_versions`, `component_digests`, `bundle_hash`; preserve `contract_digest`, prompt/output/model/tokenizer/adapter digests. | Do not include prompt, output, seeds, model artifacts, tokenizer artifacts, or LoRA adapter artifacts in the bundle. |
 | Q5.9 | ACCEPT | D-domain JSONL migration is shape-only construction. | Static catalog/IR-map checks plus shape-only `verify-gold`; no raw/customer source text. | No C6 acceptance, model run, base recalibration, retrain-C5 data generation, golden-run, or raw source import. |
 | Q5.10 | ACCEPT | Reporting is two-axis. | `external_layer_results[]` for release-blocking layers and `behavior_class_results[]` for SSOT/diagnostic classes. | No single enum for layer+behavior; no aggregate pass masking hard-layer failure. |
 | Q5.11 | ACCEPT | Implementation closeout may use local static/unit/shape-no-model proof only. | OpenSpec validation, `git diff --check`, targeted Swift/unit tests, static schema/catalog checks, shape-only no-model verify-gold, receipt consistency checks. | No model-quality evaluation, training, base recalibration, golden-run, voice, endpoint readiness, V/S/U-PASS, or C6 acceptance claims. |

@@ -69,13 +69,41 @@ C6 runner summaries SHALL emit independent metrics for external layers and inter
 - **AND** no-call collapse cannot make an unsupported or safety failure look like a correct already-state no-op
 
 ### Requirement: Replay fingerprint SHALL be recorded per eval run
-Each C6 eval run SHALL preserve per-run identity fields for prompt, output, model artifact, tokenizer, adapter, and contract digest. In addition, rebuild-C6 SHALL record a versioned `contract_bundle_fingerprint` over the contract inputs needed to interpret replay. The bundle fingerprint SHALL NOT absorb prompts, outputs, sampling seeds, model artifacts, tokenizer artifacts, or LoRA adapter artifacts.
+Each C6 eval run SHALL preserve per-run identity fields for prompt, output, model artifact, tokenizer, adapter, and contract digest. In addition, rebuild-C6 SHALL record a versioned `contract_bundle_fingerprint` over the contract inputs needed to interpret replay. The bundle fingerprint SHALL include component versions and component digests in its identity input, and receipts SHALL expose `component_versions` and `component_digests`. The bundle fingerprint SHALL NOT absorb prompts, outputs, sampling seeds, model artifacts, tokenizer artifacts, or LoRA adapter artifacts.
 
 #### Scenario: Contract bundle fingerprint is separate from run identity
 - **GIVEN** an eval run with prompt, output, model, tokenizer, and adapter digests
 - **WHEN** the run records contract identity
 - **THEN** it includes a contract bundle fingerprint over contract inputs
 - **AND** it preserves prompt/output/model/tokenizer/adapter digests as separate per-run fields
+
+#### Scenario: Component version changes affect bundle identity
+- **GIVEN** two contract bundle manifests with the same component digests
+- **AND** one manifest changes a component version
+- **WHEN** bundle hashes are computed
+- **THEN** the bundle hashes are different
+- **AND** the receipt exposes the changed component version
+
+#### Scenario: Canonical digest encoding fails closed
+- **GIVEN** identity digest input cannot be canonically encoded
+- **WHEN** C6 computes a contract or tool-output digest
+- **THEN** the operation fails as infrastructure error
+- **AND** C6 does not hash empty data as a substitute
+
+### Requirement: Summarize SHALL fail closed on model-result coverage drift
+`C6BenchCLI summarize` SHALL only summarize complete model-result envelopes whose result IDs are known C6 case IDs and whose coverage includes every expected C6 case ID at least once. Unknown result IDs and missing expected case IDs SHALL be infrastructure errors before a summary receipt is written. This input-completeness check SHALL NOT be represented as C6 acceptance or model-quality proof.
+
+#### Scenario: Unknown result IDs are rejected
+- **GIVEN** a model-results envelope contains a result ID not present in `contracts/c6-bench-cases.jsonl`
+- **WHEN** `C6BenchCLI summarize` runs
+- **THEN** it exits non-zero
+- **AND** it reports the unknown result ID
+
+#### Scenario: Missing expected case coverage is rejected
+- **GIVEN** a model-results envelope omits one or more expected C6 case IDs
+- **WHEN** `C6BenchCLI summarize` runs
+- **THEN** it exits non-zero
+- **AND** no C6 summary receipt is produced for the partial denominator
 
 ### Requirement: Base Qwen3-1.7B baseline SHALL run before LoRA diff
 Base-vs-LoRA comparison SHALL use the same harness, dataset, prompt policy, parser, mock state, scoring, replay fingerprint, and contract bundle semantics. This comparison SHALL require a signed LoRA candidate and explicit run authorization. The construction lane MAY define comparison semantics before such a candidate exists, but SHALL NOT run model-quality comparison without authorization.

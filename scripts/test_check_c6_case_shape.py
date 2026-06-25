@@ -63,7 +63,7 @@ def run_checker(row: dict) -> subprocess.CompletedProcess[str]:
         )
 
 
-def expect_pass(name: str, row: dict, failures: list[str]) -> None:
+def expect_pass(name: str, row: dict, failures: list[str], stdout_needles: list[str] | None = None) -> None:
     result = run_checker(row)
     if result.returncode != 0:
         failures.append(f"{name}: expected pass, got rc={result.returncode} stderr={result.stderr!r}")
@@ -71,6 +71,9 @@ def expect_pass(name: str, row: dict, failures: list[str]) -> None:
         failures.append(f"{name}: missing diagnostic candidate counts output")
     if "external_layer_candidate_counts=" in result.stdout:
         failures.append(f"{name}: emitted legacy external_layer_candidate_counts field")
+    for needle in stdout_needles or []:
+        if needle not in result.stdout:
+            failures.append(f"{name}: expected stdout to contain {needle!r}, got {result.stdout!r}")
 
 
 def expect_fail(name: str, row: dict, needle: str, failures: list[str]) -> None:
@@ -141,6 +144,95 @@ def main() -> int:
         "unknown expected tool is rejected",
         unknown_tool,
         "unknown expected_tool_calls name",
+        failures,
+    )
+
+    already_state_mismatch = deepcopy(valid)
+    already_state_mismatch.update(
+        {
+            "behavior_class": "already_state_noop",
+            "expected_tool_calls": [],
+            "expect_no_call": True,
+            "pre_state": {"ac.power": "off"},
+            "expected_state_delta": {"ac.power": "on"},
+            "readback_assertion": {"contains": ["已是"]},
+        }
+    )
+    expect_fail(
+        "already_state_noop requires pre_state match",
+        already_state_mismatch,
+        "already_state_noop requires pre_state",
+        failures,
+    )
+
+    safety_missing_risk = deepcopy(valid)
+    safety_missing_risk.update(
+        {
+            "behavior_class": "refusal_safety_or_policy",
+            "expected_tool_calls": [],
+            "expect_no_call": True,
+            "expected_state_delta": {},
+            "readback_assertion": {"contains": ["不能"]},
+            "clarify_tag": "rejected",
+        }
+    )
+    expect_fail(
+        "safety refusal requires risk ids",
+        safety_missing_risk,
+        "requires nonempty source_refs.risk_rule_ids",
+        failures,
+    )
+
+    clarify_wrong_tag = deepcopy(valid)
+    clarify_wrong_tag.update(
+        {
+            "behavior_class": "clarify_missing_slot",
+            "expected_tool_calls": [],
+            "expect_no_call": True,
+            "expected_state_delta": {},
+            "readback_assertion": {"contains": ["哪个"]},
+            "clarify_tag": "implicit",
+        }
+    )
+    expect_fail(
+        "clarify row requires explicit ambiguous tag",
+        clarify_wrong_tag,
+        "clarify_missing_slot requires clarify_tag",
+        failures,
+    )
+
+    coverage_row = deepcopy(valid)
+    coverage_row.update(
+        {
+            "behavior_class": "clarify_missing_slot",
+            "expected_tool_calls": [],
+            "expect_no_call": True,
+            "expected_state_delta": {},
+            "readback_assertion": {"contains": ["哪个"]},
+            "clarify_tag": "ambiguous",
+            "tags": {
+                **coverage_row["tags"],
+                "bucket": "coverage",
+                "sample_kind": "coverage-fuzz-fixture",
+                "must_pass": False,
+            },
+        }
+    )
+    expect_pass(
+        "coverage/fuzz rows stay out of golden diagnostic bucket",
+        coverage_row,
+        failures,
+        stdout_needles=['"demo_fuzz": 1'],
+    )
+
+    unknown_alternative_tool = deepcopy(valid)
+    unknown_alternative_tool["alternatives"] = [
+        {"expected_tool_calls": [{"name": "missing_alt_tool", "arguments": {}}]}
+    ]
+    expect_fail(
+        "unknown alternative expected tool is rejected",
+        unknown_alternative_tool,
+        "unknown alternative expected_tool_calls name",
         failures,
     )
 

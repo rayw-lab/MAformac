@@ -28,6 +28,8 @@ Implemented Long-run 2 construction-lane work:
 - Phase 5: explicit `behavior_class` on all 57 committed C6 rows, source-free shape checker, generator/source-truth propagation, and local gate wiring for `verify-c6-shape`.
 - UIUE impact: read-only scan only, verdict `not_blocking`.
 
+Post-closeout update: the later GPT Pro architecture absorption patch extends the receipt with visible `component_versions` and includes component versions in `bundle_hash`. See `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md`. The validation table below remains historical evidence for the original Long-run 2 closeout, not a rerun of the later patch.
+
 Deferred / still forbidden:
 - retrain-C5
 - C6 acceptance

@@ -7,6 +7,7 @@ plan_creation_head: f3a3299fe55fcb67b72f8b1a085f8939b01b1b76
 architecture_audit_head: 69432512a2c8ddcdc584bfac47f3218262544118
 route_fix_input_worktree_head: 69432512a2c8ddcdc584bfac47f3218262544118
 route_fix_input_upstream_head: 69432512a2c8ddcdc584bfac47f3218262544118
+architecture_code_absorption_input_head: e130a214f7f4cac42d68fbad7f73662a19932975
 last_verified_origin_main: c1e7d58
 branch: codex/rebuild-c6-doc-absorption-20260624
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
@@ -36,7 +37,7 @@ Live-verified route facts at the start of the architecture-audit absorption patc
 Strongest truthful status:
 
 - `rebuild-c6` identity + behavior-shape closeout: `external-pass-with-absorbed-fixes`.
-- Post-C6 parent roadmap architecture audit: `ARCH_PASS_WITH_FIXES`, with P1/P2 absorbed only into route/plan contract wording unless a later child plan explicitly implements code-level fixes.
+- Post-C6 parent roadmap architecture audit: `ARCH_PASS_WITH_FIXES`, with route/plan P1/P2 absorbed earlier and code-level C6 bench/source-free guardrails absorbed in the post-audit absorption patch.
 - Proof classes: `external_gptpro_review`, `local_static_contract`, `local_unit`, `local_shape_no_model`, `local_receipt_consistency`.
 - This is not C6 acceptance, not model-quality evaluation, not retrain-C5, not D-domain base recalibration, not candidate comparison, not golden-run, not voice readiness, not endpoint readiness, not UIUE merge, not R-L17 candidate signoff, and not V/S/U-PASS.
 
@@ -54,9 +55,10 @@ Current planning object:
 4. `docs/project/phase0/rebuild-c6-identity-shape-closeout-2026-06-25.md` - Long-run 2 closeout.
 5. `docs/project/phase0/rebuild-c6-identity-shape-gptpro-absorption-ledger-2026-06-25.md` - external audit findings and absorption ledger.
 6. `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` - next parent roadmap and child-plan split.
-7. `openspec/changes/rebuild-c6-four-layer-bench/` - active C6 carrier history and future candidate-comparison lane boundaries.
-8. `openspec/changes/retrain-c5-lora-d-domain/` - downstream C5 retrain draft, not execution authorization.
-9. `openspec/changes/ui-presentation/` - UIUE presentation contract context, not mainline merge proof.
+7. `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md` - code-level architecture audit absorption ledger for C6 bench/source-free guardrails.
+8. `openspec/changes/rebuild-c6-four-layer-bench/` - active C6 carrier history and future candidate-comparison lane boundaries.
+9. `openspec/changes/retrain-c5-lora-d-domain/` - downstream C5 retrain draft, not execution authorization.
+10. `openspec/changes/ui-presentation/` - UIUE presentation contract context, not mainline merge proof.
 
 ## Do Now
 
@@ -81,7 +83,7 @@ Current planning object:
 
 | Gate | Status | Required Next Evidence |
 |---|---|---|
-| Parent roadmap | local_docs_plan_architecture_audit_fixes_absorbed | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`. |
+| Parent roadmap | local_docs_plan_architecture_audit_code_fixes_absorbed | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`; code-level C6 bench/source-free audit findings are absorbed but do not upgrade proof class. |
 | Runtime-Presentation bridge | not_proposed | Create and validate `openspec/changes/define-runtime-presentation-bridge/`; contract-only first. |
 | C5 retrain | deferred | Requires accepted C5 child plan, physical entry gates, data generation authorization, and separate training proof. |
 | C6 acceptance/comparison | deferred | Requires signed C5 candidate and explicit run authorization; Long-run 2 shape evidence is insufficient. |
