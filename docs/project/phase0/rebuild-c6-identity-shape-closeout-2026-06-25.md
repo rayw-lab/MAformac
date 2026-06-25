@@ -88,5 +88,5 @@ Reason:
 
 1. Commit this closeout bundle.
 2. Push branch.
-3. GPT Pro audit request is now tracked at `docs/project/phase0/rebuild-c6-identity-shape-gptpro-audit-request-2026-06-25.md` and has been pushed with branch head `ce07a14`.
+3. GPT Pro audit request is tracked at `docs/project/phase0/rebuild-c6-identity-shape-gptpro-audit-request-2026-06-25.md`; live branch tip must be reconfirmed at audit dispatch time.
 4. Wait for GPT Pro verdict, absorb any P0/P1, and only then consider `external-pass` or `external-pass-with-absorbed-fixes`.

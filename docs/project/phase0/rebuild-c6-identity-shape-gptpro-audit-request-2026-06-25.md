@@ -16,9 +16,10 @@ Required findings format:
 
 - repo: `rayw-lab/MAformac`
 - branch: `codex/rebuild-c6-doc-absorption-20260624`
-- head: `a56aa83`
+- branch tip: audit the live pushed branch or PR head at review time.
+- pre-redispatch verified tip: `feef918`
 - implementation range: `ebc7933..229e9b3`
-- closeout-doc range: `229e9b3..a56aa83`
+- closeout / audit-request doc range: `229e9b3..feef918`
 
 ## Audit Scope
 
@@ -91,12 +92,13 @@ Questions:
 
 ## Phase 6 Diff Focus
 
-Commit: `a56aa83`
+Commits: `a56aa83`, `ce07a14`, `feef918`
 
 Questions:
 - Do closeout / lessons / evidence excerpt stay honest about proof class and status?
 - Is the status capped at `local-pass-pending-gptpro`?
 - Can an external auditor verify the local work from tracked docs alone, without ignored `Reports/`?
+- Does the later audit-request / pending-status documentation avoid claiming GPT Pro pass before the external verdict exists?
 
 ## Explicit No-Goals
 
