@@ -3,6 +3,7 @@
 ## Verdict
 
 status: local-pass-pending-gptpro
+final_external_audit_status: blocked-pending-gptpro
 proof_class:
 - local_static_contract
 - local_unit
@@ -87,5 +88,5 @@ Reason:
 
 1. Commit this closeout bundle.
 2. Push branch.
-3. Write and commit GPT Pro audit request.
-4. Stop at `local-pass-pending-gptpro` until external verdict is actually received and absorbed.
+3. GPT Pro audit request is now tracked at `docs/project/phase0/rebuild-c6-identity-shape-gptpro-audit-request-2026-06-25.md` and has been pushed with branch head `ce07a14`.
+4. Wait for GPT Pro verdict, absorb any P0/P1, and only then consider `external-pass` or `external-pass-with-absorbed-fixes`.
