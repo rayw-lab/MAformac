@@ -3,121 +3,100 @@ status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
 updated: 2026-06-25
-last_verified_worktree_head: 246968a
+last_verified_worktree_head: f3a3299
+last_verified_upstream_head: f3a3299
 last_verified_origin_main: c1e7d58
 branch: codex/rebuild-c6-doc-absorption-20260624
-expires_when: "rebuild-c6-four-layer-bench construction apply closeout lands, this branch is merged, or this route board is superseded by a newer board."
+expires_when: "this branch is merged, a newer current route board lands, or the post-C6 parent roadmap is superseded by accepted grill decisions."
 ---
 
-# CURRENT — MAformac Current Route Board
+# CURRENT - MAformac Current Route Board
 
 > This file is a traffic board, not a source of truth.
-> If this file conflicts with `CLAUDE.md`, archived OpenSpec specs, accepted grill decision packs, active OpenSpec changes, or signed R-L17 evidence, this file loses and must be updated.
+> If this file conflicts with `CLAUDE.md`, archived OpenSpec specs, accepted grill decision packs, active OpenSpec changes, signed evidence, or live repo state, this file loses and must be updated.
 
 ## Current Phase
 
-Post-PR4 / post-R-L17 route-only signoff: `rebuild-c6-four-layer-bench` is the current non-UIUE mainline for construction preparation.
+Post Long-run 2 rebuild-C6 identity + behavior-shape construction closeout.
 
-Current audited state:
+Live-verified route facts:
 
 - Current worktree branch: `codex/rebuild-c6-doc-absorption-20260624`.
-- Current worktree `HEAD`: `246968a` (`gov(R-L17): route-only signoff by wanglei`).
-- Pre-sign evidence commit: `ec8d35b` (`docs(phase0): R-L17 route-only signoff evidence pack`).
-- Current `origin/main`: `c1e7d58`.
-- `origin/main` is an ancestor of current `HEAD`; this branch is ahead by two documentation/governance commits.
-- Active carrier: `openspec/changes/rebuild-c6-four-layer-bench/`.
-- Latest validation in this route window: `openspec validate rebuild-c6-four-layer-bench --strict` pass; `openspec validate --all --strict` pass with 15 passed, 0 failed; `git diff --check` pass.
+- Current worktree `HEAD`: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- Current upstream `@{u}`: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- Current `origin/main`: `c1e7d58d281d0256d29034c1d120cefe0bf5a033`.
+- `origin/main` is an ancestor of current `HEAD`.
 
-R-L17 status:
+Strongest truthful status:
 
-- `route_deframing_verdict: signed_route_only`.
-- `signoff_scope: route_only_to_rebuild_c6_construction`.
-- `candidate_signoff_verdict: unsigned`.
-- Codex/OpenAI plus GLM are accepted as the heterogeneous review trace; candidate signoff does not require an additional judge solely for source diversity.
-- Route-only signoff unlocks human OpenSpec propose review, §1 construction preconditions, §2 D-domain expected-tool construction, and §3 four-layer bench construction.
-- Route-only signoff does not unlock retrain-C5, C6 acceptance, D-domain base recalibration, §4 candidate comparison, demo golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
+- `rebuild-c6` identity + behavior-shape closeout: `external-pass-with-absorbed-fixes`.
+- Proof classes: `external_gptpro_review`, `local_static_contract`, `local_unit`, `local_shape_no_model`, `local_receipt_consistency`.
+- This is not C6 acceptance, not model-quality evaluation, not retrain-C5, not D-domain base recalibration, not candidate comparison, not golden-run, not voice readiness, not endpoint readiness, not UIUE merge, not R-L17 candidate signoff, and not V/S/U-PASS.
 
-This route board reflects the current worktree. Do not cite it as merged mainline truth until the branch is merged or live mainline state is reconfirmed.
+Current planning object:
+
+- `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`
+- authority: `implementation_plan_not_ssot`
+- purpose: align docs/grill route after Long-run 2 before any new implementation lane starts.
 
 ## Read First
 
-1. `CLAUDE.md` — project constitution and highest routing rule.
-2. `docs/CURRENT.md` — this route board; router only, not SSOT.
-3. `docs/README.md` — document map.
-4. `docs/project/phase0/r-l17-human-review-evidence/R7-final-route-deframing-signoff.md` — signed route-only governance evidence.
-5. `docs/project/phase0/rebuild-c6-documentation-absorption-closeout-2026-06-24.md` — documentation absorption closeout and validation whitelist.
-6. `docs/project/phase0/rebuild-c6-precode-grill-ledger-2026-06-24.md` — Q3/Q4 row-level absorption and rejected alternatives.
-7. `docs/project/phase0/paper-to-skill-gate-absorption-ledger-2026-06-24.md` — Q2 paper absorption split; C5-owned tail remains in retrain-C5.
-8. `openspec/changes/rebuild-c6-four-layer-bench/` — active OpenSpec carrier.
+1. `CLAUDE.md` - project constitution and highest routing rule.
+2. `docs/CURRENT.md` - this route board; router only, not SSOT.
+3. `docs/README.md` - document map.
+4. `docs/project/phase0/rebuild-c6-identity-shape-closeout-2026-06-25.md` - Long-run 2 closeout.
+5. `docs/project/phase0/rebuild-c6-identity-shape-gptpro-absorption-ledger-2026-06-25.md` - external audit findings and absorption ledger.
+6. `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` - next parent roadmap and child-plan split.
+7. `openspec/changes/rebuild-c6-four-layer-bench/` - active C6 carrier history and future candidate-comparison lane boundaries.
+8. `openspec/changes/retrain-c5-lora-d-domain/` - downstream C5 retrain draft, not execution authorization.
+9. `openspec/changes/ui-presentation/` - UIUE presentation contract context, not mainline merge proof.
 
 ## Do Now
 
-1. Run the `rebuild-c6-four-layer-bench` human OpenSpec propose review.
-2. Reconfirm current branch, `HEAD`, `origin/main`, and load-bearing APIs before any implementation instruction.
-3. Resolve the remaining construction WBS grill points before the relevant code work starts:
-   - Q5.1 accepted with structural fix: this carrier may carry a bounded apply/execution producer subtask for `appliedWrites`, but C6 runtime/scorer remains a consumer.
-   - P0 branch seals before affected code: Q5.2, Q5.4, Q5.5, Q5.6, Q5.7, Q5.9, Q5.10, Q5.11.
-   - P1 closeout / coordination gates: Q5.8, Q5.12, Q5.13.
-   - Conditional only: Q5.3 `scopedKey()` public helper.
-   - Canonical order and red lines are archived in `docs/project/phase0/rebuild-c6-precode-grill-ledger-2026-06-24.md#Q5-Batch-Triage-Branching-Questions-Are-Implementation-Entry-Gates`.
-4. After propose/apply authorization, implement only §2/§3 construction scope for rebuild-C6.
-5. Keep `retrain-c5-lora-d-domain`, candidate comparison, golden-run, voice, endpoint readiness, and UIUE mainline merge as downstream gated work.
+1. Grill and accept or revise the post-C6 parent roadmap.
+2. If accepted, propose a thin `define-runtime-presentation-bridge` OpenSpec carrier before runtime/backend/UIUE implementation.
+3. Split downstream work into child plans for C5 retrain, C6 acceptance/comparison, iOS/macOS runtime backend, and demo-golden/voice/UIUE connection.
+4. Keep full runtime/backend implementation after bridge contract acceptance and aligned with model/C6 proof.
+5. Keep UIUE isolated unless state cells, C3-C6 fields, readback metadata, golden IDs, or bridge fields intersect.
 
 ## Do Not Do
 
 - Do not start LoRA data generation or training.
 - Do not run C6 acceptance, D-domain base recalibration, or real model-quality evaluation.
-- Do not execute §4 candidate comparison without a signed retrain-C5 candidate and explicit run authorization.
+- Do not execute candidate comparison without a signed retrain-C5 candidate and explicit run authorization.
 - Do not claim endpoint-ready, C6-ready, demo-golden-ready, voice-ready, V-PASS, S-PASS, or U-PASS.
 - Do not execute demo-golden-run or freeze golden IDs/readback/UIUE scene tags.
 - Do not merge UIUE into mainline or cite UIUE file:line evidence as current mainline proof without live git/PR/state reconfirmation.
-- Do not import raw cockpit/customer text, PII, secrets, or "internal only" source material into bench cases.
+- Do not import raw cockpit/customer text, PII, secrets, pricing, or internal-only source material into bench cases or training data.
 - Do not turn R-L17 route/candidate verdicts into runtime enums or C24 status IDs.
 
-## Open Blockers
+## Open Gates
 
-| Blocker | Status | Required Next Evidence |
+| Gate | Status | Required Next Evidence |
 |---|---|---|
-| R-L17 route deframing | signed_route_only | Evidence: `docs/project/phase0/r-l17-human-review-evidence/R7-final-route-deframing-signoff.md`; keep candidate unsigned. |
-| OpenSpec propose review | unlocked_not_yet_closed | Human review must accept `openspec/changes/rebuild-c6-four-layer-bench/` before implementation. |
-| Baseline/API reconfirm | partially_probed | Current symbols exist, but implementation handoff must record current file:line evidence for `ScopeOrigin`, `ScopeResolution`, `C2ScopeResolver.scopedKey()`, and `ToolContractStateApplier.applyWithEvidence`. |
-| Q5.1 apply producer scope | accepted_with_carve_out | Carrier now permits §3.9a-d bounded upstream producer work in apply/execution; C6 runtime/scorer remains consumer only. |
-| Q5.2 behavior taxonomy shape | P0_accept_with_naming_correction | Use shared `BehaviorClass` / `VehicleToolBehaviorClass` plus `behavior_class` field; keep `C6Bucket` legacy/import/report mapping and do not let `coverage` enter behavior taxonomy. |
-| Q5.3 scoped key helper | conditional_defer | Do not publicize by default; expose narrow helper only if implementation proves C6/tests cannot consume materialized `ScopeResolution.keys`. |
-| Q5.4-Q5.11 implementation branch seals | P0_before_affected_code | Resolve selector/denominator depth, `StateWrite`, dependency provenance, readback hard-pass split, JSONL shape boundary, two-axis reporting, and implementation proof classes before touching the affected code areas. |
-| Q5.8/Q5.12/Q5.13 closeout gates | P1_closeout_coordination | Preserve digest compatibility, live UIUE intersection proof if triggered, and staged docs/code/validation commit topology before closeout. |
-| Candidate signoff | unsigned | Requires completed construction evidence, signed retrain-C5 candidate, explicit run authorization, and human-owner signoff. |
-| UIUE reconfirm | isolated_external | Recheck only if UIUE touches `Core/State/`, `contracts/`, `generated/`, shared C3-C6 contracts, golden IDs, or route claims. |
+| Parent roadmap | local_docs_plan | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`. |
+| Runtime-Presentation bridge | not_proposed | Create and validate `openspec/changes/define-runtime-presentation-bridge/`; contract-only first. |
+| C5 retrain | deferred | Requires accepted C5 child plan, physical entry gates, data generation authorization, and separate training proof. |
+| C6 acceptance/comparison | deferred | Requires signed C5 candidate and explicit run authorization; Long-run 2 shape evidence is insufficient. |
+| Runtime backend | deferred_but_not_absent | Thin bridge contract may proceed first; full backend implementation waits for accepted bridge plan and model/C6 alignment. |
+| Voice/golden/UIUE | deferred | Requires stable state-cell/tool-card/C6/golden/readback IDs and separate proof classes. |
+| R-L17 candidate signoff | unsigned | Route-only signoff does not promote a candidate. |
 
 ## UIUE Isolation Tree
 
-UIUE remains outside this mainline route unless state, C3-C6, readback, golden-run IDs, or default-scope presentation contracts conflict.
+UIUE remains outside this mainline route unless state, C3-C6, readback, golden-run IDs, default-scope presentation contracts, or Runtime -> Presentation bridge fields conflict.
 
 Known external worktree:
 
 - Worktree: `/Users/wanglei/workspace/MAformac-uiue`
-- Relevant dispatch: `/Users/wanglei/workspace/MAformac-uiue/docs/dispatches/2026-06-24-phase4a-cc-window-dispatch.md`
-- Last checked impact: no current decision change for R-L17 route deframing because Phase4A is isolated and should not touch `Core/State/`, `contracts/`, or `generated/`.
+- Status: external isolated UIUE Phase 4 remediation/brainstorming unless reconfirmed live.
+- Current mainline stance: read-only intersection checks only.
 
-This is not mainline evidence. Reconfirm live UIUE git/PR state before citing UIUE as merged or using it as C6 proof.
-
-## Current Carrier Summary
-
-`rebuild-c6-four-layer-bench` owns the construction design for:
-
-- D-domain expected tool semantics in C6 release/trap cases.
-- Four independent external layers: `golden`, `demo_fuzz`, `unsupported`, and `safety`.
-- Five internal behavior classes: `tool_call`, `clarify_missing_slot`, `refusal_no_available_tool`, `refusal_safety_or_policy`, and `already_state_noop`.
-- Behavior-class SSOT across C5 data counts, C6 selectors/denominators, and apply/execution no-effect reasoning.
-- Readback plan P: renderer readback excluded from model hard-pass but retained for deterministic gold validity.
-- C6 replay fact bundle that consumes apply-layer evidence without becoming a second runtime.
-- Versioned contract bundle fingerprint over contract inputs while preserving per-run prompt/output/model/artifact digests.
-- Future D-domain base anchor design as comparison semantics only, not permission to run recalibration.
+This is not mainline evidence. Reconfirm live UIUE git/PR state before citing UIUE as merged or using it as C6, runtime, voice, golden, or V-PASS proof.
 
 ## Retired / Historical Inputs
 
-- The prior `docs/CURRENT.md` default-scope route board is superseded by this route-only rebuild-C6 board.
-- `docs/roadmap-2026-06-20-from-c6-done.md` is historical provenance, not live roadmap.
-- `docs/c5-recovery-2026-06-22/roadmap.md` has historical value but must not act as live roadmap unless split/bannered by Phase 0 disposition.
-- `docs/research/2026-06-23-a2-post-roadmap-audit-vs-home-llm.md` is a high-weight pre-propose checklist and evidence pack, not SSOT.
+- The prior `docs/CURRENT.md` route-only rebuild-C6 construction board is superseded by this post Long-run 2 board.
+- `docs/roadmap-2026-06-20-from-c6-done.md` remains historical provenance, not live roadmap.
+- `docs/project/phase0/non-uiue-pre-code-action-list-2026-06-24.md` remains historical route-control evidence; its rebuild-C6-first ordering has been consumed by Long-run 2 identity + behavior-shape construction closeout.
 - UIUE branch documents are external active work, not mainline proof until reconfirmed at the contract intersection.

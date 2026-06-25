@@ -9,6 +9,8 @@ expires: "2026-07-15"
 
 # Non-UIUE Pre-Code Action List
 
+> 2026-06-25 update: this checklist's "rebuild-C6 first" ordering has been consumed by Long-run 2 identity + behavior-shape construction closeout. It remains historical route-control evidence. Use `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` for the next parent route. This update does not claim C6 acceptance, model-quality evaluation, retrain-C5, candidate comparison, golden-run, voice, endpoint readiness, UIUE merge, or V/S/U-PASS.
+
 ## Verdict
 
 Next mainline is **unlock-layer first**, not a standalone `harden-contract-runtime-spine`.
