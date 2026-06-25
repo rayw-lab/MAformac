@@ -12,7 +12,10 @@
 
 - authority: `implementation_plan_not_ssot`; the source of truth remains `CLAUDE.md`, archived OpenSpec specs, accepted grill decision packs, active OpenSpec changes, signed evidence, and live repo state.
 - branch at plan creation: `codex/rebuild-c6-doc-absorption-20260624`.
-- live verified branch head at plan creation: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- plan_creation_head: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- architecture_audit_head: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- route_fix_input_head: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- Head truth rule: run `git rev-parse HEAD` and `git rev-parse @{u}` for live state; this plan records verification inputs, not a self-updating commit hash.
 - Long-run 2 strongest claim: `external-pass-with-absorbed-fixes` only for rebuild-C6 identity + behavior-shape construction closeout.
 - Long-run 2 does not authorize retrain-C5, C6 acceptance, D-domain base recalibration, candidate comparison, model-quality evaluation, golden-run, voice, endpoint readiness, UIUE merge, R-L17 candidate signoff, V-PASS, S-PASS, or U-PASS.
 - The project remains pure端侧, offline, no cloud backend, mock vehicle control, SwiftUI macOS+iOS, Qwen3-1.7B + LoRA mainline, Python only for development tooling.
@@ -48,12 +51,25 @@ Each child plan must carry its own writable paths, validation gates, proof class
 ## File Structure
 
 - `CLAUDE.md`: project constitution. Add only the latest post Long-run 2 route override so new sessions do not follow stale pre-C6 instructions.
-- `docs/CURRENT.md`: current route board. Replace stale `246968a` construction-prep state with verified `f3a3299` post Long-run 2 route state.
+- `docs/CURRENT.md`: current route board. Replace stale construction-prep state with `plan_creation_head=f3a3299...`, `architecture_audit_head=69432512...`, and the live-head truth rule.
 - `docs/README.md`: document map. Add the new plan and Long-run 2 closeout as current entry points.
 - `docs/project/phase0/non-uiue-pre-code-action-list-2026-06-24.md`: historical pre-code checklist. Add a supersession note that its rebuild-C6-first ordering has been consumed by Long-run 2 construction work.
 - `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`: this parent roadmap.
 - `openspec/changes/define-runtime-presentation-bridge/`: planned thin contract carrier. This plan authorizes proposing it after grill, not implementing it immediately.
 - `docs/project/phase0/post-c6-roadmap-gptpro-architecture-audit-request-2026-06-25.md`: GPT Pro external architecture audit request for this roadmap.
+
+## GPT Pro Audit Absorption Scope
+
+Two GPT Pro audit reports were read for this patch:
+
+- Long-run 2 identity + behavior-shape audit: no P0; the P1/P2 checker, fingerprint, version, and diagnostic naming findings are already absorbed in the current repo and ledger.
+- Post-C6 architecture audit: no P0; this patch absorbs plan-level P1/P2 findings for head freshness, runtime-result vocabulary, `proof_class` display discipline, stale downstream task guards, and minimal iOS/macOS runtime boundaries.
+
+Code-level findings from the architecture audit are not executed by this parent-plan patch. They are target items for later child plans:
+
+- `docs/superpowers/plans/2026-06-25-c6-acceptance-and-candidate-comparison.md`: `Tools/C6BenchCLI/main.swift` unknown result-id fail-closed behavior, expected case run coverage, `C6CanonicalJSON.encode` fail-closed behavior, and `contract_bundle_fingerprint.bundle_hash` component-version identity decision.
+- `docs/superpowers/plans/2026-06-25-c6-acceptance-and-candidate-comparison.md`: expand `scripts/test_check_c6_case_shape.py` coverage for already-state mismatch, missing risk IDs, clarify-tag checks, coverage/golden split, and unknown alternative tools.
+- `docs/project/phase0/*closeout*` templates or the relevant child-plan closeout: use `make verify-all` for full local Swift-inclusive proof and `make verify-ci` or GitHub Actions Verify for source-free CI proof; do not describe `make verify` as the full Swift gate.
 
 ### Task 1: Route Baseline Synchronization
 
@@ -81,14 +97,16 @@ git rev-parse @{u}
 git rev-parse origin/main
 ```
 
-Expected:
+Expected at the start of this architecture-audit absorption patch:
 
 ```text
 ## codex/rebuild-c6-doc-absorption-20260624...origin/codex/rebuild-c6-doc-absorption-20260624
-f3a3299fe55fcb67b72f8b1a085f8939b01b1b76
-f3a3299fe55fcb67b72f8b1a085f8939b01b1b76
+69432512a2c8ddcdc584bfac47f3218262544118
+69432512a2c8ddcdc584bfac47f3218262544118
 c1e7d58d281d0256d29034c1d120cefe0bf5a033
 ```
+
+If this plan itself is later committed, rerun the commands and let live git output supersede the recorded input head.
 
 - [ ] **Step 2: Update route board wording**
 
@@ -99,10 +117,13 @@ status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
 updated: 2026-06-25
-last_verified_worktree_head: f3a3299
-last_verified_upstream_head: f3a3299
+plan_creation_head: f3a3299fe55fcb67b72f8b1a085f8939b01b1b76
+architecture_audit_head: 69432512a2c8ddcdc584bfac47f3218262544118
+route_fix_input_worktree_head: 69432512a2c8ddcdc584bfac47f3218262544118
+route_fix_input_upstream_head: 69432512a2c8ddcdc584bfac47f3218262544118
 last_verified_origin_main: c1e7d58
 branch: codex/rebuild-c6-doc-absorption-20260624
+head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
 ```
 
 Expected content rule: the Current Phase section must say post Long-run 2 `external-pass-with-absorbed-fixes`, and it must explicitly keep retrain-C5, C6 acceptance, model-quality evaluation, candidate comparison, golden-run, voice, endpoint readiness, UIUE merge, and V/S/U-PASS locked.
@@ -235,6 +256,18 @@ Every readback and presentation scope label SHALL carry `scope_origin` from Core
 ## AD-RPB-004: Voice and orb are presentation state, not proof of voice readiness
 
 The bridge may expose `voice_state` and `orb_state` for UI choreography. Those fields do not imply ASR/TTS functional readiness, demo-golden-run pass, endpoint readiness, or V-PASS.
+
+## AD-RPB-005: Runtime result vocabulary preserves refusal class
+
+The bridge SHALL NOT expose a bare `rejected` result as the only runtime outcome. It must preserve at least unsupported/no-tool refusal and safety/policy refusal as distinct machine-readable values.
+
+## AD-RPB-006: Presentation proof classes are finite and display-capped
+
+`PresentationSnapshot.proof_class` SHALL use a finite project vocabulary. Unknown values fail closed, and local/static/external-review proof must never be displayed as endpoint-ready, voice-ready, C6-ready, or V-PASS.
+
+## AD-RPB-007: Minimal endpoint runtime boundaries
+
+Runtime work that feeds the bridge SHALL avoid blocking the main thread, SHALL emit a terminal snapshot on cancel/interruption/timeout, and SHALL NOT introduce persistence, cloud sync, or long-lived user memory.
 ```
 
 Expected: the design keeps UIUE as consumer and avoids redefining C2/C3 semantics.
@@ -253,9 +286,10 @@ Add this content:
 ## 2. Contract fields
 
 - [ ] 2.1 Define `DemoInteractionEvent` field requirements for text input, mic start, mic end, card tap, cancel, and interruption.
-- [ ] 2.2 Define `DemoRuntimeResult` outcomes: `accepted`, `rejected`, `clarify`, `already_state`, `error`.
-- [ ] 2.3 Define `PresentationSnapshot` fields: `trace_id`, `cards`, `dialog_text`, `readbacks`, `scope_origin`, `voice_state`, `orb_state`, and `proof_class`.
+- [ ] 2.2 Define `DemoRuntimeResult` outcomes: `accepted_tool_call`, `clarify_missing_slot`, `refusal_no_available_tool`, `refusal_safety_or_policy`, `already_state_noop`, `runtime_error`, and `cancelled`. A display-layer `rejected` aggregate is allowed only if it also carries a machine-readable `rejection_class` or `behavior_class_source`.
+- [ ] 2.3 Define `PresentationSnapshot` fields: `trace_id`, `cards`, `dialog_text`, `readbacks`, `scope_origin`, `voice_state`, `orb_state`, and finite-enum `proof_class` with display caps and unknown-value fail-closed behavior.
 - [ ] 2.4 Define `TraceEnvelope` as a presentation-safe view over C3 decode, plan, guard, execute, and readback stages.
+- [ ] 2.5 Define minimal runtime boundary behavior: off-main execution for runtime work, terminal snapshots for cancel/interruption/timeout, and no persistence, cloud sync, or long-lived user memory.
 
 ## 3. Red lines
 
@@ -275,7 +309,7 @@ Add this content to `openspec/changes/define-runtime-presentation-bridge/specs/r
 
 ### Requirement: Presentation Snapshot Contract
 
-The system SHALL expose a presentation snapshot that contains card state, dialog text, readbacks, scope origin, trace identity, voice state, orb state, and proof class without requiring UI presentation code to read raw runtime stores.
+The system SHALL expose a presentation snapshot that contains card state, dialog text, readbacks, scope origin, trace identity, voice state, orb state, and finite-enum proof class without requiring UI presentation code to read raw runtime stores.
 
 #### Scenario: Default scope is visible but not re-inferred
 
@@ -286,14 +320,34 @@ AND the presentation layer SHALL NOT infer the scope origin from display strings
 
 ### Requirement: Runtime Result Vocabulary
 
-The system SHALL classify runtime results as `accepted`, `rejected`, `clarify`, `already_state`, or `error` before UI presentation renders the result.
+The system SHALL classify runtime results as `accepted_tool_call`, `clarify_missing_slot`, `refusal_no_available_tool`, `refusal_safety_or_policy`, `already_state_noop`, `runtime_error`, or `cancelled` before UI presentation renders the result.
 
 #### Scenario: Already-state result is not unsupported
 
 GIVEN a user asks for a state that is already satisfied
 WHEN runtime produces no state mutation
-THEN the bridge result SHALL be `already_state`
+THEN the bridge result SHALL be `already_state_noop`
 AND it SHALL NOT be reported as unsupported or safety refusal.
+
+#### Scenario: Unsupported and safety refusals remain distinct
+
+GIVEN runtime cannot map a request to an available demo tool
+WHEN the presentation layer renders the refusal
+THEN the bridge result SHALL be `refusal_no_available_tool`
+AND it SHALL NOT be collapsed into `refusal_safety_or_policy` or a bare `rejected` value.
+
+#### Scenario: Proof class cannot be upgraded by display copy
+
+GIVEN a snapshot proof class is `local_static_contract`
+WHEN the presentation layer renders status copy
+THEN it SHALL NOT display endpoint-ready, voice-ready, C6-ready, V-PASS, S-PASS, or U-PASS claims.
+
+#### Scenario: Timeout terminates as runtime error
+
+GIVEN runtime exceeds its configured interaction timeout
+WHEN the bridge emits the final snapshot for that turn
+THEN the bridge result SHALL be `runtime_error`
+AND the snapshot SHALL be terminal for the turn.
 ```
 
 Expected: `openspec validate define-runtime-presentation-bridge --strict` can parse the change.
@@ -519,7 +573,7 @@ Expected content rule: contract-only bridge is first, but implementation-heavy b
 For each active OpenSpec task file touched in this task, add a short note near the top:
 
 ```markdown
-Unchecked downstream tasks are not execution authorization. Follow `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`, the GPT Pro architecture verdict, and the relevant child plan before implementation.
+Unchecked downstream tasks are not execution authorization. Follow `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`, the GPT Pro architecture verdict, and the relevant accepted child plan before implementation. This note does not authorize training, C6 acceptance, candidate comparison, model-quality evaluation, backend readiness, golden-run execution, voice readiness, UIUE merge, or V/S/U-PASS.
 ```
 
 Expected content rule: the note prevents stale task checkboxes from being read as permission to run training or acceptance.

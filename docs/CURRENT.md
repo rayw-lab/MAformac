@@ -3,10 +3,13 @@ status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
 updated: 2026-06-25
-last_verified_worktree_head: f3a3299
-last_verified_upstream_head: f3a3299
+plan_creation_head: f3a3299fe55fcb67b72f8b1a085f8939b01b1b76
+architecture_audit_head: 69432512a2c8ddcdc584bfac47f3218262544118
+route_fix_input_worktree_head: 69432512a2c8ddcdc584bfac47f3218262544118
+route_fix_input_upstream_head: 69432512a2c8ddcdc584bfac47f3218262544118
 last_verified_origin_main: c1e7d58
 branch: codex/rebuild-c6-doc-absorption-20260624
+head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
 expires_when: "this branch is merged, a newer current route board lands, or the post-C6 parent roadmap is superseded by accepted grill decisions."
 ---
 
@@ -19,17 +22,21 @@ expires_when: "this branch is merged, a newer current route board lands, or the 
 
 Post Long-run 2 rebuild-C6 identity + behavior-shape construction closeout.
 
-Live-verified route facts:
+Live-verified route facts at the start of the architecture-audit absorption patch:
 
 - Current worktree branch: `codex/rebuild-c6-doc-absorption-20260624`.
-- Current worktree `HEAD`: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
-- Current upstream `@{u}`: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- Route plan creation `HEAD`: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- GPT Pro architecture audit `HEAD`: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- Route-fix input worktree `HEAD`: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- Route-fix input upstream `@{u}`: `69432512a2c8ddcdc584bfac47f3218262544118`.
 - Current `origin/main`: `c1e7d58d281d0256d29034c1d120cefe0bf5a033`.
-- `origin/main` is an ancestor of current `HEAD`.
+- `origin/main` is an ancestor of the route-fix input `HEAD`.
+- This file is not a self-updating commit marker; for current branch truth after later commits, run `git rev-parse HEAD` and `git rev-parse @{u}`.
 
 Strongest truthful status:
 
 - `rebuild-c6` identity + behavior-shape closeout: `external-pass-with-absorbed-fixes`.
+- Post-C6 parent roadmap architecture audit: `ARCH_PASS_WITH_FIXES`, with P1/P2 absorbed only into route/plan contract wording unless a later child plan explicitly implements code-level fixes.
 - Proof classes: `external_gptpro_review`, `local_static_contract`, `local_unit`, `local_shape_no_model`, `local_receipt_consistency`.
 - This is not C6 acceptance, not model-quality evaluation, not retrain-C5, not D-domain base recalibration, not candidate comparison, not golden-run, not voice readiness, not endpoint readiness, not UIUE merge, not R-L17 candidate signoff, and not V/S/U-PASS.
 
@@ -74,7 +81,7 @@ Current planning object:
 
 | Gate | Status | Required Next Evidence |
 |---|---|---|
-| Parent roadmap | local_docs_plan | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`. |
+| Parent roadmap | local_docs_plan_architecture_audit_fixes_absorbed | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`. |
 | Runtime-Presentation bridge | not_proposed | Create and validate `openspec/changes/define-runtime-presentation-bridge/`; contract-only first. |
 | C5 retrain | deferred | Requires accepted C5 child plan, physical entry gates, data generation authorization, and separate training proof. |
 | C6 acceptance/comparison | deferred | Requires signed C5 candidate and explicit run authorization; Long-run 2 shape evidence is insufficient. |

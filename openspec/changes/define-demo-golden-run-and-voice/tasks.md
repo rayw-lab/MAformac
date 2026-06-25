@@ -4,6 +4,8 @@ DRAFT SKELETON (2026-06-23) — tasks 占位待细化，人审定 propose 时展
 incremental，禁大爆炸。
 -->
 
+> Unchecked downstream tasks are not execution authorization. Follow `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`, the GPT Pro architecture verdict, and the relevant accepted child plan before implementation. This file does not authorize golden-run execution, voice readiness, ASR/TTS readiness, endpoint readiness, UIUE merge, training, C6 acceptance, candidate comparison, model-quality evaluation, or V/S/U-PASS.
+
 ## 1. 前置依赖
 
 - [ ] 1.1 确认 `migrate-d-domain-tool-surface` 已 archive（D-domain 工具名可引用）。
