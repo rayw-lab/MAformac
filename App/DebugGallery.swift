@@ -197,8 +197,38 @@ struct ExpandedFamilyCardSpikeScreen: View {
     }
 }
 
+/// 多意图错峰浮现 spike（4c Task14，验 220ms stagger 单点串行错峰）。
+/// `-spikeSequencer`；启动后 sequencer 依次浮现 5 族，截图中间态（前几族亮、后面待命 = 错峰进行中非同时炸）。
+struct MultiCallSequencerSpikeScreen: View {
+    @State private var sequencer = MultiCallSequencer()
+    private let order: [FamilyCardID] = [.seat, .ambient, .ac, .screen, .volume]
+    private let cellByFamily: [FamilyCardID: DemoVehicleStateCell] = [
+        .seat: DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "2", revision: 1, visualState: .satisfied),
+        .ambient: DemoVehicleStateCell(key: "ambient.color", actualValue: "红色", revision: 1, visualState: .satisfied),
+        .ac: DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1, visualState: .satisfied),
+        .screen: DemoVehicleStateCell(key: "screen.brightness[中控屏]", actualValue: "80", revision: 1, visualState: .satisfied),
+        .volume: DemoVehicleStateCell(key: "volume.level", actualValue: "30", revision: 1, visualState: .satisfied),
+    ]
+    private var cells: [DemoVehicleStateCell] {
+        sequencer.surfacedFamilies.compactMap { cellByFamily[$0] }
+    }
+    var body: some View {
+        ZStack {
+            DeepSpaceBackground()
+            VStack(alignment: .leading, spacing: 12) {
+                Text("多意图错峰浮现 spike（4c · 220ms stagger 单点串行非同时炸）")
+                    .font(.headline).foregroundStyle(DesignTokens.inkPrimary)
+                VehicleCardsGrid(displays: VehicleCardDisplay.familyDisplays(from: cells))
+            }
+            .padding(20)
+        }
+        .task { await sequencer.surface(order) }
+    }
+}
+
 #Preview("7 态 gallery") { DemoVisualStateGallery() }
 #Preview("force unsafe") { ForcedStateScreen(state: .unsafe) }
 #Preview("value 控件 spike") { ValueControlsSpikeScreen() }
 #Preview("座椅展开 spike") { ExpandedFamilyCardSpikeScreen() }
+#Preview("错峰浮现 spike") { MultiCallSequencerSpikeScreen() }
 #endif
