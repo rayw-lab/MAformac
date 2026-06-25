@@ -66,7 +66,7 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 | change | 类型 | 装什么 | 状态（2026-06-25 更新）|
 |---|---|---|---|
 | **define-runtime-presentation-bridge**（新建）| 新建 | RPB shared_bridge_contract（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/4对象 vocabulary/card sibling/context 四维）| ✅ **已创建 + strict valid + 磊哥 accepted**（mainline runtime 实现 DEFERRED）|
-| **ui-presentation**（已存在）| 更新 | SD18-25 visual_only（V1-V12/连续舞台/层级滚动/context capsule 呈现/corner case/边界态）| ✅ **文档先行已更新**（AD-14 + tasks §8）；🔴 **DesignTokens/ContentView code 实装待做**（A-2 8.A，仍非连续舞台/仍有 TextField）|
+| **ui-presentation**（已存在）| 更新 | SD18-25 visual_only（V1-V12/连续舞台/层级滚动/context capsule 呈现/corner case/边界态）| ✅ **文档先行已更新**（AD-14 + tasks §8）+ **A-2 实施计划 v2 已定稿**（`docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md`，subagent CC + codex-rescue 两路审计辩证收 + 磊哥拍 A+：PresentationSnapshot vocabulary 容器 / 卡片复用 VehicleCardDisplay）；🔴 **DesignTokens/ContentView code 实装待做**（plan Phase 0-4，仍非连续舞台/仍有 TextField）|
 | **define-demo-default-scope**（已存在）| apply | G01-G28 | 待 apply（R-L17 blocker）|
 | retrain-c5 / rebuild-c6 / golden-run-voice（已存在）| DEFERRED | C5/C6/voice | post model gates |
 

@@ -81,10 +81,10 @@ Current UIUE-lane state (2026-06-25, updated):
 
 - Worktree: `/Users/wanglei/workspace/MAformac-uiue`
 - Branch: `uiue/phase4-default-scope-presentation`
-- HEAD: `9cf1af2`
-- Active UIUE work: visual/interaction grill closeout (SD18-24: 视觉块 V1-V12 + corner cases + 制冷热 + 层级滚动 + context capsule) in `docs/uiue-storyboard-grill-decisions.md`; grill freeze + supersession registry (S1-S10) in `docs/grill-checklist/uiue-grill-定档-2026-06-25.md`; landing matrix (234 grill 落地态) in `docs/grill-checklist/uiue-landing-matrix-2026-06-25.md`; runtime bridge grill decisions (RPB-01~53) in `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md`.
+- HEAD: `6a15ff5`
+- Active UIUE work: visual/interaction grill **closed**; **A-2 (step2) implementation plan v2 finalized** (`docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md`, subagent-CC + codex-rescue two-route audit absorbed, 磊哥 chose A+). Grill SSOT: SD3/SD5/SD18-25 in `docs/uiue-storyboard-grill-decisions.md`; freeze + supersession registry (S1-S10) in `docs/grill-checklist/uiue-grill-定档-2026-06-25.md`; landing matrix in `docs/grill-checklist/uiue-landing-matrix-2026-06-25.md`; runtime bridge decisions (RPB-01~53) in `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md`.
 - New OpenSpec change: `openspec/changes/define-runtime-presentation-bridge/` — **✅ accepted by 磊哥 2026-06-25 (A-2 ui-presentation may consume the contract shape via mock snapshots); `openspec validate --strict` pass; contract-only; no Swift implementation; no runtime/voice/C6/endpoint/V·S·U-PASS readiness claims; AD-RPB-014 context 四维**. Authored in UIUE lane, fulfills parent roadmap Task 2. Mainline co-authorship review still pending for the **runtime-side implementation** (mainline MUST NOT create a second bridge change). Acceptance = contract is stable enough for UIUE visual consumption, NOT a runtime-readiness claim.
-- Next: A-2 = update `ui-presentation` change + DesignTokens/ContentView high-quality visual implementation (consumes bridge contract).
+- Next: A-2 plan v2 finalized; ready to execute Phase 0 (bridge mock vocabulary 容器) onward per plan. Code (DesignTokens/ContentView 连续舞台 / mic dock / 对话流 / capsule) not started. Bridge **AD-RPB-015** = this bridge is the single cross-artifact ID authority; a future code-graph harness (GitNexus/roam-code) manifest derives from it, never mints a second ID set.
 
 This is UIUE-lane state, not mainline evidence. Bridge recorded as `proposed_strict_valid_contract_only`; reconfirm at the contract intersection before mainline merge.
 
