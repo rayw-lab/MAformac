@@ -140,7 +140,8 @@ struct VehicleCardDisplay: Identifiable, Equatable {
         )
     }
 
-    private static func valueText(for rawValue: String, base: String, type: UIValueType) -> String {
+    /// 值文本格式化（4a 摘要 + 4b 展开行共用；internal 供 `ExpandedFamilyDisplay` 复用，不重复格式化逻辑 §28）。
+    static func valueText(for rawValue: String, base: String, type: UIValueType) -> String {
         switch type {
         case .dial:
             return rawValue.hasSuffix("℃") ? rawValue : "\(rawValue)℃"
@@ -259,7 +260,8 @@ struct VehicleCardDisplay: Identifiable, Equatable {
     }
 
     /// 值二级 badge 形态（穷尽，禁 AnyView）：`ambient.color`→色块 / `seat.massage_mode`→模式 / 余 plain。
-    private static func badgeRenderStyle(forBase base: String, value: String) -> BadgeRenderStyle {
+    /// internal 供 `ExpandedFamilyDisplay` 复用（§28 不重复）。
+    static func badgeRenderStyle(forBase base: String, value: String) -> BadgeRenderStyle {
         switch base {
         case "ambient.color": return .colorSwatch(value)
         case "seat.massage_mode": return .mode(value)

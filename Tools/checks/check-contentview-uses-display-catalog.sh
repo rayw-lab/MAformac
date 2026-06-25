@@ -33,7 +33,7 @@ fi
 # 3) familyDisplays 必须被 VehicleCardsGrid 真消费，且数据源必须【是 family model】（gptpro 跨厂商审第3点升级）。
 #    从「VehicleCardsGrid(displays: 出现」升到「displays: 实参 == familyDisplays」——
 #    防 grid 接了个非 family 数据源（device 级/空数组/别的 var）字符串出现但语义错的假绿。
-if ! printf '%s\n' "$CODE" | grep -qE 'VehicleCardsGrid\(displays:[[:space:]]*familyDisplays\)'; then
+if ! printf '%s\n' "$CODE" | grep -qE 'VehicleCardsGrid\(displays:[[:space:]]*familyDisplays[,)]'; then
   echo "❌ [contentview-wiring] VehicleCardsGrid 的 displays 数据源必须是 familyDisplays（10 族 model）——接别的源/未消费=假绿"
   fail=1
 fi

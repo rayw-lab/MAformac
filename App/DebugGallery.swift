@@ -169,7 +169,36 @@ struct ValueControlsSpikeScreen: View {
     }
 }
 
+/// 座椅 composite 展开卡 spike（4b Task13/12，验触发聚焦展开 device composite + 座椅 5 cell 行分3类 + dim 背景）。
+/// launch arg `-spikeExpanded`；simctl 截图过目验展开卡渲染（环形/分段/色块/模式齐 + ultraThinMaterial dim）。
+struct ExpandedFamilyCardSpikeScreen: View {
+    var body: some View {
+        ZStack {
+            DeepSpaceBackground()
+            // 模拟 grid 底层（虚化）
+            VehicleCardsGrid(displays: VehicleCardDisplay.familyDisplays(
+                from: [DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "2", revision: 1, visualState: .satisfied)]
+            ))
+            .padding(20)
+            // dim/blur 层 + 展开卡（同 ContentView.expandedOverlay 形态）
+            Rectangle().fill(.ultraThinMaterial).ignoresSafeArea()
+            ExpandedFamilyCard(
+                display: ExpandedFamilyDisplay.make(for: .seat, from: [
+                    DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "2", revision: 1, visualState: .satisfied),
+                    DemoVehicleStateCell(key: "seat.vent_level[主驾]", actualValue: "1", revision: 1, visualState: .satisfied),
+                    DemoVehicleStateCell(key: "seat.massage_force", actualValue: "1", revision: 1, visualState: .changing),
+                    DemoVehicleStateCell(key: "seat.massage_mode", actualValue: "波浪模式", revision: 1, visualState: .satisfied),
+                    DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "50", revision: 1, visualState: .satisfied),
+                ]),
+                onDismiss: {}
+            )
+        }
+        .frame(minWidth: 720, minHeight: 520)
+    }
+}
+
 #Preview("7 态 gallery") { DemoVisualStateGallery() }
 #Preview("force unsafe") { ForcedStateScreen(state: .unsafe) }
 #Preview("value 控件 spike") { ValueControlsSpikeScreen() }
+#Preview("座椅展开 spike") { ExpandedFamilyCardSpikeScreen() }
 #endif

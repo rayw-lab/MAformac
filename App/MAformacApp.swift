@@ -21,6 +21,8 @@ struct MAformacApp: App {
             DemoVisualStateGallery()
         } else if ProcessInfo.processInfo.arguments.contains("-spikeControls") {
             ValueControlsSpikeScreen()   // 4b Task11 value.type 控件 spike（Gauge 渲染验收）
+        } else if ProcessInfo.processInfo.arguments.contains("-spikeExpanded") {
+            ExpandedFamilyCardSpikeScreen()   // 4b Task13 座椅 composite 展开 spike
         } else {
             mainView
         }

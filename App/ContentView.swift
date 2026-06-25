@@ -8,6 +8,7 @@ struct ContentView: View {
     @State private var commandText = "打开空调"
     @State private var lastReadback = "等待指令"
     @State private var errorText: String?
+    @State private var focus = FocusController()   // 4b 单点聚焦展开（AD-4 MAX_CONCURRENT_EXPANSIONS=1）
 
     // 10 族全景常驻摘要（消费侧派生；过滤 vehicle.*，遍历 allCases 出 10 卡，AD-9/10/11）
     private var familyDisplays: [VehicleCardDisplay] {
@@ -22,10 +23,33 @@ struct ContentView: View {
                 brandHeader            // 顶层品牌（Phase 5 上方接 orb）
                 commandBar             // 顶层临时输入（Phase 5 → 语音 orb）
                 readbackPanel          // 中层 readback/对话流（Phase 5 扩对话流）
-                VehicleCardsGrid(displays: familyDisplays)   // 下层车控卡片（10 族常驻）
+                VehicleCardsGrid(displays: familyDisplays, onTapFamily: { focus.toggle($0) })   // 下层车控卡片（10 族常驻；点族卡触发聚焦展开）
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .padding(20)
+
+            // 4b 触发聚焦展开层（AD-12 §五：ZStack overlay 非 sheet + 显式 zIndex + opacityScale 默认 mge gated）
+            if let family = focus.focusedFamily {
+                expandedOverlay(family)
+                    .zIndex(10)
+                    .transition(.opacity.combined(with: .scale(scale: 0.92)))
+            }
+        }
+        .animation(.snappy(duration: 0.32), value: focus.focusedFamily)   // 320ms opacityScale（D5 默认；mge gated upgrade 后续）
+    }
+
+    // 展开 overlay：单层 ultraThinMaterial dim/blur（点空白 dismiss）+ device composite 展开卡
+    @ViewBuilder private func expandedOverlay(_ family: FamilyCardID) -> some View {
+        ZStack {
+            Rectangle()
+                .fill(.ultraThinMaterial)   // Reduce Transparency 系统自动降不透明（AD-12 §五 solid 兜底）
+                .ignoresSafeArea()
+                .onTapGesture { focus.dismiss() }
+                .accessibilityLabel("收起展开卡")
+            ExpandedFamilyCard(
+                display: ExpandedFamilyDisplay.make(for: family, from: store.presentationCells),
+                onDismiss: { focus.dismiss() }
+            )
         }
     }
 
@@ -116,6 +140,7 @@ struct DeepSpaceBackground: View {
 
 struct VehicleCardsGrid: View {
     let displays: [VehicleCardDisplay]
+    var onTapFamily: (FamilyCardID) -> Void = { _ in }
 
     #if !os(macOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
@@ -140,7 +165,7 @@ struct VehicleCardsGrid: View {
                 ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
                     GridRow {
                         ForEach(row) { display in
-                            VehicleStateCard(display: display)
+                            VehicleStateCard(display: display, onTap: onTapFamily)
                         }
                     }
                 }
@@ -156,6 +181,7 @@ struct VehicleCardsGrid: View {
 
 struct VehicleStateCard: View {
     let display: VehicleCardDisplay
+    var onTap: (FamilyCardID) -> Void = { _ in }
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var breathe = false
@@ -214,6 +240,8 @@ struct VehicleStateCard: View {
                 radius: glowActive ? (breathe ? 18 : 9) : 0)
         .onAppear { updateBreathe() }
         .onChange(of: glowActive) { _, _ in updateBreathe() }
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onTapGesture { if let family = display.familyCardID { onTap(family) } }   // AD-12 §三：tap 聚焦展开（非 simultaneousGesture 干扰滚动）
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("vehicle-card-\(display.accessibilityKey)")
         .accessibilityLabel("\(display.title) \(display.valueText) \(a11yState)")
