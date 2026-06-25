@@ -86,9 +86,9 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 ### 7.F 触摸交互（✅ 已拍）
 - [x] 7.F1 P1 触摸 = **B 极简查看** ✅（磊哥 2026-06-24「可能会戳，不确定」→ B 落实：点卡高亮+tooltip，无调节逻辑，卡片只读非控制器，戳了有反馈保险）
 
-## 8. 完整产品形态实装（A-2，SD18-25 consolidated AD-14，consumes A-1 bridge accepted）
+## 8. 完整 demo 交互原型实装（A-2，SD18-25 + 触控/控制台/氛围灯 consolidated AD-14，全 mock 前台，consumes A-1 bridge accepted）
 
-> 文档先行 scope（2026-06-25）。消费 A-1 `define-runtime-presentation-bridge`（mock snapshot，不依赖 mainline runtime）。内部 order：8.A 连续舞台核心先做（不卡 capsule）→ 8.B context capsule（spike-gated）→ 8.C 验收。
+> 🔴 **范围扩到完整 demo 交互**（磊哥 2026-06-25，SD7 amendment）：视觉 + 触摸 + 语音 + state 联动 + 演绎控制台 + 氛围灯炸场 + capsule，**全 mock 前台**（不接真 NLU/ASR/TTS/LoRA/runtime backend，后续接线 DEFERRED）。消费 A-1 bridge（mock snapshot）。落 spec 4 个 mock-frontstage Requirement（mock interaction / expanded controls mock state / demo control panel / ambient edge burst）。实装 order：8.A 连续舞台 → **8.D 触控+state 联动+语音推理 mock** → **8.E 演绎控制台 mock** → **8.F 氛围灯炸场** → 8.B capsule → 8.C 验收。完整实施计划 = `docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md` v3（含巨人肩膀 adopt + 每 Phase codex 审计 + anchor 像素对比）。
 
 ### 8.A 连续舞台核心（直接做，不依赖 capsule spike）
 - [ ] 8.A1 ContentView 三屏连续舞台重构（**去 divider 黑线** / 去品牌 MAformac / 设置刷新右上 standalone / orb-对话-车控-mic 四 zone，SD18 V7）
@@ -108,3 +108,18 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 ### 8.C 验收（A-2 收口）
 - [ ] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
 - [ ] 8.C2 simctl 视觉 + **visual-acceptance 5-gate（米白/深空，还原投屏环境 V10）** + 对比 anchor-set（连续舞台无黑线 / 制冷热 / capsule diorama）
+
+### 8.D 触控 + state 联动 + 语音推理（全 mock，SD6/SD7，plan Phase 3）
+- [ ] 8.D1 `ValueControlView` 交互回调（dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环 → `ValueControlActions`；adopt **axiom-swiftui** binding/gesture + **IceCubesApp** 交互参考）
+- [ ] 8.D2 `ExpandedFamilyCard`/`ExpandedCellRowView` 接回调 → mock store（`store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片+numericText 联动）
+- [ ] 8.D3 🔴 `applyMockTransition` visualState 修复（值真变化→`.changing`/`.satisfied`，非只 `"on"`→`.normal`；否则触控联动假绿）+ clamp/cycle **复用 `ValueRangeMapper`**（dial 18-32/percent 0-100/stepper 档/badge 8 色，防漂移）+ 测试
+- [ ] 8.D4 语音推理 mock 预设（「26→冷了→升温」mock 响应读当前 mock 态；摘要卡只读 SD23 7.F1；静默无 TTS）
+
+### 8.E 演绎控制台（全 mock force，SD13-15/SD8，plan Phase 4）
+- [ ] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）
+- [ ] 8.E2 整车/环境 force **mock context**（speed/gear segmented + weather/time_period 互斥 → bridge force-context AD-RPB-014，不碰 state-cells.yaml）
+- [ ] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
+- [ ] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
+
+### 8.F 氛围灯炸场（SD4，plan Phase 5）
+- [ ] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）

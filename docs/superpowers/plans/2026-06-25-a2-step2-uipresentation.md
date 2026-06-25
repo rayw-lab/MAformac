@@ -6,7 +6,7 @@
 >
 > 🟢 **v3 定稿（2026-06-25）**：经 subagent CC（adversarial）+ codex-rescue + GLM-5.2 **三路审计**辩证收 + 磊哥拍多项：① A+ bridge（PresentationSnapshot vocabulary 容器/卡片复用 VehicleCardDisplay）② **范围扩到完整 demo 交互**（视觉+触摸+语音+state 联动+演绎控制台，**全 mock 前台**）③ 氛围灯 SD4 补 ④ 演绎控制台 SD13-15 进本 §8 ⑤ SD7 触摸调节实现（mock）⑥ 每 phase 派 codex 审计 + anchor 像素对比。
 
-**Goal:** 把 UIUE 从临时态重构成**完整 demo 交互原型**——10 族卡片连续舞台 + 触摸调节 + 语音对话流 + state 联动 + 氛围灯炸场 + 演绎控制台（方案经理 force 端状态）+ context capsule，**全 mock 前台**，在 iOS 模拟器逐像素接近 anchor 锚点集。
+**Goal:** 把 UIUE 从临时态重构成**完整 demo 交互原型**——10 族卡片连续舞台 + 触摸调节 + 语音对话流 + state 联动 + 氛围灯炸场 + 演绎控制台（方案经理 force 端状态）+ context capsule，**全 mock 前台**，在 iOS 模拟器视觉质量**达到或超过 anchor 锚点集**（anchor 像素对比硬门，非 1:1 复刻——grill 创新点要比 anchor 更惊艳）。
 
 **Architecture:** 七层分 Phase，全 mock 前台（`MockPresentationSnapshotProvider` 是核心，所有交互切 mock 展示）。① bridge mock vocabulary 容器 → ② 语义派生层（含氛围灯 8 色）→ ③ 连续舞台 visual（四 zone + 设置/刷新）→ ④ 触摸调节 + state 联动 + 语音推理（mock）→ ⑤ 演绎控制台（mock force）→ ⑥ 氛围灯炸场 → ⑦ context capsule → 验收。
 
@@ -31,9 +31,9 @@
 8. `docs/research/2026-06-25-context-capsule-2.5d-tech/README.md`（capsule 依赖栈）。
 9. **本 plan 配套索引** `docs/grill-checklist/uiue-a2-grill-coverage-index.md`（grill 全集 × Phase 映射，随推进消减）。
 
-**🔴 边界（磊哥 2026-06-25 终定，覆盖 SD7 行 121 旧文本）：**
+**🔴 边界（磊哥 2026-06-25 终定，正式落点 = storyboard SD7 amendment + spec 4 个 mock-frontstage Requirement，非本 plan 私自覆盖 SSOT）：**
 - UIUE A-2 = **完整 demo 交互呈现**（前端视觉 + 触摸 + 语音 + state 联动 + 演绎控制台），**全 mock 前台**。
-- 🔴 **SD7 行 121「边界放宽碰 Core/State 完整链路」= 过时**，**现在还是全 mock**（触摸/语音推理/联动/force 全用 mock 展示，**等后续接线**真后端）。
+- 🔴 **SD7 行 121「边界放宽碰 Core/State 完整链路」已正式 amend** → **全 mock**（触摸/语音推理/联动/force 全 mock 展示，**等后续接线**真后端）；正式落点 = `docs/uiue-storyboard-grill-decisions.md` SD7 AMENDMENT + `openspec/changes/ui-presentation/specs/ui-presentation/spec.md` mock-frontstage Requirement，执行方以此为准（非 plan 字面）。
 - 可碰 `DemoVehicleStateStore`（现有 **mock** 车控 store，D16 全 mock）展示触摸联动；**不接真后端**（NLU/语音推理/LoRA/ASR-TTS → 后续接线 DEFERRED）；**不改 state-cells.yaml 契约语义/codegen**；§6 红线（密钥/PII/报价）不变。
 - 语音推理「26 度→冷了→升温」= **mock 预设响应**（不真 NLU），演绎控制台 force = **mock context/state 切换**。
 
@@ -73,8 +73,8 @@
 2. **Phase gate**：`swift test` 0 fail + 碰共享 App/Core 的 Phase **双端 build**（`MAformacIOS`+`MAformacMac` BUILD SUCCEEDED）+ pre-commit 机械门绿（no-binary-visualstate/platform-vs-version-guard/wiring）+ 主线程亲核 + 分 commit。
 3. 🔴 **每 Phase 结束派 subagent codex 审计**（磊哥 2026-06-25 定）：
    - **agent**：`codex:codex-rescue`，**`run_in_background=true`**，**每次 ~20 分钟预算**。
-   - **多维度**（类似 gptPRO 代码审计，每条 P0/P1/P2 + file:line）：① 🔴 **anchor 像素级对比（重点）** ② spec/grill 覆盖（该 Phase 的 SD/AD 硬约束全实现）③ 接口/契约一致性 + wiring gate ④ 5-gate 审美（层级/对齐/遮挡/字体/重量）⑤ mock 边界（不接真后端）⑥ 代码质量（穷尽 switch/无 default 吞/不破 222 测试）⑦ 迁移安全（strangler）。
-   - 🔴 **anchor 像素对比方法**：codex Bash 跑 `simctl` 截图 → `magick compare -metric AE/RMSE <screenshot> <anchor.png> diff.png`（ImageMagick）或 python PIL 逐区域 diff，**量化偏差**（布局错位 px / 色值 ΔE / 字号比 / 留白比 / 视觉重量），报「哪个区域偏 anchor 多少」。anchor PNG = `docs/design/anchors/`（本地）。
+   - **多维度**（类似 gptPRO 代码审计，每条 P0/P1/P2 + file:line）：① 🔴 **anchor 像素级对比（重点）** ② spec/grill 覆盖（该 Phase SD/AD 硬约束全实现）③ 接口/契约一致性 + wiring gate ④ 5-gate 审美 ⑤ mock 边界（不接真后端）⑥ 代码质量（穷尽 switch/无 default 吞/不破 222 测试）⑦ 迁移安全（strangler）。
+   - 🔴 **anchor 像素对比 = 硬门（磊哥 2026-06-25：必须超过 anchor）**：codex Bash `simctl` 截图 → `magick compare -metric AE/RMSE` 或 PIL 逐区域 diff，量化偏差（布局错位 px / 色值 ΔE / 字号比 / 留白比 / 视觉重量）。🔴 **判定标准 = 实装视觉质量【达到或超过】anchor**（**非 1:1 复刻**——grill 有很多创新点[连续舞台/制冷热/氛围灯炸场/capsule diorama]，实装应比 anchor **更惊艳/更高级**，不是低于 anchor）：anchor = 视觉质量**下限基准**，**任一区域明显逊于 anchor（视觉重量/层级/质感/留白塌）= FAIL 返工**；布局/创新以 SD/AD 为准（可不同于 anchor 布局，但视觉质量必须 ≥ anchor）。截图先尺寸归一 + crop/mask 动态区域（粒子/numericText 滚动/breathe）排噪声，静态布局/色值/质感/视觉重量逐区域过硬门。anchor PNG = `docs/design/anchors/`（本地 25 张）。
    - 审计报告落 `docs/research/2026-06-25-a2-execution/phase-N-codex-audit.md`。
 4. **主线程亲核** > 信 codex（claim-vs-reality 第10变体）：load-bearing 数字/像素偏差独立核。
 5. 🔴 **每 Phase 后回顾基线（derived-tracking-writeback gate）**：回读 §0 + 更新配套索引（消减该 Phase 的 grill 项）+ landing matrix。
@@ -95,8 +95,16 @@
 **修改：**
 - `App/ContentView.swift`（连续舞台四 zone）/ `App/DesignTokens.swift` + `docs/design/tokens.md`（制冷热 §1 + 氛围灯 + hex FROZEN）。
 - `Core/Presentation/UIValueTypeMapper.swift`（VehicleCardDisplay 加 activeCell/siblingCells + familyDisplays(from:activeCells:)）。
-- `App/ExpandedFamilyCard.swift` + `App/ValueControlView.swift`（SD7 触摸调节 → mock store 写）。
-- `MAformac.xcodeproj/project.pbxproj`（portrait lock + Vortex package ref，GLM P1-3/P1-4）。
+- `App/ExpandedFamilyCard.swift` + `App/ValueControlView.swift`（SD7 触摸调节回调 → mock store 写）。
+- `Core/State/DemoVehicleStateStore.swift`（🔴 `applyMockTransition:138` visualState 值变化→changing，codex P0-3；守 222 测试）。
+- `MAformac.xcodeproj/project.pbxproj`（portrait lock `UISupportedInterfaceOrientations`=Portrait + Vortex package ref，GLM P1-3/P1-4）。
+
+**Tracking（每 Phase 消减，GLM P2-3）：**
+- `docs/grill-checklist/uiue-a2-grill-coverage-index.md` — phase coverage burn-down tracker（每 Phase 后 `- [ ]`→`- [x]`，Phase 7 grep 统计未消减）。
+
+**🔴 巨人肩膀 adopt（不手搓，development-workflow §0 + blueprint-teardown；本机 ref-repos/skills）：**
+- mic dock 波形 → **DSWaveformImage** / 对话流 DialogueBubble → **exyte-Chat** / 触控 binding·手势 → **axiom-swiftui** + **IceCubesApp** / 演绎控制台 control center → **axiom-design**(HIG) + **IceCubesApp·ShipSwift** / 氛围灯·capsule 粒子 → **Vortex** + **SwiftUIShaders·open-swiftui-animations** / capsule glass → **Inferno** + native `.glassEffect`(LiquidGlassReference github-first 实装前 clone) / orb(Phase5) → **Orb** / build·验收 → **ios-simulator-skill** + `build-ios-apps-skills` + **axiom-build·axiom-testing**。
+- ref-repos: `~/workspace/raw/05-Projects/MAformac/ref-repos/{Vortex,Inferno,exyte-Chat,DSWaveformImage,IceCubesApp,Orb,SwiftUIShaders,open-swiftui-animations,ShipSwift}`（只读不入仓）；skills: `Tools/skills/{axiom,ios-simulator-skill}`；plugins: `Tools/agent-platform-plugin-refs/build-{ios,macos}-apps-skills`。**实装前先读对应 SKILL.md**（CLAUDE §73 纪律）。
 
 ---
 
@@ -226,17 +234,44 @@ func testActiveCellDoesNotOverrideWhenNormal() {  // GLM P1-1 negative
 
 ---
 
-## Phase 3 — 触摸调节 + state 联动 + 语音推理（全 mock，SD6/SD7）
+## Phase 3 — 触摸调节 + state 联动 + 语音推理（全 mock，SD6/SD7，触控状态链细化到可实现级）
 
-> 全 mock 前台：触摸→mock store 写→卡片联动；语音推理→mock 预设响应。**不接真 NLU/语音**。
+> 全 mock 前台：触摸→mock store 写→snapshot 刷新→卡片联动；语音推理→mock 预设响应。**不接真 NLU/语音**。落 spec Requirement「expanded-card controls SHALL update mock state」。
+> 🔴 **亲核现状（codex P0-3 + GLM P1-2 坐实）**：① `ValueControlView`（`App/ValueControlView.swift:14-22`）= 纯展示控件**无交互回调** ② `applyMockTransition`（`Core/State/DemoVehicleStateStore.swift:138`）`cell.visualState = desiredValue=="on" ? .satisfied : .normal`——**温度/百分比/stepper 值变化落 `.normal` → 触控联动不亮 = 假绿** ③ mock 写 API 存在：`applyMockTransition(DemoMockTransition(key:desiredValue:source:))`。
+> adopt **axiom-swiftui**（binding/gesture/state）+ **IceCubesApp**（成熟交互参考），不手搓。
 
-- [ ] **Task 3.1** 展开卡数值控件真实调（SD6/SD7）：`ValueControlView`/`ExpandedFamilyCard` 的 dial/percent **± 步进** / stepper 段位 / toggle 切 / badge 循环 → 写 **mock `DemoVehicleStateStore`**（现有 mock 写 API）→ snapshot 重算 → 卡片态 + numericText 联动。摘要卡触摸只读（SD23 7.F1 不变）。**静默无 TTS**。
-- [ ] **Task 3.2** state 联动展示（SD7）：触摸调任意族 → mock store 写 → 10 族卡片联动（如开空调动 ac.power + ac.temp）。
-- [ ] **Task 3.3** 语音推理 mock 预设（SD7 卖点）：mock 预设场景「手动调 26 度 → store=26 → 语音『我有点冷了』→ mock 读当前 26 → 升温 → 输出 28/27 → 显示」。`#if DEBUG` 触发，**mock 预设响应非真 NLU**（exp_step 升温 mock）。对话流展示。
+### Task 3.1a: ValueControlView 交互回调（5-gate；clamp/cycle 复用 ValueRangeMapper）
+**约束:** 加 `struct ValueControlActions { var increment, decrement, toggle, cycleBadge: (() -> Void)? }`；`ValueControlView` 加 `var actions = ValueControlActions()`，dial/percent/stepper ± 接 increment/decrement，toggle 接 toggle，badge 接 cycleBadge。**值 clamp/cycle 复用 `ValueRangeMapper`**（dial 18-32 / percent 0-100 / stepper 离散档 0-3·1-10 / badge 8 色循环），**SHALL NOT 在 view 重写 range 逻辑**（防与 mapper 漂移）。
+- [ ] 实装 → build → simctl(展开卡控件可点) → commit `feat(uiue): ValueControlView 交互回调 (SD7, adopt axiom-swiftui)`
 
-每 task：实装 → 双端 build → simctl 录屏/截图（触摸调节联动）→ **codex 审计（20min，多维 + 交互正确性：触摸→state→联动链路 + mock 边界不接真后端）+ anchor 像素对比展开卡** → commit。
+### Task 3.1b: ExpandedFamilyCard 接 callback → nextValue（5-gate）
+**约束:** `ExpandedFamilyCard`/row 加 `let onMockTransition: (String, String) -> Void`（key, nextValue）；控件 actions 经 `ValueRangeMapper` 算 nextValue（clamp/cycle）→ `onMockTransition(row.key, nextValue)`。
+- [ ] 实装 → build → simctl → commit `feat(uiue): ExpandedFamilyCard onMockTransition callback (SD7)`
 
-### Phase 3 gate + codex 审计 + 索引消减 SD6/SD7。
+### Task 3.1c: ContentView overlay 持 store 写 + snapshot refresh（5-gate）
+**约束:** expanded overlay `onMockTransition` → `store.applyMockTransition(DemoMockTransition(key:key, desiredValue:nextValue, source:.user))` → `snapshot = PresentationSnapshot.from(store:store, activeCells:[family:key], context:snapshot.context, resultKind:.acceptedToolCall)` → 卡片+numericText 联动。**摘要卡触摸只读**（SD23 7.F1，不调 store）。**静默无 TTS**。
+- [ ] 实装 → build → simctl 录屏(调温度卡片联动) → commit `feat(uiue): ContentView 触控→store→snapshot 链路 (SD7)`
+
+### Task 3.1d: 🔴 applyMockTransition visualState 语义修复（TDD，codex P0-3 核心）
+**Files:** Modify `Core/State/DemoVehicleStateStore.swift:138` + Test
+**约束:** mock transition **值真变化** → `.changing`/`.satisfied`（非只 `"on"`→satisfied / 其它→`.normal`）；toggle `"on"/"off"` 仍 satisfied/normal。🔴 **守现有 222 测试不破**（先 grep `applyMockTransition` 现有测试断言，确认改 visualState 不破）。
+- [ ] **Step 1: failing test**
+```swift
+func testValueChangeProducesNonNormalVisualState() {  // codex P0-3
+    let store = DemoVehicleStateStore(cells: [DemoVehicleStateCell(key:"ac.temp_setpoint[主驾]", actualValue:"24")])
+    _ = store.applyMockTransition(DemoMockTransition(key:"ac.temp_setpoint[主驾]", desiredValue:"26", source:.user))
+    XCTAssertNotEqual(store.cell(for:"ac.temp_setpoint[主驾]")?.visualState, .normal)
+}
+```
+- [ ] Step 2 run fail → Step 3 实装（`visualState = transition.desiredValue == oldValue ? cell.visualState : (.changing)`；toggle off→normal 保留）→ Step 4 run pass（含 222 不回归）→ Step 5 commit `fix(core): applyMockTransition 值变化→changing 非 normal (codex P0-3)`
+
+### Task 3.2: state 联动展示（SD7）
+触摸调任意族 → mock store 写 → 10 族卡片联动（mock 预设联动，如开空调动 `ac.power`+`ac.temp`）。实装 → build → simctl → commit。
+
+### Task 3.3: 语音推理 mock 预设（SD7 卖点）
+mock 预设「手动调 26 → store=26 → 语音『我有点冷了』→ mock 读当前态 `store.cell(for:)` → 升温 → 输出 28/27 → 对话流显示」；`#if DEBUG` 触发，**mock 预设响应非真 NLU**。实装 → build → simctl 录屏 → commit。
+
+### Phase 3 gate + codex 审计（20min，多维 + 交互链路正确性 + mock 边界 + anchor 像素对比展开卡）+ 索引消减 SD6/SD7。
 
 ---
 
@@ -267,7 +302,7 @@ func testActiveCellDoesNotOverrideWhenNormal() {  // GLM P1-1 negative
 
 ## Phase 6 — context capsule diorama（route spike，GLM P1-3 Vortex App target）
 
-- [ ] **Task 6.1** capsule route spike（模拟器观感 A 视频 loop vs C-lite，U31 不预拍）。🔴 **GLM P1-3 Vortex App target 接法**：App 是 Xcode project 非 SPM → Modify `MAformac.xcodeproj/project.pbxproj` 加 Vortex package reference + product dependency（pin commit）；**或** C-lite spike 先用纯 SwiftUI particle placeholder，Vortex 单独集成 task。验证 `xcodebuild -scheme MAformacIOS build` 能 import。spike-result.md 记观感（route 磊哥拍）。
+- [ ] **Task 6.1** capsule route spike（模拟器观感 A 视频 loop vs C-lite，U31 不预拍）。🔴 **GLM P1-3 + codex P1 Vortex 可复现接法（写死 URL/tag/fallback）**：App 是 Xcode project 非 SPM → Modify `MAformac.xcodeproj/project.pbxproj` 加 Vortex package reference（URL `https://github.com/twostraws/Vortex`，**pin 到最新 stable release tag**：实装 `git ls-remote --tags https://github.com/twostraws/Vortex` 查具体 tag → 锁 `Package.resolved` 入仓）+ product dependency 加 MAformacIOS·MAformacMac target。🔴 **fallback 写死**：Xcode SPM 集成失败/不可复现 → 降级**纯 SwiftUI `Canvas` 粒子 placeholder**（C-lite spike 不卡，先验观感，Vortex 单独 task 接）。验证 `xcodebuild -scheme MAformacIOS build` 能 `import Vortex`。spike-result.md 记观感（route 磊哥拍）。
 - [ ] **Task 6.2** `ContextCapsule` 实装（route 定后）：消费 `snapshot.context` 四维 + crossfade（glassEffectID morph）+ 预加载 + 图标在 capsule 外（SD24）。
 
 每 task：实装 → 双端 build → simctl → **codex 审计（20min + anchor 像素对比 capsule vs anchor-00-diorama）** → commit。
@@ -280,7 +315,7 @@ func testActiveCellDoesNotOverrideWhenNormal() {  // GLM P1-1 negative
 
 - [ ] **Task 7.1** 全量门：`swift test` 0 fail + 双端 `xcodebuild` SUCCEEDED + `make verify-all` exit0 **+ 另跑** `bash Tools/checks/{check-no-binary-visualstate,check-platform-vs-version-guard,check-contentview-uses-display-catalog}.sh` 全绿（GLM P2 口径：make verify-all 含 wiring+swift test，两 shell gate 另跑）。
 - [ ] **Task 7.2** 全 phase anchor 像素对比汇总 + visual-acceptance【用户演绎体验视角】（方案经理 5min 台本 + 客户旁观 + corner case，还原投屏 V10，逐张 Read）+ 14 张满屏单态 5-gate。
-- [ ] **Task 7.3** loopaudit（≥3 subagent 至无 P0/P1）+ **基线级联回写**（grill-定档/landing matrix/索引全消减/tasks.md §8/CLAUDE §9）+ 沉淀（坑→lessons / 元认知→rules / 技能）+ closeout receipt + handoff。
+- [ ] **Task 7.3** loopaudit（≥3 subagent 至无 P0/P1）+ **基线级联回写**（grill-定档/landing matrix/tasks.md §8/CLAUDE §9）+ **coverage 索引消减统计（GLM P2-3）**：`grep -c '\- \[ \]' docs/grill-checklist/uiue-a2-grill-coverage-index.md` 统计未消减项，A-2 实装项应全 `- [x]`（DEFERRED ⏳ 不计）+ 沉淀（坑→lessons / 元认知→rules / 技能）+ closeout receipt + handoff。
 
 ---
 

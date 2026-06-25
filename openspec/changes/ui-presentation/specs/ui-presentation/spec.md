@@ -202,3 +202,49 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **WHEN** 取默认值
 - **THEN** 读 state-cells `default_scope`（G25 单一 SSOT）
 - **AND** SHALL NOT 在 UIUE 手写 per-cell 默认表（座位→主驾等仅决策举例非权威值）
+
+### Requirement: UIUE demo interactions SHALL remain mock-frontstage and SHALL NOT claim runtime readiness
+
+完整 demo 交互（触摸调节 / 语音推理 / 演绎控制台 force / 氛围灯炸场）SHALL 全 **mock 前台**（mock store 写 + mock snapshot 切 + mock 预设响应），SHALL NOT 接真 NLU/ASR/TTS/LoRA/runtime backend，SHALL NOT claim endpoint-ready/voice-ready/model-quality/V·S·U-PASS readiness。storyboard SD7「UIUE 边界放宽碰 Core/State 完整链路」SHALL 解读为 **mock 实现**（等后续接线，见 SD7 amendment）。
+
+#### Scenario: interactions are mock, not real backend
+- **GIVEN** 触摸调节 / 语音推理 / 控制台 force 任一交互
+- **WHEN** 交互发生
+- **THEN** 写 mock `DemoVehicleStateStore` / 切 mock snapshot / 出 mock 预设响应
+- **AND** SHALL NOT 调用真 NLU/ASR/TTS/LoRA，SHALL NOT claim runtime readiness（proof_class = localMock/staticPreview）
+
+### Requirement: expanded-card controls SHALL update mock state and presentation only
+
+展开卡（4b composite）数值控件（dial/percent/stepper/toggle/badge）SHALL 写 mock `DemoVehicleStateStore`（via `applyMockTransition`）并刷新 `PresentationSnapshot`；摘要卡 SHALL 只读（点高亮+tooltip 无调节，SD23 7.F1）；touch-driven value source SHALL 标 `ui_touch`/mock source；value 调节 SHALL 复用 `ValueRangeMapper` clamp/cycle 逻辑（dial 18-32 / percent 0-100 / stepper 离散档 / toggle on-off / badge 8 色循环），SHALL NOT 在 view 重写 range 逻辑（防与 mapper 漂移）。mock transition SHALL 产生 changing/satisfied 视觉态（值真变化即非 `.normal`，非只 `"on"` 触发）。
+
+#### Scenario: expanded control writes mock store and refreshes snapshot
+- **GIVEN** 展开卡 dial/stepper/toggle/badge 被触摸调节
+- **WHEN** 控件回调触发
+- **THEN** 调 `store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片 + numericText 联动
+- **AND** 摘要卡 SHALL 只读（不调 store），SHALL NOT 在 view 硬写 state key/value
+
+#### Scenario: value change produces non-normal visual state
+- **GIVEN** 触摸调温度（24→26）/ 百分比 / 档位（desiredValue 非 `"on"`）
+- **WHEN** `applyMockTransition` 应用
+- **THEN** 该 cell `visualState` SHALL = `.changing`/`.satisfied`（值真变化产生激活态）
+- **AND** SHALL NOT 落 `.normal`（否则触控联动视觉假绿，卡片不亮）
+
+### Requirement: demo control panel SHALL force mock context/state for presentation only
+
+演绎控制台（方案经理幕后工具）SHALL force mock context/state：整车（speed/gear）+ 环境（weather/time_period）via bridge **force-context**（AD-RPB-014 context 四维，SHALL NOT 碰 state-cells.yaml 契约）+ NormalRunPreset 常态复位（= DemoReset）+ AllStateSheet（33 base 按 10 族分组）；控制台视觉 SHALL 对齐 10 族卡（iOS26 glass 功能层 + material 模块卡）；SHALL NOT 接真 runtime backend，SHALL NOT customer-facing（`#if DEMO_MODE` 隔离）。
+
+#### Scenario: control panel forces mock context not real backend
+- **GIVEN** 演绎控制台 segmented 选「高速/雨天/夜晚」
+- **WHEN** force
+- **THEN** mutate mock bridge context（vehicle.speed/environment.weather 经 force-context event）驱动 capsule + 安全 guard mock
+- **AND** SHALL NOT 写 state-cells.yaml 契约，SHALL NOT 当客户面可达（DEMO_MODE 隔离）
+
+### Requirement: ambient edge burst SHALL be presentation-only and non-blocking
+
+氛围灯边缘爆发 SHALL 纯呈现层（5s burst phaseAnimator → fade out）+ `allowsHitTesting(false)`（不挡 mic/controls/卡片交互）+ 仅 `ambient.color` delta 触发（非 always-on）；SHALL 守 U30（Vortex Canvas 粒子非 layerEffect 折射 shader，不抢 mlx GPU）；SHALL NOT 阻塞主线程/抢 mic 交互。
+
+#### Scenario: burst is non-blocking overlay triggered by ambient color change
+- **GIVEN** 氛围灯指令成功（`ambient.color` delta）
+- **WHEN** 爆发渲染
+- **THEN** 屏幕边缘 5s 闪烁+Canvas 粒子爆发 → fade，`allowsHitTesting(false)` 不挡交互
+- **AND** SHALL NOT always-on（仅 color delta 触发），SHALL NOT 用 Inferno layerEffect 折射（守 U30）

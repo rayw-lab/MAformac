@@ -120,6 +120,8 @@
 
 **🔴🔴 边界调整（磊哥 2026-06-25 拍，影响全 roadmap）**：**PR7（codex rebuild-c6）已暂停**，「**UIUE 原型设计 + 产品交互设计最重要**」→ **UIUE 边界放宽**（不再受「禁碰后端 Core/State/Core/Contracts」限，可打通触摸→state→语音推理**完整链路**）。**UIUE 原型 = 完整 demo 交互**（前端视觉 + 触摸 + 语音 + state 联动 + 上下文推理），非只前端视觉。
 
+> 🔴 **AMENDMENT（磊哥 2026-06-25，覆盖上文「完整链路碰真后端」）**：UIUE A-2（step2）实现 = **全 mock 前台**——触摸→**mock** `DemoVehicleStateStore` 写、语音推理 = **mock 预设响应**、演绎控制台 force = **mock context 切换**，**不接真 NLU/ASR/TTS/LoRA/runtime backend**（后续接线 DEFERRED）。上文「可打通触摸→state→语音推理完整链路」= **用 mock 实现完整交互呈现，等后续接线**真后端；可碰现有 mock 车控 store 展示联动，**不改 state-cells.yaml 契约语义**。正式落点：OpenSpec `ui-presentation/spec.md` 4 个 mock-frontstage Requirement（mock interaction boundary / expanded controls mock state / demo control panel mock force / ambient edge burst presentation-only）+ plan v3 Phase 3-5。执行方以本 amendment + spec Requirement 为准，不以上文「碰完整链路」字面。
+
 **pre-mortem**：🐯 后端 exp_step「冷了/热了」语义是否覆盖（contract exp_step little/gear/extreme，「冷了」需映射升温，核 contract 可能补）/ 🐘 触摸+语音共享 state 单源（mock store SSOT），两者都更新它。
 
 ---
