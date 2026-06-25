@@ -58,6 +58,32 @@
 - **C-lite**（native glass + Vortex 粒子 + image offset 视差，**砍重折射 shader**）= 实时 + 省 GPU + 较像。
 - **必 spike 真机实证**（U31）：A vs C-lite，测 capsule + 模型推理同跑的帧率与观感，一手定。
 
+## Blueprint-teardown（Vortex / Inferno clone 拆到工程底，2026-06-25）
+
+> clone 到只读 ref 区 `~/workspace/raw/05-Projects/MAformac/ref-repos/{Vortex,Inferno}`（不进仓）。逐文件读 runtime。
+
+### Vortex（粒子，1557 行 Swift，MIT）
+
+- **🔴 渲染机制 = `TimelineView(.animation) + Canvas + symbols`**（`Views/VortexView.swift:22-29`）：用 `Canvas` 把粒子画进 GraphicsContext，`symbols` 把 SwiftUI view 预渲染成粒子模板复用 = **Canvas 绘制，非 layerEffect Metal shader**。→ 🔴 **GPU 比玻璃折射 layerEffect 便宜得多（U30 关键证据：Vortex 粒子可放心用，不像折射 shader 抢 mlx）**。
+- **关键工程**：① off-screen 提前 cull（`:79-80` 离屏粒子 bail，省绘制）② `targetFrameRate` 可调（`:19,42` 低帧率省 CPU——ambient capsule 用 30-40 够）③ `blendMode(.plusLighter)`（`:46-50` 发光粒子）④ `stretchFactor`（`:102` 雨滴按速度拉伸）⑤ 二级系统/secondary（`:116` 粒子生粒子，capsule 不需要 drop）。
+- **preset 直接 adopt（参数化 VortexSystem）**：
+  - `.smoke`（`Presets/Smoke.swift`）：box(0.05,0)/lifespan3/speed0.1/gray→透明 ramp/死时×2 = **尾气**（调：position 车尾、更淡更慢）。
+  - `.rain`（`Presets/Rain.swift`）：box(1.8,0)/birthRate400/lifespan0.5/speed4.5/angle190°斜/蓝/stretchFactor12 = **雨条**（调：ambient capsule 降 birthRate/speed）。
+  - `.snow`（雪）/ `.fireflies`+`.spark`（星光微闪）。
+- **API**：`VortexView(system, targetFrameRate:) { symbols }`，嵌进 capsule ZStack。
+- **adopt/adapt/drop**：adopt = VortexView + smoke/rain/snow preset；adapt = 为小 ambient capsule 调参（更少更慢，smoke 定位车尾）；drop = secondary/fireworks/confetti。
+
+### Inferno（Metal shaders，33 个 .metal，项目 U5 已采）
+
+- Metal shaders 走 `layerEffect`（采样邻近像素做折射/ripple）= 🔴 **U30 已定「最贵，与 mlx 抢 GPU -50%」**。
+- **capsule 用法（守 U30）**：玻璃壳用 **native `.glassEffect`（便宜）**，**不在 always-on capsule 跑 Inferno 折射 shader**（C-lite）。Inferno 的 RippleEffect 留 U5 氛围层炸场（瞬时、非常驻），不进 capsule。
+
+### Teardown 结论 → 强化 route 推荐
+
+- **C-lite 技术上确认可行 + GPU 安全**：native glassEffect（壳，便宜）+ Vortex 粒子（Canvas，便宜，有 smoke/rain/snow 现成 preset）+ image `.offset` 视差（便宜）。**全程无重 layerEffect → 不抢 mlx**。
+- **A（视频 loop）仍是最像 + GPU 最友好**（解码≠compute）的并列选项。
+- **真机 spike 二选一**（U31）：A vs C-lite，capsule+推理同跑帧率。teardown 把 C-lite 从「存疑」拉到「可行」。
+
 ## Sources
 
 - [twostraws/Vortex — SwiftUI particle system](https://github.com/twostraws/Vortex)

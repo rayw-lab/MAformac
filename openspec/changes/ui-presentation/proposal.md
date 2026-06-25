@@ -2,6 +2,8 @@
 > 🔴 **apply 状态（claim-vs-reality）**：Phase 1b 工程前置 ✅ done（mic/speech/deployment 锁 iOS26/2 gate 已挂/tokens 冻结/截图管线）；**Phase 3 D7 7 态消费已 apply（commit `6a3e3f9`，审计 CLEAR）**；Phase 4 卡片 apply 待后端 `default_scope` 落 main（防返工）。
 > **agree-before-build：spec 已 agree ✅；Phase 4 代码 apply 仅待后端 default_scope 交汇产物。** 决策权威源见下。
 >
+> 🔴 **AD-14 完整产品形态扩展（2026-06-25，A-2 文档先行）**：本 change scope 从「Phase 4 卡片 scope 消费」扩到 **完整产品形态**（连续舞台无 divider + 顶部 context capsule diorama + 三屏交互 + 制冷热 + 层级滚动 + 边界态纯语音），SD18-25 grill 收口（grill SSOT `docs/uiue-storyboard-grill-decisions.md` + 定档 S1-S10）。**消费 A-1 `define-runtime-presentation-bridge`（磊哥 2026-06-25 accepted，mock snapshot 即可）**。架构 = design AD-14；任务 = tasks §8（8.A 连续舞台核心先做 / 8.B capsule spike-gated / 8.C 验收）。UIUE visual_only，runtime 实现 DEFERRED。
+>
 > 🟢 **非 DEFERRED（区别于 `define-demo-golden-run-and-voice`）**：本 change = **UIUE 链路 A 前端视觉/状态消费契约**，是与 A2/LoRA（链路 B）**并行活跃**的轨（worktree `uiue/visual-ssot-state-consume`），**不延后**。A2 只产 D-domain 后端 surface，本 change 管「看得见摸得着」那一层。Fork2 已拍：UIUE 视觉/卡片/7 态消费**拆独立 capability**（非塞进 demo-golden-run）。
 
 ## Why

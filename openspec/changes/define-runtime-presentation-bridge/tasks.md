@@ -1,4 +1,6 @@
 > 🔴 **Planning-artifact vs implementation-task status**: proposal/design/spec are **authored and strict-validated** (so `openspec status` reports artifacts complete / `isComplete=true`). The checkboxes below are **downstream contract-implementation/review tasks**; unchecked items are NOT execution authorization and do NOT imply Swift implementation is complete. `0/N tasks` here means "contract authored, implementation not started", not "work missed".
+>
+> ✅ **Accepted by 磊哥 2026-06-25**: the contract is stable enough for **A-2 ui-presentation visual consumption via mock snapshots**. This acceptance is NOT a runtime-readiness/V-PASS claim; mainline runtime-side implementation review is still pending.
 
 ## 1. Proposal validation
 

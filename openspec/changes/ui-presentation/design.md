@@ -218,6 +218,33 @@ C2 DemoVehicleStateCell → Presentation Derivation → FamilyCardDisplay Model 
 ### 五、元洞察（工程分水岭）
 继续按「UI 改版」做派生层 → 越做越玄学（聚合靠全局 if、控件靠 default 吞、deferred 靠记忆）；按「语义呈现层」做 → 撑得住 4b/4c/Phase5。**下一刀优先补派生器语义正确性，不是表现层动画**——本次 4a 收口正是先 hardening B3/B4 语义层（闭合+resolver）再进 4b 控件。
 
+## AD-14 — 完整产品形态：连续舞台 + context capsule diorama + 三屏交互（SD18-25 consolidated，2026-06-25）
+
+> 承接 grill SSOT `docs/uiue-storyboard-grill-decisions.md` **SD18-25**（视觉块 V1-V12 / corner case CC / 制冷热 SD20 / 层级滚动 SD22 / 边界态 SD23 / context capsule diorama SD24-25）+ `docs/grill-checklist/uiue-grill-定档-2026-06-25.md`（作废清单 S1-S10）。**消费 A-1 `define-runtime-presentation-bridge` 契约（磊哥 2026-06-25 accepted，mock snapshot 即可不依赖 mainline runtime）**。本 AD = 这些决策落 ui-presentation 的架构锚点；细节在 SD/grill SSOT，不在此重复。
+
+### 一、连续舞台（无 divider，信息架构非三块边框，SD18 V7 硬约束）
+三屏分层靠留白+material+卡片群自然成块，**禁 divider 黑线**。顶部 context band（context capsule + 设置/刷新右上 standalone，**品牌去掉**）/ orb / 对话流 / 车控 / mic dock floating。视觉 tokens 落 `tokens.md §3.1/§6/§7/§8`（8pt 间距 / 5 级 type scale / 22 圆角 0.5pt hairline 无黑框 / theme 强制色 ivory 默认不跟随系统 V6）。
+
+### 二、顶部 context capsule = 「活体迷你窗」diorama（SD24/25）
+会动的分层迷你世界（天空/车/路/天气/玻璃折射），表达 **context 四维**（消费 bridge `context{vehicle:{speed,gear}, environment:{weather,time_period}}`，AD-RPB-014）。route 留 **A-2 spike**（A 视频 loop vs C-lite；🔴 项目 U30「layerEffect 与 mlx 抢 GPU -50%」→ 砍重折射 shader；U31 spike 不预拍）。adopt Vortex（粒子 尾气/雨/雪/星）+ native `.glassEffect`（壳）。图标在 capsule 外（守 SD24，gpt 图非权威仅视觉灵感）。
+
+### 三、7 态 + 制冷热 + corner case（消费 bridge）
+7 态色 D7（已 apply commit 6a3e3f9）+ **制冷热 sibling**（SD20，消费 bridge `sibling_cells`，`ac.mode` 驱动蓝/红 + range bar + mode 图标）。CC1 **activeCell**（非 normal 态主值切本次变化 cell，消费 bridge `active_cell`）+ partial-deny（消费 `per_action_results`）+ already_state（satisfied+ack 视觉，不塌 unsupported/safety）。
+
+### 四、层级 + 滚动（SD22）
+z-order：氛围 overlay（`allowsHitTesting(false)`）> mic dock > orb > 聚焦 dim > 滚动内容；mic dock 始终居前 + 车控 scroll 底 `contentInset`。滚动：orb/mic 钉，对话/车控内部滚；**手动滚暂停自动 scrollTo**；**fade 按 active 非屏幕位置**（防滚动闪烁）。
+
+### 五、边界态（SD23）
+**纯语音 push-to-talk（移除 ContentView TextField）** / iPhone 锁竖屏 / 文案 max ~30 字 `.truncationMode(.tail)` / ASR 二分（empty 静默回 idle / no-match → unsupported）/ 族外 blocked_hard 兜底。
+
+### 六、消费 bridge（A-1 accepted）边界
+UIUE 消费 `PresentationSnapshot`（**mock snapshot 即可，不依赖 mainline runtime**）：cards{visual_state/scope_origin/sibling_cells/active_cell}/ context 四维 / orb_state / dialog。**UIUE visual_only，bridge 契约定数据 shape，runtime 实现 DEFERRED**。
+
+### 实装 order（A-2 内部，文档先行）
+1. **连续舞台核心**（直接做，不卡 capsule）：ContentView 三屏重构 + tokens hex 定稿 + 7态/制冷热 sibling + 层级滚动 + 边界态。
+2. **context capsule**（spike-gated）：route spike → 资产 → ContextCapsule view。
+3. 验收：swift test + xcodebuild 两端 + simctl + visual-acceptance（投屏 V10）。
+
 ## 不做（demo 轻治理 / DEFERRED 边界）
 
 - ❌ 量产全链路（FC→NLU→DS→DM）/ 真车控 / 跨 session 视觉一致性纪律（demo=同一台 build）。

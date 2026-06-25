@@ -85,3 +85,26 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 7.F 触摸交互（✅ 已拍）
 - [x] 7.F1 P1 触摸 = **B 极简查看** ✅（磊哥 2026-06-24「可能会戳，不确定」→ B 落实：点卡高亮+tooltip，无调节逻辑，卡片只读非控制器，戳了有反馈保险）
+
+## 8. 完整产品形态实装（A-2，SD18-25 consolidated AD-14，consumes A-1 bridge accepted）
+
+> 文档先行 scope（2026-06-25）。消费 A-1 `define-runtime-presentation-bridge`（mock snapshot，不依赖 mainline runtime）。内部 order：8.A 连续舞台核心先做（不卡 capsule）→ 8.B context capsule（spike-gated）→ 8.C 验收。
+
+### 8.A 连续舞台核心（直接做，不依赖 capsule spike）
+- [ ] 8.A1 ContentView 三屏连续舞台重构（**去 divider 黑线** / 去品牌 MAformac / 设置刷新右上 standalone / orb-对话-车控-mic 四 zone，SD18 V7）
+- [ ] 8.A2 tokens.md hex 定稿（米白 / 7态亮底加深 / 制冷热）DRAFT→FROZEN + `DesignTokens.swift` 同步（间距 §6/字体 §3.1/圆角 §7/theme §8）
+- [ ] 8.A3 制冷热 sibling 渲染（消费 bridge `sibling_cells`，`ac.mode`→蓝/红 + range bar + mode 图标，SD20）+ `SemanticColorMapper` 契约存在性
+- [ ] 8.A4 CC1 activeCell 主值切（非 normal 态取 bridge `active_cell` 优先 primary，SD19）+ 契约存在性测试
+- [ ] 8.A5 层级 + 滚动（z-order / mic dock `contentInset` / 手动滚暂停 scrollTo / fade 按 active 非位置，SD22）
+- [ ] 8.A6 边界态（**移除 ContentView TextField 纯语音** / portrait lock / 文案 30 字 truncate / 族外 blocked_hard，SD23）
+- [ ] 8.A7 注意力优先级 + 次要族 fade（V8）+ V9 `FamilyIconMapper`（全 SF Symbols 契约存在性）
+
+### 8.B context capsule diorama（spike-gated，SD24/25）
+- [ ] 8.B1 🔴 capsule route spike（真机：A 视频 loop vs C-lite，量帧率+观感，**U31 实证不预拍 / U30 砍重折射 shader**）
+- [ ] 8.B2 capsule 资产（route 定后：C-lite 分层 stills/CoreML 深度 或 A video loop）
+- [ ] 8.B3 `ContextCapsule` view（消费 bridge `context` 四维 + crossfade 切换 + **预加载防卡顿** + 图标在 capsule 外）
+- [ ] 8.B4 adopt Vortex（`.smoke` 尾气 / `.rain` 雨 / `.snow` 雪 / 星光）+ native `.glassEffect` 壳（守 U30，不在 always-on capsule 跑 Inferno 折射 shader）
+
+### 8.C 验收（A-2 收口）
+- [ ] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
+- [ ] 8.C2 simctl 视觉 + **visual-acceptance 5-gate（米白/深空，还原投屏环境 V10）** + 对比 anchor-set（连续舞台无黑线 / 制冷热 / capsule diorama）
