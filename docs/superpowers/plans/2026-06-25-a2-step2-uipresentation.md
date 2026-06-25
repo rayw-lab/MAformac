@@ -1,136 +1,126 @@
-# UIUE A-2 (step2) ui-presentation §8 完整产品形态 Implementation Plan
+# UIUE A-2 (step2) — 完整 demo 交互原型 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development 或 superpowers:executing-plans 逐 task 执行。Steps 用 checkbox（`- [ ]`）。
+> **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development 或 executing-plans 逐 task 执行。Steps 用 checkbox（`- [ ]`）。
 >
-> 🔴 **执行方 = CC 主窗口主持**（磊哥 2026-06-25 定「定稿后不丢 codex」）。任何执行方**必先读「§0 背景决策包」+ 每 Phase 后回读基线文档**（防自拍已决决策）。
+> 🔴 **执行方 = CC 主窗口主持**（磊哥定）。任何执行方**必先读「§0 背景决策包」+ 每 Phase 后回读基线文档**（防自拍已决决策）。
 >
-> 🟢 **v2 定稿（2026-06-25）**：经 subagent CC（adversarial）+ codex-rescue 两路审计辩证收 + 磊哥拍 **A+**（PresentationSnapshot 保 bridge vocabulary 容器 / 卡片渲染复用现有 `VehicleCardDisplay`+`familyDisplays(from:)`，不造平行 SnapshotCard）。修复了：测试框架/init API、wiring gate、mic dock+对话流、phase gate 假绿、token §1、strangler、双端 build、Vortex pin、契约回写。
+> 🟢 **v3 定稿（2026-06-25）**：经 subagent CC（adversarial）+ codex-rescue + GLM-5.2 **三路审计**辩证收 + 磊哥拍多项：① A+ bridge（PresentationSnapshot vocabulary 容器/卡片复用 VehicleCardDisplay）② **范围扩到完整 demo 交互**（视觉+触摸+语音+state 联动+演绎控制台，**全 mock 前台**）③ 氛围灯 SD4 补 ④ 演绎控制台 SD13-15 进本 §8 ⑤ SD7 触摸调节实现（mock）⑥ 每 phase 派 codex 审计 + anchor 像素对比。
 
-**Goal:** 把 `App/ContentView.swift` 从临时态（TextField 输入 + 「MAformac」品牌字 + 直接消费 store）重构成**完整产品形态连续舞台**——消费 A+ bridge mock `PresentationSnapshot`（vocabulary 容器），落地 7 态/制冷热 sibling/activeCell/mic dock+对话流四 zone/层级滚动/边界态/context capsule diorama，**在 iOS 模拟器**验收到接近 anchor 锚点集的视觉。
+**Goal:** 把 UIUE 从临时态重构成**完整 demo 交互原型**——10 族卡片连续舞台 + 触摸调节 + 语音对话流 + state 联动 + 氛围灯炸场 + 演绎控制台（方案经理 force 端状态）+ context capsule，**全 mock 前台**，在 iOS 模拟器逐像素接近 anchor 锚点集。
 
-**Architecture（A+，磊哥拍）:** 四层分刀。① **bridge mock vocabulary 容器**（`PresentationSnapshot` 携带 cells + context 四维 + activeCells map + orb/dialog/readbacks + resultKind 8 类 + proofClass + refusedCell，AD-RPB-001~015 vocabulary freeze；**卡片渲染复用现有 `VehicleCardDisplay`，不造平行 SnapshotCard**）→ ② **语义派生层**（SemanticColorMapper 制冷热 / 扩 `VehicleCardDisplay` 加 activeCell·siblingCells + familyDisplays 透传 / FamilyIconMapper，**TDD XCTest**）→ ③ **连续舞台 View 重构**（ContentView 四 zone + mic dock + 对话流，**simctl 5-gate 视觉验收**）→ ④ **context capsule diorama**（route spike A vs C-lite **模拟器观感**，gated）。
+**Architecture:** 七层分 Phase，全 mock 前台（`MockPresentationSnapshotProvider` 是核心，所有交互切 mock 展示）。① bridge mock vocabulary 容器 → ② 语义派生层（含氛围灯 8 色）→ ③ 连续舞台 visual（四 zone + 设置/刷新）→ ④ 触摸调节 + state 联动 + 语音推理（mock）→ ⑤ 演绎控制台（mock force）→ ⑥ 氛围灯炸场 → ⑦ context capsule → 验收。
 
-**Tech Stack:** SwiftUI（iOS26/macOS26 锁）、**XCTest**（与现有 25 文件/222 测试一致）、`simctl`（force-state 截图）、Vortex（粒子 adopt，pin commit）、native `.glassEffect`（capsule 壳 + mic dock）。
+**Tech Stack:** SwiftUI（iOS26/macOS26）、**XCTest**（与现有 222 测试一致）、`simctl`（force-state 截图）、Vortex（粒子）、native `.glassEffect`。
 
-**🔴 分层开发 convention（磊哥定）：**
-- **语义派生层 / bridge mock / 契约存在性 task** → 标准 **TDD step**（写 failing test → run fail → 实装 → run pass → commit），plan 内给**完整 XCTest + 实装代码**。
-- **View 层 task（ContentView / mic dock / 对话流 / capsule）** → **5-gate 验收 step**（实装[约束] → `xcodebuild` 双端 build → `simctl` 截图 → visual-acceptance 5-gate 对比 anchor → commit），plan 内给**精确 interface + 关键代码骨架 + 验收门**，不写死整个 view 每一行（SwiftUI view 视觉迭代）。
+**🔴 分层开发 convention：**
+- **语义派生层 / bridge mock / 契约存在性 task** → **TDD step**（failing test → run fail → 实装 → run pass → commit），plan 内给完整 XCTest + 实装代码。
+- **View / 触摸 / 演绎控制台 / 氛围灯 / capsule task** → **5-gate + anchor 像素对比验收 step**（实装[约束] → 双端 build → simctl 截图 → anchor 像素对比 + 5-gate → commit），给精确 interface + 约束 + 验收门，不写死每行（视觉/交互迭代）。
 
 ---
 
 ## §0 🔴 背景决策包（执行前必读 + 每 Phase 后回读）
 
-> 执行方不一定在今天的 grill 现场。以下是**已拍死的背景决策**，承接不自拍；冲突念头 = 停，回读对应基线（`grill-recall-decisions-first` + `goal-dispatch-trace-to-source`）。
+**必读基线（起手 + 每 Phase 后回读）：**
+1. `CLAUDE.md` + `docs/lessons-learned.md`（K 段）。
+2. `docs/uiue-storyboard-grill-decisions.md` — **SD1-SD25 全集**（开场/push-to-talk/对话流/**氛围灯 SD4**/玻璃分层/**点卡展开 SD6**/**触摸调节 SD7**/**刷新设置 SD8**/拒识/多意图/米白/**演绎控制台 SD13-15**/orb/视觉块 SD18/corner SD19/制冷热 SD20/gptPRO SD21/层级滚动 SD22/边界 SD23/capsule SD24-25）。
+3. `docs/grill-checklist/uiue-grill-定档-2026-06-25.md` — 作废清单 S1-S10。
+4. `openspec/changes/define-runtime-presentation-bridge/design.md` — A-1 bridge AD-RPB-001~015。
+5. `openspec/changes/ui-presentation/design.md` AD-13/AD-14 + `tasks.md §8`。
+6. `docs/design/tokens.md`（视觉 SSOT，制冷热色在 **§1**）+ `docs/design/INDEX.md`。
+7. `docs/design/gptimage2-anchor-set/`（anchor prompt）+ `docs/design/anchors/`（anchor PNG，本地 gitignored，**像素对比基准**）。
+8. `docs/research/2026-06-25-context-capsule-2.5d-tech/README.md`（capsule 依赖栈）。
+9. **本 plan 配套索引** `docs/grill-checklist/uiue-a2-grill-coverage-index.md`（grill 全集 × Phase 映射，随推进消减）。
 
-**必读基线文档（起手 + 每 Phase 后回读）：**
-1. `CLAUDE.md` + `docs/lessons-learned.md`（**K 段 = 本 UIUE session 教训**）。
-2. `docs/uiue-storyboard-grill-decisions.md` — **SD3（对话流 DialogueBubble）/ SD5（摘要卡 material）/ SD18-25**（视觉块 V1-V12 / 制冷热 SD20 / hero range bar SD21 / 层级滚动 SD22 / 边界态 SD23 / context capsule SD24-25）。
-3. `docs/grill-checklist/uiue-grill-定档-2026-06-25.md` — **作废清单 S1-S10**（引决策前查作废 registry）。
-4. `openspec/changes/define-runtime-presentation-bridge/design.md` — **A-1 bridge AD-RPB-001~015**（4 对象 vocabulary；AD-RPB-015 = bridge 是 cross-artifact 单一权威）。
-5. `openspec/changes/ui-presentation/design.md` **AD-13/AD-14** + `tasks.md §8`。
-6. `docs/design/tokens.md`（视觉 SSOT，**写任何 UI 前必读**；🔴 制冷热语义色在 **§1**，非 §2[§2 是 7 态色]）+ `docs/design/INDEX.md`。
-7. `docs/research/2026-06-25-context-capsule-2.5d-tech/README.md`（capsule 依赖栈 + Vortex/Inferno teardown）。
+**🔴 边界（磊哥 2026-06-25 终定，覆盖 SD7 行 121 旧文本）：**
+- UIUE A-2 = **完整 demo 交互呈现**（前端视觉 + 触摸 + 语音 + state 联动 + 演绎控制台），**全 mock 前台**。
+- 🔴 **SD7 行 121「边界放宽碰 Core/State 完整链路」= 过时**，**现在还是全 mock**（触摸/语音推理/联动/force 全用 mock 展示，**等后续接线**真后端）。
+- 可碰 `DemoVehicleStateStore`（现有 **mock** 车控 store，D16 全 mock）展示触摸联动；**不接真后端**（NLU/语音推理/LoRA/ASR-TTS → 后续接线 DEFERRED）；**不改 state-cells.yaml 契约语义/codegen**；§6 红线（密钥/PII/报价）不变。
+- 语音推理「26 度→冷了→升温」= **mock 预设响应**（不真 NLU），演绎控制台 force = **mock context/state 切换**。
 
 **已拍死的关键决策（不自拍）：**
-- **default_scope 已落 main**（`17ae332 feat(c2): add default scope to state cells`，state-cells.yaml 11 处 default_scope）→ scope 卡片读 `default_scope` SSOT，**不手写**「座位→主驾」。
-- 🔴 **state-cells.yaml 已是 10 族全集（实况 31 base）**；`openspec/changes/ui-presentation/design.md:29`「仅 4 族」是 **stale 注释**，以 yaml 实况为准。
-- **A+ bridge 形态**（磊哥 2026-06-25）：`PresentationSnapshot` 保 vocabulary 容器，**卡片渲染复用现有 `VehicleCardDisplay`/`familyDisplays(from:)`，不造平行 SnapshotCard 展示模型**。
-- **scope 呈现 = 淡显角标**（SD23 裂缝⑤拍 B，体验审计 P1-2 已纠 `caption2 9pt`→`caption semibold` 提对比，淡≠隐形）/ **全车 = 1 聚合卡 + 青 badge**（裂缝⑥拍 c）。
-- **7 态穷尽 switch 无 default**（D7 apply `6a3e3f9`；机械门 `check-no-binary-visualstate.sh`）。
-- **纯语音 push-to-talk**（SD23 移除 TextField → 换 **mic dock**，SD18 V7：72-80pt floating glass capsule）。
-- **物理置顶作废**（S5/S6）→ AD-12 原地放大 hero + `ScrollViewReader` 滚入视野。
-- **capsule route 不拍死**（U31 spike 实证不预拍，**模拟器观感**对比）+ **U30 layerEffect 与 mlx 抢 GPU -50%**→砍重折射 shader，capsule 只 native glass + Vortex 粒子 + image offset。
-- **orb / 思考链路 = Phase 5 DEFERRED**（E0-E8 grill 收口但不在本 §8）；🔴 **但 mic dock + 对话流是本 §8.A1「orb-对话-车控-mic 四 zone」组成，不跟 orb defer**。
-- **gpt anchor 图非权威**（磊哥「不以 gpt 为准」）：只借视觉灵感/对比基准，布局以 SD/AD 为准。
+- default_scope 已落 main（`17ae332`，state-cells 11 处）→ 读 `default_scope` SSOT 不手写。
+- A+ bridge：PresentationSnapshot vocabulary 容器 / 卡片复用 `VehicleCardDisplay`+`familyDisplays(from:)` 不造平行 SnapshotCard。
+- scope 淡显角标（SD23 裂缝⑤，`caption semibold` 非 caption2 9pt）/ 全车 1 聚合卡（裂缝⑥）。
+- 7 态穷尽 switch 无 default（机械门 `check-no-binary-visualstate.sh`）。
+- 纯语音 push-to-talk（移 TextField → mic dock，SD18 V7 72-80pt glass）。
+- 物理置顶作废（S5/S6）→ AD-12 原地放大 hero + ScrollViewReader。
+- **触摸调节真实完整**（SD7：dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环，走 **mock store**，语音读当前态推理，联动 10 族，静默无 TTS）；摘要卡触摸只读（SD23 7.F1）、展开卡（composite）才有数值控件调（SD6）。
+- 演绎控制台（SD13-15）= iPhone 控制中心式竖排模块卡（常态/整车/环境/座舱）+ 常态卡 [查看全部] AllStateSheet（33 base）+ segmented 互斥 + 视觉对齐 10 族卡 iOS26 glass；时段 ⊥ 主题正交。
+- capsule route 不拍死（U31 spike 模拟器观感，GPU 真机 DEFERRED）+ U30 砍折射 shader。
+- orb / 思考链路 = Phase 5 DEFERRED（mic dock/对话流/氛围灯不跟 orb defer）。
+- gpt anchor 图非权威（只借视觉灵感 + 像素对比基准，布局以 SD/AD 为准）。
 
 ---
 
 ## Global Constraints
 
-> 每个 task 隐含包含本节。verbatim 自 spec/grill SSOT。
-
-- **平台锁**：App target iOS26.0 / macOS26.0；Core `Package.swift` 留 `.iOS(.v17)/.macOS(.v14)` 不动。**禁 `#available(iOS 17|18)`**（机械门 `check-platform-vs-version-guard.sh`）；平台差异用 `#if !os(macOS)`，a11y 用 `if reduceMotion`。
-- **A2 边界（code-only Presentation 层）**：**不改 Core 契约 / state-cells.yaml / DemoVehicleStateStore 语义 / C1-C6 codegen**；不训练/不评测/不生成语料。bridge mock 是 **UIUE 侧 not-a-contract preview 层**（AD-RPB-002）。扩 `VehicleCardDisplay` 字段（加默认值，向后兼容）+ 扩 `familyDisplays(from:activeCells:)` 可选参数（默认空，现有调用不破）= 渲染层非契约层，不算碰 Core 契约。
-- 🔴 **wiring gate（`check-contentview-uses-display-catalog.sh`，必守）**：ContentView body **必字面调用** `familyDisplays(from:` + `VehicleCardsGrid(displays: familyDisplays`（注释 strip 后真接线）+ **禁 LazyVGrid**。`Makefile verify`/`verify-ci` 都跑 `verify-contentview-wiring`。→ **A+ 弥合**：ContentView 保 `familyDisplays` computed property（内部从 `snapshot.cells` 算），实参字面仍是 `familyDisplays`，gate 不破。
-- **U30 GPU**：context capsule 不跑 Inferno 折射 layerEffect；只 native `.glassEffect`（壳/mic dock）+ Vortex 粒子（Canvas）+ image `.offset`。
-- **视觉 SSOT**：色/字/间距/圆角/动效全从 `docs/design/tokens.md → App/DesignTokens.swift` 取，禁硬编 hex。🔴 制冷热语义色落 **tokens.md §1**（`semantic.cool`/`semantic.warm`，SD20:417），非 §2。
-- **7 态穷尽**：`DemoVisualState` 7 态（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown）各独立分支，**无二值/无 `default:` 吞态**（`check-no-binary-visualstate.sh`）。
-- **测试框架 = XCTest**（与现有 25 文件/222 测试一致，**禁 Swift Testing `@Test`**——现仓 0 个 `import Testing`，混入会发现失败）。夹具用真实 init `DemoVehicleStateCell(key:actualValue:revision:)`（**非 `key:value:`**，`Core/State/DemoVehicleStateStore.swift:39`）。
-- **Grid 固定列**（非 `LazyVGrid.adaptive`）：iPhone 2 / iPad 4 / Mac 5（C22，已实装 `VehicleCardsGrid`）。
-- **iOS 模拟器验收，不真机**（磊哥 2026-06-25）：5-gate/截图走 `simctl`；**capsule GPU/帧率真机验证 DEFERRED**（tasks.md §8.B1 已回写）。
-- **make verify-all 口径**：当前 `Makefile verify-all` = `verify`(含 `verify-contentview-wiring`) + `swift-test`；**`check-no-binary-visualstate.sh` / `check-platform-vs-version-guard.sh` 由 pre-commit hooksPath 跑，不在 make verify-all 内**（Phase gate 明确「make verify-all + 两 shell gate 另跑」，不把口径写大）。
+- **平台锁**：App iOS26.0/macOS26.0；Core `Package.swift` `.iOS(.v17)/.macOS(.v14)` 不动。禁 `#available(iOS 17|18)`（`check-platform-vs-version-guard.sh`）；平台差异 `#if !os(macOS)`，a11y `if reduceMotion`。
+- **全 mock 前台**：依赖后端的交互（触摸 state 联动/语音推理/演绎控制台 force）全用 mock（mock store 写 + mock snapshot 切 + mock 预设响应）；不接真 NLU/语音/LoRA/ASR-TTS；不改 state-cells.yaml 契约语义。
+- 🔴 **wiring gate（`check-contentview-uses-display-catalog.sh`）**：ContentView body 必字面 `familyDisplays(from:` + `VehicleCardsGrid(displays: familyDisplays` + 禁 LazyVGrid。A+ 弥合：`familyDisplays` computed 从 `snapshot.storeCells` 算，字面接线不破。
+- **U30 GPU**：capsule/氛围灯不跑 Inferno 折射 layerEffect；只 native `.glassEffect` + Vortex 粒子（Canvas）+ image `.offset`。
+- **视觉 SSOT**：色/字/间距/圆角全从 tokens.md → DesignTokens.swift 取，禁硬编 hex；制冷热色落 tokens **§1**（`semantic.cool/warm`）。
+- **7 态穷尽**：DemoVisualState 7 态独立分支无二值/无 default 吞（`check-no-binary-visualstate.sh`）。
+- **测试 = XCTest**（禁 Swift Testing `@Test`）；夹具真实 init `DemoVehicleStateCell(key:actualValue:revision:visualState:)`（**非 key:value:**，`Core/State/DemoVehicleStateStore.swift:39`，含 `visualState` 字段）。
+- **Grid 固定列**（非 LazyVGrid.adaptive）：iPhone 2/iPad 4/Mac 5。
+- **iOS 模拟器验收不真机**：5-gate/截图/anchor 像素对比走 simctl；capsule GPU 真机 DEFERRED。
+- **demo 轻治理**：语义安全带（契约存在性/穷尽/聚合 resolver）不省；量产全链路/真后端砍。
 
 ---
 
 ## heavy-work harness 管控（每 Phase）
 
-> 沉淀自 `~/.claude/skills/heavy-work/SKILL.md`。
-
-1. **每 Phase = 执行线 + 审计线（subagent CC `run_in_background=true`）+ 主线程亲核 + Phase gate**。
-2. **Phase gate**：`swift test` 0 fail + 🔴 **触碰共享 `App/*`/`Core/Presentation/*` 的 Phase 必双端 build**（`xcodebuild -scheme MAformacIOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max'` **和** `-scheme MAformacMac -destination 'platform=macOS'` 都 BUILD SUCCEEDED，macOS 回归不拖到 Phase 4）+ pre-commit 两 shell gate 绿 + wiring gate 绿 + 本 Phase 一轮审无 P0/P1 + 主线程亲核 + 分 commit。
-3. 🔴 **phase gate 用 plan-local marker，不勾 OpenSpec active task（防 completion-claim 假绿，codex P0-4）**：tasks.md §8.A1/A3/A4/A7 等 active task **只在该 task 的 view/render/proof 全做完（含 orb 落地的部分留 Phase5）才勾**；plan 内 Phase 进度用本 plan 的 `- [ ]` checkbox 追踪，不提前勾 OpenSpec。
-4. 🔴 **每 Phase 结束回顾基线文档（derived-tracking-writeback gate）**：回读 §0 清单，问「本 Phase 推翻/坐实了哪些？landing matrix / grill-定档 要不要回写」→ 逐个回写不攒。`grep` 载力事实点段间一致。
-5. **截图对比**：每 View Phase 后 `simctl` 截图 → 对比 `docs/design/gptimage2-anchor-set/`（anchor 视觉目标非像素终态）。
-6. **中途沉淀（不攒）**：新坑→`docs/lessons-learned.md K`；通用 recognition 元认知→`~/.claude/rules/`；可复用动作→`Tools/skills/`；**adopt > build**（Vortex/LiquidGlassReference/axiom skills）。
-7. **整体收口**：loopaudit（≥3 subagent 至无 P0/P1）+ 14 张 simctl 5-gate + closeout receipt。
+1. **每 Phase = 执行线 + Phase gate**。
+2. **Phase gate**：`swift test` 0 fail + 碰共享 App/Core 的 Phase **双端 build**（`MAformacIOS`+`MAformacMac` BUILD SUCCEEDED）+ pre-commit 机械门绿（no-binary-visualstate/platform-vs-version-guard/wiring）+ 主线程亲核 + 分 commit。
+3. 🔴 **每 Phase 结束派 subagent codex 审计**（磊哥 2026-06-25 定）：
+   - **agent**：`codex:codex-rescue`，**`run_in_background=true`**，**每次 ~20 分钟预算**。
+   - **多维度**（类似 gptPRO 代码审计，每条 P0/P1/P2 + file:line）：① 🔴 **anchor 像素级对比（重点）** ② spec/grill 覆盖（该 Phase 的 SD/AD 硬约束全实现）③ 接口/契约一致性 + wiring gate ④ 5-gate 审美（层级/对齐/遮挡/字体/重量）⑤ mock 边界（不接真后端）⑥ 代码质量（穷尽 switch/无 default 吞/不破 222 测试）⑦ 迁移安全（strangler）。
+   - 🔴 **anchor 像素对比方法**：codex Bash 跑 `simctl` 截图 → `magick compare -metric AE/RMSE <screenshot> <anchor.png> diff.png`（ImageMagick）或 python PIL 逐区域 diff，**量化偏差**（布局错位 px / 色值 ΔE / 字号比 / 留白比 / 视觉重量），报「哪个区域偏 anchor 多少」。anchor PNG = `docs/design/anchors/`（本地）。
+   - 审计报告落 `docs/research/2026-06-25-a2-execution/phase-N-codex-audit.md`。
+4. **主线程亲核** > 信 codex（claim-vs-reality 第10变体）：load-bearing 数字/像素偏差独立核。
+5. 🔴 **每 Phase 后回顾基线（derived-tracking-writeback gate）**：回读 §0 + 更新配套索引（消减该 Phase 的 grill 项）+ landing matrix。
+6. **沉淀（不攒）**：坑→lessons K / 元认知→rules / 技能→Tools/skills；adopt>build（Vortex/axiom）。
+7. **整体收口**：loopaudit（≥3 subagent 至无 P0/P1）+ 全 phase anchor 像素对比汇总 + closeout receipt。
 
 ---
 
 ## File Structure
 
 **新建：**
-- `Core/Presentation/PresentationSnapshot.swift` — A+ vocabulary 容器（`PresentationSnapshot` + `DemoContext`/`VehicleContext`/`EnvironmentContext` 四维 + `DemoRuntimeResultKind` 8 类 + `PresentationProofClass`）+ `MockPresentationSnapshotProvider`（force-state mock）+ `store→snapshot` adapter。**纯 `import Foundation`**（与 Core/Presentation 现有 8 文件一致）。命名带 `Mock` 前缀显式标 not-a-contract（codex P2-1）。
-- `Core/Presentation/SemanticColorMapper.swift` — 制冷热 sibling（`ac.mode`→cooling/heating/neutral，SD20）。
-- `Core/Presentation/FamilyIconMapper.swift` — V9 族图标（SF Symbols 契约存在性）。
-- `App/MicDock.swift` — mic dock floating glass capsule（SD18 V7：72-80pt，左状态点/中「按住说话」/右波形，按住扩张发光）。
-- `App/DialogueStream.swift` — `DialogueBubble`（user 右/assistant 左）+ ScrollView 累积对话流（SD3，替 readbackPanel trace 列表）。
-- `App/ContextCapsule.swift` — context capsule diorama（消费 `context` 四维，spike-gated）。
-- `App/SettingsRefreshControls.swift` — 右上 standalone 设置/刷新（SD24，capsule 外）。
-- `Tests/MAformacCoreTests/{PresentationSnapshotTests,SemanticColorMapperTests,FamilyIconMapperTests}.swift` — 语义层 TDD（**XCTest**）。
+- `Core/Presentation/PresentationSnapshot.swift` — A+ vocabulary 容器 + `MockPresentationSnapshotProvider` + `store→snapshot` adapter（纯 Foundation，命名带 Mock）。
+- `Core/Presentation/SemanticColorMapper.swift` / `FamilyIconMapper.swift` / `AmbientBurstColorMapper.swift`（氛围灯 8 色混合）。
+- `App/MicDock.swift`（SD18 V7）/ `App/DialogueStream.swift`（SD3）/ `App/SettingsRefreshControls.swift`（SD8）/ `App/AmbientEdgeBurst.swift`（SD4）/ `App/ContextCapsule.swift`（SD24-25）。
+- `App/DemoControlPanel.swift`（SD13-15 演绎控制台）+ `App/AllStateSheet.swift`（33 base 弹窗）。
+- `Tests/MAformacCoreTests/{PresentationSnapshot,SemanticColorMapper,FamilyIconMapper,AmbientBurstColorMapper}Tests.swift`（XCTest）。
 
 **修改：**
-- `App/ContentView.swift` — 连续舞台重构（去品牌/去 TextField → mic dock + 对话流 / `familyDisplays` 从 snapshot.cells 算保 wiring gate / 层级滚动 / 边界态）。
-- `App/DesignTokens.swift` + `docs/design/tokens.md` — 制冷热 token 落 §1 + hex DRAFT→FROZEN。
-- `Core/Presentation/UIValueTypeMapper.swift`（`VehicleCardDisplay`）— 加 `activeCell:String?=nil` + `siblingCells:[DemoVehicleStateCell]=[]`（默认值向后兼容）+ `familyDisplays(from:activeCells:)` 扩可选参数透传（默认 `[:]` 现有调用不破，strangler）。
-- `Tests/MAformacCoreTests/VehicleCardDisplayTests.swift`（XCTestCase，追加 `func test...`）。
+- `App/ContentView.swift`（连续舞台四 zone）/ `App/DesignTokens.swift` + `docs/design/tokens.md`（制冷热 §1 + 氛围灯 + hex FROZEN）。
+- `Core/Presentation/UIValueTypeMapper.swift`（VehicleCardDisplay 加 activeCell/siblingCells + familyDisplays(from:activeCells:)）。
+- `App/ExpandedFamilyCard.swift` + `App/ValueControlView.swift`（SD7 触摸调节 → mock store 写）。
+- `MAformac.xcodeproj/project.pbxproj`（portrait lock + Vortex package ref，GLM P1-3/P1-4）。
 
 ---
 
-## Phase 0 — bridge mock vocabulary 容器（前置卡口，TDD XCTest）
+## Phase 0 — bridge mock vocabulary 容器（TDD）
 
-### Task 0.1: PresentationSnapshot A+ 容器 + adapter + MockProvider
+### Task 0.1: PresentationSnapshot A+ 容器 + adapter（@MainActor）
 
-**Files:**
-- Create: `Core/Presentation/PresentationSnapshot.swift`
-- Test: `Tests/MAformacCoreTests/PresentationSnapshotTests.swift`
+**Files:** Create `Core/Presentation/PresentationSnapshot.swift` + Test `Tests/MAformacCoreTests/PresentationSnapshotTests.swift`
 
-**Interfaces:**
-- Consumes: `DemoVisualState`（7 态）、`DemoVehicleStateCell`（`key`/`actualValue`/`revision`）、`FamilyCardID`（10 族）、`VehicleCardDisplay`（现有渲染模型）、`ScopeOrigin`（`Core/Execution/ScopeResolution.swift`，defaulted/explicit/fanout）。
-- Produces（A+ vocabulary 容器，**卡片不另造 model**）：
-  - `enum DemoRuntimeResultKind { case acceptedToolCall, clarifyMissingSlot, refusalNoAvailableTool, refusalSafetyOrPolicy, alreadyStateNoop, runtimeError, cancelled, partialAcceptPartialRefuse }`（8 类，AD-RPB-005/008/012 禁裸 rejected）
-  - `enum PresentationProofClass { case localMock, staticPreview, externalReview }`（finite，AD-RPB-006）
-  - `struct VehicleContext { let speed: Int; let gear: String }` / `struct EnvironmentContext { let weather: String; let timePeriod: String }` / `struct DemoContext { let vehicle: VehicleContext; let environment: EnvironmentContext }`（四维，AD-RPB-014）
-  - `struct PresentationSnapshot { let traceId: String; let storeCells: [DemoVehicleStateCell]; let activeCells: [FamilyCardID: String]; let refusedCell: String?; let context: DemoContext; let orbState: String; let dialogText: String; let readbacks: [String]; let resultKind: DemoRuntimeResultKind; let proofClass: PresentationProofClass }`（🔴 携带 `storeCells` + `activeCells` map 供 ContentView 调 `familyDisplays(from:activeCells:)` 出 `[VehicleCardDisplay]`，**容器不放 cards 平行 model**）
-  - `enum MockPresentationSnapshotProvider { static func coldStart() -> PresentationSnapshot; static func acStarted() -> PresentationSnapshot; static func coolingMode() -> PresentationSnapshot; static func safetyRefusal() -> PresentationSnapshot; ... }`
-  - `extension PresentationSnapshot { static func from(store: DemoVehicleStateStore, activeCells: [FamilyCardID:String], context: DemoContext, resultKind: DemoRuntimeResultKind) -> PresentationSnapshot }`（store→snapshot adapter，strangler）
+**Produces:** `DemoRuntimeResultKind`(8 类) / `PresentationProofClass` / `DemoContext`(四维 vehicle{speed,gear}+environment{weather,timePeriod}) / `PresentationSnapshot{traceId, storeCells:[DemoVehicleStateCell], activeCells:[FamilyCardID:String], refusedCell:String?, context, orbState, dialogText, readbacks, resultKind, proofClass}`（携带 storeCells+activeCells 供 ContentView 调 familyDisplays，**不放平行卡片 model**）/ `MockPresentationSnapshotProvider`（coldStart/acStarted/coolingMode/safetyRefusal…）/ `@MainActor extension PresentationSnapshot.from(store:activeCells:context:resultKind:)`（GLM P1-2）。
 
-- [ ] **Step 1: 写 failing test（XCTest，契约闭合非烟雾测试，codex P1-3）**
+- [ ] **Step 1: 写 failing test（XCTest，契约闭合非烟雾，GLM P0-1: 不调 activeCells；coldStart cells 明确）**
 
 ```swift
 import XCTest
 @testable import MAformacCore
 
 final class PresentationSnapshotTests: XCTestCase {
-    // result_kind 8 类全在（不塌成裸 rejected，AD-RPB-005/008/012）
     func testResultKindHasAllEightCases() {
-        let all: [DemoRuntimeResultKind] = [
-            .acceptedToolCall, .clarifyMissingSlot, .refusalNoAvailableTool,
-            .refusalSafetyOrPolicy, .alreadyStateNoop, .runtimeError,
-            .cancelled, .partialAcceptPartialRefuse
-        ]
+        let all: [DemoRuntimeResultKind] = [.acceptedToolCall, .clarifyMissingSlot,
+            .refusalNoAvailableTool, .refusalSafetyOrPolicy, .alreadyStateNoop,
+            .runtimeError, .cancelled, .partialAcceptPartialRefuse]
         XCTAssertEqual(Set(all).count, 8)
     }
-    // context 四维全验（非抽两列烟雾，codex P1-3：gear/timePeriod 缺也要 fail）
     func testContextFourDimensions() {
         let s = MockPresentationSnapshotProvider.coldStart()
         XCTAssertGreaterThanOrEqual(s.context.vehicle.speed, 0)
@@ -138,253 +128,188 @@ final class PresentationSnapshotTests: XCTestCase {
         XCTAssertFalse(s.context.environment.weather.isEmpty)
         XCTAssertFalse(s.context.environment.timePeriod.isEmpty)
     }
-    // coldStart 10 族常驻（经 familyDisplays 出卡，displayOrder）
+    // GLM P0-1: 用现有 familyDisplays(from:) 不带 activeCells（activeCells 留 Task 1.2）
     func testColdStartTenFamiliesViaFamilyDisplays() {
         let s = MockPresentationSnapshotProvider.coldStart()
-        let cards = VehicleCardDisplay.familyDisplays(from: s.storeCells, activeCells: s.activeCells)
+        let cards = VehicleCardDisplay.familyDisplays(from: s.storeCells)
         XCTAssertEqual(Set(cards.compactMap { $0.familyCardID }).count, FamilyCardID.allCases.count)
     }
-    // proofClass 是 localMock（force-state mock 不冒充 endpoint-ready，AD-RPB-006）
     func testMockProofClassIsLocalMock() {
         XCTAssertEqual(MockPresentationSnapshotProvider.coldStart().proofClass, .localMock)
     }
 }
 ```
 
-- [ ] **Step 2: run fail** — `swift test --filter PresentationSnapshotTests` → FAIL（类型未定义；夹具用真实 API 不先爆）。
-- [ ] **Step 3: 实装** `PresentationSnapshot.swift`：4 vocabulary 类型 + `MockPresentationSnapshotProvider`（`coldStart()` 遍历 `FamilyCardID.displayOrder` 出 cells 全 normal + context mock `speed:0,gear:"P",weather:"晴",timePeriod:"日间"` + `activeCells:[:]` + `resultKind:.acceptedToolCall` + `proofClass:.localMock`）+ `from(store:...)` adapter。Task 1.2 落地后 `familyDisplays(from:activeCells:)` 可用。
+- [ ] **Step 2: run fail** → FAIL（类型未定义；夹具真实 API 不先爆）。
+- [ ] **Step 3: 实装**（4 vocabulary 类型 + provider；🔴 **GLM P2-3: `coldStart()` 用 `storeCells: []` 靠 `familyDisplays` placeholder 出 10 族「待命」**——idle 全景态 SD1，不造 `family.ac` 假 key + context mock `speed:0,gear:"P",weather:"晴",timePeriod:"日间"` + adapter `@MainActor`）。
 - [ ] **Step 4: run pass** → PASS。
-- [ ] **Step 5: commit** — `git commit -m "feat(uiue): A+ PresentationSnapshot vocabulary 容器 + adapter (AD-RPB-015, 卡片复用 VehicleCardDisplay)"`
+- [ ] **Step 5: commit** `feat(uiue): A+ PresentationSnapshot 容器+adapter (AD-RPB-015)`
 
-### 🔴 Phase 0 gate + 基线回顾
-- `swift test` 0 fail + 双端 build（碰 Core/Presentation）+ 审计线 1 轮 + 回读 §0 #4（A-1 vocabulary 对齐）+ **不勾 OpenSpec task**（Phase 0 是 plan 内前置）。
+### Phase 0 gate + codex 审计（20min，anchor 像素对比此 phase 无 UI 跳过像素对比，验 vocabulary 完整性/契约闭合/@MainActor）+ 基线回顾（不勾 OpenSpec，更新索引 Phase 0 done）。
 
 ---
 
-## Phase 1 — 语义派生层（TDD XCTest，bug 藏身处）
+## Phase 1 — 语义派生层（TDD，含氛围灯 8 色）
 
-### Task 1.1: SemanticColorMapper 制冷热 sibling（SD20，token §1）
+### Task 1.1: SemanticColorMapper 制冷热（SD20，token §1）
+**Produces:** `enum ThermalTint{cooling,heating,neutral}` + `acThermalTint(siblingCells:)`。
+- [ ] TDD（XCTest，init `actualValue:`）：制冷→cooling/制热→heating/**无 mode→neutral 不吞错**；实装（无 `default` 吞）；commit `feat(uiue): SemanticColorMapper 制冷热 (SD20)`
 
-**Files:** Create `Core/Presentation/SemanticColorMapper.swift` + Test `Tests/MAformacCoreTests/SemanticColorMapperTests.swift`
+### Task 1.2: 扩 VehicleCardDisplay + familyDisplays 透传 + siblingCells 填充（GLM P0-2/P1-1）
+**Files:** Modify `UIValueTypeMapper.swift` + Test `VehicleCardDisplayTests.swift`（XCTestCase 追加）
+**约束（GLM 修复）：**
+- `VehicleCardDisplay` 加 `activeCell:String?=nil` + `siblingCells:[DemoVehicleStateCell]=[]`（默认值向后兼容）。
+- `familyDisplays(from:activeCells:[FamilyCardID:String]=[:])`（默认空，现有调用不破 strangler）。
+- 🔴 **GLM P0-2**：`summaryDisplay` 必设 `siblingCells: familyCells`（否则制冷热假绿）。
+- 🔴 **GLM P1-1**：非 normal 态（族 dominant visualState ≠ normal）+ activeCells 命中 → 主值切 activeCell base。
 
-**Interfaces:** Produces `enum ThermalTint: Equatable { case cooling, heating, neutral }` + `enum SemanticColorMapper { static func acThermalTint(siblingCells: [DemoVehicleStateCell]) -> ThermalTint }`（View 层映射 tokens §1 `semantic.cool`/`semantic.warm`）。
-
-- [ ] **Step 1: 写 failing test（XCTest + 真实 init `actualValue:`）**
+- [ ] **Step 1: 写 failing test（GLM P0-2 siblingCells + P1-1 visualState:.changing + normal negative）**
 
 ```swift
-import XCTest
-@testable import MAformacCore
-
-final class SemanticColorMapperTests: XCTestCase {
-    func testCoolingMode() {
-        let cells = [DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷", revision: 1)]
-        XCTAssertEqual(SemanticColorMapper.acThermalTint(siblingCells: cells), .cooling)
-    }
-    func testHeatingMode() {
-        let cells = [DemoVehicleStateCell(key: "ac.mode", actualValue: "制热", revision: 1)]
-        XCTAssertEqual(SemanticColorMapper.acThermalTint(siblingCells: cells), .heating)
-    }
-    func testNoModeIsNeutralNotSwallowedToCooling() {
-        XCTAssertEqual(SemanticColorMapper.acThermalTint(siblingCells: []), .neutral)
-    }
+func testAcDisplayCarriesModeSiblingForThermalTint() {  // GLM P0-2
+    let cells = [
+        DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1),
+        DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷", revision: 1)
+    ]
+    let ac = VehicleCardDisplay.familyDisplays(from: cells).first { $0.familyCardID == .ac }
+    XCTAssertEqual(ac?.siblingCells.contains { $0.key == "ac.mode" }, true)
 }
-```
-
-- [ ] **Step 2: run fail** → FAIL。
-- [ ] **Step 3: 实装**（`siblingCells.first { $0.key == "ac.mode" }` → switch actualValue：制冷→cooling/制热→heating/其它→**neutral（不 `default` 吞成 cooling）**；无 sibling→neutral）。
-- [ ] **Step 4: run pass** → PASS。
-- [ ] **Step 5: commit** — `git commit -m "feat(uiue): SemanticColorMapper 制冷热 (SD20, neutral 不吞错)"`
-
-### Task 1.2: 扩 VehicleCardDisplay 加 activeCell/siblingCells + familyDisplays 透传（CC P1-1，改现有非造单数）
-
-**Files:** Modify `Core/Presentation/UIValueTypeMapper.swift`（`VehicleCardDisplay` + `familyDisplays`）+ Test `Tests/MAformacCoreTests/VehicleCardDisplayTests.swift`（XCTestCase 追加）
-
-**Interfaces:**
-- `VehicleCardDisplay` 加 `var activeCell: String? = nil` + `var siblingCells: [DemoVehicleStateCell] = []`（默认值，向后兼容）。
-- `familyDisplays(from: cells)` 扩为 `familyDisplays(from: cells, activeCells: [FamilyCardID: String] = [:])`（**可选参数默认空，现有调用不破，strangler**）；非 normal 态且该族在 `activeCells` 有值 → summary 主值切到 activeCell base（对齐 SD19/AD-9，**改现有 `summaryDisplay` 分支，不造单数 `familyDisplay`**）。
-
-- [ ] **Step 1: 写 failing test（追加到现有 VehicleCardDisplayTests XCTestCase）**
-
-```swift
-func testActiveCellOverridesPrimaryInChangingState() {
-    // seat 族 primary=heat_level，本次改 backrest → activeCells 指 backrest，changing 态主值显 backrest
+func testActiveCellOverridesPrimaryOnlyWhenNonNormal() {  // GLM P1-1
     let cells = [
         DemoVehicleStateCell(key: "seat.heat_level", actualValue: "0", revision: 1),
-        DemoVehicleStateCell(key: "seat.backrest_angle", actualValue: "30", revision: 2)
+        DemoVehicleStateCell(key: "seat.backrest_angle", actualValue: "30", revision: 2, visualState: .changing)
     ]
-    let displays = VehicleCardDisplay.familyDisplays(
-        from: cells, activeCells: [.seat: "seat.backrest_angle"]
-    )
-    let seatCard = displays.first { $0.familyCardID == .seat }
-    XCTAssertEqual(seatCard?.valueText.contains("30"), true)  // 显 backrest 非 heat_level
+    let seat = VehicleCardDisplay.familyDisplays(from: cells, activeCells: [.seat: "seat.backrest_angle"])
+        .first { $0.familyCardID == .seat }
+    XCTAssertEqual(seat?.valueText.contains("30"), true)
 }
-func testFamilyDisplaysBackwardCompatibleNoActiveCells() {
-    // 现有调用 familyDisplays(from:) 默认空 activeCells，行为不变（strangler）
-    let cells = [DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1)]
-    XCTAssertFalse(VehicleCardDisplay.familyDisplays(from: cells).isEmpty)
-}
-```
-
-- [ ] **Step 2: run fail** → FAIL（`familyDisplays(from:activeCells:)` 未定义 / activeCell 字段无）。
-- [ ] **Step 3: 实装**（`VehicleCardDisplay` 加两字段；`familyDisplays` 加 `activeCells` 可选参数，`summaryDisplay` 内非 normal 态 + activeCells 命中 → 主 cell 取 activeCell base；保留旧入口语义）。
-- [ ] **Step 4: run pass** → PASS（含现有 222 测试不回归）。
-- [ ] **Step 5: commit** — `git commit -m "feat(uiue): VehicleCardDisplay 扩 activeCell/siblingCells + familyDisplays 透传 (CC1 SD19, strangler)"`
-
-### Task 1.3: FamilyIconMapper（V9 SF Symbols 契约存在性）
-
-**Files:** Create `Core/Presentation/FamilyIconMapper.swift` + Test `Tests/MAformacCoreTests/FamilyIconMapperTests.swift`
-
-**Interfaces:** Produces `enum FamilyIconMapper { static func sfSymbol(for family: FamilyCardID) -> String }`。
-
-- [ ] **Step 1: 写 failing test（XCTest，契约存在性 10 族全映射无 default 吞）**
-
-```swift
-import XCTest
-@testable import MAformacCore
-
-final class FamilyIconMapperTests: XCTestCase {
-    func testEveryFamilyHasNonEmptyIcon() {
-        for family in FamilyCardID.allCases {
-            XCTAssertFalse(FamilyIconMapper.sfSymbol(for: family).isEmpty, "family \(family) 无图标")
-        }
-    }
+func testActiveCellDoesNotOverrideWhenNormal() {  // GLM P1-1 negative
+    let cells = [DemoVehicleStateCell(key: "seat.heat_level", actualValue: "0", revision: 1, visualState: .normal),
+                 DemoVehicleStateCell(key: "seat.backrest_angle", actualValue: "30", revision: 1, visualState: .normal)]
+    let seat = VehicleCardDisplay.familyDisplays(from: cells, activeCells: [.seat: "seat.backrest_angle"])
+        .first { $0.familyCardID == .seat }
+    XCTAssertEqual(seat?.valueText.contains("30"), false)  // normal 态不切
 }
 ```
 
-- [ ] **Step 2: run fail** → FAIL。
-- [ ] **Step 3: 实装**（`switch family` **穷尽 10 族**每族显式 SF Symbol，**无 `default:`**；读 `axiom-design/sf-symbols` 确认 symbol 名存在）。
-- [ ] **Step 4: run pass** → PASS。
-- [ ] **Step 5: commit** — `git commit -m "feat(uiue): FamilyIconMapper V9 (10 族穷尽 SF Symbol)"`
+- [ ] Step 2 run fail → Step 3 实装（summaryDisplay 填 siblingCells + 非 normal activeCells 切）→ Step 4 run pass（含 222 不回归）→ Step 5 commit `feat(uiue): VehicleCardDisplay activeCell+siblingCells 填充 (CC1 SD19/SD20, GLM P0-2/P1-1)`
 
-### 🔴 Phase 1 gate + 基线回顾
-- `swift test` 0 fail（含 3 新 suite + 现有 222 不回归）+ 双端 build + 审计线 1 轮 + 回读 derivation-layer rule + **不勾 OpenSpec task**（mapper done 但 View 未渲，plan-local marker 记进度）。
+### Task 1.3: FamilyIconMapper（V9，GLM P2-1 curated allowlist）
+**Produces:** `sfSymbol(for:FamilyCardID)->String`。
+- [ ] TDD：10 族全非空 + **GLM P2-1: 注释 curated allowlist 表（每族 symbol 名 + 选 Apple 稳定符号避冷门）**；实装穷尽 switch 无 default；commit `feat(uiue): FamilyIconMapper V9 (10 族 curated SF Symbol)`
 
----
+### Task 1.4: AmbientBurstColorMapper 氛围灯 8 色混合（SD4）
+**Produces:** `enum AmbientBurstColorMapper{ static func burstGradient(for color:String)->[String] }`（8 单色→该色为主混合：紫→紫金/红→红橙/青→青紫/绿→绿青/蓝→蓝青/白→白金/橙→橙金/黄→黄金，SD4:69；色名查 tokens §1.4）。
+- [ ] TDD：8 色全有混合映射（契约存在性无 default 吞）；实装穷尽；commit `feat(uiue): AmbientBurstColorMapper 8 色混合 (SD4)`
 
-## Phase 2 — 连续舞台 View 重构（5-gate 验收，四 zone 含 mic dock+对话流）
-
-> View 层 5-gate step：实装[约束] → **双端 build** → simctl 截图 → visual-acceptance 5-gate 对比 anchor → commit。
-
-### Task 2.1: ContentView 消费 snapshot + 去品牌/去 TextField（保 wiring gate）
-
-**Files:** Modify `App/ContentView.swift` + Create `App/SettingsRefreshControls.swift`
-
-**Interfaces:** Consumes `MockPresentationSnapshotProvider`（Task 0.1）。
-
-**约束（verbatim）：**
-- ContentView 持 `@State snapshot: PresentationSnapshot = MockPresentationSnapshotProvider.coldStart()`；`#if DEBUG` 触发按钮切 `acStarted()/coolingMode()/safetyRefusal()` 驱动态变化（mock，非 demo 输入）。
-- 🔴 **保 wiring gate**：`familyDisplays` computed property 改为 `VehicleCardDisplay.familyDisplays(from: snapshot.storeCells, activeCells: snapshot.activeCells)`；body 仍 `VehicleCardsGrid(displays: familyDisplays, ...)`（字面接线不破 `check-contentview-uses-display-catalog.sh`）。
-- 删 `Text("MAformac")` brandHeader（SD24）+ 删 `commandBar` TextField（SD23）。
-- 设置/刷新 = `SettingsRefreshControls` 右上 standalone（capsule 外）。
-- runCommand/DemoWalkingSkeleton 旧链路：**本 §8 mock snapshot 驱动视觉，runCommand 真链路 strangler 保留**（`#if DEBUG` 触发按钮可调，不删；真 NLU→store 链路是更大范围，本 change defer）。
-
-- [ ] Step 1 实装 → Step 2 **双端 build** → Step 3 simctl 截图 → Step 4 5-gate（无品牌/无 TextField/设置右上/wiring gate 绿 `bash Tools/checks/check-contentview-uses-display-catalog.sh`）对比 anchor-01 → Step 5 commit `feat(uiue): ContentView 消费 snapshot + 去品牌/TextField (保 wiring gate, SD23/24)`
-
-### Task 2.2: mic dock floating glass capsule（SD18 V7，四 zone 之一）
-
-**Files:** Create `App/MicDock.swift` + 接 ContentView 底部
-
-**约束（SD18 V7:333）：** 72-80pt floating glass capsule（native `.glassEffect(.regular, in:.capsule)`），左状态点/中「按住说话」/右波形·mic symbol，按住 capsule 扩张发光；`safeAreaInset(edge:.bottom)` 钉底（SD22 D6 滚动边界）。
-
-- [ ] Step 1 实装 → Step 2 双端 build → Step 3 simctl（mic dock idle/按住态截图）→ Step 4 5-gate（mic dock 居前不被遮挡 = 真有对象可验，对比 SD18 V7 规格）→ Step 5 commit `feat(uiue): mic dock floating glass capsule (SD18 V7)`
-
-### Task 2.3: DialogueBubble 对话流替 readbackPanel（SD3，四 zone 之一）
-
-**Files:** Create `App/DialogueStream.swift` + Modify ContentView（readbackPanel → DialogueStream）
-
-**约束（SD3:47/51）：** `DialogueBubble{role:.user|.assistant, text}` user 右气泡/assistant 左气泡，`ScrollView` 累积 + `scrollTo(last)`；消费 `snapshot.dialogText`/`readbacks`（mock 多轮）。
-
-- [ ] Step 1 实装 → Step 2 双端 build → Step 3 simctl（多轮对话截图）→ Step 4 5-gate（user 右/assistant 左/累积滚动，对比 SD3）→ Step 5 commit `feat(uiue): DialogueBubble 对话流 (SD3)`
-
-### Task 2.4: tokens hex 定稿 + 制冷热 token §1 + 制冷热/activeCell 渲染（§8.A2/A3/A4）
-
-**Files:** Modify `docs/design/tokens.md`（制冷热 token 落 **§1** `semantic.cool/warm` + hex DRAFT→FROZEN）+ `App/DesignTokens.swift` + `App/ContentView.swift`（`VehicleStateCard` 接 `SemanticColorMapper`）
-
-**约束：** ac 卡背景/边框按 `ThermalTint` 取 tokens §1 蓝/红（neutral 走原 appearance）+ SD21 hero range bar + mode 图标（FamilyIconMapper/❄️）；activeCell 已在 mapper 层（Task 1.2），View 消费 `display.valueText`；SD5 摘要卡背景升 `.regularMaterial`。
-
-- [ ] Step 1 实装 → Step 2 双端 build → Step 3 simctl（制冷/制热/7态 gallery 截图，grep 无硬编 hex）→ Step 4 5-gate（制冷蓝/制热红 SD20 + material SD5 + 投屏 V10）→ Step 5 commit + tokens.md FROZEN `feat(uiue): 制冷热渲染+token §1 FROZEN+material (SD20/SD5/§8.A2)`
-
-### Task 2.5: 层级 + 滚动（§8.A5 / SD22）
-
-**约束（SD22）：** z-order：氛围 overlay（`allowsHitTesting(false)`）> mic dock > orb 占位 > 聚焦 dim > 滚动内容；orb/mic 钉、对话/车控内部滚；**手动滚暂停自动 `scrollTo`**；**fade 按 active 非位置**；`ScrollViewReader` 激活族滚入视野（AD-12）。
-
-- [ ] Step 1 实装 → Step 2 双端 build → Step 3 simctl（滚动态）→ Step 4 5-gate（mic dock 不被遮挡 + 激活族滚入）→ Step 5 commit `feat(uiue): 层级 z-order+滚动 (SD22)`
-
-### Task 2.6: 边界态 + 注意力优先级（§8.A6/A7 / SD23 / V8）
-
-**约束：** iPhone 锁竖屏（`#if !os(macOS)`）/ 文案 max ~30 字 `.truncationMode(.tail)` / ASR 二分（empty→idle / no-match→unsupported，mock）/ 族外 blocked_hard；激活族视觉重量 ≥ 次要 1.5x + 次要族 `.opacity` fade（按 active）+ 族图标 `FamilyIconMapper`。
-
-- [ ] Step 1 实装 → Step 2 双端 build → Step 3 simctl（长文案 truncate + 族外 blocked_hard + 单族激活其余 fade）→ Step 4 5-gate（视觉层级 Gate1/重量 Gate5）→ Step 5 commit `feat(uiue): 边界态+注意力优先级+族图标 (SD23/V8/V9)`
-
-### 🔴 Phase 2 gate + 基线回顾
-- 两端 build SUCCEEDED + `swift test` 0 fail + pre-commit 两 shell gate + wiring gate 绿 + 审计线 1 轮 + **simctl 14 张满屏单态初轮 5-gate** + 回读 SD3/SD5/SD18-23 无自拍 + **此时可勾 OpenSpec §8.A1/A3/A4/A5/A6/A7**（view/render 全做完，orb 部分留 Phase5 注明）+ 回写 landing「§8.A done」。
+### Phase 1 gate + codex 审计（20min：契约存在性/无 default 吞/222 不回归 + anchor 此 phase 无 UI）+ 基线回顾（索引消减 SD20/SD19/SD4-mapper/V9）。
 
 ---
 
-## Phase 3 — context capsule diorama（route spike 模拟器观感 + 实装，gated）
+## Phase 2 — 连续舞台 visual（5-gate + anchor 像素对比）
 
-> gated 在 Phase 2 后。**模拟器观感 spike**（不真机，tasks.md §8.B1 已回写）：route A 视频 loop 模拟器 photoreal 不打折；C-lite native glass 模拟器渲染不全（玻璃质感打折）。GPU/帧率真机 DEFERRED。
+> View task = 实装[约束] → 双端 build → simctl 截图 → **anchor 像素对比 + 5-gate** → commit。
 
-### Task 3.1: capsule route spike（模拟器观感 A vs C-lite，不预拍）
+- [ ] **Task 2.1** ContentView 消费 snapshot + 去品牌/TextField + 设置刷新右上（SD23/24）：`familyDisplays` computed 从 `snapshot.storeCells` 算（保 wiring gate 字面）；删 brandHeader/TextField；`#if DEBUG` 触发按钮切 mock snapshot。anchor 对比 `anchor-01`。
+- [ ] **Task 2.2** mic dock floating glass capsule（SD18 V7：72-80pt，左状态点/中「按住说话」/右波形，`safeAreaInset(.bottom)` 钉底）。anchor 对比 mic dock 区域。
+- [ ] **Task 2.3** DialogueBubble 对话流替 readbackPanel（SD3：user 右/assistant 左 ScrollView 累积 + scrollTo(last)）。anchor 对比对话区。
+- [ ] **Task 2.4** tokens hex FROZEN + 制冷热 §1 + 制冷热渲染 + SD5 摘要卡 `.regularMaterial` + SD21 hero range bar（ac 卡按 ThermalTint 蓝/红，grep 无硬编 hex）。anchor 对比制冷/制热卡。
+- [ ] **Task 2.5** 层级 z-order + 滚动（SD22：氛围 overlay allowsHitTesting(false) > mic dock > orb > dim > 内容；手动滚暂停 scrollTo；fade 按 active；ScrollViewReader 激活族滚入 AD-12）。
+- [ ] **Task 2.6** 边界态 + 注意力（SD23/V8：文案 30 字 truncate/ASR 二分 mock/族外 blocked_hard；激活族重量≥次要 1.5x + 次要 fade + FamilyIcon）。
+- [ ] **Task 2.6a** portrait lock（GLM P1-4）：Modify `MAformac.xcodeproj/project.pbxproj` iOS `INFOPLIST_KEY_UISupportedInterfaceOrientations`=Portrait（**非只 SwiftUI #if**）；验证 simctl 旋转后仍竖屏。
+- [ ] **Task 2.7** 氛围灯卡片渐变 AmbientCardGradient（SD4 动作1：氛围灯卡 colorSwatch 升级**渐变该色**常驻，消费 ambient.color）。anchor 对比氛围灯卡。
+- [ ] **Task 2.8** SD8 设置/刷新功能：`SettingsRefreshControls` 补功能——↻ 刷新=DemoReset 归 idle（切 coldStart snapshot）+ ⚙️ 设置面板（**主题切换 deepSpace↔ivory 实时** + 占位场景宏 force 入口 `#if DEMO_MODE`，连 Phase 4）。anchor 对比右上控件。
 
-**Files:** Create `App/ContextCapsule.swift`（两 spike 变体）+ 记录 `docs/research/2026-06-25-context-capsule-2.5d-tech/spike-result.md`
+每 task：Step 实装 → 双端 build → simctl 截图 → **codex anchor 像素对比 + 5-gate** → commit。
 
-**约束：** 两变体真跑模拟器对比观感（U31 不预拍）：A 视频 loop（5 anchor diorama 图 AI 动 2-3s seamless，`AVPlayerLooper`）；C-lite（native `.glassEffect` 壳 + **Vortex 粒子 pin commit** `.smoke`/`.rain`/`.snow` + 分层 stills `.offset`）。**不跑 Inferno layerEffect**（U30）。🔴 **Vortex 单一集成路径**：SPM 依赖 pin 到 commit（`Package.swift` `.package(url:"https://github.com/twostraws/Vortex", revision:"<pin>")`），不二选一拷 source（codex P2-2）。
-
-- [ ] Step 1 建两变体（Vortex SPM pin）→ Step 2 双端 build → Step 3 simctl 截图/录屏对比 `anchor-00-diorama-*` → Step 4 spike-result.md 记观感（**route 磊哥拍，不自拍**）→ Step 5 commit `spike(uiue): capsule route A vs C-lite 模拟器观感 (U31)`
-
-### Task 3.2: ContextCapsule 实装（route 定后）
-
-**Files:** Modify `App/ContextCapsule.swift` + 接 ContentView 顶 context band（替 Task 2.1 占位）
-
-**Interfaces:** Consumes `PresentationSnapshot.context`（四维，Task 0.1）。
-
-**约束：** crossfade（`glassEffectID` morph）+ 预加载防卡顿 + 图标在 capsule 外（SD24）。route 按 3.1 磊哥拍。
-
-- [ ] Step 1 实装 → Step 2 双端 build → Step 3 simctl（夜/雨/行驶 context 切换）→ Step 4 5-gate 对比 anchor-00 → Step 5 commit `feat(uiue): ContextCapsule diorama (SD24/25)`
-
-### 🔴 Phase 3 gate + 基线回顾
-- 两端 build + capsule+卡片同屏 simctl + 回读 2.5D 调研/U30/U31 + 勾 OpenSpec §8.B + 回写 landing「§8.B done + route 定」。
+### Phase 2 gate + codex 审计（20min，🔴 anchor 像素对比为重点：连续舞台/四 zone/制冷热/氛围灯卡 vs anchor 逐区域偏差）+ 14 张 simctl 5-gate + 勾 OpenSpec §8.A + 索引消减 SD3/5/18/22/23/24-顶栏/V8/V9/SD4-卡片/SD8-部分。
 
 ---
 
-## Phase 4 — 验收收口（A-2 收口）
+## Phase 3 — 触摸调节 + state 联动 + 语音推理（全 mock，SD6/SD7）
 
-### Task 4.1: 全量验收门
-- [ ] Step 1 `swift test` → 0 fail（贴输出）。
-- [ ] Step 2 `xcodebuild -scheme MAformacMac -destination 'platform=macOS' build` + `-scheme MAformacIOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' build` → 两端 SUCCEEDED。
-- [ ] Step 3 `make verify-all` → exit 0 **+ 另跑** `bash Tools/checks/check-no-binary-visualstate.sh` + `check-platform-vs-version-guard.sh` + `check-contentview-uses-display-catalog.sh` 全绿（口径：make verify-all 含 wiring gate+swift test，两 shell gate 另跑）。
-- [ ] Step 4 commit（若 fix）。
+> 全 mock 前台：触摸→mock store 写→卡片联动；语音推理→mock 预设响应。**不接真 NLU/语音**。
 
-### Task 4.2: 5-gate 视觉验收 + anchor 对比
-- [ ] Step 1 `simctl` 14 张满屏单态（mac7+iOS7）+ capsule 三 context。
-- [ ] Step 2 visual-acceptance agent【用户演绎体验视角】（方案经理 5min 台本 + 客户旁观 + corner case，还原投屏 V10，逐张 Read 不抽查）。
-- [ ] Step 3 对比 `docs/design/gptimage2-anchor-set/`（神似非像素复刻）；任一态 5-gate FAIL = 返工。
-- [ ] Step 4 截图归档 + 对比报告。
+- [ ] **Task 3.1** 展开卡数值控件真实调（SD6/SD7）：`ValueControlView`/`ExpandedFamilyCard` 的 dial/percent **± 步进** / stepper 段位 / toggle 切 / badge 循环 → 写 **mock `DemoVehicleStateStore`**（现有 mock 写 API）→ snapshot 重算 → 卡片态 + numericText 联动。摘要卡触摸只读（SD23 7.F1 不变）。**静默无 TTS**。
+- [ ] **Task 3.2** state 联动展示（SD7）：触摸调任意族 → mock store 写 → 10 族卡片联动（如开空调动 ac.power + ac.temp）。
+- [ ] **Task 3.3** 语音推理 mock 预设（SD7 卖点）：mock 预设场景「手动调 26 度 → store=26 → 语音『我有点冷了』→ mock 读当前 26 → 升温 → 输出 28/27 → 显示」。`#if DEBUG` 触发，**mock 预设响应非真 NLU**（exp_step 升温 mock）。对话流展示。
 
-### Task 4.3: loopaudit 收口 + 基线回写 + 沉淀
-- [ ] Step 1 loopaudit（≥3 subagent 至无 P0/P1，留痕 round-NN）。
-- [ ] Step 2 **基线文档级联回写**（grill-定档/landing matrix/tasks.md §8 勾选/CLAUDE §9）。
-- [ ] Step 3 **沉淀**（坑→lessons K / 元认知→rules / 技能→Tools/skills；adopt Vortex 记录）。
-- [ ] Step 4 closeout receipt + handoff。
+每 task：实装 → 双端 build → simctl 录屏/截图（触摸调节联动）→ **codex 审计（20min，多维 + 交互正确性：触摸→state→联动链路 + mock 边界不接真后端）+ anchor 像素对比展开卡** → commit。
+
+### Phase 3 gate + codex 审计 + 索引消减 SD6/SD7。
 
 ---
 
-## Self-Review（writing-plans 自检 + 两路审计修复对照）
+## Phase 4 — 演绎控制台（全 mock force，SD13/14/15/8）
 
-**1. Spec 覆盖（tasks.md §8 逐条）：** §8.A1 去 divider/品牌/TextField/右上+四 zone → Task 2.1/2.2/2.3 ✅（mic dock+对话流补齐，修 CC P1-4/codex P0-4）；§8.A2 tokens → 2.4 ✅；§8.A3 制冷热 → 1.1+2.4 ✅；§8.A4 activeCell → 1.2+2.4 ✅；§8.A5 层级滚动 → 2.5 ✅；§8.A6 边界态 → 2.6 ✅；§8.A7 注意力+FamilyIcon → 1.3+2.6 ✅；§8.B1 spike（模拟器观感，契约已回写）→ 3.1 ✅；§8.B2-4 capsule+Vortex → 3.1/3.2 ✅；§8.C 验收 → 4.1/4.2 ✅；前置 bridge mock → Task 0.1 ✅。
+> 方案经理幕后工具，force mock context/state。视觉对齐 10 族卡 iOS26 glass（SD15）。
 
-**2. 两路审计 P0/P1 修复对照：**
-- 双 SSOT（CC P0-1+codex P1-1）→ **A+**：snapshot 容器保 vocabulary + 卡片单一 VehicleCardDisplay + adapter + strangler ✅
-- 测试 API（codex P0-2+CC P1-2）→ 全 XCTest + `init(key:actualValue:revision:)` ✅
-- wiring gate（CC P0-2）→ Global Constraints 列 + `familyDisplays` computed 字面接线弥合 ✅
-- phase gate 假绿+四 zone（codex P0-4+CC P1-4）→ plan-local marker 不勾 OpenSpec + mic dock/对话流 task ✅
-- bridge vocabulary（codex P0-1/P1-3）→ Task 0.1 契约闭合 RED（8 类/四维/proofClass）✅
-- 真机 spike 契约（codex P0-3）→ tasks.md §8.B1 已回写 ✅
-- familyDisplay 签名（CC P1-1）→ 改现有 familyDisplays 接 activeCells 非造单数 ✅
-- 制冷热 token §1（CC P1-3）/ 双端 build（codex P1-2）/ Vortex pin（codex P2-2）/ preview 命名 Mock（codex P2-1）/ SD5 material+range bar（CC P2-2）/ displayOrder（CC P2-3）/ make verify-all 口径（codex P2-3）/ design.md:29 stale（CC P2-4）✅
-- CC P2-4 commit hash 092c473 = 审计误报（`17ae332` 我对，未改）。
+- [ ] **Task 4.1** `DemoControlPanel`（SD14）：iPhone 控制中心式竖排模块卡（常态/整车/环境/座舱），iOS26 glass 功能层 + material 模块卡 + segmented iOS picker 风格。从设置入口进（SD8）。anchor 对比控制台（若 anchor 有；无则对齐 10 族卡视觉体系 SD15）。
+- [ ] **Task 4.2** 整车 + 环境 force（SD13/14）：整车 时速 segmented[静态/泊车/城市/高速] + 挡位[P/R/N/D] / 环境 天气[晴/雨] + 时段[白天/夜晚] **互斥单选** → force **mock bridge context**（AD-RPB-014 context 四维切换，驱动 capsule + 安全 guard mock）。
+- [ ] **Task 4.3** 常态运行卡 + AllStateSheet（SD13/14）：常态卡 ● 当前常态 + [查看全部≣] → `AllStateSheet`（33 base 按 10 族分组网格弹窗，顺序铺开 SD15）+ [⟲ 一键复位常态]=DemoReset（mock NormalRunPreset 默认值集）。
+- [ ] **Task 4.4** 座舱场景宏 force（SD14/8）：场景宏库[上车/离车/雨天/困了] → force mock 预设（`#if DEMO_MODE`）+ 设备端态链 10 族卡片调（SD7）。
 
-**3. Type 一致性：** `PresentationSnapshot`/`DemoRuntimeResultKind`(8)/`DemoContext`(四维)/`PresentationProofClass`/`ThermalTint` 跨 Task 0.1→1.1→2.4 一致；`VehicleCardDisplay` 扩 `activeCell/siblingCells` + `familyDisplays(from:activeCells:)` 跨 0.1/1.2/2.1 一致；`FamilyCardID.allCases`(10)/`displayOrder` 跨 0.1/1.3 一致；夹具全 `DemoVehicleStateCell(key:actualValue:revision:)`。
+每 task：实装 → 双端 build → simctl 截图 → **codex 审计（20min，多维 + anchor 像素对比：控制台模块卡 vs anchor/10 族卡视觉体系 + force mock 正确性）** → commit。
 
-> ⚠️ spike 项不预拍：capsule route（A vs C-lite）由 Task 3.1 模拟器观感 spike → 磊哥拍。
+### Phase 4 gate + codex 审计 + 索引消减 SD8/13/14/15。
+
+---
+
+## Phase 5 — 氛围灯炸场 AmbientEdgeBurst（SD4 动作2）
+
+- [ ] **Task 5.1** `AmbientEdgeBurst`（SD4）：屏幕边缘混合发光（消费 AmbientBurstColorMapper 8 色，Task 1.4）+ **仅氛围灯指令触发** → 闪烁 + **Vortex Canvas 粒子爆发 5s** phaseAnimator → fade out；`allowsHitTesting(false)`（氛围层不挡交互）；深空暗底主场（米白亮底弱，SD 行 187 pre-mortem）。
+
+实装 → 双端 build → simctl 录屏（氛围灯爆发 5s）→ **codex 审计（20min + anchor 对比边缘发光 vs anchor 氛围图）** → commit `feat(uiue): AmbientEdgeBurst 边缘炸场 (SD4)`
+
+### Phase 5 gate + codex 审计 + 索引消减 SD4-炸场。
+
+---
+
+## Phase 6 — context capsule diorama（route spike，GLM P1-3 Vortex App target）
+
+- [ ] **Task 6.1** capsule route spike（模拟器观感 A 视频 loop vs C-lite，U31 不预拍）。🔴 **GLM P1-3 Vortex App target 接法**：App 是 Xcode project 非 SPM → Modify `MAformac.xcodeproj/project.pbxproj` 加 Vortex package reference + product dependency（pin commit）；**或** C-lite spike 先用纯 SwiftUI particle placeholder，Vortex 单独集成 task。验证 `xcodebuild -scheme MAformacIOS build` 能 import。spike-result.md 记观感（route 磊哥拍）。
+- [ ] **Task 6.2** `ContextCapsule` 实装（route 定后）：消费 `snapshot.context` 四维 + crossfade（glassEffectID morph）+ 预加载 + 图标在 capsule 外（SD24）。
+
+每 task：实装 → 双端 build → simctl → **codex 审计（20min + anchor 像素对比 capsule vs anchor-00-diorama）** → commit。
+
+### Phase 6 gate + codex 审计 + 索引消减 SD24/25。
+
+---
+
+## Phase 7 — 验收收口
+
+- [ ] **Task 7.1** 全量门：`swift test` 0 fail + 双端 `xcodebuild` SUCCEEDED + `make verify-all` exit0 **+ 另跑** `bash Tools/checks/{check-no-binary-visualstate,check-platform-vs-version-guard,check-contentview-uses-display-catalog}.sh` 全绿（GLM P2 口径：make verify-all 含 wiring+swift test，两 shell gate 另跑）。
+- [ ] **Task 7.2** 全 phase anchor 像素对比汇总 + visual-acceptance【用户演绎体验视角】（方案经理 5min 台本 + 客户旁观 + corner case，还原投屏 V10，逐张 Read）+ 14 张满屏单态 5-gate。
+- [ ] **Task 7.3** loopaudit（≥3 subagent 至无 P0/P1）+ **基线级联回写**（grill-定档/landing matrix/索引全消减/tasks.md §8/CLAUDE §9）+ 沉淀（坑→lessons / 元认知→rules / 技能）+ closeout receipt + handoff。
+
+---
+
+## 附录 A — simctl 截图 + anchor 像素对比命令模板（GLM P2-2）
+
+```bash
+# 1. boot + install + launch (force-state)
+xcrun simctl boot "iPhone 17 Pro Max" 2>/dev/null || true
+xcodebuild -scheme MAformacIOS -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' \
+  -derivedDataPath .build/dd build
+xcrun simctl install booted .build/dd/Build/Products/Debug-iphonesimulator/MAformacIOS.app
+xcrun simctl launch booted lab.rayw.MAformac.ios -forceVisualState <态>   # DebugGallery launch arg
+# 2. screenshot
+xcrun simctl io booted screenshot docs/research/2026-06-25-a2-execution/shots/phase<N>-<态>.png
+# 3. anchor 像素对比 (codex 审计跑)
+magick compare -metric RMSE docs/research/.../shots/phase<N>-<态>.png \
+  docs/design/anchors/anchor-<NN>.png /tmp/diff-<N>.png 2>&1   # 量化偏差; 区域 diff 用 PIL crop
+```
+
+> codex 审计逐区域报：布局错位 px / 色值 ΔE / 字号比 / 留白比 / 视觉重量偏 anchor 多少。
+
+---
+
+## Self-Review — 三路审计修复 + grill 覆盖对照
+
+**三路审计修复（subagent CC + codex-rescue + GLM）：** A+ bridge / XCTest+init(actualValue) / wiring gate 弥合 / mic dock+对话流四 zone / phase gate 不勾 OpenSpec / strangler / siblingCells 填充(GLM P0-2) / activeCell visualState 测试(GLM P1-1) / Task 0.1 测试不带 activeCells(GLM P0-1) / @MainActor adapter(GLM P1-2) / Vortex App target(GLM P1-3) / portrait pbxproj(GLM P1-4) / FamilyIcon allowlist + simctl 模板 + coldStart cells(GLM P2) / 制冷热 §1 / 双端 build / Vortex pin。
+
+**grill 覆盖（详见配套索引 `uiue-a2-grill-coverage-index.md`）：** SD1(P0 coldStart)/SD2(P2 mic dock UI,ASR DEFERRED)/SD3(P2)/SD4(P1.4+P2.7+P5)/SD5(P2.4)/SD6+SD7(P3)/SD8(P2.8+P4)/SD9(P2.6 部分)/SD10(现有 4b)/SD11(P2.4)/SD12(Phase5 宏 DEFERRED)/SD13-15(P4)/SD16(orb Phase5 DEFERRED)/SD17(散)/SD18-25(P0-2,6)。
+
+**Type 一致性：** PresentationSnapshot/DemoRuntimeResultKind(8)/DemoContext(四维)/ThermalTint/AmbientBurstColorMapper 跨 Phase 一致；VehicleCardDisplay 扩 activeCell/siblingCells + familyDisplays(from:activeCells:) 跨 0.1/1.2/2.x 一致；夹具全 `DemoVehicleStateCell(key:actualValue:revision:visualState:)`。
+
+> ⚠️ spike 不预拍：capsule route 由 Task 6.1 模拟器观感 spike → 磊哥拍。
