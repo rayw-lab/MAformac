@@ -19,6 +19,8 @@ struct MAformacApp: App {
             ForcedStateScreen(state: forced)
         } else if ProcessInfo.processInfo.arguments.contains("-showGallery") {
             DemoVisualStateGallery()
+        } else if ProcessInfo.processInfo.arguments.contains("-spikeControls") {
+            ValueControlsSpikeScreen()   // 4b Task11 value.type 控件 spike（Gauge 渲染验收）
         } else {
             mainView
         }

@@ -113,6 +113,63 @@ struct DemoVisualStateGallery: View {
     }
 }
 
+/// value.type 5 类异构控件 spike（4b Task11，验 Gauge `.accessoryCircular` iOS 真渲染 + Grid 内不冲突）。
+/// launch arg `-spikeControls`；simctl 截图过目验环形仪表/容量环渲染（非 watchOS-only 编译错 + 真出环）。
+struct ValueControlsSpikeScreen: View {
+    var body: some View {
+        ZStack {
+            DeepSpaceBackground()
+            VStack(alignment: .leading, spacing: 20) {
+                Text("value.type 5 类控件 spike（4b）")
+                    .font(.headline).foregroundStyle(DesignTokens.inkPrimary)
+                Grid(alignment: .center, horizontalSpacing: 20, verticalSpacing: 22) {
+                    GridRow {
+                        spikeCell("dial 空调温度") {
+                            ValueControlView(valueType: .dial, numericValue: 24, range: 18...32,
+                                             stepCount: 0, displayText: "24℃", isOn: false, badgeStyle: .plain)
+                        }
+                        spikeCell("percent 车窗") {
+                            ValueControlView(valueType: .percent, numericValue: 60, range: 0...100,
+                                             stepCount: 0, displayText: "60%", isOn: false, badgeStyle: .plain)
+                        }
+                        spikeCell("stepper 座椅加热") {
+                            ValueControlView(valueType: .stepper, numericValue: 2, range: 0...3,
+                                             stepCount: 3, displayText: "2挡", isOn: false, badgeStyle: .plain)
+                        }
+                    }
+                    GridRow {
+                        spikeCell("toggle 雨刮") {
+                            ValueControlView(valueType: .toggle, numericValue: 0, range: 0...1,
+                                             stepCount: 0, displayText: "开", isOn: true, badgeStyle: .plain)
+                        }
+                        spikeCell("badge 氛围灯") {
+                            ValueControlView(valueType: .badge, numericValue: 0, range: 0...1,
+                                             stepCount: 0, displayText: "红色", isOn: false, badgeStyle: .colorSwatch("红色"))
+                        }
+                        spikeCell("badge 按摩模式") {
+                            ValueControlView(valueType: .badge, numericValue: 0, range: 0...1,
+                                             stepCount: 0, displayText: "波浪模式", isOn: false, badgeStyle: .mode("波浪模式"))
+                        }
+                    }
+                }
+            }
+            .padding(28)
+        }
+        .frame(minWidth: 720, minHeight: 460)
+    }
+
+    // 泛型 @ViewBuilder（非 AnyView，守 spec R2）：控件 + 标签包一格
+    private func spikeCell<Content: View>(_ label: String, @ViewBuilder _ content: () -> Content) -> some View {
+        VStack(spacing: 8) {
+            content().frame(width: 88, height: 88)
+            Text(label).font(.caption2).foregroundStyle(DesignTokens.inkDim).lineLimit(1)
+        }
+        .padding(12)
+        .background(DesignTokens.inkDim2.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
 #Preview("7 态 gallery") { DemoVisualStateGallery() }
 #Preview("force unsafe") { ForcedStateScreen(state: .unsafe) }
+#Preview("value 控件 spike") { ValueControlsSpikeScreen() }
 #endif

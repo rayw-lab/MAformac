@@ -211,6 +211,9 @@ C2 DemoVehicleStateCell → Presentation Derivation → FamilyCardDisplay Model 
 | orb 四态（idle/think/speak/listen） | deferred | deferred | deferred | ✅ |
 | 三 zone / 活跃置顶 ScrollViewReader | deferred | deferred | deferred | ✅ |
 | state-cells **bundle 化（真机 standalone）** | deferred（Mac/模拟器 #filePath OK） | — | — | 打包阶段 |
+| value.type 控件（ValueControlView 5 类 Gauge/分段/toggle/badge） | deferred | ✅ spike 验 | harden | harden |
+| ValueRangeMapper（execution_range 委托 A2 lookup） | — | ✅ | harden | — |
+| catalog → A2 `StateCellContractLookup` 委托（消 title/scope/defaultScope 重复解析 SSOT） | execution_range 已委托 | harden（上抛磊哥重构范围） | — | — |
 
 ### 五、元洞察（工程分水岭）
 继续按「UI 改版」做派生层 → 越做越玄学（聚合靠全局 if、控件靠 default 吞、deferred 靠记忆）；按「语义呈现层」做 → 撑得住 4b/4c/Phase5。**下一刀优先补派生器语义正确性，不是表现层动画**——本次 4a 收口正是先 hardening B3/B4 语义层（闭合+resolver）再进 4b 控件。

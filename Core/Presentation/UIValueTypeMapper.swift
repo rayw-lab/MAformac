@@ -334,11 +334,13 @@ struct StateCellPresentationCatalog {
     private var titlesByBase: [String: String]
     private var defaultScopeByBase: [String: String]
     private var scopesByBase: [String: [String]]
+    private let lookup: StateCellContractLookup?
 
-    init(titlesByBase: [String: String], defaultScopeByBase: [String: String], scopesByBase: [String: [String]]) {
+    init(titlesByBase: [String: String], defaultScopeByBase: [String: String], scopesByBase: [String: [String]], lookup: StateCellContractLookup? = nil) {
         self.titlesByBase = titlesByBase
         self.defaultScopeByBase = defaultScopeByBase
         self.scopesByBase = scopesByBase
+        self.lookup = lookup
     }
 
     func displayTitle(for base: String) -> String {
@@ -347,6 +349,12 @@ struct StateCellPresentationCatalog {
 
     func defaultScope(for base: String) -> String? {
         defaultScopeByBase[base]
+    }
+
+    /// 控件值域（dial/percent/stepper）；委托 A2 `StateCellContractLookup`（execution_range 单一 SSOT，UIUE 不重复手写解析）。
+    /// enum/只读 base（无 execution_range）返 nil（toggle/badge 不需范围）。
+    func executionRange(for base: String) -> ExecutionRange? {
+        lookup?.cell(id: base)?.executionRange
     }
 
     /// 该 catalog 已知的全 base（contract-driven 闭合测试源：遍历断言 `UIValueTypeMapper.isMapped`）。
@@ -365,7 +373,14 @@ struct StateCellPresentationCatalog {
         guard !parsed.titlesByBase.isEmpty else {
             return fallback
         }
-        return parsed
+        // execution_range 单一源 = A2 StateCellContractLookup（同 yaml；UIUE 委托不重复手写解析，derivation 铁律2）
+        let lookup = try? StateCellContractLookup(yaml: yaml)
+        return StateCellPresentationCatalog(
+            titlesByBase: parsed.titlesByBase,
+            defaultScopeByBase: parsed.defaultScopeByBase,
+            scopesByBase: parsed.scopesByBase,
+            lookup: lookup
+        )
     }
 
     private static let fallback = StateCellPresentationCatalog(
