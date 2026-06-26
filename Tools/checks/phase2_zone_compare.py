@@ -39,6 +39,7 @@ STOP_RULE = (
     "instead of continuing. L1 blocks collapse only; it does not sign aesthetics "
     "or replace L3."
 )
+FAIL_EXIT_CODE = 1
 
 
 @dataclass(frozen=True)
@@ -170,6 +171,10 @@ def sentinel_verdict(
     )
 
 
+def exit_code_for_verdict(verdict: str) -> int:
+    return FAIL_EXIT_CODE if verdict == "FAIL" else 0
+
+
 def format_tsv(
     case: str,
     anchor_name: str,
@@ -228,6 +233,14 @@ def run_self_check(warn_threshold: float, fail_threshold: float) -> int:
         print(f"{label}\t{verdict}\t{reason}")
         if verdict != expected:
             print(f"self-check\tFAIL\texpected={expected} actual={verdict}")
+            return 1
+        expected_exit = FAIL_EXIT_CODE if expected == "FAIL" else 0
+        actual_exit = exit_code_for_verdict(verdict)
+        if actual_exit != expected_exit:
+            print(
+                "self-check\tFAIL\t"
+                f"expected_exit={expected_exit} actual_exit={actual_exit} verdict={verdict}"
+            )
             return 1
     print("self-check\tPASS")
     print(STOP_RULE)
@@ -292,7 +305,10 @@ def main() -> int:
         print(STOP_RULE)
         return 0
     if args.self_check:
-        return run_self_check(args.warn_threshold, args.fail_threshold)
+        try:
+            return run_self_check(args.warn_threshold, args.fail_threshold)
+        except ValueError as error:
+            parser.error(str(error))
 
     missing = [
         flag
@@ -329,7 +345,8 @@ def main() -> int:
     )
     args.output.write_text(report, encoding="utf-8")
     print(report, end="")
-    return 0
+    verdict, _, _ = sentinel_verdict(values, args.warn_threshold, args.fail_threshold)
+    return exit_code_for_verdict(verdict)
 
 
 if __name__ == "__main__":
