@@ -63,17 +63,34 @@ struct MAformacApp: App {
 
 #if DEBUG
 enum DebugLaunchArguments {
+    static var goldenPath: U17GoldenPathEntry? {
+        guard
+            let rawValue = value(after: "-goldenPathID"),
+            let id = U17GoldenPathID(rawValue: rawValue)
+        else {
+            return nil
+        }
+
+        return U17GoldenPathManifest.entry(for: id)
+    }
+
     static var showAmbientBurst: Bool {
         ProcessInfo.processInfo.arguments.contains("-showAmbientBurst") ||
         ProcessInfo.processInfo.environment["SHOW_AMBIENT_BURST"] == "1"
     }
 
     static var mockSnapshot: SnapshotPreset {
-        value(after: "-mockSnapshot").flatMap(SnapshotPreset.init(rawValue:)) ?? .cooling
+        if let goldenPath {
+            return SnapshotPreset(rawValue: goldenPath.snapshotPresetRawValue) ?? .cooling
+        }
+        return value(after: "-mockSnapshot").flatMap(SnapshotPreset.init(rawValue:)) ?? .cooling
     }
 
     static var mockTheme: PresentationTheme {
-        value(after: "-mockTheme").flatMap(PresentationTheme.init(rawValue:)) ?? .ivory
+        if let goldenPath {
+            return PresentationTheme(rawValue: goldenPath.themeRawValue) ?? .deepSpace
+        }
+        return value(after: "-mockTheme").flatMap(PresentationTheme.init(rawValue:)) ?? .ivory
     }
 
     static var ambientBurstColor: String? {
