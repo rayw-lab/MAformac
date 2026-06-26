@@ -300,7 +300,7 @@ struct VehicleCardDisplay: Identifiable, Equatable {
 enum UIValueTypeMapper {
     /// base → UIValueType **显式映射单一 SSOT**（state-cells 全 base 闭合，禁 `default` 吞错）。
     /// 🔴 `derivation-layer-discipline` 铁律1：`default` 不得同表「合法兜底」与「漏配吞错」。
-    /// 新增 state-cells base 必在此显式登记，否则 `FamilyDisplaysTests` contract 闭合测试 + `assertionFailure` 双拦。
+    /// 新增 state-cells base 必在此显式登记，否则 `FamilyDisplaysTests` contract 闭合测试 + fail-closed 双拦。
     /// 🔴 gptpro 跨厂商审第 2 点 catch：原 `default:.badge` 把 `window.lock`（enum locked/unlocked 二值锁，
     ///    实为 `.toggle`）静默吞成 badge → 4b 做 toggle 图形控件时「为什么车窗锁没开关控件」追查灾难。
     static let mapping: [String: UIValueType] = [
@@ -331,12 +331,13 @@ enum UIValueTypeMapper {
 
     static func uiValueType(forBase base: String) -> UIValueType {
         if let type = mapping[base] { return type }
-        // 漏配信号（`derivation-layer-discipline` 铁律1）：dev/test 暴露未登记 base，生产 fallback 不 crash demo。
-        assertionFailure("Unmapped UIValueType base: \(base) — 必须在 UIValueTypeMapper.mapping 显式登记（控件类型）或列入 badge allowlist 或标 4b deferred")
-        return .badge
+        preconditionFailure("Unmapped UIValueType base: \(base) — 必须在 UIValueTypeMapper.mapping 显式登记（控件类型）或列入 badge allowlist 或标 4b deferred")
     }
 
-    /// contract-driven 闭合测试用：base 是否已显式登记（不触发 `assertionFailure`）。
+    /// 显式可空查询入口：未知 base 只能返回 nil，不能静默降级成 `.badge`。
+    static func mappedUIValueType(forBase base: String) -> UIValueType? { mapping[base] }
+
+    /// contract-driven 闭合测试用：base 是否已显式登记（不触发 fail-closed）。
     static func isMapped(_ base: String) -> Bool { mapping[base] != nil }
 }
 

@@ -18,6 +18,13 @@ final class UIValueTypeMappingTests: XCTestCase {
                        "window.lock 是二值锁(locked/unlocked)，应 toggle，非被 default 吞成 badge")
     }
 
+    func testUnknownBaseDoesNotSilentlyFallbackToBadge() {
+        XCTAssertNil(
+            UIValueTypeMapper.mappedUIValueType(forBase: "unknown.future_base"),
+            "未知 base 必须 fail-closed；不能静默降级为 badge"
+        )
+    }
+
     // 🔴 contract-driven 闭合：state-cells.yaml 全 base 必显式登记（无静默 default 吞错）
     func testEveryContractBaseIsExplicitlyMapped() {
         let bases = StateCellPresentationCatalog.load().knownBases
