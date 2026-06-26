@@ -93,3 +93,10 @@ Captured at: 2026-06-26 task reconciliation pass.
 
 - `openspec/changes/ui-presentation/tasks.md` §6 now marks mechanical acceptance rows `6.1`, `6.2`, `6.3`, and `6.5` complete based on the mechanical receipt, current shell-gate rerun, current no-raw-hex grep, and current `openspec validate ui-presentation --strict` pass.
 - `6.4` remains open because visual-acceptance 5-gate / human anchor review is still not closed; this is the same blocker as A-2 `8.A/8.C2`.
+
+## Phase 2 Pause Confirmation
+
+Captured at: 2026-06-26 user confirmation.
+
+- 磊哥 explicitly agreed to keep Phase 2 visual acceptance temporarily paused.
+- This is an operator pause, not a visual pass. `8.A`, `8.C2`, and `6.4` remain open until visual-acceptance 5-gate plus anchor-level human review resumes and passes.

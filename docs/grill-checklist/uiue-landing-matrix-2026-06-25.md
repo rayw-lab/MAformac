@@ -5,12 +5,13 @@ status: landing_matrix
 artifact_kind: confirmation_sweep
 authority: discussion_input_not_ssot
 created_at: 2026-06-25
+updated_at: 2026-06-26
 inputs: [docs/UIUE-checklist.md（234）, RPB-01~53, SD1-SD25, V1-V12, CC*, AD-1~14, G01-G28]
 proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation + App + phase matrix）
 ---
 
 > 磊哥步骤 2：confirmation sweep。诚实回答「234 grill 是否确认落地」+ scope ②。
-> 🔴 **核心结论（completion-claim-triage 铁律：计划态 ≠ 执行态）**：234 是「**已 grill 拍板**」（决策态），**不是「已确认落地 spec/code」**（执行态）。盘点后定性 = **已落（契约 C1/C2/C3/C6 + UIUE 4a/4b/4c）/ 仅 grill 待落（本 session 视觉块 SD18-24 + V1-V12 + corner case + RPB bridge + default-scope apply，是主体）/ DEFERRED（Phase5 orb + 训练/C6/voice/runtime backend）/ 少量 superseded**。**234 远未「确认完毕」**——尤其本 session 的视觉块（SD18-24）+ runtime bridge（RPB）几乎全 待落。
+> 🔴 **核心结论（completion-claim-triage 铁律：计划态 ≠ 执行态）**：234 是「**已 grill 拍板**」（决策态），**不是「已确认落地 spec/code」**（执行态）。2026-06-26 A-2 执行后，状态推进为：**A-2 Phase 3/4/5/6 simulator/mock scope DONE；Phase 2 continuous-stage visual acceptance `8.A/8.C2` 仍 open；runtime backend/true-device/mainline proof 仍未声称**。本文件是 landing matrix，不替代 `docs/grill-checklist/uiue-a2-grill-coverage-index.md` 的消减账本。
 
 ## 一、landing 状态总览（系列 × 状态，grep 证据）
 
@@ -21,18 +22,19 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 | **D1-D8**（交互）| 14 | — | D1/D2/D3/D5/D7 落 4a/4b/4c code | D8 部分 | D8.3 思考链路（Phase5）| — |
 | **E0-E8**（orb/事件驱动）| 9 | — | — | — | ✅ **全 Phase5**（orb 未 code）| — |
 | **U1-U31**（UIX）| 31 | — | U6/U10/U13/U26 落 code | 多数 待落 | U5/U24/U28（Metal/投屏/TTS=Phase5/voice）| — |
-| **SD1-SD25**（本 session 演绎）| 25 | — | 仅 4a/4b/4c 重叠部分 | 🔴 **几乎全 待落**（SD18-25 视觉块/corner case/context capsule diorama）| — | V6 跟随系统→强制色 / C-ASR-fail 没听清→二分 |
-| **V1-V12**（视觉块）| 12 | — | — | 🔴 **全 待落**（tokens.md 是 design SSOT，DesignTokens.swift code 未更）| — | — |
-| **CC1-4 + CC-A/B/C**（corner case）| ~18 | — | — | 🔴 **全 待落**（UIValueTypeMapper 无 activeCell 逻辑）| CC-A5 多意图 runtime | — |
-| **RPB-01~53**（runtime bridge）| 53 | ✅ `define-runtime-presentation-bridge` change（创建+strict valid+磊哥 accepted）| — | code 消费实装待 A-2 8.A | runtime 侧实装 DEFERRED | — |
+| **SD1-SD25**（本 session 演绎）| 25 | ui-presentation §8 + A-1 bridge contract | UIUE 4a/4b/4c + A-2 P3/P4/P5/P6 simulator/mock proof；P2 visual code/evidence slice PARTIAL | 🔴 **Phase 2 visual gate 仍待落**（SD18/22/23/V-series + `8.A/8.C2`）| true ASR/TTS/backend/true-device | V6 跟随系统→强制色 / C-ASR-fail 没听清→二分 |
+| **V1-V12**（视觉块）| 12 | tokens.md + ui-presentation §8 | P2 has DesignTokens/ContentView/ThermalRangeBar/capsule placement code + v72 screenshots | 🔴 **visual 5-gate/human anchor review 未闭** | V10 投屏验收/true-device | — |
+| **CC1-4 + CC-A/B/C**（corner case）| ~18 | ui-presentation §8 + bridge vocabulary | activeCell/siblingCells/thermal mapper + P3 mock interaction/voice route | 🔴 P2 visual rows +部分多意图/拒识演出仍待 visual gate | CC-A5 多意图 runtime | — |
+| **RPB-01~53**（runtime bridge）| 53 | ✅ `define-runtime-presentation-bridge` change（创建+strict valid+磊哥 accepted）| A-2 mock-frontstage consumes snapshot/activeCells/sibling/context force for UI proof | 部分 RPB groups remain unchecked until visual/backend gates | runtime 侧实装 DEFERRED | — |
 | **G01-G28**（default-scope）| 28 | `define-demo-default-scope`（proposal 提议）| — | 🔴 待 apply（Phase -1 R-L17 blocker）| — | — |
 | **锦标赛 R1-R5** | 41 | A2/范式落 specs+code（migrate-d-domain merged main）| A2 ✅ | — | C5/C6/voice 相关 | 旧534系列 |
 
 ## 二、已落地的（confirmed，可信）
 
 - **✅ 契约 spec**：`openspec/specs/` 7 个（semantic-function-contract/scenario-state-protocol/tool-execution/vehicle-tool-bench/demo-experience/vehicle-capabilities/lora-training）= C1/C2/C3/C6 + 派生。
-- **✅ UIUE 4a/4b/4c code**（uiue `Core/Presentation/` 8 文件 + `App/` 6 文件，swift test 222/0）：
+- **✅ UIUE 4a/4b/4c code**（uiue `Core/Presentation/` + `App/`，swift test historical 222/0；A-2 later mechanical receipt records 245 tests / 0 failures）：
   - AD-9 10族常驻（FamilyCardIDMapper/ContentView）/ AD-2·U26 value.type enum+switch（UIValueTypeMapper/ValueControlView）/ AD-10 primary cell+scope聚合（FamilyPrimaryCellMapper/ScopeAggregationResolver）/ AD-11 摘要+展开（ExpandedFamilyDisplay/Card）/ AD-3 触发聚焦（FocusController）/ AD-4 multi-intent stagger（MultiCallSequencer）/ AD-1·D7·U10 7态（DesignTokens.CardAppearance）/ ValueRangeMapper 委托 A2。
+- **🟡 A-2 execution proof**（isolated UIUE worktree, not mainline proof）：Phase 3 touch + voice mock, Phase 4 control panel/settings/macro/reset, Phase 5 ambient burst, Phase 6 context capsule are DONE for simulator/mock scope; Phase 2 continuous-stage remains PARTIAL pending visual 5-gate and anchor-level human review. Closeout: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md` + 601-line report.
 - **✅ A2 D-domain**：migrate-d-domain-tool-surface merged main（C1→C6 surface）。
 
 ## 三、🔴 仅 grill 待落（决策态，未进 spec/code）—— 这是 ②的活
@@ -41,12 +43,12 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 
 | 待落项 | 现状 | 落点（②）|
 |---|---|---|
-| **SD18 V1-V12**（间距/字体/圆角/theme/连续舞台/注意力/图标/验收/duration/密度）| tokens.md §3.1/§6/§7/§8 = design SSOT（DRAFT），DesignTokens.swift code **未更**；ContentView **非连续舞台** | ui-presentation change 更新（AD-14+ + spec + tasks + DesignTokens 实装）|
-| **SD19/20/21 corner case + 制冷热 + gptPRO细节** | UIValueTypeMapper **无 activeCell/制冷热色/range bar/mode图标/fade** | ui-presentation（visual_only 部分）+ bridge（activeCell 数据）|
-| **SD22 层级滚动** | ContentView 无 z-stack/scroll inset/手动滚 flag/fade-by-active | ui-presentation |
-| **SD23 边界态**（mic-only/portrait/30字/ASR二分/族外）| ContentView **仍有 TextField**（未移除）；无 portrait lock | ui-presentation + bridge（ASR fail/族外 runtime event）|
-| **SD24/25 context capsule diorama** | 顶栏未重构（品牌未去/图标未移角/无 ContextCapsule）；route A vs C-lite 待 spike | ui-presentation 8.B（spike-gated）+ bridge（context 四维 数据）|
-| **RPB shared_bridge_contract**（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/event/snapshot/trace/card sibling/context 四维）| ✅ **bridge change 已建+strict valid+磊哥 accepted**（4 对象 vocabulary）；🔴 code 消费实装待 A-2 8.A | `define-runtime-presentation-bridge` change ✅ + A-2 8.A 消费 |
+| **SD18 V1-V12**（间距/字体/圆角/theme/连续舞台/注意力/图标/验收/duration/密度）| DesignTokens/ContentView/四 zone/米白+深空 theme 已有 A-2 P2 partial code + v72 evidence；**visual 5-gate 未闭** | resume `8.A/8.C2` visual acceptance |
+| **SD19/20/21 corner case + 制冷热 + gptPRO细节** | activeCell/siblingCells/SemanticColorMapper/ThermalRangeBar/mode icon 已实装；**anchor-level visual acceptance 未闭** | resume Phase 2 visual gate |
+| **SD22 层级滚动** | P2 has z-stack/stage/dock/scroll-area implementation evidence；coverage still open pending human visual gate | ui-presentation `8.A/8.C2` |
+| **SD23 边界态**（mic-only/portrait/30字/ASR二分/族外）| App no longer has `TextField`; pbxproj has portrait-only orientation; P2 boundary still **PARTIAL** until visual/anchor review | ui-presentation `8.A/8.C2` + later voice/backend |
+| **SD24/25 context capsule diorama** | ContextCapsule + route spike + assets/video loop landed for simulator scope; true-device GPU/FPS and final art deferred | ui-presentation 8.B done in simulator scope; true-device later |
+| **RPB shared_bridge_contract**（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/event/snapshot/trace/card sibling/context 四维）| ✅ bridge change accepted; A-2 mock-frontstage consumes activeCells/sibling/context force; runtime-side implementation remains DEFERRED | future runtime bridge implementation |
 | **G01-G28 default-scope** | proposal 提议，**未 apply**（Phase -1 R-L17 blocker）| define-demo-default-scope（apply 待 R-L17）|
 
 ## 四、DEFERRED（明确延后，不阻塞 demo 视觉收口）
@@ -61,12 +63,12 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 
 ## 六、② change 集 scoping（不止 define-runtime-presentation-bridge，磊哥点对）
 
-> 🔄 **更新 2026-06-25**（A-1 创建+accepted + A-2 文档先行后；状态列已推进，原「待创建/待更新」stale）。
+> 🔄 **更新 2026-06-26**（A-1 创建+accepted + A-2 Phase 2-6 proof anchors 后；状态列已推进，Phase 2 visual gate 仍 open）。
 
 | change | 类型 | 装什么 | 状态（2026-06-25 更新）|
 |---|---|---|---|
 | **define-runtime-presentation-bridge**（新建）| 新建 | RPB shared_bridge_contract（activeCell/refusedCell/partial-deny/already_state/8类结果枚举/4对象 vocabulary/card sibling/context 四维）| ✅ **已创建 + strict valid + 磊哥 accepted**（mainline runtime 实现 DEFERRED）|
-| **ui-presentation**（已存在）| 更新 | SD18-25 visual_only（V1-V12/连续舞台/层级滚动/context capsule 呈现/corner case/边界态）| ✅ **文档先行已更新**（AD-14 + tasks §8）+ **A-2 实施计划 v2 已定稿**（`docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md`，subagent CC + codex-rescue 两路审计辩证收 + 磊哥拍 A+：PresentationSnapshot vocabulary 容器 / 卡片复用 VehicleCardDisplay）；🔴 **DesignTokens/ContentView code 实装待做**（plan Phase 0-4，仍非连续舞台/仍有 TextField）|
+| **ui-presentation**（已存在）| 更新 | SD18-25 visual_only（V1-V12/连续舞台/层级滚动/context capsule 呈现/corner case/边界态）| 🟡 **A-2 v3 已执行到 Phase 2-6 proof anchors**：P3/P4/P5/P6 simulator/mock DONE；P2 continuous-stage visual remains PARTIAL；`8.A/8.C2` + 5-gate/human anchor review open |
 | **define-demo-default-scope**（已存在）| apply | G01-G28 | 待 apply（R-L17 blocker）|
 | retrain-c5 / rebuild-c6 / golden-run-voice（已存在）| DEFERRED | C5/C6/voice | post model gates |
 
@@ -77,10 +79,11 @@ proof: local repo grep（openspec/specs + openspec/changes + Core/Presentation +
 
 ## 七、诚实总账（答磊哥「234 确认完了吗」）
 
-**没有。** 234 是 grill 决策集（计划态），盘点后（定性，非精确计数）：
+**没有。** 234 是 grill 决策集（计划态），2026-06-26 A-2 执行后（定性，非精确计数）：
 - **已落 spec/code（主干）**：契约 C1/C2/C3/C6 + UIUE 4a/4b/4c。
-- **仅 grill 待落（主体）**：🔴 **本 session 视觉块 SD18-24 + V1-V12 + corner case + RPB bridge（53 项）+ default-scope apply** —— 这些是「拍了没落」，② 的主体活。
+- **A-2 已落 simulator/mock proof**：Phase 3/4/5/6；Phase 2 有 partial visual evidence slice。
+- **仍未确认完毕（主体）**：🔴 **Phase 2 visual acceptance `8.A/8.C2` + V-series/SD18/22/23 grouped rows + default-scope apply/mainline runtime/true-device gates**。
 - **DEFERRED（一批）**：Phase5 orb/三zone + 训练/C6/voice/runtime backend。
 - **superseded（少量）**。
 
-**下一步建议**：② 不是「落一个 change」，是 **③ 步骤**——① 更新 ui-presentation change 装 SD18-24 visual（含 DesignTokens/ContentView 实装）② 新建 define-runtime-presentation-bridge 装 RPB 契约 ③ default-scope apply（待 R-L17）。**先 ①②（视觉 + bridge 契约，不依赖 model gate），③ 训练/voice DEFERRED。**
+**下一步建议**：不要重开已闭的 Phase 3-6；等用户恢复视觉验收时，从 Phase 2 receipt + `8.A/8.C2` + coverage index 的 V/SD18/SD22/SD23 open rows 继续。
