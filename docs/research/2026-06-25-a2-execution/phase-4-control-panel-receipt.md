@@ -89,6 +89,25 @@ Not checked off:
 - `computer-use` could not attach to Simulator (`cgWindowNotFound`), and System Events click failed with `-25200`, so no physical tap chain is claimed.
 - The control panel screenshot shows the top modules; the cabin macro module is lower in the scroll and is covered by code evidence rather than a scrolled screenshot in this receipt.
 
+## P2 Inner-Loop Settings Route Probe
+
+Date: 2026-06-26
+
+Status: BLOCKER for 8.E4 / SD8 route closure.
+
+Observed serial simulator actions:
+
+- From main stage, `tap(settings)` first dismissed the expanded card overlay and did not open the settings sheet.
+- After refreshing and tapping settings again, the settings sheet opened. Runtime UI tree exposed theme tabs, `演绎控制台`, `复位`, `制冷`, `制热`, and `安全拒识`.
+- `tap(演绎控制台)` succeeded as a UI action, but the refreshed UI tree returned to the main stage instead of presenting `DemoControlPanel`.
+- Screenshot after the failed route: `docs/research/2026-06-25-a2-execution/shots/phase4-settings-control-route-failed-v1.jpg`.
+
+Interpretation:
+
+- Settings entry itself now has simulator proof.
+- The nested `SettingsPanel` → `DemoControlPanel` sheet route is not closed. This likely reflects the current single `presentedSheet` host dismissing/replacing the settings sheet without presenting the second sheet in the next transaction.
+- Keep `8.E4`, SD8, and SD12 open. Do not promote Phase 4 beyond `PARTIAL`.
+
 ## P0 Commit Anchor: Phase 4 control-panel proof slice
 
 Commit subject: `docs(uiue): anchor phase4 control-panel proof slice`

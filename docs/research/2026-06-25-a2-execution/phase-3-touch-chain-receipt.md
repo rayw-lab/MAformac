@@ -64,8 +64,35 @@ No true NLU, ASR, TTS, LoRA, live API, or real vehicle backend was connected. Th
 ## Residual Risks
 
 - Badge option lists are currently local to `ExpandedFamilyCard` row logic, not derived from a shared allowed-values catalog.
-- Runtime proof shows expanded control rendering, not an actual tap mutation on device UI.
+- Initial runtime proof only showed expanded control rendering; the P2 update below adds simulator tap mutation proof for the AC stepper path, but not drag or voice-reasoning proof.
 - Phase 3 is still mock-frontstage only; true voice/NLU/backend wiring remains explicitly out of scope.
+
+## P2 Inner-Loop Touch Evidence Update
+
+Date: 2026-06-26
+
+Status: PARTIAL improved from local-pass to simulator touch-stepper-pass for the expanded AC stepper path.
+
+Commands/actions:
+
+- `build_run_sim` with `-mockTheme ivory -mockSnapshot cooling`: PASS.
+- `snapshot_ui`: main stage exposed `e15|tap|button|空调 26℃ 执行中|26℃|vehicle-card-family.ac`.
+- `tap(e15)`: PASS; refreshed snapshot exposed expanded AC controls including `e69` reduce, `e71` increase, and `e78` option cycle.
+- `tap(e71)`: PASS; refreshed snapshot exposed `e15|tap|button|空调 27℃ 执行中|27℃|vehicle-card-family.ac` and text `27`, proving the expanded stepper path mutates mock state and refreshes the family card.
+- Screenshot: `docs/research/2026-06-25-a2-execution/shots/phase3-touch-after-increment-v2.jpg`.
+
+What this closes:
+
+- `8.D1`: `ValueControlActions` stepper callback is exercised through a real simulator tap.
+- `8.D2`: expanded card callback reaches `ContentView` mock transition and refreshes snapshot/card numeric text.
+- `8.D3`: value mutation remains non-normal (`执行中`) after changing `26℃ -> 27℃`.
+- SD6: tap card expands composite controls and numeric stepper works in simulator runtime.
+
+What this still does not close:
+
+- `8.D4`: voice-reasoning mock presets and read-current-state voice flow are still not proven by runtime evidence.
+- SD7: full touch-adjust → mock store → voice reasoning + silent/no-TTS behavior remains partial because the drag scrubber path and voice mock path are not both proven.
+- Drag automation: still `operator-pass pending`; no idb/manual/true-device drag evidence exists.
 
 ## P0 Commit Anchor: Phase 3 touch-chain proof slice
 

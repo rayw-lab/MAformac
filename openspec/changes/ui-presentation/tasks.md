@@ -112,10 +112,12 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 8.C2 simctl 视觉 + **visual-acceptance 5-gate（米白/深空，还原投屏环境 V10）** + 对比 anchor-set（连续舞台无黑线 / 制冷热 / capsule diorama）
 
 ### 8.D 触控 + state 联动 + 语音推理（全 mock，SD6/SD7，plan Phase 3）
-- [ ] 8.D1 `ValueControlView` 交互回调（dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环 → `ValueControlActions`；adopt **axiom-swiftui** binding/gesture + **IceCubesApp** 交互参考）
-- [ ] 8.D2 `ExpandedFamilyCard`/`ExpandedCellRowView` 接回调 → mock store（`store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片+numericText 联动）
-- [ ] 8.D3 🔴 `applyMockTransition` visualState 修复（值真变化→`.changing`/`.satisfied`，非只 `"on"`→`.normal`；否则触控联动假绿）+ clamp/cycle **复用 `ValueRangeMapper`**（dial 18-32/percent 0-100/stepper 档/badge 8 色，防漂移）+ 测试
+- [x] 8.D1 `ValueControlView` 交互回调（dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环 → `ValueControlActions`；adopt **axiom-swiftui** binding/gesture + **IceCubesApp** 交互参考）
+- [x] 8.D2 `ExpandedFamilyCard`/`ExpandedCellRowView` 接回调 → mock store（`store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片+numericText 联动）
+- [x] 8.D3 🔴 `applyMockTransition` visualState 修复（值真变化→`.changing`/`.satisfied`，非只 `"on"`→`.normal`；否则触控联动假绿）+ clamp/cycle **复用 `ValueRangeMapper`**（dial 18-32/percent 0-100/stepper 档/badge 8 色，防漂移）+ 测试
 - [ ] 8.D4 语音推理 mock 预设（「26→冷了→升温」mock 响应读当前 mock 态；摘要卡只读 SD23 7.F1；静默无 TTS）
+
+> 2026-06-26 P2 inner-loop evidence: Phase 3 receipt records simulator tap `AC card -> expanded increase`, with UI tree changing `空调 26℃` to `空调 27℃`. This closes the stepper/mock-state path for 8.D1-8.D3 and SD6. Keep 8.D4/SD7 open until voice-reasoning mock and drag/operator-pass evidence are recorded.
 
 ### 8.E 演绎控制台（全 mock force，SD13-15/SD8，plan Phase 4）
 - [x] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）
@@ -123,7 +125,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
 - [ ] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
 
-> 2026-06-26 P1 reconciliation: Phase 4 commit `564d0c0` anchors the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. The Phase 4 receipt remains `PARTIAL`; keep 8.E4 open until settings-entry physical tap proof and cabin macro interaction recording are captured.
+> 2026-06-26 P1/P2 reconciliation: Phase 4 commit `564d0c0` anchors the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. P2 simulator probe opens the settings sheet, but tapping `演绎控制台` returns to the main stage instead of presenting `DemoControlPanel`; keep 8.E4 open until the settings→control-panel route and cabin macro interaction recording are captured.
 
 ### 8.F 氛围灯炸场（SD4，plan Phase 5）
 - [x] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）

@@ -59,7 +59,7 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 | SD3 对话流 DialogueBubble | P2 | ⬜ | - [ ] |
 | SD4 氛围灯 3 动作 | P1 mapper + P2 卡片渐变 + **P5 炸场** | ✅ | - [x] |
 | SD5 玻璃分层 + material | P2 | ⬜ | - [ ] |
-| SD6 点卡展开 composite + 数值控件 | P3（现有 4b 保留 + 触摸）| 🟡 | - [ ] |
+| SD6 点卡展开 composite + 数值控件 | P3（现有 4b 保留 + 触摸）| ✅ simulator stepper path | - [x] |
 | SD7 触摸调节→mock store→语音推理+联动+静默 | **P3**（全 mock）| ⬜ | - [ ] |
 | SD8 刷新复位 + 设置（主题/场景宏 force）| P2 + **P4** | ⬜ | - [ ] |
 | SD9 拒识/确认/澄清（R0/R1/R2）| P2 边界 + P3 mock 语音 | 🟡 | - [ ] |
