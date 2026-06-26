@@ -44,7 +44,7 @@ created_at: 2026-06-26
 | `grill-checklist/uiue-landing-matrix-2026-06-25.md` | tracking | 粗粒度落地态 |
 
 ## 5. 全系列文档落点登记（导航）
-- **grill-tournament/**：`grill-decisions-master` · `ledger` · `final-grill-list` · `cascade-inventory` · `round-01~05` · `demo-default-scope-grill-decisions-2026-06-24` · `uiue-d1-d5-loop-competition` · `uiue-d1-d6-grill` · `uiue-phase4-grill-decisions` · **`uiue-visual-gate-harden-grill-decisions`（本次 U32-U37）**
+- **grill-tournament/**：`grill-decisions-master` · `ledger` · `final-grill-list` · `cascade-inventory` · `round-01~05` · `demo-default-scope-grill-decisions-2026-06-24` · `uiue-d1-d5-loop-competition` · `uiue-d1-d6-grill` · `uiue-phase4-grill-decisions` · **`uiue-visual-gate-harden-grill-decisions`（U32-U37）** · **`uiue-8g9-and-liquid-glass-hardening-grill-decisions`（U38+）**
 - **grill-checklist/**：`uiue-a2-grill-coverage-index` · `uiue-landing-matrix-2026-06-25` · `uiue-grill-定档-2026-06-25` · `uiue-runtime-bridge-decisions-2026-06-25`(RPB) · `uiue-runtime-bridge-amend-2026-06-25` · `UIUE-checklist`(redirect stub)
 - **docs/ 根（历史，原位 + 本索引登记，不搬）**：`UIUE-checklist.md`(canonical SD) · `uiue-storyboard-grill-decisions.md`(V/SD 视觉) · `uiue-todo-and-grill-upgrade-2026-06-25.md` · `c1-q1-q10-claude-oracle-grill-2026-06-19.md` · `p1c-training-grill-decisions.md` · `uiue-roadmap-2026-06-23.md`
 

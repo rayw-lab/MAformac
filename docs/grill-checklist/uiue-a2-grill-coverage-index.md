@@ -6,7 +6,7 @@ artifact_kind: grill_coverage_matrix
 authority: tracking_not_ssot
 created_at: 2026-06-25
 plan: docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md
-canonical_inputs: [docs/UIUE-checklist.md canonical≈240+, runtime-bridge RPB-01~53（含追加补漏 51-53）, SD1-25, V1-12, CC*, AD-1~14, U1-31, D1-8, E0-8, 锦标赛41, G01-28, 视觉门 U32-37（grill-tournament/uiue-visual-gate-harden-grill-decisions.md，2026-06-26）]
+canonical_inputs: [docs/UIUE-checklist.md canonical≈240+, runtime-bridge RPB-01~53（含追加补漏 51-53）, SD1-25, V1-12, CC*, AD-1~14, U1-31, D1-8, E0-8, 锦标赛41, G01-28, 视觉门 U32-37（grill-tournament/uiue-visual-gate-harden-grill-decisions.md，2026-06-26）, 8.G9拆包+Liquid Glass hardening U38+（grill-tournament/uiue-8g9-and-liquid-glass-hardening-grill-decisions.md，2026-06-27）]
 stale_inputs: [docs/grill-checklist/UIUE-checklist.md redirect stub（旧 SD1-SD20/≈234，不能作为当前精确分母）]
 granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_row
 ---

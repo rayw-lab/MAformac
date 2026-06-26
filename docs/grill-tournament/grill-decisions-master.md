@@ -173,6 +173,20 @@
 | U36 | 交互取证按控件动作分（tap_step/toggle/badge_cycle 自动化 · continuous_drag[仅 AC hero]operator-pass · force_state=terminal_visual_only 禁当过程 proof）+ 代表族矩阵防单样本外推 | ✅ 拍定 2026-06-26 | Q38 |
 | U37 | 一进两出：复用 PresentationSnapshot 不新建三类 + presentation derivation 只读 snapshot（mutation 层写 store 必回灌下一帧）+ 8 态 VUI 矩阵穷尽测试无 default | ✅ 拍定 2026-06-26 | Q38 |
 
+### U38+ 8.G9 拆包 + Liquid Glass hardening（2026-06-27，互动 grill）
+> 一手 SSOT = `docs/grill-tournament/uiue-8g9-and-liquid-glass-hardening-grill-decisions.md`。范围：8.G9 是否拆包、U14-U18 怎么落、以及是否新增不含投屏的 Liquid Glass hardening spike；新增 2026 iOS 前端趋势调研只作 research_not_ssot 输入，不改 grill/OpenSpec authority。
+
+| U | 议题 | 结论 / 状态 | 挂 Q |
+|---|---|---|---|
+| U38 | 8.G9 是否继续 U14-U18 一包做，还是拆成低风险项 + U17 单独小计划 | ✅ 拍定 2026-06-27：拆。`8.G9a` 先闭合 U14/U15/U16/U18；U17 `snapshot + 黄金路径 XCUITest` 单独 scoped plan，避免无现成 UI test target 拖住低风险项；不勾 `tasks.md`，不关 8.C2/V-PASS | Q32/Q34/Q35/Q37/Q38 |
+| U39 | U17 如何拆才不让单测/manifest 冒充黄金路径 XCUITest | ✅ 拍定 2026-06-27：拆 `U17a` / `U17b`，但 `U17b` 不无限 deferred。`U17a` 冻结 `golden_path_manifest` + existing launch args（`-mockSnapshot` / `-forceVisualState` / `golden_path_id`）+ unit matrix；`U17b` 单独建 UI test target + 最小 XCUITest + on-screen `simctl` L0 截图包；`8.G9` 不因 U17a 绿而整体勾选 | Q37/Q38 |
+| U40 | U14 Mac AnyLayout 已部分落地后是否继续改布局本体 | ✅ 拍定 2026-06-27：不继续改 Mac 布局本体，只补契约/测试/receipt。U14 gate 收窄为 Mac split path：保 `stageBody -> usesMacSplit -> AnyLayout(HStackLayout) -> .macPanorama`，禁 `NavigationSplitView` / adaptive `LazyVGrid` / Mac split 由 `sizeClass` 驱动；不得全仓禁 `sizeClass`，非 macOS `phoneScroll` 现有列数逻辑可保留 | Q32/Q38 |
+| U41 | U15 HTML/Preview 4 类反例落哪一层，防双份 UI 逻辑 | ✅ 拍定 2026-06-27：Preview/DebugGallery 是主可见入口，HTML 只能是同 fixture 静态镜像。新增 `U15CounterexampleFixtures`，四类 customer-visible 反例取 `clarifyMissingSlot` / `refusalNoAvailableTool` / `refusalSafetyOrPolicy` / `partialAcceptPartialRefuse`；消费同一 `PresentationSnapshot` / 8 态 matrix；HTML 禁独立状态机/视觉判断/文案 | Q35/Q38 |
+| U42 | U16 iPhone 触觉如何加且不扩大验收边界 | ✅ 拍定 2026-06-27：加 iOS-only `PresentationHapticPolicy` + `U16HapticPolicyTests`；`interactionSource == .userTouch` 才允许 `.selection/.success/.impactSoft` intent，mock/force-state/voice/snapshot refresh 必须 `.none`；macOS 永远 `.none`；不做真机触觉验收门 | Q34/Q38 |
+| U43 | U18 不上架物料的真实落点强度 | ✅ 拍定 2026-06-27：降为轻量 distribution boundary guard。当前 personal/internal self-use only；no App Store/TestFlight/external customer package/release readiness claim；不新增 release/customer checklist，不生成 store screenshots/privacy nutrition/store description/release notes | Q33/Q38 |
+| U44 | 是否新增不含投屏的 Liquid Glass hardening spike | ✅ 拍定 2026-06-27：新增无投屏 hardening spike；inventory 三处 `.glassEffect()`（MicDock/ContextCapsule/DemoControlPanel），检查 Reduce Transparency/低亮/对比度/iOS26.x；`GlassEffectContainer` 不一刀切，只有同层多 glass siblings 或证据成立才加；内容卡继续禁 glass | Q32/Q38 |
+| U45 | 编号与收口策略 | ✅ 拍定 2026-06-27：继续单一 U38+ 文档，不新第二 SSOT、不新 Q；U44 先不新 OpenSpec change；最终产 scoped implementation prompt：8.G9a 做 U14/U15/U16/U18 + U44 轻量 hardening，8.G9b 单独做 U17 XCUITest/L0 | Q38 |
+
 > **U-续批纪律（CTX U1-U31 关键拍板）**：U5 Metal 一期做 / U6 补麦克风 key+memory entitlement（非缺整个 plist，仓内已有 xcodeproj+2 app target）/ U8 演示编排并入 demo-golden-run 不单独 change / U10·U27 状态四态分开（clarify/unsupported/safety/crash，消费 DemoVisualState 7 态）/ U12 XcodeGen 降 P1 / U13 卡片按 10 族 family_card_id / U19 iOS18 API 必 `#available` / U28 中文 TTS 锁普通话（iOS18 confirmed/iOS26 preflight）/ U30 MeshGradient 必 `#available` / U31 spike 实证项不拍。
 
 > 🔴 **U11-U31 一把过收口（磊哥 2026-06-26，UIUE grill 彻底收口）**：上方 U11-U31 表 🔴/🟡 旧状态列**以本 banner 为准**。**活跃组全 ⭐ 拍定**：U12 XcodeGen 降 P1 / U13 卡片按 10 族 / **U14 Mac AnyLayout 不用 SplitView** / **U15 HTML+Preview 补 4 类反例** / **U16 触觉 Mac 不做 iPhone 加分** / **U17 snapshot+黄金路径 XCUITest**（衔接 U32-U37 视觉门）/ **U18 客户物料不上架** / U19 #available+iOS17 fallback / U26 enum+switch(value.type) 非 AnyView（已实装 UIValueTypeMapper/ValueControlView）/ U27 四态分开 / U30 MeshGradient+shader 仅氛围层（部分 Phase5）。**DEFERRED 独立立项**：voice U21/U22/U28 + U29(golden-run)。**二期方向位**：U20/U25。**已定不拍**：U11✅已落(tokens.md) / U23·U24 🔪DELETE(投屏 C0) / U31 spike 不拍。
@@ -398,12 +412,12 @@
 |---|---|---|---|
 | Q30 | UIUE 30+ findings 逐条三分（U11-U31 续批）| 🟡 | P1 |
 | Q31 | 10 族 mock cards 由 state-cells/tool-card map 支撑（U3/U13/U26）| 🟡 | P0 |
-| Q32 | 深空辉光暗底三屏 + native SwiftUI 保留/调整/重起（U2/U5/U7/U11/U14）| 🟡 | P2 |
-| Q34 | 现场 SOP Mac-primary 消除 vs preflight/fallback（U1/U16/U23/U24）| 🟡 | P1 |
-| Q35 | 三层路由 UI 态可视化（U10/U15/U20/U25/U27）| 🟡 | P1 |
+| Q32 | 深空辉光暗底三屏 + native SwiftUI 保留/调整/重起（U2/U5/U7/U11/U14/U40/U44）| 🟡 | P2 |
+| Q34 | 现场 SOP Mac-primary 消除 vs preflight/fallback（U1/U16/U23/U24/U42）| 🟡 | P1 |
+| Q35 | 三层路由 UI 态可视化（U10/U15/U20/U25/U27/U41）| 🟡 | P1 |
 | Q36 | Voice UI MVP 状态机（U21/U22/U28/U30/U31）| 🔴 | P1 |
-| Q37 | demo-golden-run 五幕编排锚合同/C6（U4/U8/U9/U17/U29）| 🟡 | P0 |
-| Q38 | 组件 adoption gate + 真实查看环境验收（U9/U30/U31）| 🟡 | P1 |
+| Q37 | demo-golden-run 五幕编排锚合同/C6（U4/U8/U9/U17/U29/U39）| 🟡 | P0 |
+| Q38 | 组件 adoption gate + 真实查看环境验收（U9/U30/U31/U38）| 🟡 | P1 |
 | Q40 | deterministic scenario macros 如何避免变成隐藏 planner / 绕过 B1/B2/F1（场景宏防隐藏 planner，G6）| 🟡 | P1 |
 > UIX 优先级：Q33(✅已拍·能跑硬前置) > Q30(10 族重筛) > Q31/Q37(炸场核心)；Q40 场景宏随 G6 首批 4 宏磊哥点选时拍；其余炸场细节随 demo 落地。
 
