@@ -140,6 +140,7 @@ Phase 0 receipt: `docs/research/2026-06-25-a2-execution/phase-0-receipt.md`（TD
 Phase 1 receipt: `docs/research/2026-06-25-a2-execution/phase-1-receipt.md`（TDD + full `swift test` + SF Symbol probe + 双端 build；RPB-51 P1 slice done, full row remains open until visual consumption）。
 A-2 mechanical verification receipt: `docs/research/2026-06-25-a2-execution/a2-mechanical-verification-receipt.md`（OpenSpec `8.C1` local/unit gates done: `make verify-all` exit0 + iOS/macOS build green；`8.C2` visual/anchor gate remains open）。
 A-2 phase closeout receipt: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`（Phase 2-6 conclusion/proof-class/residual-risk 汇总；Phase 3 SD7 closed for A-2 simulator/mock route only with drag `operator-pass pending`；Phase 2 visual gate 仍 open；Phase 4 SD8/SD12 closed by simulator proof；isolated UIUE worktree, not mainline proof）。
+A-2 final JSONL-reviewed closeout report: `docs/research/2026-06-25-a2-execution/a2-final-jsonl-reviewed-closeout-report.md`（727 行；回看 live session JSONL/lessons/process docs/receipts/tasks/coverage；结论保持 PARTIAL overall：Phase 0/1/3/4/5/6 scoped DONE，Phase 2 `8.A/8.C2`、Phase 7.2 visual、true-device/mainline/product V-PASS 仍 open）。
 
 ### 相关 U 系列（视觉/交互 → Phase；余已落/main/voice）
 

@@ -5,6 +5,8 @@
 > 🔴 **执行方 = CC 主窗口主持**（磊哥定）。任何执行方**必先读「§0 背景决策包」+ 每 Phase 后回读基线文档**（防自拍已决决策）。
 >
 > 🟢 **v3 定稿（2026-06-25）**：经 subagent CC（adversarial）+ codex-rescue + GLM-5.2 **三路审计**辩证收 + 磊哥拍多项：① A+ bridge（PresentationSnapshot vocabulary 容器/卡片复用 VehicleCardDisplay）② **范围扩到完整 demo 交互**（视觉+触摸+语音+state 联动+演绎控制台，**全 mock 前台**）③ 氛围灯 SD4 补 ④ 演绎控制台 SD13-15 进本 §8 ⑤ SD7 触摸调节实现（mock）⑥ 每 phase 派 codex 审计 + anchor 像素对比。
+>
+> 🔵 **执行状态补记（2026-06-26）**：本 plan 已执行到可恢复的 scoped closeout 状态。Phase 0/1 DONE；Phase 3/4/5/6 在 A-2 local/unit/simulator/mock scope DONE；Phase 7.1 mechanical gates DONE；Phase 2 visual acceptance `8.A/8.C2`、Phase 7.2 visual 5-gate/anchor human review 仍按磊哥确认暂停并保持 open。最终 JSONL-reviewed 收口报告：`docs/research/2026-06-25-a2-execution/a2-final-jsonl-reviewed-closeout-report.md`（727 行）；汇总 receipt：`docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`。这不是 mainline proof、true-device proof 或 product V-PASS。
 
 **Goal:** 把 UIUE 从临时态重构成**完整 demo 交互原型**——10 族卡片连续舞台 + 触摸调节 + 语音对话流 + state 联动 + 氛围灯炸场 + 演绎控制台（方案经理 force 端状态）+ context capsule，**全 mock 前台**，在 iOS 模拟器视觉质量**达到或超过 anchor 锚点集**（anchor 像素对比硬门，非 1:1 复刻——grill 创新点要比 anchor 更惊艳）。
 
@@ -347,9 +349,9 @@ mock 预设「手动调 26 → store=26 → 语音『我有点冷了』→ mock 
 
 ## Phase 7 — 验收收口
 
-- [ ] **Task 7.1** 全量门：`swift test` 0 fail + 双端 `xcodebuild` SUCCEEDED + `make verify-all` exit0 **+ 另跑** `bash Tools/checks/{check-no-binary-visualstate,check-platform-vs-version-guard,check-contentview-uses-display-catalog}.sh` 全绿（GLM P2 口径：make verify-all 含 wiring+swift test，两 shell gate 另跑）。
+- [x] **Task 7.1** 全量门：`swift test` 0 fail + 双端 `xcodebuild` SUCCEEDED + `make verify-all` exit0 **+ 另跑** `bash Tools/checks/{check-no-binary-visualstate,check-platform-vs-version-guard,check-contentview-uses-display-catalog}.sh` 全绿（GLM P2 口径：make verify-all 含 wiring+swift test，两 shell gate 另跑）。✅ 2026-06-26 scoped done for local/unit/simulator mechanical gates；receipt: `docs/research/2026-06-25-a2-execution/a2-mechanical-verification-receipt.md` + closeout receipt `a2-phase-closeout-receipt.md`。
 - [ ] **Task 7.2** 全 phase anchor 像素对比汇总 + visual-acceptance【用户演绎体验视角】（方案经理 5min 台本 + 客户旁观 + corner case，还原投屏 V10，逐张 Read）+ 14 张满屏单态 5-gate。
-- [ ] **Task 7.3** loopaudit（≥3 subagent 至无 P0/P1）+ **基线级联回写**（grill-定档/landing matrix/tasks.md §8/CLAUDE §9）+ **coverage 索引消减统计（GLM P2-3）**：`grep -c '\- \[ \]' docs/grill-checklist/uiue-a2-grill-coverage-index.md` 统计未消减项，A-2 实装项应全 `- [x]`（DEFERRED ⏳ 不计）+ 沉淀（坑→lessons / 元认知→rules / 技能）+ closeout receipt + handoff。
+- [ ] **Task 7.3** loopaudit（≥3 subagent 至无 P0/P1）+ **基线级联回写**（grill-定档/landing matrix/tasks.md §8/CLAUDE §9）+ **coverage 索引消减统计（GLM P2-3）**：`grep -c '\- \[ \]' docs/grill-checklist/uiue-a2-grill-coverage-index.md` 统计未消减项，A-2 实装项应全 `- [x]`（DEFERRED ⏳ 不计）+ 沉淀（坑→lessons / 元认知→rules / 技能）+ closeout receipt + handoff。当前 PARTIAL：receipts/ledger/tasks/coverage/lessons/long report/JSONL-reviewed report/route index cascade 已落；但 7.2 未闭，故 7.3 不升 DONE。
 
 ---
 
