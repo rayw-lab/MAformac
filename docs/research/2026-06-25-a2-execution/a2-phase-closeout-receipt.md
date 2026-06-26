@@ -2,7 +2,7 @@
 
 Captured at: 2026-06-26 12:41:20 CST
 
-Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refresh are complete for the isolated UIUE worktree. This is not mainline proof, not true-device proof, and not product V-PASS.
+Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2/P3 proof refreshes are complete for the isolated UIUE worktree. This is not mainline proof, not true-device proof, and not product V-PASS.
 
 ## P0 Commit Anchors
 
@@ -17,6 +17,7 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 | `3c2ebab` `docs(uiue): reconcile a2 phase ledger tasks and coverage` | P1 | Ledger, tasks, coverage consistency update |
 | `eeba147` `docs(uiue): add p2 inner-loop proof updates` | P2 | Phase 3 AC stepper proof, Phase 4 route blocker proof |
 | `4f7a7af` `fix(uiue): close phase4 settings control route` | P3 follow-up | Phase 4 settings route, macro, theme, reset simulator proof |
+| `e7a061a` `fix(uiue): close phase3 voice reasoning mock route` | P3 follow-up | Phase 3 mic-dock voice mock route, SD7/8.D4 task and coverage reconciliation |
 
 ## Phase Conclusions
 

@@ -311,14 +311,16 @@ mock 预设「手动调 26 → store=26 → 语音『我有点冷了』→ mock 
 
 > 方案经理幕后工具，force mock context/state。视觉对齐 10 族卡 iOS26 glass（SD15）。
 
-- [ ] **Task 4.1** `DemoControlPanel`（SD14）：iPhone 控制中心式竖排模块卡（常态/整车/环境/座舱），iOS26 glass 功能层 + material 模块卡 + segmented iOS picker 风格。从设置入口进（SD8）。anchor 对比控制台（若 anchor 有；无则对齐 10 族卡视觉体系 SD15）。
-- [ ] **Task 4.2** 整车 + 环境 force（SD13/14）：整车 时速 segmented[静态/泊车/城市/高速] + 挡位[P/R/N/D] / 环境 天气[晴/雨] + 时段[白天/夜晚] **互斥单选** → force **mock bridge context**（AD-RPB-014 context 四维切换，驱动 capsule + 安全 guard mock）。
-- [ ] **Task 4.3** 常态运行卡 + AllStateSheet（SD13/14）：常态卡 ● 当前常态 + [查看全部≣] → `AllStateSheet`（33 base 按 10 族分组网格弹窗，顺序铺开 SD15）+ [⟲ 一键复位常态]=DemoReset（mock NormalRunPreset 默认值集）。
-- [ ] **Task 4.4** 座舱场景宏 force（SD14/8）：场景宏库[上车/离车/雨天/困了] → force mock 预设（`#if DEMO_MODE`）+ 设备端态链 10 族卡片调（SD7）。
+- [x] **Task 4.1** `DemoControlPanel`（SD14）：iPhone 控制中心式竖排模块卡（常态/整车/环境/座舱），iOS26 glass 功能层 + material 模块卡 + segmented iOS picker 风格。从设置入口进（SD8）。anchor 对比控制台（若 anchor 有；无则对齐 10 族卡视觉体系 SD15）。
+- [x] **Task 4.2** 整车 + 环境 force（SD13/14）：整车 时速 segmented[静态/泊车/城市/高速] + 挡位[P/R/N/D] / 环境 天气[晴/雨] + 时段[白天/夜晚] **互斥单选** → force **mock bridge context**（AD-RPB-014 context 四维切换，驱动 capsule + 安全 guard mock）。
+- [x] **Task 4.3** 常态运行卡 + AllStateSheet（SD13/14）：常态卡 ● 当前常态 + [查看全部≣] → `AllStateSheet`（33 base 按 10 族分组网格弹窗，顺序铺开 SD15）+ [⟲ 一键复位常态]=DemoReset（mock NormalRunPreset 默认值集）。
+- [x] **Task 4.4** 座舱场景宏 force（SD14/8）：场景宏库[上车/离车/雨天/困了] → force mock 预设（`#if DEMO_MODE`）+ 设备端态链 10 族卡片调（SD7）。
 
 每 task：实装 → 双端 build → simctl 截图 → **codex 审计（20min，多维 + anchor 像素对比：控制台模块卡 vs anchor/10 族卡视觉体系 + force mock 正确性）** → commit。
 
 ### Phase 4 gate + codex 审计 + 索引消减 SD8/13/14/15。
+
+2026-06-26 收束：Phase 4 simulator/mock gate 已闭环，证据落在 `docs/research/2026-06-25-a2-execution/phase-4-control-panel-receipt.md#p3-follow-up-settings-route--theme--macro--reset-closure`；`tasks.md` §8.E 与 coverage SD8/SD12/SD13/SD14/SD15/RPB-52 已同步。Proof boundary 仍是 isolated UIUE worktree + simulator/mock，不是真机、不主线、不产品 V-PASS。
 
 ---
 
@@ -375,7 +377,7 @@ magick compare -metric RMSE docs/research/.../shots/phase<N>-<态>.png \
 
 **三路审计修复（subagent CC + codex-rescue + GLM）：** A+ bridge / XCTest+init(actualValue) / wiring gate 弥合 / mic dock+对话流四 zone / phase gate 不勾 OpenSpec / strangler / siblingCells 填充(GLM P0-2) / activeCell visualState 测试(GLM P1-1) / Task 0.1 测试不带 activeCells(GLM P0-1) / @MainActor adapter(GLM P1-2) / Vortex App target(GLM P1-3) / portrait pbxproj(GLM P1-4) / FamilyIcon allowlist + simctl 模板 + coldStart cells(GLM P2) / 制冷热 §1 / 双端 build / Vortex pin。
 
-**grill 覆盖（详见配套索引 `uiue-a2-grill-coverage-index.md`）：** SD1(P0 coldStart)/SD2(P2 mic dock UI,ASR DEFERRED)/SD3(P2)/SD4(P1.4+P2.7+P5)/SD5(P2.4)/SD6+SD7(P3)/SD8(P2.8+P4)/SD9(P2.6 部分)/SD10(现有 4b)/SD11(P2.4)/SD12(Phase5 宏 DEFERRED)/SD13-15(P4)/SD16(orb Phase5 DEFERRED)/SD17(散)/SD18-25(P0-2,6)。
+**grill 覆盖（详见配套索引 `uiue-a2-grill-coverage-index.md`）：** SD1(P0 coldStart)/SD2(P2 mic dock UI,ASR DEFERRED)/SD3(P2)/SD4(P1.4+P2.7+P5)/SD5(P2.4)/SD6+SD7(P3)/SD8(P2.8+P4)/SD9(P2.6 部分)/SD10(现有 4b)/SD11(P2.4)/SD12(P4 场景宏 + 端状态模块 simulator proof)/SD13-15(P4)/SD16(orb Phase5 DEFERRED)/SD17(散)/SD18-25(P0-2,6)。
 
 **Type 一致性：** PresentationSnapshot/DemoRuntimeResultKind(8)/DemoContext(四维)/ThermalTint/AmbientBurstColorMapper 跨 Phase 一致；VehicleCardDisplay 扩 activeCell/siblingCells + familyDisplays(from:activeCells:) 跨 0.1/1.2/2.x 一致；夹具全 `DemoVehicleStateCell(key:actualValue:revision:visualState:)`。
 

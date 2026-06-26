@@ -1,7 +1,7 @@
 # Phase 4 Demo Control Panel Receipt
 
 Date: 2026-06-26
-Status: PARTIAL / local+simulator-pass
+Status: DONE for the A-2 Phase 4 simulator/mock interaction scope; not product V-PASS
 Proof class: local + unit + simulator mock
 
 ## Scope
@@ -71,29 +71,29 @@ Implemented the Phase 4 mock-frontstage demo control panel:
 
 ## Coverage Index
 
-Checked off:
+Current checked off:
 
 - SD13: control panel blocks implemented.
 - SD14: iPhone control-center layout and AllStateSheet based on 33 state cells implemented.
 - SD15: control panel visual alignment and time-period/theme separation implemented.
+- SD8: settings/refresh route has simulator proof for theme switching, scene macro force, and reset.
+- SD12: scene macro + terminal state module flow has simulator proof for the rain macro.
 - RPB-52: forced vehicle/environment context exposed through segmented mock controls.
 
-Not checked off:
+Historical P0/P2 gap, superseded by the P3 follow-up below:
 
-- SD8: Settings route exists in code, but physical settings-entry tap proof was not captured.
-- SD12: Cabin macro code exists, but full macro interaction recording was not captured.
+- SD8 and SD12 were initially left open because settings-entry/macro route proof had not been captured. The P3 follow-up records the serial simulator route and closes them for A-2 simulator/mock scope only.
 
 ## Residual Risks
 
-- `ios-simulator-skill` semantic navigation was blocked by missing `idb`; screenshot proof uses DEBUG-only launch harness instead of recorded tap navigation through Settings.
-- `computer-use` could not attach to Simulator (`cgWindowNotFound`), and System Events click failed with `-25200`, so no physical tap chain is claimed.
-- The control panel screenshot shows the top modules; the cabin macro module is lower in the scroll and is covered by code evidence rather than a scrolled screenshot in this receipt.
+- True-device proof and customer-facing demo acceptance are not claimed.
+- Historical `idb`/`computer-use` navigation gaps are retained below as P2 context; the current Phase 4 closure uses XcodeBuildMCP serial simulator UI tree, tap, and screenshot proof.
 
 ## P2 Inner-Loop Settings Route Probe
 
 Date: 2026-06-26
 
-Status: BLOCKER for 8.E4 / SD8 route closure.
+Status: Historical P2 blocker for 8.E4 / SD8 route closure, resolved by the P3 follow-up below.
 
 Observed serial simulator actions:
 
@@ -104,9 +104,9 @@ Observed serial simulator actions:
 
 Interpretation:
 
-- Settings entry itself now has simulator proof.
-- The nested `SettingsPanel` → `DemoControlPanel` sheet route is not closed. This likely reflects the current single `presentedSheet` host dismissing/replacing the settings sheet without presenting the second sheet in the next transaction.
-- Keep `8.E4`, SD8, and SD12 open. Do not promote Phase 4 beyond `PARTIAL`.
+- Settings entry itself had simulator proof.
+- The nested `SettingsPanel` → `DemoControlPanel` sheet route was not closed at P2. This likely reflected the then-current single `presentedSheet` host dismissing/replacing the settings sheet without presenting the second sheet in the next transaction.
+- This P2 blocker is superseded by the P3 follow-up, which closes `8.E4`, SD8, and SD12 for A-2 simulator/mock scope.
 
 ## P0 Commit Anchor: Phase 4 control-panel proof slice
 
@@ -114,11 +114,11 @@ Commit subject: `docs(uiue): anchor phase4 control-panel proof slice`
 
 This commit anchors the Phase 4 receipt and the three simulator screenshots cited above. The implementation files (`DemoControlPanel.swift`, `ContentView.swift`, `MAformacApp.swift`, `UIValueTypeMapper.swift`, and the dependent test) are already anchored in shared scaffold commit `98f7c57` because the sheet route and DEBUG harness are compile-linked with the continuous-stage shell.
 
-Not anchored here: SD8 settings-entry physical tap proof, SD12 full cabin macro interaction recording, or product V-PASS.
+Not anchored in the P0 proof-slice commit: SD8 settings-entry physical tap proof, SD12 full cabin macro interaction recording, or product V-PASS.
 
-Claim boundary: `PARTIAL / local+simulator-pass` in the isolated UIUE worktree, mock-frontstage only, not mainline proof and not live/backend proof.
+P0 claim boundary at that commit: `PARTIAL / local+simulator-pass` in the isolated UIUE worktree, mock-frontstage only, not mainline proof and not live/backend proof.
 
-Next: gather serial settings-route and macro-interaction evidence before checking SD8/SD12 or promoting the Phase 4 receipt.
+The serial settings-route and macro-interaction evidence was gathered later in the P3 follow-up below.
 
 ## P3 Follow-up: Settings Route + Theme + Macro + Reset Closure
 
@@ -154,7 +154,7 @@ What this closes:
 Residual risks:
 
 - This does not claim true-device proof or customer-facing demo acceptance.
-- It does not close Phase 2 visual acceptance or Phase 3 voice-reasoning mock.
+- It does not close Phase 2 visual acceptance.
 
 ## P3 Follow-up Commit Anchor: Phase 4 settings-route closure
 

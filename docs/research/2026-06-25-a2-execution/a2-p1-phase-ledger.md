@@ -16,7 +16,7 @@ Proof boundary: isolated UIUE worktree. This ledger reconciles current code, rec
 
 ## Reconciliation Actions
 
-- Update `openspec/changes/ui-presentation/tasks.md` so Phase 4 subtask status matches receipt/coverage: check `8.E1-8.E3`, keep `8.E4` open.
+- Phase 4 task/receipt/coverage drift is now reconciled: `8.E1-8.E4`, SD8, SD12, SD13, SD14, SD15, and RPB-52 are closed for A-2 simulator/mock scope.
 - Keep Phase 2 visual rows open until visual-acceptance 5-gate passes.
 - Keep Phase 3 proof boundary explicit: SD7 is closed only for A-2 simulator/mock route; drag automation remains `operator-pass pending`, not V-PASS.
 - Keep Phase 5 and Phase 6 simulator-scope DONE boundaries explicit; do not promote them to true-device or V-PASS.

@@ -129,7 +129,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
 - [x] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
 
-> 2026-06-26 P1/P2 reconciliation: Phase 4 commit `564d0c0` anchors the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. P2 simulator probe opens the settings sheet, but tapping `演绎控制台` returns to the main stage instead of presenting `DemoControlPanel`; keep 8.E4 open until the settings→control-panel route and cabin macro interaction recording are captured.
+> 2026-06-26 P1/P2 reconciliation: Phase 4 commit `564d0c0` anchored the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. At that point the P2 simulator probe opened the settings sheet, but tapping `演绎控制台` returned to the main stage instead of presenting `DemoControlPanel`, so 8.E4 stayed open until the P3 follow-up below.
 
 > 2026-06-26 P3 follow-up evidence: commit `fix(uiue): close phase4 settings control route` queues the demo-control sheet after settings dismiss; simulator UI tree proves settings→control-panel route, deepSpace theme tab switch, rain macro state mutation, and reset back to idle. Receipt: `docs/research/2026-06-25-a2-execution/phase-4-control-panel-receipt.md#p3-follow-up-settings-route--theme--macro--reset-closure`.
 
