@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var theme: PresentationTheme
     @State private var focus = FocusController()
     @State private var presentedSheet: PresentationSheet?
+    @State private var queuedSheetAfterDismiss: PresentationSheet?
     @State private var controlPanelState = DemoControlPanelState()
     @State private var messages: [DialogueMessage]
     @State private var ambientBurst: AmbientBurstTrigger?
@@ -107,14 +108,14 @@ struct ContentView: View {
         .onAppear(perform: triggerInitialAmbientBurstIfNeeded)
         .animation(.snappy(duration: 0.32), value: focus.focusedFamily)
         .animation(.snappy(duration: 0.32), value: theme)
-        .sheet(item: $presentedSheet) { sheet in
+        .sheet(item: $presentedSheet, onDismiss: presentQueuedSheetAfterDismiss) { sheet in
             switch sheet {
             case .settings:
                 SettingsPanel(
                     theme: $theme,
                     onReset: handleReset,
                     onSnapshot: applySnapshot,
-                    onDemoControl: { presentedSheet = .demoControl }
+                    onDemoControl: presentDemoControlFromSettings
                 )
             case .demoControl:
                 DemoControlPanel(
@@ -231,6 +232,20 @@ struct ContentView: View {
     private func handleReset() {
         store.reset()
         applySnapshot(.coldStart)
+    }
+
+    private func presentDemoControlFromSettings() {
+        queuedSheetAfterDismiss = .demoControl
+        presentedSheet = nil
+    }
+
+    private func presentQueuedSheetAfterDismiss() {
+        guard let destination = queuedSheetAfterDismiss else { return }
+        queuedSheetAfterDismiss = nil
+        Task { @MainActor in
+            await Task.yield()
+            presentedSheet = destination
+        }
     }
 
     private func applySnapshot(_ preset: SnapshotPreset) {
@@ -696,6 +711,7 @@ struct SettingsPanel: View {
                 Section("演绎状态") {
                     Button {
                         onDemoControl()
+                        dismiss()
                     } label: {
                         Label("演绎控制台", systemImage: "slider.horizontal.3")
                     }

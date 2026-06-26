@@ -125,9 +125,11 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）
 - [x] 8.E2 整车/环境 force **mock context**（speed/gear segmented + weather/time_period 互斥 → bridge force-context AD-RPB-014，不碰 state-cells.yaml）
 - [x] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
-- [ ] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
+- [x] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
 
 > 2026-06-26 P1/P2 reconciliation: Phase 4 commit `564d0c0` anchors the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. P2 simulator probe opens the settings sheet, but tapping `演绎控制台` returns to the main stage instead of presenting `DemoControlPanel`; keep 8.E4 open until the settings→control-panel route and cabin macro interaction recording are captured.
+
+> 2026-06-26 P3 follow-up evidence: commit `fix(uiue): close phase4 settings control route` queues the demo-control sheet after settings dismiss; simulator UI tree proves settings→control-panel route, deepSpace theme tab switch, rain macro state mutation, and reset back to idle. Receipt: `docs/research/2026-06-25-a2-execution/phase-4-control-panel-receipt.md#p3-follow-up-settings-route--theme--macro--reset-closure`.
 
 ### 8.F 氛围灯炸场（SD4，plan Phase 5）
 - [x] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）

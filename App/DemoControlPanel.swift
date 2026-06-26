@@ -122,6 +122,7 @@ struct DemoControlPanel: View {
             .scrollContentBackground(.hidden)
             .background(DeepSpaceBackground(theme: theme))
             .navigationTitle("演绎控制台")
+            .accessibilityIdentifier("demo-control-panel")
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("完成") { dismiss() }

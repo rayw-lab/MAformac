@@ -23,7 +23,7 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 |---|---|---|---|---|
 | Phase 2 continuous stage | PARTIAL | local + simulator screenshots + zone compare | `8.A` and `8.C2` remain open; anchor-level visual acceptance 5-gate not closed | Resume visual hard gates only after receipt/coverage stays synchronized |
 | Phase 3 touch chain | PARTIAL / simulator touch-stepper-pass | local + unit + simulator UI tree/tap | `8.D4` and SD7 open; no drag/manual/voice-reasoning mock proof | Record voice-reasoning mock and drag/operator-pass evidence |
-| Phase 4 demo control panel | PARTIAL | local + unit + simulator screenshots/UI tree | `8.E4`, SD8, SD12 open; settings-to-control-panel route currently fails | Fix or re-route nested sheet transaction, then record cabin macro interaction |
+| Phase 4 demo control panel | DONE for A-2 simulator/mock interaction scope | local + unit + simulator screenshots/UI tree | No true-device/product V-PASS; customer-facing acceptance not claimed | Keep proof boundary explicit; do not reopen visual work unless new grill/anchor gap appears |
 | Phase 5 ambient burst | DONE for A-2 simulator/mock scope | local + unit + simulator screenshot + 5s recording | No true-device FPS/readability proof; ambient-card physical tap not recorded | Keep SD16/true-device rows open until later proof |
 | Phase 6 context capsule | DONE for A-2 simulator scope | local + unit + simulator screenshots + ROI metrics + route-spike recording | True-device GPU/FPS and final route-A art deferred | Treat current capsule as simulator-scope anchor, not final mobile proof |
 
@@ -31,7 +31,7 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 
 - No Phase 2 visual V-PASS is claimed. `8.C2`, SD18, SD22, and SD23 remain open because anchor-level human review and the visual-acceptance 5-gate are not closed.
 - Phase 3 has real simulator tap mutation for the AC stepper path, but drag and voice-reasoning mock proof remain missing. SD6 is checked; SD7 stays open.
-- Phase 4 has control-panel code and harness proof, plus settings-sheet entry proof. The settings `演绎控制台` route currently fails, so `8.E4`, SD8, and SD12 stay open.
+- Phase 4 has control-panel code, harness proof, settings-sheet entry proof, settings-to-control-panel route proof, deepSpace theme switch proof, rain macro state mutation proof, and reset proof. `8.E4`, SD8, and SD12 are closed for simulator/mock interaction scope only.
 - Phase 5 and Phase 6 are allowed to say DONE only inside their simulator/mock A-2 boundary. Neither is true-device or mainline proof.
 - `tasks.md`, the coverage index, phase receipts, and runtime evidence now agree on these boundaries.
 
@@ -41,7 +41,7 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 |---|---|---|
 | iOS simulator `build_run_sim` | PASS | runtime/simulator |
 | Phase 3 AC stepper UI tap | PASS: `26℃ -> 27℃` | runtime/simulator |
-| Phase 4 settings route probe | PARTIAL/BLOCKER | runtime/simulator |
+| Phase 4 settings route + macro + reset probe | PASS | runtime/simulator |
 | `swift test` | PASS: 245 tests, 3 skipped, 0 failures | unit |
 | macOS `xcodebuild` | PASS: `** BUILD SUCCEEDED **` | local |
 | `make verify-all` | PASS exit 0 | local + unit |
@@ -52,3 +52,16 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 - Treat drag automation failure as `operator-pass pending`, not as V-PASS.
 - Stop visual iteration when token/time is high and no new proof class is being added; switch to commit, receipt, or reconciliation.
 - Keep evidence capture serial when status-bar override, simulator UI tree, screenshots, or recordings are involved.
+
+## P3 Follow-up Update
+
+Captured at: 2026-06-26 13:08 CST
+
+- Commit subject: `fix(uiue): close phase4 settings control route`.
+- Phase 4 route blocker is resolved by queueing `.demoControl` until the `.settings` sheet dismisses.
+- New screenshots:
+  - `shots/phase4-settings-route-control-panel-fixed-v1.jpg`
+  - `shots/phase4-cabin-macro-rainy-result-v1.jpg`
+  - `shots/phase4-settings-theme-deepspace-v1.jpg`
+  - `shots/phase4-settings-reset-result-v1.jpg`
+- Remaining overall A-2 blockers are still Phase 2 visual acceptance (`8.C2`) and Phase 3 voice/drag proof (`8.D4`/SD7).

@@ -119,3 +119,45 @@ Not anchored here: SD8 settings-entry physical tap proof, SD12 full cabin macro 
 Claim boundary: `PARTIAL / local+simulator-pass` in the isolated UIUE worktree, mock-frontstage only, not mainline proof and not live/backend proof.
 
 Next: gather serial settings-route and macro-interaction evidence before checking SD8/SD12 or promoting the Phase 4 receipt.
+
+## P3 Follow-up: Settings Route + Theme + Macro + Reset Closure
+
+Date: 2026-06-26
+
+Status: DONE for the A-2 Phase 4 simulator/mock interaction scope. Proof remains local/simulator only, not true-device, not mainline proof, not product V-PASS.
+
+Code change:
+
+- `ContentView` now queues `.demoControl` while dismissing the current `.settings` sheet, then presents the queued sheet from the root `.sheet(item:onDismiss:)` handler after dismissal. This preserves the single enum-driven sheet router and fixes the nested settings-to-control-panel route.
+- `SettingsPanel` still owns the visible settings action and dismisses itself after requesting the queued route.
+- `DemoControlPanel` now exposes `accessibilityIdentifier("demo-control-panel")` for stable runtime proof.
+
+Serial simulator evidence:
+
+- `build_run_sim` with `-mockTheme ivory -mockSnapshot cooling`: PASS on iPhone 17 Pro Max simulator.
+- Tap `设置` (`e62`/`e63`) -> settings sheet opened and exposed theme tabs plus `演绎控制台`.
+- Tap `演绎控制台` (`e97`) -> route opened `DemoControlPanel`; UI tree exposed `Mock Force`, `方案经理幕后工具`, `整车运行`, `环境情境`, and `座舱场景`.
+- Screenshot: `docs/research/2026-06-25-a2-execution/shots/phase4-settings-route-control-panel-fixed-v1.jpg`.
+- Scroll control panel (`e82`) -> tap `执行雨天场景宏` (`e124`) -> UI tree changed main-stage mock state to `车窗 0% 执行中`, `雨刮 开 执行中`, `天窗遮阳 0% 执行中`, and dialogue `已 force 雨天 场景`.
+- Screenshot: `docs/research/2026-06-25-a2-execution/shots/phase4-cabin-macro-rainy-result-v1.jpg`.
+- Tap theme `深空` (`e89`) -> UI tree changed theme tabs from `米白|1 / 深空|0` to `米白|0 / 深空|1`.
+- Screenshot: `docs/research/2026-06-25-a2-execution/shots/phase4-settings-theme-deepspace-v1.jpg`.
+- Tap settings `复位` (`e125`) -> UI tree returned to idle reset state: dialogue `我在听...`, `车窗 60% 已满足`, `雨刮 开 待命`, `天窗遮阳 0% 待命`.
+- Screenshot: `docs/research/2026-06-25-a2-execution/shots/phase4-settings-reset-result-v1.jpg`.
+
+What this closes:
+
+- OpenSpec `8.E4`: settings panel route, theme toggle, scene macro force, and reset proof are all simulator-proven.
+- SD8: settings/refresh route now has simulator proof for theme, macro force, and reset.
+- SD12: scene macro + terminal state module flow now has simulator proof for at least the rain macro.
+
+Residual risks:
+
+- This does not claim true-device proof or customer-facing demo acceptance.
+- It does not close Phase 2 visual acceptance or Phase 3 voice-reasoning mock.
+
+## P3 Follow-up Commit Anchor: Phase 4 settings-route closure
+
+Commit subject: `fix(uiue): close phase4 settings control route`
+
+This commit anchors the nested sheet router fix, the stable control-panel accessibility identifier, the four runtime screenshots above, and the tasks/coverage/closeout receipt reconciliation for `8.E4`, SD8, and SD12.
