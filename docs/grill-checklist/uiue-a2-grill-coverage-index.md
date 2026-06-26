@@ -31,7 +31,7 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 
 | 系列 | 数量 | 落点 | A-2 纳入 | 非 A-2 | 状态 |
 |---|---|---|---|---|---|
-| **SD 用户故事** | 25 | storyboard | 21（P0-P6）| SD16 orb⏳ / SD12 宏部分⏳ | ⬜ 主体待消减 |
+| **SD 用户故事** | 25 | storyboard | 21（P0-P6）| SD16 orb本体⏳ / true ASR-TTS训练⏳ | ⬜ 主体待消减；SD12 已由 P4 simulator proof 消减 |
 | **V 视觉块** | 12 | SD18+tokens | 12（P2/P7）| — | ⬜ |
 | **CC corner case** | ~18 | SD18-25 | ~15（P1-P3）| CC2 think⏳ | ⬜ |
 | **AD 架构** | 14 | design | AD-9~14（6，P1-P6）| AD-1~8 已落 4a-c | 🟡 |

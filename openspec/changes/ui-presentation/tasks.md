@@ -1,7 +1,7 @@
 <!--
 PROPOSE-ACTIVE (2026-06-24, 磊哥拍 B 严格 OpenSpec·文档先行防返工) — proposal/design/tasks/spec 已填实(5 Req/29 Scenario, validate 绿)。锁 iOS26/macOS26(那轮拍 A, pre-mortem 坐实)。
 依赖序：本 change = UIUE 前端，依赖 migrate-d-domain([1] A2 已并 main PR#3) 但不依赖 LoRA 训练。
-apply 状态: Phase 1b ✅done / Phase 3 D7 已 apply(commit 6a3e3f9 追认) / Phase 4 契约文档先行, 代码 apply 待后端 default_scope 落 main。
+apply 状态: Phase 1b ✅done / Phase 3 D7 已 apply(commit 6a3e3f9 追认) / A-2 Phase 3/4/5/6 simulator/mock proof 已落锚；Phase 2 visual acceptance `8.A/8.C2` 暂缓且保持 open。旧 `default_scope` 依赖仍按 1.3 独立 carrier，不再阻塞 A-2 mock-frontstage Phase 4 receipt。
 incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/uiue-roadmap-2026-06-23.md。
 锁 iOS26 决策 + pre-mortem 一手见 docs/research/2026-06-24-ios26-lock-d7-premortem/。
 -->
