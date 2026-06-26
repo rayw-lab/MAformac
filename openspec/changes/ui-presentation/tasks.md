@@ -152,3 +152,5 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.G7 取证 receipt `evidence_kind` enum（tap_step/toggle/badge_cycle/continuous_drag/terminal_visual_only，U36）+ 代表族自动化样本矩阵（风量/座椅/车窗/灯光各 1 条）
 - [x] 8.G8 Reduce Motion 降级路径（U35）：粒子/氛围灯/orb 降级 + 禁动效态跑 5gate + 静态「在思考」反馈
 - [ ] 8.G9 UIUE 工程项实装（U14-U18）：Mac AnyLayout 并排 / HTML+Preview 4 类反例 / iPhone 触觉 / snapshot+黄金路径 XCUITest / 客户物料不上架
+  - [x] 8.G9a local/unit（U14/U15/U16/U18/U44）：U14 Mac split 只加契约测试和本地检查；U15 反例 fixture + DebugGallery 静态镜像；U16 触觉 policy 仅允许 iOS userTouch；U18 distribution boundary guard 仅允许 personal/internal self-use；U44 无投屏 Liquid Glass inventory 锁 MicDock/ContextCapsule/DemoControlPanel 三处 glass surface，内容卡继续禁 glass。
+  - [ ] 8.G9b（U17）保留 open：必须单独做 UI test target + 最小 XCUITest + on-screen `simctl io screenshot` L0 截图包；8.G9a local/unit 通过不得勾选父级 8.G9。

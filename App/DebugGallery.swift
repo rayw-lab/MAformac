@@ -122,6 +122,50 @@ struct DemoVisualStateGallery: View {
     }
 }
 
+/// U15 反例 gallery：只消费 `U15CounterexampleFixtures`，避免 Preview/HTML 镜像各自维护状态机或文案。
+struct CounterexampleGallery: View {
+    var body: some View {
+        ZStack {
+            DeepSpaceBackground()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    Text("U15 反例 gallery（静态 fixture 镜像）")
+                        .font(.headline)
+                        .foregroundStyle(DesignTokens.inkPrimary)
+                    ForEach(U15CounterexampleFixtures.all, id: \.id) { fixture in
+                        counterexampleCard(fixture)
+                    }
+                }
+                .padding(24)
+            }
+        }
+        .frame(minWidth: 820, minHeight: 720)
+    }
+
+    private func counterexampleCard(_ fixture: U15CounterexampleFixture) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text(fixture.title)
+                    .font(.headline)
+                    .foregroundStyle(DesignTokens.inkPrimary)
+                Text(fixture.resultKind.rawValue)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(DesignTokens.inkDim)
+            }
+            Text(fixture.snapshot.dialogText)
+                .font(.callout)
+                .foregroundStyle(DesignTokens.inkDim)
+            VehicleCardsGrid(displays: VehicleCardDisplay.familyDisplays(
+                from: fixture.snapshot.storeCells,
+                activeCells: fixture.snapshot.activeCells
+            ))
+            .frame(minHeight: 220)
+        }
+        .padding(16)
+        .background(DesignTokens.inkDim2.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+}
+
 /// value.type 5 类异构控件 spike（4b Task11，验 Gauge `.accessoryCircular` iOS 真渲染 + Grid 内不冲突）。
 /// launch arg `-spikeControls`；simctl 截图过目验环形仪表/容量环渲染（非 watchOS-only 编译错 + 真出环）。
 struct ValueControlsSpikeScreen: View {
@@ -237,6 +281,7 @@ struct MultiCallSequencerSpikeScreen: View {
 }
 
 #Preview("7 态 gallery") { DemoVisualStateGallery() }
+#Preview("U15 反例 gallery") { CounterexampleGallery() }
 #Preview("force unsafe") { ForcedStateScreen(state: .unsafe) }
 #Preview("value 控件 spike") { ValueControlsSpikeScreen() }
 #Preview("座椅展开 spike") { ExpandedFamilyCardSpikeScreen() }
