@@ -109,7 +109,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 8.C 验收（A-2 收口）
 - [x] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
-- [ ] 8.C2 simctl 视觉 + **visual-acceptance 5-gate（米白/深空，还原投屏环境 V10）** + 对比 anchor-set（连续舞台无黑线 / 制冷热 / capsule diorama）
+- [ ] 8.C2 visual-acceptance **L0-L3**（AD-15/U32-U37）：L0 on-screen simctl 真截图 + L1 zone sentinel PASS/WARN/FAIL + L2 OCR/contrast（SSIM 证据）+ **L3 人工 5-gate（米白/深空，~~投屏环境 V10~~ → 手持环境，投屏 DELETE C0）** + anchor-set 对比（连续舞台无黑线 / 制冷热 / capsule diorama）
 
 > 2026-06-26 P2 outer-ring validation reran `swift test`, macOS `xcodebuild`, and `make verify-all`: all PASS. This reinforces `8.C1` only. `8.C2` stays open because visual-acceptance 5-gate and anchor-level human review are not closed. Closeout ledger: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`.
 
@@ -135,3 +135,20 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 8.F 氛围灯炸场（SD4，plan Phase 5）
 - [x] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）
+
+### 8.G 视觉验收门 hardening + 长跑流程机制（AD-15 / U32-U37，2026-06-26 codex ~15h 长跑复盘）
+
+**A 视觉门契约**：
+- [ ] 8.G1 visual-acceptance **L0-L3 门定义**（L0 runtime-truth 字段 / L1 sentinel PASS/WARN/FAIL / L2 OCR+contrast+SSIM / L3 人工 5-gate enum）落 spec + 8.C2 验收口径（AD-15）
+- [ ] 8.G2 一进两出 **8 态 VUI 矩阵测试**（U37）：`DemoRuntimeResultKind.allCases` 每态 视觉态+话术+动效+TTS+proof，禁 default 吞，复用 `FamilyDisplaysTests` 闭合模式
+
+**B 流程机制**（回写流程文档，非本 change spec）：
+- [ ] 8.G3 `plan v3 heavy-work 段` + 全局 `heavy-work` skill 回写：long-run stop-rule（2 轮无新 proof-class 收口）/ 截图链路纪律（必 on-screen simctl 禁 off-screen ImageRenderer）/ proof-class budget
+
+**C 代码**：
+- [ ] 8.G4 `Tools/checks/phase2_zone_compare.py` 输出 RMSE → PASS/WARN/FAIL + stop-rule（U33）
+- [x] 8.G5 ContentView Grid 固定列 ✅ **已实装**（2026-06-26 核：codex 长跑 `VehicleCardsGrid` 用 `Grid + GridRow`（`App/ContentView.swift:1504`），零 LazyVGrid，pre-commit `contentview-wiring` 实跑确认；D5 C22「:40 仍 LazyVGrid」= stale 已 supersede）
+- [ ] 8.G6 `state-cells` 加 `ui_value_type` 派生字段（D3 C11）+ 清残留 2 处 `hvac.*` 命名债（apply 时核现状）
+- [ ] 8.G7 取证 receipt `evidence_kind` enum（tap_step/toggle/badge_cycle/continuous_drag/terminal_visual_only，U36）+ 代表族自动化样本矩阵（风量/座椅/车窗/灯光各 1 条）
+- [ ] 8.G8 Reduce Motion 降级路径（U35）：粒子/氛围灯/orb 降级 + 禁动效态跑 5gate + 静态「在思考」反馈
+- [ ] 8.G9 UIUE 工程项实装（U14-U18）：Mac AnyLayout 并排 / HTML+Preview 4 类反例 / iPhone 触觉 / snapshot+黄金路径 XCUITest / 客户物料不上架

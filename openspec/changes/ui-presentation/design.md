@@ -257,6 +257,22 @@ UIUE 消费 `PresentationSnapshot`（**mock snapshot 即可，不依赖 mainline
 - ⏳ **golden-run 合同回放 + voice ASR/TTS** = `define-demo-golden-run-and-voice` change（**DEFERRED**），不在本 ui-presentation change。
 - ⏳ 卡片数据若需 D-domain 工具数精确关联 → 等 A2 archive + UIUE rebase main 拿产物。
 
+## AD-15 — 视觉验收门 hardening + 长跑流程机制（U32-U37，2026-06-26，codex ~15h 长跑复盘）
+
+> 决策 SSOT = `docs/grill-tournament/uiue-visual-gate-harden-grill-decisions.md`（U32-U37）+ `grill-decisions-master.md` §3。背景：codex A-2 长跑 Phase 2 像素 RMSE 截图 v1→v72 死循环不收敛（磊哥叫停）。设备：仿真 iPhone 17 Pro/Pro Max（主验收），真机 iPhone 15 Pro Max（延后不急）。范围 = ABC 揉进本 change（A 契约 + B 流程 + C 代码，磊哥 2026-06-26）。
+
+**视觉验收门四层（U32，门 vs 证据；核心 frame = L0/L3 真门 / L1/L2 哨兵证据，禁 L2 绿当 L3 pass）**：
+- **L0 runtime-truth = 🚪真门**：截图绑 device/launchArg/theme/UItree/proof_class，**必 on-screen `simctl io screenshot`，禁 off-screen `ImageRenderer`**（防 glass/material 失真，oracle 坐实 swift-snapshot-testing #242/#612）。缺 L0 不进评分。
+- **L1 sentinel（U33）= 🚪有限机械门（只挡塌陷）**：`Tools/checks/phase2_zone_compare.py` 输出 RMSE → **PASS/WARN/FAIL**（非逼近分）+ **long-run stop-rule**（2 轮无新 proof-class 收口）。
+- **L2（U34）= OCR+contrast 🚪可读性硬门 + SSIM 📋退化证据**（LPIPS 不上：PyTorch 依赖 + 对 UI 小元素不准）。
+- **L3 人工 5-gate = 🚪唯一审美终裁**：aesthetic-first 5-gate + verdict enum（V-PASS/V-PASS_WITH_NOTES/PARTIAL/FAIL），只能磊哥给。
+
+**一进两出 contract（U37，防 fake-green）**：`PresentationSnapshot`（`Core/Presentation/PresentationSnapshot.swift:59`）唯一一进容器，**不新建 Visual/Verbal Model**；**presentation derivation 只读 snapshot**（非「ContentView 全程只读」——mutation 层 `App/ContentView.swift:271-283` 可写 store 但必回灌下一帧 snapshot）；`DemoRuntimeResultKind` 8 态 VUI 矩阵穷尽测试无 default（复用 `FamilyDisplaysTests` 闭合模式）。
+
+**取证策略（U36，按控件动作分非按族）**：`tap_step/toggle/badge_cycle` 自动化 tap 取证（state 写入+snapshot 回灌+视觉刷新）；`continuous_drag`（仅 AC hero `ThermalRangeBar`，`App/ContentView.swift:2105`）过程证 operator-pass/真机（idb touch-move iOS26 破）；`force_state = terminal_visual_only` 禁当过程 proof；**代表族矩阵防单样本外推**（风量/座椅/车窗/灯光各 1 条自动化样本）。
+
+**negative-space（U35）**：进门只加 **Reduce Motion**（粒子/氛围灯/orb 降级 + 禁动效态跑 5gate + 静态思考反馈）；**投屏 DELETE**（C0，supersede V10/U23/U24）；Contrast→L2 / 字体→L3 覆盖；Dynamic Type/中文截断/多语言/RTL/晕动 DEFERRED（demo 固定设备 + 控话术）。
+
 ## 待 spike 实证（不预拍）
 
 - AnyView vs enum+switch 性能差（AD-2，C3 局部中立）。

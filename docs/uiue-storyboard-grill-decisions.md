@@ -323,7 +323,7 @@
 | **V7 连续舞台** | 见下「连续舞台 + zone 预算」 | 锚点图 + 硬约束 |
 | **V8 注意力优先级** | **卡片状态变化 > TTS 文本 > orb > ambient edge**；氛围边缘只 5s 不抢指令。配 sequencer 220ms 错峰（不同时炸）| SD17-8 / SD4 |
 | **V9 图标系统** | 全 **SF Symbols**（filled + `.hierarchical` 配态色），反 emoji / 反混自绘。🔴 **10 族→SF Symbol 映射 = 第二 SSOT**（撞 derivation 铁律2）→ 契约存在性（每族必有图标不落 default）；7 态图标 D7 已定 | 新建 `FamilyIconMapper` 穷尽 switch + 契约存在性测试 |
-| **V10 可读性验收** | 视觉 hard gate：最小字号 / 中文最长文案（「打开主驾驶座椅加热」级）/ 44pt touch / Reduce Motion / 低电量 / **1080p 投屏截图**。🔴 **还原投屏环境非 Mac 高清自嗨**（claim-vs-reality 视觉版）| visual-acceptance gate（米白/深空各跑）|
+| **V10 可读性验收** | 视觉 hard gate：最小字号 / 中文最长文案（「打开主驾驶座椅加热」级）/ 44pt touch / Reduce Motion / 低电量 / ~~1080p 投屏截图~~ 🔴 **投屏维度 SUPERSEDED**（2026-06-26 磊哥 C0：demo master agent 手持演示**不投屏**，投屏 DELETE；见 `docs/grill-tournament/uiue-visual-gate-harden-grill-decisions.md` C0/U35）。保留非投屏可读性维度 | visual-acceptance gate（米白/深空各跑）|
 | **V11 duration ladder** | 4 档：micro 120 / state 220 / panel 320 / ambient 5s + **2 例外**：breathe 3.4s（循环）/ boot 2.5s（一次性）| tokens.md §4 扩 `motion.dur.*` |
 | **V12 组件密度** | **Mac 左右分栏**（左 orb+对话 / 右车控 5×2 全景不滚动）≠ **iPhone 竖直三屏**（2 列滚动 + active hero）| 平台分支布局 |
 

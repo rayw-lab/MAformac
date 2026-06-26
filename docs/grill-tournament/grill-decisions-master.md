@@ -151,8 +151,8 @@
 | U20 | R2-G13 | 二期 domain 切换 | ⭐落域对话驱动非 tab（tab/抽屉是 5min 迷路高发区）| 🔴待续批（二期方向位）| Q19/Q35 |
 | U21 | R3-G1 | barge-in 打断方式 | ⭐PTT 物理打断（非 VAD 自动；false barge-in 比 missed 更伤，会议室 VAD 误触=穿帮）| 🔴待续批 | Q36 |
 | U22 | R3-G2 | TTFA 策略 | ⭐先做满掩盖术 immediate ack（端侧难达 300ms，visual ack 把 1000ms 感觉成 500ms）| 🔴待续批 | Q36 |
-| U23 | R3-G3 | 暗底投屏 | ⭐保暗底 + 投屏模式秒键 ⌃P 切提亮（8bit 投影把暗渐变变灰 banding）| 🔴待续批 | Q34 |
-| U24 | R3-G4 | 投屏链路 | ⭐USB-C/HDMI 有线（AirPlay 仅 fallback；AirPlay 30-80ms 抖动+Wi-Fi 掉线）| 🔴待续批 | Q34 |
+| U23 | R3-G3 | 暗底投屏 | 🟡 **投屏维度 DELETE（C0 投屏全删，2026-06-26）**：⌃P 投屏切提亮作废；**暗底深空保留**（V6/U11） | 🟡 部分 superseded by C0（视觉门 grill U35）| Q34 |
+| U24 | R3-G4 | 投屏链路 | 🔪 **DELETE（C0 投屏全删，2026-06-26）**：USB-C/AirPlay 投屏链路不做（demo 手持演示） | 🔪 superseded by C0（视觉门 grill）| Q34 |
 | U25 | R3-G5 | 锁域可视化 | ⭐仅一枚当前域锁域胶囊（topic_stack 面包屑抢视觉增负荷）| 🔴待续批（二期方向位）| Q35 |
 | U26 | R3-G6 | 卡片渲染分发 | ⭐enum+switch(value.type) 非 AnyView（AnyView 破类型 diff 渲染慢）| 🔴待续批 | Q31 |
 | U27 | R3-G7 | 降级反馈粒度 | ⭐三触发器各自 UX+banner+ETA（单 boolean 反模式）→ CTX：状态四态分开（clarify/unsupported/safety/crash）消费 DemoVisualState 7 态 | 🟡待续批 | Q35 |
@@ -161,7 +161,21 @@
 | U30 | R3-G10 | orb shader 复杂度 | ⭐核心 native MeshGradient（必 `#available`，CTX）shader 仅氛围层（layerEffect 最贵与 mlx 抢 GPU 掉 50%）| 🟡待续批 | Q36/Q38 |
 | U31 | R3-G11 | 接真模型才能定 | （清单非投票）真实 TTFA/think tag 形态/thermal 曲线/shader 有效性/stopSpeaking delegate = 第四轮实证锚点 → CTX：**spike 实证项不拍** | 🟡待续批 | Q36/Q38 |
 
+### U32-U37 视觉验收门 hardening + 长跑流程机制（2026-06-26，codex ~15h 长跑复盘）
+> 一手 SSOT = `docs/grill-tournament/uiue-visual-gate-harden-grill-decisions.md`（engineering-contract mode + pre-mortem oracle 核证）。背景：codex A-2 长跑 Phase 2 像素 RMSE 死循环 v1→v72 不收敛实证。范围校准：投屏全删（supersede V10 投屏维度）/ demo 非车载工程 / ABC 揉一个 change 不降级。
+
+| U | 议题 | 结论 / 状态 | 挂 Q |
+|---|---|---|---|
+| U32 | 视觉验收门分层 L0-L3 + 门/证据定位（L0+L3 真门 / L1+L2 哨兵证据，SSIM 非审美门，L3 人工唯一审美终裁） | 🟡 框架拍 2026-06-26 | Q38 |
+| U33 | L1 zone_compare 语义降级 PASS/WARN/FAIL + long-run stop-rule（非 RMSE 逼近分；修脚本语义≠推翻像素门） | ✅ 已拍 | Q38 |
+| U34 | L2 指标 SSIM+OCR+WCAG contrast / LPIPS 不上 | ✅ 已拍 | Q38 |
+| U35 | negative-space 进门维度：进门只加 Reduce Motion（+5gate 复跑+静态思考反馈）；Contrast/字体已 L2/L3 覆盖；Dynamic Type/Color-blind/中文截断/多语言/RTL/晕动 DEFERRED | ✅ 拍定 2026-06-26 | Q38 |
+| U36 | 交互取证按控件动作分（tap_step/toggle/badge_cycle 自动化 · continuous_drag[仅 AC hero]operator-pass · force_state=terminal_visual_only 禁当过程 proof）+ 代表族矩阵防单样本外推 | ✅ 拍定 2026-06-26 | Q38 |
+| U37 | 一进两出：复用 PresentationSnapshot 不新建三类 + presentation derivation 只读 snapshot（mutation 层写 store 必回灌下一帧）+ 8 态 VUI 矩阵穷尽测试无 default | ✅ 拍定 2026-06-26 | Q38 |
+
 > **U-续批纪律（CTX U1-U31 关键拍板）**：U5 Metal 一期做 / U6 补麦克风 key+memory entitlement（非缺整个 plist，仓内已有 xcodeproj+2 app target）/ U8 演示编排并入 demo-golden-run 不单独 change / U10·U27 状态四态分开（clarify/unsupported/safety/crash，消费 DemoVisualState 7 态）/ U12 XcodeGen 降 P1 / U13 卡片按 10 族 family_card_id / U19 iOS18 API 必 `#available` / U28 中文 TTS 锁普通话（iOS18 confirmed/iOS26 preflight）/ U30 MeshGradient 必 `#available` / U31 spike 实证项不拍。
+
+> 🔴 **U11-U31 一把过收口（磊哥 2026-06-26，UIUE grill 彻底收口）**：上方 U11-U31 表 🔴/🟡 旧状态列**以本 banner 为准**。**活跃组全 ⭐ 拍定**：U12 XcodeGen 降 P1 / U13 卡片按 10 族 / **U14 Mac AnyLayout 不用 SplitView** / **U15 HTML+Preview 补 4 类反例** / **U16 触觉 Mac 不做 iPhone 加分** / **U17 snapshot+黄金路径 XCUITest**（衔接 U32-U37 视觉门）/ **U18 客户物料不上架** / U19 #available+iOS17 fallback / U26 enum+switch(value.type) 非 AnyView（已实装 UIValueTypeMapper/ValueControlView）/ U27 四态分开 / U30 MeshGradient+shader 仅氛围层（部分 Phase5）。**DEFERRED 独立立项**：voice U21/U22/U28 + U29(golden-run)。**二期方向位**：U20/U25。**已定不拍**：U11✅已落(tokens.md) / U23·U24 🔪DELETE(投屏 C0) / U31 spike 不拍。
 
 ### D1-D7 视觉/聚焦/数据/双端/动效/炸场深度 grill 决策晶体（2026-06-23，二次深 grill + 盲评复议 + A2 影响确认）
 
@@ -174,7 +188,7 @@
 | D2 | 展开/聚焦 | ExpandTrigger enum + FocusController 单点 + ExpansionAnimation(默认 opacityScale, gated matchedGeometry) + MAX_CONCURRENT_EXPANSIONS=1 | C10 折叠+角标(keep) / C8 子 device 优先级(keep) / C7 展开布局 / C9 展开并发(weak) / 🔴 prerequisite family_priority.json | **C8 数据源已就位**：A2 产 `generated/family-device-allowlist.json`（10 族含 device_count+intent_count+**row_count**，如 ac 族 25device/68intent/212row）→ demo 用 row_count 作高频代理（见复议 #7） |
 | D3 | 卡片渲染/value.type | ui_value_type 派生字段(state-cells，**数据 type≠UI value.type**) + @ViewBuilder 穷尽 switch + GPUBudgetCoordinator + FamilyCardLayout | C12 原生控件(strong 21.7) / C11 enum+switch 非 AnyView(solid) / C13 GPU 错峰(keep) / C3 分发实现(weak, AnyView 性能需 spike) | 🔴 **C11 待 UIUE 补派生字段**：A2 `state-cells.yaml` 有 type/unit/execution_range，**无 ui_value_type**（UIUE 加）；命名清债 A2 部分完成（`ac.power` 新命名 7 处，**残留 2 处 `hvac.*`** 待清） |
 | D4 | 双端 demo | 🔴 Mac+iPhone **两独立纯端侧 demo 实例**（iPhone 脱机独立全功能接语音）；TransportKind{none,bonjour}（删 sharedFile 镜像） | 磊哥纠正推翻镜像（D1.Q1.4 SUPERSEDED-BY D4）/ C17 Bonjour 机制(solid) / C16 竖屏内容(weak) / C4 双独立 | A2 不碰；两端共享 A2 的 D-domain IR + state-cells（端态自包含，无后端） |
-| D5 | 状态切换动效 | matchedGeometry 状态切换(macOS 可用，现 passed) vs 跨栈 zoom(unavailable)；Grid 非 LazyVGrid；promotion_criteria 5 条；ripple↔gate ungate 解循环依赖 | C21 matchedGeometry 不用 zoom(strong 均分 23.2，facts 峰值 25@round-03) / C22 Grid(strong) / C25 gated upgrade(solid) / C23 opacityScale 兜底(keep) | 🔴 **C22 待 UIUE 改**：`ContentView:40` 仍 `LazyVGrid(.adaptive(minimum:160))`（A2 不碰视觉，UIUE 改 Grid 固定列） |
+| D5 | 状态切换动效 | matchedGeometry 状态切换(macOS 可用，现 passed) vs 跨栈 zoom(unavailable)；Grid 非 LazyVGrid；promotion_criteria 5 条；ripple↔gate ungate 解循环依赖 | C21 matchedGeometry 不用 zoom(strong 均分 23.2，facts 峰值 25@round-03) / C22 Grid(strong) / C25 gated upgrade(solid) / C23 opacityScale 兜底(keep) | ✅ **C22 已实装**（2026-06-26 核：codex 长跑 ContentView 已 `Grid + GridRow`（`App/ContentView.swift:1504`），零 LazyVGrid，pre-commit contentview-wiring 实跑确认；旧「:40 仍 LazyVGrid」stale supersede） |
 | D6 | 炸场/降级 | shader-inventory + wow-choreography 4 段 + tts-policy + **双通道降级**（关键态用颜色/数值/图标承载，动画只锦上添花） | 🔴 C30 稳>炸(strong 23.3，升横切) / C28 TTS 视觉先行(strong) / C26 shader fallback(strong) / C29 断网 morph(keep) / Codex catch CC 3 处 claim-vs-reality | A2 不碰 |
 | **D7（新增，盲评 GAP-2）** | **7 态逐态视觉消费** | 🔴 **DemoVisualState 7 态各自正面渲染**（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown），**四态分开**（clarify 琥珀 ≠ unsupported 灰 ≠ safety 红 ≠ crash 灰）；消费 trace guardReason/readbackResult | 盲评 GAP-2：grill 漏「7 态逐态视觉」单独决策（ContentView:122 头号现役债）；tokens.md §2 已落 7 态色映射（待磊哥审冻结） | 🔴 **D7 头号待 UIUE 补**：`ContentView:122/:126` 仍 `cell.visualState == .satisfied ? green : gray`（7 态压绿/灰二值）；A2 不碰视觉，UIUE 链路 A 补全 7 态穷尽 switch |
 

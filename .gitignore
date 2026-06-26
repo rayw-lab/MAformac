@@ -68,3 +68,10 @@ Reports/*
 Tools/agent-platform-plugin-refs/
 # generated AI reference images (42M, regenerable from gptimage2-anchor-set/*.md prompts; kept local)
 docs/design/anchors/
+
+# 脏区清理 2026-06-26: UIUE Phase2 视觉迭代死循环产物(v1→v72 截图 + zone-compare, 687M 不入仓;
+# 反模式物证已在 grill-tournament/uiue-visual-gate-harden-grill-decisions.md; 保留 anchor + zone-compare-phase6 的 README/metrics)
+docs/research/2026-06-25-a2-execution/shots/
+docs/research/2026-06-25-a2-execution/zone-compare-v*/
+docs/research/2026-06-25-a2-execution/app-state-phase5-ambient/
+docs/research/2026-06-25-a2-execution/*-sidebyside.png
