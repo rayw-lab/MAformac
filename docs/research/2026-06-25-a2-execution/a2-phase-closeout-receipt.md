@@ -87,6 +87,14 @@ Captured at: 2026-06-26 final closeout pass.
 - Scope: 500+ line long-form summary of the 10+ hour A-2 UIUE run, including commit ledger, phase ledger, proof classes, residual risks, process lessons, and next-resume route.
 - Boundary: same as this receipt; PARTIAL overall because Phase 2 visual acceptance `8.A/8.C2` remains open.
 
+## Final JSONL-Reviewed Report
+
+Captured at: 2026-06-26 post-JSONL review pass.
+
+- Report: `docs/research/2026-06-25-a2-execution/a2-final-jsonl-reviewed-closeout-report.md`.
+- Scope: user-requested final long report after reviewing the live session JSONL, lessons learned, process docs, receipts, tasks, coverage, and current goal state.
+- Boundary: final report for the current paused state, not A-2 completion. Phase 0/1/3/4/5/6 are closed only within their recorded local/unit/simulator/mock scopes; Phase 2 visual acceptance, full Phase 7 visual closeout, true-device proof, mainline proof, and product V-PASS remain open.
+
 ## Task Ledger Maintenance
 
 Captured at: 2026-06-26 task reconciliation pass.
