@@ -13,6 +13,11 @@ extension ExecutionRange {
 /// base → 控件数值范围（dial/percent/stepper 用）；从 contract `execution_range` 读 = 真 SSOT。
 /// enum/只读 base（无 execution_range，如 ac.power/ambient.color/vehicle.gear）返 nil（toggle/badge 不需范围）。
 enum ValueRangeMapper {
+    enum StepDirection {
+        case increment
+        case decrement
+    }
+
     static func executionRange(forBase base: String, catalog: StateCellPresentationCatalog = .shared) -> ExecutionRange? {
         catalog.executionRange(for: base)
     }
@@ -29,6 +34,34 @@ enum ValueRangeMapper {
     static func clamp(_ value: Double, forBase base: String, catalog: StateCellPresentationCatalog = .shared) -> Double {
         guard let r = range(forBase: base, catalog: catalog) else { return value }
         return value.clamped(to: r)
+    }
+
+    static func steppedValue(
+        _ current: Double,
+        forBase base: String,
+        direction: StepDirection,
+        catalog: StateCellPresentationCatalog = .shared
+    ) -> String {
+        let delta: Double = direction == .increment ? 1 : -1
+        let next = clamp(current + delta, forBase: base, catalog: catalog)
+        return format(next)
+    }
+
+    static func toggledValue(isOn: Bool) -> String {
+        isOn ? "off" : "on"
+    }
+
+    static func nextBadgeValue(current: String, options: [String]) -> String {
+        guard !options.isEmpty else { return current }
+        guard let index = options.firstIndex(of: current) else { return options[0] }
+        return options[(index + 1) % options.count]
+    }
+
+    private static func format(_ value: Double) -> String {
+        if value.rounded() == value {
+            return String(Int(value))
+        }
+        return String(value)
     }
 }
 

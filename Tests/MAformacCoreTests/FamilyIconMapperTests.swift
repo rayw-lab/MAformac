@@ -13,8 +13,8 @@ final class FamilyIconMapperTests: XCTestCase {
     }
 
     func testRepresentativeStableSymbols() {
-        XCTAssertEqual(FamilyIconMapper.sfSymbol(for: .ac), "fan.fill")
-        XCTAssertEqual(FamilyIconMapper.sfSymbol(for: .ambient), "lightbulb.led.fill")
-        XCTAssertEqual(FamilyIconMapper.sfSymbol(for: .volume), "speaker.wave.2.fill")
+        XCTAssertEqual(FamilyIconMapper.sfSymbol(for: .ac), "fan")
+        XCTAssertEqual(FamilyIconMapper.sfSymbol(for: .ambient), "lightbulb")
+        XCTAssertEqual(FamilyIconMapper.sfSymbol(for: .volume), "speaker.wave.2")
     }
 }

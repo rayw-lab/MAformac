@@ -38,6 +38,21 @@ final class ValueRangeMapperTests: XCTestCase {
         XCTAssertEqual(ValueRangeMapper.clamp(5, forBase: "ac.power", catalog: catalog), 5.0, "无 range 的 base 原样返回")
     }
 
+    func testNextSteppedValueClampsToExecutionRange() {
+        XCTAssertEqual(ValueRangeMapper.steppedValue(32, forBase: "ac.temp_setpoint", direction: .increment, catalog: catalog), "32")
+        XCTAssertEqual(ValueRangeMapper.steppedValue(18, forBase: "ac.temp_setpoint", direction: .decrement, catalog: catalog), "18")
+        XCTAssertEqual(ValueRangeMapper.steppedValue(24, forBase: "ac.temp_setpoint", direction: .increment, catalog: catalog), "25")
+        XCTAssertEqual(ValueRangeMapper.steppedValue(2, forBase: "seat.heat_level", direction: .decrement, catalog: catalog), "1")
+    }
+
+    func testNextToggleAndBadgeValuesCycleWithoutViewRangeLogic() {
+        XCTAssertEqual(ValueRangeMapper.toggledValue(isOn: true), "off")
+        XCTAssertEqual(ValueRangeMapper.toggledValue(isOn: false), "on")
+        XCTAssertEqual(ValueRangeMapper.nextBadgeValue(current: "白", options: ["白", "浅蓝紫", "冰蓝"]), "浅蓝紫")
+        XCTAssertEqual(ValueRangeMapper.nextBadgeValue(current: "冰蓝", options: ["白", "浅蓝紫", "冰蓝"]), "白")
+        XCTAssertEqual(ValueRangeMapper.nextBadgeValue(current: "未知", options: ["白", "浅蓝紫"]), "白")
+    }
+
     // 🔴 契约 SSOT 加载守卫：catalog 必加载成功（否则 range 全 nil 假绿）
     func testCatalogLoadedWithExecutionRanges() {
         XCTAssertNotNil(ValueRangeMapper.range(forBase: "ac.temp_setpoint", catalog: catalog),

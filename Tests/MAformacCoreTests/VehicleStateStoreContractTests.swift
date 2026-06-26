@@ -50,4 +50,41 @@ final class VehicleStateStoreContractTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
         XCTAssertEqual(store.cell(for: "ac.power")?.visualState, .satisfied)
     }
+
+    @MainActor
+    func testValueChangeProducesNonNormalVisualState() {
+        let store = DemoVehicleStateStore(cells: [
+            DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24")
+        ])
+
+        _ = store.applyMockTransition(DemoMockTransition(key: "ac.temp_setpoint[主驾]", desiredValue: "26", source: .user))
+
+        XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+        XCTAssertNotEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.visualState, .normal)
+    }
+
+    @MainActor
+    func testToggleOffKeepsNormalVisualState() {
+        let store = DemoVehicleStateStore(cells: [
+            DemoVehicleStateCell(key: "ac.power", actualValue: "on", visualState: .satisfied)
+        ])
+
+        _ = store.applyMockTransition(DemoMockTransition(key: "ac.power", desiredValue: "off", source: .user))
+
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertEqual(store.cell(for: "ac.power")?.visualState, .normal)
+    }
+
+    @MainActor
+    func testReplaceCellsSeedsMockPresentationStore() {
+        let store = DemoVehicleStateStore()
+
+        store.replaceCells([
+            DemoVehicleStateCell(key: "ac.temp_setpoint", actualValue: "26"),
+            DemoVehicleStateCell(key: "volume.level", actualValue: "38")
+        ])
+
+        XCTAssertEqual(store.presentationCells.map(\.key), ["ac.temp_setpoint", "volume.level"])
+        XCTAssertNil(store.cell(for: "ac.power"))
+    }
 }

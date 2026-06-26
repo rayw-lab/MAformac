@@ -23,4 +23,27 @@ final class AmbientBurstColorMapperTests: XCTestCase {
         XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: "紫"), ["紫色", "黄色"])
         XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: "白"), ["白色", "黄色"])
     }
+
+    func testAmbientColorDeltaTriggersBurstOnlyForAmbientColor() {
+        XCTAssertEqual(
+            AmbientBurstTriggerPolicy.triggerColor(key: "ambient.color", previousValue: "白色", nextValue: "紫色"),
+            "紫色"
+        )
+        XCTAssertEqual(
+            AmbientBurstTriggerPolicy.triggerColor(key: "ambient.color[面发光氛围灯]", previousValue: nil, nextValue: "蓝色"),
+            "蓝色"
+        )
+        XCTAssertNil(
+            AmbientBurstTriggerPolicy.triggerColor(key: "ambient.brightness[面发光氛围灯]", previousValue: "40", nextValue: "70")
+        )
+    }
+
+    func testAmbientColorAliasesDoNotFalseTriggerWhenNormalizedValueIsSame() {
+        XCTAssertNil(
+            AmbientBurstTriggerPolicy.triggerColor(key: "ambient.color", previousValue: "紫", nextValue: "紫色")
+        )
+        XCTAssertNil(
+            AmbientBurstTriggerPolicy.triggerColor(key: "ambient.color", previousValue: "浅蓝紫", nextValue: "浅蓝紫色")
+        )
+    }
 }

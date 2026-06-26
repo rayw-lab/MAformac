@@ -120,6 +120,10 @@ public final class DemoVehicleStateStore {
         cellsByKey[key]
     }
 
+    public func replaceCells(_ cells: [DemoVehicleStateCell]) {
+        cellsByKey = Dictionary(uniqueKeysWithValues: cells.map { ($0.key, $0) })
+    }
+
     @discardableResult
     public func applyMockTransition(_ transition: DemoMockTransition) -> DemoActionReadback {
         guard var cell = cellsByKey[transition.key] else {
@@ -130,12 +134,17 @@ public final class DemoVehicleStateStore {
                 spokenText: "状态未定义"
             )
         }
+        let oldValue = cell.actualValue
         cell.desiredValue = transition.desiredValue
         cell.actualValue = transition.desiredValue
         cell.source = transition.source
         cell.revision += 1
         cell.timestamp = Date()
-        cell.visualState = transition.desiredValue == "on" ? .satisfied : .normal
+        cell.visualState = Self.visualStateAfterMockTransition(
+            oldValue: oldValue,
+            desiredValue: transition.desiredValue,
+            previousState: cell.visualState
+        )
         cellsByKey[transition.key] = cell
 
         return DemoActionReadback(
@@ -144,6 +153,23 @@ public final class DemoVehicleStateStore {
             revision: cell.revision,
             spokenText: DemoVehicleStateStore.spokenText(for: cell)
         )
+    }
+
+    private static func visualStateAfterMockTransition(
+        oldValue: String,
+        desiredValue: String,
+        previousState: DemoVisualState
+    ) -> DemoVisualState {
+        if desiredValue == oldValue {
+            return previousState
+        }
+        if desiredValue == "on" {
+            return .satisfied
+        }
+        if desiredValue == "off" {
+            return .normal
+        }
+        return .changing
     }
 
     public func reset() {

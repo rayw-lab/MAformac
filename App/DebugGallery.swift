@@ -15,6 +15,13 @@ enum DebugVisualState {
         return DemoVisualState(rawValue: args[i + 1])
     }
 
+    /// 从 launch argument 读 force-theme；nil = deepSpace（沿用旧 DEBUG 脚手架默认）。
+    static var forcedTheme: PresentationTheme {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-forceTheme"), i + 1 < args.count else { return .deepSpace }
+        return PresentationTheme(rawValue: args[i + 1]) ?? .deepSpace
+    }
+
     /// 7 态样例（ac 主 cell 数值 + blocked 态 reason；值保持数值，态色+图标+reason 表达结果，不把状态词塞进数值避免「不支持℃」）。
     static let samples: [(state: DemoVisualState, value: String, reason: String?)] = [
         (.normal, "26", nil),
@@ -56,17 +63,19 @@ enum DebugVisualState {
 /// force-state 满屏 10 族 grid（5-gate 验收主屏）。
 struct ForcedStateScreen: View {
     let state: DemoVisualState
+    var theme: PresentationTheme = .deepSpace
+
     var body: some View {
         ZStack {
-            DeepSpaceBackground()
+            DeepSpaceBackground(theme: theme)
             VStack(alignment: .leading, spacing: 12) {
-                Text("force-state · \(state.rawValue)")
+                Text("force-state · \(state.rawValue) · \(theme.rawValue)")
                     .font(.caption.monospaced())
-                    .foregroundStyle(DesignTokens.inkDim)
+                    .foregroundStyle(DesignTokens.palette(for: theme).inkDim)
                 VehicleCardsGrid(displays: VehicleCardDisplay.familyDisplays(
                     from: DebugVisualState.forcedScenarioCells(state),
                     reasons: { DebugVisualState.forcedReason(forKey: $0, state: state) }
-                ))
+                ), theme: theme)
             }
             .padding(20)
         }

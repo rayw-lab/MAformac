@@ -13,6 +13,15 @@ final class VehicleCardDisplayTests: XCTestCase {
         XCTAssertEqual(catalog.defaultScope(for: "window.position"), "主驾")
     }
 
+    func testCatalogExposesControlPanelDefaultsFromStateCells() {
+        let catalog = StateCellPresentationCatalog.load()
+
+        XCTAssertEqual(catalog.cellDefinitions.count, 33)
+        XCTAssertEqual(catalog.defaultValue(for: "ac.temp_setpoint"), "24")
+        XCTAssertEqual(catalog.defaultValue(for: "window.position"), "0")
+        XCTAssertEqual(catalog.defaultValue(for: "vehicle.gear"), "P")
+    }
+
     func testDefaultScopeUsesValueCardWithDimBadge() {
         let displays = VehicleCardDisplay.displays(
             from: [

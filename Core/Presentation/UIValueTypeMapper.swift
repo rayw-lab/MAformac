@@ -380,6 +380,14 @@ struct StateCellPresentationCatalog {
         defaultScopeByBase[base]
     }
 
+    func defaultValue(for base: String) -> String? {
+        lookup?.cell(id: base)?.defaultValue
+    }
+
+    var cellDefinitions: [StateCellDefinition] {
+        lookup?.cells ?? []
+    }
+
     /// 控件值域（dial/percent/stepper）；委托 A2 `StateCellContractLookup`（execution_range 单一 SSOT，UIUE 不重复手写解析）。
     /// enum/只读 base（无 execution_range）返 nil（toggle/badge 不需范围）。
     func executionRange(for base: String) -> ExecutionRange? {

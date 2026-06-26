@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C60000000000000000000004 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = C60000000000000000000002 /* Vortex */; };
+		C60000000000000000000005 /* Vortex in Frameworks */ = {isa = PBXBuildFile; productRef = C60000000000000000000003 /* Vortex */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		A10000000000000000000001 /* MAformacMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MAformacMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000002 /* MAformacIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MAformacIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -34,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C60000000000000000000004 /* Vortex in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C60000000000000000000005 /* Vortex in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,6 +94,9 @@
 				A20000000000000000000003 /* Features */,
 			);
 			name = MAformacMac;
+			packageProductDependencies = (
+				C60000000000000000000002 /* Vortex */,
+			);
 			productName = MAformacMac;
 			productReference = A10000000000000000000001 /* MAformacMac.app */;
 			productType = "com.apple.product-type.application";
@@ -109,6 +119,9 @@
 				A20000000000000000000003 /* Features */,
 			);
 			name = MAformacIOS;
+			packageProductDependencies = (
+				C60000000000000000000003 /* Vortex */,
+			);
 			productName = MAformacIOS;
 			productReference = A10000000000000000000002 /* MAformacIOS.app */;
 			productType = "com.apple.product-type.application";
@@ -140,6 +153,9 @@
 			);
 			mainGroup = A40000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C60000000000000000000001 /* XCRemoteSwiftPackageReference "Vortex" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A40000000000000000000002 /* Products */;
 			projectDirPath = "";
@@ -184,6 +200,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C60000000000000000000001 /* XCRemoteSwiftPackageReference "Vortex" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/Vortex";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C60000000000000000000002 /* Vortex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C60000000000000000000001 /* XCRemoteSwiftPackageReference "Vortex" */;
+			productName = Vortex;
+		};
+		C60000000000000000000003 /* Vortex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C60000000000000000000001 /* XCRemoteSwiftPackageReference "Vortex" */;
+			productName = Vortex;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AB0000000000000000000001 /* Debug */ = {
@@ -306,6 +346,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = (
+					UIInterfaceOrientationPortrait,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -338,6 +381,9 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = (
+					UIInterfaceOrientationPortrait,
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

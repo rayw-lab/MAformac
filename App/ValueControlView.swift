@@ -11,6 +11,13 @@ import SwiftUI
 ///   - `badge`   = 二级 `BadgeRenderStyle` 穷尽 switch  色块 / 模式 / 纯文本（无 if 链无 AnyView，守 spec.md:83）
 ///
 /// 🔴 双通道（AD-7）：值由「数值环 + 文本 + 色」共同承载，非只靠 Gauge 图形；ReduceMotion/低对比仍可读。
+struct ValueControlActions {
+    var increment: (() -> Void)?
+    var decrement: (() -> Void)?
+    var toggle: (() -> Void)?
+    var cycleBadge: (() -> Void)?
+}
+
 struct ValueControlView: View {
     let valueType: UIValueType
     let numericValue: Double       // dial/percent/stepper 的数值
@@ -20,6 +27,7 @@ struct ValueControlView: View {
     let isOn: Bool                 // toggle 开关态
     let badgeStyle: BadgeRenderStyle
     var tint: Color = DesignTokens.glowCyan
+    var actions = ValueControlActions()
 
     var body: some View {
         // 🔴 spec R2：穷尽 switch（无 default），每类 dedicated 分支，禁 AnyView（保静态类型 diff 高效，C11/C12）
@@ -34,30 +42,40 @@ struct ValueControlView: View {
 
     // dial = 环形仪表（🔴 .accessoryCircular 非 watchOS .circular）
     private var dialGauge: some View {
-        Gauge(value: numericValue.clamped(to: range), in: range) {
-            EmptyView()
-        } currentValueLabel: {
-            Text(displayText)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(DesignTokens.inkPrimary)
-                .minimumScaleFactor(0.6)
+        StepperLikeShell(
+            onDecrement: actions.decrement,
+            onIncrement: actions.increment
+        ) {
+            Gauge(value: numericValue.clamped(to: range), in: range) {
+                EmptyView()
+            } currentValueLabel: {
+                Text(displayText)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DesignTokens.inkPrimary)
+                    .minimumScaleFactor(0.6)
+            }
+            .gaugeStyle(.accessoryCircular)
+            .tint(tint)
         }
-        .gaugeStyle(.accessoryCircular)
-        .tint(tint)
     }
 
     // percent = 容量环（.accessoryCircularCapacity，填充比例直观）
     private var percentGauge: some View {
-        Gauge(value: numericValue.clamped(to: range), in: range) {
-            EmptyView()
-        } currentValueLabel: {
-            Text(displayText)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(DesignTokens.inkPrimary)
-                .minimumScaleFactor(0.6)
+        StepperLikeShell(
+            onDecrement: actions.decrement,
+            onIncrement: actions.increment
+        ) {
+            Gauge(value: numericValue.clamped(to: range), in: range) {
+                EmptyView()
+            } currentValueLabel: {
+                Text(displayText)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DesignTokens.inkPrimary)
+                    .minimumScaleFactor(0.6)
+            }
+            .gaugeStyle(.accessoryCircularCapacity)
+            .tint(tint)
         }
-        .gaugeStyle(.accessoryCircularCapacity)
-        .tint(tint)
     }
 
     // stepper = 分段档位条（当前档高亮，离散 N 档；双通道：档数 + 文本）
@@ -74,6 +92,14 @@ struct ValueControlView: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DesignTokens.inkPrimary)
         }
+        .overlay(alignment: .leading) {
+            hitButton(label: "减少", systemName: "minus", action: actions.decrement)
+                .offset(x: -26)
+        }
+        .overlay(alignment: .trailing) {
+            hitButton(label: "增加", systemName: "plus", action: actions.increment)
+                .offset(x: 26)
+        }
     }
     private var activeSteps: Int {
         // 🔴 codex P1-2 修：亮段 = 当前档位值(clamp+round)；段数=max → fan「1挡」亮1格 / seat「2挡」亮2格 / 「0挡」亮0格
@@ -82,18 +108,33 @@ struct ValueControlView: View {
 
     // toggle = 开关视觉（开/关 + 图标 + 色）
     private var toggleVisual: some View {
-        HStack(spacing: 6) {
-            Image(systemName: isOn ? "power.circle.fill" : "power.circle")
-                .font(.title3)
-                .foregroundStyle(isOn ? tint : DesignTokens.inkDim)
-            Text(displayText)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(isOn ? DesignTokens.inkPrimary : DesignTokens.inkDim)
+        Button {
+            actions.toggle?()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: isOn ? "power.circle.fill" : "power.circle")
+                    .font(.title3)
+                    .foregroundStyle(isOn ? tint : DesignTokens.inkDim)
+                Text(displayText)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(isOn ? DesignTokens.inkPrimary : DesignTokens.inkDim)
+            }
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel("切换")
     }
 
-    // badge = 二级 BadgeRenderStyle 穷尽 switch（无 default；色块/模式/纯文本）
     @ViewBuilder private var badgeVisual: some View {
+        Button {
+            actions.cycleBadge?()
+        } label: {
+            badgeBody
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("切换选项")
+    }
+
+    @ViewBuilder private var badgeBody: some View {
         switch badgeStyle {
         case .colorSwatch(let name):
             HStack(spacing: 6) {
@@ -114,6 +155,57 @@ struct ValueControlView: View {
             Text(displayText)
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(DesignTokens.inkPrimary)
+        }
+    }
+
+    private func hitButton(label: String, systemName: String, action: (() -> Void)?) -> some View {
+        Button {
+            action?()
+        } label: {
+            Image(systemName: systemName)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DesignTokens.inkDim)
+                .frame(width: 26, height: 34)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+}
+
+private struct StepperLikeShell<Content: View>: View {
+    var onDecrement: (() -> Void)?
+    var onIncrement: (() -> Void)?
+    @ViewBuilder var content: () -> Content
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Button {
+                onDecrement?()
+            } label: {
+                Image(systemName: "minus.circle.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DesignTokens.inkDim)
+                    .frame(width: 24, height: 36)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("减少")
+
+            content()
+                .frame(width: 56, height: 56)
+
+            Button {
+                onIncrement?()
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DesignTokens.inkDim)
+                    .frame(width: 24, height: 36)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("增加")
         }
     }
 }

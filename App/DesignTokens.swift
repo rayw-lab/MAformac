@@ -1,11 +1,85 @@
 import SwiftUI
 
+enum PresentationTheme: String, CaseIterable, Identifiable {
+    case ivory
+    case deepSpace
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .ivory: return "米白"
+        case .deepSpace: return "深空"
+        }
+    }
+
+    var colorScheme: ColorScheme {
+        switch self {
+        case .ivory: return .light
+        case .deepSpace: return .dark
+        }
+    }
+}
+
+struct ThemePalette {
+    var backgroundBase: Color
+    var backgroundHaloA: Color
+    var backgroundHaloB: Color
+    var surface: Color
+    var surfaceElevated: Color
+    var assistantBubble: Color
+    var inkPrimary: Color
+    var inkDim: Color
+    var inkDim2: Color
+    var hairline: Color
+    var softShadow: Color
+    var userBubbleStart: Color
+    var userBubbleEnd: Color
+}
+
 /// 视觉 Design Tokens — Swift 镜像 `docs/design/tokens.md`（视觉 SSOT 单源）。
 ///
 /// 🔴 view 里禁手填 hex，只从 `DesignTokens.*` 取（spec ui-presentation R4）。
 /// 语义分类 FROZEN v1.0（2026-06-24 磊哥审签）；hex 值 DRAFT（实渲微调后冻结，tasks 3.7）。
 /// 锁 iOS26/macOS26（App target deployment）：API 直接用，无 `#available` 版本守卫。
 enum DesignTokens {
+    static func palette(for theme: PresentationTheme) -> ThemePalette {
+        switch theme {
+        case .ivory:
+            ThemePalette(
+                backgroundBase: Color(hex24: 0xF8F4EF),
+                backgroundHaloA: Color(hex24: 0xE4F3FF),
+                backgroundHaloB: Color(hex24: 0xF3EAFF),
+                surface: Color(hex24: 0xFFFFFF),
+                surfaceElevated: Color(hex24: 0xFAF8F5),
+                assistantBubble: Color(hex24: 0xFFFFFF),
+                inkPrimary: Color(hex24: 0x16181D),
+                inkDim: Color(hex24: 0x5D6470),
+                inkDim2: Color(hex24: 0x8A909A),
+                hairline: Color(hex24: 0x000000).opacity(0.06),
+                softShadow: Color(hex24: 0x6B7A90),
+                userBubbleStart: Color(hex24: 0xEAF0FF),
+                userBubbleEnd: Color(hex24: 0xF0EAFE)
+            )
+        case .deepSpace:
+            ThemePalette(
+                backgroundBase: bgBase,
+                backgroundHaloA: glowCyan,
+                backgroundHaloB: glowViolet,
+                surface: Color(hex24: 0x171A24),
+                surfaceElevated: Color(hex24: 0x1C2130),
+                assistantBubble: Color(hex24: 0xFFFFFF).opacity(0.07),
+                inkPrimary: inkPrimary,
+                inkDim: inkDim,
+                inkDim2: inkDim2,
+                hairline: inkDim2.opacity(0.35),
+                softShadow: Color(hex24: 0x000000),
+                userBubbleStart: glowCyan,
+                userBubbleEnd: glowViolet
+            )
+        }
+    }
+
     // MARK: 底色 / 中性（tokens.md §1.1 深空层次）
     static let bgBase = Color(hex24: 0x121212)        // U11 + D2#2 软黑
     static let bgDeepest = Color(hex24: 0x05060C)
@@ -20,6 +94,10 @@ enum DesignTokens {
     // MARK: 功能 / 语义态色（tokens.md §1.3 + §2）
     static let stateOffline = Color(hex24: 0xFFB13C)  // 琥珀 = clarify（非红）
     static let safetyRed = Color(hex24: 0xFF5C6C)     // safety（唯一红）
+    static let semanticCool = Color(hex24: 0x1AA6FF)
+    static let semanticCoolBright = Color(hex24: 0x00E5FF)
+    static let semanticWarm = Color(hex24: 0xFF4D6D)
+    static let semanticWarmBright = Color(hex24: 0xFFB13C)
 
     // MARK: 氛围灯色板（tokens.md §1.4，ambient.color 炸场色块；view 经此取，禁手填 hex）
     /// `ambient.color` 枚举色名 → 色块 Color（深空暗底上 vivid 高对比）。
@@ -33,10 +111,34 @@ enum DesignTokens {
         case "青", "青色": return Color(hex24: 0x00E5FF)
         case "蓝", "蓝色": return Color(hex24: 0x1AA6FF)
         case "紫", "紫色": return Color(hex24: 0x7B5CFF)
+        case "浅蓝紫", "浅蓝紫色": return Color(hex24: 0x5F75FF)
         case "粉", "粉色": return Color(hex24: 0xFF7AC6)
         default: return Color(hex24: 0x7B5CFF)  // 回落 glow.violet
         }
     }
+
+    static func ambientGradient(named name: String) -> [Color] {
+        AmbientBurstColorMapper.burstGradient(for: name).map { ambientColor(named: $0) }
+    }
+
+    static func thermalAccent(for tint: ThermalTint) -> Color {
+        switch tint {
+        case .cooling: return semanticCool
+        case .heating: return semanticWarm
+        case .neutral: return glowCyan
+        }
+    }
+
+    static func thermalGradient(for tint: ThermalTint) -> [Color] {
+        switch tint {
+        case .cooling: return [semanticCool, semanticCoolBright]
+        case .heating: return [semanticWarm, semanticWarmBright]
+        case .neutral: return [semanticCool, semanticWarm]
+        }
+    }
+
+    // MARK: 动效时长（tokens.md §4）
+    static let ambientBurstDuration: TimeInterval = 5.0
 }
 
 extension Color {
@@ -92,6 +194,40 @@ struct CardAppearance: Equatable {
             CardAppearance(background: DesignTokens.inkDim.opacity(0.10),
                            border: DesignTokens.inkDim.opacity(0.50),
                            icon: "exclamationmark.triangle", breathing: false, pulsing: false)
+        }
+    }
+
+    static func of(_ state: DemoVisualState, theme: PresentationTheme) -> CardAppearance {
+        let palette = DesignTokens.palette(for: theme)
+        switch state {
+        case .normal:
+            return CardAppearance(background: palette.surfaceElevated.opacity(theme == .ivory ? 0.72 : 0.36),
+                                  border: palette.hairline,
+                                  icon: nil, breathing: false, pulsing: false)
+        case .satisfied:
+            return CardAppearance(background: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.12 : 0.14),
+                                  border: DesignTokens.glowCyan,
+                                  icon: "checkmark.circle.fill", breathing: true, pulsing: false)
+        case .changing:
+            return CardAppearance(background: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.10 : 0.12),
+                                  border: DesignTokens.glowCyan,
+                                  icon: "arrow.triangle.2.circlepath", breathing: false, pulsing: true)
+        case .blocked_with_alternative:
+            return CardAppearance(background: DesignTokens.stateOffline.opacity(theme == .ivory ? 0.12 : 0.14),
+                                  border: DesignTokens.stateOffline,
+                                  icon: "questionmark.circle.fill", breathing: false, pulsing: false)
+        case .blocked_hard:
+            return CardAppearance(background: palette.inkDim2.opacity(theme == .ivory ? 0.10 : 0.12),
+                                  border: palette.inkDim2.opacity(0.50),
+                                  icon: "lock.fill", breathing: false, pulsing: false)
+        case .unsafe:
+            return CardAppearance(background: DesignTokens.safetyRed.opacity(theme == .ivory ? 0.12 : 0.14),
+                                  border: DesignTokens.safetyRed,
+                                  icon: "exclamationmark.shield.fill", breathing: false, pulsing: false)
+        case .unknown:
+            return CardAppearance(background: palette.inkDim.opacity(0.10),
+                                  border: palette.inkDim.opacity(0.50),
+                                  icon: "exclamationmark.triangle", breathing: false, pulsing: false)
         }
     }
 }

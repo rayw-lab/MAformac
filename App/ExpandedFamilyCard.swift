@@ -6,6 +6,7 @@ import SwiftUI
 struct ExpandedFamilyCard: View {
     let display: ExpandedFamilyDisplay
     let onDismiss: () -> Void
+    var onMockTransition: (String, String) -> Void = { _, _ in }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -27,7 +28,7 @@ struct ExpandedFamilyCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 ForEach(display.rows) { row in
-                    ExpandedCellRowView(row: row)
+                    ExpandedCellRowView(row: row, onMockTransition: onMockTransition)
                     if row.id != display.rows.last?.id {
                         Divider().overlay(DesignTokens.inkDim2.opacity(0.2))
                     }
@@ -54,6 +55,7 @@ struct ExpandedFamilyCard: View {
 /// 单行：device label + 图形控件（穷尽 `ValueControlView`）+ 态图标（双通道）。
 struct ExpandedCellRowView: View {
     let row: ExpandedCellRow
+    var onMockTransition: (String, String) -> Void = { _, _ in }
     private var appearance: CardAppearance { CardAppearance.of(row.visualState) }
 
     var body: some View {
@@ -75,10 +77,69 @@ struct ExpandedCellRowView: View {
                 stepCount: row.stepCount,
                 displayText: row.displayText,
                 isOn: row.isOn,
-                badgeStyle: row.badgeStyle
+                badgeStyle: row.badgeStyle,
+                actions: actions
             )
             .frame(maxWidth: 130, minHeight: 56)
         }
         .padding(.vertical, 2)
+    }
+
+    private var actions: ValueControlActions {
+        ValueControlActions(
+            increment: stepped(.increment),
+            decrement: stepped(.decrement),
+            toggle: toggle,
+            cycleBadge: cycleBadge
+        )
+    }
+
+    private func stepped(_ direction: ValueRangeMapper.StepDirection) -> (() -> Void)? {
+        switch row.valueType {
+        case .dial, .percent, .stepper:
+            return {
+                let base = ScopedStateKey(row.id).base
+                let next = ValueRangeMapper.steppedValue(row.numericValue, forBase: base, direction: direction)
+                onMockTransition(row.id, next)
+            }
+        case .toggle, .badge:
+            return nil
+        }
+    }
+
+    private var toggle: (() -> Void)? {
+        guard row.valueType == .toggle else { return nil }
+        return {
+            onMockTransition(row.id, ValueRangeMapper.toggledValue(isOn: row.isOn))
+        }
+    }
+
+    private var cycleBadge: (() -> Void)? {
+        guard row.valueType == .badge else { return nil }
+        return {
+            let next = ValueRangeMapper.nextBadgeValue(current: currentBadgeValue, options: badgeOptions)
+            onMockTransition(row.id, next)
+        }
+    }
+
+    private var currentBadgeValue: String {
+        switch row.badgeStyle {
+        case .colorSwatch(let name), .mode(let name):
+            return name
+        case .plain:
+            return row.displayText
+        }
+    }
+
+    private var badgeOptions: [String] {
+        let base = ScopedStateKey(row.id).base
+        switch base {
+        case "ambient.color":
+            return ["白", "浅蓝紫", "冰蓝", "蓝色", "紫色", "红色", "橙色", "绿色"]
+        case "seat.massage_mode":
+            return ["关闭", "波浪模式", "舒缓模式", "活力模式"]
+        default:
+            return [row.displayText]
+        }
     }
 }
