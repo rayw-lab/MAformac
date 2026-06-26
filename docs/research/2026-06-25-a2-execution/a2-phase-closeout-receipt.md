@@ -78,3 +78,11 @@ Captured at: 2026-06-26 13:27 CST
 - Simulator UI tree proves `按住说话` tap updates `空调 26℃` to `空调 28℃`, appends `我有点冷了`, and appends `当前 26℃，已为您升到 28℃`.
 - Screenshot: `shots/phase3-voice-mock-cold-to-warm-v1.jpg`.
 - Boundary: A-2 simulator/mock only; not true ASR/TTS/LoRA/backend, not true-device proof, not mainline proof.
+
+## Final Long-Form Report
+
+Captured at: 2026-06-26 final closeout pass.
+
+- Report: `docs/research/2026-06-25-a2-execution/a2-final-500-line-closeout-report.md`.
+- Scope: 500+ line long-form summary of the 10+ hour A-2 UIUE run, including commit ledger, phase ledger, proof classes, residual risks, process lessons, and next-resume route.
+- Boundary: same as this receipt; PARTIAL overall because Phase 2 visual acceptance `8.A/8.C2` remains open.
