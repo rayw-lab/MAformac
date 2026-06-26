@@ -143,7 +143,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 8.G2 一进两出 **8 态 VUI 矩阵测试**（U37）：`DemoRuntimeResultKind.allCases` 每态 视觉态+话术+动效+TTS+proof，禁 default 吞，复用 `FamilyDisplaysTests` 闭合模式
 
 **B 流程机制**（回写流程文档，非本 change spec）：
-- [ ] 8.G3 `plan v3 heavy-work 段` + 全局 `heavy-work` skill 回写：long-run stop-rule（2 轮无新 proof-class 收口）/ 截图链路纪律（必 on-screen simctl 禁 off-screen ImageRenderer）/ proof-class budget
+- [x] 8.G3 `plan v3 heavy-work 段` + 全局 `heavy-work` skill 回写：long-run stop-rule（2 轮无新 proof-class 收口）/ 截图链路纪律（必 on-screen simctl 禁 off-screen ImageRenderer）/ proof-class budget
 
 **C 代码**：
 - [ ] 8.G4 `Tools/checks/phase2_zone_compare.py` 输出 RMSE → PASS/WARN/FAIL + stop-rule（U33）
