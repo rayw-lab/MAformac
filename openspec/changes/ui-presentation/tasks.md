@@ -99,14 +99,16 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 8.A6 边界态（**移除 ContentView TextField 纯语音** / portrait lock / 文案 30 字 truncate / 族外 blocked_hard，SD23）
 - [ ] 8.A7 注意力优先级 + 次要族 fade（V8）+ V9 `FamilyIconMapper`（全 SF Symbols 契约存在性）
 
+> 2026-06-26 v72 PARTIAL evidence: `docs/research/2026-06-25-a2-execution/phase-2-main-stage-receipt.md#additional-v72-atmosphere--ac-scrub-pass` records iPhone screenshots, 4-zone anchor compare, AC fixed hero, toned standby typography, particle/halo atmosphere, and `ThermalRangeBar` scrub code. Runtime UI snapshot sees `vehicle-card-family.ac` with `25℃`; automated drag proof remains blocked by simulator tooling (`FBSimulatorHIDEvent` no touch-move, `idb` absent). Keep 8.A and 8.C2 unchecked until visual-acceptance 5-gate plus anchor-level human review passes.
+
 ### 8.B context capsule diorama（spike-gated，SD24/25）
-- [ ] 8.B1 🔴 capsule route spike（🔴 **模拟器观感对比** A 视频 loop vs C-lite，量观感 + 像不像 anchor；**GPU/帧率真机验证 DEFERRED → 真机阶段**，磊哥 2026-06-25 拍「不真机用 iOS 模拟器」；模拟器不渲染 glass 折射/specular[paper-tiger]→route A 视频 photoreal 不打折/C-lite glass 质感打折；**U31 实证不预拍 / U30 砍重折射 shader**）
-- [ ] 8.B2 capsule 资产（route 定后：C-lite 分层 stills/CoreML 深度 或 A video loop）
-- [ ] 8.B3 `ContextCapsule` view（消费 bridge `context` 四维 + crossfade 切换 + **预加载防卡顿** + 图标在 capsule 外）
-- [ ] 8.B4 adopt Vortex（`.smoke` 尾气 / `.rain` 雨 / `.snow` 雪 / 星光）+ native `.glassEffect` 壳（守 U30，不在 always-on capsule 跑 Inferno 折射 shader）
+- [x] 8.B1 🔴 capsule route spike（🔴 **模拟器观感对比** A 视频 loop vs C-lite，量观感 + 像不像 anchor；**GPU/帧率真机验证 DEFERRED → 真机阶段**，磊哥 2026-06-25 拍「不真机用 iOS 模拟器」；模拟器不渲染 glass 折射/specular[paper-tiger]→route A 视频 photoreal 不打折/C-lite glass 质感打折；**U31 实证不预拍 / U30 砍重折射 shader**）
+- [x] 8.B2 capsule 资产（route 定后：C-lite 分层 stills/CoreML 深度 或 A video loop）
+- [x] 8.B3 `ContextCapsule` view（消费 bridge `context` 四维 + crossfade 切换 + **预加载防卡顿** + 图标在 capsule 外）
+- [x] 8.B4 adopt Vortex（`.smoke` 尾气 / `.rain` 雨 / `.snow` 雪 / 星光）+ native `.glassEffect` 壳（守 U30，不在 always-on capsule 跑 Inferno 折射 shader）
 
 ### 8.C 验收（A-2 收口）
-- [ ] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
+- [x] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
 - [ ] 8.C2 simctl 视觉 + **visual-acceptance 5-gate（米白/深空，还原投屏环境 V10）** + 对比 anchor-set（连续舞台无黑线 / 制冷热 / capsule diorama）
 
 ### 8.D 触控 + state 联动 + 语音推理（全 mock，SD6/SD7，plan Phase 3）
@@ -116,10 +118,12 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 8.D4 语音推理 mock 预设（「26→冷了→升温」mock 响应读当前 mock 态；摘要卡只读 SD23 7.F1；静默无 TTS）
 
 ### 8.E 演绎控制台（全 mock force，SD13-15/SD8，plan Phase 4）
-- [ ] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）
-- [ ] 8.E2 整车/环境 force **mock context**（speed/gear segmented + weather/time_period 互斥 → bridge force-context AD-RPB-014，不碰 state-cells.yaml）
-- [ ] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
+- [x] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）
+- [x] 8.E2 整车/环境 force **mock context**（speed/gear segmented + weather/time_period 互斥 → bridge force-context AD-RPB-014，不碰 state-cells.yaml）
+- [x] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
 - [ ] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
 
+> 2026-06-26 P1 reconciliation: Phase 4 commit `564d0c0` anchors the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. The Phase 4 receipt remains `PARTIAL`; keep 8.E4 open until settings-entry physical tap proof and cabin macro interaction recording are captured.
+
 ### 8.F 氛围灯炸场（SD4，plan Phase 5）
-- [ ] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）
+- [x] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）

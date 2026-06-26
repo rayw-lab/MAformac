@@ -57,7 +57,7 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 | SD1 idle 全景开场 | P0 coldStart | ✅ | - [x] |
 | SD2 push-to-talk + 苹果 ASR | P2 mic dock UI（ASR backend ⏳voice）| 🟡 | - [ ] |
 | SD3 对话流 DialogueBubble | P2 | ⬜ | - [ ] |
-| SD4 氛围灯 3 动作 | P1 mapper + P2 卡片渐变 + **P5 炸场** | ⬜ | - [ ] |
+| SD4 氛围灯 3 动作 | P1 mapper + P2 卡片渐变 + **P5 炸场** | ✅ | - [x] |
 | SD5 玻璃分层 + material | P2 | ⬜ | - [ ] |
 | SD6 点卡展开 composite + 数值控件 | P3（现有 4b 保留 + 触摸）| 🟡 | - [ ] |
 | SD7 触摸调节→mock store→语音推理+联动+静默 | **P3**（全 mock）| ⬜ | - [ ] |
@@ -66,9 +66,9 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 | SD10 多意图 + 3s 闭环 + 不打断 | 现有 4b + P3 | ✅🟡 | - [ ] |
 | SD11 米白主题（跟随系统 S1🔪→V6 强制色）| P2 + P2 主题切 | ⬜ | - [ ] |
 | SD12 不编排台本 + 场景宏 + 端状态模块页 | P4 端状态模块（场景宏 ⏳Phase5）| 🟡 | - [ ] |
-| SD13 演绎控制台三大块 | **P4** | ⬜ | - [ ] |
-| SD14 控制台布局 + AllStateSheet 33base | **P4** | ⬜ | - [ ] |
-| SD15 控制台视觉对齐 + 时段⊥主题 | **P4** | ⬜ | - [ ] |
+| SD13 演绎控制台三大块 | **P4** | ✅ | - [x] |
+| SD14 控制台布局 + AllStateSheet 33base | **P4** | ✅ | - [x] |
+| SD15 控制台视觉对齐 + 时段⊥主题 | **P4** | ✅ | - [x] |
 | SD16 orb 四态视觉 | ⏳ Phase5（E1）| ⏳ | - [ ] |
 | SD17 动效块收口 | 散各 Phase | 🟡 | - [ ] |
 | SD18 视觉块 V1-V12 + 连续舞台 | **P2**（逐 V 见下）| ⬜ | - [ ] |
@@ -77,8 +77,8 @@ granularity: series_full_coverage_plus_grouped_phase_checkpoints_not_one_id_one_
 | SD21 gptPRO 细节（hero range bar）| P2 | ⬜ | - [ ] |
 | SD22 层级 z-order + 滚动 | P2 | ⬜ | - [ ] |
 | SD23 边界态 7 类 | P2（去 TextField + portrait）| ⬜ | - [ ] |
-| SD24 context capsule 顶部 | **P6** | ⬜ | - [ ] |
-| SD25 capsule diorama 定稿 | **P6** | ⬜ | - [ ] |
+| SD24 context capsule 顶部 | **P6** | ✅ A-2 simulator scope; true-device GPU/FPS deferred | - [x] |
+| SD25 capsule diorama 定稿 | **P6** | ✅ C-lite default + A-video route spike; final art/true-device deferred | - [x] |
 
 ### V 系列（12 → P2/P7）
 
@@ -131,13 +131,14 @@ Phase 1 sub-checkpoints（receipt: `docs/research/2026-06-25-a2-execution/phase-
 | **RPB-26~40** P1 contract 字段 | snapshot card schema(RPB-30 + sibling·activeCell) / orb 状态源(RPB-33 ⏳Phase5) / 其余字段 | P0 容器 freeze + 消费各 Phase | - [ ] |
 | **RPB-41~50** P2 contract 字段 | 其余 vocabulary 字段（finite enum / redaction / timestamps…）| P0 容器 freeze | - [ ] |
 | **RPB-51（追加）** card sibling/secondary cells | 制冷热色 + CC1 依赖（修正「制冷热=纯 visual」分类）| P0 + P1 + P2 | - [ ] |
-| **RPB-52（追加）** 演绎控制台 force-state context | A 整车 + C 环境 force（segmented 暴露）| P0 + **P4** | - [ ] |
+| **RPB-52（追加）** 演绎控制台 force-state context | A 整车 + C 环境 force（segmented 暴露）| P0 + **P4** | - [x] |
 | **RPB-53（追加）** think 两语义张力 | analyzing 事件驱动 vs 安全固定 1.0s | ⏳ Phase5 think | - [ ] |
 
 > RPB 全 53 项已在 `uiue-runtime-bridge-decisions-2026-06-25.md` one-id-one-row 决策完成；本文只做 A-2 执行分组消减。P0 一次 freeze vocabulary 容器（snapshot/result_kind 8 类/context 四维/proof_class/source·scope_origin）；code 消费按 Phase（sibling→P1/P2 制冷热·activeCell / force-context→P4 演绎控制台 / voice·orb·think·splitter→⏳Phase5/voice/post-model）。
 
 Phase 0 receipt: `docs/research/2026-06-25-a2-execution/phase-0-receipt.md`（TDD + full `swift test` + 双端 build；anchor pixel compare skipped because this phase has no UI delta）。
 Phase 1 receipt: `docs/research/2026-06-25-a2-execution/phase-1-receipt.md`（TDD + full `swift test` + SF Symbol probe + 双端 build；RPB-51 P1 slice done, full row remains open until visual consumption）。
+A-2 mechanical verification receipt: `docs/research/2026-06-25-a2-execution/a2-mechanical-verification-receipt.md`（OpenSpec `8.C1` local/unit gates done: `make verify-all` exit0 + iOS/macOS build green；`8.C2` visual/anchor gate remains open）。
 
 ### 相关 U 系列（视觉/交互 → Phase；余已落/main/voice）
 
