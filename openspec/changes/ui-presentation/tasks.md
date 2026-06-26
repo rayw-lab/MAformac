@@ -140,7 +140,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 **A 视觉门契约**：
 - [x] 8.G1 visual-acceptance **L0-L3 门定义**（L0 runtime-truth 字段 / L1 sentinel PASS/WARN/FAIL / L2 OCR+contrast+SSIM / L3 人工 5-gate enum）落 spec + 8.C2 验收口径（AD-15）
-- [ ] 8.G2 一进两出 **8 态 VUI 矩阵测试**（U37）：`DemoRuntimeResultKind.allCases` 每态 视觉态+话术+动效+TTS+proof，禁 default 吞，复用 `FamilyDisplaysTests` 闭合模式
+- [x] 8.G2 一进两出 **8 态 VUI 矩阵测试**（U37）：`DemoRuntimeResultKind.allCases` 每态 视觉态+话术+动效+TTS+proof，禁 default 吞，复用 `FamilyDisplaysTests` 闭合模式
 
 **B 流程机制**（回写流程文档，非本 change spec）：
 - [x] 8.G3 `plan v3 heavy-work 段` + 全局 `heavy-work` skill 回写：long-run stop-rule（2 轮无新 proof-class 收口）/ 截图链路纪律（必 on-screen simctl 禁 off-screen ImageRenderer）/ proof-class budget
