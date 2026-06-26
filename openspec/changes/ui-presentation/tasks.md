@@ -50,11 +50,11 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ## 6. 验收
 
-- [ ] 6.1 `swift test`（含 UIValueTypeMapper 单测）+ `xcodebuild` 两端 BUILD SUCCEEDED。
-- [ ] 6.2 7 态各自独立渲染分支（无 `== .satisfied` 二值 / 无 default 吞态）—— `check-no-binary-visualstate.sh` 机械保证。
-- [ ] 6.3 视觉值全从 DesignTokens/tokens.md 取（grep 无硬编 hex）；无 `#available(iOS17/18)` 版本守卫—— `check-platform-vs-version-guard.sh` 机械保证。
+- [x] 6.1 `swift test`（含 UIValueTypeMapper 单测）+ `xcodebuild` 两端 BUILD SUCCEEDED（receipt: `docs/research/2026-06-25-a2-execution/a2-mechanical-verification-receipt.md`）。
+- [x] 6.2 7 态各自独立渲染分支（无 `== .satisfied` 二值 / 无 default 吞态）—— `check-no-binary-visualstate.sh` 机械保证（2026-06-26 rerun pass）。
+- [x] 6.3 视觉值全从 DesignTokens/tokens.md 取（grep 无硬编 hex）；无 `#available(iOS17/18)` 版本守卫—— `check-platform-vs-version-guard.sh` 机械保证（2026-06-26 grep + gate pass）。
 - [ ] 6.4 5-gate：simctl 14 张满屏单态（**非 gallery 缩略**，gallery 只内循环）→ 磊哥审美 5 gate 全 PASS。
-- [ ] 6.5 spec ADDED `ui-presentation` 经 `openspec validate --strict`（✅ 2026-06-24 绿）。
+- [x] 6.5 spec ADDED `ui-presentation` 经 `openspec validate --strict`（2026-06-26 `openspec validate ui-presentation --strict` pass）。
 
 ## 7. D8 默认主驾 + L3+ 思考链路 + 交互边界（2026-06-24 grill 收口，grill-master §3 D8）
 

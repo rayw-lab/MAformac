@@ -86,3 +86,10 @@ Captured at: 2026-06-26 final closeout pass.
 - Report: `docs/research/2026-06-25-a2-execution/a2-final-500-line-closeout-report.md`.
 - Scope: 500+ line long-form summary of the 10+ hour A-2 UIUE run, including commit ledger, phase ledger, proof classes, residual risks, process lessons, and next-resume route.
 - Boundary: same as this receipt; PARTIAL overall because Phase 2 visual acceptance `8.A/8.C2` remains open.
+
+## Task Ledger Maintenance
+
+Captured at: 2026-06-26 task reconciliation pass.
+
+- `openspec/changes/ui-presentation/tasks.md` §6 now marks mechanical acceptance rows `6.1`, `6.2`, `6.3`, and `6.5` complete based on the mechanical receipt, current shell-gate rerun, current no-raw-hex grep, and current `openspec validate ui-presentation --strict` pass.
+- `6.4` remains open because visual-acceptance 5-gate / human anchor review is still not closed; this is the same blocker as A-2 `8.A/8.C2`.
