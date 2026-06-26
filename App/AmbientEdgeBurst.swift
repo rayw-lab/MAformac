@@ -17,6 +17,8 @@ struct AmbientEdgeBurst: View {
     var theme: PresentationTheme
     var onFinished: (UUID) -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     private var gradient: [Color] {
         let mapped = DesignTokens.ambientGradient(named: trigger.colorName)
         let white = DesignTokens.ambientColor(named: "白色")
@@ -45,15 +47,21 @@ struct AmbientEdgeBurst: View {
         GeometryReader { proxy in
             let size = proxy.size
             ZStack {
-                TimedAmbientEdgeGlow(trigger: trigger, colors: gradient, theme: theme)
+                TimedAmbientEdgeGlow(trigger: trigger, colors: gradient, theme: theme, reduceMotion: reduceMotion)
 
-                PhaseAnimator(AmbientBurstPhase.allCases, trigger: trigger.id) { phase in
-                    edgeGlow(size: size, phase: phase)
-                } animation: { phase in
-                    phase.animation
+                if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
+                    PhaseAnimator(AmbientBurstPhase.allCases, trigger: trigger.id) { phase in
+                        edgeGlow(size: size, phase: phase)
+                    } animation: { phase in
+                        phase.animation
+                    }
+
+                    if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
+                        AmbientParticleCanvas(trigger: trigger, colors: gradient, theme: theme)
+                    }
+                } else {
+                    edgeGlow(size: size, phase: .linger)
                 }
-
-                AmbientParticleCanvas(trigger: trigger, colors: gradient, theme: theme)
             }
             .frame(width: size.width, height: size.height)
             .ignoresSafeArea()
@@ -218,15 +226,24 @@ private struct TimedAmbientEdgeGlow: View {
     let trigger: AmbientBurstTrigger
     let colors: [Color]
     var theme: PresentationTheme
+    var reduceMotion = false
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
-            let elapsed = max(0, timeline.date.timeIntervalSince(trigger.startedAt))
-            let progress = min(1, elapsed / DesignTokens.ambientBurstDuration)
-            let rampIn = min(1, progress / 0.08)
-            let fadeOut = pow(max(0, 1 - progress), 0.28)
-            GeometryReader { proxy in
-                timedGlow(size: proxy.size, energy: rampIn * fadeOut)
+        Group {
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
+                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+                    let elapsed = max(0, timeline.date.timeIntervalSince(trigger.startedAt))
+                    let progress = min(1, elapsed / DesignTokens.ambientBurstDuration)
+                    let rampIn = min(1, progress / 0.08)
+                    let fadeOut = pow(max(0, 1 - progress), 0.28)
+                    GeometryReader { proxy in
+                        timedGlow(size: proxy.size, energy: rampIn * fadeOut)
+                    }
+                }
+            } else {
+                GeometryReader { proxy in
+                    timedGlow(size: proxy.size, energy: 0.72)
+                }
             }
         }
         .allowsHitTesting(false)

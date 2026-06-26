@@ -22,34 +22,43 @@ struct ContextCapsuleView: View {
     private var speedFactor: Double { min(1, max(0, Double(context.vehicle.speed) / 80.0)) }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: reduceMotion ? 1 : 1.0 / 30.0)) { timeline in
-            GeometryReader { proxy in
-                let size = proxy.size
-                let phase = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate
-                ZStack {
-                    capsuleShell
-
-                    ZStack {
-                        baseDioramaLayer(phase: phase)
-                        sceneTint
-                        headlightLayer(size: size, phase: phase)
-                        roadMotionLayer(size: size, phase: phase)
-                        weatherLayer(size: size, phase: phase)
-                        exhaustLayer(size: size, phase: phase)
-                        glassHighlight(size: size, phase: phase)
-                    }
-                    .padding(5)
-                    .clipShape(Capsule())
-                    .overlay {
-                        Capsule()
-                            .strokeBorder(Color.white.opacity(theme == .ivory ? 0.62 : 0.26), lineWidth: 1.4)
-                    }
-                    .contentTransition(.opacity)
-                    .animation(.easeInOut(duration: 0.42), value: sceneKey)
+        Group {
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
+                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+                    capsuleContent(phase: timeline.date.timeIntervalSinceReferenceDate)
                 }
+            } else {
+                capsuleContent(phase: 0)
             }
         }
         .accessibilityLabel(accessibilityLabel)
+    }
+
+    private func capsuleContent(phase: TimeInterval) -> some View {
+        GeometryReader { proxy in
+            let size = proxy.size
+            ZStack {
+                capsuleShell
+
+                ZStack {
+                    baseDioramaLayer(phase: phase)
+                    sceneTint
+                    headlightLayer(size: size, phase: phase)
+                    roadMotionLayer(size: size, phase: phase)
+                    weatherLayer(size: size, phase: phase)
+                    exhaustLayer(size: size, phase: phase)
+                    glassHighlight(size: size, phase: phase)
+                }
+                .padding(5)
+                .clipShape(Capsule())
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(theme == .ivory ? 0.62 : 0.26), lineWidth: 1.4)
+                }
+                .contentTransition(.opacity)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.42), value: sceneKey)
+            }
+        }
     }
 
     private var capsuleShell: some View {
@@ -79,16 +88,31 @@ struct ContextCapsuleView: View {
                     theme: theme
                 ))
         case .videoLoop:
-            ContextCapsuleVideoLoopView()
-                .modifier(BaseDioramaMotion(
-                    phase: phase,
-                    route: route,
-                    isMoving: isMoving,
-                    isRainy: isRainy,
-                    isNight: isNight,
-                    speedFactor: speedFactor,
-                    theme: theme
-                ))
+            if reduceMotion {
+                Image("ContextCapsule")
+                    .resizable()
+                    .scaledToFill()
+                    .modifier(BaseDioramaMotion(
+                        phase: phase,
+                        route: route,
+                        isMoving: isMoving,
+                        isRainy: isRainy,
+                        isNight: isNight,
+                        speedFactor: speedFactor,
+                        theme: theme
+                    ))
+            } else {
+                ContextCapsuleVideoLoopView()
+                    .modifier(BaseDioramaMotion(
+                        phase: phase,
+                        route: route,
+                        isMoving: isMoving,
+                        isRainy: isRainy,
+                        isNight: isNight,
+                        speedFactor: speedFactor,
+                        theme: theme
+                    ))
+            }
         }
     }
 

@@ -5,6 +5,7 @@ struct ContentView: View {
     let traceLogger: InMemoryTraceLogger
     let speech: any SpeechSynthesisEngine
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var snapshot: PresentationSnapshot
     @State private var theme: PresentationTheme
     @State private var focus = FocusController()
@@ -106,8 +107,8 @@ struct ContentView: View {
         }
         .preferredColorScheme(theme.colorScheme)
         .onAppear(perform: triggerInitialAmbientBurstIfNeeded)
-        .animation(.snappy(duration: 0.32), value: focus.focusedFamily)
-        .animation(.snappy(duration: 0.32), value: theme)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: focus.focusedFamily)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: theme)
         .sheet(item: $presentedSheet, onDismiss: presentQueuedSheetAfterDismiss) { sheet in
             switch sheet {
             case .settings:
@@ -947,6 +948,7 @@ struct MicDock: View {
     var theme: PresentationTheme
     var state: PresentationVoiceState
     var onMockVoiceSubmit: () -> Void = {}
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isPressing = false
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
@@ -979,8 +981,12 @@ struct MicDock: View {
         .buttonStyle(.plain)
         .onLongPressGesture(minimumDuration: 0.05, maximumDistance: 28) {
         } onPressingChanged: { pressing in
-            withAnimation(.snappy(duration: 0.18)) {
+            if reduceMotion {
                 isPressing = pressing
+            } else {
+                withAnimation(.snappy(duration: 0.18)) {
+                    isPressing = pressing
+                }
             }
         }
         .accessibilityIdentifier("mic-dock")
@@ -992,13 +998,22 @@ struct WaveformMark: View {
     var active: Bool
     var theme: PresentationTheme
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var barHeights: [CGFloat] {
+        active ? [14, 24, 34, 28, 20, 12] : [10, 18, 26, 22, 15, 10]
+    }
+
     var body: some View {
         HStack(alignment: .center, spacing: 4) {
             ForEach(0..<6, id: \.self) { index in
                 Capsule()
                     .fill(DesignTokens.palette(for: theme).inkPrimary.opacity(index == 0 || index == 5 ? 0.46 : 0.92))
-                    .frame(width: 4, height: active ? CGFloat([14, 24, 34, 28, 20, 12][index]) : CGFloat([10, 18, 26, 22, 15, 10][index]))
-                    .animation(.easeInOut(duration: 0.42).repeatForever(autoreverses: true).delay(Double(index) * 0.04), value: active)
+                    .frame(width: 4, height: barHeights[index])
+                    .animation(
+                        reduceMotion ? nil : .easeInOut(duration: 0.42).repeatForever(autoreverses: true).delay(Double(index) * 0.04),
+                        value: active
+                    )
             }
         }
         .padding(.horizontal, 12)
@@ -1022,100 +1037,138 @@ struct DemoOrbView: View {
     }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: reduceMotion ? 1 : 1.0 / 30.0)) { timeline in
-            let phase = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate
-            let pulse = 1 + sin(phase * 1.8) * 0.025
-            VStack(spacing: 8) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [
-                                    DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.20 : 0.30),
-                                    DesignTokens.glowViolet.opacity(theme == .ivory ? 0.13 : 0.22),
-                                    .clear
-                                ],
-                                center: .center,
-                                startRadius: diameter * 0.24,
-                                endRadius: diameter * 1.05
-                            )
-                        )
-                        .frame(width: diameter * 1.72, height: diameter * 1.72)
-                        .blur(radius: 4)
-                        .scaleEffect(1 + sin(phase * 0.9) * 0.018)
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [
-                                    Color.white.opacity(theme == .ivory ? 0.96 : 0.54),
-                                    DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.46 : 0.58),
-                                    DesignTokens.glowViolet.opacity(theme == .ivory ? 0.62 : 0.78)
-                                ],
-                                center: .init(x: 0.68, y: 0.26),
-                                startRadius: 5,
-                                endRadius: diameter * 0.78
-                            )
-                        )
-                        .overlay {
-                            ZStack {
-                                AngularGradient(
-                                    colors: [
-                                        DesignTokens.semanticCool.opacity(theme == .ivory ? 0.46 : 0.72),
-                                        Color.white.opacity(theme == .ivory ? 0.18 : 0.12),
-                                        DesignTokens.glowViolet.opacity(theme == .ivory ? 0.54 : 0.68),
-                                        DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.34 : 0.52),
-                                        DesignTokens.semanticCool.opacity(theme == .ivory ? 0.46 : 0.72)
-                                    ],
-                                    center: .center
-                                )
-                                .rotationEffect(.degrees(phase * 12))
-                                .clipShape(Circle())
-                                .blendMode(.plusLighter)
-                                Ellipse()
-                                    .fill(Color.white.opacity(theme == .ivory ? 0.38 : 0.24))
-                                    .frame(width: diameter * 0.34, height: diameter * 0.18)
-                                    .blur(radius: 5)
-                                    .rotationEffect(.degrees(-28))
-                                    .offset(x: diameter * 0.21, y: -diameter * 0.27)
-                            }
-                        }
-                        .frame(width: diameter, height: diameter)
-                        .overlay {
-                            Circle()
-                                .strokeBorder(
-                                    LinearGradient(
-                                        colors: [
-                                            Color.white.opacity(theme == .ivory ? 0.92 : 0.36),
-                                            DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.34 : 0.48),
-                                            DesignTokens.glowViolet.opacity(theme == .ivory ? 0.22 : 0.46)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 2.2
-                                )
-                        }
-                        .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.24 : 0.42), radius: 26)
-                        .shadow(color: DesignTokens.glowViolet.opacity(theme == .ivory ? 0.10 : 0.22), radius: 40)
-                        .scaleEffect(pulse)
-                    OrbParticleField(diameter: diameter, phase: phase, theme: theme)
+        Group {
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
+                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+                    orbBody(phase: timeline.date.timeIntervalSinceReferenceDate)
                 }
-                .frame(width: diameter, height: diameter)
-                Text(orbCaption)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(palette.inkDim)
-                    .lineLimit(1)
+            } else {
+                orbBody(phase: 0)
             }
         }
         .accessibilityIdentifier("demo-orb")
+        .accessibilityLabel("助手状态，\(orbCaption)")
+    }
+
+    private func orbBody(phase: TimeInterval) -> some View {
+        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion)
+            ? 1 + sin(phase * 1.8) * 0.025
+            : 1
+
+        return VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.20 : 0.30),
+                                DesignTokens.glowViolet.opacity(theme == .ivory ? 0.13 : 0.22),
+                                .clear
+                            ],
+                            center: .center,
+                            startRadius: diameter * 0.24,
+                            endRadius: diameter * 1.05
+                        )
+                    )
+                    .frame(width: diameter * 1.72, height: diameter * 1.72)
+                    .blur(radius: 4)
+                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) ? 1 + sin(phase * 0.9) * 0.018 : 1)
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.white.opacity(theme == .ivory ? 0.96 : 0.54),
+                                DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.46 : 0.58),
+                                DesignTokens.glowViolet.opacity(theme == .ivory ? 0.62 : 0.78)
+                            ],
+                            center: .init(x: 0.68, y: 0.26),
+                            startRadius: 5,
+                            endRadius: diameter * 0.78
+                        )
+                    )
+                    .overlay {
+                        ZStack {
+                            AngularGradient(
+                                colors: [
+                                    DesignTokens.semanticCool.opacity(theme == .ivory ? 0.46 : 0.72),
+                                    Color.white.opacity(theme == .ivory ? 0.18 : 0.12),
+                                    DesignTokens.glowViolet.opacity(theme == .ivory ? 0.54 : 0.68),
+                                    DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.34 : 0.52),
+                                    DesignTokens.semanticCool.opacity(theme == .ivory ? 0.46 : 0.72)
+                                ],
+                                center: .center
+                            )
+                            .rotationEffect(.degrees(phase * 12))
+                            .clipShape(Circle())
+                            .blendMode(.plusLighter)
+                            Ellipse()
+                                .fill(Color.white.opacity(theme == .ivory ? 0.38 : 0.24))
+                                .frame(width: diameter * 0.34, height: diameter * 0.18)
+                                .blur(radius: 5)
+                                .rotationEffect(.degrees(-28))
+                                .offset(x: diameter * 0.21, y: -diameter * 0.27)
+                        }
+                    }
+                    .frame(width: diameter, height: diameter)
+                    .overlay {
+                        Circle()
+                            .strokeBorder(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(theme == .ivory ? 0.92 : 0.36),
+                                        DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.34 : 0.48),
+                                        DesignTokens.glowViolet.opacity(theme == .ivory ? 0.22 : 0.46)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2.2
+                            )
+                    }
+                    .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.24 : 0.42), radius: 26)
+                    .shadow(color: DesignTokens.glowViolet.opacity(theme == .ivory ? 0.10 : 0.22), radius: 40)
+                    .scaleEffect(pulse)
+                if reduceMotion {
+                    Image(systemName: staticOrbSymbol)
+                        .font(.system(size: diameter * 0.22, weight: .semibold))
+                        .foregroundStyle(Color.white.opacity(theme == .ivory ? 0.84 : 0.72))
+                        .symbolRenderingMode(.hierarchical)
+                        .accessibilityHidden(true)
+                }
+                if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
+                    OrbParticleField(diameter: diameter, phase: phase, theme: theme)
+                }
+            }
+            .frame(width: diameter, height: diameter)
+            Text(orbCaption)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(palette.inkDim)
+                .lineLimit(1)
+        }
     }
 
     private var orbCaption: String {
+        if reduceMotion, PresentationReducedMotionPolicy.feedback(for: state) == .staticThinking {
+            return "正在确认..."
+        }
         switch state {
         case .idle: return "我在听..."
         case .listen: return "我在听..."
         case .think: return "让我确认下..."
         case .speak: return "正在回应"
+        }
+    }
+
+    private var staticOrbSymbol: String {
+        switch state {
+        case .idle:
+            return "circle.fill"
+        case .listen:
+            return "mic.fill"
+        case .think:
+            return "ellipsis.bubble.fill"
+        case .speak:
+            return "speaker.wave.2.fill"
         }
     }
 }
@@ -1202,17 +1255,35 @@ struct StageAtmosphereLayer: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: reduceMotion ? 1 : 1.0 / 30.0)) { timeline in
-            let phase = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate
-            GeometryReader { proxy in
-                ZStack {
-                    particleCanvas(size: proxy.size, phase: phase)
-                    edgeSheen(size: proxy.size, phase: phase)
+        Group {
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
+                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+                    GeometryReader { proxy in
+                        atmosphereContent(
+                            size: proxy.size,
+                            phase: timeline.date.timeIntervalSinceReferenceDate,
+                            showParticles: true
+                        )
+                    }
+                }
+            } else {
+                GeometryReader { proxy in
+                    atmosphereContent(size: proxy.size, phase: 0, showParticles: false)
                 }
             }
         }
         .blendMode(theme == .ivory ? .plusLighter : .screen)
         .opacity(theme == .ivory ? 0.76 : 0.62)
+    }
+
+    @ViewBuilder
+    private func atmosphereContent(size: CGSize, phase: TimeInterval, showParticles: Bool) -> some View {
+        ZStack {
+            if showParticles, PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
+                particleCanvas(size: size, phase: phase)
+            }
+            edgeSheen(size: size, phase: phase)
+        }
     }
 
     private func particleCanvas(size: CGSize, phase: TimeInterval) -> some View {
@@ -1579,7 +1650,7 @@ struct VehicleStateCard: View {
         .buttonStyle(.plain)
         .opacity(isFaded ? 0.96 : 1.0)
         .scaleEffect(isHero ? 1.018 : 1.0, anchor: .center)
-        .animation(.snappy(duration: 0.32), value: isHero)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: isHero)
         .accessibilityIdentifier("vehicle-card-\(display.accessibilityKey)")
         .accessibilityLabel("\(display.title) \(display.valueText) \(a11yState)")
     }
@@ -1606,6 +1677,7 @@ struct VehicleStateCard: View {
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .onAppear { updateBreathe() }
             .onChange(of: glowActive) { _, _ in updateBreathe() }
+            .onChange(of: reduceMotion) { _, _ in updateBreathe() }
     }
 
     private var cardSpecularLayer: some View {
@@ -1740,7 +1812,7 @@ struct VehicleStateCard: View {
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                 .foregroundStyle(valueColor)
                 .contentTransition(.numericText())
-                .animation(.snappy, value: display.valueText)
+                .animation(reduceMotion ? nil : .snappy, value: display.valueText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
                 .truncationMode(.tail)
@@ -1756,7 +1828,7 @@ struct VehicleStateCard: View {
                 .font(.system(size: standardValueSize, weight: standardValueWeight, design: .rounded))
                 .foregroundStyle(valueColor)
                 .contentTransition(.numericText())
-                .animation(.snappy, value: display.valueText)
+                .animation(reduceMotion ? nil : .snappy, value: display.valueText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.58)
                 .truncationMode(.tail)
@@ -2080,7 +2152,7 @@ struct VehicleStateCard: View {
     }
 
     private func updateBreathe() {
-        guard !reduceMotion, glowActive || isHero else {
+        guard PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion), glowActive || isHero else {
             breathe = false
             return
         }

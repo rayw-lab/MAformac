@@ -18,7 +18,7 @@ enum PresentationProofClass: String, Codable, Equatable, Sendable {
     case operatorReview = "operator_review"
 }
 
-enum PresentationOrbState: String, Codable, Equatable, Sendable {
+enum PresentationOrbState: String, CaseIterable, Codable, Equatable, Sendable {
     case idle
     case listen
     case think
