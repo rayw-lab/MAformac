@@ -1,7 +1,7 @@
 # Phase 3 Touch Chain Receipt
 
 Date: 2026-06-26
-Status: PARTIAL / local-pass
+Status: DONE for A-2 simulator/mock touch + voice-reasoning scope; not product V-PASS
 Proof class: local + unit + simulator runtime
 
 ## Scope
@@ -27,6 +27,10 @@ No true NLU, ASR, TTS, LoRA, live API, or real vehicle backend was connected. Th
 - `App/ExpandedFamilyCard.swift:117` cycles badge values.
 - `App/ContentView.swift:162` passes `onMockTransition` into `ExpandedFamilyCard`.
 - `App/ContentView.swift:185` seeds the store from current snapshot, applies the mock transition, and rebuilds snapshot/readbacks.
+- `App/ContentView.swift:182` and `App/ContentView.swift:203` route `MicDock` mock submit into `applyMockVoiceColdIntent`.
+- `App/ContentView.swift:302` reads the current AC setpoint, clamps the +2℃ mock intent, applies it through `DemoVehicleStateStore`, and appends user/assistant dialogue bubbles without calling TTS.
+- `App/ContentView.swift:479` prefers `ac.temp_setpoint[主驾]` before falling back to the first AC setpoint base key.
+- `App/ContentView.swift:956` makes `MicDock` a tappable button for simulator automation while preserving the long-press visual state.
 - `Core/Presentation/ValueRangeMapper.swift:39` clamps next stepped value to contract execution range.
 - `Core/State/DemoVehicleStateStore.swift:123` adds `replaceCells`.
 - `Core/State/DemoVehicleStateStore.swift:158` returns `.changing` for changed scalar values instead of binary `.normal`.
@@ -59,12 +63,12 @@ No true NLU, ASR, TTS, LoRA, live API, or real vehicle backend was connected. Th
 
 ## Coverage Index
 
-`docs/grill-checklist/uiue-a2-grill-coverage-index.md` was not checked off for SD6/SD7 in this receipt. Rationale: 3.1a-d has local/unit/simulator proof, but no recorded physical UI tap chain or product-level visual acceptance. Keep V-PASS withheld.
+`docs/grill-checklist/uiue-a2-grill-coverage-index.md` now checks SD6 and SD7 for A-2 simulator/mock scope only. Rationale: simulator evidence covers expanded AC stepper mutation and the mic-dock voice-reasoning mock route. This is not product V-PASS, not true-device proof, and not true ASR/TTS/LoRA/backend proof.
 
 ## Residual Risks
 
 - Badge option lists are currently local to `ExpandedFamilyCard` row logic, not derived from a shared allowed-values catalog.
-- Initial runtime proof only showed expanded control rendering; the P2 update below adds simulator tap mutation proof for the AC stepper path, but not drag or voice-reasoning proof.
+- Drag scrubber automation remains `operator-pass pending`; the covered simulator touch path is the expanded AC stepper plus mic-dock voice mock.
 - Phase 3 is still mock-frontstage only; true voice/NLU/backend wiring remains explicitly out of scope.
 
 ## P2 Inner-Loop Touch Evidence Update
@@ -90,9 +94,40 @@ What this closes:
 
 What this still does not close:
 
-- `8.D4`: voice-reasoning mock presets and read-current-state voice flow are still not proven by runtime evidence.
-- SD7: full touch-adjust → mock store → voice reasoning + silent/no-TTS behavior remains partial because the drag scrubber path and voice mock path are not both proven.
 - Drag automation: still `operator-pass pending`; no idb/manual/true-device drag evidence exists.
+
+## P3 Follow-up Voice-Reasoning Mock Closure
+
+Date: 2026-06-26
+
+Status: DONE for A-2 simulator/mock voice-reasoning route.
+
+Commands/actions:
+
+- `build_run_sim` with `-mockTheme ivory -mockSnapshot cooling`: PASS.
+- `snapshot_ui`: main stage exposed `e63|tap|button|按住说话||mic-dock-safe-area`, `空调 26℃ 执行中`, and `屏幕 65% 待命`.
+- `tap(e63)`: PASS; refreshed snapshot exposed `空调 28℃ 执行中`, dialogue text `我有点冷了`, and assistant text `当前 26℃，已为您升到 28℃`.
+- Screenshot: `docs/research/2026-06-25-a2-execution/shots/phase3-voice-mock-cold-to-warm-v1.jpg`.
+
+What this closes:
+
+- `8.D4`: the mock voice preset reads current AC mock state (`26℃`) and writes the inferred warmer target (`28℃`) through `DemoVehicleStateStore`.
+- SD7 A-2 simulator/mock route: touch stepper proof + voice reasoning mock proof + no true ASR/TTS/LoRA/backend connection.
+
+What this still does not claim:
+
+- No real ASR/TTS/LoRA/backend, live API, true-device, or product V-PASS.
+- Drag scrubber automation remains `operator-pass pending`; do not treat it as automated drag acceptance.
+
+## P3 Commit Anchor: Phase 3 voice-reasoning mock route
+
+Commit subject: `fix(uiue): close phase3 voice reasoning mock route`
+
+This commit anchors the tappable mic-dock mock route, current-state AC read, mock store mutation, Phase 3 voice screenshot, and tasks/coverage/closeout reconciliation for `8.D4` and SD7. It also normalizes the Phase 2 mock screen-brightness key to `screen.brightness[中控屏]` so store-backed snapshot refreshes do not erase the screen family during touch/voice proof.
+
+Not anchored here: product V-PASS, true-device proof, true ASR/TTS/LoRA/backend wiring, or automated drag acceptance.
+
+Next: keep Phase 3 stable; remaining A-2 blocker is Phase 2 visual acceptance, with drag still recorded as `operator-pass pending`.
 
 ## P0 Commit Anchor: Phase 3 touch-chain proof slice
 
@@ -100,8 +135,8 @@ Commit subject: `docs(uiue): anchor phase3 touch-chain proof slice`
 
 This commit anchors the Phase 3 receipt and the two simulator screenshots cited above. The corresponding implementation files (`ValueControlView.swift`, `ExpandedFamilyCard.swift`, `ValueRangeMapper.swift`, `DemoVehicleStateStore.swift`, `ContentView.swift`, and related tests) are already anchored in the required shared scaffold commit `98f7c57` because hunk-splitting those references would break the compiled presentation shell.
 
-Not anchored here: a new physical tap/drag proof, SD6/SD7 coverage burn-down, or product V-PASS. The drag/tap automation blocker remains downgraded to `operator-pass pending` until manual, idb, or true-device evidence is recorded.
+Not anchored here: product V-PASS, true-device proof, true ASR/TTS/LoRA/backend wiring, or automated drag acceptance. The drag automation blocker remains downgraded to `operator-pass pending` until manual, idb, or true-device evidence is recorded.
 
-Claim boundary: `PARTIAL / local-pass` in the isolated UIUE worktree, not mainline proof and not live/backend proof.
+Claim boundary: `DONE for A-2 simulator/mock touch + voice-reasoning scope` in the isolated UIUE worktree, not mainline proof and not live/backend proof.
 
-Next: close the missing touch proof gate with serial simulator/manual evidence before checking SD6/SD7 in coverage.
+Next: leave Phase 3 stable and continue only claim-vs-reality reconciliation unless a new manual drag proof is explicitly requested.

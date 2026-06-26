@@ -179,7 +179,7 @@ struct ContentView: View {
             DialogueStream(messages: messages, theme: theme)
                 .frame(minHeight: 240, maxHeight: 330)
             Spacer(minLength: 28)
-            MicDock(theme: theme, state: snapshot.voiceState)
+            MicDock(theme: theme, state: snapshot.voiceState, onMockVoiceSubmit: applyMockVoiceColdIntent)
                 .frame(maxWidth: .infinity, minHeight: 76, maxHeight: 80)
                 .padding(.bottom, 10)
         }
@@ -200,7 +200,7 @@ struct ContentView: View {
         let split = usesMacSplit(size: size)
         if !split {
             HStack {
-                MicDock(theme: theme, state: snapshot.voiceState)
+                MicDock(theme: theme, state: snapshot.voiceState, onMockVoiceSubmit: applyMockVoiceColdIntent)
                     .frame(maxWidth: min(780, size.width - 70), minHeight: 70, maxHeight: 74)
             }
             .padding(.horizontal, horizontalPadding(for: size))
@@ -296,6 +296,52 @@ struct ContentView: View {
         }
         if let burstColor {
             triggerAmbientBurst(colorName: burstColor)
+        }
+    }
+
+    private func applyMockVoiceColdIntent() {
+        let key = primaryACSetpointKey(in: snapshot.storeCells)
+        let currentTemp = Int(cellValue(key, in: snapshot.storeCells) ?? "") ?? 26
+        let targetTemp = Int(ValueRangeMapper.clamp(Double(currentTemp + 2), forBase: "ac.temp_setpoint"))
+        let targetValue = "\(targetTemp)"
+        let response = "当前 \(currentTemp)℃，已为您升到 \(targetTemp)℃"
+
+        var cells = snapshot.storeCells
+        if !cells.contains(where: { $0.key == key }) {
+            cells.append(DemoVehicleStateCell(
+                key: key,
+                actualValue: "\(currentTemp)",
+                revision: nextRevision(in: cells),
+                visualState: .normal
+            ))
+        }
+        store.replaceCells(cells)
+        let readback = store.applyMockTransition(
+            DemoMockTransition(key: key, desiredValue: targetValue, source: .mock)
+        )
+        var scopeOrigins = snapshot.scopeOrigins
+        scopeOrigins[key] = scopeOrigins[key] ?? .defaulted
+        withAnimation(.snappy(duration: 0.30)) {
+            snapshot = PresentationSnapshot.from(
+                store: store,
+                activeCells: [.ac: key],
+                context: snapshot.context,
+                resultKind: .acceptedToolCall,
+                traceId: snapshot.traceId,
+                scopeOrigins: scopeOrigins,
+                orbState: .speak,
+                voiceState: .idle,
+                dialogText: response,
+                readbacks: snapshot.readbacks + [readback],
+                proofClass: .simulatorMock
+            )
+            messages.append(DialogueMessage(role: .user, text: "我有点冷了"))
+            messages.append(DialogueMessage(
+                role: .assistant,
+                text: response,
+                emphasis: "\(targetTemp)℃",
+                emphasisTint: .heating
+            ))
         }
     }
 
@@ -430,6 +476,16 @@ struct ContentView: View {
         cells.first { $0.key == key }?.actualValue
     }
 
+    private func primaryACSetpointKey(in cells: [DemoVehicleStateCell]) -> String {
+        if cells.contains(where: { $0.key == "ac.temp_setpoint[主驾]" }) {
+            return "ac.temp_setpoint[主驾]"
+        }
+        if let key = cells.first(where: { ScopedStateKey($0.key).base == "ac.temp_setpoint" })?.key {
+            return key
+        }
+        return "ac.temp_setpoint[主驾]"
+    }
+
     private func ambientColorValue(in cells: [DemoVehicleStateCell]) -> String? {
         cells.first { ScopedStateKey($0.key).base == "ambient.color" }?.actualValue
     }
@@ -543,7 +599,7 @@ struct ContentView: View {
                 demoCell("ac.temp_setpoint", temperature, revision: 4, state: thermalState),
                 demoCell("ac.mode", acMode, revision: 4, state: .satisfied),
                 demoCell("ac.fan_speed", "2", revision: 4, state: .normal),
-                demoCell("screen.brightness", "65", revision: 2, state: .normal),
+                demoCell("screen.brightness[中控屏]", "65", revision: 2, state: .normal),
                 demoCell("volume.level", "38", revision: 2, state: .normal),
                 demoCell("door.central_lock", "locked", revision: 2, state: .normal),
                 demoCell("sunroof.position", "0", revision: 2, state: .normal),
@@ -890,33 +946,37 @@ struct DialogueBubbleTail: Shape {
 struct MicDock: View {
     var theme: PresentationTheme
     var state: PresentationVoiceState
+    var onMockVoiceSubmit: () -> Void = {}
     @State private var isPressing = false
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var isListening: Bool { state == .listening || isPressing }
 
     var body: some View {
-        HStack(spacing: 16) {
-            Circle()
-                .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
-                .frame(width: 16, height: 16)
-                .shadow(color: DesignTokens.glowCyan.opacity(isListening ? 0.65 : 0.35), radius: isListening ? 12 : 6)
-            Text(isListening ? "松开发送" : "按住说话")
-                .font(.system(size: 21, weight: .semibold, design: .rounded))
-                .foregroundStyle(palette.inkPrimary)
-                .lineLimit(1)
-                .frame(maxWidth: .infinity)
-            WaveformMark(active: isListening, theme: theme)
-                .frame(width: 58, height: 42)
+        Button(action: onMockVoiceSubmit) {
+            HStack(spacing: 16) {
+                Circle()
+                    .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
+                    .frame(width: 16, height: 16)
+                    .shadow(color: DesignTokens.glowCyan.opacity(isListening ? 0.65 : 0.35), radius: isListening ? 12 : 6)
+                Text(isListening ? "松开发送" : "按住说话")
+                    .font(.system(size: 21, weight: .semibold, design: .rounded))
+                    .foregroundStyle(palette.inkPrimary)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity)
+                WaveformMark(active: isListening, theme: theme)
+                    .frame(width: 58, height: 42)
+            }
+            .padding(.horizontal, 22)
+            .background(.regularMaterial, in: Capsule())
+            .glassEffect()
+            .overlay {
+                Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
+            }
+            .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
+            .scaleEffect(isPressing ? 1.018 : 1.0)
         }
-        .padding(.horizontal, 22)
-        .background(.regularMaterial, in: Capsule())
-        .glassEffect()
-        .overlay {
-            Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
-        }
-        .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
-        .scaleEffect(isPressing ? 1.018 : 1.0)
+        .buttonStyle(.plain)
         .onLongPressGesture(minimumDuration: 0.05, maximumDistance: 28) {
         } onPressingChanged: { pressing in
             withAnimation(.snappy(duration: 0.18)) {

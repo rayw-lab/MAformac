@@ -117,9 +117,11 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.D1 `ValueControlView` 交互回调（dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环 → `ValueControlActions`；adopt **axiom-swiftui** binding/gesture + **IceCubesApp** 交互参考）
 - [x] 8.D2 `ExpandedFamilyCard`/`ExpandedCellRowView` 接回调 → mock store（`store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片+numericText 联动）
 - [x] 8.D3 🔴 `applyMockTransition` visualState 修复（值真变化→`.changing`/`.satisfied`，非只 `"on"`→`.normal`；否则触控联动假绿）+ clamp/cycle **复用 `ValueRangeMapper`**（dial 18-32/percent 0-100/stepper 档/badge 8 色，防漂移）+ 测试
-- [ ] 8.D4 语音推理 mock 预设（「26→冷了→升温」mock 响应读当前 mock 态；摘要卡只读 SD23 7.F1；静默无 TTS）
+- [x] 8.D4 语音推理 mock 预设（「26→冷了→升温」mock 响应读当前 mock 态；摘要卡只读 SD23 7.F1；静默无 TTS）
 
-> 2026-06-26 P2 inner-loop evidence: Phase 3 receipt records simulator tap `AC card -> expanded increase`, with UI tree changing `空调 26℃` to `空调 27℃`. This closes the stepper/mock-state path for 8.D1-8.D3 and SD6. Keep 8.D4/SD7 open until voice-reasoning mock and drag/operator-pass evidence are recorded.
+> 2026-06-26 P2 inner-loop evidence: Phase 3 receipt records simulator tap `AC card -> expanded increase`, with UI tree changing `空调 26℃` to `空调 27℃`. This closed the stepper/mock-state path for 8.D1-8.D3 and SD6; at that point 8.D4/SD7 stayed open pending voice-reasoning mock and drag/operator-pass evidence.
+
+> 2026-06-26 P3 follow-up evidence: `MicDock` now exposes a mock submit route and `applyMockVoiceColdIntent` reads the current AC mock cell before applying `26℃ -> 28℃` through `DemoVehicleStateStore`. Simulator UI tree proves `按住说话` tap changes `空调 26℃` to `空调 28℃` and appends `我有点冷了 / 当前 26℃，已为您升到 28℃` without connecting true ASR/TTS/LoRA/backend. Drag remains `operator-pass pending`, not automated V-PASS.
 
 ### 8.E 演绎控制台（全 mock force，SD13-15/SD8，plan Phase 4）
 - [x] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）

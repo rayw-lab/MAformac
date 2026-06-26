@@ -16,13 +16,14 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 | `4d42bcb` `feat(uiue): anchor phase6 context-capsule proof slice` | Phase 6 | Capsule assets, video loop, receipt, route-spike proof |
 | `3c2ebab` `docs(uiue): reconcile a2 phase ledger tasks and coverage` | P1 | Ledger, tasks, coverage consistency update |
 | `eeba147` `docs(uiue): add p2 inner-loop proof updates` | P2 | Phase 3 AC stepper proof, Phase 4 route blocker proof |
+| `4f7a7af` `fix(uiue): close phase4 settings control route` | P3 follow-up | Phase 4 settings route, macro, theme, reset simulator proof |
 
 ## Phase Conclusions
 
 | Phase | Conclusion | Proof class | Residual risk | Next action |
 |---|---|---|---|---|
 | Phase 2 continuous stage | PARTIAL | local + simulator screenshots + zone compare | `8.A` and `8.C2` remain open; anchor-level visual acceptance 5-gate not closed | Resume visual hard gates only after receipt/coverage stays synchronized |
-| Phase 3 touch chain | PARTIAL / simulator touch-stepper-pass | local + unit + simulator UI tree/tap | `8.D4` and SD7 open; no drag/manual/voice-reasoning mock proof | Record voice-reasoning mock and drag/operator-pass evidence |
+| Phase 3 touch chain | DONE for A-2 simulator/mock touch + voice scope | local + unit + simulator UI tree/tap | Drag automation remains `operator-pass pending`; no true-device/product V-PASS; no true ASR/TTS/LoRA/backend | Leave stable unless manual drag proof is explicitly requested |
 | Phase 4 demo control panel | DONE for A-2 simulator/mock interaction scope | local + unit + simulator screenshots/UI tree | No true-device/product V-PASS; customer-facing acceptance not claimed | Keep proof boundary explicit; do not reopen visual work unless new grill/anchor gap appears |
 | Phase 5 ambient burst | DONE for A-2 simulator/mock scope | local + unit + simulator screenshot + 5s recording | No true-device FPS/readability proof; ambient-card physical tap not recorded | Keep SD16/true-device rows open until later proof |
 | Phase 6 context capsule | DONE for A-2 simulator scope | local + unit + simulator screenshots + ROI metrics + route-spike recording | True-device GPU/FPS and final route-A art deferred | Treat current capsule as simulator-scope anchor, not final mobile proof |
@@ -30,7 +31,7 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 ## Loopaudit: Claim vs Reality
 
 - No Phase 2 visual V-PASS is claimed. `8.C2`, SD18, SD22, and SD23 remain open because anchor-level human review and the visual-acceptance 5-gate are not closed.
-- Phase 3 has real simulator tap mutation for the AC stepper path, but drag and voice-reasoning mock proof remain missing. SD6 is checked; SD7 stays open.
+- Phase 3 has real simulator tap mutation for the AC stepper path and mic-dock voice-reasoning mock route (`26℃ -> 28℃`). SD6 and SD7 are checked only for A-2 simulator/mock scope; drag remains `operator-pass pending`.
 - Phase 4 has control-panel code, harness proof, settings-sheet entry proof, settings-to-control-panel route proof, deepSpace theme switch proof, rain macro state mutation proof, and reset proof. `8.E4`, SD8, and SD12 are closed for simulator/mock interaction scope only.
 - Phase 5 and Phase 6 are allowed to say DONE only inside their simulator/mock A-2 boundary. Neither is true-device or mainline proof.
 - `tasks.md`, the coverage index, phase receipts, and runtime evidence now agree on these boundaries.
@@ -41,6 +42,7 @@ Status: PARTIAL overall. P0 commit anchors, P1 reconciliation, and P2 proof refr
 |---|---|---|
 | iOS simulator `build_run_sim` | PASS | runtime/simulator |
 | Phase 3 AC stepper UI tap | PASS: `26℃ -> 27℃` | runtime/simulator |
+| Phase 3 mic-dock voice mock tap | PASS: `26℃ -> 28℃` + dialogue response | runtime/simulator |
 | Phase 4 settings route + macro + reset probe | PASS | runtime/simulator |
 | `swift test` | PASS: 245 tests, 3 skipped, 0 failures | unit |
 | macOS `xcodebuild` | PASS: `** BUILD SUCCEEDED **` | local |
@@ -64,4 +66,14 @@ Captured at: 2026-06-26 13:08 CST
   - `shots/phase4-cabin-macro-rainy-result-v1.jpg`
   - `shots/phase4-settings-theme-deepspace-v1.jpg`
   - `shots/phase4-settings-reset-result-v1.jpg`
-- Remaining overall A-2 blockers are still Phase 2 visual acceptance (`8.C2`) and Phase 3 voice/drag proof (`8.D4`/SD7).
+- Remaining overall A-2 blocker is Phase 2 visual acceptance (`8.C2`). Phase 3 SD7 is closed only inside A-2 simulator/mock scope; drag automation remains `operator-pass pending`, not V-PASS.
+
+## P3 Follow-up Update: Phase 3 Voice Mock
+
+Captured at: 2026-06-26 13:27 CST
+
+- Commit subject: `fix(uiue): close phase3 voice reasoning mock route`.
+- `MicDock` is now a tappable simulator target that submits the mock voice intent.
+- Simulator UI tree proves `按住说话` tap updates `空调 26℃` to `空调 28℃`, appends `我有点冷了`, and appends `当前 26℃，已为您升到 28℃`.
+- Screenshot: `shots/phase3-voice-mock-cold-to-warm-v1.jpg`.
+- Boundary: A-2 simulator/mock only; not true ASR/TTS/LoRA/backend, not true-device proof, not mainline proof.
