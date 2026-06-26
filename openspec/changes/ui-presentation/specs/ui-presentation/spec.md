@@ -248,3 +248,36 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **WHEN** 爆发渲染
 - **THEN** 屏幕边缘 5s 闪烁+Canvas 粒子爆发 → fade，`allowsHitTesting(false)` 不挡交互
 - **AND** SHALL NOT always-on（仅 color delta 触发），SHALL NOT 用 Inferno layerEffect 折射（守 U30）
+
+### Requirement: visual acceptance SHALL use L0-L3 proof gates and SHALL NOT auto-upgrade simulator proof to V-PASS
+
+8.C2 visual acceptance SHALL remain open until the evidence package contains all four proof layers: L0 runtime-truth capture, L1 sentinel result, L2 readability/regression evidence, and L3 human 5-gate verdict. L0 SHALL record `device`, `launchArg`, `theme`, `ui_tree_evidence`, `screenshot_path`, and `proof_class`; screenshots counting as L0 SHALL be on-screen `simctl io screenshot` captures. Off-screen `ImageRenderer`, SwiftUI preview, static snapshot, or other non-composited render output SHALL NOT count as L0 evidence. Machine/local/mock/simulator proof SHALL NOT be upgraded to `V-PASS`.
+
+#### Scenario: L0 requires on-screen runtime-truth fields
+- **GIVEN** a visual-acceptance evidence item
+- **WHEN** it is submitted as L0 evidence
+- **THEN** it SHALL include `device`, `launchArg`, `theme`, `ui_tree_evidence`, `screenshot_path`, and `proof_class`
+- **AND** `screenshot_path` SHALL point to an on-screen `simctl io screenshot` capture
+- **AND** off-screen `ImageRenderer`, SwiftUI preview, static snapshot, or non-composited render output SHALL NOT satisfy L0
+
+#### Scenario: L1 sentinel blocks collapse without chasing RMSE
+- **GIVEN** zone or anchor comparison runs as L1
+- **WHEN** it reports a result
+- **THEN** the result SHALL be one of `PASS`, `WARN`, or `FAIL`
+- **AND** `FAIL` SHALL block visual acceptance for collapse/regression
+- **AND** L1 SHALL NOT chase RMSE score improvements and SHALL NOT sign aesthetic quality
+
+#### Scenario: L2 readability uses OCR and contrast as hard gates, SSIM as evidence
+- **GIVEN** L2 machine evidence is produced
+- **WHEN** text/readability and visual regression are evaluated
+- **THEN** OCR and contrast SHALL be readability hard gates
+- **AND** SSIM MAY be recorded as regression evidence
+- **AND** LPIPS SHALL NOT be a required or accepted L2 gate for this change
+- **AND** L2 passing SHALL NOT substitute for L3 human aesthetic acceptance
+
+#### Scenario: L3 human 5-gate is the only V-PASS authority
+- **GIVEN** L0, L1, and L2 evidence exists
+- **WHEN** final visual acceptance is decided
+- **THEN** L3 SHALL record a human 5-gate verdict enum of `V-PASS`, `V-PASS_WITH_NOTES`, `PARTIAL`, or `FAIL`
+- **AND** only 磊哥 MAY sign `V-PASS`
+- **AND** automated validators, local proof, mock proof, or simulator proof SHALL NOT mark A-2 complete or claim product `V-PASS`

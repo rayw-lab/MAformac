@@ -139,14 +139,14 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 ### 8.G 视觉验收门 hardening + 长跑流程机制（AD-15 / U32-U37，2026-06-26 codex ~15h 长跑复盘）
 
 **A 视觉门契约**：
-- [ ] 8.G1 visual-acceptance **L0-L3 门定义**（L0 runtime-truth 字段 / L1 sentinel PASS/WARN/FAIL / L2 OCR+contrast+SSIM / L3 人工 5-gate enum）落 spec + 8.C2 验收口径（AD-15）
+- [x] 8.G1 visual-acceptance **L0-L3 门定义**（L0 runtime-truth 字段 / L1 sentinel PASS/WARN/FAIL / L2 OCR+contrast+SSIM / L3 人工 5-gate enum）落 spec + 8.C2 验收口径（AD-15）
 - [ ] 8.G2 一进两出 **8 态 VUI 矩阵测试**（U37）：`DemoRuntimeResultKind.allCases` 每态 视觉态+话术+动效+TTS+proof，禁 default 吞，复用 `FamilyDisplaysTests` 闭合模式
 
 **B 流程机制**（回写流程文档，非本 change spec）：
 - [x] 8.G3 `plan v3 heavy-work 段` + 全局 `heavy-work` skill 回写：long-run stop-rule（2 轮无新 proof-class 收口）/ 截图链路纪律（必 on-screen simctl 禁 off-screen ImageRenderer）/ proof-class budget
 
 **C 代码**：
-- [ ] 8.G4 `Tools/checks/phase2_zone_compare.py` 输出 RMSE → PASS/WARN/FAIL + stop-rule（U33）
+- [x] 8.G4 `Tools/checks/phase2_zone_compare.py` 输出 RMSE → PASS/WARN/FAIL + stop-rule（U33）
 - [x] 8.G5 ContentView Grid 固定列 ✅ **已实装**（2026-06-26 核：codex 长跑 `VehicleCardsGrid` 用 `Grid + GridRow`（`App/ContentView.swift:1504`），零 LazyVGrid，pre-commit `contentview-wiring` 实跑确认；D5 C22「:40 仍 LazyVGrid」= stale 已 supersede）
 - [ ] 8.G6 `state-cells` 加 `ui_value_type` 派生字段（D3 C11）+ 清残留 2 处 `hvac.*` 命名债（apply 时核现状）
 - [ ] 8.G7 取证 receipt `evidence_kind` enum（tap_step/toggle/badge_cycle/continuous_drag/terminal_visual_only，U36）+ 代表族自动化样本矩阵（风量/座椅/车窗/灯光各 1 条）

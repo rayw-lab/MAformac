@@ -5,6 +5,10 @@ The zones are defined in the simulator screenshot coordinate space used by the
 Phase 2 receipt (1320x2868). Inputs are resized to the anchor dimensions before
 RMSE calculation so local simulator captures and anchor PNGs can be compared
 repeatably.
+
+This is an L1 visual sentinel: it reports PASS/WARN/FAIL to block obvious
+collapse only. Raw RMSE remains diagnostic evidence, not an aesthetics target and
+not a replacement for L3 human 5-gate review.
 """
 
 from __future__ import annotations
@@ -27,6 +31,14 @@ ZONES = (
 )
 
 PRESET_MASKS: dict[str, tuple["MaskRect", ...]] = {}
+DEFAULT_WARN_THRESHOLD = 0.180000
+DEFAULT_FAIL_THRESHOLD = 0.300000
+STOP_RULE = (
+    "L1 sentinel stop-rule: if repeated runs add no new proof class or artifact "
+    "and only tune the same L1 metric/crop, stop and close as PARTIAL/FAIL "
+    "instead of continuing. L1 blocks collapse only; it does not sign aesthetics "
+    "or replace L3."
+)
 
 
 @dataclass(frozen=True)
@@ -36,6 +48,12 @@ class MaskRect:
     y0: int
     x1: int
     y1: int
+
+
+@dataclass(frozen=True)
+class ZoneMetric:
+    name: str
+    rmse: float
 
 
 PRESET_MASKS = {
@@ -104,27 +122,156 @@ def image_data(image: Image.Image):
     return image.getdata()
 
 
-def compare(anchor_path: Path, current_path: Path, masks: tuple[MaskRect, ...]) -> list[float]:
+def compare(anchor_path: Path, current_path: Path, masks: tuple[MaskRect, ...]) -> list[ZoneMetric]:
     anchor = Image.open(anchor_path).convert("RGB")
     current = Image.open(current_path).convert("RGB").resize(anchor.size)
     anchor = apply_masks(anchor, masks)
     current = apply_masks(current, masks)
-    values: list[float] = []
-    for _, y0, y1 in ZONES:
+    values: list[ZoneMetric] = []
+    for name, y0, y1 in ZONES:
         ay0 = scale_y(y0, anchor.height)
         ay1 = scale_y(y1, anchor.height)
         anchor_crop = anchor.crop((0, ay0, anchor.width, ay1))
         current_crop = current.crop((0, ay0, anchor.width, ay1))
-        values.append(rmse(anchor_crop, current_crop))
+        values.append(ZoneMetric(name=name, rmse=rmse(anchor_crop, current_crop)))
     return values
 
 
+def validate_thresholds(warn_threshold: float, fail_threshold: float) -> None:
+    if warn_threshold < 0:
+        raise ValueError("--warn-threshold must be >= 0")
+    if fail_threshold <= warn_threshold:
+        raise ValueError("--fail-threshold must be greater than --warn-threshold")
+
+
+def sentinel_verdict(
+    metrics: list[ZoneMetric], warn_threshold: float, fail_threshold: float
+) -> tuple[str, str, ZoneMetric]:
+    validate_thresholds(warn_threshold, fail_threshold)
+    if not metrics:
+        raise ValueError("at least one zone metric is required")
+    max_metric = max(metrics, key=lambda metric: metric.rmse)
+    if max_metric.rmse >= fail_threshold:
+        return (
+            "FAIL",
+            f"{max_metric.name}_rmse={max_metric.rmse:.6f} >= fail_threshold={fail_threshold:.6f}",
+            max_metric,
+        )
+    if max_metric.rmse >= warn_threshold:
+        return (
+            "WARN",
+            f"{max_metric.name}_rmse={max_metric.rmse:.6f} >= warn_threshold={warn_threshold:.6f}",
+            max_metric,
+        )
+    return (
+        "PASS",
+        f"max_rmse={max_metric.rmse:.6f} < warn_threshold={warn_threshold:.6f}",
+        max_metric,
+    )
+
+
+def format_tsv(
+    case: str,
+    anchor_name: str,
+    metrics: list[ZoneMetric],
+    warn_threshold: float,
+    fail_threshold: float,
+) -> str:
+    verdict, reason, max_metric = sentinel_verdict(metrics, warn_threshold, fail_threshold)
+    header = "\t".join(
+        [
+            "case",
+            "anchor",
+            "l1_verdict",
+            "reason",
+            "max_zone",
+            "max_rmse",
+            "warn_threshold",
+            "fail_threshold",
+            "stop_rule",
+        ]
+        + [f"{metric.name}_rmse" for metric in metrics]
+    )
+    row = "\t".join(
+        [
+            case,
+            anchor_name,
+            verdict,
+            reason,
+            max_metric.name,
+            f"{max_metric.rmse:.6f}",
+            f"{warn_threshold:.6f}",
+            f"{fail_threshold:.6f}",
+            STOP_RULE,
+        ]
+        + [f"{metric.rmse:.6f}" for metric in metrics]
+    )
+    return header + "\n" + row + "\n"
+
+
+def run_self_check(warn_threshold: float, fail_threshold: float) -> int:
+    validate_thresholds(warn_threshold, fail_threshold)
+    pass_value = warn_threshold / 2
+    warn_value = (warn_threshold + fail_threshold) / 2
+    fail_value = fail_threshold + 0.010000
+    cases = (
+        ("pass_case", [pass_value, pass_value, pass_value, pass_value], "PASS"),
+        ("warn_case", [pass_value, warn_value, pass_value, pass_value], "WARN"),
+        ("fail_case", [pass_value, warn_value, fail_value, pass_value], "FAIL"),
+    )
+    for label, raw_values, expected in cases:
+        metrics = [
+            ZoneMetric(name=name, rmse=value)
+            for (name, _, _), value in zip(ZONES, raw_values)
+        ]
+        verdict, reason, _ = sentinel_verdict(metrics, warn_threshold, fail_threshold)
+        print(f"{label}\t{verdict}\t{reason}")
+        if verdict != expected:
+            print(f"self-check\tFAIL\texpected={expected} actual={verdict}")
+            return 1
+    print("self-check\tPASS")
+    print(STOP_RULE)
+    return 0
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", required=True, help="Case label for TSV output")
-    parser.add_argument("--anchor", required=True, type=Path, help="Anchor PNG path")
-    parser.add_argument("--current", required=True, type=Path, help="Current screenshot path")
-    parser.add_argument("--output", required=True, type=Path, help="Output metrics TSV")
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        epilog=STOP_RULE,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--case", help="Case label for TSV output")
+    parser.add_argument("--anchor", type=Path, help="Anchor PNG path")
+    parser.add_argument("--current", type=Path, help="Current screenshot path")
+    parser.add_argument("--output", type=Path, help="Output L1 sentinel TSV")
+    parser.add_argument(
+        "--warn-threshold",
+        type=float,
+        default=DEFAULT_WARN_THRESHOLD,
+        help=(
+            "Max-zone RMSE at or above this reports WARN. This is a collapse sentinel, "
+            "not an aesthetics target."
+        ),
+    )
+    parser.add_argument(
+        "--fail-threshold",
+        type=float,
+        default=DEFAULT_FAIL_THRESHOLD,
+        help=(
+            "Max-zone RMSE at or above this reports FAIL. This blocks collapse only "
+            "and does not replace L3."
+        ),
+    )
+    parser.add_argument(
+        "--print-stop-rule",
+        action="store_true",
+        help="Print the L1 stop-rule and exit without reading images.",
+    )
+    parser.add_argument(
+        "--self-check",
+        action="store_true",
+        help="Run PASS/WARN/FAIL threshold self-check without reading images.",
+    )
     parser.add_argument(
         "--mask-rect",
         action="append",
@@ -141,18 +288,47 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    if args.print_stop_rule:
+        print(STOP_RULE)
+        return 0
+    if args.self_check:
+        return run_self_check(args.warn_threshold, args.fail_threshold)
+
+    missing = [
+        flag
+        for flag, value in (
+            ("--case", args.case),
+            ("--anchor", args.anchor),
+            ("--current", args.current),
+            ("--output", args.output),
+        )
+        if value is None
+    ]
+    if missing:
+        parser.error(
+            "the following arguments are required unless --self-check or "
+            f"--print-stop-rule: {', '.join(missing)}"
+        )
+    try:
+        validate_thresholds(args.warn_threshold, args.fail_threshold)
+    except ValueError as error:
+        parser.error(str(error))
+
     preset_masks = tuple(
         rect for preset in args.mask_preset for rect in PRESET_MASKS[preset]
     )
     masks = tuple(args.mask_rect) + preset_masks
     values = compare(args.anchor, args.current, masks)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    header = "case\tanchor\t" + "\t".join(name for name, _, _ in ZONES)
-    row = "\t".join(
-        [args.case, args.anchor.name] + [f"{value:.6f}" for value in values]
+    report = format_tsv(
+        args.case,
+        args.anchor.name,
+        values,
+        args.warn_threshold,
+        args.fail_threshold,
     )
-    args.output.write_text(header + "\n" + row + "\n", encoding="utf-8")
-    print(args.output.read_text(encoding="utf-8"), end="")
+    args.output.write_text(report, encoding="utf-8")
+    print(report, end="")
     return 0
 
 
