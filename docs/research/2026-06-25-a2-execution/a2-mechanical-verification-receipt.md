@@ -37,6 +37,23 @@ Proof class: local + unit. This does not prove visual acceptance, simulator anch
 - Phase 4 receipt remains `PARTIAL`: settings/control-panel simulator evidence exists, but no broader product V-PASS is claimed.
 - Phase 6 route A video loop is simulator evidence only; true-device GPU/FPS remains deferred.
 
+## P2 Inner/Outer Ring Validation Update
+
+Captured at: 2026-06-26 12:41:20 CST
+
+Status: P2 proof gates refreshed. This update strengthens `8.C1` and the Phase 3/4 receipts, but it does not close `8.C2`, SD7, SD8, SD12, true-device, or product V-PASS.
+
+| Gate | Proof class | Result |
+|---|---|---|
+| iOS simulator `build_run_sim` with `-mockTheme ivory -mockSnapshot cooling` | runtime/simulator | PASS; app launched on iPhone 17 Pro Max simulator |
+| Phase 3 AC expanded stepper tap | runtime/simulator | PASS; UI tree changed `空调 26℃` to `空调 27℃`, screenshot `shots/phase3-touch-after-increment-v2.jpg` |
+| Phase 4 settings route probe | runtime/simulator | PARTIAL/BLOCKER; settings sheet opened, but tapping `演绎控制台` returned to main stage instead of presenting `DemoControlPanel`, screenshot `shots/phase4-settings-control-route-failed-v1.jpg` |
+| `swift test` | unit | PASS: 245 tests executed, 3 skipped, 0 failures |
+| `xcodebuild -project MAformac.xcodeproj -scheme MAformacMac -destination 'platform=macOS' -derivedDataPath .build/dd-mac build` | local | PASS: `** BUILD SUCCEEDED **` |
+| `make verify-all` | local + unit | PASS exit 0; includes source snapshot, generation, refs, cross-section, surface consistency, and Swift tests |
+
+Inner/outer split held: simulator screenshot/UI-tree proof was collected serially before broad outer gates, and no status-bar override or screenshot capture was run in parallel.
+
 ## P0 Commit Anchor: phase2-6 shared scaffold
 
 Commit subject: `feat(uiue): anchor phase2-6 shared presentation scaffold`

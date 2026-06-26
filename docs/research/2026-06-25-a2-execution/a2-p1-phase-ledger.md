@@ -20,3 +20,18 @@ Proof boundary: isolated UIUE worktree. This ledger reconciles current code, rec
 - Keep Phase 2 visual rows open until visual-acceptance 5-gate passes.
 - Keep Phase 3 SD7 open until voice-reasoning mock and drag/operator-pass evidence exist.
 - Keep Phase 5 and Phase 6 simulator-scope DONE boundaries explicit; do not promote them to true-device or V-PASS.
+
+## P2 Proof Refresh
+
+Captured at: 2026-06-26 12:41:20 CST
+
+| Gate | Status | Ledger effect |
+|---|---|---|
+| iOS simulator launch | PASS | Confirms current shared scaffold still runs in simulator |
+| Phase 3 AC expanded stepper tap | PASS | Supports `8.D1-8.D3` and SD6 only; SD7 still open |
+| Phase 4 settings route probe | PARTIAL/BLOCKER | Confirms settings entry, but keeps `8.E4`, SD8, and SD12 open |
+| `swift test` | PASS: 245 tests, 3 skipped, 0 failures | Supports `8.C1` only |
+| macOS `xcodebuild` | PASS | Supports `8.C1` only |
+| `make verify-all` | PASS exit 0 | Supports `8.C1` only |
+
+No coverage row was checked from code existence alone. Each checked row has a matching task row, receipt statement, and local/simulator evidence.

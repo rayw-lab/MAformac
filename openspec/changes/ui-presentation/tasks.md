@@ -111,6 +111,8 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
 - [ ] 8.C2 simctl 视觉 + **visual-acceptance 5-gate（米白/深空，还原投屏环境 V10）** + 对比 anchor-set（连续舞台无黑线 / 制冷热 / capsule diorama）
 
+> 2026-06-26 P2 outer-ring validation reran `swift test`, macOS `xcodebuild`, and `make verify-all`: all PASS. This reinforces `8.C1` only. `8.C2` stays open because visual-acceptance 5-gate and anchor-level human review are not closed. Closeout ledger: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`.
+
 ### 8.D 触控 + state 联动 + 语音推理（全 mock，SD6/SD7，plan Phase 3）
 - [x] 8.D1 `ValueControlView` 交互回调（dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环 → `ValueControlActions`；adopt **axiom-swiftui** binding/gesture + **IceCubesApp** 交互参考）
 - [x] 8.D2 `ExpandedFamilyCard`/`ExpandedCellRowView` 接回调 → mock store（`store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片+numericText 联动）

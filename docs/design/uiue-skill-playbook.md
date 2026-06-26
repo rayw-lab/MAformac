@@ -51,6 +51,11 @@ owner: UIUE 链路 A（worktree MAformac-uiue）
 
 ## 1. 按 Phase × 任务索引（核心表）
 
+### 横切管控 / loop review goals
+| 任务 | 用 skill | 抄代码 | pre-mortem 坑 |
+|---|---|---|---|
+| loop review goals 派单实施文件 | `verification-before-completion` + `requesting-code-review` + `closeout-receipt-writer` | `~/workspace/raw/05-Projects/MAformac/dispatches/2026-06-22-harness-enforce-audit-implementation-dispatch.md`（raw 仓外一手派单；正文不入仓） | 先走 `docs/research/2026-06-25-cc-harness-mechanism-review/INDEX.md` 的一手层级；只挂路径不复制 raw；别把 enforce/hook 派单当 UIUE 视觉契约 |
+
 ### Phase 1b 工程前置硬门（🔜next，不依赖后端）
 | 任务 | 用 skill | 抄代码 | pre-mortem 坑 |
 |---|---|---|---|

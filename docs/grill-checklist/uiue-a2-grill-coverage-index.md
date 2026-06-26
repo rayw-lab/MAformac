@@ -139,6 +139,7 @@ Phase 1 sub-checkpoints（receipt: `docs/research/2026-06-25-a2-execution/phase-
 Phase 0 receipt: `docs/research/2026-06-25-a2-execution/phase-0-receipt.md`（TDD + full `swift test` + 双端 build；anchor pixel compare skipped because this phase has no UI delta）。
 Phase 1 receipt: `docs/research/2026-06-25-a2-execution/phase-1-receipt.md`（TDD + full `swift test` + SF Symbol probe + 双端 build；RPB-51 P1 slice done, full row remains open until visual consumption）。
 A-2 mechanical verification receipt: `docs/research/2026-06-25-a2-execution/a2-mechanical-verification-receipt.md`（OpenSpec `8.C1` local/unit gates done: `make verify-all` exit0 + iOS/macOS build green；`8.C2` visual/anchor gate remains open）。
+A-2 phase closeout receipt: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`（Phase 2-6 conclusion/proof-class/residual-risk 汇总；Phase 3 SD7、Phase 4 SD8/SD12、Phase 2 visual gate 仍 open；isolated UIUE worktree, not mainline proof）。
 
 ### 相关 U 系列（视觉/交互 → Phase；余已落/main/voice）
 
