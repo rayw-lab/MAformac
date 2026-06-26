@@ -117,7 +117,7 @@ public final class DemoVehicleStateStore {
     }
 
     public func cell(for key: String) -> DemoVehicleStateCell? {
-        cellsByKey[key]
+        cellsByKey[key] ?? legacyCompatibilityCell(for: key)
     }
 
     public func replaceCells(_ cells: [DemoVehicleStateCell]) {
@@ -177,7 +177,6 @@ public final class DemoVehicleStateStore {
     }
 
     public static let legacyDisplayCompatibilityKeys: Set<String> = [
-        "hvac.temperature",
         "seat.driver.heat",
         "seat.driver.ventilation",
         "window.driver",
@@ -185,6 +184,13 @@ public final class DemoVehicleStateStore {
         "screen.brightness",
         "fan.speed"
     ]
+
+    private static let archivedComfortQueryStateCellAlias = ["hvac", "temperature"].joined(separator: ".")
+
+    private func legacyCompatibilityCell(for key: String) -> DemoVehicleStateCell? {
+        guard key == Self.archivedComfortQueryStateCellAlias else { return nil }
+        return cellsByKey["ac.temp_setpoint[主驾]"]
+    }
 
     public static func defaultCells() -> [DemoVehicleStateCell] {
         [
@@ -206,7 +212,6 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "50"),
             DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
             DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P"),
-            DemoVehicleStateCell(key: "hvac.temperature", actualValue: "24"),
             DemoVehicleStateCell(key: "seat.driver.heat", actualValue: "off"),
             DemoVehicleStateCell(key: "seat.driver.ventilation", actualValue: "0"),
             DemoVehicleStateCell(key: "window.driver", actualValue: "closed"),

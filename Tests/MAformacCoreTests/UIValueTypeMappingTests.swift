@@ -5,6 +5,13 @@ import XCTest
 /// 🔴 `derivation-layer-discipline` 铁律1：`default` 禁吞错 → 遍历契约全 base 断言每个都显式登记。
 final class UIValueTypeMappingTests: XCTestCase {
 
+    func testUIValueTypeRawValuesAreStable() {
+        XCTAssertEqual(
+            UIValueType.allCases.map(\.rawValue),
+            ["dial", "toggle", "stepper", "percent", "badge"]
+        )
+    }
+
     // 🔴 gptpro 第2点修复验证：window.lock(enum locked/unlocked 二值锁) 原 default 吞成 badge，实为 toggle
     func testWindowLockIsToggleNotBadge() {
         XCTAssertEqual(UIValueTypeMapper.uiValueType(forBase: "window.lock"), .toggle,
@@ -30,6 +37,24 @@ final class UIValueTypeMappingTests: XCTestCase {
             XCTAssertTrue(bases.contains(key),
                           "mapping 登记了契约不存在的 base 「\(key)」（base 名写错？已被 A2 移除？）")
         }
+    }
+
+    func testStateCellUIValueTypeProjectionCoversEveryKnownBase() {
+        let catalog = StateCellPresentationCatalog.load()
+        let projections = StateCellUIValueTypeProjector.projections(catalog: catalog)
+
+        XCTAssertGreaterThanOrEqual(projections.count, 30)
+        XCTAssertEqual(projections.map(\.base), catalog.knownBases.sorted())
+        XCTAssertTrue(projections.allSatisfy { !$0.uiValueTypeFieldValue.isEmpty })
+    }
+
+    func testStateCellsYAMLDoesNotCarryProducerUIValueTypeField() throws {
+        let yaml = try loadStateCellsYAML()
+
+        XCTAssertFalse(
+            yaml.contains("ui_value_type"),
+            "ui_value_type must remain consumer-side per ui-presentation spec R2 / AD-2"
+        )
     }
 
     // 各控件类型代表 base 映射正确（穷尽分类抽样）

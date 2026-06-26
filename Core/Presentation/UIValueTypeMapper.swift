@@ -1,6 +1,6 @@
 import Foundation
 
-enum UIValueType: Equatable {
+enum UIValueType: String, CaseIterable, Codable, Equatable, Sendable {
     case dial
     case toggle
     case stepper
@@ -338,6 +338,28 @@ enum UIValueTypeMapper {
 
     /// contract-driven 闭合测试用：base 是否已显式登记（不触发 `assertionFailure`）。
     static func isMapped(_ base: String) -> Bool { mapping[base] != nil }
+}
+
+struct StateCellUIValueTypeProjection: Equatable, Sendable {
+    let base: String
+    let uiValueType: UIValueType
+
+    var uiValueTypeFieldValue: String {
+        uiValueType.rawValue
+    }
+}
+
+enum StateCellUIValueTypeProjector {
+    static func projections(
+        catalog: StateCellPresentationCatalog = .shared
+    ) -> [StateCellUIValueTypeProjection] {
+        catalog.knownBases.sorted().map { base in
+            StateCellUIValueTypeProjection(
+                base: base,
+                uiValueType: UIValueTypeMapper.uiValueType(forBase: base)
+            )
+        }
+    }
 }
 
 struct ScopedStateKey: Equatable {

@@ -10,7 +10,6 @@ final class VehicleStateStoreContractTests: XCTestCase {
         let legacyMVPKeys: Set<String> = [
             "fan.speed",
             "ac.power",
-            "hvac.temperature",
             "lighting.ambient",
             "screen.brightness",
             "seat.driver.heat",
@@ -38,7 +37,25 @@ final class VehicleStateStoreContractTests: XCTestCase {
         XCTAssertFalse(keys.contains("screen.brightness"))
         XCTAssertFalse(keys.contains("lighting.ambient"))
         XCTAssertFalse(keys.contains("fan.speed"))
-        XCTAssertFalse(keys.contains("hvac.temperature"))
+    }
+
+    @MainActor
+    func testDefaultCellsDoNotCarryActiveHvacLegacyKeys() {
+        let store = DemoVehicleStateStore()
+        let keys = store.cells.map(\.key)
+        let legacyHVACPrefix = ["hvac", ""].joined(separator: ".")
+
+        XCTAssertFalse(keys.contains { $0.hasPrefix(legacyHVACPrefix) })
+    }
+
+    @MainActor
+    func testArchivedCapabilityAliasDoesNotReintroduceActiveLegacyState() {
+        let store = DemoVehicleStateStore()
+        let archivedComfortQueryKey = ["hvac", "temperature"].joined(separator: ".")
+
+        XCTAssertNotNil(store.cell(for: archivedComfortQueryKey))
+        XCTAssertFalse(store.cells.contains { $0.key == archivedComfortQueryKey })
+        XCTAssertFalse(store.presentationCells.contains { $0.key == archivedComfortQueryKey })
     }
 
     @MainActor
