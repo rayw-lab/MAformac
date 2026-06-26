@@ -149,6 +149,6 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.G4 `Tools/checks/phase2_zone_compare.py` 输出 RMSE → PASS/WARN/FAIL + stop-rule（U33）
 - [x] 8.G5 ContentView Grid 固定列 ✅ **已实装**（2026-06-26 核：codex 长跑 `VehicleCardsGrid` 用 `Grid + GridRow`（`App/ContentView.swift:1504`），零 LazyVGrid，pre-commit `contentview-wiring` 实跑确认；D5 C22「:40 仍 LazyVGrid」= stale 已 supersede）
 - [ ] 8.G6 `state-cells` 加 `ui_value_type` 派生字段（D3 C11）+ 清残留 2 处 `hvac.*` 命名债（apply 时核现状）
-- [ ] 8.G7 取证 receipt `evidence_kind` enum（tap_step/toggle/badge_cycle/continuous_drag/terminal_visual_only，U36）+ 代表族自动化样本矩阵（风量/座椅/车窗/灯光各 1 条）
+- [x] 8.G7 取证 receipt `evidence_kind` enum（tap_step/toggle/badge_cycle/continuous_drag/terminal_visual_only，U36）+ 代表族自动化样本矩阵（风量/座椅/车窗/灯光各 1 条）
 - [ ] 8.G8 Reduce Motion 降级路径（U35）：粒子/氛围灯/orb 降级 + 禁动效态跑 5gate + 静态「在思考」反馈
 - [ ] 8.G9 UIUE 工程项实装（U14-U18）：Mac AnyLayout 并排 / HTML+Preview 4 类反例 / iPhone 触觉 / snapshot+黄金路径 XCUITest / 客户物料不上架
