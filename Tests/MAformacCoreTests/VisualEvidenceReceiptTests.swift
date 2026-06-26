@@ -53,8 +53,13 @@ final class VisualEvidenceReceiptTests: XCTestCase {
     }
 
     @MainActor
-    func testAutomatedSamplesWriteStoreAndRefreshPresentationSnapshot() {
-        for sample in VisualEvidenceSampleMatrix.automatedActionSamples {
+    func testAutomatedAndRepresentativeSamplesWriteStoreAndRefreshPresentationSnapshot() {
+        let samples = VisualEvidenceSampleMatrix.automatedActionSamples
+            + VisualEvidenceSampleMatrix.representativeFamilySamples
+        XCTAssertTrue(samples.contains { $0.id == "seat-representative" })
+        XCTAssertTrue(samples.contains { $0.id == "window-representative" })
+
+        for sample in samples {
             let store = DemoVehicleStateStore(cells: [
                 DemoVehicleStateCell(key: sample.cellKey, actualValue: sample.beforeValue)
             ])
@@ -81,6 +86,8 @@ final class VisualEvidenceReceiptTests: XCTestCase {
                 sample.id
             )
             XCTAssertEqual(snapshot.proofClass, .localMock, sample.id)
+            XCTAssertTrue(sample.evidenceKind.isAutomatedTapEvidence, sample.id)
+            XCTAssertTrue(sample.evidenceKind.provesProcessMutationWithoutOperator, sample.id)
         }
     }
 
