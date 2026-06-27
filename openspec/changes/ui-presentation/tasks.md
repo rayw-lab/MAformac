@@ -154,3 +154,14 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.G9 UIUE 工程项实装（U14-U18）：Mac AnyLayout 并排 / HTML+Preview 4 类反例 / iPhone 触觉 / snapshot+黄金路径 XCUITest / 客户物料不上架
   - [x] 8.G9a local/unit（U14/U15/U16/U18/U44）：U14 Mac split 只加契约测试和本地检查；U15 反例 fixture + DebugGallery 静态镜像；U16 触觉 policy 仅允许 iOS userTouch；U18 distribution boundary guard 仅允许 personal/internal self-use；U44 无投屏 Liquid Glass inventory 锁 MicDock/ContextCapsule/DemoControlPanel 三处 glass surface，内容卡继续禁 glass。
   - [x] 8.G9b（U17）：已新增 `MAformacIOSUITests` UI test target + 最小黄金路径 XCUITest + on-screen `simctl io screenshot` L0 截图包；proof class 限 simulator L0 smoke，不关 `8.C2` / L3 / V-PASS。
+
+### 8.H post-8.C2 formal grill amendment cascade（2026-06-27，docs-only gate boundary）
+
+> Authority: `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md`。本节只把人审通过的 R0-R2 canonical groups 级联成 OpenSpec 可观察 gate / proof boundary，不搬 70 条 Cxx 原文，不授权实现，不关闭 `8.C2`。
+
+- [ ] 8.H1 R1 Interaction Integrity 前置门：后续若声明交互真值通过，必须有 `family` / `ui_value_type` / `gesture` / `writeback` / `summary_readback` / `proof_class` 矩阵；只读/过程态不得显示假 affordance。
+- [ ] 8.H2 `StateCellInteractionPolicy` / consumer projection 边界：可点性、range、enum/options、readback 必须从现有 mapper/contract 派生，SHALL NOT 在 view 内新增第三份 value/range/enum SSOT。
+- [ ] 8.H3 `verify-uiue-interactions` 仅为 UIUE 专门门候选；进入长期 gate 前必须另有 grill 决策，SHALL NOT 直接塞入全局 `make verify-all`。
+- [ ] 8.H4 R2 视觉重跑前置：R1 交互矩阵、R2b Layout Integrity / Visual Spacing、VPA 四态、capsule asset governance 均需有明确 owner/proof/defer 状态；本任务不勾 `8.C2`。
+- [ ] 8.H5 R2b Layout Integrity / Visual Spacing 只挡结构 bug：遮挡、留白、zone budget、safe-area、右侧按钮外置、胶囊居中、mic dock 不遮卡片；SHALL NOT 作为审美或 L3 裁判。
+- [ ] 8.H6 Capsule/VPA proof split：context/data proof、layout proof、diorama aesthetic/L3 proof 分层记录；GPT Image 2 / anchor 只作方向，不作工程结构或最终验收 authority。

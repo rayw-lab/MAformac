@@ -100,3 +100,19 @@ proof_class_target：`simulator/L0` + `local` + `unit/checker`；L3 只保留人
 - verification：`swift test --filter ValueRangeMapperTests` PASS，覆盖 step snap 与 clockwise/counterclockwise 语义；`UIC2VisualAcceptanceUITests` 新增 `testPercentRingSpatialTapZonesDecreaseAndIncrease`、`testPercentRingDragClockwiseAndCounterclockwiseWritesBack`、`testStepperBarSpatialTapZonesDecreaseAndIncrease`；整组 MCP 与原生 `xcodebuild` 的 `iPhone 17 Pro Max` UI test 均为 14 tests / 0 failures。
 - governance lesson：grill 不能只问“是否可点/是否写回”，还要问“用户看到的可触区域是否有空间语义、连续语义和回读语义”。本轮新增复盘文档：`docs/research/2026-06-27-uiue-8c2-interaction-grill-retrospective.md`。
 - not claimed：磊哥仍在体验，L3 未签；本轮只修 local/unit/simulator 层的 Interaction Integrity，不声明 `V-PASS`、`mobile`、`true_device` 或 `A-2 complete`，不关闭 `8.C2`。
+
+## Milestone 10 - 胶囊白边 + anchor 误用修正
+
+- new proof class：磊哥在最新 simulator 截图放大后指出顶部 `ContextCapsule` 仍有白边；人工视觉证据优先于 L0/L1/L2 机器包，8.C2 继续 open。
+- iceberg tiger：白边不是单纯 layout 偏移，而是 `ContextCapsule.imageset/context-capsule.png` 本身带预烘焙玻璃白壳，再叠 SwiftUI `.glassEffect`、stroke 和 mask 后形成双层玻璃 artifact；同类风险覆盖所有“生成图自带 chrome + 代码再画 chrome”的 UI 资产。
+- fix-forward decision：按业内分层重做：内容资产只保留 diorama 景物并裁掉预烘焙白壳，最终 capsule 轮廓、mask、轻量 glass chrome 由 SwiftUI 负责；phone 顶部布局回到 SD24 的“胶囊居中 + 设置/刷新右上 standalone”，不把右侧按钮挤入胶囊图像。
+- governance lesson：`GPT Image 2`/anchor 图只能作为方向、构图意图和审美 bar；后续开发必须正向设计逼近锚点，不能逐像素照抄，也不能让锚点里的预烘焙 artifact 反向决定代码结构。anchor 对齐测试也要测“设计约束”（居中、外置按钮、无遮挡），不要把临时视觉补丁固化成错误规范。
+- not claimed：本轮是 simulator/local 视觉返修，不声明 L3、`V-PASS`、`mobile`、`true_device`、`A-2 complete`。
+
+## Milestone 11 - R0-R2 formal amendment 文档级联
+
+- new proof class：本轮只做 `local/docs-only` 级联，把 `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` 的 canonical groups 吸收到 OpenSpec gate boundary、8.C2 evidence、CURRENT/README router；不产生新的 unit/UI/simulator/human proof。
+- new risk：把 70 项 grill 清单直接塞入 OpenSpec 或 storyboard 会污染 authority 边界；把 Layout Integrity / Visual Spacing 写成审美裁判会制造新的 fake green。
+- fix-forward decision：OpenSpec 只承接可观察 gate/proof boundary：Interaction Integrity 矩阵、consumer projection 不新增第三份 SSOT、UIUE scoped gate candidate、L0-L3 proof boundary、Layout/Spacing 结构门、Capsule/VPA proof split；Cxx 映射留在 formal amendment。
+- governance lesson：级联顺序必须是 authority → OpenSpec/evidence → router/map。router 只能指向已存在且已被下游吸收的 authority；dirty worktree 下每个文件只写 owned slice，不能顺手整理既有脏改。
+- not claimed：不关闭 `8.C2`，不声明 L3、`V-PASS`、`mobile`、`true_device`、`runtime-ready`、`voice-ready` 或 `A-2 complete`。

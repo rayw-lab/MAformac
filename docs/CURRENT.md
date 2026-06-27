@@ -2,7 +2,7 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-06-26
+updated: 2026-06-27
 last_verified_base_commit: 6763e8a
 branch: main
 expires_when: "default-scope apply closeout lands or this route board is superseded by a newer route board."
@@ -30,11 +30,13 @@ Current audited state:
 1. `CLAUDE.md` — project constitution and highest routing rule.
 2. `docs/CURRENT.md` — this route board; expire and update it at phase transition.
 3. `docs/README.md` — document map.
-4. `Tools/agent-platform-plugin-refs/README.md` — local iOS/macOS build plugin references for SwiftUI, Liquid Glass, simulator, performance, and packaging work.
-5. `.xcodebuildmcp/README.md` — this worktree's persisted Codex `build-ios-apps` default profile and simulator assignment.
-6. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
-7. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
-8. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
+4. `docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md` — UIUE 当前 post-8.C2 路线图基线；仅路线图，不是 OpenSpec SSOT。
+5. `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` — UIUE R0-R2 formal grill amendment authority；70 项人审通过后的 canonical groups / gates / blocker map，不是实现授权。
+6. `Tools/agent-platform-plugin-refs/README.md` — local iOS/macOS build plugin references for SwiftUI, Liquid Glass, simulator, performance, and packaging work.
+7. `.xcodebuildmcp/README.md` — this worktree's persisted Codex `build-ios-apps` default profile and simulator assignment.
+8. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
+9. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
+10. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
 
 Local iOS build truth:
 
@@ -83,6 +85,8 @@ Current UIUE-lane state (2026-06-26, updated):
 - Branch: `uiue/phase4-default-scope-presentation`
 - Latest A-2 closeout anchor commit: `ef2435b` (`docs(uiue): add jsonl reviewed a2 closeout report`). Earlier long-form closeout anchor: `0350c8a` (`docs(uiue): add final a2 long-run closeout report`). Live branch head advances with documentation-only reconciliation commits; always re-probe `git rev-parse --short HEAD` before acting.
 - Active UIUE work: visual/interaction grill **closed**; **A-2 (step2) implementation plan v3** (`docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md`) executed through Phase 2-6 commit anchors and receipt reconciliation inside this isolated worktree. Current status is **PARTIAL overall**: Phase 3/4/5/6 are DONE only for A-2 simulator/mock scope; Phase 2 continuous-stage visual acceptance `8.A` and `8.C2` remain open because visual-acceptance 5-gate and anchor-level human review are not closed. Final JSONL-reviewed closeout report: `docs/research/2026-06-25-a2-execution/a2-final-jsonl-reviewed-closeout-report.md` (727 lines); earlier long-form report: `docs/research/2026-06-25-a2-execution/a2-final-500-line-closeout-report.md` (601 lines). Grill SSOT: SD3/SD5/SD18-25 in `docs/uiue-storyboard-grill-decisions.md`; freeze + supersession registry (S1-S10) in `docs/grill-checklist/uiue-grill-定档-2026-06-25.md`; landing matrix in `docs/grill-checklist/uiue-landing-matrix-2026-06-25.md`; runtime bridge decisions (RPB-01~53) in `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md`.
+- Post-8.C2 路线图基线：`docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md`。当前顺序是 8.C2 返修收口 -> UIUE 交互真值门 -> 8.C2 L0-L3 重跑 -> bridge contract intersection -> runtime/voice/model 分线。该路线图不关闭 `8.C2`，不声明 V-PASS，也不把 UIUE simulator/mock proof 变成 mainline proof。
+- R0-R2 formal amendment authority：`docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md`。当前 post-8.C2 顺序固定为 R0 返修收口 -> R1 Interaction Integrity -> R2/R2b L0-L3 + capsule/VPA/Layout Integrity -> R3 closeout/router cascade。`8.C2` 仍 open；该 authority 不授权 Swift/UI 实现，不声明 `V-PASS`、`mobile`、`true_device`、`runtime-ready`、`voice-ready` 或 `A-2 complete`。
 - New OpenSpec change: `openspec/changes/define-runtime-presentation-bridge/` — **✅ accepted by 磊哥 2026-06-25 (A-2 ui-presentation may consume the contract shape via mock snapshots); `openspec validate --strict` pass; contract-only; no Swift implementation; no runtime/voice/C6/endpoint/V·S·U-PASS readiness claims; AD-RPB-014 context 四维**. Authored in UIUE lane, fulfills parent roadmap Task 2. Mainline co-authorship review still pending for the **runtime-side implementation** (mainline MUST NOT create a second bridge change). Acceptance = contract is stable enough for UIUE visual consumption, NOT a runtime-readiness claim.
 - Next: do not mark A-2 complete until Phase 2 visual acceptance resumes and closes `8.A`/`8.C2`. Continue keeping `openspec/changes/ui-presentation/tasks.md`, `docs/grill-checklist/uiue-a2-grill-coverage-index.md`, phase receipts, and closeout reports synchronized. Bridge **AD-RPB-015** remains the single cross-artifact ID authority; a future code-graph harness (GitNexus/roam-code) manifest derives from it, never mints a second ID set.
 

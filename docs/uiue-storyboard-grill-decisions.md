@@ -292,6 +292,8 @@
 - 深空：辉光 MeshGradient；米白：实色渐变 + shadow（`colorScheme` 适配）。
 - breathing/脉冲/流光/粒子（E1 多层 + keyframeAnimator/TimelineView，AD-12 §四）。
 
+**2026-06-27 R0-R2 formal amendment**：SD16 的四态 orb 继续有效，但受 `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` 的 `G-R2B-VPA-ORB-STATES` 修订约束：后续 VPA/orb 不能只呈现「我在听」单态；米白主题必须用实色渐变球 + 柔和 shadow，禁止大面积外扩辉光抢层级。该修订不代表 L3 已通过，也不授权接真 voice/runtime。
+
 **承接**：E1 orb 实现 / E2 think 事件驱动 / E3-D listen 100ms / E8 四态时序 / U30 自建 MeshGradient / SD11 米白适配 / AD-12 §四微交互。
 
 ---
@@ -309,6 +311,8 @@
 ## SD18 — 视觉块收口（V1-V12 + D1/D2/D4/D6 + CC1-CC4 + 连续舞台硬约束）（2026-06-25 磊哥「全部同意，全部存档」）
 
 > 视觉块 grill 全收口。承接 tokens.md（视觉 SSOT）/ SD5 玻璃 / SD11 米白 / SD16 orb / SD17 动效 / AD-11 摘要 / AD-12 三屏 / D7 7 态色 / aesthetic-first 5gate。核心诉求 = 治磊哥「太 low」（卡片/空间/字体/层级），final = **iOS26 连续舞台非工程布局**。
+>
+> **2026-06-27 R0-R2 formal amendment**：SD18 新增结构性验收边界，详见 `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` 的 `G-R2B-LAYOUT-SPACING` / `HG-R2B-LAYOUT`。遮挡、留白、右侧设置/刷新按钮外置、胶囊居中、orb 与上下区间距、mic dock 不遮最后一行卡片，后续必须进入 Layout Integrity / Visual Spacing 结构门；这些门只挡结构 bug，不签审美，也不替代 L3。
 
 ### V1-V12 决策（physical landing 见表）
 
@@ -546,6 +550,8 @@ D8.2 clarify 少用主线不演，仅 force-state 展示 `blocked_with_alternati
 
 **physical landing**：ContentView 顶部 band 重构——去品牌 + 设置/刷新右上角 standalone + 中间 `ContextCapsule`（glassEffect + 持续动画）；`ContextCapsule` 读 context 状态（vehicle.speed/weather/time_period，RPB-19/RPB-52）→ 切场景动画（优先级单显）；动画 subtle/slow 低视觉重量（不抢 orb/卡片，V8）。**触 runtime**：读 context cells（数据 bridge，RPB-19）；动画呈现归 UIUE visual_only。
 
+**2026-06-27 R0-R2 formal amendment**：SD24 的「胶囊居中 + 设置/刷新右上 standalone」被提升为后续结构门输入，详见 `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` 的 `G-R2B-CAPSULE-ANCHOR-ASSET` 与 `G-R2B-LAYOUT-SPACING`。设置/刷新不得进入 capsule 图像，也不得遮挡 capsule 内容；按钮右侧对齐和 capsule 居中属于 Layout Integrity，不靠 L3 人眼最后兜底。
+
 **承接**：CC-B2/driving-context（本 SD 解）/ V7 顶栏（修订：去品牌+图标移角+capsule）/ V8 注意力（capsule 最低 ambient）/ SD13 端态白名单（A 整车+C 环境=context 源）/ SD5 玻璃（capsule glassEffect）/ RPB-19 环境 context + RPB-52 force-state（数据源）/ SD16 orb（区分：capsule=context 背景 / orb=思考语音主角）。
 
 ---
@@ -578,6 +584,8 @@ D8.2 clarify 少用主线不演，仅 force-state 展示 `blocked_with_alternati
 - **twostraws/Vortex**（粒子 雨/雪/尾气/星）/ **twostraws/Inferno**（Metal shaders，项目 U5 已采）/ **conorluddy/LiquidGlassReference**（iOS26 玻璃参考）/ `3dify-ios`+Apple FCRN（平图→2.5D 深度参考）/ (route A) Kling/Runway（图→视频 loop 首尾同帧法）。调研全档 `docs/research/2026-06-25-context-capsule-2.5d-tech/`。
 
 **physical landing**：A-1 `AD-RPB-014` context 四维（已修）；A-2 实装 `ContextCapsule` view（route spike 后定 A/C-lite）；预加载 + crossfade 硬约束；图标在 capsule 外（守 SD24）。
+
+**2026-06-27 R0-R2 formal amendment**：SD25 的 gpt 图/anchor 非权威边界继续加强，详见 `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` 的 `D-R2B-001`。后续 `ContextCapsule` 资产可以先按目标 px 占位，但内容图必须是 diorama 内容层，不得自带预烘焙白壳、白边、内嵌设置/刷新图标或完整 chrome；外层 capsule 轮廓、mask、轻量 glass chrome 由 SwiftUI 正向实现。该修订不声明最终美术已过，也不启动真机/GPU/FPS 验收。
 
 **pre-mortem**：🐯 GPU 争用（U30，重 shader+mlx）→ 砍重折射/route A/spike / 🐯 3dify license（联系作者，学技术不抄码）/ 📄 simulator 不渲 glass specular（真机 demo 不是问题）/ 🐘 平图→深度边缘糊（分层资产 vs 深度图，spike 比）。
 

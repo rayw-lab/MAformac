@@ -13,6 +13,8 @@
 | 文档 | 是什么 |
 |---|---|
 | `docs/CURRENT.md` | **当前路由牌(router only,not SSOT)**:新窗口先看当前阶段/下一步/禁止动作/活跃 blockers;若与 CLAUDE/OpenSpec/grill 冲突则作废并更新 |
+| `docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md` | **UIUE 当前路线图基线**:post-8.C2 partial 后的后续顺序;先 8.C2 返修与交互真值门,再重跑 L0-L3,之后才 bridge/runtime 分线;仅路线图,不是实现计划或 OpenSpec SSOT |
+| `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` | **UIUE R0-R2 formal grill amendment authority**:70 项人审通过后的 canonical groups / decisions / hard gates / blocker map / cascade plan;不授权实现,不关闭 `8.C2`,不声明 V-PASS/mobile/true_device/runtime/voice/A-2 complete |
 | ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` | **范式 + surface 权威 SSOT**(§1-§17:generic frame 否决→D-domain 具名工具/canonical IR 仍 device×action/三层模型/demo 取巧特性/口径终拍 562/21 主议题全收口/A2 盘点) — **范式翻案权威** |
 | `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |
 | `docs/roadmap-2026-06-20-from-c6-done.md` | **historical / provenance source**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — 只作溯源,不作当前路线事实源 |

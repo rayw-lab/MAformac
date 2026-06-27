@@ -281,3 +281,47 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **THEN** L3 SHALL record a human 5-gate verdict enum of `V-PASS`, `V-PASS_WITH_NOTES`, `PARTIAL`, or `FAIL`
 - **AND** only 磊哥 MAY sign `V-PASS`
 - **AND** automated validators, local proof, mock proof, or simulator proof SHALL NOT mark A-2 complete or claim product `V-PASS`
+
+### Requirement: post-8.C2 interaction integrity SHALL use a scoped proof matrix and SHALL NOT create a third value SSOT
+
+Post-8.C2 Interaction Integrity SHALL be proven with a matrix that distinguishes `family`, `ui_value_type`, `gesture`, `writeback`, `summary_readback`, and `proof_class`. Any `StateCellInteractionPolicy` or equivalent consumer projection SHALL derive value ranges, enum/options, readback, and affordance state from existing contract/mapper sources; it SHALL NOT become a third value/range/enum SSOT in the view layer. A future `verify-uiue-interactions` gate MAY exist only as a UIUE-scoped gate candidate until a separate grill decision promotes it; it SHALL NOT be added directly to global `make verify-all`.
+
+#### Scenario: interaction matrix records gesture, writeback, readback, and proof class
+- **GIVEN** an expanded-card control is claimed as interactively covered
+- **WHEN** Interaction Integrity evidence is produced
+- **THEN** the evidence SHALL identify `family`, `ui_value_type`, `gesture`, `writeback`, `summary_readback`, and `proof_class`
+- **AND** a control that lacks real mock writeback or summary readback SHALL NOT be claimed as covered
+
+#### Scenario: consumer projection does not become a third SSOT
+- **GIVEN** UIUE needs to decide whether a value is controllable, read-only, ranged, discrete, or option-backed
+- **WHEN** that decision is rendered in SwiftUI
+- **THEN** the view SHALL consume existing mapper/contract-derived policy
+- **AND** SHALL NOT define independent value ranges, enum option lists, or readback formatting in the view layer
+
+#### Scenario: UIUE interaction gate remains scoped until separately decided
+- **GIVEN** a `verify-uiue-interactions` or equivalent gate is proposed
+- **WHEN** it is added to project automation
+- **THEN** it SHALL first be UIUE-scoped and documented with owner, runtime cost, failure ownership, and false-positive handling
+- **AND** SHALL NOT be added directly to global `make verify-all` without a separate accepted grill decision
+
+### Requirement: post-8.C2 structural visual gates SHALL stay separate from L3 aesthetic acceptance
+
+Layout Integrity and Visual Spacing gates SHALL evaluate structural defects only: overlap, blank/white-edge leakage, zone budget, safe-area violations, right-side button placement, capsule centering, orb spacing, and mic dock occlusion. These gates SHALL report structural evidence such as PASS/WARN/FAIL, `overlap_pairs`, `min_gaps`, `zone_budget`, and `safe_area_violations`; they SHALL NOT sign aesthetic quality or replace L3 human review. Capsule/VPA evidence SHALL keep context/data proof, layout proof, and diorama aesthetic/L3 proof separate.
+
+#### Scenario: layout and spacing gates block structural defects only
+- **GIVEN** the top capsule, VPA/orb, vehicle cards, or mic dock layout changes
+- **WHEN** Layout Integrity or Visual Spacing evidence is produced
+- **THEN** it SHALL evaluate overlap, blank/white-edge leakage, zone budget, safe-area violations, right-side button placement, capsule centering, orb spacing, and mic dock occlusion
+- **AND** it SHALL NOT claim premium aesthetics, animation quality, or L3 acceptance
+
+#### Scenario: capsule and VPA proof is split by concern
+- **GIVEN** capsule or VPA/orb evidence is submitted
+- **WHEN** the evidence is classified
+- **THEN** context/data proof, layout proof, and diorama aesthetic/L3 proof SHALL be recorded separately
+- **AND** GPT Image 2 or anchor images SHALL be treated as direction and aesthetic bar, not as implementation structure or final acceptance authority
+
+#### Scenario: structural gates cannot close visual acceptance
+- **GIVEN** Layout Integrity and Visual Spacing gates pass
+- **WHEN** final 8.C2 visual acceptance is decided
+- **THEN** `8.C2` SHALL still require the L0-L3 evidence package and the L3 human 5-gate verdict
+- **AND** structural gate success SHALL NOT be upgraded to `V-PASS`, `mobile`, `true_device`, or `A-2 complete`
