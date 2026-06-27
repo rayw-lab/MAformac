@@ -42,9 +42,33 @@ enum ValueRangeMapper {
         direction: StepDirection,
         catalog: StateCellPresentationCatalog = .shared
     ) -> String {
-        let delta: Double = direction == .increment ? 1 : -1
-        let next = clamp(current + delta, forBase: base, catalog: catalog)
-        return format(next)
+        let step = Double(catalog.executionRange(for: base)?.step ?? 1)
+        let delta: Double = direction == .increment ? step : -step
+        return valueString(current + delta, forBase: base, catalog: catalog)
+    }
+
+    static func valueString(
+        _ value: Double,
+        forBase base: String,
+        catalog: StateCellPresentationCatalog = .shared
+    ) -> String {
+        format(snappedValue(value, forBase: base, catalog: catalog))
+    }
+
+    static func snappedValue(
+        _ value: Double,
+        forBase base: String,
+        catalog: StateCellPresentationCatalog = .shared
+    ) -> Double {
+        guard let executionRange = executionRange(forBase: base, catalog: catalog), executionRange.step > 0 else {
+            return value
+        }
+        let range = executionRange.closed
+        let clamped = value.clamped(to: range)
+        let step = Double(executionRange.step)
+        let lower = Double(executionRange.min)
+        let snapped = lower + ((clamped - lower) / step).rounded() * step
+        return snapped.clamped(to: range)
     }
 
     static func toggledValue(isOn: Bool) -> String {
@@ -76,6 +100,31 @@ enum ValueRangeMapper {
             return String(Int(value))
         }
         return String(value)
+    }
+}
+
+enum CircularControlGestureMapper {
+    static func progress(x: Double, y: Double, size: Double) -> Double? {
+        guard size > 0 else { return nil }
+        let center = size / 2
+        let dx = x - center
+        let dy = y - center
+        guard hypot(dx, dy) > 3 else { return nil }
+        var radians = atan2(dx, -dy)
+        if radians < 0 {
+            radians += 2 * .pi
+        }
+        return radians / (2 * .pi)
+    }
+
+    static func signedProgressDelta(from start: Double, to end: Double) -> Double {
+        var delta = end - start
+        if delta > 0.5 {
+            delta -= 1
+        } else if delta < -0.5 {
+            delta += 1
+        }
+        return delta
     }
 }
 

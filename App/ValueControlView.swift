@@ -12,6 +12,7 @@ import SwiftUI
 ///
 /// 🔴 双通道（AD-7）：值由「数值环 + 文本 + 色」共同承载，非只靠 Gauge 图形；ReduceMotion/低对比仍可读。
 struct ValueControlActions {
+    var setNumeric: ((Double) -> Void)?
     var increment: (() -> Void)?
     var decrement: (() -> Void)?
     var toggle: (() -> Void)?
@@ -48,7 +49,9 @@ struct ValueControlView: View {
         StepperLikeShell(
             onDecrement: actions.decrement,
             onIncrement: actions.increment,
-            primaryAction: actions.increment,
+            numericValue: numericValue,
+            range: range,
+            onSetNumeric: actions.setNumeric,
             primaryAccessibilityIdentifier: primaryActionIdentifier
         ) {
             Gauge(value: numericValue.clamped(to: range), in: range) {
@@ -69,7 +72,9 @@ struct ValueControlView: View {
         StepperLikeShell(
             onDecrement: actions.decrement,
             onIncrement: actions.increment,
-            primaryAction: actions.increment,
+            numericValue: numericValue,
+            range: range,
+            onSetNumeric: actions.setNumeric,
             primaryAccessibilityIdentifier: primaryActionIdentifier
         ) {
             Gauge(value: numericValue.clamped(to: range), in: range) {
@@ -100,16 +105,15 @@ struct ValueControlView: View {
                 .foregroundStyle(DesignTokens.inkPrimary)
         }
         .overlay {
-            if let increment = actions.increment {
-                Button(action: increment) {
-                    Rectangle()
-                        .fill(Color.clear)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel("直接调节")
-                .accessibilityIdentifier(primaryActionIdentifier ?? "value-control-primary")
+            if actions.setNumeric != nil || actions.increment != nil || actions.decrement != nil {
+                StepperBarGestureLayer(
+                    numericValue: numericValue,
+                    range: range,
+                    onSetNumeric: actions.setNumeric,
+                    onIncrement: actions.increment,
+                    onDecrement: actions.decrement,
+                    accessibilityIdentifier: primaryActionIdentifier ?? "value-control-primary"
+                )
             }
         }
         .overlay(alignment: .leading) {
@@ -354,7 +358,9 @@ private struct AmbientColorPalette: View {
 private struct StepperLikeShell<Content: View>: View {
     var onDecrement: (() -> Void)?
     var onIncrement: (() -> Void)?
-    var primaryAction: (() -> Void)?
+    var numericValue: Double
+    var range: ClosedRange<Double>
+    var onSetNumeric: ((Double) -> Void)?
     var primaryAccessibilityIdentifier: String?
     @ViewBuilder var content: () -> Content
 
@@ -372,20 +378,18 @@ private struct StepperLikeShell<Content: View>: View {
             .buttonStyle(.plain)
             .accessibilityLabel("减少")
 
-            if let primaryAction {
+            if onSetNumeric != nil || onIncrement != nil || onDecrement != nil {
                 ZStack {
                     content()
                         .frame(width: 56, height: 56)
-                    Button(action: primaryAction) {
-                        Circle()
-                            .fill(Color.clear)
-                            .frame(width: 56, height: 56)
-                            .contentShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("直接调节")
-                    .accessibilityIdentifier(primaryAccessibilityIdentifier ?? "value-control-primary")
+                    CircularAdjustmentGestureLayer(
+                        numericValue: numericValue,
+                        range: range,
+                        onSetNumeric: onSetNumeric,
+                        onIncrement: onIncrement,
+                        onDecrement: onDecrement,
+                        accessibilityIdentifier: primaryAccessibilityIdentifier ?? "value-control-primary"
+                    )
                 }
             } else {
                 content()
@@ -404,5 +408,179 @@ private struct StepperLikeShell<Content: View>: View {
             .buttonStyle(.plain)
             .accessibilityLabel("增加")
         }
+    }
+}
+
+private struct StepperBarGestureLayer: View {
+    let numericValue: Double
+    let range: ClosedRange<Double>
+    let onSetNumeric: ((Double) -> Void)?
+    let onIncrement: (() -> Void)?
+    let onDecrement: (() -> Void)?
+    let accessibilityIdentifier: String
+
+    @State private var didDrag = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            Color.clear
+                .contentShape(Rectangle())
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                        .onChanged { value in
+                            guard movedEnough(value) else { return }
+                            didDrag = true
+                            setValue(at: value.location.x, width: proxy.size.width)
+                        }
+                        .onEnded { value in
+                            defer { didDrag = false }
+                            guard !didDrag else { return }
+                            tapStep(at: value.location.x, width: proxy.size.width)
+                        }
+                )
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("直接调节")
+        .accessibilityIdentifier(accessibilityIdentifier)
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment:
+                onIncrement?()
+            case .decrement:
+                onDecrement?()
+            @unknown default:
+                break
+            }
+        }
+    }
+
+    private func setValue(at locationX: CGFloat, width: CGFloat) {
+        guard width > 0 else { return }
+        let progress = Double(locationX / width).clamped(to: 0...1)
+        let next = range.lowerBound + progress * (range.upperBound - range.lowerBound)
+        onSetNumeric?(next)
+    }
+
+    private func tapStep(at locationX: CGFloat, width: CGFloat) {
+        guard width > 0 else {
+            onIncrement?()
+            return
+        }
+        if locationX < width / 2 {
+            onDecrement?()
+        } else {
+            onIncrement?()
+        }
+    }
+
+    private func movedEnough(_ value: DragGesture.Value) -> Bool {
+        hypot(value.translation.width, value.translation.height) >= 5
+    }
+}
+
+private struct CircularAdjustmentGestureLayer: View {
+    let numericValue: Double
+    let range: ClosedRange<Double>
+    let onSetNumeric: ((Double) -> Void)?
+    let onIncrement: (() -> Void)?
+    let onDecrement: (() -> Void)?
+    let accessibilityIdentifier: String
+
+    @State private var previousProgress: Double?
+    @State private var workingValue: Double?
+    @State private var didDrag = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            Color.clear
+                .contentShape(Circle())
+                .highPriorityGesture(adjustmentGesture(size: proxy.size))
+        }
+        .frame(width: 56, height: 56)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("直接调节")
+        .accessibilityValue(String(Int(numericValue.rounded())))
+        .accessibilityIdentifier(accessibilityIdentifier)
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment:
+                onIncrement?()
+            case .decrement:
+                onDecrement?()
+            @unknown default:
+                break
+            }
+        }
+    }
+
+    private func adjustmentGesture(size: CGSize) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .local)
+            .onChanged { value in
+                handleChange(value, size: size)
+            }
+            .onEnded { value in
+                handleEnd(value, size: size)
+            }
+    }
+
+    private func handleChange(_ value: DragGesture.Value, size: CGSize) {
+        guard movedEnough(value) else { return }
+        guard let progress = CircularControlGestureMapper.progress(
+            x: value.location.x,
+            y: value.location.y,
+            size: min(size.width, size.height)
+        ) else { return }
+        let baselineProgress: Double
+        if let previousProgress {
+            baselineProgress = previousProgress
+        } else if let startProgress = CircularControlGestureMapper.progress(
+            x: value.startLocation.x,
+            y: value.startLocation.y,
+            size: min(size.width, size.height)
+        ) {
+            baselineProgress = startProgress
+        } else {
+            baselineProgress = progress
+        }
+        if previousProgress == nil {
+            self.workingValue = numericValue
+        }
+        let delta = CircularControlGestureMapper.signedProgressDelta(from: baselineProgress, to: progress)
+        let span = range.upperBound - range.lowerBound
+        let next = ((workingValue ?? numericValue) + delta * span).clamped(to: range)
+        self.previousProgress = progress
+        self.workingValue = next
+        self.didDrag = true
+        onSetNumeric?(next)
+    }
+
+    private func handleEnd(_ value: DragGesture.Value, size: CGSize) {
+        defer {
+            previousProgress = nil
+            workingValue = nil
+            didDrag = false
+        }
+        guard !didDrag else { return }
+        guard let tappedProgress = CircularControlGestureMapper.progress(
+            x: value.location.x,
+            y: value.location.y,
+            size: min(size.width, size.height)
+        ) else {
+            onIncrement?()
+            return
+        }
+        let span = range.upperBound - range.lowerBound
+        guard span > 0 else { return }
+        let currentProgress = ((numericValue.clamped(to: range) - range.lowerBound) / span).clamped(to: 0...1)
+        let delta = CircularControlGestureMapper.signedProgressDelta(from: currentProgress, to: tappedProgress)
+        if delta >= 0 {
+            onIncrement?()
+        } else {
+            onDecrement?()
+        }
+    }
+
+    private func movedEnough(_ value: DragGesture.Value) -> Bool {
+        hypot(value.translation.width, value.translation.height) >= 5
     }
 }

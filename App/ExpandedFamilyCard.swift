@@ -90,12 +90,25 @@ struct ExpandedCellRowView: View {
 
     private var actions: ValueControlActions {
         ValueControlActions(
+            setNumeric: setNumeric,
             increment: stepped(.increment),
             decrement: stepped(.decrement),
             toggle: toggle,
             cycleBadge: cycleBadge,
             selectBadge: selectBadge
         )
+    }
+
+    private var setNumeric: ((Double) -> Void)? {
+        switch row.valueType {
+        case .dial, .percent, .stepper:
+            return { value in
+                let base = ScopedStateKey(row.id).base
+                onMockTransition(row.id, ValueRangeMapper.valueString(value, forBase: base))
+            }
+        case .toggle, .badge:
+            return nil
+        }
     }
 
     private func stepped(_ direction: ValueRangeMapper.StepDirection) -> (() -> Void)? {

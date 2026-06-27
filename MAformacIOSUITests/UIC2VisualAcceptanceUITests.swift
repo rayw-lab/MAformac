@@ -236,6 +236,80 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
     }
 
     @MainActor
+    func testPercentRingSpatialTapZonesDecreaseAndIncrease() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let windowCard = app.descendants(matching: .any)["vehicle-card-family.window"]
+        XCTAssertTrue(windowCard.waitForExistence(timeout: 12))
+        tapPossiblyOffscreen(windowCard, in: app)
+
+        let expandedWindow = app.descendants(matching: .any)["expanded-window"]
+        XCTAssertTrue(expandedWindow.waitForExistence(timeout: 8))
+        XCTAssertTrue(waitForTreeText("60%", in: app), "测试前置：cooling mock 的车窗开度应为 60%")
+
+        let ring = app.descendants(matching: .any)["value-control-window-position-primary"]
+        XCTAssertTrue(ring.waitForExistence(timeout: 6))
+        ring.coordinate(withNormalizedOffset: CGVector(dx: 0.50, dy: 0.82)).tap()
+        XCTAssertTrue(waitForTreeText("59%", in: app), "点按环形下方区域必须减小车窗开度")
+
+        ring.coordinate(withNormalizedOffset: CGVector(dx: 0.34, dy: 0.30)).tap()
+        XCTAssertTrue(waitForTreeText("60%", in: app), "点按环形左上区域必须增大车窗开度")
+    }
+
+    @MainActor
+    func testPercentRingDragClockwiseAndCounterclockwiseWritesBack() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let windowCard = app.descendants(matching: .any)["vehicle-card-family.window"]
+        XCTAssertTrue(windowCard.waitForExistence(timeout: 12))
+        tapPossiblyOffscreen(windowCard, in: app)
+
+        let expandedWindow = app.descendants(matching: .any)["expanded-window"]
+        XCTAssertTrue(expandedWindow.waitForExistence(timeout: 8))
+        let ring = app.descendants(matching: .any)["value-control-window-position-primary"]
+        XCTAssertTrue(ring.waitForExistence(timeout: 6))
+        XCTAssertTrue(waitForTreeText("60%", in: app), "测试前置：cooling mock 的车窗开度应为 60%")
+
+        let bottom = ring.coordinate(withNormalizedOffset: CGVector(dx: 0.50, dy: 0.82))
+        let left = ring.coordinate(withNormalizedOffset: CGVector(dx: 0.18, dy: 0.50))
+        bottom.press(forDuration: 0.1, thenDragTo: left)
+        XCTAssertTrue(waitForTreeText("85%", in: app), "顺时针拖动环形控件必须连续增大并写回")
+
+        left.press(forDuration: 0.1, thenDragTo: bottom)
+        XCTAssertTrue(waitForTreeText("60%", in: app), "逆时针拖动环形控件必须连续减小并写回")
+    }
+
+    @MainActor
+    func testStepperBarSpatialTapZonesDecreaseAndIncrease() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let seatCard = app.descendants(matching: .any)["vehicle-card-family.seat"]
+        XCTAssertTrue(seatCard.waitForExistence(timeout: 12))
+        tapPossiblyOffscreen(seatCard, in: app)
+
+        let expandedSeat = app.descendants(matching: .any)["expanded-seat"]
+        XCTAssertTrue(expandedSeat.waitForExistence(timeout: 8))
+        XCTAssertTrue(waitForTreeText("2挡", in: app), "测试前置：cooling mock 的座椅加热应为 2挡")
+
+        let bar = app.descendants(matching: .any)["value-control-seat-heat_level-primary"]
+        XCTAssertTrue(bar.waitForExistence(timeout: 6))
+        bar.coordinate(withNormalizedOffset: CGVector(dx: 0.12, dy: 0.35)).tap()
+        XCTAssertTrue(waitForTreeText("1挡", in: app), "点按分段条左侧必须降低座椅档位")
+
+        bar.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.35)).tap()
+        XCTAssertTrue(waitForTreeText("2挡", in: app), "点按分段条右侧必须提高座椅档位")
+    }
+
+    @MainActor
     func testAllTenFamilyRepresentativeControlsWriteBackOnPrimaryTouch() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
@@ -426,6 +500,10 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
             }
             RunLoop.current.run(until: Date().addingTimeInterval(0.2))
         }
-        element.tap()
+        if element.isHittable {
+            element.tap()
+        } else {
+            element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
     }
 }

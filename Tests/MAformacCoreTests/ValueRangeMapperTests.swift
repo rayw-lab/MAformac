@@ -45,6 +45,21 @@ final class ValueRangeMapperTests: XCTestCase {
         XCTAssertEqual(ValueRangeMapper.steppedValue(2, forBase: "seat.heat_level", direction: .decrement, catalog: catalog), "1")
     }
 
+    func testValueStringSnapsToContractStepBeforeFormatting() {
+        XCTAssertEqual(ValueRangeMapper.valueString(76.6, forBase: "window.position", catalog: catalog), "77")
+        XCTAssertEqual(ValueRangeMapper.valueString(32.4, forBase: "ac.temp_setpoint", catalog: catalog), "32")
+    }
+
+    func testCircularGestureProgressMatchesClockwiseRingSemantics() {
+        let current = 0.76
+        let redZone = CircularControlGestureMapper.progress(x: 20, y: 20, size: 56)
+        let yellowZone = CircularControlGestureMapper.progress(x: 28, y: 44, size: 56)
+        XCTAssertNotNil(redZone)
+        XCTAssertNotNil(yellowZone)
+        XCTAssertGreaterThan(redZone!, current, "当前 76% 时，左上环区应被判为顺时针增大方向")
+        XCTAssertLessThan(yellowZone!, current, "当前 76% 时，下方环区应被判为逆时针减小方向")
+    }
+
     func testNextToggleAndBadgeValuesCycleWithoutViewRangeLogic() {
         XCTAssertEqual(ValueRangeMapper.toggledValue(isOn: true), "off")
         XCTAssertEqual(ValueRangeMapper.toggledValue(isOn: false), "on")

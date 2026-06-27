@@ -91,3 +91,12 @@ proof_class_target：`simulator/L0` + `local` + `unit/checker`；L3 只保留人
 - fix-forward decision：`ValueControlView` 为 `dial/percent/stepper/toggle` 增加稳定 primary touch target，点中心圆圈/档位条/开关主体均走既有 `ValueControlActions` 写回；`ExpandedFamilyCard` 为 close 和每行 primary target 提供稳定 accessibility identifier；新增 10 族摘要卡展开/收起矩阵和 10 族代表控件写回矩阵。
 - verification：`testAmbientBrightnessGaugeCircleWritesBackOnTouch` 验证氛围灯亮度圆圈 `62% -> 63%`；`testAllTenFamilyCardsExpandWithoutCrash` 覆盖 10 族摘要卡展开/收起；`testAllTenFamilyRepresentativeControlsWriteBackOnPrimaryTouch` 覆盖空调/座椅/车窗/屏幕/氛围灯/音量/雨刮/车门/天窗遮阳/香氛代表控件写回并刷新摘要；整组 `UIC2VisualAcceptanceUITests` 在 `iPhone 17 Pro Max` 上 MCP 与原生 `xcodebuild` 均 11/0 PASS。
 - governance lesson：发现单点触摸 bug 后，不能只修该点；必须立刻用 iceberg teardown 扩到同 value type、同 writeback path、同 summary/readback path、同 proof-device path。机器/UI test PASS 仍不签 L3；`8.C2` 保持 open 等磊哥复签。
+
+## Milestone 9 - 环形/分段空间手势二次返修
+
+- new proof class：磊哥继续在 L3 人审体验中指出环形控件手感不对：按住圆圈应支持顺/逆时针连续调节；点按环形下方应减小，点按左上/红框区域应增大。该反馈来自可见 simulator 操作，不是 L0/L1/L2 机器结论。
+- iceberg tiger：这不是 `window.position` 单点 bug，而是 `.dial`/`.percent` 环形控件的 primary touch contract 缺失；同类还覆盖 `ac.temp_setpoint`、`screen.brightness`、`ambient.brightness`、`volume.level`、`sunroof.position`、`sunshade.position`、`seat.backrest_angle`、`door.tailgate_height` 等连续/百分比控件。继续泛化后发现 `.stepper` 分段条也存在“点哪都增大”的假空间语义。
+- fix-forward decision：`CircularControlGestureMapper` 统一角度进度与跨 0 点 signed delta；`ValueRangeMapper.valueString/snappedValue` 统一 clamp + contract step snap；`ValueControlView` 的 ring 和 stepper bar 改为空间手势层，tap 按位置决定增减，drag 连续写回；保留 accessibility adjustable action，不把手势变成 VoiceOver 不可达能力。
+- verification：`swift test --filter ValueRangeMapperTests` PASS，覆盖 step snap 与 clockwise/counterclockwise 语义；`UIC2VisualAcceptanceUITests` 新增 `testPercentRingSpatialTapZonesDecreaseAndIncrease`、`testPercentRingDragClockwiseAndCounterclockwiseWritesBack`、`testStepperBarSpatialTapZonesDecreaseAndIncrease`；整组 MCP 与原生 `xcodebuild` 的 `iPhone 17 Pro Max` UI test 均为 14 tests / 0 failures。
+- governance lesson：grill 不能只问“是否可点/是否写回”，还要问“用户看到的可触区域是否有空间语义、连续语义和回读语义”。本轮新增复盘文档：`docs/research/2026-06-27-uiue-8c2-interaction-grill-retrospective.md`。
+- not claimed：磊哥仍在体验，L3 未签；本轮只修 local/unit/simulator 层的 Interaction Integrity，不声明 `V-PASS`、`mobile`、`true_device` 或 `A-2 complete`，不关闭 `8.C2`。
