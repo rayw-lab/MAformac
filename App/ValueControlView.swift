@@ -28,6 +28,7 @@ struct ValueControlView: View {
     let isOn: Bool                 // toggle 开关态
     let badgeStyle: BadgeRenderStyle
     var badgeOptions: [String] = []
+    var primaryActionIdentifier: String? = nil
     var tint: Color = DesignTokens.glowCyan
     var actions = ValueControlActions()
 
@@ -46,7 +47,9 @@ struct ValueControlView: View {
     private var dialGauge: some View {
         StepperLikeShell(
             onDecrement: actions.decrement,
-            onIncrement: actions.increment
+            onIncrement: actions.increment,
+            primaryAction: actions.increment,
+            primaryAccessibilityIdentifier: primaryActionIdentifier
         ) {
             Gauge(value: numericValue.clamped(to: range), in: range) {
                 EmptyView()
@@ -65,7 +68,9 @@ struct ValueControlView: View {
     private var percentGauge: some View {
         StepperLikeShell(
             onDecrement: actions.decrement,
-            onIncrement: actions.increment
+            onIncrement: actions.increment,
+            primaryAction: actions.increment,
+            primaryAccessibilityIdentifier: primaryActionIdentifier
         ) {
             Gauge(value: numericValue.clamped(to: range), in: range) {
                 EmptyView()
@@ -93,6 +98,19 @@ struct ValueControlView: View {
             Text(displayText)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DesignTokens.inkPrimary)
+        }
+        .overlay {
+            if let increment = actions.increment {
+                Button(action: increment) {
+                    Rectangle()
+                        .fill(Color.clear)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("直接调节")
+                .accessibilityIdentifier(primaryActionIdentifier ?? "value-control-primary")
+            }
         }
         .overlay(alignment: .leading) {
             hitButton(label: "减少", systemName: "minus", action: actions.decrement)
@@ -124,6 +142,7 @@ struct ValueControlView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("切换")
+        .accessibilityIdentifier(primaryActionIdentifier ?? "value-control-toggle")
     }
 
     @ViewBuilder private var badgeVisual: some View {
@@ -335,6 +354,8 @@ private struct AmbientColorPalette: View {
 private struct StepperLikeShell<Content: View>: View {
     var onDecrement: (() -> Void)?
     var onIncrement: (() -> Void)?
+    var primaryAction: (() -> Void)?
+    var primaryAccessibilityIdentifier: String?
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -351,8 +372,25 @@ private struct StepperLikeShell<Content: View>: View {
             .buttonStyle(.plain)
             .accessibilityLabel("减少")
 
-            content()
-                .frame(width: 56, height: 56)
+            if let primaryAction {
+                ZStack {
+                    content()
+                        .frame(width: 56, height: 56)
+                    Button(action: primaryAction) {
+                        Circle()
+                            .fill(Color.clear)
+                            .frame(width: 56, height: 56)
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("直接调节")
+                    .accessibilityIdentifier(primaryAccessibilityIdentifier ?? "value-control-primary")
+                }
+            } else {
+                content()
+                    .frame(width: 56, height: 56)
+            }
 
             Button {
                 onIncrement?()

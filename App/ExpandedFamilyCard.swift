@@ -22,6 +22,7 @@ struct ExpandedFamilyCard: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("收起")
+                .accessibilityIdentifier("expanded-\(display.family.rawValue)-close")
             }
             if display.rows.isEmpty {
                 Text("待命").font(.headline).foregroundStyle(DesignTokens.inkDim)
@@ -79,6 +80,7 @@ struct ExpandedCellRowView: View {
                 isOn: row.isOn,
                 badgeStyle: row.badgeStyle,
                 badgeOptions: badgeOptions,
+                primaryActionIdentifier: primaryActionIdentifier,
                 actions: actions
             )
             .frame(maxWidth: 130, minHeight: 56)
@@ -138,5 +140,9 @@ struct ExpandedCellRowView: View {
 
     private var badgeOptions: [String] {
         BadgeOptionMapper.options(forBase: ScopedStateKey(row.id).base)
+    }
+
+    private var primaryActionIdentifier: String {
+        "value-control-\(ScopedStateKey(row.id).base.replacingOccurrences(of: ".", with: "-"))-primary"
     }
 }
