@@ -9,6 +9,7 @@ struct ExpandedCellRow: Identifiable, Equatable {
     var range: ClosedRange<Double>
     var stepCount: Int
     var displayText: String
+    var rawValue: String
     var isOn: Bool
     var badgeStyle: BadgeRenderStyle
     var visualState: DemoVisualState
@@ -73,6 +74,7 @@ struct ExpandedFamilyDisplay: Equatable {
             range: range,
             stepCount: stepCount,
             displayText: displayText,
+            rawValue: cell.actualValue,
             isOn: isOn,
             badgeStyle: badgeStyle,
             visualState: cell.visualState

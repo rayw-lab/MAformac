@@ -76,6 +76,48 @@ final class UIValueTypeMappingTests: XCTestCase {
         XCTAssertEqual(UIValueTypeMapper.uiValueType(forBase: "vehicle.gear"), .badge, "只读仪表→badge")
     }
 
+    func testInteractiveBadgeOptionsDeriveFromContractValues() throws {
+        let yaml = try loadStateCellsYAML()
+        let lookup = try StateCellContractLookup(yaml: yaml)
+        let catalog = StateCellPresentationCatalog.load()
+
+        for base in BadgeOptionMapper.interactiveModeBases.sorted() {
+            XCTAssertEqual(
+                BadgeOptionMapper.options(forBase: base, catalog: catalog),
+                lookup.cell(id: base)?.values ?? [],
+                "\(base) 的展开选项必须从 state-cells.yaml values 派生，不能手写第二份列表"
+            )
+        }
+
+        XCTAssertEqual(
+            BadgeOptionMapper.options(forBase: "ambient.color", catalog: catalog),
+            AmbientBurstColorMapper.canonicalColorOptions
+        )
+        XCTAssertEqual(
+            BadgeOptionMapper.options(forBase: "seat.massage_mode", catalog: catalog),
+            ["波浪模式", "蛇形模式", "蝶形模式", "舒缓模式", "松弛模式", "全身伸展模式"]
+        )
+        XCTAssertFalse(BadgeOptionMapper.options(forBase: "seat.massage_mode", catalog: catalog).contains("活力模式"))
+        XCTAssertFalse(BadgeOptionMapper.options(forBase: "seat.massage_mode", catalog: catalog).contains("关闭"))
+    }
+
+    func testReadOnlyAndMotionBadgesDoNotExposeFakeOptions() {
+        let catalog = StateCellPresentationCatalog.load()
+        for base in ["door.car_door", "window.motion", "sunroof.motion", "vehicle.speed", "vehicle.gear"] {
+            XCTAssertTrue(
+                BadgeOptionMapper.options(forBase: base, catalog: catalog).isEmpty,
+                "\(base) 是过程态或只读态，不能渲染成可点但无真实语义的选择器"
+            )
+        }
+    }
+
+    func testInteractiveModeBadgesRenderWithModeStyle() {
+        XCTAssertEqual(VehicleCardDisplay.badgeRenderStyle(forBase: "volume.mode", value: "现代"), .mode("现代"))
+        XCTAssertEqual(VehicleCardDisplay.badgeRenderStyle(forBase: "wiper.mode", value: "自动模式"), .mode("自动模式"))
+        XCTAssertEqual(VehicleCardDisplay.badgeRenderStyle(forBase: "fragrance.mode", value: "白茶模式"), .mode("白茶模式"))
+        XCTAssertEqual(VehicleCardDisplay.badgeRenderStyle(forBase: "door.car_door", value: "opening"), .plain)
+    }
+
     // 🔴 codex P2-2 + gptpro 第6点：mapping 与 contract `StateCellDefinition.type/unit/values` 语义对齐（机械化防第二份 SSOT 漂移）。
     // 期望 UIValueType 从 contract 字段推导（int+celsius→dial / int+percent→percent / int+gear→stepper / enum 2值→toggle / enum 多值→badge / int 其它单位→badge 只读）。
     func testMappingSemanticallyAlignedWithContract() throws {

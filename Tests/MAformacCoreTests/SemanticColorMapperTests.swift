@@ -30,5 +30,20 @@ final class SemanticColorMapperTests: XCTestCase {
             ),
             .neutral
         )
+        XCTAssertEqual(
+            SemanticColorMapper.acThermalTint(
+                siblingCells: [DemoVehicleStateCell(key: "ac.mode", actualValue: "自动", revision: 1)]
+            ),
+            .neutral
+        )
+    }
+
+    func testACThermalTintUnknownModeFallsBackWithoutCrashing() {
+        XCTAssertEqual(
+            SemanticColorMapper.acThermalTint(
+                siblingCells: [DemoVehicleStateCell(key: "ac.mode", actualValue: "除雾", revision: 1)]
+            ),
+            .neutral
+        )
     }
 }

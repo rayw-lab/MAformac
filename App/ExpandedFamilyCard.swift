@@ -78,6 +78,7 @@ struct ExpandedCellRowView: View {
                 displayText: row.displayText,
                 isOn: row.isOn,
                 badgeStyle: row.badgeStyle,
+                badgeOptions: badgeOptions,
                 actions: actions
             )
             .frame(maxWidth: 130, minHeight: 56)
@@ -90,7 +91,8 @@ struct ExpandedCellRowView: View {
             increment: stepped(.increment),
             decrement: stepped(.decrement),
             toggle: toggle,
-            cycleBadge: cycleBadge
+            cycleBadge: cycleBadge,
+            selectBadge: selectBadge
         )
     }
 
@@ -110,36 +112,31 @@ struct ExpandedCellRowView: View {
     private var toggle: (() -> Void)? {
         guard row.valueType == .toggle else { return nil }
         return {
-            onMockTransition(row.id, ValueRangeMapper.toggledValue(isOn: row.isOn))
+            let base = ScopedStateKey(row.id).base
+            onMockTransition(row.id, ValueRangeMapper.toggledValue(current: row.rawValue, forBase: base))
         }
     }
 
     private var cycleBadge: (() -> Void)? {
-        guard row.valueType == .badge else { return nil }
+        guard row.valueType == .badge, !badgeOptions.isEmpty else { return nil }
         return {
             let next = ValueRangeMapper.nextBadgeValue(current: currentBadgeValue, options: badgeOptions)
             onMockTransition(row.id, next)
         }
     }
 
-    private var currentBadgeValue: String {
-        switch row.badgeStyle {
-        case .colorSwatch(let name), .mode(let name):
-            return name
-        case .plain:
-            return row.displayText
+    private var selectBadge: ((String) -> Void)? {
+        guard row.valueType == .badge, !badgeOptions.isEmpty else { return nil }
+        return { value in
+            onMockTransition(row.id, value)
         }
     }
 
+    private var currentBadgeValue: String {
+        row.rawValue
+    }
+
     private var badgeOptions: [String] {
-        let base = ScopedStateKey(row.id).base
-        switch base {
-        case "ambient.color":
-            return ["白", "浅蓝紫", "冰蓝", "蓝色", "紫色", "红色", "橙色", "绿色"]
-        case "seat.massage_mode":
-            return ["关闭", "波浪模式", "舒缓模式", "活力模式"]
-        default:
-            return [row.displayText]
-        }
+        BadgeOptionMapper.options(forBase: ScopedStateKey(row.id).base)
     }
 }

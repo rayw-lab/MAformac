@@ -163,10 +163,10 @@ public final class DemoVehicleStateStore {
         if desiredValue == oldValue {
             return previousState
         }
-        if desiredValue == "on" {
+        if ["on", "open", "unlocked", "unmuted"].contains(desiredValue) {
             return .satisfied
         }
-        if desiredValue == "off" {
+        if ["off", "closed", "locked", "muted"].contains(desiredValue) {
             return .normal
         }
         return .changing
@@ -199,6 +199,7 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "ac.temp_setpoint[副驾]", actualValue: "24"),
             DemoVehicleStateCell(key: "ac.temp_setpoint[左后]", actualValue: "24"),
             DemoVehicleStateCell(key: "ac.temp_setpoint[右后]", actualValue: "24"),
+            DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷"),
             DemoVehicleStateCell(key: "ac.fan_speed[主驾]", actualValue: "1"),
             DemoVehicleStateCell(key: "window.position[主驾]", actualValue: "0"),
             DemoVehicleStateCell(key: "window.position[副驾]", actualValue: "0"),
@@ -209,7 +210,11 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "ambient.color", actualValue: "白"),
             DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "0"),
             DemoVehicleStateCell(key: "seat.vent_level[主驾]", actualValue: "0"),
+            DemoVehicleStateCell(key: "seat.massage_mode", actualValue: "波浪模式"),
             DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "50"),
+            DemoVehicleStateCell(key: "volume.mode", actualValue: "现代"),
+            DemoVehicleStateCell(key: "wiper.mode", actualValue: "手动模式"),
+            DemoVehicleStateCell(key: "fragrance.mode", actualValue: "若云模式"),
             DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
             DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P"),
             DemoVehicleStateCell(key: "seat.driver.heat", actualValue: "off"),
@@ -222,13 +227,29 @@ public final class DemoVehicleStateStore {
     }
 
     public static func spokenText(for cell: DemoVehicleStateCell) -> String {
+        let scopedKey = ScopedStateKey(cell.key)
+        let catalog = StateCellPresentationCatalog.shared
+        if let rendered = catalog.renderReadback(
+            stateKey: cell.key,
+            scope: scopedKey.scope,
+            value: cell.actualValue
+        ) {
+            return rendered
+        }
+
         switch (cell.key, cell.actualValue) {
         case ("ac.power", "on"):
             return "空调已打开"
         case ("ac.power", "off"):
             return "空调已关闭"
         default:
-            return "\(cell.key) 当前为 \(cell.actualValue)"
+            let valueType = UIValueTypeMapper.mappedUIValueType(forBase: scopedKey.base) ?? .badge
+            let displayValue = VehicleCardDisplay.valueText(for: cell.actualValue, base: scopedKey.base, type: valueType)
+            let title = catalog.displayTitle(for: scopedKey.base)
+            guard title != scopedKey.base else {
+                return "\(cell.key) 当前为 \(cell.actualValue)"
+            }
+            return "\(title)\(displayValue)"
         }
     }
 }

@@ -163,6 +163,9 @@ struct VehicleCardDisplay: Identifiable, Equatable {
             if base == "vehicle.speed" {
                 return rawValue.hasSuffix("km/h") ? rawValue : "\(rawValue)km/h"
             }
+            if base == "ac.mode", rawValue == "auto" {
+                return "自动"
+            }
             return rawValue
         }
     }
@@ -286,14 +289,46 @@ struct VehicleCardDisplay: Identifiable, Equatable {
         )
     }
 
-    /// 值二级 badge 形态（穷尽，禁 AnyView）：`ambient.color`→色块 / `seat.massage_mode`→模式 / 余 plain。
+    /// 值二级 badge 形态（穷尽，禁 AnyView）：色彩/可选业务模式→专用样式，过程态/只读仪表→plain。
     /// internal 供 `ExpandedFamilyDisplay` 复用（§28 不重复）。
     static func badgeRenderStyle(forBase base: String, value: String) -> BadgeRenderStyle {
         switch base {
         case "ambient.color": return .colorSwatch(value)
-        case "seat.massage_mode": return .mode(value)
+        case "ac.mode", "seat.massage_mode", "volume.mode", "wiper.mode", "fragrance.mode":
+            return .mode(displayModeValue(for: value, base: base))
         default: return .plain
         }
+    }
+
+    static func displayModeValue(for rawValue: String, base: String) -> String {
+        if base == "ac.mode", rawValue == "auto" {
+            return "自动"
+        }
+        return rawValue
+    }
+}
+
+enum BadgeOptionMapper {
+    static let interactiveModeBases: Set<String> = [
+        "ac.mode",
+        "seat.massage_mode",
+        "volume.mode",
+        "wiper.mode",
+        "fragrance.mode",
+    ]
+
+    static func options(forBase base: String, catalog: StateCellPresentationCatalog = .shared) -> [String] {
+        if base == "ambient.color" {
+            return AmbientBurstColorMapper.canonicalColorOptions
+        }
+        guard interactiveModeBases.contains(base) else {
+            return []
+        }
+        return catalog.enumValues(for: base) ?? []
+    }
+
+    static func hasInteractiveOptions(forBase base: String, catalog: StateCellPresentationCatalog = .shared) -> Bool {
+        !options(forBase: base, catalog: catalog).isEmpty
     }
 }
 
@@ -405,6 +440,17 @@ struct StateCellPresentationCatalog {
 
     func defaultValue(for base: String) -> String? {
         lookup?.cell(id: base)?.defaultValue
+    }
+
+    func enumValues(for base: String) -> [String]? {
+        guard let values = lookup?.cell(id: base)?.values, !values.isEmpty else {
+            return nil
+        }
+        return values
+    }
+
+    func renderReadback(stateKey: String, scope: String?, value: String, scopeOrigin: ScopeOrigin? = nil) -> String? {
+        lookup?.renderReadback(stateKey: stateKey, scope: scope, value: value, scopeOrigin: scopeOrigin)
     }
 
     var cellDefinitions: [StateCellDefinition] {

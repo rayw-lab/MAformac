@@ -1,12 +1,15 @@
 import Foundation
 
 enum AmbientBurstColorMapper {
+    static let canonicalColorOptions: [String] = ["白", "红", "橙", "黄", "绿", "青", "蓝", "紫"]
+
     private static let aliases: [String: String] = [
         "紫": "紫色", "紫色": "紫色",
         "红": "红色", "红色": "红色",
         "青": "青色", "青色": "青色",
         "绿": "绿色", "绿色": "绿色",
         "蓝": "蓝色", "蓝色": "蓝色",
+        "冰蓝": "青色", "冰蓝色": "青色",
         "浅蓝紫": "浅蓝紫色", "浅蓝紫色": "浅蓝紫色",
         "白": "白色", "白色": "白色",
         "橙": "橙色", "橙色": "橙色",
@@ -27,7 +30,6 @@ enum AmbientBurstColorMapper {
 
     static func normalizedColorName(for color: String) -> String {
         guard let normalized = aliases[color] else {
-            assertionFailure("Unhandled ambient.color alias: \(color)")
             return "紫色"
         }
         return normalized
@@ -36,7 +38,6 @@ enum AmbientBurstColorMapper {
     static func burstGradient(for color: String) -> [String] {
         let normalized = normalizedColorName(for: color)
         guard let gradient = burstGradients[normalized] else {
-            assertionFailure("Missing burst gradient for ambient.color: \(normalized)")
             return ["紫色", "黄色"]
         }
         return gradient

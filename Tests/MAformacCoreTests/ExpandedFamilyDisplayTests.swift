@@ -45,6 +45,7 @@ final class ExpandedFamilyDisplayTests: XCTestCase {
         XCTAssertEqual(mode?.valueType, .badge)
         XCTAssertEqual(mode?.badgeStyle, .mode("波浪模式"))
         XCTAssertEqual(mode?.displayText, "波浪模式")
+        XCTAssertEqual(mode?.rawValue, "波浪模式")
     }
 
     // toggle cell 派生 isOn（雨刮 power on → 开）
@@ -58,6 +59,45 @@ final class ExpandedFamilyDisplayTests: XCTestCase {
         XCTAssertEqual(power?.valueType, .toggle)
         XCTAssertTrue(power?.isOn ?? false)
         XCTAssertEqual(power?.displayText, "开")
+    }
+
+    func testAcModeRowUsesModeBadgeAndChineseAutoDisplayText() {
+        let cooling = ExpandedFamilyDisplay.make(
+            for: .ac,
+            from: [DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷", revision: 1, visualState: .satisfied)],
+            catalog: catalog
+        ).rows.first { $0.id == "ac.mode" }
+        XCTAssertEqual(cooling?.valueType, .badge)
+        XCTAssertEqual(cooling?.badgeStyle, .mode("制冷"))
+        XCTAssertEqual(cooling?.displayText, "制冷")
+
+        let auto = ExpandedFamilyDisplay.make(
+            for: .ac,
+            from: [DemoVehicleStateCell(key: "ac.mode", actualValue: "auto", revision: 1, visualState: .satisfied)],
+            catalog: catalog
+        ).rows.first { $0.id == "ac.mode" }
+        XCTAssertEqual(auto?.badgeStyle, .mode("自动"))
+        XCTAssertEqual(auto?.displayText, "自动")
+        XCTAssertEqual(auto?.rawValue, "auto")
+    }
+
+    func testInteractiveEnumModeRowsUseModeBadges() {
+        let cells = [
+            DemoVehicleStateCell(key: "volume.mode", actualValue: "现代", revision: 1, visualState: .satisfied),
+            DemoVehicleStateCell(key: "wiper.mode", actualValue: "自动模式", revision: 1, visualState: .satisfied),
+            DemoVehicleStateCell(key: "fragrance.mode", actualValue: "白茶模式", revision: 1, visualState: .satisfied),
+        ]
+
+        let volume = ExpandedFamilyDisplay.make(for: .volume, from: cells, catalog: catalog)
+            .rows.first { $0.id == "volume.mode" }
+        let wiper = ExpandedFamilyDisplay.make(for: .wiper, from: cells, catalog: catalog)
+            .rows.first { $0.id == "wiper.mode" }
+        let fragrance = ExpandedFamilyDisplay.make(for: .fragrance, from: cells, catalog: catalog)
+            .rows.first { $0.id == "fragrance.mode" }
+
+        XCTAssertEqual(volume?.badgeStyle, .mode("现代"))
+        XCTAssertEqual(wiper?.badgeStyle, .mode("自动模式"))
+        XCTAssertEqual(fragrance?.badgeStyle, .mode("白茶模式"))
     }
 
     // 空族 → rows 空（展开无 cell 族不崩）

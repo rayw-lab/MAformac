@@ -96,8 +96,12 @@ enum DesignTokens {
     static let safetyRed = Color(hex24: 0xFF5C6C)     // safety（唯一红）
     static let semanticCool = Color(hex24: 0x1AA6FF)
     static let semanticCoolBright = Color(hex24: 0x00E5FF)
+    static let semanticCoolIce = Color(hex24: 0x9EEFFF)
+    static let semanticCoolDeep = Color(hex24: 0x006BFF)
     static let semanticWarm = Color(hex24: 0xFF4D6D)
     static let semanticWarmBright = Color(hex24: 0xFFB13C)
+    static let semanticWarmSoft = Color(hex24: 0xFFD1C2)
+    static let semanticWarmDeep = Color(hex24: 0xC91E3A)
 
     // MARK: 氛围灯色板（tokens.md §1.4，ambient.color 炸场色块；view 经此取，禁手填 hex）
     /// `ambient.color` 枚举色名 → 色块 Color（深空暗底上 vivid 高对比）。
@@ -131,8 +135,8 @@ enum DesignTokens {
 
     static func thermalGradient(for tint: ThermalTint) -> [Color] {
         switch tint {
-        case .cooling: return [semanticCool, semanticCoolBright]
-        case .heating: return [semanticWarm, semanticWarmBright]
+        case .cooling: return [semanticCoolIce, semanticCoolBright, semanticCool, semanticCoolDeep]
+        case .heating: return [semanticWarmSoft, semanticWarm, semanticWarmDeep]
         case .neutral: return [semanticCool, semanticWarm]
         }
     }

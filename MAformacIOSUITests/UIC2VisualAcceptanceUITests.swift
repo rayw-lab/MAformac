@@ -75,6 +75,75 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
     }
 
     @MainActor
+    func testAmbientColorPickerSelectsEightColorWithoutCrash() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let ambientCard = app.descendants(matching: .any)["vehicle-card-family.ambient"]
+        XCTAssertTrue(ambientCard.waitForExistence(timeout: 12))
+        ambientCard.tap()
+
+        let expandedAmbient = app.descendants(matching: .any)["expanded-ambient"]
+        XCTAssertTrue(expandedAmbient.waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["氛围灯红"].waitForExistence(timeout: 6))
+        app.buttons["氛围灯红"].tap()
+
+        XCTAssertEqual(app.state, .runningForeground)
+        let tree = app.debugDescription
+        XCTAssertTrue(tree.contains("expanded-ambient"))
+        XCTAssertTrue(tree.contains("氛围灯红"))
+    }
+
+    @MainActor
+    func testAcModePickerSwitchesHeatingWithoutCrash() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let acCard = app.descendants(matching: .any)["vehicle-card-family.ac"]
+        XCTAssertTrue(acCard.waitForExistence(timeout: 12))
+        acCard.tap()
+
+        let expandedAC = app.descendants(matching: .any)["expanded-ac"]
+        XCTAssertTrue(expandedAC.waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["模式制热"].waitForExistence(timeout: 6))
+        app.buttons["模式制热"].tap()
+
+        XCTAssertEqual(app.state, .runningForeground)
+        let tree = app.debugDescription
+        XCTAssertTrue(tree.contains("expanded-ac"))
+        XCTAssertTrue(tree.contains("模式制热"))
+        XCTAssertTrue(tree.contains("制热"))
+        XCTAssertTrue(waitForTreeText("制热 · 自动", in: app), "外层空调卡必须跟随 ac.mode 写回切到制热语义")
+    }
+
+    @MainActor
+    func testSeatMassageModePickerUsesContractOptionsWithoutCrash() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let seatCard = app.descendants(matching: .any)["vehicle-card-family.seat"]
+        XCTAssertTrue(seatCard.waitForExistence(timeout: 12))
+        seatCard.tap()
+
+        let expandedSeat = app.descendants(matching: .any)["expanded-seat"]
+        XCTAssertTrue(expandedSeat.waitForExistence(timeout: 12))
+        XCTAssertTrue(app.buttons["模式蛇形模式"].waitForExistence(timeout: 6))
+        app.buttons["模式蛇形模式"].tap()
+
+        XCTAssertEqual(app.state, .runningForeground)
+        let tree = app.debugDescription
+        XCTAssertTrue(tree.contains("expanded-seat"))
+        XCTAssertTrue(tree.contains("模式蛇形模式"))
+        XCTAssertFalse(tree.contains("模式活力模式"))
+    }
+
+    @MainActor
     private func runVisualCase(_ caseID: String) throws {
         let visualCase = try visualCase(for: caseID)
         let app = XCUIApplication()
@@ -112,6 +181,19 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
         let deadline = Date().addingTimeInterval(16)
         repeat {
             if identifiers.contains(where: { app.descendants(matching: .any)[$0].exists }) {
+                return true
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        } while Date() < deadline
+
+        return false
+    }
+
+    @MainActor
+    private func waitForTreeText(_ text: String, in app: XCUIApplication, timeout: TimeInterval = 8) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        repeat {
+            if app.debugDescription.contains(text) {
                 return true
             }
             RunLoop.current.run(until: Date().addingTimeInterval(0.2))

@@ -19,9 +19,19 @@ final class AmbientBurstColorMapperTests: XCTestCase {
         }
     }
 
+    func testCanonicalAmbientPickerOptionsStayOnEightContractColors() {
+        XCTAssertEqual(AmbientBurstColorMapper.canonicalColorOptions, ["白", "红", "橙", "黄", "绿", "青", "蓝", "紫"])
+
+        for color in AmbientBurstColorMapper.canonicalColorOptions {
+            XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: color).count, 2)
+        }
+    }
+
     func testAmbientColorAliasesNormalizeToTokenNames() {
         XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: "紫"), ["紫色", "黄色"])
         XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: "白"), ["白色", "黄色"])
+        XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: "冰蓝"), ["青色", "紫色"])
+        XCTAssertEqual(AmbientBurstColorMapper.burstGradient(for: "暖白"), ["紫色", "黄色"])
     }
 
     func testAmbientColorDeltaTriggersBurstOnlyForAmbientColor() {

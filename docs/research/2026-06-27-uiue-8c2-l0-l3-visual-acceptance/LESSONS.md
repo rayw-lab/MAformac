@@ -67,3 +67,18 @@ proof_class_target：`simulator/L0` + `local` + `unit/checker`；L3 只保留人
 - new risk：active `design.md` 旧段落残留“投屏 V10”会和 AD-15 的 `投屏 DELETE` 冲突，后续 agent 可能误把投屏拉回 8.C2 gate；L2 package checker 默认写 summary 会让 read-only 审计不能安全复跑。
 - fix-forward decision：`design.md` 验收行改为 `L0-L3，手持环境；投屏 DELETE C0`；`check-8c2-l2-package.py` 改成默认只读校验，只有 `--write-summary` 才重写 summary。
 - not claimed：修复 P2 只提升证据包可复核性，不关闭 `8.C2`。
+
+## Milestone 6 - L3 首轮人审发现阻断问题
+
+- new proof class：磊哥首轮 operator/L3 人审在 simulator 可见 UI 上发现产品级问题：空调制冷条不是足够明确的浅蓝到深蓝渐变、内容玻璃质感不足、氛围灯展开/选择 8 色时崩溃。
+- new risk：L0-L2 机器包未覆盖 `cooling + ivory` 组合，也不会判断“高级感”“玻璃质感”或连续交互崩溃；L1 `PASS/WARN` 只挡塌陷，不能替代 L3。
+- fix-forward decision：8.C2 保持 open；本轮追加产品修复与回归：氛围灯选择器回到 contract 8 色并显示 4x2 色板，修掉 `AmbientBurstColorMapper` unknown alias SIGTRAP；空调冷/热条改为明确的浅蓝→深蓝 / 浅红→深红渐变；内容卡增强自研 glass/specular/rim，但不把 content card 改成 system `.glassEffect()`。
+- not claimed：修复后的 simulator 截图和 XCUITest 只能作为 local/simulator 回归；是否达到 L3/V-PASS 仍需磊哥重新人审签核。
+
+## Milestone 7 - L3 二轮人审发现“假交互/假选项”类问题
+
+- new proof class：磊哥二轮 operator/L3 人审继续在 simulator 可见 UI 上发现空调模式点击“制热”后外层仍保持制冷蓝色；随后代码排查确认同类问题覆盖 `.badge`/`.toggle` 控件族。
+- new risk：旧实现把 `badgeOptions` 默认成当前文本，制造“看起来可点但不会变”的假交互；座椅按摩模式硬编码了 contract 外的“关闭/活力模式”；二值 toggle 统一写 `on/off`，会把 `locked/unlocked`、`muted/unmuted` 写成非法 mock state；phase2 snapshot 缺少座椅/音量/雨刮/香氛 mode cells，导致 10 族展开不完整。
+- fix-forward decision：新增 contract-derived `BadgeOptionMapper`，只让 `ac.mode`、`seat.massage_mode`、`volume.mode`、`wiper.mode`、`fragrance.mode` 和 `ambient.color` 暴露真实选项；过程态/只读态不再显示假选择器；toggle 写回按 C2 enum values 翻转；direct UI readback 优先 C2 模板并用 display title 兜底；phase2/default mock store 补齐可演示 mode cells；交互 palette 去掉外层嵌套 `Button`，模式选项改成分行，避免新假 affordance 和窄宽度挤压。
+- verification：`swift test --filter UIValueTypeMappingTests`、`ExpandedFamilyDisplayTests`、`ValueRangeMapperTests`、`VehicleStateStoreContractTests` 均 PASS；XCUITest `testAcModePickerSwitchesHeatingWithoutCrash` 验证制热后外层出现 `制热 · 自动`，`testAmbientColorPickerSelectsEightColorWithoutCrash` 验证氛围灯色板选择不崩，`testSeatMassageModePickerUsesContractOptionsWithoutCrash` 验证座椅按摩可选 contract 6 项且无“活力模式”，均 PASS。
+- not claimed：这些回归证明 local/unit/simulator 层 bug 已修，不代表 L3 通过；直接触摸挡位本轮未实现，当前 `vehicle.gear` 仍是只读仪表，应进入后续 Interaction Integrity `SHOULD_GRILL`；8.C2 仍需磊哥重新人审。

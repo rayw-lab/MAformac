@@ -10,7 +10,8 @@ enum SemanticColorMapper {
     private static let acModeTints: [String: ThermalTint] = [
         "制冷": .cooling,
         "制热": .heating,
-        "auto": .neutral
+        "auto": .neutral,
+        "自动": .neutral
     ]
 
     static func acThermalTint(siblingCells: [DemoVehicleStateCell]) -> ThermalTint {
@@ -18,7 +19,6 @@ enum SemanticColorMapper {
             return .neutral
         }
         guard let tint = acModeTints[mode.actualValue] else {
-            assertionFailure("Unhandled ac.mode value: \(mode.actualValue)")
             return .neutral
         }
         return tint

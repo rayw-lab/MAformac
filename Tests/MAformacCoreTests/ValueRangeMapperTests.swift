@@ -53,6 +53,15 @@ final class ValueRangeMapperTests: XCTestCase {
         XCTAssertEqual(ValueRangeMapper.nextBadgeValue(current: "未知", options: ["白", "浅蓝紫"]), "白")
     }
 
+    func testToggleValueUsesContractEnumValues() {
+        XCTAssertEqual(ValueRangeMapper.toggledValue(current: "on", forBase: "ac.power", catalog: catalog), "off")
+        XCTAssertEqual(ValueRangeMapper.toggledValue(current: "off", forBase: "ac.power", catalog: catalog), "on")
+        XCTAssertEqual(ValueRangeMapper.toggledValue(current: "locked", forBase: "window.lock", catalog: catalog), "unlocked")
+        XCTAssertEqual(ValueRangeMapper.toggledValue(current: "unlocked", forBase: "door.child_lock", catalog: catalog), "locked")
+        XCTAssertEqual(ValueRangeMapper.toggledValue(current: "muted", forBase: "volume.mute", catalog: catalog), "unmuted")
+        XCTAssertEqual(ValueRangeMapper.toggledValue(current: "unmuted", forBase: "volume.mute", catalog: catalog), "muted")
+    }
+
     // 🔴 契约 SSOT 加载守卫：catalog 必加载成功（否则 range 全 nil 假绿）
     func testCatalogLoadedWithExecutionRanges() {
         XCTAssertNotNil(ValueRangeMapper.range(forBase: "ac.temp_setpoint", catalog: catalog),

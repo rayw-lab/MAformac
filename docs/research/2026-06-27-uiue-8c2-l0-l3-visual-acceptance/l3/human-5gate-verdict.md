@@ -2,7 +2,7 @@
 
 日期：2026-06-27
 scope：仅 `8.C2` visual-acceptance L3
-当前状态：`PENDING`
+当前状态：`PARTIAL`（首轮人审发现阻断问题；修复后需重新签核）
 
 ## 可选 verdict enum
 
@@ -29,8 +29,8 @@ scope：仅 `8.C2` visual-acceptance L3
 
 ## 签核记录
 
-- 签核人：待磊哥填写
-- 签核时间：待填写
-- 最终 verdict：`PENDING`
+- 签核人：磊哥（首轮人审反馈）
+- 签核时间：2026-06-27
+- 最终 verdict：`PARTIAL`
 - 是否允许勾选 `8.C2`：否
-- 备注：待填写
+- 备注：首轮/二轮人审在 simulator 可见 UI 上发现 `cooling + ivory` 空调渐变语义不足、玻璃质感不足、氛围灯 8 色选择崩溃、空调模式点击制热后外层仍蓝色，以及多个 badge/toggle 控件存在假交互/contract 外值风险。L0-L2 证据包不能替代 L3；修复后需重新人审，只有磊哥可签 `V-PASS`。

@@ -51,6 +51,20 @@ enum ValueRangeMapper {
         isOn ? "off" : "on"
     }
 
+    static func toggledValue(
+        current: String,
+        forBase base: String,
+        catalog: StateCellPresentationCatalog = .shared
+    ) -> String {
+        guard let values = catalog.enumValues(for: base), values.count == 2 else {
+            return toggledValue(isOn: ["on", "open", "unlocked", "unmuted"].contains(current))
+        }
+        guard let index = values.firstIndex(of: current) else {
+            return values[0]
+        }
+        return values[(index + 1) % values.count]
+    }
+
     static func nextBadgeValue(current: String, options: [String]) -> String {
         guard !options.isEmpty else { return current }
         guard let index = options.firstIndex(of: current) else { return options[0] }

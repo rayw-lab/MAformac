@@ -16,6 +16,7 @@ struct ValueControlActions {
     var decrement: (() -> Void)?
     var toggle: (() -> Void)?
     var cycleBadge: (() -> Void)?
+    var selectBadge: ((String) -> Void)?
 }
 
 struct ValueControlView: View {
@@ -26,6 +27,7 @@ struct ValueControlView: View {
     let displayText: String        // 格式化文本（24℃/80%/2挡/开…）
     let isOn: Bool                 // toggle 开关态
     let badgeStyle: BadgeRenderStyle
+    var badgeOptions: [String] = []
     var tint: Color = DesignTokens.glowCyan
     var actions = ValueControlActions()
 
@@ -125,32 +127,73 @@ struct ValueControlView: View {
     }
 
     @ViewBuilder private var badgeVisual: some View {
-        Button {
-            actions.cycleBadge?()
-        } label: {
+        if hasBadgeAction, badgeOptions.isEmpty {
+            Button {
+                actions.cycleBadge?()
+            } label: {
+                badgeBody
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("切换选项")
+        } else {
             badgeBody
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("切换选项")
+    }
+
+    private var hasBadgeAction: Bool {
+        actions.cycleBadge != nil || actions.selectBadge != nil
     }
 
     @ViewBuilder private var badgeBody: some View {
         switch badgeStyle {
         case .colorSwatch(let name):
-            HStack(spacing: 6) {
-                Circle()
-                    .fill(DesignTokens.ambientColor(named: name))
-                    .frame(width: 18, height: 18)
-                    .overlay(Circle().strokeBorder(.white.opacity(0.4), lineWidth: 0.5))
-                    .shadow(color: DesignTokens.ambientColor(named: name).opacity(0.6), radius: 5)
-                Text(displayText).font(.subheadline).foregroundStyle(DesignTokens.inkPrimary)
+            VStack(alignment: .trailing, spacing: 5) {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(LinearGradient(colors: DesignTokens.ambientGradient(named: name), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 18, height: 18)
+                        .overlay(Circle().strokeBorder(.white.opacity(0.48), lineWidth: 0.6))
+                        .shadow(color: DesignTokens.ambientColor(named: name).opacity(0.7), radius: 6)
+                    Text(displayText).font(.caption.weight(.semibold)).foregroundStyle(DesignTokens.inkPrimary)
+                }
+                if !badgeOptions.isEmpty {
+                    AmbientColorPalette(
+                        options: badgeOptions,
+                        selectedName: name,
+                        onSelect: { option in
+                            if let selectBadge = actions.selectBadge {
+                                selectBadge(option)
+                            } else {
+                                actions.cycleBadge?()
+                            }
+                        }
+                    )
+                }
             }
         case .mode(let mode):
-            Text(mode)
-                .font(.subheadline.weight(.medium))
-                .padding(.horizontal, 9).padding(.vertical, 3)
-                .background(DesignTokens.glowViolet.opacity(0.18), in: Capsule())
-                .foregroundStyle(DesignTokens.inkPrimary)
+            VStack(alignment: .trailing, spacing: 5) {
+                Text(mode)
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 9).padding(.vertical, 3)
+                    .background(modeTint(for: mode).opacity(0.20), in: Capsule())
+                    .foregroundStyle(DesignTokens.inkPrimary)
+                    .overlay(
+                        Capsule().strokeBorder(modeTint(for: mode).opacity(0.52), lineWidth: 0.7)
+                    )
+                if !badgeOptions.isEmpty {
+                    ModeOptionPalette(
+                        options: badgeOptions,
+                        selectedMode: mode,
+                        onSelect: { option in
+                            if let selectBadge = actions.selectBadge {
+                                selectBadge(option)
+                            } else {
+                                actions.cycleBadge?()
+                            }
+                        }
+                    )
+                }
+            }
         case .plain:
             Text(displayText)
                 .font(.subheadline.weight(.medium))
@@ -170,6 +213,122 @@ struct ValueControlView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)
+    }
+
+    private func modeTint(for mode: String) -> Color {
+        switch mode {
+        case "制热": return DesignTokens.semanticWarm
+        case "制冷": return DesignTokens.semanticCoolBright
+        case "自动", "auto": return DesignTokens.glowViolet
+        default: return DesignTokens.glowViolet
+        }
+    }
+}
+
+private struct ModeOptionPalette: View {
+    let options: [String]
+    let selectedMode: String
+    let onSelect: (String) -> Void
+
+    private var rows: [[String]] {
+        stride(from: 0, to: options.count, by: 3).map { start in
+            Array(options[start..<min(start + 3, options.count)])
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                HStack(spacing: 5) {
+                    ForEach(row, id: \.self) { option in
+                        let label = displayLabel(for: option)
+                        Button {
+                            onSelect(option)
+                        } label: {
+                            Text(label)
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 4)
+                                .foregroundStyle(isSelected(option) ? Color.white : DesignTokens.inkPrimary)
+                                .background(
+                                    Capsule().fill(optionTint(for: option).opacity(isSelected(option) ? 0.88 : 0.18))
+                                )
+                                .overlay(
+                                    Capsule().strokeBorder(optionTint(for: option).opacity(isSelected(option) ? 0.95 : 0.38), lineWidth: 0.7)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("模式\(label)")
+                    }
+                }
+            }
+        }
+    }
+
+    private func displayLabel(for option: String) -> String {
+        option == "auto" ? "自动" : option
+    }
+
+    private func isSelected(_ option: String) -> Bool {
+        displayLabel(for: option) == selectedMode
+    }
+
+    private func optionTint(for option: String) -> Color {
+        switch option {
+        case "制热": return DesignTokens.semanticWarm
+        case "制冷": return DesignTokens.semanticCoolBright
+        case "auto": return DesignTokens.glowViolet
+        default: return DesignTokens.glowViolet
+        }
+    }
+}
+
+private struct AmbientColorPalette: View {
+    let options: [String]
+    let selectedName: String
+    let onSelect: (String) -> Void
+
+    private var rows: [[String]] {
+        stride(from: 0, to: options.count, by: 4).map { start in
+            Array(options[start..<min(start + 4, options.count)])
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                HStack(spacing: 6) {
+                    ForEach(row, id: \.self) { option in
+                        Button {
+                            onSelect(option)
+                        } label: {
+                            Circle()
+                                .fill(LinearGradient(colors: DesignTokens.ambientGradient(named: option),
+                                                     startPoint: .topLeading,
+                                                     endPoint: .bottomTrailing))
+                                .frame(width: 17, height: 17)
+                                .overlay(
+                                    Circle().strokeBorder(
+                                        isSelected(option) ? Color.white.opacity(0.96) : Color.white.opacity(0.32),
+                                        lineWidth: isSelected(option) ? 1.6 : 0.55
+                                    )
+                                )
+                                .shadow(color: DesignTokens.ambientColor(named: option).opacity(isSelected(option) ? 0.78 : 0.38),
+                                        radius: isSelected(option) ? 6 : 3)
+                                .contentShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("氛围灯\(option)")
+                    }
+                }
+            }
+        }
+    }
+
+    private func isSelected(_ option: String) -> Bool {
+        AmbientBurstColorMapper.normalizedColorName(for: option) == AmbientBurstColorMapper.normalizedColorName(for: selectedName)
     }
 }
 

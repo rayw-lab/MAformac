@@ -595,6 +595,7 @@ struct ContentView: View {
             storeCells: [
                 demoCell("seat.heat_level", "2", revision: 2, state: .normal),
                 demoCell("seat.vent_level", "1", revision: 2, state: .normal),
+                demoCell("seat.massage_mode", "波浪模式", revision: 2, state: .normal),
                 demoCell("ambient.color", "浅蓝紫", revision: 3, state: .satisfied),
                 demoCell("ambient.brightness", "62", revision: 3, state: .normal),
                 demoCell("ac.temp_setpoint", temperature, revision: 4, state: thermalState),
@@ -602,12 +603,15 @@ struct ContentView: View {
                 demoCell("ac.fan_speed", "2", revision: 4, state: .normal),
                 demoCell("screen.brightness[中控屏]", "65", revision: 2, state: .normal),
                 demoCell("volume.level", "38", revision: 2, state: .normal),
+                demoCell("volume.mode", "现代", revision: 2, state: .normal),
                 demoCell("door.central_lock", "locked", revision: 2, state: .normal),
                 demoCell("sunroof.position", "0", revision: 2, state: .normal),
                 demoCell("window.position", "60", revision: 2, state: .satisfied),
                 demoCell("wiper.power", "on", revision: 2, state: .normal),
                 demoCell("wiper.speed", "1", revision: 2, state: .normal),
-                demoCell("fragrance.power", "off", revision: 2, state: .normal)
+                demoCell("wiper.mode", "手动模式", revision: 2, state: .normal),
+                demoCell("fragrance.power", "off", revision: 2, state: .normal),
+                demoCell("fragrance.mode", "若云模式", revision: 2, state: .normal)
             ],
             activeCells: [.ac: "ac.temp_setpoint"],
             scopeOrigins: ["ac.temp_setpoint": .defaulted],
@@ -1684,7 +1688,7 @@ struct VehicleStateCard: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color.white.opacity(theme == .ivory ? (isHero ? 0.42 : 0.22) : 0.13),
+                    Color.white.opacity(theme == .ivory ? (isHero ? 0.58 : 0.28) : 0.16),
                     Color.white.opacity(0.04),
                     Color.clear
                 ],
@@ -1694,7 +1698,7 @@ struct VehicleStateCard: View {
             if isHero {
                 LinearGradient(
                     colors: [
-                        DesignTokens.thermalAccent(for: thermalTint).opacity(theme == .ivory ? 0.14 : 0.22),
+                        DesignTokens.thermalAccent(for: thermalTint).opacity(theme == .ivory ? 0.22 : 0.26),
                         Color.clear
                     ],
                     startPoint: .bottomLeading,
@@ -1890,11 +1894,11 @@ struct VehicleStateCard: View {
             ], startPoint: .topLeading, endPoint: .bottomTrailing)
             effectiveAppearance.background.opacity(appearanceWashOpacity)
             if case .colorSwatch(let name) = display.badgeStyle {
-                LinearGradient(colors: DesignTokens.ambientGradient(named: name).map { $0.opacity(theme == .ivory ? 0.020 : 0.12) },
+                LinearGradient(colors: DesignTokens.ambientGradient(named: name).map { $0.opacity(theme == .ivory ? 0.085 : 0.16) },
                                startPoint: .topLeading, endPoint: .bottomTrailing)
             }
             if family == .ac {
-                LinearGradient(colors: DesignTokens.thermalGradient(for: thermalTint).map { $0.opacity(theme == .ivory ? (isHero ? 0.022 : 0.030) : 0.12) },
+                LinearGradient(colors: DesignTokens.thermalGradient(for: thermalTint).map { $0.opacity(theme == .ivory ? (isHero ? 0.105 : 0.055) : 0.16) },
                                startPoint: .leading, endPoint: .trailing)
             }
         }
@@ -1971,7 +1975,7 @@ struct VehicleStateCard: View {
     }
 
     private var borderOpacity: Double {
-        if isHero { return 0.26 }
+        if isHero { return theme == .ivory ? 0.38 : 0.30 }
         if glowActive { return layout == .phoneScroll ? 0.30 : 0.72 }
         return layout == .phoneScroll ? 0.14 : 0.38
     }
@@ -1983,7 +1987,7 @@ struct VehicleStateCard: View {
     }
 
     private var rimLineWidth: CGFloat {
-        if isHero { return 1.05 }
+        if isHero { return theme == .ivory ? 1.25 : 1.05 }
         return layout == .phoneScroll ? 0.58 : 0.85
     }
 
@@ -2119,13 +2123,13 @@ struct VehicleStateCard: View {
 
     private var surfaceOpacity: Double {
         if theme != .ivory { return 0.72 }
-        if isHero { return 0.58 }
+        if isHero { return 0.46 }
         return layout == .phoneScroll ? 0.52 : 0.62
     }
 
     private var topGlassOpacity: Double {
         if theme != .ivory { return 0.10 }
-        return isHero ? 0.22 : 0.11
+        return isHero ? 0.32 : 0.13
     }
 
     private var appearanceWashOpacity: Double {
@@ -2206,7 +2210,7 @@ struct ThermalRangeBar: View {
     private var fillColors: [Color] {
         switch tint {
         case .cooling:
-            return [DesignTokens.semanticCool, DesignTokens.semanticCool.opacity(0.92)]
+            return DesignTokens.thermalGradient(for: tint)
         case .heating:
             return DesignTokens.thermalGradient(for: tint)
         case .neutral:
@@ -2269,7 +2273,11 @@ struct ThermalRangeBar: View {
     private func track(width: CGFloat) -> some View {
         ZStack(alignment: .leading) {
             Capsule()
-                .fill(DesignTokens.palette(for: theme).inkDim2.opacity(theme == .ivory ? 0.18 : 0.24))
+                .fill(
+                    LinearGradient(colors: fillColors.map { $0.opacity(theme == .ivory ? 0.26 : 0.22) },
+                                   startPoint: .leading,
+                                   endPoint: .trailing)
+                )
             Capsule()
                 .fill(LinearGradient(colors: fillColors,
                                      startPoint: .leading, endPoint: .trailing))
