@@ -1,0 +1,69 @@
+Attributes: Application, 0x105242e40, pid: 79894, label: 'MAformac'
+Element subtree:
+ →Application, 0x105242e40, pid: 79894, label: 'MAformac'
+    Window (Main), 0x105242f80, {{0.0, 0.0}, {440.0, 956.0}}
+      Other, 0x1052430c0, {{0.0, 0.0}, {440.0, 956.0}}
+        Other, 0x105243200, {{0.0, 0.0}, {440.0, 956.0}}
+          Other, 0x105243340, {{0.0, 0.0}, {440.0, 956.0}}
+            Other, 0x105243480, {{0.0, 0.0}, {440.0, 956.0}}
+              Image, 0x1052435c0, {{50.0, 56.0}, {314.6, 108.0}}, identifier: 'context-band', label: '环境胶囊，日间，晴，30公里每小时，D挡'
+              StaticText, 0x105243700, {{49.3, 97.0}, {341.3, 285.7}}, identifier: 'demo-orb', label: '助手状态，让我确认下...'
+              ScrollView, 0x105243840, {{22.0, 338.0}, {396.0, 124.0}}, identifier: 'dialogue-stream'
+                Other, 0x105243980, {{22.0, 338.0}, {396.0, 124.0}}
+                  StaticText, 0x105243ac0, {{281.7, 362.0}, {119.3, 18.0}}, label: '行驶中打开后备箱'
+                  StaticText, 0x105243c00, {{39.0, 410.0}, {298.0, 38.0}}, label: '行驶中为了安全暂时不能开尾门，停稳后我再帮您'
+              ScrollView, 0x105243d40, {{22.0, 486.0}, {396.0, 354.0}}, identifier: 'vehicle-cards'
+                Other, 0x105243e80, {{22.0, 486.0}, {396.0, 532.0}}
+                  Button, 0x115040000, {{36.4, 490.3}, {179.2, 189.3}}, identifier: 'vehicle-card-family.ac', label: '空调 待命 待命', value: 25℃
+                    StaticText, 0x115040140, {{50.7, 509.8}, {32.6, 19.7}}, label: '空调'
+                    Image, 0x115040280, {{172.1, 506.6}, {26.1, 26.1}}, identifier: 'fan.fill', label: 'fan.fill'
+                    StaticText, 0x1150403c0, {{50.7, 545.0}, {44.8, 28.2}}, label: '待命'
+                    Other, 0x115040500, {{50.7, 581.3}, {150.7, 24.4}}, label: '调节空调温度', value: 25℃
+                    StaticText, 0x115040640, {{50.7, 613.8}, {24.4, 14.6}}, label: '自动'
+                  Button, 0x115040780, {{236.0, 492.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.seat', label: '座椅 待命 待命'
+                    Image, 0x1150408c0, {{244.7, 509.3}, {24.3, 21.7}}, identifier: 'carseat.left', label: 'carseat.left'
+                    StaticText, 0x115040a00, {{279.0, 500.0}, {28.0, 17.0}}, label: '座椅'
+                    StaticText, 0x115040b40, {{279.0, 519.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x115040c80, {{236.0, 564.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.window', label: '车窗 待命 待命'
+                    Image, 0x115040dc0, {{245.3, 583.0}, {23.3, 18.7}}, identifier: 'rectangle.split.3x1', label: 'Column View'
+                    StaticText, 0x115040f00, {{279.0, 572.0}, {28.0, 17.0}}, label: '车窗'
+                    StaticText, 0x115041040, {{279.0, 591.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x115041180, {{236.0, 636.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.volume', label: '音量 待命 待命'
+                    Image, 0x1150412c0, {{245.3, 655.3}, {23.3, 17.7}}, identifier: 'speaker.wave.2', label: 'Volume High'
+                    StaticText, 0x115041400, {{279.0, 644.0}, {28.0, 17.0}}, label: '音量'
+                    StaticText, 0x115041540, {{279.0, 663.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x115041680, {{38.0, 686.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.ambient', label: '氛围灯 待命 待命'
+                    Image, 0x1150417c0, {{52.3, 702.3}, {13.7, 23.7}}, identifier: 'lightbulb', label: 'lightbulb'
+                    StaticText, 0x115041900, {{81.0, 694.0}, {28.0, 17.0}}, label: '氛围'
+                    StaticText, 0x115041a40, {{81.0, 713.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x115041b80, {{236.0, 708.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.screen', label: '屏幕 待命 待命'
+                    Image, 0x115041cc0, {{245.0, 726.0}, {24.3, 20.7}}, identifier: 'display', label: 'Mac'
+                    StaticText, 0x115041e00, {{279.0, 716.0}, {28.0, 17.0}}, label: '屏幕'
+                    StaticText, 0x115041f40, {{279.0, 735.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x115042080, {{38.0, 758.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.wiper', label: '雨刮 待命 待命'
+                    Image, 0x1150421c0, {{44.0, 776.0}, {29.7, 21.0}}, identifier: 'windshield.front.and.wiper', label: 'windshield.front.and.wiper'
+                    StaticText, 0x115042300, {{81.0, 766.0}, {28.0, 17.0}}, label: '雨刮'
+                    StaticText, 0x115042440, {{81.0, 785.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x115042580, {{236.0, 780.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.door', label: '车门 0% 安全拦截'
+                    Image, 0x1150426c0, {{249.0, 797.7}, {16.0, 21.3}}, identifier: 'door.left.hand.open', label: 'door.left.hand.open'
+                    StaticText, 0x115042800, {{279.0, 788.0}, {28.0, 17.0}}, label: '车门'
+                    StaticText, 0x115042940, {{279.0, 807.0}, {27.7, 21.7}}, label: '0%'
+                    Image, 0x115042a80, {{382.7, 802.3}, {10.0, 12.0}}, identifier: 'exclamationmark.shield.fill', label: 'exclamationmark.shield.fill'
+                  Button, 0x115042bc0, {{38.0, 830.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.sunroofShade', label: '天窗遮阳 待命 待命'
+                    Image, 0x115042d00, {{47.7, 847.0}, {22.3, 22.3}}, identifier: 'sun.max', label: 'Brightness Higher'
+                    StaticText, 0x115042e40, {{81.0, 838.0}, {55.7, 17.0}}, label: '天窗遮阳'
+                    StaticText, 0x115042f80, {{81.0, 857.0}, {36.0, 21.7}}, label: '待命'
+                  Button, 0x1150430c0, {{38.0, 902.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.fragrance', label: '香氛 待命 待命'
+                    Image, 0x115043200, {{48.3, 921.0}, {21.3, 19.0}}, identifier: 'leaf', label: 'leaf'
+                    StaticText, 0x115043340, {{81.0, 910.0}, {28.0, 17.0}}, label: '香氛'
+                    StaticText, 0x115043480, {{81.0, 929.0}, {36.0, 21.7}}, label: '待命'
+              Button, 0x1150435c0, {{328.0, 58.0}, {46.0, 46.0}}, identifier: 'settings-refresh-controls', label: '复位'
+              Button, 0x115043700, {{386.0, 58.0}, {46.0, 46.0}}, identifier: 'settings-refresh-controls', label: '设置'
+              Button, 0x115043840, {{35.0, 888.0}, {370.0, 42.0}}, identifier: 'mic-dock-safe-area', label: '按住说话'
+Path to element:
+ →Application, 0x105242e40, pid: 79894, label: 'MAformac'
+Query chain:
+ →Find: Target Application 'lab.rayw.MAformac.ios'
+  Output: {
+    Application, 0x115043980, pid: 79894, label: 'MAformac'
+  }

@@ -246,7 +246,7 @@ UIUE 消费 `PresentationSnapshot`（**mock snapshot 即可，不依赖 mainline
 3. **演绎控制台（全 mock force，SD13-15/SD8）**：DemoControlPanel 三大块 + AllStateSheet 33base + force mock context（AD-RPB-014 四维）+ 设置主题切/场景宏 force。
 4. **氛围灯炸场（SD4）**：AmbientEdgeBurst 边缘 5s 爆发（Vortex Canvas 守 U30）。
 5. **context capsule**（spike-gated）：route spike → 资产 → ContextCapsule view。
-6. 验收：swift test + xcodebuild 两端 + simctl + **visual-acceptance（投屏 V10）+ anchor 像素对比 + 每 Phase codex 审计**。
+6. 验收：swift test + xcodebuild 两端 + simctl + **visual-acceptance（L0-L3，手持环境；投屏 DELETE C0）+ anchor 像素对比 + 每 Phase codex 审计**。
 
 🔴 **全 mock 边界**（落 spec 4 个 mock-frontstage Requirement）：触控/语音推理/控制台 force 全 mock（mock store/mock snapshot/mock 预设响应），不接真 NLU/ASR/TTS/LoRA/runtime backend（后续接线 DEFERRED），不改 state-cells.yaml 契约语义。完整实施计划 = `docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md` v3；adopt 巨人肩膀（DSWaveformImage/exyte-Chat/axiom/Vortex/Inferno/IceCubesApp/Orb）。
 

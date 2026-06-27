@@ -1,0 +1,57 @@
+{
+  "proof_class": "local_l2_ocr_contrast_ssim",
+  "cases": [
+    {
+      "case_id": "main_cooling_deep_space",
+      "l1_verdict": "WARN",
+      "l2_verdict": "PASS",
+      "ocr_status": "PASS",
+      "contrast_status": "PASS",
+      "contrast_min_ratio": 5.141771550411697,
+      "ssim": 0.4682243378016718
+    },
+    {
+      "case_id": "main_heating_ivory",
+      "l1_verdict": "WARN",
+      "l2_verdict": "PASS",
+      "ocr_status": "PASS",
+      "contrast_status": "PASS",
+      "contrast_min_ratio": 2.621627792340988,
+      "ssim": 0.5040291700202492
+    },
+    {
+      "case_id": "safety_refusal_ivory",
+      "l1_verdict": "PASS",
+      "l2_verdict": "PASS",
+      "ocr_status": "PASS",
+      "contrast_status": "PASS",
+      "contrast_min_ratio": 6.5076880805027075,
+      "ssim": 0.50556504653508
+    },
+    {
+      "case_id": "capsule_video_loop_deep_space",
+      "l1_verdict": "WARN",
+      "l2_verdict": "PASS",
+      "ocr_status": "PASS",
+      "contrast_status": "PASS",
+      "contrast_min_ratio": 5.141771550411697,
+      "ssim": 0.4824572189818022
+    },
+    {
+      "case_id": "u17_golden_path_deep_space",
+      "l1_verdict": "PASS",
+      "l2_verdict": "PASS",
+      "ocr_status": "PASS",
+      "contrast_status": "PASS",
+      "contrast_min_ratio": 5.141771550411697,
+      "ssim": 0.992248384621754
+    }
+  ],
+  "claims_not_made": [
+    "L3",
+    "V-PASS",
+    "mobile",
+    "true_device",
+    "A-2 complete"
+  ]
+}
