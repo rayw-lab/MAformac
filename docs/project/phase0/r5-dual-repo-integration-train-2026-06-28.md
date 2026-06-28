@@ -1,5 +1,5 @@
 ---
-status: RUNNING
+status: DONE
 label: UIUE_R5_D6_DUAL_REPO_INTEGRATION_TRAIN
 artifact_kind: dual_repo_integration_receipt
 created_at: 2026-06-28
@@ -14,6 +14,17 @@ authority: integration_receipt_not_runtime_contract
 本 receipt 只记录 UIUE R5 D1-D5 integration train 的本地文档、单测、静态检查、OpenSpec contract 与 GitNexus 刷新证据。
 
 不声明 R5 complete、runtime-ready、mobile proof、true_device proof、voice-ready、model-ready、golden-ready、endpoint-ready、UIUE merge、V-PASS、S-PASS、U-PASS、A-2、A-2 ready 或 A-2 complete。
+
+## 0.0 D7 reconciliation note
+
+2026-06-28 D7 human-review gate prep 重新 live-probe 双仓后，将本 receipt 从 stale `RUNNING` marker 对齐到已回写 commander 的 D6 verdict `DONE`：
+
+| repo | branch | D6 start_head | D6 final_head | final dirty state at D7 probe |
+|---|---|---:|---:|---|
+| UIUE | `uiue/phase4-default-scope-presentation` | `926dec8311c63a7b51cd1a1a5f633009e25cf7d2` | `9d50aa0d44d6d92871ae3ca0f67970439eb46c35` | D7-owned doc deltas only; D6 committed state clean |
+| main | `codex/rebuild-c6-doc-absorption-20260624` | `0a2ff0f7d30d6caf2d48f018f6b874828fb70c03` | `d332db736a0c47eb3b8dc09c80fb907a0f43e29e` | cached diff empty; pre-existing preserve-unowned dirty remains unstaged |
+
+This reconciliation changes documentation status only. It does not add runtime, simulator, mobile, true-device, model, voice, golden, endpoint, UIUE merge, V/S/U, or A-2 proof.
 
 ## 0.1 Commander ordering correction absorbed
 
@@ -341,7 +352,21 @@ Because this receipt records GitNexus evidence after the first refresh pass, con
 
 ## 7. Exact pathspec staging and commits
 
-Pending. Final overall Codex audit must be the last pre-staging/pre-commit audit gate. `git add .` is forbidden.
+Completed by exact pathspec only. `git add .` was not used.
+
+| repo | commit | message | final cached state |
+|---|---|---|---|
+| UIUE | `9d50aa0d44d6d92871ae3ca0f67970439eb46c35` | `docs/uiue: integrate r5 runtime presentation coordination` | empty |
+| main | `d332db736a0c47eb3b8dc09c80fb907a0f43e29e` | `feat(presentation): harden runtime presentation bridge contract` | empty |
+
+Post-commit GitNexus refresh was rerun because commit creation changed the indexed commit identity:
+
+| repo | result |
+|---|---|
+| UIUE | `node .gitnexus/run.cjs analyze` PASS; `changed=0 added=0 deleted=0`; status up-to-date at indexed/current `9d50aa0` |
+| main | `node .gitnexus/run.cjs analyze` PASS; `changed=0 added=0 deleted=0`; status up-to-date at indexed/current `d332db7` |
+
+Final overall Codex audit was rerun after post-commit GitNexus refresh and returned `PASS` with `findings_P0_P1: []`.
 
 ## 8. Residual risks
 
