@@ -69,7 +69,7 @@ public struct DemoMockTransition: Equatable, Sendable {
     }
 }
 
-public struct DemoActionReadback: Equatable, Sendable {
+public struct DemoActionReadback: Codable, Equatable, Sendable {
     public var key: String
     public var actualValue: String
     public var revision: Int

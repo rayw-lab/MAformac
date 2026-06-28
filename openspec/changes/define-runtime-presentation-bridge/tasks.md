@@ -31,3 +31,10 @@
 - [x] 5.1 Run `openspec validate define-runtime-presentation-bridge --strict`.
 - [x] 5.2 Run `openspec validate --all --strict`.
 - [x] 5.3 Run `git diff --check`.
+
+## 6. Phase1 typed bridge contract
+
+- [x] 6.1 Add `DemoInteractionEvent`, `DemoRuntimeResult`, `DemoRuntimeOutcome`, `PresentationSnapshot`, `TraceEnvelope`, and finite `PresentationProofClass` as mainline Core contract types.
+- [x] 6.2 Preserve upstream `VehicleToolBehaviorClass.toolCall` while mapping it to bridge `accepted_tool_call`.
+- [x] 6.3 Carry missing/unresolved scope through explicit reason metadata, not `ScopeOrigin.missing`.
+- [x] 6.4 Add focused unit tests for behavior mapping, scope-missing disposition, proof-class fail-closed behavior, and snapshot codability.

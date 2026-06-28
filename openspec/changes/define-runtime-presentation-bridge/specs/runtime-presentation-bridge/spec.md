@@ -47,6 +47,13 @@ WHEN runtime produces no state mutation
 THEN the bridge result SHALL be `already_state_noop`
 AND it SHALL NOT be reported as unsupported or safety refusal.
 
+#### Scenario: Tool-call source maps to accepted bridge result
+
+GIVEN an existing C6/C5 behavior source class is `tool_call`
+WHEN the bridge emits a presentation runtime result
+THEN the bridge result SHALL be `accepted_tool_call`
+AND it SHALL preserve `tool_call` as source metadata rather than renaming the upstream behavior class.
+
 #### Scenario: Unsupported and safety refusals remain distinct
 
 GIVEN runtime cannot map a request to an available demo tool
