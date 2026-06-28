@@ -92,6 +92,64 @@ WHEN the bridge emits the final snapshot for that turn
 THEN the bridge result SHALL be `runtime_error`
 AND the snapshot SHALL be terminal for the turn.
 
+#### Scenario: Guard denial terminates as presentation-safe refusal
+
+GIVEN runtime guard logic denies an action for safety, policy, or allowlist reasons
+WHEN the bridge emits the final snapshot for that turn
+THEN the bridge result SHALL be `refusal_safety_or_policy`
+AND the snapshot SHALL be terminal for the turn
+AND the snapshot SHALL carry trace identity, finite proof class, and a safe machine-readable reason without raw model output, training receipts, or raw runtime store references.
+
+#### Scenario: Thrown adapter failure terminates as runtime error
+
+GIVEN runtime or adapter execution throws after trace identity exists
+WHEN the bridge emits the final snapshot for that turn
+THEN the bridge result SHALL be `runtime_error`
+AND the snapshot SHALL be terminal for the turn
+AND it SHALL carry trace identity, finite proof class, and a safe machine-readable reason instead of failing silently.
+
+#### Scenario: Partial accept/refuse terminates with composite presentation state
+
+GIVEN a turn has at least one accepted effect and at least one refused effect
+WHEN the bridge emits the final snapshot for that turn
+THEN the snapshot SHALL be terminal for the turn
+AND it SHALL carry the accepted readbacks plus mixed card presentation state for accepted and refused effects.
+
+#### Scenario: Cancel, interruption, timeout, and backgrounding all terminate
+
+GIVEN a turn is cancelled, interrupted, times out, or is interrupted by app backgrounding
+WHEN the bridge emits the final snapshot for that turn
+THEN the snapshot SHALL be terminal for the turn
+AND it SHALL carry trace identity, finite proof class, result class, and stop reason metadata.
+
+#### Scenario: Timeout is a terminal stop result, not a user event kind
+
+GIVEN runtime detects an interaction timeout
+WHEN the bridge represents the timeout for presentation
+THEN timeout SHALL be carried as a terminal stop/result outcome
+AND it SHALL NOT require adding `timeout` to the user interaction event kind set.
+
+#### Scenario: Event provenance and scope resolution remain separate
+
+GIVEN a user interaction event starts a turn
+WHEN runtime and presentation state are represented by the bridge
+THEN the event MAY carry source/provenance metadata
+AND resolved scope origin SHALL remain on snapshot, readback, or outcome metadata instead of being inferred from the event payload.
+
+#### Scenario: Trace envelope is presentation-safe and append-only by construction
+
+GIVEN trace entries are exposed through a presentation snapshot
+WHEN the bridge creates a presentation-safe trace envelope
+THEN messages SHALL redact raw model output, training receipt, and raw runtime store markers
+AND appending entries SHALL require matching trace identity and monotonic timestamps.
+
+#### Scenario: Card ordering and semantics are machine-readable
+
+GIVEN accepted and refused effects both affect presentation cards
+WHEN the bridge orders and annotates cards for presentation
+THEN refused or unsafe card states SHALL be able to outrank satisfied card states
+AND active, sibling, reason, role, and scope-origin semantics SHALL be machine-readable rather than UI-only copy.
+
 ### Requirement: Dispatch readiness without runtime proof
 
 The system SHALL allow UIUE R5 to update only to dispatch readiness after the mainline bridge owner receipt/carrier lands, while preserving all downstream proof-class gates.

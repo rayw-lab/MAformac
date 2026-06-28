@@ -38,3 +38,28 @@
 - [x] 6.2 Preserve upstream `VehicleToolBehaviorClass.toolCall` while mapping it to bridge `accepted_tool_call`.
 - [x] 6.3 Carry missing/unresolved scope through explicit reason metadata, not `ScopeOrigin.missing`.
 - [x] 6.4 Add focused unit tests for behavior mapping, scope-missing disposition, proof-class fail-closed behavior, and snapshot codability.
+
+## 7. Phase1 terminal snapshot adapter behavior proof
+
+- [x] 7.1 Add a minimal terminal snapshot adapter/factory for guard-denial, thrown-error, partial accept/refuse, and stop outcomes.
+- [x] 7.2 Prove guard denial maps to a terminal presentation-safe `refusal_safety_or_policy` snapshot without raw model/store/training fields.
+- [x] 7.3 Prove thrown adapter/runtime failure maps to a terminal `runtime_error` snapshot with trace identity and safe reason.
+- [x] 7.4 Prove partial accept/refuse carries accepted readbacks and mixed card state in a terminal snapshot.
+- [x] 7.5 Prove cancel, interruption, timeout, and backgrounding all emit terminal snapshots.
+- [x] 7.6 Run Codex native subagent P0/P1 audit and resolve or record findings.
+- [x] 7.7 Run Hermes/GLM P0/P1 audit loop and resolve or record findings.
+
+## 8. R5 Dispatch 2 mainline contract/test hardening
+
+- [x] 8.1 Rewrite `C006` as: timeout is a terminal stop/result outcome, not a required interaction event kind; prove with unit test.
+- [x] 8.2 Cover `C007` by separating event provenance/source from snapshot/readback/outcome scope metadata; prove with unit test.
+- [x] 8.3 Cover `C024` by adding presentation-safe trace redaction for raw model output, training receipt, and raw runtime store markers; prove with unit test.
+- [x] 8.4 Rewrite and cover `C029` as: refused/unsafe cards can outrank satisfied cards in deterministic presentation ordering; prove with unit test.
+- [x] 8.5 Cover `C030` with machine-readable card semantics for role, active state, sibling keys, reason, and scope origin; prove with unit test.
+- [x] 8.6 Cover `C143` with append-only trace envelope helper requiring matching trace identity and monotonic timestamps; prove with unit test.
+- [x] 8.7 Rewrite `C052` as deferred: production force-state behavior is not created in this dispatch; future demo tooling owner must prove DEMO_MODE, trace provenance, and no production path.
+- [x] 8.8 Rewrite `C061` as deferred: retry/idempotency no-double-write belongs to future runtime adapter execution tests, while bridge-level card/trace contracts remain local-unit only.
+- [x] 8.9 Defer `C005` runtime write ownership to future runtime adapter wiring; current bridge surface remains snapshot/event contract-only.
+- [x] 8.10 Defer `C018` SceneMacroRegistry/Core config ownership; mainline must own a future OpenSpec before UIUE treats it as shared runtime config.
+- [x] 8.11 Run Codex native subagent P0/P1 audit and resolve or record findings.
+- [x] 8.12 Run Hermes/GLM P0/P1 audit loop or user-authorized Codex equivalent after Hermes stall; resolve or record findings.
