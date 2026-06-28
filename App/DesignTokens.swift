@@ -102,6 +102,8 @@ enum DesignTokens {
     static let semanticWarmBright = Color(hex24: 0xFFB13C)
     static let semanticWarmSoft = Color(hex24: 0xFFD1C2)
     static let semanticWarmDeep = Color(hex24: 0xC91E3A)
+    static let semanticWarmGoldGray = Color(hex24: 0xC8B184)
+    static let semanticWarmGoldGrayDim = Color(hex24: 0x7D7364)
 
     // MARK: 氛围灯色板（tokens.md §1.4，ambient.color 炸场色块；view 经此取，禁手填 hex）
     /// `ambient.color` 枚举色名 → 色块 Color（深空暗底上 vivid 高对比）。

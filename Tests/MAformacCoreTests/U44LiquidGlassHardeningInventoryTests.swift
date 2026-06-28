@@ -55,9 +55,9 @@ final class U44LiquidGlassHardeningInventoryTests: XCTestCase {
         let demoControlPanel = stripLineComments(try source(at: "App/DemoControlPanel.swift"))
         let expandedFamilyCard = stripLineComments(try source(at: "App/ExpandedFamilyCard.swift"))
 
-        XCTAssertTrue(contentView.contains(".glassEffect()"))
-        XCTAssertTrue(contextCapsule.contains(".glassEffect()"))
-        XCTAssertTrue(demoControlPanel.contains(".glassEffect()"))
+        XCTAssertTrue(containsGlassEffectModifier(in: contentView))
+        XCTAssertTrue(containsGlassEffectModifier(in: contextCapsule))
+        XCTAssertTrue(containsGlassEffectModifier(in: demoControlPanel))
         XCTAssertFalse(expandedFamilyCard.contains(".glassEffect("))
     }
 
@@ -100,5 +100,9 @@ final class U44LiquidGlassHardeningInventoryTests: XCTestCase {
             searchRange = range.upperBound..<source.endIndex
         }
         return count
+    }
+
+    private func containsGlassEffectModifier(in source: String) -> Bool {
+        source.contains(".glassEffect(")
     }
 }

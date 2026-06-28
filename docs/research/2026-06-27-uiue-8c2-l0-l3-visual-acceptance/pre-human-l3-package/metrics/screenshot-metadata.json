@@ -1,0 +1,129 @@
+[
+  {
+    "case_id": "main_cooling_ivory",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_ivory.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "ivory",
+    "snapshot": "cooling",
+    "anchor": "continuous_stage_no_black_line + cooling",
+    "capture_command": "xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_ivory.png",
+    "proof_class": "simulator_l0_runtime_truth"
+  },
+  {
+    "case_id": "main_cooling_deep_space",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_deep_space.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "deepSpace",
+    "snapshot": "cooling",
+    "anchor": "deep_space + cooling",
+    "capture_command": "xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_deep_space.png",
+    "proof_class": "simulator_l0_runtime_truth"
+  },
+  {
+    "case_id": "main_heating_ivory",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_heating_ivory.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "ivory",
+    "snapshot": "heating",
+    "anchor": "heating",
+    "capture_command": "xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_heating_ivory.png",
+    "proof_class": "simulator_l0_runtime_truth"
+  },
+  {
+    "case_id": "safety_refusal_ivory",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/safety_refusal_ivory.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "ivory",
+    "snapshot": "safetyRefusal",
+    "anchor": "orb_think/safety",
+    "capture_command": "xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/safety_refusal_ivory.png",
+    "proof_class": "simulator_l0_runtime_truth"
+  },
+  {
+    "case_id": "capsule_video_loop_deep_space",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "deepSpace",
+    "snapshot": "cooling",
+    "anchor": "capsule_diorama_video_loop",
+    "capture_command": "xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+    "proof_class": "simulator_l0_runtime_truth"
+  },
+  {
+    "case_id": "cold_start_ivory",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/cold_start_ivory.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "ivory",
+    "snapshot": "coldStart",
+    "anchor": "orb_idle",
+    "capture_command": "xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/cold_start_ivory.png",
+    "proof_class": "simulator_l0_runtime_truth"
+  },
+  {
+    "case_id": "u17_golden_path_deep_space",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/u17_golden_path_deep_space.png",
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "viewport_points_observed_in_xcuitest": {
+      "width": 440,
+      "height": 956
+    },
+    "scale_inferred": 3.0,
+    "theme": "deepSpace",
+    "snapshot": "goldenPath:uiue_g9b_ac_success_deep_space",
+    "anchor": "U17 golden path deep-space AC success",
+    "capture_command": "xcrun simctl launch 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios -goldenPathID uiue_g9b_ac_success_deep_space && xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/u17_golden_path_deep_space.png",
+    "captured_at_added_utc": "2026-06-27T16:03:11Z",
+    "proof_class": "simulator_l0_runtime_truth"
+  }
+]

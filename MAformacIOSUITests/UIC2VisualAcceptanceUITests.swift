@@ -192,6 +192,108 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
     }
 
     @MainActor
+    func testPhoneTopBandControlsStayOutsideCapsuleAndAlignWithCards() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        app.launch()
+
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 16))
+        let capsule = app.descendants(matching: .any)["context-band"]
+        let refresh = app.buttons["refresh-control"]
+        let settings = app.buttons["settings-control"]
+        let acCard = app.descendants(matching: .any)["vehicle-card-family.ac"]
+        let seatCard = app.descendants(matching: .any)["vehicle-card-family.seat"]
+        let userBubble = app.descendants(matching: .any)["dialogue-bubble-user"]
+
+        XCTAssertTrue(capsule.waitForExistence(timeout: 12))
+        XCTAssertTrue(refresh.waitForExistence(timeout: 6))
+        XCTAssertTrue(settings.waitForExistence(timeout: 6))
+        XCTAssertTrue(acCard.waitForExistence(timeout: 12))
+        XCTAssertTrue(seatCard.waitForExistence(timeout: 12))
+        XCTAssertTrue(userBubble.waitForExistence(timeout: 6))
+
+        XCTAssertGreaterThanOrEqual(
+            refresh.frame.minX,
+            capsule.frame.maxX + 6,
+            "刷新按钮必须在环境胶囊外侧，不能压到胶囊图像上"
+        )
+        XCTAssertGreaterThanOrEqual(
+            settings.frame.minX,
+            capsule.frame.maxX + 6,
+            "设置按钮也必须在环境胶囊外侧"
+        )
+        XCTAssertLessThanOrEqual(abs(refresh.frame.midX - settings.frame.midX), 2)
+        XCTAssertLessThanOrEqual(
+            abs(settings.frame.maxX - userBubble.frame.maxX),
+            3,
+            "设置/刷新按钮列右边缘应对齐到用户气泡右边缘"
+        )
+        XCTAssertLessThanOrEqual(
+            abs(refresh.frame.maxX - settings.frame.maxX),
+            1,
+            "刷新按钮右边缘必须与设置按钮右边缘对齐"
+        )
+        XCTAssertGreaterThanOrEqual(
+            refresh.frame.minY,
+            settings.frame.maxY + 4,
+            "phone 空间不足时，刷新按钮应在设置按钮正下方"
+        )
+        XCTAssertLessThanOrEqual(
+            abs(capsule.frame.midX - app.frame.midX),
+            14,
+            "环境胶囊应保持顶部舞台居中，而不是被右侧按钮挤到左边"
+        )
+        XCTAssertGreaterThanOrEqual(
+            settings.frame.minX - capsule.frame.maxX,
+            8,
+            "右上按钮列必须独立在环境胶囊外，不能贴边遮挡胶囊高光"
+        )
+        XCTAssertLessThanOrEqual(
+            abs(acCard.frame.minY - seatCard.frame.minY),
+            8,
+            "端状态左右两列首行应对齐"
+        )
+
+        let columnGap = seatCard.frame.minX - acCard.frame.maxX
+        XCTAssertGreaterThanOrEqual(columnGap, 9, "端状态左右列不能贴边挤在一起")
+        XCTAssertLessThanOrEqual(columnGap, 18, "端状态左右列间距不能再次跑成断层")
+    }
+
+    @MainActor
+    func testOrbPresetStatesExposeDistinctCaptionsAndStayContained() throws {
+        let idleApp = XCUIApplication()
+        idleApp.launchArguments = ["-mockSnapshot", "coldStart", "-mockTheme", "ivory"]
+        idleApp.launch()
+        XCTAssertTrue(idleApp.wait(for: .runningForeground, timeout: 16))
+        XCTAssertTrue(waitForTreeText("随时待命", in: idleApp), "idle 态不能继续和 listen 态共用“我在听...”文案")
+
+        let listenApp = XCUIApplication()
+        listenApp.launchArguments = ["-mockSnapshot", "listening", "-mockTheme", "ivory"]
+        listenApp.launch()
+        XCTAssertTrue(listenApp.wait(for: .runningForeground, timeout: 16))
+        XCTAssertTrue(waitForTreeText("我在听...", in: listenApp), "listen 态必须有独立 mock preset 和 UI tree proof")
+
+        let speakApp = XCUIApplication()
+        speakApp.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]
+        speakApp.launch()
+        XCTAssertTrue(speakApp.wait(for: .runningForeground, timeout: 16))
+        XCTAssertTrue(waitForTreeText("正在回应", in: speakApp), "已完成车控读回的 preset 应暴露 speak 态")
+        let speakOrb = speakApp.descendants(matching: .any)["demo-orb"]
+        XCTAssertTrue(speakOrb.waitForExistence(timeout: 6))
+        XCTAssertLessThanOrEqual(
+            speakOrb.frame.height,
+            220,
+            "VPA 光晕和粒子场必须收在 orb 区域内，不能再次吞掉中段空间"
+        )
+
+        let thinkApp = XCUIApplication()
+        thinkApp.launchArguments = ["-mockSnapshot", "safetyRefusal", "-mockTheme", "ivory"]
+        thinkApp.launch()
+        XCTAssertTrue(thinkApp.wait(for: .runningForeground, timeout: 16))
+        XCTAssertTrue(waitForTreeText("让我确认下...", in: thinkApp), "安全拒绝 preset 应暴露 think 态")
+    }
+
+    @MainActor
     func testAmbientColorPickerSelectsEightColorWithoutCrash() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-mockSnapshot", "cooling", "-mockTheme", "ivory"]

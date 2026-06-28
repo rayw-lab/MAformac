@@ -17,6 +17,8 @@ struct ContentView: View {
     @State private var didTriggerInitialAmbientBurst = false
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
+    private let forceReduceMotion: Bool
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     init(
         store: DemoVehicleStateStore,
@@ -26,13 +28,15 @@ struct ContentView: View {
         initialTheme: PresentationTheme = .ivory,
         initialAmbientBurstColor: String? = nil,
         initialContext: DemoContext? = nil,
-        contextCapsuleRoute: ContextCapsuleRoute = .cLite
+        contextCapsuleRoute: ContextCapsuleRoute = .cLite,
+        forceReduceMotion: Bool = false
     ) {
         self.store = store
         self.traceLogger = traceLogger
         self.speech = speech
         self.initialAmbientBurstColor = initialAmbientBurstColor
         self.contextCapsuleRoute = contextCapsuleRoute
+        self.forceReduceMotion = forceReduceMotion
         let initial = Self.phase2State(for: initialPreset)
         var snapshot = initial.snapshot
         if let initialContext {
@@ -77,14 +81,16 @@ struct ContentView: View {
                     .padding(.top, stageTopPadding(for: size))
                     .padding(.bottom, 8)
 
-                SettingsRefreshControls(
-                    theme: theme,
-                    onReset: handleReset,
-                    onSettings: { presentedSheet = .settings }
-                )
-                .padding(.top, topControlsTopPadding(for: size))
-                .padding(.trailing, topControlsTrailingPadding(for: size))
-                .zIndex(8)
+                if usesMacSplit(size: size) {
+                    SettingsRefreshControls(
+                        theme: theme,
+                        onReset: handleReset,
+                        onSettings: { presentedSheet = .settings }
+                    )
+                    .padding(.top, topControlsTopPadding(for: size))
+                    .padding(.trailing, topControlsTrailingPadding(for: size))
+                    .zIndex(8)
+                }
 
                 if let family = focus.focusedFamily {
                     expandedOverlay(family)
@@ -107,8 +113,8 @@ struct ContentView: View {
         }
         .preferredColorScheme(theme.colorScheme)
         .onAppear(perform: triggerInitialAmbientBurstIfNeeded)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: focus.focusedFamily)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: theme)
+        .animation(effectiveReduceMotion ? nil : .snappy(duration: 0.32), value: focus.focusedFamily)
+        .animation(effectiveReduceMotion ? nil : .snappy(duration: 0.32), value: theme)
         .sheet(item: $presentedSheet, onDismiss: presentQueuedSheetAfterDismiss) { sheet in
             switch sheet {
             case .settings:
@@ -151,8 +157,8 @@ struct ContentView: View {
             }
         } else {
             VStack(alignment: .leading, spacing: 10) {
-                topContextBand(size: size)
-                DemoOrbView(theme: theme, state: snapshot.orbState)
+                topContextBand(size: size, showsControls: true)
+                DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
                     .frame(maxWidth: .infinity)
                     .frame(height: orbHeight(for: size))
                 DialogueStream(messages: messages, theme: theme)
@@ -175,7 +181,7 @@ struct ContentView: View {
             topContextBand(size: size)
                 .padding(.trailing, 86)
             Spacer(minLength: 12)
-            DemoOrbView(theme: theme, state: snapshot.orbState)
+            DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
                 .frame(maxWidth: .infinity)
             DialogueStream(messages: messages, theme: theme)
                 .frame(minHeight: 240, maxHeight: 330)
@@ -186,14 +192,61 @@ struct ContentView: View {
         }
     }
 
-    private func topContextBand(size: CGSize) -> some View {
-        HStack(spacing: 0) {
-            ContextCapsuleView(theme: theme, context: snapshot.context, route: contextCapsuleRoute)
-                .frame(width: contextCapsuleWidth(for: size), height: contextCapsuleHeight(for: size))
-                .padding(.leading, usesMacSplit(size: size) ? 0 : 28)
-            Spacer(minLength: usesMacSplit(size: size) ? 0 : 86)
+    @ViewBuilder
+    private func topContextBand(size: CGSize, showsControls: Bool = false) -> some View {
+        let split = usesMacSplit(size: size)
+        if showsControls && !split {
+            GeometryReader { proxy in
+                let controlsRightOutset: CGFloat = 8
+                let controlsWidth: CGFloat = 44
+                let gap: CGFloat = 12
+                let capsuleWidth = min(
+                    max(286, proxy.size.width * 0.76),
+                    proxy.size.width - controlsWidth - gap - controlsRightOutset
+                )
+
+                ZStack(alignment: .topTrailing) {
+                    contextCapsuleBandElement(
+                        width: capsuleWidth,
+                        height: contextCapsuleHeight(for: size)
+                    )
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                    SettingsRefreshControls(
+                        theme: theme,
+                        layout: .vertical,
+                        onReset: handleReset,
+                        onSettings: { presentedSheet = .settings }
+                    )
+                    .frame(width: controlsWidth, height: contextCapsuleHeight(for: size), alignment: .top)
+                    .padding(.top, 1)
+                    .padding(.trailing, -controlsRightOutset)
+                }
+            }
+            .frame(height: contextCapsuleHeight(for: size))
+        } else {
+            HStack(alignment: .top, spacing: 0) {
+                contextCapsuleBandElement(
+                    width: contextCapsuleWidth(for: size),
+                    height: contextCapsuleHeight(for: size)
+                )
+                Spacer(minLength: split ? 0 : 86)
+            }
         }
-        .accessibilityIdentifier("context-band")
+    }
+
+    private func contextCapsuleBandElement(width: CGFloat, height: CGFloat) -> some View {
+        ZStack {
+            ContextCapsuleView(theme: theme, context: snapshot.context, route: contextCapsuleRoute)
+                .accessibilityHidden(true)
+            Rectangle()
+                .fill(Color.white.opacity(0.001))
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("环境胶囊")
+                .accessibilityIdentifier("context-band")
+        }
+        .frame(width: width, height: height)
+        .clipShape(Capsule())
     }
 
     @ViewBuilder
@@ -543,6 +596,11 @@ struct ContentView: View {
                 Self.phase2IdleBaselineSnapshot(),
                 [DialogueMessage(role: .assistant, text: "我在听...")]
             )
+        case .listening:
+            return (
+                Self.listeningSnapshot(),
+                [DialogueMessage(role: .user, text: "你好"), DialogueMessage(role: .assistant, text: "我在听...")]
+            )
         case .cooling:
             return (
                 Self.phase2CoolingSnapshot(),
@@ -571,25 +629,32 @@ struct ContentView: View {
     }
 
     private static func heatingSnapshot() -> PresentationSnapshot {
-        phase2Snapshot(acMode: "制热", temperature: "28", thermalState: .changing)
+        phase2Snapshot(acMode: "制热", temperature: "28", thermalState: .changing, orbState: .speak)
     }
 
     private static func phase2IdleBaselineSnapshot() -> PresentationSnapshot {
-        var snapshot = phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .normal)
-        snapshot.orbState = .idle
+        var snapshot = phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .normal, orbState: .idle)
+        snapshot.dialogText = "我在听..."
+        snapshot.resultKind = nil
+        return snapshot
+    }
+
+    private static func listeningSnapshot() -> PresentationSnapshot {
+        var snapshot = phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .normal, orbState: .listen)
         snapshot.dialogText = "我在听..."
         snapshot.resultKind = nil
         return snapshot
     }
 
     private static func phase2CoolingSnapshot() -> PresentationSnapshot {
-        phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .changing)
+        phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .changing, orbState: .speak)
     }
 
     private static func phase2Snapshot(
         acMode: String,
         temperature: String,
-        thermalState: DemoVisualState
+        thermalState: DemoVisualState,
+        orbState: PresentationOrbState
     ) -> PresentationSnapshot {
         PresentationSnapshot(
             storeCells: [
@@ -619,7 +684,7 @@ struct ContentView: View {
                 vehicle: DemoVehicleContext(speed: 0, gear: "P"),
                 environment: DemoEnvironmentContext(weather: "晴", timePeriod: "日间")
             ),
-            orbState: .listen,
+            orbState: orbState,
             voiceState: .idle,
             dialogText: acMode == "制热" ? "已为您升温" : "已为您调到舒适温度",
             resultKind: .acceptedToolCall
@@ -701,6 +766,7 @@ struct ContentView: View {
 
 enum SnapshotPreset: String, CaseIterable, Identifiable {
     case coldStart
+    case listening
     case cooling
     case heating
     case safetyRefusal
@@ -710,6 +776,7 @@ enum SnapshotPreset: String, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .coldStart: return "复位"
+        case .listening: return "聆听"
         case .cooling: return "制冷"
         case .heating: return "制热"
         case .safetyRefusal: return "安全拒识"
@@ -725,29 +792,44 @@ enum PresentationSheet: String, Identifiable {
 }
 
 struct SettingsRefreshControls: View {
+    enum Layout {
+        case horizontal
+        case vertical
+    }
+
     var theme: PresentationTheme
+    var layout: Layout = .horizontal
     var onReset: () -> Void
     var onSettings: () -> Void
 
+    @ViewBuilder
     var body: some View {
-        HStack(spacing: 12) {
-            iconButton(systemName: "arrow.clockwise", label: "复位", action: onReset)
-            iconButton(systemName: "gearshape", label: "设置", action: onSettings)
+        switch layout {
+        case .horizontal:
+            HStack(spacing: 8) {
+                iconButton(systemName: "arrow.clockwise", label: "复位", action: onReset)
+                iconButton(systemName: "gearshape", label: "设置", action: onSettings)
+            }
+        case .vertical:
+            VStack(spacing: 6) {
+                iconButton(systemName: "gearshape", label: "设置", action: onSettings)
+                iconButton(systemName: "arrow.clockwise", label: "复位", action: onReset)
+            }
         }
-        .accessibilityIdentifier("settings-refresh-controls")
     }
 
     private func iconButton(systemName: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: 21, weight: .medium))
-                .frame(width: 46, height: 46)
+                .font(.system(size: 20, weight: .medium))
+                .frame(width: 44, height: 44)
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .foregroundStyle(DesignTokens.palette(for: theme).inkPrimary)
         .background(DesignTokens.palette(for: theme).surface.opacity(theme == .ivory ? 0.001 : 0.10), in: Circle())
         .accessibilityLabel(label)
+        .accessibilityIdentifier(label == "复位" ? "refresh-control" : "settings-control")
     }
 }
 
@@ -885,6 +967,9 @@ struct DialogueBubble: View {
                 }
                 .frame(maxWidth: 340, alignment: message.role == .user ? .trailing : .leading)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(message.text)
+                .accessibilityIdentifier(message.role == .user ? "dialogue-bubble-user" : "dialogue-bubble-assistant")
             if message.role == .assistant {
                 Spacer(minLength: 50)
             }
@@ -1028,21 +1113,23 @@ struct WaveformMark: View {
 struct DemoOrbView: View {
     var theme: PresentationTheme
     var state: PresentationOrbState
+    var forceReduceMotion = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
     private var diameter: CGFloat {
         switch state {
-        case .idle: return 96
-        case .listen: return 112
-        case .think, .speak: return 112
+        case .idle: return 88
+        case .listen: return 98
+        case .think, .speak: return 102
         }
     }
 
     var body: some View {
         Group {
-            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion) {
                 TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
                     orbBody(phase: timeline.date.timeIntervalSinceReferenceDate)
                 }
@@ -1055,7 +1142,7 @@ struct DemoOrbView: View {
     }
 
     private func orbBody(phase: TimeInterval) -> some View {
-        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion)
+        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion)
             ? 1 + sin(phase * 1.8) * 0.025
             : 1
 
@@ -1065,18 +1152,18 @@ struct DemoOrbView: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.20 : 0.30),
-                                DesignTokens.glowViolet.opacity(theme == .ivory ? 0.13 : 0.22),
+                                DesignTokens.semanticCoolBright.opacity(theme == .ivory ? 0.14 : 0.24),
+                                DesignTokens.glowViolet.opacity(theme == .ivory ? 0.08 : 0.16),
                                 .clear
                             ],
                             center: .center,
-                            startRadius: diameter * 0.24,
-                            endRadius: diameter * 1.05
+                            startRadius: diameter * 0.18,
+                            endRadius: diameter * 0.76
                         )
                     )
-                    .frame(width: diameter * 1.72, height: diameter * 1.72)
-                    .blur(radius: 4)
-                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) ? 1 + sin(phase * 0.9) * 0.018 : 1)
+                    .frame(width: diameter * 1.36, height: diameter * 1.36)
+                    .blur(radius: 3)
+                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion) ? 1 + sin(phase * 0.9) * 0.012 : 1)
                 Circle()
                     .fill(
                         RadialGradient(
@@ -1129,17 +1216,17 @@ struct DemoOrbView: View {
                                 lineWidth: 2.2
                             )
                     }
-                    .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.24 : 0.42), radius: 26)
-                    .shadow(color: DesignTokens.glowViolet.opacity(theme == .ivory ? 0.10 : 0.22), radius: 40)
+                    .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.18 : 0.34), radius: 14)
+                    .shadow(color: DesignTokens.glowViolet.opacity(theme == .ivory ? 0.07 : 0.16), radius: 20)
                     .scaleEffect(pulse)
-                if reduceMotion {
+                if effectiveReduceMotion {
                     Image(systemName: staticOrbSymbol)
                         .font(.system(size: diameter * 0.22, weight: .semibold))
                         .foregroundStyle(Color.white.opacity(theme == .ivory ? 0.84 : 0.72))
                         .symbolRenderingMode(.hierarchical)
                         .accessibilityHidden(true)
                 }
-                if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
+                if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: effectiveReduceMotion) {
                     OrbParticleField(diameter: diameter, phase: phase, theme: theme)
                 }
             }
@@ -1152,11 +1239,11 @@ struct DemoOrbView: View {
     }
 
     private var orbCaption: String {
-        if reduceMotion, PresentationReducedMotionPolicy.feedback(for: state) == .staticThinking {
+        if effectiveReduceMotion, PresentationReducedMotionPolicy.feedback(for: state) == .staticThinking {
             return "正在确认..."
         }
         switch state {
-        case .idle: return "我在听..."
+        case .idle: return "随时待命"
         case .listen: return "我在听..."
         case .think: return "让我确认下..."
         case .speak: return "正在回应"
@@ -1185,7 +1272,7 @@ struct OrbParticleField: View {
     var body: some View {
         Canvas { context, size in
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            for index in 0..<112 {
+            for index in 0..<72 {
                 let xSeed = CGFloat((index * 37 + 19) % 101) / 50.5 - 1
                 let ySeed = CGFloat((index * 61 + 7) % 101) / 50.5 - 1
                 let drift = CGFloat(sin(phase * 0.34 + Double(index) * 0.71))
@@ -1193,8 +1280,8 @@ struct OrbParticleField: View {
                 let particleSize = index.isMultiple(of: 19) ? 4.6 : (index.isMultiple(of: 7) ? 2.2 : 1.35)
                 let opacity = max(0.0, min(0.42, 0.38 - Double(abs(distance - 0.74)) * 0.20))
                 let point = CGPoint(
-                    x: center.x + xSeed * diameter * 1.30 + drift * 2.2,
-                    y: center.y + ySeed * diameter * 0.92 + diameter * 0.22 - drift * 1.2
+                    x: center.x + xSeed * diameter * 0.72 + drift * 1.6,
+                    y: center.y + ySeed * diameter * 0.55 + diameter * 0.10 - drift * 0.9
                 )
 
                 if index.isMultiple(of: 19) {
@@ -1211,7 +1298,7 @@ struct OrbParticleField: View {
                 }
             }
         }
-        .frame(width: diameter * 3.05, height: diameter * 2.55)
+        .frame(width: diameter * 1.70, height: diameter * 1.35)
         .blendMode(.plusLighter)
         .allowsHitTesting(false)
     }
@@ -1509,8 +1596,8 @@ struct VehicleCardsGrid: View {
         GeometryReader { proxy in
             let sideInset: CGFloat = 16
             let available = proxy.size.width - sideInset * 2
-            let gap: CGFloat = 22
-            let leftWidth = (available - gap) * 0.515
+            let gap: CGFloat = 14
+            let leftWidth = (available - gap) * 0.52
             let rightWidth = available - gap - leftWidth
             let heroFamily = featuredHeroFamily
             HStack(alignment: .top, spacing: gap) {
@@ -1564,7 +1651,7 @@ struct VehicleCardsGrid: View {
     }
 
     private var phoneFeaturedHeight: CGFloat {
-        6 * phoneCompactTotalHeight + 5 * phoneFeaturedSpacing
+        158 + 3 * phoneCompactTotalHeight + 3 * phoneFeaturedSpacing
     }
 
     private var phoneFeaturedSpacing: CGFloat {
@@ -1644,6 +1731,12 @@ struct VehicleStateCard: View {
     private var thermalTint: ThermalTint {
         family == .ac ? SemanticColorMapper.acThermalTint(siblingCells: display.siblingCells) : .neutral
     }
+    private var usesDeepSpaceHeatingEdge: Bool {
+        theme == .deepSpace && family == .ac && thermalTint == .heating
+    }
+    private var edgeAccentColor: Color {
+        usesDeepSpaceHeatingEdge ? DesignTokens.semanticWarmGoldGray : effectiveAppearance.border
+    }
 
     var body: some View {
         Button {
@@ -1669,7 +1762,7 @@ struct VehicleStateCard: View {
                 ZStack {
                     cardSpecularLayer
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .strokeBorder(effectiveAppearance.border.opacity(borderOpacity),
+                        .strokeBorder(edgeAccentColor.opacity(borderOpacity),
                                       lineWidth: borderLineWidth)
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .strokeBorder(cardRimGradient, lineWidth: rimLineWidth)
@@ -1996,7 +2089,7 @@ struct VehicleStateCard: View {
             colors: [
                 Color.white.opacity(theme == .ivory ? (isHero ? 0.82 : 0.68) : 0.28),
                 Color.white.opacity(theme == .ivory ? 0.08 : 0.05),
-                effectiveAppearance.border.opacity(glowActive || isHero ? 0.32 : 0.16)
+                edgeAccentColor.opacity(glowActive || isHero ? 0.32 : 0.16)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -2112,7 +2205,7 @@ struct VehicleStateCard: View {
 
     private var shadowColor: Color {
         if glowActive || isHero {
-            return appearance.border.opacity(theme == .ivory ? 0.16 : 0.52)
+            return edgeAccentColor.opacity(theme == .ivory ? 0.16 : 0.52)
         }
         return palette.softShadow.opacity(theme == .ivory ? 0.07 : 0.22)
     }

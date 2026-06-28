@@ -1,0 +1,196 @@
+{
+  "case_id": "main_cooling_deep_space",
+  "captured_at": "2026-06-27T23:23:31+08:00",
+  "source_ui_tree": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/ui-trees/main_cooling_deep_space.txt",
+  "viewport_points": {
+    "width": 440,
+    "height": 956
+  },
+  "identifier_frames": {
+    "context-band": {
+      "x": 69.7,
+      "y": 56.0,
+      "width": 300.7,
+      "height": 108.0
+    },
+    "settings-control": {
+      "x": 382.0,
+      "y": 57.0,
+      "width": 44.0,
+      "height": 44.0
+    },
+    "refresh-control": {
+      "x": 382.0,
+      "y": 107.0,
+      "width": 44.0,
+      "height": 44.0
+    },
+    "demo-orb": {
+      "x": 133.3,
+      "y": 168.0,
+      "width": 173.3,
+      "height": 145.2
+    },
+    "dialogue-stream": {
+      "x": 22.0,
+      "y": 338.0,
+      "width": 396.0,
+      "height": 124.0
+    },
+    "dialogue-bubble-user": {
+      "x": 324.3,
+      "y": 372.0,
+      "width": 101.7,
+      "height": 40.0
+    },
+    "dialogue-bubble-assistant": {
+      "x": 14.0,
+      "y": 420.0,
+      "width": 155.3,
+      "height": 40.0
+    },
+    "vehicle-cards": {
+      "x": 22.0,
+      "y": 486.0,
+      "width": 396.0,
+      "height": 354.0
+    },
+    "vehicle-card-family.ac": {
+      "x": 36.4,
+      "y": 490.3,
+      "width": 185.3,
+      "height": 189.3
+    },
+    "snowflake": {
+      "x": 183.3,
+      "y": 506.6,
+      "width": 22.1,
+      "height": 24.8
+    },
+    "vehicle-card-family.seat": {
+      "x": 234.0,
+      "y": 492.0,
+      "width": 168.0,
+      "height": 64.0
+    },
+    "carseat.left": {
+      "x": 242.7,
+      "y": 509.3,
+      "width": 24.3,
+      "height": 21.7
+    },
+    "chevron.right": {
+      "x": 384.0,
+      "y": 513.0,
+      "width": 9.0,
+      "height": 15.0
+    },
+    "vehicle-card-family.window": {
+      "x": 234.0,
+      "y": 564.0,
+      "width": 168.0,
+      "height": 64.0
+    },
+    "rectangle.split.3x1": {
+      "x": 243.3,
+      "y": 583.0,
+      "width": 23.3,
+      "height": 18.7
+    },
+    "vehicle-card-family.volume": {
+      "x": 234.0,
+      "y": 636.0,
+      "width": 168.0,
+      "height": 64.0
+    },
+    "speaker.wave.2": {
+      "x": 243.3,
+      "y": 655.3,
+      "width": 23.3,
+      "height": 17.7
+    },
+    "vehicle-card-family.ambient": {
+      "x": 38.0,
+      "y": 686.0,
+      "width": 182.0,
+      "height": 64.0
+    },
+    "lightbulb": {
+      "x": 52.3,
+      "y": 701.7,
+      "width": 13.7,
+      "height": 23.7
+    },
+    "vehicle-card-family.screen": {
+      "x": 234.0,
+      "y": 708.0,
+      "width": 168.0,
+      "height": 64.0
+    },
+    "display": {
+      "x": 243.0,
+      "y": 726.0,
+      "width": 24.3,
+      "height": 20.7
+    },
+    "vehicle-card-family.wiper": {
+      "x": 38.0,
+      "y": 758.0,
+      "width": 182.0,
+      "height": 64.0
+    },
+    "windshield.front.and.wiper": {
+      "x": 44.0,
+      "y": 776.0,
+      "width": 29.7,
+      "height": 21.0
+    },
+    "vehicle-card-family.door": {
+      "x": 234.0,
+      "y": 780.0,
+      "width": 168.0,
+      "height": 64.0
+    },
+    "door.left.hand.open": {
+      "x": 247.0,
+      "y": 797.7,
+      "width": 16.0,
+      "height": 21.3
+    },
+    "vehicle-card-family.sunroofShade": {
+      "x": 38.0,
+      "y": 830.0,
+      "width": 182.0,
+      "height": 64.0
+    },
+    "sun.max": {
+      "x": 47.7,
+      "y": 847.0,
+      "width": 22.3,
+      "height": 22.3
+    },
+    "vehicle-card-family.fragrance": {
+      "x": 38.0,
+      "y": 902.0,
+      "width": 182.0,
+      "height": 64.0
+    },
+    "leaf": {
+      "x": 48.3,
+      "y": 921.0,
+      "width": 21.3,
+      "height": 19.0
+    },
+    "mic-dock-safe-area": {
+      "x": 35.0,
+      "y": 888.0,
+      "width": 370.0,
+      "height": 42.0
+    }
+  },
+  "safe_area": {
+    "top": 0,
+    "bottom": 0
+  },
+  "proof_class": "simulator_ui_tree_from_xcuitest_log"
+}

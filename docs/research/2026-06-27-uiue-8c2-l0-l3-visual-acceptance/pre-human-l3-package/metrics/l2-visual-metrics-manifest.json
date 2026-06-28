@@ -1,0 +1,60 @@
+{
+  "generated_at_utc": "2026-06-27T16:08:55Z",
+  "repo": "/Users/wanglei/workspace/MAformac-uiue",
+  "head": "4a4aabbacf0736e5ff6f137be4de6cf5c6d37cb5",
+  "generator_script": "/Users/wanglei/workspace/MAformac-uiue/docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/scripts/generate-l2-visual-metrics.py",
+  "generator_command": "python3 /Users/wanglei/workspace/MAformac-uiue/docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/scripts/generate-l2-visual-metrics.py --package-dir docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package --head 4a4aabbacf0736e5ff6f137be4de6cf5c6d37cb5",
+  "metric_path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/metrics/l2-visual-metrics.json",
+  "screenshot_metadata_path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/metrics/screenshot-metadata.json",
+  "input_source": "L0 on-screen simctl screenshots",
+  "proof_class": "local_pixel_metric_from_simctl_screenshot",
+  "source_images": [
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+      "sha256": "40a0025ea64d77666afc9b4d2dd6d2517588dd56efc6d3e78d8732f8210bc710",
+      "bytes": 3039287,
+      "captured_by": "xcrun simctl io screenshot"
+    },
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/cold_start_ivory.png",
+      "sha256": "07ebadc59b2b40e6635e23afe3b149d9a6ffff1e92768357ea57887775fd776d",
+      "bytes": 3957791,
+      "captured_by": "xcrun simctl io screenshot"
+    },
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_deep_space.png",
+      "sha256": "0b7170dd32c9f55df9776ea70cca49635700b8ba9aa2008fe59aad9fd594d212",
+      "bytes": 3009707,
+      "captured_by": "xcrun simctl io screenshot"
+    },
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_ivory.png",
+      "sha256": "bc4bad443505989753113f0cfb34863fbf4b48bf16f864db7d6994e8e9c1b208",
+      "bytes": 3974995,
+      "captured_by": "xcrun simctl io screenshot"
+    },
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_heating_ivory.png",
+      "sha256": "783543d647a85355363e37e8edb4f29533ccf0e35b63f8d077a373c404a78bc4",
+      "bytes": 3960946,
+      "captured_by": "xcrun simctl io screenshot"
+    },
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/safety_refusal_ivory.png",
+      "sha256": "a020ffa736cf663aecbf46ca618d0b03648f9b0c49b5d8a3c204aa0d3d72cc7b",
+      "bytes": 3839361,
+      "captured_by": "xcrun simctl io screenshot"
+    },
+    {
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/u17_golden_path_deep_space.png",
+      "sha256": "6473de7b26ce3bbf412772be295f6595e3a61e3e974972abd56f76f767612562",
+      "bytes": 2998711,
+      "captured_by": "xcrun simctl io screenshot"
+    }
+  ],
+  "non_claims": [
+    "metrics are not L3 aesthetic verdict",
+    "metrics are not mobile/true_device proof",
+    "OCR engine was unavailable; UI tree text checks are separate evidence"
+  ]
+}

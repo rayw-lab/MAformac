@@ -31,6 +31,7 @@ struct ContextCapsuleView: View {
                 capsuleContent(phase: 0)
             }
         }
+        .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
     }
 
@@ -38,8 +39,6 @@ struct ContextCapsuleView: View {
         GeometryReader { proxy in
             let size = proxy.size
             ZStack {
-                capsuleShell
-
                 ZStack {
                     baseDioramaLayer(phase: phase)
                     sceneTint
@@ -49,26 +48,29 @@ struct ContextCapsuleView: View {
                     exhaustLayer(size: size, phase: phase)
                     glassHighlight(size: size, phase: phase)
                 }
-                .padding(5)
-                .clipShape(Capsule())
-                .overlay {
-                    Capsule()
-                        .strokeBorder(Color.white.opacity(theme == .ivory ? 0.62 : 0.26), lineWidth: 1.4)
-                }
+                .padding(0.5)
+                .compositingGroup()
+                .clipShape(Capsule(), style: FillStyle(antialiased: true))
                 .contentTransition(.opacity)
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.42), value: sceneKey)
+
+                capsuleChrome
             }
+            .compositingGroup()
+            .clipShape(Capsule(), style: FillStyle(antialiased: true))
+            .shadow(color: palette.softShadow.opacity(theme == .ivory ? 0.12 : 0.40), radius: 14, y: 8)
         }
     }
 
-    private var capsuleShell: some View {
+    private var capsuleChrome: some View {
         Capsule()
-            .fill(.regularMaterial)
-            .glassEffect()
+            .fill(Color.clear)
+            .glassEffect(.regular, in: Capsule())
+            .opacity(theme == .ivory ? 0.34 : 0.55)
             .overlay {
-                Capsule().strokeBorder(Color.white.opacity(theme == .ivory ? 0.64 : 0.24), lineWidth: 1)
+                Capsule().strokeBorder(Color.white.opacity(theme == .ivory ? 0.16 : 0.12), lineWidth: 0.8)
             }
-            .shadow(color: palette.softShadow.opacity(theme == .ivory ? 0.22 : 0.50), radius: 18, y: 10)
+            .allowsHitTesting(false)
     }
 
     @ViewBuilder
@@ -127,10 +129,10 @@ struct ContextCapsuleView: View {
 
         func body(content: Content) -> some View {
             content
-            .scaleEffect(1.035)
+            .scaleEffect(x: 1.03, y: 1.08, anchor: .center)
             .offset(
                 x: horizontalOffset,
-                y: isRainy ? 0.8 : 0
+                y: isRainy ? 0.2 : 0
             )
             .saturation(isRainy ? 0.82 : (theme == .ivory ? 1.10 : 0.76))
             .brightness(isNight ? -0.22 : (theme == .ivory ? 0.02 : -0.14))
@@ -309,13 +311,10 @@ struct ContextCapsuleView: View {
 
     private func glassHighlight(size: CGSize, phase: TimeInterval) -> some View {
         ZStack(alignment: .topLeading) {
-            Capsule()
-                .strokeBorder(Color.white.opacity(theme == .ivory ? 0.34 : 0.18), lineWidth: 0.8)
-
             Circle()
-                .fill(Color.white.opacity(theme == .ivory ? 0.74 : 0.30))
-                .frame(width: size.height * 0.44, height: size.height * 0.26)
-                .blur(radius: 5)
+                .fill(Color.white.opacity(theme == .ivory ? 0.42 : 0.22))
+                .frame(width: size.height * 0.34, height: size.height * 0.20)
+                .blur(radius: 4)
                 .offset(x: size.width * 0.045 + CGFloat(sin(phase * 0.25) * 2), y: size.height * 0.05)
         }
         .allowsHitTesting(false)

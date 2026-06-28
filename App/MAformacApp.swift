@@ -45,16 +45,17 @@ struct MAformacApp: App {
 
     private var mainView: some View {
         #if DEBUG
-        ContentView(
-            store: vehicleStore,
-            traceLogger: traceLogger,
-            speech: speech,
-            initialPreset: DebugLaunchArguments.mockSnapshot,
-            initialTheme: DebugLaunchArguments.mockTheme,
-            initialAmbientBurstColor: DebugLaunchArguments.ambientBurstColor,
-            initialContext: DebugLaunchArguments.mockContext,
-            contextCapsuleRoute: DebugLaunchArguments.contextCapsuleRoute
-        )
+            ContentView(
+                store: vehicleStore,
+                traceLogger: traceLogger,
+                speech: speech,
+                initialPreset: DebugLaunchArguments.mockSnapshot,
+                initialTheme: DebugLaunchArguments.mockTheme,
+                initialAmbientBurstColor: DebugLaunchArguments.ambientBurstColor,
+                initialContext: DebugLaunchArguments.mockContext,
+                contextCapsuleRoute: DebugLaunchArguments.contextCapsuleRoute,
+                forceReduceMotion: DebugLaunchArguments.forceReduceMotion
+            )
         #else
         ContentView(store: vehicleStore, traceLogger: traceLogger, speech: speech)
         #endif
@@ -77,6 +78,11 @@ enum DebugLaunchArguments {
     static var showAmbientBurst: Bool {
         ProcessInfo.processInfo.arguments.contains("-showAmbientBurst") ||
         ProcessInfo.processInfo.environment["SHOW_AMBIENT_BURST"] == "1"
+    }
+
+    static var forceReduceMotion: Bool {
+        ProcessInfo.processInfo.arguments.contains("-forceReduceMotion") ||
+        ProcessInfo.processInfo.environment["FORCE_REDUCE_MOTION"] == "1"
     }
 
     static var mockSnapshot: SnapshotPreset {

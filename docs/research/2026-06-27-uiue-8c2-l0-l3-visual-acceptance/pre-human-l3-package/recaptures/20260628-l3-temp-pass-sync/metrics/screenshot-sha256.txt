@@ -1,0 +1,5 @@
+c893663c3bc37a9cb634791bac3caf9fc804d026ec6df2bc2d6254ae107bb7e3  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/screenshots/l0-simctl/capsule_video_loop_deep_space.png
+ba0205800892e3b517ddaa16783ddfa4ac96e488eee907a8cdd2242797ea5132  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/screenshots/l0-simctl/main_cooling_deep_space.png
+b226ea09031d3c68738a9ed52c860185b4a018cafada13ca6e738b9d5cc1e7ac  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/screenshots/l0-simctl/main_cooling_ivory.png
+9fdc68ec0727900c0f9330d4bb480e934edacf76af2b11787a5f8108e288b01c  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/screenshots/l0-simctl/main_heating_deep_space.png
+a805ce44bfc02049e29cdf94e8c092ab2e1d121b920733e8b4a7aa671b348b77  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/screenshots/l0-simctl/main_heating_ivory.png

@@ -1,0 +1,30 @@
+{
+  "generated_at_utc": "2026-06-28T00:33:36Z",
+  "crop_regions": {
+    "top-stage": [
+      0,
+      0,
+      1320,
+      1450
+    ],
+    "ac-card": [
+      70,
+      1450,
+      720,
+      2100
+    ],
+    "capsule": [
+      190,
+      165,
+      1140,
+      520
+    ]
+  },
+  "strips": {
+    "continuous_stage_no_black_line": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/anchor-strip-continuous-stage-no-black-line-recapture-r2.png",
+    "cooling_vs_heating": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/anchor-strip-cooling-vs-heating-recapture-r2.png",
+    "capsule_diorama": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/anchor-strip-capsule-diorama-recapture-r2.png"
+  },
+  "generator": "inline PIL crop/strip generator recorded in command transcript; crop boxes are explicit here",
+  "supersedes": "20260628-l3-temp-pass-sync crops/strips because that first recapture did not terminate app before relaunch and reused one pid for multiple launch-arg cases"
+}
