@@ -14,6 +14,13 @@
 |---|---|
 | `docs/CURRENT.md` | **当前路由牌(router only,not SSOT)**:新窗口先看当前阶段/下一步/禁止动作/活跃 blockers;若与 CLAUDE/OpenSpec/grill 冲突则作废并更新 |
 | `docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md` | **UIUE 当前路线图基线**:post-8.C2 partial 后的后续顺序;先 8.C2 返修与交互真值门,再重跑 L0-L3,之后才 bridge/runtime 分线;仅路线图,不是实现计划或 OpenSpec SSOT |
+| `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/r3-evidence-index.md` | **UIUE 8.C2 R3 evidence index**:L3 `PASS_WITH_NOTES`、Reduce Motion simulator-debug-override 截图、VPA/orb 四态 presentation/mock proof、recapture r2 同步；不声明 V-PASS/mobile/true_device/runtime/voice/model |
+| `Reports/uiue-8c2-r3-closeout-20260628/closeout.md` | **UIUE 8.C2 R3 closeout receipt**:关闭 `8.C2` 的文档级联与验证/审计索引；只覆盖 simulator/mock visual-acceptance scope |
+| `docs/grill-tournament/uiue-r4-human-review-packet-2026-06-28.md` | **UIUE R4 人审前置包**:基于 R4 v2 50 条、R3 closeout/evidence、分类表和 residual 路由表；只供 R4 grill 人审，不是 R4 closeout |
+| `docs/grill-tournament/uiue-r4-burndown-2026-06-28.md` | **UIUE R4 burndown 立项 ledger**:R4 人审通过后将 C01-C50 具体化为 owner / artifact / fail-closed / status；非代码前置，不是实现 closeout |
+| `docs/grill-tournament/uiue-r4-mainline-coauthor-review-request-2026-06-28.md` | **UIUE R4 mainline co-author request**:mainline 只读探测 + bridge 共创问题清单；当前 pending，不伪造主线接受 |
+| `docs/grill-tournament/uiue-r4-pre-grill-classification-2026-06-28.md` | **UIUE R4 C01-C50 分类表**:50 行全覆盖，把每条路由到 bridge schema / visual policy / evidence checklist / mainline co-author / R5 deferred / user decision；C50 是治理总闸 |
+| `docs/grill-tournament/uiue-r3-residual-routing-to-r4-r5-2026-06-28.md` | **UIUE R3 residual 路由表**:runtime-driven orb、复杂推理、1.5s 长按、a11y、10-family、white-edge、Reduce Motion 等残缺按 R4/R5 分线，不假绿 |
 | `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` | **UIUE R0-R2 formal grill amendment authority**:70 项人审通过后的 canonical groups / decisions / hard gates / blocker map / cascade plan;不授权实现,不关闭 `8.C2`,不声明 V-PASS/mobile/true_device/runtime/voice/A-2 complete |
 | `docs/grill-tournament/uiue-r1-interaction-integrity-matrix-2026-06-27.md` | **UIUE R1 pre-UI interaction matrix**:从 live code 取证 family/value type/range/options/gesture/writeback/readback/proof/gap;只作 UI 改动前准备,不新增第三份 SSOT,不关闭 `8.C2` |
 | `docs/grill-tournament/uiue-r2b-layout-spacing-checker-spec-2026-06-27.md` | **UIUE R2b pre-UI layout checker spec**:定义 Layout Integrity / Visual Spacing receipt schema 和 Capsule/VPA proof split;只挡结构 bug,不签审美,不替代 L3 |

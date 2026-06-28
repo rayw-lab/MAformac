@@ -109,7 +109,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 8.C 验收（A-2 收口）
 - [x] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
-- [ ] 8.C2 visual-acceptance **L0-L3**（AD-15/U32-U37）：L0 on-screen simctl 真截图 + L1 zone sentinel PASS/WARN/FAIL + L2 OCR/contrast（SSIM 证据）+ **L3 人工 5-gate（米白/深空，~~投屏环境 V10~~ → 手持环境，投屏 DELETE C0）** + anchor-set 对比（连续舞台无黑线 / 制冷热 / capsule diorama）
+- [x] 8.C2 visual-acceptance **L0-L3**（AD-15/U32-U37）：L0 on-screen simctl 真截图 + L1 zone sentinel PASS/WARN/FAIL + L2 OCR/contrast（SSIM 证据）+ **L3 人工 5-gate（米白/深空，~~投屏环境 V10~~ → 手持环境，投屏 DELETE C0）** + anchor-set 对比（连续舞台无黑线 / 制冷热 / capsule diorama）
 
 > 2026-06-26 P2 outer-ring validation reran `swift test`, macOS `xcodebuild`, and `make verify-all`: all PASS. This reinforces `8.C1` only. `8.C2` stays open because visual-acceptance 5-gate and anchor-level human review are not closed. Closeout ledger: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`.
 
