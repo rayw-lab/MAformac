@@ -1,5 +1,5 @@
 ---
-status: pre_ui_preparation
+status: implementation_slice_partial
 artifact_kind: interaction_integrity_matrix
 date: 2026-06-27
 repo: /Users/wanglei/workspace/MAformac-uiue
@@ -20,9 +20,9 @@ non_claims:
 
 ## Verdict
 
-本文件是 UI 改动前的 R1 Interaction Integrity 准备工件。它把 live code 中已存在的 mapper / contract / view writeback / UI test 证据串成矩阵，作为后续实现和审计的入口。它不授权 UI 实现，不关闭 `8.C2`，也不把 simulator/local proof 升格为 L3 或产品验收。
+本文件是 UI 改动前到第一实现切片的 R1 Interaction Integrity 工件。它把 live code 中已存在的 mapper / contract / view writeback / UI test 证据串成矩阵，并链接本轮新增的 Core projection proof，作为后续实现和审计的入口。它不授权完整 UI 实现，不关闭 `8.C2`，也不把 simulator + local + unit proof 升格为 L3 或产品验收。
 
-`StateCellInteractionPolicy` 当前不是 Swift 实体；live repo 里只在 formal authority / OpenSpec / roadmap 文档中出现。若后续需要落地，只能做 consumer-side read-only projection，派生自既有 contract / mapper / catalog / store，不得在 view 层新增第三份 value / range / enum / readback SSOT。
+`StateCellInteractionPolicy` 第一实现 slice 已落为 Swift read-only projection：`Core/Presentation/StateCellInteractionPolicy.swift`。它只能作为 presentation consumer projection，派生自既有 contract / mapper / catalog / store，不得在 view 层新增第三份 value / range / enum / readback SSOT。验证入口：`swift test --filter StateCellInteractionPolicyTests`。
 
 `verify-uiue-interactions` 仍只是 UIUE scoped gate candidate。它不得直接进入全局 `make verify-all`；进入长期 gate 前必须另有 grill 决策，说明 owner、runtime cost、failure ownership 和 false-positive policy。
 
@@ -90,7 +90,7 @@ non_claims:
 | R1-GAP-003 | stepper drag | `StepperBarGestureLayer.setValue` implements drag, but current UI tests cover only left/right tap. | Add UI test or unit-level gesture mapping proof before claiming stepper drag coverage. |
 | R1-GAP-004 | ring edge cases | Ring tap and one drag path are covered, but cross-zero boundary and all percent/dial bases are not. | Add focused unit tests for `CircularControlGestureMapper.signedProgressDelta` plus at least one boundary UI smoke. |
 | R1-GAP-005 | read-only/process badge affordance | Unit tests prevent fake options for several read-only bases, but UI affordance screenshots/matrix are not complete. | Include read-only/process rows in the future matrix receipt and ensure no primary touch target is exposed for them. |
-| R1-GAP-006 | proof class escalation | UI test proof is simulator/local; no human L3 or product acceptance comes from this matrix. | Keep all closeouts explicit: `local/unit/simulator` only until L3 signs. |
+| R1-GAP-006 | proof class escalation | UI test proof is simulator/local; no human L3 or product acceptance comes from this matrix. | Keep all closeouts explicit: `local + unit + simulator` only until L3 signs. |
 | R1-GAP-007 | `verify-uiue-interactions` automation | No Makefile target exists and no gate decision has been signed. | Draft UIUE-only gate decision before adding automation; do not modify global `make verify-all` by default. |
 
 ## Pre-UI Checklist
@@ -101,3 +101,14 @@ non_claims:
 - Any writeback claim must prove the path reaches `DemoVehicleStateStore.applyMockTransition` and summary readback updates.
 - Any `proof_class` must match the evidence layer; simulator UI tests do not imply L3, mobile, true device, runtime readiness, or V-PASS.
 - `8.C2` remains open until the L0-L3 evidence package and human 5-gate verdict close it.
+
+## Implementation Receipt Link
+
+2026-06-27 R1/R2b first slice:
+
+- R1 projection: `Core/Presentation/StateCellInteractionPolicy.swift`
+- R1 unit proof: `Tests/MAformacCoreTests/StateCellInteractionPolicyTests.swift`
+- Receipt: `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/r1-r2b-implementation/README.md`
+- Burndown ledger: `docs/grill-tournament/uiue-r0-r2-grill-burndown-2026-06-27.md`
+
+Boundary: this only adds local + unit evidence for the projection and representative writeback/readback path. It does not claim full 10-family x all-value-type UI proof, stepper drag UI proof, a11y/44pt coverage, L3, `8.C2` closure, mobile, true-device, runtime-ready, voice-ready, or A-2 complete.

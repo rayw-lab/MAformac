@@ -1,5 +1,5 @@
 ---
-status: pre_ui_preparation
+status: implementation_slice_partial
 artifact_kind: layout_spacing_checker_spec
 date: 2026-06-27
 repo: /Users/wanglei/workspace/MAformac-uiue
@@ -20,9 +20,9 @@ non_claims:
 
 ## Verdict
 
-本文件定义 UI 改动前的 R2b 结构门准备口径。Layout Integrity / Visual Spacing 只能挡结构 bug：遮挡、留白/白边、zone budget、安全区、右侧按钮外置/对齐、胶囊居中、mic dock 遮挡、orb spacing / halo budget。它不能签审美，不能替代 L3，也不能关闭 `8.C2`。
+本文件定义 UI 改动前到第一实现切片的 R2b 结构门口径。Layout Integrity / Visual Spacing 只能挡结构 bug：遮挡、留白/白边、zone budget、安全区、右侧按钮外置/对齐、胶囊居中、mic dock 遮挡、orb spacing / halo budget。它不能签审美，不能替代 L3，也不能关闭 `8.C2`。
 
-本轮不新增 checker 脚本、不改 Swift / assets / UI tests。原因：OpenSpec 已有 gate/proof boundary；当前需要先冻结 checker 输入/输出 schema 和 proof split，避免 UI 改动时用截图主观描述替代结构 receipt。后续如实现脚本，建议先做 UIUE-scoped checker，不直接进入全局 `make verify-all`。
+本轮已新增 UIUE-scoped checker foundation：`Tools/checks/check-uiue-layout-spacing.py`，并生成 fixture receipt：`docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/r1-r2b-implementation/layout-spacing-receipt.json`。本轮仍不改 Swift UI / assets / UI tests；checker 暂不进入全局 `make verify-all`，只作为 local structural receipt foundation，避免用截图主观描述替代结构 receipt。
 
 ## Evidence Status Boundary
 
@@ -72,6 +72,16 @@ The checker must not consume GPT Image 2 / anchor images as geometry truth. Anch
 ```json
 {
   "status": "PASS|WARN|FAIL",
+  "threshold_source": {
+    "min_gap_points": {
+      "value": 8,
+      "source": "formal spec|checker spec|UI decision|measured baseline|explicit dispatch default"
+    },
+    "white_edge_pixel_threshold": {
+      "status": "BLOCKED_FOR_THRESHOLD",
+      "source": "not formalized yet"
+    }
+  },
   "proof_class": "local|simulator",
   "source_ui_tree": {
     "path": "docs/research/.../case-ui-tree.txt",
@@ -85,6 +95,13 @@ The checker must not consume GPT Image 2 / anchor images as geometry truth. Anch
     "scale": 3,
     "viewport_points": {"width": 430, "height": 932}
   },
+  "missing_identifiers": [
+    {
+      "identifier": "demo-orb",
+      "status": "FAIL",
+      "reason": "required target frame missing"
+    }
+  ],
   "overlap_pairs": [
     {
       "a": "refresh-control",
@@ -100,6 +117,7 @@ The checker must not consume GPT Image 2 / anchor images as geometry truth. Anch
       "axis": "x",
       "gap_points": 8,
       "threshold_points": 8,
+      "threshold_source": "explicit dispatch default or formalized checker spec source",
       "status": "PASS"
     }
   ],
@@ -142,6 +160,8 @@ The checker must not consume GPT Image 2 / anchor images as geometry truth. Anch
 | R2B-MIC-DOCK | `mic-dock-safe-area` does not cover final visible card row | bottom dock exclusion respected | dock occludes cards or creates dead tap zone | identifier exists in committed baseline at `App/ContentView.swift:199`; visual cases wait for it | no overlap pair receipt with cards. |
 | R2B-ORB-SPACING | `demo-orb` frame and halo budget stay within allocated zone | four states remain distinct and contained; halo does not swallow card/dialogue zone | halo too large, state copy overlaps, only one visible state | dirty worktree has distinct captions at `App/ContentView.swift:1221`; committed baseline has duplicate idle/listen caption at `App/ContentView.swift:1154` | no halo pixel radius or particle spill receipt. |
 
+If a threshold has not been formalized, the checker must report `WARN` or `BLOCKED_FOR_THRESHOLD`, not `PASS`. If any required target identifier is missing, the checker must emit `missing_identifiers` and return `FAIL`; absence of a target frame must not be hidden by unrelated white-edge warnings. Every threshold must cite a source: formal spec, this checker spec, UI design decision, measured baseline, or an explicit dispatch default.
+
 ## Capsule / VPA Proof Split
 
 | proof_stream | proves | source | cannot prove |
@@ -160,14 +180,30 @@ The checker must not consume GPT Image 2 / anchor images as geometry truth. Anch
 
 ## Minimal Future Checker Scope
 
-If a checker is added before UI implementation, keep it scoped:
+The first checker slice has been added and must stay scoped:
 
-- candidate path: `Tools/checks/check-uiue-layout-spacing.py`
+- path: `Tools/checks/check-uiue-layout-spacing.py`
 - inputs: UI tree text + screenshot metadata + optional crop directory
-- outputs: one JSON receipt matching the schema above
+- outputs: one JSON receipt matching the schema above, including `missing_identifiers` and `threshold_source`
+- missing required identifiers: emit `missing_identifiers`, set status `FAIL`, and exit non-zero
 - owner: UIUE test owner
 - proof class: `local` for parser-only; `simulator` only when fed fresh simulator screenshot/UI tree
 - non-goal: no aesthetic score, no L3 verdict, no global `make verify-all` integration without separate grill decision
+
+2026-06-27 local fixture receipt:
+
+- Receipt: `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/r1-r2b-implementation/layout-spacing-receipt.json`
+- Status: `WARN`, because white-edge leakage remains `BLOCKED_FOR_THRESHOLD` until edge-pixel threshold and real crop evidence are formalized.
+- Negative receipt: `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/r1-r2b-implementation/layout-spacing-missing-target-receipt.json` proves a missing required target frame returns `FAIL`.
+- Proof class: `local`; this does not close `8.C2`.
+
+2026-06-27 pre-human L3 fresh receipt:
+
+- Receipt: `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/metrics/l1-r2b-layout-spacing-fresh-receipt.json`
+- Source UI tree: `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/metrics/main_cooling_deep_space-ui-tree-frames.json`, extracted from `UIC2VisualAcceptanceUITests` simulator log.
+- Status: `WARN`; `missing_identifiers=0`, `overlap_pairs` has no FAIL, `safe_area_violations=0`; only white-edge threshold remains unresolved.
+- Checker refinement in the pre-human L3 run: settings/refresh vertical stack uses a compact `control_stack_gap_points` threshold, and vehicle-card frames are clipped to the `vehicle-cards` ScrollView viewport before overlap/zone checks. This prevents false FAIL from legal compact controls and offscreen scroll content while keeping required identifiers and visible overlap fail-closed.
+- Proof class: `input_source=simulator_ui_tree; evaluation_proof_class=local_checker`; this still does not sign L3 aesthetics or close `8.C2`.
 
 ## Pre-UI Checklist
 
