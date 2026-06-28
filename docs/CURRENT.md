@@ -59,14 +59,17 @@ Current planning object:
 8. `openspec/changes/rebuild-c6-four-layer-bench/` - active C6 carrier history and future candidate-comparison lane boundaries.
 9. `openspec/changes/retrain-c5-lora-d-domain/` - downstream C5 retrain draft, not execution authorization.
 10. `openspec/changes/ui-presentation/` - UIUE presentation contract context, not mainline merge proof.
+11. `openspec/changes/define-runtime-presentation-bridge/` - active contract-only Runtime -> Presentation bridge carrier; mainline mapping authority for UIUE provenance, not runtime proof.
+12. `docs/project/phase0/mainline-runtime-presentation-bridge-unblock-2026-06-28.md` - Phase 0 owner-gate unblock receipt for C01/C03/C06/C18.
 
 ## Do Now
 
-1. Grill and accept or revise the post-C6 parent roadmap.
-2. If accepted, propose a thin `define-runtime-presentation-bridge` OpenSpec carrier before runtime/backend/UIUE implementation.
+1. Keep the thin `define-runtime-presentation-bridge` OpenSpec carrier as the active contract-only Runtime -> Presentation mapping authority.
+2. Treat UIUE bridge documents as candidate/provenance inputs unless referenced through the mainline carrier.
 3. Split downstream work into child plans for C5 retrain, C6 acceptance/comparison, iOS/macOS runtime backend, and demo-golden/voice/UIUE connection.
 4. Keep full runtime/backend implementation after bridge contract acceptance and aligned with model/C6 proof.
 5. Keep UIUE isolated unless state cells, C3-C6 fields, readback metadata, golden IDs, or bridge fields intersect.
+6. UIUE may update R5 readiness only after this carrier/owner receipt commit exists, and only to dispatch readiness with proof-class notes.
 
 ## Do Not Do
 
@@ -84,7 +87,7 @@ Current planning object:
 | Gate | Status | Required Next Evidence |
 |---|---|---|
 | Parent roadmap | local_docs_plan_architecture_audit_code_fixes_absorbed | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`; code-level C6 bench/source-free audit findings are absorbed but do not upgrade proof class. |
-| Runtime-Presentation bridge | not_proposed | Create and validate `openspec/changes/define-runtime-presentation-bridge/`; contract-only first. |
+| Runtime-Presentation bridge | proposed_active_contract_only | `openspec/changes/define-runtime-presentation-bridge/` validates as the mainline-visible carrier; closes C01/C03/C06/C18 for dispatch readiness only, not runtime/mobile/model proof. |
 | C5 retrain | deferred | Requires accepted C5 child plan, physical entry gates, data generation authorization, and separate training proof. |
 | C6 acceptance/comparison | deferred | Requires signed C5 candidate and explicit run authorization; Long-run 2 shape evidence is insufficient. |
 | Runtime backend | deferred_but_not_absent | Thin bridge contract may proceed first; full backend implementation waits for accepted bridge plan and model/C6 alignment. |
