@@ -1,10 +1,11 @@
 ---
-status: R5_PRECONDITIONS_BLOCKED
+status: R5_PRECONDITIONS_READY_WITH_NOTES
 artifact_kind: r5_readiness_handoff
 date: 2026-06-28
 repo: /Users/wanglei/workspace/MAformac-uiue
 branch: uiue/phase4-default-scope-presentation
-head: 5d3df555d80b949df4bd1bb23773e218dd95daf0
+head_before_update: eed57f4109c851ea93a7ede7488cb50a0090c2f1
+mainline_unblock_commit: 9ba609a13fdf311546f20561081c4a9bb858d0fc
 proof_class_ceiling: docs/local + local + unit + simulator/mock
 verdict_scope: dispatch_readiness_only
 non_claims: [not mainline runtime acceptance, not mobile proof, not true_device proof, not V-PASS, not voice-ready, not model-ready, not golden-ready, not endpoint-ready]
@@ -14,21 +15,32 @@ non_claims: [not mainline runtime acceptance, not mobile proof, not true_device 
 
 ## Verdict
 
-`R5_PRECONDITIONS_BLOCKED`
+`R5_PRECONDITIONS_READY_WITH_NOTES`
 
-## Why Blocked
+This is **dispatch readiness only**. It allows R5 lane planning to start, but it does not implement R5 and does not upgrade any UIUE proof beyond the recorded ceiling.
 
-1. C01/C03/C06/C18 are still `deferred_with_owner_trigger` in Step 1 receipt and Step 4 ledger.
-2. mainline live truth is still `Runtime-Presentation bridge | not_proposed`, and mainline bridge carrier directory is still missing.
-3. `scope_origin=missing` remains a candidate decision, not a mainline-accepted Core enum route.
+## What Changed
+
+1. Mainline commit `9ba609a13fdf311546f20561081c4a9bb858d0fc` (`docs(mainline): unblock runtime presentation bridge gate`) landed the mainline-visible carrier at `/Users/wanglei/workspace/MAformac/openspec/changes/define-runtime-presentation-bridge/`.
+2. Mainline unblock receipt `/Users/wanglei/workspace/MAformac/docs/project/phase0/mainline-runtime-presentation-bridge-unblock-2026-06-28.md` closes C01/C03/C06/C18 for dispatch readiness.
+3. Mainline route board now records `Runtime-Presentation bridge | proposed_active_contract_only`.
+4. Mainline contract explicitly caps UIUE R5 to `R5_PRECONDITIONS_READY_WITH_NOTES` and forbids runtime/mobile/true_device/voice/model/golden/endpoint/V-PASS/S-PASS/U-PASS claims.
+
+## Remaining Notes
+
+- C01/C03/C06/C18 are closed only for R5 dispatch readiness.
+- Core `ScopeOrigin` is not extended with a locked `missing` case; missing or unresolved scope remains represented through presentation/result metadata or explicit failure reason.
+- UIUE remains a consumer/provenance lane. The mainline carrier is the current authority for this unblock.
+- The old Step 1 co-author receipt is superseded by the mainline unblock receipt above.
 
 ## What This Verdict Means
 
-- It blocks **starting R5 as an execution phase**.
+- It permits R5 scheme/lane planning and dispatch preparation to start.
+- It does **not** mark R5 execution complete.
 - It does **not** erase the R5 lane backlog already identified.
 - It does **not** upgrade any UIUE local proof into runtime/mainline/mobile/true-device readiness.
 
-## Candidate R5 Lanes Once Blockers Clear
+## Candidate R5 Lanes
 
 - runtime-driven orb binding
 - complex reasoning -> `think`
@@ -37,16 +49,10 @@ non_claims: [not mainline runtime acceptance, not mobile proof, not true_device 
 - voice lane
 - model/golden lane
 
-## Immediate Unblock Trigger
+## Required Inputs For R5 Planning
 
-- Obtain a mainline-visible owner decision that settles:
-  - whether UIUE bridge can be adopted as shared authority
-  - whether a mainline-visible carrier is required and how it avoids second SSOT
-  - how `scope_origin=missing` is handled
-
-## Required Inputs For Next Attempt
-
-- `/Users/wanglei/workspace/MAformac/docs/project/phase0/uiue-r4-mainline-coauthor-receipt-2026-06-28.md`
+- `/Users/wanglei/workspace/MAformac/docs/project/phase0/mainline-runtime-presentation-bridge-unblock-2026-06-28.md`
+- `/Users/wanglei/workspace/MAformac/openspec/changes/define-runtime-presentation-bridge/specs/runtime-presentation-bridge/spec.md`
 - `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-r4-exit-burndown-2026-06-28.md`
 - `/Users/wanglei/workspace/MAformac-uiue/Reports/uiue-r4-closeout-20260628/closeout.md`
 - `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-r4-human-review-checklist-before-r5-2026-06-28.md`
