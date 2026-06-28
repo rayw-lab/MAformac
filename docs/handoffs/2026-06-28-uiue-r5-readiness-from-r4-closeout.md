@@ -40,6 +40,12 @@ This is **dispatch readiness only**. It allows R5 lane planning to start, but it
 - It does **not** erase the R5 lane backlog already identified.
 - It does **not** upgrade any UIUE local proof into runtime/mainline/mobile/true-device readiness.
 
+## Post-Readiness Consumer Grill
+
+- Phase1 consumer-line grill receipt: `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-r5-phase1-consumer-grill-2026-06-28.md`.
+- Verdict: `PASS_WITH_NOTES` for docs/local consumer mapping and lane classification only.
+- Main constraint preserved: UIUE may consume mainline bridge vocabulary and existing local/mock result mapping, but it must not mint new shared field names before mainline Phase1 field/type verdict.
+
 ## Candidate R5 Lanes
 
 - runtime-driven orb binding

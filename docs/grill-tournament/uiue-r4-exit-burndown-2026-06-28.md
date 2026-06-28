@@ -103,3 +103,4 @@ non_claims: [no V-PASS, no mobile, no true_device, no runtime-ready, no voice-re
 2. Step 4 不把 Step 2 local proof pack 升格成 runtime/mobile/true_device/mainline acceptance。
 3. Step 4 不把 Step 3 residual 改写成“已完成”；只把它们变成后续 lane/backlog 的清晰入口。
 4. 若 Step 5/6 要引用本 ledger，必须同时保留 proof class 与 non-claims。
+5. Phase1 consumer grill receipt `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-r5-phase1-consumer-grill-2026-06-28.md` 只新增 docs/local consumer mapping 与 lane classification；不改变本 ledger 的 runtime/mobile/true_device/V-PASS non-claims。
