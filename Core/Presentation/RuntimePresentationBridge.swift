@@ -150,6 +150,33 @@ public enum PresentationOrbDisplayState: String, Codable, CaseIterable, Equatabl
     case speak
 }
 
+private enum PresentationPayloadSanitizer {
+    static let redactedTokens = [
+        "DemoRuntimeAdapter",
+        "RuntimeAdapterBox",
+        "requestFingerprint",
+        "parentRequestFingerprint",
+        "failureLedger",
+        "successLedger",
+        "settledParentPlan",
+        "runtimeStore",
+        "rawModelOutput",
+        "trainingReceipt"
+    ]
+
+    static func redacted(_ value: String, maxLength: Int = 160) -> String {
+        var safeValue = value
+        for token in redactedTokens where safeValue.contains(token) {
+            safeValue = safeValue.replacingOccurrences(of: token, with: "[redacted]")
+        }
+        return String(safeValue.prefix(maxLength))
+    }
+
+    static func redactedOptional(_ value: String?, maxLength: Int = 160) -> String? {
+        value.map { redacted($0, maxLength: maxLength) }
+    }
+}
+
 public struct TraceEnvelope: Codable, Equatable, Sendable {
     public let traceID: String
     public private(set) var entries: [TraceEntry]
@@ -190,11 +217,34 @@ public struct TraceEnvelope: Codable, Equatable, Sendable {
     }
 
     public func presentationSafe(
-        redactedTokens: [String] = ["rawModelOutput", "trainingReceipt", "runtimeStore"],
+        redactedTokens: [String] = [
+            "DemoRuntimeAdapter",
+            "RuntimeAdapterBox",
+            "requestFingerprint",
+            "parentRequestFingerprint",
+            "failureLedger",
+            "successLedger",
+            "settledParentPlan",
+            "runtimeStore",
+            "rawModelOutput",
+            "trainingReceipt"
+        ],
         maxMessageLength: Int = 160
     ) -> TraceEnvelope {
+        let safeTraceID = TraceAttributes.redacted(
+            traceID,
+            redactedTokens: redactedTokens,
+            maxMessageLength: maxMessageLength
+        )
         let safeEntries = entries.map { entry in
             var copy = entry
+            copy.traceID = safeTraceID
+            copy.runId = copy.runId.map {
+                TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+            }
+            copy.parentSpanId = copy.parentSpanId.map {
+                TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+            }
             var message = copy.message
             for token in redactedTokens where message.contains(token) {
                 message = message.replacingOccurrences(of: token, with: "[redacted]")
@@ -206,7 +256,7 @@ public struct TraceEnvelope: Codable, Equatable, Sendable {
             )
             return copy
         }
-        return TraceEnvelope(validatedTraceID: traceID, entries: safeEntries)
+        return TraceEnvelope(validatedTraceID: safeTraceID, entries: safeEntries)
     }
 
     public init(from decoder: any Decoder) throws {
@@ -357,6 +407,152 @@ public struct PresentationSnapshot: Codable, Equatable, Sendable {
     }
 }
 
+public enum RuntimePresentationPayloadSchema: String, Codable, CaseIterable, Equatable, Sendable {
+    case v1 = "r5_runtime_presentation_payload_v1"
+}
+
+public enum PresentationReconciliationStatus: String, Codable, CaseIterable, Equatable, Sendable {
+    case verified
+    case mismatch
+    case unavailable
+    case notApplicable = "not_applicable"
+}
+
+public enum PresentationReconciliationMismatchClass: String, Codable, CaseIterable, Equatable, Sendable {
+    case missingReadback = "missing_readback"
+    case valueMismatch = "value_mismatch"
+    case revisionRegression = "revision_regression"
+    case scopeMismatch = "scope_mismatch"
+    case unknown
+}
+
+public struct PresentationReconciliation: Codable, Equatable, Sendable {
+    public var status: PresentationReconciliationStatus
+    public var readbackKey: String?
+    public var mismatchClass: PresentationReconciliationMismatchClass?
+    public var safeReason: String?
+
+    public init(
+        status: PresentationReconciliationStatus,
+        readbackKey: String? = nil,
+        mismatchClass: PresentationReconciliationMismatchClass? = nil,
+        safeReason: String? = nil
+    ) {
+        self.status = status
+        self.readbackKey = readbackKey.map { PresentationPayloadSanitizer.redacted($0) }
+        self.mismatchClass = mismatchClass
+        self.safeReason = PresentationPayloadSanitizer.redactedOptional(safeReason)
+    }
+}
+
+public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
+    public var schemaVersion: RuntimePresentationPayloadSchema
+    public var traceID: String
+    public var turnID: String
+    public var eventID: String?
+    public var isTerminal: Bool
+    public var outcome: DemoRuntimeOutcome
+    public var proofClass: PresentationProofClass
+    public var cards: [DemoVehicleStateCell]
+    public var cardSemantics: [PresentationCardSemantics]?
+    public var readbacks: [DemoActionReadback]
+    public var reconciliation: PresentationReconciliation
+    public var traceEnvelope: TraceEnvelope?
+    public var timestamp: Date
+
+    public init(
+        schemaVersion: RuntimePresentationPayloadSchema = .v1,
+        traceID: String,
+        turnID: String,
+        eventID: String? = nil,
+        isTerminal: Bool,
+        outcome: DemoRuntimeOutcome,
+        proofClass: PresentationProofClass,
+        cards: [DemoVehicleStateCell],
+        cardSemantics: [PresentationCardSemantics]? = nil,
+        readbacks: [DemoActionReadback] = [],
+        reconciliation: PresentationReconciliation,
+        traceEnvelope: TraceEnvelope? = nil,
+        timestamp: Date = Date()
+    ) {
+        self.schemaVersion = schemaVersion
+        self.traceID = PresentationPayloadSanitizer.redacted(traceID)
+        self.turnID = PresentationPayloadSanitizer.redacted(turnID)
+        self.eventID = eventID.map { PresentationPayloadSanitizer.redacted($0) }
+        self.isTerminal = isTerminal
+        self.outcome = RuntimePresentationPayload.presentationSafe(outcome)
+        self.proofClass = proofClass
+        self.cards = cards.map(RuntimePresentationPayload.presentationSafe)
+        self.cardSemantics = cardSemantics?.map(RuntimePresentationPayload.presentationSafe)
+        self.readbacks = readbacks.map(RuntimePresentationPayload.presentationSafe)
+        self.reconciliation = reconciliation
+        self.traceEnvelope = traceEnvelope?.presentationSafe()
+        self.timestamp = timestamp
+    }
+
+    public init(
+        snapshot: PresentationSnapshot,
+        turnID: String,
+        eventID: String? = nil,
+        reconciliation: PresentationReconciliation
+    ) {
+        self.init(
+            traceID: snapshot.traceID,
+            turnID: turnID,
+            eventID: eventID,
+            isTerminal: snapshot.isTerminal,
+            outcome: snapshot.runtimeOutcome,
+            proofClass: snapshot.proofClass,
+            cards: snapshot.cards,
+            cardSemantics: snapshot.cardSemantics,
+            readbacks: snapshot.readbacks,
+            reconciliation: reconciliation,
+            traceEnvelope: snapshot.traceEnvelope,
+            timestamp: snapshot.timestamp
+        )
+    }
+
+    private static func presentationSafe(_ outcome: DemoRuntimeOutcome) -> DemoRuntimeOutcome {
+        DemoRuntimeOutcome(
+            result: outcome.result,
+            behaviorClassSource: outcome.behaviorClassSource,
+            reason: PresentationPayloadSanitizer.redactedOptional(outcome.reason),
+            missingSlot: PresentationPayloadSanitizer.redactedOptional(outcome.missingSlot),
+            scopeFailureReason: PresentationPayloadSanitizer.redactedOptional(outcome.scopeFailureReason)
+        )
+    }
+
+    private static func presentationSafe(_ cell: DemoVehicleStateCell) -> DemoVehicleStateCell {
+        DemoVehicleStateCell(
+            key: PresentationPayloadSanitizer.redacted(cell.key),
+            actualValue: PresentationPayloadSanitizer.redacted(cell.actualValue),
+            revision: cell.revision,
+            visualState: cell.visualState
+        )
+    }
+
+    private static func presentationSafe(_ semantics: PresentationCardSemantics) -> PresentationCardSemantics {
+        PresentationCardSemantics(
+            cellKey: PresentationPayloadSanitizer.redacted(semantics.cellKey),
+            role: semantics.role,
+            scopeOrigin: semantics.scopeOrigin,
+            reason: PresentationPayloadSanitizer.redactedOptional(semantics.reason),
+            isActive: semantics.isActive,
+            siblingKeys: semantics.siblingKeys.map { PresentationPayloadSanitizer.redacted($0) }
+        )
+    }
+
+    private static func presentationSafe(_ readback: DemoActionReadback) -> DemoActionReadback {
+        DemoActionReadback(
+            key: PresentationPayloadSanitizer.redacted(readback.key),
+            actualValue: PresentationPayloadSanitizer.redacted(readback.actualValue),
+            revision: readback.revision,
+            spokenText: PresentationPayloadSanitizer.redacted(readback.spokenText),
+            scopeOrigin: readback.scopeOrigin
+        )
+    }
+}
+
 public enum TerminalSnapshotStopReason: String, Codable, CaseIterable, Equatable, Sendable {
     case cancelled
     case interrupted
@@ -502,7 +698,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         return String(safeReason.prefix(160))
     }
 
-    private static let unsafeReasonTokens = ["rawModelOutput", "trainingReceipt", "runtimeStore"]
+    private static let unsafeReasonTokens = PresentationPayloadSanitizer.redactedTokens
 }
 
 private extension TraceAttributes {

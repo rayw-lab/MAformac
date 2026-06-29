@@ -358,6 +358,150 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(snapshot.cardSemantics?.first?.isActive, true)
     }
 
+    func testRuntimePresentationPayloadCarriesStableEnvelopeOutcomeReadbacksAndReconciliation() throws {
+        let timestamp = Date(timeIntervalSince1970: 1_800_000_050)
+        let snapshot = PresentationSnapshot(
+            traceID: "trace-payload",
+            runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
+            cards: [
+                DemoVehicleStateCell(key: "ac.power", actualValue: "on", revision: 2, visualState: .satisfied)
+            ],
+            cardSemantics: [
+                PresentationCardSemantics(
+                    cellKey: "ac.power",
+                    role: .accepted,
+                    scopeOrigin: .explicit,
+                    reason: "user_requested",
+                    isActive: true
+                )
+            ],
+            readbacks: [
+                DemoActionReadback(
+                    key: "ac.power",
+                    actualValue: "on",
+                    revision: 2,
+                    spokenText: "空调已打开",
+                    scopeOrigin: .explicit
+                )
+            ],
+            proofClass: .localUnit,
+            isTerminal: true,
+            timestamp: timestamp
+        )
+
+        let payload = RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: "turn-1",
+            eventID: "event-1",
+            reconciliation: PresentationReconciliation(
+                status: .verified,
+                readbackKey: "ac.power",
+                safeReason: "readback_verified"
+            )
+        )
+        let decoded = try JSONDecoder().decode(RuntimePresentationPayload.self, from: JSONEncoder().encode(payload))
+
+        XCTAssertEqual(decoded.schemaVersion, .v1)
+        XCTAssertEqual(decoded.traceID, "trace-payload")
+        XCTAssertEqual(decoded.turnID, "turn-1")
+        XCTAssertEqual(decoded.eventID, "event-1")
+        XCTAssertTrue(decoded.isTerminal)
+        XCTAssertEqual(decoded.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(decoded.proofClass, .localUnit)
+        XCTAssertEqual(decoded.cards.first?.key, "ac.power")
+        XCTAssertEqual(decoded.cardSemantics?.first?.role, .accepted)
+        XCTAssertEqual(decoded.readbacks.first?.spokenText, "空调已打开")
+        XCTAssertEqual(decoded.reconciliation.status, .verified)
+        XCTAssertEqual(decoded.reconciliation.readbackKey, "ac.power")
+    }
+
+    func testRuntimePresentationPayloadRedactsPrivateAdapterAndRawMarkersFromEncoding() throws {
+        let traceEntry = TraceEntry(
+            stage: .readback,
+            traceID: "trace-requestFingerprint",
+            runId: "run-RuntimeAdapterBox",
+            parentSpanId: "span-failureLedger",
+            message: "DemoRuntimeAdapter RuntimeAdapterBox requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore",
+            attributes: TraceAttributes(
+                stopReason: "RuntimeAdapterBox",
+                guardReason: "failureLedger runtimeStore"
+            ),
+            timestamp: Date(timeIntervalSince1970: 1_800_000_060)
+        )
+        let snapshot = PresentationSnapshot(
+            traceID: "trace-requestFingerprint",
+            runtimeOutcome: DemoRuntimeOutcome(
+                result: .runtimeError,
+                reason: "DemoRuntimeAdapter parentRequestFingerprint rawModelOutput",
+                missingSlot: "failureLedger",
+                scopeFailureReason: "trainingReceipt runtimeStore"
+            ),
+            cards: [
+                DemoVehicleStateCell(
+                    key: "RuntimeAdapterBox",
+                    actualValue: "requestFingerprint",
+                    revision: 1,
+                    visualState: .unknown
+                )
+            ],
+            cardSemantics: [
+                PresentationCardSemantics(
+                    cellKey: "failureLedger",
+                    role: .context,
+                    reason: "settledParentPlan successLedger"
+                )
+            ],
+            readbacks: [
+                DemoActionReadback(
+                    key: "parentRequestFingerprint",
+                    actualValue: "rawModelOutput",
+                    revision: 1,
+                    spokenText: "trainingReceipt",
+                    scopeOrigin: .explicit
+                )
+            ],
+            proofClass: .localUnit,
+            traceEnvelope: try XCTUnwrap(TraceEnvelope(traceID: "trace-requestFingerprint", entries: [traceEntry])),
+            isTerminal: true
+        )
+
+        let payload = RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: "turn-requestFingerprint",
+            eventID: "event-failureLedger",
+            reconciliation: PresentationReconciliation(
+                status: .mismatch,
+                readbackKey: "failureLedger",
+                mismatchClass: .valueMismatch,
+                safeReason: "RuntimeAdapterBox rawModelOutput"
+            )
+        )
+        let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+
+        for forbidden in [
+            "DemoRuntimeAdapter",
+            "RuntimeAdapterBox",
+            "requestFingerprint",
+            "parentRequestFingerprint",
+            "failureLedger",
+            "successLedger",
+            "settledParentPlan",
+            "runtimeStore",
+            "rawModelOutput",
+            "trainingReceipt"
+        ] {
+            XCTAssertFalse(encoded.contains(forbidden), "encoded payload leaked \(forbidden)")
+        }
+        XCTAssertTrue(encoded.contains("[redacted]"))
+    }
+
+    func testRuntimePresentationPayloadEnumsFailClosedForUnknownReconciliationAndProofClass() {
+        XCTAssertThrowsError(try JSONDecoder().decode(PresentationReconciliationStatus.self, from: Data(#""runtime_ready""#.utf8)))
+        XCTAssertThrowsError(try JSONDecoder().decode(PresentationReconciliationMismatchClass.self, from: Data(#""failureLedger""#.utf8)))
+        XCTAssertThrowsError(try JSONDecoder().decode(RuntimePresentationPayloadSchema.self, from: Data(#""v2_unreviewed""#.utf8)))
+        XCTAssertThrowsError(try JSONDecoder().decode(PresentationProofClass.self, from: Data(#""true_device_ready""#.utf8)))
+    }
+
     private struct UnsafeTraceEnvelope: Codable {
         var traceID: String
         var entries: [TraceEntry]
