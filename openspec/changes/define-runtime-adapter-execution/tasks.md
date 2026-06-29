@@ -47,13 +47,13 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 6. D13 Gate 2 Main C3 Runtime Adapter Integration Code
 
-- [ ] 6.1 Reconfirm Gate 1 Hermes PASS before Swift edits.
-- [ ] 6.2 Run GitNexus impact before touching any Swift symbol, and require extra audit for any touched HIGH/CRITICAL symbol.
-- [ ] 6.3 Integrate Runtime Adapter V0 into `C3ExecutionPipeline` without editing `ToolCallFrame`.
-- [ ] 6.4 Add local/unit tests for C3 adapter routing, per-transition identity, retry replay, conflict fail-closed, and failed-attempt no-success-ledger behavior.
-- [ ] 6.5 Validate with target Swift tests, `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, and `openspec validate --all --strict`.
-- [ ] 6.6 Run GitNexus `detect_changes(scope=staged)` before commit.
-- [ ] 6.7 Run Hermes Gate 2 audit and require `HERMES_R5_D13_GATE_2_C3_INTEGRATION_VERDICT: PASS`.
+- [x] 6.1 Reconfirm Gate 1 Hermes PASS before Swift edits.
+- [x] 6.2 Run GitNexus impact before touching any Swift symbol, and require extra audit for any touched HIGH/CRITICAL symbol.
+- [x] 6.3 Integrate Runtime Adapter V0 into `C3ExecutionPipeline` without editing `ToolCallFrame`.
+- [x] 6.4 Add local/unit tests for C3 adapter routing, per-transition identity, retry replay, conflict fail-closed, and failed-attempt no-success-ledger behavior.
+- [x] 6.5 Validate with target Swift tests, `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, and `openspec validate --all --strict`.
+- [x] 6.6 Run GitNexus `detect_changes(scope=staged)` before commit.
+- [x] 6.7 Run Hermes Gate 2 audit and require `HERMES_R5_D13_GATE_2_C3_INTEGRATION_VERDICT: PASS`.
 
 ## 7. D13 Gate 3 UIUE Boundary Guard
 

@@ -105,6 +105,118 @@ final class C3ExecutionPipelineTests: XCTestCase {
         XCTAssertEqual(result.readbacks.first?.revision, revisionAfterFirstWrite)
     }
 
+    @MainActor
+    func testC3RetryReplayUsesAdapterLedgerWithoutSecondWrite() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-window-driver",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try pipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+
+        let retry = ToolCallFrame.fixture(
+            id: "cmd-window-driver",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: store.currentRevision
+        )
+        let result = try pipeline.execute(retry, store: store, traceLogger: InMemoryTraceLogger())
+
+        let cellAfterRetry = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+        XCTAssertEqual(cellAfterRetry.revision, cellAfterFirst.revision)
+        XCTAssertEqual(cellAfterRetry.timestamp, cellAfterFirst.timestamp)
+        XCTAssertEqual(result.readbacks.first?.revision, cellAfterFirst.revision)
+    }
+
+    @MainActor
+    func testC3SameCommandIdentityWithDifferentRequestFailsClosed() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-window-conflict",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "主驾"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "30", type: "PERCENT"),
+            stateRevision: 0
+        )
+
+        _ = try pipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+
+        let conflicting = ToolCallFrame.fixture(
+            id: "cmd-window-conflict",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "主驾"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "60", type: "PERCENT"),
+            stateRevision: store.currentRevision
+        )
+
+        XCTAssertThrowsError(try pipeline.execute(conflicting, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .idempotencyConflict(commandID: "cmd-window-conflict#window.position[主驾]"))
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "30")
+    }
+
+    @MainActor
+    func testC3PerTransitionIdentityKeepsFanoutFromConflicting() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let frame = ToolCallFrame.fixture(
+            id: "cmd-window-fanout",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "全车"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "45", type: "PERCENT"),
+            stateRevision: 0
+        )
+
+        let result = try pipeline.execute(frame, store: store, traceLogger: InMemoryTraceLogger())
+
+        XCTAssertEqual(Set(result.readbacks.map(\.key)), Set([
+            "window.position[主驾]",
+            "window.position[副驾]",
+            "window.position[左后]",
+            "window.position[右后]"
+        ]))
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "45")
+        XCTAssertEqual(store.cell(for: "window.position[副驾]")?.actualValue, "45")
+        XCTAssertEqual(store.cell(for: "window.position[左后]")?.actualValue, "45")
+        XCTAssertEqual(store.cell(for: "window.position[右后]")?.actualValue, "45")
+    }
+
+    @MainActor
+    func testC3AdapterFailureDoesNotCreateSuccessLedger() throws {
+        let cells = DemoVehicleStateStore.defaultCells().filter { $0.key != "window.position[主驾]" }
+        let brokenStore = DemoVehicleStateStore(cells: cells)
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let frame = ToolCallFrame.fixture(
+            id: "cmd-window-missing-cell",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try pipeline.execute(frame, store: brokenStore, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .missingStateCell("window.position[主驾]"))
+        }
+
+        let repairedStore = DemoVehicleStateStore()
+        let result = try pipeline.execute(frame, store: repairedStore, traceLogger: InMemoryTraceLogger())
+
+        XCTAssertEqual(result.readbacks.first?.key, "window.position[主驾]")
+        XCTAssertEqual(result.readbacks.first?.actualValue, "100")
+        XCTAssertEqual(repairedStore.cell(for: "window.position[主驾]")?.actualValue, "100")
+    }
+
     func testOmittedWindowScopeResolvesToC2DefaultScope() throws {
         let pipeline = try makePipeline(intentConfirmed: true)
         let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "window.position"))
@@ -251,6 +363,7 @@ final class C3ExecutionPipelineTests: XCTestCase {
 
 private extension ToolCallFrame {
     static func fixture(
+        id: String = UUID().uuidString,
         device: String,
         actionPrimitive: String,
         slots: [String: String] = [:],
@@ -258,6 +371,7 @@ private extension ToolCallFrame {
         stateRevision: Int
     ) -> ToolCallFrame {
         ToolCallFrame(
+            id: id,
             agentID: "vehicle-control",
             capabilityID: "cabin.\(device)",
             toolName: "vehicle_control",

@@ -33,11 +33,27 @@ private struct PlannedTransition: Equatable {
     var scopeOrigin: ScopeOrigin?
 }
 
+private final class RuntimeAdapterBox: @unchecked Sendable {
+    @MainActor
+    private var adapter: DemoRuntimeAdapter?
+
+    @MainActor
+    func resolve() -> DemoRuntimeAdapter {
+        if let adapter {
+            return adapter
+        }
+        let adapter = DemoRuntimeAdapter()
+        self.adapter = adapter
+        return adapter
+    }
+}
+
 public struct C3ExecutionPipeline: Sendable {
     public var semantic: SemanticContractLookup
     public var stateCells: StateCellContractLookup
     public var riskPolicy: RiskPolicyLookup
     public var allowlist: L1DemoAllowlistLookup
+    private let runtimeAdapterBox: RuntimeAdapterBox
     private let intentConfirmedProvider: @Sendable () -> Bool
 
     public init(
@@ -51,6 +67,7 @@ public struct C3ExecutionPipeline: Sendable {
         self.stateCells = stateCells
         self.riskPolicy = riskPolicy
         self.allowlist = allowlist
+        self.runtimeAdapterBox = RuntimeAdapterBox()
         self.intentConfirmedProvider = intentConfirmed
     }
 
@@ -117,8 +134,16 @@ public struct C3ExecutionPipeline: Sendable {
         var readbacks: [DemoActionReadback] = []
         for planned in transitions {
             let transition = planned.transition
-            let applied = store.applyMockTransition(transition)
-            traceLogger.recordExecute(traceID: frame.traceID, message: "\(applied.key)=\(applied.actualValue)")
+            let commandID = adapterCommandID(parent: frame, transition: transition)
+            let adapterResult = try runtimeAdapterBox.resolve().execute(
+                commandID: commandID,
+                frame: adapterFrame(parent: frame, transition: transition, commandID: commandID),
+                store: store
+            )
+            traceLogger.recordExecute(
+                traceID: frame.traceID,
+                message: "\(adapterResult.readback.key)=\(adapterResult.readback.actualValue):\(adapterResult.provenance.rawValue)"
+            )
             var verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
             verified.scopeOrigin = planned.scopeOrigin
             // gap#5:播报优先消费 C2 readback_zh 模板,而非 store 硬编码兜底。
@@ -139,6 +164,25 @@ public struct C3ExecutionPipeline: Sendable {
         }
 
         return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks)
+    }
+
+    private func adapterCommandID(parent frame: ToolCallFrame, transition: DemoMockTransition) -> String {
+        "\(frame.id)#\(transition.key)"
+    }
+
+    private func adapterFrame(parent frame: ToolCallFrame, transition: DemoMockTransition, commandID: String) -> ToolCallFrame {
+        ToolCallFrame(
+            id: commandID,
+            traceID: frame.traceID,
+            agentID: frame.agentID,
+            capabilityID: frame.capabilityID,
+            toolName: "set_vehicle_control",
+            arguments: [
+                "state_key": transition.key,
+                "target_state": transition.desiredValue
+            ],
+            surfacePolicy: frame.surfacePolicy
+        )
     }
 
     @MainActor
