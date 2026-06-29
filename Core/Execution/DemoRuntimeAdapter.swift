@@ -381,7 +381,16 @@ public final class DemoRuntimeAdapter {
         guard ledgerLoadError == nil else {
             return
         }
-        try? persistSnapshot()
+        do {
+            try persistSnapshot()
+        } catch {
+            failureLedger.append(DemoRuntimeAdapterFailureRecord(
+                commandID: commandID,
+                requestFingerprint: fingerprint,
+                kind: .retryableFailure,
+                reason: "failure_ledger_write_failed:\(reason)"
+            ))
+        }
     }
 
     private func persistSnapshot() throws {

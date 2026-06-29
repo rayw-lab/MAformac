@@ -281,6 +281,36 @@ final class C3ExecutionPipelineTests: XCTestCase {
     }
 
     @MainActor
+    func testC3SettledPlanWriteFailureDoesNotLeaveInMemoryReplay() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        try Data("not-a-directory".utf8).write(to: directory.appendingPathComponent("c3"))
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-settled-save-fails",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try pipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-settled-save-fails",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+        let trace = InMemoryTraceLogger()
+
+        XCTAssertThrowsError(try pipeline.execute(staleRetry, store: store, traceLogger: trace)) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .staleState(expected: 1, actual: 0))
+        }
+        XCTAssertFalse(trace.entries.contains { $0.stage == .guard && $0.message == "stale_retry_replay" })
+    }
+
+    @MainActor
     func testC3DurableMissingAdapterEntryFailsClosedBeforeMutation() throws {
         let directory = try temporaryDurableLedgerDirectory()
         let store = DemoVehicleStateStore()

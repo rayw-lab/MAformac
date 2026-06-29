@@ -27,7 +27,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
-    func testDefaultRunnerUsesAppDefaultContractBundleForAppPath() async throws {
+    func testDefaultRunnerUsesSingleCommandDemoBundleForAppPath() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
         let speech = RecordingSpeechSynthesisEngine()

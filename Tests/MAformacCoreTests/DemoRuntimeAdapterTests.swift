@@ -373,6 +373,19 @@ final class DemoRuntimeAdapterTests: XCTestCase {
         XCTAssertEqual(adapter.failureLedger.last?.kind, .retryableFailure)
     }
 
+    @MainActor
+    func testFailureLedgerRecordsPersistenceFailureInMemory() throws {
+        let store = DemoVehicleStateStore()
+        let adapter = DemoRuntimeAdapter(ledgerStore: FailingDemoRuntimeAdapterLedgerStore())
+
+        XCTAssertThrowsError(try adapter.execute(commandID: "cmd-ledger-save-fails", frame: frame(key: "ac.power", target: "on"), store: store)) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .durableLedgerWriteFailed(commandID: "cmd-ledger-save-fails"))
+        }
+
+        XCTAssertTrue(adapter.failureLedger.contains { $0.reason == "durable_ledger_write_failed" })
+        XCTAssertTrue(adapter.failureLedger.contains { $0.reason == "failure_ledger_write_failed:durable_ledger_write_failed" })
+    }
+
     private func frame(key: String, target: String) -> ToolCallFrame {
         ToolCallFrame(
             agentID: "vehicle-control",
@@ -399,5 +412,15 @@ final class DemoRuntimeAdapterTests: XCTestCase {
         try mutate(&root)
         let mutated = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
         try mutated.write(to: fileURL, options: [.atomic])
+    }
+}
+
+private struct FailingDemoRuntimeAdapterLedgerStore: DemoRuntimeAdapterLedgerStore {
+    func load() throws -> DemoRuntimeAdapterLedgerSnapshot {
+        DemoRuntimeAdapterLedgerSnapshot()
+    }
+
+    func save(_ snapshot: DemoRuntimeAdapterLedgerSnapshot) throws {
+        throw DemoRuntimeAdapterLedgerStoreError.unknownKey("forced_save_failure")
     }
 }

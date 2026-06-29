@@ -219,9 +219,17 @@ private final class RuntimeAdapterBox: @unchecked Sendable {
             transitions: transitions
         )
         settledPlans[parentID] = settledPlan
-        try? settledPlanStore?.save(C3SettledPlanSnapshot(
-            settledPlans: settledPlans.mapValues(DurableSettledPlan.init(settledPlan:))
-        ))
+        guard let settledPlanStore else {
+            return
+        }
+        do {
+            try settledPlanStore.save(C3SettledPlanSnapshot(
+                settledPlans: settledPlans.mapValues(DurableSettledPlan.init(settledPlan:))
+            ))
+        } catch {
+            settledPlans.removeValue(forKey: parentID)
+            settledPlanLoadFailed = true
+        }
     }
 
     @MainActor

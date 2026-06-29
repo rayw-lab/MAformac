@@ -35,7 +35,7 @@ public final class DemoRuntimeSessionRunner {
         traceLogger: any TraceLogger,
         speech: any SpeechSynthesisEngine
     ) throws -> DemoRuntimeSessionRunner {
-        let bundle = DemoRuntimeContractBundle.appDefault
+        let bundle = DemoRuntimeContractBundle.singleCommandDemoDefault
         return DemoRuntimeSessionRunner(
             store: store,
             pipeline: try bundle.makePipeline(),
@@ -135,7 +135,7 @@ public struct DemoRuntimeContractBundle: Sendable {
         )
     }
 
-    public static let appDefault = DemoRuntimeContractBundle(
+    public static let singleCommandDemoDefault = DemoRuntimeContractBundle(
         semanticJSONL: """
         {"contract_row_id":"runtime_app_ac_power_on","device":"ac","action_primitive":"power_on","slot":"device","slot_keys":[],"clarify_tag":"explicit","risk":"","exec_tier":"L1","execution_range_ref":"ac.power","value":{"ref":"","direct":"","offset":"on","type":"STATE"}}
         """,
