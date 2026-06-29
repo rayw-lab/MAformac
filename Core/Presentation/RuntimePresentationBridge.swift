@@ -154,6 +154,10 @@ private enum PresentationPayloadSanitizer {
     static let redactedTokens = [
         "DemoRuntimeAdapter",
         "RuntimeAdapterBox",
+        "durableLedger",
+        "persistentLedger",
+        "adapterLedger",
+        "local_durable_adapter_ledger",
         "requestFingerprint",
         "parentRequestFingerprint",
         "failureLedger",
@@ -221,6 +225,10 @@ public struct TraceEnvelope: Codable, Equatable, Sendable {
         redactedTokens: [String] = [
             "DemoRuntimeAdapter",
             "RuntimeAdapterBox",
+            "durableLedger",
+            "persistentLedger",
+            "adapterLedger",
+            "local_durable_adapter_ledger",
             "requestFingerprint",
             "parentRequestFingerprint",
             "failureLedger",

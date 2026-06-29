@@ -424,10 +424,10 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             traceID: "trace-requestFingerprint",
             runId: "run-RuntimeAdapterBox",
             parentSpanId: "span-failureLedger",
-            message: "DemoRuntimeAdapter RuntimeAdapterBox requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore rawRuntimeStore",
+            message: "DemoRuntimeAdapter RuntimeAdapterBox durableLedger persistentLedger adapterLedger local_durable_adapter_ledger requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore rawRuntimeStore",
             attributes: TraceAttributes(
                 stopReason: "RuntimeAdapterBox",
-                guardReason: "failureLedger runtimeStore rawRuntimeStore"
+                guardReason: "failureLedger runtimeStore rawRuntimeStore durableLedger"
             ),
             timestamp: Date(timeIntervalSince1970: 1_800_000_060)
         )
@@ -437,7 +437,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                 result: .runtimeError,
                 reason: "DemoRuntimeAdapter parentRequestFingerprint rawModelOutput",
                 missingSlot: "failureLedger",
-                scopeFailureReason: "trainingReceipt runtimeStore rawRuntimeStore"
+                scopeFailureReason: "trainingReceipt runtimeStore rawRuntimeStore persistentLedger"
             ),
             cards: [
                 DemoVehicleStateCell(
@@ -484,6 +484,10 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         for forbidden in [
             "DemoRuntimeAdapter",
             "RuntimeAdapterBox",
+            "durableLedger",
+            "persistentLedger",
+            "adapterLedger",
+            "local_durable_adapter_ledger",
             "requestFingerprint",
             "parentRequestFingerprint",
             "failureLedger",
