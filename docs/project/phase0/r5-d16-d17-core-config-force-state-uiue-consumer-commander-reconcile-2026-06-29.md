@@ -2,7 +2,7 @@
 artifact_kind: r5_d16_d17_core_config_force_state_uiue_consumer_commander_reconcile
 gate: D17_GATE_8_DUAL_REPO_RECONCILE
 repo: /Users/wanglei/workspace/MAformac-uiue
-status: LOCAL_VALIDATION_PASS_PENDING_AUDIT
+status: CLAUDE_CODE_PASS_P2_FIX_PENDING_CODEX_SUBAGENT_FINAL_AUDIT
 proof_class: docs_local + local_static + local_unit + openspec_local + hermes_audits
 created_at: 2026-06-29
 ---
@@ -11,7 +11,7 @@ created_at: 2026-06-29
 
 ## Verdict
 
-`LOCAL_VALIDATION_PASS_PENDING_AUDIT`
+`CLAUDE_CODE_PASS_P2_FIX_PENDING_CODEX_SUBAGENT_FINAL_AUDIT`
 
 D16+D17 is reconciled under proof cap. Main owns D16 Core config / `SceneMacroRegistry` and demo/debug force-state boundary truth. UIUE consumes D15/D16 stable names through local raw-name mapping, fail-closed tests, and verifier receipts. This does not claim production runtime, durable ledger, mobile, true-device, live API, UIUE merge, visual L3, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready.
 
@@ -58,7 +58,7 @@ No-change reason: row/proof movement belongs in the living route map, burndown p
 Gate8 must keep both runtime-store spellings explicit:
 
 - `rawRuntimeStore`: forbidden by Gate6 deny-list and tests.
-- `runtimeStore`: absent from Gate6 allow-list and therefore fail-closed as unknown presentation field.
+- `runtimeStore`: absent from Gate6 allow-list and covered by a post-Claude-Code named negative unit assertion as `unknownPresentationField`.
 
 This distinction remains a verifier note, not a new shared field.
 
@@ -76,7 +76,7 @@ This distinction remains a verifier note, not a new shared field.
 | Claim-vs-proof | D16/D17 proof is docs/local + local/static/unit/OpenSpec + audits. No runtime/mobile/live/merge/A-2 readiness. |
 | Boundary | main owns payload/config/force-state truth; UIUE consumes stable names and fail-closes unknowns/private names. |
 | If wrong, what proves it | Route map, burndown diff, Gate3/Gate4/Gate4R/Gate5/Gate6/Gate7 transcripts, `RuntimePresentationConsumerMappingTests`, and main `DemoForceStateBoundary.swift`. |
-| Post-audit correction | Gate8 Hermes audit returned FAIL/P1 for stale route-map wait-gate wording on `C018`/`C052`; fixed post-audit and revalidated locally. This is `audit_fail_fixed_post_audit`, not Hermes PASS. Final Claude Code adversarial audit remains pending. |
+| Post-audit correction | Gate8 Hermes audit returned FAIL/P1 for stale route-map wait-gate wording on `C018`/`C052`; fixed post-audit and revalidated locally. This is `audit_fail_fixed_post_audit`, not Hermes PASS. Final Claude Code adversarial audit returned PASS with P0/P1 empty and P2 advisory notes. Controller fixed the actionable `runtimeStore` named negative-test advisory; Codex blind final subagent audit remains pending. |
 
 ## Validation
 
@@ -94,8 +94,7 @@ Passed local validation:
 Pending:
 
 - GitNexus detect_changes for exact Gate8 diffs.
-- Gate8 final Claude Code adversarial audit.
-- Final Claude Code adversarial audit covering Gate1-Gate8 plus Gate4R.
+- Codex blind final subagent audit covering Gate1-Gate8 plus Gate4R.
 
 ## Gate8 Audit
 
@@ -105,4 +104,16 @@ Pending:
 - P0: none.
 - P1: stale route-map wait-gate wording still described `C018` as future mainline authority and `C052` as D9-only debug spike.
 - Fix: updated `docs/roadmaps/2026-06-28-uiue-r5-dispatch-ready-decomposition-map.md` wait-gate and historical dispatch-log wording to distinguish historical dispositions from current D16/D17 truth.
+- Post-fix local validation: UIUE `git diff --check`, `openspec validate ui-presentation --strict`, and `swift test --filter RuntimePresentationConsumerMappingTests` PASS.
+
+## Final Claude Code Audit
+
+- Prompt: `Reports/r5-d17-final-cc-audit-20260629T1908/claude-code-final-audit-prompt.txt`.
+- Result: `CLAUDE_CODE_R5_D16_D17_FINAL_ADVERSARIAL_AUDIT_VERDICT: PASS`.
+- P0: none.
+- P1: none.
+- P2: advisory notes only:
+  - Gate5 receipt stale status was reported by Claude Code, but current Gate5 receipt already records `DONE_UNDER_AUDIT_FAIL_FIXED_POST_AUDIT`; no repo fix needed.
+  - `runtimeStore` was protected by fail-closed absence from allow-list but lacked a named unit assertion; fixed by adding a `validatePresentationField("runtimeStore")` negative assertion.
+  - Gate7 visual smoke was skipped under proof cap and remains a documented non-claim; no fake visual proof added.
 - Post-fix local validation: UIUE `git diff --check`, `openspec validate ui-presentation --strict`, and `swift test --filter RuntimePresentationConsumerMappingTests` PASS.
