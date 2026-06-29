@@ -133,6 +133,8 @@ Post-audit fix:
 
 This is fail-fixed post-audit evidence, not a Hermes PASS.
 
+Operator update after the fix: do not rerun the same Hermes round. Gate1-Gate3 proceed under one-pass Hermes audit cadence with P1 fixed post-audit and local validation rerun.
+
 ## Validation
 
 | Command | Result | Proof class |

@@ -131,4 +131,4 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 - [x] 15.3 Add local/integration tests for cross-pipeline settled parent replay, changed parent fingerprint fail-closed, corrupt/missing durable row fail-closed, and D14 stale/readback regression coverage.
 - [x] 15.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
 - [x] 15.5 Run GitNexus `detect_changes` on the exact staged Gate 3 diff before commit.
-- [ ] 15.6 Run Hermes round 1 over Gates 1-3 with anchor `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: PASS|FAIL`.
+- [x] 15.6 Run Hermes round 1 over Gates 1-3 with anchor `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: FAIL`; fix owned P1/P2 post-audit and proceed under operator no-rerun override.

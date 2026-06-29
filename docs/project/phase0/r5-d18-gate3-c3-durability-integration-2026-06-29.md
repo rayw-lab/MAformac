@@ -4,7 +4,7 @@ Date: 2026-06-29
 Label: `D18_GATE_3_C3_RECONSTRUCTION_INTEGRATION_TESTS`
 Repo: `/Users/wanglei/workspace/MAformac`
 Proof class: `local` / `unit` / `integration` / `static`
-Status: `DONE_UNDER_HERMES_ROUND1_FAIL_FIXED_POST_AUDIT_PENDING_RERUN`
+Status: `DONE_UNDER_HERMES_ROUND1_FAIL_FIXED_POST_AUDIT_OPERATOR_NO_RERUN`
 
 ## Conclusion
 
@@ -162,7 +162,9 @@ Post-audit fix:
 - Reduced `failureLedger` to internal `private(set)` main/test observability; it remains forbidden from presentation/UIUE payloads.
 - Post-audit staged GitNexus `detect_changes(scope=staged)` returned expected `medium`: 37 changed symbols, 1 affected replay process, 6 changed files.
 
-Current audit status is fail-fixed post-audit pending Hermes round 1 rerun. Do not describe the original Hermes round as PASS.
+Operator update after the fix: do not rerun the same Hermes round. Gate1-Gate3 proceed under one-pass Hermes audit cadence with P1 fixed post-audit and local validation rerun. Do not describe the original Hermes round as PASS.
+
+An attempted rerun was interrupted after the operator update; its partial ignored artifact is not used as proof.
 
 ## Dirty Split
 
