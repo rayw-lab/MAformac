@@ -296,8 +296,9 @@ enum RuntimePresentationConsumerMapping {
     }
 
     static func rejectForbiddenConsumerName(_ name: String) throws {
+        let options: String.CompareOptions = [.anchored, .caseInsensitive, .diacriticInsensitive]
         if forbiddenPrivateNames.contains(where: { forbidden in
-            name == forbidden || name.hasPrefix(forbidden)
+            name.range(of: forbidden, options: options) != nil
         }) {
             throw RuntimePresentationConsumerValidationError.forbiddenPrivateName(name)
         }

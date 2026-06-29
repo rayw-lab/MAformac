@@ -72,6 +72,9 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
         XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("requestFingerprint")) { error in
             XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("requestFingerprint"))
         }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("RequestFingerprintShadow")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("RequestFingerprintShadow"))
+        }
         XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("runtimeStore")) { error in
             XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("runtimeStore"))
         }

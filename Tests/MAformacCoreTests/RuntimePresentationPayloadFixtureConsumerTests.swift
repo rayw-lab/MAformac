@@ -100,6 +100,15 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
             )
         }
 
+        XCTAssertThrowsError(
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(outcomeReason: "runtimeadapterbox leaked"))
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationConsumerValidationError,
+                .forbiddenPrivateName("RuntimeAdapterBox")
+            )
+        }
+
         for name in RuntimePresentationConsumerMapping.forbiddenPrivateNames {
             XCTAssertFalse(RuntimePresentationConsumerMapping.payloadFieldNames.contains(name), name)
             XCTAssertFalse(RuntimePresentationConsumerMapping.d15ProofClassNames.contains(name), name)

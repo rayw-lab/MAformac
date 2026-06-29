@@ -541,7 +541,8 @@ private enum RuntimePresentationPayloadPrivateMarkerGuard {
     }
 
     private static func rejectForbiddenMarkers(in value: String) throws {
-        if let forbidden = RuntimePresentationConsumerMapping.forbiddenPrivateNames.first(where: { value.contains($0) }) {
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        if let forbidden = RuntimePresentationConsumerMapping.forbiddenPrivateNames.first(where: { value.range(of: $0, options: options) != nil }) {
             throw RuntimePresentationConsumerValidationError.forbiddenPrivateName(forbidden)
         }
     }
