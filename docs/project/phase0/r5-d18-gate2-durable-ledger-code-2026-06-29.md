@@ -4,7 +4,7 @@ Date: 2026-06-29
 Label: `D18_GATE_2_DURABLE_LEDGER_CODE_TESTS`
 Repo: `/Users/wanglei/workspace/MAformac`
 Proof class: `local` / `unit` / `static`
-Status: `DONE`
+Status: `DONE_UNDER_HERMES_ROUND1_FAIL_FIXED_POST_AUDIT`
 
 ## Conclusion
 
@@ -120,12 +120,25 @@ If this were wrong, `Tests/MAformacCoreTests/DemoRuntimeAdapterTests.swift` woul
 
 Hermes round 1 will audit Gates 1-3 after Gate3 local validation. If it reports a Gate2 P0/P1, owned code/tests/docs must be corrected and affected validations rerun before D19 can start.
 
+## Hermes Round 1 Finding Absorption
+
+Hermes round 1 returned `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: FAIL` with P0 empty and one P1: durable ledger JSON accepted unknown/lossy fields because Swift `JSONDecoder` is permissive by default.
+
+Post-audit fix:
+
+- Added strict key-set validation before decoding adapter durable ledger JSON.
+- Reject unknown keys at root, success entry, readback, and failure record levels.
+- Added tests for unknown success-entry fields and unknown readback fields.
+- Reduced `failureLedger` from public readable surface to internal `private(set)` main/test observability.
+
+This is fail-fixed post-audit evidence, not a Hermes PASS.
+
 ## Validation
 
 | Command | Result | Proof class |
 | --- | --- | --- |
 | `git diff --check` | PASS | `local/static` |
-| `swift test --filter 'DemoRuntimeAdapterTests|RuntimePresentationBridgeTests'` | PASS: 32 tests, 0 failures | `local/unit` |
+| `swift test --filter 'DemoRuntimeAdapterTests|RuntimePresentationBridgeTests'` | PASS: 32 tests, 0 failures before Hermes; superseded by post-audit 66-test rerun in Gate3 receipt | `local/unit` |
 | `openspec validate define-runtime-adapter-execution --strict` | PASS: change is valid | `local/OpenSpec` |
 | `openspec validate --all --strict` | PASS: 18 passed, 0 failed | `local/OpenSpec` |
 | `git diff --cached --check` | PASS | `local/static` |

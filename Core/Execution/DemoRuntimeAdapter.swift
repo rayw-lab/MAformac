@@ -86,6 +86,7 @@ struct DemoRuntimeAdapterLedgerSnapshot: Codable, Equatable, Sendable {
 
 enum DemoRuntimeAdapterLedgerStoreError: Error, Equatable {
     case unsupportedSchema(String)
+    case unknownKey(String)
 }
 
 protocol DemoRuntimeAdapterLedgerStore: Sendable {
@@ -105,6 +106,7 @@ struct FileBackedDemoRuntimeAdapterLedgerStore: DemoRuntimeAdapterLedgerStore {
             return DemoRuntimeAdapterLedgerSnapshot()
         }
         let data = try Data(contentsOf: fileURL)
+        try validateKnownKeys(in: data)
         let snapshot = try JSONDecoder().decode(DemoRuntimeAdapterLedgerSnapshot.self, from: data)
         guard snapshot.schemaVersion == DemoRuntimeAdapterLedgerSnapshot.currentSchemaVersion else {
             throw DemoRuntimeAdapterLedgerStoreError.unsupportedSchema(snapshot.schemaVersion)
@@ -120,6 +122,47 @@ struct FileBackedDemoRuntimeAdapterLedgerStore: DemoRuntimeAdapterLedgerStore {
         let data = try encoder.encode(snapshot)
         try data.write(to: fileURL, options: [.atomic])
     }
+
+    private func validateKnownKeys(in data: Data) throws {
+        let json = try JSONSerialization.jsonObject(with: data)
+        guard let root = json as? [String: Any] else {
+            throw DemoRuntimeAdapterLedgerStoreError.unknownKey("root")
+        }
+        try validate(keys: root.keys, allowed: ["schemaVersion", "successLedger", "failureLedger"], context: "root")
+
+        if let successLedger = root["successLedger"] as? [String: Any] {
+            for (commandID, value) in successLedger {
+                guard let entry = value as? [String: Any] else {
+                    throw DemoRuntimeAdapterLedgerStoreError.unknownKey("successLedger.\(commandID)")
+                }
+                try validate(keys: entry.keys, allowed: ["requestFingerprint", "readback"], context: "successLedger.\(commandID)")
+                guard let readback = entry["readback"] as? [String: Any] else {
+                    throw DemoRuntimeAdapterLedgerStoreError.unknownKey("successLedger.\(commandID).readback")
+                }
+                try validate(
+                    keys: readback.keys,
+                    allowed: ["key", "actualValue", "revision", "spokenText", "scopeOrigin"],
+                    context: "successLedger.\(commandID).readback"
+                )
+            }
+        }
+
+        if let failureLedger = root["failureLedger"] as? [[String: Any]] {
+            for (index, failure) in failureLedger.enumerated() {
+                try validate(
+                    keys: failure.keys,
+                    allowed: ["commandID", "requestFingerprint", "kind", "reason"],
+                    context: "failureLedger[\(index)]"
+                )
+            }
+        }
+    }
+
+    private func validate(keys: Dictionary<String, Any>.Keys, allowed: Set<String>, context: String) throws {
+        for key in keys where !allowed.contains(key) {
+            throw DemoRuntimeAdapterLedgerStoreError.unknownKey("\(context).\(key)")
+        }
+    }
 }
 
 @MainActor
@@ -127,7 +170,7 @@ public final class DemoRuntimeAdapter {
     private let ledgerStore: DemoRuntimeAdapterLedgerStore?
     private var ledgerLoadError: Error?
     private var ledger: [String: DemoRuntimeAdapterSuccessRecord] = [:]
-    public private(set) var failureLedger: [DemoRuntimeAdapterFailureRecord] = []
+    private(set) var failureLedger: [DemoRuntimeAdapterFailureRecord] = []
 
     public init() {
         self.ledgerStore = nil

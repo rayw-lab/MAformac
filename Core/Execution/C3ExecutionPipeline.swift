@@ -93,6 +93,7 @@ private struct C3SettledPlanSnapshot: Codable, Equatable, Sendable {
 
 private enum C3SettledPlanStoreError: Error, Equatable {
     case unsupportedSchema(String)
+    case unknownKey(String)
 }
 
 private protocol C3SettledPlanStore: Sendable {
@@ -112,6 +113,7 @@ private struct FileBackedC3SettledPlanStore: C3SettledPlanStore {
             return C3SettledPlanSnapshot()
         }
         let data = try Data(contentsOf: fileURL)
+        try validateKnownKeys(in: data)
         let snapshot = try JSONDecoder().decode(C3SettledPlanSnapshot.self, from: data)
         guard snapshot.schemaVersion == C3SettledPlanSnapshot.currentSchemaVersion else {
             throw C3SettledPlanStoreError.unsupportedSchema(snapshot.schemaVersion)
@@ -126,6 +128,43 @@ private struct FileBackedC3SettledPlanStore: C3SettledPlanStore {
         encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(snapshot)
         try data.write(to: fileURL, options: [.atomic])
+    }
+
+    private func validateKnownKeys(in data: Data) throws {
+        let json = try JSONSerialization.jsonObject(with: data)
+        guard let root = json as? [String: Any] else {
+            throw C3SettledPlanStoreError.unknownKey("root")
+        }
+        try validate(keys: root.keys, allowed: ["schemaVersion", "settledPlans"], context: "root")
+
+        if let settledPlans = root["settledPlans"] as? [String: Any] {
+            for (parentID, value) in settledPlans {
+                guard let settledPlan = value as? [String: Any] else {
+                    throw C3SettledPlanStoreError.unknownKey("settledPlans.\(parentID)")
+                }
+                try validate(
+                    keys: settledPlan.keys,
+                    allowed: ["parentRequestFingerprint", "transitions"],
+                    context: "settledPlans.\(parentID)"
+                )
+                guard let transitions = settledPlan["transitions"] as? [[String: Any]] else {
+                    throw C3SettledPlanStoreError.unknownKey("settledPlans.\(parentID).transitions")
+                }
+                for (index, transition) in transitions.enumerated() {
+                    try validate(
+                        keys: transition.keys,
+                        allowed: ["key", "desiredValue", "source", "scopeOrigin"],
+                        context: "settledPlans.\(parentID).transitions[\(index)]"
+                    )
+                }
+            }
+        }
+    }
+
+    private func validate(keys: Dictionary<String, Any>.Keys, allowed: Set<String>, context: String) throws {
+        for key in keys where !allowed.contains(key) {
+            throw C3SettledPlanStoreError.unknownKey("\(context).\(key)")
+        }
     }
 }
 

@@ -356,6 +356,93 @@ final class C3ExecutionPipelineTests: XCTestCase {
     }
 
     @MainActor
+    func testC3DurableUnknownAdapterEntryFieldFailsClosedBeforeMutation() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-unknown-adapter-field",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+        let adapterStore = FileBackedDemoRuntimeAdapterLedgerStore(
+            directory: directory.appendingPathComponent("adapter", isDirectory: true)
+        )
+        try mutateLedgerJSON(at: adapterStore.fileURL) { root in
+            var successLedger = root["successLedger"] as? [String: Any] ?? [:]
+            var entry = successLedger["cmd-durable-unknown-adapter-field#window.position[主驾]"] as? [String: Any] ?? [:]
+            entry["unknownDurableField"] = "future"
+            successLedger["cmd-durable-unknown-adapter-field#window.position[主驾]"] = entry
+            root["successLedger"] = successLedger
+        }
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-unknown-adapter-field",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try reconstructedPipeline.execute(staleRetry, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(
+                error as? DemoRuntimeAdapterError,
+                .durableLedgerCorrupt(commandID: "cmd-durable-unknown-adapter-field#window.position[主驾]")
+            )
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.revision, cellAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.timestamp, cellAfterFirst.timestamp)
+    }
+
+    @MainActor
+    func testC3DurableUnknownSettledPlanFieldFallsBackToStaleGuardBeforeMutation() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-unknown-settled-plan",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+        let c3StoreURL = directory
+            .appendingPathComponent("c3", isDirectory: true)
+            .appendingPathComponent("c3-settled-parent-plans.json")
+        try mutateLedgerJSON(at: c3StoreURL) { root in
+            var settledPlans = root["settledPlans"] as? [String: Any] ?? [:]
+            var plan = settledPlans["cmd-durable-unknown-settled-plan"] as? [String: Any] ?? [:]
+            plan["unknownSettledPlanField"] = "future"
+            settledPlans["cmd-durable-unknown-settled-plan"] = plan
+            root["settledPlans"] = settledPlans
+        }
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-unknown-settled-plan",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try reconstructedPipeline.execute(staleRetry, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .staleState(expected: 1, actual: 0))
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.revision, cellAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.timestamp, cellAfterFirst.timestamp)
+    }
+
+    @MainActor
     func testC3DurableReadbackDriftFailsClosedWithoutRepairWrite() throws {
         let directory = try temporaryDurableLedgerDirectory()
         let store = DemoVehicleStateStore()
@@ -658,6 +745,14 @@ final class C3ExecutionPipelineTests: XCTestCase {
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
+    }
+
+    private func mutateLedgerJSON(at fileURL: URL, mutate: (inout [String: Any]) throws -> Void) throws {
+        let data = try Data(contentsOf: fileURL)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        try mutate(&root)
+        let mutated = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        try mutated.write(to: fileURL, options: [.atomic])
     }
 
     private func readRepoFile(_ relativePath: String) throws -> String {

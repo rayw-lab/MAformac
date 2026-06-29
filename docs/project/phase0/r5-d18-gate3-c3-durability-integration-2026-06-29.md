@@ -4,7 +4,7 @@ Date: 2026-06-29
 Label: `D18_GATE_3_C3_RECONSTRUCTION_INTEGRATION_TESTS`
 Repo: `/Users/wanglei/workspace/MAformac`
 Proof class: `local` / `unit` / `integration` / `static`
-Status: `DONE_PENDING_COMMIT_AND_HERMES_ROUND_1`
+Status: `DONE_UNDER_HERMES_ROUND1_FAIL_FIXED_POST_AUDIT_PENDING_RERUN`
 
 ## Conclusion
 
@@ -41,6 +41,8 @@ This is still `local_durable_adapter_ledger` proof only. It is not production du
 - `testC3DurableMissingAdapterEntryFailsClosedBeforeMutation`
 - `testC3DurableCorruptAdapterEntryFailsClosedBeforeMutation`
 - `testC3DurableReadbackDriftFailsClosedWithoutRepairWrite`
+- Post-Hermes: `testC3DurableUnknownAdapterEntryFieldFailsClosedBeforeMutation`
+- Post-Hermes: `testC3DurableUnknownSettledPlanFieldFallsBackToStaleGuardBeforeMutation`
 
 ## GitNexus
 
@@ -70,6 +72,8 @@ Interpretation: the CRITICAL results are expected because Gate3 intentionally ed
 Gate3 can fail by reconstructing parent plans without matching parent fingerprint, by replaying from C3 state when adapter durable rows are missing, by treating corrupt adapter rows as absence and then mutating through a stale request, by repairing readback drift with a write, or by exposing C3 parent fingerprints/settled plans to UIUE.
 
 The actual pitfall hit was a Swift explicit return omission in `settledPlan(parentID:)`; it was caught by the first compile and fixed before validation.
+
+Hermes round 1 later found a deeper same-class P1: `JSONDecoder` accepted unknown durable fields. The post-audit fix added strict key validation before decoding adapter and C3 durable JSON.
 
 ## Iceberg Teardown
 
@@ -126,11 +130,39 @@ Hermes round 1 must audit Gates 1-3 after this gate. P0/P1 findings block D19 un
 | Command | Result | Proof class |
 | --- | --- | --- |
 | `git diff --check` | PASS | `local/static` |
-| `swift test --filter 'DemoRuntimeAdapterTests|C3ExecutionPipelineTests|VehicleStateStoreContractTests|RuntimePresentationBridgeTests'` | PASS: 62 tests, 0 failures | `local/unit/integration` |
+| `swift test --filter 'DemoRuntimeAdapterTests|C3ExecutionPipelineTests|VehicleStateStoreContractTests|RuntimePresentationBridgeTests'` | PASS: 62 tests, 0 failures before Hermes; PASS: 66 tests, 0 failures after P1 fix | `local/unit/integration` |
 | `openspec validate define-runtime-adapter-execution --strict` | PASS: change is valid | `local/OpenSpec` |
 | `openspec validate --all --strict` | PASS: 18 passed, 0 failed | `local/OpenSpec` |
 | `git diff --cached --check` | PASS | `local/static` |
 | GitNexus `detect_changes(scope=staged)` | PASS with expected `medium` risk: 43 changed symbols, 5 affected replay processes, 4 changed files | `local/static/graph` |
+
+## Hermes Round 1 Finding Absorption
+
+Hermes round 1 transcript path:
+
+- `Reports/d18-gates-1-3-hermes-round1-2026-06-29.txt` (ignored artifact, not staged)
+
+Anchor:
+
+- `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: FAIL`
+
+Findings:
+
+- P0: empty
+- P1: durable ledger unknown/lossy entry fail-closed incomplete due to permissive `JSONDecoder`
+- P2: stale Gate3 status wording
+- P2: `failureLedger` public readability made "private observability" wording too broad
+
+Post-audit fix:
+
+- Adapter durable ledger now validates known keys at root, success entry, readback, and failure record levels before `JSONDecoder`.
+- C3 settled parent-plan store now validates known keys at root, settled plan, and planned transition levels before `JSONDecoder`.
+- Added adapter tests for unknown success-entry and readback fields.
+- Added C3 tests for unknown adapter durable field and unknown C3 settled-plan field.
+- Reduced `failureLedger` to internal `private(set)` main/test observability; it remains forbidden from presentation/UIUE payloads.
+- Post-audit staged GitNexus `detect_changes(scope=staged)` returned expected `medium`: 37 changed symbols, 1 affected replay process, 6 changed files.
+
+Current audit status is fail-fixed post-audit pending Hermes round 1 rerun. Do not describe the original Hermes round as PASS.
 
 ## Dirty Split
 

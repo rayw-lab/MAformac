@@ -148,6 +148,74 @@ final class DemoRuntimeAdapterTests: XCTestCase {
     }
 
     @MainActor
+    func testUnknownDurableSuccessEntryFieldFailsClosedWithoutMutation() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let store = DemoVehicleStateStore()
+
+        _ = try DemoRuntimeAdapter(ledgerStore: ledgerStore).execute(
+            commandID: "cmd-unknown-success-field",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "ac.power"))
+        try mutateLedgerJSON(at: ledgerStore.fileURL) { root in
+            var successLedger = root["successLedger"] as? [String: Any] ?? [:]
+            var entry = successLedger["cmd-unknown-success-field"] as? [String: Any] ?? [:]
+            entry["unknownDurableField"] = "future"
+            successLedger["cmd-unknown-success-field"] = entry
+            root["successLedger"] = successLedger
+        }
+
+        let reconstructedAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+        XCTAssertThrowsError(try reconstructedAdapter.execute(
+            commandID: "cmd-unknown-success-field",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .durableLedgerCorrupt(commandID: "cmd-unknown-success-field"))
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.revision, cellAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "ac.power")?.timestamp, cellAfterFirst.timestamp)
+        XCTAssertEqual(reconstructedAdapter.failureLedger.last?.kind, .corruptLedgerEntry)
+    }
+
+    @MainActor
+    func testUnknownDurableReadbackFieldFailsClosedWithoutMutation() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let store = DemoVehicleStateStore()
+
+        _ = try DemoRuntimeAdapter(ledgerStore: ledgerStore).execute(
+            commandID: "cmd-unknown-readback-field",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "ac.power"))
+        try mutateLedgerJSON(at: ledgerStore.fileURL) { root in
+            var successLedger = root["successLedger"] as? [String: Any] ?? [:]
+            var entry = successLedger["cmd-unknown-readback-field"] as? [String: Any] ?? [:]
+            var readback = entry["readback"] as? [String: Any] ?? [:]
+            readback["unknownReadbackField"] = "future"
+            entry["readback"] = readback
+            successLedger["cmd-unknown-readback-field"] = entry
+            root["successLedger"] = successLedger
+        }
+
+        let reconstructedAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+        XCTAssertThrowsError(try reconstructedAdapter.execute(
+            commandID: "cmd-unknown-readback-field",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .durableLedgerCorrupt(commandID: "cmd-unknown-readback-field"))
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.revision, cellAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "ac.power")?.timestamp, cellAfterFirst.timestamp)
+        XCTAssertEqual(reconstructedAdapter.failureLedger.last?.kind, .corruptLedgerEntry)
+    }
+
+    @MainActor
     func testDurableFailureRecordDoesNotCreateSuccessfulReplay() throws {
         let directory = try temporaryLedgerDirectory()
         let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
@@ -323,5 +391,13 @@ final class DemoRuntimeAdapterTests: XCTestCase {
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
+    }
+
+    private func mutateLedgerJSON(at fileURL: URL, mutate: (inout [String: Any]) throws -> Void) throws {
+        let data = try Data(contentsOf: fileURL)
+        var root = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        try mutate(&root)
+        let mutated = try JSONSerialization.data(withJSONObject: root, options: [.sortedKeys])
+        try mutated.write(to: fileURL, options: [.atomic])
     }
 }
