@@ -160,3 +160,64 @@ GIVEN this mainline bridge carrier validates
 WHEN UIUE updates its R5 readiness note
 THEN UIUE MAY move at most to `R5_PRECONDITIONS_READY_WITH_NOTES`
 AND it SHALL NOT claim runtime-ready, mobile proof, true-device proof, voice-ready, model-ready, golden-ready, endpoint-ready, UIUE merge, V-PASS, S-PASS, or U-PASS.
+
+### Requirement: Main-owned presentation payload contract
+
+The system SHALL define Runtime -> Presentation payload fields in mainline authority before any future UIUE runtime consumer uses them. The payload contract SHALL expose only presentation-safe, adapter-agnostic fields for envelope identity, outcome, cards, readbacks, reconciliation, proof class, and presentation-safe trace.
+
+#### Scenario: Payload envelope has finite compatibility identity
+
+GIVEN runtime produces a presentation handoff
+WHEN the bridge emits the payload
+THEN the payload SHALL carry a finite schema version
+AND it SHALL carry trace identity and presentation turn or event identity
+AND it SHALL carry whether the payload is terminal for the turn.
+
+#### Scenario: Payload outcome is stable and presentation-safe
+
+GIVEN runtime emits any accepted, refused, no-op, stop, or error outcome
+WHEN the bridge serializes that outcome for presentation
+THEN the payload SHALL carry a stable result or outcome class
+AND it SHALL carry only safe reason or mismatch classes
+AND it SHALL NOT expose raw model output, raw runtime store data, or training receipts.
+
+#### Scenario: Payload card fields are machine-readable
+
+GIVEN presentation cards are included in the Runtime -> Presentation payload
+WHEN a future consumer reads the payload
+THEN each card SHALL expose machine-readable card identity and semantics such as family or key, role, active state, sibling relationship, reason, and scope origin when available
+AND those fields SHALL NOT require the consumer to parse display copy.
+
+#### Scenario: Payload readbacks are stable presentation fields
+
+GIVEN runtime has verified or attempted readback state
+WHEN the bridge emits readbacks for presentation
+THEN each readback SHALL expose presentation-safe key, actual value, revision, spoken text when available, and scope origin when available
+AND it SHALL NOT expose raw runtime store objects or adapter ledger rows.
+
+#### Scenario: Reconciliation is status, not ledger exposure
+
+GIVEN adapter or C3 execution performed readback reconciliation
+WHEN the bridge emits presentation reconciliation state
+THEN the payload SHALL expose only presentation-safe reconciliation status or mismatch class
+AND it SHALL NOT expose `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, success ledger internals, failure ledger internals, or settled parent-plan internals.
+
+#### Scenario: UIUE cannot invent shared payload fields
+
+GIVEN UIUE needs to consume Runtime -> Presentation data in a later dispatch
+WHEN UIUE defines consumer code or tests
+THEN UIUE SHALL consume only fields defined by this mainline contract or a later mainline contract
+AND it SHALL NOT infer shared fields from UIUE docs, adapter private names, receipts, or local test helper names.
+
+#### Scenario: Adapter-private names are forbidden in encoded payload
+
+GIVEN the bridge encodes a presentation payload
+WHEN the encoded payload is inspected as text
+THEN it SHALL NOT contain `DemoRuntimeAdapter`, `RuntimeAdapterBox`, `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, raw ledger internals, settled parent-plan internals, raw runtime store markers, raw model output markers, or training receipt markers except in negative tests or forbidden-field documentation.
+
+#### Scenario: Payload proof class remains capped
+
+GIVEN D15 payload contract validation passes locally
+WHEN documentation, UI copy, or future consumers describe the proof
+THEN they SHALL cap proof at docs/local, local_static, local_unit, OpenSpec, GitNexus, Codex subagent verifier, and anchored Hermes verifier only when present
+AND they SHALL NOT claim runtime-ready, mobile proof, true-device proof, live API proof, UIUE merge, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready.

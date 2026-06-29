@@ -6,6 +6,8 @@ Mainline currently has UIUE bridge semantics, runtime vocabulary, and route-boar
 
 - Add a thin Runtime -> Presentation bridge carrier that maps UIUE candidate/provenance semantics into mainline authority.
 - Define observable bridge vocabulary for runtime results, presentation snapshots, trace envelopes, proof-class display caps, and scope-origin handling.
+- Define the D15 main-owned Runtime -> Presentation payload/readback/reconciliation contract after D14 adapter semantics, including stable presentation-safe field categories and schema compatibility boundaries.
+- Forbid adapter-private implementation fields from becoming UIUE-facing or presentation payload fields, including `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, request fingerprints, ledger internals, settled parent-plan internals, raw runtime stores, raw model output, and training receipts.
 - Record that UIUE documents remain candidate/provenance inputs until mainline references them through this carrier.
 - Record the human-review decisions:
   - HR-01: use `create_mainline_visible_carrier_with_mapping`.
@@ -34,6 +36,7 @@ Mainline currently has UIUE bridge semantics, runtime vocabulary, and route-boar
 - No Swift implementation.
 - No Core enum expansion.
 - No C5 retrain, C6 acceptance/comparison, runtime backend, voice, golden-run, endpoint readiness, mobile/true-device proof, UIUE merge, V-PASS, S-PASS, or U-PASS.
+- No UIUE consumer implementation and no authorization for UIUE to invent shared payload fields.
 
 ## Non-goals
 
@@ -41,6 +44,8 @@ Mainline currently has UIUE bridge semantics, runtime vocabulary, and route-boar
 - Do not claim mainline runtime-ready, voice-ready, model-ready, golden-ready, endpoint-ready, mobile-ready, true-device-ready, or V-PASS.
 - Do not copy UIUE docs wholesale into a second same-meaning bridge SSOT.
 - Do not add `missing` to Core `ScopeOrigin`.
+- Do not expose adapter-private identifiers or ledgers as stable presentation payload fields.
+- Do not treat D15 local/unit/docs proof as runtime/mobile/true-device/live proof.
 
 ## Success Criteria
 
@@ -49,3 +54,4 @@ Mainline currently has UIUE bridge semantics, runtime vocabulary, and route-boar
 - `git diff --check` passes.
 - `docs/CURRENT.md` and `docs/README.md` no longer conflict with the bridge carrier state.
 - C01/C03/C06/C18 are documented as closed by this contract-only carrier for dispatch readiness, while downstream runtime/mobile/model gates remain locked.
+- D15 payload authority defines stable main-owned field categories for envelope identity, outcome, cards, readbacks, reconciliation, proof class, and presentation-safe trace without leaking adapter-private internals.

@@ -43,6 +43,31 @@ A display-layer aggregate such as `rejected` is allowed only if machine-readable
 
 Future runtime work that feeds the bridge SHOULD avoid blocking the main thread, emit a terminal snapshot on cancel/interruption/timeout, and avoid persistence, cloud sync, real vehicle control, or long-lived user memory. This design records the boundary only; it does not implement it.
 
+## AD-RPB-008: D15 payload contract is main-owned and presentation-safe
+
+After D14, Runtime Adapter V0 and C3 have local/unit proof for session-scoped execution, failure recording, readback reconciliation, exact settled stale retry, and private parent-plan replay boundaries. D15 does not expose those mechanics. It defines the stable main-owned Runtime -> Presentation payload contract that a future UIUE consumer may use only after the main contract lands.
+
+Stable payload categories are:
+
+- envelope identity: finite schema version, trace identity, presentation turn/event identity, terminal flag;
+- outcome: runtime/result class, safe reason class, stop reason when applicable, proof class;
+- cards: machine-readable family/key/role/active/sibling/reason/scope-origin semantics and display-safe state;
+- readbacks: key, display-safe actual value, revision, spoken text, and scope origin;
+- reconciliation: presentation-safe status or mismatch class derived from readback/outcome, not raw adapter ledgers;
+- trace: presentation-safe trace envelope with redacted messages and finite attributes.
+
+UIUE may consume only these main-defined field categories after D15. UIUE must not infer shared fields from private Swift names, tests, adapter ledgers, or D14 receipts.
+
+## AD-RPB-009: Adapter-private fields are not payload fields
+
+The payload contract SHALL NOT expose `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, success/failure ledger internals, settled parent-plan internals, private provenance, adapter-local implementation names, raw runtime store, raw model output, or training receipts as UIUE-facing or presentation payload fields.
+
+Reconciliation is represented as presentation-safe outcome/readback status. It is not a copy of adapter ledger rows, C3 parent request fingerprints, or store internals. Private implementation details may appear only in negative tests, receipts, or forbidden-field documentation.
+
+## AD-RPB-010: D15 does not promote proof class
+
+D15 maximum proof remains docs/local, local_static, local_unit, OpenSpec, GitNexus, Codex subagent verifier, and Hermes verifier only if an anchored Hermes PASS exists. It does not prove durable ledger, production runtime, live API, mobile, true-device, UIUE merge, V-PASS, S-PASS, U-PASS, A-2 readiness, voice, model, golden, or endpoint readiness.
+
 ## Accepted C-dispositions
 
 | ID | Disposition |

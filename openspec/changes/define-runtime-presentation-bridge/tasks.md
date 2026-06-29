@@ -63,3 +63,15 @@
 - [x] 8.10 Defer `C018` SceneMacroRegistry/Core config ownership; mainline must own a future OpenSpec before UIUE treats it as shared runtime config.
 - [x] 8.11 Run Codex native subagent P0/P1 audit and resolve or record findings.
 - [x] 8.12 Run Hermes/GLM P0/P1 audit loop or user-authorized Codex equivalent after Hermes stall; resolve or record findings.
+
+## 9. R5 D15 Runtime -> Presentation payload contract
+
+- [x] 9.1 Gate 1: define main-owned payload/readback/reconciliation authority and forbidden adapter-private exposure in proposal, design, and spec.
+- [x] 9.2 Gate 1: run local validation, Codex native subagent audit, and anchored Hermes audit.
+- [ ] 9.3 Gate 2: implement stable presentation-safe payload type or builder in main Core Presentation code.
+- [ ] 9.4 Gate 2: add focused local/unit tests for schema version, outcome, cards, readbacks, reconciliation status, proof cap, and forbidden private-field encoding.
+- [ ] 9.5 Gate 2: run GitNexus impact/detect, local validation, Codex native subagent audit, and anchored Hermes audit.
+- [ ] 9.6 Gate 3: verify committed Gate 1/2 diff from clean worktree, including forbidden-field search and UIUE read-only boundary guard.
+- [ ] 9.7 Gate 3: run GitNexus verifier, Codex native subagent audit, and anchored Hermes audit.
+- [ ] 9.8 Gate 4: reconcile UIUE route map and burndown without implementing UIUE consumer integration.
+- [ ] 9.9 Gate 4: run UIUE local validation, Codex native subagent audit, and anchored Hermes audit before exact-path docs commit.
