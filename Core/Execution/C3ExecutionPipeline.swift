@@ -38,36 +38,159 @@ private struct SettledPlan {
     var transitions: [PlannedTransition]
 }
 
+private struct DurablePlannedTransition: Codable, Equatable, Sendable {
+    var key: String
+    var desiredValue: String
+    var source: DemoVehicleValueSource
+    var scopeOrigin: ScopeOrigin?
+
+    init(planned: PlannedTransition) {
+        self.key = planned.transition.key
+        self.desiredValue = planned.transition.desiredValue
+        self.source = planned.transition.source
+        self.scopeOrigin = planned.scopeOrigin
+    }
+
+    func plannedTransition() -> PlannedTransition {
+        PlannedTransition(
+            transition: DemoMockTransition(key: key, desiredValue: desiredValue, source: source),
+            scopeOrigin: scopeOrigin
+        )
+    }
+}
+
+private struct DurableSettledPlan: Codable, Equatable, Sendable {
+    var parentRequestFingerprint: String
+    var transitions: [DurablePlannedTransition]
+
+    init(settledPlan: SettledPlan) {
+        self.parentRequestFingerprint = settledPlan.parentRequestFingerprint
+        self.transitions = settledPlan.transitions.map(DurablePlannedTransition.init(planned:))
+    }
+
+    func settledPlan() -> SettledPlan {
+        SettledPlan(
+            parentRequestFingerprint: parentRequestFingerprint,
+            transitions: transitions.map { $0.plannedTransition() }
+        )
+    }
+}
+
+private struct C3SettledPlanSnapshot: Codable, Equatable, Sendable {
+    static let currentSchemaVersion = "r5.d18.c3_settled_parent_plan.v1"
+
+    var schemaVersion: String
+    var settledPlans: [String: DurableSettledPlan]
+
+    init(
+        schemaVersion: String = C3SettledPlanSnapshot.currentSchemaVersion,
+        settledPlans: [String: DurableSettledPlan] = [:]
+    ) {
+        self.schemaVersion = schemaVersion
+        self.settledPlans = settledPlans
+    }
+}
+
+private enum C3SettledPlanStoreError: Error, Equatable {
+    case unsupportedSchema(String)
+}
+
+private protocol C3SettledPlanStore: Sendable {
+    func load() throws -> C3SettledPlanSnapshot
+    func save(_ snapshot: C3SettledPlanSnapshot) throws
+}
+
+private struct FileBackedC3SettledPlanStore: C3SettledPlanStore {
+    let fileURL: URL
+
+    init(directory: URL, fileName: String = "c3-settled-parent-plans.json") {
+        self.fileURL = directory.appendingPathComponent(fileName)
+    }
+
+    func load() throws -> C3SettledPlanSnapshot {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return C3SettledPlanSnapshot()
+        }
+        let data = try Data(contentsOf: fileURL)
+        let snapshot = try JSONDecoder().decode(C3SettledPlanSnapshot.self, from: data)
+        guard snapshot.schemaVersion == C3SettledPlanSnapshot.currentSchemaVersion else {
+            throw C3SettledPlanStoreError.unsupportedSchema(snapshot.schemaVersion)
+        }
+        return snapshot
+    }
+
+    func save(_ snapshot: C3SettledPlanSnapshot) throws {
+        let directory = fileURL.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let data = try encoder.encode(snapshot)
+        try data.write(to: fileURL, options: [.atomic])
+    }
+}
+
 private final class RuntimeAdapterBox: @unchecked Sendable {
+    private let adapterLedgerStore: DemoRuntimeAdapterLedgerStore?
+    private let settledPlanStore: C3SettledPlanStore?
+    private var settledPlanLoadFailed = false
     @MainActor
     private var adapter: DemoRuntimeAdapter?
     @MainActor
     private var settledPlans: [String: SettledPlan] = [:]
+
+    init(
+        adapterLedgerStore: DemoRuntimeAdapterLedgerStore? = nil,
+        settledPlanStore: C3SettledPlanStore? = nil
+    ) {
+        self.adapterLedgerStore = adapterLedgerStore
+        self.settledPlanStore = settledPlanStore
+        guard let settledPlanStore else {
+            return
+        }
+        do {
+            let snapshot = try settledPlanStore.load()
+            self.settledPlans = snapshot.settledPlans.mapValues { $0.settledPlan() }
+        } catch {
+            self.settledPlanLoadFailed = true
+        }
+    }
 
     @MainActor
     func resolve() -> DemoRuntimeAdapter {
         if let adapter {
             return adapter
         }
-        let adapter = DemoRuntimeAdapter()
+        let adapter: DemoRuntimeAdapter
+        if let adapterLedgerStore {
+            adapter = DemoRuntimeAdapter(ledgerStore: adapterLedgerStore)
+        } else {
+            adapter = DemoRuntimeAdapter()
+        }
         self.adapter = adapter
         return adapter
     }
 
     @MainActor
     func recordSettledPlanIfAbsent(parentID: String, parentRequestFingerprint: String, transitions: [PlannedTransition]) {
-        guard settledPlans[parentID] == nil else {
+        guard !settledPlanLoadFailed, settledPlans[parentID] == nil else {
             return
         }
-        settledPlans[parentID] = SettledPlan(
+        let settledPlan = SettledPlan(
             parentRequestFingerprint: parentRequestFingerprint,
             transitions: transitions
         )
+        settledPlans[parentID] = settledPlan
+        try? settledPlanStore?.save(C3SettledPlanSnapshot(
+            settledPlans: settledPlans.mapValues(DurableSettledPlan.init(settledPlan:))
+        ))
     }
 
     @MainActor
     func settledPlan(parentID: String) -> SettledPlan? {
-        settledPlans[parentID]
+        guard !settledPlanLoadFailed else {
+            return nil
+        }
+        return settledPlans[parentID]
     }
 }
 
@@ -91,6 +214,29 @@ public struct C3ExecutionPipeline: Sendable {
         self.riskPolicy = riskPolicy
         self.allowlist = allowlist
         self.runtimeAdapterBox = RuntimeAdapterBox()
+        self.intentConfirmedProvider = intentConfirmed
+    }
+
+    init(
+        semantic: SemanticContractLookup,
+        stateCells: StateCellContractLookup,
+        riskPolicy: RiskPolicyLookup,
+        allowlist: L1DemoAllowlistLookup,
+        intentConfirmed: @escaping @Sendable () -> Bool = { true },
+        localDurableLedgerDirectory: URL
+    ) {
+        self.semantic = semantic
+        self.stateCells = stateCells
+        self.riskPolicy = riskPolicy
+        self.allowlist = allowlist
+        self.runtimeAdapterBox = RuntimeAdapterBox(
+            adapterLedgerStore: FileBackedDemoRuntimeAdapterLedgerStore(
+                directory: localDurableLedgerDirectory.appendingPathComponent("adapter", isDirectory: true)
+            ),
+            settledPlanStore: FileBackedC3SettledPlanStore(
+                directory: localDurableLedgerDirectory.appendingPathComponent("c3", isDirectory: true)
+            )
+        )
         self.intentConfirmedProvider = intentConfirmed
     }
 

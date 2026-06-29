@@ -215,6 +215,188 @@ final class C3ExecutionPipelineTests: XCTestCase {
     }
 
     @MainActor
+    func testC3DurableReconstructionReplaysSettledParentWithoutSecondWrite() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-window-stale-replay",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let trace = InMemoryTraceLogger()
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-window-stale-replay",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+        let replay = try reconstructedPipeline.execute(staleRetry, store: store, traceLogger: trace)
+        let cellAfterReplay = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+
+        XCTAssertEqual(replay.readbacks.first?.key, "window.position[主驾]")
+        XCTAssertEqual(cellAfterReplay.revision, cellAfterFirst.revision)
+        XCTAssertEqual(cellAfterReplay.timestamp, cellAfterFirst.timestamp)
+        XCTAssertTrue(trace.entries.contains { $0.stage == .guard && $0.message == "stale_retry_replay" })
+    }
+
+    @MainActor
+    func testC3DurableChangedParentFingerprintFallsBackToStaleGuardBeforeMutation() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-window-parent-conflict",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "主驾"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "30", type: "PERCENT"),
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let staleChanged = ToolCallFrame.fixture(
+            id: "cmd-durable-window-parent-conflict",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "主驾"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "60", type: "PERCENT"),
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try reconstructedPipeline.execute(staleChanged, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .staleState(expected: 1, actual: 0))
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "30")
+    }
+
+    @MainActor
+    func testC3DurableMissingAdapterEntryFailsClosedBeforeMutation() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-missing-adapter-entry",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+        let adapterStore = FileBackedDemoRuntimeAdapterLedgerStore(
+            directory: directory.appendingPathComponent("adapter", isDirectory: true)
+        )
+        try FileManager.default.removeItem(at: adapterStore.fileURL)
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-missing-adapter-entry",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try reconstructedPipeline.execute(staleRetry, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .staleState(expected: 1, actual: 0))
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.revision, cellAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.timestamp, cellAfterFirst.timestamp)
+    }
+
+    @MainActor
+    func testC3DurableCorruptAdapterEntryFailsClosedBeforeMutation() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-corrupt-adapter-entry",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+        let adapterStore = FileBackedDemoRuntimeAdapterLedgerStore(
+            directory: directory.appendingPathComponent("adapter", isDirectory: true)
+        )
+        try Data("{\"schemaVersion\":".utf8).write(to: adapterStore.fileURL)
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-corrupt-adapter-entry",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try reconstructedPipeline.execute(staleRetry, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(
+                error as? DemoRuntimeAdapterError,
+                .durableLedgerCorrupt(commandID: "cmd-durable-corrupt-adapter-entry#window.position[主驾]")
+            )
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.revision, cellAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.timestamp, cellAfterFirst.timestamp)
+    }
+
+    @MainActor
+    func testC3DurableReadbackDriftFailsClosedWithoutRepairWrite() throws {
+        let directory = try temporaryDurableLedgerDirectory()
+        let store = DemoVehicleStateStore()
+        let firstPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-durable-readback-drift",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try firstPipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        _ = store.applyMockTransition(DemoMockTransition(key: "window.position[主驾]", desiredValue: "0"))
+        let driftedCell = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+
+        let reconstructedPipeline = try makePipeline(intentConfirmed: true, durabilityDirectory: directory)
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-durable-readback-drift",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try reconstructedPipeline.execute(staleRetry, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(
+                error as? DemoRuntimeAdapterError,
+                .readbackReconciliationFailed(
+                    commandID: "cmd-durable-readback-drift#window.position[主驾]",
+                    key: "window.position[主驾]",
+                    expected: "100",
+                    actual: "0"
+                )
+            )
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "0")
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.revision, driftedCell.revision)
+    }
+
+    @MainActor
     func testC3SameCommandIdentityWithDifferentRequestFailsClosed() throws {
         let store = DemoVehicleStateStore()
         let pipeline = try makePipeline(intentConfirmed: true)
@@ -446,11 +628,21 @@ final class C3ExecutionPipelineTests: XCTestCase {
         }
     }
 
-    private func makePipeline(intentConfirmed: Bool) throws -> C3ExecutionPipeline {
+    private func makePipeline(intentConfirmed: Bool, durabilityDirectory: URL? = nil) throws -> C3ExecutionPipeline {
         let semantic = try SemanticContractLookup(jsonl: readRepoFile("contracts/semantic-function-contract.jsonl"))
         let stateCells = try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml"))
         let risk = try RiskPolicyLookup(yaml: readRepoFile("contracts/risk-policy.yaml"))
         let allowlist = try L1DemoAllowlistLookup(yaml: readRepoFile("contracts/l1-demo-allowlist.yaml"))
+        if let durabilityDirectory {
+            return C3ExecutionPipeline(
+                semantic: semantic,
+                stateCells: stateCells,
+                riskPolicy: risk,
+                allowlist: allowlist,
+                intentConfirmed: { intentConfirmed },
+                localDurableLedgerDirectory: durabilityDirectory
+            )
+        }
         return C3ExecutionPipeline(
             semantic: semantic,
             stateCells: stateCells,
@@ -458,6 +650,14 @@ final class C3ExecutionPipelineTests: XCTestCase {
             allowlist: allowlist,
             intentConfirmed: { intentConfirmed }
         )
+    }
+
+    private func temporaryDurableLedgerDirectory() throws -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("MAformac-C3ExecutionPipelineTests", isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
     }
 
     private func readRepoFile(_ relativePath: String) throws -> String {

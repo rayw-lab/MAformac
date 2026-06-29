@@ -126,9 +126,9 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 15. D18 Gate 3 C3 Reconstruction Integration Tests
 
-- [ ] 15.1 Run GitNexus context/impact for `C3ExecutionPipeline`, `RuntimeAdapterBox`, `DemoRuntimeAdapter`, and any edited symbol before edits.
-- [ ] 15.2 Integrate the local durable ledger boundary into C3 reconstruction with explicit local storage injection that does not leak adapter-private fields.
-- [ ] 15.3 Add local/integration tests for cross-pipeline settled parent replay, changed parent fingerprint fail-closed, corrupt/missing durable row fail-closed, and D14 stale/readback regression coverage.
-- [ ] 15.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
-- [ ] 15.5 Run GitNexus `detect_changes` on the exact staged Gate 3 diff before commit.
+- [x] 15.1 Run GitNexus context/impact for `C3ExecutionPipeline`, `RuntimeAdapterBox`, `DemoRuntimeAdapter`, and any edited symbol before edits.
+- [x] 15.2 Integrate the local durable ledger boundary into C3 reconstruction with explicit local storage injection that does not leak adapter-private fields.
+- [x] 15.3 Add local/integration tests for cross-pipeline settled parent replay, changed parent fingerprint fail-closed, corrupt/missing durable row fail-closed, and D14 stale/readback regression coverage.
+- [x] 15.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
+- [x] 15.5 Run GitNexus `detect_changes` on the exact staged Gate 3 diff before commit.
 - [ ] 15.6 Run Hermes round 1 over Gates 1-3 with anchor `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: PASS|FAIL`.
