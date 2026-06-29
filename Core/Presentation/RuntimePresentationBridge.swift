@@ -160,6 +160,7 @@ private enum PresentationPayloadSanitizer {
         "successLedger",
         "settledParentPlan",
         "runtimeStore",
+        "rawRuntimeStore",
         "rawModelOutput",
         "trainingReceipt"
     ]
@@ -226,6 +227,7 @@ public struct TraceEnvelope: Codable, Equatable, Sendable {
             "successLedger",
             "settledParentPlan",
             "runtimeStore",
+            "rawRuntimeStore",
             "rawModelOutput",
             "trainingReceipt"
         ],

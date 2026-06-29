@@ -132,3 +132,12 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 - [x] 15.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
 - [x] 15.5 Run GitNexus `detect_changes` on the exact staged Gate 3 diff before commit.
 - [x] 15.6 Run Hermes round 1 over Gates 1-3 with anchor `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: FAIL`; fix owned P1/P2 post-audit and proceed under operator no-rerun override.
+
+## 16. D18 Gate 4 Private Payload Boundary Verifier
+
+- [x] 16.1 Re-probe main and UIUE repo truth before verifier writes; keep UIUE read-only and preserve source dispatch artifacts.
+- [x] 16.2 Cross-search main presentation payload surfaces and UIUE consumer guard surfaces for private adapter, durable ledger, raw runtime store, raw model output, and training receipt names.
+- [x] 16.3 Classify grep hits as implementation-private, sanitizer/deny-list, negative test, OpenSpec authority, or receipt documentation; stop for any UIUE consumption of D18 durable ledger terms.
+- [x] 16.4 Fix the main presentation sanitizer gap for `rawRuntimeStore`, which was forbidden by authority/UIUE deny-list but not explicitly redacted by main.
+- [x] 16.5 Validate with target main/UIUE tests, OpenSpec strict checks, `git diff --check`, staged diff check, and GitNexus `detect_changes` on the exact staged Gate 4 diff.
+- [x] 16.6 Record Gate4 receipt and carry Hermes round 1 truth as `FAIL/P1 fixed post-audit under operator no-rerun override`, not as Hermes PASS.

@@ -107,6 +107,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertFalse(encoded.contains("rawModelOutput"))
         XCTAssertFalse(encoded.contains("trainingReceipt"))
         XCTAssertFalse(encoded.contains("runtimeStore"))
+        XCTAssertFalse(encoded.contains("rawRuntimeStore"))
     }
 
     func testThrownErrorProjectsToTerminalRuntimeErrorSnapshotWithTraceIdentity() {
@@ -225,7 +226,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         let first = TraceEntry(
             stage: .decode,
             traceID: "trace-redact",
-            message: "rawModelOutput:secret trainingReceipt runtimeStore",
+            message: "rawModelOutput:secret trainingReceipt runtimeStore rawRuntimeStore",
             timestamp: firstTimestamp
         )
         let envelope = try XCTUnwrap(TraceEnvelope(traceID: "trace-redact", entries: [first]))
@@ -235,6 +236,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertFalse(safe.entries[0].message.contains("rawModelOutput"))
         XCTAssertFalse(safe.entries[0].message.contains("trainingReceipt"))
         XCTAssertFalse(safe.entries[0].message.contains("runtimeStore"))
+        XCTAssertFalse(safe.entries[0].message.contains("rawRuntimeStore"))
         XCTAssertTrue(safe.entries[0].message.contains("[redacted]"))
 
         let validAppend = TraceEntry(
@@ -256,7 +258,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             timestamp: firstTimestamp.addingTimeInterval(-1)
         )
 
-        XCTAssertEqual(envelope.appending(validAppend)?.entries.map(\.message), ["rawModelOutput:secret trainingReceipt runtimeStore", "readback_ok"])
+        XCTAssertEqual(envelope.appending(validAppend)?.entries.map(\.message), ["rawModelOutput:secret trainingReceipt runtimeStore rawRuntimeStore", "readback_ok"])
         XCTAssertNil(envelope.appending(wrongTrace))
         XCTAssertNil(envelope.appending(nonMonotonic))
     }
@@ -278,17 +280,17 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         let traceEntry = TraceEntry(
             stage: .decode,
             traceID: "trace-boundary",
-            message: "rawModelOutput:secret trainingReceipt runtimeStore",
+            message: "rawModelOutput:secret trainingReceipt runtimeStore rawRuntimeStore",
             attributes: TraceAttributes(
                 stopReason: "rawModelOutput:stop",
-                guardReason: "trainingReceipt:guard runtimeStore"
+                guardReason: "trainingReceipt:guard runtimeStore rawRuntimeStore"
             ),
             timestamp: Date(timeIntervalSince1970: 1_800_000_030)
         )
         let rawEnvelope = try XCTUnwrap(TraceEnvelope(traceID: "trace-boundary", entries: [traceEntry]))
         let snapshot = RuntimePresentationTerminalSnapshotAdapter.guardDenial(
             traceID: "trace-boundary",
-            reason: "rawModelOutput:secret trainingReceipt runtimeStore",
+            reason: "rawModelOutput:secret trainingReceipt runtimeStore rawRuntimeStore",
             traceEnvelope: rawEnvelope
         )
 
@@ -296,10 +298,11 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertFalse(encoded.contains("rawModelOutput"))
         XCTAssertFalse(encoded.contains("trainingReceipt"))
         XCTAssertFalse(encoded.contains("runtimeStore"))
-        XCTAssertEqual(snapshot.runtimeOutcome.reason, "[redacted]:secret [redacted] [redacted]")
-        XCTAssertEqual(snapshot.traceEnvelope?.entries.first?.message, "[redacted]:secret [redacted] [redacted]")
+        XCTAssertFalse(encoded.contains("rawRuntimeStore"))
+        XCTAssertEqual(snapshot.runtimeOutcome.reason, "[redacted]:secret [redacted] [redacted] [redacted]")
+        XCTAssertEqual(snapshot.traceEnvelope?.entries.first?.message, "[redacted]:secret [redacted] [redacted] [redacted]")
         XCTAssertEqual(snapshot.traceEnvelope?.entries.first?.attributes.stopReason, "[redacted]:stop")
-        XCTAssertEqual(snapshot.traceEnvelope?.entries.first?.attributes.guardReason, "[redacted]:guard [redacted]")
+        XCTAssertEqual(snapshot.traceEnvelope?.entries.first?.attributes.guardReason, "[redacted]:guard [redacted] [redacted]")
     }
 
     func testTraceEnvelopeDecoderRejectsInvalidEntryIdentityAndOrdering() throws {
@@ -421,10 +424,10 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             traceID: "trace-requestFingerprint",
             runId: "run-RuntimeAdapterBox",
             parentSpanId: "span-failureLedger",
-            message: "DemoRuntimeAdapter RuntimeAdapterBox requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore",
+            message: "DemoRuntimeAdapter RuntimeAdapterBox requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore rawRuntimeStore",
             attributes: TraceAttributes(
                 stopReason: "RuntimeAdapterBox",
-                guardReason: "failureLedger runtimeStore"
+                guardReason: "failureLedger runtimeStore rawRuntimeStore"
             ),
             timestamp: Date(timeIntervalSince1970: 1_800_000_060)
         )
@@ -434,7 +437,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                 result: .runtimeError,
                 reason: "DemoRuntimeAdapter parentRequestFingerprint rawModelOutput",
                 missingSlot: "failureLedger",
-                scopeFailureReason: "trainingReceipt runtimeStore"
+                scopeFailureReason: "trainingReceipt runtimeStore rawRuntimeStore"
             ),
             cards: [
                 DemoVehicleStateCell(
@@ -487,6 +490,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             "successLedger",
             "settledParentPlan",
             "runtimeStore",
+            "rawRuntimeStore",
             "rawModelOutput",
             "trainingReceipt"
         ] {
