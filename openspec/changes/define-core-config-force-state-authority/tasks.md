@@ -27,3 +27,12 @@
 - [x] 4.2 Verify UIUE has not consumed D16 config/force-state names before release.
 - [x] 4.3 Record proof cap, non-claims, and `d17_release_gate: closed`.
 - [ ] 4.4 Run required validation, Hermes audit, exact-stage verifier receipt, and commit. Gate4 Hermes returned FAIL/P1; D17 release is closed pending a separate fix/reopen decision.
+
+## 4R. D16 Gate 4R Force-State Codable Bypass Repair And Reopen
+
+- [x] 4R.1 Re-probe main/UIUE live truth and confirm D17 has not started.
+- [x] 4R.2 Remove or harden external construction paths for `DemoForceStateContext`, including synthesized `Decodable` / `Codable`.
+- [x] 4R.3 Add local/unit and external package proof that `DemoForceStateContext` is not externally decodable.
+- [x] 4R.4 Preserve fail-closed tests for `.customerFacing`, empty context, duplicate dimensions, and missing `.demoHarness` provenance.
+- [x] 4R.5 Run local validation, OpenSpec validation, GitNexus context/detect, and UIUE read-only bounded grep.
+- [ ] 4R.6 Run one audit pass, record audit result, decide `d17_release_gate: open|closed`, exact-stage Gate4R owned paths, and commit.

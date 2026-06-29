@@ -23,7 +23,7 @@ public struct DemoForceStateValue: Codable, Equatable, Sendable {
     }
 }
 
-public struct DemoForceStateContext: Codable, Equatable, Sendable {
+public struct DemoForceStateContext: Equatable, Sendable {
     public let isolation: DemoForceStateIsolation
     public let provenanceEventID: String
     public let provenanceTraceID: String

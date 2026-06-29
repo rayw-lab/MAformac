@@ -113,6 +113,10 @@ final class DemoForceStateBoundaryTests: XCTestCase {
         }
     }
 
+    func testForceStateContextIsNotExternallyDecodable() {
+        XCTAssertFalse(DemoForceStateContext.self is Decodable.Type)
+    }
+
     private func demoHarnessEvent() -> DemoInteractionEvent {
         DemoInteractionEvent(
             eventID: "evt.force-state.gate3",
