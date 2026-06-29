@@ -5,7 +5,7 @@
 - [x] 1.3 Write Gate 1 receipt with live repo truth, dirty split, harness, validation, audit results, and non-claims.
 - [x] 1.4 Run `git diff --check`, `openspec validate define-core-config-force-state-authority --strict`, and `openspec validate --all --strict`.
 - [x] 1.5 Run Hermes hard audit and require anchored PASS with empty P0/P1 findings.
-- [ ] 1.6 Exact-stage only Gate 1 owned paths and commit `docs(main): define d16 core config force-state authority`.
+- [x] 1.6 Exact-stage only Gate 1 owned paths and commit `docs(main): define d16 core config force-state authority`.
 
 ## 2. D16 Gate 2 Core Config Code
 
@@ -23,7 +23,7 @@
 
 ## 4. D16 Gate 4 Upstream Verifier
 
-- [ ] 4.1 Verify committed D16 diff from clean-worktree perspective and refresh GitNexus if needed.
-- [ ] 4.2 Verify UIUE has not consumed D16 config/force-state names before release.
-- [ ] 4.3 Record proof cap, non-claims, and `d17_release_gate: open|closed`.
-- [ ] 4.4 Run required validation, Hermes audit, exact-stage verifier receipt, and commit.
+- [x] 4.1 Verify committed D16 diff from clean-worktree perspective and refresh GitNexus if needed.
+- [x] 4.2 Verify UIUE has not consumed D16 config/force-state names before release.
+- [x] 4.3 Record proof cap, non-claims, and `d17_release_gate: closed`.
+- [ ] 4.4 Run required validation, Hermes audit, exact-stage verifier receipt, and commit. Gate4 Hermes returned FAIL/P1; D17 release is closed pending a separate fix/reopen decision.
