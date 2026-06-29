@@ -55,6 +55,165 @@ final class DemoRuntimeAdapterTests: XCTestCase {
     }
 
     @MainActor
+    func testDurableLedgerReplaysAcrossNewAdapterWithoutSecondWrite() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let store = DemoVehicleStateStore()
+        let firstAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+
+        let first = try firstAdapter.execute(
+            commandID: "cmd-durable-ac-on",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "ac.power"))
+
+        let reconstructedAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+        let replay = try reconstructedAdapter.execute(
+            commandID: "cmd-durable-ac-on",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+        let cellAfterReplay = try XCTUnwrap(store.cell(for: "ac.power"))
+
+        XCTAssertEqual(first.provenance, .firstExecution)
+        XCTAssertEqual(replay.provenance, .retryReplay)
+        XCTAssertEqual(replay.readback, first.readback)
+        XCTAssertEqual(cellAfterReplay.revision, cellAfterFirst.revision)
+        XCTAssertEqual(cellAfterReplay.timestamp, cellAfterFirst.timestamp)
+    }
+
+    @MainActor
+    func testDurableLedgerFingerprintMismatchFailsClosedAcrossAdapter() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let store = DemoVehicleStateStore()
+
+        _ = try DemoRuntimeAdapter(ledgerStore: ledgerStore).execute(
+            commandID: "cmd-durable-conflict",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+
+        let reconstructedAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+        XCTAssertThrowsError(try reconstructedAdapter.execute(
+            commandID: "cmd-durable-conflict",
+            frame: frame(key: "ac.power", target: "off"),
+            store: store
+        )) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .idempotencyConflict(commandID: "cmd-durable-conflict"))
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(reconstructedAdapter.failureLedger.last?.kind, .conflict)
+    }
+
+    @MainActor
+    func testCorruptDurableLedgerFailsClosedWithoutMutation() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try Data("{\"successLedger\":".utf8).write(to: ledgerStore.fileURL)
+        let store = DemoVehicleStateStore()
+        let adapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+
+        XCTAssertThrowsError(try adapter.execute(
+            commandID: "cmd-corrupt-ledger",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .durableLedgerCorrupt(commandID: "cmd-corrupt-ledger"))
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertEqual(adapter.failureLedger.last?.kind, .corruptLedgerEntry)
+    }
+
+    @MainActor
+    func testUnknownDurableLedgerSchemaFailsClosedWithoutMutation() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let unsupported = DemoRuntimeAdapterLedgerSnapshot(schemaVersion: "unexpected.schema")
+        try ledgerStore.save(unsupported)
+        let store = DemoVehicleStateStore()
+        let adapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+
+        XCTAssertThrowsError(try adapter.execute(
+            commandID: "cmd-unknown-ledger-schema",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .durableLedgerCorrupt(commandID: "cmd-unknown-ledger-schema"))
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertEqual(adapter.failureLedger.last?.kind, .corruptLedgerEntry)
+    }
+
+    @MainActor
+    func testDurableFailureRecordDoesNotCreateSuccessfulReplay() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let store = DemoVehicleStateStore()
+        let invalid = ToolCallFrame(
+            agentID: "vehicle-control",
+            capabilityID: "cabin.runtime_adapter",
+            toolName: "unsupported_tool",
+            arguments: [
+                "state_key": "ac.power",
+                "target_state": "on"
+            ]
+        )
+
+        XCTAssertThrowsError(try DemoRuntimeAdapter(ledgerStore: ledgerStore).execute(
+            commandID: "cmd-durable-failure",
+            frame: invalid,
+            store: store
+        )) { error in
+            XCTAssertEqual(error as? DemoRuntimeAdapterError, .unsupportedTool("unsupported_tool"))
+        }
+
+        let reconstructedAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+        let result = try reconstructedAdapter.execute(
+            commandID: "cmd-durable-failure",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+        XCTAssertEqual(result.provenance, .firstExecution)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+    }
+
+    @MainActor
+    func testDurableReplayReconcilesCurrentStoreReadback() throws {
+        let directory = try temporaryLedgerDirectory()
+        let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
+        let store = DemoVehicleStateStore()
+
+        _ = try DemoRuntimeAdapter(ledgerStore: ledgerStore).execute(
+            commandID: "cmd-durable-readback-drift",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )
+        _ = store.applyMockTransition(DemoMockTransition(key: "ac.power", desiredValue: "off"))
+
+        let reconstructedAdapter = DemoRuntimeAdapter(ledgerStore: ledgerStore)
+        XCTAssertThrowsError(try reconstructedAdapter.execute(
+            commandID: "cmd-durable-readback-drift",
+            frame: frame(key: "ac.power", target: "on"),
+            store: store
+        )) { error in
+            XCTAssertEqual(
+                error as? DemoRuntimeAdapterError,
+                .readbackReconciliationFailed(
+                    commandID: "cmd-durable-readback-drift",
+                    key: "ac.power",
+                    expected: "on",
+                    actual: "off"
+                )
+            )
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertEqual(reconstructedAdapter.failureLedger.last?.kind, .retryableFailure)
+    }
+
+    @MainActor
     func testAlreadyStateReturnsNoopProvenanceWithoutMutation() throws {
         let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
         let store = DemoVehicleStateStore(cells: [
@@ -156,5 +315,13 @@ final class DemoRuntimeAdapterTests: XCTestCase {
                 "target_state": target
             ]
         )
+    }
+
+    private func temporaryLedgerDirectory() throws -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("MAformac-DemoRuntimeAdapterTests", isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory
     }
 }

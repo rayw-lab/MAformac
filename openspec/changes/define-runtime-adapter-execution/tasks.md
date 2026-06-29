@@ -118,11 +118,11 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 14. D18 Gate 2 Durable Ledger Code And Tests
 
-- [ ] 14.1 Run GitNexus context/impact for `DemoRuntimeAdapter` and any edited Swift symbol before edits.
-- [ ] 14.2 Implement the smallest explicit local durable ledger storage boundary for adapter success/failure records using deterministic temporary-directory-friendly storage.
-- [ ] 14.3 Add local/unit tests for cross-adapter success replay, fingerprint mismatch fail-closed, corrupt/unknown entry fail-closed, failure-not-success replay, and readback reconciliation.
-- [ ] 14.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
-- [ ] 14.5 Run GitNexus `detect_changes` on the exact staged Gate 2 diff before commit.
+- [x] 14.1 Run GitNexus context/impact for `DemoRuntimeAdapter` and any edited Swift symbol before edits.
+- [x] 14.2 Implement the smallest explicit local durable ledger storage boundary for adapter success/failure records using deterministic temporary-directory-friendly storage.
+- [x] 14.3 Add local/unit tests for cross-adapter success replay, fingerprint mismatch fail-closed, corrupt/unknown entry fail-closed, failure-not-success replay, and readback reconciliation.
+- [x] 14.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
+- [x] 14.5 Run GitNexus `detect_changes` on the exact staged Gate 2 diff before commit.
 
 ## 15. D18 Gate 3 C3 Reconstruction Integration Tests
 

@@ -6,6 +6,8 @@ public enum DemoRuntimeAdapterError: Error, Equatable {
     case missingStateCell(String)
     case idempotencyConflict(commandID: String)
     case readbackReconciliationFailed(commandID: String, key: String, expected: String, actual: String)
+    case durableLedgerCorrupt(commandID: String)
+    case durableLedgerWriteFailed(commandID: String)
 }
 
 public enum DemoRuntimeAdapterProvenance: String, Codable, Equatable, Sendable {
@@ -18,6 +20,7 @@ public enum DemoRuntimeAdapterFailureKind: String, Codable, Equatable, Sendable 
     case retryableFailure = "retryable_failure"
     case terminalFailure = "terminal_failure"
     case conflict
+    case corruptLedgerEntry = "corrupt_ledger_entry"
 }
 
 public struct DemoRuntimeAdapterFailureRecord: Codable, Equatable, Sendable {
@@ -58,23 +61,104 @@ public struct DemoRuntimeAdapterResult: Codable, Equatable, Sendable {
     }
 }
 
-@MainActor
-public final class DemoRuntimeAdapter {
-    private struct LedgerEntry {
-        var requestFingerprint: String
-        var readback: DemoActionReadback
+struct DemoRuntimeAdapterSuccessRecord: Codable, Equatable, Sendable {
+    var requestFingerprint: String
+    var readback: DemoActionReadback
+}
+
+struct DemoRuntimeAdapterLedgerSnapshot: Codable, Equatable, Sendable {
+    static let currentSchemaVersion = "r5.d18.local_durable_adapter_ledger.v1"
+
+    var schemaVersion: String
+    var successLedger: [String: DemoRuntimeAdapterSuccessRecord]
+    var failureLedger: [DemoRuntimeAdapterFailureRecord]
+
+    init(
+        schemaVersion: String = DemoRuntimeAdapterLedgerSnapshot.currentSchemaVersion,
+        successLedger: [String: DemoRuntimeAdapterSuccessRecord] = [:],
+        failureLedger: [DemoRuntimeAdapterFailureRecord] = []
+    ) {
+        self.schemaVersion = schemaVersion
+        self.successLedger = successLedger
+        self.failureLedger = failureLedger
+    }
+}
+
+enum DemoRuntimeAdapterLedgerStoreError: Error, Equatable {
+    case unsupportedSchema(String)
+}
+
+protocol DemoRuntimeAdapterLedgerStore: Sendable {
+    func load() throws -> DemoRuntimeAdapterLedgerSnapshot
+    func save(_ snapshot: DemoRuntimeAdapterLedgerSnapshot) throws
+}
+
+struct FileBackedDemoRuntimeAdapterLedgerStore: DemoRuntimeAdapterLedgerStore {
+    let fileURL: URL
+
+    init(directory: URL, fileName: String = "demo-runtime-adapter-ledger.json") {
+        self.fileURL = directory.appendingPathComponent(fileName)
     }
 
-    private var ledger: [String: LedgerEntry] = [:]
+    func load() throws -> DemoRuntimeAdapterLedgerSnapshot {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return DemoRuntimeAdapterLedgerSnapshot()
+        }
+        let data = try Data(contentsOf: fileURL)
+        let snapshot = try JSONDecoder().decode(DemoRuntimeAdapterLedgerSnapshot.self, from: data)
+        guard snapshot.schemaVersion == DemoRuntimeAdapterLedgerSnapshot.currentSchemaVersion else {
+            throw DemoRuntimeAdapterLedgerStoreError.unsupportedSchema(snapshot.schemaVersion)
+        }
+        return snapshot
+    }
+
+    func save(_ snapshot: DemoRuntimeAdapterLedgerSnapshot) throws {
+        let directory = fileURL.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let data = try encoder.encode(snapshot)
+        try data.write(to: fileURL, options: [.atomic])
+    }
+}
+
+@MainActor
+public final class DemoRuntimeAdapter {
+    private let ledgerStore: DemoRuntimeAdapterLedgerStore?
+    private var ledgerLoadError: Error?
+    private var ledger: [String: DemoRuntimeAdapterSuccessRecord] = [:]
     public private(set) var failureLedger: [DemoRuntimeAdapterFailureRecord] = []
 
-    public init() {}
+    public init() {
+        self.ledgerStore = nil
+    }
+
+    init(ledgerStore: DemoRuntimeAdapterLedgerStore) {
+        self.ledgerStore = ledgerStore
+        do {
+            let snapshot = try ledgerStore.load()
+            self.ledger = snapshot.successLedger
+            self.failureLedger = snapshot.failureLedger
+        } catch {
+            self.ledgerLoadError = error
+        }
+    }
 
     public func execute(
         commandID: String,
         frame: ToolCallFrame,
         store: DemoVehicleStateStore
     ) throws -> DemoRuntimeAdapterResult {
+        if ledgerLoadError != nil {
+            recordFailure(
+                commandID: commandID,
+                fingerprint: nil,
+                kind: .corruptLedgerEntry,
+                reason: "durable_ledger_corrupt"
+            )
+            throw DemoRuntimeAdapterError.durableLedgerCorrupt(commandID: commandID)
+        }
+
         let plannedTransition: DemoMockTransition
         do {
             plannedTransition = try transition(from: frame)
@@ -126,7 +210,18 @@ public final class DemoRuntimeAdapter {
                 actual: actual
             )
         }
-        ledger[commandID] = LedgerEntry(requestFingerprint: fingerprint, readback: readback)
+        ledger[commandID] = DemoRuntimeAdapterSuccessRecord(requestFingerprint: fingerprint, readback: readback)
+        do {
+            try persistSnapshot()
+        } catch {
+            recordFailure(
+                commandID: commandID,
+                fingerprint: fingerprint,
+                kind: .retryableFailure,
+                reason: "durable_ledger_write_failed"
+            )
+            throw DemoRuntimeAdapterError.durableLedgerWriteFailed(commandID: commandID)
+        }
 
         return DemoRuntimeAdapterResult(
             commandID: commandID,
@@ -141,6 +236,16 @@ public final class DemoRuntimeAdapter {
         frame: ToolCallFrame,
         store: DemoVehicleStateStore
     ) throws -> DemoRuntimeAdapterResult? {
+        if ledgerLoadError != nil {
+            recordFailure(
+                commandID: commandID,
+                fingerprint: nil,
+                kind: .corruptLedgerEntry,
+                reason: "durable_ledger_corrupt"
+            )
+            throw DemoRuntimeAdapterError.durableLedgerCorrupt(commandID: commandID)
+        }
+
         let transition = try transition(from: frame)
         let fingerprint = requestFingerprint(toolName: frame.toolName, transition: transition)
         guard let existing = ledger[commandID], existing.requestFingerprint == fingerprint else {
@@ -174,7 +279,7 @@ public final class DemoRuntimeAdapter {
     private func replayExisting(
         commandID: String,
         fingerprint: String,
-        existing: LedgerEntry,
+        existing: DemoRuntimeAdapterSuccessRecord,
         store: DemoVehicleStateStore
     ) throws -> DemoRuntimeAdapterResult {
         guard let current = store.cell(for: existing.readback.key) else {
@@ -229,6 +334,20 @@ public final class DemoRuntimeAdapter {
             requestFingerprint: fingerprint,
             kind: kind,
             reason: reason
+        ))
+        guard ledgerLoadError == nil else {
+            return
+        }
+        try? persistSnapshot()
+    }
+
+    private func persistSnapshot() throws {
+        guard let ledgerStore else {
+            return
+        }
+        try ledgerStore.save(DemoRuntimeAdapterLedgerSnapshot(
+            successLedger: ledger,
+            failureLedger: failureLedger
         ))
     }
 }
