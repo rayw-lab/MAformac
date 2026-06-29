@@ -163,22 +163,22 @@ Accepted by user in commander chat after reviewing the high-friction human-revie
 | ID | Original | P | Route | Action | Avg | Question | Next step |
 |---|---|---|---|---|---:|---|---|
 | C003 | RPB-03 | P1 | mainline_first | Keep | 21.7 | bridge 4 名和字段名必须由 mainline carrier/DTO 锁定。 | Create standalone burndown item with explicit validator and proof class. |
-| C005 | RPB-05 | P1 | mainline_first | Keep | 21.5 | 写所有权: 触摸/事件走 executor 或 runtime adapter, 不直接写 store。 | Create standalone burndown item with explicit validator and proof class. |
+| C005 | RPB-05 | P1 | mainline_first | Keep | 21.5 | 写所有权: 触摸/事件走 executor 或 runtime adapter, 不直接写 store。 | D9/D10 disposition: `covered_by_D9_local_unit` for current local mock executor/store write path only; production runtime adapter ownership remains future proof. Preserve original row. |
 | C006 | RPB-06 | P1 | mainline_first | Rewrite | 20.2 | 事件集必须封闭, 包含 text/mic/card/cancel/interruption/timeout 等。 | Rewrite into one falsifiable assertion before dispatch; keep original ID as provenance. |
 | C007 | RPB-07 | P1 | mainline_first | Keep | 20.5 | 事件 payload 必须区分 source/provenance 与 scope_origin/resolution。 | Create standalone burndown item with explicit validator and proof class. |
 | C009 | RPB-09 | P1 | mainline_first | Keep | 21.7 | Runtime result enum 保持机器可读, 不用裸 rejected。 | Create standalone burndown item with explicit validator and proof class. |
 | C010 | RPB-10 | P1 | mainline_first | Keep | 20.5 | 拒识词表要区分 unsupported/safety/clarify/already-state/runtime-error。 | Create standalone burndown item with explicit validator and proof class. |
 | C014 | RPB-14 | P1 | mainline_first | Keep | 21.0 | already_state_noop 独立结果, 视觉可 satisfied 但语义非 accepted delta。 | Create standalone burndown item with explicit validator and proof class. |
 | C017 | RPB-17 | P1 | mainline_first | Keep | 21.3 | partial deny 需要综合 snapshot, 逐 cell 混态与综合 readback。 | Create standalone burndown item with explicit validator and proof class. |
-| C018 | RPB-18 | P1 | mainline_first | Keep | 20.3 | SceneMacroRegistry 属 Core config, 非 UIUE-only 隐藏 planner。 | Create standalone burndown item with explicit validator and proof class. |
+| C018 | RPB-18 | P1 | mainline_first | Keep | 20.3 | SceneMacroRegistry 属 Core config, 非 UIUE-only 隐藏 planner。 | D9/D10 disposition: `deferred_owner_decision`; no SceneMacroRegistry/Core config authority was invented. Preserve original row for future mainline owner lane. |
 | C022 | RPB-22 | P1 | mainline_first | Keep | 21.7 | cancel/interruption/timeout/backgrounding 必须有终态 snapshot。 | Create standalone burndown item with explicit validator and proof class. |
 | C023 | RPB-23 | P1 | mainline_first | Keep | 21.0 | ASR/TTS 边界: backend 接 text, voice-ready 需真机 ASR/TTS proof。 | Create standalone burndown item with explicit validator and proof class. |
 | C024 | RPB-24 | P1 | mainline_first | Keep | 20.5 | TraceEnvelope 最小字段和 redaction 需要锁。 | Create standalone burndown item with explicit validator and proof class. |
 | C029 | RPB-29 | P2 | mainline_first | Rewrite | 18.0 | active cell 优先级需定义, refused 可压过 satisfied。 | Rewrite into one falsifiable assertion before dispatch; keep original ID as provenance. |
 | C030 | RPB-30 | P1 | mainline_first | Keep | 21.8 | snapshot card schema 要带 scope/reason/active/sibling 等呈现所需语义。 | Create standalone burndown item with explicit validator and proof class. |
 | C038 | RPB-38 | P2 | mainline_first | Rewrite | 18.3 | persistence 仅 DialogueState 短时, 不做 cloud/long memory。 | Rewrite into one falsifiable assertion before dispatch; keep original ID as provenance. |
-| C052 | RPB-52 | P2 | mainline_first | Rewrite | 19.7 | force-state context 输入需 `#if DEMO_MODE` + bridge event + trace provenance。 | Rewrite into one falsifiable assertion before dispatch; keep original ID as provenance. |
-| C061 | CE-008 | P2 | mainline_first | Rewrite | 19.3 | retry/idempotency 规则: 重试不得二次写 state 或吞掉 no-op。 | Rewrite into one falsifiable assertion before dispatch; keep original ID as provenance. |
+| C052 | RPB-52 | P2 | mainline_first | Rewrite | 19.7 | force-state context 输入需 `#if DEMO_MODE` + bridge event + trace provenance。 | D9/D10 disposition: `covered_by_D9_debug_only_bounded_spike`; production/runtime force-state remains future owner work. Preserve original row. |
+| C061 | CE-008 | P2 | mainline_first | Rewrite | 19.3 | retry/idempotency 规则: 重试不得二次写 state 或吞掉 no-op。 | D9/D10 disposition: `partial_D9_retry_deferred`; already-state no-double-write covered by local/unit proof, retry/full runtime adapter idempotency remains future. Preserve original row. |
 | C062 | CE-009 | P1 | mainline_first | Keep | 21.0 | snapshot 禁 raw model output, 只带 presentation-safe outcome。 | Create standalone burndown item with explicit validator and proof class. |
 | C097 | CE-044 | P1 | mainline_first | Keep | 21.3 | mainline/UIUE proof class crosswalk。 | Create standalone burndown item with explicit validator and proof class. |
 | C138 | MC-003 | P1 | mainline_first | Keep | 21.3 | `isTerminal` 由结果类派生还是 runtime adapter 显式写入。 | Create standalone burndown item with explicit validator and proof class. |
@@ -378,8 +378,8 @@ Accepted by user in commander chat after reviewing the high-friction human-revie
 
 | ID | Original | P | Route | Action | Avg | Question | Next step |
 |---|---|---|---|---|---:|---|---|
-| C134 | CE-081 | P1 | human_review | DeferHuman | 15.5 | white-edge threshold 保留 WARN 或 formalize, 禁偷写 PASS。 | Keep in human review backlog; no code until wording/interaction is accepted. |
-| C135 | CE-082 | P1 | human_review | DeferHuman | 15.0 | capsule final-art 是 human/product visual lane, 不阻塞 R5 dispatch。 | Keep in human review backlog; no code until wording/interaction is accepted. |
+| C134 | CE-081 | P1 | human_review | DeferHuman | 15.5 | white-edge threshold 保留 WARN 或 formalize, 禁偷写 PASS。 | D9/D10 disposition: `blocked_for_threshold`; Stage 3 added simulator review evidence but did not sign white-edge PASS. Keep in human review backlog. |
+| C135 | CE-082 | P1 | human_review | DeferHuman | 15.0 | capsule final-art 是 human/product visual lane, 不阻塞 R5 dispatch。 | D9/D10 disposition: `simulator_review_prep_only`; Stage 3 screenshot is simulator_mock review prep, not final-art acceptance. Keep in human/product lane. |
 | C160 | UC-007 | P1 | human_review | DeferHuman | 18.0 | card `accessibilityLabel` 是否包含 scope/reason/proof/read-only。 | Keep in human review backlog; no code until wording/interaction is accepted. |
 | C161 | UC-008 | P1 | human_review | DeferHuman | 16.5 | `ValueControlView` direct controls 的 a11y value/hint/range。 | Keep in human review backlog; no code until wording/interaction is accepted. |
 | C162 | UC-009 | P1 | human_review | DeferHuman | 16.7 | MicDock button tap 与“按住说话”文案的语义错配。 | Keep in human review backlog; no code until wording/interaction is accepted. |
