@@ -23,7 +23,108 @@ struct RuntimePresentationRowDisposition: Equatable, Sendable {
     let note: String
 }
 
+enum RuntimePresentationConsumerValidationError: Error, Equatable, Sendable {
+    case unknownPayloadSchema(String)
+    case unknownPresentationField(String)
+    case unknownProofClass(String)
+    case unknownReconciliationStatus(String)
+    case unknownReconciliationMismatchClass(String)
+    case unknownCoreConfigName(String)
+    case unknownSceneMacroName(String)
+    case unknownForceContextDimension(String)
+    case forbiddenPrivateName(String)
+}
+
 enum RuntimePresentationConsumerMapping {
+    static let payloadSchemaNames = [
+        "r5_runtime_presentation_payload_v1"
+    ]
+
+    static let payloadEnvelopeFields = [
+        "schemaVersion",
+        "traceID",
+        "turnID",
+        "eventID",
+        "isTerminal"
+    ]
+
+    static let payloadContentFields = [
+        "outcome",
+        "proofClass",
+        "cards",
+        "cardSemantics",
+        "readbacks",
+        "reconciliation",
+        "traceEnvelope"
+    ]
+
+    static var payloadFieldNames: [String] {
+        payloadEnvelopeFields + payloadContentFields
+    }
+
+    static let d15ProofClassNames = [
+        "docs_local",
+        "openspec_contract",
+        "local_static_contract",
+        "local_unit",
+        "local_shape_no_model",
+        "local_receipt_consistency",
+        "simulator_mock",
+        "external_gptpro_review"
+    ]
+
+    static let reconciliationStatusNames = [
+        "verified",
+        "mismatch",
+        "unavailable",
+        "not_applicable"
+    ]
+
+    static let reconciliationMismatchClassNames = [
+        "missing_readback",
+        "value_mismatch",
+        "revision_regression",
+        "scope_mismatch",
+        "unknown"
+    ]
+
+    static let coreConfigNames = [
+        "scene_macro_registry.version",
+        "scene_macro_registry.stable_names",
+        "d17.consumer_authority"
+    ]
+
+    static let sceneMacroNames = [
+        "scene1.human_language_comfort",
+        "scene2.multi_intent_comfort",
+        "scene3.followup_window_memory",
+        "scene4.driver_window_generalization",
+        "scene5.driving_safety_refusal"
+    ]
+
+    static let forceContextDimensionNames = [
+        "vehicle.speed",
+        "vehicle.gear",
+        "environment.weather",
+        "environment.time_period"
+    ]
+
+    static let forbiddenPrivateNames = [
+        "DemoRuntimeAdapter",
+        "DemoRuntimeAdapterResult",
+        "DemoRuntimeAdapterProvenance",
+        "RuntimeAdapterBox",
+        "requestFingerprint",
+        "parentRequestFingerprint",
+        "failureLedger",
+        "successLedger",
+        "settledParentPlan",
+        "rawRuntimeStore",
+        "rawModelOutput",
+        "trainingReceipt",
+        "DemoForceStateContext"
+    ]
+
     static let stableMainlineEventKinds = [
         "text_input",
         "mic_start",
@@ -138,6 +239,63 @@ enum RuntimePresentationConsumerMapping {
 
     static func disposition(for rowID: String) -> RuntimePresentationRowDisposition? {
         rowDispositions.first { $0.rowID == rowID }
+    }
+
+    static func validatePayloadSchema(_ name: String) throws {
+        guard payloadSchemaNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownPayloadSchema(name)
+        }
+    }
+
+    static func validatePresentationField(_ name: String) throws {
+        try rejectForbiddenConsumerName(name)
+        guard payloadFieldNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownPresentationField(name)
+        }
+    }
+
+    static func validateProofClass(_ name: String) throws {
+        guard d15ProofClassNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownProofClass(name)
+        }
+    }
+
+    static func validateReconciliationStatus(_ name: String) throws {
+        guard reconciliationStatusNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownReconciliationStatus(name)
+        }
+    }
+
+    static func validateReconciliationMismatchClass(_ name: String) throws {
+        guard reconciliationMismatchClassNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownReconciliationMismatchClass(name)
+        }
+    }
+
+    static func validateCoreConfigName(_ name: String) throws {
+        guard coreConfigNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownCoreConfigName(name)
+        }
+    }
+
+    static func validateSceneMacroName(_ name: String) throws {
+        guard sceneMacroNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownSceneMacroName(name)
+        }
+    }
+
+    static func validateForceContextDimension(_ name: String) throws {
+        guard forceContextDimensionNames.contains(name) else {
+            throw RuntimePresentationConsumerValidationError.unknownForceContextDimension(name)
+        }
+    }
+
+    static func rejectForbiddenConsumerName(_ name: String) throws {
+        if forbiddenPrivateNames.contains(where: { forbidden in
+            name == forbidden || name.hasPrefix(forbidden)
+        }) {
+            throw RuntimePresentationConsumerValidationError.forbiddenPrivateName(name)
+        }
     }
 
     private static func resultEntry(

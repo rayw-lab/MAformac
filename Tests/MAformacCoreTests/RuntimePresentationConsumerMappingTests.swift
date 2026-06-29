@@ -43,6 +43,141 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
         }
     }
 
+    func testD17PayloadSchemaAndFieldsConsumeOnlyStableMainlineNames() throws {
+        XCTAssertEqual(RuntimePresentationConsumerMapping.payloadSchemaNames, ["r5_runtime_presentation_payload_v1"])
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.payloadFieldNames,
+            [
+                "schemaVersion",
+                "traceID",
+                "turnID",
+                "eventID",
+                "isTerminal",
+                "outcome",
+                "proofClass",
+                "cards",
+                "cardSemantics",
+                "readbacks",
+                "reconciliation",
+                "traceEnvelope"
+            ]
+        )
+
+        try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v1")
+        try RuntimePresentationConsumerMapping.validatePresentationField("reconciliation")
+
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v2")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPayloadSchema("r5_runtime_presentation_payload_v2"))
+        }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("requestFingerprint")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("requestFingerprint"))
+        }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("uiueInventedSharedField")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPresentationField("uiueInventedSharedField"))
+        }
+    }
+
+    func testD17ProofAndReconciliationNamesFailClosed() throws {
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.d15ProofClassNames,
+            [
+                "docs_local",
+                "openspec_contract",
+                "local_static_contract",
+                "local_unit",
+                "local_shape_no_model",
+                "local_receipt_consistency",
+                "simulator_mock",
+                "external_gptpro_review"
+            ]
+        )
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.reconciliationStatusNames,
+            ["verified", "mismatch", "unavailable", "not_applicable"]
+        )
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.reconciliationMismatchClassNames,
+            ["missing_readback", "value_mismatch", "revision_regression", "scope_mismatch", "unknown"]
+        )
+
+        try RuntimePresentationConsumerMapping.validateProofClass("local_unit")
+        try RuntimePresentationConsumerMapping.validateReconciliationStatus("mismatch")
+        try RuntimePresentationConsumerMapping.validateReconciliationMismatchClass("scope_mismatch")
+
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateProofClass("runtime_ready")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownProofClass("runtime_ready"))
+        }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateReconciliationStatus("failureLedger")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownReconciliationStatus("failureLedger"))
+        }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateReconciliationMismatchClass("parentRequestFingerprint")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownReconciliationMismatchClass("parentRequestFingerprint"))
+        }
+    }
+
+    func testD17CoreConfigSceneMacroAndForceContextNamesFailClosed() throws {
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.coreConfigNames,
+            [
+                "scene_macro_registry.version",
+                "scene_macro_registry.stable_names",
+                "d17.consumer_authority"
+            ]
+        )
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.sceneMacroNames,
+            [
+                "scene1.human_language_comfort",
+                "scene2.multi_intent_comfort",
+                "scene3.followup_window_memory",
+                "scene4.driver_window_generalization",
+                "scene5.driving_safety_refusal"
+            ]
+        )
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.forceContextDimensionNames,
+            ["vehicle.speed", "vehicle.gear", "environment.weather", "environment.time_period"]
+        )
+
+        try RuntimePresentationConsumerMapping.validateCoreConfigName("d17.consumer_authority")
+        try RuntimePresentationConsumerMapping.validateSceneMacroName("scene5.driving_safety_refusal")
+        try RuntimePresentationConsumerMapping.validateForceContextDimension("vehicle.speed")
+
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateCoreConfigName("uiue.local.config")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownCoreConfigName("uiue.local.config"))
+        }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateSceneMacroName("scene6.uiue_invented")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownSceneMacroName("scene6.uiue_invented"))
+        }
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateForceContextDimension("customer_facing")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownForceContextDimension("customer_facing"))
+        }
+    }
+
+    func testD17ForbiddenPrivateRuntimeAndForceStateNamesAreRejected() {
+        let forbiddenNames = [
+            "DemoRuntimeAdapter",
+            "DemoRuntimeAdapterResult",
+            "RuntimeAdapterBox",
+            "requestFingerprint",
+            "parentRequestFingerprint",
+            "failureLedger",
+            "successLedger",
+            "settledParentPlan",
+            "rawRuntimeStore",
+            "rawModelOutput",
+            "trainingReceipt",
+            "DemoForceStateContext",
+            "DemoRuntimeAdapterPrivateField"
+        ]
+
+        for name in forbiddenNames {
+            XCTAssertThrowsError(try RuntimePresentationConsumerMapping.rejectForbiddenConsumerName(name), name) { error in
+                XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName(name))
+            }
+        }
+    }
+
     func testRuntimeResultMappingUsesStructuredNamesRatherThanDisplayCopy() {
         for entry in RuntimePresentationConsumerMapping.resultEntries {
             XCTAssertEqual(entry.structuredSource, "mainline_structured_runtime_result")
