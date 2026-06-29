@@ -16,10 +16,10 @@
 
 ## 3. D16 Gate 3 Force-State Boundary Code
 
-- [ ] 3.1 Before editing Swift symbols, run GitNexus impact/context for each target symbol or record an exact GitNexus blocker.
-- [ ] 3.2 Implement demo/debug-isolated force-state boundary with bridge event provenance and no direct state-cell contract mutation.
-- [ ] 3.3 Add local/unit tests proving production/customer-facing path is unavailable or fails closed.
-- [ ] 3.4 Run targeted Swift tests, OpenSpec validation, `git diff --check`, GitNexus `detect_changes`, and Hermes audit.
+- [x] 3.1 Before editing Swift symbols, run GitNexus impact/context for each target symbol or record an exact GitNexus blocker.
+- [x] 3.2 Implement demo/debug-isolated force-state boundary with bridge event provenance and no direct state-cell contract mutation.
+- [x] 3.3 Add local/unit tests proving production/customer-facing path is unavailable or fails closed.
+- [x] 3.4 Run targeted Swift tests, OpenSpec validation, `git diff --check`, GitNexus `detect_changes`, and Hermes audit.
 
 ## 4. D16 Gate 4 Upstream Verifier
 
