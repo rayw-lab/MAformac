@@ -109,7 +109,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 8.C 验收（A-2 收口）
 - [x] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
-- [x] 8.C2 visual-acceptance **L0-L3**（AD-15/U32-U37）：L0 on-screen simctl 真截图 + L1 zone sentinel PASS/WARN/FAIL + L2 OCR/contrast（SSIM 证据）+ **L3 人工 5-gate（米白/深空，~~投屏环境 V10~~ → 手持环境，投屏 DELETE C0）** + anchor-set 对比（连续舞台无黑线 / 制冷热 / capsule diorama）
+- [ ] 8.C2 visual-acceptance **L0-L3**（AD-15/U32-U37）：L0 on-screen simctl 真截图 + L1 zone sentinel PASS/WARN/FAIL + L2 OCR/contrast（SSIM 证据）+ **L3 人工 5-gate（米白/深空，~~投屏环境 V10~~ → 手持环境，投屏 DELETE C0）** + anchor-set 对比（连续舞台无黑线 / 制冷热 / capsule diorama）。当前保持 open；既有 P2/P3 证据只强化局部 simulator/local proof，不关闭 L3 human 5-gate。
 
 > 2026-06-26 P2 outer-ring validation reran `swift test`, macOS `xcodebuild`, and `make verify-all`: all PASS. This reinforces `8.C1` only. `8.C2` stays open because visual-acceptance 5-gate and anchor-level human review are not closed. Closeout ledger: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`.
 
@@ -165,3 +165,13 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [ ] 8.H4 R2 视觉重跑前置：R1 交互矩阵、R2b Layout Integrity / Visual Spacing、VPA 四态、capsule asset governance 均需有明确 owner/proof/defer 状态；本任务不勾 `8.C2`。
 - [ ] 8.H5 R2b Layout Integrity / Visual Spacing 只挡结构 bug：遮挡、留白、zone budget、safe-area、右侧按钮外置、胶囊居中、mic dock 不遮卡片；SHALL NOT 作为审美或 L3 裁判。
 - [ ] 8.H6 Capsule/VPA proof split：context/data proof、layout proof、diorama aesthetic/L3 proof 分层记录；GPT Image 2 / anchor 只作方向，不作工程结构或最终验收 authority。
+
+### 8.I D17 UIUE Runtime -> Presentation consumer train（2026-06-29，D15/D16 main authority consumer）
+
+> Authority: main D15 payload contract, main D16 Core config / force-state authority, Gate4R `d17_release_gate: open`. Proof cap remains local/unit/simulator_mock. No UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, or A-2 claim.
+
+- [x] 8.I1 Gate5 authority: define UIUE consumer boundary for D15 `RuntimePresentationPayload` / `PresentationReconciliation` and D16 stable Core config / SceneMacroRegistry / force-context names.
+- [x] 8.I2 Gate5 forbid UIUE-invented shared fields, enum values, proof classes, Core config truth, force-state truth, private adapter fields, raw runtime/model/training fields, and `DemoForceStateContext` decode/constructor surfaces.
+- [ ] 8.I3 Gate6 implement UIUE consumer mapping and local/unit fail-closed tests for unknown schema/proof/reconciliation/config/macro/force-context/presentation names.
+- [ ] 8.I4 Gate7 run UIUE consumer verifier and optional simulator/local visual smoke under proof cap.
+- [ ] 8.I5 Gate8 reconcile dual repo route map, burndown, grill/ledger cascade, final Claude Code adversarial audit, and exact-path commits.

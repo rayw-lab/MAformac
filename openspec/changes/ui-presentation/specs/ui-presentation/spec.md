@@ -325,3 +325,31 @@ Layout Integrity and Visual Spacing gates SHALL evaluate structural defects only
 - **WHEN** final 8.C2 visual acceptance is decided
 - **THEN** `8.C2` SHALL still require the L0-L3 evidence package and the L3 human 5-gate verdict
 - **AND** structural gate success SHALL NOT be upgraded to `V-PASS`, `mobile`, `true_device`, or `A-2 complete`
+
+### Requirement: D17 UIUE consumer authority SHALL consume only main-owned stable payload/config/force-state surfaces
+
+D17 UIUE consumer work SHALL consume only D15 presentation-safe Runtime -> Presentation payload fields and D16 stable main-owned Core config, scene macro, and force-context names. UIUE SHALL NOT invent shared fields, enum values, proof classes, Core config truth, force-state truth, or private adapter payload names. This authority does not implement consumer code by itself.
+
+#### Scenario: D17 consumes D15 payload and D16 stable names only
+- **GIVEN** D16 Gate4R has opened `d17_release_gate`
+- **WHEN** UIUE defines or implements D17 consumer mapping
+- **THEN** it SHALL consume only main-owned D15 payload envelope/content/reconciliation/proof fields and D16 stable config, scene macro, and force-context names
+- **AND** it SHALL NOT infer additional shared fields from UIUE docs, receipts, test helpers, private adapter names, raw runtime state, or local mock implementation details
+
+#### Scenario: unknown values fail closed
+- **GIVEN** a payload or config input contains an unknown schema, proof class, reconciliation status, mismatch class, config key, scene macro name, force-context dimension, or unexpected presentation field
+- **WHEN** UIUE validates that input
+- **THEN** the consumer SHALL fail closed
+- **AND** it SHALL NOT render the input as a supported successful shared feature
+
+#### Scenario: private runtime and force-state construction surfaces remain forbidden
+- **GIVEN** UIUE parses or maps a presentation payload
+- **WHEN** it encounters names from `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, ledger internals, settled parent plan internals, raw runtime store, raw model output, training receipt, adapter-local private names, or `DemoForceStateContext` decode/constructor surfaces
+- **THEN** UIUE SHALL reject those names as non-consumer authority
+- **AND** it SHALL NOT mirror them into local shared DTOs or UIUE-owned enums
+
+#### Scenario: D17 proof cap is not readiness
+- **GIVEN** D17 UIUE consumer authority, local/unit tests, or simulator smoke passes
+- **WHEN** status is reported
+- **THEN** the proof SHALL remain capped to local/unit/simulator_mock as applicable
+- **AND** it SHALL NOT claim UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready

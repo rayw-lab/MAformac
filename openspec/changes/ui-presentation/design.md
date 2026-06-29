@@ -278,3 +278,33 @@ UIUE 消费 `PresentationSnapshot`（**mock snapshot 即可，不依赖 mainline
 - AnyView vs enum+switch 性能差（AD-2，C3 局部中立）。
 - GPU 预算/帧率（C13 GPU~50% = ESTIMATE，Instruments 实测坐实）。
 - matchedGeometry 动效在低端机帧率（promotion_criteria 门的实测锚）。
+
+## AD-16 — D17 main-owned payload/config/force-state consumer boundary（2026-06-29）
+
+> Authority chain: main D15 `define-runtime-presentation-bridge` payload contract, main D16 `define-core-config-force-state-authority`, Gate4R release receipt `d17_release_gate: open`, and this UIUE Gate5 authority. This AD authorizes UIUE consumer authority only; implementation and fail-closed tests belong to Gate6.
+
+### 一、UIUE 可消费的 main-owned stable surface
+
+UIUE MAY consume only the following main-owned stable surfaces:
+
+- D15 payload envelope fields: `schemaVersion`, `traceID`, `turnID`, `eventID`, `isTerminal`.
+- D15 payload content fields: `outcome`, `proofClass`, `cards`, `cardSemantics`, `readbacks`, `reconciliation`, `traceEnvelope`, only as presentation-safe values.
+- D15 reconciliation surface: `PresentationReconciliation.status`, `readbackKey`, `mismatchClass`, and `safeReason`.
+- D15 finite proof classes as labels for proof cap only, not readiness promotion.
+- D16 Core config names: `scene_macro_registry.version`, `scene_macro_registry.stable_names`, `d17.consumer_authority`.
+- D16 scene macro names: `scene1.human_language_comfort`, `scene2.multi_intent_comfort`, `scene3.followup_window_memory`, `scene4.driver_window_generalization`, `scene5.driving_safety_refusal`.
+- D16 force-context dimensions as names only when carried by main-owned presentation payload/context authority: `vehicle.speed`, `vehicle.gear`, `environment.weather`, `environment.time_period`.
+
+### 二、UIUE 不拥有的 surface
+
+UIUE SHALL NOT consume, map, serialize, or infer shared fields from `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, success/failure ledger internals, settled parent plan internals, raw runtime store, raw model output, training receipt, adapter-local private names, or any `DemoForceStateContext` decode/constructor surface. Gate4R closed the `DemoForceStateContext` external `Decodable` construction bypass; UIUE must treat that type as non-consumer authority and must not re-open it through local DTO mirroring.
+
+### 三、fail-closed and proof cap
+
+Unknown schema, proof class, reconciliation status, mismatch class, config key, scene macro name, force-context dimension, or unexpected presentation field SHALL fail closed in UIUE consumer mapping. Gate6 implementation must prove this with local/unit tests before any consumer code is called complete.
+
+The proof ceiling for D17 UIUE remains `local`, `unit`, and optional `simulator_mock`. D17 SHALL NOT claim UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready.
+
+### 四、claim-vs-proof correction
+
+D15 created main payload authority but did not implement UIUE consumption. D16 Gate4R opened the D17 release gate after repairing the force-state construction bypass, but it did not provide runtime/mobile/live proof. Therefore Gate5 is authority only: it defines the consumer boundary and forbids UIUE invented shared fields before Gate6 code/tests.

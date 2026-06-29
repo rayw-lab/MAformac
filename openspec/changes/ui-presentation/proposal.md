@@ -39,6 +39,7 @@ D1-D7 二次深 grill（CC 5×⭐ + Codex 物理化 + 辩证 check）+ 30 决策
 - **U7 native SwiftUI translation**：保 scheme1 深空辉光方向 ≠ 保现状代码；视觉值只从 tokens.md 取（base #121212）。
 - **C8 高频代理**：卡片优先级用 A2 产 `generated/family-device-allowlist.json` 的 `row_count`（产品约定收窄，量产 priority 字段砍）。
 - **🔴 D8 默认主驾 + default_scope 消费（R5，2026-06-24 grill 收口）**：卡片读 per-cell `default_scope`（G25 SSOT）锚定默认 scope（座位→主驾等），不弹区域 clarify；scope 呈现单一规则（默认淡显角标 / 非默认显式 / 全车 fan-out 聚合卡+badge / 多轮升级聚合范围词），卡片·TTS·readback 三处同源。依赖后端 `default_scope` 字段（独立 `define-demo-default-scope` change）。
+- **D17 Runtime -> Presentation payload consumer authority（2026-06-29）**：UIUE 只能消费 main D15 `RuntimePresentationPayload` / `PresentationReconciliation` presentation-safe 字段，以及 main D16 Core config / SceneMacroRegistry / force-state stable names；未知 schema、proof、reconciliation、config、macro、force-context dimension 必须 fail closed。UIUE 不得消费 main private adapter / ledger / raw runtime / raw model / training receipt / `DemoForceStateContext` construction surfaces，也不得把 local/unit/simulator_mock 证明升格成 runtime/mobile/true-device/live/V-PASS/A-2。
 - spec ADDED：`ui-presentation`（新 capability，5 Req / 29 Scenario）。
 
 ## Capabilities
