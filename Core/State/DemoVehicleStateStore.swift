@@ -130,6 +130,14 @@ public final class DemoVehicleStateStore {
                 spokenText: "状态未定义"
             )
         }
+        if cell.actualValue == transition.desiredValue {
+            return DemoActionReadback(
+                key: cell.key,
+                actualValue: cell.actualValue,
+                revision: cell.revision,
+                spokenText: DemoVehicleStateStore.spokenText(for: cell)
+            )
+        }
         cell.desiredValue = transition.desiredValue
         cell.actualValue = transition.desiredValue
         cell.source = transition.source

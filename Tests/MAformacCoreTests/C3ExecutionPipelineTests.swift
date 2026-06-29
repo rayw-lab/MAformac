@@ -78,6 +78,33 @@ final class C3ExecutionPipelineTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "window.position[右后]")?.actualValue, "30")
     }
 
+    @MainActor
+    func testRepeatedAlreadyStateCommandDoesNotDoubleWriteRevision() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let first = ToolCallFrame.fixture(
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try pipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+        let revisionAfterFirstWrite = try XCTUnwrap(store.cell(for: "window.position[主驾]")).revision
+
+        let repeated = ToolCallFrame.fixture(
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: store.currentRevision
+        )
+        let result = try pipeline.execute(repeated, store: store, traceLogger: InMemoryTraceLogger())
+
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "100")
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.revision, revisionAfterFirstWrite)
+        XCTAssertEqual(result.readbacks.first?.revision, revisionAfterFirstWrite)
+    }
+
     func testOmittedWindowScopeResolvesToC2DefaultScope() throws {
         let pipeline = try makePipeline(intentConfirmed: true)
         let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "window.position"))
