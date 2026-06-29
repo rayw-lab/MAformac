@@ -1,9 +1,9 @@
 ---
 artifact_kind: r5_d18_d19_runtime_durability_uiue_guard_commander_reconcile
-gate: D19_GATE_7_DOC_CASCADE_ROUTE_RECONCILE
+gate: D19_GATE_8_FINAL_RECONCILE_AND_BLIND_AUDITS
 repo: /Users/wanglei/workspace/MAformac-uiue
-status: DONE_PENDING_GATE8_FINAL_AUDITS
-proof_class: docs_local + local_static + local_unit + openspec_local + gitnexus_static + hermes_audits
+status: DONE_UNDER_PROOF_CAP_WITH_FINAL_AUDIT_FAIL_FIXED
+proof_class: docs_local + local_static + local_unit + local_integration + openspec_local + gitnexus_static + hermes_audits + claude_code_audit + codex_subagent_audit
 created_at: 2026-06-29
 ---
 
@@ -11,9 +11,9 @@ created_at: 2026-06-29
 
 ## Verdict
 
-`DONE_PENDING_GATE8_FINAL_AUDITS`
+`DONE_UNDER_PROOF_CAP_WITH_FINAL_AUDIT_FAIL_FIXED`
 
-Gate7 cascades D18+D19 into the living route map, burndown, and dual-repo reconcile receipts. D18 moves `C005`/`C061` to main-owned local durable adapter ledger proof. D19 adds UIUE negative guard authority/tests only.
+Gate8 closes D18+D19 under proof cap after final validation and audits. D18 moves `C005`/`C061` to main-owned local durable adapter ledger proof. D19 adds UIUE negative guard authority/tests only. Final audit truth includes one Codex native blind audit `FAIL/P1` for stale Gate8 ledger/task/receipt state, fixed post-audit without rerun under the operator one-round final-audit policy.
 
 This does not claim production durable runtime, runtime-ready, mobile, true-device, live API, UIUE merge, visual L3, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, endpoint-ready, or R5 completion.
 
@@ -27,9 +27,13 @@ This does not claim production durable runtime, runtime-ready, mobile, true-devi
 | D18 Gates1-3 post-Hermes fix | main | `b6b92fd` | DONE under fail-fixed | Hermes round1 FAIL/P1 unknown durable JSON fields fixed post-audit; not Hermes PASS. |
 | D18 Gates1-3 audit wording fix | main | `d61b3c` | DONE | Records operator no-rerun override truth. |
 | D18 Gate4 | main | `b6a7937` | DONE | Private payload boundary verifier; `rawRuntimeStore` redaction fixed. |
+| D18/D19 Gate7 route wording fix | UIUE | `15667aa` | DONE under Hermes round3 lower-severity fix | Hermes round3 PASS P0/P1/P2 empty; lower-severity stale route wording fixed post-audit without rerun. |
+| D18/D19 Claude Code P2 fix | main | `e7e6298` | DONE under Claude PASS/P2 fixed | Claude Code final blind audit PASS P0/P1 empty; P2 durable private markers fixed post-audit. |
 | D19 Gate5 | UIUE | `fd46e68` | DONE | Durability guard authority only. |
 | D19 Gate6 | UIUE | `86ed726` | DONE | Durability guard code/tests. |
 | D19 Gate6 Hermes receipt | UIUE | `8255b3d` | DONE | Hermes round2 PASS P0/P1/P2 empty. |
+| D19 Gate8 task ledger fix | UIUE | `b9869ca` | DONE | `8.J4` marked complete after Director intake; no proof promotion. |
+| D19 Gate8 Codex final audit fix | UIUE | pending final docs commit | DONE under Codex FAIL/P1 fixed | Codex native blind final audit FAIL/P1 for stale Gate8 task/receipt/route-map ledger state; fixed post-audit, not Codex PASS. |
 
 ## Route Map And Burndown Cascade
 
@@ -68,27 +72,30 @@ No-change reason: D18/D19 proof movement belongs in the living route map, burndo
 | Claim-vs-proof | Local durable adapter ledger and UIUE local/unit guard proof only; no runtime/mobile/live/UIUE merge readiness. |
 | Boundary | Main owns D18 durable runtime implementation truth; UIUE rejects D18 private names and does not consume durable rows. |
 | If wrong, what proves it | Route map D18+D19 section, burndown C005/C061 rows, main D18 receipts, UIUE D19 receipts/tests. |
-| Post-audit correction | Gate8 will run Hermes round3, then Claude Code blind final audit, then Codex native blind audit. Findings must be fixed and recorded without false PASS wording. |
+| Post-audit correction | Gate8 ran Hermes round3, Claude Code blind final audit, and Codex native blind final audit. Hermes round3 PASS had lower-severity route wording fixed; Claude Code PASS/P2 had durable private-marker redaction fixed; Codex final audit FAIL/P1 had stale Gate8 ledger/task/receipt state fixed. Do not rewrite Codex as PASS. |
 
 ## Validation
 
-Passed local validation:
+Passed final local validation after post-audit fixes:
 
 - UIUE `git diff --check`: PASS.
 - UIUE `openspec validate ui-presentation --strict`: PASS.
+- UIUE `swift test --filter RuntimePresentationConsumerMappingTests`: PASS, 14 tests, 0 failures.
 - main `git diff --check`: PASS.
 - main `openspec validate define-runtime-adapter-execution --strict`: PASS.
 - main `openspec validate define-runtime-presentation-bridge --strict`: PASS.
 - main `openspec validate --all --strict`: PASS.
-- main GitNexus `detect_changes(scope=staged)`: `low`, 1 changed docs file, 0 affected processes.
-- UIUE GitNexus `detect_changes(scope=staged)`: `low`, 3 changed docs files, 0 affected processes.
+- main `swift test --filter 'DemoRuntimeAdapterTests|C3ExecutionPipelineTests|RuntimePresentationBridgeTests|VehicleStateStoreContractTests'`: PASS, 66 tests, 0 failures.
+- main GitNexus staged checks were run for owned Swift/doc changes before commits; post-Claude redaction fix staged detect was `low`, 6 changed symbols, 0 affected processes.
+- UIUE GitNexus staged checks were run for owned docs/code changes before commits; post-`8.J4` staged detect was `low`, 2 changed symbols, 0 affected processes.
 
-Pending for Gate8:
+Gate8 audit truth:
 
-- final targeted Swift test reruns.
-- Hermes round3 over Gates7-8.
-- Claude Code blind final audit.
-- Codex native blind final audit.
+- Hermes round1 over D18 Gates1-3: `FAIL`, P1 unknown durable JSON fields fixed post-audit under operator no-rerun override. Not Hermes PASS.
+- Hermes round2 over D18 Gate4 through D19 Gate6: `PASS`, P0/P1/P2 empty.
+- Hermes round3 over Gates7-8: `PASS`, P0/P1/P2 empty, lower-severity route wording fixed post-audit without rerun.
+- Claude Code final blind audit: `PASS`, P0/P1 empty, P2 durable private-marker redaction fixed post-audit in main commit `e7e6298`.
+- Codex native final blind audit: `FAIL`, P0 empty, P1 stale Gate8 task/receipt/route-map ledger state fixed post-audit in this final docs commit. Not Codex PASS.
 
 ## Dirty Split
 

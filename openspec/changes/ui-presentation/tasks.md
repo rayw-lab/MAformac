@@ -174,7 +174,7 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.I2 Gate5 forbid UIUE-invented shared fields, enum values, proof classes, Core config truth, force-state truth, private adapter fields, raw runtime/model/training fields, and `DemoForceStateContext` decode/constructor surfaces.
 - [x] 8.I3 Gate6 implement UIUE consumer mapping and local/unit fail-closed tests for unknown schema/proof/reconciliation/config/macro/force-context/presentation names.
 - [x] 8.I4 Gate7 run UIUE consumer verifier and optional simulator/local visual smoke under proof cap.
-- [ ] 8.I5 Gate8 reconcile dual repo route map, burndown, grill/ledger cascade, final Claude Code adversarial audit, and exact-path commits.
+- [x] 8.I5 Gate8 reconcile dual repo route map, burndown, grill/ledger cascade, final Claude Code adversarial audit, and exact-path commits.
 
 ### 8.J D19 UIUE durability guard train（2026-06-29，D18 proof-governance / deny-list consumer）
 
@@ -184,4 +184,6 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.J2 Gate5 forbid UIUE consumption of durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, request/parent fingerprints, success/failure ledger, settled parent plan, raw runtime store, raw model output, training receipt, adapter-local private names, and D18 storage/schema internals.
 - [x] 8.J3 Gate6 implement UIUE local/unit fail-closed guard tests for D18 durable/private names and readiness/proof-cap non-promotion.
 - [x] 8.J4 Gate7 update route/burndown/reconcile docs under proof cap.
-- [ ] 8.J5 Gate8 final reconcile and blind audits across D18+D19 Gates1-8.
+- [x] 8.J5 Gate8 final reconcile and blind audits across D18+D19 Gates1-8.
+
+Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2 empty and one lower-severity route wording correction fixed afterward. Claude Code blind final audit anchored PASS with P0/P1 empty and P2 durable private-marker redaction fixed afterward in main. Codex native blind final audit anchored FAIL/P1 for stale Gate8 task/receipt/route-map ledger state; this was fixed post-audit under the operator one-round final-audit policy and must not be described as Codex PASS.
