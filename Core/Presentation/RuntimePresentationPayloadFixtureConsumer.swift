@@ -471,6 +471,8 @@ private struct FixtureTimestamp: Decodable {
 private enum RuntimePresentationPayloadFixtureConsumerBridge {
     static func proofClass(for mainlineName: String) -> PresentationProofClass {
         switch mainlineName {
+        case "local_unit":
+            return .localMock
         case "docs_local", "openspec_contract", "local_static_contract", "local_shape_no_model", "local_receipt_consistency":
             return .staticPreview
         case "simulator_mock":

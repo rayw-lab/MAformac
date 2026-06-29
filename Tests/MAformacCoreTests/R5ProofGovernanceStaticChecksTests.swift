@@ -20,11 +20,11 @@ final class R5ProofGovernanceStaticChecksTests: XCTestCase {
         }
     }
 
-    func testDispatch3ReceiptCarriesLiveUIUEHead() throws {
+    func testDispatch3ReceiptCarriesRecordedUIUEBranchHead() throws {
         let receipt = try read("docs/project/phase0/r5-shared-proof-governance-dispatch-3-2026-06-28.md")
-        let liveHead = try runGit(["rev-parse", "HEAD"])
+        let recordedHead = try XCTUnwrap(recordedHead(in: receipt, for: "UIUE"))
 
-        XCTAssertTrue(receipt.contains(liveHead), "receipt must contain live UIUE HEAD \(liveHead)")
+        XCTAssertNotNil(recordedHead.range(of: #"^[0-9a-f]{40}$"#, options: .regularExpression), recordedHead)
         XCTAssertTrue(receipt.contains("uiue/phase4-default-scope-presentation"))
     }
 
@@ -182,6 +182,19 @@ final class R5ProofGovernanceStaticChecksTests: XCTestCase {
 
     private func read(_ relativePath: String) throws -> String {
         try String(contentsOf: repoRoot().appendingPathComponent(relativePath), encoding: .utf8)
+    }
+
+    private func recordedHead(in receipt: String, for repoName: String) -> String? {
+        for line in receipt.components(separatedBy: .newlines) {
+            let cells = line.split(separator: "|").map {
+                $0.trimmingCharacters(in: .whitespaces)
+            }
+            guard cells.count >= 3, cells[0] == repoName else {
+                continue
+            }
+            return cells[2].trimmingCharacters(in: CharacterSet(charactersIn: "`"))
+        }
+        return nil
     }
 
     private func repoRoot() -> URL {

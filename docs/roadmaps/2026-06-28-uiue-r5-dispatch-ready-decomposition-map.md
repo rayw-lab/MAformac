@@ -1,11 +1,11 @@
 ---
-status: LIVING_ROUTE_CONTROL_AFTER_D20_D21_GATE3_FIXED_POST_AUDIT_GATE4_IN_PROGRESS
+status: LIVING_ROUTE_CONTROL_AFTER_D20_D21_GPTPRO_REQUEST_CHANGES_FIXED_POST_AUDIT
 artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
 last_updated_at: 2026-06-30
 owner: commander
-proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit
-authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_execution_through_gate3
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit
+authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_gptpro_fixed_post_audit
 canonical_for:
   - UIUE R5 dispatch grouping
   - serial_parallel_dependency_order
@@ -52,7 +52,8 @@ Current truth for `UIUE_R5_D20_D21_RUNTIME_UIUE_INTEGRATION_PR_SUPERTRAIN`:
 - Gate2 D21 UIUE payload fixture consumer: DONE under proof cap. UIUE added a local JSON fixture consumer into `PresentationSnapshot`; Hermes Gate2 PASS with P0/P1/P2 empty.
 - Gate3 cross-repo fixture contract: DONE as `hermes_fail_fixed_post_audit`. Hermes Gate3 FAIL/P1 was limited to untracked fixture packaging; exact-path staging fixed the git-state issue, and local validation was rerun without a Hermes rerun.
 - Public fixture sha256: `57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f`.
-- Gate4 final reconcile, Claude Code final audit, push to existing PR #7/#6, and one combined GPT Pro PR-pair audit remain the active serial gate at this checkpoint.
+- Gate4 final reconcile: Hermes PASS; Claude Code final audit PASS with P2 docs nits fixed locally without rerun; both existing PR branches were pushed without creating or merging PRs.
+- Combined GPT Pro PR-pair audit returned `REQUEST_CHANGES`, not PASS. Fixes were applied post-audit without a GPT Pro rerun: #6 CI self-invalidating live-head check was repaired, #6 PR body legacy `V-PASS` wording became explicit historical/non-claim wording, UIUE `local_unit` proof mapping became explicit `.localMock`, main single-command demo bundle was renamed away from `appDefault`, and main durable failure paths no longer silently retain settled replay/failure-ledger persistence errors.
 
 This update does not claim runtime-ready, mobile, true-device, live proof,
 UIUE merge, V/S/U-PASS, A-2 completion, R5 completion, or voice/model/golden/
@@ -113,7 +114,7 @@ Post-D18+D19 Gate8 long-task order:
 
 | order | candidate dispatch | primary repo | goal | hard stop |
 |---:|---|---|---|---|
-| active | D20+D21 Runtime/UIUE Integration PR Supertrain | main + UIUE split, no merge | Gates1-3 are executed under proof cap; Gate3 carries `hermes_fail_fixed_post_audit` for fixed git-state packaging only. Gate4 must finish final local validation, Hermes final reconcile, one Claude Code full-train audit, existing PR #7/#6 push, and one combined GPT Pro PR-pair audit. | Stop if old `DemoWalkingSkeleton` remains the app execution path, UIUE consumes private/durable main names, local fixture proof is promoted to production/runtime/mobile/live readiness, PR reconciliation tries `git add .`, new PRs, merge, or no-touch paths, or audit fallback is used as an extra node rather than a replacement. |
+| fixed-post-audit | D20+D21 Runtime/UIUE Integration PR Supertrain | main + UIUE split, no merge | Gates1-4 executed under proof cap. Gate3 remains `hermes_fail_fixed_post_audit`; GPT Pro remains `REQUEST_CHANGES` with post-audit local/PR-body fixes and no GPT Pro rerun. | Stop if this row is rewritten as GPT Pro PASS, runtime-ready, mobile/true-device/live proof, UIUE merge, V/S/U/A-2/R5 completion, or if residual P2 items are treated as closed without separate authority. |
 | later | visual L3 / true-device / voice/model/golden lanes | UIUE/main split | Open only with separate authority and proof plan after D20/D21 residuals are reconciled. | Stop if D20/D21 local/unit/integration/simulator proof is treated as V-PASS, A-2 complete, mobile, true-device, voice-ready, model-ready, golden-ready, endpoint-ready, or UIUE merge. |
 
 Do not open C5/C6 model, golden, voice, mobile/true-device, endpoint, merge, or V/S/U/A-2 readiness lanes from this R5 route-control document. D20/D21 starts large-scale coding only inside the runtime-entry and presentation-consumer bridge described above.

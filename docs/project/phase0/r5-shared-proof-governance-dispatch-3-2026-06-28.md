@@ -53,7 +53,7 @@ Proof ceiling: `docs_local + receipt_consistency + local_static`
 | `C189` | S1 guard | guarded | `guarded_no_regression` | schema + receipt | `receipt_consistency` | C5/C6/golden/voice are listed as independent non-claim lanes | Future lanes need separate proof plans. |
 | `C046` | S2 hygiene | covered | `covered_by_governance_checker` | schema required fields | `receipt_consistency + local_static` | command/surface_or_device/proof_class/touched_paths/residual required | None for P0/P1. |
 | `C047` | S2 hygiene | covered | `covered_by_governance_checker` | schema status vocabulary | `receipt_consistency + local_static` | `contract_aligned` and `consumer_mapping_ready` cannot mean merged | None for P0/P1. |
-| `C048` | S2 hygiene | covered | `covered_by_governance_checker` | receipt repo truth + live-head test | `receipt_consistency + local_static` | checker compares receipt head to live `git rev-parse HEAD` | Must refresh if HEAD changes before commit. |
+| `C048` | S2 hygiene | covered | `covered_by_governance_checker` | receipt repo truth + live-head test | `receipt_consistency + local_static` | checker requires a dispatch-time 40-hex UIUE branch head in receipt repo truth | Must refresh when this receipt itself is re-issued, not on every PR merge ref. |
 | `C049` | S2 hygiene | covered | `covered_by_governance_checker` | schema + receipt residual section | `receipt_consistency + local_static` | unresolved P0/P1 carry-forward field required | None currently; subagent audit completed with no P0/P1. |
 | `C107` | S2 hygiene | covered | `covered_by_governance_checker` | schema non-claims checkbox | `receipt_consistency + local_static` | non-claims checkbox required | None for P0/P1. |
 | `C108` | S2 rewrite | covered | `rewritten_as_falsifiable_rule` | schema validation gate table | `receipt_consistency + local_static` | validation gate derives from docs/Swift/mainline/simulator touched path class | None for P0/P1. |
@@ -74,7 +74,7 @@ Proof ceiling: `docs_local + receipt_consistency + local_static`
 | `receipt_schema_required_fields` | covered | Schema and checker require command, surface_or_device, proof_class, touched_paths, dirty_split, residual_risks, live_HEAD, non_claims_checkbox, unresolved_P0_P1_carry_forward. |
 | `validation_gate_by_touched_paths` | covered | Schema table maps docs-only, Swift/UIUE code, mainline read-only reference, OpenSpec touched, simulator/screenshot, and runtime/device paths to gates. |
 | `dual_repo_dirty_split` | covered | Receipt records UIUE dirty split and main reference dirty split separately. |
-| `live_head_required` | covered | Static checker compares receipt UIUE head to live `git rev-parse HEAD`. |
+| `live_head_required` | covered | Static checker verifies the receipt carries a dispatch-time 40-hex UIUE branch head for the recorded branch. |
 
 ## K1_M3_H1 Status
 
