@@ -1,22 +1,28 @@
 ---
-status: DISPATCH_READY_DECOMPOSITION_CANDIDATE
-artifact_kind: commander_dispatch_decomposition_map
+status: LIVING_ROUTE_CONTROL_AFTER_D14
+artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
+last_updated_at: 2026-06-29
 owner: commander
-proof_class: docs/local + calibration_receipts
-authority: coordination_map_after_step0
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier
+authority: coordination_map_after_step0_plus_d14_commander_intake
 canonical_for:
   - UIUE R5 dispatch grouping
   - serial_parallel_dependency_order
   - human_review_nodes
   - stop_conditions
   - proof_cap_wording
+  - living_r5_route_control
+  - post_D14_next_long_task_order
+  - grill_burndown_progress_accounting
 not_canonical_for:
   - mainline shared runtime field authority
   - RuntimePresentationBridge Swift schema authority
   - OpenSpec requirements
   - implementation authorization
   - runtime/mobile/true_device/voice/model/golden/endpoint readiness
+  - merge authorization
+  - push authorization
 non_claims:
   - no R5 execution complete
   - no runtime-ready
@@ -39,6 +45,46 @@ non_claims:
 
 This document combines the UIUE STEP0 baseline freeze verdict and the main-side STEP0 calibration verdict into a dispatch-ready dependency map. It does not dispatch windows by itself and does not authorize implementation. A later commander prompt may use this map to create bounded dispatches.
 
+As of D14, this file is also the living R5 route-control document. Update it after every accepted dispatch, phase review, or commander route decision. Each update must record live repo truth, proof-class ceiling, grill burndown movement, changed row dispositions, next long-task order, stop conditions, and any stale wording corrected during intake.
+
+## Current Route Snapshot After D14
+
+Last live-verified commander checkpoint:
+
+| repo | HEAD | status |
+|---|---|---|
+| main | `66dda258052a5f29b397db0a554eda5b6dabce5f` | preserve-unowned dirty only: `AGENTS.md`, `CLAUDE.md`, `docs/CURRENT.md`, `docs/README.md`, `.xcodebuildmcp/`, `Tools/agent-platform-plugin-refs/` |
+| UIUE | `98e48da84ebf5c75332e6c62d1b181be2675ba97` | commander-owned route map was already dirty before Gate 4; untracked source dispatches remain: D12, D13, D14; `docs/research/2026-06-29-visual-acceptance-standard/` is unrelated pre-existing untracked evidence |
+
+D14 route truth:
+
+- `C005` and `C061` were strengthened from D13 C3-path local/unit proof to D14 **main C3-path local/unit residual proof**: session-scoped success/failure ledgers, readback reconciliation, exact settled stale retry ordering through a parent request fingerprint + settled parent plan, and private `RuntimeAdapterBox` boundary.
+- D14 does not add new closed grill row IDs; it deepens the same `C005`/`C061` proof class and reduces residuals inside those rows.
+- Ledger and parent-plan replay remain session-scoped and non-durable. Production runtime, durable persistence, mobile/true-device/live proof, UIUE payload contract/consumption, and UIUE merge remain future work.
+- `C018` remains a future Core config / SceneMacroRegistry owner lane. `C052` remains debug-only bounded spike proof; production/runtime force-state authority remains future work.
+- UIUE remains a guarded consumer. D14 does not define a UIUE-facing payload contract and does not authorize UIUE Swift to consume Runtime Adapter V0 private fields.
+- Gate 3 used a Codex substitute verifier because Hermes quota was unavailable; no Hermes Gate 3 anchor is claimed for D14.
+
+Grill burndown accounting:
+
+| lens | count | percent | meaning |
+|---|---:|---:|---|
+| Routed/classified rows | 215/215 | 100.0% | Every grill row has route/action/package. This is routing completion, not implementation completion. |
+| Task-shape compression | 8 workstreams from 215 rows | 96.3% compressed | The row set is controlled as 5 implementation dispatches plus 3 ledgers, not 215 standalone tickets. |
+| Strict proof-closed rows | about 30/215 | about 14.0% | D14 did not add new row IDs; it strengthened `C005`/`C061` local/unit proof. Proof remains capped; no runtime/mobile/true-device claim. |
+| Debug-only bounded spike counted separately | +1 row | about 14.4% if included | `C052` has D9 debug-only bounded spike proof only; production/runtime force-state remains future owner work. |
+| Future/human/spike ledgers still open | 45/215 | 20.9% | Future lane 29 + spike 8 + remaining human 8 cannot be closed by runtime code alone. |
+
+Post-D14 long-task order:
+
+| order | candidate dispatch | primary repo | goal | hard stop |
+|---:|---|---|---|---|
+| D15 | Main-owned Runtime -> Presentation payload contract | main first, UIUE read-only | Define stable main-owned presentation payload/readback/reconciliation fields after D14 session-scoped adapter semantics. | Stop if the contract exposes `DemoRuntimeAdapter*`, `requestFingerprint`, `failureLedger`, private ledger/provenance, or adapter-local implementation names as UIUE fields. |
+| D16 | Core config and force-state owner lanes | main | Handle `C018` SceneMacroRegistry/Core config authority and `C052` production/runtime force-state authority separately from UIUE. | Stop if UIUE invents Core config truth or if debug-only force-state is promoted to runtime proof. |
+| D17 | UIUE consumer integration against stable payload | UIUE after D15 | Consume only main-owned stable payload names with UIUE local/unit/simulator proof and no proof promotion. | Stop if UIUE creates shared fields, claims merge/readiness, or treats simulator/local proof as mobile/true-device/runtime. |
+
+Do not open C5/C6 model, golden, voice, mobile/true-device, endpoint, merge, or V/S/U/A-2 readiness lanes from this R5 route-control document. Those remain separate future lanes requiring their own authority and proof plans.
+
 ## Inputs Frozen
 
 | Input | Current truth | Evidence |
@@ -60,7 +106,8 @@ This document combines the UIUE STEP0 baseline freeze verdict and the main-side 
 | Dispatch 9: serial bounded lanes with Hermes gates | DONE under proof cap on 2026-06-29. `C052` is covered only as a debug-only bounded spike; `C005` is covered only for the current local mock executor/store write path; `C061` is partial for already-state no-double-write while retry/full adapter idempotency remains deferred; `C018` stays deferred owner decision; final-art capsule is simulator review prep only; white-edge stays blocked for threshold. | UIUE commits `cfcf2fd` and `4baab55`; main commit `8c81d13`; receipts `r5-c052-force-state-debug-spike-2026-06-29.md`, `r5-mainline-deferred-gates-c005-c018-c061-2026-06-29.md`, and `r5-final-art-white-edge-visual-review-2026-06-29.md`; Hermes anchors `HERMES_R5_D9_STAGE_1_VERDICT: PASS`, `HERMES_R5_D9_STAGE_2_VERDICT: PASS`, `HERMES_R5_D9_STAGE_3_VERDICT: PASS`; Stage 3 screenshot sha256 `c282b354294956bc450360293f7c6e6cdaf9f0f9038262c897f72f0b526e512f`. | Proof remains docs/local + local_static + local_unit + OpenSpec + simulator_mock. This is not R5 complete, runtime-ready, mobile/true-device proof, UIUE merge, V/S/U-PASS, or A-2 readiness/completion. |
 | Dispatch 10: commander reconcile, receipt, map/burndown, validation | DONE after local validation and Hermes hard gate. D10 reconciles D9 without proof promotion and updates this map plus burndown provenance. | Receipt: `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d10-commander-reconcile-2026-06-29.md`; source dispatch: `/Users/wanglei/workspace/MAformac-uiue/docs/dispatches/2026-06-29-uiue-r5-d10-commander-reconcile-dispatch.md`; Hermes anchor: `HERMES_R5_D10_COMMANDER_RECONCILE_VERDICT: PASS`. | D10 is docs/local reconcile only. Main remained read-only; no simulator rerun; no code edits; no push; no proof promotion. |
 | Dispatch 12: Runtime Adapter V0 code train | DONE through Gate 4 under proof cap. `C005` and `C061` move to Runtime Adapter V0 local/unit code-backed coverage in main; UIUE remains a guarded consumer and does not invent shared runtime fields. `C018`, `C052`, final-art, and white-edge remain outside D12 implementation scope. | Main commits `b4afc82` and `451c699`; UIUE commit `004ae82`; Gate 1 receipt `r5-d12-gate1-runtime-adapter-v0-openspec-authority-2026-06-29.md`; Gate 2 receipt `r5-d12-gate2-runtime-adapter-v0-code-2026-06-29.md`; Gate 3 receipt `r5-d12-gate3-uiue-consumer-guard-2026-06-29.md`; Hermes anchors `HERMES_R5_D12_GATE_1_OPENSPEC_AUTHORITY_VERDICT: PASS`, `HERMES_R5_D12_GATE_2_RUNTIME_ADAPTER_V0_VERDICT: PASS`, and `HERMES_R5_D12_GATE_3_UIUE_CONSUMER_GUARD_VERDICT: PASS`. | Proof remains docs/local + local_static + local_unit + OpenSpec contract only. The adapter is not wired into production runtime, has no durable ledger, and gives no runtime-ready, mobile/true-device/live, UIUE merge, V/S/U-PASS, or A-2 readiness/completion proof. |
-| Dispatch 13: C3 Runtime Adapter Integration Train | DONE through Gate 4 under proof cap. `C005` and `C061` move from D12 standalone adapter local/unit proof to D13 C3-path local/unit code-backed proof in main. UIUE remains a guarded consumer and does not consume Runtime Adapter V0 private fields or define a payload contract. | Main commits `199a12c` and `612e0df`; UIUE commit `4859105`; Gate 1 receipt `r5-d13-gate1-c3-runtime-adapter-integration-authority-2026-06-29.md`; Gate 2 receipt `r5-d13-gate2-c3-runtime-adapter-integration-code-2026-06-29.md`; Gate 3 receipt `r5-d13-gate3-uiue-c3-adapter-boundary-guard-2026-06-29.md`; Gate 4 receipt `r5-d13-c3-runtime-adapter-integration-commander-reconcile-2026-06-29.md`; Hermes anchors `HERMES_R5_D13_GATE_1_C3_AUTHORITY_VERDICT: PASS`, `HERMES_R5_D13_GATE_2_C3_INTEGRATION_VERDICT: PASS`, `HERMES_R5_D13_GATE_3_UIUE_BOUNDARY_VERDICT: PASS`, and Gate 4 requires `HERMES_R5_D13_GATE_4_RECONCILE_VERDICT: PASS`. | Proof remains docs/local + local_static + local_unit + OpenSpec/GitNexus only. Ledger is still in-memory; exact stale retry, persistent ledger, production runtime, mobile/true-device/live, UIUE merge, final-art, white-edge, voice/model/golden/endpoint readiness, V/S/U-PASS, and A-2 claims remain unproven. |
+| Dispatch 13: C3 Runtime Adapter Integration Train | DONE through Gate 4 under proof cap. `C005` and `C061` move from D12 standalone adapter local/unit proof to D13 C3-path local/unit code-backed proof in main. UIUE remains a guarded consumer and does not consume Runtime Adapter V0 private fields or define a payload contract. | Main commits `199a12c` and `612e0df`; UIUE commits `4859105` and `98e48da`; Gate 1 receipt `r5-d13-gate1-c3-runtime-adapter-integration-authority-2026-06-29.md`; Gate 2 receipt `r5-d13-gate2-c3-runtime-adapter-integration-code-2026-06-29.md`; Gate 3 receipt `r5-d13-gate3-uiue-c3-adapter-boundary-guard-2026-06-29.md`; Gate 4 receipt `r5-d13-c3-runtime-adapter-integration-commander-reconcile-2026-06-29.md`; Hermes anchors `HERMES_R5_D13_GATE_1_C3_AUTHORITY_VERDICT: PASS`, `HERMES_R5_D13_GATE_2_C3_INTEGRATION_VERDICT: PASS`, `HERMES_R5_D13_GATE_3_UIUE_BOUNDARY_VERDICT: PASS`, and `HERMES_R5_D13_GATE_4_RECONCILE_VERDICT: PASS`. | Proof remains docs/local + local_static + local_unit + OpenSpec/GitNexus only. Ledger is still in-memory; exact stale retry, persistent ledger, production runtime, mobile/true-device/live, UIUE merge, final-art, white-edge, voice/model/golden/endpoint readiness, V/S/U-PASS, and A-2 claims remain unproven. |
+| Dispatch 14: Runtime Adapter Residual Train | DONE through Gate 4 under proof cap. `C005` and `C061` keep the same row identity but move from D13 residual state to D14 session-scoped local/unit residual proof: failure ledger, readback reconciliation, exact settled stale retry ordering, parent request fingerprint, and private `RuntimeAdapterBox` boundary. | Main commits `1fd8a7b`, `5d0cd27`, and `66dda25`; UIUE Gate 4 receipt `r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md`; Gate 1 receipt `r5-d14-gate1-runtime-adapter-residual-openspec-authority-2026-06-29.md`; Gate 2 receipt `r5-d14-gate2-runtime-adapter-residual-code-2026-06-29.md`; Gate 3 receipt `r5-d14-gate3-runtime-adapter-residual-verifier-2026-06-29.md`; Codex substitute verifier PASS for Gate 3 because Hermes quota was unavailable. | Proof remains docs/local + local_static + local_unit + OpenSpec/GitNexus + substitute verifier only. Ledger is session-scoped and non-durable; no production runtime, mobile/true-device/live, UIUE payload contract/consumption, UIUE merge, final-art, white-edge, voice/model/golden/endpoint readiness, V/S/U-PASS, or A-2 claim. |
 
 ## Dispatch Log
 
@@ -77,6 +124,7 @@ This document combines the UIUE STEP0 baseline freeze verdict and the main-side 
 | Dispatch 10: commander reconcile, receipt, map/burndown, validation | DONE after Hermes hard gate | `/Users/wanglei/workspace/MAformac-uiue/docs/dispatches/2026-06-29-uiue-r5-d10-commander-reconcile-dispatch.md`; receipt `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d10-commander-reconcile-2026-06-29.md` | `019f10df-8ebc-7c71-b026-f3dbc0262153` | reconciled D9 into map/burndown without proof promotion; local validation passed and `HERMES_R5_D10_COMMANDER_RECONCILE_VERDICT: PASS` was required before commit. |
 | Dispatch 12: Runtime Adapter V0 code train | DONE after four serial Hermes gates | `/Users/wanglei/workspace/MAformac-uiue/docs/dispatches/2026-06-29-uiue-r5-d12-runtime-adapter-v0-code-train-dispatch.md`; receipts listed in Dispatch Intake Updates | `019f10df-8ebc-7c71-b026-f3dbc0262153` | Gate 1 OpenSpec authority, Gate 2 main Runtime Adapter V0 code, Gate 3 UIUE consumer guard, and Gate 4 reconcile passed local validation and Hermes; no merge, push, runtime-ready, mobile/true-device, V/S/U, or A-2 claim. |
 | Dispatch 13: C3 Runtime Adapter Integration Train | DONE after four serial Hermes gates | `/Users/wanglei/workspace/MAformac-uiue/docs/dispatches/2026-06-29-uiue-r5-d13-c3-runtime-adapter-integration-dispatch.md`; receipt `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d13-c3-runtime-adapter-integration-commander-reconcile-2026-06-29.md` | `019f10df-8ebc-7c71-b026-f3dbc0262153` | Gate 1 C3 authority, Gate 2 main C3 adapter integration, Gate 3 UIUE boundary guard, and Gate 4 reconcile passed local validation and Hermes; no push, merge, runtime-ready, mobile/true-device, UIUE payload contract, V/S/U, or A-2 claim. |
+| Dispatch 14: Runtime Adapter Residual Train | DONE under Hermes-quota override with Codex substitute verifier | `/Users/wanglei/workspace/MAformac-uiue/docs/dispatches/2026-06-29-uiue-r5-d14-runtime-adapter-residual-train-dispatch.md`; receipt `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md` | `019f1215-ca98-7083-a6dd-9a62d46444ad` | Gate 1 OpenSpec authority, Gate 2 main residual code, Gate 3 GitNexus/substitute verifier, and Gate 4 reconcile passed local validation / Codex audits; no Hermes Gate 3 anchor claimed, no push, merge, runtime-ready, mobile/true-device, UIUE payload contract, V/S/U, or A-2 claim. |
 
 ## Calibration Result
 
@@ -133,7 +181,10 @@ flowchart TD
 
 ## Recommended Dispatch Count
 
-Recommended: **5 dispatches now**, plus **3 ledgers** that should not become implementation dispatches unless the user explicitly reopens them.
+Original D1-pre recommendation: **5 implementation dispatches**, plus **3 ledgers**
+that should not become implementation dispatches unless the user explicitly
+reopens them. This plan is now historical route provenance consumed through
+D13; use "Current Route Snapshot After D13" for active next-task ordering.
 
 | # | Dispatch | Owner | Rows / scope | Serial or parallel | Proof cap | Exit gate |
 |---:|---|---|---|---|---|---|
@@ -226,12 +277,19 @@ Stop and return to commander if any dispatch attempts one of these:
 
 ## Dispatch Decision
 
-Proceed with the remaining implementation dispatches only after commander approval:
+The original D1-pre five-dispatch plan has been consumed through D13. Do not
+restart Dispatch 1-5 unless a new P0/P1 finding invalidates their receipts.
 
-1. Dispatch 1 is accepted for local/unit coverage and no longer needs to be resent unless new P0/P1 evidence appears.
-2. Mainline contract/test hardening.
-3. Shared proof-governance hardening.
-4. UIUE consumer mapping against stable mainline names.
-5. Commander reconcile and provenance ledger.
+Current commander route:
+
+1. Keep D13 as `DONE under proof cap`, not as runtime-ready or merge-ready.
+2. Open D14 as a new long-running main runtime residual train if development
+   continues immediately.
+3. Keep D15 payload contract, D16 Core config/force-state, and D17 UIUE
+   consumer integration behind their upstream gates.
+4. Keep human/product, spike-required, and future-lane rows as ledgers until
+   explicitly reopened.
+5. Update this file after each accepted verdict before dispatching the next
+   long task.
 
 Do not dispatch the human/product ledger, spike-before-implementation ledger, or future-lane ledger as implementation work. They are governance surfaces, bounded falsification receipts, and proof caps.
