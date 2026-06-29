@@ -239,3 +239,87 @@ GIVEN `C3ExecutionPipeline` owns a private runtime adapter box
 WHEN tests construct C3 pipelines from non-main helper code
 THEN the construction SHALL continue to compile without making the public C3 initializer `@MainActor`
 AND adapter resolution SHALL remain inside `@MainActor` execution.
+
+### Requirement: Local Durable Adapter Ledger Boundary
+
+Runtime Adapter V0 SHALL support a main-owned local file-backed ledger proof only when storage is explicitly injectable and bounded to local deterministic storage.
+
+#### Scenario: Durable ledger is injectable local storage
+
+GIVEN a test constructs Runtime Adapter V0 with a local durable ledger store
+WHEN the test provides a temporary-directory storage location
+THEN the adapter SHALL use that explicit location for durable proof
+AND it SHALL NOT rely on hidden global state, cloud storage, production runtime services, UIUE code, mobile clients, or true-device state.
+
+#### Scenario: Local durable proof does not imply production durability
+
+GIVEN local file-backed durable adapter ledger tests pass
+WHEN receipts or UIUE guard documents describe D18
+THEN they MAY call the proof `local_durable_adapter_ledger`
+AND they SHALL NOT claim production durable runtime, cross-device durability, mobile proof, true-device proof, live proof, voice-ready, model-ready, golden-ready, endpoint-ready, UIUE merge, V-PASS, S-PASS, U-PASS, A-2 readiness, A-2 completion, or R5 completion.
+
+### Requirement: Durable Success Replay Reconstruction
+
+Runtime Adapter V0 SHALL reconstruct retry replay from a durable success entry only when command identity, request fingerprint, stored entry shape, and current store readback all reconcile.
+
+#### Scenario: New adapter replays matching durable success without mutation
+
+GIVEN one adapter instance successfully executed a command and persisted a durable success entry after store readback reconciliation
+AND a new adapter instance is constructed with the same durable ledger store
+WHEN the new adapter receives the same command identity and matching request fingerprint
+THEN it SHALL reconcile readback against the current store path
+AND it SHALL return retry replay without applying a second state mutation.
+
+#### Scenario: Reused identity with different fingerprint fails closed after reconstruction
+
+GIVEN a durable success entry exists for one command identity and request fingerprint
+WHEN a new adapter receives the same command identity with a different request fingerprint
+THEN it SHALL reject the attempt as an idempotency conflict
+AND it SHALL NOT replay the old readback
+AND it SHALL NOT apply a new mutation
+AND it SHALL NOT overwrite the durable success entry.
+
+#### Scenario: Unknown or corrupt durable entry fails closed
+
+GIVEN the local durable ledger contains an unknown, corrupt, or lossy entry for a command identity
+WHEN the adapter attempts reconstruction
+THEN it SHALL fail closed
+AND it SHALL NOT apply a state mutation
+AND it SHALL NOT convert the corrupt entry into successful replay evidence.
+
+### Requirement: Durable Failure Ledger Semantics
+
+Runtime Adapter V0 SHALL keep any durable failure ledger records private to main adapter observability and SHALL NOT treat them as successful idempotency entries.
+
+#### Scenario: Durable failure record does not create fake success
+
+GIVEN an adapter attempt records a retryable failure, terminal failure, conflict, corrupt ledger entry, or readback reconciliation failure
+WHEN the same command identity is retried without a durable success entry
+THEN the adapter SHALL evaluate the current attempt instead of replaying fake success
+AND it SHALL still fail closed for conflicts or unsafe current input.
+
+#### Scenario: Failure ledger internals are not presentation fields
+
+GIVEN a Runtime -> Presentation payload or UIUE consumer mapping is created
+WHEN D18 durable failure records exist
+THEN the payload and UIUE mapping SHALL NOT expose `failureLedger`, durable failure rows, success ledger internals, `requestFingerprint`, `parentRequestFingerprint`, settled parent-plan internals, raw private payload, adapter-local provenance, raw runtime store markers, raw model output, or training receipts.
+
+### Requirement: C3 Local Durable Reconstruction
+
+`C3ExecutionPipeline` SHALL prove cross-pipeline reconstruction only as a local integration behavior layered on the adapter durable ledger boundary.
+
+#### Scenario: Reconstructed C3 pipeline replays settled parent request without mutation
+
+GIVEN one C3 pipeline settled a parent request through Runtime Adapter V0 and persisted durable adapter/C3 replay state
+AND a new C3 pipeline is constructed with the same explicit local durable ledger store
+WHEN the new pipeline receives the same parent identity and matching parent request fingerprint
+THEN it MAY replay the settled parent plan from durable state
+AND it SHALL reconcile every per-transition adapter entry against current store readback
+AND it SHALL NOT apply a second state mutation.
+
+#### Scenario: Changed or unsafe reconstructed C3 request fails before write
+
+GIVEN durable C3 replay state exists for one parent request
+WHEN a reconstructed pipeline receives a changed parent request fingerprint, changed transition fingerprint, missing durable entry, corrupt durable entry, or drifted store readback
+THEN it SHALL fail closed before any new write
+AND it SHALL preserve the existing D14 stale-state and readback reconciliation protections.

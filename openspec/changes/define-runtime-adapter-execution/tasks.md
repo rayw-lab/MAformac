@@ -106,3 +106,29 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 - [ ] 12.3 Preserve proof caps, non-claims, access gaps, C005/C061/C018/C052 dispositions, and D15 boundary.
 - [ ] 12.4 Validate with `git diff --check`, `openspec validate ui-presentation --strict`, `git diff --cached --name-only`, and `git diff --cached --check`.
 - [ ] 12.5 Run Codex native subagent Gate 4 audit within 1200 seconds and require empty P0/P1.
+
+## 13. D18 Gate 1 Runtime Durability Authority
+
+- [x] 13.1 Re-probe main/UIUE HEAD, branch, dirty split, and cached state before Gate 1 writes.
+- [x] 13.2 Re-read D18+D19 dispatch, D14/D15/D16+D17 authority chain, active Runtime Adapter OpenSpec, and UIUE deny-list residuals.
+- [x] 13.3 Re-check external idempotency references for request identity, request fingerprint, failure-after-validation, and safe retry pitfalls.
+- [x] 13.4 Define D18 authority for local file-backed durable adapter ledger, cross-adapter reconstruction, C3 cross-pipeline reconstruction, failure/corrupt-entry fail-closed behavior, and private-ledger no-leak boundary.
+- [x] 13.5 Preserve proof caps: `local_durable_adapter_ledger` only; no production runtime, mobile, true-device, live, UIUE merge, V-PASS, S-PASS, U-PASS, A-2, voice/model/golden/endpoint readiness, or R5 completion claim.
+- [x] 13.6 Validate with `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, `openspec validate define-runtime-presentation-bridge --strict`, and `openspec validate --all --strict`.
+
+## 14. D18 Gate 2 Durable Ledger Code And Tests
+
+- [ ] 14.1 Run GitNexus context/impact for `DemoRuntimeAdapter` and any edited Swift symbol before edits.
+- [ ] 14.2 Implement the smallest explicit local durable ledger storage boundary for adapter success/failure records using deterministic temporary-directory-friendly storage.
+- [ ] 14.3 Add local/unit tests for cross-adapter success replay, fingerprint mismatch fail-closed, corrupt/unknown entry fail-closed, failure-not-success replay, and readback reconciliation.
+- [ ] 14.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
+- [ ] 14.5 Run GitNexus `detect_changes` on the exact staged Gate 2 diff before commit.
+
+## 15. D18 Gate 3 C3 Reconstruction Integration Tests
+
+- [ ] 15.1 Run GitNexus context/impact for `C3ExecutionPipeline`, `RuntimeAdapterBox`, `DemoRuntimeAdapter`, and any edited symbol before edits.
+- [ ] 15.2 Integrate the local durable ledger boundary into C3 reconstruction with explicit local storage injection that does not leak adapter-private fields.
+- [ ] 15.3 Add local/integration tests for cross-pipeline settled parent replay, changed parent fingerprint fail-closed, corrupt/missing durable row fail-closed, and D14 stale/readback regression coverage.
+- [ ] 15.4 Validate with target Swift tests, OpenSpec strict checks, `git diff --check`, and staged diff checks.
+- [ ] 15.5 Run GitNexus `detect_changes` on the exact staged Gate 3 diff before commit.
+- [ ] 15.6 Run Hermes round 1 over Gates 1-3 with anchor `HERMES_R5_D18_GATES_1_3_RUNTIME_DURABILITY_VERDICT: PASS|FAIL`.

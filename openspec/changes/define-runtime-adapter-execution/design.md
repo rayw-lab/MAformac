@@ -141,6 +141,52 @@ D14 SHALL keep this as an explicitly bounded local/unit concurrency boundary. `@
 
 This does not prove production concurrency safety.
 
+## AD-RAE-020: D18 local durable adapter ledger is explicit and injectable
+
+D18 SHALL define durability as a main-owned, local file-backed adapter ledger proof. The storage location SHALL be explicitly injectable so tests can use deterministic temporary directories and production/demo callers do not rely on hidden global state.
+
+The local durable ledger MAY store successful adapter outcomes and private failure records needed for local replay/reconstruction. It SHALL NOT become a UIUE-facing payload, presentation contract, cloud database, cross-device sync format, or production durable runtime claim.
+
+## AD-RAE-021: Durable success entries are written only after side effect and readback reconciliation
+
+The durable success ledger SHALL persist a successful entry only after the adapter side effect completes and readback reconciliation succeeds through the store path.
+
+Validation failures, unsupported tools, missing required arguments, idempotency conflicts, stale/unsafe C3 attempts, missing store cells, thrown errors, corrupt durable rows, and readback mismatches SHALL NOT create successful durable replay entries.
+
+This preserves the D12-D14 rule that fake success is worse than no replay.
+
+## AD-RAE-022: Cross-adapter reconstruction replays only matching command identity and fingerprint
+
+A new `DemoRuntimeAdapter` instance MAY reconstruct a prior successful local result from the durable ledger only when:
+
+1. the command identity matches;
+2. the request fingerprint matches;
+3. the stored entry is recognized and decodes without loss;
+4. readback can be reconciled against the current store path; and
+5. the replay does not apply a second state mutation.
+
+Same command identity plus a different request fingerprint SHALL fail closed and SHALL NOT replay or overwrite the prior success.
+
+## AD-RAE-023: Failure taxonomy remains private and cannot masquerade as replayable success
+
+D18 durable failure records, if persisted, SHALL remain adapter-private observability. They MAY distinguish retryable failure, terminal failure, conflict, corrupt ledger entry, and readback reconciliation failure, but they SHALL NOT block a later corrected attempt unless a successful entry already exists for the same command identity and fingerprint.
+
+Failure records SHALL NOT be encoded as successful readbacks, presentation-safe reconciliation payloads, UIUE shared fields, or proof-class upgrades.
+
+## AD-RAE-024: C3 cross-pipeline reconstruction is a separate local proof
+
+C3 may use D18 durable storage only after Gate 2 defines the adapter storage boundary. C3 reconstruction proof SHALL require a new pipeline or adapter box to replay a previously settled parent request from local durable state without mutating the store.
+
+The replay still SHALL verify parent request fingerprint, per-transition adapter fingerprints, and current store readback. Changed parent request fingerprint, changed transition fingerprint, corrupt/missing durable rows, or readback drift SHALL fail closed before any write.
+
+This is a local/integration proof for `C005` / `C061` residual reduction. It is not production runtime durability, mobile, true-device, live, voice, model, golden, endpoint, UIUE merge, V-PASS, S-PASS, U-PASS, A-2, or R5 completion proof.
+
+## AD-RAE-025: Durable ledger internals are forbidden presentation/UIUE fields
+
+D18 SHALL keep durable ledger rows, adapter storage paths, request fingerprints, parent request fingerprints, failure ledgers, success ledger internals, settled parent-plan internals, raw private payloads, adapter-local provenance, raw runtime store markers, raw model output, and training receipts out of the Runtime -> Presentation payload and out of UIUE shared-field allow-lists.
+
+UIUE may consume D18 only as proof-governance metadata and deny-list guardrail authority until a later main-owned presentation contract explicitly exposes stable adapter-agnostic names.
+
 ## Pre-Mortem And Cross-Search Findings
 
 Local search found current write behavior split between `C3ExecutionPipeline`, `DemoActionExecutor`, and `DemoVehicleStateStore`, while D11 receipts say retry/full adapter idempotency is future work. Web references reinforce three design constraints:
@@ -166,6 +212,10 @@ Same-class risk map:
 - UIUE consumes a field not owned by mainline.
 - multi-transition C3 plans reuse one raw parent identity and trigger false idempotency conflict;
 - adapter-local provenance becomes a presentation payload by accident.
+- local file-backed storage is mislabeled as production durable runtime;
+- durable failure records become replayable success records;
+- corrupt durable rows decode leniently and authorize unsafe replay;
+- UIUE deny-lists miss new D18 private names.
 
 Immediate fix: define OpenSpec authority before Swift.
 
