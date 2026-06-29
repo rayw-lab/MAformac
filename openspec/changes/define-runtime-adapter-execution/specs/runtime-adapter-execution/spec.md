@@ -147,6 +147,13 @@ WHEN a new adapter instance or new runtime adapter box is created
 THEN the new instance SHALL NOT retain the previous instance's successful ledger entry
 AND receipts SHALL NOT describe the behavior as persistent or durable idempotency proof.
 
+#### Scenario: C3 parent plan ledger is session-scoped
+
+GIVEN `C3ExecutionPipeline` has recorded a settled parent plan for stale retry replay
+WHEN a new pipeline or new runtime adapter box is created
+THEN the new pipeline SHALL NOT retain the previous parent plan ledger
+AND the behavior SHALL remain local/session proof only.
+
 ### Requirement: Exact Stale Retry Ordering
 
 `C3ExecutionPipeline` SHALL define how exact stale retries interact with the existing C3 stale-state guard.
@@ -155,16 +162,26 @@ AND receipts SHALL NOT describe the behavior as persistent or durable idempotenc
 
 GIVEN C3 previously executed a transition through Runtime Adapter V0 with a stable parent frame identity
 AND the adapter session ledger contains settled entries for the per-transition command identities
-AND a later attempt uses the same parent identity and reconstructs matching request fingerprints
+AND C3 recorded a settled parent request fingerprint and settled transition plan in the current session
+AND a later attempt uses the same parent identity and matching parent request fingerprint
 AND the later attempt has a stale `stateRevision`
 WHEN C3 evaluates the later attempt
 THEN C3 MAY replay the settled adapter results before raising stale-state failure
 AND it SHALL NOT apply a second state mutation.
 
+#### Scenario: Settled multi-transition stale retry replays the settled plan
+
+GIVEN C3 previously settled a parent request that produced more than one planned transition
+AND the later stale attempt uses the same parent identity and matching parent request fingerprint
+WHEN current store state would reconstruct fewer planned transitions than the settled parent plan
+THEN C3 SHALL use the settled parent plan for replay
+AND it SHALL still require adapter readback reconciliation for every replayed transition
+AND it SHALL NOT apply a second state mutation.
+
 #### Scenario: Stale changed request still fails before mutation
 
 GIVEN C3 previously settled one transition request for a parent identity
-WHEN a stale later attempt reuses that identity but reconstructs a different request fingerprint
+WHEN a stale later attempt reuses that identity but has a different parent request fingerprint
 THEN C3 SHALL NOT replay the old readback for the changed request
 AND the normal stale-state guard SHALL fail the attempt before any new write.
 

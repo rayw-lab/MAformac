@@ -136,6 +136,85 @@ final class C3ExecutionPipelineTests: XCTestCase {
     }
 
     @MainActor
+    func testC3ExactStaleRetryReplaysSettledAdapterResultBeforeStaleGuard() throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-window-stale-replay",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+
+        _ = try pipeline.execute(first, store: store, traceLogger: trace)
+        let cellAfterFirst = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+
+        let staleRetry = ToolCallFrame.fixture(
+            id: "cmd-window-stale-replay",
+            device: "window",
+            actionPrimitive: "power_on",
+            slots: ["position": "主驾"],
+            stateRevision: 0
+        )
+        let result = try pipeline.execute(staleRetry, store: store, traceLogger: trace)
+
+        let cellAfterReplay = try XCTUnwrap(store.cell(for: "window.position[主驾]"))
+        XCTAssertEqual(cellAfterReplay.revision, cellAfterFirst.revision)
+        XCTAssertEqual(cellAfterReplay.timestamp, cellAfterFirst.timestamp)
+        XCTAssertEqual(result.readbacks.first?.revision, cellAfterFirst.revision)
+        XCTAssertTrue(trace.entries.contains { $0.stage == .guard && $0.message == "stale_retry_replay" })
+    }
+
+    @MainActor
+    func testC3ExactStaleRetryReplaysSettledFanoutPlanWhenCurrentPlanWouldOmitPrerequisite() throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let first = ToolCallFrame(
+            id: "cmd-ac-stale-replay",
+            traceID: "trace-ac-stale-replay",
+            agentID: "vehicle-control",
+            capabilityID: "cabin.ac_temperature",
+            toolName: "vehicle_control",
+            device: "ac_temperature",
+            actionPrimitive: "increase_by_exp",
+            slots: ["direction": "主驾"],
+            value: ContractValue(ref: "CUR", direct: "+", offset: "LITTLE", type: "EXP"),
+            stateRevision: 0,
+            candidateSource: .upstreamToolCall
+        )
+
+        let firstResult = try pipeline.execute(first, store: store, traceLogger: trace)
+        let powerAfterFirst = try XCTUnwrap(store.cell(for: "ac.power"))
+        let tempAfterFirst = try XCTUnwrap(store.cell(for: "ac.temp_setpoint[主驾]"))
+
+        let staleRetry = ToolCallFrame(
+            id: "cmd-ac-stale-replay",
+            traceID: "trace-ac-stale-replay",
+            agentID: "vehicle-control",
+            capabilityID: "cabin.ac_temperature",
+            toolName: "vehicle_control",
+            device: "ac_temperature",
+            actionPrimitive: "increase_by_exp",
+            slots: ["direction": "主驾"],
+            value: ContractValue(ref: "CUR", direct: "+", offset: "LITTLE", type: "EXP"),
+            stateRevision: 0,
+            candidateSource: .upstreamToolCall
+        )
+        let replay = try pipeline.execute(staleRetry, store: store, traceLogger: trace)
+
+        XCTAssertEqual(firstResult.readbacks.map(\.key), ["ac.power", "ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(replay.readbacks.map(\.key), ["ac.power", "ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(store.cell(for: "ac.power")?.revision, powerAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "ac.power")?.timestamp, powerAfterFirst.timestamp)
+        XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.revision, tempAfterFirst.revision)
+        XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.timestamp, tempAfterFirst.timestamp)
+        XCTAssertTrue(trace.entries.contains { $0.stage == .guard && $0.message == "stale_retry_replay" })
+    }
+
+    @MainActor
     func testC3SameCommandIdentityWithDifferentRequestFailsClosed() throws {
         let store = DemoVehicleStateStore()
         let pipeline = try makePipeline(intentConfirmed: true)
@@ -161,6 +240,36 @@ final class C3ExecutionPipelineTests: XCTestCase {
 
         XCTAssertThrowsError(try pipeline.execute(conflicting, store: store, traceLogger: InMemoryTraceLogger())) { error in
             XCTAssertEqual(error as? DemoRuntimeAdapterError, .idempotencyConflict(commandID: "cmd-window-conflict#window.position[主驾]"))
+        }
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "30")
+    }
+
+    @MainActor
+    func testC3StaleChangedRequestFallsBackToStaleGuardBeforeMutation() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+        let first = ToolCallFrame.fixture(
+            id: "cmd-window-stale-conflict",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "主驾"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "30", type: "PERCENT"),
+            stateRevision: 0
+        )
+
+        _ = try pipeline.execute(first, store: store, traceLogger: InMemoryTraceLogger())
+
+        let staleChanged = ToolCallFrame.fixture(
+            id: "cmd-window-stale-conflict",
+            device: "window",
+            actionPrimitive: "by_percent",
+            slots: ["position": "主驾"],
+            value: ContractValue(ref: "ZERO", direct: "+", offset: "60", type: "PERCENT"),
+            stateRevision: 0
+        )
+
+        XCTAssertThrowsError(try pipeline.execute(staleChanged, store: store, traceLogger: InMemoryTraceLogger())) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .staleState(expected: 1, actual: 0))
         }
         XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "30")
     }

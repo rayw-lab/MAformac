@@ -33,9 +33,16 @@ private struct PlannedTransition: Equatable {
     var scopeOrigin: ScopeOrigin?
 }
 
+private struct SettledPlan {
+    var parentRequestFingerprint: String
+    var transitions: [PlannedTransition]
+}
+
 private final class RuntimeAdapterBox: @unchecked Sendable {
     @MainActor
     private var adapter: DemoRuntimeAdapter?
+    @MainActor
+    private var settledPlans: [String: SettledPlan] = [:]
 
     @MainActor
     func resolve() -> DemoRuntimeAdapter {
@@ -45,6 +52,22 @@ private final class RuntimeAdapterBox: @unchecked Sendable {
         let adapter = DemoRuntimeAdapter()
         self.adapter = adapter
         return adapter
+    }
+
+    @MainActor
+    func recordSettledPlanIfAbsent(parentID: String, parentRequestFingerprint: String, transitions: [PlannedTransition]) {
+        guard settledPlans[parentID] == nil else {
+            return
+        }
+        settledPlans[parentID] = SettledPlan(
+            parentRequestFingerprint: parentRequestFingerprint,
+            transitions: transitions
+        )
+    }
+
+    @MainActor
+    func settledPlan(parentID: String) -> SettledPlan? {
+        settledPlans[parentID]
     }
 }
 
@@ -108,6 +131,11 @@ public struct C3ExecutionPipeline: Sendable {
             throw ToolExecutionError.guardDenied("intent_not_confirmed")
         }
 
+        if frame.stateRevision < store.currentRevision,
+           let replay = try replaySettledStaleRequestIfAvailable(frame, store: store, traceLogger: traceLogger) {
+            return replay
+        }
+
         guard frame.stateRevision >= store.currentRevision else {
             traceLogger.recordGuard(traceID: frame.traceID, message: "stale_state", attributes: TraceAttributes(guardReason: "stale_state"))
             throw ToolExecutionError.staleState(expected: store.currentRevision, actual: frame.stateRevision)
@@ -162,12 +190,93 @@ public struct C3ExecutionPipeline: Sendable {
             )
             readbacks.append(verified)
         }
+        runtimeAdapterBox.recordSettledPlanIfAbsent(
+            parentID: frame.id,
+            parentRequestFingerprint: parentRequestFingerprint(for: frame),
+            transitions: transitions
+        )
 
+        return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks)
+    }
+
+    @MainActor
+    private func replaySettledStaleRequestIfAvailable(
+        _ frame: ToolCallFrame,
+        store: DemoVehicleStateStore,
+        traceLogger: any TraceLogger
+    ) throws -> C3ExecutionResult? {
+        guard let settledPlan = runtimeAdapterBox.settledPlan(parentID: frame.id),
+              settledPlan.parentRequestFingerprint == parentRequestFingerprint(for: frame) else {
+            return nil
+        }
+        let adapter = runtimeAdapterBox.resolve()
+        var replayed: [(PlannedTransition, DemoRuntimeAdapterResult)] = []
+        for planned in settledPlan.transitions {
+            let transition = planned.transition
+            let commandID = adapterCommandID(parent: frame, transition: transition)
+            guard let adapterResult = try adapter.replayIfSettled(
+                commandID: commandID,
+                frame: adapterFrame(parent: frame, transition: transition, commandID: commandID),
+                store: store
+            ) else {
+                return nil
+            }
+            replayed.append((planned, adapterResult))
+        }
+
+        traceLogger.recordGuard(traceID: frame.traceID, message: "stale_retry_replay", attributes: TraceAttributes(guardReason: "stale_retry_replay"))
+        var readbacks: [DemoActionReadback] = []
+        for (planned, adapterResult) in replayed {
+            let transition = planned.transition
+            traceLogger.recordExecute(
+                traceID: frame.traceID,
+                message: "\(adapterResult.readback.key)=\(adapterResult.readback.actualValue):\(adapterResult.provenance.rawValue)"
+            )
+            var verified = try C2ReadbackVerifier.verify(
+                store: store,
+                key: transition.key,
+                expectedValue: adapterResult.readback.actualValue
+            )
+            verified.scopeOrigin = planned.scopeOrigin
+            if let rendered = stateCells.renderReadback(
+                stateKey: transition.key,
+                scope: scope(forKey: transition.key),
+                value: verified.actualValue,
+                scopeOrigin: planned.scopeOrigin
+            ) {
+                verified.spokenText = rendered
+            }
+            traceLogger.recordReadback(
+                traceID: frame.traceID,
+                message: verified.spokenText,
+                attributes: TraceAttributes(readbackResult: .verified)
+            )
+            readbacks.append(verified)
+        }
         return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks)
     }
 
     private func adapterCommandID(parent frame: ToolCallFrame, transition: DemoMockTransition) -> String {
         "\(frame.id)#\(transition.key)"
+    }
+
+    private func parentRequestFingerprint(for frame: ToolCallFrame) -> String {
+        let slots = frame.slots
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key)=\($0.value)" }
+            .joined(separator: "\u{1E}")
+        return [
+            "tool=\(frame.toolName)",
+            "device=\(frame.device)",
+            "primitive=\(frame.actionPrimitive)",
+            "slots=\(slots)",
+            "value.ref=\(frame.value.ref)",
+            "value.direct=\(frame.value.direct)",
+            "value.offset=\(frame.value.offset)",
+            "value.type=\(frame.value.type)",
+            "state_revision=\(frame.stateRevision)",
+            "source=\(frame.candidateSource.rawValue)"
+        ].joined(separator: "\u{1F}")
     }
 
     private func adapterFrame(parent frame: ToolCallFrame, transition: DemoMockTransition, commandID: String) -> ToolCallFrame {

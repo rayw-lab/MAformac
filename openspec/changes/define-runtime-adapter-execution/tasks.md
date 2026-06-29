@@ -83,13 +83,13 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 10. D14 Gate 2 Main Code + Tests
 
-- [ ] 10.1 Reconfirm Gate 1 Codex subagent audit PASS before Swift edits.
-- [ ] 10.2 Run GitNexus impact before touching any Swift symbol and require pitfall loop/subagent audit for touched HIGH/CRITICAL symbols.
-- [ ] 10.3 Implement the D14 session ledger, stale retry ordering, failure ledger, readback reconciliation, and concurrency-boundary slice without editing `ToolCallFrame` or UIUE.
-- [ ] 10.4 Add/extend targeted local/unit tests for D14 semantics.
-- [ ] 10.5 Validate with target Swift tests, `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, and `openspec validate --all --strict`.
-- [ ] 10.6 Run GitNexus `detect_changes(scope=staged)` before commit.
-- [ ] 10.7 Run Codex native subagent Gate 2 audit within 1200 seconds and require empty P0/P1.
+- [x] 10.1 Reconfirm Gate 1 Codex subagent audit PASS before Swift edits.
+- [x] 10.2 Run GitNexus impact before touching any Swift symbol and require pitfall loop/subagent audit for touched HIGH/CRITICAL symbols.
+- [x] 10.3 Implement the D14 session ledger, stale retry ordering, failure ledger, readback reconciliation, and concurrency-boundary slice without editing `ToolCallFrame` or UIUE.
+- [x] 10.4 Add/extend targeted local/unit tests for D14 semantics.
+- [x] 10.5 Validate with target Swift tests, `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, and `openspec validate --all --strict`.
+- [x] 10.6 Run GitNexus `detect_changes(scope=staged)` before commit.
+- [x] 10.7 Run Codex native subagent Gate 2 audit within 1200 seconds and require empty P0/P1.
 
 ## 11. D14 Gate 3 Hermes + GitNexus Verifier
 

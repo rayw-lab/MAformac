@@ -41,6 +41,20 @@ final class DemoRuntimeAdapterTests: XCTestCase {
     }
 
     @MainActor
+    func testNewAdapterSessionDoesNotPersistLedger() throws {
+        let store = DemoVehicleStateStore()
+        let firstSession = DemoRuntimeAdapter()
+
+        _ = try firstSession.execute(commandID: "cmd-session-boundary", frame: frame(key: "ac.power", target: "on"), store: store)
+
+        let secondSession = DemoRuntimeAdapter()
+        let result = try secondSession.execute(commandID: "cmd-session-boundary", frame: frame(key: "ac.power", target: "off"), store: store)
+
+        XCTAssertEqual(result.provenance, .firstExecution)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+    }
+
+    @MainActor
     func testAlreadyStateReturnsNoopProvenanceWithoutMutation() throws {
         let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
         let store = DemoVehicleStateStore(cells: [
@@ -68,6 +82,7 @@ final class DemoRuntimeAdapterTests: XCTestCase {
             XCTAssertEqual(error as? DemoRuntimeAdapterError, .idempotencyConflict(commandID: "cmd-ac"))
         }
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(adapter.failureLedger.last?.kind, .conflict)
     }
 
     @MainActor
@@ -87,6 +102,7 @@ final class DemoRuntimeAdapterTests: XCTestCase {
         XCTAssertThrowsError(try adapter.execute(commandID: "cmd-retry-after-fail", frame: invalid, store: store)) { error in
             XCTAssertEqual(error as? DemoRuntimeAdapterError, .unsupportedTool("unsupported_tool"))
         }
+        XCTAssertEqual(adapter.failureLedger.last?.kind, .terminalFailure)
 
         let result = try adapter.execute(
             commandID: "cmd-retry-after-fail",
@@ -105,10 +121,29 @@ final class DemoRuntimeAdapterTests: XCTestCase {
         XCTAssertThrowsError(try adapter.execute(commandID: "cmd-missing-cell", frame: frame(key: "missing.cell", target: "on"), store: store)) { error in
             XCTAssertEqual(error as? DemoRuntimeAdapterError, .missingStateCell("missing.cell"))
         }
+        XCTAssertEqual(adapter.failureLedger.last?.kind, .retryableFailure)
 
         let result = try adapter.execute(commandID: "cmd-missing-cell", frame: frame(key: "ac.power", target: "on"), store: store)
         XCTAssertEqual(result.provenance, .firstExecution)
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+    }
+
+    @MainActor
+    func testRetryReplayReconcilesCurrentStoreReadback() throws {
+        let store = DemoVehicleStateStore()
+        let adapter = DemoRuntimeAdapter()
+
+        _ = try adapter.execute(commandID: "cmd-readback-drift", frame: frame(key: "ac.power", target: "on"), store: store)
+        _ = store.applyMockTransition(DemoMockTransition(key: "ac.power", desiredValue: "off"))
+
+        XCTAssertThrowsError(try adapter.execute(commandID: "cmd-readback-drift", frame: frame(key: "ac.power", target: "on"), store: store)) { error in
+            XCTAssertEqual(
+                error as? DemoRuntimeAdapterError,
+                .readbackReconciliationFailed(commandID: "cmd-readback-drift", key: "ac.power", expected: "on", actual: "off")
+            )
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertEqual(adapter.failureLedger.last?.kind, .retryableFailure)
     }
 
     private func frame(key: String, target: String) -> ToolCallFrame {

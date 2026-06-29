@@ -94,7 +94,7 @@ C3 may use adapter provenance for internal trace or unit assertions, but `C3Exec
 
 D14 SHALL make the Runtime Adapter ledger boundary explicit as session-scoped local/unit state owned by a `DemoRuntimeAdapter` instance or the `RuntimeAdapterBox` that owns that instance.
 
-A new adapter or a new box starts with an empty session ledger. This is intentional for D14 and SHALL NOT be described as persistent, durable, cross-launch, cross-process, cross-device, or production-ready idempotency.
+A new adapter or a new box starts with an empty session ledger. This includes both adapter command-success/failure ledgers and any C3 parent-plan ledger used to replay settled stale requests. This is intentional for D14 and SHALL NOT be described as persistent, durable, cross-launch, cross-process, cross-device, or production-ready idempotency.
 
 Durable ledger storage, cross-launch replay, and external storage format are future work.
 
@@ -103,11 +103,12 @@ Durable ledger storage, cross-launch replay, and external storage format are fut
 D14 SHALL define the C3 stale retry ordering as:
 
 1. C3 may attempt a pre-stale replay lookup only for a request that can be mapped to already-settled adapter command identities in the current session ledger.
-2. The replay lookup SHALL verify the current request fingerprint matches the settled ledger entry.
-3. If every planned transition has a matching settled entry and readback reconciliation passes, C3 may return replay readbacks without mutating state even when the parent frame `stateRevision` is older than the current store revision.
-4. If no settled entry exists, if any fingerprint differs, or if the request cannot be reconstructed safely, the normal C3 stale-state guard remains authoritative and the stale attempt SHALL fail before any new write.
+2. The replay lookup SHALL verify the parent request fingerprint matches the settled C3 parent-plan entry before using the already-settled planned transitions.
+3. The adapter replay lookup SHALL verify each settled per-transition command identity and request fingerprint, and SHALL reconcile readback against the current store path.
+4. If the parent request fingerprint matches and every settled transition has a matching adapter entry with reconciled readback, C3 may return replay readbacks without mutating state even when the parent frame `stateRevision` is older than the current store revision.
+5. If no settled parent plan exists, if the parent fingerprint differs, if any adapter fingerprint differs, or if replay readback reconciliation fails, the normal C3 stale-state guard or fail-closed adapter error remains authoritative and the stale attempt SHALL NOT apply a new write.
 
-This proves local/session exact stale replay ordering only for reconstructable settled requests. Current-relative requests that cannot safely reconstruct the original desired state remain stale-guarded.
+This proves local/session exact stale replay ordering only for settled parent requests. Parent request fingerprinting is needed for current-relative requests whose derived desired values would change if recomputed from current store state.
 
 ## AD-RAE-017: Failure ledger records non-success outcomes without blocking corrected retry
 
