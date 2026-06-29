@@ -75,3 +75,11 @@
 - [x] 9.7 Gate 3: run GitNexus verifier, Codex native subagent audit, and anchored Hermes audit, or record an explicit operator override and substitute hard audit.
 - [ ] 9.8 Gate 4: reconcile UIUE route map and burndown without implementing UIUE consumer integration.
 - [ ] 9.9 Gate 4: run UIUE local validation, Codex native subagent audit, and anchored Hermes audit before exact-path docs commit.
+
+## 10. R5 D20/D21 Public Fixture Contract
+
+- [x] 10.1 Add deterministic presentation-safe public `RuntimePresentationPayload` fixture JSON under `Tests/Fixtures/RuntimePresentationPayload/`.
+- [x] 10.2 Record fixture sha256 in a manifest shared with the UIUE fixture copy.
+- [x] 10.3 Prove main can generate the committed public fixture object from `RuntimePresentationPayload` while excluding non-public timestamp fields.
+- [x] 10.4 Prove the public fixture contains no adapter-private, durable-ledger, raw-runtime, raw-model, or training receipt markers.
+- [x] 10.5 Preserve proof caps: fixture proof remains local/unit/static only and does not claim runtime-ready, mobile, true-device, live, UIUE merge, V/S/U-PASS, A-2, voice/model/golden/endpoint readiness, or R5 completion.

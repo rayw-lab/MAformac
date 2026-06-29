@@ -141,3 +141,11 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 - [x] 16.4 Fix the main presentation sanitizer gap for `rawRuntimeStore`, which was forbidden by authority/UIUE deny-list but not explicitly redacted by main.
 - [x] 16.5 Validate with target main/UIUE tests, OpenSpec strict checks, `git diff --check`, staged diff check, and GitNexus `detect_changes` on the exact staged Gate 4 diff.
 - [x] 16.6 Record Gate4 receipt and carry Hermes round 1 truth as `FAIL/P1 fixed post-audit under operator no-rerun override`, not as Hermes PASS.
+
+## 17. R5 D20 App Runtime Entry Under Proof Cap
+
+- [x] 17.1 Move the main app text command entry off `DemoWalkingSkeleton` and onto a main-owned `DemoRuntimeSessionRunner`.
+- [x] 17.2 Route decoded command text through `C3ExecutionPipeline` and the runtime adapter path before producing `RuntimePresentationPayload`.
+- [x] 17.3 Preserve C3 stale/replay and readback verification semantics; do not promote local/runtime adapter proof to production runtime readiness.
+- [x] 17.4 Add local/unit tests proving app-facing command text emits sanitized runtime presentation payloads and preserves durable stale replay without a second write.
+- [x] 17.5 Validate with targeted Swift tests, OpenSpec strict checks, `git diff --check`, staged diff checks, and Gate audit evidence.

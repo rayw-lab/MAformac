@@ -568,6 +568,16 @@ Use this order in `docs/CURRENT.md` after grill acceptance:
 
 Expected content rule: contract-only bridge is first, but implementation-heavy backend is after model/C6 gates.
 
+2026-06-30 D20/D21 execution note: `UIUE_R5_D20_D21_RUNTIME_UIUE_INTEGRATION_PR_SUPERTRAIN`
+is a narrower child authorization that supersedes the sentence above only for
+the demo app command-entry slice. It permits the existing app text command path
+to move from `DemoWalkingSkeleton` to a main-owned
+`C3ExecutionPipeline` / runtime-adapter / `RuntimePresentationPayload` path and
+permits UIUE to consume presentation-safe public JSON fixtures into
+`PresentationSnapshot`. It does not authorize model-backed backend readiness,
+voice/golden/mobile/live proof, UIUE merge, V/S/U-PASS, A-2 completion, or R5
+completion.
+
 - [ ] **Step 3: Guard stale task files**
 
 For each active OpenSpec task file touched in this task, add a short note near the top:

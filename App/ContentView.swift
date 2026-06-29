@@ -64,16 +64,15 @@ struct ContentView: View {
     @MainActor
     private func runCommand() async {
         errorText = nil
-        let skeleton = DemoWalkingSkeleton(
-            store: store,
-            guardrail: DemoFastPathGuard(),
-            traceLogger: traceLogger,
-            speech: speech
-        )
 
         do {
-            let readback = try await skeleton.handle(text: commandText)
-            lastReadback = "\(readback.key): \(readback.actualValue)"
+            let runner = try DemoRuntimeSessionRunner.defaultRunner(
+                store: store,
+                traceLogger: traceLogger,
+                speech: speech
+            )
+            let payload = try await runner.run(text: commandText)
+            lastReadback = payload.readbacks.map(\.spokenText).joined(separator: "；")
         } catch {
             errorText = "\(error)"
         }
