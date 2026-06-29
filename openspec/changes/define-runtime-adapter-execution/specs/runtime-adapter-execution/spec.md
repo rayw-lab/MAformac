@@ -135,3 +135,90 @@ GIVEN D13 C3 local/unit integration passes
 WHEN main or UIUE receipts describe Runtime Adapter V0 provenance
 THEN they SHALL keep adapter provenance as internal main execution evidence
 AND they SHALL NOT define or consume new UIUE-facing adapter fields in D13.
+
+### Requirement: Session-Scoped Ledger Boundary
+
+Runtime Adapter V0 SHALL treat its local idempotency ledger as session-scoped local/unit state unless a later change defines durable persistence.
+
+#### Scenario: New adapter session starts with empty ledger
+
+GIVEN one Runtime Adapter V0 instance has already settled a command identity
+WHEN a new adapter instance or new runtime adapter box is created
+THEN the new instance SHALL NOT retain the previous instance's successful ledger entry
+AND receipts SHALL NOT describe the behavior as persistent or durable idempotency proof.
+
+### Requirement: Exact Stale Retry Ordering
+
+`C3ExecutionPipeline` SHALL define how exact stale retries interact with the existing C3 stale-state guard.
+
+#### Scenario: Settled exact stale retry may replay before stale failure
+
+GIVEN C3 previously executed a transition through Runtime Adapter V0 with a stable parent frame identity
+AND the adapter session ledger contains settled entries for the per-transition command identities
+AND a later attempt uses the same parent identity and reconstructs matching request fingerprints
+AND the later attempt has a stale `stateRevision`
+WHEN C3 evaluates the later attempt
+THEN C3 MAY replay the settled adapter results before raising stale-state failure
+AND it SHALL NOT apply a second state mutation.
+
+#### Scenario: Stale changed request still fails before mutation
+
+GIVEN C3 previously settled one transition request for a parent identity
+WHEN a stale later attempt reuses that identity but reconstructs a different request fingerprint
+THEN C3 SHALL NOT replay the old readback for the changed request
+AND the normal stale-state guard SHALL fail the attempt before any new write.
+
+### Requirement: Failure Ledger Semantics
+
+Runtime Adapter V0 SHALL record failed attempts in a local failure ledger without treating them as successful replay entries.
+
+#### Scenario: Retryable failure is recorded without fake success
+
+GIVEN a command reaches adapter semantics but cannot produce valid readback because a state cell is missing or reconciliation fails
+WHEN the adapter fails the attempt
+THEN it SHALL record a `retryable_failure`
+AND it SHALL NOT record a successful replay entry.
+
+#### Scenario: Terminal failure is recorded without blocking corrected retry
+
+GIVEN a command has an unsupported tool name or is missing a required adapter argument
+WHEN the adapter rejects the attempt
+THEN it SHALL record a `terminal_failure`
+AND a later corrected attempt with the same command identity MAY execute if no successful ledger entry exists.
+
+#### Scenario: Conflict is recorded without overwriting settled success
+
+GIVEN a command identity has already settled with one request fingerprint
+WHEN a later attempt reuses that identity with a different fingerprint
+THEN the adapter SHALL record a `conflict`
+AND it SHALL NOT overwrite the settled success entry.
+
+### Requirement: Retry Readback Reconciliation
+
+Runtime Adapter V0 SHALL reconcile retry replay readback against the current store path before returning a replay result.
+
+#### Scenario: Retry replay returns only reconciled readback
+
+GIVEN a command identity has already settled with a successful readback
+WHEN the same command and request fingerprint are retried
+THEN the adapter SHALL verify the current store cell still matches the settled actual value
+AND it SHALL return a `retry_replay` result without mutation.
+
+#### Scenario: Drifted readback fails closed
+
+GIVEN a command identity has already settled with a successful readback
+AND the current store cell no longer matches the settled actual value
+WHEN the same command and request fingerprint are retried
+THEN the adapter SHALL fail closed with a reconciliation failure
+AND it SHALL NOT rewrite the current store state.
+
+### Requirement: RuntimeAdapterBox Concurrency Boundary
+
+`RuntimeAdapterBox` SHALL remain a private local/unit concurrency boundary for C3 adapter reuse until a later runtime proof changes that boundary.
+
+#### Scenario: C3 construction remains non-main-actor
+
+GIVEN `C3ExecutionPipeline` owns a private runtime adapter box
+WHEN tests construct C3 pipelines from non-main helper code
+THEN the construction SHALL continue to compile without making the public C3 initializer `@MainActor`
+AND adapter resolution SHALL remain inside `@MainActor` execution.

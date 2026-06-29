@@ -90,6 +90,56 @@ This is a local/unit C3 integration proof, not production retry readiness. Persi
 
 C3 may use adapter provenance for internal trace or unit assertions, but `C3ExecutionResult` and UIUE receipts SHALL NOT promote `first_execution`, `retry_replay`, or `already_state_noop` into a new UIUE payload contract in D13.
 
+## AD-RAE-015: D14 ledger boundary is session-scoped, not persistent
+
+D14 SHALL make the Runtime Adapter ledger boundary explicit as session-scoped local/unit state owned by a `DemoRuntimeAdapter` instance or the `RuntimeAdapterBox` that owns that instance.
+
+A new adapter or a new box starts with an empty session ledger. This is intentional for D14 and SHALL NOT be described as persistent, durable, cross-launch, cross-process, cross-device, or production-ready idempotency.
+
+Durable ledger storage, cross-launch replay, and external storage format are future work.
+
+## AD-RAE-016: Exact stale retry replay is ordered before stale-state failure only for matching settled requests
+
+D14 SHALL define the C3 stale retry ordering as:
+
+1. C3 may attempt a pre-stale replay lookup only for a request that can be mapped to already-settled adapter command identities in the current session ledger.
+2. The replay lookup SHALL verify the current request fingerprint matches the settled ledger entry.
+3. If every planned transition has a matching settled entry and readback reconciliation passes, C3 may return replay readbacks without mutating state even when the parent frame `stateRevision` is older than the current store revision.
+4. If no settled entry exists, if any fingerprint differs, or if the request cannot be reconstructed safely, the normal C3 stale-state guard remains authoritative and the stale attempt SHALL fail before any new write.
+
+This proves local/session exact stale replay ordering only for reconstructable settled requests. Current-relative requests that cannot safely reconstruct the original desired state remain stale-guarded.
+
+## AD-RAE-017: Failure ledger records non-success outcomes without blocking corrected retry
+
+D14 SHALL add an adapter-local failure ledger for observability of failed attempts. The ledger SHALL distinguish:
+
+- `retryable_failure`: input reached adapter semantics but may become valid after state or environment repair, such as missing state cell or readback reconciliation mismatch;
+- `terminal_failure`: unsupported tool shape or missing required adapter argument;
+- `conflict`: reused command identity with a different request fingerprint after a settled success.
+
+Failure records SHALL NOT be treated as successful idempotency entries, SHALL NOT replay fake success, and SHALL NOT prevent a later corrected attempt from executing when no successful entry exists for that command identity.
+
+## AD-RAE-018: Retry replay performs readback reconciliation
+
+D14 retry replay SHALL reconcile the settled ledger readback against the current store path before returning `retry_replay`.
+
+If the current store cell is missing or its actual value differs from the settled successful readback, the adapter SHALL fail closed, record a retryable failure record, and SHALL NOT rewrite state to force reconciliation.
+
+This keeps the store path as the source of truth and prevents stale ledger readback from masquerading as current mock state.
+
+## AD-RAE-019: RuntimeAdapterBox concurrency boundary remains local and bounded
+
+`RuntimeAdapterBox` may keep `C3ExecutionPipeline` construction non-`@MainActor` while resolving the `DemoRuntimeAdapter` only inside `@MainActor` execution.
+
+D14 SHALL keep this as an explicitly bounded local/unit concurrency boundary. `@unchecked Sendable` on the private box is acceptable only if:
+
+- the box stays private to `C3ExecutionPipeline`;
+- adapter access remains `@MainActor`;
+- tests continue to compile non-main pipeline construction helpers; and
+- receipts keep broader runtime concurrency proof as future work.
+
+This does not prove production concurrency safety.
+
 ## Pre-Mortem And Cross-Search Findings
 
 Local search found current write behavior split between `C3ExecutionPipeline`, `DemoActionExecutor`, and `DemoVehicleStateStore`, while D11 receipts say retry/full adapter idempotency is future work. Web references reinforce three design constraints:
@@ -98,6 +148,7 @@ Local search found current write behavior split between `C3ExecutionPipeline`, `
 - AWS Builders Library recommends caller-provided client request identifiers for safe retries and warns about late-arriving duplicate requests: `https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/`.
 - The IETF Idempotency-Key draft defines a request-header approach and highlights request fingerprint use for idempotent retries: `https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header`.
 - Google AIP-180 treats API compatibility as a first-class concern, reinforcing that internal fields should not be treated as externally stable consumer contracts without explicit ownership: `https://google.aip.dev/180`.
+- Swift `Sendable` / actor-isolation references show why the private box boundary must be explicit rather than accidentally leaking `@MainActor` construction into C3 callers: `https://github.com/swiftlang/swift-evolution/blob/main/proposals/0302-concurrent-value-and-concurrent-closures.md` and `https://github.com/apple/swift-evolution/blob/main/proposals/0327-actor-initializers.md`.
 
 ## Iceberg Teardown
 

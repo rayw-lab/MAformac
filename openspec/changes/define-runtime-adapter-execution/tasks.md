@@ -57,16 +57,52 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 7. D13 Gate 3 UIUE Boundary Guard
 
-- [ ] 7.1 Reconfirm Gate 2 Hermes PASS before UIUE docs work.
-- [ ] 7.2 Search UIUE for adapter-private field consumption and distinguish existing presentation vocabulary from adapter provenance.
-- [ ] 7.3 Write UIUE docs-only boundary guard without creating a payload contract.
-- [ ] 7.4 Validate with `git diff --check`, `openspec validate ui-presentation --strict`, and targeted grep evidence.
-- [ ] 7.5 Run Hermes Gate 3 audit and require `HERMES_R5_D13_GATE_3_UIUE_BOUNDARY_VERDICT: PASS`.
+- [x] 7.1 Reconfirm Gate 2 Hermes PASS before UIUE docs work.
+- [x] 7.2 Search UIUE for adapter-private field consumption and distinguish existing presentation vocabulary from adapter provenance.
+- [x] 7.3 Write UIUE docs-only boundary guard without creating a payload contract.
+- [x] 7.4 Validate with `git diff --check`, `openspec validate ui-presentation --strict`, and targeted grep evidence.
+- [x] 7.5 Run Hermes Gate 3 audit and require `HERMES_R5_D13_GATE_3_UIUE_BOUNDARY_VERDICT: PASS`.
 
 ## 8. D13 Gate 4 Commander Reconcile
 
-- [ ] 8.1 Reconfirm Gate 3 Hermes PASS before map/burndown work.
-- [ ] 8.2 Update UIUE reconcile receipt, decomposition map, and burndown according to actual D13 proof.
-- [ ] 8.3 Preserve proof caps, non-claims, access gaps, and stop conditions.
-- [ ] 8.4 Validate with `git diff --check` and `openspec validate ui-presentation --strict`.
-- [ ] 8.5 Run Hermes Gate 4 audit and require `HERMES_R5_D13_GATE_4_RECONCILE_VERDICT: PASS`.
+- [x] 8.1 Reconfirm Gate 3 Hermes PASS before map/burndown work.
+- [x] 8.2 Update UIUE reconcile receipt, decomposition map, and burndown according to actual D13 proof.
+- [x] 8.3 Preserve proof caps, non-claims, access gaps, and stop conditions.
+- [x] 8.4 Validate with `git diff --check` and `openspec validate ui-presentation --strict`.
+- [x] 8.5 Run Hermes Gate 4 audit and require `HERMES_R5_D13_GATE_4_RECONCILE_VERDICT: PASS`.
+
+## 9. D14 Gate 1 Runtime Adapter Residual OpenSpec Authority
+
+- [x] 9.1 Re-probe main/UIUE HEAD and dirty split before Gate 1 writes.
+- [x] 9.2 Re-read D14 dispatch, D13 receipts, D1-D12 phase review, active OpenSpec, and runtime adapter/C3/store/test surfaces.
+- [x] 9.3 Refresh or verify main GitNexus index and inspect `DemoRuntimeAdapter`, `C3ExecutionPipeline`, `RuntimeAdapterBox`, and `DemoVehicleStateStore.applyMockTransition`.
+- [x] 9.4 Record GitNexus impact for Gate 2 candidate symbols and treat HIGH/CRITICAL as explicit audit risk.
+- [x] 9.5 Define D14 authority for session-scoped ledger boundary, exact stale retry ordering, failure ledger taxonomy, readback reconciliation, and `RuntimeAdapterBox` concurrency boundary.
+- [x] 9.6 Validate with `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, and `openspec validate --all --strict`.
+- [x] 9.7 Run Codex native subagent Gate 1 audit within 1200 seconds and require empty P0/P1.
+
+## 10. D14 Gate 2 Main Code + Tests
+
+- [ ] 10.1 Reconfirm Gate 1 Codex subagent audit PASS before Swift edits.
+- [ ] 10.2 Run GitNexus impact before touching any Swift symbol and require pitfall loop/subagent audit for touched HIGH/CRITICAL symbols.
+- [ ] 10.3 Implement the D14 session ledger, stale retry ordering, failure ledger, readback reconciliation, and concurrency-boundary slice without editing `ToolCallFrame` or UIUE.
+- [ ] 10.4 Add/extend targeted local/unit tests for D14 semantics.
+- [ ] 10.5 Validate with target Swift tests, `git diff --check`, `openspec validate define-runtime-adapter-execution --strict`, and `openspec validate --all --strict`.
+- [ ] 10.6 Run GitNexus `detect_changes(scope=staged)` before commit.
+- [ ] 10.7 Run Codex native subagent Gate 2 audit within 1200 seconds and require empty P0/P1.
+
+## 11. D14 Gate 3 Hermes + GitNexus Verifier
+
+- [ ] 11.1 Re-check or refresh GitNexus after Gate 2 commit.
+- [ ] 11.2 Run GitNexus context/impact/detect on the committed D14 surface and explain any HIGH/CRITICAL results.
+- [ ] 11.3 Run Hermes Gate 3 audit and require `HERMES_R5_D14_GATE_3_RUNTIME_ADAPTER_RESIDUAL_VERIFIER_VERDICT: PASS`.
+- [ ] 11.4 Rerun local validation: `git diff --check`, OpenSpec strict validates, and target Swift tests.
+- [ ] 11.5 Run Codex native subagent Gate 3 audit within 1200 seconds after Hermes/GitNexus evidence is available.
+
+## 12. D14 Gate 4 Commander Reconcile
+
+- [ ] 12.1 Reconfirm Gate 3 PASS before UIUE docs work.
+- [ ] 12.2 Update UIUE reconcile receipt, decomposition map, and burndown according to actual D14 proof.
+- [ ] 12.3 Preserve proof caps, non-claims, access gaps, C005/C061/C018/C052 dispositions, and D15 boundary.
+- [ ] 12.4 Validate with `git diff --check`, `openspec validate ui-presentation --strict`, `git diff --cached --name-only`, and `git diff --cached --check`.
+- [ ] 12.5 Run Codex native subagent Gate 4 audit within 1200 seconds and require empty P0/P1.

@@ -15,6 +15,7 @@ This change creates the mainline Runtime Adapter V0 execution authority for stab
 - Define how `C3ExecutionPipeline` routes planned mock transitions through Runtime Adapter V0.
 - Define per-transition command identity derivation from an existing parent `ToolCallFrame.id` without editing `ToolCallFrame`.
 - Define that C3 may construct adapter-local `set_vehicle_control` frames from planned transitions, while keeping adapter provenance internal to main.
+- Define the D14 residual slice: session-scoped ledger boundary, exact stale retry ordering, failure ledger taxonomy, readback reconciliation, and `RuntimeAdapterBox` concurrency boundary.
 - Preserve local/unit/OpenSpec proof cap and non-claims.
 
 ## Capabilities
@@ -51,7 +52,9 @@ This change creates the mainline Runtime Adapter V0 execution authority for stab
 - Do not define `C018` SceneMacroRegistry/Core config.
 - Do not implement `C052` production force-state.
 - Do not create persistent database/cloud idempotency storage.
+- Do not claim session-scoped ledger behavior as durable/persistent ledger proof.
 - Do not expose new UIUE shared fields in Gate 1.
+- Do not create a UIUE-facing runtime presentation payload contract in D14.
 - Do not claim runtime-ready, mobile-ready, true-device-ready, voice-ready, model-ready, golden-ready, endpoint-ready, merge-ready, or R5 complete.
 
 ## Success Criteria
@@ -59,5 +62,5 @@ This change creates the mainline Runtime Adapter V0 execution authority for stab
 - `openspec validate define-runtime-adapter-execution --strict` passes.
 - `openspec validate --all --strict` passes.
 - `git diff --check` passes.
-- Gate 2 can integrate Runtime Adapter V0 into `C3ExecutionPipeline` with local/unit tests for per-transition command identity, retry replay, failed command behavior, idempotency conflict, and adapter-owned mock write path.
+- Gate 2 can reduce Runtime Adapter residuals with local/unit or local/integration tests for session-scoped ledger reset, exact stale retry ordering, failure ledger taxonomy, readback reconciliation, and `RuntimeAdapterBox` concurrency boundary.
 - The receipt records pre-mortem, local/web cross-search, iceberg teardown, GitNexus impact, Codex subagent audit, and D13 proof caps.
