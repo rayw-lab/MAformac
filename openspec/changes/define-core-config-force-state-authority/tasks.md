@@ -35,4 +35,4 @@
 - [x] 4R.3 Add local/unit and external package proof that `DemoForceStateContext` is not externally decodable.
 - [x] 4R.4 Preserve fail-closed tests for `.customerFacing`, empty context, duplicate dimensions, and missing `.demoHarness` provenance.
 - [x] 4R.5 Run local validation, OpenSpec validation, GitNexus context/detect, and UIUE read-only bounded grep.
-- [ ] 4R.6 Run one audit pass, record audit result, decide `d17_release_gate: open|closed`, exact-stage Gate4R owned paths, and commit.
+- [x] 4R.6 Run one audit pass, record audit result, decide `d17_release_gate: open`, exact-stage Gate4R owned paths, and commit.

@@ -7,9 +7,9 @@ UIUE: `/Users/wanglei/workspace/MAformac-uiue` read-only
 
 ## Verdict
 
-`LOCAL_VALIDATION_PASS_PENDING_AUDIT`
+`DONE`
 
-`d17_release_gate: pending_audit`
+`d17_release_gate: open`
 
 Gate4R repairs the Gate4 Hermes P1 construction bypass by removing `DemoForceStateContext` synthesized `Codable` / `Decodable` conformance. External clients can still read contexts returned by `DemoForceStateBoundary.accept(...)`, but cannot decode or construct a `DemoForceStateContext` with `isolation = customer_facing` through `JSONDecoder`.
 
@@ -64,7 +64,7 @@ Gate3 fixed the explicit public initializer bypass by making `DemoForceStateCont
 | `git diff --check` | PASS | local/static |
 | `openspec validate define-core-config-force-state-authority --strict && openspec validate --all --strict` | PASS; full OpenSpec 18 items / 0 failed | local/OpenSpec |
 | `rg -n "DemoForceStateContext.*Codable\|DemoForceStateContext.*Decodable\|JSONDecoder\\(\\)\\.decode\\(DemoForceStateContext\|public init\\(" Core/Config/DemoForceStateBoundary.swift Tests/MAformacCoreTests/DemoForceStateBoundaryTests.swift` | PASS for the repaired surface: no `DemoForceStateContext` Codable/Decodable conformance or decode call; remaining public initializers are `DemoForceStateValue` and `DemoForceStateBoundary`. | local/static |
-| UIUE bounded grep under `Core App Features Tests openspec Package.swift` for D16 stable names / force-state names | Exit 1, no premature D16/D17 consumption in bounded active surfaces | local/static |
+| UIUE bounded grep under `Core App Features Tests openspec Package.swift` for D16 stable names / force-state names | Exit 1 for new D16 stable-name consumer implementation in bounded active surfaces. This does not claim older generic UIUE force-state vocabulary is absent. | local/static |
 
 ## External Package Decode Probe
 
@@ -110,22 +110,37 @@ This directly closes the Gate4 Hermes reproduction path where an external packag
 | If wrong, what proves it | `Core/Config/DemoForceStateBoundary.swift`, `Tests/MAformacCoreTests/DemoForceStateBoundaryTests.swift`, `/tmp/maformac-d16-gate4r-external-decode/build-output-r2.txt`, and `Reports/r5-d16-gate4-20260629T1808/hermes-output.txt`. |
 | Post-audit correction | Pending Gate4R audit. |
 
+## Gate4R Audit
+
+- Prompt: `Reports/r5-d16-gate4r-20260629T1822/hermes-prompt.txt`
+- Transcript: `Reports/r5-d16-gate4r-20260629T1822/hermes-output.txt`
+- Anchor: `HERMES_R5_D16_GATE_4R_FORCE_STATE_CODABLE_BYPASS_REPAIR_REOPEN_VERDICT: PASS`
+- P0: Empty.
+- P1: Empty.
+- P2: UIUE “not started” evidence is acceptable for release, but should stay narrowly worded because older UIUE artifacts may contain generic force-state vocabulary.
+- Release gate recommendation: open.
+- Controller decision: open D17 consumer authority gate only; this is not runtime/mobile/true-device/live proof.
+
 ## Release Decision
 
-Pending one audit pass:
+Open:
 
 ```yaml
-d17_release_gate: pending_audit
+d17_release_gate: open
+audit_status: audit_pass
+hermes_or_auditor_transcript: Reports/r5-d16-gate4r-20260629T1822/hermes-output.txt
 external_decodable_bypass_closed: true
-release_basis_if_audit_passes:
+release_basis:
   - Gate4R removed DemoForceStateContext Decodable/Codable conformance
   - external package JSONDecoder probe fails to compile with Decodable requirement
   - local/unit/static/OpenSpec validation passed
   - UIUE bounded grep shows D17 has not started
+  - Gate4R Hermes PASS with P0/P1 empty
 not_release_basis:
   - not Gate3 Hermes PASS
   - not Gate4 Hermes PASS
   - not runtime/mobile/true-device/live/V-PASS proof
+next_gate: D17_GATE_5_UIUE_CONSUMER_AUTHORITY
 ```
 
 ## Non-Claims
