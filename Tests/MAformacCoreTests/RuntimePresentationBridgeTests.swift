@@ -424,10 +424,10 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             traceID: "trace-requestFingerprint",
             runId: "run-RuntimeAdapterBox",
             parentSpanId: "span-failureLedger",
-            message: "DemoRuntimeAdapter RuntimeAdapterBox durableLedger persistentLedger adapterLedger local_durable_adapter_ledger requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore rawRuntimeStore",
+            message: "DemoRuntimeAdapter RuntimeAdapterBox RUNTIMEADAPTERBOX durableLedger persistentLedger adapterLedger local_durable_adapter_ledger requestFingerprint parentRequestFingerprint failureLedger rawModelOutput trainingReceipt runtimeStore RawRuntimeStore",
             attributes: TraceAttributes(
                 stopReason: "RuntimeAdapterBox",
-                guardReason: "failureLedger runtimeStore rawRuntimeStore durableLedger"
+                guardReason: "failureLedger runtimeStore RAWRUNTIMESTORE durableLedger"
             ),
             timestamp: Date(timeIntervalSince1970: 1_800_000_060)
         )
@@ -435,7 +435,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             traceID: "trace-requestFingerprint",
             runtimeOutcome: DemoRuntimeOutcome(
                 result: .runtimeError,
-                reason: "DemoRuntimeAdapter parentRequestFingerprint rawModelOutput",
+                reason: "DemoRuntimeAdapter parentRequestFingerprint RAWMODELOUTPUT",
                 missingSlot: "failureLedger",
                 scopeFailureReason: "trainingReceipt runtimeStore rawRuntimeStore persistentLedger"
             ),
@@ -499,6 +499,9 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             "trainingReceipt"
         ] {
             XCTAssertFalse(encoded.contains(forbidden), "encoded payload leaked \(forbidden)")
+        }
+        for mixedCaseForbidden in ["RUNTIMEADAPTERBOX", "RAWRUNTIMESTORE", "RAWMODELOUTPUT", "RawRuntimeStore"] {
+            XCTAssertFalse(encoded.contains(mixedCaseForbidden), "encoded payload leaked \(mixedCaseForbidden)")
         }
         XCTAssertTrue(encoded.contains("[redacted]"))
     }

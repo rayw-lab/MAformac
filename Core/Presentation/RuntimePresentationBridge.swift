@@ -171,8 +171,9 @@ private enum PresentationPayloadSanitizer {
 
     static func redacted(_ value: String, maxLength: Int = 160) -> String {
         var safeValue = value
-        for token in redactedTokens where safeValue.contains(token) {
-            safeValue = safeValue.replacingOccurrences(of: token, with: "[redacted]")
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        for token in redactedTokens.sorted(by: { $0.count > $1.count }) where safeValue.range(of: token, options: options) != nil {
+            safeValue = safeValue.replacingOccurrences(of: token, with: "[redacted]", options: options)
         }
         return String(safeValue.prefix(maxLength))
     }
@@ -256,8 +257,9 @@ public struct TraceEnvelope: Codable, Equatable, Sendable {
                 TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
             }
             var message = copy.message
-            for token in redactedTokens where message.contains(token) {
-                message = message.replacingOccurrences(of: token, with: "[redacted]")
+            let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+            for token in redactedTokens.sorted(by: { $0.count > $1.count }) where message.range(of: token, options: options) != nil {
+                message = message.replacingOccurrences(of: token, with: "[redacted]", options: options)
             }
             copy.message = String(message.prefix(maxMessageLength))
             copy.attributes = copy.attributes.presentationSafe(
@@ -702,8 +704,9 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
     private static func normalizedReason(_ reason: String, fallback: String) -> String {
         let trimmed = reason.trimmingCharacters(in: .whitespacesAndNewlines)
         var safeReason = trimmed.isEmpty ? fallback : trimmed
-        for token in unsafeReasonTokens where safeReason.contains(token) {
-            safeReason = safeReason.replacingOccurrences(of: token, with: "[redacted]")
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        for token in unsafeReasonTokens.sorted(by: { $0.count > $1.count }) where safeReason.range(of: token, options: options) != nil {
+            safeReason = safeReason.replacingOccurrences(of: token, with: "[redacted]", options: options)
         }
         return String(safeReason.prefix(160))
     }
@@ -725,8 +728,9 @@ private extension TraceAttributes {
 
     static func redacted(_ value: String, redactedTokens: [String], maxMessageLength: Int) -> String {
         var safeValue = value
-        for token in redactedTokens where safeValue.contains(token) {
-            safeValue = safeValue.replacingOccurrences(of: token, with: "[redacted]")
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        for token in redactedTokens.sorted(by: { $0.count > $1.count }) where safeValue.range(of: token, options: options) != nil {
+            safeValue = safeValue.replacingOccurrences(of: token, with: "[redacted]", options: options)
         }
         return String(safeValue.prefix(maxMessageLength))
     }
