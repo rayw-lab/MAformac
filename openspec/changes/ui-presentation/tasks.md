@@ -173,5 +173,5 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.I1 Gate5 authority: define UIUE consumer boundary for D15 `RuntimePresentationPayload` / `PresentationReconciliation` and D16 stable Core config / SceneMacroRegistry / force-context names.
 - [x] 8.I2 Gate5 forbid UIUE-invented shared fields, enum values, proof classes, Core config truth, force-state truth, private adapter fields, raw runtime/model/training fields, and `DemoForceStateContext` decode/constructor surfaces.
 - [x] 8.I3 Gate6 implement UIUE consumer mapping and local/unit fail-closed tests for unknown schema/proof/reconciliation/config/macro/force-context/presentation names.
-- [ ] 8.I4 Gate7 run UIUE consumer verifier and optional simulator/local visual smoke under proof cap.
+- [x] 8.I4 Gate7 run UIUE consumer verifier and optional simulator/local visual smoke under proof cap.
 - [ ] 8.I5 Gate8 reconcile dual repo route map, burndown, grill/ledger cascade, final Claude Code adversarial audit, and exact-path commits.
