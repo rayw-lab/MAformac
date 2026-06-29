@@ -2,7 +2,7 @@
 artifact_kind: r5_d19_gate6_uiue_durability_guard_code_receipt
 gate: D19_GATE_6_UIUE_DURABILITY_GUARD_CODE_TESTS
 repo: /Users/wanglei/workspace/MAformac-uiue
-status: DONE_BEFORE_HERMES_ROUND2
+status: DONE_UNDER_HERMES_ROUND2_PASS
 proof_class: local_unit + local_static + openspec_local
 created_at: 2026-06-29
 ---
@@ -11,11 +11,13 @@ created_at: 2026-06-29
 
 ## Verdict
 
-`DONE_BEFORE_HERMES_ROUND2`
+`DONE_UNDER_HERMES_ROUND2_PASS`
 
 Gate6 extends the existing UIUE `RuntimePresentationConsumerMapping` deny-list so D18 durable/private runtime names fail closed and cannot become presentation fields, proof labels, proof caps, or readiness claims.
 
 This remains local/unit/static guard proof only. It does not parse main runtime payloads, durable ledger files, C3 durable stores, adapter ledger rows, or storage schemas. It does not claim UIUE merge, runtime-ready, production durable runtime, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, endpoint-ready, or R5 completion.
+
+Hermes round2 audited Gates4-6 after the Gate6 commit and returned anchored PASS with P0/P1/P2 empty. This is an audit result over local/static/unit/OpenSpec proof only; it does not upgrade proof class.
 
 ## Scope
 
@@ -81,6 +83,22 @@ This remains local/unit/static guard proof only. It does not parse main runtime 
 | main read-only `openspec validate define-runtime-adapter-execution --strict` | PASS | local/OpenSpec |
 | main read-only `openspec validate define-runtime-presentation-bridge --strict` | PASS | local/OpenSpec |
 | `git diff --cached --check` | PASS before commit | local/static |
+
+## Hermes Round 2
+
+| item | result |
+|---|---|
+| Auditor | Hermes GLM-5.2 code |
+| Scope | Gates4-6: main Gate4 private payload boundary verifier, UIUE Gate5 durability guard authority, UIUE Gate6 durability guard code/tests |
+| Prompt | `Reports/r5-d18-d19-gates4-6-hermes-round2-20260629/hermes-prompt.txt` |
+| Transcript | `Reports/r5-d18-d19-gates4-6-hermes-round2-20260629/hermes-output.txt` |
+| Anchor | `HERMES_R5_D18_D19_GATES_4_6_BOUNDARY_GUARD_VERDICT: PASS` |
+| P0 | none |
+| P1 | none |
+| P2 | none |
+| Controller action | Proceed to Gate7 under proof cap; no rerun needed. |
+
+Hermes verified that Gate4 redacts `rawRuntimeStore`, Gate5 consumes D18 only as proof-governance/deny-list authority, Gate6 rejects D18 durable/private names before they can become presentation/proof/proof-cap allow-list values, and both repos keep source dispatch artifacts unstaged. Hermes also preserved the proof cap: local/unit/static/OpenSpec/GitNexus/audit evidence only.
 
 ## Dirty Split
 
