@@ -52,6 +52,44 @@ This provenance is local/unit execution metadata. It is not a UIUE proof label a
 
 Runtime Adapter V0 may feed future presentation snapshots, but it does not modify `runtime-presentation-bridge` vocabulary in Gate 1. UIUE consumes only mainline-owned names and must not invent runtime adapter fields.
 
+## AD-RAE-010: C3 routes planned transitions through Runtime Adapter V0
+
+D13 SHALL move supported mock writes in `C3ExecutionPipeline` from direct `DemoVehicleStateStore.applyMockTransition` calls to Runtime Adapter V0 execution calls. C3 still owns semantic validation, stale-state checks, risk checks, allowlist checks, transition planning, readback verification, and trace logging.
+
+The adapter owns the write side effect for each supported planned `DemoMockTransition`.
+
+## AD-RAE-011: C3 parent identity is not the adapter ledger identity
+
+`ToolCallFrame.id` is the C3 parent command identity. It SHALL NOT be reused directly as the adapter ledger identity for every planned transition, because C3 can fan one frame into multiple transitions such as `ac.power` plus `ac.temperature` or several window keys.
+
+C3 SHALL derive a deterministic per-transition adapter command identity from the parent frame and planned transition, for example:
+
+`<ToolCallFrame.id>#<transition.key>`
+
+If a deterministic fallback is needed for local/unit proof, it SHALL include stable request-shaping fields and the planned transition key. Tests SHOULD pass an explicit `ToolCallFrame.id`.
+
+## AD-RAE-012: C3 constructs adapter-local frames without editing ToolCallFrame
+
+D13 SHALL NOT edit the shared `ToolCallFrame` schema. C3 may construct an adapter-local frame using the existing `ToolCallFrame(arguments:)` initializer with:
+
+- `toolName = "set_vehicle_control"`;
+- `state_key = <planned transition key>`;
+- `target_state = <planned desired value>`;
+- `id = <per-transition adapter command identity>`;
+- `traceID` and agent/capability context copied from the parent frame.
+
+This adapter-local frame is an internal main execution detail, not a UIUE-facing payload.
+
+## AD-RAE-013: C3 retry replay is bounded by existing C3 safety gates
+
+A C3 retry replay can be proven only when the retry attempt reaches the adapter boundary after satisfying existing C3 semantic, risk, allowlist, and stale-state checks. The D13 local/unit test may reuse the parent `ToolCallFrame.id` with an updated `stateRevision` when the current C3 stale-state guard would otherwise block an exact stale retry before adapter execution.
+
+This is a local/unit C3 integration proof, not production retry readiness. Persistent ledger, cross-launch replay, exact stale retry handling, and failure ledger durability remain future work.
+
+## AD-RAE-014: Adapter provenance remains internal
+
+C3 may use adapter provenance for internal trace or unit assertions, but `C3ExecutionResult` and UIUE receipts SHALL NOT promote `first_execution`, `retry_replay`, or `already_state_noop` into a new UIUE payload contract in D13.
+
 ## Pre-Mortem And Cross-Search Findings
 
 Local search found current write behavior split between `C3ExecutionPipeline`, `DemoActionExecutor`, and `DemoVehicleStateStore`, while D11 receipts say retry/full adapter idempotency is future work. Web references reinforce three design constraints:
@@ -59,6 +97,7 @@ Local search found current write behavior split between `C3ExecutionPipeline`, `
 - Stripe documents idempotency keys as preserving the first result for retried requests and rejecting parameter mismatch for reused keys: `https://docs.stripe.com/api/idempotent_requests`.
 - AWS Builders Library recommends caller-provided client request identifiers for safe retries and warns about late-arriving duplicate requests: `https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/`.
 - The IETF Idempotency-Key draft defines a request-header approach and highlights request fingerprint use for idempotent retries: `https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-idempotency-key-header`.
+- Google AIP-180 treats API compatibility as a first-class concern, reinforcing that internal fields should not be treated as externally stable consumer contracts without explicit ownership: `https://google.aip.dev/180`.
 
 ## Iceberg Teardown
 
@@ -73,6 +112,8 @@ Same-class risk map:
 - duplicate command id with changed payload silently replays stale result;
 - failed execution accidentally recorded as successful;
 - UIUE consumes a field not owned by mainline.
+- multi-transition C3 plans reuse one raw parent identity and trigger false idempotency conflict;
+- adapter-local provenance becomes a presentation payload by accident.
 
 Immediate fix: define OpenSpec authority before Swift.
 
