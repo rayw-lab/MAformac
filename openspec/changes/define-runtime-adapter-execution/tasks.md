@@ -91,13 +91,13 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 - [x] 10.6 Run GitNexus `detect_changes(scope=staged)` before commit.
 - [x] 10.7 Run Codex native subagent Gate 2 audit within 1200 seconds and require empty P0/P1.
 
-## 11. D14 Gate 3 Hermes + GitNexus Verifier
+## 11. D14 Gate 3 GitNexus + Substitute Verifier
 
-- [ ] 11.1 Re-check or refresh GitNexus after Gate 2 commit.
-- [ ] 11.2 Run GitNexus context/impact/detect on the committed D14 surface and explain any HIGH/CRITICAL results.
-- [ ] 11.3 Run Hermes Gate 3 audit and require `HERMES_R5_D14_GATE_3_RUNTIME_ADAPTER_RESIDUAL_VERIFIER_VERDICT: PASS`.
-- [ ] 11.4 Rerun local validation: `git diff --check`, OpenSpec strict validates, and target Swift tests.
-- [ ] 11.5 Run Codex native subagent Gate 3 audit within 1200 seconds after Hermes/GitNexus evidence is available.
+- [x] 11.1 Re-check or refresh GitNexus after Gate 2 commit.
+- [x] 11.2 Run GitNexus context/impact/detect on the committed D14 surface and explain any HIGH/CRITICAL results.
+- [x] 11.3 Record operator Hermes quota override; do not claim Hermes anchor; run substitute Codex verifier requiring empty P0/P1.
+- [x] 11.4 Rerun local validation: `git diff --check`, OpenSpec strict validates, and target Swift tests.
+- [x] 11.5 Run Codex native subagent Gate 3 audit within 1200 seconds after GitNexus evidence is available.
 
 ## 12. D14 Gate 4 Commander Reconcile
 
