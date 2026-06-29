@@ -353,3 +353,19 @@ D17 UIUE consumer work SHALL consume only D15 presentation-safe Runtime -> Prese
 - **WHEN** status is reported
 - **THEN** the proof SHALL remain capped to local/unit/simulator_mock as applicable
 - **AND** it SHALL NOT claim UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready
+
+### Requirement: D19 UIUE durability guard SHALL consume D18 only as proof-governance and deny-list authority
+
+D19 UIUE durability guard work SHALL treat main D18 local durable runtime work as proof-governance and deny-list authority only. UIUE SHALL NOT consume D18 durable ledger or runtime-private names as presentation payload fields, UI labels, proof labels, readiness labels, or merge authority.
+
+#### Scenario: D19 rejects durable runtime private names
+- **GIVEN** D18 has local durable adapter/C3 authority and Gate4 private payload boundary verification
+- **WHEN** UIUE defines or implements D19 durability guard validation
+- **THEN** it SHALL reject durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, `requestFingerprint`, `parentRequestFingerprint`, success ledger, failure ledger, `settledParentPlan`, settled parent plan internals, raw runtime store markers including `rawRuntimeStore`, raw model output, training receipt, adapter-local private names, and D18 storage path/schema internals
+- **AND** it SHALL NOT mirror those names into local shared DTOs, presentation fields, UI labels, or UIUE-owned enums
+
+#### Scenario: local durability proof does not become readiness
+- **GIVEN** D18 local durable ledger tests, GitNexus checks, OpenSpec validation, or audit findings have been recorded
+- **WHEN** UIUE reports D19 guard status
+- **THEN** UIUE SHALL describe that proof as local/static/unit/integration/OpenSpec/GitNexus proof only, as applicable
+- **AND** it SHALL NOT claim production durable runtime, runtime-ready, mobile, true-device, live API, UIUE merge, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, endpoint-ready, or R5 completion

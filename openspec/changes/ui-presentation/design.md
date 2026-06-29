@@ -308,3 +308,26 @@ The proof ceiling for D17 UIUE remains `local`, `unit`, and optional `simulator_
 ### 四、claim-vs-proof correction
 
 D15 created main payload authority but did not implement UIUE consumption. D16 Gate4R opened the D17 release gate after repairing the force-state construction bypass, but it did not provide runtime/mobile/live proof. Therefore Gate5 is authority only: it defines the consumer boundary and forbids UIUE invented shared fields before Gate6 code/tests.
+
+## AD-17 — D19 durability guard authority（2026-06-29）
+
+> Authority chain: main D18 Gates 1-4 local durable adapter/C3 authority, Gate4 private payload boundary verifier commit `b6a793755cfb7438c0f3e5edecb6cd32d5524336`, D17 UIUE consumer deny-list, and this UIUE Gate5 authority. D19 consumes D18 only as proof-governance and deny-list guardrails; it does not consume durable runtime rows as presentation data.
+
+### 一、UIUE may consume only guardrail semantics
+
+UIUE MAY treat D18 as authority for these guardrail facts only:
+
+- local durability proof is capped to `local`, `unit`, `integration`, `static`, `OpenSpec`, or `GitNexus` evidence as applicable;
+- durable runtime internals are main-owned implementation details, not UIUE shared fields;
+- presentation payloads must remain D15/D17 stable surfaces and must reject private durability names;
+- unknown durability/proof/readiness names fail closed rather than becoming UIUE display labels.
+
+### 二、D18 durability names remain forbidden
+
+UIUE SHALL NOT consume, map, serialize, display, or infer shared fields from durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, `requestFingerprint`, `parentRequestFingerprint`, success ledger, failure ledger, `settledParentPlan`, settled parent plan internals, raw runtime store markers including `rawRuntimeStore`, raw model output, training receipt, adapter-local private names, or D18 storage path/schema internals.
+
+### 三、proof cap and merge boundary
+
+D19 UIUE durability guard work is consumer-boundary and governance work only. It SHALL NOT claim UIUE merge, runtime-ready, production durable runtime, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, endpoint-ready, or R5 completion.
+
+Gate6 implementation may add local/unit fail-closed tests for the deny-list and proof-cap semantics, but those tests still do not prove runtime/mobile/live readiness.
