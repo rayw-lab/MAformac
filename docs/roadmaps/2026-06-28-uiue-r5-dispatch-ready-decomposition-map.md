@@ -1,11 +1,11 @@
 ---
-status: LIVING_ROUTE_CONTROL_AFTER_D16_D17
+status: LIVING_ROUTE_CONTROL_AFTER_D18_D19_GATE7
 artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
 last_updated_at: 2026-06-29
 owner: commander
-proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit
-authority: coordination_map_after_step0_plus_d16_d17_commander_intake
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard
+authority: coordination_map_after_step0_plus_d18_d19_gate7_reconcile
 canonical_for:
   - UIUE R5 dispatch grouping
   - serial_parallel_dependency_order
@@ -13,7 +13,7 @@ canonical_for:
   - stop_conditions
   - proof_cap_wording
   - living_r5_route_control
-  - post_D16_D17_next_long_task_order
+  - post_D18_D19_next_long_task_order
   - grill_burndown_progress_accounting
 not_canonical_for:
   - mainline shared runtime field authority
@@ -47,27 +47,31 @@ This document combines the UIUE STEP0 baseline freeze verdict and the main-side 
 
 As of D17, this file is also the living R5 route-control document. Update it after every accepted dispatch, phase review, or commander route decision. Each update must record live repo truth, proof-class ceiling, grill burndown movement, changed row dispositions, next long-task order, stop conditions, and any stale wording corrected during intake.
 
-## Current Route Snapshot After D16+D17
+## Current Route Snapshot After D18+D19 Gate7
 
-Last live-verified commander checkpoint before the final route-map follow-up commit:
+Last live-verified commander checkpoint before the Gate7 route-map commit:
 
 | repo | HEAD | status |
 |---|---|---|
-| main | `7ee172d0136044581aac232cfa78e17f619788e4` | preserve-unowned dirty only: `AGENTS.md`, `CLAUDE.md`, `docs/CURRENT.md`, `docs/README.md`, `.xcodebuildmcp/`, `Tools/agent-platform-plugin-refs/` |
-| UIUE | `9ec757cc868a195431f39a01ecfb1007e09f3d4f` | untracked source dispatches remain: D12, D13, D14, D15, D16+D17; `docs/research/2026-06-29-visual-acceptance-standard/` is unrelated pre-existing untracked evidence |
+| main | `b6a793755cfb7438c0f3e5edecb6cd32d5524336` | preserve-unowned dirty only: `AGENTS.md`, `CLAUDE.md`, `docs/CURRENT.md`, `docs/README.md`, `.xcodebuildmcp/`, `Tools/agent-platform-plugin-refs/` |
+| UIUE | `8255b3d62eab7f33850c5f6d6692acacf4e8cbb9` | untracked source dispatches remain: D12, D13, D14, D15, D16+D17, D18+D19; `docs/research/2026-06-29-visual-acceptance-standard/` is unrelated pre-existing untracked evidence |
 
-This map is a living route-control artifact. The current follow-up document commit itself records the Codex blind final-audit P1 repair and therefore cannot self-reference its own final commit hash inside the pre-commit checkpoint table.
+This map is a living route-control artifact. The current Gate7 document commit records D18+D19 route movement and therefore cannot self-reference its own final commit hash inside the pre-commit checkpoint table.
 
-D16+D17 route truth:
+D18+D19 route truth:
 
 - D15 defines and locally proves a main-owned `RuntimePresentationPayload` / `PresentationReconciliation` contract surface in main. Stable categories are schema version, presentation-safe identity, terminal flag, outcome, proof class, cards, card semantics, readbacks, reconciliation status, presentation-safe trace, and timestamp.
 - D15 forbids UIUE-facing exposure of `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, request fingerprints, private ledgers, settled parent-plan internals, raw runtime store, raw model output, training receipt, and adapter-local names.
 - D16 defines and locally proves main-owned Core config / `SceneMacroRegistry` stable names for `C018`, plus a demo/debug force-state boundary for `C052`. Gate4R closes the `DemoForceStateContext` synthesized `Decodable` construction bypass and opens `d17_release_gate`.
 - D17 implements UIUE consumer authority, raw-name allow/deny mapping, fail-closed tests, and verifier receipts for consuming D15/D16 stable names. UIUE still does not consume private adapter fields or construct/decode `DemoForceStateContext`.
+- D18 adds main-owned local durable adapter/C3 replay proof for `C005`/`C061`: file-backed local durable adapter ledger, C3 cross-pipeline settled parent replay, strict unknown-key fail-closed decoding, readback drift fail-closed behavior, and private payload boundary verification. Proof remains `local_durable_adapter_ledger` plus local/unit/integration/static/OpenSpec/GitNexus/audit only.
+- D19 adds UIUE durability guard authority and local/unit fail-closed tests. UIUE consumes D18 only as proof-governance/deny-list guardrails and rejects durable/private names such as durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, request/parent fingerprints, success/failure ledger, `settledParentPlan`, `runtimeStore`, `rawRuntimeStore`, raw model output, training receipt, adapter-local private names, and D18 storage/schema internals.
 - D15 strengthens payload-contract rows under main docs/local + local/unit proof and narrows stale D14 wording: UIUE payload contract definition is no longer future, but UIUE payload consumption, UIUE merge, production runtime, mobile/true-device/live proof, and durable execution remain future work.
 - `C018` now has main-owned local/unit Core config / SceneMacroRegistry authority and UIUE D17 consumer mapping. `C052` has main demo/debug boundary local/unit proof and UIUE force-context name fail-closed mapping, but production/runtime force-state remains future work.
+- `C005`/`C061` now have main-owned local durable adapter ledger proof after D18, but production durable runtime, mobile/true-device/live proof, UIUE runtime consumption, and UIUE merge remain future work. D19 is negative guard proof only.
 - D15 Gate 3 and Gate 4 use operator-authorized CC substitute audit instead of Hermes. This is not a Hermes PASS and does not upgrade proof class.
 - D16 Gate3 used operator one-pass Hermes override after fixing a P1 explicit initializer bypass; Gate4 failed on a Codable bypass; Gate4R passed Hermes after removing `DemoForceStateContext` `Decodable`/`Codable`. D17 Gate5 had Hermes FAIL/P1 fixed post-audit for stale `8.C2` proof-promotion wording; Gate6 and Gate7 Hermes passed with P0/P1 empty. Gate8 Hermes had FAIL/P1 stale route-map wording fixed post-audit; Claude Code final audit passed P0/P1 empty; Codex blind final audit found this route-map checkpoint/ledger stale and this follow-up document update records the fix without a second subagent round.
+- D18+D19 Hermes round1 over Gates1-3 was FAIL/P1 unknown durable JSON fields fixed post-audit under operator no-rerun override; this must not be described as Hermes PASS. Hermes round2 over Gates4-6 passed with P0/P1/P2 empty. Gate7/Gate8 final audits remain pending.
 
 Grill burndown accounting:
 
@@ -75,15 +79,15 @@ Grill burndown accounting:
 |---|---:|---:|---|
 | Routed/classified rows | 215/215 | 100.0% | Every grill row has route/action/package. This is routing completion, not implementation completion. |
 | Task-shape compression | 8 workstreams from 215 rows | 96.3% compressed | The row set is controlled as 5 implementation dispatches plus 3 ledgers, not 215 standalone tickets. |
-| Strict proof-closed rows | about 37/215 | about 17.2% | D16 adds main local/unit Core config / `SceneMacroRegistry` coverage for `C018`; D17 consumes D15 payload/config names under UIUE local/unit fail-closed tests. Proof remains capped; no runtime/mobile/true-device claim. |
+| Strict proof-closed rows | about 39/215 | about 18.1% | D16 adds main local/unit Core config / `SceneMacroRegistry` coverage for `C018`; D17 consumes D15 payload/config names under UIUE local/unit fail-closed tests; D18 adds local durable adapter ledger proof for `C005`/`C061`; D19 adds negative UIUE durability guard tests. Proof remains capped; no production runtime/mobile/true-device claim. |
 | Demo/debug force-state row counted separately | +1 row | about 14.4% if included | `C052` moved from D9 debug-only bounded spike proof to D16 demo/debug force-state boundary local/unit proof after Gate4R Codable/Decodable bypass repair; production/runtime force-state remains future owner work. |
 | Future/human/spike ledgers still open | 45/215 | 20.9% | Future lane 29 + spike 8 + remaining human 8 cannot be closed by runtime code alone. |
 
-Post-D17 long-task order:
+Post-D18+D19 Gate7 long-task order:
 
 | order | candidate dispatch | primary repo | goal | hard stop |
 |---:|---|---|---|---|
-| next | Runtime execution durability / persistent ledger residual | main | Choose from remaining route evidence: durable persistence, production runtime integration, exact live/runtime proof for `C005`/`C061`, or production force-state if separately authorized. | Stop if session-scoped/local/unit proof is promoted to durable/runtime/mobile/live readiness. |
+| next | Production runtime integration / live-runtime proof planning | main | Choose only from residual evidence: production durable runtime wiring, real runtime/mobile/true-device/live proof for `C005`/`C061`, or production force-state if separately authorized. | Stop if local durable adapter ledger proof is promoted to production/runtime/mobile/live readiness. |
 | later | visual L3 / true-device / voice/model/golden lanes | UIUE/main split | Open only with separate authority and proof plan. | Stop if D17 local/unit/simulator proof is treated as V-PASS, A-2 complete, mobile, true-device, voice-ready, model-ready, golden-ready, endpoint-ready, or UIUE merge. |
 
 Do not open C5/C6 model, golden, voice, mobile/true-device, endpoint, merge, or V/S/U/A-2 readiness lanes from this R5 route-control document. Those remain separate future lanes requiring their own authority and proof plans.
@@ -113,6 +117,7 @@ Do not open C5/C6 model, golden, voice, mobile/true-device, endpoint, merge, or 
 | Dispatch 14: Runtime Adapter Residual Train | DONE through Gate 4 under proof cap. `C005` and `C061` keep the same row identity but move from D13 residual state to D14 session-scoped local/unit residual proof: failure ledger, readback reconciliation, exact settled stale retry ordering, parent request fingerprint, and private `RuntimeAdapterBox` boundary. | Main commits `1fd8a7b`, `5d0cd27`, and `66dda25`; UIUE Gate 4 receipt `r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md`; Gate 1 receipt `r5-d14-gate1-runtime-adapter-residual-openspec-authority-2026-06-29.md`; Gate 2 receipt `r5-d14-gate2-runtime-adapter-residual-code-2026-06-29.md`; Gate 3 receipt `r5-d14-gate3-runtime-adapter-residual-verifier-2026-06-29.md`; Codex substitute verifier PASS for Gate 3 because Hermes quota was unavailable. | Proof remains docs/local + local_static + local_unit + OpenSpec/GitNexus + substitute verifier only. Ledger is session-scoped and non-durable; no production runtime, mobile/true-device/live, UIUE payload contract/consumption, UIUE merge, final-art, white-edge, voice/model/golden/endpoint readiness, V/S/U-PASS, or A-2 claim. |
 | Dispatch 15: Runtime Presentation Payload Contract Train | DONE through Gate 4 under proof cap and operator Hermes override. Main defines stable presentation-safe payload/readback/reconciliation fields. UIUE only reconciles route map/burndown/receipt and does not implement consumer integration. | Main commits `c212863`, `ab9a682`, and `1d9b674`; UIUE Gate 4 receipt `r5-d15-runtime-presentation-payload-contract-commander-reconcile-2026-06-29.md`; Gate 1 receipt `r5-d15-gate1-runtime-presentation-payload-contract-authority-2026-06-29.md`; Gate 2 receipt `r5-d15-gate2-runtime-presentation-payload-contract-code-2026-06-29.md`; Gate 3 receipt `r5-d15-gate3-runtime-presentation-payload-contract-verifier-2026-06-29.md`; CC substitute audit PASS for Gate 3 and Gate 4 after operator override. | Proof remains docs/local + local_static + local_unit + OpenSpec/GitNexus + CC substitute verifier only. No Hermes Gate 3/4 PASS claimed, no UIUE consumer, no production runtime, mobile/true-device/live, UIUE merge, final-art, white-edge, voice/model/golden/endpoint readiness, V/S/U-PASS, or A-2 claim. |
 | Dispatch 16+17: Core config / force-state authority + UIUE consumer supertrain | DONE under proof cap after Gate8 reconcile, Claude Code PASS, Codex blind final audit FAIL/P1 absorbed post-audit. D16 main commits define `C018` Core config / `SceneMacroRegistry` authority and `C052` demo/debug force-state boundary; Gate4R repairs the `DemoForceStateContext` Codable bypass and opens D17. D17 UIUE commits define authority, implement raw-name consumer mapping/fail-closed tests, verify forbidden/private/proof-cap boundaries, reconcile route/burndown, and add a named `runtimeStore` fail-closed assertion. | Main commits `16860c8`, `d00023a`, `47c5e9c`, `e4f2559`, `ac1569f`, `1175a1f`, `7ee172d`; UIUE commits `50d2a74`, `f55a80e`, `87173b1`, `466873d`, `9ec757c`, plus this follow-up route-map final-doc commit; Gate5 receipt `r5-d17-gate5-uiue-consumer-authority-2026-06-29.md`; Gate6 receipt `r5-d17-gate6-uiue-consumer-code-2026-06-29.md`; Gate7 receipt `r5-d17-gate7-uiue-consumer-verifier-visual-smoke-2026-06-29.md`; Gate8 receipt `r5-d16-d17-core-config-force-state-uiue-consumer-commander-reconcile-2026-06-29.md`; Gate4R receipt in main. | Proof remains docs/local + local_static + local_unit + OpenSpec/GitNexus + Hermes/Claude Code/Codex-subagent audit evidence only. No production runtime, durable ledger, mobile/true-device/live, UIUE merge, visual L3/V-PASS, S-PASS, U-PASS, A-2, voice/model/golden/endpoint readiness. Gate3, Gate5, Gate8 Hermes, and Codex blind final audit include audit-fail-fixed-post-audit facts and must not be rewritten as Hermes/Codex PASS. |
+| Dispatch 18+19: Runtime durability + UIUE durability guard supertrain | Gate7 docs cascade in progress under proof cap. D18 main commits define local file-backed durable adapter ledger and C3 cross-pipeline replay proof for `C005`/`C061`, repair unknown-key durable JSON fail-closed behavior after Hermes round1 P1, and harden private payload redaction for `rawRuntimeStore`. D19 UIUE commits define and implement negative durability guard authority/tests only. | Main commits `d5facdb`, `83c286c`, `3439c37`, `b6b92fd`, `d61b3c`, `b6a7937`; UIUE commits `fd46e68`, `86ed726`, `8255b3d`; main receipts `r5-d18-gate1-runtime-durability-authority-2026-06-29.md`, `r5-d18-gate2-durable-ledger-code-2026-06-29.md`, `r5-d18-gate3-c3-durability-integration-2026-06-29.md`, `r5-d18-gate4-private-payload-boundary-verifier-2026-06-29.md`; UIUE receipts `r5-d19-gate5-uiue-durability-guard-authority-2026-06-29.md`, `r5-d19-gate6-uiue-durability-guard-code-2026-06-29.md`. | Proof remains local durable adapter ledger + local/static/unit/integration/OpenSpec/GitNexus/Hermes only. D18 is not production durable runtime; D19 is not UIUE runtime consumer proof. No runtime-ready, mobile/true-device/live, UIUE merge, visual L3/V-PASS, S-PASS, U-PASS, A-2, voice/model/golden/endpoint readiness. Hermes round1 was FAIL/P1 fixed post-audit under operator no-rerun; Hermes round2 PASS P0/P1/P2 empty. |
 
 ## Dispatch Log
 
@@ -238,10 +243,10 @@ These rows still cannot be consumed as behavior-complete by UIUE until future ow
 
 | Row | Reason to wait |
 |---|---|
-| `C005` | D14/D15 preserve main ownership: D14 proves C3-path adapter-owned mock write and session ledger residuals under local/unit proof; D15 defines a presentation-safe payload contract; D17 consumes stable payload names in UIUE local/unit fail-closed mapping only. Durable execution ownership, persistent ledger, production runtime consumer, mobile/true-device/live proof, and UIUE merge remain future work. |
+| `C005` | D18 now proves main-owned local file-backed durable adapter ledger replay for adapter-owned mock writes under `local_durable_adapter_ledger` proof cap, including strict fail-closed durable JSON handling after Hermes round1 P1. D19 UIUE rejects D18 durability/private names as negative guard only. Production durable runtime wiring, mobile/true-device/live proof, UIUE runtime consumer proof, and UIUE merge remain future work. |
 | `C018` | D16 now provides mainline Core config / `SceneMacroRegistry` local/unit authority, and D17 consumes the stable names in UIUE fail-closed mapping only. Production/runtime readiness, UIUE ownership of Core config truth, and UIUE merge remain future work. |
 | `C052` | D16 now provides a demo/debug force-state boundary under local/unit proof, and Gate4R closes the `DemoForceStateContext` Codable/Decodable construction bypass. Production/runtime force-state authority, mobile/true-device/live proof, and UIUE force-state ownership remain future work. |
-| `C061` | D14 proves session-scoped retry/reconciliation residuals under main local/unit proof; D15 exposes only presentation-safe reconciliation status, not private retry identity or ledger internals; D17 consumes stable reconciliation names in UIUE local/unit fail-closed mapping only. Persistent retry ledger, production runtime, mobile/true-device/live proof, and UIUE merge remain future work. |
+| `C061` | D18 extends D14 retry/reconciliation residuals from session-scoped proof to local durable adapter/C3 replay proof: cross-adapter replay, cross-pipeline settled parent replay, fingerprint mismatch fail-closed, readback drift fail-closed, and unknown durable keys fail closed. D19 UIUE rejects durable/private names and does not consume retry identity or ledger internals. Production durable runtime, mobile/true-device/live proof, and UIUE merge remain future work. |
 
 Rows `C006`, `C007`, `C024`, `C029`, `C030`, and `C143` are covered for local/unit/OpenSpec consumption by Dispatch 2 only; they are still not runtime-ready, mobile, true-device, live, V-PASS, S-PASS, U-PASS, A-2, A-2 ready, or A-2 complete proof.
 
