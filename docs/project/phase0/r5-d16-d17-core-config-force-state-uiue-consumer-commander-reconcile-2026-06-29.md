@@ -2,7 +2,7 @@
 artifact_kind: r5_d16_d17_core_config_force_state_uiue_consumer_commander_reconcile
 gate: D17_GATE_8_DUAL_REPO_RECONCILE
 repo: /Users/wanglei/workspace/MAformac-uiue
-status: CLAUDE_CODE_PASS_P2_FIX_PENDING_CODEX_SUBAGENT_FINAL_AUDIT
+status: DONE_UNDER_CODEX_BLIND_AUDIT_FAIL_FIXED_POST_AUDIT
 proof_class: docs_local + local_static + local_unit + openspec_local + hermes_audits
 created_at: 2026-06-29
 ---
@@ -11,7 +11,7 @@ created_at: 2026-06-29
 
 ## Verdict
 
-`CLAUDE_CODE_PASS_P2_FIX_PENDING_CODEX_SUBAGENT_FINAL_AUDIT`
+`DONE under Codex blind audit FAIL/P1 fixed post-audit`
 
 D16+D17 is reconciled under proof cap. Main owns D16 Core config / `SceneMacroRegistry` and demo/debug force-state boundary truth. UIUE consumes D15/D16 stable names through local raw-name mapping, fail-closed tests, and verifier receipts. This does not claim production runtime, durable ledger, mobile, true-device, live API, UIUE merge, visual L3, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready.
 
@@ -28,6 +28,7 @@ D16+D17 is reconciled under proof cap. Main owns D16 Core config / `SceneMacroRe
 | D17 Gate5 | UIUE | `50d2a74` | DONE under audit_fail_fixed_post_audit | Hermes FAIL/P1 stale `8.C2` proof-promotion wording; fixed; not Hermes PASS |
 | D17 Gate6 | UIUE | `f55a80e` | DONE | Hermes PASS, P0/P1 empty; P2 runtimeStore/rawRuntimeStore carried to Gate7/Gate8 |
 | D17 Gate7 | UIUE | `87173b1` | DONE | Hermes PASS, P0/P1 empty; P2 requires Gate8 runtimeStore/rawRuntimeStore negative probe |
+| D17 Gate8 | UIUE/main | UIUE `466873d` + `9ec757c`, main `7ee172d` | DONE under audit_fail_fixed_post_audit | Gate8 Hermes FAIL/P1 fixed; Claude Code PASS P0/P1 empty; Codex blind final audit FAIL/P1 route-map stale ledger fixed post-audit; not Codex PASS |
 
 ## Route Map And Burndown Cascade
 
@@ -76,7 +77,7 @@ This distinction remains a verifier note, not a new shared field.
 | Claim-vs-proof | D16/D17 proof is docs/local + local/static/unit/OpenSpec + audits. No runtime/mobile/live/merge/A-2 readiness. |
 | Boundary | main owns payload/config/force-state truth; UIUE consumes stable names and fail-closes unknowns/private names. |
 | If wrong, what proves it | Route map, burndown diff, Gate3/Gate4/Gate4R/Gate5/Gate6/Gate7 transcripts, `RuntimePresentationConsumerMappingTests`, and main `DemoForceStateBoundary.swift`. |
-| Post-audit correction | Gate8 Hermes audit returned FAIL/P1 for stale route-map wait-gate wording on `C018`/`C052`; fixed post-audit and revalidated locally. This is `audit_fail_fixed_post_audit`, not Hermes PASS. Final Claude Code adversarial audit returned PASS with P0/P1 empty and P2 advisory notes. Controller fixed the actionable `runtimeStore` named negative-test advisory; Codex blind final subagent audit remains pending. |
+| Post-audit correction | Gate8 Hermes audit returned FAIL/P1 for stale route-map wait-gate wording on `C018`/`C052`; fixed post-audit and revalidated locally. This is `audit_fail_fixed_post_audit`, not Hermes PASS. Final Claude Code adversarial audit returned PASS with P0/P1 empty and P2 advisory notes. Controller fixed the actionable `runtimeStore` named negative-test advisory. Codex blind final subagent audit returned FAIL/P1 for stale route-map checkpoint/ledger; this receipt and route map fix it post-audit. Per operator instruction, no second subagent round was run, so this is not Codex PASS. |
 
 ## Validation
 
@@ -93,8 +94,7 @@ Passed local validation:
 
 Pending:
 
-- GitNexus detect_changes for exact Gate8 diffs.
-- Codex blind final subagent audit covering Gate1-Gate8 plus Gate4R.
+- none for D16+D17 Gate8 under current proof cap.
 
 ## Gate8 Audit
 
@@ -105,6 +105,16 @@ Pending:
 - P1: stale route-map wait-gate wording still described `C018` as future mainline authority and `C052` as D9-only debug spike.
 - Fix: updated `docs/roadmaps/2026-06-28-uiue-r5-dispatch-ready-decomposition-map.md` wait-gate and historical dispatch-log wording to distinguish historical dispositions from current D16/D17 truth.
 - Post-fix local validation: UIUE `git diff --check`, `openspec validate ui-presentation --strict`, and `swift test --filter RuntimePresentationConsumerMappingTests` PASS.
+
+## Codex Blind Final Audit
+
+- Auditor: Codex native subagent.
+- Scope: blind read-only audit of Gate1-Gate8 plus Gate4R across main and UIUE.
+- Result: `CODEX_SUBAGENT_R5_D16_D17_BLIND_FINAL_AUDIT_VERDICT: FAIL`.
+- P0: none.
+- P1: stale route-map checkpoint and Dispatch 16+17 ledger still showed main `1175a1f`, UIUE `87173b1`, and "pending final audit" after main `7ee172d`, UIUE `466873d`/`9ec757c`, and final audit work.
+- Fix: updated `docs/roadmaps/2026-06-28-uiue-r5-dispatch-ready-decomposition-map.md` current checkpoint and Dispatch 16+17 row; updated this receipt from pending final audit to `DONE under Codex blind audit FAIL/P1 fixed post-audit`.
+- Policy note: no second subagent audit was run, per operator instruction that the Codex subagent final audit is one round only. This closeout records the blind audit as `FAIL/P1 fixed post-audit`, not Codex PASS.
 
 ## Final Claude Code Audit
 
