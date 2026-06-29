@@ -9,10 +9,10 @@
 
 ## 2. D16 Gate 2 Core Config Code
 
-- [ ] 2.1 Before editing Swift symbols, run GitNexus impact/context for each target symbol or record an exact GitNexus blocker.
-- [ ] 2.2 Implement finite main-owned Core config / scene macro registry code under local project conventions.
-- [ ] 2.3 Add local/unit tests for stable known names, unknown-name fail-closed behavior, and no readiness/proof promotion.
-- [ ] 2.4 Run targeted Swift tests, OpenSpec validation, `git diff --check`, GitNexus `detect_changes`, and Hermes audit.
+- [x] 2.1 Before editing Swift symbols, run GitNexus impact/context for each target symbol or record an exact GitNexus blocker.
+- [x] 2.2 Implement finite main-owned Core config / scene macro registry code under local project conventions.
+- [x] 2.3 Add local/unit tests for stable known names, unknown-name fail-closed behavior, and no readiness/proof promotion.
+- [x] 2.4 Run targeted Swift tests, OpenSpec validation, `git diff --check`, GitNexus `detect_changes`, and Hermes audit.
 
 ## 3. D16 Gate 3 Force-State Boundary Code
 
