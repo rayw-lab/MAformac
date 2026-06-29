@@ -73,7 +73,7 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
             XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("requestFingerprint"))
         }
         XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("runtimeStore")) { error in
-            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPresentationField("runtimeStore"))
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("runtimeStore"))
         }
         XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("uiueInventedSharedField")) { error in
             XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPresentationField("uiueInventedSharedField"))
@@ -162,11 +162,16 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
             "DemoRuntimeAdapter",
             "DemoRuntimeAdapterResult",
             "RuntimeAdapterBox",
+            "durableLedger",
+            "persistentLedger",
+            "adapterLedger",
+            "local_durable_adapter_ledger",
             "requestFingerprint",
             "parentRequestFingerprint",
             "failureLedger",
             "successLedger",
             "settledParentPlan",
+            "runtimeStore",
             "rawRuntimeStore",
             "rawModelOutput",
             "trainingReceipt",
@@ -178,6 +183,39 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
             XCTAssertThrowsError(try RuntimePresentationConsumerMapping.rejectForbiddenConsumerName(name), name) { error in
                 XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName(name))
             }
+        }
+    }
+
+    func testD19DurabilityPrivateNamesFailClosedWithoutBecomingPresentationOrProofLabels() {
+        let d19DurabilityPrivateNames = [
+            "durableLedger",
+            "persistentLedger",
+            "adapterLedger",
+            "local_durable_adapter_ledger",
+            "requestFingerprint",
+            "parentRequestFingerprint",
+            "failureLedger",
+            "successLedger",
+            "settledParentPlan",
+            "runtimeStore",
+            "rawRuntimeStore",
+            "rawModelOutput",
+            "trainingReceipt"
+        ]
+
+        for name in d19DurabilityPrivateNames {
+            XCTAssertThrowsError(try RuntimePresentationConsumerMapping.rejectForbiddenConsumerName(name), name) { error in
+                XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName(name))
+            }
+            XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField(name), name) { error in
+                XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName(name))
+            }
+            XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validateProofClass(name), name) { error in
+                XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownProofClass(name))
+            }
+            XCTAssertFalse(RuntimePresentationConsumerMapping.payloadFieldNames.contains(name), name)
+            XCTAssertFalse(RuntimePresentationConsumerMapping.d15ProofClassNames.contains(name), name)
+            XCTAssertFalse(RuntimePresentationConsumerMapping.proofCaps.contains(name), name)
         }
     }
 
@@ -208,6 +246,8 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
             "model_ready",
             "golden_ready",
             "endpoint_ready",
+            "production_durable_runtime",
+            "local_durable_adapter_ledger",
             "UIUE_merge",
             "V" + "-PASS",
             "S" + "-PASS",

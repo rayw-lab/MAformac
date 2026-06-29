@@ -182,6 +182,6 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 - [x] 8.J1 Gate5 authority: define UIUE durability guard boundary for D18 proof-governance and deny-list semantics only.
 - [x] 8.J2 Gate5 forbid UIUE consumption of durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, request/parent fingerprints, success/failure ledger, settled parent plan, raw runtime store, raw model output, training receipt, adapter-local private names, and D18 storage/schema internals.
-- [ ] 8.J3 Gate6 implement UIUE local/unit fail-closed guard tests for D18 durable/private names and readiness/proof-cap non-promotion.
+- [x] 8.J3 Gate6 implement UIUE local/unit fail-closed guard tests for D18 durable/private names and readiness/proof-cap non-promotion.
 - [ ] 8.J4 Gate7 update route/burndown/reconcile docs under proof cap.
 - [ ] 8.J5 Gate8 final reconcile and blind audits across D18+D19 Gates1-8.
