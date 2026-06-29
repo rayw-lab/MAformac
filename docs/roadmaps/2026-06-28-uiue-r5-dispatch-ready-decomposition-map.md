@@ -1,11 +1,11 @@
 ---
-status: LIVING_ROUTE_CONTROL_AFTER_D18_D19_GATE7
+status: LIVING_ROUTE_CONTROL_AFTER_D20_D21_GATE3_FIXED_POST_AUDIT_GATE4_IN_PROGRESS
 artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
-last_updated_at: 2026-06-29
+last_updated_at: 2026-06-30
 owner: commander
-proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard
-authority: coordination_map_after_step0_plus_d18_d19_gate7_reconcile
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit
+authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_execution_through_gate3
 canonical_for:
   - UIUE R5 dispatch grouping
   - serial_parallel_dependency_order
@@ -14,6 +14,7 @@ canonical_for:
   - proof_cap_wording
   - living_r5_route_control
   - post_D18_D19_next_long_task_order
+  - d20_d21_supertrain_execution_state
   - grill_burndown_progress_accounting
 not_canonical_for:
   - mainline shared runtime field authority
@@ -43,20 +44,34 @@ non_claims:
 
 # UIUE R5 Dispatch-Ready Decomposition Map
 
+## D20/D21 Execution Update (2026-06-30)
+
+Current truth for `UIUE_R5_D20_D21_RUNTIME_UIUE_INTEGRATION_PR_SUPERTRAIN`:
+
+- Gate1 D20 main app runtime entry: DONE under proof cap. Main `App/ContentView.swift` command entry moved to `DemoRuntimeSessionRunner -> C3ExecutionPipeline -> RuntimePresentationPayload`; Hermes Gate1 PASS with a P2 default-runner test gap fixed locally without rerun.
+- Gate2 D21 UIUE payload fixture consumer: DONE under proof cap. UIUE added a local JSON fixture consumer into `PresentationSnapshot`; Hermes Gate2 PASS with P0/P1/P2 empty.
+- Gate3 cross-repo fixture contract: DONE as `hermes_fail_fixed_post_audit`. Hermes Gate3 FAIL/P1 was limited to untracked fixture packaging; exact-path staging fixed the git-state issue, and local validation was rerun without a Hermes rerun.
+- Public fixture sha256: `57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f`.
+- Gate4 final reconcile, Claude Code final audit, push to existing PR #7/#6, and one combined GPT Pro PR-pair audit remain the active serial gate at this checkpoint.
+
+This update does not claim runtime-ready, mobile, true-device, live proof,
+UIUE merge, V/S/U-PASS, A-2 completion, R5 completion, or voice/model/golden/
+endpoint readiness.
+
 This document combines the UIUE STEP0 baseline freeze verdict and the main-side STEP0 calibration verdict into a dispatch-ready dependency map. It does not dispatch windows by itself and does not authorize implementation. A later commander prompt may use this map to create bounded dispatches.
 
 As of D17, this file is also the living R5 route-control document. Update it after every accepted dispatch, phase review, or commander route decision. Each update must record live repo truth, proof-class ceiling, grill burndown movement, changed row dispositions, next long-task order, stop conditions, and any stale wording corrected during intake.
 
-## Current Route Snapshot After D18+D19 Gate7
+## Current Route Snapshot After D18+D19 Gate8 And D20/D21 Dispatch Authorization
 
-Last live-verified commander checkpoint before the Gate7 route-map commit:
+Last live-verified commander checkpoint for the D20/D21 route update:
 
 | repo | HEAD | status |
 |---|---|---|
-| main | `b6a793755cfb7438c0f3e5edecb6cd32d5524336` | preserve-unowned dirty only: `AGENTS.md`, `CLAUDE.md`, `docs/CURRENT.md`, `docs/README.md`, `.xcodebuildmcp/`, `Tools/agent-platform-plugin-refs/` |
-| UIUE | `8255b3d62eab7f33850c5f6d6692acacf4e8cbb9` | untracked source dispatches remain: D12, D13, D14, D15, D16+D17, D18+D19; `docs/research/2026-06-29-visual-acceptance-standard/` is unrelated pre-existing untracked evidence |
+| main | `ae0f3e717d9ebc0bf0be2edab0364f314bb41ef0` | branch `codex/rebuild-c6-doc-absorption-20260624`, ahead `0/34` from upstream; preserve-unowned dirty: `AGENTS.md`, `CLAUDE.md`, `docs/CURRENT.md`, `docs/README.md`, `.xcodebuildmcp/`, `Tools/agent-platform-plugin-refs/`; commander-owned new dispatch: `docs/dispatches/2026-06-29-uiue-r5-d20-d21-runtime-uiue-integration-pr-supertrain-dispatch.md`; existing PR #7 draft open against `main` |
+| UIUE | `bde4f783cac1950c4c802fd1133f0d1e934e25f6` | branch `uiue/phase4-default-scope-presentation`, ahead `0/92` from upstream; commander-owned route-map update in this file; untracked source dispatches remain: D12, D13, D14, D15, D16+D17, D18+D19; `docs/research/2026-06-29-visual-acceptance-standard/` is unrelated pre-existing untracked evidence; existing PR #6 open against `main` |
 
-This map is a living route-control artifact. The current Gate7 document commit records D18+D19 route movement and therefore cannot self-reference its own final commit hash inside the pre-commit checkpoint table.
+This map is a living route-control artifact. The checkpoint above records planning-time truth and loses to live `git status`, `git rev-parse HEAD`, `git rev-list --left-right --count @{u}...HEAD`, and `gh pr view` at D20/D21 execution time.
 
 D18+D19 route truth:
 
@@ -73,6 +88,17 @@ D18+D19 route truth:
 - D16 Gate3 used operator one-pass Hermes override after fixing a P1 explicit initializer bypass; Gate4 failed on a Codable bypass; Gate4R passed Hermes after removing `DemoForceStateContext` `Decodable`/`Codable`. D17 Gate5 had Hermes FAIL/P1 fixed post-audit for stale `8.C2` proof-promotion wording; Gate6 and Gate7 Hermes passed with P0/P1 empty. Gate8 Hermes had FAIL/P1 stale route-map wording fixed post-audit; Claude Code final audit passed P0/P1 empty; Codex blind final audit found this route-map checkpoint/ledger stale and this follow-up document update records the fix without a second subagent round.
 - D18+D19 Hermes round1 over Gates1-3 was FAIL/P1 unknown durable JSON fields fixed post-audit under operator no-rerun override; this must not be described as Hermes PASS. Hermes round2 over Gates4-6 passed with P0/P1/P2 empty. Hermes round3 over Gates7-8 passed with P0/P1/P2 empty and a lower-severity route wording fix afterward. Claude Code final blind audit passed with P0/P1 empty and a P2 durable private-marker redaction fixed in main. Codex native final blind audit failed on stale Gate8 task/receipt/route-map ledger state; that P1 was fixed post-audit and is not a Codex PASS.
 
+## D20+D21 Route Decision After Secondary Teardown-Cite
+
+Hermes's supplemental critique is absorbed with these guardrails, after cross-checking current code paths:
+
+| claim | local cite | route decision |
+|---|---|---|
+| D20 must not build a sidecar harness while the app still uses the old skeleton. | Pre-D20 before-state evidence: main `App/ContentView.swift:65-76` constructed `DemoWalkingSkeleton` and called `handle(text:)`; `Features/VehicleControl/DemoWalkingSkeleton.swift:29-46` decoded with `FastPathIntentEngine` and wrote via `DemoActionExecutor.applyMockTransition`. This row is superseded by the 2026-06-30 execution update above for current truth. | D20 must physically replace the user-facing app command entry with a main-owned runtime session/controller path. Reusing `FastPathIntentEngine` as text-to-`ToolCallFrame` decode is allowed; execution must flow through `C3ExecutionPipeline` and `RuntimePresentationPayload`, not the old mock executor. |
+| D20's real execution chain exists but is not the app entry. | Main `Core/Execution/C3ExecutionPipeline.swift:259-280` has the local durable ledger initializer; `:282-384` performs semantic lookup, allowlist/risk checks, runtime adapter execution, C2 readback verification, and settled-plan recording. | D20 must bridge text input -> `ToolCallFrame` -> `C3ExecutionPipeline.execute` -> sanitized presentation payload. It must not import UIUE `PresentationSnapshot` into main; if an intermediate presentation model is needed, it must stay main-owned under `RuntimePresentationPayload` authority. |
+| D21 must be a payload-to-snapshot adapter, not another static allow/deny proof. | UIUE `Core/Presentation/RuntimePresentationConsumerMapping.swift:38-63` defines payload schema and fields, `:112-130` forbids private/durable names, and `:149-153` caps proof classes; UIUE `PresentationSnapshot.swift:59-99` is the frontstage state container; UIUE `App/ContentView.swift:50-68` renders from snapshot state. | D21 must add a UIUE-local JSON fixture consumer that decodes presentation-safe payload JSON and maps into `PresentationSnapshot`, without importing main Swift private types or durable/runtime internals. |
+| PR/push must not skip branch reconciliation. | Live truth shows main PR #7 for `codex/rebuild-c6-doc-absorption-20260624`, UIUE PR #6 for `uiue/phase4-default-scope-presentation`, with local ahead counts and dirty/untracked splits above. | D20/D21 final gate must update existing PR #7/#6 only; no new PR, no merge. Before push, it must print exact pathspec commit ledger, dirty split, `git rev-list --left-right --count @{u}...HEAD`, and `gh pr view` for both PRs. |
+
 Grill burndown accounting:
 
 | lens | count | percent | meaning |
@@ -83,14 +109,14 @@ Grill burndown accounting:
 | Demo/debug force-state row counted separately | +1 row | about 14.4% if included | `C052` moved from D9 debug-only bounded spike proof to D16 demo/debug force-state boundary local/unit proof after Gate4R Codable/Decodable bypass repair; production/runtime force-state remains future owner work. |
 | Future/human/spike ledgers still open | 45/215 | 20.9% | Future lane 29 + spike 8 + remaining human 8 cannot be closed by runtime code alone. |
 
-Post-D18+D19 Gate7 long-task order:
+Post-D18+D19 Gate8 long-task order:
 
 | order | candidate dispatch | primary repo | goal | hard stop |
 |---:|---|---|---|---|
-| next | Production runtime integration / live-runtime proof planning | main | Choose only from residual evidence: production durable runtime wiring, real runtime/mobile/true-device/live proof for `C005`/`C061`, or production force-state if separately authorized. | Stop if local durable adapter ledger proof is promoted to production/runtime/mobile/live readiness. |
-| later | visual L3 / true-device / voice/model/golden lanes | UIUE/main split | Open only with separate authority and proof plan. | Stop if D17 local/unit/simulator proof is treated as V-PASS, A-2 complete, mobile, true-device, voice-ready, model-ready, golden-ready, endpoint-ready, or UIUE merge. |
+| active | D20+D21 Runtime/UIUE Integration PR Supertrain | main + UIUE split, no merge | Gates1-3 are executed under proof cap; Gate3 carries `hermes_fail_fixed_post_audit` for fixed git-state packaging only. Gate4 must finish final local validation, Hermes final reconcile, one Claude Code full-train audit, existing PR #7/#6 push, and one combined GPT Pro PR-pair audit. | Stop if old `DemoWalkingSkeleton` remains the app execution path, UIUE consumes private/durable main names, local fixture proof is promoted to production/runtime/mobile/live readiness, PR reconciliation tries `git add .`, new PRs, merge, or no-touch paths, or audit fallback is used as an extra node rather than a replacement. |
+| later | visual L3 / true-device / voice/model/golden lanes | UIUE/main split | Open only with separate authority and proof plan after D20/D21 residuals are reconciled. | Stop if D20/D21 local/unit/integration/simulator proof is treated as V-PASS, A-2 complete, mobile, true-device, voice-ready, model-ready, golden-ready, endpoint-ready, or UIUE merge. |
 
-Do not open C5/C6 model, golden, voice, mobile/true-device, endpoint, merge, or V/S/U/A-2 readiness lanes from this R5 route-control document. Those remain separate future lanes requiring their own authority and proof plans.
+Do not open C5/C6 model, golden, voice, mobile/true-device, endpoint, merge, or V/S/U/A-2 readiness lanes from this R5 route-control document. D20/D21 starts large-scale coding only inside the runtime-entry and presentation-consumer bridge described above.
 
 ## Inputs Frozen
 
@@ -195,7 +221,9 @@ flowchart TD
 Original D1-pre recommendation: **5 implementation dispatches**, plus **3 ledgers**
 that should not become implementation dispatches unless the user explicitly
 reopens them. This plan is now historical route provenance consumed through
-D13; use "Current Route Snapshot After D13" for active next-task ordering.
+D13. Use "Current Route Snapshot After D18+D19 Gate8 And D20/D21 Dispatch
+Authorization" and "D20+D21 Route Decision After Secondary Teardown-Cite" for
+active next-task ordering.
 
 | # | Dispatch | Owner | Rows / scope | Serial or parallel | Proof cap | Exit gate |
 |---:|---|---|---|---|---|---|
@@ -226,7 +254,7 @@ Unsafe parallel work:
 
 - Two mainline implementation windows should not concurrently edit `RuntimePresentationBridge.swift`, OpenSpec bridge files, or `RuntimePresentationBridgeTests.swift`.
 - UIUE must not implement adapter consumption for terminal snapshot behavior until mainline Dispatch 1 has a verdict.
-- UIUE must not introduce shared bridge fields, proof enum values, result enum names, shared adapter code, or runtime payload parsing outside mainline authority.
+- UIUE must not introduce shared bridge fields, proof enum values, result enum names, shared adapter code, or private/raw runtime payload parsing outside mainline authority. D21 may implement only the authorized presentation-safe public JSON fixture consumer.
 
 ## Mainline Wait Gates
 
@@ -284,23 +312,29 @@ Stop and return to commander if any dispatch attempts one of these:
 7. Edits raw customer/source material into repo artifacts.
 8. Dispatches M3 merge-only rows as 52 standalone implementation tasks.
 9. Runs voice/model/golden/mobile/true-device work under this R5 dispatch map.
-10. Lets UIUE early work escape docs/local matrix into shared adapter code or runtime payload parsing.
+10. Lets UIUE early work escape docs/local matrix into shared adapter code, main private Swift types, durable/runtime internals, or private raw payload parsing. D21 may parse only presentation-safe public JSON fixtures under local/unit proof cap.
 
 ## Dispatch Decision
 
-The original D1-pre five-dispatch plan has been consumed through D13. Do not
-restart Dispatch 1-5 unless a new P0/P1 finding invalidates their receipts.
+The original D1-pre five-dispatch plan and subsequent D12-D19 trains have been
+consumed through D18+D19 Gate8. Do not restart Dispatch 1-5, D12-D19, or their
+historical gates unless a new P0/P1 finding invalidates their receipts.
 
 Current commander route:
 
-1. Keep D13 as `DONE under proof cap`, not as runtime-ready or merge-ready.
-2. Open D14 as a new long-running main runtime residual train if development
-   continues immediately.
-3. Keep D15 payload contract, D16 Core config/force-state, and D17 UIUE
-   consumer integration behind their upstream gates.
-4. Keep human/product, spike-required, and future-lane rows as ledgers until
-   explicitly reopened.
-5. Update this file after each accepted verdict before dispatching the next
+1. Continue `UIUE_R5_D20_D21_RUNTIME_UIUE_INTEGRATION_PR_SUPERTRAIN` in Gate4
+   final reconcile. Gates1-3 are not V-PASS/A-2/R5 completion proof.
+2. D20 has moved main app command execution off the old `DemoWalkingSkeleton`
+   entry and onto a main-owned C3/runtime-adapter/payload entry path.
+3. D21 has added a UIUE-local presentation-safe JSON fixture consumer into
+   `PresentationSnapshot`; UIUE does not import main private Swift types or
+   consume durable/runtime internals.
+4. Gate 4 must reconcile dirty/ahead/open-PR truth and update only existing PR
+   #7 and PR #6 before GPT Pro PR audit; no new PR, no merge.
+5. Keep human/product, spike-required, visual L3, true-device, voice, model,
+   golden, endpoint, merge, and V/S/U/A-2 readiness rows as separate future
+   lanes until explicitly reopened.
+6. Update this file after each accepted verdict before dispatching the next
    long task.
 
 Do not dispatch the human/product ledger, spike-before-implementation ledger, or future-lane ledger as implementation work. They are governance surfaces, bounded falsification receipts, and proof caps.

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "r5_runtime_presentation_payload_fixture_manifest_v1",
+  "fixtures": [
+    {
+      "name": "ac_power_public_payload.v1.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v1",
+      "sha256": "57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f",
+      "producerRepo": "MAformac",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v1.json",
+      "consumerRepo": "MAformac-uiue",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v1.json",
+      "proofClass": "local_unit",
+      "notes": [
+        "presentation_safe_public_fixture",
+        "timestamp_fields_omitted_by_public_projection"
+      ]
+    }
+  ]
+}

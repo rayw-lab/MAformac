@@ -187,3 +187,13 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 - [x] 8.J5 Gate8 final reconcile and blind audits across D18+D19 Gates1-8.
 
 Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2 empty and one lower-severity route wording correction fixed afterward. Claude Code blind final audit anchored PASS with P0/P1 empty and P2 durable private-marker redaction fixed afterward in main. Codex native blind final audit anchored FAIL/P1 for stale Gate8 task/receipt/route-map ledger state; this was fixed post-audit under the operator one-round final-audit policy and must not be described as Codex PASS.
+
+### 8.K D21 UIUE Runtime Presentation Payload Fixture Consumer（2026-06-30，D20/D21 supertrain）
+
+> Authority: main D20 app runtime-entry bridge and main D15 `RuntimePresentationPayload` public contract. UIUE consumes only presentation-safe public JSON fixtures into `PresentationSnapshot`. No main private Swift imports, no durable/runtime internals, no UIUE merge, no runtime-ready, no mobile, no true-device, no live API, no V-PASS/S-PASS/U-PASS, no A-2, no voice/model/golden/endpoint, and no R5 complete claim.
+
+- [x] 8.K1 Implement UIUE-local public JSON fixture consumer for `schemaVersion`, `traceID`, `turnID`, `eventID`, `isTerminal`, `outcome`, `proofClass`, `cards`, `cardSemantics`, `readbacks`, `reconciliation`, and `traceEnvelope`.
+- [x] 8.K2 Fail closed on unknown top-level fields, unknown nested fields, unknown schema/proof/outcome/reconciliation values, and forbidden private/durable markers.
+- [x] 8.K3 Decode the cross-repo public fixture into `PresentationSnapshot` and preserve UIUE proof caps.
+- [x] 8.K4 Record and validate the public fixture sha256 shared with main: `57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f`.
+- [x] 8.K5 Carry Gate3 audit truth as `hermes_fail_fixed_post_audit` because the only P1 was untracked fixture packaging fixed by exact-path staging and local validation, without rerunning Hermes.
