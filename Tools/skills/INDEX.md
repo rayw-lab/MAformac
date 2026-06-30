@@ -45,6 +45,24 @@
 
 ---
 
+## 1b. IMPORT — Apple 平台开发 skill 导入（OpenAI curated + Claude Code 社区）
+
+> **装法**（2026-06-24 磊哥定）：source 落 `Tools/skills/<name>/`，`.claude/skills/<name>` symlink **项目级激活**（**不进全局** `~/.claude/skills/`）。社区 repo 必经 github-first 核实（star + 近 60 天活跃）才 adopt；plugin 自带 `hooks/` 一律删（CVE-2025-59536 第三方 hook RCE，hooks.md 红线）。
+
+| skill | 来源（star / 活跃） | 触发（when） | 状态 |
+|---|---|---|---|
+| `ios-ettrace-performance` | OpenAI curated `build-ios-apps` | iOS Simulator ETTrace launch/runtime profile、符号化 flamegraph JSON 分析 | ✅ |
+| `ios-debugger-agent` | OpenAI curated `build-ios-apps` | ETTrace/iOS 调试需 simulator build/install/launch/logs/screenshots | ✅ |
+| `ios-simulator-skill` | conorluddy（⭐1105 / 6天前） | iOS app build/run/测试/自动化：**29 scripts**，语义 UI 导航（a11y 树省 token）、build 自动化、simulator 生命周期、hang/性能/截图 | ✅ 新装 |
+| `axiom/*`（**27 skills**） | CharlesWiltgen（⭐992 / 4天前） | xOS（iOS/iPadOS/watchOS/tvOS/macOS）全平台开发，见下方清单 | ✅ 新装 |
+
+**axiom 27 skills**（`Tools/skills/axiom/skills/`，全部项目级激活）——纯 6M 知识，已删 plugin 的 `hooks/` + `bin/` 27M 二进制（xclog/xcprof/xcsym/xcui，其能力由 ios-simulator-skill + ios-ettrace 覆盖）+ agents/commands：
+- **MAformac 高频相关**：`axiom-swiftui` `axiom-build` `axiom-macos` `axiom-swift` `axiom-testing` `axiom-performance` `axiom-design`（HIG/Liquid Glass/SF Symbols）`axiom-accessibility` `axiom-concurrency` `axiom-data`(SwiftData) `axiom-ai`(Foundation Models) `axiom-apple-docs` `axiom-shipping`
+- **全集其余（按需触发）**：`axiom-networking` `axiom-security` `axiom-integration` `axiom-uikit` `axiom-media` `axiom-xcode-mcp` `axiom-tools` `axiom-games` `axiom-health` `axiom-payments` `axiom-vision` `axiom-watchos` `axiom-graphics` `axiom-location`
+- 参考源（只读，不入仓）：`~/workspace/raw/05-Projects/MAformac/ref-repos/{ios-simulator-skill,axiom-src}`
+
+---
+
 ## 2. ADOPT — 直接用 superpowers v6 现成的（怎么组合替代）
 
 ### 2a. `completion-vpass-gate` → `verification-before-completion`（1:1 直接替代）

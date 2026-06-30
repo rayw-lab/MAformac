@@ -201,4 +201,3 @@ Trial packet 路由:
 4. 若继续 UIUE: 走 PR #5，不直接推 main。
 5. 若继续架构吸收: 先读 `docs/research/2026-06-24-pr4-gptpro-architecture-absorption.md`，再起 OpenSpec proposal。
 6. 若继续 C5/C6: 先读 `Tools/paper-to-skill-gate/trial-runs/2026-06-24-p0-five-pack-index.md` 和 `docs/handoffs/2026-06-24-default-scope-commander-handoff.md` 的 18 路 ledger。
-

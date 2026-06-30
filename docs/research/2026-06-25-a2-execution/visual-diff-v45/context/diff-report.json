@@ -1,0 +1,20 @@
+{
+  "baseline": "context-anchor.png",
+  "current": "context-impl.png",
+  "results": {
+    "dimensions": [
+      941,
+      309
+    ],
+    "total_pixels": 290769,
+    "different_pixels": 104551,
+    "difference_percentage": 35.96,
+    "threshold_percentage": 100.0,
+    "passed": true,
+    "verdict": "PASS"
+  },
+  "artifacts": {
+    "diff": "diff.png",
+    "comparison": "side-by-side.png"
+  }
+}

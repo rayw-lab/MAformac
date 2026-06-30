@@ -1,0 +1,41 @@
+{
+  "generated_at_utc": "2026-06-28T00:29:33Z",
+  "crop_regions": {
+    "top-stage": [
+      0,
+      0,
+      1320,
+      1450
+    ],
+    "ac-card": [
+      70,
+      1450,
+      720,
+      2100
+    ],
+    "capsule": [
+      190,
+      165,
+      1140,
+      520
+    ]
+  },
+  "crops": [
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_cooling_ivory-top-stage.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_cooling_ivory-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_cooling_deep_space-top-stage.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_cooling_deep_space-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_heating_ivory-top-stage.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_heating_ivory-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_heating_deep_space-top-stage.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/main_heating_deep_space-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/capsule_video_loop_deep_space-top-stage.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/capsule_video_loop_deep_space-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/capsule_video_loop_deep_space-capsule.png"
+  ],
+  "strips": [
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/anchor-strip-continuous-stage-no-black-line-recapture.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/anchor-strip-cooling-vs-heating-recapture.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync/crops/anchor-strip-capsule-diorama-recapture.png"
+  ]
+}

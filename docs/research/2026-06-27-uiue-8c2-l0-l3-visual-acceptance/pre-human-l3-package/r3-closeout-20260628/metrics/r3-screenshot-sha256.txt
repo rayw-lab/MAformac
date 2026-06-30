@@ -1,0 +1,5 @@
+eda86d4e54d6406ba5c4b7f197ff2acd01f9c12636e849178678fcc4a051296c  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/screenshots/orb-four-state/orb_idle_ivory.png
+c2e75d76812d192ccf77701159d2d41b4ca794726317f0d8e4df45ddf5bcaaa6  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/screenshots/orb-four-state/orb_listen_ivory.png
+6c334f268e71a1e546edb904cb9eaa826aab269e943992ba44c8fd7330f2ac33  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/screenshots/orb-four-state/orb_speak_ivory.png
+0fc081221337709404b817c8f847a9edebe9950655dc2e8e48ab87c9cb88778b  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/screenshots/orb-four-state/orb_think_ivory.png
+3c6157419e6b684049fdb516638d1edf018e38c442d74da0d10714433304e8cc  docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/screenshots/reduce-motion/reduce_motion_think_ivory.png

@@ -14,6 +14,8 @@ upstream:
 note: 本档 = UIUE 链路 A（worktree uiue/visual-ssot-state-consume）的**推进事实源**。3 fork 已全拍（fork1 深空辉光 / fork2 ui-presentation 拆独立 / fork3 走 worktree）；D1-D7 grill + 盲评 11 复议已收口（grill-master §3 决策晶体）。Phase 进度见 §〇.0 进度快照。
 ---
 
+> 2026-06-27 更新：本文保留为历史推进事实源和溯源材料。8.C2 partial 之后的当前后续顺序，以 `docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md` 为准；该新文档不替代 OpenSpec、grill 决策或 L3 人审。
+
 # 〇.0 进度快照（progress SSOT，2026-06-23 升级）
 
 > 🟢 **A2 链路 B 已并 main（PR#3 `fd2220b`，2026-06-23 merged；`gh pr view 3`=MERGED 核实）**：A2 = code-only 范式对齐 generic frame→D-domain（C1→C6 全链路 surface），swift test/make verify 绿 + 三厂商终审 + subagent CC CLEAR 后并 main。**训练线三步仍 DEFERRED 独立立项（非 A2 完直接训）**：① C5 数据生成（D-domain 四类自然中文语料）② C5 实际重训（守 rank16Mainline+LR1e-4）③ C6 四层评测（candidate vs base 10/23 不退化）。UIUE 链路 A 与 A2 **两 worktree 并行**；A2 已并 main → UIUE **Phase 4** 可 rebase main 拿 A2 产物（family-device-allowlist / D-domain / state-cells 10 族），其余 Phase 不依赖。

@@ -1,0 +1,20 @@
+{
+  "baseline": "controls-anchor.png",
+  "current": "controls-impl.png",
+  "results": {
+    "dimensions": [
+      941,
+      827
+    ],
+    "total_pixels": 778207,
+    "different_pixels": 155833,
+    "difference_percentage": 20.02,
+    "threshold_percentage": 100.0,
+    "passed": true,
+    "verdict": "PASS"
+  },
+  "artifacts": {
+    "diff": "diff.png",
+    "comparison": "side-by-side.png"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "case_id": "main_cooling_deep_space",
+  "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/screenshots/l0-simctl/main_cooling_deep_space.png",
+  "captured_at": "2026-06-27T23:17:00+08:00",
+  "pixel_size": {
+    "width": 1320,
+    "height": 2868
+  },
+  "scale": 3,
+  "viewport_points": {
+    "width": 440,
+    "height": 956
+  },
+  "simulator": "iPhone 17 Pro Max / 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D",
+  "proof_class": "simulator_l0_runtime_truth"
+}

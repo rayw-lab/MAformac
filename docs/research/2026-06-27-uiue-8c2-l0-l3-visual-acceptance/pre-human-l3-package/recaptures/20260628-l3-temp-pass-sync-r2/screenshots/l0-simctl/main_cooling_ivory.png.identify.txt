@@ -1,0 +1,3 @@
+/Users/wanglei/workspace/MAformac-uiue/docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_ivory.png
+  pixelWidth: 1320
+  pixelHeight: 2868

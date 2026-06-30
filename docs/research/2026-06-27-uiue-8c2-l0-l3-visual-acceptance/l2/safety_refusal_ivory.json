@@ -1,0 +1,87 @@
+{
+  "case_id" : "safety_refusal_ivory",
+  "claims_not_made" : [
+    "L3",
+    "V-PASS",
+    "mobile",
+    "true_device",
+    "A-2 complete"
+  ],
+  "contrast" : {
+    "method" : "region_1st_to_99th_percentile_luminance_ratio",
+    "min_ratio" : 6.5076880805027075,
+    "samples" : [
+      {
+        "contrastRatio" : 17.640339546241375,
+        "name" : "dialogue"
+      },
+      {
+        "contrastRatio" : 6.5076880805027075,
+        "name" : "vehicle_cards"
+      },
+      {
+        "contrastRatio" : 17.003622969719732,
+        "name" : "mic_dock"
+      }
+    ],
+    "status" : "PASS",
+    "threshold" : 1.5
+  },
+  "image_path" : "docs\/research\/2026-06-27-uiue-8c2-l0-l3-visual-acceptance\/l0\/safety_refusal_ivory-simctl.png",
+  "ocr" : {
+    "engine" : "VNRecognizeTextRequest",
+    "expected_text" : [
+      "行驶中",
+      "安全",
+      "尾门"
+    ],
+    "missing_text" : [
+
+    ],
+    "recognized_text" : [
+      "09:41",
+      "三の",
+      "G2",
+      "◎",
+      "让我确认下",
+      "行驶中打开后备箱",
+      "行驶中为了安全暂时不能开尾门，停稳后我再",
+      "帮您",
+      "空调",
+      "待命",
+      "自动",
+      "』）",
+      "氛围",
+      "待命",
+      "雨刮",
+      "待命",
+      "座椅",
+      "待命",
+      "车窗",
+      "待命",
+      "音量",
+      "待命",
+      "屏幕",
+      "待命",
+      "车门",
+      "0%",
+      "按住说话"
+    ],
+    "status" : "PASS"
+  },
+  "proof_class" : "local_l2_ocr_contrast_ssim",
+  "ssim" : {
+    "anchorPath" : "docs\/research\/2026-06-27-uiue-8c2-l0-l3-visual-acceptance\/l1\/anchors\/safety_refusal_ivory-anchor.png",
+    "status" : "RECORDED",
+    "value" : 0.50556504653508005
+  },
+  "ui_tree_corroboration" : {
+    "missing_text" : [
+
+    ],
+    "note" : "UI tree is corroboration only and cannot replace OCR",
+    "status" : "PASS"
+  },
+  "ui_tree_path" : "docs\/research\/2026-06-27-uiue-8c2-l0-l3-visual-acceptance\/l0\/safety_refusal_ivory-ui-tree.txt",
+  "verdict" : "PASS"
+}

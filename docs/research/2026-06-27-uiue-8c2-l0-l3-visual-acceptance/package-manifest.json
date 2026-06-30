@@ -1,0 +1,43 @@
+{
+  "package_id": "uiue-8c2-l0-l3-visual-acceptance",
+  "created_at": "2026-06-27T00:44:36Z",
+  "repo_head": "aef42d8",
+  "proof_class": "simulator_l0_runtime_truth_plus_local_l1_l2_pending_l3",
+  "cases": [
+    "main_cooling_deep_space",
+    "main_heating_ivory",
+    "safety_refusal_ivory",
+    "capsule_video_loop_deep_space",
+    "u17_golden_path_deep_space"
+  ],
+  "l0": [
+    "l0/main_cooling_deep_space.json",
+    "l0/main_heating_ivory.json",
+    "l0/safety_refusal_ivory.json",
+    "l0/capsule_video_loop_deep_space.json",
+    "l0/u17_golden_path_deep_space.json"
+  ],
+  "l1": {
+    "summary": "l1/l1-summary.tsv",
+    "boundary": "L1 sentinel blocks collapse only; it does not sign aesthetics or replace L3."
+  },
+  "l2": {
+    "summary": "l2/l2-summary.json",
+    "ocr_engine": "VNRecognizeTextRequest",
+    "contrast_gate": "hard_gate",
+    "ssim": "regression_evidence_only"
+  },
+  "l3": {
+    "template": "l3/human-5gate-verdict.md",
+    "verdict": "PENDING",
+    "v_pass_authority": "磊哥 only"
+  },
+  "readme": "README.md",
+  "claims_not_made": [
+    "mobile",
+    "true_device",
+    "L3",
+    "V-PASS",
+    "A-2 complete"
+  ]
+}

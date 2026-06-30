@@ -1,0 +1,84 @@
+{
+  "case_id" : "main_cooling_deep_space",
+  "claims_not_made" : [
+    "L3",
+    "V-PASS",
+    "mobile",
+    "true_device",
+    "A-2 complete"
+  ],
+  "contrast" : {
+    "method" : "region_1st_to_99th_percentile_luminance_ratio",
+    "min_ratio" : 5.141771550411697,
+    "samples" : [
+      {
+        "contrastRatio" : 5.141771550411697,
+        "name" : "dialogue"
+      },
+      {
+        "contrastRatio" : 15.679940526697399,
+        "name" : "vehicle_cards"
+      },
+      {
+        "contrastRatio" : 16.403517088622134,
+        "name" : "mic_dock"
+      }
+    ],
+    "status" : "PASS",
+    "threshold" : 1.5
+  },
+  "image_path" : "docs\/research\/2026-06-27-uiue-8c2-l0-l3-visual-acceptance\/l0\/main_cooling_deep_space-simctl.png",
+  "ocr" : {
+    "engine" : "VNRecognizeTextRequest",
+    "expected_text" : [
+      "空调",
+      "26",
+      "按住说话"
+    ],
+    "missing_text" : [
+
+    ],
+    "recognized_text" : [
+      "09:41",
+      "我在听…",
+      "座椅",
+      "2挡",
+      "车窗",
+      "60%",
+      "音量",
+      "38%",
+      "屏幕",
+      "65%",
+      "车门",
+      "关",
+      "我有点冷",
+      "已为您调到26°C",
+      "空调",
+      "26•",
+      "皿",
+      "制冷•自动",
+      "氛围",
+      "小）",
+      "浅蓝紫",
+      "雨刮",
+      "开",
+      "按住说话"
+    ],
+    "status" : "PASS"
+  },
+  "proof_class" : "local_l2_ocr_contrast_ssim",
+  "ssim" : {
+    "anchorPath" : "docs\/research\/2026-06-27-uiue-8c2-l0-l3-visual-acceptance\/l1\/anchors\/main_cooling_deep_space-anchor.png",
+    "status" : "RECORDED",
+    "value" : 0.46822433780167177
+  },
+  "ui_tree_corroboration" : {
+    "missing_text" : [
+
+    ],
+    "note" : "UI tree is corroboration only and cannot replace OCR",
+    "status" : "PASS"
+  },
+  "ui_tree_path" : "docs\/research\/2026-06-27-uiue-8c2-l0-l3-visual-acceptance\/l0\/main_cooling_deep_space-ui-tree.txt",
+  "verdict" : "PASS"
+}

@@ -2,6 +2,8 @@
 > 🔴 **apply 状态（claim-vs-reality）**：Phase 1b 工程前置 ✅ done（mic/speech/deployment 锁 iOS26/2 gate 已挂/tokens 冻结/截图管线）；**Phase 3 D7 7 态消费已 apply（commit `6a3e3f9`，审计 CLEAR）**；Phase 4 卡片 apply 待后端 `default_scope` 落 main（防返工）。
 > **agree-before-build：spec 已 agree ✅；Phase 4 代码 apply 仅待后端 default_scope 交汇产物。** 决策权威源见下。
 >
+> 🔴 **AD-14 完整产品形态扩展（2026-06-25，A-2 文档先行）**：本 change scope 从「Phase 4 卡片 scope 消费」扩到 **完整产品形态**（连续舞台无 divider + 顶部 context capsule diorama + 三屏交互 + 制冷热 + 层级滚动 + 边界态纯语音），SD18-25 grill 收口（grill SSOT `docs/uiue-storyboard-grill-decisions.md` + 定档 S1-S10）。**消费 A-1 `define-runtime-presentation-bridge`（磊哥 2026-06-25 accepted，mock snapshot 即可）**。架构 = design AD-14；任务 = tasks §8（8.A 连续舞台核心先做 / 8.B capsule spike-gated / 8.C 验收）。UIUE visual_only，runtime 实现 DEFERRED。
+>
 > 🟢 **非 DEFERRED（区别于 `define-demo-golden-run-and-voice`）**：本 change = **UIUE 链路 A 前端视觉/状态消费契约**，是与 A2/LoRA（链路 B）**并行活跃**的轨（worktree `uiue/visual-ssot-state-consume`），**不延后**。A2 只产 D-domain 后端 surface，本 change 管「看得见摸得着」那一层。Fork2 已拍：UIUE 视觉/卡片/7 态消费**拆独立 capability**（非塞进 demo-golden-run）。
 
 ## Why
@@ -37,8 +39,21 @@ D1-D7 二次深 grill（CC 5×⭐ + Codex 物理化 + 辩证 check）+ 30 决策
 - **U7 native SwiftUI translation**：保 scheme1 深空辉光方向 ≠ 保现状代码；视觉值只从 tokens.md 取（base #121212）。
 - **C8 高频代理**：卡片优先级用 A2 产 `generated/family-device-allowlist.json` 的 `row_count`（产品约定收窄，量产 priority 字段砍）。
 - **🔴 D8 默认主驾 + default_scope 消费（R5，2026-06-24 grill 收口）**：卡片读 per-cell `default_scope`（G25 SSOT）锚定默认 scope（座位→主驾等），不弹区域 clarify；scope 呈现单一规则（默认淡显角标 / 非默认显式 / 全车 fan-out 聚合卡+badge / 多轮升级聚合范围词），卡片·TTS·readback 三处同源。依赖后端 `default_scope` 字段（独立 `define-demo-default-scope` change）。
+- **D17 Runtime -> Presentation payload consumer authority（2026-06-29）**：UIUE 只能消费 main D15 `RuntimePresentationPayload` / `PresentationReconciliation` presentation-safe 字段，以及 main D16 Core config / SceneMacroRegistry / force-state stable names；未知 schema、proof、reconciliation、config、macro、force-context dimension 必须 fail closed。UIUE 不得消费 main private adapter / ledger / raw runtime / raw model / training receipt / `DemoForceStateContext` construction surfaces，也不得把 local/unit/simulator_mock 证明升格成 runtime/mobile/true-device/live/V-PASS/A-2。
+- **D19 durability guard authority（2026-06-29）**：UIUE 只能把 main D18 local durable runtime work 作为 proof-governance / deny-list guardrail 消费；不得把 durable ledger、persistent ledger、adapter ledger、request/parent fingerprint、success/failure ledger、settled parent plan、raw runtime store、raw model output、training receipt 或 local durability proof 映射成 UIUE presentation data、readiness label 或 merge claim。
 - spec ADDED：`ui-presentation`（新 capability，5 Req / 29 Scenario）。
 
 ## Capabilities
 
 - **ui-presentation**（new）：UIUE 视觉/状态消费契约 SSOT — DemoVisualState 7 态消费 + 卡片 value.type 渲染 + **default_scope 消费与 scope 呈现（默认主驾/淡显/聚合）** + Liquid Glass surface_role + 视觉 token 约束 + 双端展示 + 多调用编排。
+
+## Files to modify（Phase 4a 卡片 scope 呈现摘要层，2026-06-25）
+
+- `openspec/changes/ui-presentation/design.md`（AD-9/10/11 + 纠 AD-2 stale 路径）
+- `Core/Presentation/FamilyCardIDMapper.swift`（new — device base→10 族派生，optional 返回，AD-9）
+- `Core/Presentation/FamilyPrimaryCellMapper.swift`（new — 族→主 cell base，AD-10）
+- `Core/Presentation/UIValueTypeMapper.swift`（加 `familyCardID` + `badgeStyle: BadgeRenderStyle` + `familyDisplays(from:catalog:)` 10 族常驻；复用 scope 聚合:54-129 不重写）
+- `App/ContentView.swift`（vehicleCards `LazyVGrid`→`Grid` 渲 familyDisplays + scope 角标 + numericText + breathe + ambient 色块；三屏分层下层布局）
+- `App/DebugGallery.swift`（force-state gallery 同步 family_card）
+- `Tools/checks/check-contentview-uses-display-catalog.sh`（new — 接线 enforce gate，strip 注释 + 验真调用）
+- `Tests/MAformacCoreTests/{FamilyCardIDMapperTests,FamilyPrimaryCellMapperTests}.swift`（new）+ 扩 `VehicleCardDisplayTests.swift`

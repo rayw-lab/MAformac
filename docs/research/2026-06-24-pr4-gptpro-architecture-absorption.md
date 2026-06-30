@@ -326,4 +326,3 @@ Scope in：
 ## 7. 一句话吸收结论
 
 两份 GPT Pro 报告下半段的核心价值不是“多补几个测试”，而是指出 `default_scope` 必须从散落规则升级为一条薄而可复放的 contract spine：`ScopedStateKey / TargetResolution -> PlannedEffect / StateApplyDiagnostics -> ContractReplayEngine / ReadbackRenderer -> PresentationAdapter / C5-C6 gates -> head-bound receipt`。PR #4 已经完成止血版；后续应按 OpenSpec 拆分推进，防止一次性重构，也防止 C3/C5/C6/UI 继续各自理解 scope。
-

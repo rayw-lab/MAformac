@@ -202,3 +202,170 @@ demo SHALL 作 macOS（MAformacMac）+ iOS（MAformacIOS）两独立纯端侧实
 - **WHEN** 取默认值
 - **THEN** 读 state-cells `default_scope`（G25 单一 SSOT）
 - **AND** SHALL NOT 在 UIUE 手写 per-cell 默认表（座位→主驾等仅决策举例非权威值）
+
+### Requirement: UIUE demo interactions SHALL remain mock-frontstage and SHALL NOT claim runtime readiness
+
+完整 demo 交互（触摸调节 / 语音推理 / 演绎控制台 force / 氛围灯炸场）SHALL 全 **mock 前台**（mock store 写 + mock snapshot 切 + mock 预设响应），SHALL NOT 接真 NLU/ASR/TTS/LoRA/runtime backend，SHALL NOT claim endpoint-ready/voice-ready/model-quality/V·S·U-PASS readiness。storyboard SD7「UIUE 边界放宽碰 Core/State 完整链路」SHALL 解读为 **mock 实现**（等后续接线，见 SD7 amendment）。
+
+#### Scenario: interactions are mock, not real backend
+- **GIVEN** 触摸调节 / 语音推理 / 控制台 force 任一交互
+- **WHEN** 交互发生
+- **THEN** 写 mock `DemoVehicleStateStore` / 切 mock snapshot / 出 mock 预设响应
+- **AND** SHALL NOT 调用真 NLU/ASR/TTS/LoRA，SHALL NOT claim runtime readiness（proof_class = localMock/staticPreview）
+
+### Requirement: expanded-card controls SHALL update mock state and presentation only
+
+展开卡（4b composite）数值控件（dial/percent/stepper/toggle/badge）SHALL 写 mock `DemoVehicleStateStore`（via `applyMockTransition`）并刷新 `PresentationSnapshot`；摘要卡 SHALL 只读（点高亮+tooltip 无调节，SD23 7.F1）；touch-driven value source SHALL 标 `ui_touch`/mock source；value 调节 SHALL 复用 `ValueRangeMapper` clamp/cycle 逻辑（dial 18-32 / percent 0-100 / stepper 离散档 / toggle on-off / badge 8 色循环），SHALL NOT 在 view 重写 range 逻辑（防与 mapper 漂移）。mock transition SHALL 产生 changing/satisfied 视觉态（值真变化即非 `.normal`，非只 `"on"` 触发）。
+
+#### Scenario: expanded control writes mock store and refreshes snapshot
+- **GIVEN** 展开卡 dial/stepper/toggle/badge 被触摸调节
+- **WHEN** 控件回调触发
+- **THEN** 调 `store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片 + numericText 联动
+- **AND** 摘要卡 SHALL 只读（不调 store），SHALL NOT 在 view 硬写 state key/value
+
+#### Scenario: value change produces non-normal visual state
+- **GIVEN** 触摸调温度（24→26）/ 百分比 / 档位（desiredValue 非 `"on"`）
+- **WHEN** `applyMockTransition` 应用
+- **THEN** 该 cell `visualState` SHALL = `.changing`/`.satisfied`（值真变化产生激活态）
+- **AND** SHALL NOT 落 `.normal`（否则触控联动视觉假绿，卡片不亮）
+
+### Requirement: demo control panel SHALL force mock context/state for presentation only
+
+演绎控制台（方案经理幕后工具）SHALL force mock context/state：整车（speed/gear）+ 环境（weather/time_period）via bridge **force-context**（AD-RPB-014 context 四维，SHALL NOT 碰 state-cells.yaml 契约）+ NormalRunPreset 常态复位（= DemoReset）+ AllStateSheet（33 base 按 10 族分组）；控制台视觉 SHALL 对齐 10 族卡（iOS26 glass 功能层 + material 模块卡）；SHALL NOT 接真 runtime backend，SHALL NOT customer-facing（`#if DEMO_MODE` 隔离）。
+
+#### Scenario: control panel forces mock context not real backend
+- **GIVEN** 演绎控制台 segmented 选「高速/雨天/夜晚」
+- **WHEN** force
+- **THEN** mutate mock bridge context（vehicle.speed/environment.weather 经 force-context event）驱动 capsule + 安全 guard mock
+- **AND** SHALL NOT 写 state-cells.yaml 契约，SHALL NOT 当客户面可达（DEMO_MODE 隔离）
+
+### Requirement: ambient edge burst SHALL be presentation-only and non-blocking
+
+氛围灯边缘爆发 SHALL 纯呈现层（5s burst phaseAnimator → fade out）+ `allowsHitTesting(false)`（不挡 mic/controls/卡片交互）+ 仅 `ambient.color` delta 触发（非 always-on）；SHALL 守 U30（Vortex Canvas 粒子非 layerEffect 折射 shader，不抢 mlx GPU）；SHALL NOT 阻塞主线程/抢 mic 交互。
+
+#### Scenario: burst is non-blocking overlay triggered by ambient color change
+- **GIVEN** 氛围灯指令成功（`ambient.color` delta）
+- **WHEN** 爆发渲染
+- **THEN** 屏幕边缘 5s 闪烁+Canvas 粒子爆发 → fade，`allowsHitTesting(false)` 不挡交互
+- **AND** SHALL NOT always-on（仅 color delta 触发），SHALL NOT 用 Inferno layerEffect 折射（守 U30）
+
+### Requirement: visual acceptance SHALL use L0-L3 proof gates and SHALL NOT auto-upgrade simulator proof to V-PASS
+
+8.C2 visual acceptance SHALL remain open until the evidence package contains all four proof layers: L0 runtime-truth capture, L1 sentinel result, L2 readability/regression evidence, and L3 human 5-gate verdict. L0 SHALL record `device`, `launchArg`, `theme`, `ui_tree_evidence`, `screenshot_path`, and `proof_class`; screenshots counting as L0 SHALL be on-screen `simctl io screenshot` captures. Off-screen `ImageRenderer`, SwiftUI preview, static snapshot, or other non-composited render output SHALL NOT count as L0 evidence. Machine/local/mock/simulator proof SHALL NOT be upgraded to `V-PASS`.
+
+#### Scenario: L0 requires on-screen runtime-truth fields
+- **GIVEN** a visual-acceptance evidence item
+- **WHEN** it is submitted as L0 evidence
+- **THEN** it SHALL include `device`, `launchArg`, `theme`, `ui_tree_evidence`, `screenshot_path`, and `proof_class`
+- **AND** `screenshot_path` SHALL point to an on-screen `simctl io screenshot` capture
+- **AND** off-screen `ImageRenderer`, SwiftUI preview, static snapshot, or non-composited render output SHALL NOT satisfy L0
+
+#### Scenario: L1 sentinel blocks collapse without chasing RMSE
+- **GIVEN** zone or anchor comparison runs as L1
+- **WHEN** it reports a result
+- **THEN** the result SHALL be one of `PASS`, `WARN`, or `FAIL`
+- **AND** `FAIL` SHALL block visual acceptance for collapse/regression
+- **AND** L1 SHALL NOT chase RMSE score improvements and SHALL NOT sign aesthetic quality
+
+#### Scenario: L2 readability uses OCR and contrast as hard gates, SSIM as evidence
+- **GIVEN** L2 machine evidence is produced
+- **WHEN** text/readability and visual regression are evaluated
+- **THEN** OCR and contrast SHALL be readability hard gates
+- **AND** SSIM MAY be recorded as regression evidence
+- **AND** LPIPS SHALL NOT be a required or accepted L2 gate for this change
+- **AND** L2 passing SHALL NOT substitute for L3 human aesthetic acceptance
+
+#### Scenario: L3 human 5-gate is the only V-PASS authority
+- **GIVEN** L0, L1, and L2 evidence exists
+- **WHEN** final visual acceptance is decided
+- **THEN** L3 SHALL record a human 5-gate verdict enum of `V-PASS`, `V-PASS_WITH_NOTES`, `PARTIAL`, or `FAIL`
+- **AND** only 磊哥 MAY sign `V-PASS`
+- **AND** automated validators, local proof, mock proof, or simulator proof SHALL NOT mark A-2 complete or claim product `V-PASS`
+
+### Requirement: post-8.C2 interaction integrity SHALL use a scoped proof matrix and SHALL NOT create a third value SSOT
+
+Post-8.C2 Interaction Integrity SHALL be proven with a matrix that distinguishes `family`, `ui_value_type`, `gesture`, `writeback`, `summary_readback`, and `proof_class`. Any `StateCellInteractionPolicy` or equivalent consumer projection SHALL derive value ranges, enum/options, readback, and affordance state from existing contract/mapper sources; it SHALL NOT become a third value/range/enum SSOT in the view layer. A future `verify-uiue-interactions` gate MAY exist only as a UIUE-scoped gate candidate until a separate grill decision promotes it; it SHALL NOT be added directly to global `make verify-all`.
+
+#### Scenario: interaction matrix records gesture, writeback, readback, and proof class
+- **GIVEN** an expanded-card control is claimed as interactively covered
+- **WHEN** Interaction Integrity evidence is produced
+- **THEN** the evidence SHALL identify `family`, `ui_value_type`, `gesture`, `writeback`, `summary_readback`, and `proof_class`
+- **AND** a control that lacks real mock writeback or summary readback SHALL NOT be claimed as covered
+
+#### Scenario: consumer projection does not become a third SSOT
+- **GIVEN** UIUE needs to decide whether a value is controllable, read-only, ranged, discrete, or option-backed
+- **WHEN** that decision is rendered in SwiftUI
+- **THEN** the view SHALL consume existing mapper/contract-derived policy
+- **AND** SHALL NOT define independent value ranges, enum option lists, or readback formatting in the view layer
+
+#### Scenario: UIUE interaction gate remains scoped until separately decided
+- **GIVEN** a `verify-uiue-interactions` or equivalent gate is proposed
+- **WHEN** it is added to project automation
+- **THEN** it SHALL first be UIUE-scoped and documented with owner, runtime cost, failure ownership, and false-positive handling
+- **AND** SHALL NOT be added directly to global `make verify-all` without a separate accepted grill decision
+
+### Requirement: post-8.C2 structural visual gates SHALL stay separate from L3 aesthetic acceptance
+
+Layout Integrity and Visual Spacing gates SHALL evaluate structural defects only: overlap, blank/white-edge leakage, zone budget, safe-area violations, right-side button placement, capsule centering, orb spacing, and mic dock occlusion. These gates SHALL report structural evidence such as PASS/WARN/FAIL, `overlap_pairs`, `min_gaps`, `zone_budget`, and `safe_area_violations`; they SHALL NOT sign aesthetic quality or replace L3 human review. Capsule/VPA evidence SHALL keep context/data proof, layout proof, and diorama aesthetic/L3 proof separate.
+
+#### Scenario: layout and spacing gates block structural defects only
+- **GIVEN** the top capsule, VPA/orb, vehicle cards, or mic dock layout changes
+- **WHEN** Layout Integrity or Visual Spacing evidence is produced
+- **THEN** it SHALL evaluate overlap, blank/white-edge leakage, zone budget, safe-area violations, right-side button placement, capsule centering, orb spacing, and mic dock occlusion
+- **AND** it SHALL NOT claim premium aesthetics, animation quality, or L3 acceptance
+
+#### Scenario: capsule and VPA proof is split by concern
+- **GIVEN** capsule or VPA/orb evidence is submitted
+- **WHEN** the evidence is classified
+- **THEN** context/data proof, layout proof, and diorama aesthetic/L3 proof SHALL be recorded separately
+- **AND** GPT Image 2 or anchor images SHALL be treated as direction and aesthetic bar, not as implementation structure or final acceptance authority
+
+#### Scenario: structural gates cannot close visual acceptance
+- **GIVEN** Layout Integrity and Visual Spacing gates pass
+- **WHEN** final 8.C2 visual acceptance is decided
+- **THEN** `8.C2` SHALL still require the L0-L3 evidence package and the L3 human 5-gate verdict
+- **AND** structural gate success SHALL NOT be upgraded to `V-PASS`, `mobile`, `true_device`, or `A-2 complete`
+
+### Requirement: D17 UIUE consumer authority SHALL consume only main-owned stable payload/config/force-state surfaces
+
+D17 UIUE consumer work SHALL consume only D15 presentation-safe Runtime -> Presentation payload fields and D16 stable main-owned Core config, scene macro, and force-context names. UIUE SHALL NOT invent shared fields, enum values, proof classes, Core config truth, force-state truth, or private adapter payload names. This authority does not implement consumer code by itself.
+
+#### Scenario: D17 consumes D15 payload and D16 stable names only
+- **GIVEN** D16 Gate4R has opened `d17_release_gate`
+- **WHEN** UIUE defines or implements D17 consumer mapping
+- **THEN** it SHALL consume only main-owned D15 payload envelope/content/reconciliation/proof fields and D16 stable config, scene macro, and force-context names
+- **AND** it SHALL NOT infer additional shared fields from UIUE docs, receipts, test helpers, private adapter names, raw runtime state, or local mock implementation details
+
+#### Scenario: unknown values fail closed
+- **GIVEN** a payload or config input contains an unknown schema, proof class, reconciliation status, mismatch class, config key, scene macro name, force-context dimension, or unexpected presentation field
+- **WHEN** UIUE validates that input
+- **THEN** the consumer SHALL fail closed
+- **AND** it SHALL NOT render the input as a supported successful shared feature
+
+#### Scenario: private runtime and force-state construction surfaces remain forbidden
+- **GIVEN** UIUE parses or maps a presentation payload
+- **WHEN** it encounters names from `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, ledger internals, settled parent plan internals, raw runtime store, raw model output, training receipt, adapter-local private names, or `DemoForceStateContext` decode/constructor surfaces
+- **THEN** UIUE SHALL reject those names as non-consumer authority
+- **AND** it SHALL NOT mirror them into local shared DTOs or UIUE-owned enums
+
+#### Scenario: D17 proof cap is not readiness
+- **GIVEN** D17 UIUE consumer authority, local/unit tests, or simulator smoke passes
+- **WHEN** status is reported
+- **THEN** the proof SHALL remain capped to local/unit/simulator_mock as applicable
+- **AND** it SHALL NOT claim UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, or endpoint-ready
+
+### Requirement: D19 UIUE durability guard SHALL consume D18 only as proof-governance and deny-list authority
+
+D19 UIUE durability guard work SHALL treat main D18 local durable runtime work as proof-governance and deny-list authority only. UIUE SHALL NOT consume D18 durable ledger or runtime-private names as presentation payload fields, UI labels, proof labels, readiness labels, or merge authority.
+
+#### Scenario: D19 rejects durable runtime private names
+- **GIVEN** D18 has local durable adapter/C3 authority and Gate4 private payload boundary verification
+- **WHEN** UIUE defines or implements D19 durability guard validation
+- **THEN** it SHALL reject durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, `requestFingerprint`, `parentRequestFingerprint`, success ledger, failure ledger, `settledParentPlan`, settled parent plan internals, raw runtime store markers including `rawRuntimeStore`, raw model output, training receipt, adapter-local private names, and D18 storage path/schema internals
+- **AND** it SHALL NOT mirror those names into local shared DTOs, presentation fields, UI labels, or UIUE-owned enums
+
+#### Scenario: local durability proof does not become readiness
+- **GIVEN** D18 local durable ledger tests, GitNexus checks, OpenSpec validation, or audit findings have been recorded
+- **WHEN** UIUE reports D19 guard status
+- **THEN** UIUE SHALL describe that proof as local/static/unit/integration/OpenSpec/GitNexus proof only, as applicable
+- **AND** it SHALL NOT claim production durable runtime, runtime-ready, mobile, true-device, live API, UIUE merge, V-PASS, S-PASS, U-PASS, A-2 readiness, voice-ready, model-ready, golden-ready, endpoint-ready, or R5 completion

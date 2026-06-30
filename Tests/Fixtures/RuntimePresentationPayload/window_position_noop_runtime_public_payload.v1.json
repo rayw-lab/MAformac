@@ -16,7 +16,7 @@
       "key": "window.position[主驾]",
       "revision": 1,
       "source": "mock",
-      "visualState": "normal"
+      "visualState": "changing"
     }
   ],
   "eventID": "turn-d22-window-position-noop-1:runtime-presentation",

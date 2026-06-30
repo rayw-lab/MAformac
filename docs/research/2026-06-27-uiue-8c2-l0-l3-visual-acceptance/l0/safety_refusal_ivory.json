@@ -1,0 +1,32 @@
+{
+  "case_id": "safety_refusal_ivory",
+  "captured_at": "2026-06-27T00:44:15Z",
+  "device": {
+    "name": "iPhone 17 Pro Max",
+    "udid": "9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D",
+    "runtime": "iOS Simulator"
+  },
+  "launchArg": "-mockSnapshot safetyRefusal -mockTheme ivory",
+  "theme": "ivory",
+  "ui_tree_evidence": "l0/safety_refusal_ivory-ui-tree.txt",
+  "screenshot_path": "l0/safety_refusal_ivory-simctl.png",
+  "proof_class": "simulator_l0_runtime_truth",
+  "screenshot_source": "on_screen_simctl_io_booted_screenshot",
+  "capture_command": "xcrun simctl io booted screenshot",
+  "ui_tree_source": "XCUITest stdout debugDescription markers",
+  "forbidden_sources_not_used": [
+    "ImageRenderer",
+    "SwiftUI preview",
+    "Preview",
+    "static snapshot",
+    "XCTAttachment",
+    "xcuitest_attachment"
+  ],
+  "claims_not_made": [
+    "mobile",
+    "true_device",
+    "L3",
+    "V-PASS",
+    "A-2 complete"
+  ]
+}

@@ -1,0 +1,70 @@
+# UIUE R4 Bridge Final Grill Matrix v2
+
+- Date: 2026-06-28
+- v1 source: `final-grill-matrix.md`
+- Supplement source: `supplement-ui-cornercases/final-supplement-matrix.md`
+- Verdict: `PASS_WITH_BOUNDARY_REWRITE`
+- Scope: R4 bridge grill checklist plus UIUE stage corner cases.
+- Proof class: planning / audit checklist only.
+
+## Matrix
+
+| ID | Stage | Grill question | RED | GREEN | BLUE | PURPLE | ORANGE | BLACK | Avg | Priority | Route | Action | Recommendation |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | --- |
+| C01 | R4 | R4 是否已经锁定 Runtime-Presentation bridge 的单一合同权威，并把 UIUE 已接受 bridge change 与 mainline 路线牌仍写 `not_proposed` / `deferred` 的差异收敛成一个不再分叉的 SSOT？ | 5 | 5 | 5 | 5 | 5 | 5 | 5.00 | P0 | R4-mainline-coauthor | keep | 作为 R4 第一项 burndown：指定 bridge authority、mainline co-author 结论和禁止第二桥的证据位置。 |
+| C02 | R4 | R3 8.C2 人审带 notes 通过后，R4 是否明确区分 `operator-pass with notes`、UIUE visual evidence、bridge contract acceptance、mainline runtime acceptance 和 R5 readiness？ | 5 | 5 | 5 | 5 | 5 | 5 | 5.00 | P0 | R4-evidence | keep | 写成 proof-class cap：R3 人审可继续推进，但不得升级为 runtime、mobile、voice、V-PASS 或 `8.C2` 外延完成。 |
+| C03 | R4 | mainline co-author review 是否有明确 owner、输入文件、输出 receipt、阻断条件和冲突处理路径，特别是 UIUE 已推进而 mainline 仍未吸收 bridge 路线时？ | 5 | 5 | 4 | 5 | 4 | 5 | 4.67 | P0 | R4-mainline-coauthor | rewrite | 要求 executor 给出 co-author checklist 和 stop condition；缺 owner 或缺输出时 R4 不得出站。 |
+| C04 | R4 | `PresentationSnapshot` 的最小字段、可选字段、默认值和 `missing/unknown` fail-closed 行为是否足以驱动 UIUE 卡片、胶囊、orb、readback 与证据截图，而不是回退到 raw store 推断？ | 4 | 4 | 5 | 5 | 5 | 4 | 4.50 | P0 | R4-contract | rewrite | 把字段清单、未知值降级、fixture 样例和 UI consumption boundary 绑定成一个 contract gate。 |
+| C05 | R4 | `DemoRuntimeResult.result_kind` 是否用机器可读枚举覆盖 accepted、refused、partial accept/refuse、already-state no-op、cancelled、runtime error 等终态，并能映射到 mixed outcome UI？ | 4 | 5 | 5 | 5 | 5 | 4 | 4.67 | P0 | R4-contract | rewrite | 对齐 OpenSpec 枚举命名，同时保留人类场景说明；要求 fixture 覆盖成功、拒绝、部分成功、no-op 和异常。 |
+| C06 | R4 | `scope_origin` 当前 Core 三态与 bridge 提议的 `missing` 第四态是否有显式兼容策略，避免把 default scope、用户显式范围、fanout 和缺失范围混成一个 UI 状态？ | 5 | 5 | 4 | 5 | 4 | 5 | 4.67 | P0 | R4-mainline-coauthor | rewrite | 标注 `missing` 是 bridge-proposed future addition；mainline co-author 必须决定落点、迁移和 fail-closed 行为。 |
+| C07 | R4 | R1/R2 的 `default_scope`、`scope_origin`、action availability、disabled reason 和可操作集合是否被 bridge 携带到 presentation，而不是只停留在 UIUE 本地 interaction policy 测试？ | 4 | 5 | 4 | 2 | 4 | 4 | 3.83 | P1 | R4-contract | rewrite | 缩窄为 interaction semantics crossing bridge；避免重复 R1 单测，要求 snapshot/fixture 可观察。 |
+| C08 | R4 | readback 的来源、proof class、scope、per-action result 和最终文案是否有单一数据路径，保证 UI 卡片、胶囊、TTS 文案和 evidence receipt 不各自重算？ | 5 | 5 | 5 | 3 | 5 | 5 | 4.67 | P0 | R4-contract | keep | 要求 single-source readback fixture；任何 UI/TTS/receipt 派生都必须指回同一 snapshot/result 字段。 |
+| C09 | R4 | R4 是否定义有限 `proof_class` 枚举、显示上限和降级规则，明确 UIUE simulator/mock 截图不能被解释为 runtime、mobile、true-device、voice 或 V-PASS？ | 5 | 5 | 5 | 5 | 5 | 5 | 5.00 | P0 | R4-evidence | keep | 作为 fake-green 总闸；最终 receipt 必须显示 proof class 且默认 fail-closed。 |
+| C10 | R4 | mixed outcome 场景下，bridge 是否能同时表达 active cell、refused cell、sibling cells、per-action results 和 readback，避免 UI 只显示一个全局成功或失败？ | 4 | 4 | 5 | 5 | 5 | 4 | 4.50 | P0 | R4-contract | keep | 要求至少一个 mixed fixture 和截图/evidence 对齐；异常与拒绝路径不能只靠文案补丁。 |
+| C11 | R4 | 空调制冷/制热、座椅通风/加热、车窗等 sibling state 是否通过 bridge snapshot 表达互斥关系和当前态，避免视觉层继续硬编码推断？ | 4 | 3 | 5 | 4 | 4 | 4 | 4.00 | P1 | R4-contract | merge | 与 C04/C10 同组 burndown；保留为 sibling-state 追问，要求字段或显式 visual policy 给出来源。 |
+| C12 | R4 | `source`、`scope_origin`、`scope`、`readback.source` 和 `trace_id` 的概念边界是否拆清，防止来源、范围解析、证据链和运行时 trace 在 R5 互相污染？ | 5 | 4 | 4 | 5 | 4 | 5 | 4.50 | P1 | R4-contract | keep | 加入术语表和负例：UI touch source、scope resolution、value provenance、trace identity 不可互作替身。 |
+| C13 | R4 | force-context 事件里的车速、挡位、天气、时间段等 demo 条件是否限定在 bridge event/fixture 范围内，并禁止被误读为真实车辆状态或 live API 输入？ | 4 | 4 | 4 | 4 | 4 | 4 | 4.00 | P1 | R4-test-harness | keep | 作为 demo-mode fixture guard；所有 receipt 标注 mock/context input，不得写 live truth。 |
+| C14 | R4 | `voice_state`、`orb_state`、thinking 或胶囊动画字段是否被定义为 presentation choreography，并明确不构成 ASR、TTS、voice golden、endpoint 或 voice-ready 证据？ | 5 | 4 | 5 | 4 | 3 | 5 | 4.33 | P1 | R5-voice | rewrite | R4 可定义显示字段和证据 cap；voice pipeline readiness 必须留到 R5 独立 lane。 |
+| C15 | R4 | R4 是否解释 cards start changing、readback ready、TTS start/end、timeout/cancel 等两段 thinking 语义，避免 R5 把 UI 演出时序误当 runtime 执行时序？ | 4 | 3 | 4 | 3 | 4 | 4 | 3.67 | P1 | R4-evidence | merge | 与 C14/C21 同组；保留为时序语义追问，重点是 evidence 表达边界。 |
+| C16 | R4 | UIUE adapter 是否被限制为 mock snapshot/fixture 到 `PresentationSnapshot` 的消费端，禁止直接读取 runtime store、C3 trace、raw command 或 mainline backend 私有结构？ | 5 | 5 | 5 | 5 | 4 | 5 | 4.83 | P0 | R4-contract | keep | 写成 hard no-touch boundary；UIUE visual lane 只能消费 bridge contract。 |
+| C17 | R4 | mainline runtime 将来如何把 C3/C3ExecutionResult/TraceEntry 投影到 `DemoRuntimeResult` 是否有最小兼容草图，同时不让 R4 反向改写 C3 或 C6 行为合同？ | 5 | 5 | 4 | 5 | 4 | 5 | 4.67 | P0 | R5-runtime | rewrite | 需要 projection sketch 和 non-goal 列表；R4 定 seam，不实现 runtime backend。 |
+| C18 | R4 | R4 与 post-C6 identity/behavior-shape rebuild 的重叠是否拆清：bridge 只承载 presentation contract，不负责 C6 acceptance、behavior taxonomy 完成或模型质量判定？ | 5 | 5 | 4 | 4 | 3 | 5 | 4.33 | P0 | Mainline-roadmap | keep | 在路线图中标注 bridge 不替代 C6 acceptance/comparison；缺此项会把 post-C6 主线假绿。 |
+| C19 | R4 | R4 是否明确 C5 retrain、LoRA candidate、demo golden、voice golden 和 endpoint readiness 都是 R5/mainline 后续门，不因 bridge schema 存在而自动解锁？ | 5 | 5 | 4 | 5 | 3 | 5 | 4.50 | P0 | R5-model | keep | 作为 R5 split guard；schema 存在只允许后续接线，不允许宣称 model/golden/voice ready。 |
+| C20 | R4 | `trace_id`、`turn_id`、snapshot version 和 evidence receipt 是否稳定到足以让 UIUE 截图、unit fixture、simulator capture 和 mainline runtime logs 对同一轮 replay 对齐？ | 4 | 4 | 5 | 4 | 5 | 4 | 4.33 | P1 | R4-evidence | rewrite | 写成可复跑 identity 条件；不要求 R5 runtime log 已存在，但要能预留对齐键。 |
+| C21 | R4 | bridge 对 timeout、cancel、runtime_error、unsupported action、安全拒绝和部分拒绝是否都有 terminal snapshot 要求，避免异常路径只有成功态 UI 证据？ | 4 | 5 | 5 | 5 | 5 | 5 | 4.83 | P0 | R4-test-harness | keep | 最小 negative fixture 必须覆盖；没有异常终态 snapshot 时 R4 不出站。 |
+| C22 | R4 | R4 是否保留 MAformac 离线、端侧、无云依赖、mock 车控边界和三轮记忆约束，不把 bridge 扩成线上 API、持久化服务或真实车控执行层？ | 4 | 4 | 4 | 4 | 3 | 5 | 4.00 | P1 | Mainline-roadmap | keep | 作为项目宪法守门；若后续 runtime 需要扩展，必须另开 mainline change。 |
+| C23 | R4 | graph manifest、visual evidence manifest、capability IDs 和 route tables 是否被标明为 derived/index artefacts，而不是第二套 authority 或替代 bridge/OpenSpec 合同？ | 5 | 4 | 3 | 5 | 4 | 5 | 4.33 | P1 | R4-contract | keep | 放入 SSOT hygiene；manifest 只能索引、校验或派生，不得反写合同。 |
+| C24 | R4 | R1 interaction integrity 的 action availability、disabled reason、writeback 和 no-op 规则是否能通过 bridge 被 UI 观察，而不是只靠按钮本地禁用态实现？ | 4 | 5 | 5 | 4 | 5 | 4 | 4.50 | P1 | R4-test-harness | merge | 与 C07 同组；要求 fixture 证明 disabled/no-op/writeback 不只存在于本地 UI 代码。 |
+| C25 | R4 | R2/R2b 的布局、胶囊、小圆球/orb、多主题和 reduce motion 状态是否能从 bridge presentation fields 或显式 visual policy 解释，而不是散落在主题分支逻辑中？ | 3 | 3 | 5 | 3 | 4 | 4 | 3.67 | P1 | R4-evidence | rewrite | 不强迫所有视觉规则进 schema；要求状态来源、policy 文件和截图 receipt 能互相指认。 |
+| C26 | R4 | R4 证据是否要求每份 receipt 标注 repo、branch、HEAD、dirty ownership 和 proof class，尤其在 UIUE 与 mainline worktree 同时推进时防止串证？ | 5 | 5 | 4 | 4 | 5 | 5 | 4.67 | P0 | R4-evidence | keep | 作为所有 R4 closeout 的格式硬门；缺任一字段只能 `PARTIAL`。 |
+| C27 | R4 | bridge schema 是否有版本号、fixture 兼容策略和破坏性变更规则，能支持 R4 checklist、R5 runtime adapter 和后续 mainline tests 并行演进？ | 4 | 5 | 4 | 5 | 5 | 5 | 4.67 | P0 | R4-contract | keep | 要求 schema version、fixture migration note 和 breaking-change gate；否则 R5 会踩 stale fixtures。 |
+| C28 | R4 | R4 测试计划是否拆成 schema、fixture、unit、simulator、evidence、contract validation 的最小门，并避免一个不可复跑的 `make verify-all` 式大一统门？ | 4 | 5 | 4 | 4 | 5 | 4 | 4.33 | P0 | R4-test-harness | rewrite | 按 proof class 拆验证门，给每门 owner、命令或 receipt；没有全绿就按门级 partial 记录。 |
+| C29 | R4 | R4 exit criteria 是否写清：哪些 P0/P1 grill 必须 burndown，哪些 notes 可以带入，哪些 runtime/voice/model lanes 必须另开任务而不能混在 R4？ | 5 | 5 | 4 | 5 | 5 | 5 | 4.83 | P0 | R4-contract | rewrite | 作为最终出站 gate；R4 closeout 必须列 burndown 表和 R5 lane split，不得用“可继续”替代。 |
+| C30 | R4 | Liquid4All、外部 H5/FastAPI、旧 demo bridge 或参考实现是否全部限定为参考材料，并禁止把其字段、样式或 runtime 假设直接复制进 MAformac/UIUE 合同？ | 5 | 4 | 4 | 4 | 3 | 4 | 4.00 | P1 | Mainline-roadmap | rewrite | 写成 reference hygiene：可以借鉴问题形态，不复制字段、样式、部署或 runtime 架构。 |
+| C31 | R4 | R4 是否需要一张 UIUE zone ownership/evidence 表，说明顶部 context/capsule、orb/thinking、dialogue/readback、vehicle controls、mic dock、overlay/sheet 各自消费哪些 snapshot 字段、哪些只属 visual policy、哪些需要 evidence，而不是把 zone manifest 升格成第二 bridge SSOT？ | 5 | 4 | 5 | 2 | 5 | 5 | 4.33 | P0 | R4-visual-policy | rewrite | 保留为 zone 分类表，不让 bridge schema 膨胀；输出应指向 C50 的三类分类。 |
+| C32 | R4 | 每个 zone 是否都有明确的状态来源：context capsule 读 `context`、orb 读 `orbState`、mic 读 `voiceState`、dialogue 读 `dialogText/readbacks`、cards 读 `storeCells/activeCells/refusedCell`，缺来源时 fail-closed？ | 5 | 4 | 4 | 4 | 4 | 4 | 4.17 | P1 | R4-contract | merge | 与 C31/C50 结合；保留为 source mapping checklist，不单独扩 schema。 |
+| C33 | R4 | 跨 zone 注意力链是否可验：卡片状态变化、readback/TTS 文案、orb thinking/speaking、context capsule ambient、edge burst 不能同时抢主焦点，且 reduce motion 下仍保留状态语义？ | 5 | 5 | 5 | 4 | 5 | 5 | 4.83 | P0 | R4-visual-policy | keep | 写入 visual policy；验证需要场景截图/多帧或明确时序 receipt。 |
+| C34 | R4 | 若产品决定支持 1.5 秒长按进入思考/演绎控制台，R4 是否定义触发 zone、progress feedback、取消半径、松手行为、reduce motion/a11y 替代入口，并与 mic 按住说话区分？ | 5 | 3 | 4 | 3 | 4 | 3 | 3.67 | P1 | R4-user-decision | rewrite | 保留但不当作已实现；先让用户/产品拍入口，再进入 visual policy 或后续实现任务。 |
+| C35 | R4 | mic 按住说话、长按思考、卡片 tap 展开、温度条 drag、车控区 scroll、对话区 scroll、overlay dismiss 和设置按钮之间是否有 gesture arbitration 规则，避免手势串扰？ | 5 | 5 | 5 | 5 | 5 | 4 | 4.83 | P0 | R4-visual-policy | keep | 作为核心交互门；至少要求手势冲突矩阵和负例 proof。 |
+| C36 | R4 | 演绎控制台入口是否被标明为 demo/operator surface，而不是用户车控能力；从 settings、长按或其他入口进入都不得改变 runtime/voice readiness 结论？ | 5 | 5 | 4 | 4 | 4 | 5 | 4.50 | P0 | R4-evidence | rewrite | 要求 receipt 标注 operator surface；不能把控制台路径写成用户 runtime 功能。 |
+| C37 | R4 | 顶部车辆样式/环境 capsule 跟随端状态时，speed/gear、weather、time_period、macro scene、reset normal、safety refusal 等冲突是否有显示优先级？ | 4 | 4 | 5 | 4 | 4 | 4 | 4.17 | P1 | R4-visual-policy | rewrite | 归 visual policy；定义 context display priority，不写 raw runtime 逻辑。 |
+| C38 | R4 | context capsule 是否禁止展示 raw speed/gear 数字但允许展示行驶/雨/夜等语境，并用证据证明它守住 `vehicle.* not rendered as control` 的红线？ | 5 | 4 | 5 | 4 | 5 | 5 | 4.67 | P0 | R4-evidence | keep | 保留为车辆语境红线；截图/receipt 只证明语境表达，不证明真实车辆状态。 |
+| C39 | R4 | 顶部 capsule、设置、刷新、Dynamic Island/safe area 的布局是否需要固定 zone-pair evidence，证明其不遮挡、不吞手势、不进入 capsule 图像？ | 3 | 3 | 3 | 2 | 3 | 2 | 2.67 | P1 | R4-test-harness | merge | 合并入 C31/C45 的 evidence checklist；不作为单独 schema gate。 |
+| C40 | R4 | 演绎控制台 force context、macro scene、reset normal 是否产生完整 snapshot lifecycle：context、activeCells、readbacks/dialogue、orb/voice state、proofClass 和 stale visual clearing 同步？ | 5 | 4 | 5 | 5 | 5 | 5 | 4.83 | P0 | R4-contract | keep | 作为 bridge/snapshot 生命周期硬门；缺任何同步只可 `PARTIAL`。 |
+| C41 | R4 | macro 场景一次改变多个 family 时，bridge 是否表达 per-action active cells、per-action readbacks、ambient burst 触发和最终综合文案，避免一个 `accepted` 压扁多 zone 变化？ | 4 | 5 | 4 | 4 | 4 | 4 | 4.17 | P1 | R4-contract | rewrite | 与 C10/C40 对齐；要求 multi-action fixture，而非单全局成功态。 |
+| C42 | R4 | reset/theme/preset 切换后，cards、orb、capsule、dialogue、mic dock 和 overlay 是否有 stale-state clearing 规则，防止上一轮 active/refused/thinking/pressing 视觉残留？ | 5 | 3 | 5 | 4 | 5 | 5 | 4.50 | P0 | R4-visual-policy | keep | 与 C40 同组；需要负例/重置后截图或 UI tree proof。 |
+| C43 | R4 | 手动滚动与自动 scroll-to-active 是否有 R4 policy：用户正在滚 vehicle controls 或 dialogue 时不得被 active family 自动拉回，系统触发 active 且用户未滚时才滚入视野？ | 4 | 4 | 5 | 4 | 4 | 4 | 4.17 | P1 | R4-visual-policy | keep | 保留为 scroll ownership policy；不要把它变成 runtime 字段。 |
+| C44 | R4 | active family hero/fade、expanded overlay、dismiss tap 和 card writeback 是否证明空间记忆不被破坏：不物理重排、不丢 activeCell、不把 overlay 局部 state 当全局 store？ | 3 | 5 | 4 | 4 | 4 | 4 | 4.00 | P1 | R4-visual-policy | rewrite | 与 C43/C45 成组；验证空间记忆和 state ownership。 |
+| C45 | R4 | z-order/hit-testing 是否成为 R4 corner case：ambient burst 不挡交互，mic dock 不遮最后一行卡片，expanded overlay 拦截背景 tap，capsule invisible hit area 不吞 settings/refresh？ | 4 | 5 | 5 | 5 | 5 | 4 | 4.67 | P0 | R4-test-harness | keep | 作为 UI test/checker/evidence gate；覆盖 hit-testing 与 z-order 负例。 |
+| C46 | R4 | accessibility 是否按 zone 明确：每个可点/可调/可展开/可关闭区域有稳定 identifier、label/value、VoiceOver 路径，温度 scrub 有 adjustable 替代，long press 有非手势替代？ | 4 | 4 | 4 | 5 | 5 | 4 | 4.33 | P0 | R4-test-harness | rewrite | 细化为 a11y checklist；长按替代入口依赖 C34 产品决定。 |
+| C47 | R4 | reduce motion 是否按 zone 出证据：orb、capsule、edge burst、waveform、card breathing、hero/fade、sheet transition 均降级为静态但可读状态，而不是只截一张图？ | 5 | 5 | 5 | 5 | 5 | 5 | 5.00 | P0 | R4-test-harness | keep | 升为补充 P0；需要 zone-wise receipt。 |
+| C48 | R4 | Mac panorama 与 iPhone portrait 的 zone topology 是否分别验收，同一 PresentationSnapshot 在两种布局下不产生 proof-class 互相替代？ | 4 | 4 | 5 | 4 | 4 | 4 | 4.17 | P1 | R4-evidence | keep | 作为平台 proof split；Mac 不能替 iPhone，simulator 不能替 true-device。 |
+| C49 | R4 | 对动效时序、长按 progress、crossfade、stale clearing 等时间性声明，R4 evidence 是否需要视频/时间点/多帧截图，而不是只靠静态 screenshot 或 UI tree frame？ | 5 | 5 | 5 | 4 | 5 | 3 | 4.50 | P0 | R4-evidence | rewrite | 只要求时间性 claim 用多帧/视频；静态布局仍可用 UI tree/crop。 |
+| C50 | R4 | 哪些 UI 细节进 bridge schema、哪些进 visual policy、哪些只进 evidence checklist 是否需要一张分类表，防止四区动效/车辆样式/演绎入口把 R4 bridge 膨胀成 UI 实现总表？ | 5 | 5 | 5 | 5 | 5 | 5 | 5.00 | P0 | R4-contract | keep | 作为补充总闸；所有 C31-C49 必须归类后才能进入 R4 burndown。 |
+
+## v2 Delta
+
+- Added C31-C50 after deductive review of UIUE stage corner cases.
+- C50 is the governor for the supplement: every new UI detail must be classified as bridge schema, visual policy, or evidence checklist before R4 burndown.
+- This v2 does not close `8.C2` and does not claim runtime, voice, model, mobile, true-device, golden, endpoint, or V-PASS readiness.
+

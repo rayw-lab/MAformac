@@ -1,0 +1,129 @@
+{
+  "anchor_insitu": {
+    "bbox": [
+      104,
+      94,
+      801,
+      411
+    ],
+    "bbox_rel": [
+      0.1105,
+      0.0562,
+      0.8512,
+      0.2458
+    ],
+    "width_rel": 0.7407,
+    "height_rel": 0.1896,
+    "mean_luma": 210.41,
+    "mean_saturation": 0.0716,
+    "dark_ratio": 0.0327,
+    "bright_ratio": 0.6004,
+    "cool_ratio": 0.2984,
+    "violet_ratio": 0.2561,
+    "warm_ratio": 0.0016,
+    "crop_path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/anchor_insitu-capsule-crop.png"
+  },
+  "impl_idle_day": {
+    "bbox": [
+      116,
+      181,
+      1075,
+      705
+    ],
+    "bbox_rel": [
+      0.0879,
+      0.0631,
+      0.8144,
+      0.2458
+    ],
+    "width_rel": 0.7265,
+    "height_rel": 0.1827,
+    "mean_luma": 211.64,
+    "mean_saturation": 0.0933,
+    "dark_ratio": 0.0257,
+    "bright_ratio": 0.5584,
+    "cool_ratio": 0.3811,
+    "violet_ratio": 0.2531,
+    "warm_ratio": 0.0022,
+    "crop_path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/impl_idle_day-capsule-crop.png"
+  },
+  "impl_rainy_night": {
+    "bbox": [
+      109,
+      166,
+      1075,
+      705
+    ],
+    "bbox_rel": [
+      0.0826,
+      0.0579,
+      0.8144,
+      0.2458
+    ],
+    "width_rel": 0.7318,
+    "height_rel": 0.1879,
+    "mean_luma": 169.9,
+    "mean_saturation": 0.1138,
+    "dark_ratio": 0.0706,
+    "bright_ratio": 0.3657,
+    "cool_ratio": 0.6107,
+    "violet_ratio": 0.2294,
+    "warm_ratio": 0.0,
+    "crop_path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/impl_rainy_night-capsule-crop.png"
+  },
+  "impl_city_driving": {
+    "bbox": [
+      110,
+      181,
+      1075,
+      705
+    ],
+    "bbox_rel": [
+      0.0833,
+      0.0631,
+      0.8144,
+      0.2458
+    ],
+    "width_rel": 0.7311,
+    "height_rel": 0.1827,
+    "mean_luma": 212.49,
+    "mean_saturation": 0.0915,
+    "dark_ratio": 0.024,
+    "bright_ratio": 0.5687,
+    "cool_ratio": 0.3732,
+    "violet_ratio": 0.2481,
+    "warm_ratio": 0.0022,
+    "crop_path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/impl_city_driving-capsule-crop.png"
+  },
+  "anchor_normal_day": {
+    "image_size": [
+      1536,
+      1024
+    ],
+    "mean_luma": 231.64,
+    "path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/anchor_normal_day.png"
+  },
+  "anchor_driving_day": {
+    "image_size": [
+      1536,
+      1024
+    ],
+    "mean_luma": 220.27,
+    "path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/anchor_driving_day.png"
+  },
+  "anchor_rain_night_driving": {
+    "image_size": [
+      1536,
+      1024
+    ],
+    "mean_luma": 148.38,
+    "path": "docs/research/2026-06-25-a2-execution/zone-compare-phase6-capsule/anchor_rain_night_driving.png"
+  },
+  "rmse": {
+    "impl_idle_vs_anchor_insitu_crop": 46.62,
+    "impl_idle_vs_impl_rainy": 66.6,
+    "impl_idle_vs_impl_driving": 16.18,
+    "impl_rainy_vs_anchor_rain_night_driving": 87.68,
+    "impl_drive_vs_anchor_driving_day": 54.74
+  }
+}

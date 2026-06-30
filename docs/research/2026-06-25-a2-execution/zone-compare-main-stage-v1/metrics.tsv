@@ -1,0 +1,9 @@
+case	anchor	context	orb	dialogue	controls
+ivory-coldStart	anchor-01-idle-baseline.png	0.231576	0.0992344	0.122078	0.188746
+ivory-cooling	anchor-00-diorama-5-fullscreen-insitu.png	0.220429	0.0901216	0.120486	0.201252
+ivory-heating	anchor-02-heat-red-hero.png	0.229041	0.137889	0.13571	0.195447
+ivory-safetyRefusal	anchor-05-r2-refuse.png	0.212961	0.161925	0.173978	0.186573
+deepSpace-coldStart	anchor-07-night-deepspace.png	0.327848	0.219112	0.194643	0.20317
+deepSpace-cooling	anchor-07-night-deepspace.png	0.327778	0.247473	0.203004	0.212632
+deepSpace-heating	anchor-02-heat-red-hero.png	0.637807	0.751627	0.82092	0.771577
+deepSpace-safetyRefusal	anchor-05-r2-refuse.png	0.651659	0.744245	0.786476	0.786106

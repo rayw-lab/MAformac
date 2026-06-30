@@ -20,6 +20,7 @@ owner: UIUE 链路A（worktree uiue/visual-ssot-state-consume）
 | **`tokens.md`** | 色/字/间/动效**值**（锁 scheme1 一手 + U11/U2 拍板 + 7 态色映射） | 取任何色值/字号/间距/动效参数前 |
 | **`hig-liquid-glass-rules.md`** | HIG **约束规则**（Liquid Glass functional-layer-only / iOS18 #available 守卫 / shader 氛围层 / 动效坑 / 5 Gate） | 写任何 SwiftUI view 前 |
 | **`visual-anchors/`** | 2-3 张视觉锚点 PNG + 「学什么/不学什么」注 | 判断「长得对不对」时对照 |
+| **`uiue-skill-playbook.md`** | 「什么 Phase/任务用什么 skill + 抄什么 ref-repos 代码 + 避什么坑」三列索引（Tools/skills teardown + lens5 adopt 清单 + pre-mortem 坑映射） | **实装任何 UIUE 任务前**，定位该调哪个 skill / 抄哪段代码 |
 
 ## 一手溯源
 - 色值真源：`prototypes/scheme1-deep-space-interactive.html:8-83`（深空辉光交互概念稿）

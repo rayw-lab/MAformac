@@ -16,7 +16,7 @@
       "key": "ambient.brightness[面发光氛围灯]",
       "revision": 1,
       "source": "mock",
-      "visualState": "normal"
+      "visualState": "changing"
     }
   ],
   "eventID": "turn-d22-ambient-brightness-1:runtime-presentation",
