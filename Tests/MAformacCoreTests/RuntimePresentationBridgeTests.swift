@@ -145,7 +145,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
 
         XCTAssertTrue(snapshot.isTerminal)
         XCTAssertEqual(snapshot.traceID, "trace-partial")
-        XCTAssertEqual(snapshot.runtimeOutcome.result, .refusalSafetyOrPolicy)
+        XCTAssertEqual(snapshot.runtimeOutcome.result, .partialAcceptPartialRefuse)
         XCTAssertEqual(snapshot.runtimeOutcome.reason, "partial_accept_refuse")
         XCTAssertEqual(snapshot.readbacks, [acceptedReadback])
         XCTAssertEqual(snapshot.cards.map(\.visualState), [.satisfied, .unsafe])
@@ -332,7 +332,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         )
         let snapshot = PresentationSnapshot(
             traceID: "trace-card-semantics",
-            runtimeOutcome: DemoRuntimeOutcome(result: .refusalSafetyOrPolicy, reason: "partial_accept_refuse"),
+            runtimeOutcome: DemoRuntimeOutcome(result: .partialAcceptPartialRefuse, reason: "partial_accept_refuse"),
             cards: PresentationCardOrdering.orderedForPresentation([satisfied, refused]),
             cardSemantics: [
                 PresentationCardSemantics(

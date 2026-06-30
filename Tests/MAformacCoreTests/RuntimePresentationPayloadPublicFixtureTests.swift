@@ -53,6 +53,32 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         }
     }
 
+    func testBridgeContractFixtureResultsArePublicRuntimeResults() throws {
+        let manifest = try Self.loadManifest()
+        let publicRuntimeResults = Set(DemoRuntimeResult.allCases.map(\.rawValue))
+
+        for fixture in manifest.fixtures where fixture.fixtureClass == "bridge_contract_fixture" {
+            XCTAssertTrue(publicRuntimeResults.contains(fixture.result), fixture.name)
+            XCTAssertEqual(fixture.result, try Self.fixtureResult(Self.fixturesDirectory.appendingPathComponent(fixture.name)), fixture.name)
+        }
+    }
+
+    func testPublicFixturesDecodeThroughMainPublicVocabularyTypes() throws {
+        let manifest = try Self.loadManifest()
+        let decoder = JSONDecoder()
+
+        for fixture in manifest.fixtures {
+            let data = try Data(contentsOf: Self.fixturesDirectory.appendingPathComponent(fixture.name))
+            let envelope = try decoder.decode(PublicFixtureTypedEnvelope.self, from: data)
+
+            XCTAssertEqual(envelope.schemaVersion, .v1, fixture.name)
+            XCTAssertEqual(envelope.outcome.result.rawValue, fixture.result, fixture.name)
+            XCTAssertEqual(envelope.proofClass.rawValue, fixture.proofClass, fixture.name)
+            XCTAssertFalse(envelope.cards.isEmpty, fixture.name)
+            XCTAssertEqual(envelope.traceEnvelope?.traceID, envelope.traceID, fixture.name)
+        }
+    }
+
     func testPublicFixturesContainOnlyPublicTopLevelFieldsAndNoPrivateOrDurableMarkers() throws {
         for fixtureName in Self.expectedFixtureNames {
             let fixtureURL = Self.fixturesDirectory.appendingPathComponent(fixtureName)
@@ -389,6 +415,27 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         var consumerPath: String
         var proofClass: String
         var notes: [String]
+    }
+
+    private struct PublicFixtureTypedEnvelope: Decodable {
+        var schemaVersion: RuntimePresentationPayloadSchema
+        var traceID: String
+        var outcome: DemoRuntimeOutcome
+        var proofClass: PresentationProofClass
+        var cards: [PublicFixtureTypedCard]
+        var readbacks: [DemoActionReadback]
+        var reconciliation: PresentationReconciliation
+        var traceEnvelope: TraceEnvelope?
+    }
+
+    private struct PublicFixtureTypedCard: Decodable {
+        var key: String
+        var actualValue: String
+        var desiredValue: String?
+        var availability: DemoVehicleAvailability
+        var source: DemoVehicleValueSource
+        var revision: Int
+        var visualState: DemoVisualState
     }
 
     private struct ManifestExpectation {

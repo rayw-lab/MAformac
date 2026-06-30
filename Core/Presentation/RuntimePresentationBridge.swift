@@ -50,6 +50,7 @@ public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Sendabl
     case refusalNoAvailableTool = "refusal_no_available_tool"
     case refusalSafetyOrPolicy = "refusal_safety_or_policy"
     case alreadyStateNoop = "already_state_noop"
+    case partialAcceptPartialRefuse = "partial_accept_partial_refuse"
     case runtimeError = "runtime_error"
     case cancelled
     case interrupted
@@ -634,7 +635,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         terminalSnapshot(
             traceID: traceID,
             outcome: DemoRuntimeOutcome(
-                result: .refusalSafetyOrPolicy,
+                result: .partialAcceptPartialRefuse,
                 reason: normalizedReason(reason, fallback: "partial_accept_refuse")
             ),
             cards: acceptedCards + refusedCards,

@@ -1,6 +1,6 @@
 # R5 D22 Runtime Payload Corpus Expansion Main Receipt
 
-Status: Gate1-Gate4 local closure passed; Hermes gate audits 1-4 passed with P0/P1 empty.
+Status: Gate1-Gate4 local closure passed; Hermes gate audits 1-4 passed with P0/P1 empty. First GPT Pro PR-pair audits returned `REQUEST_CHANGES`; owned fixes are applied post-audit and a user-requested post-fix GPT Pro rerun is pending after push.
 
 ## Scope
 
@@ -12,6 +12,8 @@ Status: Gate1-Gate4 local closure passed; Hermes gate audits 1-4 passed with P0/
 
 ## Changed Main Paths
 
+- `Core/Presentation/RuntimePresentationBridge.swift`
+- `Tests/MAformacCoreTests/RuntimePresentationBridgeTests.swift`
 - `Tests/MAformacCoreTests/RuntimePresentationPayloadPublicFixtureTests.swift`
 - `Tests/Fixtures/RuntimePresentationPayload/manifest.json`
 - `Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v1.json`
@@ -33,6 +35,9 @@ Status: Gate1-Gate4 local closure passed; Hermes gate audits 1-4 passed with P0/
 - Gate4: docs were cascaded into main receipt/OpenSpec tasks and UIUE receipt/OpenSpec route map under exact staging/no-touch plan.
 - Gate4 audit: `HERMES_R5_D22_GATE_4_DOC_CASCADE_PR_RECONCILE_VERDICT: PASS`; P0/P1/P2 empty. This covers doc cascade, dirty split, exact-path staging plan, PR #7/#6 update plan, and proof wording before the post-gate commit/push path.
 - Claude Code final audit: skipped by direct user override after Gate4 (`不需要安排claudecode审计了`). D22 closeout must not claim the original six-node audit budget was executed.
+- First GPT Pro PR-pair audits: `/Users/wanglei/Downloads/pr_audit_7(5).md` and `/Users/wanglei/Downloads/pr_audit_7(6).md` both returned `GPTPRO_R5_D22_PR_PAIR_AUDIT_VERDICT: REQUEST_CHANGES`.
+- GPT Pro P1 fixed post-audit: main now includes `DemoRuntimeResult.partialAcceptPartialRefuse = "partial_accept_partial_refuse"`, `RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse` emits that result, bridge tests assert it, and `RuntimePresentationPayloadPublicFixtureTests` decodes all 9 public fixtures through main public vocabulary types so manifest `result` values cannot drift away from typed result enums.
+- GPT Pro P2/P1-process handling: PR #6 large historical/reviewability surface will be handled by PR-body whitelist rather than splitting, because D22 operator constraints require updating existing PR #6/#7 only with no new PR and no merge. Runtime-generated proof wording remains limited to accepted/noop local generator fixtures; non-happy fixtures remain `bridge_contract_fixture`.
 
 ## Fixture Corpus
 
@@ -50,8 +55,9 @@ Status: Gate1-Gate4 local closure passed; Hermes gate audits 1-4 passed with P0/
 
 ## Validation Snapshot
 
-- `swift test --filter RuntimePresentationPayloadPublicFixtureTests`: PASS, 5 tests.
-- `swift test --filter 'DemoRuntimeSessionRunnerTests|DemoRuntimeAdapterTests|C3ExecutionPipelineTests|RuntimePresentationBridgeTests|VehicleStateStoreContractTests|RuntimePresentationPayloadPublicFixtureTests'`: PASS, 77 tests.
+- `swift test --filter RuntimePresentationPayloadPublicFixtureTests`: PASS, 7 tests after post-GPT-Pro vocabulary regression.
+- `swift test --filter 'DemoRuntimeSessionRunnerTests|DemoRuntimeAdapterTests|C3ExecutionPipelineTests|RuntimePresentationBridgeTests|VehicleStateStoreContractTests|RuntimePresentationPayloadPublicFixtureTests'`: PASS, 79 tests.
+- Post-GPT-Pro P1 regression: `swift test --filter 'RuntimePresentationBridgeTests|RuntimePresentationPayloadPublicFixtureTests'`: PASS, 25 tests.
 - `xcodebuild -scheme MAformacMac -destination 'platform=macOS' build`: PASS.
 - `openspec validate define-runtime-adapter-execution --strict`: PASS.
 - `openspec validate define-runtime-presentation-bridge --strict`: PASS.
@@ -80,7 +86,7 @@ D22 does not rewrite or globally close the UIUE 215-row runtime-presentation gri
 
 ## Dirty Split
 
-- `owned_by_D22`: changed test, fixture, OpenSpec task, and D22 receipt paths listed above.
+- `owned_by_D22`: changed runtime bridge, test, fixture, OpenSpec task, and D22 receipt paths listed above.
 - `preserve_unowned_dirty`: `AGENTS.md`, `CLAUDE.md`, `docs/CURRENT.md`, `docs/README.md`, `.xcodebuildmcp/`, and `Tools/agent-platform-plugin-refs/`.
 - `source_dispatch_trace_artifact`: D20/D21 and D22 dispatch files under `docs/dispatches/`; not staged unless separately authorized.
 - `generated_or_report_only`: none staged by D22.
