@@ -95,3 +95,11 @@
 - [x] 11.6 Preserve proof caps and fixture-class truth: `runtime_generated_fixture` is local/unit generator evidence, and `bridge_contract_fixture` is contract-boundary fixture evidence only.
 - [x] 11.7 Fix first GPT Pro PR-pair P1 post-audit by adding public result `partial_accept_partial_refuse`, making the partial accept/refuse adapter emit it, and adding main public-vocabulary decoding coverage for all 9 fixtures.
 - [x] 11.8 Record first GPT Pro audits as `REQUEST_CHANGES` fixed post-audit; user requested a post-fix GPT Pro rerun after push, without changing the first audit result into PASS.
+
+## 12. R5 D23 Shared Public Fixture Schema Checker
+
+- [x] 12.1 Add a main-owned public fixture schema artifact at `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json`.
+- [x] 12.2 Bind the fixture manifest to the schema artifact with sha256, owner path, UIUE consumer path, and update rule.
+- [x] 12.3 Prove the schema covers manifest schema version, payload schema version, exact fixture count/names, allowed fixture classes, allowed proof classes, corpus result vocabulary, public top-level fields, forbidden top-level/card timestamp fields, private/durable/raw marker denial, proof cap, and non-claims.
+- [x] 12.4 Keep result vocabulary main-owned by proving every schema `allowedResults` entry is expressible by `DemoRuntimeResult` without widening the corpus contract to every runtime enum case.
+- [x] 12.5 Record D23 review policy truth: no Gate Hermes/Claude Code audit by user override; post-gate review is Codex subagent xhigh, then GPT Pro after fixes/push, without turning advisory review into proof class or readiness.

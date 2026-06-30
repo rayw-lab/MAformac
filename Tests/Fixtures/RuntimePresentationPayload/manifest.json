@@ -1,5 +1,15 @@
 {
   "schemaVersion": "r5_runtime_presentation_payload_fixture_manifest_v1",
+  "sharedSchema": {
+    "name": "public_fixture_schema.v1.json",
+    "schemaVersion": "r5_runtime_presentation_public_fixture_schema_v1",
+    "ownerRepo": "MAformac",
+    "ownerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json",
+    "sha256": "0833e599921bb680c8a6a80a51aecf4fb6e08241b1392661e2466ae5f345849b",
+    "consumerRepo": "MAformac-uiue",
+    "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json",
+    "updateRule": "UIUE must copy this main-owned schema artifact unchanged or fail parity review."
+  },
   "fixtures": [
     {
       "name": "ac_power_public_payload.v1.json",
