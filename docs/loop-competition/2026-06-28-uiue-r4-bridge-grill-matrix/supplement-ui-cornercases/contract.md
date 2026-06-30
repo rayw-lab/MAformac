@@ -113,4 +113,3 @@ Before closeout, verify:
 - `final-supplement-matrix.md` contains exactly 20 supplemental rows unless a candidate is explicitly dropped with rationale.
 - `final-grill-matrix-v2.md` contains the original 30 rows plus the final supplemental rows.
 - No final artifact claims V-PASS, mobile, true-device, runtime-ready, voice-ready, model-ready, golden-ready, endpoint-ready, or `8.C2` closure.
-

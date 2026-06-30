@@ -58,4 +58,3 @@
 Before R4 exit, burn down every P0 with file-backed evidence. P1 items may carry notes into R5 only if the R4 closeout explicitly names owner, route, and proof-class cap.
 
 Do not close `8.C2`, claim V-PASS, claim mobile/true-device proof, or declare runtime/voice/model/golden/endpoint readiness from this checklist.
-

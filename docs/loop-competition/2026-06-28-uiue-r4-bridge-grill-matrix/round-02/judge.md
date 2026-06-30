@@ -72,4 +72,3 @@ Hard agreement:
 `PASS_WITH_REWRITE_NOTES`.
 
 The final matrix should carry all six reviewer scores and use P0/P1 priority to decide burndown order, not remove lower-scored topics.
-

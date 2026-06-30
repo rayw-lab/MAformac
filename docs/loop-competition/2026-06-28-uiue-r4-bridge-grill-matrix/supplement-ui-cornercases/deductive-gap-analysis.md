@@ -35,4 +35,3 @@
 ## Deductive Verdict
 
 There are real R4 supplemental gaps. They are not all new implementation tasks, but they are required grill questions because R4 is the transition where UIUE presentation details either become explicit consumer policy or accidentally become hidden runtime contract.
-

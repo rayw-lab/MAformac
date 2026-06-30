@@ -88,4 +88,3 @@ Potential grouping in the final burndown, without reducing the final matrix coun
 `PASS_WITH_REWRITE_NOTES`.
 
 The blind set is strong enough to advance to Round 02. The controller should keep all 30 topics, tighten wording, and preserve the proof-class and R4/R5 boundary discipline.
-

@@ -162,4 +162,3 @@ Minimum acceptable response:
 - Any accepted bridge field names are listed in one summary block.
 - Any code-facing change proposal names the exact file or module it would touch.
 - Any unresolved runtime risk is copied to the next UIUE closeout checklist.
-

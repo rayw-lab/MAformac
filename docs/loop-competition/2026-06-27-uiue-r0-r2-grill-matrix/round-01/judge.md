@@ -62,4 +62,3 @@ proof_boundary：local / unit / simulator；不声明 L3 / V-PASS / mobile / tru
 ## Round 01 Verdict
 
 保留全部 70 项进入 Round 02。Round 01 没有建议删除项；低分项主要是“需要并入 canonical group 或改写成更可执行的门”，不是无价值。
-

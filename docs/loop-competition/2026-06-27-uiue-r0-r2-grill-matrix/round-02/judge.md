@@ -46,4 +46,3 @@ proof_boundary：local / unit / simulator；不声明 L3 / V-PASS / mobile / tru
 ## Round 02 Verdict
 
 保留全部 70 项进入最终矩阵。最终矩阵应将低分项标为 `P2 / merge-only / rewrite`，而不是删除；因为它们仍覆盖真实失败路径或 governance 缺口。
-

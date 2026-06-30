@@ -167,4 +167,3 @@ git add \
 ```
 
 Current heavy dirty tree does not block docs/local R4 burndown ledger creation, but it blocks direct implementation, broad formatting, or commit/closeout without a fresh ownership review.
-

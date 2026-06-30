@@ -67,4 +67,3 @@
 - Added C31-C50 after deductive review of UIUE stage corner cases.
 - C50 is the governor for the supplement: every new UI detail must be classified as bridge schema, visual policy, or evidence checklist before R4 burndown.
 - This v2 does not close `8.C2` and does not claim runtime, voice, model, mobile, true-device, golden, endpoint, or V-PASS readiness.
-
