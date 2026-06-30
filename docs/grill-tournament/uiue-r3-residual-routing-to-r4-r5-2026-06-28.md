@@ -34,4 +34,3 @@ Primary sources:
 - `no` in `Block R4 human review?` means 磊哥 can review the R4 route/classification now; it does not mean the residual is implemented.
 - `depends` in `Block R4 exit?` means R4 must explicitly choose route/owner/non-claim before exit, but may defer code proof to R5/later if accepted with notes.
 - Any attempt to convert simulator/mock evidence into runtime/mobile/true-device proof must fail closed.
-

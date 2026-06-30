@@ -98,4 +98,3 @@ Verdict scope: R4 human review has passed this pre-grill routing package, but th
 - Bridge design states `missing` is a bridge-proposed future addition, not a current Core value.
 - R4 decision options remain open: extend Core enum; create presentation-only enum; delete bridge `missing` and use existing origin plus explicit fail reason; or defer to R5 with non-claim and fail-closed rule.
 - Current R4 state: **not locked**. C06 is `blocked_by_mainline_coauthor` until mainline co-author decides the enum/adapter route.
-

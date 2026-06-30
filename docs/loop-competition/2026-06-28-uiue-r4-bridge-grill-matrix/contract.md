@@ -162,4 +162,3 @@ Before closeout, the controller must mechanically verify:
 - Each reviewer file contains `C01` through `C30`.
 - Final matrix contains exactly 30 final candidate rows.
 - No final file claims V-PASS, mobile pass, true-device pass, runtime-ready, voice-ready, model-ready, golden-ready, endpoint-ready, or `8.C2` closure.
-

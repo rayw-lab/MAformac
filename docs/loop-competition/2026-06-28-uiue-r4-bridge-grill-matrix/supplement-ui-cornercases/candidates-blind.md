@@ -30,4 +30,3 @@ These are supplemental grill questions only. They do not encode final priority, 
 | C48 | R4 | Mac panorama 与 iPhone portrait 的 zone topology 是否需要分别验收：同一 PresentationSnapshot 在 Mac 左右分栏和 iPhone 竖屏多区布局下不产生 proof-class 互相替代？ |
 | C49 | R4 | R4 evidence 是否需要视频/时间点/多帧截图来证明动效时序、长按 progress、crossfade、stale clearing，而不是只靠静态 screenshot 或 UI tree frame？ |
 | C50 | R4 | 哪些 UI 细节应进入 bridge schema、哪些应进入 visual policy、哪些只进入 evidence checklist 是否需要一张分类表，防止四区动效/车辆样式/演绎入口把 R4 bridge 合同膨胀成 UI 实现总表？ |
-

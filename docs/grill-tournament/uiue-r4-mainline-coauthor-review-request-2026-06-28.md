@@ -80,4 +80,3 @@ Current decision: **pending / blocked_by_mainline_coauthor**. Without a mainline
 - Mainline accepted: `no evidence found`.
 - Current status: `pending_mainline_coauthor_receipt`.
 - Ledger implication: related P0 rows are `blocked_by_mainline_coauthor`, not accepted.
-

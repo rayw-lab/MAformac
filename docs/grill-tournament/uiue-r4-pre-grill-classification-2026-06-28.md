@@ -96,4 +96,3 @@ C50 is the governance gate: no UI detail may be inserted into bridge schema unti
 - `mainline co-author`: C01, C03, C06, C18, C22, C30
 - `R5 deferred`: C14, C17, C19
 - `user decision`: C34
-

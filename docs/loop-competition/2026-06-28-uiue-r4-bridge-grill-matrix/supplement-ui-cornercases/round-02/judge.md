@@ -62,4 +62,3 @@ The final synthesis should split each item into one of three buckets:
 `PASS_WITH_BOUNDARY_REWRITE`.
 
 The supplemental candidates should be accepted into a v2 matrix, with `C50` acting as the classification gate and with lower standalone value items marked `merge` rather than deleted.
-

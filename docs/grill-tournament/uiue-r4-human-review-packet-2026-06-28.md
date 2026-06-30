@@ -149,4 +149,3 @@ Follow-up artifacts:
 - If human review passes: create the R4 pending burndown list from accepted P0/P1 routes, keeping C50 as the gate.
 - If human review is partial: mark blockers by Cxx ID and route them back to `bridge schema`, `visual policy`, `evidence checklist`, `mainline co-author`, `R5 deferred`, or `user decision` owner.
 - Do not close additional OpenSpec tasks or declare any runtime/mobile/readiness milestone from this packet alone.
-

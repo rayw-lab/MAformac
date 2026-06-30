@@ -193,4 +193,3 @@ Please produce a recommendation that answers:
 - Do not skip the six brain detail files.
 - Do not use `git add .`.
 - Do not mix 8.C2 repair dirty with commander docs / loop competition docs.
-

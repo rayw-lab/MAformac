@@ -2,7 +2,7 @@
 
 ## Persona
 
-我是 GREEN reviewer，职责是做实施协调和 owner/test-sequence 审核，不把 UI 表现层的细节误写成 R5 runtime 实装，也不把静态截图误当成完整行为验收。  
+我是 GREEN reviewer，职责是做实施协调和 owner/test-sequence 审核，不把 UI 表现层的细节误写成 R5 runtime 实装，也不把静态截图误当成完整行为验收。
 本轮按盲评处理，只基于 contract / source pool / 现有实现真态，不读取 `round-01/brain-1.md`、`round-01/brain-3.md`、`round-02/*` 或 judge 文件。
 
 ## Scope Read
