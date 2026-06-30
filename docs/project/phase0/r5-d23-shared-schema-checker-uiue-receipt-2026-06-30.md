@@ -33,6 +33,12 @@ Status: Gate2 UIUE local closure passed under proof cap. Gate-level Hermes/Claud
 - `diff -qr /Users/wanglei/workspace/MAformac/Tests/Fixtures/RuntimePresentationPayload /Users/wanglei/workspace/MAformac-uiue/Tests/Fixtures/RuntimePresentationPayload`: PASS, no output.
 - GitNexus impact before edits: `RuntimePresentationPayloadFixtureConsumerTests` reported CRITICAL by import granularity, 0 affected processes; edits stayed in test/fixture/schema surfaces.
 
+## Post-Gate Reviews
+
+- Codex subagent xhigh post-gate audit: PASS; P0/P1/P2 none. Proof class remains local/unit/static plus GitHub API remote-truth; not readiness proof.
+- GPT Pro PR-pair audit: `GPTPRO_R5_D23_SHARED_SCHEMA_CHECKER_PR_PAIR_AUDIT_VERDICT: PASS_WITH_NOTES`; report `/Users/wanglei/workspace/data/gptpro-downloads/20260630-132650/message.md`; audited PR #7 head `09525cf89ad9cf04e1dba2e1fa214273f07346fa` and PR #6 head `609f3258aa172a0522ddfa5da9041df4bd18ef3b`.
+- GPT Pro P0/P1/P2: none in D23 owned scope. Residual non-blocking notes: UIUE sibling-main parity test is conditional outside side-by-side checkouts, and PR #6 remains broad because it is a long-lived branch constrained to existing PR #6/no split/no merge.
+
 ## Dirty Split
 
 - `owned_by_D23`: changed paths listed above.
@@ -45,3 +51,4 @@ Status: Gate2 UIUE local closure passed under proof cap. Gate-level Hermes/Claud
 - Cross-repo parity needs a named schema artifact and an executable parity check. A manifest alone can preserve fixture hashes while still letting checker rules diverge.
 - UIUE may be stricter than main for local guard names, but the main-owned public schema remains the shared authority; UIUE stricter guard names are subset/superset checks, not shared-field inventions.
 - Conditional sibling-repo parity is useful locally and should be paired with explicit `diff -qr` validation in receipts, because CI may not checkout both repos side by side.
+- If this shared schema lane becomes a release/merge gate, the parity check should fetch/check both PR heads or consume a pinned main schema digest in CI instead of relying on optional sibling checkout state.
