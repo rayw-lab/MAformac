@@ -1,0 +1,70 @@
+{
+  "cardSemantics": [
+    {
+      "cellKey": "ac.power",
+      "isActive": true,
+      "reason": "user_requested",
+      "role": "accepted",
+      "scopeOrigin": "explicit",
+      "siblingKeys": [
+        "door.lock"
+      ]
+    },
+    {
+      "cellKey": "door.lock",
+      "isActive": false,
+      "reason": "safety_policy_refusal",
+      "role": "refused",
+      "scopeOrigin": "explicit",
+      "siblingKeys": [
+        "ac.power"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "actualValue": "on",
+      "availability": "available",
+      "key": "ac.power",
+      "revision": 2,
+      "source": "mock",
+      "visualState": "satisfied"
+    },
+    {
+      "actualValue": "locked",
+      "availability": "available",
+      "key": "door.lock",
+      "revision": 3,
+      "source": "mock",
+      "visualState": "unsafe"
+    }
+  ],
+  "eventID": "event-partial-accept-refuse-1",
+  "isTerminal": true,
+  "outcome": {
+    "reason": "partial_accept_refuse",
+    "result": "partial_accept_partial_refuse"
+  },
+  "proofClass": "local_unit",
+  "readbacks": [
+    {
+      "actualValue": "on",
+      "key": "ac.power",
+      "revision": 2,
+      "scopeOrigin": "explicit",
+      "spokenText": "ac opened"
+    }
+  ],
+  "reconciliation": {
+    "readbackKey": "ac.power",
+    "safeReason": "partial_readback_verified",
+    "status": "verified"
+  },
+  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "traceEnvelope": {
+    "entries": [],
+    "traceID": "trace-partial-accept-refuse-1"
+  },
+  "traceID": "trace-partial-accept-refuse-1",
+  "turnID": "turn-partial-accept-refuse-1"
+}

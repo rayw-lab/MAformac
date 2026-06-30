@@ -50,4 +50,50 @@ final class VehicleStateStoreContractTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
         XCTAssertEqual(store.cell(for: "ac.power")?.visualState, .satisfied)
     }
+
+    @MainActor
+    func testAlreadyStateMockTransitionReturnsReadbackWithoutBumpingRevision() throws {
+        let timestamp = Date(timeIntervalSince1970: 1_700_000_000)
+        let store = DemoVehicleStateStore(cells: [
+            DemoVehicleStateCell(
+                key: "ac.power",
+                actualValue: "on",
+                desiredValue: "on",
+                timestamp: timestamp,
+                revision: 7,
+                visualState: .satisfied
+            )
+        ])
+
+        let readback = store.applyMockTransition(DemoMockTransition(key: "ac.power", desiredValue: "on"))
+        let cell = try XCTUnwrap(store.cell(for: "ac.power"))
+
+        XCTAssertEqual(readback.actualValue, "on")
+        XCTAssertEqual(readback.revision, 7)
+        XCTAssertEqual(cell.revision, 7)
+        XCTAssertEqual(cell.timestamp, timestamp)
+        XCTAssertEqual(cell.visualState, .satisfied)
+    }
+
+    @MainActor
+    func testDemoActionExecutorOwnsMockStoreWritePath() throws {
+        let store = DemoVehicleStateStore()
+        let executor = DemoActionExecutor()
+        let frame = ToolCallFrame(
+            agentID: "vehicle-control",
+            capabilityID: "cabin.ac_power",
+            toolName: "set_vehicle_control",
+            arguments: [
+                "state_key": "ac.power",
+                "target_state": "on",
+            ]
+        )
+
+        let readback = try executor.applyMockTransition(frame, store: store)
+
+        XCTAssertEqual(readback.key, "ac.power")
+        XCTAssertEqual(readback.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.power")?.revision, readback.revision)
+    }
 }

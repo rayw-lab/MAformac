@@ -13,10 +13,18 @@
 | 文档 | 是什么 |
 |---|---|
 | `docs/CURRENT.md` | **当前路由牌(router only,not SSOT)**:新窗口先看当前阶段/下一步/禁止动作/活跃 blockers;若与 CLAUDE/OpenSpec/grill 冲突则作废并更新 |
+| `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` | **Post Long-run 2 parent roadmap**:bridge contract first, model/C6 next, full backend/UIUE connection later under child plans; implementation_plan_not_ssot |
+| `openspec/changes/define-runtime-presentation-bridge/` | **Runtime -> Presentation bridge carrier**: contract-only mainline mapping authority for UIUE provenance, runtime result vocabulary, presentation snapshot, `ScopeOrigin` disposition, and proof-class display caps; not runtime implementation |
+| `docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md` | **D24 UIUE absorption manifest**: main-traceable inventory for local dirty split, PR #7/#6 file surfaces, UIUE source dispositions, route-control merge gates, and no-claim boundaries before PR merge |
+| `docs/project/phase0/mainline-runtime-presentation-bridge-unblock-2026-06-28.md` | **Phase 0 bridge owner-gate unblock receipt**: records HR-01/02/03 acceptance, C01/C03/C06/C18 dispatch-readiness disposition, dirty ownership, validation, and non-claims |
+| `docs/project/phase0/post-c6-roadmap-gptpro-architecture-audit-request-2026-06-25.md` | **GPT Pro architecture audit request**: asks external review to challenge the post-C6 roadmap for downgrade risk and over-engineering risk |
+| `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md` | **Post-C6 architecture audit absorption ledger**: absorbed route/plan and C6 bench/source-free P1/P2 fixes; local proof only, not C6 acceptance/model-quality |
+| `docs/project/phase0/rebuild-c6-identity-shape-closeout-2026-06-25.md` + `docs/project/phase0/rebuild-c6-identity-shape-gptpro-absorption-ledger-2026-06-25.md` | **Long-run 2 closeout evidence**: `external-pass-with-absorbed-fixes` for rebuild-C6 identity + behavior-shape construction only; not C6 acceptance/model-quality/retrain/golden/voice/UIUE/V-PASS |
 | ⭐`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` | **范式 + surface 权威 SSOT**(§1-§17:generic frame 否决→D-domain 具名工具/canonical IR 仍 device×action/三层模型/demo 取巧特性/口径终拍 562/21 主议题全收口/A2 盘点) — **范式翻案权威** |
 | `docs/grill-tournament/final-grill-list.md` + `docs/grill-tournament/cascade-inventory.md` | **决策统一**(41 题运行清单 + 文档级联 inventory) |
 | `docs/roadmap-2026-06-20-from-c6-done.md` | **historical / provenance source**(五件套 harness 骨架 OpenSpec/Pocock/Superpowers/Pi/Mastra + P0-P2 执行序 + 7 HIGH 已拍 + 一手 file:line + 依赖图;surface 已被范式翻案演进) — 只作溯源,不作当前路线事实源 |
 | `CLAUDE.md` (§9) | 项目宪法 + 新基线指针 + 下一步 P1 |
+| `Tools/agent-platform-plugin-refs/README.md` + `.xcodebuildmcp/README.md` | **Codex iOS/macOS build 入口**:插件引用 + 本 worktree 默认 `build-ios-apps` profile。main 固定 `MAformacIOS` + `iPhone 17 Pro`;新窗口先看这里再跑 `session_show_defaults` / `build_run_sim()` |
 | `docs/project/phase0/` | **Phase 0 route-control manifests**(authority/stage/decision/status/gate materialization; not runtime contracts; filled docs must carry status/retire metadata) |
 | `docs/superpowers/plans/` | **implementation plans only**(Superpowers 执行计划; not SSOT; must carry authority/retire metadata) |
 | `docs/srd-three-layer-intent-routing.md` | **架构事实源**(三层意图路由/意图收缩/落域/LoRA 慢路 + §12 实装锚点) |

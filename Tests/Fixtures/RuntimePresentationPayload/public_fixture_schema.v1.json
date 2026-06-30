@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "r5_runtime_presentation_public_fixture_schema_v1",
+  "ownerRepo": "MAformac",
+  "ownerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json",
+  "manifestSchemaVersion": "r5_runtime_presentation_payload_fixture_manifest_v1",
+  "payloadSchemaVersion": "r5_runtime_presentation_payload_v1",
+  "fixtureCount": 9,
+  "fixtureNames": [
+    "ac_power_public_payload.v1.json",
+    "refusal_safety_public_payload.v1.json",
+    "runtime_error_public_payload.v1.json",
+    "reconciliation_mismatch_public_payload.v1.json",
+    "partial_accept_refuse_public_payload.v1.json",
+    "window_position_runtime_public_payload.v1.json",
+    "screen_brightness_runtime_public_payload.v1.json",
+    "ambient_brightness_runtime_public_payload.v1.json",
+    "window_position_noop_runtime_public_payload.v1.json"
+  ],
+  "allowedFixtureClasses": [
+    "bridge_contract_fixture",
+    "runtime_generated_fixture"
+  ],
+  "allowedProofClasses": [
+    "local_unit"
+  ],
+  "allowedResults": [
+    "accepted_tool_call",
+    "refusal_safety_or_policy",
+    "runtime_error",
+    "partial_accept_partial_refuse"
+  ],
+  "requiredManifestFields": [
+    "name",
+    "schemaVersion",
+    "caseID",
+    "fixtureClass",
+    "result",
+    "familyCoverage",
+    "sha256",
+    "producerRepo",
+    "producerPath",
+    "consumerRepo",
+    "consumerPath",
+    "proofClass",
+    "notes"
+  ],
+  "publicTopLevelFields": [
+    "schemaVersion",
+    "traceID",
+    "turnID",
+    "eventID",
+    "isTerminal",
+    "outcome",
+    "proofClass",
+    "cards",
+    "cardSemantics",
+    "readbacks",
+    "reconciliation",
+    "traceEnvelope"
+  ],
+  "forbiddenTopLevelFields": [
+    "timestamp"
+  ],
+  "forbiddenCardFields": [
+    "timestamp"
+  ],
+  "traceEntryTimestampPolicy": "allowed_only_inside_traceEnvelope.entries",
+  "privateDurableRawMarkers": [
+    "DemoRuntimeAdapter",
+    "RuntimeAdapterBox",
+    "durableLedger",
+    "persistentLedger",
+    "adapterLedger",
+    "local_durable_adapter_ledger",
+    "requestFingerprint",
+    "parentRequestFingerprint",
+    "failureLedger",
+    "successLedger",
+    "settledParentPlan",
+    "runtimeStore",
+    "rawRuntimeStore",
+    "rawModelOutput",
+    "trainingReceipt",
+    "DemoForceStateContext"
+  ],
+  "proofClassCeiling": "local_unit_static_fixture_contract_only",
+  "nonClaims": [
+    "production_runtime",
+    "runtime_ready",
+    "mobile",
+    "true_device",
+    "live_api",
+    "uiue_merge",
+    "v_pass",
+    "s_pass",
+    "u_pass",
+    "a2_complete",
+    "r5_complete",
+    "voice_ready",
+    "model_ready",
+    "golden_ready",
+    "endpoint_ready"
+  ]
+}

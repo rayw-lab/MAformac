@@ -398,16 +398,17 @@ public enum ToolContractStateApplyError: Error, Equatable, Sendable, CustomStrin
 public struct ToolContractStateApplyResult: Equatable, Sendable {
     public var state: [String: String]
     public var scopeOriginEvidence: [String: String]
+    public var appliedWrites: [StateWrite]
 
-    public init(state: [String: String], scopeOriginEvidence: [String: String] = [:]) {
+    public init(
+        state: [String: String],
+        scopeOriginEvidence: [String: String] = [:],
+        appliedWrites: [StateWrite] = []
+    ) {
         self.state = state
         self.scopeOriginEvidence = scopeOriginEvidence
+        self.appliedWrites = appliedWrites
     }
-}
-
-private struct ToolContractStateWriteEvidence {
-    var stateKey: String
-    var scopeOrigin: ScopeOrigin?
 }
 
 public enum ToolContractStateApplier {
@@ -428,6 +429,7 @@ public enum ToolContractStateApplier {
     ) throws -> ToolContractStateApplyResult {
         var state = preState
         var scopeOriginEvidence: [String: String] = [:]
+        var appliedWrites: [StateWrite] = []
         for call in toolCalls {
             let irs = ToolContractNormalizer.normalize(call, irMap: irMap)
             guard !irs.isEmpty else {
@@ -435,6 +437,7 @@ public enum ToolContractStateApplier {
             }
             for ir in irs {
                 let writes = try apply(ir, state: &state, stateCells: stateCells)
+                appliedWrites.append(contentsOf: writes)
                 for write in writes {
                     if let scopeOrigin = write.scopeOrigin {
                         scopeOriginEvidence[write.stateKey] = scopeOrigin.rawValue
@@ -442,7 +445,11 @@ public enum ToolContractStateApplier {
                 }
             }
         }
-        return ToolContractStateApplyResult(state: state, scopeOriginEvidence: scopeOriginEvidence)
+        return ToolContractStateApplyResult(
+            state: state,
+            scopeOriginEvidence: scopeOriginEvidence,
+            appliedWrites: appliedWrites
+        )
     }
 
     // device → C2 cell id 单一 SSOT 映射(S2 5 族 + S3 6 族 = 10 族 demo-positive); C3ExecutionPipeline 复用此单源
@@ -487,7 +494,7 @@ public enum ToolContractStateApplier {
         _ ir: ToolContractIR,
         state: inout [String: String],
         stateCells: StateCellContractLookup
-    ) throws -> [ToolContractStateWriteEvidence] {
+    ) throws -> [StateWrite] {
         guard let cellID = deviceCellMap[ir.device] else {
             logUnmapped(ir.device)
             throw ToolContractStateApplyError.unmappedDevice(ir.device)
@@ -500,8 +507,7 @@ public enum ToolContractStateApplier {
             return []
         }
         if cell.type == "enum" {
-            try applyEnumCell(ir, cellID: cellID, cell: cell, state: &state, stateCells: stateCells)
-            return []
+            return try applyEnumCell(ir, cellID: cellID, cell: cell, state: &state, stateCells: stateCells)
         } else {
             return try applyNumericCell(ir, cellID: cellID, cell: cell, state: &state)
         }
@@ -511,13 +517,15 @@ public enum ToolContractStateApplier {
     private static func applyEnumCell(
         _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition,
         state: inout [String: String], stateCells: StateCellContractLookup
-    ) throws {
+    ) throws -> [StateWrite] {
+        let before = state[cellID]
+        let after: String
         if isOff(ir.actionPrimitive, value: ir.value) {
-            state[cellID] = "off"
+            after = "off"
         } else if isOn(ir.actionPrimitive, value: ir.value) {
-            state[cellID] = "on"
+            after = "on"
         } else if let raw = firstNonEmpty(ir.value.direct, ir.value.offset, ir.slots["color"]) {
-            state[cellID] = c2ColorValue(for: raw, stateCells: stateCells)
+            after = c2ColorValue(for: raw, stateCells: stateCells)
         } else {
             throw ToolContractStateApplyError.unsupportedStateMutation(
                 device: ir.device,
@@ -525,12 +533,14 @@ public enum ToolContractStateApplier {
                 cellID: cellID
             )
         }
+        state[cellID] = after
+        return [StateWrite(stateKey: cellID, beforeValue: before, afterValue: after, writeKind: .direct)]
     }
 
     // numeric cell: target 直写 / exp ±expStepLittle clamp executionRange / scope 区位(window 多区位) / depends_on 联动。
     private static func applyNumericCell(
         _ ir: ToolContractIR, cellID: String, cell: StateCellDefinition, state: inout [String: String]
-    ) throws -> [ToolContractStateWriteEvidence] {
+    ) throws -> [StateWrite] {
         let resolutionFrame = ToolCallFrame(
             traceID: "state-applier",
             agentID: "vehicle-control",
@@ -582,13 +592,29 @@ public enum ToolContractStateApplier {
                 cellID: cellID
             )
         }
+        var writes: [StateWrite] = []
         for key in writeKeys {
+            let before = state[key]
             state[key] = value
+            writes.append(StateWrite(
+                stateKey: key,
+                beforeValue: before,
+                afterValue: value,
+                scopeOrigin: resolution.origin,
+                writeKind: .direct
+            ))
         }
         for dependency in cell.dependsOn {                          // 写 cell 激活依赖(ac.temp_setpoint→ac.power=on)
+            let before = state[dependency]
             state[dependency] = "on"
+            writes.append(StateWrite(
+                stateKey: dependency,
+                beforeValue: before,
+                afterValue: "on",
+                writeKind: .dependency
+            ))
         }
-        return writeKeys.map { ToolContractStateWriteEvidence(stateKey: $0, scopeOrigin: resolution.origin) }
+        return writes
     }
 
     private static func clampUpper(_ value: Int, _ range: ExecutionRange?) -> Int {

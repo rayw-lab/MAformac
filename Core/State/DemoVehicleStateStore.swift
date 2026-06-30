@@ -69,7 +69,7 @@ public struct DemoMockTransition: Equatable, Sendable {
     }
 }
 
-public struct DemoActionReadback: Equatable, Sendable {
+public struct DemoActionReadback: Codable, Equatable, Sendable {
     public var key: String
     public var actualValue: String
     public var revision: Int
@@ -128,6 +128,14 @@ public final class DemoVehicleStateStore {
                 actualValue: "missing",
                 revision: currentRevision,
                 spokenText: "状态未定义"
+            )
+        }
+        if cell.actualValue == transition.desiredValue {
+            return DemoActionReadback(
+                key: cell.key,
+                actualValue: cell.actualValue,
+                revision: cell.revision,
+                spokenText: DemoVehicleStateStore.spokenText(for: cell)
             )
         }
         cell.desiredValue = transition.desiredValue

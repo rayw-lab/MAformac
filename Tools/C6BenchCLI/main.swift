@@ -75,6 +75,7 @@ struct C6BenchCLI {
         let validation = generator.validate(cases)
         let qwenHash = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
         let contractDigest = try C6Hash.contractDigest(repoRoot: repoRoot, datasetText: datasetText)
+        let contractBundleFingerprint = try C6ContractBundleFingerprint.receipt(repoRoot: repoRoot, datasetText: datasetText)
         let envelope = try SpikeE3Envelope.load(url: URL(fileURLWithPath: modelResultsPath))
         let modelArtifactDigest = try artifactDigest(path: modelArtifactPath, flag: "--model-artifact")
         let tokenizerDigest = try artifactDigest(path: tokenizerArtifactPath, flag: "--tokenizer-artifact")
@@ -95,6 +96,7 @@ struct C6BenchCLI {
             modelID: envelope.modelID,
             modelArtifactDigest: modelArtifactDigest,
             tokenizerDigest: tokenizerDigest,
+            contractBundleFingerprint: contractBundleFingerprint,
             loraAdapterDigest: loraAdapterDigest,
             loraAdapterID: loraAdapterID,
             loraCheckpointID: loraCheckpointID,
@@ -102,12 +104,15 @@ struct C6BenchCLI {
             irMap: try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot)   // S5 Cut-2: D-domain 名 normalize→state
         )
         let caseByID = Dictionary(uniqueKeysWithValues: cases.map { ($0.caseID, $0) })
+        let knownCaseIDs = Set(caseByID.keys)
+        let unknownResultIDs = Set(envelope.results.map(\.id)).subtracting(knownCaseIDs).sorted()
+        guard unknownResultIDs.isEmpty else {
+            throw CLIError.usage("summarize unknown result ids: \(formatIDList(unknownResultIDs))")
+        }
         var runCounters: [String: Int] = [:]
         var runs: [C6EvalRun] = []
         for result in envelope.results {
-            guard let item = caseByID[result.id] else {
-                continue
-            }
+            let item = caseByID[result.id]!
             let index = result.runIndex ?? runCounters[result.id, default: 0]
             runCounters[result.id, default: 0] += 1
             let output = C6RuntimeOutput(
@@ -118,6 +123,11 @@ struct C6BenchCLI {
                 samplingSeed: "\(index)"
             )
             runs.append(try runner.evaluate(case: item, output: output, runIndex: index))
+        }
+        let coveredCaseIDs = Set(runCounters.keys)
+        let missingCaseIDs = cases.map(\.caseID).filter { !coveredCaseIDs.contains($0) }
+        guard missingCaseIDs.isEmpty else {
+            throw CLIError.usage("summarize missing model results for case ids: \(formatIDList(missingCaseIDs))")
         }
         let summary = runner.summarize(cases: cases, runs: runs, validation: validation)
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
@@ -189,8 +199,20 @@ struct C6BenchCLI {
         return try C6Hash.fileHash(url: url)
     }
 
+    private static func formatIDList(_ ids: [String], limit: Int = 10) -> String {
+        let head = ids.prefix(limit).joined(separator: ",")
+        guard ids.count > limit else { return head }
+        return "\(head) (+\(ids.count - limit) more)"
+    }
+
     private static func renderMarkdown(summary: C6Summary, validation: C6DatasetValidation) -> String {
-        """
+        let componentVersionsMarkdown = summary.contractBundleFingerprint.componentVersions.keys.sorted()
+            .map { "    - \($0): \(summary.contractBundleFingerprint.componentVersions[$0] ?? "")" }
+            .joined(separator: "\n")
+        let componentDigestsMarkdown = summary.contractBundleFingerprint.componentDigests.keys.sorted()
+            .map { "    - \($0): \(summary.contractBundleFingerprint.componentDigests[$0] ?? "")" }
+            .joined(separator: "\n")
+        return """
         # C6 vehicle-tool-bench summary
 
         status: \(summary.status)
@@ -202,6 +224,13 @@ struct C6BenchCLI {
         lora_adapter_digest: "\(summary.loraAdapterDigest)"
         qwen_tool_call_format_version: \(summary.qwenToolCallFormatVersion)
         contract_digest: \(summary.contractDigest)
+        contract_bundle_fingerprint:
+          schema_version: \(summary.contractBundleFingerprint.schemaVersion)
+          bundle_hash: \(summary.contractBundleFingerprint.bundleHash)
+          component_versions:
+        \(componentVersionsMarkdown)
+          component_digests:
+        \(componentDigestsMarkdown)
 
         ## Dataset
         - cases: \(validation.caseCount)
