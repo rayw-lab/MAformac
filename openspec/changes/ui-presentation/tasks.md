@@ -211,4 +211,15 @@ Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2
 - [x] 8.L5 Keep noop coverage contract-bound to main's current public encoding: `accepted_tool_call` plus `familyCoverage: already_state_noop` and revision/readback evidence; do not invent a UIUE-only shared result.
 - [x] 8.L6 Record the bounded R5 runtime-presentation grill crosswalk in the D22 UIUE receipt and keep human/product, voice/model/golden, mobile/true-device/live, endpoint, and merge lanes deferred.
 - [x] 8.L7 Fix first GPT Pro PR-pair P2 post-audit by rejecting `cards[].timestamp` in the fixture consumer because main's public projection strips card timestamps.
+
+### 8.M D23 Shared Public Fixture Schema Checker（2026-06-30，D23 supertrain）
+
+> Authority: main-owned `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json` copied into UIUE for local consumer/parity proof. UIUE may be stricter locally but must not invent shared fields, result names, proof classes, or consume main private Swift/durable/runtime/raw internals.
+
+- [x] 8.M1 Copy/adopt the main-owned public fixture schema artifact without modifying schema content in UIUE.
+- [x] 8.M2 Bind the UIUE manifest to the shared schema artifact with sha256, owner path, consumer path, and update rule.
+- [x] 8.M3 Validate schema-driven fixture count/names, fixture classes, proof classes, allowed results, public top-level fields, forbidden top-level/card timestamps, private/durable/raw marker denial, proof cap, and non-claims.
+- [x] 8.M4 Prove schema `allowedResults` map through `RuntimePresentationConsumerMapping.localResultKind` without adding UIUE-only shared result names.
+- [x] 8.M5 Add local sibling main parity coverage and receipt-level `diff -qr` evidence for the public fixture/schema corpus.
+- [x] 8.M6 Record D23 review policy truth: no Gate Hermes/Claude Code audit by user override; post-gate review is Codex subagent xhigh, then GPT Pro after fixes/push, without turning advisory review into proof class or readiness.
 - [x] 8.L8 Record first GPT Pro audits as `REQUEST_CHANGES` fixed post-audit; user requested a post-fix GPT Pro rerun after push, without changing the first audit result into PASS.

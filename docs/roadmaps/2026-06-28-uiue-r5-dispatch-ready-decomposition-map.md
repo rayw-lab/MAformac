@@ -1,10 +1,10 @@
 ---
-status: LIVING_ROUTE_CONTROL_AFTER_D22_GATE4_LOCAL_AND_HERMES_PASS
+status: LIVING_ROUTE_CONTROL_AFTER_D23_LOCAL_SCHEMA_CHECKER_PASS_PENDING_POST_GATE_REVIEWS
 artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
 last_updated_at: 2026-06-30
 owner: commander
-proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit + d22_local_unit_fixture_corpus + d22_gate3_hermes_pass + d22_gate4_hermes_pass
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit + d22_local_unit_fixture_corpus + d22_gate3_hermes_pass + d22_gate4_hermes_pass + d23_local_unit_static_shared_schema_checker
 authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_gptpro_fixed_post_audit_plus_d22_gate4_local
 canonical_for:
   - UIUE R5 dispatch grouping
@@ -16,6 +16,7 @@ canonical_for:
   - post_D18_D19_next_long_task_order
   - d20_d21_supertrain_execution_state
   - d22_runtime_payload_corpus_execution_state
+  - d23_shared_public_fixture_schema_checker_execution_state
   - grill_burndown_progress_accounting
 not_canonical_for:
   - mainline shared runtime field authority
@@ -44,6 +45,21 @@ non_claims:
 ---
 
 # UIUE R5 Dispatch-Ready Decomposition Map
+
+## D23 Execution Update (2026-06-30)
+
+Current truth for `UIUE_R5_D23_SHARED_SCHEMA_CHECKER_PR_HYGIENE_SUPERTRAIN`:
+
+- Gate1 main shared public fixture schema/checker: DONE under proof cap. Main added `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json`, bound `manifest.json` to its sha256/update rule, and schema-driven `RuntimePresentationPayloadPublicFixtureTests` now prove fixture count/names, public fields, forbidden timestamp fields, allowed fixture classes/results/proof classes, private/durable/raw marker denial, and non-claims.
+- Gate2 UIUE schema checker adoption/parity: DONE under proof cap. UIUE copied/adopted the same schema artifact, bound its manifest to the schema sha256/update rule, validates schema-driven consumer mapping into `PresentationSnapshot`, and has a local sibling main parity check plus receipt-level `diff -qr` evidence.
+- Gate3 PR remote truth/reviewability hygiene: pre-D23-push remote truth is PR #7 `3e716020eef958b3f18e90b2ab9df3f3b53bdc31` and PR #6 `1c66467ee7485ea08200624f7bd6843999905f12`, both CLEAN with successful checks. D23 remains existing PR #7/#6 only; no new PR and no merge.
+- Gate4 doc cascade/final reconcile: D23 main receipt is `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d23-shared-schema-checker-main-receipt-2026-06-30.md`; UIUE receipt is `docs/project/phase0/r5-d23-shared-schema-checker-uiue-receipt-2026-06-30.md`; OpenSpec task cascades are `define-runtime-presentation-bridge` §12 and `ui-presentation` §8.M.
+- User override for D23 review cadence: do not run Gate Hermes or Claude Code audits. After all gates, run quick self-check, one Codex subagent xhigh audit, fix any owned findings, then run GPT Pro. These reviews are advisory/user-selected review sources and do not become gate proof class or readiness.
+- D23 source dispatch artifact and D22 commander verdict remain trace artifacts unless separately authorized for staging.
+
+This update does not claim production runtime readiness, runtime-ready status,
+mobile, true-device, live API, UIUE merge, V/S/U-PASS, A-2 completion, R5
+completion, voice/model/golden, or endpoint readiness.
 
 ## D22 Execution Update (2026-06-30)
 
