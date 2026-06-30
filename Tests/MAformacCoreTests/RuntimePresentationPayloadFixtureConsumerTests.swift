@@ -81,6 +81,26 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         }
     }
 
+    func testProofClassMappingsAreExplicitAndDoNotPromoteMainlineProofs() throws {
+        let expectedProofClasses: [String: PresentationProofClass] = [
+            "docs_local": .staticPreview,
+            "openspec_contract": .staticPreview,
+            "local_static_contract": .staticPreview,
+            "local_unit": .localMock,
+            "local_shape_no_model": .staticPreview,
+            "local_receipt_consistency": .staticPreview,
+            "simulator_mock": .simulatorMock,
+            "external_gptpro_review": .operatorReview
+        ]
+
+        XCTAssertEqual(Set(RuntimePresentationConsumerMapping.d15ProofClassNames), Set(expectedProofClasses.keys))
+
+        for (mainlineName, expectedProofClass) in expectedProofClasses {
+            let snapshot = try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(proofClass: mainlineName))
+            XCTAssertEqual(snapshot.proofClass, expectedProofClass, mainlineName)
+        }
+    }
+
     func testConsumerRejectsForbiddenPrivateAndDurableMarkersAnywhereInFixture() {
         XCTAssertThrowsError(
             try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""requestFingerprint": "x","#))
@@ -116,44 +136,97 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         }
     }
 
-    func testCommittedCrossRepoPublicFixtureDecodesToPresentationSnapshot() throws {
-        let data = try Data(contentsOf: Self.fixtureURL)
-        let snapshot = try RuntimePresentationPayloadFixtureConsumer.consume(data)
+    func testCommittedCrossRepoPublicFixturesDecodeToPresentationSnapshots() throws {
+        let snapshots = Dictionary(
+            uniqueKeysWithValues: try Self.expectedFixtureNames.map { fixtureName in
+                (
+                    fixtureName,
+                    try RuntimePresentationPayloadFixtureConsumer.consume(
+                        try Data(contentsOf: Self.fixtureURL(fixtureName))
+                    )
+                )
+            }
+        )
 
-        XCTAssertEqual(snapshot.traceId, "trace-public-1")
-        XCTAssertEqual(snapshot.storeCells.map(\.key), ["ac.power"])
-        XCTAssertEqual(snapshot.storeCells.first?.actualValue, "on")
-        XCTAssertEqual(snapshot.activeCells[.ac], "ac.power")
-        XCTAssertEqual(snapshot.scopeOrigins["ac.power"], .explicit)
-        XCTAssertEqual(snapshot.dialogText, "空调已打开")
-        XCTAssertEqual(snapshot.readbacks.first?.spokenText, "空调已打开")
-        XCTAssertEqual(snapshot.resultKind, .acceptedToolCall)
-        XCTAssertEqual(snapshot.proofClass, .localMock)
+        let acPower = try XCTUnwrap(snapshots[Self.fixtureName])
+        XCTAssertEqual(acPower.traceId, "trace-public-1")
+        XCTAssertEqual(acPower.storeCells.map(\.key), ["ac.power"])
+        XCTAssertEqual(acPower.activeCells[.ac], "ac.power")
+        XCTAssertEqual(acPower.scopeOrigins["ac.power"], .explicit)
+        XCTAssertEqual(acPower.dialogText, "空调已打开")
+        XCTAssertEqual(acPower.readbacks.first?.spokenText, "空调已打开")
+        XCTAssertEqual(acPower.resultKind, .acceptedToolCall)
+        XCTAssertEqual(acPower.proofClass, .localMock)
+
+        let refusal = try XCTUnwrap(snapshots["refusal_safety_public_payload.v1.json"])
+        XCTAssertEqual(refusal.storeCells.map(\.key), ["door.lock"])
+        XCTAssertEqual(refusal.storeCells.first?.visualState, .unsafe)
+        XCTAssertTrue(refusal.activeCells.isEmpty)
+        XCTAssertEqual(refusal.refusedCell, "door.lock")
+        XCTAssertEqual(refusal.dialogText, "safety_policy_refusal")
+        XCTAssertEqual(refusal.resultKind, .refusalSafetyOrPolicy)
+        XCTAssertEqual(refusal.proofClass, .localMock)
+
+        let runtimeError = try XCTUnwrap(snapshots["runtime_error_public_payload.v1.json"])
+        XCTAssertEqual(runtimeError.storeCells.map(\.key), ["ac.power"])
+        XCTAssertTrue(runtimeError.activeCells.isEmpty)
+        XCTAssertNil(runtimeError.refusedCell)
+        XCTAssertEqual(runtimeError.dialogText, "execution_error")
+        XCTAssertEqual(runtimeError.resultKind, .runtimeError)
+        XCTAssertEqual(runtimeError.proofClass, .localMock)
+
+        let mismatch = try XCTUnwrap(snapshots["reconciliation_mismatch_public_payload.v1.json"])
+        XCTAssertEqual(mismatch.activeCells[.ac], "ac.power")
+        XCTAssertEqual(mismatch.dialogText, "ac state was not verified")
+        XCTAssertEqual(mismatch.readbacks.first?.actualValue, "off")
+        XCTAssertEqual(mismatch.resultKind, .acceptedToolCall)
+        XCTAssertEqual(mismatch.proofClass, .localMock)
+
+        let partial = try XCTUnwrap(snapshots["partial_accept_refuse_public_payload.v1.json"])
+        XCTAssertEqual(partial.storeCells.map(\.key), ["ac.power", "door.lock"])
+        XCTAssertEqual(partial.activeCells[.ac], "ac.power")
+        XCTAssertEqual(partial.refusedCell, "door.lock")
+        XCTAssertEqual(partial.dialogText, "ac opened")
+        XCTAssertEqual(partial.resultKind, .partialAcceptPartialRefuse)
+        XCTAssertEqual(partial.proofClass, .localMock)
     }
 
     func testCommittedCrossRepoFixtureSha256AndPublicFieldManifest() throws {
         let manifest = try Self.loadManifest()
-        let fixture = try XCTUnwrap(manifest.fixtures.first { $0.name == Self.fixtureName })
-        let fixtureData = try Data(contentsOf: Self.fixtureURL)
-        let fixtureText = try XCTUnwrap(String(data: fixtureData, encoding: .utf8))
-        let fixtureObject = try Self.loadJSONObject(fixtureData)
+        XCTAssertEqual(manifest.schemaVersion, "r5_runtime_presentation_payload_fixture_manifest_v1")
+        XCTAssertEqual(Set(manifest.fixtures.map(\.name)), Self.expectedFixtureNames)
 
-        XCTAssertEqual(fixture.sha256, Self.fixtureSHA256)
-        XCTAssertEqual(try C6Hash.fileHash(url: Self.fixtureURL), fixture.sha256)
-        XCTAssertEqual(Set(fixtureObject.keys), Set(RuntimePresentationConsumerMapping.payloadFieldNames))
-        XCTAssertFalse(fixtureObject.keys.contains("timestamp"))
+        for fixture in manifest.fixtures {
+            let fixtureURL = Self.fixtureURL(fixture.name)
+            let fixtureData = try Data(contentsOf: fixtureURL)
+            let fixtureText = try XCTUnwrap(String(data: fixtureData, encoding: .utf8))
+            let fixtureObject = try Self.loadJSONObject(fixtureData)
 
-        for marker in RuntimePresentationConsumerMapping.forbiddenPrivateNames {
-            XCTAssertFalse(fixtureText.contains(marker), marker)
+            XCTAssertEqual(fixture.schemaVersion, "r5_runtime_presentation_payload_v1", fixture.name)
+            XCTAssertEqual(try C6Hash.fileHash(url: fixtureURL), fixture.sha256, fixture.name)
+            XCTAssertEqual(fixture.producerRepo, "MAformac", fixture.name)
+            XCTAssertEqual(fixture.consumerRepo, "MAformac-uiue", fixture.name)
+            XCTAssertEqual(fixture.producerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
+            XCTAssertEqual(fixture.consumerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
+            XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
+            XCTAssertEqual(Set(fixtureObject.keys), Set(RuntimePresentationConsumerMapping.payloadFieldNames), fixture.name)
+            XCTAssertFalse(fixtureObject.keys.contains("timestamp"), fixture.name)
+
+            for marker in RuntimePresentationConsumerMapping.forbiddenPrivateNames {
+                XCTAssertNil(fixtureText.range(of: marker, options: [.caseInsensitive, .diacriticInsensitive]), "\(fixture.name): \(marker)")
+            }
         }
     }
 
     private static let fixtureName = "ac_power_public_payload.v1.json"
-    private static let fixtureSHA256 = "57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f"
 
-    private static var fixtureURL: URL {
-        fixturesDirectory.appendingPathComponent(fixtureName)
-    }
+    private static let expectedFixtureNames: Set<String> = [
+        fixtureName,
+        "refusal_safety_public_payload.v1.json",
+        "runtime_error_public_payload.v1.json",
+        "reconciliation_mismatch_public_payload.v1.json",
+        "partial_accept_refuse_public_payload.v1.json"
+    ]
 
     private static var manifestURL: URL {
         fixturesDirectory.appendingPathComponent("manifest.json")
@@ -164,6 +237,10 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("Fixtures/RuntimePresentationPayload")
+    }
+
+    private static func fixtureURL(_ fixtureName: String) -> URL {
+        fixturesDirectory.appendingPathComponent(fixtureName)
     }
 
     private static func loadJSONObject(_ data: Data) throws -> [String: Any] {

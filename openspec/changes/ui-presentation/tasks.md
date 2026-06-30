@@ -194,6 +194,8 @@ Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2
 
 - [x] 8.K1 Implement UIUE-local public JSON fixture consumer for `schemaVersion`, `traceID`, `turnID`, `eventID`, `isTerminal`, `outcome`, `proofClass`, `cards`, `cardSemantics`, `readbacks`, `reconciliation`, and `traceEnvelope`.
 - [x] 8.K2 Fail closed on unknown top-level fields, unknown nested fields, unknown schema/proof/outcome/reconciliation values, and forbidden private/durable markers.
-- [x] 8.K3 Decode the cross-repo public fixture into `PresentationSnapshot` and preserve UIUE proof caps.
-- [x] 8.K4 Record and validate the public fixture sha256 shared with main: `57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f`.
+- [x] 8.K3 Decode the cross-repo public fixtures into `PresentationSnapshot` and preserve UIUE proof caps.
+- [x] 8.K4 Record and validate the public fixture sha256 manifest shared with main.
 - [x] 8.K5 Carry Gate3 audit truth as `hermes_fail_fixed_post_audit` because the only P1 was untracked fixture packaging fixed by exact-path staging and local validation, without rerunning Hermes.
+- [x] 8.K6 Decode refusal safety, runtime error, reconciliation mismatch, and partial-accept/refuse fixtures without consuming main private Swift types or durable/runtime internals.
+- [x] 8.K7 Map `partial_accept_partial_refuse` and all allowed proofClass labels explicitly; unknown or future proof labels must fail closed instead of defaulting to `.localMock`.

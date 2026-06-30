@@ -119,7 +119,7 @@ private struct RuntimePresentationPayloadFixture: Decodable {
             dialogText: resolvedDialogText,
             readbacks: localReadbacks,
             resultKind: resultKind,
-            proofClass: RuntimePresentationPayloadFixtureConsumerBridge.proofClass(for: proofClass)
+            proofClass: try RuntimePresentationPayloadFixtureConsumerBridge.proofClass(for: proofClass)
         )
     }
 }
@@ -469,7 +469,7 @@ private struct FixtureTimestamp: Decodable {
 }
 
 private enum RuntimePresentationPayloadFixtureConsumerBridge {
-    static func proofClass(for mainlineName: String) -> PresentationProofClass {
+    static func proofClass(for mainlineName: String) throws -> PresentationProofClass {
         switch mainlineName {
         case "local_unit":
             return .localMock
@@ -480,7 +480,7 @@ private enum RuntimePresentationPayloadFixtureConsumerBridge {
         case "external_gptpro_review":
             return .operatorReview
         default:
-            return .localMock
+            throw RuntimePresentationConsumerValidationError.unknownProofClass(mainlineName)
         }
     }
 

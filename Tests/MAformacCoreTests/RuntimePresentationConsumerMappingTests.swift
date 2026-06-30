@@ -29,6 +29,7 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
             ("already_state_noop", .alreadyStateNoop),
             ("runtime_error", .runtimeError),
             ("cancelled", .cancelled),
+            ("partial_accept_partial_refuse", .partialAcceptPartialRefuse),
             ("interrupted", .cancelled)
         ]
 

@@ -167,6 +167,7 @@ enum RuntimePresentationConsumerMapping {
         resultEntry("already_state_noop", localKind: .alreadyStateNoop),
         resultEntry("runtime_error", localKind: .runtimeError),
         resultEntry("cancelled", localKind: .cancelled),
+        resultEntry("partial_accept_partial_refuse", localKind: .partialAcceptPartialRefuse),
         resultEntry(
             "interrupted",
             localKind: .cancelled,
