@@ -84,6 +84,15 @@ D22 does not rewrite or globally close the UIUE 215-row runtime-presentation gri
 - `hermes-cli-glm52-code`: used for exactly one audit node per gate.
 - `gptpro` / `finishing-a-development-branch`: used for the post-commit/push PR-pair audit path. Claude Code final audit is skipped by direct user override, not counted as an executed audit node.
 
+## Lessons Learned
+
+- Public projection is not the same shape as the full runtime DTO. D22 public fixtures intentionally strip volatile `timestamp` fields, so the right regression is a public-vocabulary typed envelope test, not forcing stripped JSON back through a full `RuntimePresentationPayload` decode.
+- Manifest strings are contract only when main typed vocabulary and producer adapters can express them. The `partial_accept_partial_refuse` gap existed because manifest/UIUE agreed while main `DemoRuntimeResult` and `partialAcceptRefuse` still spoke refusal-only truth.
+- Multiple GPT Pro audits must be merged by finding union, not by assuming identical P0/P1/P2. The second report added PR-level reviewability risk that the first report only treated as metadata drift.
+- Exact-path staging and PR-level reviewability are different proof layers. D22 can stage only owned files while PR #6 still needs a PR-body whitelist for historical/report/tooling artifacts already in the long-lived branch.
+- GitHub Git Data API push-equivalent can create a remote commit SHA different from a local commit with the same tree/parent/message because the serialized commit object is not byte-identical. For network-blocked pushes, remote PR head/tree verification is the authority; local `@{u}` can be stale if the remote object cannot be fetched.
+- First audit truth must remain first audit truth. A `REQUEST_CHANGES` result fixed post-audit is not retroactively a PASS; a later user-requested GPT Pro rerun is a separate post-fix audit node.
+
 ## Dirty Split
 
 - `owned_by_D22`: changed runtime bridge, test, fixture, OpenSpec task, and D22 receipt paths listed above.
