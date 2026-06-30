@@ -1,6 +1,6 @@
 # R5 D22 Runtime Payload Corpus Expansion UIUE Gate3 Receipt
 
-Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty.
+Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty. First GPT Pro PR-pair audits returned `REQUEST_CHANGES`; owned UIUE guard fixes are applied post-audit and a user-requested post-fix GPT Pro rerun is pending after push.
 
 ## Scope
 
@@ -11,6 +11,7 @@ Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty.
 
 ## Changed UIUE Paths
 
+- `Core/Presentation/RuntimePresentationPayloadFixtureConsumer.swift`
 - `Tests/Fixtures/RuntimePresentationPayload/manifest.json`
 - `Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v1.json`
 - `Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v1.json`
@@ -52,11 +53,11 @@ Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty.
 
 ## Validation
 
-- `swift test --filter RuntimePresentationPayloadFixtureConsumerTests`: PASS, 8 tests.
-- `swift test --filter 'RuntimePresentationPayloadFixtureConsumerTests|RuntimePresentationConsumerMappingTests|PresentationSnapshotTests|VehicleCardDisplayTests|SemanticColorMapperTests'`: PASS, 40 tests.
+- `swift test --filter RuntimePresentationPayloadFixtureConsumerTests`: PASS, 9 tests after post-GPT-Pro timestamp guard regression.
+- `swift test --filter 'RuntimePresentationPayloadFixtureConsumerTests|RuntimePresentationConsumerMappingTests|PresentationSnapshotTests|VehicleCardDisplayTests|SemanticColorMapperTests'`: PASS, 41 tests.
 - `git -C /Users/wanglei/workspace/MAformac-uiue diff --check`: PASS.
 - `cd /Users/wanglei/workspace/MAformac-uiue && openspec validate ui-presentation --strict`: PASS.
-- `cd /Users/wanglei/workspace/MAformac-uiue && make verify-ci`: PASS, 345 tests, 3 skipped.
+- `cd /Users/wanglei/workspace/MAformac-uiue && make verify-ci`: PASS, 346 tests, 3 skipped.
 - `cd /Users/wanglei/workspace/MAformac && openspec validate define-runtime-presentation-bridge --strict`: PASS.
 
 ## Gate Audit
@@ -72,6 +73,9 @@ Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty.
 - No burndown/loop-competition source matrix was rewritten. D22 changes a bounded route-control disposition for D22-relevant clusters only; it does not claim full historical grill closure for the 215-row matrix.
 - `HERMES_R5_D22_GATE_4_DOC_CASCADE_PR_RECONCILE_VERDICT: PASS`; P0/P1/P2 empty. Gate4 audit covered doc cascade, dirty split, exact-path staging plan, existing PR #7/#6-only plan, and proof wording before the post-gate commit/push path.
 - Claude Code final audit is skipped by direct user override after Gate4 (`不需要安排claudecode审计了`). D22 closeout must not claim the original six-node audit budget was executed.
+- First GPT Pro PR-pair audits: `/Users/wanglei/Downloads/pr_audit_7(5).md` and `/Users/wanglei/Downloads/pr_audit_7(6).md` both returned `GPTPRO_R5_D22_PR_PAIR_AUDIT_VERDICT: REQUEST_CHANGES`.
+- UIUE-owned GPT Pro fix: `RuntimePresentationPayloadFixtureConsumer` now rejects `cards[].timestamp` because main's public fixture projection strips card timestamps; trace-envelope entry timestamps remain allowed as presentation-safe trace metadata.
+- PR #6 reviewability handling: the post-fix PR body will include a machine-readable whitelist for D22-owned paths plus historical/non-D22 artifact classes. This is chosen instead of splitting because D22 operator constraints require existing PR #6/#7 only, no new PR, and no merge.
 
 ## Superpowers And Risk Ledger
 
@@ -89,9 +93,10 @@ Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty.
 - Immediate fix: manifest decoder/tests now assert `caseID`, `fixtureClass`, `result`, and `familyCoverage`.
 - Class-level guard: fixture directory parity check, manifest hash checks, strict payload field decoder, private marker denial, and proof-class bridging tests.
 - Governance guard: D22 receipt labels fixture proof as local/unit/static only and keeps runtime-ready/mobile/live claims out of scope.
+- Post-GPT-Pro guard: UIUE fixture decoding rejects nested card timestamps and now asserts every manifest result maps through `RuntimePresentationConsumerMapping.localResultKind`.
 - Goal drift check: Gate3 stayed on JSON fixture consumption into `PresentationSnapshot`; it did not wire UIUE frontstage to main runtime and did not create UIUE-only shared fields.
 - Self-question: if this were wrong, `diff -qr` between the two fixture directories, `RuntimePresentationPayloadFixtureConsumerTests`, or `openspec validate ui-presentation --strict` should fail or show an unproven field/proof mismatch.
 
 ## Proof Cap
 
-Proof is limited to local unit/static/OpenSpec/GitNexus evidence. Gate3 does not claim production runtime readiness, runtime-ready status, mobile, true-device, live API, UIUE merge, V/S/U-PASS, A-2 completion, R5 completion, voice/model/golden, or endpoint readiness.
+Proof is limited to local unit/static/OpenSpec/GitNexus/GPT-Pro-audit evidence. Gate3 does not claim production runtime readiness, runtime-ready status, mobile, true-device, live API, UIUE merge, V/S/U-PASS, A-2 completion, R5 completion, voice/model/golden, or endpoint readiness.

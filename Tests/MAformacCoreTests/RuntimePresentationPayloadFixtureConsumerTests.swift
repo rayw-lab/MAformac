@@ -43,6 +43,17 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         }
     }
 
+    func testConsumerRejectsCardTimestampsBecausePublicProjectionStripsThem() {
+        let payload = Self.validPayload(extraCardField: #""timestamp": 0,"#)
+
+        XCTAssertThrowsError(try RuntimePresentationPayloadFixtureConsumer.consume(payload)) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownNestedField(path: "cards[]", field: "timestamp")
+            )
+        }
+    }
+
     func testConsumerRejectsUnknownSchemaProofOutcomeAndReconciliationValues() {
         XCTAssertThrowsError(
             try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(schemaVersion: "r5_runtime_presentation_payload_v2"))
@@ -244,6 +255,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
             XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
             XCTAssertTrue(Self.allowedFixtureClasses.contains(fixture.fixtureClass), fixture.name)
             XCTAssertEqual(fixture.result, try Self.fixtureResult(fixtureData), fixture.name)
+            XCTAssertNotNil(RuntimePresentationConsumerMapping.localResultKind(forMainlineResultName: fixture.result), fixture.name)
             let expectedMetadata = try XCTUnwrap(Self.expectedManifestMetadata[fixture.name], fixture.name)
             XCTAssertEqual(fixture.caseID, expectedMetadata.caseID, fixture.name)
             XCTAssertEqual(fixture.fixtureClass, expectedMetadata.fixtureClass, fixture.name)
@@ -440,7 +452,6 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
                   "key": "ac.power",
                   "actualValue": "on",
                   "availability": "available",
-                  "timestamp": 0,
                   "source": "mock",
                   "revision": 2,
                   "visualState": "satisfied"

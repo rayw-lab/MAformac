@@ -175,7 +175,6 @@ private struct FixtureCard: Decodable {
         case actualValue
         case desiredValue
         case availability
-        case timestamp
         case source
         case revision
         case visualState
@@ -192,7 +191,6 @@ private struct FixtureCard: Decodable {
         actualValue = try container.decode(String.self, forKey: .actualValue)
         desiredValue = try container.decodeIfPresent(String.self, forKey: .desiredValue)
         availability = try container.decodeIfPresent(String.self, forKey: .availability)
-        _ = try container.decodeIfPresent(FixtureTimestamp.self, forKey: .timestamp)
         source = try container.decodeIfPresent(String.self, forKey: .source)
         revision = try container.decode(Int.self, forKey: .revision)
         visualState = try container.decode(String.self, forKey: .visualState)

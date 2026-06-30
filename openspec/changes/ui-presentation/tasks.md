@@ -210,3 +210,5 @@ Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2
 - [x] 8.L4 Preserve D20/D21 refusal, runtime-error, reconciliation mismatch, partial accept/refuse, unknown field, unknown proof, and private/durable marker fail-closed coverage.
 - [x] 8.L5 Keep noop coverage contract-bound to main's current public encoding: `accepted_tool_call` plus `familyCoverage: already_state_noop` and revision/readback evidence; do not invent a UIUE-only shared result.
 - [x] 8.L6 Record the bounded R5 runtime-presentation grill crosswalk in the D22 UIUE receipt and keep human/product, voice/model/golden, mobile/true-device/live, endpoint, and merge lanes deferred.
+- [x] 8.L7 Fix first GPT Pro PR-pair P2 post-audit by rejecting `cards[].timestamp` in the fixture consumer because main's public projection strips card timestamps.
+- [x] 8.L8 Record first GPT Pro audits as `REQUEST_CHANGES` fixed post-audit; user requested a post-fix GPT Pro rerun after push, without changing the first audit result into PASS.
