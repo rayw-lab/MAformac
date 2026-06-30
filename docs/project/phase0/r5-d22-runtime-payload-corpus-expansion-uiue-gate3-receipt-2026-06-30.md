@@ -97,6 +97,15 @@ Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty. 
 - Goal drift check: Gate3 stayed on JSON fixture consumption into `PresentationSnapshot`; it did not wire UIUE frontstage to main runtime and did not create UIUE-only shared fields.
 - Self-question: if this were wrong, `diff -qr` between the two fixture directories, `RuntimePresentationPayloadFixtureConsumerTests`, or `openspec validate ui-presentation --strict` should fail or show an unproven field/proof mismatch.
 
+## Lessons Learned
+
+- UIUE should consume main public JSON as a projection contract, not as a tolerant mirror of main private/runtime DTOs. Rejecting `cards[].timestamp` makes that boundary explicit while still allowing trace-envelope timestamps.
+- Manifest parity is necessary but not sufficient. UIUE can correctly consume a result name that main accidentally cannot produce; the producer repo must also hold typed enum and adapter emission regressions.
+- Audit reports can diverge usefully. Treat two GPT Pro reports as separate evidence inputs and fix the union of owned findings; record any process-only finding that cannot be code-fixed inside D22 constraints.
+- PR branch history and D22 staged ownership are different scopes. The repo receipt proves exact-path D22 changes; PR #6 still needs reviewer-facing whitelist language for broad historical/report/tooling files.
+- Network fallback is part of release governance. When normal `git push` fails and GitHub API updates the ref, the durable proof is PR head SHA plus remote tree/parent checks, not a local upstream counter.
+- No audit result should be rewritten after the fact. The first GPT Pro run remains `REQUEST_CHANGES fixed-post-audit`; the user-requested post-fix GPT Pro rerun must be recorded as a separate audit.
+
 ## Proof Cap
 
 Proof is limited to local unit/static/OpenSpec/GitNexus/GPT-Pro-audit evidence. Gate3 does not claim production runtime readiness, runtime-ready status, mobile, true-device, live API, UIUE merge, V/S/U-PASS, A-2 completion, R5 completion, voice/model/golden, or endpoint readiness.

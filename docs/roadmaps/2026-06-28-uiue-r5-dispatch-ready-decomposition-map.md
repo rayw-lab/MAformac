@@ -56,6 +56,7 @@ Current truth for `UIUE_R5_D22_RUNTIME_PAYLOAD_CORPUS_EXPANSION_SUPERTRAIN`:
 - Claude Code final audit is skipped by direct user override after Gate4 (`不需要安排claudecode审计了`); do not count it as an executed D22 audit node.
 - First GPT Pro PR-pair audits returned `REQUEST_CHANGES`, not PASS. Owned fixes are applied post-audit: main now represents and emits public result `partial_accept_partial_refuse`, main typed public-vocabulary tests decode all 9 fixtures, and UIUE rejects `cards[].timestamp` because the public projection strips card timestamps. The user then requested a post-fix GPT Pro rerun after push.
 - PR #6 reviewability P1-process from the second GPT Pro report is handled by PR-body whitelist rather than PR split, because D22 remains constrained to existing PR #7/#6 only, no new PR, and no merge.
+- Lessons learned are captured in the D22 main/UIUE receipts: public projection differs from full runtime DTO decode, manifest truth must be backed by main typed enums and adapter emission, dual GPT Pro reports should be unioned, exact-path staging is not the same as PR-level reviewability, GitHub API push-equivalent needs remote head/tree proof, and first-audit `REQUEST_CHANGES` must not be rewritten as PASS.
 - D22 bounded grill crosswalk: recorded in `docs/project/phase0/r5-d22-runtime-payload-corpus-expansion-uiue-gate3-receipt-2026-06-30.md`; D22 does not close the full 215-row historical grill matrix.
 - D22 source dispatch artifacts remain trace artifacts and are not staged unless separately authorized.
 
