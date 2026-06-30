@@ -93,3 +93,5 @@
 - [x] 11.4 Assert generated fixtures match committed public JSON projection while stripping non-public timestamp volatility and preserving trace/readback semantics in tests.
 - [x] 11.5 Keep the UIUE-facing contract presentation-safe: no adapter-private Swift types, durable ledger internals, raw runtime store, raw model output, training receipt, request fingerprint, or settled-plan internals.
 - [x] 11.6 Preserve proof caps and fixture-class truth: `runtime_generated_fixture` is local/unit generator evidence, and `bridge_contract_fixture` is contract-boundary fixture evidence only.
+- [x] 11.7 Fix first GPT Pro PR-pair P1 post-audit by adding public result `partial_accept_partial_refuse`, making the partial accept/refuse adapter emit it, and adding main public-vocabulary decoding coverage for all 9 fixtures.
+- [x] 11.8 Record first GPT Pro audits as `REQUEST_CHANGES` fixed post-audit; user requested a post-fix GPT Pro rerun after push, without changing the first audit result into PASS.
