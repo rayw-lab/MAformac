@@ -189,6 +189,39 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(partial.dialogText, "ac opened")
         XCTAssertEqual(partial.resultKind, .partialAcceptPartialRefuse)
         XCTAssertEqual(partial.proofClass, .localMock)
+
+        let window = try XCTUnwrap(snapshots[RuntimeFixtureName.windowPosition])
+        XCTAssertEqual(window.storeCells.map(\.key), ["window.position[主驾]"])
+        XCTAssertEqual(window.activeCells[.window], "window.position[主驾]")
+        XCTAssertEqual(window.scopeOrigins["window.position[主驾]"], .explicit)
+        XCTAssertEqual(window.dialogText, "主驾车窗开度100%")
+        XCTAssertEqual(window.readbacks.first?.actualValue, "100")
+        XCTAssertEqual(window.resultKind, .acceptedToolCall)
+        XCTAssertEqual(window.proofClass, .localMock)
+
+        let screen = try XCTUnwrap(snapshots[RuntimeFixtureName.screenBrightness])
+        XCTAssertEqual(screen.storeCells.map(\.key), ["screen.brightness[中控屏]"])
+        XCTAssertEqual(screen.activeCells[.screen], "screen.brightness[中控屏]")
+        XCTAssertEqual(screen.scopeOrigins["screen.brightness[中控屏]"], .explicit)
+        XCTAssertEqual(screen.dialogText, "中控屏亮度80%")
+        XCTAssertEqual(screen.resultKind, .acceptedToolCall)
+        XCTAssertEqual(screen.proofClass, .localMock)
+
+        let ambient = try XCTUnwrap(snapshots[RuntimeFixtureName.ambientBrightness])
+        XCTAssertEqual(ambient.storeCells.map(\.key), ["ambient.brightness[面发光氛围灯]"])
+        XCTAssertEqual(ambient.activeCells[.ambient], "ambient.brightness[面发光氛围灯]")
+        XCTAssertEqual(ambient.scopeOrigins["ambient.brightness[面发光氛围灯]"], .explicit)
+        XCTAssertEqual(ambient.dialogText, "面发光氛围灯亮度40%")
+        XCTAssertEqual(ambient.resultKind, .acceptedToolCall)
+        XCTAssertEqual(ambient.proofClass, .localMock)
+
+        let noop = try XCTUnwrap(snapshots[RuntimeFixtureName.windowPositionNoop])
+        XCTAssertEqual(noop.storeCells.map(\.key), ["window.position[主驾]"])
+        XCTAssertEqual(noop.activeCells[.window], "window.position[主驾]")
+        XCTAssertEqual(noop.dialogText, "主驾车窗开度100%")
+        XCTAssertEqual(noop.readbacks.first?.revision, 1)
+        XCTAssertEqual(noop.resultKind, .acceptedToolCall)
+        XCTAssertEqual(noop.proofClass, .localMock)
     }
 
     func testCommittedCrossRepoFixtureSha256AndPublicFieldManifest() throws {
@@ -209,6 +242,16 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
             XCTAssertEqual(fixture.producerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
             XCTAssertEqual(fixture.consumerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
             XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
+            XCTAssertTrue(Self.allowedFixtureClasses.contains(fixture.fixtureClass), fixture.name)
+            XCTAssertEqual(fixture.result, try Self.fixtureResult(fixtureData), fixture.name)
+            let expectedMetadata = try XCTUnwrap(Self.expectedManifestMetadata[fixture.name], fixture.name)
+            XCTAssertEqual(fixture.caseID, expectedMetadata.caseID, fixture.name)
+            XCTAssertEqual(fixture.fixtureClass, expectedMetadata.fixtureClass, fixture.name)
+            XCTAssertEqual(fixture.result, expectedMetadata.result, fixture.name)
+            XCTAssertEqual(fixture.familyCoverage, expectedMetadata.familyCoverage, fixture.name)
+            if fixture.fixtureClass == "runtime_generated_fixture" {
+                XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
+            }
             XCTAssertEqual(Set(fixtureObject.keys), Set(RuntimePresentationConsumerMapping.payloadFieldNames), fixture.name)
             XCTAssertFalse(fixtureObject.keys.contains("timestamp"), fixture.name)
 
@@ -225,7 +268,80 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         "refusal_safety_public_payload.v1.json",
         "runtime_error_public_payload.v1.json",
         "reconciliation_mismatch_public_payload.v1.json",
-        "partial_accept_refuse_public_payload.v1.json"
+        "partial_accept_refuse_public_payload.v1.json",
+        RuntimeFixtureName.windowPosition,
+        RuntimeFixtureName.screenBrightness,
+        RuntimeFixtureName.ambientBrightness,
+        RuntimeFixtureName.windowPositionNoop
+    ]
+
+    private enum RuntimeFixtureName {
+        static let windowPosition = "window_position_runtime_public_payload.v1.json"
+        static let screenBrightness = "screen_brightness_runtime_public_payload.v1.json"
+        static let ambientBrightness = "ambient_brightness_runtime_public_payload.v1.json"
+        static let windowPositionNoop = "window_position_noop_runtime_public_payload.v1.json"
+    }
+
+    private static let allowedFixtureClasses: Set<String> = [
+        "runtime_generated_fixture",
+        "bridge_contract_fixture"
+    ]
+
+    private static let expectedManifestMetadata: [String: ManifestExpectation] = [
+        fixtureName: ManifestExpectation(
+            caseID: "D22-AC-POWER-ACCEPTED-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["ac.power"]
+        ),
+        "refusal_safety_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-REFUSAL-SAFETY-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "refusal_safety_or_policy",
+            familyCoverage: ["door.lock", "safety_refusal"]
+        ),
+        "runtime_error_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-RUNTIME-ERROR-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "runtime_error",
+            familyCoverage: ["ac.power", "runtime_error"]
+        ),
+        "reconciliation_mismatch_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-RECONCILIATION-MISMATCH-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["ac.power", "reconciliation_mismatch"]
+        ),
+        "partial_accept_refuse_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "partial_accept_partial_refuse",
+            familyCoverage: ["ac.power", "door.lock", "partial_accept_partial_refuse"]
+        ),
+        RuntimeFixtureName.windowPosition: ManifestExpectation(
+            caseID: "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["window.position"]
+        ),
+        RuntimeFixtureName.screenBrightness: ManifestExpectation(
+            caseID: "D22-SCREEN-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["screen.brightness"]
+        ),
+        RuntimeFixtureName.ambientBrightness: ManifestExpectation(
+            caseID: "D22-AMBIENT-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["ambient.brightness"]
+        ),
+        RuntimeFixtureName.windowPositionNoop: ManifestExpectation(
+            caseID: "D22-WINDOW-POSITION-NOOP-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["window.position", "already_state_noop"]
+        )
     ]
 
     private static var manifestURL: URL {
@@ -250,6 +366,15 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         return object
     }
 
+    private static func fixtureResult(_ data: Data) throws -> String {
+        let object = try loadJSONObject(data)
+        guard let outcome = object["outcome"] as? [String: Any],
+              let result = outcome["result"] as? String else {
+            throw FixtureError.invalidJSONObject
+        }
+        return result
+    }
+
     private static func loadManifest() throws -> FixtureManifest {
         try JSONDecoder().decode(FixtureManifest.self, from: try Data(contentsOf: manifestURL))
     }
@@ -262,6 +387,10 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
     private struct FixtureManifestEntry: Decodable {
         var name: String
         var schemaVersion: String
+        var caseID: String
+        var fixtureClass: String
+        var result: String
+        var familyCoverage: [String]
         var sha256: String
         var producerRepo: String
         var producerPath: String
@@ -269,6 +398,13 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         var consumerPath: String
         var proofClass: String
         var notes: [String]
+    }
+
+    private struct ManifestExpectation {
+        var caseID: String
+        var fixtureClass: String
+        var result: String
+        var familyCoverage: [String]
     }
 
     private enum FixtureError: Error {

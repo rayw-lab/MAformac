@@ -1,0 +1,50 @@
+{
+  "cardSemantics": [
+    {
+      "cellKey": "ambient.brightness[面发光氛围灯]",
+      "isActive": true,
+      "reason": "readback_verified",
+      "role": "accepted",
+      "scopeOrigin": "explicit",
+      "siblingKeys": []
+    }
+  ],
+  "cards": [
+    {
+      "actualValue": "40",
+      "availability": "available",
+      "key": "ambient.brightness[面发光氛围灯]",
+      "revision": 1,
+      "source": "mock",
+      "visualState": "normal"
+    }
+  ],
+  "eventID": "turn-d22-ambient-brightness-1:runtime-presentation",
+  "isTerminal": true,
+  "outcome": {
+    "reason": "readback_verified",
+    "result": "accepted_tool_call"
+  },
+  "proofClass": "local_unit",
+  "readbacks": [
+    {
+      "actualValue": "40",
+      "key": "ambient.brightness[面发光氛围灯]",
+      "revision": 1,
+      "scopeOrigin": "explicit",
+      "spokenText": "面发光氛围灯亮度40%"
+    }
+  ],
+  "reconciliation": {
+    "readbackKey": "ambient.brightness[面发光氛围灯]",
+    "safeReason": "c2_readback_verified",
+    "status": "verified"
+  },
+  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "traceEnvelope": {
+    "entries": [],
+    "traceID": "trace-d22-ambient-brightness-1"
+  },
+  "traceID": "trace-d22-ambient-brightness-1",
+  "turnID": "turn-d22-ambient-brightness-1"
+}

@@ -1,11 +1,11 @@
 ---
-status: LIVING_ROUTE_CONTROL_AFTER_D20_D21_GPTPRO_REQUEST_CHANGES_FIXED_POST_AUDIT
+status: LIVING_ROUTE_CONTROL_AFTER_D22_GATE4_LOCAL_AND_HERMES_PASS
 artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
 last_updated_at: 2026-06-30
 owner: commander
-proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit
-authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_gptpro_fixed_post_audit
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit + d22_local_unit_fixture_corpus + d22_gate3_hermes_pass + d22_gate4_hermes_pass
+authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_gptpro_fixed_post_audit_plus_d22_gate4_local
 canonical_for:
   - UIUE R5 dispatch grouping
   - serial_parallel_dependency_order
@@ -15,6 +15,7 @@ canonical_for:
   - living_r5_route_control
   - post_D18_D19_next_long_task_order
   - d20_d21_supertrain_execution_state
+  - d22_runtime_payload_corpus_execution_state
   - grill_burndown_progress_accounting
 not_canonical_for:
   - mainline shared runtime field authority
@@ -43,6 +44,22 @@ non_claims:
 ---
 
 # UIUE R5 Dispatch-Ready Decomposition Map
+
+## D22 Execution Update (2026-06-30)
+
+Current truth for `UIUE_R5_D22_RUNTIME_PAYLOAD_CORPUS_EXPANSION_SUPERTRAIN`:
+
+- Gate1 main runtime corpus authority and generator: DONE under proof cap. Main manifest now carries D22 metadata for all public fixtures and preserves existing D20/D21 fixture hashes. Hermes Gate1 PASS with P0/P1 empty and a P2 carry-forward to update UIUE manifest decoding in Gate3.
+- Gate2 main multi-family payload execution: DONE under proof cap. Main added local runtime-generated public fixtures for window position, screen brightness, ambient brightness, and window noop coverage through `DemoRuntimeSessionRunner -> C3ExecutionPipeline -> runtime adapter -> C2 readback -> RuntimePresentationPayload`. Hermes Gate2 PASS with P0/P1 empty and a P2 reminder that JSON fixtures alone are not standalone runtime provenance.
+- Gate3 UIUE expanded corpus consumption: DONE under proof cap. UIUE copied the 9-fixture public corpus, asserts D22 manifest metadata, maps window/screen/ambient/noop fixtures into `PresentationSnapshot`, and retains D20/D21 failure-boundary coverage. Hermes Gate3 PASS with P0/P1 empty and a P2 noop-contract observation recorded in the D22 UIUE receipt.
+- Gate4 doc cascade / PR reconcile prep: DONE under proof cap. Hermes Gate4 PASS with P0/P1/P2 empty, covering doc cascade, dirty split, exact-path staging plan, existing PR #7/#6-only plan, and proof wording before the post-gate commit/push path.
+- Claude Code final audit is skipped by direct user override after Gate4 (`不需要安排claudecode审计了`); do not count it as an executed D22 audit node.
+- D22 bounded grill crosswalk: recorded in `docs/project/phase0/r5-d22-runtime-payload-corpus-expansion-uiue-gate3-receipt-2026-06-30.md`; D22 does not close the full 215-row historical grill matrix.
+- D22 source dispatch artifacts remain trace artifacts and are not staged unless separately authorized.
+
+This update does not claim production runtime readiness, runtime-ready status,
+mobile, true-device, live API, UIUE merge, V/S/U-PASS, A-2 completion, R5
+completion, voice/model/golden, or endpoint readiness.
 
 ## D20/D21 Execution Update (2026-06-30)
 

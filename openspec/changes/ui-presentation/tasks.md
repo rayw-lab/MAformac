@@ -199,3 +199,14 @@ Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2
 - [x] 8.K5 Carry Gate3 audit truth as `hermes_fail_fixed_post_audit` because the only P1 was untracked fixture packaging fixed by exact-path staging and local validation, without rerunning Hermes.
 - [x] 8.K6 Decode refusal safety, runtime error, reconciliation mismatch, and partial-accept/refuse fixtures without consuming main private Swift types or durable/runtime internals.
 - [x] 8.K7 Map `partial_accept_partial_refuse` and all allowed proofClass labels explicitly; unknown or future proof labels must fail closed instead of defaulting to `.localMock`.
+
+### 8.L D22 Expanded Runtime Presentation Payload Corpus（2026-06-30，D22 supertrain）
+
+> Authority: main D22 public fixture manifest and main-owned local generator tests. UIUE consumes only copied presentation-safe public JSON fixtures into `PresentationSnapshot`. No main private Swift imports, no durable/runtime internals, no UIUE merge, no runtime-ready, no mobile, no true-device, no live API, no V-PASS/S-PASS/U-PASS, no A-2, no voice/model/golden/endpoint, and no R5 complete claim.
+
+- [x] 8.L1 Sync the D22 9-fixture public corpus and manifest from main without modifying fixture payload content in UIUE.
+- [x] 8.L2 Decode and assert D22 manifest metadata: `caseID`, `fixtureClass`, `result`, `familyCoverage`, and `proofClass`.
+- [x] 8.L3 Map accepted multi-family fixtures for window position, screen brightness, and ambient brightness into `PresentationSnapshot` active cells, scope origins, readbacks, result kind, and proof class.
+- [x] 8.L4 Preserve D20/D21 refusal, runtime-error, reconciliation mismatch, partial accept/refuse, unknown field, unknown proof, and private/durable marker fail-closed coverage.
+- [x] 8.L5 Keep noop coverage contract-bound to main's current public encoding: `accepted_tool_call` plus `familyCoverage: already_state_noop` and revision/readback evidence; do not invent a UIUE-only shared result.
+- [x] 8.L6 Record the bounded R5 runtime-presentation grill crosswalk in the D22 UIUE receipt and keep human/product, voice/model/golden, mobile/true-device/live, endpoint, and merge lanes deferred.
