@@ -29,21 +29,34 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
 
     func testPublicFixtureManifestCoversExpectedFixturesWithSha256s() throws {
         let manifest = try Self.loadManifest()
+        let schema = try Self.loadSharedSchema()
 
-        XCTAssertEqual(manifest.schemaVersion, "r5_runtime_presentation_payload_fixture_manifest_v1")
-        XCTAssertEqual(Set(manifest.fixtures.map(\.name)), Self.expectedFixtureNames)
+        XCTAssertEqual(manifest.schemaVersion, schema.manifestSchemaVersion)
+        XCTAssertEqual(manifest.sharedSchema.name, "public_fixture_schema.v1.json")
+        XCTAssertEqual(manifest.sharedSchema.schemaVersion, schema.schemaVersion)
+        XCTAssertEqual(manifest.sharedSchema.ownerRepo, schema.ownerRepo)
+        XCTAssertEqual(manifest.sharedSchema.ownerPath, schema.ownerPath)
+        XCTAssertEqual(manifest.sharedSchema.consumerRepo, "MAformac-uiue")
+        XCTAssertEqual(manifest.sharedSchema.consumerPath, schema.ownerPath)
+        XCTAssertEqual(
+            try C6Hash.fileHash(url: Self.sharedSchemaURL),
+            manifest.sharedSchema.sha256
+        )
+        XCTAssertEqual(Set(manifest.fixtures.map(\.name)), Set(schema.fixtureNames))
+        XCTAssertEqual(manifest.fixtures.count, schema.fixtureCount)
 
         for fixture in manifest.fixtures {
             let fixtureURL = Self.fixturesDirectory.appendingPathComponent(fixture.name)
 
-            XCTAssertEqual(fixture.schemaVersion, "r5_runtime_presentation_payload_v1", fixture.name)
+            XCTAssertEqual(fixture.schemaVersion, schema.payloadSchemaVersion, fixture.name)
             XCTAssertEqual(try C6Hash.fileHash(url: fixtureURL), fixture.sha256, fixture.name)
             XCTAssertEqual(fixture.producerRepo, "MAformac", fixture.name)
             XCTAssertEqual(fixture.consumerRepo, "MAformac-uiue", fixture.name)
             XCTAssertEqual(fixture.producerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
             XCTAssertEqual(fixture.consumerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
-            XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
-            XCTAssertTrue(Self.allowedFixtureClasses.contains(fixture.fixtureClass), fixture.name)
+            XCTAssertTrue(schema.allowedProofClasses.contains(fixture.proofClass), fixture.name)
+            XCTAssertTrue(Set(schema.allowedFixtureClasses).contains(fixture.fixtureClass), fixture.name)
+            XCTAssertTrue(Set(schema.allowedResults).contains(fixture.result), fixture.name)
             XCTAssertEqual(fixture.result, try Self.fixtureResult(fixtureURL), fixture.name)
             let expectedMetadata = try XCTUnwrap(Self.expectedManifestMetadata[fixture.name], fixture.name)
             XCTAssertEqual(fixture.caseID, expectedMetadata.caseID, fixture.name)
@@ -51,6 +64,31 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
             XCTAssertEqual(fixture.result, expectedMetadata.result, fixture.name)
             XCTAssertEqual(fixture.familyCoverage, expectedMetadata.familyCoverage, fixture.name)
         }
+    }
+
+    func testSharedPublicFixtureSchemaIsMainOwnedAndExpressibleByPublicTypes() throws {
+        let schema = try Self.loadSharedSchema()
+        let typedResults = Set(DemoRuntimeResult.allCases.map(\.rawValue))
+
+        XCTAssertEqual(schema.schemaVersion, "r5_runtime_presentation_public_fixture_schema_v1")
+        XCTAssertEqual(schema.ownerRepo, "MAformac")
+        XCTAssertEqual(schema.ownerPath, "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json")
+        XCTAssertEqual(schema.manifestSchemaVersion, "r5_runtime_presentation_payload_fixture_manifest_v1")
+        XCTAssertEqual(schema.payloadSchemaVersion, "r5_runtime_presentation_payload_v1")
+        XCTAssertEqual(schema.fixtureCount, Self.expectedFixtureNames.count)
+        XCTAssertEqual(Set(schema.fixtureNames), Self.expectedFixtureNames)
+        XCTAssertEqual(Set(schema.allowedFixtureClasses), Self.allowedFixtureClasses)
+        XCTAssertEqual(Set(schema.allowedProofClasses), ["local_unit"])
+        XCTAssertTrue(Set(schema.allowedResults).isSubset(of: typedResults))
+        XCTAssertEqual(Set(schema.requiredManifestFields), Self.requiredManifestFields)
+        XCTAssertEqual(Set(schema.publicTopLevelFields), Self.publicTopLevelFields)
+        XCTAssertEqual(Set(schema.forbiddenTopLevelFields), ["timestamp"])
+        XCTAssertEqual(Set(schema.forbiddenCardFields), ["timestamp"])
+        XCTAssertEqual(schema.traceEntryTimestampPolicy, "allowed_only_inside_traceEnvelope.entries")
+        XCTAssertEqual(Set(schema.privateDurableRawMarkers), Set(Self.privateAndDurableMarkers))
+        XCTAssertEqual(schema.proofClassCeiling, "local_unit_static_fixture_contract_only")
+        XCTAssertTrue(schema.nonClaims.contains("runtime_ready"))
+        XCTAssertTrue(schema.nonClaims.contains("uiue_merge"))
     }
 
     func testBridgeContractFixtureResultsArePublicRuntimeResults() throws {
@@ -80,14 +118,23 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
     }
 
     func testPublicFixturesContainOnlyPublicTopLevelFieldsAndNoPrivateOrDurableMarkers() throws {
+        let schema = try Self.loadSharedSchema()
+
         for fixtureName in Self.expectedFixtureNames {
             let fixtureURL = Self.fixturesDirectory.appendingPathComponent(fixtureName)
             let text = try String(contentsOf: fixtureURL, encoding: .utf8)
             let fixtureObject = try Self.loadJSONObject(fixtureURL)
 
-            XCTAssertEqual(Set(fixtureObject.keys), Self.publicTopLevelFields, fixtureName)
-            XCTAssertFalse(fixtureObject.keys.contains("timestamp"), fixtureName)
-            for marker in Self.privateAndDurableMarkers {
+            XCTAssertEqual(Set(fixtureObject.keys), Set(schema.publicTopLevelFields), fixtureName)
+            for field in schema.forbiddenTopLevelFields {
+                XCTAssertFalse(fixtureObject.keys.contains(field), fixtureName)
+            }
+            for card in (fixtureObject["cards"] as? [[String: Any]]) ?? [] {
+                for field in schema.forbiddenCardFields {
+                    XCTAssertFalse(card.keys.contains(field), fixtureName)
+                }
+            }
+            for marker in schema.privateDurableRawMarkers {
                 XCTAssertNil(text.range(of: marker, options: [.caseInsensitive, .diacriticInsensitive]), "\(fixtureName): \(marker)")
             }
         }
@@ -145,6 +192,22 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
     private static let allowedFixtureClasses: Set<String> = [
         "runtime_generated_fixture",
         "bridge_contract_fixture"
+    ]
+
+    private static let requiredManifestFields: Set<String> = [
+        "name",
+        "schemaVersion",
+        "caseID",
+        "fixtureClass",
+        "result",
+        "familyCoverage",
+        "sha256",
+        "producerRepo",
+        "producerPath",
+        "consumerRepo",
+        "consumerPath",
+        "proofClass",
+        "notes"
     ]
 
     private static let expectedManifestMetadata: [String: ManifestExpectation] = [
@@ -244,6 +307,10 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
 
     private static var manifestURL: URL {
         fixturesDirectory.appendingPathComponent("manifest.json")
+    }
+
+    private static var sharedSchemaURL: URL {
+        fixturesDirectory.appendingPathComponent("public_fixture_schema.v1.json")
     }
 
     private static var fixturesDirectory: URL {
@@ -387,6 +454,10 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         try JSONDecoder().decode(FixtureManifest.self, from: try Data(contentsOf: manifestURL))
     }
 
+    private static func loadSharedSchema() throws -> PublicFixtureSchema {
+        try JSONDecoder().decode(PublicFixtureSchema.self, from: try Data(contentsOf: sharedSchemaURL))
+    }
+
     private static func fixtureResult(_ url: URL) throws -> String {
         let object = try loadJSONObject(url)
         guard let outcome = object["outcome"] as? [String: Any],
@@ -398,7 +469,19 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
 
     private struct FixtureManifest: Decodable {
         var schemaVersion: String
+        var sharedSchema: SharedSchemaReference
         var fixtures: [FixtureManifestEntry]
+    }
+
+    private struct SharedSchemaReference: Decodable {
+        var name: String
+        var schemaVersion: String
+        var ownerRepo: String
+        var ownerPath: String
+        var sha256: String
+        var consumerRepo: String
+        var consumerPath: String
+        var updateRule: String
     }
 
     private struct FixtureManifestEntry: Decodable {
@@ -426,6 +509,27 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         var readbacks: [DemoActionReadback]
         var reconciliation: PresentationReconciliation
         var traceEnvelope: TraceEnvelope?
+    }
+
+    private struct PublicFixtureSchema: Decodable {
+        var schemaVersion: String
+        var ownerRepo: String
+        var ownerPath: String
+        var manifestSchemaVersion: String
+        var payloadSchemaVersion: String
+        var fixtureCount: Int
+        var fixtureNames: [String]
+        var allowedFixtureClasses: [String]
+        var allowedProofClasses: [String]
+        var allowedResults: [String]
+        var requiredManifestFields: [String]
+        var publicTopLevelFields: [String]
+        var forbiddenTopLevelFields: [String]
+        var forbiddenCardFields: [String]
+        var traceEntryTimestampPolicy: String
+        var privateDurableRawMarkers: [String]
+        var proofClassCeiling: String
+        var nonClaims: [String]
     }
 
     private struct PublicFixtureTypedCard: Decodable {
