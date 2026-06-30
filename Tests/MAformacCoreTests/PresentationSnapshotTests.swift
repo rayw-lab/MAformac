@@ -61,7 +61,7 @@ final class PresentationSnapshotTests: XCTestCase {
             revision: 1,
             visualState: .satisfied
         )
-        let snapshot = PresentationSnapshot(
+        let snapshot = StagePresentationSnapshot(
             storeCells: [cell],
             scopeOrigins: ["window.position[主驾]": .defaulted]
         )

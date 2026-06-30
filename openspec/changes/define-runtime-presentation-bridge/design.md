@@ -1,82 +1,78 @@
 # Runtime-Presentation Bridge Design
 
-> Authority: design rationale for `define-runtime-presentation-bridge` (contract-only).
-> Source decisions: `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md` (RPB-01~53), `docs/uiue-storyboard-grill-decisions.md` (SD18-24), parent roadmap Task 2.
-> AD-RPB-001~007 build on the roadmap draft; AD-RPB-008~014 add the RPB decision-table enrichments (partial-deny, active/refused cells, sibling cells, source vs scope_origin, already-state, thinking gates, force-state context).
+## AD-RPB-001: Mainline carrier is the authority mapping
 
-## AD-RPB-001: Contract-first, implementation-later
+Mainline accepts this thin carrier as the mainline-visible authority mapping for Runtime -> Presentation bridge semantics. UIUE documents remain candidate/provenance inputs unless this carrier or a later archived mainline spec references them.
 
-The bridge defines event/result/snapshot/trace vocabulary before runtime backend or UIUE merge work. Allowed before model/C6 gates because it does not execute a model, train data, wire an endpoint, or claim readiness. Implementation (mainline runtime projection + UIUE consumption) is downstream.
+This avoids both failure modes:
 
-## AD-RPB-002: UIUE consumes snapshots, not stores
+- no fake acceptance based only on UIUE documents;
+- no second same-meaning bridge SSOT in mainline.
 
-UIUE SHALL consume a `PresentationSnapshot`. It SHALL NOT depend directly on `DemoVehicleStateStore`, raw trace arrays, model output, or training receipts. (Evidence: uiue `Core/Presentation/*` already imports only Foundation/Observation and consumes `[DemoVehicleStateCell]` as input — RPB-04.) Pure preview/spike may read the store behind a debug flag, marked as not-a-contract.
+## AD-RPB-002: Contract-first, implementation-later
 
-## AD-RPB-003: Scope origin is single-source
+The bridge defines event/result/snapshot vocabulary before runtime backend or UIUE merge work. This is allowed before model/C6 gates because it does not execute a model, train data, run C6 acceptance, or claim readiness.
 
-Every readback and presentation scope label SHALL carry `scope_origin` from Core scope resolution (`ScopeResolution.origin`). UIUE may choose visual emphasis (defaulted = low-emphasis / elided per G18), but it MUST NOT infer defaulted/explicit/fanout/missing from display strings — RPB-08.
+## AD-RPB-003: UIUE consumes mapped snapshots, not raw runtime stores
 
-## AD-RPB-004: Voice and orb are presentation state, not proof of voice readiness
+UIUE SHALL consume the mapped presentation semantics from the mainline bridge. It SHALL NOT treat UIUE-local bridge notes as standalone mainline SSOT, and it SHALL NOT depend directly on raw runtime stores, raw trace arrays, model output, or training receipts as acceptance proof.
 
-The bridge may expose `voice_state` and `orb_state` for UI choreography. These fields do not imply ASR/TTS functional readiness, demo-golden-run pass, endpoint readiness, or V-PASS — RPB-23/RPB-33.
+## AD-RPB-004: ScopeOrigin remains Core-owned
 
-## AD-RPB-005: Runtime result vocabulary preserves refusal class
+Core `ScopeOrigin` remains exactly `defaulted`, `explicit`, and `fanout` in the current mainline. Missing or unresolved scope SHALL be represented as result metadata, presentation metadata, or an explicit failure reason. A UI-local presentation-only label MAY be used for display if needed, but it SHALL NOT be treated as a locked Core enum case.
 
-The bridge SHALL NOT expose a bare `rejected` result as the only runtime outcome. It MUST preserve at least unsupported/no-tool refusal and safety/policy refusal as distinct machine-readable values — RPB-09/RPB-10. (D7 four-state separation: clarify ≠ unsupported ≠ safety ≠ crash.)
+## AD-RPB-005: Runtime result vocabulary preserves refusal and missing-slot classes
+
+The bridge SHALL preserve at least:
+
+- accepted tool call;
+- clarify/missing-slot result;
+- no available tool / unsupported refusal;
+- safety or policy refusal;
+- already-state no-op;
+- runtime error;
+- cancelled/interrupted result.
+
+A display-layer aggregate such as `rejected` is allowed only if machine-readable `result_class`, `rejection_class`, or equivalent source metadata remains available.
 
 ## AD-RPB-006: Presentation proof classes are finite and display-capped
 
-`PresentationSnapshot.proof_class` SHALL use a finite project vocabulary. Unknown values fail closed, and local/static/external-review proof MUST never be displayed as endpoint-ready, voice-ready, C6-ready, or V/S/U-PASS — RPB-25/RPB-36.
+`PresentationSnapshot.proof_class` SHALL use finite project vocabulary. Unknown values fail closed. Local/static/docs proof MUST NOT be displayed as runtime-ready, endpoint-ready, voice-ready, model-ready, golden-ready, mobile-ready, true-device-ready, C6-ready, V-PASS, S-PASS, or U-PASS.
 
-## AD-RPB-007: Minimal endpoint runtime boundaries
+## AD-RPB-007: Minimal runtime boundary wording
 
-Runtime work feeding the bridge SHALL avoid blocking the main thread, SHALL emit a terminal snapshot on cancel/interruption/timeout, and SHALL NOT introduce persistence, cloud sync, or long-lived user memory (short-lived 3-turn dialogue context excepted) — RPB-22/RPB-37/RPB-38.
+Future runtime work that feeds the bridge SHOULD avoid blocking the main thread, emit a terminal snapshot on cancel/interruption/timeout, and avoid persistence, cloud sync, real vehicle control, or long-lived user memory. This design records the boundary only; it does not implement it.
 
----
+## AD-RPB-008: D15 payload contract is main-owned and presentation-safe
 
-## AD-RPB-008: Result vocabulary includes partial-accept-partial-refuse
+After D14, Runtime Adapter V0 and C3 have local/unit proof for session-scoped execution, failure recording, readback reconciliation, exact settled stale retry, and private parent-plan replay boundaries. D15 does not expose those mechanics. It defines the stable main-owned Runtime -> Presentation payload contract that a future UIUE consumer may use only after the main contract lands.
 
-The runtime result vocabulary SHALL include `partial_accept_partial_refuse` for mixed-outcome turns (e.g. "open window and open tailgate while moving" → window satisfied + tailgate refused). The bridge SHALL carry per-action outcomes so presentation renders one combined snapshot with mixed per-card states and one composite readback — RPB-17/CC-A4. (Roadmap draft omitted this; mainline C3 currently throws on first guard denial, so partial-deny is a contract gap to fill.)
+Stable payload categories are:
 
-## AD-RPB-009: Snapshot carries active cell and refused cell
+- envelope identity: finite schema version, trace identity, presentation turn/event identity, terminal flag;
+- outcome: runtime/result class, safe reason class, stop reason when applicable, proof class;
+- cards: machine-readable family/key/role/active/sibling/reason/scope-origin semantics and display-safe state;
+- readbacks: key, display-safe actual value, revision, spoken text, and scope origin;
+- reconciliation: presentation-safe status or mismatch class derived from readback/outcome, not raw adapter ledgers;
+- trace: presentation-safe trace envelope with redacted messages and finite attributes.
 
-`PresentationSnapshot` SHALL carry, per turn, an `active_cell` (the cell this turn changed/focuses) and, for refusals, a `refused_cell` (the cell that was denied). These are distinct from a family's primary cell. Rationale: a family's summary primary cell may not be the cell that changed or was refused — RPB-29/RPB-51, CC1 (seat backrest/vent changed but primary is heat_level), CC-B1 (tailgate refused but primary is central_lock). Presentation MAY let a refused cell or active cell outrank the satisfied/primary cell for visual priority.
+UIUE may consume only these main-defined field categories after D15. UIUE must not infer shared fields from private Swift names, tests, adapter ledgers, or D14 receipts.
 
-## AD-RPB-010: Card schema carries sibling cells for semantic styling
+## AD-RPB-009: Adapter-private fields are not payload fields
 
-A snapshot card SHALL be able to carry, alongside its displayed cell, the family's relevant **sibling cells** (or at least the styling-driving cell). Rationale: cooling-blue / heating-red styling (SD20) reads `ac.mode` alongside `ac.temp_setpoint`; active-cell substitution (CC1) reads the changed sibling. Without sibling carriage, semantic value coloring and active-cell display cannot render from the snapshot alone — RPB-30/RPB-51. (This corrects the earlier classification of cooling/heating color as pure `visual_only`: the rendering logic is visual_only, but it depends on `shared_bridge_contract` sibling carriage.)
+The payload contract SHALL NOT expose `DemoRuntimeAdapter*`, `RuntimeAdapterBox`, `requestFingerprint`, `parentRequestFingerprint`, `failureLedger`, success/failure ledger internals, settled parent-plan internals, private provenance, adapter-local implementation names, raw runtime store, raw model output, or training receipts as UIUE-facing or presentation payload fields.
 
-## AD-RPB-011: Value provenance and scope resolution are two orthogonal fields
+Reconciliation is represented as presentation-safe outcome/readback status. It is not a copy of adapter ledger rows, C3 parent request fingerprints, or store internals. Private implementation details may appear only in negative tests, receipts, or forbidden-field documentation.
 
-The bridge SHALL distinguish two fields that must never be merged — RPB-08:
-- `source` = value provenance (who/what set the value): reuse `DemoVehicleValueSource{mock, user, system}` (`Core/State/DemoVehicleStateStore.swift`), extended for bridge input with `ui_touch` and `voice`. Internal provenance; not customer-facing.
-- `scope_origin` = scope resolution (how the 温区 scope was determined): reuse the existing `ScopeOrigin` enum (`Core/Execution/ScopeResolution.swift`, field `ScopeResolution.origin`), **current values `defaulted, explicit, fanout`**. Customer-facing structured metadata (AD-RPB-003).
+## AD-RPB-010: D15 does not promote proof class
 
-(Clarification — RPB-08 / parent roadmap were imprecise about where the enum lives: the value-provenance enum is `DemoVehicleValueSource` (in the store); the scope-resolution enum is `ScopeOrigin` (in `ScopeResolution`). They are two distinct enums, no naming collision. 🔴 A `missing` scope-origin value (scope unresolvable / absent) is a **bridge-proposed future addition, NOT a current Core value** — current `ScopeOrigin` has only `defaulted/explicit/fanout`; if `missing` is adopted it requires extending `ScopeOrigin` or a separate presentation scope enum, to be settled at mainline co-authorship.)
+D15 maximum proof remains docs/local, local_static, local_unit, OpenSpec, GitNexus, Codex subagent verifier, and Hermes verifier only if an anchored Hermes PASS exists. It does not prove durable ledger, production runtime, live API, mobile, true-device, UIUE merge, V-PASS, S-PASS, U-PASS, A-2 readiness, voice, model, golden, or endpoint readiness.
 
-## AD-RPB-012: Already-state is a distinct result mapped to a satisfied presentation
+## Accepted C-dispositions
 
-The bridge SHALL classify a no-op-because-already-true outcome as `already_state_noop`, distinct from accepted/unsupported/safety/clarify and never collapsed into them (c06 schema `already_state_must_not_be_collapsed_into_unsupported_or_safety`) — RPB-14. Presentation reuses the `satisfied` visual but distinguishes it from a fresh change: no revision bump, no numeric-roll, an acknowledgment cue, and an already-state readback. The bridge does NOT require an 8th `DemoVisualState`; the **result vocabulary** keeps `already_state_noop` separate while the **visual state** maps to `satisfied`.
-
-## AD-RPB-013: Event-driven thinking gates with two thinking semantics
-
-The bridge SHALL expose event-driven gates rather than fixed visual delays — RPB-21: `cards_did_start_changing` (handoff signal), `readback_ready`, `tts_start`, `tts_end`, plus `timeout` and `fallback`. Thinking has **two semantics** that MUST be distinguishable — RPB-53:
-- **analyzing think** = event-driven, masks backend work, ends on `cards_did_start_changing`.
-- **safety-refusal think** = a legitimate fixed short display (≈1.0s) that is NOT a backend-masking delay.
-
-A blanket "no fixed delays" rule MUST NOT delete the legitimate safety-refusal fixed display.
-
-## AD-RPB-014: Demo-mode force-state context input feeds a context surface (four dimensions, not one scene)
-
-Demo-mode console force-state (driving speed/gear, weather, time period) SHALL be expressed as a force-context event that mutates runtime context **through a bridge event** (not a direct store write), so the safety guard reading `vehicle.speed` has traceable provenance — RPB-52. 🔴 The bridge SHALL expose the **full context as distinct dimensions** — `vehicle{speed, gear}` + `environment{weather, time_period}` — **NOT a single pre-resolved scene name**, because the presentation context surface (SD24 diorama「活体迷你窗」capsule) **composites** these dimensions into one animated mini-scene (e.g. night ⊕ driving ⊕ rain rendered as layered sky + moving car + rain overlay together). A presentation-side priority-resolved scene name MAY be offered as a convenience, but the four dimensions are the contract. Weather/time are context inputs and display facts, not device cards — RPB-19. Force-state is demo-mode-isolated and MUST NOT be reachable in a customer-facing build.
-
-## AD-RPB-015: This bridge is the single cross-artifact authority; a code-graph harness manifest derives from it, never mints a second ID set
-
-If a code-graph harness (GitNexus / roam-code style — per the 2026-06-25 `reference-repos/graph-harness-research/` task index) is later adopted for blast-radius / impact preflight, its proposed cross-artifact "bridge manifest" (the research's T1 stable IDs + T2 runtime-presentation manifest: `family_id / state_cell_id / visual_slot_id / tool_surface_id / semantic_row_id / bench_case_id / golden_id / dataset_recipe_id`) SHALL be **derived from this bridge contract + the existing C1/C2 contract IDs**, and SHALL NOT define a parallel ID vocabulary. Rationale: the research's T2 "runtime-presentation bridge manifest" is the **same object** as this bridge contract — two sources for one truth. A second hand-authored ID set would create a double-SSOT that drifts (codex-meta §7 single-authority / claim-vs-reality §10 段间分叉). The graph layer **reads** these contracts to emit impact edges; authority stays here + in C1/C2. A graph harness, if adopted, is an isolated-scan exploration/preflight tool, not a contract source.
-
-## Object summary (proposed names; freeze in spec/tasks)
-
-- `DemoInteractionEvent` — text input / mic start / mic end / ASR text / ASR empty / card tap / value adjust / reset / force-macro / force-context-state / cancel / interruption / timeout; payload: family id, cell key, action kind, raw value, display value, scope, `scope_origin`, `source`, revision, trace id, initiator.
-- `DemoRuntimeResult` — `result_kind ∈ {accepted_tool_call, clarify_missing_slot, refusal_no_available_tool, refusal_safety_or_policy, already_state_noop, runtime_error, cancelled, partial_accept_partial_refuse}`; `active_cell`, `refused_cell`, `reason`, `readback`, `per_action_results[]`.
-- `PresentationSnapshot` — `trace_id`, `cards[]{family_id, cell_id, title, value, unit, visual_state, scope_origin, sibling_cells, active_cell, reason, available_actions, last_update}`, `dialog_text`, `readbacks`, `voice_state`, `orb_state`, `context{vehicle:{speed, gear}, environment:{weather, time_period}}` (four dimensions for the diorama capsule; optional `resolved_scene` convenience), finite-enum `proof_class`.
-- `TraceEnvelope` — presentation-safe view over C3 decode/plan/guard/execute/readback stages: trace id, event id, request text, normalized intent, guard result, transitions, readbacks, proof class, timestamps, redactions.
+| ID | Disposition |
+|---|---|
+| C01 | Closed for mainline dispatch readiness by this carrier: mainline accepts a thin runtime-presentation bridge carrier as the mainline-visible authority mapping; UIUE docs remain candidate/provenance, not standalone mainline SSOT. |
+| C03 | Closed for mainline dispatch readiness by this carrier: the carrier references/maps UIUE bridge semantics without creating a second same-meaning bridge SSOT. |
+| C06 | Closed for mainline dispatch readiness by this carrier: Core `ScopeOrigin` remains `defaulted/explicit/fanout`; missing/unresolved scope is represented in presentation/result metadata or explicit failure reason, not as a locked Core enum case. |
+| C18 | Closed for mainline dispatch readiness by this carrier: mainline route moves from `not_proposed` to active proposed/accepted bridge-carrier state; R5 may start only as dispatch readiness, not runtime/mobile proof. |

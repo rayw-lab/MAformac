@@ -27,14 +27,14 @@ struct StateCellInteractionPolicy: Equatable {
     var canWriteBack: Bool
     var writebackPath: StateCellInteractionWritebackPath
     var catalogReadback: String?
-    var proofClass: PresentationProofClass
+    var proofClass: StagePresentationProofClass
 }
 
 enum StateCellInteractionPolicyProjector {
     static func policy(
         for cell: DemoVehicleStateCell,
         catalog: StateCellPresentationCatalog = .shared,
-        proofClass: PresentationProofClass = .localMock
+        proofClass: StagePresentationProofClass = .localMock
     ) -> StateCellInteractionPolicy {
         let scopedKey = ScopedStateKey(cell.key)
         let base = scopedKey.base
@@ -77,7 +77,7 @@ enum StateCellInteractionPolicyProjector {
     static func policies(
         for cells: [DemoVehicleStateCell],
         catalog: StateCellPresentationCatalog = .shared,
-        proofClass: PresentationProofClass = .localMock
+        proofClass: StagePresentationProofClass = .localMock
     ) -> [StateCellInteractionPolicy] {
         cells
             .map { policy(for: $0, catalog: catalog, proofClass: proofClass) }

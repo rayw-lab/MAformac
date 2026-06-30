@@ -17,7 +17,7 @@ struct DemoRuntimeResultPresentationEntry: Equatable, Sendable {
     let dialogText: String
     let motionKind: PresentationMotionKind
     let ttsState: PresentationVoiceState
-    let proofClass: PresentationProofClass
+    let proofClass: StagePresentationProofClass
 }
 
 enum DemoRuntimeResultPresentationMatrix {

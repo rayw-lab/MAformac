@@ -93,7 +93,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
     }
 
     func testProofClassMappingsAreExplicitAndDoNotPromoteMainlineProofs() throws {
-        let expectedProofClasses: [String: PresentationProofClass] = [
+        let expectedProofClasses: [String: StagePresentationProofClass] = [
             "docs_local": .staticPreview,
             "openspec_contract": .staticPreview,
             "local_static_contract": .staticPreview,

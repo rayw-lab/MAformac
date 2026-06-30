@@ -1,41 +1,105 @@
-> 🔴 **Planning-artifact vs implementation-task status**: proposal/design/spec are **authored and strict-validated** (so `openspec status` reports artifacts complete / `isComplete=true`). The checkboxes below are **downstream contract-implementation/review tasks**; unchecked items are NOT execution authorization and do NOT imply Swift implementation is complete. `0/N tasks` here means "contract authored, implementation not started", not "work missed".
->
-> ✅ **Accepted by 磊哥 2026-06-25**: the contract is stable enough for **A-2 ui-presentation visual consumption via mock snapshots**. This acceptance is NOT a runtime-readiness/V-PASS claim; mainline runtime-side implementation review is still pending.
+## 1. Carrier validation
 
-## 1. Proposal validation
+- [x] 1.1 Create the mainline-visible carrier under `openspec/changes/define-runtime-presentation-bridge/`.
+- [x] 1.2 Record HR-01/HR-02/HR-03 in the carrier wording.
+- [x] 1.3 Record C01/C03/C06/C18 as dispatch-readiness dispositions, not runtime/mobile proof.
+- [x] 1.4 Keep this change contract-only; do not implement Swift.
 
-- [x] 1.1 Validate this change with `openspec validate define-runtime-presentation-bridge --strict`. (pass, 2026-06-25)
-- [x] 1.2 Validate all OpenSpec with `openspec validate --all --strict`. (16 passed, 0 failed)
-- [x] 1.3 Run `git diff --check`. (clean, exit 0)
+## 2. Contract fields
 
-## 2. Contract fields — events
+- [x] 2.1 Define Runtime -> Presentation authority mapping and no-second-SSOT rule.
+- [x] 2.2 Define runtime result vocabulary covering accepted tool calls, clarify/missing slot, unsupported refusal, safety/policy refusal, already-state no-op, runtime error, and cancelled/interrupted.
+- [x] 2.3 Define presentation snapshot requirements for trace identity, cards, dialog/readbacks, scope origin, optional voice/orb display state, and finite proof class.
+- [x] 2.4 Define `ScopeOrigin` disposition: no Core `missing`; missing/unresolved scope uses result/presentation metadata or explicit failure reason.
+- [x] 2.5 Define proof-class display caps so docs/local proof cannot be upgraded by UI copy.
 
-- [ ] 2.1 Define `DemoInteractionEvent` event kinds: text input, mic start, mic end, ASR text, ASR empty, card tap, value adjust, reset, force-macro, **force-context-state (demo-mode)**, cancel, interruption, timeout.
-- [ ] 2.2 Define `DemoInteractionEvent` payload: family id, cell key, action kind, raw value, display value, scope, `scope_origin`, **`source` (provenance, distinct from `scope_origin`)**, revision, trace id, initiator.
+## 3. Document cascade
 
-## 3. Contract fields — results
+- [x] 3.1 Update `docs/CURRENT.md` so bridge state is no longer `not_proposed`.
+- [x] 3.2 Update `docs/README.md` with the carrier and unblock receipt.
+- [x] 3.3 Update/supersede `docs/project/phase0/uiue-r4-mainline-coauthor-receipt-2026-06-28.md` without claiming runtime proof.
+- [x] 3.4 Create `docs/project/phase0/mainline-runtime-presentation-bridge-unblock-2026-06-28.md` with dirty ownership and validation receipt.
 
-- [ ] 3.1 Define `DemoRuntimeResult.result_kind`: `accepted_tool_call`, `clarify_missing_slot`, `refusal_no_available_tool`, `refusal_safety_or_policy`, `already_state_noop`, `runtime_error`, `cancelled`, **`partial_accept_partial_refuse`**. A display-layer `rejected` aggregate is allowed only if it also carries a machine-readable `rejection_class`.
-- [ ] 3.2 Define `already_state_noop` as distinct (not unsupported/safety), with renderer-owned already-state readback and no store mutation.
-- [ ] 3.3 Define `partial_accept_partial_refuse` with `per_action_results[]` so one combined snapshot carries mixed per-card outcomes plus one composite readback.
-- [ ] 3.4 Define `active_cell` and `refused_cell` on the result/snapshot, distinct from a family primary cell.
+## 4. Red lines
 
-## 4. Contract fields — snapshot
+- [x] 4.1 Do not edit `/Users/wanglei/workspace/MAformac-uiue`.
+- [x] 4.2 Do not start UIUE R5 implementation.
+- [x] 4.3 Do not claim runtime-ready, voice-ready, model-ready, golden-ready, endpoint-ready, mobile, true_device, V-PASS, S-PASS, U-PASS, or UIUE merge.
 
-- [ ] 4.1 Define `PresentationSnapshot` fields: `trace_id`, `cards`, `dialog_text`, `readbacks`, `scope_origin`, `voice_state`, `orb_state`, **`context{vehicle:{speed,gear}, environment:{weather,time_period}}` 四维**（diorama composite，见 4.3；optional `resolved_scene`）, and finite-enum `proof_class` with display caps and unknown-value fail-closed behavior.
-- [ ] 4.2 Define the card schema: family id, cell id, title, value, unit, visual state, `scope_origin`, **`sibling_cells` (for semantic styling: cooling/heating mode + active-cell substitution)**, `active_cell`, reason, available actions, last update.
-- [ ] 4.3 Define `context` as **distinct dimensions** `vehicle{speed, gear}` + `environment{weather, time_period}` (NOT a single pre-resolved scene; the SD24 diorama capsule composites them, e.g. night⊕driving⊕rain layered) + force-context provenance; an optional `resolved_scene` name MAY be offered for convenience; weather/time are context inputs and display facts, not device cards.
+## 5. Validation
 
-## 5. Contract fields — trace + gates
+- [x] 5.1 Run `openspec validate define-runtime-presentation-bridge --strict`.
+- [x] 5.2 Run `openspec validate --all --strict`.
+- [x] 5.3 Run `git diff --check`.
 
-- [ ] 5.1 Define `TraceEnvelope` as a presentation-safe view over C3 decode, plan, guard, execute, and readback stages.
-- [ ] 5.2 Define event-driven thinking gates: `cards_did_start_changing`, `readback_ready`, `tts_start`, `tts_end`, `timeout`, `fallback`.
-- [ ] 5.3 Define the two thinking semantics: analyzing think (event-driven, backend-masking) vs safety-refusal think (legitimate fixed short display) — the gates MUST NOT delete the fixed safety display.
-- [ ] 5.4 Define minimal runtime boundary behavior: off-main execution for runtime work, terminal snapshots for cancel/interruption/timeout, and no persistence, cloud sync, or long-lived user memory (3-turn dialogue context excepted).
+## 6. Phase1 typed bridge contract
 
-## 6. Red lines
+- [x] 6.1 Add `DemoInteractionEvent`, `DemoRuntimeResult`, `DemoRuntimeOutcome`, `PresentationSnapshot`, `TraceEnvelope`, and finite `PresentationProofClass` as mainline Core contract types.
+- [x] 6.2 Preserve upstream `VehicleToolBehaviorClass.toolCall` while mapping it to bridge `accepted_tool_call`.
+- [x] 6.3 Carry missing/unresolved scope through explicit reason metadata, not `ScopeOrigin.missing`.
+- [x] 6.4 Add focused unit tests for behavior mapping, scope-missing disposition, proof-class fail-closed behavior, and snapshot codability.
 
-- [ ] 6.1 Do not implement Swift in this contract-only change.
-- [ ] 6.2 Do not modify UIUE or Core Swift code in this change (contract docs only).
-- [ ] 6.3 Do not claim runtime/backend/model/voice/endpoint/golden-run readiness or V/S/U-PASS from contract validation.
-- [ ] 6.4 Do not redefine C2/C3 semantics; reuse existing Core concepts (`DemoVehicleValueSource`, `DemoActionReadback`, `DemoVehicleStateCell`, `C3ExecutionResult`, `TraceEntry`, `DemoVisualState`, `ScopeResolution`).
+## 7. Phase1 terminal snapshot adapter behavior proof
+
+- [x] 7.1 Add a minimal terminal snapshot adapter/factory for guard-denial, thrown-error, partial accept/refuse, and stop outcomes.
+- [x] 7.2 Prove guard denial maps to a terminal presentation-safe `refusal_safety_or_policy` snapshot without raw model/store/training fields.
+- [x] 7.3 Prove thrown adapter/runtime failure maps to a terminal `runtime_error` snapshot with trace identity and safe reason.
+- [x] 7.4 Prove partial accept/refuse carries accepted readbacks and mixed card state in a terminal snapshot.
+- [x] 7.5 Prove cancel, interruption, timeout, and backgrounding all emit terminal snapshots.
+- [x] 7.6 Run Codex native subagent P0/P1 audit and resolve or record findings.
+- [x] 7.7 Run Hermes/GLM P0/P1 audit loop and resolve or record findings.
+
+## 8. R5 Dispatch 2 mainline contract/test hardening
+
+- [x] 8.1 Rewrite `C006` as: timeout is a terminal stop/result outcome, not a required interaction event kind; prove with unit test.
+- [x] 8.2 Cover `C007` by separating event provenance/source from snapshot/readback/outcome scope metadata; prove with unit test.
+- [x] 8.3 Cover `C024` by adding presentation-safe trace redaction for raw model output, training receipt, and raw runtime store markers; prove with unit test.
+- [x] 8.4 Rewrite and cover `C029` as: refused/unsafe cards can outrank satisfied cards in deterministic presentation ordering; prove with unit test.
+- [x] 8.5 Cover `C030` with machine-readable card semantics for role, active state, sibling keys, reason, and scope origin; prove with unit test.
+- [x] 8.6 Cover `C143` with append-only trace envelope helper requiring matching trace identity and monotonic timestamps; prove with unit test.
+- [x] 8.7 Rewrite `C052` as deferred: production force-state behavior is not created in this dispatch; future demo tooling owner must prove DEMO_MODE, trace provenance, and no production path.
+- [x] 8.8 Rewrite `C061` as deferred: retry/idempotency no-double-write belongs to future runtime adapter execution tests, while bridge-level card/trace contracts remain local-unit only.
+- [x] 8.9 Defer `C005` runtime write ownership to future runtime adapter wiring; current bridge surface remains snapshot/event contract-only.
+- [x] 8.10 Defer `C018` SceneMacroRegistry/Core config ownership; mainline must own a future OpenSpec before UIUE treats it as shared runtime config.
+- [x] 8.11 Run Codex native subagent P0/P1 audit and resolve or record findings.
+- [x] 8.12 Run Hermes/GLM P0/P1 audit loop or user-authorized Codex equivalent after Hermes stall; resolve or record findings.
+
+## 9. R5 D15 Runtime -> Presentation payload contract
+
+- [x] 9.1 Gate 1: define main-owned payload/readback/reconciliation authority and forbidden adapter-private exposure in proposal, design, and spec.
+- [x] 9.2 Gate 1: run local validation, Codex native subagent audit, and anchored Hermes audit.
+- [x] 9.3 Gate 2: implement stable presentation-safe payload type or builder in main Core Presentation code.
+- [x] 9.4 Gate 2: add focused local/unit tests for schema version, outcome, cards, readbacks, reconciliation status, proof cap, and forbidden private-field encoding.
+- [x] 9.5 Gate 2: run GitNexus impact/detect, local validation, Codex native subagent audit, and anchored Hermes audit.
+- [x] 9.6 Gate 3: verify committed Gate 1/2 diff from clean worktree, including forbidden-field search and UIUE read-only boundary guard.
+- [x] 9.7 Gate 3: run GitNexus verifier, Codex native subagent audit, and anchored Hermes audit, or record an explicit operator override and substitute hard audit.
+- [ ] 9.8 Gate 4: reconcile UIUE route map and burndown without implementing UIUE consumer integration.
+- [ ] 9.9 Gate 4: run UIUE local validation, Codex native subagent audit, and anchored Hermes audit before exact-path docs commit.
+
+## 10. R5 D20/D21 Public Fixture Contract
+
+- [x] 10.1 Add deterministic presentation-safe public `RuntimePresentationPayload` fixture JSON set under `Tests/Fixtures/RuntimePresentationPayload/`.
+- [x] 10.2 Record fixture sha256 entries in a manifest shared with the UIUE fixture copy.
+- [x] 10.3 Prove main can generate the committed public fixture object from `RuntimePresentationPayload` while excluding non-public timestamp fields.
+- [x] 10.4 Prove the public fixture set contains no adapter-private, durable-ledger, raw-runtime, raw-model, or training receipt markers.
+- [x] 10.5 Preserve proof caps: fixture proof remains local/unit/static only and does not claim runtime-ready, mobile, true-device, live, UIUE merge, V/S/U-PASS, A-2, voice/model/golden/endpoint readiness, or R5 completion.
+- [x] 10.6 Cover non-happy-path public payload boundaries for refusal safety, runtime error, reconciliation mismatch, and partial accept/refuse without adding private runtime fields.
+
+## 11. R5 D22 Runtime Payload Corpus Expansion
+
+- [x] 11.1 Add D22 manifest governance metadata for every public fixture entry: `caseID`, `fixtureClass`, `result`, `familyCoverage`, and `proofClass`.
+- [x] 11.2 Preserve the existing 5 D20/D21 bridge-contract fixtures and classify them as `bridge_contract_fixture` without changing their JSON hashes.
+- [x] 11.3 Add local runtime-generated public fixtures for `window.position`, `screen.brightness`, `ambient.brightness`, and `window.position` noop coverage.
+- [x] 11.4 Assert generated fixtures match committed public JSON projection while stripping non-public timestamp volatility and preserving trace/readback semantics in tests.
+- [x] 11.5 Keep the UIUE-facing contract presentation-safe: no adapter-private Swift types, durable ledger internals, raw runtime store, raw model output, training receipt, request fingerprint, or settled-plan internals.
+- [x] 11.6 Preserve proof caps and fixture-class truth: `runtime_generated_fixture` is local/unit generator evidence, and `bridge_contract_fixture` is contract-boundary fixture evidence only.
+- [x] 11.7 Fix first GPT Pro PR-pair P1 post-audit by adding public result `partial_accept_partial_refuse`, making the partial accept/refuse adapter emit it, and adding main public-vocabulary decoding coverage for all 9 fixtures.
+- [x] 11.8 Record first GPT Pro audits as `REQUEST_CHANGES` fixed post-audit; user requested a post-fix GPT Pro rerun after push, without changing the first audit result into PASS.
+
+## 12. R5 D23 Shared Public Fixture Schema Checker
+
+- [x] 12.1 Add a main-owned public fixture schema artifact at `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json`.
+- [x] 12.2 Bind the fixture manifest to the schema artifact with sha256, owner path, UIUE consumer path, and update rule.
+- [x] 12.3 Prove the schema covers manifest schema version, payload schema version, exact fixture count/names, allowed fixture classes, allowed proof classes, corpus result vocabulary, public top-level fields, forbidden top-level/card timestamp fields, private/durable/raw marker denial, proof cap, and non-claims.
+- [x] 12.4 Keep result vocabulary main-owned by proving every schema `allowedResults` entry is expressible by `DemoRuntimeResult` without widening the corpus contract to every runtime enum case.
+- [x] 12.5 Record D23 review policy truth: no Gate Hermes/Claude Code audit by user override; post-gate review is Codex subagent xhigh, then GPT Pro after fixes/push, without turning advisory review into proof class or readiness.

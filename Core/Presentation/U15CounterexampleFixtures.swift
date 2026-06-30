@@ -4,7 +4,7 @@ struct U15CounterexampleFixture: Equatable {
     let id: String
     let title: String
     let resultKind: DemoRuntimeResultKind
-    let snapshot: PresentationSnapshot
+    let snapshot: StagePresentationSnapshot
     let proofIntent: String
 }
 
@@ -118,7 +118,7 @@ enum U15CounterexampleFixtures {
         proofIntent: String
     ) -> U15CounterexampleFixture {
         let entry = DemoRuntimeResultPresentationMatrix.entry(for: resultKind)
-        let snapshot = PresentationSnapshot(
+        let snapshot = StagePresentationSnapshot(
             traceId: "u15-\(id)",
             storeCells: cells,
             activeCells: activeCells,

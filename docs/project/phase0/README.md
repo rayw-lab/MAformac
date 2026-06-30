@@ -49,6 +49,8 @@ These files are not implementation, not OpenSpec archive, and not permission to 
 - `c5-recovery-roadmap-disposition.md` records which roadmaps are historical versus live carriers.
 - `phase0-d1-d10-closeout.md` records current closeout status; it is accepted for D1-D10 user decisions but still partial until heterogeneous review and OpenSpec carriers are accepted.
 - `phase0-d1-d10-cascade-audit-codex-2026-06-24.md` records the Codex same-vendor cascade pre-check and main-thread absorption.
+- `rebuild-c6-documentation-absorption-closeout-2026-06-24.md` records the documentation-only closeout for `rebuild-c6-four-layer-bench`. It is approved for human OpenSpec propose review, not apply/implementation.
+- `r-l17-human-review-evidence/route-deframing-prep-2026-06-24.md` prepares R-L17 route deframing and the heterogeneous judge prompt. It is not route signoff.
 
 ## Demo Default Scope Gate Pack
 
@@ -59,6 +61,13 @@ These files are not implementation, not OpenSpec archive, and not permission to 
 - Apply plan: `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. This is a Superpowers implementation plan after Phase -1 closeout, not a Phase 0 route-control artifact. It is governed by Phase 0/G01-G28 decisions and retires after default-scope apply closeout.
 - Apply-plan audit: `default-scope-apply-plan-audit-codex-2026-06-24.md` records the Codex same-vendor pre-check (`CLEAR_WITH_FIXES`) and absorbed fixes. It does not close R-L17.
 - UIUE worktree pinning: external worktree `/Users/wanglei/workspace/MAformac-uiue`, current recorded HEAD `17f2af1` as of 2026-06-24. This remains an unverified external reference; reconfirm current UIUE files before citing UIUE file:line evidence.
+
+## D20-D24 R5 Runtime/UIUE PR Absorption Pack
+
+- D20-D23 receipts and commander verdicts record proof-capped runtime-payload, UIUE consumer, public fixture corpus, shared schema/checker, and PR remote-truth work. They are local/static/unit/integration/OpenSpec/GitHub evidence only, not runtime/product readiness.
+- D24 absorption manifest: `r5-d24-uiue-absorption-manifest-2026-06-30.md`. It is the main-traceable inventory for PR #7/#6, local dirty split, UIUE source dispositions, broad PR #6 surfaces, and no-claim boundaries before merge.
+- UIUE source manifest: `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`. It remains source-side evidence and does not make UIUE docs/reports/tools current mainline proof by itself.
+- D24 merge order remains PR #7 first, then PR #6 after fresh re-probe/update/check. Branch deletion, runtime-ready, mobile, true-device, live API, V/S/U-PASS, A-2 complete, R5 complete, voice/model/golden/endpoint-ready claims remain explicitly out of scope.
 
 ## Current State
 

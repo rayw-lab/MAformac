@@ -97,7 +97,7 @@ struct DemoControlPanelState: Equatable {
 struct DemoControlPanel: View {
     @Binding var theme: PresentationTheme
     @Binding var state: DemoControlPanelState
-    var snapshot: PresentationSnapshot
+    var snapshot: StagePresentationSnapshot
     var onApplyContext: (DemoControlPanelState) -> Void
     var onResetNormal: () -> Void
     var onApplyMacro: (CabinSceneMacro) -> Void
@@ -372,7 +372,7 @@ private struct DemoPanelTileButtonStyle: ButtonStyle {
 }
 
 struct AllStateSheet: View {
-    var snapshot: PresentationSnapshot
+    var snapshot: StagePresentationSnapshot
     var controlState: DemoControlPanelState
     var theme: PresentationTheme
     @Environment(\.dismiss) private var dismiss
@@ -441,7 +441,7 @@ private struct AllStateSection: Identifiable {
         }
     }
 
-    static func make(snapshot: PresentationSnapshot, controlState: DemoControlPanelState) -> [AllStateSection] {
+    static func make(snapshot: StagePresentationSnapshot, controlState: DemoControlPanelState) -> [AllStateSection] {
         let entries = AllStateEntry.make(snapshot: snapshot, controlState: controlState)
         let order = ["整车", "环境"] + FamilyCardID.displayOrder.map(\.displayName)
         return order.compactMap { title in
@@ -458,7 +458,7 @@ private struct AllStateEntry: Identifiable {
     var value: String
     var visualState: DemoVisualState
 
-    static func make(snapshot: PresentationSnapshot, controlState: DemoControlPanelState) -> [AllStateEntry] {
+    static func make(snapshot: StagePresentationSnapshot, controlState: DemoControlPanelState) -> [AllStateEntry] {
         let catalog = StateCellPresentationCatalog.shared
         let exactCells = Dictionary(uniqueKeysWithValues: snapshot.storeCells.map { ($0.key, $0) })
         let cellsByBase = Dictionary(grouping: snapshot.storeCells, by: { ScopedStateKey($0.key).base })

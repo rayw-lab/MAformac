@@ -12,7 +12,7 @@ enum RuntimePresentationPayloadFixtureConsumerError: Error, Equatable, Sendable 
 }
 
 enum RuntimePresentationPayloadFixtureConsumer {
-    static func consume(_ data: Data) throws -> PresentationSnapshot {
+    static func consume(_ data: Data) throws -> StagePresentationSnapshot {
         try RuntimePresentationPayloadPrivateMarkerGuard.rejectForbiddenMarkers(in: data)
 
         let payload = try JSONDecoder().decode(RuntimePresentationPayloadFixture.self, from: data)
@@ -73,7 +73,7 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         traceEnvelope = try container.decodeIfPresent(FixtureTraceEnvelope.self, forKey: .traceEnvelope)
     }
 
-    func presentationSnapshot() throws -> PresentationSnapshot {
+    func presentationSnapshot() throws -> StagePresentationSnapshot {
         let resultKind = try outcome.localResultKind()
         let localReadbacks = try readbacks.map { try $0.demoReadback() }
         let localCards = try cards.map { try $0.demoCell() }
@@ -105,7 +105,7 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         let dialogText = localReadbacks.map(\.spokenText).filter { !$0.isEmpty }.joined(separator: "；")
         let resolvedDialogText = dialogText.isEmpty ? (outcome.reason ?? resultPresentation.dialogText) : dialogText
 
-        return PresentationSnapshot(
+        return StagePresentationSnapshot(
             traceId: traceID,
             storeCells: localCards,
             activeCells: activeCells,
@@ -467,7 +467,7 @@ private struct FixtureTimestamp: Decodable {
 }
 
 private enum RuntimePresentationPayloadFixtureConsumerBridge {
-    static func proofClass(for mainlineName: String) throws -> PresentationProofClass {
+    static func proofClass(for mainlineName: String) throws -> StagePresentationProofClass {
         switch mainlineName {
         case "local_unit":
             return .localMock

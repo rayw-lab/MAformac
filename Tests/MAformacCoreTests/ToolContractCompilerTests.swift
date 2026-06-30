@@ -144,6 +144,41 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertEqual(state["window.position[右后]"], "0")
     }
 
+    func testStateApplierEvidenceIncludesDirectAndDependencyWrites() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let result = try ToolContractStateApplier.applyWithEvidence(
+            toolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["target_temperature": "24"])],
+            to: ["ac.power": "off", "ac.temp_setpoint[主驾]": "22"],
+            stateCells: stateCells
+        )
+
+        XCTAssertTrue(result.appliedWrites.contains {
+            $0.stateKey == "ac.temp_setpoint[主驾]" &&
+                $0.beforeValue == "22" &&
+                $0.afterValue == "24" &&
+                $0.writeKind == .direct
+        })
+        XCTAssertTrue(result.appliedWrites.contains {
+            $0.stateKey == "ac.power" &&
+                $0.beforeValue == "off" &&
+                $0.afterValue == "on" &&
+                $0.writeKind == .dependency
+        })
+    }
+
+    func testStateApplierEvidenceIncludesEnumDirectWrites() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let result = try ToolContractStateApplier.applyWithEvidence(
+            toolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            to: ["ac.power": "off"],
+            stateCells: stateCells
+        )
+
+        XCTAssertEqual(result.appliedWrites, [
+            StateWrite(stateKey: "ac.power", beforeValue: "off", afterValue: "on", scopeOrigin: nil, writeKind: .direct)
+        ])
+    }
+
     func testStateApplierFansOutOnlyForExplicitCollectionAlias() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())

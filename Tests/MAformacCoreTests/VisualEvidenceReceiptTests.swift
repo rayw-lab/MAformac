@@ -67,7 +67,7 @@ final class VisualEvidenceReceiptTests: XCTestCase {
             let readback = store.applyMockTransition(
                 DemoMockTransition(key: sample.cellKey, desiredValue: sample.afterValue, source: .user)
             )
-            let snapshot = PresentationSnapshot.from(
+            let snapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [sample.family: sample.cellKey],
                 readbacks: [readback]

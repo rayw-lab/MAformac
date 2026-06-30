@@ -6,7 +6,7 @@ struct ContentView: View {
     let speech: any SpeechSynthesisEngine
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var snapshot: PresentationSnapshot
+    @State private var snapshot: StagePresentationSnapshot
     @State private var theme: PresentationTheme
     @State private var focus = FocusController()
     @State private var presentedSheet: PresentationSheet?
@@ -334,7 +334,7 @@ struct ContentView: View {
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = .explicit
         withAnimation(.snappy(duration: 0.28)) {
-            snapshot = PresentationSnapshot.from(
+            snapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [family: key],
                 context: snapshot.context,
@@ -376,7 +376,7 @@ struct ContentView: View {
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = scopeOrigins[key] ?? .defaulted
         withAnimation(.snappy(duration: 0.30)) {
-            snapshot = PresentationSnapshot.from(
+            snapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [.ac: key],
                 context: snapshot.context,
@@ -495,7 +495,7 @@ struct ContentView: View {
     ) {
         store.replaceCells(cells)
         withAnimation(.snappy(duration: 0.28)) {
-            snapshot = PresentationSnapshot.from(
+            snapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: activeCells,
                 context: context,
@@ -589,7 +589,7 @@ struct ContentView: View {
         }
     }
 
-    private static func phase2State(for preset: SnapshotPreset) -> (snapshot: PresentationSnapshot, messages: [DialogueMessage]) {
+    private static func phase2State(for preset: SnapshotPreset) -> (snapshot: StagePresentationSnapshot, messages: [DialogueMessage]) {
         switch preset {
         case .coldStart:
             return (
@@ -628,25 +628,25 @@ struct ContentView: View {
         }
     }
 
-    private static func heatingSnapshot() -> PresentationSnapshot {
+    private static func heatingSnapshot() -> StagePresentationSnapshot {
         phase2Snapshot(acMode: "制热", temperature: "28", thermalState: .changing, orbState: .speak)
     }
 
-    private static func phase2IdleBaselineSnapshot() -> PresentationSnapshot {
+    private static func phase2IdleBaselineSnapshot() -> StagePresentationSnapshot {
         var snapshot = phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .normal, orbState: .idle)
         snapshot.dialogText = "我在听..."
         snapshot.resultKind = nil
         return snapshot
     }
 
-    private static func listeningSnapshot() -> PresentationSnapshot {
+    private static func listeningSnapshot() -> StagePresentationSnapshot {
         var snapshot = phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .normal, orbState: .listen)
         snapshot.dialogText = "我在听..."
         snapshot.resultKind = nil
         return snapshot
     }
 
-    private static func phase2CoolingSnapshot() -> PresentationSnapshot {
+    private static func phase2CoolingSnapshot() -> StagePresentationSnapshot {
         phase2Snapshot(acMode: "制冷", temperature: "26", thermalState: .changing, orbState: .speak)
     }
 
@@ -655,8 +655,8 @@ struct ContentView: View {
         temperature: String,
         thermalState: DemoVisualState,
         orbState: PresentationOrbState
-    ) -> PresentationSnapshot {
-        PresentationSnapshot(
+    ) -> StagePresentationSnapshot {
+        StagePresentationSnapshot(
             storeCells: [
                 demoCell("seat.heat_level", "2", revision: 2, state: .normal),
                 demoCell("seat.vent_level", "1", revision: 2, state: .normal),

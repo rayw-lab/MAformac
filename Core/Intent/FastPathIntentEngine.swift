@@ -17,12 +17,16 @@ public struct FastPathIntentEngine: Sendable {
             agentID: "vehicle-control",
             capabilityID: "vehicle.ac.toggle",
             toolName: "set_vehicle_control",
-            arguments: [
-                "state_key": "ac.power",
-                "target_state": "on"
-            ],
+            device: "ac",
+            actionPrimitive: "power_on",
+            value: ContractValue(offset: "on", type: "STATE"),
+            candidateSource: .fastPath,
+            rawPayload: .object([
+                "device": .string("ac"),
+                "action_primitive": .string("power_on"),
+                "target_state": .string("on")
+            ]),
             surfacePolicy: .primaryPanel
         )
     }
 }
-

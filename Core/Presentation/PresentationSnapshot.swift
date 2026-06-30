@@ -11,7 +11,7 @@ enum DemoRuntimeResultKind: String, CaseIterable, Codable, Equatable, Sendable {
     case partialAcceptPartialRefuse = "partial_accept_partial_refuse"
 }
 
-enum PresentationProofClass: String, Codable, Equatable, Sendable {
+enum StagePresentationProofClass: String, Codable, Equatable, Sendable {
     case localMock = "local_mock"
     case staticPreview = "static_preview"
     case simulatorMock = "simulator_mock"
@@ -56,7 +56,7 @@ struct DemoContext: Codable, Equatable, Sendable {
 ///
 /// This carries presentation-safe state for UIUE without requiring the front stage
 /// to read runtime traces, NLU output, voice state machines, or training receipts.
-struct PresentationSnapshot: Equatable {
+struct StagePresentationSnapshot: Equatable {
     var traceId: String
     var storeCells: [DemoVehicleStateCell]
     var activeCells: [FamilyCardID: String]
@@ -68,7 +68,7 @@ struct PresentationSnapshot: Equatable {
     var dialogText: String
     var readbacks: [DemoActionReadback]
     var resultKind: DemoRuntimeResultKind?
-    var proofClass: PresentationProofClass
+    var proofClass: StagePresentationProofClass
 
     init(
         traceId: String = UUID().uuidString,
@@ -82,7 +82,7 @@ struct PresentationSnapshot: Equatable {
         dialogText: String = "",
         readbacks: [DemoActionReadback] = [],
         resultKind: DemoRuntimeResultKind? = nil,
-        proofClass: PresentationProofClass = .localMock
+        proofClass: StagePresentationProofClass = .localMock
     ) {
         self.traceId = traceId
         self.storeCells = storeCells
@@ -100,12 +100,12 @@ struct PresentationSnapshot: Equatable {
 }
 
 enum MockPresentationSnapshotProvider {
-    static func coldStart() -> PresentationSnapshot {
-        PresentationSnapshot(storeCells: [])
+    static func coldStart() -> StagePresentationSnapshot {
+        StagePresentationSnapshot(storeCells: [])
     }
 
-    static func acStarted() -> PresentationSnapshot {
-        PresentationSnapshot(
+    static func acStarted() -> StagePresentationSnapshot {
+        StagePresentationSnapshot(
             storeCells: [
                 DemoVehicleStateCell(key: "ac.power", actualValue: "on", revision: 1, visualState: .satisfied),
                 DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24", revision: 1, visualState: .normal)
@@ -117,8 +117,8 @@ enum MockPresentationSnapshotProvider {
         )
     }
 
-    static func coolingMode() -> PresentationSnapshot {
-        PresentationSnapshot(
+    static func coolingMode() -> StagePresentationSnapshot {
+        StagePresentationSnapshot(
             storeCells: [
                 DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "26", revision: 2, visualState: .changing),
                 DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷", revision: 2, visualState: .satisfied)
@@ -130,8 +130,8 @@ enum MockPresentationSnapshotProvider {
         )
     }
 
-    static func safetyRefusal() -> PresentationSnapshot {
-        PresentationSnapshot(
+    static func safetyRefusal() -> StagePresentationSnapshot {
+        StagePresentationSnapshot(
             storeCells: [
                 DemoVehicleStateCell(key: "door.tailgate_height[尾门]", actualValue: "0", revision: 1, visualState: .unsafe)
             ],
@@ -149,7 +149,7 @@ enum MockPresentationSnapshotProvider {
     }
 }
 
-extension PresentationSnapshot {
+extension StagePresentationSnapshot {
     @MainActor
     static func from(
         store: DemoVehicleStateStore,
@@ -163,9 +163,9 @@ extension PresentationSnapshot {
         voiceState: PresentationVoiceState = .idle,
         dialogText: String = "",
         readbacks: [DemoActionReadback] = [],
-        proofClass: PresentationProofClass = .localMock
-    ) -> PresentationSnapshot {
-        PresentationSnapshot(
+        proofClass: StagePresentationProofClass = .localMock
+    ) -> StagePresentationSnapshot {
+        StagePresentationSnapshot(
             traceId: traceId,
             storeCells: store.presentationCells,
             activeCells: activeCells,

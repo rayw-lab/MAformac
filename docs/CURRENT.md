@@ -2,131 +2,140 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-06-28
-last_verified_base_commit: 6763e8a
-branch: main
-expires_when: "default-scope apply closeout lands or this route board is superseded by a newer route board."
+updated: 2026-06-25
+plan_creation_head: f3a3299fe55fcb67b72f8b1a085f8939b01b1b76
+architecture_audit_head: 69432512a2c8ddcdc584bfac47f3218262544118
+route_fix_input_worktree_head: 69432512a2c8ddcdc584bfac47f3218262544118
+route_fix_input_upstream_head: 69432512a2c8ddcdc584bfac47f3218262544118
+architecture_code_absorption_input_head: e130a214f7f4cac42d68fbad7f73662a19932975
+last_verified_origin_main: c1e7d58
+branch: codex/rebuild-c6-doc-absorption-20260624
+head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
+expires_when: "this branch is merged, a newer current route board lands, or the post-C6 parent roadmap is superseded by accepted grill decisions."
 ---
 
-# CURRENT — MAformac Current Route Board
+# CURRENT - MAformac Current Route Board
 
 > This file is a traffic board, not a source of truth.
-> If this file conflicts with `CLAUDE.md`, archived OpenSpec specs, accepted grill decision packs, or active OpenSpec changes, this file loses and must be updated.
+> If this file conflicts with `CLAUDE.md`, archived OpenSpec specs, accepted grill decision packs, active OpenSpec changes, signed evidence, or live repo state, this file loses and must be updated.
 
 ## Current Phase
 
-R5 D24 absorption/source-manifest and PR merge-control is active under proof cap.
+R5 D24 local/cloud dual-repo absorption and PR merge-control is active under proof cap.
 
 Live-verified D24 route facts at execution start:
 
+- Main worktree branch: `codex/rebuild-c6-doc-absorption-20260624`.
+- Main local HEAD: `f58c006498766a49b607ed8cfb70c8ffb4ae9ac2`.
+- Main PR #7: `OPEN`, draft `true`, `mergeStateStatus=CLEAN`, head `7c5c8a8a174da7d5e93ceef4adbae482efa0d5a2`, checks `SUCCESS`.
 - UIUE worktree branch: `uiue/phase4-default-scope-presentation`.
 - UIUE local HEAD: `4c7da7167a64f79839327d9f11d633aa2948f171`.
 - UIUE PR #6: `OPEN`, draft `false`, `mergeStateStatus=CLEAN`, head `1b84af5f08bc0ac188c01b53ca888b0eb3d13c1c`, checks `SUCCESS`.
-- Main PR #7: `OPEN`, draft `true`, `mergeStateStatus=CLEAN`, head `7c5c8a8a174da7d5e93ceef4adbae482efa0d5a2`, checks `SUCCESS`.
-- Source manifest: `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`.
-- Main absorption manifest: `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md`.
-- Merge order, if all D24 gates pass: PR #7 first, then fresh PR #6 re-probe/update/check, then PR #6.
+- D24 absorption manifest: `docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md`.
+- UIUE source manifest: `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`.
+- Merge order, if all D24 gates pass: PR #7 first, then re-probe/update/check PR #6, then PR #6.
 
-This is absorption + route-control + cloud PR merge + post-merge verification only. It is not UIUE runtime-ready, mobile, true-device, live API, A-2 complete, R5 complete, V/S/U-PASS, voice/model/golden/endpoint-ready, or product readiness.
+This D24 route is absorption + route-control + cloud PR merge + post-merge local verification only. It is not R5 complete, A-2 complete, runtime-ready, mobile, true-device, live API, V/S/U-PASS, voice-ready, model-ready, golden-ready, or endpoint-ready.
 
-Post-A2 / default-scope apply authorized: Phase -1 carrier materialization is accepted for apply, but physical implementation has not started.
+Post Long-run 2 rebuild-C6 identity + behavior-shape construction closeout.
 
-Current audited state:
+Live-verified route facts at the start of the architecture-audit absorption patch:
 
-- Main repo branch: `main`.
-- Main repo base at audit: `6763e8a`.
-- Active draft carrier: `openspec/changes/define-demo-default-scope/`.
-- OpenSpec validation at audit: `openspec validate define-demo-default-scope --strict` pass; `openspec validate --all --strict` pass with 14 passed, 0 failed.
-- Phase -1 carrier scope is documentation/OpenSpec-only and is accepted for apply. The next implementation must follow `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. Same-vendor plan pre-check returned `CLEAR_WITH_FIXES`, and fixes are absorbed in the plan. This still does not authorize training, C6 acceptance, endpoint claims, demo-golden-run, voice, or UIUE merge.
+- Current worktree branch: `codex/rebuild-c6-doc-absorption-20260624`.
+- Route plan creation `HEAD`: `f3a3299fe55fcb67b72f8b1a085f8939b01b1b76`.
+- GPT Pro architecture audit `HEAD`: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- Route-fix input worktree `HEAD`: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- Route-fix input upstream `@{u}`: `69432512a2c8ddcdc584bfac47f3218262544118`.
+- Current `origin/main`: `c1e7d58d281d0256d29034c1d120cefe0bf5a033`.
+- `origin/main` is an ancestor of the route-fix input `HEAD`.
+- This file is not a self-updating commit marker; for current branch truth after later commits, run `git rev-parse HEAD` and `git rev-parse @{u}`.
+
+Strongest truthful status:
+
+- `rebuild-c6` identity + behavior-shape closeout: `external-pass-with-absorbed-fixes`.
+- Post-C6 parent roadmap architecture audit: `ARCH_PASS_WITH_FIXES`, with route/plan P1/P2 absorbed earlier and code-level C6 bench/source-free guardrails absorbed in the post-audit absorption patch.
+- Proof classes: `external_gptpro_review`, `local_static_contract`, `local_unit`, `local_shape_no_model`, `local_receipt_consistency`.
+- This is not C6 acceptance, not model-quality evaluation, not retrain-C5, not D-domain base recalibration, not candidate comparison, not golden-run, not voice readiness, not endpoint readiness, not UIUE merge, not R-L17 candidate signoff, and not V/S/U-PASS.
+
+Current planning object:
+
+- `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`
+- authority: `implementation_plan_not_ssot`
+- purpose: align docs/grill route after Long-run 2 before any new implementation lane starts.
 
 ## Read First
 
-1. `CLAUDE.md` — project constitution and highest routing rule.
-2. `docs/CURRENT.md` — this route board; expire and update it at phase transition.
-3. `docs/README.md` — document map.
-4. `docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md` — UIUE 当前 post-8.C2 路线图基线；仅路线图，不是 OpenSpec SSOT。
-5. `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` — UIUE R0-R2 formal grill amendment authority；70 项人审通过后的 canonical groups / gates / blocker map，不是实现授权。
-6. `Tools/agent-platform-plugin-refs/README.md` — local iOS/macOS build plugin references for SwiftUI, Liquid Glass, simulator, performance, and packaging work.
-7. `.xcodebuildmcp/README.md` — this worktree's persisted Codex `build-ios-apps` default profile and simulator assignment.
-8. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
-9. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
-10. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
-11. `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md` — D24 UIUE source-side inventory and disposition manifest.
-12. `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md` — D24 main-traceable absorption manifest.
+1. `CLAUDE.md` - project constitution and highest routing rule.
+2. `docs/CURRENT.md` - this route board; router only, not SSOT.
+3. `docs/README.md` - document map.
+4. `Tools/agent-platform-plugin-refs/README.md` - local iOS/macOS build plugin references for SwiftUI, Liquid Glass, simulator, performance, and packaging work.
+5. `.xcodebuildmcp/README.md` - this worktree's persisted Codex `build-ios-apps` default profile and simulator assignment.
+6. `docs/project/phase0/rebuild-c6-identity-shape-closeout-2026-06-25.md` - Long-run 2 closeout.
+7. `docs/project/phase0/rebuild-c6-identity-shape-gptpro-absorption-ledger-2026-06-25.md` - external audit findings and absorption ledger.
+8. `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` - next parent roadmap and child-plan split.
+9. `docs/project/phase0/post-c6-roadmap-gptpro-architecture-absorption-ledger-2026-06-25.md` - code-level architecture audit absorption ledger for C6 bench/source-free guardrails.
+10. `openspec/changes/rebuild-c6-four-layer-bench/` - active C6 carrier history and future candidate-comparison lane boundaries.
+11. `openspec/changes/retrain-c5-lora-d-domain/` - downstream C5 retrain draft, not execution authorization.
+12. `openspec/changes/ui-presentation/` - UIUE presentation contract context, not mainline merge proof.
+13. `openspec/changes/define-runtime-presentation-bridge/` - active contract-only Runtime -> Presentation bridge carrier; mainline mapping authority for UIUE provenance, not runtime proof.
+14. `docs/project/phase0/mainline-runtime-presentation-bridge-unblock-2026-06-28.md` - Phase 0 owner-gate unblock receipt for C01/C03/C06/C18.
+15. `docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md` - D24 main-traceable local/cloud/UIUE absorption manifest.
+16. `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md` - D24 UIUE source-side manifest.
 
 Local iOS build truth:
 
 - This worktree's persisted Codex `build-ios-apps` profile is `ios`.
 - Default iOS scheme is `MAformacIOS`.
-- Dedicated simulator is `iPhone 17 Pro Max`.
-- Main worktree must keep a different simulator because both worktrees share `lab.rayw.MAformac.ios`.
+- Dedicated simulator is `iPhone 17 Pro`.
+- UIUE worktree must keep a different simulator because both worktrees share `lab.rayw.MAformac.ios`.
 
 ## Do Now
 
-1. Complete D24 source-side reconciliation: keep `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`, this route board, and `docs/README.md` aligned with main D24 absorption manifest.
-2. Preserve D22/D23 facts: `DONE_UNDER_PROOF_CAP / PASS_WITH_NOTES`; user-selected advisory reviews are not gates/proof class; first GPT Pro `REQUEST_CHANGES` was fixed post-audit where recorded.
-3. Before PR #6 merge, wait for PR #7 to merge first, then re-probe/update/check PR #6 against the new base.
-4. Keep C5, C6, golden-run, and UIUE runtime readiness as downstream/non-claims unless separately authorized after D24 closeout.
+1. Execute D24A-D24G serially: absorption manifests, route-control reconciliation, code/CI/OpenSpec validation, exact-path commits/pushes/checks, PR #7 merge, PR #6 re-probe/update/check/merge, and post-merge local verification.
+2. Keep PR #7 -> PR #6 merge order fixed. PR #6 must be re-probed after PR #7 because pre-#7 `CLEAN` does not prove post-#7 mergeability.
+3. Preserve D22/D23 commander facts: `DONE_UNDER_PROOF_CAP / PASS_WITH_NOTES`, user-selected advisory reviews are not gates/proof class, Claude Code final audit skipped by user override where recorded, and first GPT Pro `REQUEST_CHANGES` was fixed post-audit rather than rewritten as PASS.
+4. Keep the thin `define-runtime-presentation-bridge` OpenSpec carrier as the active contract-only Runtime -> Presentation mapping authority.
+5. Treat UIUE bridge/research/report/tooling documents as candidate/provenance inputs unless referenced through the mainline carrier or D24 absorption manifest.
+6. Split downstream work into child plans for C5 retrain, C6 acceptance/comparison, iOS/macOS runtime backend, and demo-golden/voice/UIUE connection after D24 closeout.
 
 ## Do Not Do
 
 - Do not start LoRA data generation or training.
-- Do not run D-domain base recalibration or real model-quality evaluation.
+- Do not run C6 acceptance, D-domain base recalibration, or real model-quality evaluation.
+- Do not execute candidate comparison without a signed retrain-C5 candidate and explicit run authorization.
 - Do not claim endpoint-ready, C6-ready, demo-golden-ready, voice-ready, V-PASS, S-PASS, or U-PASS.
 - Do not execute demo-golden-run or freeze golden IDs/readback/UIUE scene tags.
-- Do not merge UIUE into mainline or cite UIUE file:line evidence as current mainline proof.
-- Do not edit archived OpenSpec specs for default-scope behavior; add active deltas and archive later.
+- Do not merge UIUE into mainline or cite UIUE file:line evidence as current mainline proof without live git/PR/state reconfirmation.
+- Do not import raw cockpit/customer text, PII, secrets, pricing, or internal-only source material into bench cases or training data.
+- Do not turn R-L17 route/candidate verdicts into runtime enums or C24 status IDs.
 
-## Open Blockers
+## Open Gates
 
-| Blocker | Status | Required Next Evidence |
+| Gate | Status | Required Next Evidence |
 |---|---|---|
-| `define-demo-default-scope` acceptance | accepted for apply | Carrier remains active until implementation is applied and archived. |
-| Physical default-scope implementation | not started | C2 `default_scope` schema/validation, C3 target resolution, state applier, readback metadata, C5/C6/golden dependencies, tests. |
-| `scope.first` / `?? "全车"` / `?? "all"` debt | pre-implementation evidence only | Record grep evidence, then prove removal or explicit bridging in apply closeout. |
-| Legacy UI state keys | pre-implementation evidence only | Prove scoped-key read path or one-way compatibility adapter before default-scope apply closeout. |
-| C5/C2 scope candidate parity | open apply gate | C5 fallback/rendered scope candidates must derive from C2 `scope/default_scope`; no hardcoded second vocabulary. |
-| Scope-origin single source | open apply gate | A typed `ScopeOrigin` or equivalent closed source must feed readback/TTS/verifier/UIUE metadata; no per-channel recomputation. |
-| Apply plan audit | same-vendor pre-check absorbed | `docs/project/phase0/default-scope-apply-plan-audit-codex-2026-06-24.md`; this does not close R-L17. |
-| R-L17 heterogeneous deframing | open G2-G5 | Evidence files under `docs/project/phase0/r-l17-human-review-evidence/`; same-vendor reviews remain pre-check only. |
-| UIUE reconfirm | external dirty reference | Reconfirm UIUE HEAD and file evidence after mainline `default_scope` contract stabilizes. |
+| Parent roadmap | local_docs_plan_architecture_audit_code_fixes_absorbed | User grill must accept or revise `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md`; code-level C6 bench/source-free audit findings are absorbed but do not upgrade proof class. |
+| Runtime-Presentation bridge | proposed_active_contract_only | `openspec/changes/define-runtime-presentation-bridge/` validates as the mainline-visible carrier; closes C01/C03/C06/C18 for dispatch readiness only, not runtime/mobile/model proof. |
+| C5 retrain | deferred | Requires accepted C5 child plan, physical entry gates, data generation authorization, and separate training proof. |
+| C6 acceptance/comparison | deferred | Requires signed C5 candidate and explicit run authorization; Long-run 2 shape evidence is insufficient. |
+| Runtime backend | deferred_but_not_absent | Thin bridge contract may proceed first; full backend implementation waits for accepted bridge plan and model/C6 alignment. |
+| Voice/golden/UIUE | deferred | Requires stable state-cell/tool-card/C6/golden/readback IDs and separate proof classes. |
+| R-L17 candidate signoff | unsigned | Route-only signoff does not promote a candidate. |
 
 ## UIUE Isolation Tree
 
-UIUE remains outside mainline blockers unless state, C3-C6, readback, golden-run IDs, or default-scope presentation contracts conflict.
+UIUE remains outside this mainline route unless state, C3-C6, readback, golden-run IDs, default-scope presentation contracts, or Runtime -> Presentation bridge fields conflict.
 
-Current UIUE-lane state (2026-06-26, updated):
+Known external worktree:
 
 - Worktree: `/Users/wanglei/workspace/MAformac-uiue`
-- Branch: `uiue/phase4-default-scope-presentation`
-- Latest A-2 closeout anchor commit: `ef2435b` (`docs(uiue): add jsonl reviewed a2 closeout report`). Earlier long-form closeout anchor: `0350c8a` (`docs(uiue): add final a2 long-run closeout report`). Live branch head advances with documentation-only reconciliation commits; always re-probe `git rev-parse --short HEAD` before acting.
-- Active UIUE work: visual/interaction grill **closed**; **A-2 (step2) implementation plan v3** (`docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md`) executed through Phase 2-6 commit anchors and receipt reconciliation inside this isolated worktree. Current status is **PARTIAL overall**: Phase 3/4/5/6 are DONE only for A-2 simulator/mock scope. Historical pre-R3 state had both Phase 2 continuous-stage visual acceptance `8.A` and `8.C2` open; current R3 truth is that `8.C2` is closed with notes for simulator/mock visual-acceptance scope only, while `8.A` remains independent and is not completed by `8.C2`. Final JSONL-reviewed closeout report: `docs/research/2026-06-25-a2-execution/a2-final-jsonl-reviewed-closeout-report.md` (727 lines); earlier long-form report: `docs/research/2026-06-25-a2-execution/a2-final-500-line-closeout-report.md` (601 lines). Grill SSOT: SD3/SD5/SD18-25 in `docs/uiue-storyboard-grill-decisions.md`; freeze + supersession registry (S1-S10) in `docs/grill-checklist/uiue-grill-定档-2026-06-25.md`; landing matrix in `docs/grill-checklist/uiue-landing-matrix-2026-06-25.md`; runtime bridge decisions (RPB-01~53) in `docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md`.
-- Post-8.C2 路线图基线：`docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md`。2026-06-28 R3 closeout 已获得磊哥 L3 `PASS_WITH_NOTES` human review truth，并补齐 Reduce Motion simulator-debug-override screenshot、VPA/orb 四态 simulator proof、recapture r2 evidence sync、burndown delta、双审计和 post-closure validation；`8.C2` 已关闭。R3 closeout receipt: `Reports/uiue-8c2-r3-closeout-20260628/closeout.md`；repo-visible R3 evidence index: `docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/r3-closeout-20260628/r3-evidence-index.md`。这只覆盖 `8.C2` simulator/mock visual-acceptance scope，不声明 V-PASS，也不把 UIUE simulator/mock proof 变成 mainline/runtime/mobile/true_device/voice/model proof。
-- R4 grill 人审前置包（docs/local only，不是 R4 closeout）：`docs/grill-tournament/uiue-r4-human-review-packet-2026-06-28.md`。配套分类表：`docs/grill-tournament/uiue-r4-pre-grill-classification-2026-06-28.md`；R3 residual 路由表：`docs/grill-tournament/uiue-r3-residual-routing-to-r4-r5-2026-06-28.md`。R4 v2 50 条源矩阵：`docs/loop-competition/2026-06-28-uiue-r4-bridge-grill-matrix/final-grill-matrix-v2.md`；C50 是治理总闸，UI 细节必须先分类为 bridge schema / visual policy / evidence checklist / mainline co-author / R5 deferred / user decision，不能直接塞进 bridge schema。R4 人审已通过后进入非代码前置收口：`docs/grill-tournament/uiue-r4-burndown-2026-06-28.md` 和 `docs/grill-tournament/uiue-r4-mainline-coauthor-review-request-2026-06-28.md`。2026-06-28 mainline commit `9ba609a13fdf311546f20561081c4a9bb858d0fc` 已落地主线 carrier，C01/C03/C06/C18 对 R5 dispatch readiness 关闭；不得把该状态写成 runtime/mobile/true_device/voice/model/golden/endpoint/V-PASS。
-- R0-R2 formal amendment authority：`docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md`。当前 post-8.C2 顺序固定为 R0 返修收口 -> R1 Interaction Integrity -> R2/R2b L0-L3 + capsule/VPA/Layout Integrity -> R3 closeout/router cascade。R3 closeout 消减见 `docs/grill-tournament/uiue-r0-r2-grill-burndown-2026-06-27.md`；R2b white-edge threshold/capsule final-art/mobile/true_device/runtime/voice/model 仍是 residual/non-claims，不再作为 `8.C2` R3 blocker。
-- R1/R2b 第一实现切片仍是 **PARTIAL local + unit + checker foundation**，但 `8.C2` R3 visual-acceptance closeout 已在独立证据包中收口。不要把 R3 `8.C2` closeout 反推成完整 R1/R2b readiness，也不要声明 `V-PASS`、`mobile`、`true_device`、`runtime-ready`、`voice-ready` 或 `A-2 complete`。
-- New OpenSpec change: `openspec/changes/define-runtime-presentation-bridge/` — **✅ accepted by 磊哥 2026-06-25 for UIUE visual consumption; mainline carrier now exists at `/Users/wanglei/workspace/MAformac/openspec/changes/define-runtime-presentation-bridge/` via commit `9ba609a13fdf311546f20561081c4a9bb858d0fc`; contract-only; no Swift implementation; no runtime/voice/C6/endpoint/V·S·U-PASS readiness claims; AD-RPB-014 context 四维**. UIUE remains the consumer/provenance lane; mainline carrier is the current owner-visible unblock path. Acceptance = R5 dispatch readiness only, NOT a runtime-readiness claim.
-- Next: after `8.C2` R3 closeout, keep `8.A` and all runtime/voice/model/mainline bridge work separate. Do not mark A-2 complete from `8.C2` alone. Continue keeping `openspec/changes/ui-presentation/tasks.md`, `docs/grill-checklist/uiue-a2-grill-coverage-index.md`, phase receipts, and closeout reports synchronized. Bridge **AD-RPB-015** remains the single cross-artifact ID authority; a future code-graph harness (GitNexus/roam-code) manifest derives from it, never mints a second ID set.
+- Status: external isolated UIUE Phase 4 remediation/brainstorming unless reconfirmed live.
+- Current mainline stance: read-only intersection checks only.
 
-This is UIUE-lane state plus read-only mainline carrier provenance, not runtime implementation evidence. Bridge recorded as `proposed_active_contract_only` for dispatch readiness; reconfirm at the contract intersection before any mainline merge or runtime proof claim.
-
-## Current Carrier Summary
-
-`define-demo-default-scope` must own:
-
-- C2 `default_scope` authority.
-- Missing vs explicit vs fan-out scope split.
-- Closed collection alias policy.
-- `scope_origin`, `resolved_scope`, and presentation policy metadata.
-- Legacy unscoped key disposition.
-- Omitted-scope x `clarify_tag` route composition.
-- Dependency gates for `retrain-c5-lora-d-domain`, `rebuild-c6-four-layer-bench`, and `define-demo-golden-run-and-voice`.
-
-Known P1 note: older `define-demo-golden-run-and-voice` draft text still contains historical UIUE physical-anchor language. It is acceptable as an existing draft placeholder, but golden-run acceptance must either reconfirm or downgrade that language before any freeze/readiness claim.
+This is not mainline evidence. Reconfirm live UIUE git/PR state before citing UIUE as merged or using it as C6, runtime, voice, golden, or V-PASS proof.
 
 ## Retired / Historical Inputs
 
-- `docs/roadmap-2026-06-20-from-c6-done.md` is historical provenance, not live roadmap.
-- `docs/c5-recovery-2026-06-22/roadmap.md` has historical value but must not act as live roadmap unless split/bannered by Phase 0 disposition.
-- `docs/research/2026-06-23-a2-post-roadmap-audit-vs-home-llm.md` is a high-weight pre-propose checklist and evidence pack, not SSOT.
+- The prior `docs/CURRENT.md` route-only rebuild-C6 construction board is superseded by this post Long-run 2 board.
+- `docs/roadmap-2026-06-20-from-c6-done.md` remains historical provenance, not live roadmap.
+- `docs/project/phase0/non-uiue-pre-code-action-list-2026-06-24.md` remains historical route-control evidence; its rebuild-C6-first ordering has been consumed by Long-run 2 identity + behavior-shape construction closeout.
 - UIUE branch documents are external active work, not mainline proof until reconfirmed at the contract intersection.
