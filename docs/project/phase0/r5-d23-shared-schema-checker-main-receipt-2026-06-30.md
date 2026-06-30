@@ -31,6 +31,12 @@ Status: Gate1 main local closure passed under proof cap. Gate-level Hermes/Claud
 - `swift test --filter RuntimePresentationPayloadPublicFixtureTests`: PASS, 8 tests.
 - GitNexus impact before edits: `RuntimePresentationPayloadPublicFixtureTests` reported CRITICAL by import granularity, 0 affected processes; edits stayed in test/fixture/schema surfaces.
 
+## Post-Gate Reviews
+
+- Codex subagent xhigh post-gate audit: PASS; P0/P1/P2 none. Proof class remains local/unit/static plus GitHub API remote-truth; not readiness proof.
+- GPT Pro PR-pair audit: `GPTPRO_R5_D23_SHARED_SCHEMA_CHECKER_PR_PAIR_AUDIT_VERDICT: PASS_WITH_NOTES`; report `/Users/wanglei/workspace/data/gptpro-downloads/20260630-132650/message.md`; audited PR #7 head `09525cf89ad9cf04e1dba2e1fa214273f07346fa` and PR #6 head `609f3258aa172a0522ddfa5da9041df4bd18ef3b`.
+- GPT Pro P0/P1/P2: none in D23 owned scope. Residual non-blocking notes: conditional sibling parity is not a universal CI gate, and PR #6 remains broad because it is a long-lived branch constrained to existing PR #6/no split/no merge.
+
 ## Dirty Split
 
 - `owned_by_D23`: changed paths listed above.
@@ -43,3 +49,4 @@ Status: Gate1 main local closure passed under proof cap. Gate-level Hermes/Claud
 - A public schema/checker lane should be a portable artifact plus tests, not only hard-coded Swift constants.
 - Schema result vocabulary should express the current fixture corpus subset and then prove that subset is typed by main, rather than widening the fixture contract to every possible runtime result.
 - UIUE may maintain stricter local forbidden-marker guards, but those stricter UIUE guard names must not be pushed back into the main-owned public schema without main authority.
+- Conditional sibling-repo parity is useful local evidence, but future CI-hardening should make cross-repo parity non-optional if this lane becomes a merge gate.
