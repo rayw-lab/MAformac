@@ -84,3 +84,12 @@
 - [x] 10.4 Prove the public fixture set contains no adapter-private, durable-ledger, raw-runtime, raw-model, or training receipt markers.
 - [x] 10.5 Preserve proof caps: fixture proof remains local/unit/static only and does not claim runtime-ready, mobile, true-device, live, UIUE merge, V/S/U-PASS, A-2, voice/model/golden/endpoint readiness, or R5 completion.
 - [x] 10.6 Cover non-happy-path public payload boundaries for refusal safety, runtime error, reconciliation mismatch, and partial accept/refuse without adding private runtime fields.
+
+## 11. R5 D22 Runtime Payload Corpus Expansion
+
+- [x] 11.1 Add D22 manifest governance metadata for every public fixture entry: `caseID`, `fixtureClass`, `result`, `familyCoverage`, and `proofClass`.
+- [x] 11.2 Preserve the existing 5 D20/D21 bridge-contract fixtures and classify them as `bridge_contract_fixture` without changing their JSON hashes.
+- [x] 11.3 Add local runtime-generated public fixtures for `window.position`, `screen.brightness`, `ambient.brightness`, and `window.position` noop coverage.
+- [x] 11.4 Assert generated fixtures match committed public JSON projection while stripping non-public timestamp volatility and preserving trace/readback semantics in tests.
+- [x] 11.5 Keep the UIUE-facing contract presentation-safe: no adapter-private Swift types, durable ledger internals, raw runtime store, raw model output, training receipt, request fingerprint, or settled-plan internals.
+- [x] 11.6 Preserve proof caps and fixture-class truth: `runtime_generated_fixture` is local/unit generator evidence, and `bridge_contract_fixture` is contract-boundary fixture evidence only.

@@ -12,6 +12,21 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         XCTAssertFalse(fixtureObject.keys.contains("timestamp"))
     }
 
+    @MainActor
+    func testRuntimeGeneratedPublicFixturesMatchCommittedProjection() async throws {
+        for fixtureCase in RuntimeFixtureCase.allCases {
+            let fixtureURL = Self.fixturesDirectory.appendingPathComponent(fixtureCase.fixtureName)
+            let fixtureObject = try Self.loadJSONObject(fixtureURL)
+            let generated = try await Self.generatedRuntimeFixture(for: fixtureCase)
+
+            XCTAssertEqual(fixtureObject as NSDictionary, generated.publicObject as NSDictionary, fixtureCase.fixtureName)
+            XCTAssertTrue(
+                generated.traceMessages.contains { $0.contains(fixtureCase.expectedExecuteMarker) },
+                "\(fixtureCase.fixtureName): \(generated.traceMessages)"
+            )
+        }
+    }
+
     func testPublicFixtureManifestCoversExpectedFixturesWithSha256s() throws {
         let manifest = try Self.loadManifest()
 
@@ -28,6 +43,13 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
             XCTAssertEqual(fixture.producerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
             XCTAssertEqual(fixture.consumerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
             XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
+            XCTAssertTrue(Self.allowedFixtureClasses.contains(fixture.fixtureClass), fixture.name)
+            XCTAssertEqual(fixture.result, try Self.fixtureResult(fixtureURL), fixture.name)
+            let expectedMetadata = try XCTUnwrap(Self.expectedManifestMetadata[fixture.name], fixture.name)
+            XCTAssertEqual(fixture.caseID, expectedMetadata.caseID, fixture.name)
+            XCTAssertEqual(fixture.fixtureClass, expectedMetadata.fixtureClass, fixture.name)
+            XCTAssertEqual(fixture.result, expectedMetadata.result, fixture.name)
+            XCTAssertEqual(fixture.familyCoverage, expectedMetadata.familyCoverage, fixture.name)
         }
     }
 
@@ -87,7 +109,73 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         "refusal_safety_public_payload.v1.json",
         "runtime_error_public_payload.v1.json",
         "reconciliation_mismatch_public_payload.v1.json",
-        "partial_accept_refuse_public_payload.v1.json"
+        "partial_accept_refuse_public_payload.v1.json",
+        RuntimeFixtureCase.windowPosition.fixtureName,
+        RuntimeFixtureCase.screenBrightness.fixtureName,
+        RuntimeFixtureCase.ambientBrightness.fixtureName,
+        RuntimeFixtureCase.windowPositionNoop.fixtureName
+    ]
+
+    private static let allowedFixtureClasses: Set<String> = [
+        "runtime_generated_fixture",
+        "bridge_contract_fixture"
+    ]
+
+    private static let expectedManifestMetadata: [String: ManifestExpectation] = [
+        fixtureName: ManifestExpectation(
+            caseID: "D22-AC-POWER-ACCEPTED-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["ac.power"]
+        ),
+        "refusal_safety_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-REFUSAL-SAFETY-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "refusal_safety_or_policy",
+            familyCoverage: ["door.lock", "safety_refusal"]
+        ),
+        "runtime_error_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-RUNTIME-ERROR-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "runtime_error",
+            familyCoverage: ["ac.power", "runtime_error"]
+        ),
+        "reconciliation_mismatch_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-RECONCILIATION-MISMATCH-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["ac.power", "reconciliation_mismatch"]
+        ),
+        "partial_accept_refuse_public_payload.v1.json": ManifestExpectation(
+            caseID: "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V1",
+            fixtureClass: "bridge_contract_fixture",
+            result: "partial_accept_partial_refuse",
+            familyCoverage: ["ac.power", "door.lock", "partial_accept_partial_refuse"]
+        ),
+        RuntimeFixtureCase.windowPosition.fixtureName: ManifestExpectation(
+            caseID: "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["window.position"]
+        ),
+        RuntimeFixtureCase.screenBrightness.fixtureName: ManifestExpectation(
+            caseID: "D22-SCREEN-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["screen.brightness"]
+        ),
+        RuntimeFixtureCase.ambientBrightness.fixtureName: ManifestExpectation(
+            caseID: "D22-AMBIENT-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["ambient.brightness"]
+        ),
+        RuntimeFixtureCase.windowPositionNoop.fixtureName: ManifestExpectation(
+            caseID: "D22-WINDOW-POSITION-NOOP-RUNTIME-V1",
+            fixtureClass: "runtime_generated_fixture",
+            result: "accepted_tool_call",
+            familyCoverage: ["window.position", "already_state_noop"]
+        )
     ]
 
     private static let publicTopLevelFields: Set<String> = [
@@ -188,6 +276,35 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
 
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
+        return try publicJSONObject(from: payload, encoder: encoder)
+    }
+
+    @MainActor
+    private static func generatedRuntimeFixture(for fixtureCase: RuntimeFixtureCase) async throws -> GeneratedRuntimeFixture {
+        let store = DemoVehicleStateStore()
+        for seedTransition in fixtureCase.seedTransitions {
+            store.applyMockTransition(seedTransition)
+        }
+        let trace = InMemoryTraceLogger()
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try repoPipeline(),
+            traceLogger: trace,
+            speech: RecordingSpeechSynthesisEngine(),
+            frameDecoder: { _ in fixtureCase.frame },
+            timestampProvider: { Date(timeIntervalSince1970: 1_800_000_100) }
+        )
+
+        let payload = try await runner.run(text: fixtureCase.text)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return GeneratedRuntimeFixture(
+            publicObject: try publicJSONObject(from: payload, encoder: encoder),
+            traceMessages: trace.entries.map { "\($0.stage.rawValue):\($0.message)" }
+        )
+    }
+
+    private static func publicJSONObject(from payload: RuntimePresentationPayload, encoder: JSONEncoder) throws -> [String: Any] {
         let encoded = try encoder.encode(payload)
         let rawObject = try loadJSONObject(encoded)
         let generatedFields = Set(rawObject.keys)
@@ -205,7 +322,28 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
                 return publicCard
             }
         }
+        if var traceEnvelope = publicObject["traceEnvelope"] as? [String: Any] {
+            traceEnvelope["entries"] = []
+            publicObject["traceEnvelope"] = traceEnvelope
+        }
         return publicObject
+    }
+
+    private static func repoPipeline() throws -> C3ExecutionPipeline {
+        C3ExecutionPipeline(
+            semantic: try SemanticContractLookup(jsonl: readRepoFile("contracts/semantic-function-contract.jsonl")),
+            stateCells: try StateCellContractLookup(yaml: readRepoFile("contracts/state-cells.yaml")),
+            riskPolicy: try RiskPolicyLookup(yaml: readRepoFile("contracts/risk-policy.yaml")),
+            allowlist: try L1DemoAllowlistLookup(yaml: readRepoFile("contracts/l1-demo-allowlist.yaml"))
+        )
+    }
+
+    private static func readRepoFile(_ relativePath: String) throws -> String {
+        let repoRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return try String(contentsOf: repoRoot.appendingPathComponent(relativePath), encoding: .utf8)
     }
 
     private static func loadJSONObject(_ url: URL) throws -> [String: Any] {
@@ -223,6 +361,15 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         try JSONDecoder().decode(FixtureManifest.self, from: try Data(contentsOf: manifestURL))
     }
 
+    private static func fixtureResult(_ url: URL) throws -> String {
+        let object = try loadJSONObject(url)
+        guard let outcome = object["outcome"] as? [String: Any],
+              let result = outcome["result"] as? String else {
+            throw FixtureError.invalidJSONObject
+        }
+        return result
+    }
+
     private struct FixtureManifest: Decodable {
         var schemaVersion: String
         var fixtures: [FixtureManifestEntry]
@@ -231,6 +378,10 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
     private struct FixtureManifestEntry: Decodable {
         var name: String
         var schemaVersion: String
+        var caseID: String
+        var fixtureClass: String
+        var result: String
+        var familyCoverage: [String]
         var sha256: String
         var producerRepo: String
         var producerPath: String
@@ -238,6 +389,131 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         var consumerPath: String
         var proofClass: String
         var notes: [String]
+    }
+
+    private struct ManifestExpectation {
+        var caseID: String
+        var fixtureClass: String
+        var result: String
+        var familyCoverage: [String]
+    }
+
+    private struct GeneratedRuntimeFixture {
+        var publicObject: [String: Any]
+        var traceMessages: [String]
+    }
+
+    private enum RuntimeFixtureCase: CaseIterable {
+        case windowPosition
+        case screenBrightness
+        case ambientBrightness
+        case windowPositionNoop
+
+        var fixtureName: String {
+            switch self {
+            case .windowPosition:
+                return "window_position_runtime_public_payload.v1.json"
+            case .screenBrightness:
+                return "screen_brightness_runtime_public_payload.v1.json"
+            case .ambientBrightness:
+                return "ambient_brightness_runtime_public_payload.v1.json"
+            case .windowPositionNoop:
+                return "window_position_noop_runtime_public_payload.v1.json"
+            }
+        }
+
+        var text: String {
+            switch self {
+            case .windowPosition:
+                return "打开主驾车窗"
+            case .screenBrightness:
+                return "中控屏调亮一点"
+            case .ambientBrightness:
+                return "面发光氛围灯亮度调到40%"
+            case .windowPositionNoop:
+                return "主驾车窗保持全开"
+            }
+        }
+
+        var frame: ToolCallFrame {
+            switch self {
+            case .windowPosition:
+                return Self.frame(
+                    id: "turn-d22-window-position-1",
+                    traceID: "trace-d22-window-position-1",
+                    device: "window",
+                    actionPrimitive: "power_on",
+                    slots: ["position": "主驾"]
+                )
+            case .screenBrightness:
+                return Self.frame(
+                    id: "turn-d22-screen-brightness-1",
+                    traceID: "trace-d22-screen-brightness-1",
+                    device: "screen_brightness",
+                    actionPrimitive: "increase_by_exp",
+                    slots: ["screen_type": "中控屏"],
+                    value: ContractValue(ref: "CUR", direct: "+", offset: "LITTLE", type: "EXP")
+                )
+            case .ambientBrightness:
+                return Self.frame(
+                    id: "turn-d22-ambient-brightness-1",
+                    traceID: "trace-d22-ambient-brightness-1",
+                    device: "atmosphere_lamp_brightness",
+                    actionPrimitive: "by_percent",
+                    slots: ["name": "面发光氛围灯"],
+                    value: ContractValue(ref: "ZERO", direct: "+", offset: "40", type: "PERCENT")
+                )
+            case .windowPositionNoop:
+                return Self.frame(
+                    id: "turn-d22-window-position-noop-1",
+                    traceID: "trace-d22-window-position-noop-1",
+                    device: "window",
+                    actionPrimitive: "power_on",
+                    slots: ["position": "主驾"]
+                )
+            }
+        }
+
+        var seedTransitions: [DemoMockTransition] {
+            switch self {
+            case .windowPositionNoop:
+                return [DemoMockTransition(key: "window.position[主驾]", desiredValue: "100")]
+            case .windowPosition, .screenBrightness, .ambientBrightness:
+                return []
+            }
+        }
+
+        var expectedExecuteMarker: String {
+            switch self {
+            case .windowPositionNoop:
+                return "already_state_noop"
+            case .windowPosition, .screenBrightness, .ambientBrightness:
+                return "first_execution"
+            }
+        }
+
+        private static func frame(
+            id: String,
+            traceID: String,
+            device: String,
+            actionPrimitive: String,
+            slots: [String: String] = [:],
+            value: ContractValue = ContractValue()
+        ) -> ToolCallFrame {
+            ToolCallFrame(
+                id: id,
+                traceID: traceID,
+                agentID: "vehicle-control",
+                capabilityID: "cabin.\(device)",
+                toolName: "vehicle_control",
+                device: device,
+                actionPrimitive: actionPrimitive,
+                slots: slots,
+                value: value,
+                stateRevision: 0,
+                candidateSource: .upstreamToolCall
+            )
+        }
     }
 
     private enum FixtureError: Error {

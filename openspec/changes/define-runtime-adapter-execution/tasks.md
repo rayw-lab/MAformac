@@ -149,3 +149,4 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 - [x] 17.3 Preserve C3 stale/replay and readback verification semantics; do not promote local/runtime adapter proof to production runtime readiness.
 - [x] 17.4 Add local/unit tests proving app-facing command text emits sanitized runtime presentation payloads and preserves durable stale replay without a second write.
 - [x] 17.5 Validate with targeted Swift tests, OpenSpec strict checks, `git diff --check`, staged diff checks, and Gate audit evidence.
+- [x] 17.6 D22 expands local runtime-generated fixture evidence for window position, screen brightness, ambient brightness, and already-state/noop through the `DemoRuntimeSessionRunner -> C3ExecutionPipeline -> runtime adapter -> C2 readback -> RuntimePresentationPayload` path, while keeping proof capped at local/unit/static evidence.
