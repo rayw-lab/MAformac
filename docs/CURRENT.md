@@ -15,6 +15,20 @@ expires_when: "default-scope apply closeout lands or this route board is superse
 
 ## Current Phase
 
+R5 D24 absorption/source-manifest and PR merge-control is active under proof cap.
+
+Live-verified D24 route facts at execution start:
+
+- UIUE worktree branch: `uiue/phase4-default-scope-presentation`.
+- UIUE local HEAD: `4c7da7167a64f79839327d9f11d633aa2948f171`.
+- UIUE PR #6: `OPEN`, draft `false`, `mergeStateStatus=CLEAN`, head `1b84af5f08bc0ac188c01b53ca888b0eb3d13c1c`, checks `SUCCESS`.
+- Main PR #7: `OPEN`, draft `true`, `mergeStateStatus=CLEAN`, head `7c5c8a8a174da7d5e93ceef4adbae482efa0d5a2`, checks `SUCCESS`.
+- Source manifest: `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`.
+- Main absorption manifest: `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md`.
+- Merge order, if all D24 gates pass: PR #7 first, then fresh PR #6 re-probe/update/check, then PR #6.
+
+This is absorption + route-control + cloud PR merge + post-merge verification only. It is not UIUE runtime-ready, mobile, true-device, live API, A-2 complete, R5 complete, V/S/U-PASS, voice/model/golden/endpoint-ready, or product readiness.
+
 Post-A2 / default-scope apply authorized: Phase -1 carrier materialization is accepted for apply, but physical implementation has not started.
 
 Current audited state:
@@ -37,6 +51,8 @@ Current audited state:
 8. `docs/grill-tournament/demo-default-scope-grill-decisions-2026-06-24.md` — accepted G01-G28 default-scope decision pack.
 9. `docs/project/phase0/README.md` — Phase 0 route-control index, D1-D10 state, R-L17 blockers.
 10. `openspec/changes/define-demo-default-scope/` — current Phase -1 OpenSpec carrier.
+11. `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md` — D24 UIUE source-side inventory and disposition manifest.
+12. `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md` — D24 main-traceable absorption manifest.
 
 Local iOS build truth:
 
@@ -47,10 +63,10 @@ Local iOS build truth:
 
 ## Do Now
 
-1. Commit the Phase -1 closeout, route-board update, carrier D2 route-matrix fix, same-vendor apply-plan audit record, and apply plan together.
-2. Execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md` in order: C2 -> C3 -> state applier -> readback -> C5 -> C6 -> tests/gates.
-3. Keep C5, C6, golden-run, and UIUE as downstream consumers of `define-demo-default-scope`. They must depend on it, not redefine default-scope semantics.
-5. If `define-demo-default-scope` is accepted, execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md`; keep this route board router-only and put evidence in receipts, tests, and OpenSpec closeout files.
+1. Complete D24 source-side reconciliation: keep `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`, this route board, and `docs/README.md` aligned with main D24 absorption manifest.
+2. Preserve D22/D23 facts: `DONE_UNDER_PROOF_CAP / PASS_WITH_NOTES`; user-selected advisory reviews are not gates/proof class; first GPT Pro `REQUEST_CHANGES` was fixed post-audit where recorded.
+3. Before PR #6 merge, wait for PR #7 to merge first, then re-probe/update/check PR #6 against the new base.
+4. Keep C5, C6, golden-run, and UIUE runtime readiness as downstream/non-claims unless separately authorized after D24 closeout.
 
 ## Do Not Do
 

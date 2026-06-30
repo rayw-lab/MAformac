@@ -1,11 +1,12 @@
 ---
-status: LIVING_ROUTE_CONTROL_AFTER_D23_LOCAL_SCHEMA_CHECKER_PASS_PENDING_POST_GATE_REVIEWS
+status: LIVING_ROUTE_CONTROL_AFTER_D23_DONE_UNDER_PROOF_CAP_PASS_WITH_NOTES
 artifact_kind: commander_dispatch_decomposition_map_and_living_route_control
 created_at: 2026-06-28
 last_updated_at: 2026-06-30
 owner: commander
-proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit + d22_local_unit_fixture_corpus + d22_gate3_hermes_pass + d22_gate4_hermes_pass + d23_local_unit_static_shared_schema_checker
-authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_gptpro_fixed_post_audit_plus_d22_gate4_local
+proof_class: docs/local + calibration_receipts + local_unit_receipts + hermes_gates + codex_substitute_verifier + cc_substitute_verifier + d16_d17_local_unit + d18_local_durable_adapter_ledger + d19_local_unit_guard + d20_d21_local_unit_integration + d20_d21_public_fixture + gate3_hermes_fail_fixed_post_audit + gptpro_request_changes_fixed_post_audit + d22_local_unit_fixture_corpus + d22_gate3_hermes_pass + d22_gate4_hermes_pass + d23_local_unit_static_shared_schema_checker + d23_github_api_remote_truth
+review_policy: d23_advisory_reviews_user_selected_not_gate_not_proof_class
+authority: coordination_map_after_step0_plus_d18_d19_gate8_plus_d20_d21_gptpro_fixed_post_audit_plus_d22_gate4_local_plus_d23_commander_intake
 canonical_for:
   - UIUE R5 dispatch grouping
   - serial_parallel_dependency_order
@@ -46,16 +47,32 @@ non_claims:
 
 # UIUE R5 Dispatch-Ready Decomposition Map
 
+## D24 Execution Intake Update (2026-06-30)
+
+Current truth for `UIUE_R5_D24_FULL_ABSORPTION_ROUTE_CONTROL_PR_MERGE_LONGRUN`:
+
+- D24 is active as absorption + route-control + PR merge-control under proof cap. It is not a new runtime implementation lane and does not claim R5/A-2/runtime/product readiness.
+- Main D24 manifest: `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d24-uiue-absorption-manifest-2026-06-30.md`.
+- UIUE source manifest: `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`.
+- Live PR truth at D24 intake: PR #7 head `7c5c8a8a174da7d5e93ceef4adbae482efa0d5a2`, `OPEN`, draft, CLEAN, checks success; PR #6 head `1b84af5f08bc0ac188c01b53ca888b0eb3d13c1c`, `OPEN`, non-draft, CLEAN, checks success.
+- Merge order is fixed: PR #7 first; then re-probe/update/check PR #6; then PR #6. PR #6 pre-#7 `CLEAN` is not post-#7 merge proof.
+- D24 keeps D22/D23 commander facts intact: `DONE_UNDER_PROOF_CAP / PASS_WITH_NOTES`; user-selected advisory reviews are not gates/proof class; first GPT Pro `REQUEST_CHANGES` facts remain fixed-post-audit where recorded.
+- D24 source classification: UIUE D12-D19 source dispatches are historical provenance; `docs/research/2026-06-29-visual-acceptance-standard/` is summary-index input; selected PR #6 Reports are trackable evidence receipts only; generated local Reports/screenshots/cache/tool byproducts remain generated-drop unless specifically cited.
+
+This update does not claim production runtime readiness, runtime-ready status,
+mobile, true-device, live API, UIUE merge completion, V/S/U-PASS, A-2
+completion, R5 completion, voice/model/golden, or endpoint readiness.
+
 ## D23 Execution Update (2026-06-30)
 
 Current truth for `UIUE_R5_D23_SHARED_SCHEMA_CHECKER_PR_HYGIENE_SUPERTRAIN`:
 
 - Gate1 main shared public fixture schema/checker: DONE under proof cap. Main added `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json`, bound `manifest.json` to its sha256/update rule, and schema-driven `RuntimePresentationPayloadPublicFixtureTests` now prove fixture count/names, public fields, forbidden timestamp fields, allowed fixture classes/results/proof classes, private/durable/raw marker denial, and non-claims.
 - Gate2 UIUE schema checker adoption/parity: DONE under proof cap. UIUE copied/adopted the same schema artifact, bound its manifest to the schema sha256/update rule, validates schema-driven consumer mapping into `PresentationSnapshot`, and has a local sibling main parity check plus receipt-level `diff -qr` evidence.
-- Gate3 PR remote truth/reviewability hygiene: pre-D23-push remote truth is PR #7 `3e716020eef958b3f18e90b2ab9df3f3b53bdc31` and PR #6 `1c66467ee7485ea08200624f7bd6843999905f12`, both CLEAN with successful checks. D23 remains existing PR #7/#6 only; no new PR and no merge.
+- Gate3 PR remote truth/reviewability hygiene: final D23 PR truth is PR #7 `7c5c8a8a174da7d5e93ceef4adbae482efa0d5a2` and PR #6 `1b84af5f08bc0ac188c01b53ca888b0eb3d13c1c`, both CLEAN with successful checks. Local `@{u}`/ahead state remains stale because normal git push hit a GitHub 443 timeout and the execution thread used GitHub Git Data API for remote updates; PR API head/tree truth is the authority. D23 remains existing PR #7/#6 only; no new PR and no merge.
 - Gate4 doc cascade/final reconcile: D23 main receipt is `/Users/wanglei/workspace/MAformac/docs/project/phase0/r5-d23-shared-schema-checker-main-receipt-2026-06-30.md`; UIUE receipt is `docs/project/phase0/r5-d23-shared-schema-checker-uiue-receipt-2026-06-30.md`; OpenSpec task cascades are `define-runtime-presentation-bridge` §12 and `ui-presentation` §8.M.
 - User override for D23 review cadence: do not run Gate Hermes or Claude Code audits. After all gates, run quick self-check, one Codex subagent xhigh audit, fix any owned findings, then run GPT Pro. These reviews are advisory/user-selected review sources and do not become gate proof class or readiness.
-- Post-gate Codex subagent xhigh audit: PASS, P0/P1/P2 none. Post-push GPT Pro PR-pair audit: `GPTPRO_R5_D23_SHARED_SCHEMA_CHECKER_PR_PAIR_AUDIT_VERDICT: PASS_WITH_NOTES`; report `/Users/wanglei/workspace/data/gptpro-downloads/20260630-132650/message.md`; P0/P1/P2 none in D23 owned scope. Residual non-blocking notes are conditional parity not being a universal CI gate and PR #6 remaining broad under the no-new-PR/no-merge constraint.
+- Post-gate Codex subagent xhigh audit: PASS, P0/P1/P2 none. Post-push GPT Pro PR-pair audit: `GPTPRO_R5_D23_SHARED_SCHEMA_CHECKER_PR_PAIR_AUDIT_VERDICT: PASS_WITH_NOTES`; report `/Users/wanglei/workspace/data/gptpro-downloads/20260630-132650/message.md`; P0/P1/P2 none in D23 owned scope. GPT Pro audited PR #7 head `09525cf89ad9cf04e1dba2e1fa214273f07346fa` and PR #6 head `609f3258aa172a0522ddfa5da9041df4bd18ef3b`; final PR heads add post-review docs/advisory recording commits, so do not claim GPT Pro audited the final head SHAs. Residual non-blocking notes are conditional parity not being a universal CI gate, PR #6 remaining broad under the no-new-PR/no-merge constraint, and the schema being a contract/checker artifact rather than an exhaustive JSON Schema.
 - D23 source dispatch artifact and D22 commander verdict remain trace artifacts unless separately authorized for staging.
 
 This update does not claim production runtime readiness, runtime-ready status,

@@ -19,6 +19,7 @@
 | `docs/grill-tournament/uiue-r4-human-review-packet-2026-06-28.md` | **UIUE R4 人审前置包**:基于 R4 v2 50 条、R3 closeout/evidence、分类表和 residual 路由表；只供 R4 grill 人审，不是 R4 closeout |
 | `docs/grill-tournament/uiue-r4-burndown-2026-06-28.md` | **UIUE R4 burndown 立项 ledger**:R4 人审通过后将 C01-C50 具体化为 owner / artifact / fail-closed / status；非代码前置，不是实现 closeout |
 | `docs/grill-tournament/uiue-r4-mainline-coauthor-review-request-2026-06-28.md` | **UIUE R4 mainline co-author request**:mainline 只读探测 + bridge 共创问题清单；当前 pending，不伪造主线接受 |
+| `docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md` | **D24 UIUE source manifest**:本地 dirty/untracked、PR #6 1130 文件 surface、Reports/Tools/research/source dispatch 的处置账本；只作 source-side evidence，不升级为 runtime/mobile/true_device/product proof |
 | `docs/grill-tournament/uiue-r4-pre-grill-classification-2026-06-28.md` | **UIUE R4 C01-C50 分类表**:50 行全覆盖，把每条路由到 bridge schema / visual policy / evidence checklist / mainline co-author / R5 deferred / user decision；C50 是治理总闸 |
 | `docs/grill-tournament/uiue-r3-residual-routing-to-r4-r5-2026-06-28.md` | **UIUE R3 residual 路由表**:runtime-driven orb、复杂推理、1.5s 长按、a11y、10-family、white-edge、Reduce Motion 等残缺按 R4/R5 分线，不假绿 |
 | `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` | **UIUE R0-R2 formal grill amendment authority**:70 项人审通过后的 canonical groups / decisions / hard gates / blocker map / cascade plan;不授权实现,不关闭 `8.C2`,不声明 V-PASS/mobile/true_device/runtime/voice/A-2 complete |
