@@ -12,27 +12,83 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         XCTAssertFalse(fixtureObject.keys.contains("timestamp"))
     }
 
-    func testPublicFixtureSha256IsRecordedInManifest() throws {
+    func testPublicFixtureManifestCoversExpectedFixturesWithSha256s() throws {
         let manifest = try Self.loadManifest()
-        let fixture = try XCTUnwrap(manifest.fixtures.first { $0.name == Self.fixtureName })
 
-        XCTAssertEqual(fixture.schemaVersion, "r5_runtime_presentation_payload_v1")
-        XCTAssertEqual(fixture.sha256, Self.fixtureSHA256)
-        XCTAssertEqual(try C6Hash.fileHash(url: Self.fixtureURL), fixture.sha256)
-        XCTAssertEqual(fixture.producerRepo, "MAformac")
-        XCTAssertEqual(fixture.consumerRepo, "MAformac-uiue")
+        XCTAssertEqual(manifest.schemaVersion, "r5_runtime_presentation_payload_fixture_manifest_v1")
+        XCTAssertEqual(Set(manifest.fixtures.map(\.name)), Self.expectedFixtureNames)
+
+        for fixture in manifest.fixtures {
+            let fixtureURL = Self.fixturesDirectory.appendingPathComponent(fixture.name)
+
+            XCTAssertEqual(fixture.schemaVersion, "r5_runtime_presentation_payload_v1", fixture.name)
+            XCTAssertEqual(try C6Hash.fileHash(url: fixtureURL), fixture.sha256, fixture.name)
+            XCTAssertEqual(fixture.producerRepo, "MAformac", fixture.name)
+            XCTAssertEqual(fixture.consumerRepo, "MAformac-uiue", fixture.name)
+            XCTAssertEqual(fixture.producerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
+            XCTAssertEqual(fixture.consumerPath, "Tests/Fixtures/RuntimePresentationPayload/\(fixture.name)", fixture.name)
+            XCTAssertEqual(fixture.proofClass, "local_unit", fixture.name)
+        }
     }
 
-    func testPublicFixtureContainsNoPrivateOrDurableMarkers() throws {
-        let text = try String(contentsOf: Self.fixtureURL, encoding: .utf8)
+    func testPublicFixturesContainOnlyPublicTopLevelFieldsAndNoPrivateOrDurableMarkers() throws {
+        for fixtureName in Self.expectedFixtureNames {
+            let fixtureURL = Self.fixturesDirectory.appendingPathComponent(fixtureName)
+            let text = try String(contentsOf: fixtureURL, encoding: .utf8)
+            let fixtureObject = try Self.loadJSONObject(fixtureURL)
 
-        for marker in Self.privateAndDurableMarkers {
-            XCTAssertFalse(text.contains(marker), marker)
+            XCTAssertEqual(Set(fixtureObject.keys), Self.publicTopLevelFields, fixtureName)
+            XCTAssertFalse(fixtureObject.keys.contains("timestamp"), fixtureName)
+            for marker in Self.privateAndDurableMarkers {
+                XCTAssertNil(text.range(of: marker, options: [.caseInsensitive, .diacriticInsensitive]), "\(fixtureName): \(marker)")
+            }
+        }
+    }
+
+    func testNonHappyPathPublicFixturesCoverContractBoundaries() throws {
+        let expectations: [String: (result: String, status: String, mismatchClass: String?)] = [
+            "refusal_safety_public_payload.v1.json": (
+                result: "refusal_safety_or_policy",
+                status: "not_applicable",
+                mismatchClass: nil
+            ),
+            "runtime_error_public_payload.v1.json": (
+                result: "runtime_error",
+                status: "unavailable",
+                mismatchClass: nil
+            ),
+            "reconciliation_mismatch_public_payload.v1.json": (
+                result: "accepted_tool_call",
+                status: "mismatch",
+                mismatchClass: "value_mismatch"
+            ),
+            "partial_accept_refuse_public_payload.v1.json": (
+                result: "partial_accept_partial_refuse",
+                status: "verified",
+                mismatchClass: nil
+            )
+        ]
+
+        for (fixtureName, expected) in expectations {
+            let object = try Self.loadJSONObject(Self.fixturesDirectory.appendingPathComponent(fixtureName))
+            let outcome = try XCTUnwrap(object["outcome"] as? [String: Any], fixtureName)
+            let reconciliation = try XCTUnwrap(object["reconciliation"] as? [String: Any], fixtureName)
+
+            XCTAssertEqual(outcome["result"] as? String, expected.result, fixtureName)
+            XCTAssertEqual(reconciliation["status"] as? String, expected.status, fixtureName)
+            XCTAssertEqual(reconciliation["mismatchClass"] as? String, expected.mismatchClass, fixtureName)
         }
     }
 
     private static let fixtureName = "ac_power_public_payload.v1.json"
-    private static let fixtureSHA256 = "57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f"
+
+    private static let expectedFixtureNames: Set<String> = [
+        fixtureName,
+        "refusal_safety_public_payload.v1.json",
+        "runtime_error_public_payload.v1.json",
+        "reconciliation_mismatch_public_payload.v1.json",
+        "partial_accept_refuse_public_payload.v1.json"
+    ]
 
     private static let publicTopLevelFields: Set<String> = [
         "schemaVersion",

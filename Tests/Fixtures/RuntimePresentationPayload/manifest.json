@@ -14,6 +14,62 @@
         "presentation_safe_public_fixture",
         "timestamp_fields_omitted_by_public_projection"
       ]
+    },
+    {
+      "name": "refusal_safety_public_payload.v1.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v1",
+      "sha256": "1e6d704e92d3e4c513e29b42e8184df4e0dbe0dd7b1403319de6d37ecddc2a43",
+      "producerRepo": "MAformac",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v1.json",
+      "consumerRepo": "MAformac-uiue",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v1.json",
+      "proofClass": "local_unit",
+      "notes": [
+        "presentation_safe_public_fixture",
+        "refusal_safety_or_policy_boundary"
+      ]
+    },
+    {
+      "name": "runtime_error_public_payload.v1.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v1",
+      "sha256": "db65c8c97f11cefdb45d82da90b21a9653056d53f5762fc8a2602c7d50aa889f",
+      "producerRepo": "MAformac",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v1.json",
+      "consumerRepo": "MAformac-uiue",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v1.json",
+      "proofClass": "local_unit",
+      "notes": [
+        "presentation_safe_public_fixture",
+        "runtime_error_boundary"
+      ]
+    },
+    {
+      "name": "reconciliation_mismatch_public_payload.v1.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v1",
+      "sha256": "6baee090729ac3c3db7e5d9041cd186d4a7eb993398aae4b2319cd059688f423",
+      "producerRepo": "MAformac",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v1.json",
+      "consumerRepo": "MAformac-uiue",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v1.json",
+      "proofClass": "local_unit",
+      "notes": [
+        "presentation_safe_public_fixture",
+        "reconciliation_mismatch_boundary"
+      ]
+    },
+    {
+      "name": "partial_accept_refuse_public_payload.v1.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v1",
+      "sha256": "4e7de740715634a34c7d5c73ccd94f9161a62e85612b3066cac6dea9aa818649",
+      "producerRepo": "MAformac",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v1.json",
+      "consumerRepo": "MAformac-uiue",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v1.json",
+      "proofClass": "local_unit",
+      "notes": [
+        "presentation_safe_public_fixture",
+        "partial_accept_partial_refuse_boundary"
+      ]
     }
   ]
 }
