@@ -95,6 +95,50 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertTrue(receipt.splitWhitelist.contains("dev_selection"))
     }
 
+    func testSixAxisHeldOutOverlapBlocksTrainRows() throws {
+        try assertAxisOverlap(axisKey: "parent_semantic_id", value: "parent:shared", expectedReason: "train_parent_semantic_overlap")
+        try assertAxisOverlap(axisKey: "device", value: "ac", expectedReason: "train_device_overlap")
+        try assertAxisOverlap(axisKey: "tool_name", value: "set_cabin_ac", expectedReason: "train_tool_overlap")
+        try assertAxisOverlap(axisKey: "value_type", value: "EXP", expectedReason: "train_value_type_overlap")
+        try assertAxisOverlap(axisKey: "template_family", value: "temperature_request", expectedReason: "train_template_family_overlap")
+        try assertAxisOverlap(axisKey: "generator_source", value: "hermes_glm", expectedReason: "train_generator_source_overlap")
+    }
+
+    func testDeviceOverlapBlocksEvenWhenParentDoesNotOverlap() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-DEV","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-DEV","parent_semantic_id":"parent:train.unique","device":"ac","tool_name":"set_cabin_ac","value_type":"EXP","template_family":"train_template","generator_source":"codex","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        {"sample_id":"C5-HELDOUT-DEV","split":"heldout","bucket":"heldout_test","case_id":"C5-HELDOUT-DEV","parent_semantic_id":"parent:heldout.unique","device":"ac","tool_name":"different_tool","value_type":"PERCENT","template_family":"heldout_template","generator_source":"hermes_glm","must_not_train":true,"input_zh":"空调打开"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertEqual(receipt.trainParentSemanticOverlap, 0)
+        XCTAssertEqual(receipt.trainHeldOutAxisOverlapCount, 1)
+        XCTAssertTrue(receipt.hasHardFailure)
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "train_device_overlap" })
+    }
+
+    func testCleanSixAxisSplitPasses() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-CLEAN","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-CLEAN","parent_semantic_id":"parent:train.clean","device":"ac","tool_name":"set_cabin_ac","value_type":"EXP","template_family":"train_template","generator_source":"codex","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        {"sample_id":"C5-HELDOUT-CLEAN","split":"heldout","bucket":"heldout_test","case_id":"C5-HELDOUT-CLEAN","parent_semantic_id":"parent:heldout.clean","device":"window","tool_name":"set_window_position","value_type":"PERCENT","template_family":"heldout_template","generator_source":"hermes_glm","must_not_train":true,"input_zh":"打开车窗"}
+        """)
+
+        XCTAssertEqual(receipt.status, "data_gate_ready")
+        XCTAssertEqual(receipt.trainHeldOutAxisOverlapCount, 0)
+        XCTAssertFalse(receipt.hasHardFailure)
+    }
+
+    func testLegacyReceiptDecodesWithoutHeldOutAxisFields() throws {
+        let json = """
+        {"receipt_version":"c5-data-gate.v1","generated_at":"2026-06-20T00:00:00Z","status":"data_gate_ready","source_snapshot_digest":"source-digest","source_authorization_status":"authorized_fixture","format_contract_version":"format-digest","row_count":1,"bucket_counts":{"train":1},"split_whitelist":["train","heldout"],"must_not_train_violations":0,"detected_parent_semantic_overlap_count":0,"train_parent_semantic_overlap":0,"tool_call_format_pass":1,"tool_call_format_failures":[],"masking_coverage":{"function_name":true,"argument_name":true,"argument_value":true,"train_on_turn":true},"redaction_status":"pass","quarantine_count":0,"failure_receipt":[],"proposed_fix":{"auto_apply":false,"suggestions":[]}}
+        """
+        let receipt = try JSONDecoder().decode(C5DataGateReceipt.self, from: Data(json.utf8))
+
+        XCTAssertNil(receipt.trainHeldOutAxisOverlapCount)
+        XCTAssertNil(receipt.heldOutAxisOverlaps)
+        XCTAssertFalse(receipt.hasHardFailure)
+    }
+
     private func makeReceipt(
         c6Cases: [C6BenchCase] = [],
         jsonl: String
@@ -110,6 +154,37 @@ final class C5DataGateTests: XCTestCase {
             generatedAt: "2026-06-20T00:00:00Z"
         )
         return C5DataGateValidator().receipt(candidates: candidates, c6Cases: c6Cases, context: context)
+    }
+
+    private func assertAxisOverlap(axisKey: String, value: String, expectedReason: String) throws {
+        let parentTrain = axisKey == "parent_semantic_id" ? value : "parent:train.\(axisKey)"
+        let parentHeldout = axisKey == "parent_semantic_id" ? value : "parent:heldout.\(axisKey)"
+        let trainAxis = axisFields(overriding: axisKey, with: value, parent: parentTrain, suffix: "train")
+        let heldoutAxis = axisFields(overriding: axisKey, with: value, parent: parentHeldout, suffix: "heldout")
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-\(axisKey)","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-\(axisKey)",\(trainAxis),"must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        {"sample_id":"C5-HELDOUT-\(axisKey)","split":"heldout","bucket":"heldout_test","case_id":"C5-HELDOUT-\(axisKey)",\(heldoutAxis),"must_not_train":true,"input_zh":"空调打开"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked", axisKey)
+        XCTAssertEqual(receipt.trainHeldOutAxisOverlapCount, 1, axisKey)
+        XCTAssertTrue(receipt.hasHardFailure, axisKey)
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == expectedReason }, axisKey)
+    }
+
+    private func axisFields(overriding axisKey: String, with value: String, parent: String, suffix: String) -> String {
+        var fields = [
+            "parent_semantic_id": parent,
+            "device": "device-\(suffix)",
+            "tool_name": "tool-\(suffix)",
+            "value_type": "value-\(suffix)",
+            "template_family": "template-\(suffix)",
+            "generator_source": "generator-\(suffix)"
+        ]
+        fields[axisKey] = value
+        return fields.sorted { $0.key < $1.key }
+            .map { "\"\($0.key)\":\"\($0.value)\"" }
+            .joined(separator: ",")
     }
 
     private func protectedC6Case(caseID: String, semanticID: String) -> C6BenchCase {

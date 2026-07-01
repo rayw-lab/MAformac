@@ -7,6 +7,11 @@ public struct C5DataGateCandidate: Decodable, Sendable {
     public var caseID: String?
     public var parentSemanticID: String?
     public var candidateParentSemanticID: String?
+    public var device: String?
+    public var toolName: String?
+    public var valueType: String?
+    public var templateFamily: String?
+    public var generatorSource: String?
     public var mustNotTrain: Bool
     public var sourceAuthorization: String?
     public var inputText: String
@@ -25,6 +30,13 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         case candidateParentSemanticID = "candidate_parent_semantic_id"
         case parentID = "parent_id"
         case scenarioFamilyID = "scenario_family_id"
+        case device
+        case toolName = "tool_name"
+        case valueType = "value_type"
+        case templateFamily = "template_family"
+        case generatorSource = "generator_source"
+        case generatorModelID = "generator_model_id"
+        case value
         case mustNotTrain = "must_not_train"
         case sourceAuthorization = "source_authorization"
         case inputZh = "input_zh"
@@ -44,6 +56,11 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         caseID: String?,
         parentSemanticID: String?,
         candidateParentSemanticID: String? = nil,
+        device: String? = nil,
+        toolName: String? = nil,
+        valueType: String? = nil,
+        templateFamily: String? = nil,
+        generatorSource: String? = nil,
         mustNotTrain: Bool,
         sourceAuthorization: String?,
         inputText: String,
@@ -58,6 +75,11 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         self.caseID = caseID
         self.parentSemanticID = parentSemanticID
         self.candidateParentSemanticID = candidateParentSemanticID
+        self.device = device
+        self.toolName = toolName
+        self.valueType = valueType
+        self.templateFamily = templateFamily
+        self.generatorSource = generatorSource
         self.mustNotTrain = mustNotTrain
         self.sourceAuthorization = sourceAuthorization
         self.inputText = inputText
@@ -90,6 +112,15 @@ public struct C5DataGateCandidate: Decodable, Sendable {
             ?? container.decodeIfPresent(String.self, forKey: .parentID)
             ?? container.decodeIfPresent(String.self, forKey: .scenarioFamilyID)
         self.candidateParentSemanticID = try container.decodeIfPresent(String.self, forKey: .candidateParentSemanticID)
+        self.device = try container.decodeIfPresent(String.self, forKey: .device)
+        self.toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
+            ?? toolCall?.name
+            ?? expectedToolCalls?.compactMap { $0.toolName ?? $0.name }.first
+        self.valueType = try container.decodeIfPresent(String.self, forKey: .valueType)
+            ?? container.decodeIfPresent(C5DataGateCandidateValue.self, forKey: .value)?.type
+        self.templateFamily = try container.decodeIfPresent(String.self, forKey: .templateFamily)
+        self.generatorSource = try container.decodeIfPresent(String.self, forKey: .generatorSource)
+            ?? container.decodeIfPresent(String.self, forKey: .generatorModelID)
         self.mustNotTrain = try container.decodeIfPresent(Bool.self, forKey: .mustNotTrain) ?? false
         self.sourceAuthorization = try container.decodeIfPresent(String.self, forKey: .sourceAuthorization)
         self.inputText = try container.decodeIfPresent(String.self, forKey: .inputZh)
@@ -166,6 +197,8 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
     public var mustNotTrainViolations: Int
     public var detectedParentSemanticOverlapCount: Int
     public var trainParentSemanticOverlap: Int
+    public var heldOutAxisOverlaps: [C5HeldOutAxisOverlap]?
+    public var trainHeldOutAxisOverlapCount: Int?
     public var toolCallFormatPass: Int
     public var toolCallFormatFailures: [C5DataGateFailure]
     public var maskingCoverage: C5MaskingCoverage
@@ -187,6 +220,8 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
         case mustNotTrainViolations = "must_not_train_violations"
         case detectedParentSemanticOverlapCount = "detected_parent_semantic_overlap_count"
         case trainParentSemanticOverlap = "train_parent_semantic_overlap"
+        case heldOutAxisOverlaps = "held_out_axis_overlaps"
+        case trainHeldOutAxisOverlapCount = "train_held_out_axis_overlap_count"
         case toolCallFormatPass = "tool_call_format_pass"
         case toolCallFormatFailures = "tool_call_format_failures"
         case maskingCoverage = "masking_coverage"
@@ -199,8 +234,66 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
     public var hasHardFailure: Bool {
         mustNotTrainViolations > 0
             || trainParentSemanticOverlap > 0
+            || (trainHeldOutAxisOverlapCount ?? 0) > 0
             || !toolCallFormatFailures.isEmpty
             || redactionStatus == "fail"
+    }
+}
+
+public enum C5HeldOutOverlapAxis: String, CaseIterable, Codable, Sendable {
+    case parentSemanticID = "parent_semantic_id"
+    case device
+    case toolName = "tool_name"
+    case valueType = "value_type"
+    case templateFamily = "template_family"
+    case generatorSource = "generator_source"
+
+    var failureReason: String {
+        switch self {
+        case .parentSemanticID:
+            return "train_parent_semantic_overlap"
+        case .device:
+            return "train_device_overlap"
+        case .toolName:
+            return "train_tool_overlap"
+        case .valueType:
+            return "train_value_type_overlap"
+        case .templateFamily:
+            return "train_template_family_overlap"
+        case .generatorSource:
+            return "train_generator_source_overlap"
+        }
+    }
+
+    func value(in candidate: C5DataGateCandidate) -> String? {
+        let raw: String?
+        switch self {
+        case .parentSemanticID:
+            raw = candidate.overlapParentSemanticID
+        case .device:
+            raw = candidate.device
+        case .toolName:
+            raw = candidate.toolName
+        case .valueType:
+            raw = candidate.valueType
+        case .templateFamily:
+            raw = candidate.templateFamily
+        case .generatorSource:
+            raw = candidate.generatorSource
+        }
+        return raw?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+    }
+}
+
+public struct C5HeldOutAxisOverlap: Codable, Equatable, Sendable {
+    public var axis: String
+    public var trainOverlapCount: Int
+    public var overlappingValues: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case axis
+        case trainOverlapCount = "train_overlap_count"
+        case overlappingValues = "overlapping_values"
     }
 }
 
@@ -250,6 +343,7 @@ public struct C5ProposedFix: Codable, Equatable, Sendable {
 
 public struct C5DataGateValidator: Sendable {
     public static let splitWhitelist = ["train", "heldout", "must_pass", "c6_base", "dev_selection", "quarantine"]
+    public static let heldOutOverlapAxes = C5HeldOutOverlapAxis.allCases
 
     public init() {}
 
@@ -265,6 +359,11 @@ public struct C5DataGateValidator: Sendable {
             .union(protectedParents)
         let trainOverlapParents = Set(normalized.filter { $0.split == "train" }.compactMap(\.candidate.overlapParentSemanticID))
             .intersection(nonTrainParents)
+        let heldOutAxisOverlaps = Self.heldOutOverlapAxes.map {
+            axisOverlap(axis: $0, normalized: normalized, protectedParents: protectedParents)
+        }
+        let trainHeldOutAxisOverlapCount = heldOutAxisOverlaps.reduce(0) { $0 + $1.trainOverlapCount }
+        let heldOutOverlapByAxis = Dictionary(uniqueKeysWithValues: zip(Self.heldOutOverlapAxes, heldOutAxisOverlaps))
         var failures: [C5DataGateFailure] = []
         var formatFailures: [C5DataGateFailure] = []
         var redactionFailures: [C5DataGateFailure] = []
@@ -281,6 +380,14 @@ public struct C5DataGateValidator: Sendable {
             }
             if item.split == "train", let parent = candidate.overlapParentSemanticID, trainOverlapParents.contains(parent) {
                 failures.append(failure(candidate, split: item.split, reason: "train_parent_semantic_overlap", severity: "P1"))
+            }
+            for axis in Self.heldOutOverlapAxes where axis != .parentSemanticID {
+                guard item.split == "train",
+                      let value = axis.value(in: candidate),
+                      heldOutOverlapByAxis[axis]?.overlappingValues.contains(value) == true else {
+                    continue
+                }
+                failures.append(failure(candidate, split: item.split, reason: axis.failureReason, severity: "P1"))
             }
             if item.split == "train" && candidate.overlapParentSemanticID == nil {
                 failures.append(failure(candidate, split: item.split, reason: "missing_candidate_parent_semantic_id_for_train", severity: "P1"))
@@ -320,7 +427,7 @@ public struct C5DataGateValidator: Sendable {
             $0.split == "train" && ($0.candidate.overlapParentSemanticID.map(trainOverlapParents.contains) == true)
         }.count
         let status: String
-        if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty {
+        if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || trainHeldOutAxisOverlapCount > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty {
             status = "blocked"
         } else if sourceReady {
             status = "data_gate_ready"
@@ -340,6 +447,8 @@ public struct C5DataGateValidator: Sendable {
             mustNotTrainViolations: mustNotTrainViolations,
             detectedParentSemanticOverlapCount: trainOverlapParents.count,
             trainParentSemanticOverlap: hardTrainOverlap,
+            heldOutAxisOverlaps: heldOutAxisOverlaps,
+            trainHeldOutAxisOverlapCount: trainHeldOutAxisOverlapCount,
             toolCallFormatPass: toolCallFormatPass,
             toolCallFormatFailures: formatFailures,
             maskingCoverage: coverage,
@@ -375,6 +484,7 @@ public struct C5DataGateValidator: Sendable {
         - must_not_train_violations: \(receipt.mustNotTrainViolations)
         - detected_parent_semantic_overlap_count: \(receipt.detectedParentSemanticOverlapCount)
         - train_parent_semantic_overlap: \(receipt.trainParentSemanticOverlap)
+        - train_held_out_axis_overlap_count: \(receipt.trainHeldOutAxisOverlapCount ?? 0)
         - tool_call_format_pass: \(receipt.toolCallFormatPass)
         - tool_call_format_failures: \(receipt.toolCallFormatFailures.count)
         - redaction_status: \(receipt.redactionStatus)
@@ -421,6 +531,30 @@ public struct C5DataGateValidator: Sendable {
         Self.splitWhitelist.contains(split)
     }
 
+    private func axisOverlap(
+        axis: C5HeldOutOverlapAxis,
+        normalized: [NormalizedCandidate],
+        protectedParents: Set<String>
+    ) -> C5HeldOutAxisOverlap {
+        let protectedSplits = normalized.filter {
+            $0.split != "train" && $0.split != "dev_selection" && $0.split != "quarantine"
+        }
+        var protectedValues = Set(protectedSplits.compactMap { axis.value(in: $0.candidate) })
+        if axis == .parentSemanticID {
+            protectedValues.formUnion(protectedParents)
+        }
+        let overlappingValues = Set(normalized.filter { $0.split == "train" }.compactMap { axis.value(in: $0.candidate) })
+            .intersection(protectedValues)
+        let trainOverlapCount = normalized.filter {
+            $0.split == "train" && (axis.value(in: $0.candidate).map(overlappingValues.contains) == true)
+        }.count
+        return C5HeldOutAxisOverlap(
+            axis: axis.rawValue,
+            trainOverlapCount: trainOverlapCount,
+            overlappingValues: overlappingValues.sorted()
+        )
+    }
+
     private func failure(_ candidate: C5DataGateCandidate, split: String, reason: String, severity: String) -> C5DataGateFailure {
         C5DataGateFailure(
             sampleID: candidate.sampleID,
@@ -460,6 +594,9 @@ public struct C5DataGateValidator: Sendable {
         if failures.contains(where: { $0.reason == "train_parent_semantic_overlap" }) {
             suggestions.append("split by parent_semantic_id and quarantine overlaps before train")
         }
+        if failures.contains(where: { $0.reason.hasPrefix("train_") && $0.reason.hasSuffix("_overlap") && $0.reason != "train_parent_semantic_overlap" }) {
+            suggestions.append("split held-out by device/tool/value_type/template_family/generator_source before train")
+        }
         if failures.contains(where: { $0.reason == "tool_call_format_mismatch" }) {
             suggestions.append("render train action rows with shared qwen tool_call wrapper")
         }
@@ -484,6 +621,10 @@ private struct C5InlineToolCall: Decodable {
     var wrapper: String?
     var name: String?
     var arguments: [String: C5LooseJSON]?
+}
+
+private struct C5DataGateCandidateValue: Decodable {
+    var type: String?
 }
 
 private struct C5ExpectedToolCall: Decodable {
@@ -550,5 +691,11 @@ private enum C5LooseJSON: Decodable, Equatable {
         } else {
             self = .null
         }
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
     }
 }
