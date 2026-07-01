@@ -426,4 +426,31 @@ gate7 = C5 **训练集** utterance 生成的编排架构。要把它从【resear
 - ✅ **未产训练数据/语料**：fixture 全部 `<PLACEHOLDER>`，**无一条真中文话术**（V1-V8 dry-run 用例的 utterance 字段全 `<PLACEHOLDER_zh_utterance_NO_REAL_TEXT>`）。
 - ✅ **只读一手源复算**：前一次 data 的复算是只读（`Reports/` 目录读，无写无改）。
 - 🔴 `R7: real cloud generation run BLOCKED until candidate signoff + run auth；fixture 仅字段占位无真话术`。
-- 🔴 未决口径型分歧（§6 Q1/Q2）**上报 commander 转磊哥拍，未自拍**。
+- 🔴 未决口径型分歧（§6 Q1/Q2）→ **磊哥已拍 D-008**（Q1-A GPT-5.5 纯异源 judge / Q2-A 口径重述）。
+
+---
+
+## §10 grounded round landing（D-010 locked，2026-07-01 磊哥「全部同意」）
+
+> grounded grill round（本 session 经验发现驱动，110 决策，`docs/c5-training-readiness-grill/SYNTHESIS-grounded-round.md`）净新载力 ⭐ 已 locked，回写进本 design。
+
+### §10.1 vendor-enum 异源 G1 门（A-096/097 locked，确认 §3.2）
+§3.2 顶层 vendor 枚举（Anthropic/OpenAI/Volc-twofish）+ G1 门 `judge_source_vendor≠generator_source_vendor` = **A-096/097 locked** 确认。补：G1 receipt 记 `same_vendor_count/total/same_vendor_pct`（A-101）；unknown/empty vendor 直接 block（A-099）。
+
+### §10.2 bug-derived precision 门（E-098/129 locked，新增）
+WS2 bug shortlist（1730/4053）= 弱监督非 gold → 新增 precision 门：每族 min(50,max(20,10%候选)) 人审、小族全审，**precision<0.8 该族不扩量**；任一族 redaction fail / judge reject axis 单项>20% / heldout collision>0 即停该族（E-129）。bug 候选**默认 quarantine**，过 precision+redaction+label-gold 才转候选（E-096/121）。
+
+### §10.3 source tags（E-128 / D-125 locked，S2/S5 字段新增）
+S2/S5 fixture 加 bug 溯源字段：`source=bug_derived_pattern` / `raw_source_redacted=true` / `raw_text_absent=true` / `ws2_family` / `ws2_failure_mode`（E-128）；配比来源 `quota_source=intent|bug|scene|recovery`（D-125）——防审计无法区分 raw bug / 派生 pattern / 合成 utterance。
+
+### §10.4 生成配比（D-096~125 locked，喂真生成，R7 BLOCKED）
+每族每类 quota = intent 基线 + bug 压力 + demo/安全地板混合公式（D-096）；🔴 **bug 多 ≠ 多训 positive**（音量/屏幕 bug 多是 failure/refusal，屏幕黑屏→failure 不→调亮度 positive，D-097/E-109/E-110）；稀疏族地板 + scene-trigger（雨刮 12/天窗 34 不砍，靠「下雨了」场景，D-098/E-113）；followup 屏幕/音量补 scene-derived 标 source 不伪造 transition lineage（D-102/117）。🔴 这是**真生成时的配比**，R7 BLOCKED 不现在跑。
+
+### §10.5 bug 失败模式→C6 层映射（E-100~130 locked，喂 C6 eval）
+809 执行失败→failure receipt/C6 trap **不入 action train**（E-100/124）；415 多意图→C6 multi-action trap（E-102）；380 unsupported→no-call/refusal（E-104）；234 clarify→demo_fuzz clarify（E-106）；97 口语体感词→自然中文 positive/clarify 按 value-form（E-107）；58 safety→safety layer 一票否决（E-108）。bug→C6 四层默认矩阵见 E-115。
+
+### §10.6 旧 3804 复用（M4 reconcile locked）
+旧 3804 utterance **TEXT 可作 recovery candidate**（逐条重过 redaction/label_conflict/diversity/**新 vendor-enum 异源 judge**/六轴 held-out，D-103），但**旧 hermes judge verdict 作废**（假异源 100% same-vendor 不可信，A-131）→ 不吃旧 verdict、全部重判。旧 696 非 10 族只进 unsupported candidate 或丢（D-104）；旧样本不喂新 cloud prompt（D-105）。
+
+### §10.7 R7 边界（不变）
+🔴 grounded round lock 的是 **grill 决策 + design 回写**，**真生成/真训练仍 BLOCKED**（candidate signoff + run auth 才 lift）。gate7 scope = 生成阶段，**别背 0/34 训练侧锅**（E-117/F-049）。
