@@ -66,11 +66,11 @@ gate7 = C5 **训练集** utterance 生成的编排架构。要把它从【resear
 **埋雷② — 多样性偏薄 / 尾部收窄（θ-α 同质化在 data 层的显影）**
 - 复算：mean utterance = **9.3 字符**（min 2 / max 20）——短祈使句为主。
 - 复算 per-seed distinct-utterance 分布：**373 个 seed 只有 1 条 distinct utterance**、676 个 2 条、562 个 3 条；仅 84+52 个 seed 到 6-7 条。
-- 抽样（`generated-utterances-final.jsonl` 前 3 contract_row 的 distinct utterance）：
-  - `c1_airControl_000002`: 只 2 条（"帮我把空调打开" / "打开空调设置界面"）。
-  - `c1_airControl_000003`: 3 条（"主驾这边空调打开" / "副驾空调打开一下" / "打开左侧空调设置"）。
-  - `c1_airControl_000004`: 3 条（"帮我把空调关掉" / "帮我把空调关了吧" / "关闭空调设置界面"）。
-- 含义：措辞集中在「帮我把 X 打开/关掉」祈使模板 + 「打开 X 设置界面」——**缺 D-080 要求的 short-imperative / ellipsis / polite / context-followup 四类长短句覆盖**（`worker-1-data-round2.md:51` D-080-A），缺 D-079 的 value-form（SPOT/EXP/PERCENT）覆盖（`:50` D-079-A）。这正是 probe pre-mortem「单源同质化 distribution collapse，fc_l3 尾部仍缺」（`probe:102`）+ E7 model collapse（`probe:72`）在实测数据里的样子。**同源两模型 + per-seed 变体少 = diversity gate 形同虚设**。
+- 抽样（`generated-utterances-final.jsonl` 前 3 contract_row 的 distinct utterance，字面话术已 redacted，仅保留 shape）：
+  - `c1_airControl_000002`: 只 2 条（`pattern_class=short_imperative / normalized_template=PH_DEVICE_ACTION / length=8 / hash8=1ff4b871`；`pattern_class=settings_navigation / normalized_template=PH_OPEN_DEVICE_SETTINGS / length=8 / hash8=1f2c853a`）。
+  - `c1_airControl_000003`: 3 条（`pattern_class=seat_scoped_imperative / normalized_template=PH_SEAT_DEVICE_ACTION / length=9 / hash8=618a61c4`；`pattern_class=seat_scoped_polite / normalized_template=PH_SEAT_DEVICE_ACTION_POLITE / length=8 / hash8=1131ab63`；`pattern_class=side_scoped_settings / normalized_template=PH_SIDE_DEVICE_SETTINGS / length=8 / hash8=e83b88e6`）。
+  - `c1_airControl_000004`: 3 条（`pattern_class=short_imperative / normalized_template=PH_DEVICE_ACTION / length=8 / hash8=0a5e5b6b`；`pattern_class=softened_imperative / normalized_template=PH_DEVICE_ACTION_SOFTENED / length=9 / hash8=656d16a3`；`pattern_class=settings_navigation / normalized_template=PH_CLOSE_DEVICE_SETTINGS / length=8 / hash8=0e732197`）。
+- 含义：措辞集中在 `PH_DEVICE_ACTION` 短祈使模板 + `PH_OPEN_DEVICE_SETTINGS` 设置页导航模板——**缺 D-080 要求的 short-imperative / ellipsis / polite / context-followup 四类长短句覆盖**（`worker-1-data-round2.md:51` D-080-A），缺 D-079 的 value-form（SPOT/EXP/PERCENT）覆盖（`:50` D-079-A）。这正是 probe pre-mortem「单源同质化 distribution collapse，fc_l3 尾部仍缺」（`probe:102`）+ E7 model collapse（`probe:72`）在实测数据里的样子。**同源两模型 + per-seed 变体少 = diversity gate 形同虚设**。
 
 **埋雷③ — 「0 条自然中文」的口径需澄清（dispute-triage：不照抄 SPEC 措辞，以一手 data 为准）**
 - SPEC §0 写惨败1 = 训练集「0 条自然中文」。**但一手 data 显示 gate7 阶段确实产了 4306 条 distinct 中文 utterance**（§1.1 复算）。
@@ -221,7 +221,7 @@ gate7 = C5 **训练集** utterance 生成的编排架构。要把它从【resear
 
 ### §4.2 dedupe 门（D-076/D-077）
 
-- **文本粒度三键**（D-076-A `worker-1-data-round2.md:47`）：`normalized_utterance + slot_skeleton + tool_signature` 三键去重（不只 exact text——前一次「帮我把空调关掉/关了吧」换标点近重复应被 catch）。
+- **文本粒度三键**（D-076-A `worker-1-data-round2.md:47`）：`normalized_utterance + slot_skeleton + tool_signature` 三键去重（不只 exact text——前一次 `pattern_class=softened_imperative / normalized_template=PH_DEVICE_ACTION / hash8_pair=0a5e5b6b,656d16a3` 这类近重复应被 catch）。
 - **语义粒度**（D-077-A `worker-1-data-round2.md:48`）：同 `parent + tool + value_type + slot值` 等价 → 近重复（防 value 等价样本穿过 held-out）。
 - **per-seed 上限**（D-075-A `worker-1-data-round2.md:46` / `probe:59`）：每 seed 每 generator ≤2，总候选 ≤8（防单 seed 风格淹没 + 死记）。
 
