@@ -183,7 +183,6 @@ struct C5TrainingCLI {
           --model \(config.model) \\
           --data \(outputDir.appendingPathComponent("mlx-data").path) \\
           --config \(outputDir.appendingPathComponent("mlx-lora-config.yaml").path) \\
-          --mask-prompt \\
           --require-maformac-loss-mask \\
           --num-layers \(config.numLayers) \\
           --batch-size \(config.batchSize) \\

@@ -91,6 +91,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--inspect-batches", type=int, default=0)
     parser.add_argument("--inspect-output", type=str, default=None)
     parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--self-test-loss-mask", action="store_true")
     args = vars(parser.parse_args(argv))
 
     config_path = args.get("config")
@@ -112,6 +113,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "inspect_batches": 0,
             "inspect_output": None,
             "require_maformac_loss_mask": False,
+            "self_test_loss_mask": False,
         }
     )
     for key, value in defaults.items():
@@ -493,6 +495,8 @@ def train_model(args, model: nn.Module, train_set, valid_set, metrics: MetricsWr
         optimizer=opt,
         train_dataset=CacheDataset(train_set),
         val_dataset=CacheDataset(valid_set) if valid_set else None,
+        loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss,
+        iterate_batches=maformac_iterate_batches if args.require_maformac_loss_mask else stock_iterate_batches,
         metrics=metrics,
         grad_clip_norm=args.grad_clip_norm,
         disable_grad_clip=args.disable_grad_clip,
@@ -505,9 +509,11 @@ def evaluate_model(args, model: nn.Module, test_set):
     test_loss = evaluate(
         model=model,
         dataset=CacheDataset(test_set),
+        loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss,
         batch_size=args.batch_size,
         num_batches=args.test_batches,
         max_seq_length=args.max_seq_length,
+        iterate_batches=maformac_iterate_batches if args.require_maformac_loss_mask else stock_iterate_batches,
     )
     print(f"Test loss {test_loss:.3f}, Test ppl {math.exp(test_loss):.3f}.", flush=True)
 
@@ -525,83 +531,301 @@ def batch_signature(batch_index: int, batch_tuple: Any) -> dict[str, Any]:
     }
 
 
-def validate_maformac_loss_mask_files(data_dir: str | Path, require_train: bool) -> dict[str, Any]:
-    root = Path(data_dir)
+class MAformacLossMaskDataset:
+    def __init__(self, data: list[dict[str, Any]], tokenizer):
+        self._data = data
+        self.tokenizer = tokenizer
+
+    def process(self, record: dict[str, Any]):
+        return build_maformac_token_labels(record, self.tokenizer)
+
+    def __getitem__(self, idx: int):
+        return self._data[idx]
+
+    def __len__(self):
+        return len(self._data)
+
+
+def read_jsonl_records(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    rows = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError as error:
+                raise LossMaskValidationError(f"{path.name}:{line_number}:json_decode:{error.msg}") from error
+    return rows
+
+
+def locate_subsequence(haystack: list[int], needle: list[int]) -> int | None:
+    if not needle:
+        return None
+    limit = len(haystack) - len(needle)
+    for start in range(0, limit + 1):
+        if haystack[start : start + len(needle)] == needle:
+            return start
+    return None
+
+
+def assistant_tokenization(record: dict[str, Any], tokenizer) -> tuple[list[int], list[int], list[tuple[int, int]], int]:
+    messages = record["messages"]
+    tools = record.get("tools")
+    assistant = messages[-1]["content"]
+    full_tokens = tokenizer.apply_chat_template(messages, tools=tools, return_dict=False)
+    add_generation_prompt = messages[-1].get("role") == "assistant"
+    prompt_tokens = tokenizer.apply_chat_template(
+        messages[:-1],
+        tools=tools,
+        add_generation_prompt=add_generation_prompt,
+        return_dict=False,
+    )
+    encoded = tokenizer(
+        assistant,
+        add_special_tokens=False,
+        return_offsets_mapping=True,
+    )
+    assistant_tokens = encoded["input_ids"]
+    offsets = encoded.get("offset_mapping")
+    if offsets is None:
+        raise LossMaskValidationError("tokenizer_offset_mapping_missing")
+
+    start = len(prompt_tokens)
+    if full_tokens[start : start + len(assistant_tokens)] != assistant_tokens:
+        found = locate_subsequence(full_tokens, assistant_tokens)
+        if found is None:
+            raise LossMaskValidationError("assistant_token_subsequence_not_found")
+        start = found
+    return full_tokens, assistant_tokens, [(int(s), int(e)) for s, e in offsets], start
+
+
+def token_indices_for_span(offsets: list[tuple[int, int]], span: dict[str, Any]) -> list[int]:
+    start = int(span["start"])
+    end = int(span["end"])
+    return [
+        index
+        for index, (token_start, token_end) in enumerate(offsets)
+        if token_start < end and start < token_end
+    ]
+
+
+def build_maformac_token_labels(record: dict[str, Any], tokenizer) -> tuple[list[int], list[int]]:
+    loss_mask = record.get("loss_mask")
+    if not isinstance(loss_mask, dict):
+        raise LossMaskValidationError("loss_mask_missing")
+    if loss_mask.get("ignore_index", -100) != -100:
+        raise LossMaskValidationError("ignore_index_not_minus_100")
+    if "labels" in loss_mask:
+        raise LossMaskValidationError("char_indexed_loss_mask_labels_forbidden")
+
+    tokens, _, offsets, assistant_start = assistant_tokenization(record, tokenizer)
+    labels = [-100] * len(tokens)
+    trainable_token_count = 0
+
+    for span in loss_mask.get("trainable_spans", []):
+        for assistant_index in token_indices_for_span(offsets, span):
+            full_index = assistant_start + assistant_index
+            if 0 <= full_index < len(tokens):
+                labels[full_index] = int(tokens[full_index])
+                trainable_token_count += 1
+
+    for span in loss_mask.get("masked_think_spans", []):
+        for assistant_index in token_indices_for_span(offsets, span):
+            full_index = assistant_start + assistant_index
+            if 0 <= full_index < len(labels):
+                labels[full_index] = -100
+
+    if loss_mask.get("enforcement") != "all_masked_not_train_eligible" and not any(label != -100 for label in labels):
+        raise LossMaskValidationError("token_trainable_labels_missing")
+    if len(labels) != len(tokens):
+        raise LossMaskValidationError("token_label_count_mismatch")
+    record["_maformac_token_mask_summary"] = {
+        "tokens": len(tokens),
+        "trainable_tokens": sum(1 for label in labels if label != -100),
+        "ignored_tokens": sum(1 for label in labels if label == -100),
+        "trainable_span_tokens_before_think_mask": trainable_token_count,
+    }
+    return tokens, labels
+
+
+def maformac_masked_cross_entropy_from_logits(logits, token_labels, ignore_index: int = -100):
+    mask = token_labels != ignore_index
+    safe_targets = mx.where(mask, token_labels, 0)
+    ce = nn.losses.cross_entropy(logits, safe_targets) * mask
+    ntoks = mask.sum()
+    return ce.astype(mx.float32).sum() / ntoks, ntoks
+
+
+def maformac_masked_loss(model, batch, token_labels):
+    inputs = batch[:, :-1]
+    labels = token_labels[:, 1:]
+    logits = model(inputs)
+    return maformac_masked_cross_entropy_from_logits(logits, labels)
+
+
+def maformac_iterate_batches(
+    dataset,
+    batch_size,
+    max_seq_length,
+    loop=False,
+    seed=None,
+    comm_group=None,
+):
+    len_fn = lambda idx: len(dataset[idx][0])
+    idx = sorted(range(len(dataset)), key=len_fn)
+    if len(dataset) < batch_size:
+        raise ValueError(
+            f"Dataset must have at least batch_size={batch_size}"
+            f" examples but only has {len(dataset)}."
+        )
+
+    if comm_group is not None:
+        offset = comm_group.rank()
+        step = comm_group.size()
+    else:
+        offset = 0
+        step = 1
+    if batch_size % step != 0:
+        raise ValueError("The batch size must be divisible by the number of workers")
+
+    batch_idx = [
+        idx[i + offset : i + offset + batch_size : step]
+        for i in range(0, len(idx) - batch_size + 1, batch_size)
+    ]
+    if seed:
+        np.random.seed(seed)
+    while True:
+        indices = np.random.permutation(len(batch_idx))
+        for i in indices:
+            rows = [dataset[j] for j in batch_idx[i]]
+            batch_tokens, batch_labels = zip(*rows)
+            lengths = [len(tokens) for tokens in batch_tokens]
+            if max(lengths) > max_seq_length:
+                print(
+                    f"[WARNING] Some sequences are longer than {max_seq_length} tokens. "
+                    f"The longest sentence {max(lengths)} will be truncated to {max_seq_length}. "
+                    "Consider pre-splitting your data to save memory.",
+                    flush=True,
+                )
+            pad_to = 32
+            max_length_in_batch = 1 + pad_to * ((max(lengths) + pad_to - 1) // pad_to)
+            max_length_in_batch = min(max_length_in_batch, max_seq_length)
+            batch_arr = np.zeros((batch_size // step, max_length_in_batch), np.int32)
+            label_arr = np.full((batch_size // step, max_length_in_batch), -100, np.int32)
+            for j in range(batch_size // step):
+                truncated_length = min(lengths[j], max_seq_length)
+                batch_arr[j, :truncated_length] = batch_tokens[j][:truncated_length]
+                label_arr[j, :truncated_length] = batch_labels[j][:truncated_length]
+            yield mx.array(batch_arr), mx.array(label_arr)
+        if not loop:
+            break
+
+
+def load_maformac_loss_mask_datasets(args, tokenizer):
+    root = Path(args.data)
     if not root.exists():
         raise LossMaskValidationError(f"maformac_loss_mask_data_dir_missing:{root}")
+    records = {
+        "train": read_jsonl_records(root / "train.jsonl"),
+        "valid": read_jsonl_records(root / "valid.jsonl"),
+        "test": read_jsonl_records(root / "test.jsonl"),
+    }
+    if args.train and len(records["train"]) == 0:
+        raise ValueError("Training set not found or empty. Must provide training set for fine-tuning.")
+    if args.train and len(records["valid"]) == 0:
+        print("Warning: Validation set not found or empty. Training will proceed without validation.", flush=True)
+    if args.test and len(records["test"]) == 0:
+        raise ValueError("Test set not found or empty. Must provide test set for evaluation.")
 
+    datasets = {split: MAformacLossMaskDataset(rows, tokenizer) for split, rows in records.items()}
+    summary = validate_maformac_loss_mask_datasets(datasets, require_train=bool(args.train))
+    return datasets["train"], datasets["valid"], datasets["test"], summary
+
+
+def validate_maformac_loss_mask_datasets(datasets: dict[str, MAformacLossMaskDataset], require_train: bool) -> dict[str, Any]:
     summary: dict[str, Any] = {
         "event": "maformac_loss_mask_preflight",
-        "data_dir": str(root),
         "records": 0,
         "trainable_records": 0,
         "ignored_label_records": 0,
+        "trainable_tokens": 0,
+        "ignored_tokens": 0,
         "splits": {},
     }
     errors: list[str] = []
-
-    for split in ["train", "valid", "test"]:
-        path = root / f"{split}.jsonl"
-        split_summary = {"records": 0, "trainable_records": 0, "ignored_label_records": 0}
-        if not path.exists():
-            if split == "train" and require_train:
-                errors.append(f"{split}.jsonl_missing")
-            summary["splits"][split] = split_summary
-            continue
-
-        with path.open("r", encoding="utf-8") as handle:
-            for line_number, line in enumerate(handle, start=1):
-                if not line.strip():
-                    continue
-                split_summary["records"] += 1
-                summary["records"] += 1
-                try:
-                    record = json.loads(line)
-                except json.JSONDecodeError as error:
-                    errors.append(f"{split}:{line_number}:json_decode:{error.msg}")
-                    continue
-
-                loss_mask = record.get("loss_mask")
-                if not isinstance(loss_mask, dict):
-                    errors.append(f"{split}:{line_number}:loss_mask_missing")
-                    continue
-
-                labels = loss_mask.get("labels")
-                if not isinstance(labels, list) or not labels:
-                    errors.append(f"{split}:{line_number}:loss_mask_labels_missing_or_empty")
-                    continue
-                if not all(isinstance(label, int) for label in labels):
-                    errors.append(f"{split}:{line_number}:loss_mask_labels_not_int")
-                    continue
-
-                ignore_index = loss_mask.get("ignore_index", -100)
-                if ignore_index != -100:
-                    errors.append(f"{split}:{line_number}:ignore_index_not_minus_100")
-
-                has_ignored = any(label == -100 for label in labels)
-                has_trainable = any(label != -100 for label in labels)
-                if has_ignored:
-                    split_summary["ignored_label_records"] += 1
-                    summary["ignored_label_records"] += 1
-                else:
-                    errors.append(f"{split}:{line_number}:no_ignored_labels")
-
-                enforcement = loss_mask.get("enforcement")
-                if has_trainable:
-                    split_summary["trainable_records"] += 1
-                    summary["trainable_records"] += 1
-                elif enforcement != "all_masked_not_train_eligible":
-                    errors.append(f"{split}:{line_number}:no_trainable_labels")
-
-        if split == "train" and require_train and split_summary["records"] == 0:
-            errors.append("train.jsonl_empty")
+    for split, dataset in datasets.items():
+        split_summary = {
+            "records": len(dataset),
+            "trainable_records": 0,
+            "ignored_label_records": 0,
+            "trainable_tokens": 0,
+            "ignored_tokens": 0,
+        }
+        for index in range(len(dataset)):
+            try:
+                _, labels = dataset.process(dataset[index])
+            except Exception as error:
+                errors.append(f"{split}:{index + 1}:{error}")
+                continue
+            trainable = sum(1 for label in labels if label != -100)
+            ignored = sum(1 for label in labels if label == -100)
+            if trainable > 0:
+                split_summary["trainable_records"] += 1
+                split_summary["trainable_tokens"] += trainable
+            if ignored > 0:
+                split_summary["ignored_label_records"] += 1
+                split_summary["ignored_tokens"] += ignored
+        for key in ["records", "trainable_records", "ignored_label_records", "trainable_tokens", "ignored_tokens"]:
+            summary[key] += split_summary[key]
         summary["splits"][split] = split_summary
 
-    if require_train and summary["trainable_records"] == 0:
-        errors.append("trainable_loss_mask_records_missing")
+    if require_train and datasets["train"].__len__() == 0:
+        errors.append("train.jsonl_empty")
+    if require_train and summary["splits"]["train"]["trainable_tokens"] == 0:
+        errors.append("trainable_loss_mask_tokens_missing")
     if errors:
         raise LossMaskValidationError(json.dumps({"errors": errors[:25], "summary": summary}, ensure_ascii=False, sort_keys=True))
     return summary
+
+
+def run_loss_mask_self_test() -> None:
+    logits = mx.array(
+        [
+            [
+                [8.0, 0.0, 0.0],
+                [0.0, 8.0, 0.0],
+                [0.0, 0.0, 8.0],
+            ]
+        ],
+        dtype=mx.float32,
+    )
+    labels = mx.array([[0, -100, 2]], dtype=mx.int32)
+    masked_loss, ntoks = maformac_masked_cross_entropy_from_logits(logits, labels)
+    unmasked_loss, _ = maformac_masked_cross_entropy_from_logits(
+        logits,
+        mx.array([[0, 2, 2]], dtype=mx.int32),
+    )
+    mx.eval(masked_loss, unmasked_loss, ntoks)
+    if int(ntoks.item()) != 2:
+        raise AssertionError(f"expected 2 trainable tokens, got {int(ntoks.item())}")
+    if not float(masked_loss.item()) < float(unmasked_loss.item()):
+        raise AssertionError("masked token still contributed to loss")
+    print(
+        json.dumps(
+            {
+                "event": "loss_mask_self_test",
+                "status": "pass",
+                "trainable_tokens": int(ntoks.item()),
+                "masked_loss": float(masked_loss.item()),
+                "unmasked_loss": float(unmasked_loss.item()),
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
 
 
 def inspect_batches(args) -> None:
@@ -633,6 +857,10 @@ def inspect_batches(args) -> None:
 
 
 def run(args) -> None:
+    if args.self_test_loss_mask:
+        run_loss_mask_self_test()
+        return
+
     version = require_pinned_mlx_lm(args.allow_mlx_lm_version_mismatch)
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
     np.random.seed(args.seed)
@@ -671,23 +899,22 @@ def run(args) -> None:
                 "stock_update_inside_compile": args.stock_update_inside_compile,
             }
         )
-        if args.require_maformac_loss_mask:
-            loss_mask_summary = validate_maformac_loss_mask_files(
-                args.data,
-                require_train=bool(args.train),
-            )
-            metrics.write(loss_mask_summary)
-            print(
-                "MAformac loss_mask preflight "
-                f"records={loss_mask_summary['records']} "
-                f"trainable_records={loss_mask_summary['trainable_records']} "
-                f"ignored_label_records={loss_mask_summary['ignored_label_records']}",
-                flush=True,
-            )
         print("Loading pretrained model", flush=True)
         model, tokenizer = load(args.model, tokenizer_config={"trust_remote_code": True})
         print("Loading datasets", flush=True)
-        train_set, valid_set, test_set = load_dataset(args, tokenizer)
+        if args.require_maformac_loss_mask:
+            train_set, valid_set, test_set, loss_mask_summary = load_maformac_loss_mask_datasets(args, tokenizer)
+            metrics.write(loss_mask_summary)
+            print(
+                "MAformac token loss_mask preflight "
+                f"records={loss_mask_summary['records']} "
+                f"trainable_records={loss_mask_summary['trainable_records']} "
+                f"trainable_tokens={loss_mask_summary['trainable_tokens']} "
+                f"ignored_tokens={loss_mask_summary['ignored_tokens']}",
+                flush=True,
+            )
+        else:
+            train_set, valid_set, test_set = load_dataset(args, tokenizer)
         if args.train:
             print("Training", flush=True)
             train_model(args, model, train_set, valid_set, metrics)
