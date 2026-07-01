@@ -113,8 +113,30 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertEqual(receipt.status, "blocked")
         XCTAssertEqual(receipt.trainParentSemanticOverlap, 0)
         XCTAssertEqual(receipt.trainHeldOutAxisOverlapCount, 1)
+        XCTAssertEqual(receipt.trainHeldOutAxisOverlapRowCount, 1)
         XCTAssertTrue(receipt.hasHardFailure)
         XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "train_device_overlap" })
+    }
+
+    func testTrainCandidateMissingDeviceBlocksSixAxisSplit() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-MISSING-DEVICE","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-MISSING-DEVICE","parent_semantic_id":"parent:train.missing.device","tool_name":"set_cabin_ac","value_type":"EXP","template_family":"train_template","generator_source":"codex","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.hasHardFailure)
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "missing_train_device_axis_for_six_axis_split" })
+    }
+
+    func testGeneratorSourceAxisUsesCanonicalVendorNotModelID() throws {
+        let receipt = try makeReceipt(jsonl: """
+        {"sample_id":"C5-TRAIN-VENDOR","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-TRAIN-VENDOR","parent_semantic_id":"parent:train.vendor","device":"ac","tool_name":"set_cabin_ac","value_type":"EXP","template_family":"train_template","generator_model_id":"hermes_glm","generator_source_vendor":"Volc-twofish","must_not_train":false,"input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        {"sample_id":"C5-HELDOUT-VENDOR","split":"heldout","bucket":"heldout_test","case_id":"C5-HELDOUT-VENDOR","parent_semantic_id":"parent:heldout.vendor","device":"window","tool_name":"set_window_position","value_type":"PERCENT","template_family":"heldout_template","generator_model_id":"ark_standard","generator_source_vendor":"Volc-twofish","must_not_train":true,"input_zh":"打开车窗"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "train_generator_source_overlap" })
+        XCTAssertTrue(receipt.heldOutAxisOverlaps?.contains { $0.axis == "generator_source" && $0.overlappingValues == ["Volc-twofish"] } == true)
     }
 
     func testCleanSixAxisSplitPasses() throws {
@@ -125,6 +147,7 @@ final class C5DataGateTests: XCTestCase {
 
         XCTAssertEqual(receipt.status, "data_gate_ready")
         XCTAssertEqual(receipt.trainHeldOutAxisOverlapCount, 0)
+        XCTAssertEqual(receipt.trainHeldOutAxisOverlapRowCount, 0)
         XCTAssertFalse(receipt.hasHardFailure)
     }
 
