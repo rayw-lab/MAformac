@@ -56,6 +56,10 @@ class NonFiniteTrainingError(RuntimeError):
         self.payload = payload
 
 
+class LossMaskValidationError(RuntimeError):
+    pass
+
+
 class MetricsWriter:
     def __init__(self, path: str | None):
         self.path = Path(path) if path else None
@@ -86,6 +90,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--allow-mlx-lm-version-mismatch", action="store_true")
     parser.add_argument("--inspect-batches", type=int, default=0)
     parser.add_argument("--inspect-output", type=str, default=None)
+    parser.add_argument("--require-maformac-loss-mask", action="store_true")
     args = vars(parser.parse_args(argv))
 
     config_path = args.get("config")
@@ -106,6 +111,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "nonfinite_fallback_lr": DEFAULT_NONFINITE_FALLBACK_LR,
             "inspect_batches": 0,
             "inspect_output": None,
+            "require_maformac_loss_mask": False,
         }
     )
     for key, value in defaults.items():
@@ -519,6 +525,85 @@ def batch_signature(batch_index: int, batch_tuple: Any) -> dict[str, Any]:
     }
 
 
+def validate_maformac_loss_mask_files(data_dir: str | Path, require_train: bool) -> dict[str, Any]:
+    root = Path(data_dir)
+    if not root.exists():
+        raise LossMaskValidationError(f"maformac_loss_mask_data_dir_missing:{root}")
+
+    summary: dict[str, Any] = {
+        "event": "maformac_loss_mask_preflight",
+        "data_dir": str(root),
+        "records": 0,
+        "trainable_records": 0,
+        "ignored_label_records": 0,
+        "splits": {},
+    }
+    errors: list[str] = []
+
+    for split in ["train", "valid", "test"]:
+        path = root / f"{split}.jsonl"
+        split_summary = {"records": 0, "trainable_records": 0, "ignored_label_records": 0}
+        if not path.exists():
+            if split == "train" and require_train:
+                errors.append(f"{split}.jsonl_missing")
+            summary["splits"][split] = split_summary
+            continue
+
+        with path.open("r", encoding="utf-8") as handle:
+            for line_number, line in enumerate(handle, start=1):
+                if not line.strip():
+                    continue
+                split_summary["records"] += 1
+                summary["records"] += 1
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError as error:
+                    errors.append(f"{split}:{line_number}:json_decode:{error.msg}")
+                    continue
+
+                loss_mask = record.get("loss_mask")
+                if not isinstance(loss_mask, dict):
+                    errors.append(f"{split}:{line_number}:loss_mask_missing")
+                    continue
+
+                labels = loss_mask.get("labels")
+                if not isinstance(labels, list) or not labels:
+                    errors.append(f"{split}:{line_number}:loss_mask_labels_missing_or_empty")
+                    continue
+                if not all(isinstance(label, int) for label in labels):
+                    errors.append(f"{split}:{line_number}:loss_mask_labels_not_int")
+                    continue
+
+                ignore_index = loss_mask.get("ignore_index", -100)
+                if ignore_index != -100:
+                    errors.append(f"{split}:{line_number}:ignore_index_not_minus_100")
+
+                has_ignored = any(label == -100 for label in labels)
+                has_trainable = any(label != -100 for label in labels)
+                if has_ignored:
+                    split_summary["ignored_label_records"] += 1
+                    summary["ignored_label_records"] += 1
+                else:
+                    errors.append(f"{split}:{line_number}:no_ignored_labels")
+
+                enforcement = loss_mask.get("enforcement")
+                if has_trainable:
+                    split_summary["trainable_records"] += 1
+                    summary["trainable_records"] += 1
+                elif enforcement != "all_masked_not_train_eligible":
+                    errors.append(f"{split}:{line_number}:no_trainable_labels")
+
+        if split == "train" and require_train and split_summary["records"] == 0:
+            errors.append("train.jsonl_empty")
+        summary["splits"][split] = split_summary
+
+    if require_train and summary["trainable_records"] == 0:
+        errors.append("trainable_loss_mask_records_missing")
+    if errors:
+        raise LossMaskValidationError(json.dumps({"errors": errors[:25], "summary": summary}, ensure_ascii=False, sort_keys=True))
+    return summary
+
+
 def inspect_batches(args) -> None:
     tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
     train_set, _, _ = load_dataset(args, tokenizer)
@@ -586,6 +671,19 @@ def run(args) -> None:
                 "stock_update_inside_compile": args.stock_update_inside_compile,
             }
         )
+        if args.require_maformac_loss_mask:
+            loss_mask_summary = validate_maformac_loss_mask_files(
+                args.data,
+                require_train=bool(args.train),
+            )
+            metrics.write(loss_mask_summary)
+            print(
+                "MAformac loss_mask preflight "
+                f"records={loss_mask_summary['records']} "
+                f"trainable_records={loss_mask_summary['trainable_records']} "
+                f"ignored_label_records={loss_mask_summary['ignored_label_records']}",
+                flush=True,
+            )
         print("Loading pretrained model", flush=True)
         model, tokenizer = load(args.model, tokenizer_config={"trust_remote_code": True})
         print("Loading datasets", flush=True)
@@ -610,6 +708,9 @@ def main(argv: Iterable[str] | None = None) -> int:
     except NonFiniteTrainingError as error:
         print("NONFINITE_TRAINING_STOP " + json.dumps(error.payload, sort_keys=True), file=sys.stderr)
         return 70
+    except LossMaskValidationError as error:
+        print(f"LOSS_MASK_PREFLIGHT_FAILED {error}", file=sys.stderr)
+        return 66
 
 
 if __name__ == "__main__":

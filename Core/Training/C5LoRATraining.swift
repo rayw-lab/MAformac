@@ -397,13 +397,70 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     }
 
     public var mlxRecord: C5MLXRecord {
-        C5MLXRecord(messages: messages, tools: tools)
+        C5MLXRecord(messages: messages, tools: tools, lossMask: lossMask)
+    }
+
+    public var lossMask: C5MLXLossMask {
+        C5LossMaskBuilder.lossMask(for: self)
     }
 }
 
 public struct C5MLXRecord: Codable, Equatable, Sendable {
     public var messages: [C5TrainingMessage]
     public var tools: [[String: JSONValue]]
+    public var lossMask: C5MLXLossMask
+
+    enum CodingKeys: String, CodingKey {
+        case messages
+        case tools
+        case lossMask = "loss_mask"
+    }
+}
+
+public struct C5MLXLossMaskSpan: Codable, Equatable, Sendable {
+    public var kind: String
+    public var start: Int
+    public var end: Int
+    public var text: String
+
+    public init(kind: String, start: Int, end: Int, text: String) {
+        self.kind = kind
+        self.start = start
+        self.end = end
+        self.text = text
+    }
+}
+
+public struct C5MLXLossMask: Codable, Equatable, Sendable {
+    public static let ignoreIndex = -100
+
+    public var ignoreIndex: Int
+    public var labels: [Int]
+    public var trainableSpans: [C5MLXLossMaskSpan]
+    public var maskedThinkSpans: [C5MLXLossMaskSpan]
+    public var enforcement: String
+
+    enum CodingKeys: String, CodingKey {
+        case ignoreIndex = "ignore_index"
+        case labels
+        case trainableSpans = "trainable_spans"
+        case maskedThinkSpans = "masked_think_spans"
+        case enforcement
+    }
+
+    public init(
+        ignoreIndex: Int = C5MLXLossMask.ignoreIndex,
+        labels: [Int],
+        trainableSpans: [C5MLXLossMaskSpan],
+        maskedThinkSpans: [C5MLXLossMaskSpan],
+        enforcement: String
+    ) {
+        self.ignoreIndex = ignoreIndex
+        self.labels = labels
+        self.trainableSpans = trainableSpans
+        self.maskedThinkSpans = maskedThinkSpans
+        self.enforcement = enforcement
+    }
 }
 
 public struct C5ValueAugmentation: Equatable, Sendable {
@@ -1830,6 +1887,166 @@ public struct C5PreparedTrainingDataset: Equatable, Sendable {
     public var receipt: C5TrainingReceipt
 }
 
+public enum C5LossMaskBuilder {
+    public static func lossMask(for sample: C5TrainingSample) -> C5MLXLossMask {
+        let assistant = sample.assistantPayload
+        var labels = Array(repeating: C5MLXLossMask.ignoreIndex, count: assistant.count)
+        let thinkSpans = thinkBlockSpans(in: assistant)
+        var trainableSpans: [C5MLXLossMaskSpan] = []
+        guard sample.trainEligible, sample.masking.trainOnTurn else {
+            return C5MLXLossMask(
+                labels: labels,
+                trainableSpans: [],
+                maskedThinkSpans: thinkSpans,
+                enforcement: "all_masked_not_train_eligible"
+            )
+        }
+
+        if sample.expectedToolCalls.isEmpty {
+            markAllOccurrences(
+                of: "NO_TOOL",
+                kind: "no_tool_label",
+                in: assistant,
+                labels: &labels,
+                spans: &trainableSpans
+            )
+        } else {
+            for call in sample.expectedToolCalls {
+                if sample.masking.functionName {
+                    markAllOccurrences(
+                        of: call.name,
+                        kind: "function_name",
+                        in: assistant,
+                        labels: &labels,
+                        spans: &trainableSpans
+                    )
+                }
+                if sample.masking.argumentName {
+                    for key in call.arguments.keys.sorted() {
+                        markJSONStringOccurrences(
+                            key,
+                            kind: "argument_name",
+                            in: assistant,
+                            labels: &labels,
+                            spans: &trainableSpans
+                        )
+                    }
+                }
+                if sample.masking.argumentValue {
+                    for value in call.arguments.values {
+                        for text in scalarValueStrings(value) {
+                            markAllOccurrences(
+                                of: text,
+                                kind: "argument_value",
+                                in: assistant,
+                                labels: &labels,
+                                spans: &trainableSpans
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        for span in thinkSpans {
+            setLabels(in: span.start..<span.end, to: C5MLXLossMask.ignoreIndex, labels: &labels)
+        }
+        return C5MLXLossMask(
+            labels: labels,
+            trainableSpans: trainableSpans.sorted { lhs, rhs in
+                lhs.start == rhs.start ? lhs.end < rhs.end : lhs.start < rhs.start
+            },
+            maskedThinkSpans: thinkSpans,
+            enforcement: "labels_enforced_function_arg_name_arg_value_with_think_mask"
+        )
+    }
+
+    private static func markJSONStringOccurrences(
+        _ text: String,
+        kind: String,
+        in haystack: String,
+        labels: inout [Int],
+        spans: inout [C5MLXLossMaskSpan]
+    ) {
+        markAllOccurrences(of: "\"\(text)\"", kind: kind, in: haystack, labels: &labels, spans: &spans, trimQuotes: true)
+    }
+
+    private static func markAllOccurrences(
+        of needle: String,
+        kind: String,
+        in haystack: String,
+        labels: inout [Int],
+        spans: inout [C5MLXLossMaskSpan],
+        trimQuotes: Bool = false
+    ) {
+        guard !needle.isEmpty else {
+            return
+        }
+        var searchStart = haystack.startIndex
+        while let range = haystack.range(of: needle, range: searchStart..<haystack.endIndex) {
+            let effectiveRange: Range<String.Index>
+            if trimQuotes, needle.hasPrefix("\""), needle.hasSuffix("\""), needle.count >= 2 {
+                effectiveRange = haystack.index(after: range.lowerBound)..<haystack.index(before: range.upperBound)
+            } else {
+                effectiveRange = range
+            }
+            let start = haystack.distance(from: haystack.startIndex, to: effectiveRange.lowerBound)
+            let end = haystack.distance(from: haystack.startIndex, to: effectiveRange.upperBound)
+            setLabels(in: start..<end, to: 0, labels: &labels)
+            spans.append(C5MLXLossMaskSpan(kind: kind, start: start, end: end, text: String(haystack[effectiveRange])))
+            searchStart = range.upperBound
+        }
+    }
+
+    private static func scalarValueStrings(_ value: JSONValue) -> [String] {
+        switch value {
+        case .string(let text):
+            return text.isEmpty ? [] : [text]
+        case .number(let number):
+            if number.rounded() == number {
+                return [String(Int(number))]
+            }
+            return [String(number)]
+        case .bool(let bool):
+            return [bool ? "true" : "false"]
+        case .object(let object):
+            return object.values.flatMap(scalarValueStrings)
+        case .array(let values):
+            return values.flatMap(scalarValueStrings)
+        case .null:
+            return []
+        }
+    }
+
+    private static func thinkBlockSpans(in text: String) -> [C5MLXLossMaskSpan] {
+        var spans: [C5MLXLossMaskSpan] = []
+        var searchStart = text.startIndex
+        while let open = text.range(of: "<think>", range: searchStart..<text.endIndex) {
+            let afterOpen = open.upperBound
+            guard let close = text.range(of: "</think>", range: afterOpen..<text.endIndex) else {
+                break
+            }
+            let end = close.upperBound
+            let startOffset = text.distance(from: text.startIndex, to: open.lowerBound)
+            let endOffset = text.distance(from: text.startIndex, to: end)
+            spans.append(C5MLXLossMaskSpan(kind: "think_span", start: startOffset, end: endOffset, text: String(text[open.lowerBound..<end])))
+            searchStart = end
+        }
+        return spans
+    }
+
+    private static func setLabels(in range: Range<Int>, to value: Int, labels: inout [Int]) {
+        let lower = max(0, range.lowerBound)
+        let upper = min(labels.count, range.upperBound)
+        guard lower < upper else {
+            return
+        }
+        for index in lower..<upper {
+            labels[index] = value
+        }
+    }
+}
+
 public enum C5TrainingRenderer {
     public static func renderToolCall(_ call: C5TrainingToolCall) -> String {
         let payload = C5CanonicalJSONObject.renderOrdered([
@@ -2303,10 +2520,11 @@ public struct C5TrainingDatasetBuilder: Sendable {
         if options.requireCandidateDataQualityGate && candidateDataQuality.status != "pass" {
             hardFailures.append(contentsOf: candidateDataQuality.failureReceipt)
         }
+        let lossMaskFailures = validateLossMaskEnforcement(samples: samples)
         let generatorOrchestration = buildGeneratorOrchestrationReceipt(samples: samples)
         let validatorSummary = buildValidatorSummary(dataGateReceipt: dataGateReceipt, offsetFixture: offsetFixture, samples: samples)
         let lineageSummary = buildLineageSummary(samples: samples)
-        var formalStep2Failures = generatorOrchestration.failureReceipt + validatorSummary.failureReceipt + lineageSummary.failureReceipt
+        var formalStep2Failures = lossMaskFailures + generatorOrchestration.failureReceipt + validatorSummary.failureReceipt + lineageSummary.failureReceipt
         if !coverage.functionName || !coverage.argumentName || !coverage.argumentValue {
             formalStep2Failures.append("masking_complete_augmentation_not_implemented")
         }
@@ -2340,7 +2558,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
             "C6 release gate remains final-only; this receipt cannot claim model-quality V-PASS without a real C6 diff",
             "Mac behavior parity and true-device candidate V-PASS are reported separately",
             "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
-            "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training"
+            "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training",
+            "mlx-data records carry loss_mask.labels; function/argument/value spans are trainable and prompt/wrapper/think spans are ignore_index=-100"
         ]
         if !options.includeNoCallCounterfactuals || options.refusalRatioTarget == 0 {
             frameSurfaced.append("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows")
@@ -2371,7 +2590,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 "generator_model_id", "generator_call_id", "semantic_judge_model_id", "semantic_judge_call_id", "prompt_hash",
                 "augmentation_parent_id", "lineage_group_id", "split_origin", "candidate_dedupe_group_id", "expected_tool_call_signature",
                 "counterfactual_pair_id", "acceptance_stage", "training_method_contract_authority", "offset_artifact_authority", "generator_orchestration", "validator_summary", "lineage_summary",
-                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity"
+                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity", "loss_mask.labels"
             ],
             failureReceipt: hardFailures + formalStep2Failures,
             rowCount: samples.count,
@@ -2480,6 +2699,34 @@ public struct C5TrainingDatasetBuilder: Sendable {
             parentInTrainStatus: dataGateReceipt.trainParentSemanticOverlap == 0 ? "pass" : "fail",
             failureReceipt: failures
         )
+    }
+
+    private func validateLossMaskEnforcement(samples: [C5TrainingSample]) -> [String] {
+        var failures: [String] = []
+        for sample in samples where sample.trainEligible {
+            let mask = sample.lossMask
+            if mask.labels.count != sample.assistantPayload.count {
+                failures.append("loss_mask_label_count_mismatch_\(sample.sampleID)")
+            }
+            for span in mask.maskedThinkSpans {
+                let range = span.start..<span.end
+                if range.contains(where: { mask.labels.indices.contains($0) && mask.labels[$0] != C5MLXLossMask.ignoreIndex }) {
+                    failures.append("loss_mask_think_span_not_ignored_\(sample.sampleID)")
+                }
+            }
+            if sample.expectedToolCalls.isEmpty {
+                if !mask.trainableSpans.contains(where: { $0.kind == "no_tool_label" }) {
+                    failures.append("loss_mask_no_tool_label_missing_\(sample.sampleID)")
+                }
+            } else {
+                for required in ["function_name", "argument_name", "argument_value"] {
+                    if !mask.trainableSpans.contains(where: { $0.kind == required }) {
+                        failures.append("loss_mask_\(required)_span_missing_\(sample.sampleID)")
+                    }
+                }
+            }
+        }
+        return failures
     }
 
     private func buildLineageSummary(samples: [C5TrainingSample]) -> C5LineageSummary {

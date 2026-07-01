@@ -856,6 +856,15 @@ final class C5LoRATrainingTests: XCTestCase {
 
     func testMLXConfigUsesScaleAndExcludesEmbeddings() {
         let config = C5MLXLoRAConfig.rank16Mainline()
+        let expectedProjectionKeys = [
+            "self_attn.q_proj",
+            "self_attn.k_proj",
+            "self_attn.v_proj",
+            "self_attn.o_proj",
+            "mlp.gate_proj",
+            "mlp.up_proj",
+            "mlp.down_proj"
+        ]
 
         XCTAssertEqual(config.scale, 20)
         XCTAssertEqual(config.learningRate, 0.0001)
@@ -880,8 +889,88 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(config.renderedWarmupSteps, 12)
         XCTAssertTrue(config.renderYAML.contains("# optimizer_update_steps: 150"))
         XCTAssertTrue(config.renderYAML.contains("warmup: 12"))
-        XCTAssertTrue(config.keys.contains("self_attn.q_proj"))
-        XCTAssertTrue(config.keys.contains("mlp.down_proj"))
+        XCTAssertEqual(C5MLXLoRAConfig.defaultProjectionKeys, expectedProjectionKeys)
+        XCTAssertEqual(Set(config.keys), Set(expectedProjectionKeys))
+        XCTAssertEqual(config.keys.count, 7)
+        XCTAssertFalse(config.keys == ["self_attn.q_proj", "self_attn.v_proj"])
+    }
+
+    func testMLXRecordLossMaskEnforcesFunctionArgNameAndArgValueSpans() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(id: "loss-mask-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾")
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
+        )
+        let sample = prepared.samples[0]
+        let record = sample.mlxRecord
+        let assistant = sample.assistantPayload
+
+        XCTAssertEqual(record.lossMask.ignoreIndex, -100)
+        XCTAssertEqual(record.lossMask.labels.count, assistant.count)
+        XCTAssertEqual(record.lossMask.enforcement, "labels_enforced_function_arg_name_arg_value_with_think_mask")
+        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
+        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "argument_name" && $0.text == "position" })
+        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "argument_value" && $0.text == "主驾" })
+        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "<tool_call>"), -100)
+        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "tool_call_frame"), 0)
+        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "position"), 0)
+        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "主驾"), 0)
+    }
+
+    func testThinkSpanIsAlwaysIgnoredByLossMaskEvenWhenToolCallSpanTrains() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "think-mask-row", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
+        )
+        var sample = prepared.samples[0]
+        let toolCall = sample.assistantPayload.trimmingCharacters(in: .whitespacesAndNewlines)
+        sample.messages[sample.messages.count - 1] = C5TrainingMessage(
+            role: "assistant",
+            content: "<think>内部推理不要训练</think>\n\n\(toolCall)"
+        )
+        let mask = sample.lossMask
+
+        XCTAssertEqual(mask.maskedThinkSpans.count, 1)
+        XCTAssertEqual(label(in: mask, assistant: sample.assistantPayload, at: "<think>"), -100)
+        XCTAssertEqual(label(in: mask, assistant: sample.assistantPayload, at: "内部推理不要训练"), -100)
+        XCTAssertEqual(label(in: mask, assistant: sample.assistantPayload, at: "tool_call_frame"), 0)
+        XCTAssertFalse(mask.trainableSpans.contains { $0.text.contains("内部推理") })
+    }
+
+    func testSmokeOnlyLossMaskKeepsAllLabelsIgnored() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "smoke-mask-row", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, maskingStage: .smokeOnly)
+        )
+        let mask = prepared.samples[0].lossMask
+
+        XCTAssertEqual(mask.enforcement, "all_masked_not_train_eligible")
+        XCTAssertTrue(mask.trainableSpans.isEmpty)
+        XCTAssertTrue(mask.labels.allSatisfy { $0 == -100 })
+    }
+
+    func testRenderedTrainCommandRequiresMAformacLossMaskPreflight() throws {
+        let cli = try readRepoFile("Tools/C5TrainingCLI/main.swift")
+
+        XCTAssertTrue(cli.contains("--mask-prompt \\"))
+        XCTAssertTrue(cli.contains("--require-maformac-loss-mask \\"))
+    }
+
+    func testPythonTrainingLoopFailsClosedWhenLossMaskPreflightEnabled() throws {
+        let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
+
+        XCTAssertTrue(loop.contains("parser.add_argument(\"--require-maformac-loss-mask\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("def validate_maformac_loss_mask_files"))
+        XCTAssertTrue(loop.contains("loss_mask = record.get(\"loss_mask\")"))
+        XCTAssertTrue(loop.contains("raise LossMaskValidationError"))
+        XCTAssertTrue(loop.contains("LOSS_MASK_PREFLIGHT_FAILED"))
     }
 
     func testGeneralizationDiagnosticAndFuseParityFailClosed() {
@@ -1129,6 +1218,19 @@ final class C5LoRATrainingTests: XCTestCase {
         )
         let positive = prepared.samples.first { $0.split == "train" }
         XCTAssertEqual(positive?.expectedToolCalls.first?.name, "tool_call_frame", "空 catalog → frame legacy(向后兼容, strangler)")
+    }
+
+    private func label(in mask: C5MLXLossMask, assistant: String, at needle: String) -> Int {
+        guard let range = assistant.range(of: needle) else {
+            XCTFail("missing needle \(needle)")
+            return Int.min
+        }
+        let offset = assistant.distance(from: assistant.startIndex, to: range.lowerBound)
+        guard mask.labels.indices.contains(offset) else {
+            XCTFail("offset outside labels \(offset)")
+            return Int.min
+        }
+        return mask.labels[offset]
     }
 
     private func semanticSeed(
