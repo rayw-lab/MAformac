@@ -45,7 +45,7 @@ R-L17 route-only signed ✅(2026-06-25 磊哥签)
 | 现状 | gate/裁决 | 依据 |
 |---|---|---|
 | ✅ construction 就绪 | gate3 preflight / gate4 scale / **gate5 六轴held-out**(main `aa1adf8f`) / **gate6 四层阈值化**(main `696676ba`) / **gate8 工具数=562**(wave1 %44 `64c6f62f`,自跑绿) / **裁决-A harness**(main,R7-guarded dry-run) / **裁决-B positive-not-diluted**(main `696676ba`) |
-| 🔴 **P0 假enforce 修复中** | **gate2 masking**(wave1 %45 `87a3bbc9`)——🔴 对抗审计 %49 抓 + commander grep 亲核坐实 **假enforce（0/34 精确同构）**：`loss_mask` 是 mlx-lm 训练**不消费**的 dead field（stock `default_loss`+`--mask-prompt` offset，loss_mask 只在 preflight `:564-601`）+ labels char-indexed(`:1893`)非 token + think-mask 零生效。三层校验全校 dead field 内部一致=循环失守（我自跑 44/0 绿也没 catch）。**lora-keys 7层门 ✅ 真（那部分 clear）**。%45 修复中（char→token + mlx-lm 真消费 + F-068 真验证门；real-model proof R7-gated）|
+| 🔨 **P0 fix 完成（R7-safe verified，re-audit 中）** | **gate2 masking**——原 P0 假enforce（对抗审计抓，D-014）**已修**（%45 fix）：char→token post-tokenize（`build_maformac_token_labels`，char-indexed fail-closed）+ 训练 train/eval 真用 `maformac_masked_loss` 消费 token-level mask（`c5_mlx_train_loop.py:498/:654`，**非** stock `default_loss`）+ F-068 `--self-test-loss-mask` 门。**commander 亲核（这次验消费非字段）**：grep 训练路径真走 custom loss + 自跑 self-test `masked_loss=0.00067 vs unmasked=2.667`（masked→~0）。异源 re-audit 跑中。🔴 **real-model 集成 proof R7-gated**（真 Qwen/MLX batch dump 等磊哥 run-auth）|
 | ⚠️ 部分/边界 | gate1 训练循环(机制建 `:513` gate formal training,真跑 verify=R7 边界) / gate7 云generator(design merged `db9f490f`,代码未闭环,真跑=R7) |
 | 🔴 R7-blocked 真跑(等磊哥 run auth) | 裁决-A tiny ablation RUN / gate1 真跑 / gate7 真生成 / C6 真评测 / candidate |
 | 🔓 人审解锁 | R-L17 candidate signoff(磊哥最后一拍) |
