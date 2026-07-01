@@ -895,7 +895,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(config.keys == ["self_attn.q_proj", "self_attn.v_proj"])
     }
 
-    func testMLXRecordLossMaskEnforcesFunctionArgNameAndArgValueSpans() {
+    func testMLXRecordLossMaskEnforcesFunctionArgNameAndArgValueSpans() throws {
         let prepared = C5TrainingDatasetBuilder().build(
             seeds: [
                 semanticSeed(id: "loss-mask-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾")
@@ -906,18 +906,17 @@ final class C5LoRATrainingTests: XCTestCase {
         )
         let sample = prepared.samples[0]
         let record = sample.mlxRecord
-        let assistant = sample.assistantPayload
+        let encoded = try JSONEncoder().encode(record)
+        let json = String(decoding: encoded, as: UTF8.self)
 
         XCTAssertEqual(record.lossMask.ignoreIndex, -100)
-        XCTAssertEqual(record.lossMask.labels.count, assistant.count)
-        XCTAssertEqual(record.lossMask.enforcement, "labels_enforced_function_arg_name_arg_value_with_think_mask")
+        XCTAssertEqual(record.lossMask.tokenLabelSource, "runtime_tokenizer_offsets")
+        XCTAssertEqual(record.lossMask.enforcement, "token_labels_enforced_after_tokenization_with_think_mask")
         XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
         XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "argument_name" && $0.text == "position" })
         XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "argument_value" && $0.text == "主驾" })
-        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "<tool_call>"), -100)
-        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "tool_call_frame"), 0)
-        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "position"), 0)
-        XCTAssertEqual(label(in: record.lossMask, assistant: assistant, at: "主驾"), 0)
+        XCTAssertTrue(json.contains("\"token_label_source\":\"runtime_tokenizer_offsets\""))
+        XCTAssertFalse(json.contains("\"labels\""))
     }
 
     func testThinkSpanIsAlwaysIgnoredByLossMaskEvenWhenToolCallSpanTrains() {
@@ -936,9 +935,8 @@ final class C5LoRATrainingTests: XCTestCase {
         let mask = sample.lossMask
 
         XCTAssertEqual(mask.maskedThinkSpans.count, 1)
-        XCTAssertEqual(label(in: mask, assistant: sample.assistantPayload, at: "<think>"), -100)
-        XCTAssertEqual(label(in: mask, assistant: sample.assistantPayload, at: "内部推理不要训练"), -100)
-        XCTAssertEqual(label(in: mask, assistant: sample.assistantPayload, at: "tool_call_frame"), 0)
+        XCTAssertTrue(mask.maskedThinkSpans.contains { $0.text.contains("内部推理不要训练") })
+        XCTAssertTrue(mask.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
         XCTAssertFalse(mask.trainableSpans.contains { $0.text.contains("内部推理") })
     }
 
@@ -953,24 +951,37 @@ final class C5LoRATrainingTests: XCTestCase {
 
         XCTAssertEqual(mask.enforcement, "all_masked_not_train_eligible")
         XCTAssertTrue(mask.trainableSpans.isEmpty)
-        XCTAssertTrue(mask.labels.allSatisfy { $0 == -100 })
+        XCTAssertEqual(mask.tokenLabelSource, "runtime_tokenizer_offsets")
     }
 
     func testRenderedTrainCommandRequiresMAformacLossMaskPreflight() throws {
         let cli = try readRepoFile("Tools/C5TrainingCLI/main.swift")
 
-        XCTAssertTrue(cli.contains("--mask-prompt \\"))
         XCTAssertTrue(cli.contains("--require-maformac-loss-mask \\"))
+        XCTAssertFalse(cli.contains("--mask-prompt \\"))
     }
 
     func testPythonTrainingLoopFailsClosedWhenLossMaskPreflightEnabled() throws {
         let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
 
         XCTAssertTrue(loop.contains("parser.add_argument(\"--require-maformac-loss-mask\", action=\"store_true\")"))
-        XCTAssertTrue(loop.contains("def validate_maformac_loss_mask_files"))
+        XCTAssertTrue(loop.contains("def load_maformac_loss_mask_datasets"))
+        XCTAssertTrue(loop.contains("def build_maformac_token_labels"))
+        XCTAssertTrue(loop.contains("def maformac_masked_loss"))
+        XCTAssertTrue(loop.contains("loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss"))
         XCTAssertTrue(loop.contains("loss_mask = record.get(\"loss_mask\")"))
+        XCTAssertTrue(loop.contains("char_indexed_loss_mask_labels_forbidden"))
         XCTAssertTrue(loop.contains("raise LossMaskValidationError"))
         XCTAssertTrue(loop.contains("LOSS_MASK_PREFLIGHT_FAILED"))
+    }
+
+    func testPythonTrainingLoopHasSyntheticLossMaskSelfTest() throws {
+        let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
+
+        XCTAssertTrue(loop.contains("parser.add_argument(\"--self-test-loss-mask\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("def maformac_masked_cross_entropy_from_logits"))
+        XCTAssertTrue(loop.contains("def run_loss_mask_self_test"))
+        XCTAssertTrue(loop.contains("\"event\": \"loss_mask_self_test\""))
     }
 
     func testGeneralizationDiagnosticAndFuseParityFailClosed() {
@@ -1218,19 +1229,6 @@ final class C5LoRATrainingTests: XCTestCase {
         )
         let positive = prepared.samples.first { $0.split == "train" }
         XCTAssertEqual(positive?.expectedToolCalls.first?.name, "tool_call_frame", "空 catalog → frame legacy(向后兼容, strangler)")
-    }
-
-    private func label(in mask: C5MLXLossMask, assistant: String, at needle: String) -> Int {
-        guard let range = assistant.range(of: needle) else {
-            XCTFail("missing needle \(needle)")
-            return Int.min
-        }
-        let offset = assistant.distance(from: assistant.startIndex, to: range.lowerBound)
-        guard mask.labels.indices.contains(offset) else {
-            XCTFail("offset outside labels \(offset)")
-            return Int.min
-        }
-        return mask.labels[offset]
     }
 
     private func semanticSeed(

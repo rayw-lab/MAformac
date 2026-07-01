@@ -435,31 +435,31 @@ public struct C5MLXLossMask: Codable, Equatable, Sendable {
     public static let ignoreIndex = -100
 
     public var ignoreIndex: Int
-    public var labels: [Int]
     public var trainableSpans: [C5MLXLossMaskSpan]
     public var maskedThinkSpans: [C5MLXLossMaskSpan]
     public var enforcement: String
+    public var tokenLabelSource: String
 
     enum CodingKeys: String, CodingKey {
         case ignoreIndex = "ignore_index"
-        case labels
         case trainableSpans = "trainable_spans"
         case maskedThinkSpans = "masked_think_spans"
         case enforcement
+        case tokenLabelSource = "token_label_source"
     }
 
     public init(
         ignoreIndex: Int = C5MLXLossMask.ignoreIndex,
-        labels: [Int],
         trainableSpans: [C5MLXLossMaskSpan],
         maskedThinkSpans: [C5MLXLossMaskSpan],
-        enforcement: String
+        enforcement: String,
+        tokenLabelSource: String = "runtime_tokenizer_offsets"
     ) {
         self.ignoreIndex = ignoreIndex
-        self.labels = labels
         self.trainableSpans = trainableSpans
         self.maskedThinkSpans = maskedThinkSpans
         self.enforcement = enforcement
+        self.tokenLabelSource = tokenLabelSource
     }
 }
 
@@ -1890,12 +1890,10 @@ public struct C5PreparedTrainingDataset: Equatable, Sendable {
 public enum C5LossMaskBuilder {
     public static func lossMask(for sample: C5TrainingSample) -> C5MLXLossMask {
         let assistant = sample.assistantPayload
-        var labels = Array(repeating: C5MLXLossMask.ignoreIndex, count: assistant.count)
         let thinkSpans = thinkBlockSpans(in: assistant)
         var trainableSpans: [C5MLXLossMaskSpan] = []
         guard sample.trainEligible, sample.masking.trainOnTurn else {
             return C5MLXLossMask(
-                labels: labels,
                 trainableSpans: [],
                 maskedThinkSpans: thinkSpans,
                 enforcement: "all_masked_not_train_eligible"
@@ -1907,7 +1905,6 @@ public enum C5LossMaskBuilder {
                 of: "NO_TOOL",
                 kind: "no_tool_label",
                 in: assistant,
-                labels: &labels,
                 spans: &trainableSpans
             )
         } else {
@@ -1917,7 +1914,6 @@ public enum C5LossMaskBuilder {
                         of: call.name,
                         kind: "function_name",
                         in: assistant,
-                        labels: &labels,
                         spans: &trainableSpans
                     )
                 }
@@ -1927,7 +1923,6 @@ public enum C5LossMaskBuilder {
                             key,
                             kind: "argument_name",
                             in: assistant,
-                            labels: &labels,
                             spans: &trainableSpans
                         )
                     }
@@ -1939,7 +1934,6 @@ public enum C5LossMaskBuilder {
                                 of: text,
                                 kind: "argument_value",
                                 in: assistant,
-                                labels: &labels,
                                 spans: &trainableSpans
                             )
                         }
@@ -1948,16 +1942,12 @@ public enum C5LossMaskBuilder {
             }
         }
 
-        for span in thinkSpans {
-            setLabels(in: span.start..<span.end, to: C5MLXLossMask.ignoreIndex, labels: &labels)
-        }
         return C5MLXLossMask(
-            labels: labels,
             trainableSpans: trainableSpans.sorted { lhs, rhs in
                 lhs.start == rhs.start ? lhs.end < rhs.end : lhs.start < rhs.start
             },
             maskedThinkSpans: thinkSpans,
-            enforcement: "labels_enforced_function_arg_name_arg_value_with_think_mask"
+            enforcement: "token_labels_enforced_after_tokenization_with_think_mask"
         )
     }
 
@@ -1965,17 +1955,15 @@ public enum C5LossMaskBuilder {
         _ text: String,
         kind: String,
         in haystack: String,
-        labels: inout [Int],
         spans: inout [C5MLXLossMaskSpan]
     ) {
-        markAllOccurrences(of: "\"\(text)\"", kind: kind, in: haystack, labels: &labels, spans: &spans, trimQuotes: true)
+        markAllOccurrences(of: "\"\(text)\"", kind: kind, in: haystack, spans: &spans, trimQuotes: true)
     }
 
     private static func markAllOccurrences(
         of needle: String,
         kind: String,
         in haystack: String,
-        labels: inout [Int],
         spans: inout [C5MLXLossMaskSpan],
         trimQuotes: Bool = false
     ) {
@@ -1992,7 +1980,6 @@ public enum C5LossMaskBuilder {
             }
             let start = haystack.distance(from: haystack.startIndex, to: effectiveRange.lowerBound)
             let end = haystack.distance(from: haystack.startIndex, to: effectiveRange.upperBound)
-            setLabels(in: start..<end, to: 0, labels: &labels)
             spans.append(C5MLXLossMaskSpan(kind: kind, start: start, end: end, text: String(haystack[effectiveRange])))
             searchStart = range.upperBound
         }
@@ -2035,16 +2022,6 @@ public enum C5LossMaskBuilder {
         return spans
     }
 
-    private static func setLabels(in range: Range<Int>, to value: Int, labels: inout [Int]) {
-        let lower = max(0, range.lowerBound)
-        let upper = min(labels.count, range.upperBound)
-        guard lower < upper else {
-            return
-        }
-        for index in lower..<upper {
-            labels[index] = value
-        }
-    }
 }
 
 public enum C5TrainingRenderer {
@@ -2559,7 +2536,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             "Mac behavior parity and true-device candidate V-PASS are reported separately",
             "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
             "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training",
-            "mlx-data records carry loss_mask.labels; function/argument/value spans are trainable and prompt/wrapper/think spans are ignore_index=-100"
+            "mlx-data records carry loss_mask trainable/think char spans; c5_mlx_train_loop tokenizes records and constructs token-level labels with ignore_index=-100"
         ]
         if !options.includeNoCallCounterfactuals || options.refusalRatioTarget == 0 {
             frameSurfaced.append("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows")
@@ -2582,7 +2559,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             discoveryFindings: [
                 "route_tier is derived from normalized C1 fc_flags, not execution-tier metadata",
                 "stock mlx-lm training has no enable_thinking injection point in tuner datasets path",
-                "assistant content uses double-newline prefix so stock mask offset trains the tool_call span instead of swallowing its first bytes"
+                "stock mlx-lm mask_prompt is only a contiguous completion offset; MAformac training loop overrides dataset/iterate/loss for token-level span masks"
             ],
             frameSurfaced: frameSurfaced,
             physicalFields: [
@@ -2590,7 +2567,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 "generator_model_id", "generator_call_id", "semantic_judge_model_id", "semantic_judge_call_id", "prompt_hash",
                 "augmentation_parent_id", "lineage_group_id", "split_origin", "candidate_dedupe_group_id", "expected_tool_call_signature",
                 "counterfactual_pair_id", "acceptance_stage", "training_method_contract_authority", "offset_artifact_authority", "generator_orchestration", "validator_summary", "lineage_summary",
-                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity", "loss_mask.labels"
+                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity", "loss_mask.trainable_spans", "loss_mask.masked_think_spans"
             ],
             failureReceipt: hardFailures + formalStep2Failures,
             rowCount: samples.count,
@@ -2705,14 +2682,18 @@ public struct C5TrainingDatasetBuilder: Sendable {
         var failures: [String] = []
         for sample in samples where sample.trainEligible {
             let mask = sample.lossMask
-            if mask.labels.count != sample.assistantPayload.count {
-                failures.append("loss_mask_label_count_mismatch_\(sample.sampleID)")
-            }
             for span in mask.maskedThinkSpans {
-                let range = span.start..<span.end
-                if range.contains(where: { mask.labels.indices.contains($0) && mask.labels[$0] != C5MLXLossMask.ignoreIndex }) {
-                    failures.append("loss_mask_think_span_not_ignored_\(sample.sampleID)")
+                if span.start < 0 || span.end > sample.assistantPayload.count || span.start >= span.end {
+                    failures.append("loss_mask_think_span_bounds_invalid_\(sample.sampleID)")
                 }
+                if mask.trainableSpans.contains(where: { trainable in
+                    trainable.start < span.end && span.start < trainable.end
+                }) {
+                    failures.append("loss_mask_trainable_span_overlaps_think_\(sample.sampleID)")
+                }
+            }
+            for span in mask.trainableSpans where span.start < 0 || span.end > sample.assistantPayload.count || span.start >= span.end {
+                failures.append("loss_mask_trainable_span_bounds_invalid_\(sample.sampleID)")
             }
             if sample.expectedToolCalls.isEmpty {
                 if !mask.trainableSpans.contains(where: { $0.kind == "no_tool_label" }) {
