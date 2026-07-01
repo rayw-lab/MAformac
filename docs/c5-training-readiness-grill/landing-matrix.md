@@ -45,12 +45,12 @@ R-L17 route-only signed ✅(2026-06-25 磊哥签)
 | 现状 | gate/裁决 | 依据 |
 |---|---|---|
 | ✅ construction 就绪 | gate3 preflight / gate4 scale / **gate5 六轴held-out**(main `aa1adf8f`) / **gate6 四层阈值化**(main `696676ba`) / **gate8 工具数=562**(wave1 %44 `64c6f62f`,自跑绿) / **裁决-A harness**(main,R7-guarded dry-run) / **裁决-B positive-not-diluted**(main `696676ba`) |
-| 🔨 wave-1 construction done | **gate2 masking enforce+think-mask+lora-keys 7层门**(wave1 %45 `87a3bbc9`,自跑 C5LoRATraining 全绿含 think-mask 测试)——⚠️ mlx-lm runtime 真消费 loss_mask 需 R7 run 时 dump token/label 证 |
+| 🔴 **P0 假enforce 修复中** | **gate2 masking**(wave1 %45 `87a3bbc9`)——🔴 对抗审计 %49 抓 + commander grep 亲核坐实 **假enforce（0/34 精确同构）**：`loss_mask` 是 mlx-lm 训练**不消费**的 dead field（stock `default_loss`+`--mask-prompt` offset，loss_mask 只在 preflight `:564-601`）+ labels char-indexed(`:1893`)非 token + think-mask 零生效。三层校验全校 dead field 内部一致=循环失守（我自跑 44/0 绿也没 catch）。**lora-keys 7层门 ✅ 真（那部分 clear）**。%45 修复中（char→token + mlx-lm 真消费 + F-068 真验证门；real-model proof R7-gated）|
 | ⚠️ 部分/边界 | gate1 训练循环(机制建 `:513` gate formal training,真跑 verify=R7 边界) / gate7 云generator(design merged `db9f490f`,代码未闭环,真跑=R7) |
 | 🔴 R7-blocked 真跑(等磊哥 run auth) | 裁决-A tiny ablation RUN / gate1 真跑 / gate7 真生成 / C6 真评测 / candidate |
 | 🔓 人审解锁 | R-L17 candidate signoff(磊哥最后一拍) |
 
-🔴 **iceberg 坐实**：construction 侧**基本齐**（8 gate 里 gate3/4/5/6/8 + 裁决A/B ✅ + gate2 wave-1 done）。真实剩余缺口 = ① gate2 runtime 消费待 R7 run 证 ② **E-2 设计决策**（562 工具 surface ≈74-99k tokens 超 Qwen3-1.7B context，必 subset/constrained-decoding，磊哥定策略）③ grill 维度10/11/5 补深已做(wave-1)待磊哥 lock ④ R7-blocked 真跑全等磊哥 candidate signoff。**「按训练键」类等磊哥签，非 construction 缺口。**
+🔴 **iceberg 坐实 + wave-1 audit 修正**：gate3/4/5/6/8 + 裁决A/B construction ✅（对抗审计 CLEAR）；🔴 **gate2 P0 假enforce 修复中**（masking=disaster-core 本要防 θ-α，对抗审计抓到假绿，修复是 pre-LoRA 关键——**这次 catch 正是 pre-LoRA push 的价值：训练前拦下 θ-α round 2**）。真实剩余缺口 = ① **gate2 P0 修复**（char→token + mlx-lm 真消费 + F-068 真验证门，real-model proof R7-gated）② **E-2 设计决策**（562 工具 surface ≈74-99k tokens 超 Qwen3-1.7B context，必 subset/constrained-decoding，磊哥定策略）③ grill 维度10/11/5 补深已做(wave-1)待磊哥 lock ④ R7-blocked 真跑全等磊哥 candidate signoff。**gate2 修复 + 磊哥 4 决策 = 到训练前节点。**
 
 ## §4 维护
 

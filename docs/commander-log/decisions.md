@@ -142,3 +142,14 @@
 - **Alternatives rejected**: 同 main 树并发写（rejected：T-1 index 损坏）；merge main 进 doc-absorption 统一 base（rejected：~24 文件冲突，改用分 base worktree）；commander 亲写全部 grill/code（rejected：指挥非执行，纵切+裁决+reconcile 才是 commander 活）；%43 留 uiue（rejected：uiue R7-isolated 非 pre-LoRA，灵活调来补 grill）。
 - **Hard constraint（R7）**: R7-safe only（construction/grill/design）；R7-blocked（裁决A/gate1/generator 真跑、真生成、真评测）**只 build harness 不 run**，到边界上抛磊哥。worker 回稿 gh/grep 亲核**不信 ack**（T-4 假绿）。
 - **落点**: 3 worktree + worker SPEC（inline SSOT）+ 本 D-013 + `swarm-runs.md` run + task #3/#4 in_progress
+- 🔴 **SUPERSEDED（部分）by D-014**：本 D-013 + swarm-runs 记的「gate2 masking GENUINE / 自跑绿」被对抗审计推翻 = **gate2 P0 假enforce**（gate8/grill/R7 部分仍 CLEAR 有效）。
+
+## D-014 循环验证 catch — gate2 masking P0 假enforce（对抗审计抓，commander 自跑漏，supersede D-013 gate2 GENUINE）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Audit-catch/Correction ｜ **Owners**: 对抗审计员(adversarial-auditor) catch + commander 亲核坐实
+- **Context (what/why)**: wave-1 循环验证相，commander 派对抗审计员（≥1 异源审，D-011 教训）终审 wave-1。**抓到 gate2 masking P0 假enforce（0/34 精确同构）**——commander 之前**自跑 44/0 绿 + grep 亲核都没 catch**（验的是「字段内部一致」非「mlx-lm 真消费」= 循环失守）。
+- **Finding（commander grep 亲核坐实，非盲信审计）**: gate2 `loss_mask` 是 mlx-lm 训练**不消费**的 dead field——训练走 stock `default_loss`+`--mask-prompt` offset（`c5_mlx_train_loop.py:177`/`main.swift:186`），loss_mask 只在 preflight（`:564-601`）；labels **char-indexed**（`:1893 assistant.count`）非 token；think-mask 零生效（θ-α 第二战线裸奔）。三层校验（Swift validateLossMaskEnforcement/test + py preflight）全校 dead field 内部一致 = 循环失守。
+- 🔴 **元教训（最刺眼）**: commander 自己写的 grill **F-077/F-078/F-064/F-068 精准预判此病**（「masking 声称 enforce 实 dry_run」「enforce 非 declare 要绑可重跑命令」），**实现层却全掉进去 = 认知到≠行为改** → 修法：F-068 物化成「masking 真进 loss」可重跑机械门（P1）。
+- **Decision**: ① **supersede D-013 + swarm-runs「gate2 GENUINE」**（gate2=P0 假enforce 非 done）② 派 %45 修（R7-safe：char→token + mlx-lm 真消费 token-level mask + F-068 unit 证 -100 真进 loss；real-model 集成 proof R7-gated 等磊哥 run-auth；遇架构岔口停下上抛）③ 上抛磊哥 design 岔口：⭐ 全 token-level span+think mask（override mlx-lm，masking 不省 §7 + 防 θ-α）vs stock `--mask-prompt` offset（取巧但无 think-mask）。
+- 🔴 **验证价值实证**: 这次 catch = premortem+iceberg+≥1 异源审 **拦下 θ-α round 2**（若信自跑绿→报 done→磊哥签→又 0/34）。**disaster-core 必 ≥1 异源审**；commander 自跑（验字段一致）catch 不到架构级假enforce（claim-vs-reality 铁律2:合规≠成功）。
+- **CLEAR（audit 确认）**: gate8（562 独立复算 + value-form 真 + E-2 真发现）/ grill Dim5/10/11（11 arxiv 全真 + BFCL 诚实 TODO）/ R7 无越界。
+- **落点**: `AUDIT-adversarial.md` + `landing-matrix.md §3` gate2 改 P0 + 本 D-014 + swarm-runs banner + task #5
