@@ -10,6 +10,7 @@ final class C5TinyAblationHarnessTests: XCTestCase {
         XCTAssertEqual(verdict.status, "dry_run_pass")
         XCTAssertTrue(verdict.passed)
         XCTAssertEqual(verdict.reason, "dry_run_metric_target_met")
+        XCTAssertEqual(verdict.metricSource, .fixture)
         XCTAssertEqual(verdict.baselineEmptyToolCallOutputs, 28)
         XCTAssertEqual(verdict.baselineDenominator, 34)
         XCTAssertEqual(verdict.targetEmptyToolCallOutputsStrictlyBelow, 5)
@@ -34,5 +35,16 @@ final class C5TinyAblationHarnessTests: XCTestCase {
         XCTAssertEqual(verdict.status, "blocked")
         XCTAssertFalse(verdict.passed)
         XCTAssertEqual(verdict.reason, "dry_run_sample_count_out_of_range")
+    }
+
+    func testTinyAblationRealMetricSourceIsBlockedByR7() {
+        let verdict = C5TinyAblationHarness().evaluate(
+            metrics: C5TinyAblationMetrics(sampleCount: 34, emptyToolCallOutputs: 0, metricSource: .realBlocked)
+        )
+
+        XCTAssertEqual(verdict.status, "blocked")
+        XCTAssertFalse(verdict.passed)
+        XCTAssertEqual(verdict.metricSource, .realBlocked)
+        XCTAssertEqual(verdict.reason, "real_ablation_blocked_by_r7")
     }
 }

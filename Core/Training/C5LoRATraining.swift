@@ -305,6 +305,7 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var candidateParentSemanticID: String
     public var candidateCanonicalSemanticID: String
     public var candidateDedupeGroupID: String
+    public var device: String = ""
     public var expectedToolCallSignature: String
     public var routeTierSource: String
     public var routeTier: C5RouteTier
@@ -316,6 +317,7 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var masking: C5MaskingFlags
     public var acceptanceStage: C5AcceptanceStage
     public var generatorModelID: String
+    public var generatorSourceVendor: String? = nil
     public var generatorCallID: String
     public var semanticJudgeModelID: String
     public var semanticJudgeCallID: String
@@ -338,6 +340,7 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case candidateParentSemanticID = "candidate_parent_semantic_id"
         case candidateCanonicalSemanticID = "candidate_canonical_semantic_id"
         case candidateDedupeGroupID = "candidate_dedupe_group_id"
+        case device
         case expectedToolCallSignature = "expected_tool_call_signature"
         case routeTierSource = "route_tier_source"
         case routeTier = "route_tier"
@@ -349,6 +352,7 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case masking
         case acceptanceStage = "acceptance_stage"
         case generatorModelID = "generator_model_id"
+        case generatorSourceVendor = "generator_source_vendor"
         case generatorCallID = "generator_call_id"
         case semanticJudgeModelID = "semantic_judge_model_id"
         case semanticJudgeCallID = "semantic_judge_call_id"
@@ -375,10 +379,13 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
             caseID: sampleID,
             parentSemanticID: parentSemanticID,
             candidateParentSemanticID: candidateParentSemanticID,
+            device: device,
             toolName: expectedToolCalls.first?.name,
             valueType: valueStrategy.rawValue,
             templateFamily: utteranceSource.rawValue,
-            generatorSource: generatorModelID,
+            generatorSource: generatorSourceVendor ?? generatorModelID,
+            generatorModelID: generatorModelID,
+            generatorSourceVendor: generatorSourceVendor,
             mustNotTrain: split != "train",
             sourceAuthorization: "authorized_c1_semantic_contract",
             inputText: messages.first(where: { $0.role == "user" })?.content ?? "",
@@ -807,6 +814,7 @@ public struct C5GeneratedUtteranceRecord: Codable, Equatable, Sendable {
     public var variant: Int
     public var utterance: String
     public var generatorModelID: String
+    public var generatorSourceVendor: String? = nil
     public var generatorCallID: String
     public var semanticJudgeModelID: String
     public var semanticJudgeCallID: String
@@ -818,6 +826,7 @@ public struct C5GeneratedUtteranceRecord: Codable, Equatable, Sendable {
         case variant
         case utterance
         case generatorModelID = "generator_model_id"
+        case generatorSourceVendor = "generator_source_vendor"
         case generatorCallID = "generator_call_id"
         case semanticJudgeModelID = "semantic_judge_model_id"
         case semanticJudgeCallID = "semantic_judge_call_id"
@@ -2709,6 +2718,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             candidateParentSemanticID: candidateParentSemanticID,
             candidateCanonicalSemanticID: seed.canonicalSemanticID,
             candidateDedupeGroupID: seed.dedupeGroupID,
+            device: seed.device,
             expectedToolCallSignature: C6Hash.sha256Hex(Data(renderedToolCall.utf8)),
             routeTierSource: "route_deriver_v2_fc_flags_value_type",
             routeTier: seed.routeTier,
@@ -2725,6 +2735,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             ),
             acceptanceStage: maskingStage == .smokeOnly ? .trainHealth : .trainableV0,
             generatorModelID: generatedRecord?.generatorModelID ?? "deterministic_semantic_protocol_v1",
+            generatorSourceVendor: generatedRecord?.generatorSourceVendor,
             generatorCallID: generatedRecord?.generatorCallID ?? "local-contract-\(seed.contractRowID)-v\(variant)",
             semanticJudgeModelID: generatedRecord?.semanticJudgeModelID ?? "",
             semanticJudgeCallID: generatedRecord?.semanticJudgeCallID ?? "",
