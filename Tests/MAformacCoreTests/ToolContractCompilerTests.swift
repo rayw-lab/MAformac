@@ -27,6 +27,16 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertTrue(surfaceNames.contains("adjust_ac_temperature_to_number"))
     }
 
+    func testFamilyAllowlistToolCountMatchesDDomainCatalog() throws {
+        let catalog = try ToolContractCompiler.loadDDomainCatalog(repoRoot: repoRoot())
+        let allowlistURL = repoRoot().appendingPathComponent("generated/family-device-allowlist.json")
+        let allowlist = try JSONDecoder().decode(FamilyDeviceAllowlistMetaFixture.self, from: Data(contentsOf: allowlistURL))
+
+        XCTAssertEqual(allowlist.meta.toolCount, catalog.count, "tool_count must be derived from D-domain catalog count, not demo_intents")
+        XCTAssertTrue(allowlist.meta.toolCountDerivation.contains("ToolContractCompiler.loadDDomainCatalog"))
+        XCTAssertTrue(allowlist.meta.toolCountDerivation.contains("not demo_intents reuse"))
+    }
+
     func testRenderedToolsTextOnlyDDomainNoGenericFrame() throws {
         let catalog = try ToolContractCompiler.loadDDomainCatalog(repoRoot: repoRoot())
         let compiler = ToolContractCompiler(seeds: [], dDomainCatalog: catalog)
@@ -282,5 +292,19 @@ final class ToolContractCompilerTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+    }
+}
+
+private struct FamilyDeviceAllowlistMetaFixture: Decodable {
+    var meta: Meta
+
+    struct Meta: Decodable {
+        var toolCount: Int
+        var toolCountDerivation: String
+
+        enum CodingKeys: String, CodingKey {
+            case toolCount = "tool_count"
+            case toolCountDerivation = "tool_count_derivation"
+        }
     }
 }
