@@ -34,12 +34,13 @@
 - **D-008** gate7 design 收口 + Q1-A/Q2-A 拍板（Accepted）：前数据集反思洞察（同源自审假异源 / 0/34 口径=生成产 4306 中文根因训练侧）
 - **D-009** grounded grill round 收口（Accepted）：本 session 经验驱动 110 新决策，总监综合
 - **D-010** grounded 净新载力 ⭐ locked（Accepted，磊哥「全部同意」）+ 回写 gate7 §10
-- **D-011** 🔴 GPT Pro 第3家审 3 PR + 3 worker 修 findings + 磊哥拍 A merge（Accepted，%45 merge 中）：CI bug 根因（verify.yml 浅 clone 没 fetch head）+ 全 3 PR CI 绿 commander 亲核 genuine；R7 守住
+- **D-011** GPT Pro 第3家审 3 PR + 3 worker 修 + 磊哥拍 A merge（✅ Done，3 门 MERGED main=ab355f6c CI SUCCESS）：CI bug 根因（verify.yml 浅 clone 没 fetch head）；R7 守住
+- **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
 
-## 下一步（候选，磊哥定）
-- **B 窄切片派单**⭐：mic/card/cancel mock event shell + error terminal payload + §9.8/9.9 docs reconcile（全 local/unit，非 model-backed）→ 拆 3 worker 派单、subagent CC 审、上抛磊哥拍
-- **C** 深挖某道 ❌ LoRA gate 怎么补（8 道里 3❌未实装：多轴 held-out / C6 四层阈值化 / 云 generator+异源 judge）
-- **A commit**（13 doc + commander-log 一并提 or 等 worktree 同步①）
+## 下一步（D-012 overnight pre-LoRA push，调研相进行中）
+- **now 调研相**：3 subagent 跑中（gate-reality reconcile stale landing-matrix / grill-gaps 12 维度盘点 / push-premortem 联网搜坑）→ 收敛出 WBS
+- **next**：iceberg teardown「为何反复到不了 training-ready」+ WBS（R7-safe 切片：gate2 masking enforce / gate8 工具数实算 / 剩余 grill / gate6·7 construction 补全）→ 派 3 worker 实施（**基于 main=ab355f6c，非 stale doc-absorption 分支**）→ loopaudit + ≥3 厂商终审 → R7 边界上抛磊哥 candidate signoff
+- 旧候选（B 窄切片 / C 深挖 gate / A commit ✅已做 `15a5acec`）并入 D-012 编排
 
 ## swarm worker 拓扑（🔴 pane id 唯一，防 label 误射 probe）
 - 我 = `%42` commander-status @ ma-status-swarm

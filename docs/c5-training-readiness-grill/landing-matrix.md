@@ -38,16 +38,19 @@ R-L17 route-only signed ✅(2026-06-25 磊哥签)
                            └→ 磊哥最后一拍：candidate signoff + run auth → 真训练（守 R7，本 grill 不越此线）
 ```
 
-## §3 当前缺口汇总（到节点还差）
+## §3 当前缺口汇总（🔴 2026-07-02 wave-1 后 reconcile — supersede 上方 §1 表旧「❌」态）
 
-| 现状 | gate/裁决 | 数 |
-|---|---|---:|
-| ✅ 已就绪 | gate 3 preflight / gate 4 scale-authority | 2 |
-| ⚠️ 待确认 | gate 1 训练循环 / gate 2 masking / gate 8 工具数实算 | 3 |
-| ❌ 未实装 | gate 5 多轴held-out / gate 6 四层阈值化 / gate 7 云generator / 裁决-A tiny ablation / 裁决-B positive-not-diluted | 5 |
-| 🔓 人审解锁 | R-L17 candidate signoff（磊哥最后一拍）| 1 |
+> git 一手 + wave-1 自跑坐实：上方 §1 表标 gate5/6/裁决A/B 为 ❌ 是 **stale**（derived-tracking 漏回写 D-011 merge）——实际已 merge main。commander-log D-012/D-013。
 
-🔴 **到训练前节点 = 补 5 个 ❌ + 确认 3 个 ⚠️**（gate 6 rebuild-C6 已被 R-L17 解锁可先做）。这是人审拍 grill 决策后的实装清单。
+| 现状 | gate/裁决 | 依据 |
+|---|---|---|
+| ✅ construction 就绪 | gate3 preflight / gate4 scale / **gate5 六轴held-out**(main `aa1adf8f`) / **gate6 四层阈值化**(main `696676ba`) / **gate8 工具数=562**(wave1 %44 `64c6f62f`,自跑绿) / **裁决-A harness**(main,R7-guarded dry-run) / **裁决-B positive-not-diluted**(main `696676ba`) |
+| 🔨 wave-1 construction done | **gate2 masking enforce+think-mask+lora-keys 7层门**(wave1 %45 `87a3bbc9`,自跑 C5LoRATraining 全绿含 think-mask 测试)——⚠️ mlx-lm runtime 真消费 loss_mask 需 R7 run 时 dump token/label 证 |
+| ⚠️ 部分/边界 | gate1 训练循环(机制建 `:513` gate formal training,真跑 verify=R7 边界) / gate7 云generator(design merged `db9f490f`,代码未闭环,真跑=R7) |
+| 🔴 R7-blocked 真跑(等磊哥 run auth) | 裁决-A tiny ablation RUN / gate1 真跑 / gate7 真生成 / C6 真评测 / candidate |
+| 🔓 人审解锁 | R-L17 candidate signoff(磊哥最后一拍) |
+
+🔴 **iceberg 坐实**：construction 侧**基本齐**（8 gate 里 gate3/4/5/6/8 + 裁决A/B ✅ + gate2 wave-1 done）。真实剩余缺口 = ① gate2 runtime 消费待 R7 run 证 ② **E-2 设计决策**（562 工具 surface ≈74-99k tokens 超 Qwen3-1.7B context，必 subset/constrained-decoding，磊哥定策略）③ grill 维度10/11/5 补深已做(wave-1)待磊哥 lock ④ R7-blocked 真跑全等磊哥 candidate signoff。**「按训练键」类等磊哥签，非 construction 缺口。**
 
 ## §4 维护
 

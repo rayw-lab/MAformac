@@ -120,3 +120,25 @@
 - **Consequences**: 3 构造门落 main（rebuild-c6 §1/§2/§3 construction 已解锁允许）；🔴 **R7 全程守住**（修复+merge = construction/doc/yaml only，status `construction_*` 显式标构造门非真验收；retrain-c5/真生成/candidate signoff/C6 真验收/golden/voice/uiue-merge/V-S-U-PASS 仍 BLOCKED）。
 - **落点**: `swarm-runs.md` run 2026-07-01-gptpro-audit-3pr-fix-dispatch（执行进展段） + 本决策 + handoff `docs/handoffs/2026-07-02-*.md`
 - **🔴 关键学习（跨项目复用）**: ① **GPT Pro connector fail → diff-upload workaround**（`gh pr diff > file` 上传 chatgpt MCP，GPT 读实际代码非空审）② **收稿=gh/grep 一手核非 ack**（swarm §3 强化，3 PR 全核销与回执一致）③ worker auto-compact 救 context（%44 7%→50% / %45 13%→87%，印证不用担心 worker context）
+
+## D-012 今夜自主推进到 LoRA 训练前节点（overnight swarm push，R7-bounded）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（进行中）｜ **Type**: Strategy/Goal ｜ **Owners**: 磊哥 `/goal` + 6 指令 / commander 编排
+- **Context (what/why)**: 磊哥 `/goal`「今夜你和 3 worker 推进到 LoRA 训练前，前置工作都做完」+ 6 指令：① 双方都有 subagent 灵活用 ② 任何关键动作带「有记忆项目总监」认知 ③ 关键动作必 **premortem + iceberg teardown** ④ commander 主**指挥非执行** ⑤ 关键动作走 **调研→脑暴→设计→计划→实施→循环验证** ⑥ 很多 grill 清单还没做，**多多联网**。前置节点 = `docs/c5-training-readiness-grill/landing-matrix.md §1` 的 8 gate + 2 裁决门 → 物理就绪（守 D-003 严禁跳 gate）。
+- **Decision**: 五相编排——**调研相**（3 subagent 并行：gate-reality reconcile stale landing-matrix / grill-gaps 12 维度盘点 / push-premortem 联网搜坑）→ **脑暴设计相**（iceberg teardown「为何反复到不了 ready」+ WBS 拆 R7-safe 切片）→ **计划相**（worker 派单 inline SSOT）→ **实施相**（3 codex worker %44/%45/%43 + 各自 subagent 建 construction/grill/spec，commander 亲挖纵切）→ **循环验证相**（loopaudit + ≥3 厂商终审）。R7-safe（construction/grill/spec/reconcile/工具数实算）全做完；R7-blocked（真训练/真生成/tiny-ablation RUN/candidate）到边界**上抛磊哥签，不自主跨**。
+- **Alternatives rejected**: 直接开训（rejected：D-003 严禁跳 gate + R7 BLOCKED）；一次大爆炸不走 premortem/iceberg（rejected：磊哥要 6 步过程防第三次惨败）；commander 亲自执行代码（rejected：磊哥「主要是指挥不是执行」，worker+subagent 灵活）；基于 stale doc-absorption 分支实施（rejected：main=ab355f6c 已含 gate5/6/7 merge，本 worktree 落后，实施须基于 main，gate-reality 确认后定拓扑）。
+- **Hard constraint（死守 R7）**: 🔴 retrain-c5 真训练/真数据生成/C6 acceptance/candidate comparison/golden/voice/endpoint/uiue-merge/V-S-U-PASS 全 **BLOCKED**。到「万事俱备只欠按训练键」为止 → 磊哥最后 candidate signoff + run auth（`R7-final-route-deframing-signoff`）。模糊边界（tiny-ablation RUN / 训练循环 smoke run / generator 真跑）= push-premortem 判定 + 必上抛，不自主跨。
+- **Consequences**: 立 D-012 + task 跟踪 + 3 调研 subagent 跑中 → 综合 → iceberg → WBS → 派 worker construction/grill → 循环验证 → 到 R7 边界收口上抛。commander-log 全程自维护（每相里程碑即写 decisions + 刷 INDEX）。
+- **落点**: 本 D-012 + `COMMANDER-INDEX` 当前阶段/下一步刷新 + task 列表 + `swarm-runs.md` 新 run 2026-07-02-overnight-pre-lora-push
+
+## D-013 调研+脑暴设计收口 → 3-worker R7-safe WBS 派发（iceberg + premortem 亲核 + 拓扑决策）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Design/Dispatch ｜ **Owners**: commander 综合 + 磊哥 briefing
+- **Context (what/why)**: D-012 调研相收齐（gate-reality 我亲挖 git 一手 + grill-gaps + push-premortem 三份，落 `runs/2026-07-02-overnight-pre-lora-push/`）。**iceberg teardown 结论「反复到不了 ready」三层**：① **stale tracking 错觉**——gate5/6/裁决A/B construction 已 merge 落 main（`aa1adf8f`/`696676ba`），landing-matrix 标 ❌ 是 derived-tracking 漏回写；② **真缺口**在 grill 维度10（gate体系+R-L17 仅 10 条）/维度11（pre-mortem 仅 12 条）稀薄 + gate8 工具数 TBD + gate2 masking construction；③ **结构性天花板**：证明性验证（裁决A 真跑/gate1 真跑/C6 真评测）被 R7 有意锁磊哥手（对的非失败）。
+- **premortem 亲核（§4 裁决）**: 🔴 T-3（mlx #2616 Qwen3 LoRA 0.28%=θ-α 症状）→ 我 grep 亲核 = **paper-tiger**，`defaultProjectionKeys` `Core/Training/C5LoRATraining.swift:1264` 已列全 7 层 q/k/v/o+gate/up/down（3.48%），团队早防了；残留=加 coverage 门防回归（E-3）。HIGH 处置：T-1 worktree 隔离已建 / T-2 裁决A 真跑=R7 边界**上抛磊哥** / T-5 masking dry_run+`<think>` loss-mask 双验 / E-1「万事俱备」必标裁决A 等 run-auth / E-2 工具数 context 预算。
+- **Decision（WBS 3 worker + commander，全 R7-safe）**:
+  - **%44 → gate8 工具数实算**（worktree `MAformac-g8-tool` off main，branch `c5gate/g8-tool-count`）：ToolContractCompiler 实算 `generated/family-device-allowlist.json:302` tool_count TBD→真值 + E-2 context 预算估。
+  - **%45 → gate2 masking enforce**（worktree `MAformac-g2-mask` off main，`c5gate/g2-masking-enforce`）：masking 退 dry_run→enforce + `<think>` loss-mask 硬化 + E-3 lora-keys coverage 门测试。
+  - **%43 → grill 维度11+维度5 补深**（worktree `MAformac-grill` off doc-absorption HEAD，`c5grill/dim11-dim5-deepen`）：pre-mortem enforcement 挂点 + 3 缺失模式 + 论文 verify，写**独立文件**防冲突。
+  - **commander → 维度10 grill 补深（gate体系+R-L17 纵切）+ tracking reconcile（landing-matrix/proposed→locked/commander-log）+ 裁决亲核每 worker 回稿**。
+- **Alternatives rejected**: 同 main 树并发写（rejected：T-1 index 损坏）；merge main 进 doc-absorption 统一 base（rejected：~24 文件冲突，改用分 base worktree）；commander 亲写全部 grill/code（rejected：指挥非执行，纵切+裁决+reconcile 才是 commander 活）；%43 留 uiue（rejected：uiue R7-isolated 非 pre-LoRA，灵活调来补 grill）。
+- **Hard constraint（R7）**: R7-safe only（construction/grill/design）；R7-blocked（裁决A/gate1/generator 真跑、真生成、真评测）**只 build harness 不 run**，到边界上抛磊哥。worker 回稿 gh/grep 亲核**不信 ack**（T-4 假绿）。
+- **落点**: 3 worktree + worker SPEC（inline SSOT）+ 本 D-013 + `swarm-runs.md` run + task #3/#4 in_progress
