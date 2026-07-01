@@ -11,6 +11,8 @@
 3. 读 **`docs/README.md`**(文档地图)
 4. 读最近 **`docs/handoffs/`**(若有)
 
+若你是通过 `tmux-bridge` 收到 Claude commander 派发的 Codex worker，还必须同时遵守本项目 `CLAUDE.md` 的“跨厂商 tmux 蜂群入口”和全局 `/Users/wanglei/.codex/AGENTS.md §13`；收稿以指定 output file 为准，不靠 ack。
+
 ## 一句话项目
 
 MAformac = 纯端侧(macOS/iOS)、离线、Qwen3 小模型 + LoRA 的车控**方案演示助手**(给客户现场演示,**非量产/非真车控**)。北极星:**现场 5 分钟内听懂中文、反应快、不崩、看着惊艳、断网也能跑**。
@@ -29,3 +31,47 @@ MAformac = 纯端侧(macOS/iOS)、离线、Qwen3 小模型 + LoRA 的车控**方
 
 <!-- OPENSPEC:START 工具可在此注入 managed guidance block,不影响 CLAUDE.md -->
 <!-- OPENSPEC:END -->
+
+<!-- gitnexus:start -->
+# GitNexus — Code Intelligence
+
+This project is indexed by GitNexus as **MAformac-r5-main-current** (28497 symbols, 51005 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+
+> Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
+
+## Always Do
+
+- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
+- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "main"})`.
+- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
+- When exploring unfamiliar code, use `query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
+- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
+
+## Never Do
+
+- NEVER edit a function, class, or method without first running `impact` on it.
+- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
+- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
+- NEVER commit changes without running `detect_changes()` to check affected scope.
+
+## Resources
+
+| Resource | Use for |
+|----------|---------|
+| `gitnexus://repo/MAformac-r5-main-current/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/MAformac-r5-main-current/clusters` | All functional areas |
+| `gitnexus://repo/MAformac-r5-main-current/processes` | All execution flows |
+| `gitnexus://repo/MAformac-r5-main-current/process/{name}` | Step-by-step execution trace |
+
+## CLI
+
+| Task | Read this skill file |
+|------|---------------------|
+| Understand architecture / "How does X work?" | `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` |
+| Blast radius / "What breaks if I change X?" | `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` |
+| Trace bugs / "Why is X failing?" | `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` |
+| Rename / extract / split / refactor | `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` |
+| Tools, resources, schema reference | `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` |
+| Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
+
+<!-- gitnexus:end -->

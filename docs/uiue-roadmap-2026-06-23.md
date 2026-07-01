@@ -1,6 +1,6 @@
 ---
 type: uiue-roadmap
-status: ACTIVE（UIUE 链路 A 推进 SSOT，3 fork 全拍 + D1-D7 grill 收口 + 盲评 11 复议并入，2026-06-23 升级；对齐 Q22 单源精神）
+status: HISTORICAL / external-only（2026-06-30 A 文档收敛降级：UIUE 非主线证据，路线以 CLAUDE §9 + parent roadmap 为准；UIUE 推进在隔离 worktree MAformac-uiue，本主线仓副本仅溯源）
 date: 2026-06-23
 author: Claude (CC0)
 upstream:

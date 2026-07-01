@@ -1,5 +1,7 @@
 # MAformac 语音链路 + 热词 + 协议（from raw）
 
+> ⚠️ **provenance（2026-06-30 A 文档收敛）**：语音链路早期参考料；voice 当前 DEFERRED，ASR/TTS 决策见 `grill-decisions-master.md §4.6`（系统 SFSpeechRecognizer 主）+ `CLAUDE.md §9`，本文仅作来源参考。
+
 > **定位**：MAformac 语音模块的工程参考。从某车厂真实座舱资料（ASR/TTS/VAD/唤醒/降噪/端到端蓝皮书/接口协议/热词文档）深读提炼，已**全部脱敏**（客户统一称「某车厂」，无报价 / 密钥 / PII / 人名 / 标「禁止外传/对内」原文复制）。
 >
 > **北极星对齐**：纯端侧 iOS/macOS、完全离线、端到端闭环目标 **800ms**（按住喊话 → 执行示意 → TTS 首响）。本文所有取舍都服务于「断网 Mac/iPhone 上 5 分钟炸场」。

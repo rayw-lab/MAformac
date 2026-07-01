@@ -1,5 +1,7 @@
 # MAformac 融合装配蓝图 — 38 肩膀 → 你自己的 MasterAgent demo
 
+> ⚠️ **HISTORICAL / design-provenance（2026-06-30 A 文档收敛降级）**：早期 38 肩膀装配蓝图，当前 runtime/bridge 路线以 active OpenSpec carrier（`define-runtime-presentation-bridge`）+ `CLAUDE.md §9` 为准；本文仅作设计溯源，勿当当前路线。
+
 > 配套:`tech-baseline-from-raw.md`(v0.1 §1-§12)+ `tech-baseline-supplement-v0.2.md`(§13-§17)+ Codex `referencerepo/reports/`(38 repo 深度研究)。
 > 本篇回答唯一问题:**这 38 个肩膀,具体怎么拼成一个能跑的端侧 MasterAgent demo。**
 > 生成日期:2026-06-17 · 边界:全文「某车厂」,无客户名/报价/密钥。

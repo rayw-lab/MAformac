@@ -122,6 +122,21 @@
 > **综合↔细粒度映射**：锦标赛 Q30-Q38 是 UIUE 的【综合 grill 题】；下方 U1-U31 是【细粒度逐条决策】，一手源 = GRILL-MASTER（R1-R3 31 条）。U1-U10 已拍（§18），U11-U31 待续批（对应 GRILL-MASTER R2-G4~R3-G11）。
 > verdict + 物理落点：U1-U10 见 §18；U11-U31 默认 ⭐（GRILL-MASTER「磊哥可全 ⭐ 一把过」），待逐条确认。
 
+### §3-UIUE 🔴 UIUE 链路 A 独有决策注册（指针 SSOT，晶体正文在 uiue 仓待「合并一把推」）
+
+> **A 文档收敛 A2b（磊哥 2026-06-30 拍 ⭐方案 1）**：UIUE 在隔离 worktree（`MAformac-uiue`）独立 grill 的数百个设计决策，主线 master 此前全无（仅 U1-U31，commander §4 亲核 grep U32/SD/RPB/V/CC = 0 坐实）。本段是**主线唯一 SSOT 的注册指针**——登记这些决策的存在 + uiue 落点 + 状态以**防丢**；晶体正文不现在搬主线（避免与「后续合并一把推」重复），等 uiue docs 整体合并 main 时随之进。在此之前主线引用 UIUE 独有决策一律以本注册指向的 uiue `file:line` 为准。诊断一手 = `~/Projects/agent-tmux-stack-research/runs/2026-06-30-uiue-main-status-review/DOC-A1-uiue-inventory.md`。
+
+| 系列 | 议题域 | uiue 落点（绝对路径 file:line，commander 2026-06-30 §4 已亲核存在+内容匹配）| 状态 |
+|---|---|---|---|
+| U32-U45 | 视觉验收门 L0-L3 + 8.G9 / Liquid Glass hardening | `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-visual-gate-harden-grill-decisions.md:49`（U32 起）+ 同目录 `uiue-8g9-and-liquid-glass-hardening-grill-decisions.md`（U38-45）| 已拍，待合并回主线 |
+| P4-D1~D3 | Phase4 边界 / ui_value_type 映射 / 撤回 device 伪 frame | `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-phase4-grill-decisions.md:16`（:16/:50/:60）| 已拍 |
+| SD1-SD25 | 用户故事演绎台本决策 | `/Users/wanglei/workspace/MAformac-uiue/docs/uiue-storyboard-grill-decisions.md:9`（SD1 起，至 SD25）| 已拍（部分被 R0-R2 amendment 修订）|
+| V1-V12 | 视觉块（间距/字体/圆角/glass/theme/可读性；V10 投屏 superseded）| `/Users/wanglei/workspace/MAformac-uiue/docs/uiue-storyboard-grill-decisions.md:317`（V1-V12 决策段）| 已拍 |
+| CC*（SD19 三场景）| corner cases（多意图错峰 / R2 安全拒识 / clarify + CC1 升级）| `/Users/wanglei/workspace/MAformac-uiue/docs/uiue-storyboard-grill-decisions.md:372`（SD19 corner case 收口）| 已拍（部分 runtime deferred）|
+| RPB-01~53 | Runtime-Presentation bridge 决策 | `/Users/wanglei/workspace/MAformac-uiue/docs/grill-checklist/uiue-runtime-bridge-decisions-2026-06-25.md:54`（P0 决策表 RPB-01~25 起）| P0/P1/P2 已决，runtime 实装 deferred |
+| G-R0/R1/R2B + HG + R1-GAP-007 + R2B-7gate | R0-R2 formal amendments + hard gates + 覆盖 gaps | `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md` + 同目录 `uiue-r1-*` / `uiue-r2b-*` | 已拍 / gap ledger |
+| R3 / HR-01~07 / R4 C01-C50 / R5 Phase1 | R3 residual routing / R4 human review / R4 分类 / R5 consumer | `/Users/wanglei/workspace/MAformac-uiue/docs/grill-tournament/`（`uiue-r3-*` / `uiue-r4-*` / `uiue-r5-phase1-consumer-*`）| R4/R5 routing；R5 = `PASS_WITH_NOTES` |
+
 ### U1-U10 已拍（磊哥 + codex cite-verify + CC verdict，§18）
 | U | GRILL-MASTER | 议题 | ✅结论 | 物理落点（codex 核 file:line）| 挂 Q |
 |---|---|---|---|---|---|

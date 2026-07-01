@@ -1,5 +1,7 @@
 # MAformac 技术架构基座 v0.1
 
+> ⚠️ **HISTORICAL（2026-06-30 A 文档收敛）**：早期基座 v0.1，部分已被 v2 + 范式翻案 supersede；仅作溯源，当前以 `contracts/` + 范式权威（`grill-decisions-amend-paradigm-tool-surface.md`）+ `CLAUDE.md §9` 为准。
+
 > 综合自 7 路并行提炼（真实座舱项目资料 + 38 个参考 repo）。
 > 边界声明：全文不出现真实客户公司名（一律「某车厂」）、报价/商业条款、密钥/PII、对内禁外传原文；仅保留架构 / 语义 / 协议 / 字段结构。
 > 文档定位：可直接作为开发蓝图。密度优先，工程精确。

@@ -1,5 +1,7 @@
 # Demo Experience Script Placeholders
 
+> ⚠️ **placeholder / superseded（2026-06-30 A 文档收敛）**：占位脚本，非 golden-run SSOT；demo 脚本以 `contracts/demo-golden-run` + `grill-decisions-master.md` 为准。
+
 state=placeholder
 owner_change=define-vehicle-tool-bench
 
