@@ -11,6 +11,7 @@
 4. **技术栈即便有基座,也逐项 check 问磊哥**,不擅自用基座顶替;深聊要带**代码链路 + 数据链路**。
 5. **辩证 check 跨 agent 结论(Codex/GPT Pro)是双向**:认可主体 + catch 问题,不盲从也不全盘否。
 6. **UI 不死磕细节**:雏形够用即往前(磊哥:UI 后续必改);但**信息架构**(主窗口/多 agent 容器)要聊清,那不是细节。
+7. **调研/实施派 3 codex worker,不 reflex-spawn subagent CC**(磊哥 2026-07-02 纠,截图 5 个 subagent 各占 1 tmux pane=9 panes 乱):overnight pre-LoRA push 调研相我开了 5 个 Claude subagent(gate-reality/grill-gaps/push-premortem 调研 + wave1-audit/fix-reaudit 审计),但当时 3 codex worker(%44/%45/%43)全 idle、就是干调研/实施的既定 swarm。根因 = **codex-meta §26 负载下抓 recall 最低工具**(Agent 一键 spawn 快)非 best-fit(worker 要 tmux read-act-read 稍重);且 async Claude subagent 收稿有摩擦(gate-reality idle-notify **交付零**、我自己 git 做它的活,其余要显式 file-write 才交稿,看着像卡)。→ **调研/实施/read-heavy 默认派 3 worker**(磊哥配的 auto-compact 质量高、tmux RECEIPT 报稿干净、3 窗口够用);**subagent CC 仅终极审计用**(cross-vendor/fresh-context 对抗,如 disaster-core gate2 复验合理);别 worker idle 时开自己 subagent 干 worker 活;**tmux 保持 2×2(1 commander + 3 worker)**。见 memory `feedback-swarm-dispatch-workers-not-subagentcc` + swarm-commander 宪法。
 
 ## B. 技术坑点(MAformac)
 
