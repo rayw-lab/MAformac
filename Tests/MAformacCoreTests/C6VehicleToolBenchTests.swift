@@ -1230,7 +1230,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
 
         let summary = runner.summarize(cases: [golden, demoFuzz, unsupported, safety], runs: runs, validation: goldValidation(caseCount: 4))
 
-        XCTAssertEqual(summary.status, "four_layer_threshold_pass")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_pass")
         XCTAssertTrue(summary.externalLayerStats.allSatisfy { $0.status == .pass })
         XCTAssertEqual(summary.externalLayerStats.first { $0.layer == .golden }?.threshold.minimumPassRate, 1.0)
         XCTAssertEqual(summary.externalLayerStats.first { $0.layer == .demoFuzz }?.threshold.minimumPassRate, 0.8)
@@ -1268,7 +1268,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(demoFuzz.status, .blocked)
         XCTAssertEqual(demoFuzz.passRate, 0.75)
         XCTAssertTrue(demoFuzz.blockedReasons.contains("pass_rate_below_threshold"))
-        XCTAssertEqual(summary.status, "four_layer_threshold_blocked")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
     }
 
     func testLayerThresholdFailsClosedWhenExpectedCaseHasNoRun() throws {
@@ -1299,7 +1299,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(golden.missingRunCaseIDs, ["C6-GOLDEN-MISSING-RUN-002"])
         XCTAssertTrue(golden.blockedReasons.contains("case_missing_runs"))
         XCTAssertTrue(golden.blockedReasons.contains("incomplete_coverage"))
-        XCTAssertEqual(summary.status, "four_layer_threshold_blocked")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
     }
 
     func testPositiveActionInvariantIsNotDilutedByNoCallSuccesses() throws {
@@ -1342,7 +1342,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertTrue(summary.positiveActionInvariant.blockedReasons.contains("positive_action_hard_failure"))
         XCTAssertTrue(summary.positiveActionInvariant.blockedReasons.contains("empty_output_rate_above_threshold"))
         XCTAssertTrue(summary.positiveActionInvariant.blockedReasons.contains("no_op_output_rate_above_threshold"))
-        XCTAssertEqual(summary.status, "four_layer_threshold_blocked")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
     }
 
     func testPositiveActionInvariantFailsClosedWhenExpectedActionCaseHasNoRun() throws {
@@ -1372,7 +1372,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(summary.positiveActionInvariant.missingRunCaseIDs, ["C6-POSITIVE-MISSING-RUN-001"])
         XCTAssertTrue(summary.positiveActionInvariant.blockedReasons.contains("case_missing_runs"))
         XCTAssertTrue(summary.positiveActionInvariant.blockedReasons.contains("incomplete_coverage"))
-        XCTAssertEqual(summary.status, "four_layer_threshold_blocked")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
     }
 
     func testSafetyLayerHardFailureBlocksSummary() throws {
@@ -1399,7 +1399,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertEqual(safetyStats.status, .blocked)
         XCTAssertEqual(safetyStats.hardFailureCount, 1)
         XCTAssertTrue(safetyStats.blockedReasons.contains("hard_failure"))
-        XCTAssertEqual(summary.status, "four_layer_threshold_blocked")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
     }
 
     func testUnsupportedFalseCallStillRecordsLegacyIrrelAccAndBlocksLayer() throws {
@@ -1421,7 +1421,7 @@ final class C6VehicleToolBenchTests: XCTestCase {
         let summary = runner.summarize(cases: [unsupported], runs: [falsePositive], validation: goldValidation(caseCount: 1))
         let unsupportedStats = try XCTUnwrap(summary.externalLayerStats.first { $0.layer == .unsupported })
 
-        XCTAssertEqual(summary.status, "four_layer_threshold_blocked")
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
         XCTAssertEqual(summary.IrrelAccThreshold, 0.9)
         XCTAssertEqual(summary.IrrelAcc, 0)
         XCTAssertEqual(unsupportedStats.noToolFalsePositiveCount, 1)
@@ -1486,6 +1486,120 @@ final class C6VehicleToolBenchTests: XCTestCase {
         XCTAssertTrue(json.contains("\"bundle_hash\""))
         XCTAssertTrue(json.contains("\"component_versions\""))
         XCTAssertTrue(json.contains("\"component_digests\""))
+    }
+
+    func testSummaryFailsClosedWhenRunReferencesCaseOutsideDenominator() throws {
+        let runner = try makeRunner()
+        let known = C6BenchCase.fixture(
+            caseID: "C6-KNOWN-001",
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"],
+            behaviorClass: .toolCall
+        )
+        let orphan = C6BenchCase.fixture(
+            caseID: "C6-ORPHAN-001",
+            expectedToolCalls: [C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])],
+            expectedStateDelta: ["ac.power": "on"],
+            readbackContains: ["空调"],
+            behaviorClass: .toolCall
+        )
+        let knownRun = try runner.evaluate(case: known, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"), runIndex: 0)
+        let orphanRun = try runner.evaluate(case: orphan, output: C6RuntimeOutput(toolCalls: [
+            C6ToolCall(name: "set_cabin_ac", arguments: ["power": "on"])
+        ], text: "空调已打开"), runIndex: 1)
+
+        let summary = runner.summarize(cases: [known], runs: [knownRun, orphanRun], validation: goldValidation(caseCount: 1))
+
+        XCTAssertEqual(summary.denominatorReport.orphanRunCaseIDs, ["C6-ORPHAN-001"])
+        XCTAssertEqual(summary.status, "construction_four_layer_threshold_blocked")
+    }
+
+    func testLegacyC6SummaryDecodeDefaultsConstructionFields() throws {
+        let json = """
+        {
+          "status":"local_construction_report",
+          "model_id":"model",
+          "model_artifact_digest":"model-digest",
+          "tokenizer_digest":"tokenizer-digest",
+          "lora_adapter_id":"",
+          "lora_checkpoint_id":"",
+          "lora_adapter_digest":"",
+          "qwen_tool_call_format_version":"qwen-v1",
+          "contract_digest":"contract-digest",
+          "contract_bundle_fingerprint":{
+            "schema_version":"c6_contract_bundle_v1",
+            "bundle_hash":"bundle",
+            "component_digests":{"c1.semantic_function_contract":"1111"},
+            "component_versions":{"c1.semantic_function_contract":"v1"}
+          },
+          "total_cases":1,
+          "total_runs":1,
+          "IrrelAcc":1.0,
+          "IrrelAcc_threshold":0.9,
+          "contract_coverage_score":1.0,
+          "scenario_score":1.0,
+          "hard_failure_count":0,
+          "no_tool_false_positive_count":0,
+          "behavior_class_stats":[],
+          "external_layer_stats":[{"layer":"golden","case_count":1,"run_count":1,"hard_failure_count":0}],
+          "denominator_report":{"unresolved_behavior_class_case_ids":[],"layer_case_ids":{"golden":["C6-LEGACY-001"]}},
+          "per_case_stats":[],
+          "eval_runs":[{
+            "run_id":"run-1",
+            "case_id":"C6-LEGACY-001",
+            "model_id":"model",
+            "model_artifact_digest":"model-digest",
+            "tokenizer_digest":"tokenizer-digest",
+            "lora_adapter_id":"",
+            "lora_checkpoint_id":"",
+            "lora_adapter_digest":"",
+            "qwen_tool_call_format_version":"qwen-v1",
+            "prompt_hash":"prompt",
+            "sampling_seed":"0",
+            "tool_output_digest":"tool-output",
+            "contract_digest":"contract-digest",
+            "contract_bundle_fingerprint":{
+              "schema_version":"c6_contract_bundle_v1",
+              "bundle_hash":"bundle",
+              "component_digests":{"c1.semantic_function_contract":"1111"},
+              "component_versions":{"c1.semantic_function_contract":"v1"}
+            },
+            "gate_result":{
+              "tool_call_set_match":true,
+              "no_tool_false_positive_count":0,
+              "state_delta_match":true,
+              "readback_match":true,
+              "clarify_match":true,
+              "hard_failed":false,
+              "failure_classes":[],
+              "model_hard_failed":false,
+              "readback_hard_failed":false,
+              "applied_writes":[],
+              "dependency_write_keys":[],
+              "unexpected_mutation_keys":[],
+              "scope_origin_evidence":{}
+            },
+            "elapsed_ms":1
+          }]
+        }
+        """
+
+        let summary = try JSONDecoder().decode(C6Summary.self, from: Data(json.utf8))
+
+        XCTAssertEqual(summary.status, "local_construction_report")
+        XCTAssertEqual(summary.positiveActionInvariant.status, .pass)
+        XCTAssertEqual(summary.positiveActionInvariant.caseCount, 0)
+        XCTAssertEqual(summary.denominatorReport.orphanRunCaseIDs, [])
+        XCTAssertEqual(summary.externalLayerStats.first?.threshold.minimumPassRate, 1.0)
+        XCTAssertEqual(summary.externalLayerStats.first?.status, .pass)
+        let gate = try XCTUnwrap(summary.evalRuns.first?.gateResult)
+        XCTAssertEqual(gate.modelHardPassBasis, [])
+        XCTAssertFalse(gate.readbackExcludedFromModelHardPass)
+        XCTAssertFalse(gate.toolOutputWasNoOp)
+        XCTAssertFalse(gate.toolOutputTextWasEmpty)
     }
 
     // MARK: - S5 D-domain 迁移回归 + C5/C6 同源 parity(防 0/34 换皮)
