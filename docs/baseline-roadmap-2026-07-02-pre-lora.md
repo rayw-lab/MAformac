@@ -4,7 +4,7 @@ artifact_kind: pre_lora_tree_pr_merge_roadmap
 authority: baseline_until_superseded（树/合并/PR 节点的当前权威路线；与 live git 冲突时以 live 为准并回写本文件）
 created: 2026-07-02
 author: claude-commander（新任，D-015 接棒复审后）
-as_of_main: ab355f6c（PR #9/#10/#11 已 merge，全部 11 个云端 PR MERGED/CLOSED，零 open）
+as_of_main: 80ea379c（M1 收口 D-018：PR #12-#15 已 merge；前态 ab355f6c）
 evidence: L1-tree-pr-doc-inventory.md（%44 read-only 盘点，2026-07-02）+ commander git/gh 亲核
 companion: docs/lora-loop-blueprint-2026-07-02.md（训练闭环鸟瞰，姊妹篇）
 expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only signoff 2026-07-15 到期前须复核
@@ -12,18 +12,18 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 
 # 基线路线图（2026-07-02 此时此刻）— 树 / 合并 / PR 节点
 
-> 一句话：**现在保持现状（verdict: HOLD）**。所有隔离树不动、不删、不合，直到磊哥拍 5 件决策中的 ⑤（wave-1 consolidation）与 cleanup 授权；训练相关真跑全部等 candidate signoff + run auth（R7）。
+> 一句话（2026-07-02 晚更新）：**M1 已收口（D-018），树处置进入 M2 待授权态**——隔离树仍不删（M2 dry-run 清单已备等磊哥一次性授权）；训练相关真跑仍等 candidate signoff + run auth（R7）。原 HOLD verdict 完成使命转历史。
 
 ## §0 冻结时刻快照
 
 | 维度 | 状态 |
 |---|---|
 | main | **`80ea379c`（M1 收口后，D-018）**：α gate2+guard `99734be6` / β gate8 `d93c59b8` / γ 40 件文档 `f3ab165d` / δ 验收修复 `80ea379c` 全合流；验收 PASS（main 范围，sibling UIUE fixture 环境噪声单列 defer M4）。前态 `ab355f6c`（gate5/6/7 落地）留档 |
-| 云端 PR | #1-#11 全 MERGED/CLOSED，**零 open** |
+| 云端 PR | #1-#15 全 MERGED/CLOSED，**零 open**（#12 β/#13 α/#14 γ/#15 δ = M1 四支）|
 | wave-1 分支 | ✅ **全部已合流 main（D-018）**：g8-tool/g2-mask 经 PR #12/#13；grill 树 2 件 Dim 文档经 γ PR #14 port（原分支转 cleanup 候选进 M2 清单）|
 | 指挥官分支 | `codex/rebuild-c6-doc-absorption-20260624`（主树，**147 behind** main；ahead 数随本分支文档 commit 递增——本文初稿时 `7dd64a50`/14 ahead，D-016 commit 后 `629b1132`/15 ahead，**live 以 `git rev-list --left-right --count main...HEAD` 为准**；commander-log、C5 grill 语料、handoffs 全在此）|
 | R7 | route-only signed（2026-06-25，**expires 2026-07-15**）；candidate unsigned；retrain/真生成/真评测/uiue-merge/V-S-U-PASS 全 BLOCKED |
-| 磊哥 5 件待拍 | ① gate2 masking design 岔口（⭐token-mask override 已实现并双审 CONFIRMED）② E-2 subset 策略 ③ grill Dim10/11/5 lock（~58 条 proposed）④ T-2 tiny-ablation 真跑 run-auth ⑤ wave-1 consolidation-to-main |
+| 磊哥决策态 | ①③⑤ **已拍 locked**（D-017「ABCDE都要做」）且 ⑤ 已执行完（D-018）；② 方向 locked、实装形态 = E-2 grill round 消减后上抛细拍；④ tiny-ablation run-auth **仍待磊哥**（R7 线唯一堵点）+ 附注 R7 signoff 2026-07-15 到期 |
 
 ## §1 全树状态矩阵（16 worktree + 关键裸分支）
 
@@ -34,9 +34,9 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 | 树 | 分支@HEAD | vs main | 处置 | 后续节点 |
 |---|---|---|---|---|
 | 主树 `MAformac` | doc-absorption（盘点时 `7dd64a50`+dirty；D-016 后 `629b1132`+，ahead 随文档 commit 递增） | 147↓/live↑ | **keep-as-isolation**（commander 工作树） | 节点 M1：文档选择性 PR（🔴 禁整支直合——branch 侧 README 等旧于 main，直合=回退；本分支 CURRENT.md 已重写为最新草案，随 M1-γ 进 main） |
-| `MAformac-g2-mask` | g2-masking `47ca8cda` | 0↓/2↑ 干净 | **merge-via-PR 首选**（代码 only，无 docs 冲突） | 节点 M1（等磊哥⑤+①） |
-| `MAformac-g8-tool` | g8-tool `64c6f62f` | 0↓/1↑ 干净 | **merge-via-PR 首选**（代码+generated only） | 节点 M1（等磊哥⑤+②口径确认） |
-| `MAformac-grill` | dim11-dim5 `f9e67901` | 147↓/8↑ | **keep**；只港其 2 个新 grill 文档（Dim11/5），禁整支合 | 节点 M1 文档 PR（等磊哥③ lock） |
+| `MAformac-g2-mask` | ✅ 已合流（PR #13 含 3 commits） | — | 转 M2 清理候选 | M2 |
+| `MAformac-g8-tool` | ✅ 已合流（PR #12；工厂 SSOT 补丁经 PR #15） | — | 转 M2 清理候选 | M2 |
+| `MAformac-grill` | 2 件 Dim 文档 ✅ 已经 γ port 合流（locked frontmatter） | 147↓/8↑ | 分支残值已榨干 → 转 M2 清理候选（禁整支合不变） | M2 |
 | `MAformac-uiue` | uiue/phase4 `56b0b95a`+dirty | 89↓/6↑ | **keep-as-isolation**（R7 显式 blocks `uiue_merge_to_mainline`） | 节点 M4（candidate signoff 之后单独立项，非本路线图范围） |
 | `.d25-worktrees/k1-spike-ledger` | d25-k1 `dc5ef7ec` | 7↓/1↑ 干净 | **merge-via-PR 候选**（5 份 D25 K1 phase0 receipt docs） | 节点 M3（磊哥单独拍：D25 收据是否还要进 main） |
 
@@ -80,7 +80,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 
 **PR 纪律**（沿用 D-011 实证）：commander 不 merge（磊哥是 apply gate）；每 PR 补 `verify.yml` fetch base+head 已在 main 修净；收稿 gh/grep 一手核非 ack；staged 不 batch。
 
-## §3 现在是否保持现状 — verdict: **HOLD（保持现状）**
+## §3 现状 verdict — ~~HOLD~~ → **M1 done，进入 M2-待授权 / E-2 grill / ④run-auth 三线**（2026-07-02 晚）
 
 - 三个 wave-1 树承载着已双审 CONFIRMED 但未拍板的产出 → 动它们 = 在磊哥拍板前改变证据现场。
 - g5/g6/g7 等清理候选零风险但也零收益紧迫性 → 攒到 M2 一次授权一次清，避免碎步破坏性操作。
