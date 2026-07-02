@@ -12,5 +12,6 @@
   "thinking": "no_think_block",
   "parser_id": "p3h_tool_call_json_ordered_v2",
   "tool_call_cardinality": "ordered_multi_call",
-  "output_boundary": "raw_generation_and_truncated_output"
+  "output_boundary": "raw_generation_and_truncated_output",
+  "tools_mount_policy": "p3h_v3_training_row_or_e2_sg_catalog"
 }

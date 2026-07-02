@@ -118,3 +118,91 @@ C6-MP-005 prompt_has_empty_think=true raw_generation_startswith_think=false elap
 - Empty `observed_tool_names` in smoke are raw evidence only; no behavior-quality verdict is claimed.
 - CI state is checked outside this receipt after each push; this receipt does not claim CI pass unless separately reported.
 - No PR merge, no training, no C6/model-quality acceptance, no candidate comparison, and no V/S/U-PASS claimed.
+
+## GF-149~155 Tools-Mount v3 Absorbed
+
+- GF-149: probe prompts now mount tools via `tokenizer.apply_chat_template(messages, tools=...)`; A/B axes resolve `source_sample_id` / `augmentation_parent_id` to the exact P12-v6 training row `tools` field. Missing mounts fail closed with exit 2 `invalid_probe_tools_mount_missing`.
+- GF-150: C/D axes mount generated D-domain catalog `_sg` groups for the expected tool(s), using `/Users/wanglei/workspace/MAformac/generated/D_domain.tools.demo.json`; multi-call cases merge multiple `_sg` groups with tool-name de-duplication. This is recorded as policy `e2_sg_full_group`.
+- GF-151: decode contract includes `tools_mount_policy=p3h_v3_training_row_or_e2_sg_catalog`; each per-case artifact records `mounted_tool_count`, `mounted_tool_names`, `mount_source`, and `mount_policy`.
+- GF-152: prompt assertions now require a non-empty tools mount, `<tools>...</tools>` markers, empty no-think block, assistant skeleton, and a token-count floor. Real tokenizer dry-run over 68 cases passed; token range was 364..3847.
+- GF-153: repeated identical tool calls are collapsed to the first call for this probe generation surface; ordered multi-call parsing remains covered for distinct calls.
+- GF-155: v6 training was not rerun; paired probe was rerun to local artifact root `/Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6-probe2/`.
+
+## Validation — Tools-Mount v3
+
+```bash
+/opt/homebrew/opt/python@3.13/bin/python3.13 -m py_compile Tools/ProbeHarness/probe_harness.py Tests/ProbeHarnessTests/test_probe_harness.py
+# exit 0
+
+/opt/homebrew/opt/python@3.13/bin/python3.13 -m unittest discover -s Tests/ProbeHarnessTests -p 'test_*.py' -v
+# Ran 16 tests OK
+```
+
+Real tokenizer prompt validation:
+
+```text
+rendered 68 min (364, 'P3D-B-009', 2, 'train_row:c5-train-00009') max (3847, 'C6-MP-028', 10, 'catalog_sg:atmosphere_lamp_color,atmosphere_lamp_brightness')
+```
+
+Mount resolver dry-run:
+
+```text
+cases 68 mounts 68
+A n=15 mounted_tool_count unique=[2,4]
+B n=15 mounted_tool_count unique=[2,4]
+C n=4 mounted_tool_count unique=[1,2]
+D n=34 mounted_tool_count unique=[1,4,8,9,10]
+```
+
+## v6-probe2 Paired Runtime Evidence
+
+Command persisted at:
+
+```text
+/Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6-probe2/probe2-command.txt
+```
+
+Runtime summary:
+
+```text
+started_at=2026-07-03T01:21:04+08:00
+finished_at=2026-07-03T01:25:25+08:00
+elapsed_seconds=261
+exit_code=0
+base_records=68
+adapter_records=68
+```
+
+Per-axis expected-match summary, exact/order-sensitive on `observed_tool_names == expected_tool_calls[].name`:
+
+| axis | arm | total | empty | non_empty | expected_match | expected_mismatch | mounted_tool_count_min | mounted_tool_count_max |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| A | base | 15 | 12 | 3 | 3 | 12 | 2 | 4 |
+| A | adapter | 15 | 0 | 15 | 15 | 0 | 2 | 4 |
+| B | base | 15 | 2 | 13 | 12 | 3 | 2 | 4 |
+| B | adapter | 15 | 0 | 15 | 11 | 4 | 2 | 4 |
+| C | base | 4 | 0 | 4 | 4 | 0 | 1 | 2 |
+| C | adapter | 4 | 0 | 4 | 4 | 0 | 1 | 2 |
+| D | base | 34 | 2 | 32 | 18 | 16 | 1 | 10 |
+| D | adapter | 34 | 0 | 34 | 8 | 26 | 1 | 10 |
+
+Sample evidence:
+
+```text
+adapter P3D-A-001 mounted=2 mount_source=train_row:c5-train-00001 prompt_has_tools=true observed=[open_ac_cooling_mode] expected=[open_ac_cooling_mode]
+adapter P3D-B-001 mounted=2 mount_source=train_row:c5-train-00001 prompt_has_tools=true observed=[open_ac_cooling_mode] expected=[open_ac_cooling_mode]
+adapter C6-MP-002 mounted=10 mount_source=catalog_sg:ac_temperature prompt_has_tools=true observed=[open_ac_temperature_to_exp] expected=[raise_ac_temperature_by_exp]
+```
+
+Machine summaries:
+
+```text
+/Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6-probe2/paired-axis-expected-match-summary.json
+/Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6-probe2/paired-axis-expected-match-summary.md
+```
+
+## Residual Risk — Tools-Mount v3
+
+- This run changes only probe input surface; it does not retrain, alter v6 weights, or touch Core/Training.
+- D-axis is report-only paired data under catalog `_sg` mount policy; no C6 acceptance, candidate comparison, model-quality verdict, threshold lock, or V/S/U-PASS is claimed.
+- Repeated identical tool-call collapse is a v6 probe tolerance for missing EOS supervision; the data-side `<|im_end|>` supervision remains v6.1 work.
