@@ -82,8 +82,10 @@ verify-source: .venv/.deps.stamp
 
 regen: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_c1.py
+	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
 	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
+	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
 
 regen-tool-contract: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
