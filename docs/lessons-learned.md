@@ -197,3 +197,10 @@
 2. **🔴 SSOT 必须列全消费者,不能只列当前争论里最显眼的两个名字**:Q4.5 起初只说 `behavior_class` vs `C6Bucket`,但 Q2/Q3 已经让同一 taxonomy 同时服务 C5 `data_class_observed_count`、C6 denominators/selectors、apply `no_effect_reason`。只修 C6 两个名字,apply 或 C5 仍会私建分类。→ **定义 shared taxonomy 时显式列 producer/consumer: C5 数据计数、C6 分母/selector、apply no-effect reasoning;任何少列一个消费者的"SSOT"都是潜在双源。**
 
 3. **🟡 static teardown 只能支撑文档设计,不能升格成验证通过**:paper/code teardown 能证明"应该怎样设计"和"哪些路径有风险",不能证明 C6 acceptance、模型质量、base recalibration 或 demo readiness。→ **OpenSpec 文档吸收的 proof class 只写 `local`/`local_static_teardown`;验证白名单只用 OpenSpec validation 和 `git diff --check`,不得把 teardown 证据写成 golden-run、C6 pass、V-PASS 或 readiness。**
+
+## K. M1 consolidation + 交叉审双拦截教训(2026-07-02, wave-1 合流 main)
+
+1. 🔴 **per-branch CI 绿 ≠ 全量验收绿；merge 后必须跑一次完整 `make verify-all` 验收**。实证:gate8 分支(PR #12)CI 绿+22 测试绿+双审 CLEAR+D-015 复算 562 对,但它**直改 `generated/family-device-allowlist.json` 派生物没改工厂 `scripts/gen_family_allowlist.py`**——regen 一跑 562 打回 TBD,merge 后验收 diff 门才现形(claim-vs-reality 第9坑「派生物 vs 工厂」在【提交流程】的变体:每个人都核了派生物的值,没人问工厂产不产同样的值)。修复=PR #15(工厂实算 tool_count+Makefile regen 重排 gen_tool_contract 先行解 stale-by-one)。防线:改任何 `generated/` 文件的 PR,审计维度必含「工厂 regen 后 diff-clean 吗」;merge 后全量 verify-all 是验收标配非可选。
+2. **交叉审对抗 fixture 是破「作者+commander 双盲」的标配**。实证×2:①gate2 反向 guard 只扫 `("train","valid")` 漏 test.jsonl——commander 当天亲读过那行也没扣出,%43 构造 test.jsonl 对抗 fixture 实跑才现形(XAUDIT-alpha FAIL+P0→一行修复+行为测试→P0-RESOLVED);②E-2 design 包被 %44 抓「六轴写成五方丢 train target 轴」。规律:静态读码抓不到「枚举少一项」类缺口,**构造反例实跑**才抓得到;grill/design 产物上抛前必过一轮异源对抗审。
+3. **staged PR 序(α→β→γ)+每支独立 CI+审计 = 回滚点保全**。γ 文档整编支(40 件)用「新支 off main 复制 port」而非 rebase 旧支,语义审用 hash 对比(35 逐字节一致+3 whitespace-only+2 带溯源 frontmatter)半小时收口——比人肉读 40 件快且可复算。
+4. **worker 主动回报纪律(磊哥 2026-07-02 定)**:每任务完成打 `REPORT|任务|status|产出|SHA|残留` 行,长任务每 ~5min 打 `PROGRESS` 行,blocker 立即 `BLOCKED` 行,不静默——commander 轮询成本降一半,漏收稿风险消除。已发三 worker 常设。
