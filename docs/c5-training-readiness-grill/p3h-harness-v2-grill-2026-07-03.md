@@ -28,3 +28,6 @@ seed: base-only 冒烟抓到 base 输出`<think>`开头烧光 80 token + %43 PR2
 
 ## 融合义务
 - lock 后并入 F-044 v6 spec（decode 契约段）+ governance-fit landing。GF-142 结果回写 GF-W1 D3（decode 具体值）。
+
+## 亲核收口（2026-07-03 凌晨，commander）
+GF-141~148 八项全落地亲核 PASS（commit dd323c27，11/11 测试亲跑）。v2 冒烟证据：`prompt_has_empty_think=true`、`raw_startswith_think=false`、base honest 行为浮现（C6-MP-004 raw=`{"action":"open_ac"}`=懂语义不懂 D-domain 协议格式——正是 paired delta 要测的形态）。GF-W1 GF-032/033（stop set 裸 `\n` / `</tool_call>` 截断风险）被 v2 架构消解：多 call 提取吃 `raw_generation`（未截断），stop_tokens 只作用于 `truncated_output` 展示字段，不再 load-bearing——GF-032/033 融合结论=保留现 stop set 无害，证据层已与 stop 解耦。

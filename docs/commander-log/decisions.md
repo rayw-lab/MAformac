@@ -302,3 +302,9 @@
 - **%43 PR26 交叉审 REQUEST_CHANGES 收讫**（P1×2：paired 可静默降级 base-only / decode 契约缺 prompt/thinking/parser 字段；P2×3：raw 证据压缩/multi-call 丢失/PR scope drift）——P1-2 与输入面错配同根汇合，全部并入 P3H v2 修复包派 %44（GF-141~148 八项+重跑冒烟验证）。
 - **%44 冒烟顺带修了 mlx_lm 0.31.1 API 兼容**（generate 不吃 temp → sampler=None greedy+回归测试）。
 - merge PR #26 改为：v2 修复完成+%43 复审 APPROVE 后。
+
+## D-032（2026-07-03 凌晨）P12+P3Hv2 双亲核 PASS → tiny v6 训练+probe 开跑
+- **P12 镜像门 commander 亲核坐实**：old v5 exit **66**（44 行全 under_supervision，parser_critical_untrained 逐 fragment + ratio 0.12-0.37<0.90 归因精准）/ new v6 exit **0**（ratio=1.0，44/44 trainable，泄漏 0）。A+ 契约（磊哥六拍③）镜像验证达成。P12 诚实 PARTIAL（sibling UIUE fixture 5 失败=非 P12 范围已知噪声；GitNexus critical blast radius 已标注留 reviewer）。教训：亲核 exit code 勿用管道后 `$?`（测的是 tail）。
+- **P3H v2 亲核 PASS**：GF-141~148 全落地；输入面对齐坐实（prompt 空 think 块断言 fail-closed）；base honest 行为浮现（懂语义不懂协议格式）；GF-032/033 被架构消解（提取吃 raw_generation，stop 只影响展示字段）。
+- **GF-W1 40 决策收讫**（GF-001~040：consumer frontmatter/loss 枚举边界/decode 具体值；GF-030 拍 max_tokens 80 只留 historical，v6 用 160=与 GF-147 一致）。
+- **拓扑**：%44 接 SPEC-PCD（tiny v6 训练真跑 600 iters + paired 四轴 probe 68 case，verdict 留 commander）；%43 交叉审 P12 中；%45 wave-1 生成预研中。
