@@ -211,3 +211,13 @@
 2. **commander 直跑外部 LLM CLI 不可靠**:hermes 直跑回 284 字节废稿(无人盯守/无质检/background stdout 截断风险)——外审执行位必须是能"盯全程+质检+重试"的 worker(%44 首单即自带 attempt 编号+jq 提取+字节数/verdict 质检,范式正确)。timeout 上限 20 分钟(磊哥定)。
 3. **hermes CLI 本体损坏的诊断路径**:SyntaxError→查 git status 发现是中断的 stash pop 冲突现场(5 UU 文件)→ `git reset --merge` 可逆中止(git 在 pop 冲突时不丢 stash,stash@{0} 18 文件原封)→ import 自检恢复。别上来就改冲突标记——先判断是不是别人的半截操作现场。
 4. 🔴 **交叉审的「验证声称」本身要抽核（审计的审计）**:XG7D 交叉审声称亲跑验证「manifest 缺失/目标不在 group/policy 失配」三态 fail-closed 给 PASS_WITH_NOTES,但 hermes 亲构 wrong-policy probe 实跑证明**第三态从未被拦**(loader `C5LoRATraining.swift:2861` 取首 entry policy 零校验)——交叉审的第三态验证是假的(可能只构造了前两态 fixture 就外推)。修法:① 审计员回执必逐态贴【实跑命令+输出】非清单式声称 ② commander 收审计稿抽核「声称验过的最关键一态」③ 真异源(跨厂商)终审对 ship-blocking 面必做——同 runtime(codex)交叉审会共享盲区。这是 claim-vs-reality 铁律2「审计实跑一手」在【审计员自身产出】上的递归应用。
+
+## M. tiny-ablation v5 高价值失败 + 三轮跨 LLM 辩证元认知(2026-07-02)
+
+1. 🔴 **consumer-anchored sufficiency（充分性轴）**:项目验证哲学成熟轴=真实性(claim-vs-reality,可机械化);本次暴露正交的**充分性轴**(做的=下游消费者要的吗)——必须锚定消费者契约才可测。gate2 dead-field(产物没人消费)与本次(监督没喂够消费者所需)=**同一生产者-消费者契约的两半断裂**。修法:产物 frontmatter 声明 consumers/sufficiency_evidence + landing 加 fit-proof 列 + 审计 SPEC 模板加 fit 维度 + readiness 四级词表(mechanism-true/fit-proven/experiment-valid/behavior-proven)。
+2. **归因收敛偏差(commander 亲身)**:首轮 teardown 找到第一个能解释现象的根因(探针重叠 0/34)就收敛,**同一批数据里的更深根因(训练 user=协议串)近在手边没看**——GPT-5.5 看同样数据多问一层抓到。修法=**归因 loop-until-dry**:每轮问「同一批证据还支持什么别的根因」直到连续一轮无新增,而非首个可解释根因即收。
+3. **纪律场景索引过窄(commander 亲身)**:「同 harness 分层」是我参与锁死的 c5-recovery 纪律,却没应用到 F-044 自身(28/34 历史锚跨 harness)——规则绑死原生场景(C6 评测)不触发同型新场景(任何 baseline-candidate 比较)。修法=项目级铁律出现【同型结构】时主动泛化匹配(配对比较→同 harness;派生物→查工厂;声称→查消费)。
+4. **证据第二信息层(commander 亲身)**:probe 的 `NO_TOOL×27` 亲眼看过,注意力全在主信息(输出了 NO_TOOL)漏了第二层(重复 27 次到 token 上限=decode 契约/stop token 缺失)。修法=关键证据扫两遍:「它回答主问题什么」+「它还暴露什么别的」。
+5. 🔴 **跨 LLM 开放归因强破框(对 codex-meta §31 的精细化)**:§31 说 cross-vendor≠cross-frame(核对性任务上换厂商仍共享 task frame)——但本次三轮辩证(Fable5→GPT-5.5→Fable5)每轮抓到上轮真漏(输入面/目的漂移 ↔ 重叠数据/基线断裂/decode 契约),因为**开放归因任务上不同 LLM 的先验框架决定「先看哪」**,frame 差异恰好成为资产。精细化判据:**核对性任务(字段对不对)跨厂商弱破框;开放性任务(为什么失败/还有什么)跨厂商强破框**——P0 级失败分析制度化走「双 LLM 独立写→交叉辩证→终版综合」(成本~1h)。
+6. **机械闯关元门**:v1-v5 五连机械修每次都对(D-025 快速通道无罪),但连续机械修≥3=「在给语义可疑之物铺路」的统计信号——若 v3 后做过一次 5 分钟 fit-spot,209 tokens 哨兵就会被扣住省两轮授权。修法=连续 3 次机械修→强制 fit-spot(「我在给什么铺路?它语义成立吗?」)。
+7. **哨兵数字行为学**:209 trainable tokens 在 preflight 里躺过全程、人机都读过、无人扣扳机——「数字可见≠数字有门」。修法=receipt 每个载力数字必有阈值门或显式 no_gate_by_design 标注。

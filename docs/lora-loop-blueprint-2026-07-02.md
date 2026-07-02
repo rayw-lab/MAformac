@@ -34,7 +34,7 @@ expires_when: 任一 gate 状态变化 / tiny-ablation 真跑后 / candidate sig
 | gate6 C6 四层阈值化 | ✅ construction（main `696676ba`） | 分母 case 覆盖 fail-closed（交叉审抓假绿后修） |
 | gate7 云 generator+异源 judge | 🟡 **design merged，代码未闭环** | 唯一剩余大块 R7-safe construction（见 §4 节点 C） |
 | gate8 工具数 value-form 实算 | ✅ 562（分支，待 M1-β） | + E-2 硬发现（🔴 2026-07-02 **真 Qwen3-1.7B tokenizer 实测**，商队各估算 74-138k 全部作废）：562 工具目录 compact JSON = **126,275 tokens** / default = **159,899 tokens**（tokenizer 自身报警超 131,072 上限）→ 562 全集**任何** context 配置装不下，10 族 scoped subset + 受限解码是数学必然非取巧 |
-| 裁决-A tiny ablation | 🟡 harness 已建（main），**RUN = R7 等磊哥④** | empty 28/34→<5/34 才许声称范式修复 |
+| 裁决-A tiny ablation | 🔴 v5 已真跑→`BLOCKED_INVALID_FOR_PARADIGM_VERDICT`（四根因，FINAL teardown 档）；v6 契约重构中（D-027） | 🔴 门已重定义：28/34 历史锚降 provenance；v6=同 harness base-adapter 配对 paired delta+absolute，4 轴分账（A/B 硬门、C 观察、D report-only） |
 | 裁决-B positive-not-diluted | ✅ construction（main，随 gate6） | action 轴独立 fail-closed + OOD 探针 |
 | R-L17 | route-only signed（**2026-07-15 到期**）；candidate unsigned | 真训/真生成/真评测全 BLOCKED |
 
@@ -118,7 +118,7 @@ alert 语义（借 Trackio 形态，本地 JSONL）：`non_finite_loss / grad_sp
 | **B** | M1 consolidation（gate2/gate8/文档三支 staged PR） | R7-safe，等⑤ |
 | **C** | **gate7 generator pipeline 代码闭环**（design→代码：多源调用编排/vendor-enum G1 门/precision 门/receipt——build 不 run） | 🟡 **剩余最大 R7-safe construction**，可派 3 worker，建议 M1 后立项 |
 | **D** | E-2 subset 实装（磊哥②拍板后：场景 scoped 工具面 + 受限解码，10 族 subset 进 prompt surface） | R7-safe construction |
-| **E** | 裁决-A tiny ablation 真跑（磊哥④） | ✍️ 第一次真跑，闭环体系首次全链路点火 |
+| **E** | ✅v5 真跑完成（首次全链路点火，四根因重标=高价值失败）→ E′ = v6 rerun（Phase 0-3 后另签 run-auth） | ✍️ |
 | **F** | 数据 wave-1 真生成（gate7 真跑）+ 数据门 | ✍️ 等 candidate signoff 前置链 |
 | **G** | formal 训练 + C6 评测循环（§2 ③-⑥） | ✍️ run auth |
 | **H** | candidate signoff → **训练闭环终点** | ✍️ R-L17 终拍 |

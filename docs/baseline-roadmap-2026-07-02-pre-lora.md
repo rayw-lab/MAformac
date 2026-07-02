@@ -74,7 +74,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 节点 M3 — D25 K1 receipts PR（磊哥单独拍要不要）
  ▼
 （R7 线，与 M1-M3 正交）
-节点 T — 磊哥④ tiny-ablation run-auth → 裁决-A 真跑 → …（见姊妹篇闭环图）
+节点 T — ✅v5 已真跑（D-024 授权）→ 🔴 verdict=BLOCKED_INVALID_FOR_PARADIGM_VERDICT（四根因重标，FINAL teardown 档）→ v6 契约重构 Phase 0-3 进行中（D-027）→ v6 run-auth 另签
 节点 M4 — candidate signoff 之后：UIUE merge 立项、golden/voice 解锁（R7 blocks 列表逐项）
 ```
 
