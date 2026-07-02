@@ -1,0 +1,16 @@
+{
+  "temperature": 0,
+  "max_tokens": 160,
+  "stop_tokens": [
+    "</tool_call>",
+    "\n",
+    "\n\n",
+    "\r\n"
+  ],
+  "tokenizer_wrapper": "mlx_lm_tokenizer_wrapper",
+  "prompt_skeleton_id": "qwen3_patched_no_think_chat_template",
+  "thinking": "no_think_block",
+  "parser_id": "p3h_tool_call_json_ordered_v2",
+  "tool_call_cardinality": "ordered_multi_call",
+  "output_boundary": "raw_generation_and_truncated_output"
+}
