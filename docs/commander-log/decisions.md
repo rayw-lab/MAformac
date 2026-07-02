@@ -308,3 +308,9 @@
 - **P3H v2 亲核 PASS**：GF-141~148 全落地；输入面对齐坐实（prompt 空 think 块断言 fail-closed）；base honest 行为浮现（懂语义不懂协议格式）；GF-032/033 被架构消解（提取吃 raw_generation，stop 只影响展示字段）。
 - **GF-W1 40 决策收讫**（GF-001~040：consumer frontmatter/loss 枚举边界/decode 具体值；GF-030 拍 max_tokens 80 只留 historical，v6 用 160=与 GF-147 一致）。
 - **拓扑**：%44 接 SPEC-PCD（tiny v6 训练真跑 600 iters + paired 四轴 probe 68 case，verdict 留 commander）；%43 交叉审 P12 中；%45 wave-1 生成预研中。
+
+## D-033（2026-07-03 凌晨）P12 审 P1×2 分诊 + wave-1 决策包 + GF-W3 派发
+- **%43 P12 交叉审 REQUEST_CHANGES 收讫**（P0=0；P1-1 `legacy_missing` 绕过 A+ 显式契约[bypass 探针实证 PASS 1.0]；P1-2 natural rows 仅验 tool-name 可污染 gold；P2 receipt 缺 fit-proof 机读 frontmatter，level 应 mechanism_true）。**分诊：两 P1 不影响在跑 tiny v6 训练**（v6 数据无 natural rows + profile 字段显式），属 P12 merge 前必修（=wave-1 拍点#1 关键路径），排 %45 P5W 后接修。
+- **wave-1 磊哥 5 拍点决策包**落 `docs/c5-training-readiness-grill/wave1-owner-decision-package-2026-07-03.md`（基座冻结⭐P12修复后merge/云凭证[无default]/首波4.5k⭐/salvage重judge⭐/人工门staffing）。live 生成今晚推进到「只差凭证」。
+- 训练进度：iter 140 loss 4.48→0.52，LR warmup 正常（iter30 显示 0 = warmup 起点，疑点消解）。
+- 拓扑：%44 训练+probe 中 / %45 P5W（labeler 桥接+mock 端到端+数据门实跑）/ %43 GF-W3 制度官。
