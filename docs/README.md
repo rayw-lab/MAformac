@@ -8,7 +8,7 @@
 >
 > ⚠️ **路线 v3 历史基线(2026-06-20,surface 已被上方范式翻案演进,IR/路线骨架仍有溯源价值)**:C1/C2、C3 execution、C6 vehicle-tool-bench 均已 archived → `openspec/specs/`;C6 base Qwen3-1.7B 无 LoRA hard_fail 0.789 是 C5 提升判据。`docs/roadmap-2026-06-20-from-c6-done.md` 已是 **historical / provenance source**,不再是唯一推进事实源或必读第一。当前推进事实源以 `CLAUDE.md §9` 指向的 grill SSOT、范式权威、级联账本、Phase 0 manifests、active OpenSpec drafts 为准。范围真值:空调 **18-32℃** / 风量 **1-10 档**(旧 16-30/0-5 拍错)。
 
-## ⭐ 当前权威文档(v3 新基线,2026-06-20,以此为准)
+## ⭐ 当前文档地图 / 唯一基线入口（discoverability map；权威基线定义见 `CLAUDE.md §9` + 下表，非本标题「以此为准」一刀切）
 
 | 文档 | 是什么 |
 |---|---|
