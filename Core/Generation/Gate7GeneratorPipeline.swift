@@ -101,7 +101,7 @@ public struct Gate7ExecutionContract: Equatable, Sendable {
 
     public init(maxAttempts: Int = 2, timeoutMilliseconds: Int = 30_000) {
         self.maxAttempts = max(1, maxAttempts)
-        self.timeoutMilliseconds = timeoutMilliseconds
+        self.timeoutMilliseconds = max(1, timeoutMilliseconds)
     }
 }
 
@@ -111,6 +111,11 @@ public struct Gate7AttemptReceipt: Codable, Equatable, Sendable {
     public var attempt: Int
     public var status: String
     public var errorCode: String?
+    public var timeoutPolicyMilliseconds: Int
+    public var elapsedMilliseconds: Int
+    public var timedOut: Bool
+    public var rawPayloadSHA256: String?
+    public var rawPayloadBytes: Int?
 
     enum CodingKeys: String, CodingKey {
         case stage
@@ -118,6 +123,11 @@ public struct Gate7AttemptReceipt: Codable, Equatable, Sendable {
         case attempt
         case status
         case errorCode = "error_code"
+        case timeoutPolicyMilliseconds = "timeout_policy_ms"
+        case elapsedMilliseconds = "elapsed_ms"
+        case timedOut = "timed_out"
+        case rawPayloadSHA256 = "raw_payload_sha256"
+        case rawPayloadBytes = "raw_payload_bytes"
     }
 }
 
@@ -357,13 +367,29 @@ public struct Gate7GeneratorPipeline: Sendable {
         var attempts: [Gate7AttemptReceipt] = []
         var last = Gate7ProviderResponse(status: .retryExhausted, errorCode: "retry_exhausted")
         for index in 1...executionContract.maxAttempts {
-            last = provider.complete(Gate7ProviderRequest(stage: stage, groupID: request.manifestEntry.groupID, prompt: request.prompt))
+            let startedAt = Date()
+            let response = provider.complete(Gate7ProviderRequest(stage: stage, groupID: request.manifestEntry.groupID, prompt: request.prompt))
+            let elapsedMilliseconds = max(0, Int(Date().timeIntervalSince(startedAt) * 1000))
+            let didTimeout = elapsedMilliseconds > executionContract.timeoutMilliseconds || response.status == .timeout
+            last = didTimeout
+                ? Gate7ProviderResponse(
+                    status: .timeout,
+                    utterances: response.utterances,
+                    errorCode: response.errorCode ?? "timeout_exceeded",
+                    rawPayload: response.rawPayload
+                )
+                : response
             attempts.append(Gate7AttemptReceipt(
                 stage: stage.rawValue,
                 vendor: provider.vendor.rawValue,
                 attempt: index,
                 status: last.status.rawValue,
-                errorCode: last.errorCode
+                errorCode: last.errorCode,
+                timeoutPolicyMilliseconds: executionContract.timeoutMilliseconds,
+                elapsedMilliseconds: elapsedMilliseconds,
+                timedOut: didTimeout,
+                rawPayloadSHA256: last.rawPayload.map { C6Hash.sha256Hex(Data($0.utf8)) },
+                rawPayloadBytes: last.rawPayload.map { Data($0.utf8).count }
             ))
             if last.status == .pass || last.status == .blockedR7 {
                 return (last, attempts, last.status)
