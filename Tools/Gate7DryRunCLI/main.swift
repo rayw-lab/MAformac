@@ -78,6 +78,17 @@ struct Gate7DryRunCLI {
             subsetGroupID: manifestEntry.groupID,
             subsetPolicyDigest: manifest.meta.groupingContractDigest
         )
+        let recipeQuota = Gate7RecipeQuotaConfig.wave1ConstructionAnchors
+        let recipeAllocation = Gate7QuotaCalculator.allocate([
+            Gate7QuotaInput(
+                familyID: manifestEntry.groupID,
+                intentBaseline: limit,
+                bugPressure: 0,
+                demoFloor: 0,
+                safetyFloor: 0,
+                recipeQuota: recipeQuota
+            )
+        ]).first
         let request = Gate7PipelineRequest(
             manifestMeta: manifest.meta,
             manifestEntry: manifestEntry,
@@ -142,7 +153,15 @@ struct Gate7DryRunCLI {
             dataGateLegacyMissingSurfaceAllowedCount: pipelineReceipt.dataGateReceipt?.legacyMissingSurfaceAllowedCount ?? 0,
             dataGateSurfaceFieldPass: pipelineReceipt.dataGateReceipt?.surfaceFieldPass ?? 0,
             dataGateHardFailure: pipelineReceipt.dataGateReceipt?.hasHardFailure ?? true,
-            dataGateFailureReasons: pipelineReceipt.dataGateReceipt?.failureReceipt.map(\.reason) ?? []
+            dataGateFailureReasons: pipelineReceipt.dataGateReceipt?.failureReceipt.map(\.reason) ?? [],
+            recipeQuotaSource: recipeAllocation?.quotaSource ?? recipeQuota.quotaSource,
+            recipeAllocatedQuota: recipeAllocation?.quota ?? 0,
+            recipeOpenClosePolarityMinPerDirection: recipeQuota.openClosePolarityMinPerDirection,
+            recipeNegativeQuotaActivation: recipeQuota.negativeQuotaActivation,
+            recipeQueryReadOnlyQuota: recipeQuota.queryReadOnlyQuota,
+            recipeUnsupportedRefusalQuota: recipeQuota.unsupportedRefusalQuota,
+            recipeSafetyRefusalQuota: recipeQuota.safetyRefusalQuota,
+            recipeMultiCallPairingMinimum: recipeQuota.multiCallPairingMinimum
         )
         return DryRunResult(receipt: receipt, candidateRows: candidateRows)
     }
@@ -232,6 +251,14 @@ struct Gate7DryRunCLI {
         - data_gate_surface_field_pass: \(receipt.dataGateSurfaceFieldPass)
         - data_gate_hard_failure: \(receipt.dataGateHardFailure)
         - data_gate_failure_reasons: \(receipt.dataGateFailureReasons)
+        - recipe_quota_source: \(receipt.recipeQuotaSource)
+        - recipe_allocated_quota: \(receipt.recipeAllocatedQuota)
+        - recipe_open_close_polarity_min_per_direction: \(receipt.recipeOpenClosePolarityMinPerDirection)
+        - recipe_negative_quota_activation: \(receipt.recipeNegativeQuotaActivation)
+        - recipe_query_read_only_quota: \(receipt.recipeQueryReadOnlyQuota)
+        - recipe_unsupported_refusal_quota: \(receipt.recipeUnsupportedRefusalQuota)
+        - recipe_safety_refusal_quota: \(receipt.recipeSafetyRefusalQuota)
+        - recipe_multi_call_pairing_minimum: \(receipt.recipeMultiCallPairingMinimum)
 
         Boundary: mock provider only; no live cloud generation and no training.
         """
@@ -280,6 +307,14 @@ struct DryRunReceipt: Codable, Equatable {
     var dataGateSurfaceFieldPass: Int
     var dataGateHardFailure: Bool
     var dataGateFailureReasons: [String]
+    var recipeQuotaSource: String
+    var recipeAllocatedQuota: Int
+    var recipeOpenClosePolarityMinPerDirection: Int
+    var recipeNegativeQuotaActivation: String
+    var recipeQueryReadOnlyQuota: Int
+    var recipeUnsupportedRefusalQuota: Int
+    var recipeSafetyRefusalQuota: Int
+    var recipeMultiCallPairingMinimum: Int
 
     enum CodingKeys: String, CodingKey {
         case generatedAt = "generated_at"
@@ -314,6 +349,14 @@ struct DryRunReceipt: Codable, Equatable {
         case dataGateSurfaceFieldPass = "data_gate_surface_field_pass"
         case dataGateHardFailure = "data_gate_hard_failure"
         case dataGateFailureReasons = "data_gate_failure_reasons"
+        case recipeQuotaSource = "recipe_quota_source"
+        case recipeAllocatedQuota = "recipe_allocated_quota"
+        case recipeOpenClosePolarityMinPerDirection = "recipe_open_close_polarity_min_per_direction"
+        case recipeNegativeQuotaActivation = "recipe_negative_quota_activation"
+        case recipeQueryReadOnlyQuota = "recipe_query_read_only_quota"
+        case recipeUnsupportedRefusalQuota = "recipe_unsupported_refusal_quota"
+        case recipeSafetyRefusalQuota = "recipe_safety_refusal_quota"
+        case recipeMultiCallPairingMinimum = "recipe_multi_call_pairing_minimum"
     }
 }
 
