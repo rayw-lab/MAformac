@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 @testable import MAformacCore
 
@@ -80,6 +81,58 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
         XCTAssertEqual(receipt.status, .retryExhausted)
         XCTAssertEqual(receipt.attempts.count, 2)
         XCTAssertEqual(Set(receipt.attempts.map(\.errorCode)), ["json_parse_error"])
+    }
+
+    func testExecutionContractRecordsTimeoutPolicyOnAttemptReceipt() throws {
+        let manifest = try loadManifest()
+        let request = try makeRequest(manifest: manifest)
+        let pipeline = Gate7GeneratorPipeline(
+            generator: SlowGate7Provider(
+                vendor: .openai,
+                response: Gate7ProviderResponse(status: .pass, utterances: diverseUtterances()),
+                delaySeconds: 0.02
+            ),
+            judge: Gate7MockLLMProvider(vendor: .anthropic, responsesByStage: [:]),
+            executionContract: Gate7ExecutionContract(maxAttempts: 1, timeoutMilliseconds: 1)
+        )
+
+        let receipt = try pipeline.run(request)
+
+        XCTAssertEqual(receipt.status, .retryExhausted)
+        let attempt = try XCTUnwrap(receipt.attempts.first)
+        XCTAssertEqual(attempt.status, Gate7PipelineStatus.timeout.rawValue)
+        XCTAssertEqual(attempt.errorCode, "timeout_exceeded")
+        XCTAssertEqual(attempt.timeoutPolicyMilliseconds, 1)
+        XCTAssertGreaterThanOrEqual(attempt.elapsedMilliseconds, 1)
+        XCTAssertTrue(attempt.timedOut)
+    }
+
+    func testAttemptReceiptCarriesRawPayloadDigestWithoutRawBody() throws {
+        let manifest = try loadManifest()
+        let request = try makeRequest(manifest: manifest)
+        let rawPayload = "{\"debug\":\"generator-payload\"}"
+        let pipeline = Gate7GeneratorPipeline(
+            generator: Gate7MockLLMProvider(
+                vendor: .openai,
+                responsesByStage: [
+                    .generator: Gate7ProviderResponse(
+                        status: .parseError,
+                        errorCode: "json_parse_error",
+                        rawPayload: rawPayload
+                    )
+                ]
+            ),
+            judge: Gate7MockLLMProvider(vendor: .anthropic, responsesByStage: [:]),
+            executionContract: Gate7ExecutionContract(maxAttempts: 1, timeoutMilliseconds: 30_000)
+        )
+
+        let receipt = try pipeline.run(request)
+
+        let attempt = try XCTUnwrap(receipt.attempts.first)
+        XCTAssertEqual(attempt.rawPayloadSHA256, C6Hash.sha256Hex(Data(rawPayload.utf8)))
+        XCTAssertEqual(attempt.rawPayloadBytes, Data(rawPayload.utf8).count)
+        let encoded = String(data: try JSONEncoder().encode(attempt), encoding: .utf8) ?? ""
+        XCTAssertFalse(encoded.contains(rawPayload), "attempt receipt keeps raw payload digest/size only, not the raw body")
     }
 
     func testFourDeterministicGatesBlockDiversityDedupeRedactionAndDecontamination() throws {
@@ -204,5 +257,17 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
             judgeVendor: .anthropic,
             subsetContext: try entry.subsetContext()
         )
+    }
+
+    private struct SlowGate7Provider: Gate7LLMProvider {
+        var vendor: Gate7Vendor
+        var response: Gate7ProviderResponse
+        var delaySeconds: TimeInterval
+        var isStubbed: Bool { true }
+
+        func complete(_ request: Gate7ProviderRequest) -> Gate7ProviderResponse {
+            Thread.sleep(forTimeInterval: delaySeconds)
+            return response
+        }
     }
 }
