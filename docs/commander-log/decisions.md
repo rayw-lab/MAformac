@@ -230,3 +230,4 @@
 - **模式**: ① commander **只通过 tmux 掌控 3 worker**，不自己直跑外部审计/外部 LLM 调用（subagent CC 也不用于此——hermes-rescue subagent spawn 的是 Claude 家族=假异源，已 shutdown_request 关闭 + kill %51 pane 保 2×2）② **GPT Pro 外审、hermes 异审全部交 worker 自己跑**（worker 在 codex CLI 显性调用 `~/.codex/skills/hermes-cli-glm52-code` / gptpro 技能——codex 环境 `--prompt-file` 正常且 worker 能盯全程重试）③ **%44 升级临时项目助理（外审协调官）**：外部调用执行+盯守+收产出+初步 findings 整理。
 - **佐证**: commander 直跑 hermes 两次：第一次 hermes CLI 本体 stash 冲突炸（已可逆修复：`git reset --merge` 中止失败 pop，stash@{0} 18 文件原封保留供磊哥重处理）；第二次回稿仅 **284 字节=废稿**（留档 `HERMES-FINAL-AUDIT-G7-commander-direct.md` 勿引）——印证 worker 盯守模式更可靠。
 - **落点**: 本 D-021 + %44 首单（hermes G7 终审，质检门 <2000 字节=废稿重试）+ memory 更新
+- 🔴 **UPDATE（磊哥泛化 D-021，2026-07-02）**：助理角色**只是临时**——commander 可**随时流转 3 worker 角色**：调研/设计/联网搜证/grill/脑暴/codex 自审/外部 gptpro-hermes 审计/**开发任务（最多）**/**架构设计（最多）**/数据-训练-评测-测试，**一切执行下沉 worker**；commander=纯编排+裁决+记忆+收稿亲核（「你就是上帝即可」）。角色帽子按任务派单时指定，不固定编制。
