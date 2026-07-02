@@ -1170,6 +1170,41 @@ final class C5LoRATrainingTests: XCTestCase {
         try ToolContractCompiler.loadDDomainCatalog(repoRoot: a2RepoRoot())   // 562 demo D-domain 具名工具
     }
 
+    private struct TestSubsetManifest: Decodable {
+        var entries: [Entry]
+
+        struct Entry: Decodable {
+            var subsetPolicyID: String
+            var groupID: String
+            var mountMode: String
+            var toolIDsOrdered: [String]
+
+            enum CodingKeys: String, CodingKey {
+                case subsetPolicyID = "subset_policy_id"
+                case groupID = "group_id"
+                case mountMode = "mount_mode"
+                case toolIDsOrdered = "tool_ids_ordered"
+            }
+        }
+    }
+
+    private func subsetManifestEntry(containing toolID: String) throws -> TestSubsetManifest.Entry {
+        let url = a2RepoRoot().appendingPathComponent("generated/subset-policy-manifest.json")
+        let manifest = try JSONDecoder().decode(TestSubsetManifest.self, from: Data(contentsOf: url))
+        return try XCTUnwrap(
+            manifest.entries.first { $0.mountMode == "single_group" && $0.toolIDsOrdered.contains(toolID) },
+            "expected \(toolID) to be covered by a single_group manifest entry"
+        )
+    }
+
+    private func writeSubsetManifest(toolIDsOrdered: [String], to url: URL) throws {
+        let encodedToolIDs = toolIDsOrdered.map { "\"\($0)\"" }.joined(separator: ",")
+        let text = """
+        {"entries":[{"subset_policy_id":"test-policy","group_id":"test-group","mount_mode":"single_group","tool_ids_ordered":[\(encodedToolIDs)],"distractor_policy":{"strategy":"same_sg_then_same_domain_then_other","k":3}}]}
+        """
+        try text.write(to: url, atomically: true, encoding: .utf8)
+    }
+
     private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", valueType: String = "EXP", slotKeys: [String] = ["device"]) -> C5SemanticSeed {
         let encodedSlotKeys = slotKeys.map { "\"\($0)\"" }.joined(separator: ",")
         let json = """
@@ -1237,6 +1272,68 @@ final class C5LoRATrainingTests: XCTestCase {
         let catalogNames = Set(catalog.map(\.function.name))
         XCTAssertTrue(distractorNames.allSatisfy { catalogNames.contains($0) }, "distractor ∈ 562 D-domain catalog(非 irrelevant 占位)")
         XCTAssertFalse(distractorNames.contains("open_ac"), "distractor 不含目标工具自身")
+    }
+
+    // G7D: C5 prompt surface 从 subset manifest 装载目标所在 single_group，而不是手写 target+distractors。
+    func testDDomainSurfaceMountsManifestGroupAndMetadataDigest() throws {
+        let catalog = try loadDemoCatalog()
+        let manifestEntry = try subsetManifestEntry(containing: "open_ac")
+        let manifestURL = a2RepoRoot().appendingPathComponent("generated/subset-policy-manifest.json")
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let positive = try XCTUnwrap(prepared.samples.first { $0.split == "train" })
+        let toolNames = positive.tools.compactMap { functionName($0) }
+        XCTAssertEqual(toolNames, manifestEntry.toolIDsOrdered, "G7D: mounted prompt tools follow manifest tool_ids_ordered exactly")
+        XCTAssertEqual(positive.subsetPolicyID, manifestEntry.subsetPolicyID)
+        XCTAssertEqual(positive.subsetGroupID, manifestEntry.groupID)
+        XCTAssertEqual(positive.mountedToolCount, manifestEntry.toolIDsOrdered.count)
+        XCTAssertEqual(positive.subsetPolicyDigest, try C6Hash.fileHash(url: manifestURL))
+    }
+
+    func testDDomainDistractorsFollowManifestSameSGPriority() throws {
+        let catalog = try loadDemoCatalog()
+        let target = try XCTUnwrap(catalog.first { $0.function.name == "open_ac" })
+        let sameSG = catalog
+            .filter { $0.function.name != "open_ac" && $0.sg == target.sg }
+            .map(\.function.name)
+            .sorted()
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+        let positive = try XCTUnwrap(prepared.samples.first { $0.split == "train" })
+        let expected = Array(sameSG.prefix(min(3, sameSG.count)))
+        XCTAssertEqual(positive.promptDistractorToolIDs, expected, "S-207: same_sg_then_same_domain_then_other,k=3 starts with same _sg")
+    }
+
+    func testDDomainSubsetManifestMissingIsFailClosed() throws {
+        let catalog = try loadDemoCatalog()
+        let missingPath = try makeTemporaryDirectory().appendingPathComponent("missing-subset-policy-manifest.json").path
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog, subsetPolicyManifestPath: missingPath)
+        )
+        XCTAssertTrue(prepared.samples.isEmpty, "manifest missing must not silently fall back to legacy frame or target+distractors")
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("subset_manifest_missing"))
+    }
+
+    func testDDomainSubsetManifestTargetMissingIsFailClosed() throws {
+        let catalog = try loadDemoCatalog()
+        let tempDir = try makeTemporaryDirectory()
+        let manifestURL = tempDir.appendingPathComponent("subset-policy-manifest.json")
+        try writeSubsetManifest(toolIDsOrdered: ["close_ac"], to: manifestURL)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog, subsetPolicyManifestPath: manifestURL.path)
+        )
+        XCTAssertTrue(prepared.samples.isEmpty, "target not in any manifest single_group must fail closed")
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("subset_manifest_target_missing"))
     }
 
     // cut1: 值形态工具 emit value arg; device/action_primitive 不 emit(编码进名); arg 键 ∈ schema(additionalProperties:false)
