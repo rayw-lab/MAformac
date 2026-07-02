@@ -222,3 +222,4 @@
 - **审计战绩累计**: 本日交叉审/验收门共咬住 **5 个真问题**（gate2 dead field[前日]/guard 漏 test split/gate8 派生物没改工厂/E-2 包丢 train target 轴/G7A 手写表）——对抗 fixture + 验收 diff 门 双机制全部生效。
 - **冻结确认**: cap 7200/S-201 字段组/degraded_clarify/C6 add-only 接入——四项全程零改动（两轮审计逐项 grep 确认）。
 - **落点**: 本 D-020 + R7-draft B.1 前置表刷新 + SPEC-G7D
+- 🔴 **UPDATE（磊哥 2026-07-02：hermes 终审安排）**：E-2 subset-policy 实装 + gate7 generator pipeline 代码闭环两大任务**完成后**（G7C/G7D merged + 验收绿），安排 **hermes 跨厂商异源终审**（cross-vendor-final-audit 铁律：≥3 厂商并集，codex 交叉审已有 → hermes=第二厂商，范围 = G7A/B/C/D 全体 = manifest codegen/预算门/grammar artifact/C6 subset schema/六轴 receipt/generator 编排/C5 builder 装载）。**hermes 现在待命不派**；触发点 = 两大任务合流验收后。
