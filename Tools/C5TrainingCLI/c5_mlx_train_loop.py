@@ -160,6 +160,8 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--inspect-batches", type=int, default=0)
     parser.add_argument("--inspect-output", type=str, default=None)
     parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--preflight-loss-mask-only", action="store_true")
+    parser.add_argument("--allow-legacy-loss-objective", action="store_true")
     parser.add_argument("--self-test-loss-mask", action="store_true")
     args = vars(parser.parse_args(argv))
 
@@ -182,6 +184,8 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "inspect_batches": 0,
             "inspect_output": None,
             "require_maformac_loss_mask": False,
+            "preflight_loss_mask_only": False,
+            "allow_legacy_loss_objective": False,
             "self_test_loss_mask": False,
         }
     )
@@ -631,12 +635,13 @@ def guard_stock_loader_rejects_loss_mask(args) -> None:
 
 
 class MAformacLossMaskDataset:
-    def __init__(self, data: list[dict[str, Any]], tokenizer):
+    def __init__(self, data: list[dict[str, Any]], tokenizer, allow_legacy_loss_objective: bool = False):
         self._data = data
         self.tokenizer = tokenizer
+        self.allow_legacy_loss_objective = allow_legacy_loss_objective
 
     def process(self, record: dict[str, Any]):
-        return build_maformac_token_labels(record, self.tokenizer)
+        return build_maformac_token_labels(record, self.tokenizer, self.allow_legacy_loss_objective)
 
     def __getitem__(self, idx: int):
         return self._data[idx]
@@ -671,7 +676,8 @@ def locate_subsequence(haystack: list[int], needle: list[int]) -> int | None:
 
 
 def tokenizer_for_offsets(tokenizer):
-    return getattr(tokenizer, "_tokenizer", tokenizer)
+    candidate = getattr(tokenizer, "_tokenizer", tokenizer)
+    return candidate if callable(candidate) else tokenizer
 
 
 def assistant_tokenization(record: dict[str, Any], tokenizer) -> tuple[list[int], list[int], list[tuple[int, int]], int]:
@@ -716,7 +722,159 @@ def token_indices_for_span(offsets: list[tuple[int, int]], span: dict[str, Any])
     ]
 
 
-def build_maformac_token_labels(record: dict[str, Any], tokenizer) -> tuple[list[int], list[int]]:
+def assistant_content(record: dict[str, Any]) -> str:
+    messages = record.get("messages") or []
+    for message in reversed(messages):
+        if message.get("role") == "assistant":
+            return str(message.get("content") or "")
+    return ""
+
+
+def think_ranges(text: str) -> list[tuple[int, int]]:
+    ranges: list[tuple[int, int]] = []
+    cursor = 0
+    while True:
+        start = text.find("<think>", cursor)
+        if start < 0:
+            break
+        end = text.find("</think>", start + len("<think>"))
+        if end < 0:
+            break
+        end += len("</think>")
+        ranges.append((start, end))
+        cursor = end
+    return ranges
+
+
+def non_think_ranges(text: str) -> list[tuple[int, int]]:
+    ranges: list[tuple[int, int]] = []
+    cursor = 0
+    for start, end in think_ranges(text):
+        if cursor < start:
+            ranges.append((cursor, start))
+        cursor = max(cursor, end)
+    if cursor < len(text):
+        ranges.append((cursor, len(text)))
+    return ranges
+
+
+def span_ranges(loss_mask: dict[str, Any], key: str) -> list[tuple[int, int]]:
+    ranges: list[tuple[int, int]] = []
+    for span in loss_mask.get(key, []):
+        try:
+            start = int(span["start"])
+            end = int(span["end"])
+        except Exception as error:
+            raise LossMaskValidationError(f"{key}_span_invalid") from error
+        if start < 0 or end <= start:
+            raise LossMaskValidationError(f"{key}_span_bounds_invalid")
+        ranges.append((start, end))
+    return ranges
+
+
+def span_covers(ranges: list[tuple[int, int]], start: int, end: int) -> bool:
+    return any(span_start <= start and end <= span_end for span_start, span_end in ranges)
+
+
+def covered_char_count(target_ranges: list[tuple[int, int]], trainable_ranges: list[tuple[int, int]]) -> int:
+    covered: set[int] = set()
+    for start, end in target_ranges:
+        for index in range(start, end):
+            if any(train_start <= index < train_end for train_start, train_end in trainable_ranges):
+                covered.add(index)
+    return len(covered)
+
+
+def parser_critical_fragments(record: dict[str, Any], assistant: str) -> list[str]:
+    if "NO_TOOL" in assistant:
+        return ["NO_TOOL"]
+    fragments = ["<tool_call>", "</tool_call>", "{", "}", '"name"', '"arguments"']
+    try:
+        payload_start = assistant.index("<tool_call>") + len("<tool_call>")
+        payload_end = assistant.index("</tool_call>", payload_start)
+        payload = json.loads(assistant[payload_start:payload_end])
+        if isinstance(payload, dict):
+            name = payload.get("name")
+            if isinstance(name, str) and name:
+                fragments.append(name)
+            arguments = payload.get("arguments")
+            if isinstance(arguments, dict):
+                for key, value in arguments.items():
+                    fragments.append(f'"{key}"')
+                    if isinstance(value, str) and value:
+                        fragments.append(value)
+                    elif isinstance(value, (int, float, bool)):
+                        fragments.append(str(value).lower() if isinstance(value, bool) else str(value))
+    except Exception:
+        fragments.append("tool_call_json_payload_parseable")
+    return sorted(set(fragment for fragment in fragments if fragment))
+
+
+def validate_record_supervision_coverage(record: dict[str, Any], allow_legacy_loss_objective: bool = False) -> dict[str, Any]:
+    loss_mask = record.get("loss_mask")
+    if not isinstance(loss_mask, dict):
+        raise LossMaskValidationError("loss_mask_missing")
+    assistant = assistant_content(record)
+    if not assistant:
+        raise LossMaskValidationError("assistant_message_missing")
+    objective = record.get("loss_objective_profile")
+    if objective in {"functionName", "argumentName", "argumentValue", "function_name", "argument_name", "argument_value"}:
+        raise LossMaskValidationError("loss_objective_profile_uses_augmentation_name")
+    legacy_loss_objective = False
+    if objective is None:
+        if not allow_legacy_loss_objective:
+            raise LossMaskValidationError("loss_objective_profile_missing")
+        objective = "legacy_missing"
+        legacy_loss_objective = True
+    elif objective == "legacy_missing":
+        if not allow_legacy_loss_objective:
+            raise LossMaskValidationError("legacy_loss_objective_not_allowed")
+        legacy_loss_objective = True
+    if objective not in {"assistant_full_except_think", "no_tool_full", "diagnostic_span_only", "legacy_missing"}:
+        raise LossMaskValidationError(f"loss_objective_profile_unknown:{objective}")
+    augmentation = record.get("augmentation_profile", {})
+    if isinstance(augmentation, dict) and "train_on_turn" in augmentation:
+        raise LossMaskValidationError("augmentation_profile_mixed_train_on_turn")
+
+    trainable = span_ranges(loss_mask, "trainable_spans")
+    masked_think = span_ranges(loss_mask, "masked_think_spans")
+    non_think = non_think_ranges(assistant)
+    trainable_non_think = covered_char_count(non_think, trainable)
+    assistant_non_think = sum(end - start for start, end in non_think)
+    ratio = 1.0 if assistant_non_think == 0 else trainable_non_think / assistant_non_think
+    errors: list[str] = []
+    if objective != "diagnostic_span_only":
+        for fragment in parser_critical_fragments(record, assistant):
+            position = assistant.find(fragment)
+            if position < 0:
+                errors.append(f"parser_critical_missing:{fragment}")
+                continue
+            if not span_covers(trainable, position, position + len(fragment)):
+                errors.append(f"parser_critical_untrained:{fragment}")
+    if ratio < 0.90:
+        errors.append(f"assistant_non_think_trainable_ratio_below_0.90:{ratio:.4f}")
+    if any(span_start < think_end and think_start < span_end for think_start, think_end in masked_think for span_start, span_end in trainable):
+        errors.append("think_span_trainable_leakage")
+    if errors:
+        raise LossMaskValidationError("under_supervision:" + ",".join(errors[:12]))
+    return {
+        "assistant_non_think_chars": assistant_non_think,
+        "trainable_non_think_chars": trainable_non_think,
+        "trainable_non_think_ratio": ratio,
+        "parser_critical_status": "pass",
+        "ratio_status": "pass",
+        "legacy_loss_objective": legacy_loss_objective,
+        "gate_contract": {
+            "parser_critical": "threshold=all_required_fragments_trainable",
+            "assistant_non_think_trainable_ratio": "threshold>=0.90",
+            "prompt_user_system_leakage": "threshold=0",
+            "think_leakage": "threshold=0",
+            "record_counts": "no_gate_by_design_observability_only",
+        },
+    }
+
+
+def build_maformac_token_labels(record: dict[str, Any], tokenizer, allow_legacy_loss_objective: bool = False) -> tuple[list[int], list[int]]:
     loss_mask = record.get("loss_mask")
     if not isinstance(loss_mask, dict):
         raise LossMaskValidationError("loss_mask_missing")
@@ -724,6 +882,10 @@ def build_maformac_token_labels(record: dict[str, Any], tokenizer) -> tuple[list
         raise LossMaskValidationError("ignore_index_not_minus_100")
     if "labels" in loss_mask:
         raise LossMaskValidationError("char_indexed_loss_mask_labels_forbidden")
+    record["_maformac_supervision_coverage"] = validate_record_supervision_coverage(
+        record,
+        allow_legacy_loss_objective=allow_legacy_loss_objective,
+    )
 
     tokens, _, offsets, assistant_start = assistant_tokenization(record, tokenizer)
     labels = [-100] * len(tokens)
@@ -845,7 +1007,14 @@ def load_maformac_loss_mask_datasets(args, tokenizer):
     if args.test and len(records["test"]) == 0:
         raise ValueError("Test set not found or empty. Must provide test set for evaluation.")
 
-    datasets = {split: MAformacLossMaskDataset(rows, tokenizer) for split, rows in records.items()}
+    datasets = {
+        split: MAformacLossMaskDataset(
+            rows,
+            tokenizer,
+            allow_legacy_loss_objective=bool(args.allow_legacy_loss_objective),
+        )
+        for split, rows in records.items()
+    }
     summary = validate_maformac_loss_mask_datasets(
         datasets,
         require_train=bool(args.train),
@@ -866,9 +1035,25 @@ def validate_maformac_loss_mask_datasets(
         "ignored_label_records": 0,
         "trainable_tokens": 0,
         "ignored_tokens": 0,
+        "legacy_loss_objective_allowed": any(dataset.allow_legacy_loss_objective for dataset in datasets.values()),
+        "legacy_loss_objective_record_count": 0,
         "max_seq_length": max_seq_length,
         "max_token_length": 0,
         "length_violations": [],
+        "supervision_coverage_digest": {
+            "assistant_non_think_chars": 0,
+            "trainable_non_think_chars": 0,
+            "min_trainable_non_think_ratio": None,
+            "parser_critical_status": "pass",
+            "ratio_status": "pass",
+            "gate_contract": {
+                "parser_critical": "threshold=all_required_fragments_trainable",
+                "assistant_non_think_trainable_ratio": "threshold>=0.90",
+                "prompt_user_system_leakage": "threshold=0",
+                "think_leakage": "threshold=0",
+                "record_counts": "no_gate_by_design_observability_only",
+            },
+        },
         "splits": {},
     }
     errors: list[str] = []
@@ -907,6 +1092,15 @@ def validate_maformac_loss_mask_datasets(
             if ignored > 0:
                 split_summary["ignored_label_records"] += 1
                 split_summary["ignored_tokens"] += ignored
+            coverage = dataset[index].get("_maformac_supervision_coverage", {})
+            digest = summary["supervision_coverage_digest"]
+            digest["assistant_non_think_chars"] += int(coverage.get("assistant_non_think_chars", 0))
+            digest["trainable_non_think_chars"] += int(coverage.get("trainable_non_think_chars", 0))
+            ratio = coverage.get("trainable_non_think_ratio")
+            if ratio is not None:
+                digest["min_trainable_non_think_ratio"] = ratio if digest["min_trainable_non_think_ratio"] is None else min(digest["min_trainable_non_think_ratio"], ratio)
+            if coverage.get("legacy_loss_objective") is True:
+                summary["legacy_loss_objective_record_count"] += 1
         for key in ["records", "trainable_records", "ignored_label_records", "trainable_tokens", "ignored_tokens"]:
             summary[key] += split_summary[key]
         summary["splits"][split] = split_summary
@@ -1033,6 +1227,13 @@ def run(args) -> None:
 
     if args.inspect_batches:
         inspect_batches(args)
+        return
+    if args.preflight_loss_mask_only:
+        if not args.require_maformac_loss_mask:
+            raise LossMaskValidationError("preflight_loss_mask_only_requires_require_maformac_loss_mask")
+        tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
+        _, _, _, loss_mask_summary = load_maformac_loss_mask_datasets(args, tokenizer)
+        print(json.dumps(loss_mask_summary, ensure_ascii=False, sort_keys=True), flush=True)
         return
 
     metrics = MetricsWriter(args.metrics_jsonl)
