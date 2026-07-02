@@ -277,3 +277,9 @@
 - **Phase 0 已落**: D-026 措辞窄化 / landing 里程碑5（裁决-A 重标+F-044 口径级联）/ R7 Part A 续签代录 + Part B 状态改 v5-consumed（v6 另签）。
 - **Phase 1-3 分工**: %45=契约+builder 主刀（枚举/full-assistant/coverage 双门/自反测试/B 轴自然行 builder 支持）｜ %44=探针 harness 固化（decode 契约/base 配对双臂/三口径 overlap receipt/仓内工具化+单测）｜ %43=4 轴探针集与 B 轴数据清单（从 C1 契约确定性抽取非 LLM 生成，防 C6 泄漏）+ F-044 修订草案。文件面三方不相交。
 - **落点**: 本 D-027 + 三 SPEC + FINAL teardown 档 §4 delta 逐项进 SPEC
+
+## D-028（2026-07-02 深夜）Phase 3 双收稿 + P3H P1 catch + governance-fit grill round 启动
+- **%43 P3D 收割**：v6 四轴探针设计三件套收进主线 `docs/c5-training-readiness-grill/v6-probe-design/`（commit `321634ba`）。commander 亲核：B 轴泄漏声称坐实（15 句 exact match C6 gold=0 / B 轴工具∩C6 工具=空 / c5-train-00001→c1_airControl_000018 配对一致）；C 轴 4/10 candidate_gap 诚实不硬凑（接受，放宽与否留 F-044-Q3 磊哥拍）；F-044 草案 = 标准 grill 格式 8 决策+Q1-Q4 open point。
+- **%44 P3H 亲核 catch P1 退单**：PR #26 结构/测试 5/5/fail-closed 均 PASS，但 `truncate_at_stop_token` 全文 find 截断 + 训练 target assistant 以 `\n\n<tool_call>` 开头 → commander 在其 worktree 复现：训练形态输出被截成空串、tools=[]，测试零覆盖。**v6 真跑会把学对了的模型判成全空 = v5 NO_TOOL 假象同构（harness 自制 invalid_probe）**。退单修法：前导空白剥离+回归测试+RECEIPT 补记+更新 PR。元认知：consumer-anchored sufficiency 活证第三例——truncate 机制测试全绿（mechanism-true）但没测「训练分布的真实输出形态」这个 fit 维度（fit-proven 缺位）；亲核必须拿【训练 target 的真实形态】喂 harness，不是拿 harness 自己的 fixture。
+- **governance-fit grill round 启动**（磊哥令「反思细化 grill 按范式组织」）：骨架 `docs/c5-training-readiness-grill/governance-fit-grill-README.md`（W1 契约细化 GF-0xx / W2 门与词表 GF-1xx / W3 制度 GF-2xx / commander 纵切 GF-Cxx）。W2 已派 %43（D4 哨兵数字门化清单 / D5 readiness 四级词表+fit-proof 列 / D6 F-044 终稿），SPEC=仓外 `runs/governance-fit-grill/SPEC-GF-W2.md`。W1/W3 等 %45/%44 空闲接力。
+- CURRENT 残段清理：原 5 件决策段台账化（全 CLOSED）、指针 D-001~027、handoff 指针刷新。

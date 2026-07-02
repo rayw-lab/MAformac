@@ -37,11 +37,14 @@
 - **D-011** GPT Pro 第3家审 3 PR + 3 worker 修 + 磊哥拍 A merge（✅ Done，3 门 MERGED main=ab355f6c CI SUCCESS）：CI bug 根因（verify.yml 浅 clone 没 fetch head）；R7 守住
 - **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
 
-## 下一步（as-of 2026-07-02 深夜 D-023：唯一关键路径 = PR #23 HIGH 修复 → 修完停下等磊哥）
-- **今日总账**：11 支 PR 合流 #12-#22（M1 四支 + RAT + G7 四支 + hermes 修复两支），main=`a8fcd245`；审计体系咬住 8 个真问题（guard test-split / gate8 工厂 / E-2 六轴 / G7A 手写表 / G7D policy 零校验[hermes] / C6+G7 dead fields[hermes] / XG7D 假验证[hermes 二层] / S-210 第三层不可达[交换审]）。
-- **进行中**：#23 HIGH 修复（%43 fresh 重启后自包含重派——它曾 47min 卡死，kill+npm 重装+重派救援，宪法 §8 PROVEN）→ %45 delta 复验 → merge → 验收 → 🔴 **停下等磊哥**（磊哥令）。
-- **冻结**：hermes 下个审计点等磊哥通知；M2 删除等磊哥；④ tiny-ablation 物理前置已齐（G7 全支+E-2 Phase-1 merged）等 #23 收口后上抛签字包（R7 draft B.1）。
-- **模式（D-021）**：commander=上帝视角只编排裁决记忆亲核；一切执行下沉 worker，角色随需流转；外审 worker 显性调技能 20min 上限。
+## 下一步（D-028 后，2026-07-02 深夜）
+
+1. **收 %44 P3H P1 修复**（truncate 前导换行 bug）→ 亲核回归测试 + PR #26 merge 判断。
+2. **收 %45 P12 loss/augmentation 契约**（SPEC-P12，跑中）→ 亲核 + 交叉审。
+3. **收 %43 GF-W2 grill**（哨兵数字门化/readiness 四级词表/F-044 终稿）→ 消减综合；W1/W3 接力派给空闲 worker。
+4. Phase 1-3 全收口后：**v6 run-auth 包上抛磊哥**（FINAL 档 §5 + F-044 终稿 + GF grill 消减结果一起）。
+5. 挂起等磊哥：M2 树清理授权 / M4 UIUE / hermes 下个审计点（磊哥通知制）。
+
 
 ## 留史（as-of 2026-07-02 深夜 D-019+：M1 done / RAT merged / G7 construction 进行中）
 - **已收口**：M1 四支 PR 合流+验收 PASS main 范围（D-018）→ E-2 grill round 43 决策 locked_with_conditions（D-019）→ **RAT PR #16 merged，main=`af72a60a`**（磊哥条件一完成，spot audit CLEAR：删除行仅 stale 路由句/w-files 仅 status 级联）。
