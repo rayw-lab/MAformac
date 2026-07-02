@@ -33,7 +33,7 @@ expires_when: 任一 gate 状态变化 / tiny-ablation 真跑后 / candidate sig
 | gate5 六轴 held-out | ✅ construction（main `aa1adf8f`） | parent/device/tool/value_type/template/generator_source |
 | gate6 C6 四层阈值化 | ✅ construction（main `696676ba`） | 分母 case 覆盖 fail-closed（交叉审抓假绿后修） |
 | gate7 云 generator+异源 judge | 🟡 **design merged，代码未闭环** | 唯一剩余大块 R7-safe construction（见 §4 节点 C） |
-| gate8 工具数 value-form 实算 | ✅ 562（分支，待 M1-β） | + E-2 硬发现：562 工具面 ≈103-138k tokens（保守口径）超 1.7B context |
+| gate8 工具数 value-form 实算 | ✅ 562（分支，待 M1-β） | + E-2 硬发现（🔴 2026-07-02 **真 Qwen3-1.7B tokenizer 实测**，商队各估算 74-138k 全部作废）：562 工具目录 compact JSON = **126,275 tokens** / default = **159,899 tokens**（tokenizer 自身报警超 131,072 上限）→ 562 全集**任何** context 配置装不下，10 族 scoped subset + 受限解码是数学必然非取巧 |
 | 裁决-A tiny ablation | 🟡 harness 已建（main），**RUN = R7 等磊哥④** | empty 28/34→<5/34 才许声称范式修复 |
 | 裁决-B positive-not-diluted | ✅ construction（main，随 gate6） | action 轴独立 fail-closed + OOD 探针 |
 | R-L17 | route-only signed（**2026-07-15 到期**）；candidate unsigned | 真训/真生成/真评测全 BLOCKED |

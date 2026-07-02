@@ -21,7 +21,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 | main | `ab355f6c`，CI Verify SUCCESS，`make verify-all` 472 tests/0 fail（D-011）；3 训练前置门（gate5/6/7）已落 |
 | 云端 PR | #1-#11 全 MERGED/CLOSED，**零 open** |
 | wave-1 未合分支 | g8-tool `64c6f62f`（+1 commit，0 behind）/ g2-mask `47ca8cda`（+2 commit，0 behind）/ grill `f9e67901`（基于 doc-absorption）|
-| 指挥官分支 | `codex/rebuild-c6-doc-absorption-20260624`（主树，**147 behind / 14 ahead** main；commander-log、C5 grill 语料、handoffs 全在此）|
+| 指挥官分支 | `codex/rebuild-c6-doc-absorption-20260624`（主树，**147 behind** main；ahead 数随本分支文档 commit 递增——本文初稿时 `7dd64a50`/14 ahead，D-016 commit 后 `629b1132`/15 ahead，**live 以 `git rev-list --left-right --count main...HEAD` 为准**；commander-log、C5 grill 语料、handoffs 全在此）|
 | R7 | route-only signed（2026-06-25，**expires 2026-07-15**）；candidate unsigned；retrain/真生成/真评测/uiue-merge/V-S-U-PASS 全 BLOCKED |
 | 磊哥 5 件待拍 | ① gate2 masking design 岔口（⭐token-mask override 已实现并双审 CONFIRMED）② E-2 subset 策略 ③ grill Dim10/11/5 lock（~58 条 proposed）④ T-2 tiny-ablation 真跑 run-auth ⑤ wave-1 consolidation-to-main |
 
@@ -33,7 +33,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 
 | 树 | 分支@HEAD | vs main | 处置 | 后续节点 |
 |---|---|---|---|---|
-| 主树 `MAformac` | doc-absorption `7dd64a50`+dirty | 147↓/14↑ | **keep-as-isolation**（commander 工作树） | 节点 M1：文档选择性 PR（🔴 禁整支直合——branch 侧 CURRENT/README 旧于 main，直合=回退） |
+| 主树 `MAformac` | doc-absorption（盘点时 `7dd64a50`+dirty；D-016 后 `629b1132`+，ahead 随文档 commit 递增） | 147↓/live↑ | **keep-as-isolation**（commander 工作树） | 节点 M1：文档选择性 PR（🔴 禁整支直合——branch 侧 README 等旧于 main，直合=回退；本分支 CURRENT.md 已重写为最新草案，随 M1-γ 进 main） |
 | `MAformac-g2-mask` | g2-masking `47ca8cda` | 0↓/2↑ 干净 | **merge-via-PR 首选**（代码 only，无 docs 冲突） | 节点 M1（等磊哥⑤+①） |
 | `MAformac-g8-tool` | g8-tool `64c6f62f` | 0↓/1↑ 干净 | **merge-via-PR 首选**（代码+generated only） | 节点 M1（等磊哥⑤+②口径确认） |
 | `MAformac-grill` | dim11-dim5 `f9e67901` | 147↓/8↑ | **keep**；只港其 2 个新 grill 文档（Dim11/5），禁整支合 | 节点 M1 文档 PR（等磊哥③ lock） |
@@ -100,7 +100,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 | 文档 | 现居 | main 上有吗 | M1 后落点 |
 |---|---|---|---|
 | `CLAUDE.md` 宪法（§9 route banner） | main（各树自带快照） | ✅ 最新在 main | 不动；§9 banner 在 M1-γ 时按新基线刷一段 |
-| `docs/CURRENT.md` 路由牌 | 各树各版本，**doc-absorption 版已 stale**（记 771f48a） | main 版也旧 | M1-γ 带刷新版进 main（唯一权威） |
+| `docs/CURRENT.md` 路由牌 | 各树各版本；**本分支版已于 `629b1132` 重写为最新草案**（前版 D25 时代 stale 已 supersede） | main 版仍是旧态（D24/D25 时代） | M1-γ 带本分支刷新版进 main（成为唯一权威） |
 | grill 总 SSOT `docs/grill-tournament/grill-decisions-master.md` | main | ✅ | 不动 |
 | **C5 训练 grill 语料** `docs/c5-training-readiness-grill/`（442+ 决策/landing-matrix/SYNTHESIS） | 🔴 **doc-absorption 分支**（main 只有 gate7-design 单件经 PR #11） | ❌ 大部分不在 | **M1-γ 主要货物**——这是当前最大的「权威文档不在 main」缺口 |
 | commander-log 记忆图谱 3 件 | doc-absorption | ❌ | M1-γ |
