@@ -327,6 +327,10 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var expectedToolCalls: [C5TrainingToolCall]
     public var noCall: C5NoCallMetadata?
     public var promptDistractorToolIDs: [String]
+    public var subsetPolicyID: String? = nil
+    public var subsetGroupID: String? = nil
+    public var mountedToolCount: Int? = nil
+    public var subsetPolicyDigest: String? = nil
 
     enum CodingKeys: String, CodingKey {
         case sampleID = "sample_id"
@@ -362,6 +366,10 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case expectedToolCalls = "expected_tool_calls"
         case noCall = "no_call"
         case promptDistractorToolIDs = "prompt_distractor_tool_ids"
+        case subsetPolicyID = "subset_policy_id"
+        case subsetGroupID = "subset_group_id"
+        case mountedToolCount = "mounted_tool_count"
+        case subsetPolicyDigest = "subset_policy_digest"
     }
 
     public var assistantPayload: String {
@@ -795,6 +803,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var scope: C5TrainingScope
     public var surface: C5TrainingSurface
     public var dDomainCatalog: [DDomainToolEntry]
+    public var subsetPolicyManifestPath: String?
     public var scopeCandidatesBySlot: [String: [String]]
     public var scopeCandidatesByDeviceSlot: [String: [String: [String]]]
 
@@ -822,6 +831,7 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         scope: C5TrainingScope = .demo,
         surface: C5TrainingSurface = .dDomain,
         dDomainCatalog: [DDomainToolEntry] = [],
+        subsetPolicyManifestPath: String? = "generated/subset-policy-manifest.json",
         scopeCandidatesBySlot: [String: [String]] = [:],
         scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
     ) {
@@ -848,8 +858,40 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.scope = scope
         self.surface = surface
         self.dDomainCatalog = dDomainCatalog
+        self.subsetPolicyManifestPath = subsetPolicyManifestPath
         self.scopeCandidatesBySlot = scopeCandidatesBySlot
         self.scopeCandidatesByDeviceSlot = scopeCandidatesByDeviceSlot
+    }
+}
+
+private struct C5LoadedSubsetPolicyManifest: Sendable {
+    var policyID: String
+    var digest: String
+    var singleGroupEntriesByToolID: [String: C5SubsetPolicyManifest.Entry]
+}
+
+private struct C5SubsetPolicyManifest: Decodable, Sendable {
+    var entries: [Entry]
+
+    struct Entry: Decodable, Sendable {
+        var subsetPolicyID: String
+        var groupID: String
+        var mountMode: String
+        var toolIDsOrdered: [String]
+        var distractorPolicy: DistractorPolicy
+
+        enum CodingKeys: String, CodingKey {
+            case subsetPolicyID = "subset_policy_id"
+            case groupID = "group_id"
+            case mountMode = "mount_mode"
+            case toolIDsOrdered = "tool_ids_ordered"
+            case distractorPolicy = "distractor_policy"
+        }
+    }
+
+    struct DistractorPolicy: Decodable, Sendable {
+        var strategy: String
+        var k: Int
     }
 }
 
@@ -2418,7 +2460,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
         dataGateContext: C5DataGateRunContext,
         options: C5TrainingBuildOptions = C5TrainingBuildOptions()
     ) -> C5PreparedTrainingDataset {
-        let positiveSamples = buildPositiveSamples(seeds: seeds, options: options)
+        let positiveResult = buildPositiveSamples(seeds: seeds, options: options)
+        let positiveSamples = positiveResult.samples
         let positiveWithDev = assignDevSelection(samples: positiveSamples, count: options.devSelectionRows)
         let noCalls = options.includeNoCallCounterfactuals
             ? buildNoCallSamples(from: positiveWithDev.filter { $0.split == "train" }, options: options)
@@ -2467,7 +2510,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             lineageParentOverlap: dataGateReceipt.trainParentSemanticOverlap
         )
         let trainingMethodAuthority = C5TrainingMethodContractAuthority.evaluate()
-        var hardFailures: [String] = []
+        var hardFailures: [String] = positiveResult.failureReceipt
         if dataGateReceipt.status == "blocked" {
             hardFailures.append("data_gate_blocked")
         }
@@ -2566,6 +2609,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 "route_tier_source", "route_tier", "utterance_source", "value_strategy", "masking_stage", "train_eligible",
                 "generator_model_id", "generator_call_id", "semantic_judge_model_id", "semantic_judge_call_id", "prompt_hash",
                 "augmentation_parent_id", "lineage_group_id", "split_origin", "candidate_dedupe_group_id", "expected_tool_call_signature",
+                "subset_policy_id", "subset_group_id", "mounted_tool_count", "subset_policy_digest",
                 "counterfactual_pair_id", "acceptance_stage", "training_method_contract_authority", "offset_artifact_authority", "generator_orchestration", "validator_summary", "lineage_summary",
                 "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity", "loss_mask.trainable_spans", "loss_mask.masked_think_spans"
             ],
@@ -2734,7 +2778,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
         )
     }
 
-    private func buildPositiveSamples(seeds: [C5SemanticSeed], options: C5TrainingBuildOptions) -> [C5TrainingSample] {
+    private struct PositiveBuildResult {
+        var samples: [C5TrainingSample]
+        var failureReceipt: [String]
+    }
+
+    private func buildPositiveSamples(seeds: [C5SemanticSeed], options: C5TrainingBuildOptions) -> PositiveBuildResult {
         // paradigm §1 scope: demo→10 族 562 intent allowlist(seed.intent ∈ catalog names); 空 catalog→不过滤(frame legacy 向后兼容)
         let catalogNames = Set(options.dDomainCatalog.map(\.function.name))
         let scopedSeeds: [C5SemanticSeed]
@@ -2745,6 +2794,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             scopedSeeds = seeds
         }
         let catalogByName = Dictionary(options.dDomainCatalog.map { ($0.function.name, $0) }, uniquingKeysWith: { first, _ in first })
+        let manifestResult = loadSubsetPolicyManifestIfRequired(options: options, catalogByName: catalogByName)
         let eligible = scopedSeeds.filter { !$0.device.isEmpty && !$0.actionPrimitive.isEmpty }
         let grouped = Dictionary(grouping: eligible, by: \.routeTier)
         var generatedByKey: [String: C5GeneratedUtteranceRecord] = [:]
@@ -2758,14 +2808,69 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let ruleTarget = max(1, Int(Double(options.targetPositiveRows) * 0.075))
         let fcTarget = max(0, options.targetPositiveRows - ruleTarget)
         var samples: [C5TrainingSample] = []
-        samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
-        samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
-        samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
+        var sampleFailures = manifestResult.failures
+        samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
         if samples.count < options.targetPositiveRows {
             let remaining = options.targetPositiveRows - samples.count
-            samples.append(contentsOf: variants(from: eligible, target: remaining, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
+            samples.append(contentsOf: variants(from: eligible, target: remaining, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
         }
-        return Array(samples.prefix(options.targetPositiveRows))
+        return PositiveBuildResult(samples: Array(samples.prefix(options.targetPositiveRows)), failureReceipt: Array(Set(sampleFailures)).sorted())
+    }
+
+    private func loadSubsetPolicyManifestIfRequired(
+        options: C5TrainingBuildOptions,
+        catalogByName: [String: DDomainToolEntry]
+    ) -> (manifest: C5LoadedSubsetPolicyManifest?, failures: [String]) {
+        guard options.surface == .dDomain, !options.dDomainCatalog.isEmpty else {
+            return (nil, [])
+        }
+        guard let path = options.subsetPolicyManifestPath, !path.isEmpty else {
+            FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_MISSING path unset — fail-closed\n".utf8))
+            return (nil, ["subset_manifest_missing"])
+        }
+        let url = path.hasPrefix("/")
+            ? URL(fileURLWithPath: path)
+            : URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true).appendingPathComponent(path)
+        do {
+            let data = try Data(contentsOf: url)
+            let decoded = try JSONDecoder().decode(C5SubsetPolicyManifest.self, from: data)
+            let singleGroupEntries = decoded.entries.filter { $0.mountMode == "single_group" }
+            guard !singleGroupEntries.isEmpty else {
+                FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_EMPTY path=\(url.path) no single_group entries — fail-closed\n".utf8))
+                return (nil, ["subset_manifest_no_single_group_entries"])
+            }
+            var entriesByToolID: [String: C5SubsetPolicyManifest.Entry] = [:]
+            var failures: [String] = []
+            for entry in singleGroupEntries {
+                for toolID in entry.toolIDsOrdered {
+                    guard catalogByName[toolID] != nil else {
+                        appendUnique("subset_manifest_catalog_mismatch", to: &failures)
+                        continue
+                    }
+                    if entriesByToolID[toolID] == nil {
+                        entriesByToolID[toolID] = entry
+                    }
+                }
+            }
+            guard failures.isEmpty else {
+                FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_CLOSURE_FAIL path=\(url.path) failures=\(failures.joined(separator: ",")) — fail-closed\n".utf8))
+                return (nil, failures)
+            }
+            let policyID = singleGroupEntries.first?.subsetPolicyID ?? ""
+            return (
+                C5LoadedSubsetPolicyManifest(
+                    policyID: policyID,
+                    digest: C6Hash.sha256Hex(data),
+                    singleGroupEntriesByToolID: entriesByToolID
+                ),
+                []
+            )
+        } catch {
+            FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_MISSING path=\(url.path) error=\(error.localizedDescription) — fail-closed\n".utf8))
+            return (nil, ["subset_manifest_missing"])
+        }
     }
 
     private func variants(
@@ -2775,6 +2880,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
         generatedByKey: [String: C5GeneratedUtteranceRecord],
         usedVariantKeys: inout Set<String>,
         catalogByName: [String: DDomainToolEntry],
+        subsetManifest: C5LoadedSubsetPolicyManifest?,
+        failureReceipt: inout [String],
         sampleOffset: Int = 0
     ) -> [C5TrainingSample] {
         guard !seeds.isEmpty, target > 0 else {
@@ -2804,6 +2911,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     surface: options.surface,
                     catalog: options.dDomainCatalog,
                     catalogByName: catalogByName,
+                    subsetManifest: subsetManifest,
+                    failureReceipt: &failureReceipt,
                     scopeCandidatesBySlot: options.scopeCandidatesBySlot,
                     scopeCandidatesByDeviceSlot: options.scopeCandidatesByDeviceSlot
                 ) {
@@ -2813,6 +2922,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
             variant += 1
         }
         return result
+    }
+
+    private func appendUnique(_ failure: String, to failures: inout [String]) {
+        if !failures.contains(failure) {
+            failures.append(failure)
+        }
     }
 
     private func generatedRecordKey(contractRowID: String, variant: Int) -> String {
@@ -2851,6 +2966,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             // 从 sample.tools 物理删该工具(非只写 metadata removedToolID)。removedName 兼容 frame(tool_call_frame)/D-domain(intent)。
             let removedName = positive.expectedToolCalls.first?.name ?? "tool_call_frame"
             sample.tools = positive.tools.filter { Self.toolSchemaName($0) != removedName }
+            sample.mountedToolCount = sample.tools.count
             // 活样本断言: removedName 真不在 tools(targetToolPresent=false 与产物一致, 防 metadata 假声称)
             let targetStillPresent = sample.tools.contains { Self.toolSchemaName($0) == removedName }
             sample.noCall = C5NoCallMetadata(
@@ -2883,6 +2999,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
         surface: C5TrainingSurface,
         catalog: [DDomainToolEntry],
         catalogByName: [String: DDomainToolEntry],
+        subsetManifest: C5LoadedSubsetPolicyManifest?,
+        failureReceipt: inout [String],
         scopeCandidatesBySlot: [String: [String]],
         scopeCandidatesByDeviceSlot: [String: [String: [String]]]
     ) -> C5TrainingSample? {
@@ -2898,20 +3016,57 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let call: C5TrainingToolCall
         let resolvedTools: [[String: JSONValue]]
         let distractorIDs: [String]
+        let subsetPolicyID: String?
+        let subsetGroupID: String?
+        let mountedToolCount: Int?
+        let subsetPolicyDigest: String?
         if surface == .dDomain, !catalog.isEmpty {
             // 🔴 P1(GPT Pro+GLM 审计共识): catalog 非空但 intent 缺失 = 铁律5 fail-CLOSED(skip 返 nil, 不 fallback frame 污染 A2 surface);
             // scope filter 已保证命中, 此分支是 defensive。旧实现 stderr+frame fallback 会让 dDomain 调用者误以为产 D-domain 实混入 frame。
             guard let entry = catalogByName[seed.intent] else {
+                appendUnique("ddomain_catalog_target_missing", to: &failureReceipt)
                 FileHandle.standardError.write(Data("S4_DDOMAIN_MISS intent=\(seed.intent) not in catalog(\(catalog.count)) — fail-closed skip(不 fallback frame), scope filter should prevent\n".utf8))
                 return nil
+            }
+            guard let subsetManifest else {
+                appendUnique("subset_manifest_missing", to: &failureReceipt)
+                FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_MISSING intent=\(seed.intent) — fail-closed skip\n".utf8))
+                return nil
+            }
+            guard let subsetEntry = subsetManifest.singleGroupEntriesByToolID[seed.intent] else {
+                appendUnique("subset_manifest_target_missing", to: &failureReceipt)
+                FileHandle.standardError.write(Data("G7D_SUBSET_TARGET_MISS intent=\(seed.intent) — fail-closed skip\n".utf8))
+                return nil
+            }
+            guard subsetEntry.distractorPolicy.strategy == "same_sg_then_same_domain_then_other" else {
+                appendUnique("subset_manifest_distractor_policy_unsupported", to: &failureReceipt)
+                FileHandle.standardError.write(Data("G7D_SUBSET_DISTRACTOR_POLICY_UNSUPPORTED intent=\(seed.intent) strategy=\(subsetEntry.distractorPolicy.strategy) — fail-closed skip\n".utf8))
+                return nil
+            }
+            var mountedEntries: [DDomainToolEntry] = []
+            for toolID in subsetEntry.toolIDsOrdered {
+                guard let mountedEntry = catalogByName[toolID] else {
+                    appendUnique("subset_manifest_catalog_mismatch", to: &failureReceipt)
+                    FileHandle.standardError.write(Data("G7D_SUBSET_MOUNT_MISS group=\(subsetEntry.groupID) tool=\(toolID) — fail-closed skip\n".utf8))
+                    return nil
+                }
+                mountedEntries.append(mountedEntry)
             }
             call = C5TrainingToolCall(
                 name: seed.intent,
                 arguments: C5TrainingRenderer.dDomainToolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments, toolEntry: entry, variant: variant)
             )
-            let distractors = C5TrainingRenderer.sameFamilyDistractors(target: entry, catalog: catalog, variant: variant)
-            resolvedTools = [C5TrainingRenderer.dDomainToolSchema(entry)] + distractors.schemas
-            distractorIDs = distractors.ids
+            resolvedTools = mountedEntries.map(C5TrainingRenderer.dDomainToolSchema)
+            distractorIDs = manifestDistractorIDs(
+                target: entry,
+                catalog: catalog,
+                variant: variant,
+                policy: subsetEntry.distractorPolicy
+            )
+            subsetPolicyID = subsetEntry.subsetPolicyID.isEmpty ? subsetManifest.policyID : subsetEntry.subsetPolicyID
+            subsetGroupID = subsetEntry.groupID
+            mountedToolCount = resolvedTools.count
+            subsetPolicyDigest = subsetManifest.digest
         } else {
             // frame legacy(catalog 空 OR surface=.frame): strangler 向后兼容(唯一 frame 入口, 非 dDomain miss fallback)
             call = C5TrainingToolCall(
@@ -2927,6 +3082,10 @@ public struct C5TrainingDatasetBuilder: Sendable {
             let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
             resolvedTools = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed]) + distractors.schemas
             distractorIDs = distractors.ids
+            subsetPolicyID = nil
+            subsetGroupID = nil
+            mountedToolCount = nil
+            subsetPolicyDigest = nil
         }
         let renderedToolCall = C5TrainingRenderer.renderToolCall(call)
         let assistant = "\n\n" + renderedToolCall
@@ -2976,8 +3135,43 @@ public struct C5TrainingDatasetBuilder: Sendable {
             tools: resolvedTools,
             expectedToolCalls: [call],
             noCall: nil,
-            promptDistractorToolIDs: distractorIDs
+            promptDistractorToolIDs: distractorIDs,
+            subsetPolicyID: subsetPolicyID,
+            subsetGroupID: subsetGroupID,
+            mountedToolCount: mountedToolCount,
+            subsetPolicyDigest: subsetPolicyDigest
         )
+    }
+
+    private func manifestDistractorIDs(
+        target: DDomainToolEntry,
+        catalog: [DDomainToolEntry],
+        variant: Int,
+        policy: C5SubsetPolicyManifest.DistractorPolicy
+    ) -> [String] {
+        let pool = catalog.filter { $0.function.name != target.function.name }
+        guard !pool.isEmpty, policy.k > 0 else {
+            return []
+        }
+        let sameGroup = pool.filter { $0.sg == target.sg }.sorted { $0.function.name < $1.function.name }
+        let sameDomain = pool.filter { $0.sg != target.sg && $0.domain == target.domain }.sorted { $0.function.name < $1.function.name }
+        let others = pool.filter { $0.domain != target.domain }.sorted { $0.function.name < $1.function.name }
+        let ranked = sameGroup + sameDomain + others
+        guard !ranked.isEmpty else {
+            return []
+        }
+        var picked: [String] = []
+        var idx = variant % ranked.count
+        var guardCounter = 0
+        while picked.count < min(policy.k, ranked.count) && guardCounter < ranked.count * 2 {
+            let name = ranked[idx % ranked.count].function.name
+            if !picked.contains(name) {
+                picked.append(name)
+            }
+            idx += 1
+            guardCounter += 1
+        }
+        return picked
     }
 }
 
