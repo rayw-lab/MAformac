@@ -332,3 +332,9 @@
 - %45 G7 surface 修复闭环：生成行→DataGate projection→JSONL 候选行贯通 tools/mounted_tool_count/subset 三族 5 字段（21/21 行全带，`RECEIPT-P5W-G7-SURFACE.md` file:line 证据表）——第四轮 iceberg 扩散点当晚闭环，wave-1 数据 surface 与训练面对齐。
 - 晨报包落 `docs/handoffs/2026-07-03-overnight-v6-verdict-morning-brief.md`（goal 兑现账+醒来 5 拍）。lessons M.8~M.10（same-surface 维度分解表/复算工具假信号/paired 信息增益）。
 - 在途：%44 EOS 监督实装+whitespace 修；%43 GF 消减稿异源核对。
+
+## D-037（2026-07-03 凌晨）收尾轮：EOS v6.1 重训授权内推进 + 消减 GF-126 补 + 🔴 GitHub billing blocker
+- %44 GF-153 EOS 实装收讫（PR #28；v61 镜像 exit0、`<|im_end|>` id151645 单次监督、trainable 764→808、old v5 仍 exit66）→ 接 **v6.1 tiny 重训+probe 复刻**（run-auth 范围：tiny scope/四红线不动/单变量=EOS 增量；验证点=A 保持 15/15+重复病理消除）。
+- %43 消减异源核对 REQUEST_CHANGES：抓到 GF-126（status 词表映射）未被 31 组吸收——一行修退 %45；其余映射 135/136、max_tokens/stop/D 挂载冲突消解全 PASS。%43 转 D 轴退化形态清单（wave-1 regression 锚细化）。
+- %45 接 GF-126 补 + DataGate global missing-surface hard gate（自身 residual 闭环）。
+- 🔴 **外部 blocker（磊哥项 +1）**：GitHub annotation「recent account payments failed or spending limit needs increased」——PR #27/#28 新 CI job 不启动。属账户 billing 层，worker/commander 不可修。晨报已追加。

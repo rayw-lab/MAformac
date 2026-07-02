@@ -25,7 +25,8 @@ for: 磊哥醒来一页看全
 3. B 轴四败下钻：2 条 close→open 极性翻转 + 2 条细分设备混淆 = tiny 44 行覆盖稀疏的预期形态
 
 ## 醒来待您拍（按优先级）
-1. **PR #26（probe harness）/ #27（P12 A+ 契约）merge**——双双异 worker 审计 APPROVE + CI（26 双绿；27 一支 whitespace fail 修复中）；classifier 不许我自合，您一键即可。
+0. 🔴 **GitHub billing/spending limit**：PR #27/#28 新 CI job 不启动（annotation=account payments failed / spending limit）——账户层修复后 CI 才能跑绿。
+1. **PR #26 / #27（P12 A+ 契约）/ #28（v6.1 EOS 监督）merge**——双双异 worker 审计 APPROVE + CI（26 双绿；27 一支 whitespace fail 修复中）；classifier 不许我自合，您一键即可。
 2. **wave-1 5 拍点**：`docs/c5-training-readiness-grill/wave1-owner-decision-package-2026-07-03.md`（云凭证是唯一无 default 项）。
 3. **GF 121 决策 lock**：31 组消减包（`runs/governance-fit-grill/gf-reduction-draft.md`，commander 终审后附）+ F-044 阈值终值（A 15/15、B 14/15 draft；v6 实测 B 11/15 敏感性已列）。
 4. **v6.1 是否重训**：EOS 监督（GF-153，%44 实装中）消重复病理；不改裁决结论，可与 wave-1 合并训。
