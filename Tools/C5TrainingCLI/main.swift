@@ -279,6 +279,9 @@ struct C5TrainingCLI {
         - optimizer_update_steps: \(receipt.mlxConfig.optimizerUpdateSteps)
         - rendered_schedule_decay_steps: \(receipt.mlxConfig.renderedScheduleDecaySteps)
         - rendered_warmup_steps: \(receipt.mlxConfig.renderedWarmupSteps)
+        - early_stop_basis: \(receipt.mlxConfig.earlyStopBasis)
+        - early_stop_checkpoint_steps: \(receipt.mlxConfig.earlyStopCheckpointSteps.map(String.init).joined(separator: ","))
+        - early_stop_policy: \(receipt.mlxConfig.earlyStopPolicy)
         - max_seq_length: \(receipt.mlxConfig.maxSeqLength)
         - keys: \(receipt.mlxConfig.keys.joined(separator: ", "))
 

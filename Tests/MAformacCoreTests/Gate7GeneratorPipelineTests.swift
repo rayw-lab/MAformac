@@ -281,7 +281,7 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
         XCTAssertTrue(result.dataGateReceipt?.failureReceipt.contains { $0.reason == "train_device_overlap" } == true)
     }
 
-    func testQuotaAndPrecisionSkeletonsAreDeterministic() {
+    func testQuotaAndPrecisionSkeletonsAreDeterministic() throws {
         let allocations = Gate7QuotaCalculator.allocate([
             Gate7QuotaInput(
                 familyID: "wiper",
@@ -289,7 +289,8 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
                 bugPressure: 2,
                 demoFloor: 4,
                 safetyFloor: 6,
-                sparseFamilyFloor: 12
+                sparseFamilyFloor: 12,
+                recipeQuota: .wave1ConstructionAnchors
             ),
             Gate7QuotaInput(
                 familyID: "ac",
@@ -302,6 +303,12 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
 
         XCTAssertEqual(allocations.first { $0.familyID == "wiper" }?.quota, 12)
         XCTAssertEqual(allocations.first { $0.familyID == "ac" }?.quota, 35)
+        let wiper = try XCTUnwrap(allocations.first { $0.familyID == "wiper" })
+        XCTAssertEqual(wiper.quotaSource, "intent_bug_scene_recovery")
+        XCTAssertEqual(wiper.negativeQuotaActivation, "deferred_refusal_ratio_zero_conflict")
+        XCTAssertEqual(wiper.components["open_close_polarity_floor"], 2)
+        XCTAssertEqual(wiper.components["active_negative_quota"], 0)
+        XCTAssertEqual(wiper.components["multi_call_pairing_minimum"], 2)
         XCTAssertEqual(Gate7PrecisionGate.humanReviewSampleSize(candidateCount: 3), 20)
         XCTAssertEqual(Gate7PrecisionGate.humanReviewSampleSize(candidateCount: 600), 50)
         XCTAssertFalse(Gate7PrecisionGate.shouldStopFamily(reviewed: 10, accepted: 8))
