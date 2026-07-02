@@ -224,3 +224,9 @@
 - **落点**: 本 D-020 + R7-draft B.1 前置表刷新 + SPEC-G7D
 - 🔴 **UPDATE（磊哥 2026-07-02：hermes 终审安排）**：E-2 subset-policy 实装 + gate7 generator pipeline 代码闭环两大任务**完成后**（G7C/G7D merged + 验收绿），安排 **hermes 跨厂商异源终审**（cross-vendor-final-audit 铁律：≥3 厂商并集，codex 交叉审已有 → hermes=第二厂商，范围 = G7A/B/C/D 全体 = manifest codegen/预算门/grammar artifact/C6 subset schema/六轴 receipt/generator 编排/C5 builder 装载）。**hermes 现在待命不派**；触发点 = 两大任务合流验收后。
 - 🟢 **UPDATE（G7C/G7D 合流 + hermes 终审触发，2026-07-02）**：G7C PR #19（XG7C CLEAR：R7 blocked_r7 桩/G1 同 vendor fail-closed/labeler LLM 零参与/四门行为全过）→ `0ff56e06` ｜ G7D PR #20（XG7D PASS_WITH_NOTES，唯一 P2-watch=`subset_policy_digest` 取整文件哈希 vs meta 内 grouping_contract_digest——**更强口径不冲突**，按磊哥 digest 冻结令报备存档不改）→ `1d822961` = **当前 main**。**两大任务（E-2 subset Phase-1 实装 + gate7 generator pipeline 代码闭环）全部合流**。%45 跑 merge 后验收中；🔴 **hermes 跨厂商终审已出击**（磊哥 standing order，background agent `hermes-g7-final-audit`，只读 worktree `MAformac-hermes-audit`@1d822961，范围 G7A/B/C/D 全体 + dead-field 同构扫描，产出 HERMES-FINAL-AUDIT-G7.md）。今日 PR 合流累计 **9 支**（#12-#20）。
+
+## D-021 外审执行位模式（磊哥定）：commander 只 tmux 掌控 worker，外审全下沉 worker，%44 升临时项目助理
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Collaboration-mode ｜ **Owners**: 磊哥三连指令
+- **模式**: ① commander **只通过 tmux 掌控 3 worker**，不自己直跑外部审计/外部 LLM 调用（subagent CC 也不用于此——hermes-rescue subagent spawn 的是 Claude 家族=假异源，已 shutdown_request 关闭 + kill %51 pane 保 2×2）② **GPT Pro 外审、hermes 异审全部交 worker 自己跑**（worker 在 codex CLI 显性调用 `~/.codex/skills/hermes-cli-glm52-code` / gptpro 技能——codex 环境 `--prompt-file` 正常且 worker 能盯全程重试）③ **%44 升级临时项目助理（外审协调官）**：外部调用执行+盯守+收产出+初步 findings 整理。
+- **佐证**: commander 直跑 hermes 两次：第一次 hermes CLI 本体 stash 冲突炸（已可逆修复：`git reset --merge` 中止失败 pop，stash@{0} 18 文件原封保留供磊哥重处理）；第二次回稿仅 **284 字节=废稿**（留档 `HERMES-FINAL-AUDIT-G7-commander-direct.md` 勿引）——印证 worker 盯守模式更可靠。
+- **落点**: 本 D-021 + %44 首单（hermes G7 终审，质检门 <2000 字节=废稿重试）+ memory 更新
