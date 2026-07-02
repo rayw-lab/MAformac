@@ -195,3 +195,12 @@
 - **M1-γ port 纪律**：新 branch off main=`ab355f6c`；逐文件语义比较只 port 本分支更新内容；🔴 `gate7-cloud-generator-design.md` 以 main 版（PR #11 含 §10）为准不回退；grill 树 2 件 Dim11/5 port 时 frontmatter 改 locked；禁整支 merge doc-absorption/grill（147 behind 回退风险，baseline-roadmap §2）。
 - **分工**: %45=α（guard+push+PR）/ %44=β（push+PR）+γ（文档整编支）/ %43=E-2 素材 / commander=lock 级联回写+Dim10 frontmatter+收稿裁决+E-2 纵切+gh 核销。
 - **落点**: 本 D-017 + SPEC-M1A/M1BG/E2 @ `runs/2026-07-02-baseline-roadmap/` + landing-matrix §4 里程碑
+
+## D-018 M1 consolidation 完成 + 验收 PASS（main 范围）+ 验收门抓 regen drift 的修复闭环
+- **Date**: 2026-07-02 ｜ **Status**: ✅ Done ｜ **Type**: Merge-closeout ｜ **Owners**: 磊哥 goal「推进到 M1 合流 main 并验收」/ commander 执行
+- **合流链（gh 一手核销）**: PR #13 α gate2（3 commits 含反向 guard+test-split fix）→ `99734be6` ｜ PR #12 β gate8 → `d93c59b8` ｜ PR #14 γ 40 件文档整编 → `f3ab165d` ｜ **PR #15 δ 验收修复** → `80ea379c` = 当前 main。main CI Verify SUCCESS ×2（f3ab165d/d93c59b8 亲核）。
+- **审计链（每支都有拦截或亲核）**: α 交叉审 FAIL+P0（guard 漏 test split，%43 对抗 fixture 抓）→ 一行修+行为测试 → P0-RESOLVED 复验 ｜ γ commander 亲自语义审（hash 对比 35 逐字节+3 whitespace+2 溯源 frontmatter，零回退）｜ **验收门抓 δ**：gate8 曾直改 generated/ 派生物没改工厂 gen_family_allowlist.py，merge 后 verify-all diff 门现形 → PR #15（工厂实算 tool_count + Makefile regen 重排 tool_contract 先行）→ 重验收原 blocker 消解。
+- **验收 verdict**: **PASS（main 范围）**——regen/diff/verify-refs/cross-section/surface/gold/c6-shape/default-scope/python test/contentview-wiring 全绿；唯一残留 = sibling UIUE fixture 对比测试失败 = **环境噪声非 M1 回归**（M1 未动 Tests/Fixtures 任何字节，失败输入与 M1 前相同；UIUE 树 R7 隔离分叉本预期，M4 收口时消解）。豁免单列不冒充全绿。
+- **教训沉淀**: lessons-learned **K 段 4 条**（per-branch CI≠全量验收 / 交叉审对抗 fixture 破双盲×2 实证 / staged PR+hash 语义审 / worker 主动回报纪律）。
+- **Consequences**: 训练前置基线全部在 main（gate2 token-masking 真 enforce + 反向 guard 三 split / gate8 562 工厂实算 / 28+2 件 grill 语料 / commander-log / 两基线文档 / CURRENT 新版）。M2 清理清单已备等授权执行；M3 D25 裁决=收（待开小 PR）；E-2 grill round 进行中（W1/W3 done + D9 done + W2 跑中 → 消减综合上抛）。
+- **落点**: 本 D-018 + lessons K + baseline-roadmap/CURRENT/MEMORY 同步刷

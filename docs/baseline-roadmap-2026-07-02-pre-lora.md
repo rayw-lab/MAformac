@@ -18,9 +18,9 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 
 | 维度 | 状态 |
 |---|---|
-| main | `ab355f6c`，CI Verify SUCCESS，`make verify-all` 472 tests/0 fail（D-011）；3 训练前置门（gate5/6/7）已落 |
+| main | **`80ea379c`（M1 收口后，D-018）**：α gate2+guard `99734be6` / β gate8 `d93c59b8` / γ 40 件文档 `f3ab165d` / δ 验收修复 `80ea379c` 全合流；验收 PASS（main 范围，sibling UIUE fixture 环境噪声单列 defer M4）。前态 `ab355f6c`（gate5/6/7 落地）留档 |
 | 云端 PR | #1-#11 全 MERGED/CLOSED，**零 open** |
-| wave-1 未合分支 | g8-tool `64c6f62f`（+1 commit，0 behind）/ g2-mask `47ca8cda`（+2 commit，0 behind）/ grill `f9e67901`（基于 doc-absorption）|
+| wave-1 分支 | ✅ **全部已合流 main（D-018）**：g8-tool/g2-mask 经 PR #12/#13；grill 树 2 件 Dim 文档经 γ PR #14 port（原分支转 cleanup 候选进 M2 清单）|
 | 指挥官分支 | `codex/rebuild-c6-doc-absorption-20260624`（主树，**147 behind** main；ahead 数随本分支文档 commit 递增——本文初稿时 `7dd64a50`/14 ahead，D-016 commit 后 `629b1132`/15 ahead，**live 以 `git rev-list --left-right --count main...HEAD` 为准**；commander-log、C5 grill 语料、handoffs 全在此）|
 | R7 | route-only signed（2026-06-25，**expires 2026-07-15**）；candidate unsigned；retrain/真生成/真评测/uiue-merge/V-S-U-PASS 全 BLOCKED |
 | 磊哥 5 件待拍 | ① gate2 masking design 岔口（⭐token-mask override 已实现并双审 CONFIRMED）② E-2 subset 策略 ③ grill Dim10/11/5 lock（~58 条 proposed）④ T-2 tiny-ablation 真跑 run-auth ⑤ wave-1 consolidation-to-main |
@@ -58,7 +58,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 现在（HOLD 保持现状）
  │  磊哥拍 ①masking岔口 + ②E-2 + ③grill lock + ⑤consolidation
  ▼
-节点 M1 — wave-1 consolidation（staged PR，一次一支，绿了再下一支）
+节点 M1 — wave-1 consolidation ✅ 完成（2026-07-02，D-018；实际多一支 δ=PR#15 验收修复）
  │  PR-α: c5gate/g2-masking-enforce → main（代码，0 behind，干净）
  │  PR-β: c5gate/g8-tool-count → main（代码+generated，0 behind，干净）
  │  PR-γ: 文档整编支（🔴 新开 branch off main=ab355f6c，把以下【复制/port】进来，
