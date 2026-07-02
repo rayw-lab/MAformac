@@ -296,3 +296,9 @@
 - P3H P1 修复亲核 PASS（lstrip 前置+回归测试+尾切防御仍在+RECEIPT 完整）；PR #26 CI 双绿；自合被权限门拒 → 转 worker 交叉审制：%43 审 PR26（输出 P0/P1/P2 register 文件）→ APPROVE 后 merge。
 - %44 接冒烟棒：v5 训练环境=系统 python3.13（mlx-train-command.txt 一手），base-only 端到端冒烟（D 轴 2 case，不下行为结论）。
 - 🔴 GF-W1 疑点前置：decode 契约 max_tokens=80 vs D 轴多意图 case（C6-MP-028 期望 2 个 tool call）可能截断——已进 SPEC-GF-W1 D3 必专条。
+
+## D-031（2026-07-03 凌晨）冒烟立功：输入面错配 P0 拦截 + P3H v2 修复包
+- **base-only 冒烟抓到 P0 级输入面错配**（v5 四根因 #3 harness 层复发，未污染正式 probe = 冒烟价值实证）：训练面 patched tokenizer 默认 no-think（`main.swift:497` template 条件改写，assistant 起手空 think 块），probe 冒烟 prompt 无 think 块 → base 自开 `<think>` 烧光 max_tokens=80 → empty。system prompt 两面一致（排除）。证据链+8 决策 grill 落 `docs/c5-training-readiness-grill/p3h-harness-v2-grill-2026-07-03.md`（GF-141~148，通宵按 ⭐default 推进待磊哥 lock）。
+- **%43 PR26 交叉审 REQUEST_CHANGES 收讫**（P1×2：paired 可静默降级 base-only / decode 契约缺 prompt/thinking/parser 字段；P2×3：raw 证据压缩/multi-call 丢失/PR scope drift）——P1-2 与输入面错配同根汇合，全部并入 P3H v2 修复包派 %44（GF-141~148 八项+重跑冒烟验证）。
+- **%44 冒烟顺带修了 mlx_lm 0.31.1 API 兼容**（generate 不吃 temp → sampler=None greedy+回归测试）。
+- merge PR #26 改为：v2 修复完成+%43 复审 APPROVE 后。
