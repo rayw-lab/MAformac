@@ -920,6 +920,27 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(json.contains("\"labels\""))
     }
 
+    func testDevSelectionEvaluationRecordKeepsSupervisionWithoutChangingSplitGate() throws {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(id: "eval-mask-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾")
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 2, devSelectionRows: 1)
+        )
+        let sample = try XCTUnwrap(prepared.samples.first { $0.split == "dev_selection" })
+
+        XCTAssertFalse(sample.trainEligible)
+        XCTAssertTrue(sample.dataGateCandidate.mustNotTrain)
+        XCTAssertEqual(sample.mlxRecord.lossMask.enforcement, "all_masked_not_train_eligible")
+
+        let supervised = sample.supervisedEvaluationMLXRecord.lossMask
+        XCTAssertEqual(supervised.enforcement, "token_labels_enforced_after_tokenization_with_think_mask")
+        XCTAssertTrue(supervised.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
+        XCTAssertFalse(supervised.trainableSpans.isEmpty)
+    }
+
     func testThinkSpanIsAlwaysIgnoredByLossMaskEvenWhenToolCallSpanTrains() {
         let prepared = C5TrainingDatasetBuilder().build(
             seeds: [semanticSeed(id: "think-mask-row", fuzzy: true, free: false)],
@@ -1296,6 +1317,36 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(positive.subsetGroupID, manifestEntry.groupID)
         XCTAssertEqual(positive.mountedToolCount, manifestEntry.toolIDsOrdered.count)
         XCTAssertEqual(positive.subsetPolicyDigest, try C6Hash.fileHash(url: manifestURL))
+    }
+
+    func testDDomainE2DowngradesSeatMassageForceTimeToTargetAndFirstSibling() throws {
+        let catalog = try loadDemoCatalog()
+        let manifestEntry = try subsetManifestEntry(containing: "lower_seat_massage_force_little")
+        XCTAssertEqual(manifestEntry.groupID, "seat.massage_force_time")
+        let seed = rawSeed(
+            id: "seat-massage-force-1",
+            intent: "lower_seat_massage_force_little",
+            device: "seat_massage_force",
+            actionPrimitive: "decrease_by_exp",
+            valueType: "EXP",
+            slotKeys: ["mode", "position"]
+        )
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+
+        let positive = try XCTUnwrap(prepared.samples.first { $0.split == "train" })
+        let toolNames = positive.tools.compactMap { functionName($0) }
+        let expectedSibling = try XCTUnwrap(manifestEntry.toolIDsOrdered.first { $0 != "lower_seat_massage_force_little" })
+
+        XCTAssertEqual(toolNames, ["lower_seat_massage_force_little", expectedSibling])
+        XCTAssertEqual(positive.promptDistractorToolIDs, [expectedSibling])
+        XCTAssertEqual(positive.mountedToolCount, 2)
+        XCTAssertEqual(positive.subsetPolicyID, manifestEntry.subsetPolicyID)
+        XCTAssertEqual(positive.subsetGroupID, "seat.massage_force_time")
     }
 
     func testDDomainDistractorsFollowManifestSameSGPriority() throws {

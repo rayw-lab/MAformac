@@ -413,6 +413,13 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         C5MLXRecord(messages: messages, tools: tools, lossMask: lossMask)
     }
 
+    public var supervisedEvaluationMLXRecord: C5MLXRecord {
+        var supervised = self
+        supervised.trainEligible = true
+        supervised.masking.trainOnTurn = true
+        return C5MLXRecord(messages: messages, tools: tools, lossMask: C5LossMaskBuilder.lossMask(for: supervised))
+    }
+
     public var lossMask: C5MLXLossMask {
         C5LossMaskBuilder.lossMask(for: self)
     }
@@ -3060,26 +3067,37 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 FileHandle.standardError.write(Data("G7D_SUBSET_DISTRACTOR_POLICY_UNSUPPORTED intent=\(seed.intent) strategy=\(subsetEntry.distractorPolicy.strategy) — fail-closed skip\n".utf8))
                 return nil
             }
-            var mountedEntries: [DDomainToolEntry] = []
+            var manifestMountedEntries: [DDomainToolEntry] = []
             for toolID in subsetEntry.toolIDsOrdered {
                 guard let mountedEntry = catalogByName[toolID] else {
                     appendUnique("subset_manifest_catalog_mismatch", to: &failureReceipt)
                     FileHandle.standardError.write(Data("G7D_SUBSET_MOUNT_MISS group=\(subsetEntry.groupID) tool=\(toolID) — fail-closed skip\n".utf8))
                     return nil
                 }
-                mountedEntries.append(mountedEntry)
+                manifestMountedEntries.append(mountedEntry)
             }
             call = C5TrainingToolCall(
                 name: seed.intent,
                 arguments: C5TrainingRenderer.dDomainToolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments, toolEntry: entry, variant: variant)
             )
-            resolvedTools = mountedEntries.map(C5TrainingRenderer.dDomainToolSchema)
-            distractorIDs = manifestDistractorIDs(
+            let mountedEntries = degradedMountedEntriesIfNeeded(
                 target: entry,
-                catalog: catalog,
-                variant: variant,
-                policy: subsetEntry.distractorPolicy
+                manifestEntries: manifestMountedEntries,
+                subsetEntry: subsetEntry
             )
+            resolvedTools = mountedEntries.map(C5TrainingRenderer.dDomainToolSchema)
+            if mountedEntries.count < manifestMountedEntries.count {
+                distractorIDs = mountedEntries
+                    .map(\.function.name)
+                    .filter { $0 != entry.function.name }
+            } else {
+                distractorIDs = manifestDistractorIDs(
+                    target: entry,
+                    catalog: catalog,
+                    variant: variant,
+                    policy: subsetEntry.distractorPolicy
+                )
+            }
             subsetPolicyID = subsetEntry.subsetPolicyID.isEmpty ? subsetManifest.policyID : subsetEntry.subsetPolicyID
             subsetGroupID = subsetEntry.groupID
             mountedToolCount = resolvedTools.count
@@ -3158,6 +3176,23 @@ public struct C5TrainingDatasetBuilder: Sendable {
             mountedToolCount: mountedToolCount,
             subsetPolicyDigest: subsetPolicyDigest
         )
+    }
+
+    private func degradedMountedEntriesIfNeeded(
+        target: DDomainToolEntry,
+        manifestEntries: [DDomainToolEntry],
+        subsetEntry: C5SubsetPolicyManifest.Entry
+    ) -> [DDomainToolEntry] {
+        guard subsetEntry.groupID == "seat.massage_force_time" else {
+            return manifestEntries
+        }
+        guard let targetEntry = manifestEntries.first(where: { $0.function.name == target.function.name }) else {
+            return manifestEntries
+        }
+        guard let firstSibling = manifestEntries.first(where: { $0.function.name != target.function.name }) else {
+            return [targetEntry]
+        }
+        return [targetEntry, firstSibling]
     }
 
     private func manifestDistractorIDs(
