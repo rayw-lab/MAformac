@@ -965,6 +965,8 @@ final class C5LoRATrainingTests: XCTestCase {
         let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
 
         XCTAssertTrue(loop.contains("parser.add_argument(\"--require-maformac-loss-mask\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("def guard_stock_loader_rejects_loss_mask"))
+        XCTAssertTrue(loop.contains("loss_mask_present_but_flag_missing"))
         XCTAssertTrue(loop.contains("def load_maformac_loss_mask_datasets"))
         XCTAssertTrue(loop.contains("def build_maformac_token_labels"))
         XCTAssertTrue(loop.contains("def maformac_masked_loss"))
@@ -973,6 +975,34 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(loop.contains("char_indexed_loss_mask_labels_forbidden"))
         XCTAssertTrue(loop.contains("raise LossMaskValidationError"))
         XCTAssertTrue(loop.contains("LOSS_MASK_PREFLIGHT_FAILED"))
+    }
+
+    func testPythonTrainingLoopRejectsLossMaskRowsWhenFlagMissing() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for loss-mask reverse guard")
+        }
+        let temporary = try makeTemporaryDirectory()
+        let row = #"{"text":"masked row","loss_mask":{"ignore_index":-100,"trainable_spans":[]}}"# + "\n"
+        try row.write(to: temporary.appendingPathComponent("train.jsonl"), atomically: true, encoding: .utf8)
+        try "{}\n".write(to: temporary.appendingPathComponent("valid.jsonl"), atomically: true, encoding: .utf8)
+
+        let result = runProcess(
+            executable: pythonExecutable,
+            arguments: [
+                repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+                "--model", "dummy-model-never-loaded",
+                "--data", temporary.path,
+                "--train",
+                "--allow-mlx-lm-version-mismatch"
+            ],
+            cwd: repoRoot
+        )
+
+        XCTAssertEqual(result.status, 66, result.stderr + result.stdout)
+        XCTAssertTrue(result.stderr.contains("LOSS_MASK_PREFLIGHT_FAILED"), result.stderr + result.stdout)
+        XCTAssertTrue(result.stderr.contains("loss_mask_present_but_flag_missing"), result.stderr + result.stdout)
     }
 
     func testPythonTrainingLoopHasSyntheticLossMaskSelfTest() throws {
