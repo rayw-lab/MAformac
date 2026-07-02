@@ -508,12 +508,14 @@ public struct C5MLXLossMaskSpan: Codable, Equatable, Sendable {
 
 public struct C5MLXLossMask: Codable, Equatable, Sendable {
     public static let ignoreIndex = -100
+    public static let assistantEndToken = "<|im_end|>"
 
     public var ignoreIndex: Int
     public var trainableSpans: [C5MLXLossMaskSpan]
     public var maskedThinkSpans: [C5MLXLossMaskSpan]
     public var enforcement: String
     public var tokenLabelSource: String
+    public var trainableAssistantEndToken: String?
 
     enum CodingKeys: String, CodingKey {
         case ignoreIndex = "ignore_index"
@@ -521,6 +523,7 @@ public struct C5MLXLossMask: Codable, Equatable, Sendable {
         case maskedThinkSpans = "masked_think_spans"
         case enforcement
         case tokenLabelSource = "token_label_source"
+        case trainableAssistantEndToken = "trainable_assistant_end_token"
     }
 
     public init(
@@ -528,13 +531,15 @@ public struct C5MLXLossMask: Codable, Equatable, Sendable {
         trainableSpans: [C5MLXLossMaskSpan],
         maskedThinkSpans: [C5MLXLossMaskSpan],
         enforcement: String,
-        tokenLabelSource: String = "runtime_tokenizer_offsets"
+        tokenLabelSource: String = "runtime_tokenizer_offsets",
+        trainableAssistantEndToken: String? = C5MLXLossMask.assistantEndToken
     ) {
         self.ignoreIndex = ignoreIndex
         self.trainableSpans = trainableSpans
         self.maskedThinkSpans = maskedThinkSpans
         self.enforcement = enforcement
         self.tokenLabelSource = tokenLabelSource
+        self.trainableAssistantEndToken = trainableAssistantEndToken
     }
 }
 
@@ -2148,7 +2153,8 @@ public enum C5LossMaskBuilder {
             return C5MLXLossMask(
                 trainableSpans: [],
                 maskedThinkSpans: thinkSpans,
-                enforcement: "all_masked_not_train_eligible"
+                enforcement: "all_masked_not_train_eligible",
+                trainableAssistantEndToken: nil
             )
         }
 
@@ -2849,7 +2855,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             "Mac behavior parity and true-device candidate V-PASS are reported separately",
             "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
             "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training",
-            "mlx-data records carry loss_mask trainable/think char spans; c5_mlx_train_loop tokenizes records and constructs token-level labels with ignore_index=-100"
+            "mlx-data records carry loss_mask trainable/think char spans plus trainable_assistant_end_token; c5_mlx_train_loop tokenizes records and constructs token-level labels with ignore_index=-100"
         ]
         if !options.includeNoCallCounterfactuals || options.refusalRatioTarget == 0 {
             frameSurfaced.append("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows")
@@ -2860,8 +2866,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
             status: receiptStatus,
             fitProofLevel: "mechanism_true",
             consumer: "Tools/C5TrainingCLI/c5_mlx_train_loop.py --require-maformac-loss-mask",
-            consumedArtifact: "mlx-data JSONL loss_objective_profile + loss_mask.trainable_spans + loss_mask.masked_think_spans",
-            sufficiencyEvidence: "prepare emits objective-separated loss records; preflight fails closed on missing objectives unless --allow-legacy-loss-objective is explicit; repo training loop converts spans to token labels before loss",
+            consumedArtifact: "mlx-data JSONL loss_objective_profile + loss_mask.trainable_spans + loss_mask.masked_think_spans + loss_mask.trainable_assistant_end_token",
+            sufficiencyEvidence: "prepare emits objective-separated loss records; preflight fails closed on missing objectives/end-token supervision unless --allow-legacy-loss-objective is explicit for objectives; repo training loop converts spans plus assistant <|im_end|> to token labels before loss",
             residualGap: "prepare receipt does not claim live training, C6 model-quality V-PASS, endpoint byte parity, or true-device acceptance",
             sourceRefs: [
                 "docs/p1c-training-grill-decisions.md:103-408",
@@ -2887,7 +2893,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 "subset_policy_id", "subset_group_id", "mounted_tool_count", "subset_policy_digest",
                 "counterfactual_pair_id", "acceptance_stage", "training_method_contract_authority", "offset_artifact_authority", "generator_orchestration", "validator_summary", "lineage_summary",
                 "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity", "loss_objective_profile", "augmentation_profile",
-                "supervision_coverage_digest", "loss_mask.trainable_spans", "loss_mask.masked_think_spans"
+                "supervision_coverage_digest", "loss_mask.trainable_spans", "loss_mask.masked_think_spans", "loss_mask.trainable_assistant_end_token"
             ],
             failureReceipt: hardFailures + formalStep2Failures,
             rowCount: samples.count,
@@ -3003,6 +3009,9 @@ public struct C5TrainingDatasetBuilder: Sendable {
         var failures: [String] = []
         for sample in samples where sample.trainEligible {
             let mask = sample.lossMask
+            if mask.trainableAssistantEndToken != C5MLXLossMask.assistantEndToken {
+                failures.append("loss_mask_assistant_end_token_supervision_missing_\(sample.sampleID)")
+            }
             for span in mask.maskedThinkSpans {
                 if span.start < 0 || span.end > sample.assistantPayload.count || span.start >= span.end {
                     failures.append("loss_mask_think_span_bounds_invalid_\(sample.sampleID)")

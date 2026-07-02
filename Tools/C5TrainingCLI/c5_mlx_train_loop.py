@@ -27,6 +27,7 @@ from typing import Any, Iterable
 REQUIRED_MLX_LM_VERSION = "0.31.1"
 DEFAULT_GRAD_CLIP_NORM = 1.0
 DEFAULT_NONFINITE_FALLBACK_LR = 5e-5
+ASSISTANT_END_TOKEN = "<|im_end|>"
 
 mx = nn = optim = np = yaml = None
 average_gradients = tree_flatten = tree_map = tree_reduce = None
@@ -675,6 +676,42 @@ def locate_subsequence(haystack: list[int], needle: list[int]) -> int | None:
     return None
 
 
+def required_assistant_end_token(loss_mask: dict[str, Any]) -> str:
+    token = loss_mask.get("trainable_assistant_end_token")
+    if token != ASSISTANT_END_TOKEN:
+        raise LossMaskValidationError("assistant_end_token_supervision_missing")
+    return token
+
+
+def token_id_for_text(tokenizer, token_text: str) -> int:
+    convert = getattr(tokenizer, "convert_tokens_to_ids", None)
+    if callable(convert):
+        token_id = convert(token_text)
+        if isinstance(token_id, int) and token_id >= 0:
+            return token_id
+    encoded = tokenizer(token_text, add_special_tokens=False)
+    token_ids = encoded.get("input_ids") if isinstance(encoded, dict) else encoded
+    if isinstance(token_ids, list) and len(token_ids) == 1 and isinstance(token_ids[0], int):
+        return token_ids[0]
+    raise LossMaskValidationError(f"assistant_end_token_id_unresolved:{token_text}")
+
+
+def assistant_end_token_index(
+    tokens: list[int],
+    assistant_start: int,
+    assistant_token_count: int,
+    tokenizer,
+    token_text: str,
+) -> int:
+    token_id = token_id_for_text(tokenizer, token_text)
+    expected = assistant_start + assistant_token_count
+    search_end = min(len(tokens), expected + 8)
+    for index in range(expected, search_end):
+        if tokens[index] == token_id:
+            return index
+    raise LossMaskValidationError(f"assistant_end_token_not_found_after_assistant:{token_text}")
+
+
 def tokenizer_for_offsets(tokenizer):
     candidate = getattr(tokenizer, "_tokenizer", tokenizer)
     return candidate if callable(candidate) else tokenizer
@@ -835,6 +872,9 @@ def validate_record_supervision_coverage(record: dict[str, Any], allow_legacy_lo
     augmentation = record.get("augmentation_profile", {})
     if isinstance(augmentation, dict) and "train_on_turn" in augmentation:
         raise LossMaskValidationError("augmentation_profile_mixed_train_on_turn")
+    assistant_end_token = None
+    if loss_mask.get("enforcement") != "all_masked_not_train_eligible":
+        assistant_end_token = required_assistant_end_token(loss_mask)
 
     trainable = span_ranges(loss_mask, "trainable_spans")
     masked_think = span_ranges(loss_mask, "masked_think_spans")
@@ -864,9 +904,12 @@ def validate_record_supervision_coverage(record: dict[str, Any], allow_legacy_lo
         "parser_critical_status": "pass",
         "ratio_status": "pass",
         "legacy_loss_objective": legacy_loss_objective,
+        "assistant_end_token_supervision": "declared" if assistant_end_token is not None else "not_applicable_all_masked",
+        "trainable_assistant_end_token": assistant_end_token,
         "gate_contract": {
             "parser_critical": "threshold=all_required_fragments_trainable",
             "assistant_non_think_trainable_ratio": "threshold>=0.90",
+            "assistant_end_token_supervision": "threshold=<|im_end|> declared and token-labeled",
             "prompt_user_system_leakage": "threshold=0",
             "think_leakage": "threshold=0",
             "record_counts": "no_gate_by_design_observability_only",
@@ -887,9 +930,10 @@ def build_maformac_token_labels(record: dict[str, Any], tokenizer, allow_legacy_
         allow_legacy_loss_objective=allow_legacy_loss_objective,
     )
 
-    tokens, _, offsets, assistant_start = assistant_tokenization(record, tokenizer)
+    tokens, assistant_tokens, offsets, assistant_start = assistant_tokenization(record, tokenizer)
     labels = [-100] * len(tokens)
     trainable_token_count = 0
+    assistant_end_index: int | None = None
 
     for span in loss_mask.get("trainable_spans", []):
         for assistant_index in token_indices_for_span(offsets, span):
@@ -904,6 +948,17 @@ def build_maformac_token_labels(record: dict[str, Any], tokenizer, allow_legacy_
             if 0 <= full_index < len(labels):
                 labels[full_index] = -100
 
+    if loss_mask.get("enforcement") != "all_masked_not_train_eligible":
+        assistant_end_token = required_assistant_end_token(loss_mask)
+        assistant_end_index = assistant_end_token_index(
+            tokens,
+            assistant_start,
+            len(assistant_tokens),
+            tokenizer,
+            assistant_end_token,
+        )
+        labels[assistant_end_index] = int(tokens[assistant_end_index])
+
     if loss_mask.get("enforcement") != "all_masked_not_train_eligible" and not any(label != -100 for label in labels):
         raise LossMaskValidationError("token_trainable_labels_missing")
     if len(labels) != len(tokens):
@@ -913,6 +968,8 @@ def build_maformac_token_labels(record: dict[str, Any], tokenizer, allow_legacy_
         "trainable_tokens": sum(1 for label in labels if label != -100),
         "ignored_tokens": sum(1 for label in labels if label == -100),
         "trainable_span_tokens_before_think_mask": trainable_token_count,
+        "assistant_end_token_supervised": assistant_end_index is not None,
+        "assistant_end_token_index": assistant_end_index,
     }
     return tokens, labels
 
@@ -1035,6 +1092,7 @@ def validate_maformac_loss_mask_datasets(
         "ignored_label_records": 0,
         "trainable_tokens": 0,
         "ignored_tokens": 0,
+        "assistant_end_token_supervised_records": 0,
         "legacy_loss_objective_allowed": any(dataset.allow_legacy_loss_objective for dataset in datasets.values()),
         "legacy_loss_objective_record_count": 0,
         "max_seq_length": max_seq_length,
@@ -1064,6 +1122,7 @@ def validate_maformac_loss_mask_datasets(
             "ignored_label_records": 0,
             "trainable_tokens": 0,
             "ignored_tokens": 0,
+            "assistant_end_token_supervised_records": 0,
             "max_token_length": 0,
         }
         for index in range(len(dataset)):
@@ -1101,14 +1160,23 @@ def validate_maformac_loss_mask_datasets(
                 digest["min_trainable_non_think_ratio"] = ratio if digest["min_trainable_non_think_ratio"] is None else min(digest["min_trainable_non_think_ratio"], ratio)
             if coverage.get("legacy_loss_objective") is True:
                 summary["legacy_loss_objective_record_count"] += 1
+            token_summary = dataset[index].get("_maformac_token_mask_summary", {})
+            if token_summary.get("assistant_end_token_supervised") is True:
+                split_summary["assistant_end_token_supervised_records"] += 1
         for key in ["records", "trainable_records", "ignored_label_records", "trainable_tokens", "ignored_tokens"]:
             summary[key] += split_summary[key]
+        summary["assistant_end_token_supervised_records"] += split_summary["assistant_end_token_supervised_records"]
         summary["splits"][split] = split_summary
 
     if require_train and datasets["train"].__len__() == 0:
         errors.append("train.jsonl_empty")
     if require_train and summary["splits"]["train"]["trainable_tokens"] == 0:
         errors.append("trainable_loss_mask_tokens_missing")
+    if summary["trainable_records"] != summary["assistant_end_token_supervised_records"]:
+        errors.append(
+            "assistant_end_token_supervised_record_count_mismatch:"
+            f"{summary['assistant_end_token_supervised_records']}/{summary['trainable_records']}"
+        )
     if summary["length_violations"]:
         for violation in summary["length_violations"][:25]:
             errors.append(
