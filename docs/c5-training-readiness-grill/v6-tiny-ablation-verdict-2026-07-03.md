@@ -39,3 +39,17 @@ attribution=tiny 44 行数据稀疏（「关闭」自然语义仅 2 训练行且
 集合关系：base 18 ∩ adapter 8 = 6 both；**base-only 退化 12**；adapter-only 提升 2（window 百分比行）；neither 14。
 六形态：①`open_*` 过度泛化侵占 raise/lower/adjust（6 条，亮度/风速重灾）②close/否定极性反转（3）③window 数值化入侵简单开（2）④🔴 **query→actuation（`query_ac_temperature`→`open_ac_temperature_to_max`，只读变控制=安全语义级风险类）**（1）⑤adapter 仅胜在显式百分比行（2，但同配方制造了③）⑥多 call 首调丢失+次调极性漂移共存（MP-028）。
 **wave-1 配方锚 6 条**：D 轴聚合数≠纯模型质量（退化集中于 LoRA surface 语义族碰撞）/ window 百分比行需负例配平 / open-adjust-raise/lower 数据分离 / query 反执行负例 / 否定纠正对监督 / 保留 ordered-call 证据+双 call 配对样本。
+
+## 附录2：v6.1 EOS 增量对照（同配方单变量=trainable span 延至 `<|im_end|>`）
+| 轴 | v6-probe2 adapter | v6.1 adapter | delta |
+|---|---|---|---|
+| A | 15/15 | **15/15** | 0 ✅ 协议记忆无损 |
+| B | 11/15 | 11/15 | 0 |
+| C | 4/4 | 2/4 | -2（empty +1） |
+| D | 8/34 | 5/34 | -3（empty +3） |
+**重复病理：repeated_end 68/68 → 1/68**（EOS 监督生效，GF-153 主目标达成）；残余 4 parse_error + 1 重复（TRAP-LURE-001）待下钻。C/D 微降+empty 增=EOS 让模型对边缘 case 更早停（「沉默化」），tiny 规模下的次级效应，wave-1 广覆盖下再评。
+
+## 附录3：wave-1 proto build 全量数据门首跑（2026-07-03 凌晨，%45）
+- **build：4500 样本（train 4100/valid 400/test 128）38.8s**；工具覆盖 expected 314/562、mounted 395/562、55 subset 组、tools/row avg14.5 max48。
+- **C5DataGate 全量 exit0 `data_gate_ready`：4500 行 must_not_train=0/parent_overlap=0/heldout_axis_overlap=0/row_overlap=0/tool_format_fail=0/quarantine=0/C6 交集=0**——磊哥「数据门跑完」全量版兑现（协议串模式，自然句待云语料）。
+- 🔴 **暴露 wave-1 训练前必修 gap**（tiny 44 行未暴露）：MLX preflight strict exit66——`max_token_length=8982 > max_seq 8192`、length_violations=294、valid/test 行 under-supervised（当前契约只监督 train 行）。→ 新 grill 议题：长行策略（截断/提 max_seq/拆样本）+ valid/test 行监督契约。

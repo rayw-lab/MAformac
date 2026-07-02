@@ -13,7 +13,7 @@ for: 磊哥醒来一页看全
 | 您的要求 | 状态 |
 |---|---|
 | tiny ablation 跑完 | ✅ 训练 600 iters（loss 0.072/NONFINITE 0）+ paired 四轴 probe2 + verdict `docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md` |
-| wave-1 真生成 + 数据门 | 🟡 live 生成=真 blocker（代码有意 fail-closed+无云凭证）；已推进到「只差凭证」：G7 mock 端到端 PASS、labeler slots 桥接实装、generator surface GAP 修复中、**tiny 数据门实跑 data_gate_ready（44 行硬计数全零）** |
+| wave-1 真生成 + 数据门 | 🟡→🟢 live 云生成=真 blocker（无凭证）；但 **wave-1 协议串底座 4500 行已 build + C5DataGate 全量 exit0 硬计数全零**（数据门全量兑现）；G7 surface 贯通+missing_surface 硬门实装；暴露训练前必修：max_token 8982>8192/294 长度违规/valid-test 监督契约（新 grill 议题） |
 | A+ 修 loss/augmentation/coverage/probe四轴/base配对/decode 契约 | ✅ 全落地（P12+P3H v2/v3），双异 worker 审计 APPROVE |
 | old v5 必 FAIL / new v6 必 PASS | ✅ 镜像门 commander 双亲核（old exit66 under-supervision 归因精准 / new exit0 ratio 1.0） |
 | 硬三件+文件为准 | ✅ 全 receipt 在 `runs/tiny-ablation-adjudication-A/` |
@@ -29,7 +29,7 @@ for: 磊哥醒来一页看全
 1. **PR #26 / #27（P12 A+ 契约）/ #28（v6.1 EOS 监督）merge**——双双异 worker 审计 APPROVE + CI（26 双绿；27 一支 whitespace fail 修复中）；classifier 不许我自合，您一键即可。
 2. **wave-1 5 拍点**：`docs/c5-training-readiness-grill/wave1-owner-decision-package-2026-07-03.md`（云凭证是唯一无 default 项）。
 3. **GF 121 决策 lock**：31 组消减包（`runs/governance-fit-grill/gf-reduction-draft.md`，commander 终审后附）+ F-044 阈值终值（A 15/15、B 14/15 draft；v6 实测 B 11/15 敏感性已列）。
-4. **v6.1 是否重训**：EOS 监督（GF-153，%44 实装中）消重复病理；不改裁决结论，可与 wave-1 合并训。
+4. **v6.1 已重训+probe**（授权内单变量）：A 保持 15/15、重复病理 68/68→1/68（EOS 生效）、C/D 微降=早停沉默化次级效应（verdict 附录2）；PR #28 已开。
 5. wave-1 数据配方新增依据：open/close 极性对称配比必做；D 轴退化（8 vs base18）作 regression 锚。
 
 ## 产出索引
