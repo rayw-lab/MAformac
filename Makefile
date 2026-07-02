@@ -1,6 +1,7 @@
 PYTHON_BOOTSTRAP ?= python3
 PYTHON := .venv/bin/python
 PIP := .venv/bin/pip
+PYTHON_TOKENIZER ?= python3.13
 GENERATED_CONTRACTS := \
 	contracts/semantic-function-contract.jsonl \
 	contracts/semantic-followup-transitions.jsonl \
@@ -19,9 +20,11 @@ GENERATED_DOMAIN := \
 	generated/D_domain.tools.full.json \
 	generated/d_domain_ir_map.json \
 	generated/strangler_map.json \
-	generated/rendered_tools_text
+	generated/rendered_tools_text \
+	generated/subset-policy-manifest.json \
+	generated/subset-grammar-artifacts.json
 
-.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test clean-venv
+.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -76,6 +79,7 @@ test: .venv/.deps.stamp
 	$(PYTHON) scripts/test_tool_name_sanitize.py
 	$(PYTHON) scripts/test_check_c6_case_shape.py
 	$(PYTHON) scripts/test_c6_bench_cli.py
+	$(PYTHON) scripts/test_subset_manifest.py
 
 verify-source: .venv/.deps.stamp
 	$(PYTHON) scripts/freeze_snapshot.py --check
@@ -86,9 +90,13 @@ regen: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
 	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
+	HF_HUB_OFFLINE=1 $(PYTHON_TOKENIZER) scripts/gen_subset_manifest.py --emit --verify-budget --budget-cap 7200 --tokenizer-mode qwen --output-dir generated
 
 regen-tool-contract: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
+
+verify-subset-budget:
+	HF_HUB_OFFLINE=1 $(PYTHON_TOKENIZER) scripts/gen_subset_manifest.py --check --verify-budget --budget-cap 7200 --tokenizer-mode qwen
 
 verify-refs: .venv/.deps.stamp
 	$(PYTHON) scripts/verify_refs.py
