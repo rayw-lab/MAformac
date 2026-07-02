@@ -231,3 +231,12 @@
 - **佐证**: commander 直跑 hermes 两次：第一次 hermes CLI 本体 stash 冲突炸（已可逆修复：`git reset --merge` 中止失败 pop，stash@{0} 18 文件原封保留供磊哥重处理）；第二次回稿仅 **284 字节=废稿**（留档 `HERMES-FINAL-AUDIT-G7-commander-direct.md` 勿引）——印证 worker 盯守模式更可靠。
 - **落点**: 本 D-021 + %44 首单（hermes G7 终审，质检门 <2000 字节=废稿重试）+ memory 更新
 - 🔴 **UPDATE（磊哥泛化 D-021，2026-07-02）**：助理角色**只是临时**——commander 可**随时流转 3 worker 角色**：调研/设计/联网搜证/grill/脑暴/codex 自审/外部 gptpro-hermes 审计/**开发任务（最多）**/**架构设计（最多）**/数据-训练-评测-测试，**一切执行下沉 worker**；commander=纯编排+裁决+记忆+收稿亲核（「你就是上帝即可」）。角色帽子按任务派单时指定，不固定编制。
+
+## D-022 hermes GLM-5.2 终审收稿（REQUEST_CHANGES）+ 辩证吸收 + 三线修复派发
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（修复中）｜ **Type**: Cross-vendor-audit-absorption ｜ **Owners**: hermes 审 / commander 亲核裁决 / 三 worker 修
+- **hermes verdict = REQUEST_CHANGES**（真异源 GLM-5.2，%44 助理执行位跑通；产出磊哥手转）：**P0=0**。
+- **P1（ship-blocking，commander 亲核 `C5LoRATraining.swift:2861` 坐实）**：G7D loader 取首 entry 的 subset_policy_id 当真值**零校验**——wrong-policy manifest 被静默接受产样本（= SF-13 manifest 混训风险的入口）。hermes **亲手构造 wrong-policy probe 实跑暴露**（非读码推断）。🔴 **二层 catch**：XG7D 交叉审曾声称验过「policy 失配」三态给 PASS_WITH_NOTES——被 hermes 证伪 = **交叉审的验证声称本身也要抽核**（审计的审计，异源层级价值第 6+7 例）。
+- **P2×2**：C6 dead fields（`expectedUnsupportedClass` 只 decode 零消费 / `isModelFailure` 恒 false）+ G7 no-op（`timeoutMilliseconds` 未用 / `rawPayload` 只写不读）——dead-field 同构扫描的直接收获。
+- **CLEAR 项**：分组血缘/双向闭包/562 并集/预算门/唯一 degraded pair/add-only 零侵入/六轴 receipt blocked/R7 无网络路径/G1 门/labeler LLM 零参与/四门/冻结参数——全项亲跑复现命令给证。
+- **辩证吸收**：P1/P2 全收（无一撞已决，均为实现漏）；steelman 零驳回。**修复三线**：%45 P1（policy authority 校验 + hermes probe 固化为永久测试）/ %43 P2-C6（补真消费禁删字段——两字段是 S-210 locked 的 expected 侧载体）/ %44 P2-G7（接行为或删+说理）。修后交换交叉审 + hermes delta 复审（%44 助理执行）→ staged merge。
+- **落点**: 本 D-022 + `HERMES-FINAL-AUDIT-G7.md`（%44 产出）+ 三修复 SPEC（tmux inline）
