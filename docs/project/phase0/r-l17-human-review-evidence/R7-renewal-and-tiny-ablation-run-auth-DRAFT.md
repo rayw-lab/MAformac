@@ -40,15 +40,21 @@ human_owner_signature: <未填>
 ### B.1 授权前置条件（全 ☑ 才可进签字区）
 | # | 前置 | 验证方式 | 状态 |
 |---|---|---|---|
-| 1 | 🔴 gate7 pipeline construction PR merged（G7A/G7B/G7C/G7D） | gh pr state=MERGED + main CI 绿 | ◐ 部分：A(#18 `c93efaee`)/B(#17 `2b006b8a`) MERGED 双审绿；C/D 进行中 |
-| 2 | 🔴 E-2 Phase-1 construction merged（manifest codegen + 预算门 + grammar artifact + C6 schema + receipt + 🆕 C5 builder 按 manifest[G7D]） | 同上 + `verify-subset-budget` 本地绿 | ◐ 部分：前五项已 merged（G7A/G7B）；G7D builder 装载进行中 |
-| 3 | route-only signoff 有效（未过期或已续签 Part A） | 本目录 signoff 文件 status | ☐ |
+| 1 | 🔴 gate7 pipeline construction PR merged（G7A/G7B/G7C/G7D） | gh pr state=MERGED + main CI 绿 | ☑ **全 MERGED**：A `c93efaee`/B `2b006b8a`/C `0ff56e06`/D `1d822961`，每支交叉审绿 |
+| 2 | 🔴 E-2 Phase-1 construction merged（manifest codegen + 预算门 + grammar artifact + C6 schema + receipt + C5 builder 按 manifest） | 同上 + `verify-subset-budget` 本地绿 | ☑ 全 merged + hermes findings 修复闭环（#21/#22/#23 closed，含 P1 policy authority + S-210 三层可达），`verify-subset-budget` PASS |
+| 3 | route-only signoff 有效（未过期或已续签 Part A） | 本目录 signoff 文件 status | ☑ 有效期内（expires 2026-07-15；Part A 续签模板备好） |
 | 4 | ablation 样本集就绪且过数据门（20-50 样本，含 subset manifest digest；must_not_train/C6 保护零命中） | C5DataGate receipt | ☐ |
-| 5 | 训练循环 verified（gate1 机制 + `--require-maformac-loss-mask` + 反向 guard 三 split 在 main） | main 代码态（已满足，D-018）+ run 前 self-test 复跑 | ☐ |
+| 5 | 训练循环 verified（gate1 机制 + `--require-maformac-loss-mask` + 反向 guard 三 split 在 main） | main 代码态 ☑（D-018）；run 前 self-test 复跑（run plan Step 2 前置） | ☑/run 前复跑 |
 | 6 | run 配置 = rank16Mainline 工厂（scale20/LR1e-4/gradClip1.0），零手改 | 渲染命令 diff 工厂 | ☐ |
-| 7 | receipt 契约就绪（run manifest / metrics.jsonl / 行为中门 / C6 样本探针 / non_claims） | blueprint §3 receipt 契约 | ☐ |
+| 7 | receipt 契约就绪（run manifest / metrics.jsonl / 行为中门 / C6 样本探针 / non_claims） | blueprint §3 + run plan §落盘清单 | ☑ |
 | 8 | 判定标准预注册（防移门）：**empty 28/34→<5/34 通过；未过不得声称范式修复；不得事后放宽** | 本 checklist 即预注册 | ☑ 预注册于此 |
 | 9 | ≥1 异源审计员指定（非 Claude-family，审 run 产物） | 磊哥指定 | ☐ |
+
+### B.1.1 真态快照 + scoped waiver（2026-07-02 深夜，磊哥认可态）
+- main = `aac84de9`（13 支 PR #12-#23 全合流；G7A/B/C/D + E-2 Phase-1 merged；hermes findings #21/#22/#23 closed）。
+- 终验收 receipt = **PARTIAL_SIBLING_NOISE**：main 全机械门 PASS + 修复轮目标套件全绿（C5 53/0 / C6Subset 18/0 / G7 8/0）；唯一失败 = pre-existing sibling UIUE fixture 对比测试（M1 前已存在，输入与本轮全部变更无关）。
+- 🔴 **scoped waiver（磊哥 2026-07-02）**：sibling UIUE fixture 噪声**仅豁免为本轮 tiny-ablation 的前置验收残留**——不豁免 wave-1/formal train/candidate/C6 acceptance 的验收要求；M4 UIUE 收口时根治。
+- 🔴 **non-claims（写死）**：tiny-ablation 通过 **不代表** wave-1 数据授权、不代表 formal train、不代表 candidate、不代表 C6 acceptance、不代表 UIUE merge、不代表 V/S/U-PASS——仅回答一个问题：「D-domain 范式在 20-50 样本过拟合下能否把 empty 从 28/34 打到 <5/34」。
 
 ### B.2 run 范围（授权即仅此，超出即违）
 - **仅** 裁决-A tiny ablation：20-50 样本小训练 + 行为探针评测。**不是** formal 训练、不是数据 wave、不是 C6 acceptance、不是 candidate comparison。
