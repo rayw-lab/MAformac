@@ -992,6 +992,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(record.lossMask.ignoreIndex, -100)
         XCTAssertEqual(record.lossMask.tokenLabelSource, "runtime_tokenizer_offsets")
         XCTAssertEqual(record.lossMask.enforcement, "token_labels_enforced_after_tokenization_with_think_mask")
+        XCTAssertEqual(record.lossMask.trainableAssistantEndToken, "<|im_end|>")
         XCTAssertEqual(record.lossObjectiveProfile, .assistantFullExceptThink)
         XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "assistant_non_think_payload" && $0.text.contains("<tool_call>") })
         XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.text.contains("\"name\"") && $0.text.contains("\"arguments\"") })
@@ -1001,6 +1002,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(json.contains("\"loss_objective_profile\":\"assistant_full_except_think\""))
         XCTAssertTrue(json.contains("\"augmentation_profile\""))
         XCTAssertTrue(json.contains("\"token_label_source\":\"runtime_tokenizer_offsets\""))
+        XCTAssertTrue(json.contains("\"trainable_assistant_end_token\":\"<|im_end|>\""))
         XCTAssertFalse(json.contains("\"labels\""))
     }
 
@@ -1103,6 +1105,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(mask.enforcement, "all_masked_not_train_eligible")
         XCTAssertTrue(mask.trainableSpans.isEmpty)
         XCTAssertEqual(mask.tokenLabelSource, "runtime_tokenizer_offsets")
+        XCTAssertNil(mask.trainableAssistantEndToken)
     }
 
     func testRenderedTrainCommandRequiresMAformacLossMaskPreflight() throws {
@@ -1122,6 +1125,8 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(loop.contains("loss_mask_present_but_flag_missing"))
         XCTAssertTrue(loop.contains("loss_objective_profile_missing"))
         XCTAssertTrue(loop.contains("legacy_loss_objective_allowed"))
+        XCTAssertTrue(loop.contains("assistant_end_token_supervision_missing"))
+        XCTAssertTrue(loop.contains("assistant_end_token_supervised_records"))
         XCTAssertTrue(loop.contains("def load_maformac_loss_mask_datasets"))
         XCTAssertTrue(loop.contains("def build_maformac_token_labels"))
         XCTAssertTrue(loop.contains("def maformac_masked_loss"))
@@ -1176,6 +1181,50 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(legacy.status, 0, legacy.stderr + legacy.stdout)
         XCTAssertTrue(legacy.stdout.contains(#""legacy_loss_objective_allowed": true"#), legacy.stderr + legacy.stdout)
         XCTAssertTrue(legacy.stdout.contains(#""legacy_loss_objective_record_count": 1"#), legacy.stderr + legacy.stdout)
+    }
+
+    func testPythonTrainingLoopSupervisesAssistantEndTokenAndRejectsMissingContract() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
+        guard FileManager.default.fileExists(atPath: baseModelDir.appendingPathComponent("tokenizer_config.json").path) else {
+            throw XCTSkip("missing local Qwen3 tokenizer fixture; source-free CI skips this local integration proof")
+        }
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for assistant end-token fixture")
+        }
+        let temporary = try makeTemporaryDirectory()
+        let modelDir = temporary.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
+        try createTrainingTokenizerPatch(sourceDir: baseModelDir, outputDir: modelDir)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "assistant_end_token_contract", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, usesTrainingTokenizerPatch: true)
+        )
+
+        let commonArguments = [
+            repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+            "--model", modelDir.path,
+            "--data", temporary.path,
+            "--require-maformac-loss-mask",
+            "--preflight-loss-mask-only",
+            "--train",
+            "--allow-mlx-lm-version-mismatch"
+        ]
+
+        let validRow = try String(decoding: JSONEncoder().encode(prepared.samples[0].mlxRecord), as: UTF8.self) + "\n"
+        try validRow.write(to: temporary.appendingPathComponent("train.jsonl"), atomically: true, encoding: .utf8)
+        let success = runProcess(executable: pythonExecutable, arguments: commonArguments, cwd: repoRoot)
+        XCTAssertEqual(success.status, 0, success.stderr + success.stdout)
+        XCTAssertTrue(success.stdout.contains(#""assistant_end_token_supervised_records": 1"#), success.stderr + success.stdout)
+
+        let invalidRow = try mlxRecordJSONWithoutAssistantEndToken(sample: prepared.samples[0]) + "\n"
+        try invalidRow.write(to: temporary.appendingPathComponent("train.jsonl"), atomically: true, encoding: .utf8)
+        let failure = runProcess(executable: pythonExecutable, arguments: commonArguments, cwd: repoRoot)
+        XCTAssertEqual(failure.status, 66, failure.stderr + failure.stdout)
+        XCTAssertTrue(failure.stderr.contains("LOSS_MASK_PREFLIGHT_FAILED"), failure.stderr + failure.stdout)
+        XCTAssertTrue(failure.stderr.contains("assistant_end_token_supervision_missing"), failure.stderr + failure.stdout)
     }
 
     func testPythonTrainingLoopRejectsLossMaskRowsWhenFlagMissing() throws {
@@ -1820,6 +1869,22 @@ final class C5LoRATrainingTests: XCTestCase {
             return "{}"
         }
         object.removeValue(forKey: "loss_objective_profile")
+        let patched = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        return String(decoding: patched, as: UTF8.self)
+    }
+
+    private func mlxRecordJSONWithoutAssistantEndToken(sample: C5TrainingSample) throws -> String {
+        let data = try JSONEncoder().encode(sample.mlxRecord)
+        guard var object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            XCTFail("encoded mlx record is not a JSON object")
+            return "{}"
+        }
+        guard var lossMask = object["loss_mask"] as? [String: Any] else {
+            XCTFail("encoded mlx record is missing loss_mask")
+            return "{}"
+        }
+        lossMask.removeValue(forKey: "trainable_assistant_end_token")
+        object["loss_mask"] = lossMask
         let patched = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
         return String(decoding: patched, as: UTF8.self)
     }
