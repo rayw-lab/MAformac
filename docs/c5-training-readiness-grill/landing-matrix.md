@@ -22,7 +22,7 @@ status: pre_human_signoff
 | 6 | C6 四层阈值化 fail-closed | **E-002~006** | **`rebuild-c6-four-layer-bench`**（R-L17 已解锁 construction §1/§2/§3）| C6 status `:1423` 固定 construction_report | 四层各阈值 fail-closed | ❌ 当前只统计 |
 | 7 | 云多源 generator+异源 judge | **D-031~037** | — | generator 编排 | 多源+异源judge+diversity 代码闭环 | ❌ research 锁方向代码未闭环 |
 | 8 | A2 D-domain codegen 落地 | D-005 / E-026 / **F-046**(工具数收口) | `migrate-d-domain-tool-surface` | ToolContractCompiler 单源 | 工具数 value-form 实算 | ⚠️ A2 已合 main，工具数 [TBD] 待实算 |
-| 裁决-A | **G6-C/D-fix tiny ablation**（范式真解决?）| **F-044** | — | — | empty 28/34→<5/34 + stepwise ablation | ❌ 必过才声称范式修复成功 |
+| 裁决-A | **G6-C/D-fix tiny ablation**（范式真解决?）| **F-044** | — | — | v5 重标 INVALID（D-027）；28/34=historical provenance；v6=四轴 paired base/adapter delta+absolute（A/B hard、C observe、D report-only） | ❌ 必过才声称范式修复成功 |
 | 裁决-B | positive-not-diluted+OOD invariant | **F-043** | — | C6 action 轴独立 fail-closed | positive 不被 negative/readback 稀释 | ❌ 待实装 |
 | R-L17 | candidate signoff（人审解锁训练）| **F-045** | — | R7 `route_only_signed`→candidate | C6 construction 完成+signed candidate+run auth+human signoff | 🔓 route-only signed / candidate ❌ blocked |
 

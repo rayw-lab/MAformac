@@ -73,7 +73,7 @@ reason:
 | 1 契约 | + consumer 契约 frontmatter（`consumers:`/`sufficiency_evidence:`）从本议题产物开始试点；+ 哨兵数字门化规则（载力数字必有门或 `no_gate_by_design`） |
 | 2 代码 | + coverage 自反测试保留（old fail/new pass）；+ 探针 decode 契约实装（greedy/stop tokens/max_tokens 进 harness 与 receipt） |
 | 3 探针重设计 | 🔴 + **base 配对臂**：4 轴每轴 base(无 adapter) 与 adapter 同 harness 同 decode 各跑一遍；门改「配对差 + 绝对值」双条件；+ F-044 修订（废 θ-α 28/34 历史锚，改同 harness 实测 base 锚） |
-| 4 v6 rerun | + R7 交叉核对（route-only 7-15 到期，v6 若在其后需先续签 Part A）；+ 新 run-auth 必须引用本档 §0 verdict 四 reason（防授权书与归因脱节） |
+| 4 v6 rerun | + R7 交叉核对（route-only 7-15 到期（✅ D-027 已续签至 07-23，本句为决策前风险说明），v6 若在其后需先续签 Part A）；+ 新 run-auth 必须引用本档 §0 verdict 四 reason（防授权书与归因脱节） |
 | 5 wave-1 | + gate7 pipeline 的样本组装消费新 loss 契约（G7C 代码已 merge，接口需按 Phase 1 契约字段对齐——排查点入 wave-1 前置清单） |
 | 6 formal | +（无新增，GPT-5.5 版已含 mid-training 行为门与分账评测） |
 | 7 governance | + 审计 SPEC 模板加 fit 维度；+ 机械闯关元门（连续 ≥3 → fit-spot）；+ P0 失败分析双 LLM 辩证制度化；+ readiness 词表四级采纳（mechanism-true / fit-proven / experiment-valid / behavior-proven） |
@@ -87,7 +87,7 @@ reason:
 | 3 | A+ 契约方案（loss profile 枚举/augmentation 拆名/coverage 双门/train_on_turn 退役） | ⭐ 拍 A+ |
 | 4 | base 配对重锚（F-044 修订，废历史 28/34 锚） | ⭐ 拍（不拍则 v6 结果仍不可解释） |
 | 5 | Phase 0-3 先行授权（docs/code/test only，不训练不生成） | ⭐ 授权（worker 立即可动，v6 run-auth 另签） |
-| 6 | R7 续签 Part A（7-15 到期，v6 大概率在其后） | ⭐ 顺手签 |
+| 6 | R7 续签 Part A（原 7-15 到期；✅ D-027 已续签至 07-23） | ⭐ 顺手签 |
 
 ## §6 级联义务（本档收口时执行）
 

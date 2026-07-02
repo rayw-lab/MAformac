@@ -5,7 +5,7 @@ paradigm: UIUE 215-grill 决策矩阵（7 列 + 防惨败列 + 消减表 + landi
 id_ranges: W1 契约细化官 GF-001~040 / W2 门与词表官 GF-101~140 / W3 制度官 GF-201~240 / commander 纵切 GF-C01~10
 created: 2026-07-02
 seed: tiny-ablation 三轮跨 LLM teardown（FINAL 档 §3/§4）+ lessons M 段 7 条——反思产出的治理原语需 grill 细化成可实装决策
-status: w1_w2_delivered_w3_running（W1/W2 各 40 决策已收割；W3 制度官 %43 跑中；另有 GF-141~148 P3H v2 grill 已按 default 落地）
+status: w1_w2_w3_delivered_pending_commander_reduction（三官各 40 决策收讫；另有 GF-141~156 两轮 harness grill 按 overnight default 落地）
 ---
 
 # governance-fit grill round — 反思细化（磊哥令：按范式组织推进）
@@ -26,5 +26,5 @@ status: w1_w2_delivered_w3_running（W1/W2 各 40 决策已收割；W3 制度官
 |---|---|---|---|---|
 | D1-D3 | W1 | 40 (GF-001~040) | consumer frontmatter schema + loss 枚举边界 + decode 具体值（GF-030 max_tokens 80→historical, v6=160） | ✅ proposed 稿收割 `governance-fit-w1-decisions.md`，待磊哥 lock |
 | D4-D6 | W2 | 40 (GF-101~140) | 12 field groups + 4级词表+5 landing 字段 + F-044 终稿 | ✅ proposed 稿收割 `governance-fit-w2-decisions.md`，待磊哥 lock |
-| D7-D9 | W3 | — | — | pending |
+| D7-D9 | W3 | 40 (GF-201~240) | D7 双LLM P0 门槛+成本上限 / D8 GF-127 审计模板 / D9 N=3 机械 fit-spot 元门 | ✅ proposed 稿收讫（run 目录），待消减 |
 | 纵切 | commander | — | — | pending |
