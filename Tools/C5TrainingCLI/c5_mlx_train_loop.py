@@ -23,31 +23,89 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any, Iterable
 
-import mlx.core as mx
-import mlx.nn as nn
-import mlx.optimizers as optim
-import numpy as np
-import yaml
-from mlx.nn.utils import average_gradients
-from mlx.utils import tree_flatten, tree_map, tree_reduce
-from tqdm import tqdm
-from transformers import AutoTokenizer
-
-from mlx_lm.lora import CONFIG_DEFAULTS, build_parser, yaml_loader
-from mlx_lm.tuner.datasets import CacheDataset, load_dataset
-from mlx_lm.tuner.trainer import TrainingArgs, default_loss, evaluate, grad_checkpoint
-from mlx_lm.tuner.trainer import iterate_batches as stock_iterate_batches
-from mlx_lm.tuner.utils import (
-    build_schedule,
-    linear_to_lora_layers,
-    print_trainable_parameters,
-)
-from mlx_lm.utils import load, save_config
-
 
 REQUIRED_MLX_LM_VERSION = "0.31.1"
 DEFAULT_GRAD_CLIP_NORM = 1.0
 DEFAULT_NONFINITE_FALLBACK_LR = 5e-5
+
+mx = nn = optim = np = yaml = None
+average_gradients = tree_flatten = tree_map = tree_reduce = None
+tqdm = AutoTokenizer = None
+CONFIG_DEFAULTS = build_parser = yaml_loader = None
+CacheDataset = load_dataset = None
+TrainingArgs = default_loss = evaluate = grad_checkpoint = None
+stock_iterate_batches = None
+build_schedule = linear_to_lora_layers = print_trainable_parameters = None
+load = save_config = None
+
+
+def ensure_mlx_runtime() -> None:
+    global mx, nn, optim, np, yaml
+    global average_gradients, tree_flatten, tree_map, tree_reduce
+    global tqdm, AutoTokenizer
+    global CONFIG_DEFAULTS, build_parser, yaml_loader
+    global CacheDataset, load_dataset
+    global TrainingArgs, default_loss, evaluate, grad_checkpoint, stock_iterate_batches
+    global build_schedule, linear_to_lora_layers, print_trainable_parameters
+    global load, save_config
+
+    if mx is not None:
+        return
+
+    import mlx.core as _mx
+    import mlx.nn as _nn
+    import mlx.optimizers as _optim
+    import numpy as _np
+    import yaml as _yaml
+    from mlx.nn.utils import average_gradients as _average_gradients
+    from mlx.utils import tree_flatten as _tree_flatten
+    from mlx.utils import tree_map as _tree_map
+    from mlx.utils import tree_reduce as _tree_reduce
+    from tqdm import tqdm as _tqdm
+    from transformers import AutoTokenizer as _AutoTokenizer
+
+    from mlx_lm.lora import CONFIG_DEFAULTS as _CONFIG_DEFAULTS
+    from mlx_lm.lora import build_parser as _build_parser
+    from mlx_lm.lora import yaml_loader as _yaml_loader
+    from mlx_lm.tuner.datasets import CacheDataset as _CacheDataset
+    from mlx_lm.tuner.datasets import load_dataset as _load_dataset
+    from mlx_lm.tuner.trainer import TrainingArgs as _TrainingArgs
+    from mlx_lm.tuner.trainer import default_loss as _default_loss
+    from mlx_lm.tuner.trainer import evaluate as _evaluate
+    from mlx_lm.tuner.trainer import grad_checkpoint as _grad_checkpoint
+    from mlx_lm.tuner.trainer import iterate_batches as _stock_iterate_batches
+    from mlx_lm.tuner.utils import build_schedule as _build_schedule
+    from mlx_lm.tuner.utils import linear_to_lora_layers as _linear_to_lora_layers
+    from mlx_lm.tuner.utils import print_trainable_parameters as _print_trainable_parameters
+    from mlx_lm.utils import load as _load
+    from mlx_lm.utils import save_config as _save_config
+
+    mx = _mx
+    nn = _nn
+    optim = _optim
+    np = _np
+    yaml = _yaml
+    average_gradients = _average_gradients
+    tree_flatten = _tree_flatten
+    tree_map = _tree_map
+    tree_reduce = _tree_reduce
+    tqdm = _tqdm
+    AutoTokenizer = _AutoTokenizer
+    CONFIG_DEFAULTS = _CONFIG_DEFAULTS
+    build_parser = _build_parser
+    yaml_loader = _yaml_loader
+    CacheDataset = _CacheDataset
+    load_dataset = _load_dataset
+    TrainingArgs = _TrainingArgs
+    default_loss = _default_loss
+    evaluate = _evaluate
+    grad_checkpoint = _grad_checkpoint
+    stock_iterate_batches = _stock_iterate_batches
+    build_schedule = _build_schedule
+    linear_to_lora_layers = _linear_to_lora_layers
+    print_trainable_parameters = _print_trainable_parameters
+    load = _load
+    save_config = _save_config
 
 
 class NonFiniteTrainingError(RuntimeError):
@@ -80,7 +138,18 @@ class MetricsWriter:
 
 
 def parse_args(argv: list[str]) -> types.SimpleNamespace:
-    parser = build_parser()
+    try:
+        ensure_mlx_runtime()
+        parser = build_parser()
+        defaults = dict(CONFIG_DEFAULTS)
+    except ModuleNotFoundError:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--config", type=str, default=None)
+        parser.add_argument("--model", type=str, default=None)
+        parser.add_argument("--data", type=str, default=None)
+        parser.add_argument("--train", action="store_true")
+        parser.add_argument("--test", action="store_true")
+        defaults = {}
     parser.add_argument("--grad-clip-norm", type=float, default=None)
     parser.add_argument("--disable-grad-clip", action="store_true")
     parser.add_argument("--stock-update-inside-compile", action="store_true")
@@ -96,6 +165,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
 
     config_path = args.get("config")
     if config_path:
+        ensure_mlx_runtime()
         print("Loading configuration file", config_path)
         with open(config_path, "r", encoding="utf-8") as file:
             config = yaml.load(file, yaml_loader)
@@ -103,7 +173,6 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             if args.get(key, None) is None:
                 args[key] = value
 
-    defaults = dict(CONFIG_DEFAULTS)
     defaults.update(
         {
             "grad_clip_norm": DEFAULT_GRAD_CLIP_NORM,
@@ -175,15 +244,22 @@ def clipped_train(
     optimizer,
     train_dataset,
     val_dataset=None,
-    args: TrainingArgs = TrainingArgs(),
-    loss: callable = default_loss,
-    iterate_batches: callable = stock_iterate_batches,
+    args=None,
+    loss: callable | None = None,
+    iterate_batches: callable | None = None,
     metrics: MetricsWriter | None = None,
     grad_clip_norm: float = DEFAULT_GRAD_CLIP_NORM,
     disable_grad_clip: bool = False,
     stock_update_inside_compile: bool = False,
     nonfinite_fallback_lr: float = DEFAULT_NONFINITE_FALLBACK_LR,
 ):
+    if args is None:
+        args = TrainingArgs()
+    if loss is None:
+        loss = default_loss
+    if iterate_batches is None:
+        iterate_batches = stock_iterate_batches
+
     if mx.metal.is_available():
         mx.set_wired_limit(mx.device_info()["max_recommended_working_set_size"])
     print(f"Starting training..., iters: {args.iters}", flush=True)
@@ -531,6 +607,24 @@ def batch_signature(batch_index: int, batch_tuple: Any) -> dict[str, Any]:
     }
 
 
+def guard_stock_loader_rejects_loss_mask(args) -> None:
+    data_root = Path(args.data)
+    for split in ("train", "valid"):
+        path = data_root / f"{split}.jsonl"
+        if not path.exists():
+            continue
+        with path.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(record, dict) and "loss_mask" in record:
+                    raise LossMaskValidationError("loss_mask_present_but_flag_missing")
+
+
 class MAformacLossMaskDataset:
     def __init__(self, data: list[dict[str, Any]], tokenizer):
         self._data = data
@@ -858,9 +952,14 @@ def inspect_batches(args) -> None:
 
 def run(args) -> None:
     if args.self_test_loss_mask:
+        ensure_mlx_runtime()
         run_loss_mask_self_test()
         return
 
+    if not args.require_maformac_loss_mask:
+        guard_stock_loader_rejects_loss_mask(args)
+
+    ensure_mlx_runtime()
     version = require_pinned_mlx_lm(args.allow_mlx_lm_version_mismatch)
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
     np.random.seed(args.seed)
