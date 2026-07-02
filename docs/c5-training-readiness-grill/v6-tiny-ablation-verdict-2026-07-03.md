@@ -34,3 +34,8 @@ attribution=tiny 44 行数据稀疏（「关闭」自然语义仅 2 训练行且
 
 ## verdict 词表（GF-154/F-044，不升格）
 `A_PASS_TINY_SCOPE + B_FAIL_WITH_ATTRIBUTION(data_sparsity) + probe1=INVALID_PROBE(tools挂载缺失,已修复重跑)`。不声称：范式整体成立/C6 acceptance/candidate/模型质量/V-S-U-PASS。
+
+## 附录：D 轴退化形态图（%43 深挖，2026-07-03，一手 `runs/tiny-ablation-adjudication-A/v6-d-axis-degradation-map.md`）
+集合关系：base 18 ∩ adapter 8 = 6 both；**base-only 退化 12**；adapter-only 提升 2（window 百分比行）；neither 14。
+六形态：①`open_*` 过度泛化侵占 raise/lower/adjust（6 条，亮度/风速重灾）②close/否定极性反转（3）③window 数值化入侵简单开（2）④🔴 **query→actuation（`query_ac_temperature`→`open_ac_temperature_to_max`，只读变控制=安全语义级风险类）**（1）⑤adapter 仅胜在显式百分比行（2，但同配方制造了③）⑥多 call 首调丢失+次调极性漂移共存（MP-028）。
+**wave-1 配方锚 6 条**：D 轴聚合数≠纯模型质量（退化集中于 LoRA surface 语义族碰撞）/ window 百分比行需负例配平 / open-adjust-raise/lower 数据分离 / query 反执行负例 / 否定纠正对监督 / 保留 ordered-call 证据+双 call 配对样本。
