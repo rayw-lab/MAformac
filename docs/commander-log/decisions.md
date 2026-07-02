@@ -262,3 +262,11 @@
 - **规则**: 已授权 run 期间遇 **机械性 blocker**（代码 bug/环境/工具链——不碰阈值/样本量/配方参数/scope 边界四红线）→ **commander 直接授权修复 + 固化测试 + 继续跑**，事后 receipt 汇报；四红线才上抛磊哥。BLOCKED 上抛从「默认动作」改为「仅四红线」。
 - **首例**: tiny-ablation Step2 exit 66——`'TokenizerWrapper' object is not callable`（mlx-lm `load()` 返回 wrapper 不可直调；gate2 修复期 self-test 合成 logits/Swift 测试 dummy model 均不触 tokenizer 真调用路径，第一次真跑才现形 = re-audit 残留 P1 预言的正确性残留，fail-closed 正确拦下）。修法=`getattr(tokenizer, "_tokenizer", tokenizer)` 兼容 + 单测。机械修复，非配方/阈值/scope 改动。
 - **落点**: 本 D-025 + 宪法 §8 补条 + run receipt
+
+## D-026 🔴 裁决-A verdict = BLOCKED（34/34 NO_TOOL 重复）+ 归因坐实 = masking span 语义误用（配方级，修复上抛）
+- **Date**: 2026-07-02 深夜 ｜ **Status**: Accepted（失败门纪律执行中，重跑等磊哥新授权）｜ **Type**: Adjudication-verdict + Dim10 归因 ｜ **Owners**: commander 亲核归因 / %45 执行 run
+- **run 全链实录**: v1 dev-selection 吸干→v2 masking_complete 未实装→v3 NONFINITE(1024 截断除零)→v4 8192 Metal OOM→v5(batch1/grad16+grad_checkpoint+seq5120) **600 iters 训练完成零 NONFINITE**（loss 2.11→0.16 区间震荡，adapter 落盘）→ 34-case 探针全 dump → harness real verdict = **blocked（emptyToolCallOutputs=34/34 ≥ 5）**。失败门纪律全程守（未改 LR/rank/scale/clip/iters/样本/阈值，未重跑，未开 wave-1）。
+- **归因（commander 一手下钻 train.jsonl+probe dump，非聚合推断）**: ① probe 显示模型**非沉默**——输出 `NO_TOOL.NO_TOOL...` 无限重复（与 θ-α 空输出不同型）② train.jsonl 44 条 positive 的 `trainable_spans` **只含 function_name 碎片**（例：71 字符 assistant 全文只放行 20 字符工具名；字符覆盖率 median 29.7% min 12%；全集仅 209 trainable tokens）——`<tool_call>` 包裹/JSON 骨架/闭合全被 -100 掩死 ③ 模型唯一被完整监督的输出形态=NO_TOOL → 学会且只会它。**根因 = P1-C 早已锁的「masking 三形态实为两类机制」被实现混淆：function/arg masking 本是【数据增广】（换名防死记），却被做成【loss span】（只训 name 碎片）；train_on_turn 的 loss-mask 正确语义 = 掩 prompt 训全 assistant turn（业界标准 SFT masking，home-llm 同款）**。
+- 🎯 **价值**: tiny-ablation 用 ~50 分钟真跑在 formal train 前抓出 masking 语义级配方缺陷——若直接 wave-1 = 第三次 0/34。裁决门体系再次自证（D-003「严禁跳 gate」的活证据）。**范式（D-domain 具名工具可学性）未被证伪**——监督信号残缺时模型无从学起，本 run 不构成范式判决。
+- **修复提案（配方红线，上抛磊哥）**: ⭐ **A**：trainable_spans 改为**整个 assistant 输出 span**（train_on_turn 正确语义；prompt 掩、assistant 全训；think span 仍掩=gate2 think-mask 保留；function/arg 碎片 span 语义归还给数据增广形态=wave-1 的 augmentation 实装）｜ B：显式枚举包裹+name+args 全 span（≈A 的枚举版）。两案都不动 LR/rank/scale/iters/样本/阈值。**重跑同 44 样本 = 磊哥新授权**（失败门纪律）。
+- **落点**: 本 D-026 + verdict.json/probe/RECEIPT-TINY-ABLATION 一手 + 上抛磊哥
