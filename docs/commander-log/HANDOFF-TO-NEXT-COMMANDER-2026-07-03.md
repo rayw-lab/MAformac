@@ -51,7 +51,7 @@ created: 2026-07-03 凌晨
 - 主线树 `MAformac` @ `codex/rebuild-c6-doc-absorption-20260624`——**commander 决策/grill/verdict 全在此，领先 main 77 commits 未 push**🔴（下任第一要务之一：push + 开 docs PR，或磊哥拍直接合）。untracked：runs/（仓外证据镜像）、XSWAP-23-fix.md、.xcodebuildmcp/、Tools/agent-platform-plugin-refs/（历史遗留，别误 commit）。
 - `MAformac-p3h-probe` @ codex/p3h-probe-harness-20260702 = **PR #26**（clean）
 - `MAformac-p12-loss-contract` @ codex/p12-v61-eos-span-20260703 = **PR #28**（含 #27 的分支历史；worktree 现在 checkout 的是 v61 分支）
-- `MAformac-p5w-wave1-bridge` @ codex/p5w-wave1-bridge-20260703 = G7 surface+hardgate，**收工时刚令 %45 commit+push+开 PR（查收！）**
+- `MAformac-p5w-wave1-bridge` @ codex/p5w-wave1-bridge-20260703 = G7 surface+hardgate = **PR #29**（clean ✅）
 - `MAformac-uiue` @ uiue/phase4 = %43 驻地，M4 待收，R7 blocks uiue_merge
 - `MAformac-m1g` @ main = 干净 main 镜像
 **历史/清理 backlog（M2，磊哥未授权删除，绝不直合——分支 tip 落后会回退 main）**：g2-mask/g5/g6/g7/g7a-d/g8-tool/grill/w1/w2/p1fix/p2c6/p2g7/rat/.d24×3/.d25/.step0/.tiny-ablation/hermes-audit + /tmp 若干 detached。
@@ -62,7 +62,7 @@ created: 2026-07-03 凌晨
 | #26 | P3H probe harness v1-v3 | 双审 APPROVE（%43 两轮）、CI 待 billing 重跑 | ① 独立可先合 |
 | #27 | P12 A+ 契约+镜像门 | 交叉审→修复→Fix Re-review APPROVE、whitespace 已修 | ② 独立可合；**是 wave-1 拍点#1 的前置**（wave-1 pin 它合入后的 main） |
 | #28 | v6.1 EOS 监督 | 基于 #27 分支 | ③ 在 #27 后合（或 rebase） |
-| (new) | G7 surface+hardgate（p5w） | %45 开 PR 中 | ④ wave-1 live 前置，需一轮交叉审（%43） |
+| **#29** | G7 surface+hardgate（p5w） | ✅ 已开（commit 5c68f945，worktree clean）；CI 同受 billing 影响 | ④ wave-1 live 前置，需一轮交叉审（%43） |
 | (new) | commander docs 77 commits | 未 push | ⑤ 或磊哥拍直接快进合（纯 docs） |
 **路线**：billing 修复 → CI 全绿 → 磊哥按 ①②③④⑤ merge → main 即具备 wave-1 全前置 → 云凭证接线 → wave-1 live。
 
@@ -82,6 +82,6 @@ created: 2026-07-03 凌晨
 
 ## 9. 下任立即动作清单
 1. 读 CURRENT + 晨报 + 本文件恢复上下文（≤10min）。
-2. 查收 %45 的 p5w PR 是否开出（我收工前最后一单）；未出则按 §5 保护现场。
+2. ~~查收 p5w PR~~ ✅ 已落地 PR #29（现场保护完成）。下任对它派一轮 %43 交叉审即可进合并链。
 3. 磊哥醒 → 按晨报 0-5 走拍板流程；拍完按 §7 依赖序推进。
 4. worker 三个在待命（pane 存活）；重启派单前先 capture 各 pane 确认状态；%45 记得「完成即 commit」提醒。
