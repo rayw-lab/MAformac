@@ -39,6 +39,8 @@
 
 ## 下一步（D-039 通宵收官后，等磊哥晨拍）
 
+> 🔴 **新指挥官起手必读**：`HANDOFF-TO-NEXT-COMMANDER-2026-07-03.md`（全景交接：协作模式/worker 画像/树与 PR/合并路线/关键节点）。
+
 1. 磊哥醒后按晨报 `docs/handoffs/2026-07-03-overnight-v6-verdict-morning-brief.md` 逐项拍：0 GitHub billing → 1 PR #26/#27/#28 merge（双审 APPROVE 在案）→ 2 wave-1 7 拍点（云凭证唯一无 default）→ 3 GF 137 决策 lock（消减 31 组 APPROVE_FOR_UPLIFT）→ 4 F-044 阈值终值。
 2. 拍完即启：wave-1 live 生成（G7 全链已「只差凭证」）+ 数据门全量 + wave-1 训练（配方锚：E-2 降档挂载/open-close 极性配比/query 反执行负例/D 轴 regression 锚）。
 3. 三 worker 待命中（pane 存活）。
