@@ -214,3 +214,11 @@
 - **R7 = 现在备续签/真跑签字模板不等 7-15**：commander 亲自产出 R7 renewal + tiny-ablation run-auth checklist，**状态保持 draft/unsigned**。
 - **落点**: 本 D-019 + E-2 全组文档 status→locked_with_conditions + landing-matrix 里程碑4 + SPEC-G7A/B/C + R7 renewal draft
 - 🔴 **UPDATE（磊哥收敛顺序锁死，2026-07-02）**：① **#16 RAT PR 先行**：CI 绿 + spot audit + merge 是第一收敛点；G7A/G7B 可继续写**不得越过 RAT 合入 main**；🔴 **G7C 暂不开**（撤销 %44 接力指令，改 standby）——等 G7A manifest 接口 + G7B schema/receipt 口径稳定再建。② 🔴 **G7B 消费链硬要求**：禁 wrapper-only 字段存在——必须行为测试证明**现有 C6 消费链真读 subset 字段**（构造带字段 case→断言消费路径输出生效+消费点 file:line），否则回执 honest 标 `adapter_receipt_proof_only`，禁称「C6 schema fully integrated」（gate2 dead-field 教训的 enforce 化）。③ **敏感参数冻结上抛**：7200 cap / digest 口径 / degraded_clarify 策略 / C6 subset 接入方式——任何改动 BLOCKED 上抛磊哥人审，worker/commander 均禁自改。④ M2 仍只 dry-run；④tiny-ablation/R7 仍 HOLD。三 worker 已收指令确认。
+
+## D-020 G7A+G7B 审计绿合流 main + G7C 开闸 + G7D 补片（E-2 Phase-1 construction 收尾中）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Merge-milestone ｜ **Owners**: commander 按 D-019 收敛序执行
+- **合流（gh 一手核销）**: G7A PR #18（manifest codegen 18,260 entries + 预算门 cap7200 + grammar artifact；XAUDIT 抓 **B1 手写表 BLOCKER** → contract 文件模式修复 `contracts/subset-grouping.yaml`[authored_design_input 定性+双向闭包 fail-closed+S-201 entry 零动] → delta 复审 **B1-RESOLVED** entry payload 逐字节等价）→ `cc5b1aa8`+`c93efaee` ｜ G7B PR #17（C6SubsetContext add-only + 六轴 receipt；XAUDIT **CLEAR** 消费链行为证明非 dead field，verdict 诚实 `adapter_receipt_proof_plus_runner_extension_behavior_proof` 不称 fully integrated=守磊哥硬要求）→ `2b006b8a` = **当前 main**。
+- **进行中**: %45 merge 后验收（K.1 标配）→ 接 **G7D**（design 包 Phase-1 收尾：C5 训练样本 builder 按 manifest 装载 + 样本 metadata 记 digest[S-206/S-207 locked] + fail-closed 禁双路径）；%44 **G7C 开闸**（磊哥条件满足：A/B merged 接口稳定；SPEC 已补真实接口事实）。%43 待 C/D 落地接交叉审。
+- **审计战绩累计**: 本日交叉审/验收门共咬住 **5 个真问题**（gate2 dead field[前日]/guard 漏 test split/gate8 派生物没改工厂/E-2 包丢 train target 轴/G7A 手写表）——对抗 fixture + 验收 diff 门 双机制全部生效。
+- **冻结确认**: cap 7200/S-201 字段组/degraded_clarify/C6 add-only 接入——四项全程零改动（两轮审计逐项 grep 确认）。
+- **落点**: 本 D-020 + R7-draft B.1 前置表刷新 + SPEC-G7D

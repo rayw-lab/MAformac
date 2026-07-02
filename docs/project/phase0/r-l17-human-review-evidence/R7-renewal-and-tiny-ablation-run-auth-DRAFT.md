@@ -40,8 +40,8 @@ human_owner_signature: <未填>
 ### B.1 授权前置条件（全 ☑ 才可进签字区）
 | # | 前置 | 验证方式 | 状态 |
 |---|---|---|---|
-| 1 | 🔴 gate7 pipeline construction PR merged（G7A/G7B/G7C 三支） | gh pr state=MERGED + main CI 绿 | ☐ 未满足（进行中） |
-| 2 | 🔴 E-2 Phase-1 construction merged（manifest codegen + 预算门 + grammar artifact + C6 schema + receipt） | 同上 + `verify-subset-budget` 本地绿 | ☐ 未满足（进行中） |
+| 1 | 🔴 gate7 pipeline construction PR merged（G7A/G7B/G7C/G7D） | gh pr state=MERGED + main CI 绿 | ◐ 部分：A(#18 `c93efaee`)/B(#17 `2b006b8a`) MERGED 双审绿；C/D 进行中 |
+| 2 | 🔴 E-2 Phase-1 construction merged（manifest codegen + 预算门 + grammar artifact + C6 schema + receipt + 🆕 C5 builder 按 manifest[G7D]） | 同上 + `verify-subset-budget` 本地绿 | ◐ 部分：前五项已 merged（G7A/G7B）；G7D builder 装载进行中 |
 | 3 | route-only signoff 有效（未过期或已续签 Part A） | 本目录 signoff 文件 status | ☐ |
 | 4 | ablation 样本集就绪且过数据门（20-50 样本，含 subset manifest digest；must_not_train/C6 保护零命中） | C5DataGate receipt | ☐ |
 | 5 | 训练循环 verified（gate1 机制 + `--require-maformac-loss-mask` + 反向 guard 三 split 在 main） | main 代码态（已满足，D-018）+ run 前 self-test 复跑 | ☐ |
