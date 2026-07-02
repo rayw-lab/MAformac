@@ -609,7 +609,7 @@ def batch_signature(batch_index: int, batch_tuple: Any) -> dict[str, Any]:
 
 def guard_stock_loader_rejects_loss_mask(args) -> None:
     data_root = Path(args.data)
-    for split in ("train", "valid"):
+    for split in ("train", "valid", "test"):
         path = data_root / f"{split}.jsonl"
         if not path.exists():
             continue
