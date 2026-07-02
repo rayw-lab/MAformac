@@ -314,3 +314,9 @@
 - **wave-1 磊哥 5 拍点决策包**落 `docs/c5-training-readiness-grill/wave1-owner-decision-package-2026-07-03.md`（基座冻结⭐P12修复后merge/云凭证[无default]/首波4.5k⭐/salvage重judge⭐/人工门staffing）。live 生成今晚推进到「只差凭证」。
 - 训练进度：iter 140 loss 4.48→0.52，LR warmup 正常（iter30 显示 0 = warmup 起点，疑点消解）。
 - 拓扑：%44 训练+probe 中 / %45 P5W（labeler 桥接+mock 端到端+数据门实跑）/ %43 GF-W3 制度官。
+
+## D-034（2026-07-03 凌晨）v6 probe 根因实锤=tools 挂载缺失 + 首个正面行为证据 + 第四轮 iceberg
+- v6 训练健康（600 iters loss 0.072、preflight 44/44 ratio1.0、NONFINITE=0），probe 全轴 empty → **四步排除法实锤根因=probe 无 tools 挂载**（训练渲染带 E-2 两级挂载 737 token，probe render_prompt 无 tools 参数）。teacher-forcing 17/17 满分 + 带挂载生成 A/B 轴全完美 = **模型学会了，D-domain 自然中文迁移首个正面样例**。v6 probe1 定性 INVALID_PROBE（GF-154，v5 重标同构）。
+- grill 两连发：GF-149~156（v3 tools-mount 契约）+ 第四轮 iceberg 报告（抽象两次：未枚举维度断裂 → same-surface 单数名词掩盖复合性；治理=surface 维度分解表；扩散=wave-1 generator surface 风险列拍点附加项）。
+- %44 接 harness v3 + v6-probe2 四轴重跑；GF-156 元认知（复算工具自身假信号：commander span 误差 14/18 几乎误导）。
+- 当日 REPORT 洪峰全收：P5W（labeler 桥接+mock 端到端+tiny 数据门 data_gate_ready 44 行）、P12 修复（63/63 测试+镜像门保持+bypass 探针转 FAIL+fit_proof=mechanism_true）、GF-W3 40 决策、cross-section drift 27 条（P1=14 待批量回写）。
