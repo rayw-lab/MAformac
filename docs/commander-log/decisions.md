@@ -213,3 +213,4 @@
 - **M2 = 只 dry-run 不删**（指挥官分支 E-2 docs/D-018 未进 main；等 ratification PR 合完再执行删除）。**M3 D25 = 延期**（非 LoRA 关键路径，不抢上下文）。
 - **R7 = 现在备续签/真跑签字模板不等 7-15**：commander 亲自产出 R7 renewal + tiny-ablation run-auth checklist，**状态保持 draft/unsigned**。
 - **落点**: 本 D-019 + E-2 全组文档 status→locked_with_conditions + landing-matrix 里程碑4 + SPEC-G7A/B/C + R7 renewal draft
+- 🔴 **UPDATE（磊哥收敛顺序锁死，2026-07-02）**：① **#16 RAT PR 先行**：CI 绿 + spot audit + merge 是第一收敛点；G7A/G7B 可继续写**不得越过 RAT 合入 main**；🔴 **G7C 暂不开**（撤销 %44 接力指令，改 standby）——等 G7A manifest 接口 + G7B schema/receipt 口径稳定再建。② 🔴 **G7B 消费链硬要求**：禁 wrapper-only 字段存在——必须行为测试证明**现有 C6 消费链真读 subset 字段**（构造带字段 case→断言消费路径输出生效+消费点 file:line），否则回执 honest 标 `adapter_receipt_proof_only`，禁称「C6 schema fully integrated」（gate2 dead-field 教训的 enforce 化）。③ **敏感参数冻结上抛**：7200 cap / digest 口径 / degraded_clarify 策略 / C6 subset 接入方式——任何改动 BLOCKED 上抛磊哥人审，worker/commander 均禁自改。④ M2 仍只 dry-run；④tiny-ablation/R7 仍 HOLD。三 worker 已收指令确认。
