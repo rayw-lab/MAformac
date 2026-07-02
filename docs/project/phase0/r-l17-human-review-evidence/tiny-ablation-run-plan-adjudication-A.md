@@ -72,3 +72,11 @@ swift run C5TrainingCLI prepare \
 ```
 - 其余一切不变：target-positive 40 / scope demo / surface d_domain / masking_complete_v1 / rank16Mainline 渲染原样 / 34-case 探针 / 门 <5。
 - **Step 1 绿门（v2 新增，全部满足才进 Step 2）**：① train rows = **40** ② `train_eligible=40` ③ `loss_mask_present=40` ④ `mlx-data/train.jsonl` 存在 ⑤ `mlx-train-command.txt` 存在（+原有 C5DataGate receipt 绿 + subset digest）。
+
+## §5 Addendum v3（磊哥 2026-07-02「推进 同意」，仅换已实装 masking 态 + 绿门对齐 builder 真实形态，零 scope 扩张）
+
+> 背景：v2 BLOCKED——`masking_complete_v1` 的 argument_value 增广 main 未实装（builder honest 拒绝 exit 65）；且 builder 自动加 4 条 no-call 负例（44≠40）。CLI masking 枚举一手 = `smoke_only|trainable_v0|masking_complete_v1`。
+
+1. **Step 1 命令的 `--masking-stage` 改为 `trainable_v0`**（main 已实装态）。训练循环层 token-level loss-mask 真消费不受影响（`--require-maformac-loss-mask` 恒渲染 + py preflight exit-66 兜底）。🔴 **「masking_complete_v1 argument_value 增广实装」= wave-1 硬前置缺口**，记入 landing-matrix gate2 行，不丢账。
+2. **Step 1 绿门（v3 权威）**：positive=40 + builder 自动 no-call 负例（4 条，保留——负例防全正例训崩）= **总 44 行**（落 harness 20-50 窗）、全行 loss_mask_present、`train_eligible={True:44}`、DataGate `data_gate_ready`、`mlx-data/train.jsonl` + `mlx-train-command.txt` 存在。
+3. **Step 4**：harness `sampleCount=44`。其余一切不变（40 正例语义/demo/d_domain/dev-selection 0/渲染原样/34-case 探针/门 <5/失败纪律/verdict receipt 诚实标「无 argument_value 增广」）。
