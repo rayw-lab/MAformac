@@ -160,6 +160,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--inspect-batches", type=int, default=0)
     parser.add_argument("--inspect-output", type=str, default=None)
     parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--self-test-loss-mask", action="store_true")
     args = vars(parser.parse_args(argv))
 
@@ -182,6 +183,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "inspect_batches": 0,
             "inspect_output": None,
             "require_maformac_loss_mask": False,
+            "preflight_only": False,
             "self_test_loss_mask": False,
         }
     )
@@ -1063,7 +1065,11 @@ def run(args) -> None:
                 f"ignored_tokens={loss_mask_summary['ignored_tokens']}",
                 flush=True,
             )
+            if args.preflight_only:
+                return
         else:
+            if args.preflight_only:
+                raise ValueError("--preflight-only requires --require-maformac-loss-mask")
             train_set, valid_set, test_set = load_dataset(args, tokenizer)
         if args.train:
             print("Training", flush=True)
