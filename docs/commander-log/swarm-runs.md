@@ -98,3 +98,12 @@
 - 收稿 = `ls` output file，不信 ack；worker `status=pass` commander 自核
 - live > report：曾抓 D25「staged 未 commit」report stale（live 已 commit）
 - worker 自动压缩不丢工作 → 不因 context 低换人/调 scope
+
+## run 2026-07-02-baseline-roadmap（新任 commander：基线双文档 → M1 合流 → E-2 grill → G7 construction，一日三战）
+- **任务链**: 磊哥「写此时此刻 baseline 路线图」→「ABCDE 都要做」→「M1 合流验收」→「E-2 按 grill 范式深化」→ D-019 七项拍板 → G7 construction。
+- **产出（runs/2026-07-02-baseline-roadmap/ 30+ 文件）**: L1 全树盘点 / L2 hf-skills teardown / L3 训练闭环素材 / L4 E-2 真 tokenizer 实算 / TASK-LEDGER / M2-dryrun / SPEC×10 / RECEIPT×8 / XAUDIT×4。
+- **M1（D-018）**: PR #12/#13/#14/#15 staged 合流 main=`80ea379c` + 验收 PASS main 范围。拦截×3（guard 漏 test split / gate8 改派生物没改工厂 / E-2 包丢 train target 轴）。
+- **E-2 grill round（D-019）**: 9 维度树 → W1/W2/W3+D9 = 43 决策 → 13 会聚+1 仲裁（7,901 vs 7,200 cap → degraded_clarify）→ E2-A~E 磊哥 locked_with_conditions → RAT PR #16 merged main=`af72a60a`。
+- **G7 construction（进行中）**: G7A PR #18（manifest 18,260 entries/1 degraded pair；XAUDIT 抓 B1 手写表 BLOCKER → contract 文件模式修复中）/ G7B PR #17（XAUDIT CLEAR：消费链行为证明非 dead field，verdict 诚实 adapter_receipt_proof）/ G7C 暂缓（磊哥令等 A/B 口径稳）。
+- **纪律沉淀**: worker 回报纪律（REPORT/PROGRESS/BLOCKED 行）+ 3-worker 使用范式入 memory（磊哥点名满意）+ lessons K 段。
+- **收稿=文件+亲核**: 全部 receipt 关键声称经 commander gh/grep/亲跑抽核（562 三路复算 / self-test 复现 / 消费链测试亲读 / spot audit hash 对比）。
