@@ -5,7 +5,7 @@ paradigm: UIUE 215-grill 决策矩阵（7 列 + 防惨败列 + 消减表 + landi
 id_ranges: W1 契约细化官 GF-001~040 / W2 门与词表官 GF-101~140 / W3 制度官 GF-201~240 / commander 纵切 GF-C01~10
 created: 2026-07-02
 seed: tiny-ablation 三轮跨 LLM teardown（FINAL 档 §3/§4）+ lessons M 段 7 条——反思产出的治理原语需 grill 细化成可实装决策
-status: skeleton_created_pending_worker_availability（三 worker 完成 Phase 1-3 当前稿后接力）
+status: w2_delivered_w1_w3_pending（W2 40 决策已收割；W1 派 %43 接力中；W3 待空闲 worker）
 ---
 
 # governance-fit grill round — 反思细化（磊哥令：按范式组织推进）
@@ -25,6 +25,6 @@ status: skeleton_created_pending_worker_availability（三 worker 完成 Phase 1
 | 维度 | worker | 决策数 | 消减后 | 状态 |
 |---|---|---|---|---|
 | D1-D3 | W1 | — | — | pending |
-| D4-D6 | W2 | — | — | pending |
+| D4-D6 | W2 | 40 (GF-101~140) | 12 field groups + 4级词表+5 landing 字段 + F-044 终稿 | ✅ proposed 稿收割 `governance-fit-w2-decisions.md`，待磊哥 lock |
 | D7-D9 | W3 | — | — | pending |
 | 纵切 | commander | — | — | pending |
