@@ -1373,7 +1373,7 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         "mlp.down_proj"
     ]
 
-    public static func rank16Mainline(model: String = "mlx-community/Qwen3-1.7B-4bit", maxSeqLength: Int = 1024) -> C5MLXLoRAConfig {
+    public static func rank16Mainline(model: String = "mlx-community/Qwen3-1.7B-4bit", maxSeqLength: Int = 8192) -> C5MLXLoRAConfig {
         C5MLXLoRAConfig(
             model: model,
             fineTuneType: "lora",

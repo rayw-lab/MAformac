@@ -400,6 +400,11 @@ def clipped_train(
             mx.eval(lvalue, toks, grad_accum)
 
         loss_value = to_float(lvalue)
+        token_count_value = to_float(toks)
+        if token_count_value <= 0:
+            raise LossMaskValidationError(
+                f"batch_trainable_tokens_zero:iteration={it}:max_seq_length={args.max_seq_length}"
+            )
         update_loss_values.append(loss_value)
         loss_finite = math.isfinite(loss_value)
         grad_norm_value = to_float(grad_norm_preclip) if do_update else None
@@ -755,7 +760,8 @@ def maformac_masked_cross_entropy_from_logits(logits, token_labels, ignore_index
     safe_targets = mx.where(mask, token_labels, 0)
     ce = nn.losses.cross_entropy(logits, safe_targets) * mask
     ntoks = mask.sum()
-    return ce.astype(mx.float32).sum() / ntoks, ntoks
+    safe_ntoks = mx.maximum(ntoks, mx.array(1, dtype=ntoks.dtype))
+    return ce.astype(mx.float32).sum() / safe_ntoks, ntoks
 
 
 def maformac_masked_loss(model, batch, token_labels):
@@ -840,11 +846,19 @@ def load_maformac_loss_mask_datasets(args, tokenizer):
         raise ValueError("Test set not found or empty. Must provide test set for evaluation.")
 
     datasets = {split: MAformacLossMaskDataset(rows, tokenizer) for split, rows in records.items()}
-    summary = validate_maformac_loss_mask_datasets(datasets, require_train=bool(args.train))
+    summary = validate_maformac_loss_mask_datasets(
+        datasets,
+        require_train=bool(args.train),
+        max_seq_length=args.max_seq_length,
+    )
     return datasets["train"], datasets["valid"], datasets["test"], summary
 
 
-def validate_maformac_loss_mask_datasets(datasets: dict[str, MAformacLossMaskDataset], require_train: bool) -> dict[str, Any]:
+def validate_maformac_loss_mask_datasets(
+    datasets: dict[str, MAformacLossMaskDataset],
+    require_train: bool,
+    max_seq_length: int | None = None,
+) -> dict[str, Any]:
     summary: dict[str, Any] = {
         "event": "maformac_loss_mask_preflight",
         "records": 0,
@@ -852,6 +866,9 @@ def validate_maformac_loss_mask_datasets(datasets: dict[str, MAformacLossMaskDat
         "ignored_label_records": 0,
         "trainable_tokens": 0,
         "ignored_tokens": 0,
+        "max_seq_length": max_seq_length,
+        "max_token_length": 0,
+        "length_violations": [],
         "splits": {},
     }
     errors: list[str] = []
@@ -862,13 +879,26 @@ def validate_maformac_loss_mask_datasets(datasets: dict[str, MAformacLossMaskDat
             "ignored_label_records": 0,
             "trainable_tokens": 0,
             "ignored_tokens": 0,
+            "max_token_length": 0,
         }
         for index in range(len(dataset)):
             try:
-                _, labels = dataset.process(dataset[index])
+                tokens, labels = dataset.process(dataset[index])
             except Exception as error:
                 errors.append(f"{split}:{index + 1}:{error}")
                 continue
+            token_length = len(tokens)
+            split_summary["max_token_length"] = max(split_summary["max_token_length"], token_length)
+            summary["max_token_length"] = max(summary["max_token_length"], token_length)
+            if max_seq_length is not None and token_length > max_seq_length:
+                summary["length_violations"].append(
+                    {
+                        "split": split,
+                        "row": index + 1,
+                        "token_length": token_length,
+                        "max_seq_length": max_seq_length,
+                    }
+                )
             trainable = sum(1 for label in labels if label != -100)
             ignored = sum(1 for label in labels if label == -100)
             if trainable > 0:
@@ -885,6 +915,13 @@ def validate_maformac_loss_mask_datasets(datasets: dict[str, MAformacLossMaskDat
         errors.append("train.jsonl_empty")
     if require_train and summary["splits"]["train"]["trainable_tokens"] == 0:
         errors.append("trainable_loss_mask_tokens_missing")
+    if summary["length_violations"]:
+        for violation in summary["length_violations"][:25]:
+            errors.append(
+                "token_length_exceeds_max_seq_length:"
+                f"{violation['split']}:{violation['row']}:"
+                f"{violation['token_length']}>{violation['max_seq_length']}"
+            )
     if errors:
         raise LossMaskValidationError(json.dumps({"errors": errors[:25], "summary": summary}, ensure_ascii=False, sort_keys=True))
     return summary
@@ -903,13 +940,21 @@ def run_loss_mask_self_test() -> None:
     )
     labels = mx.array([[0, -100, 2]], dtype=mx.int32)
     masked_loss, ntoks = maformac_masked_cross_entropy_from_logits(logits, labels)
+    zero_loss, zero_ntoks = maformac_masked_cross_entropy_from_logits(
+        logits,
+        mx.array([[-100, -100, -100]], dtype=mx.int32),
+    )
     unmasked_loss, _ = maformac_masked_cross_entropy_from_logits(
         logits,
         mx.array([[0, 2, 2]], dtype=mx.int32),
     )
-    mx.eval(masked_loss, unmasked_loss, ntoks)
+    mx.eval(masked_loss, zero_loss, unmasked_loss, ntoks, zero_ntoks)
     if int(ntoks.item()) != 2:
         raise AssertionError(f"expected 2 trainable tokens, got {int(ntoks.item())}")
+    if int(zero_ntoks.item()) != 0:
+        raise AssertionError(f"expected 0 trainable tokens for all-ignore labels, got {int(zero_ntoks.item())}")
+    if not math.isfinite(float(zero_loss.item())):
+        raise AssertionError("zero-token loss must remain finite before explicit fail-closed guard")
     if not float(masked_loss.item()) < float(unmasked_loss.item()):
         raise AssertionError("masked token still contributed to loss")
     print(
@@ -918,6 +963,7 @@ def run_loss_mask_self_test() -> None:
                 "event": "loss_mask_self_test",
                 "status": "pass",
                 "trainable_tokens": int(ntoks.item()),
+                "zero_token_fail_closed_guard": "finite_loss_zero_ntoks",
                 "masked_loss": float(masked_loss.item()),
                 "unmasked_loss": float(unmasked_loss.item()),
             },
