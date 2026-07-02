@@ -37,13 +37,12 @@
 - **D-011** GPT Pro 第3家审 3 PR + 3 worker 修 + 磊哥拍 A merge（✅ Done，3 门 MERGED main=ab355f6c CI SUCCESS）：CI bug 根因（verify.yml 浅 clone 没 fetch head）；R7 守住
 - **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
 
-## 下一步（D-034 后，2026-07-03 凌晨）
+## 下一步（D-039 通宵收官后，等磊哥晨拍）
 
-1. **收 %44 harness v3 + v6-probe2 四轴重跑**（tools 挂载修复，GF-149~155）→ commander 判 verdict（A 15/15、B 14/15 draft 阈值）。
-2. **收 %43 P12 修复复核**（Fix Re-review 段）→ APPROVE 后 P12/PR26 进入 merge 链（wave-1 拍点#1 前置）。
-3. **%45 接力**：wave-1 generator surface 补验（iceberg 第四轮扩散点）+ GF 120 决策消减初稿。
-4. probe2 有果后：**v6 结果包 + wave-1 5 拍点 + GF 消减 上抛磊哥**（醒后一次拍）。
-5. 挂起等磊哥：wave-1 云凭证（拍点#2 无 default）/ M2 树清理 / M4 UIUE。
+1. 磊哥醒后按晨报 `docs/handoffs/2026-07-03-overnight-v6-verdict-morning-brief.md` 逐项拍：0 GitHub billing → 1 PR #26/#27/#28 merge（双审 APPROVE 在案）→ 2 wave-1 7 拍点（云凭证唯一无 default）→ 3 GF 137 决策 lock（消减 31 组 APPROVE_FOR_UPLIFT）→ 4 F-044 阈值终值。
+2. 拍完即启：wave-1 live 生成（G7 全链已「只差凭证」）+ 数据门全量 + wave-1 训练（配方锚：E-2 降档挂载/open-close 极性配比/query 反执行负例/D 轴 regression 锚）。
+3. 三 worker 待命中（pane 存活）。
+4. 挂起：M2 树清理 / M4 UIUE / hermes 下个审计点。
 
 
 ## 留史（as-of 2026-07-02 深夜 D-019+：M1 done / RAT merged / G7 construction 进行中）

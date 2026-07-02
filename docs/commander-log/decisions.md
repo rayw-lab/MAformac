@@ -345,3 +345,9 @@
 - **GF 消减终审 APPROVE_FOR_UPLIFT**：GF-148 补入 G28 后映射 136/136 闭合（%43 两轮机械展开核对立功：GF-126→GF-148 各抓一漏）。
 - %45 DataGate missing_surface 硬门实装收讫（no-legacy exit65 blocked/legacy flag 显式豁免，17/17+11/11+81/81）。%43 INDEX×2 归档（36+11 行，纠 SPEC 计数）。
 - 通宵 goal 状态：**全部可兑现项已兑现**；不可兑现项均为真 blocker（云凭证/GitHub billing）已列晨报待磊哥。
+
+## D-039（2026-07-03 凌晨）通宵收官终格
+- 长度 gap 量化解收讫（%45）：294 违规全出自 `seat.massage_force_time` 单组（E-2 已知 degraded 重灾族）；⭐E-2 降档挂载 target+first-sibling 294/294 收全且全量 max 1793（成本同降）——**E-2 grill 43 决策的降档设计直接解题**。已进 verdict 附录3+wave-1 拍点包（新增拍点 6 长行策略/7 valid-test 监督契约）。
+- parse_error 下钻定性收讫（%44）：4 case 全 malformed 截断且 v6 同 case 本就 repeated-tail 不稳——EOS 把「重复」压成「早停截断」，同源非净退化。
+- 三 worker 收工待命（pane 存活）。通宵账：**D-028~039 十二格决策、3 次训练（v6/v6.1）、2 轮 paired probe、4500 全量数据门、GF 137 决策（121+16）、grill 文件 5 份、iceberg 第四轮、PR×3 双审 APPROVE、drift 27 回写、lessons M.8-10、宪法/MEMORY 刷新**。
+- 等磊哥晨拍 0-5 项见晨报（billing/merge×3/wave-1 7 拍/GF lock/F-044 阈值）。
