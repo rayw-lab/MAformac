@@ -1,6 +1,6 @@
 import Foundation
 
-public struct C5DataGateCandidate: Decodable, Sendable {
+public struct C5DataGateCandidate: Codable, Sendable {
     public var sampleID: String
     public var split: String?
     public var bucket: String
@@ -21,6 +21,11 @@ public struct C5DataGateCandidate: Decodable, Sendable {
     public var hasActionToolCall: Bool
     public var hasSharedWrapper: Bool
     public var masking: C5MaskingFlags
+    public var tools: [[String: JSONValue]]
+    public var mountedToolCount: Int?
+    public var subsetPolicyID: String?
+    public var subsetGroupID: String?
+    public var subsetPolicyDigest: String?
 
     enum CodingKeys: String, CodingKey {
         case sampleID = "sample_id"
@@ -42,6 +47,10 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         case value
         case mustNotTrain = "must_not_train"
         case sourceAuthorization = "source_authorization"
+        case inputText = "input_text"
+        case assistantText = "assistant_text"
+        case hasActionToolCall = "has_action_tool_call"
+        case hasSharedWrapper = "has_shared_wrapper"
         case inputZh = "input_zh"
         case utterance
         case queryTemplate = "query_template"
@@ -50,6 +59,11 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         case expectedToolCalls = "expected_tool_calls"
         case expected
         case masking
+        case tools
+        case mountedToolCount = "mounted_tool_count"
+        case subsetPolicyID = "subset_policy_id"
+        case subsetGroupID = "subset_group_id"
+        case subsetPolicyDigest = "subset_policy_digest"
     }
 
     public init(
@@ -72,7 +86,12 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         assistantText: String,
         hasActionToolCall: Bool,
         hasSharedWrapper: Bool,
-        masking: C5MaskingFlags
+        masking: C5MaskingFlags,
+        tools: [[String: JSONValue]] = [],
+        mountedToolCount: Int? = nil,
+        subsetPolicyID: String? = nil,
+        subsetGroupID: String? = nil,
+        subsetPolicyDigest: String? = nil
     ) {
         self.sampleID = sampleID
         self.split = split
@@ -98,6 +117,11 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         self.hasActionToolCall = hasActionToolCall
         self.hasSharedWrapper = hasSharedWrapper
         self.masking = masking
+        self.tools = tools
+        self.mountedToolCount = mountedToolCount
+        self.subsetPolicyID = subsetPolicyID
+        self.subsetGroupID = subsetGroupID
+        self.subsetPolicyDigest = subsetPolicyDigest
     }
 
     public init(from decoder: Decoder) throws {
@@ -142,15 +166,52 @@ public struct C5DataGateCandidate: Decodable, Sendable {
         self.generatorSource = self.generatorSourceVendor
         self.mustNotTrain = try container.decodeIfPresent(Bool.self, forKey: .mustNotTrain) ?? false
         self.sourceAuthorization = try container.decodeIfPresent(String.self, forKey: .sourceAuthorization)
-        self.inputText = try container.decodeIfPresent(String.self, forKey: .inputZh)
+        self.inputText = try container.decodeIfPresent(String.self, forKey: .inputText)
+            ?? container.decodeIfPresent(String.self, forKey: .inputZh)
             ?? container.decodeIfPresent(String.self, forKey: .utterance)
             ?? container.decodeIfPresent(String.self, forKey: .queryTemplate)
             ?? messages.first { $0.role == "user" }?.content
             ?? ""
-        self.assistantText = assistantText
-        self.hasActionToolCall = !(expectedToolCalls ?? []).isEmpty || toolCall != nil
-        self.hasSharedWrapper = explicitWrapper || assistantText.contains("<tool_call>")
+        self.assistantText = try container.decodeIfPresent(String.self, forKey: .assistantText) ?? assistantText
+        self.hasActionToolCall = try container.decodeIfPresent(Bool.self, forKey: .hasActionToolCall)
+            ?? (!(expectedToolCalls ?? []).isEmpty || toolCall != nil)
+        self.hasSharedWrapper = try container.decodeIfPresent(Bool.self, forKey: .hasSharedWrapper)
+            ?? (explicitWrapper || assistantText.contains("<tool_call>"))
         self.masking = (try container.decodeIfPresent(C5MaskingFlags.self, forKey: .masking)) ?? C5MaskingFlags()
+        self.tools = try container.decodeIfPresent([[String: JSONValue]].self, forKey: .tools) ?? []
+        self.mountedToolCount = try container.decodeIfPresent(Int.self, forKey: .mountedToolCount)
+        self.subsetPolicyID = try container.decodeIfPresent(String.self, forKey: .subsetPolicyID)
+        self.subsetGroupID = try container.decodeIfPresent(String.self, forKey: .subsetGroupID)
+        self.subsetPolicyDigest = try container.decodeIfPresent(String.self, forKey: .subsetPolicyDigest)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(sampleID, forKey: .sampleID)
+        try container.encodeIfPresent(split, forKey: .split)
+        try container.encode(bucket, forKey: .bucket)
+        try container.encodeIfPresent(caseID, forKey: .caseID)
+        try container.encodeIfPresent(parentSemanticID, forKey: .parentSemanticID)
+        try container.encodeIfPresent(candidateParentSemanticID, forKey: .candidateParentSemanticID)
+        try container.encodeIfPresent(device, forKey: .device)
+        try container.encodeIfPresent(toolName, forKey: .toolName)
+        try container.encodeIfPresent(valueType, forKey: .valueType)
+        try container.encodeIfPresent(templateFamily, forKey: .templateFamily)
+        try container.encodeIfPresent(generatorSource, forKey: .generatorSource)
+        try container.encodeIfPresent(generatorModelID, forKey: .generatorModelID)
+        try container.encodeIfPresent(generatorSourceVendor, forKey: .generatorSourceVendor)
+        try container.encode(mustNotTrain, forKey: .mustNotTrain)
+        try container.encodeIfPresent(sourceAuthorization, forKey: .sourceAuthorization)
+        try container.encode(inputText, forKey: .inputText)
+        try container.encode(assistantText, forKey: .assistantText)
+        try container.encode(hasActionToolCall, forKey: .hasActionToolCall)
+        try container.encode(hasSharedWrapper, forKey: .hasSharedWrapper)
+        try container.encode(masking, forKey: .masking)
+        try container.encode(tools, forKey: .tools)
+        try container.encodeIfPresent(mountedToolCount, forKey: .mountedToolCount)
+        try container.encodeIfPresent(subsetPolicyID, forKey: .subsetPolicyID)
+        try container.encodeIfPresent(subsetGroupID, forKey: .subsetGroupID)
+        try container.encodeIfPresent(subsetPolicyDigest, forKey: .subsetPolicyDigest)
     }
 
     public var overlapParentSemanticID: String? {
@@ -209,17 +270,20 @@ public struct C5DataGateRunContext: Sendable {
     public var sourceAuthorizationStatus: String
     public var formatContractVersion: String
     public var generatedAt: String
+    public var allowLegacyMissingSurface: Bool
 
     public init(
         sourceSnapshotDigest: String,
         sourceAuthorizationStatus: String,
         formatContractVersion: String,
-        generatedAt: String
+        generatedAt: String,
+        allowLegacyMissingSurface: Bool = false
     ) {
         self.sourceSnapshotDigest = sourceSnapshotDigest
         self.sourceAuthorizationStatus = sourceAuthorizationStatus
         self.formatContractVersion = formatContractVersion
         self.generatedAt = generatedAt
+        self.allowLegacyMissingSurface = allowLegacyMissingSurface
     }
 }
 
@@ -241,6 +305,10 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
     public var trainHeldOutAxisOverlapRowCount: Int?
     public var toolCallFormatPass: Int
     public var toolCallFormatFailures: [C5DataGateFailure]
+    public var allowLegacyMissingSurface: Bool?
+    public var missingSurfaceCount: Int?
+    public var legacyMissingSurfaceAllowedCount: Int?
+    public var surfaceFieldPass: Int?
     public var maskingCoverage: C5MaskingCoverage
     public var redactionStatus: String
     public var quarantineCount: Int
@@ -265,6 +333,10 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
         case trainHeldOutAxisOverlapRowCount = "train_held_out_axis_overlap_row_count"
         case toolCallFormatPass = "tool_call_format_pass"
         case toolCallFormatFailures = "tool_call_format_failures"
+        case allowLegacyMissingSurface = "allow_legacy_missing_surface"
+        case missingSurfaceCount = "missing_surface_count"
+        case legacyMissingSurfaceAllowedCount = "legacy_missing_surface_allowed_count"
+        case surfaceFieldPass = "surface_field_pass"
         case maskingCoverage = "masking_coverage"
         case redactionStatus = "redaction_status"
         case quarantineCount = "quarantine_count"
@@ -278,6 +350,7 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
             || (trainHeldOutAxisOverlapCount ?? 0) > 0
             || (trainHeldOutAxisOverlapRowCount ?? 0) > 0
             || !toolCallFormatFailures.isEmpty
+            || failureReceipt.contains { $0.reason == "missing_candidate_surface_fields" }
             || failureReceipt.contains { $0.reason == "missing_train_device_axis_for_six_axis_split" }
             || redactionStatus == "fail"
     }
@@ -419,6 +492,10 @@ public struct C5DataGateValidator: Sendable {
         var formatFailures: [C5DataGateFailure] = []
         var redactionFailures: [C5DataGateFailure] = []
         var missingAxisMetadataFailures: [C5DataGateFailure] = []
+        var surfaceFailures: [C5DataGateFailure] = []
+        var missingSurfaceCount = 0
+        var legacyMissingSurfaceAllowedCount = 0
+        var surfaceFieldPass = 0
         var mustNotTrainViolations = 0
         var toolCallFormatPass = 0
         var quarantineCount = 0
@@ -426,6 +503,19 @@ public struct C5DataGateValidator: Sendable {
         for item in normalized {
             let candidate = item.candidate
             var isQuarantined = item.split == "quarantine"
+            let missingSurfaceFields = missingSurfaceFields(candidate)
+            if missingSurfaceFields.isEmpty {
+                surfaceFieldPass += 1
+            } else {
+                missingSurfaceCount += 1
+                if context.allowLegacyMissingSurface {
+                    legacyMissingSurfaceAllowedCount += 1
+                } else {
+                    let itemFailure = failure(candidate, split: item.split, reason: "missing_candidate_surface_fields", severity: "P1")
+                    surfaceFailures.append(itemFailure)
+                    failures.append(itemFailure)
+                }
+            }
             if item.split == "train" && (candidate.mustNotTrain || candidate.caseID.map(protectedCaseIDs.contains) == true) {
                 mustNotTrainViolations += 1
                 failures.append(failure(candidate, split: item.split, reason: "must_not_train_candidate_in_train", severity: "P0"))
@@ -487,7 +577,7 @@ public struct C5DataGateValidator: Sendable {
             $0.split == "train" && ($0.candidate.overlapParentSemanticID.map(trainOverlapParents.contains) == true)
         }.count
         let status: String
-        if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || trainHeldOutAxisOverlapCount > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty || !missingAxisMetadataFailures.isEmpty {
+        if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || trainHeldOutAxisOverlapCount > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty || !missingAxisMetadataFailures.isEmpty || !surfaceFailures.isEmpty {
             status = "blocked"
         } else if sourceReady {
             status = "data_gate_ready"
@@ -512,6 +602,10 @@ public struct C5DataGateValidator: Sendable {
             trainHeldOutAxisOverlapRowCount: trainHeldOutAxisOverlapRowCount,
             toolCallFormatPass: toolCallFormatPass,
             toolCallFormatFailures: formatFailures,
+            allowLegacyMissingSurface: context.allowLegacyMissingSurface,
+            missingSurfaceCount: missingSurfaceCount,
+            legacyMissingSurfaceAllowedCount: legacyMissingSurfaceAllowedCount,
+            surfaceFieldPass: surfaceFieldPass,
             maskingCoverage: coverage,
             redactionStatus: redactionFailures.isEmpty ? "pass" : "fail",
             quarantineCount: quarantineCount,
@@ -549,6 +643,10 @@ public struct C5DataGateValidator: Sendable {
         - train_held_out_axis_overlap_row_count: \(receipt.trainHeldOutAxisOverlapRowCount ?? 0)
         - tool_call_format_pass: \(receipt.toolCallFormatPass)
         - tool_call_format_failures: \(receipt.toolCallFormatFailures.count)
+        - allow_legacy_missing_surface: \(receipt.allowLegacyMissingSurface == true)
+        - missing_surface_count: \(receipt.missingSurfaceCount ?? 0)
+        - legacy_missing_surface_allowed_count: \(receipt.legacyMissingSurfaceAllowedCount ?? 0)
+        - surface_field_pass: \(receipt.surfaceFieldPass ?? 0)
         - redaction_status: \(receipt.redactionStatus)
 
         ## Masking coverage
@@ -645,6 +743,30 @@ public struct C5DataGateValidator: Sendable {
         return prohibited.contains { text.localizedCaseInsensitiveContains($0) }
     }
 
+    private func missingSurfaceFields(_ candidate: C5DataGateCandidate) -> [String] {
+        var fields: [String] = []
+        if candidate.tools.isEmpty {
+            fields.append("tools")
+        }
+        if let mountedToolCount = candidate.mountedToolCount {
+            if mountedToolCount != candidate.tools.count {
+                fields.append("mounted_tool_count_mismatch")
+            }
+        } else {
+            fields.append("mounted_tool_count")
+        }
+        if candidate.subsetPolicyID?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty == nil {
+            fields.append("subset_policy_id")
+        }
+        if candidate.subsetGroupID?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty == nil {
+            fields.append("subset_group_id")
+        }
+        if candidate.subsetPolicyDigest?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty == nil {
+            fields.append("subset_policy_digest")
+        }
+        return fields
+    }
+
     private func suggestedFixes(failures: [C5DataGateFailure], sourceReady: Bool) -> [String] {
         var suggestions: [String] = []
         if !sourceReady {
@@ -664,6 +786,9 @@ public struct C5DataGateValidator: Sendable {
         }
         if failures.contains(where: { $0.reason == "tool_call_format_mismatch" }) {
             suggestions.append("render train action rows with shared qwen tool_call wrapper")
+        }
+        if failures.contains(where: { $0.reason == "missing_candidate_surface_fields" }) {
+            suggestions.append("populate tools/mounted_tool_count/subset fields before formal wave-1 data gate, or rerun legacy fixtures with explicit allow_legacy_missing_surface")
         }
         if failures.contains(where: { $0.reason == "redaction_violation" }) {
             suggestions.append("redact prohibited raw-source text before re-running gate")

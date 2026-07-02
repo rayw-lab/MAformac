@@ -400,7 +400,12 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
             assistantText: assistantPayload,
             hasActionToolCall: !expectedToolCalls.isEmpty,
             hasSharedWrapper: assistantPayload.contains("<tool_call>"),
-            masking: masking
+            masking: masking,
+            tools: tools,
+            mountedToolCount: mountedToolCount,
+            subsetPolicyID: subsetPolicyID,
+            subsetGroupID: subsetGroupID,
+            subsetPolicyDigest: subsetPolicyDigest
         )
     }
 

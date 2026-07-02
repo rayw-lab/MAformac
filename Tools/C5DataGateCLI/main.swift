@@ -30,7 +30,8 @@ struct C5DataGateCLI {
             sourceSnapshotDigest: sourceDigest,
             sourceAuthorizationStatus: options.sourceAuthorizationStatus,
             formatContractVersion: formatDigest,
-            generatedAt: isoNow()
+            generatedAt: isoNow(),
+            allowLegacyMissingSurface: options.allowLegacyMissingSurface
         )
         let validator = C5DataGateValidator()
         let receipt = validator.receipt(candidates: candidates, c6Cases: c6Cases, context: context)
@@ -147,6 +148,7 @@ private struct Options {
     var candidatePaths: [String]
     var sourceDigestPaths: [String]
     var sourceAuthorizationStatus: String
+    var allowLegacyMissingSurface: Bool
 
     init(arguments: [String]) throws {
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -154,6 +156,7 @@ private struct Options {
         candidatePaths = []
         sourceDigestPaths = []
         sourceAuthorizationStatus = "unknown"
+        allowLegacyMissingSurface = false
         var iterator = arguments.dropFirst().makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -172,12 +175,14 @@ private struct Options {
             case "--output-dir":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --output-dir value") }
                 outputDir = value
+            case "--allow-legacy-missing-surface":
+                allowLegacyMissingSurface = true
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }
         }
         if candidatePaths.isEmpty {
-            throw CLIError.usage("usage: C5DataGateCLI --candidates PATH[,PATH...] [--repo-root PATH] [--source-digest-path PATH] [--source-authorization STATUS] [--output-dir PATH]")
+            throw CLIError.usage("usage: C5DataGateCLI --candidates PATH[,PATH...] [--repo-root PATH] [--source-digest-path PATH] [--source-authorization STATUS] [--output-dir PATH] [--allow-legacy-missing-surface]")
         }
         if sourceDigestPaths.isEmpty {
             sourceDigestPaths = candidatePaths
