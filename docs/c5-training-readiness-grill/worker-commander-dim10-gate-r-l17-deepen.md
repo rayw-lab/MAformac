@@ -5,7 +5,7 @@ paradigm: UIUE 215-grill 决策矩阵（7 列 + 防惨败列 cite P1-P9）
 dimension: 10（gate 体系 + R-L17）
 id_range: F-076~F-095
 round: overnight-deepen（2026-07-02，D-012 承接）
-status: proposed（待磊哥人审 lock）
+status: locked_by_magnet_2026-07-02（D-017「ABCDE都要做 我授权了」，F-076~095 全 20 条 proposed→locked）
 r7_boundary: grill-only 写决策，不训练/不生成/不评测；真跑等 candidate signoff
 created: 2026-07-02
 ---

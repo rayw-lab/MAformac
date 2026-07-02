@@ -180,3 +180,18 @@
 - **Consequences**: 现状 HOLD 直到磊哥 5 件决策；R7 route-only **2026-07-15 到期**入 5 件附注；gate7 pipeline 代码闭环 = 剩余最大 R7-safe construction（节点 C，M1 后可立项派 worker）；两基线文档随 M1-γ 进 main。
 - **落点**: 本 D-016 + 上述 3 文档 + task #1-#7 全 completed
 - 🟢 **UPDATE（hermes 审计吸收 + E-2 真口径，2026-07-02）**：hermes 审计 D-016 产出（2 P1 + 3 P2 全事实型，我逐条 cite-verify 5/5 坐实）→ 全吸收：① L2 锚点漂移（引 CURRENT.md:104-113 已被 629b1132 重写位移）→ L2 加 RECONCILED banner（旧锚 `git show 7dd64a50:docs/CURRENT.md` 可核，正文一手 receipt 不改）② task ledger 缺失 → `runs/.../TASK-LEDGER.md` 补齐 #1-#7 逐项证据锚，closeout 口径降级为「3 worker reports + commander synthesis + ledger 补齐」③ roadmap 147/14 self-staleness → 改「147 behind + ahead 随文档 commit 递增（7dd64a50/14→629b1132/15），live 以 git rev-list 为准」④ §5 CURRENT 行措辞矛盾 → 改「本分支版 629b1132 已重写为最新草案，main 版仍旧态」⑤ L3 加 RECONCILED banner（§1 gate 态列引 grill 树旧 landing-matrix，权威=主树 §3+blueprint §1）。🔴 **E-2 一步到位升真口径**：mlx-community/Qwen3-1.7B-4bit 本机缓存 tokenizer 离线实测（R7-safe tokenizer-only）562 工具目录 compact JSON=**126,275 tokens** / default=**159,899 tokens**（tokenizer 报警超 131,072 max）→ hermes proxy 估算（74-109k）与我保守口径（103-138k）**全部作废**，结论加固：562 全集任何 context 配置装不下，subset 是数学必然。blueprint §1/CURRENT/MEMORY 三处已同步刷。hermes elephant（proof-class 混用：HF cloud/Hub/Trackio 不可替代 local C5/C6/R7 signoff）= blueprint §5 hard drops 已覆盖，确认无缺口。
+
+## D-017 磊哥授权 ABCDE 全做（①②③⑤ locked + M1 执行 + gate7 立项 + E-2 grill + HOLD 纪律贯穿）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Decision-lock + Dispatch ｜ **Owners**: 磊哥「ABCDE都要做哦 我授权了，你自己看分工和边界，三个worker目前空闲」
+- **授权解读（边界，防越权）**:
+  - **① masking design 岔口 = locked ⭐**：全 token-mask override（已实现 `47ca8cda` + 双异源 CONFIRMED + D-015 复审）。
+  - **② E-2 subset = 方向 locked**（真 tokenizer 口径 126,275/159,899 tokens 超 131,072 上限，subset 数学必然）；**实装形态不自拍**——D 项 grill 出 design 决策包上抛细拍。
+  - **③ grill Dim10/11/5 = locked**：58 条（F-076~095=20 + F-055~075=21 + A-134~150=17）proposed→locked，级联回写 frontmatter + landing-matrix §4。
+  - **⑤ consolidation = 授权执行**：M1 staged PR α(g2)→β(g8)→γ(文档整编支)，每支 CI 绿 + 交叉审 CLEAR → **worker rebase-merge（D-011 先例 + 本次「都要做」明确授权）** → commander gh 一手核销；任一支审出 P0 → 停该支上抛。
+  - **C gate7 pipeline 立项**：M1 绿后基于新 main 开 worktree 派单（本轮先备 SPEC）。
+  - **D E-2 设计 grill**：%43 素材 + commander 纵切 → design 包上抛磊哥细拍。
+  - 🔴 **E HOLD 纪律贯穿（不因「都要做」松动）**：④ tiny-ablation RUN/gate1 真跑/真生成 = 仍 BLOCKED 等单独 run-auth；M2 树清理（破坏性）= 未授权不动；R7 全程守。
+- **M1-α 前置**：反向 guard（数据含 loss_mask 而 flag 缺失 → fail-closed；D-015 观察① + hermes P2 独立撞出）由 %45 在 g2-mask 补 commit + 测试，再 push 开 PR。
+- **M1-γ port 纪律**：新 branch off main=`ab355f6c`；逐文件语义比较只 port 本分支更新内容；🔴 `gate7-cloud-generator-design.md` 以 main 版（PR #11 含 §10）为准不回退；grill 树 2 件 Dim11/5 port 时 frontmatter 改 locked；禁整支 merge doc-absorption/grill（147 behind 回退风险，baseline-roadmap §2）。
+- **分工**: %45=α（guard+push+PR）/ %44=β（push+PR）+γ（文档整编支）/ %43=E-2 素材 / commander=lock 级联回写+Dim10 frontmatter+收稿裁决+E-2 纵切+gh 核销。
+- **落点**: 本 D-017 + SPEC-M1A/M1BG/E2 @ `runs/2026-07-02-baseline-roadmap/` + landing-matrix §4 里程碑
