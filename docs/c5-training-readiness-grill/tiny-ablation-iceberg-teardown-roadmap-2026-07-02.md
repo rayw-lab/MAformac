@@ -637,4 +637,3 @@ Stop:
 - If changing sample/probe composition, request fresh run-auth before any training.
 - Do not claim D-domain paradigm verdict until Axis A/B are separated and run.
 ```
-
