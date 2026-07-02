@@ -55,3 +55,20 @@ swift run C5TrainingCLI \
 
 ## §3 与签字包的关系
 本 plan 被 `R7-renewal-and-tiny-ablation-run-auth-DRAFT.md` Part B 引用；磊哥在 B.3 签字区落笔（`sample_count_approved: 40` 建议值）即授权**本 plan 全文且仅本 plan**。执行 worker 派单时本文件整体 inline，每步 receipt 回 %42。
+
+## §4 Addendum v2（磊哥 2026-07-02 亲拍，仅修执行命令零 scope 扩张）
+
+> 背景：Step1 首跑 BLOCKED（worker 按「偏离=停」正确停下）——原 plan 命令未列 `--dev-selection`，CLI 默认 `devSelectionRows=400` 把 40 条正例全部吸进 dev_selection → train 0 行 / loss_mask=null / offset fixture fail。磊哥拍 addendum：**只修命令形态**。
+
+**Step 1 命令（v2 权威，取代 §2 Step 1 命令块）**：
+```
+swift run C5TrainingCLI prepare \
+  --output-dir <RUNDIR>/build \
+  --scope demo \
+  --surface d_domain \
+  --target-positive 40 \
+  --dev-selection 0 \
+  --masking-stage masking_complete_v1
+```
+- 其余一切不变：target-positive 40 / scope demo / surface d_domain / masking_complete_v1 / rank16Mainline 渲染原样 / 34-case 探针 / 门 <5。
+- **Step 1 绿门（v2 新增，全部满足才进 Step 2）**：① train rows = **40** ② `train_eligible=40` ③ `loss_mask_present=40` ④ `mlx-data/train.jsonl` 存在 ⑤ `mlx-train-command.txt` 存在（+原有 C5DataGate receipt 绿 + subset digest）。
