@@ -52,4 +52,4 @@ attribution=tiny 44 行数据稀疏（「关闭」自然语义仅 2 训练行且
 ## 附录3：wave-1 proto build 全量数据门首跑（2026-07-03 凌晨，%45）
 - **build：4500 样本（train 4100/valid 400/test 128）38.8s**；工具覆盖 expected 314/562、mounted 395/562、55 subset 组、tools/row avg14.5 max48。
 - **C5DataGate 全量 exit0 `data_gate_ready`：4500 行 must_not_train=0/parent_overlap=0/heldout_axis_overlap=0/row_overlap=0/tool_format_fail=0/quarantine=0/C6 交集=0**——磊哥「数据门跑完」全量版兑现（协议串模式，自然句待云语料）。
-- 🔴 **暴露 wave-1 训练前必修 gap**（tiny 44 行未暴露）：MLX preflight strict exit66——`max_token_length=8982 > max_seq 8192`、length_violations=294、valid/test 行 under-supervised（当前契约只监督 train 行）。→ 新 grill 议题：长行策略（截断/提 max_seq/拆样本）+ valid/test 行监督契约。
+- 🔴 **暴露 wave-1 训练前必修 gap**（tiny 44 行未暴露）：MLX preflight strict exit66——`max_token_length=8982 > max_seq 8192`、length_violations=294、valid/test 行 under-supervised（当前契约只监督 train 行）。→ 量化解已出（%45 分析，`wave1-proto-build/wave1-length-violation-analysis.md`）：294 条违规**全部**来自 `seat.massage_force_time` 单一 subset 组（17 工具挂载，8935-8982 token=E-2 已知 degraded 重灾族）；三解——max_seq 9000 即收全 / ⭐**E-2 降档挂载（target+first-sibling）294/294 回 8192 内且全量 max 仅 1793**（训练成本同降）/ target-only max 995。+ valid/test 行监督契约议题。与 wave-1 5 拍点同会话拍。

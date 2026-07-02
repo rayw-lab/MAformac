@@ -17,4 +17,7 @@ source: %45 wave1-pregen-survey.md（250 行，file:line 证据表）+ commander
 | 4 | 旧 3,804/4,500 文本 salvage | ⭐参与，但全量重过 vendor-enum judge + C5DataGate（旧 same-vendor judge verdict 作废） | 承接既有 salvage 决策，省生成成本 |
 | 5 | 人工精度门 staffing | ⭐磊哥本人按代码算的 sample size 抽检（`Gate7GeneratorPipeline.swift:657-670`，family<0.8 停）；或拍「首波跳过人工门、数据门+judge 双机械门先行」 | 无人认领 label = 门空转 |
 
+| 6 | 长行策略（proto build 实测新增） | ⭐E-2 降档挂载 target+first-sibling（294/294 违规收全、全量 max 1793、成本同降）；备选 max_seq 9000 | 违规全来自 seat.massage_force_time 单组；量化分析 `runs/.../wave1-proto-build/wave1-length-violation-analysis.md` |
+| 7 | valid/test 行监督契约（proto build 实测新增） | ⭐valid/test 行补 A+ 契约字段使 strict preflight 全绿；备选显式豁免 flag | 当前契约只监督 train 行，strict 模式 4628 行 exit66 |
+
 拍完 → commander 派 worker 接线跑 wave-1 live + C5DataGate 全量 → 数据 receipt 上抛。
