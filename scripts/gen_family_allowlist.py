@@ -18,6 +18,11 @@ from collections import defaultdict
 from pathlib import Path
 
 CONTRACT = "contracts/semantic-function-contract.jsonl"
+DEMO_TOOL_CATALOG = "D_domain.tools.demo.json"
+TOOL_COUNT_DERIVATION = (
+    "ToolContractCompiler.loadDDomainCatalog(repoRoot:).count over generated/D_domain.tools.demo.json; "
+    "value-form expanded D-domain named tool catalog, not demo_intents reuse."
+)
 
 # 口径权威（磊哥 2026-06-23 终拍 562；boundary §1 per-family 三数）
 CALIBER = {
@@ -176,9 +181,21 @@ def validate(dev_rows: dict, dev_intents: dict) -> tuple:
     return ok, report, assigned
 
 
-def build_manifest(repo_root: Path, dev_rows: dict, dev_intents: dict, assigned: dict) -> dict:
+def read_demo_tool_count(output_dir: Path) -> int:
+    catalog_path = output_dir / DEMO_TOOL_CATALOG
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise SystemExit(f"FAIL: missing D-domain demo catalog for tool_count: {catalog_path}") from exc
+    if not isinstance(catalog, list):
+        raise SystemExit(f"FAIL: D-domain demo catalog is not a list: {catalog_path}")
+    return len(catalog)
+
+
+def build_manifest(repo_root: Path, output_dir: Path, dev_rows: dict, dev_intents: dict, assigned: dict) -> dict:
     contract_path = repo_root / CONTRACT
     sha = hashlib.sha256(contract_path.read_bytes()).hexdigest()
+    tool_count = read_demo_tool_count(output_dir)
     families = {}
     for fam, devices in FAM.items():
         devices = list(dict.fromkeys(devices))
@@ -199,7 +216,8 @@ def build_manifest(repo_root: Path, dev_rows: dict, dev_intents: dict, assigned:
             "contract_source": CONTRACT,
             "contract_sha256": sha,
             "caliber": CALIBER,
-            "tool_count": "TBD — S1 codegen value-form 实算（paradigm §16 议题7 命名框架；562=intent 非工具数）",
+            "tool_count": tool_count,
+            "tool_count_derivation": TOOL_COUNT_DERIVATION,
             "scope_tier_detail": "DEFERRED — positive/unsupported/safety/followup 四类 LoRA 数据细分属 retrain-c5（A2 code-only 仅 demo/oos scope）",
             "col_o_priority": "DEFERRED — runtime 端侧挂载优先级（raw xlsx 第15列），A2 code-only surface 不需",
         },
@@ -231,10 +249,13 @@ def main() -> int:
     if not ok:
         print("FAIL: family allowlist 自验证未通过（jsonl 漂移或 FAM allowlist 错），拒绝 emit", file=sys.stderr)
         return 1
+    output_dir = repo_root / args.output_dir
+    tool_count = read_demo_tool_count(output_dir)
+    print(f"OK D_DOMAIN_TOOL_COUNT: {tool_count} from {output_dir / DEMO_TOOL_CATALOG}")
     if args.emit:
-        out_dir = repo_root / args.output_dir
+        out_dir = output_dir
         out_dir.mkdir(parents=True, exist_ok=True)
-        manifest = build_manifest(repo_root, dev_rows, dev_intents, assigned)
+        manifest = build_manifest(repo_root, output_dir, dev_rows, dev_intents, assigned)
         out_path = out_dir / "family-device-allowlist.json"
         out_path.write_text(json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
         print(f"wrote {out_path}")
