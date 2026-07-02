@@ -871,6 +871,9 @@ private struct C5LoadedSubsetPolicyManifest: Sendable {
 }
 
 private struct C5SubsetPolicyManifest: Decodable, Sendable {
+    // Policy authority source: scripts/gen_subset_manifest.py:24 POLICY_ID.
+    static let expectedPolicyID = "e2-lite-v1"
+
     var entries: [Entry]
 
     struct Entry: Decodable, Sendable {
@@ -2809,6 +2812,9 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let fcTarget = max(0, options.targetPositiveRows - ruleTarget)
         var samples: [C5TrainingSample] = []
         var sampleFailures = manifestResult.failures
+        if manifestResult.manifest == nil, !sampleFailures.isEmpty {
+            return PositiveBuildResult(samples: [], failureReceipt: Array(Set(sampleFailures)).sorted())
+        }
         samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
         samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
         samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
@@ -2836,6 +2842,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
         do {
             let data = try Data(contentsOf: url)
             let decoded = try JSONDecoder().decode(C5SubsetPolicyManifest.self, from: data)
+            let observedPolicyIDs = Set(decoded.entries.map(\.subsetPolicyID))
+            guard observedPolicyIDs.count == 1, observedPolicyIDs.first == C5SubsetPolicyManifest.expectedPolicyID else {
+                let observed = observedPolicyIDs.sorted().joined(separator: ",")
+                FileHandle.standardError.write(Data("G7D_SUBSET_POLICY_MISMATCH path=\(url.path) expected=\(C5SubsetPolicyManifest.expectedPolicyID) observed=\(observed.isEmpty ? "<none>" : observed) — fail-closed\n".utf8))
+                return (nil, ["subset_policy_mismatch"])
+            }
             let singleGroupEntries = decoded.entries.filter { $0.mountMode == "single_group" }
             guard !singleGroupEntries.isEmpty else {
                 FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_EMPTY path=\(url.path) no single_group entries — fail-closed\n".utf8))
@@ -2858,7 +2870,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_CLOSURE_FAIL path=\(url.path) failures=\(failures.joined(separator: ",")) — fail-closed\n".utf8))
                 return (nil, failures)
             }
-            let policyID = singleGroupEntries.first?.subsetPolicyID ?? ""
+            let policyID = singleGroupEntries.first?.subsetPolicyID ?? C5SubsetPolicyManifest.expectedPolicyID
             return (
                 C5LoadedSubsetPolicyManifest(
                     policyID: policyID,
