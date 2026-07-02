@@ -12,10 +12,13 @@ import probe_harness as harness
 
 
 class FakeRunner:
-    def generate(self, *, model_path, adapter_path, user_text, contract):
+    def generate(self, *, model_path, adapter_path, user_text, tools, contract):
         prompt = (
             "<|im_start|>system\n"
             f"{harness.SYSTEM_PROMPT}<|im_end|>\n"
+            "<tools>\n"
+            + "\n".join(json.dumps(tool, ensure_ascii=False) for tool in tools)
+            + "\n</tools>\n"
             "<|im_start|>user\n"
             f"{user_text}<|im_end|>\n"
             "<|im_start|>assistant\n"
@@ -39,6 +42,7 @@ def valid_decode_payload(**overrides):
         "parser_id": "p3h_tool_call_json_ordered_v2",
         "tool_call_cardinality": "ordered_multi_call",
         "output_boundary": "raw_generation_and_truncated_output",
+        "tools_mount_policy": "p3h_v3_training_row_or_e2_sg_catalog",
     }
     payload.update(overrides)
     return payload
@@ -61,6 +65,12 @@ class ProbeHarnessTests(unittest.TestCase):
             payload.pop("parser_id")
             harness.DecodeContract.from_payload(payload)
 
+    def test_decode_contract_missing_tools_mount_policy_fails_closed(self):
+        with self.assertRaisesRegex(harness.HarnessError, "decode_contract_missing:tools_mount_policy"):
+            payload = valid_decode_payload()
+            payload.pop("tools_mount_policy")
+            harness.DecodeContract.from_payload(payload)
+
     def test_paired_base_adapter_summary_shape(self):
         cases = [
             {
@@ -68,6 +78,7 @@ class ProbeHarnessTests(unittest.TestCase):
                 "input_zh": "有点冷",
                 "behavior_class": "tool_call",
                 "expected_tool_calls": [{"name": "raise_ac_temperature_by_exp", "arguments": {}}],
+                "tools": [{"type": "function", "function": {"name": "raise_ac_temperature_by_exp"}}],
                 "tags": {"bucket": "action"},
             },
             {
@@ -75,6 +86,7 @@ class ProbeHarnessTests(unittest.TestCase):
                 "input_zh": "打开车窗",
                 "behavior_class": "tool_call",
                 "expected_tool_calls": [{"name": "open_window", "arguments": {}}],
+                "tools": [{"type": "function", "function": {"name": "open_window"}}],
                 "tags": {"bucket": "action"},
             },
         ]
@@ -143,10 +155,19 @@ class ProbeHarnessTests(unittest.TestCase):
         self.assertFalse(kwargs["verbose"])
 
     def test_prompt_skeleton_requires_empty_think_block(self):
-        valid_prompt = "<|im_start|>assistant\n<think>\n\n</think>\n\n"
-        harness.validate_prompt_skeleton(valid_prompt, harness.DEFAULT_DECODE_CONTRACT)
+        valid_prompt = "<tools>\n{}\n</tools>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+        harness.validate_prompt_skeleton(valid_prompt, harness.DEFAULT_DECODE_CONTRACT, mounted_tool_count=1, prompt_token_count=300)
         with self.assertRaisesRegex(harness.HarnessError, "invalid_probe_prompt_missing_empty_think_block"):
-            harness.validate_prompt_skeleton("<|im_start|>assistant\n", harness.DEFAULT_DECODE_CONTRACT)
+            harness.validate_prompt_skeleton("<tools>\n{}\n</tools>\n<|im_start|>assistant\n", harness.DEFAULT_DECODE_CONTRACT, mounted_tool_count=1, prompt_token_count=300)
+
+    def test_prompt_skeleton_requires_tools_section_and_token_floor(self):
+        valid_tail = "<|im_start|>assistant\n<think>\n\n</think>\n\n"
+        with self.assertRaisesRegex(harness.HarnessError, "invalid_probe_prompt_missing_tools_mount"):
+            harness.validate_prompt_skeleton("<tools>\n{}\n</tools>\n" + valid_tail, harness.DEFAULT_DECODE_CONTRACT)
+        with self.assertRaisesRegex(harness.HarnessError, "invalid_probe_prompt_missing_tools_section"):
+            harness.validate_prompt_skeleton(valid_tail, harness.DEFAULT_DECODE_CONTRACT, mounted_tool_count=1, prompt_token_count=300)
+        with self.assertRaisesRegex(harness.HarnessError, "invalid_probe_prompt_tools_token_length_too_short"):
+            harness.validate_prompt_skeleton("<tools>\n{}\n</tools>\n" + valid_tail, harness.DEFAULT_DECODE_CONTRACT, mounted_tool_count=1, prompt_token_count=299)
 
     def test_multi_call_parser_preserves_ordered_calls(self):
         case = {
@@ -165,6 +186,17 @@ class ProbeHarnessTests(unittest.TestCase):
         self.assertEqual(parsed["observed_tool_names"], [call["name"] for call in case["expected_tool_calls"]])
         self.assertEqual(parsed["tool_call_count"], 2)
         self.assertEqual(parsed["parse_errors"], [])
+
+    def test_repeated_identical_tool_calls_collapse_to_first_call(self):
+        raw = (
+            '<tool_call>{"name":"open_ac","arguments":{}}</tool_call>\n'
+            '<tool_call>{"name":"open_ac","arguments":{}}</tool_call>\n'
+            '<tool_call>{"name":"open_ac","arguments":{}}</tool_call>'
+        )
+        parsed = harness.parse_tool_calls(raw)
+
+        self.assertEqual(parsed["observed_tool_names"], ["open_ac"])
+        self.assertEqual(parsed["tool_call_count"], 1)
 
     def test_paired_mode_requires_adapter_unless_base_only_smoke(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -189,6 +221,55 @@ class ProbeHarnessTests(unittest.TestCase):
                         str(root / "out"),
                     ]
                 )
+
+    def test_missing_tools_mount_fails_closed_in_run_arm(self):
+        cases = [{"case_id": "CASE-1", "input_zh": "打开空调", "behavior_class": "tool_call"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(harness.HarnessError, "invalid_probe_tools_mount_missing:CASE-1"):
+                harness.run_arm(
+                    arm_name="base",
+                    model_path=Path("base"),
+                    adapter_path=None,
+                    cases=cases,
+                    contract=harness.DEFAULT_DECODE_CONTRACT,
+                    output_dir=Path(tmp),
+                    runner=FakeRunner(),
+                )
+
+    def test_build_tool_mounts_uses_training_row_for_a_b_and_catalog_sg_for_c_d(self):
+        cases = [
+            {
+                "case_id": "P3D-A-001",
+                "input_zh": "device=ac; 请按这个语义执行",
+                "behavior_class": "tool_call",
+                "expected_tool_calls": [{"name": "open_ac", "arguments": {}}],
+                "source_sample_id": "c5-train-00001",
+                "tags": {"bucket": "A"},
+            },
+            {
+                "case_id": "P3D-C-001",
+                "input_zh": "打开快速除雾",
+                "behavior_class": "tool_call",
+                "expected_tool_calls": [{"name": "open_defog_mode", "arguments": {}}],
+                "tags": {"bucket": "C"},
+            },
+        ]
+        train_rows = [
+            {
+                "sample_id": "c5-train-00001",
+                "tools": [{"type": "function", "function": {"name": "open_ac"}}],
+            }
+        ]
+        catalog_rows = [
+            {"type": "function", "_sg": "defog_mode", "function": {"name": "close_defog_mode"}},
+            {"type": "function", "_sg": "defog_mode", "function": {"name": "open_defog_mode"}},
+        ]
+        mounts = harness.build_tool_mounts(cases, train_rows=train_rows, catalog_rows=catalog_rows)
+
+        self.assertEqual(mounts["P3D-A-001"]["mount_source"], "train_row:c5-train-00001")
+        self.assertEqual(harness.mounted_tool_names({"tools": mounts["P3D-A-001"]["tools"]}), ["open_ac"])
+        self.assertEqual(mounts["P3D-C-001"]["mount_source"], "catalog_sg:defog_mode")
+        self.assertEqual(harness.mounted_tool_names({"tools": mounts["P3D-C-001"]["tools"]}), ["close_defog_mode", "open_defog_mode"])
 
     def test_overlap_summary_three_metric_families(self):
         cases = [

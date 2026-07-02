@@ -21,6 +21,7 @@ from typing import Any, Iterable, Protocol
 SYSTEM_PROMPT = "你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。"
 REQUIRED_STOP_TOKENS = ("</tool_call>", "\n", "\n\n", "\r\n")
 TOOL_CALL_START_PATTERN = re.compile(r"<tool_call>\s*", re.DOTALL)
+DEFAULT_TOOL_CATALOG = Path("/Users/wanglei/workspace/MAformac/generated/D_domain.tools.demo.json")
 
 
 class HarnessError(RuntimeError):
@@ -38,6 +39,7 @@ class DecodeContract:
     parser_id: str
     tool_call_cardinality: str
     output_boundary: str
+    tools_mount_policy: str
 
     @classmethod
     def from_path(cls, path: Path) -> "DecodeContract":
@@ -57,6 +59,7 @@ class DecodeContract:
             "parser_id",
             "tool_call_cardinality",
             "output_boundary",
+            "tools_mount_policy",
         )
         missing = [key for key in required if key not in payload]
         if missing:
@@ -71,6 +74,7 @@ class DecodeContract:
             parser_id=str(payload["parser_id"]),
             tool_call_cardinality=str(payload["tool_call_cardinality"]),
             output_boundary=str(payload["output_boundary"]),
+            tools_mount_policy=str(payload["tools_mount_policy"]),
         )
         contract.validate()
         return contract
@@ -92,6 +96,8 @@ class DecodeContract:
             raise HarnessError("decode_contract_tool_call_cardinality_invalid")
         if self.output_boundary != "raw_generation_and_truncated_output":
             raise HarnessError("decode_contract_output_boundary_invalid")
+        if self.tools_mount_policy != "p3h_v3_training_row_or_e2_sg_catalog":
+            raise HarnessError("decode_contract_tools_mount_policy_invalid")
         missing = [token for token in REQUIRED_STOP_TOKENS if token not in self.stop_tokens]
         if missing:
             escaped = ",".join(repr(token) for token in missing)
@@ -108,6 +114,7 @@ class DecodeContract:
             "parser_id": self.parser_id,
             "tool_call_cardinality": self.tool_call_cardinality,
             "output_boundary": self.output_boundary,
+            "tools_mount_policy": self.tools_mount_policy,
         }
 
 
@@ -121,6 +128,7 @@ DEFAULT_DECODE_CONTRACT = DecodeContract(
     parser_id="p3h_tool_call_json_ordered_v2",
     tool_call_cardinality="ordered_multi_call",
     output_boundary="raw_generation_and_truncated_output",
+    tools_mount_policy="p3h_v3_training_row_or_e2_sg_catalog",
 )
 
 
@@ -131,7 +139,15 @@ class GenerationResult:
 
 
 class ModelRunner(Protocol):
-    def generate(self, *, model_path: Path, adapter_path: Path | None, user_text: str, contract: DecodeContract) -> GenerationResult:
+    def generate(
+        self,
+        *,
+        model_path: Path,
+        adapter_path: Path | None,
+        user_text: str,
+        tools: list[dict[str, Any]],
+        contract: DecodeContract,
+    ) -> GenerationResult:
         ...
 
 
@@ -139,7 +155,15 @@ class MlxLmRunner:
     def __init__(self) -> None:
         self._cache: dict[tuple[str, str | None], tuple[Any, Any]] = {}
 
-    def generate(self, *, model_path: Path, adapter_path: Path | None, user_text: str, contract: DecodeContract) -> GenerationResult:
+    def generate(
+        self,
+        *,
+        model_path: Path,
+        adapter_path: Path | None,
+        user_text: str,
+        tools: list[dict[str, Any]],
+        contract: DecodeContract,
+    ) -> GenerationResult:
         try:
             from mlx_lm import generate, load  # type: ignore
         except ModuleNotFoundError as error:
@@ -153,7 +177,7 @@ class MlxLmRunner:
             self._cache[cache_key] = load(str(model_path), **kwargs)
         model, tokenizer = self._cache[cache_key]
 
-        prompt = render_prompt(tokenizer, user_text, contract)
+        prompt = render_prompt(tokenizer, user_text, tools, contract)
         kwargs = generate_kwargs_for_contract(generate, prompt=prompt, contract=contract)
         output = generate(model, tokenizer, **kwargs)
         return GenerationResult(prompt=prompt, raw_generation=str(output))
@@ -189,20 +213,38 @@ def truncate_at_stop_token(text: str, stop_tokens: Iterable[str]) -> str:
     return normalized[: min(positions)]
 
 
-def render_prompt(tokenizer: Any, user_text: str, contract: DecodeContract) -> str:
+def render_prompt(tokenizer: Any, user_text: str, tools: list[dict[str, Any]], contract: DecodeContract) -> str:
+    if not tools:
+        raise HarnessError("invalid_probe_tools_missing")
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": user_text},
     ]
     try:
-        prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        prompt = tokenizer.apply_chat_template(messages, tools=tools, tokenize=False, add_generation_prompt=True)
     except Exception as error:
         raise HarnessError("invalid_probe_prompt_render_failed") from error
-    validate_prompt_skeleton(prompt, contract)
+    validate_prompt_skeleton(prompt, contract, mounted_tool_count=len(tools), prompt_token_count=token_count(tokenizer, prompt))
     return prompt
 
 
-def validate_prompt_skeleton(prompt: str, contract: DecodeContract) -> None:
+def token_count(tokenizer: Any, prompt: str) -> int | None:
+    encoder = getattr(tokenizer, "encode", None)
+    if not callable(encoder):
+        return None
+    try:
+        return len(encoder(prompt))
+    except Exception:
+        return None
+
+
+def validate_prompt_skeleton(
+    prompt: str,
+    contract: DecodeContract,
+    *,
+    mounted_tool_count: int = 0,
+    prompt_token_count: int | None = None,
+) -> None:
     if contract.thinking != "no_think_block":
         raise HarnessError("invalid_probe_prompt_thinking_contract")
     if "<think>\n\n</think>" not in prompt:
@@ -211,6 +253,12 @@ def validate_prompt_skeleton(prompt: str, contract: DecodeContract) -> None:
         raise HarnessError("invalid_probe_prompt_tail_mismatch")
     if "<|im_start|>assistant\n<think>\n\n</think>" not in prompt:
         raise HarnessError("invalid_probe_prompt_assistant_skeleton_mismatch")
+    if mounted_tool_count <= 0:
+        raise HarnessError("invalid_probe_prompt_missing_tools_mount")
+    if "<tools>" not in prompt or "</tools>" not in prompt:
+        raise HarnessError("invalid_probe_prompt_missing_tools_section")
+    if prompt_token_count is not None and prompt_token_count < 300:
+        raise HarnessError("invalid_probe_prompt_tools_token_length_too_short")
 
 
 def load_cases(path: Path, *, behavior_class: str | None) -> list[dict[str, Any]]:
@@ -252,6 +300,7 @@ def parse_tool_calls(raw_output: str) -> dict[str, Any]:
             parse_errors.append({"offset": match.start(), "error": "arguments_not_object", "name": name})
             continue
         calls.append({"name": name, "arguments": arguments})
+    calls = collapse_repeated_single_call(calls)
     return {
         "tool_calls": calls,
         "observed_tool_names": [call["name"] for call in calls],
@@ -259,6 +308,15 @@ def parse_tool_calls(raw_output: str) -> dict[str, Any]:
         "tool_call_count": len(calls),
         "has_tail_after_last_tool_call": has_tail_after_last_tool_call(raw_output),
     }
+
+
+def collapse_repeated_single_call(calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if len(calls) <= 1:
+        return calls
+    first = calls[0]
+    if all(call == first for call in calls[1:]):
+        return [first]
+    return calls
 
 
 def has_tail_after_last_tool_call(raw_output: str) -> bool:
@@ -294,6 +352,112 @@ def surface_for_case(case: dict[str, Any]) -> str:
     return "natural"
 
 
+def build_tool_mounts(
+    cases: list[dict[str, Any]],
+    *,
+    train_rows: list[dict[str, Any]] | None,
+    catalog_rows: list[dict[str, Any]] | None,
+) -> dict[str, dict[str, Any]]:
+    train_by_id = {
+        str(row.get("sample_id")): row
+        for row in train_rows or []
+        if row.get("sample_id")
+    }
+    catalog_by_name = {
+        str(row.get("function", {}).get("name")): row
+        for row in catalog_rows or []
+        if row.get("function", {}).get("name")
+    }
+    catalog_by_sg: dict[str, list[dict[str, Any]]] = {}
+    for row in catalog_rows or []:
+        sg = row.get("_sg")
+        if isinstance(sg, str) and sg:
+            catalog_by_sg.setdefault(sg, []).append(row)
+    for rows in catalog_by_sg.values():
+        rows.sort(key=lambda row: str(row.get("function", {}).get("name", "")))
+
+    mounts: dict[str, dict[str, Any]] = {}
+    for case in cases:
+        case_id = str(case["case_id"])
+        axis = axis_for_case(case)
+        if axis in {"A", "B"}:
+            sample_id = source_sample_id_for_case(case)
+            if not sample_id or sample_id not in train_by_id:
+                raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:train_row")
+            tools = train_by_id[sample_id].get("tools", [])
+            if not isinstance(tools, list) or not tools:
+                raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:train_tools")
+            mounts[case_id] = {
+                "tools": tools,
+                "mount_source": f"train_row:{sample_id}",
+                "mount_policy": "training_row_tools_exact",
+            }
+            continue
+
+        case_tools = case.get("tools")
+        if isinstance(case_tools, list) and case_tools:
+            mounts[case_id] = {
+                "tools": case_tools,
+                "mount_source": "case.tools",
+                "mount_policy": "case_embedded_tools",
+            }
+            continue
+
+        expected_names = expected_tool_names(case)
+        if not expected_names:
+            raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:expected_tool_calls")
+        if not catalog_rows:
+            raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:catalog")
+        grouped_entries: list[dict[str, Any]] = []
+        group_ids: list[str] = []
+        for name in expected_names:
+            entry = catalog_by_name.get(name)
+            if entry is None:
+                raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:catalog_tool:{name}")
+            sg = entry.get("_sg")
+            if not isinstance(sg, str) or not sg or sg not in catalog_by_sg:
+                raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:catalog_sg:{name}")
+            group_ids.append(sg)
+            grouped_entries.extend(catalog_by_sg[sg])
+        tools = dedupe_tools_by_name([catalog_tool_schema(entry) for entry in grouped_entries])
+        mounts[case_id] = {
+            "tools": tools,
+            "mount_source": "catalog_sg:" + ",".join(dict.fromkeys(group_ids)),
+            "mount_policy": "e2_sg_full_group",
+        }
+    return mounts
+
+
+def source_sample_id_for_case(case: dict[str, Any]) -> str | None:
+    for key in ("source_sample_id", "augmentation_parent_id", "sample_id"):
+        value = case.get(key)
+        if isinstance(value, str) and value:
+            return value
+    tags = case.get("tags") if isinstance(case.get("tags"), dict) else {}
+    for key in ("source_sample_id", "augmentation_parent_id", "sample_id"):
+        value = tags.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def catalog_tool_schema(entry: dict[str, Any]) -> dict[str, Any]:
+    return {"type": entry.get("type", "function"), "function": entry["function"]}
+
+
+def dedupe_tools_by_name(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    deduped: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for tool in tools:
+        function = tool.get("function") if isinstance(tool, dict) else None
+        name = function.get("name") if isinstance(function, dict) else None
+        if not isinstance(name, str) or not name or name in seen:
+            continue
+        seen.add(name)
+        deduped.append(tool)
+    return deduped
+
+
 def run_arm(
     *,
     arm_name: str,
@@ -303,6 +467,7 @@ def run_arm(
     contract: DecodeContract,
     output_dir: Path,
     runner: ModelRunner,
+    tool_mounts: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     arm_dir = output_dir / arm_name
     arm_dir.mkdir(parents=True, exist_ok=True)
@@ -310,11 +475,13 @@ def run_arm(
     axis_summary: dict[str, dict[str, int]] = {}
 
     for index, case in enumerate(cases, start=1):
+        mount = tool_mount_for_case(case, tool_mounts)
         started = time.time()
         generation = runner.generate(
             model_path=model_path,
             adapter_path=adapter_path,
             user_text=str(case["input_zh"]),
+            tools=mount["tools"],
             contract=contract,
         )
         elapsed_ms = int((time.time() - started) * 1000)
@@ -335,6 +502,10 @@ def run_arm(
             "behavior_class": case.get("behavior_class"),
             "input_zh": case["input_zh"],
             "expected_tool_calls": case.get("expected_tool_calls", []),
+            "mounted_tool_count": len(mount["tools"]),
+            "mounted_tool_names": mounted_tool_names({"tools": mount["tools"]}),
+            "mount_source": mount["mount_source"],
+            "mount_policy": mount["mount_policy"],
             "prompt": generation.prompt,
             "raw_generation": generation.raw_generation,
             "truncated_output": truncated_output,
@@ -371,6 +542,8 @@ def run_arm(
                 "empty_tool_call_output": record["empty_tool_call_output"],
                 "tool_call_count": record["tool_call_count"],
                 "observed_tool_names": record["observed_tool_names"],
+                "mounted_tool_count": record["mounted_tool_count"],
+                "mount_source": record["mount_source"],
                 "elapsed_ms": record["elapsed_ms"],
             }
             for record in records
@@ -378,6 +551,20 @@ def run_arm(
     }
     (arm_dir / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return summary
+
+
+def tool_mount_for_case(case: dict[str, Any], tool_mounts: dict[str, dict[str, Any]] | None) -> dict[str, Any]:
+    case_id = str(case["case_id"])
+    if tool_mounts and case_id in tool_mounts:
+        mount = tool_mounts[case_id]
+    else:
+        tools = case.get("tools")
+        if not isinstance(tools, list) or not tools:
+            raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}")
+        mount = {"tools": tools, "mount_source": "case.tools", "mount_policy": "case_embedded_tools"}
+    if not isinstance(mount.get("tools"), list) or not mount["tools"]:
+        raise HarnessError(f"invalid_probe_tools_mount_missing:{case_id}:empty")
+    return mount
 
 
 def paired_summary(base: dict[str, Any], adapter: dict[str, Any]) -> dict[str, Any]:
@@ -450,11 +637,17 @@ def mounted_tool_names(row: dict[str, Any]) -> list[str]:
 
 
 def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    text = path.read_text(encoding="utf-8")
+    stripped = text.lstrip()
+    if stripped.startswith("["):
+        payload = json.loads(text)
+        if not isinstance(payload, list):
+            raise HarnessError(f"{path}:json_array_expected")
+        return payload
     rows: list[dict[str, Any]] = []
-    with path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            if line.strip():
-                rows.append(json.loads(line))
+    for line in text.splitlines():
+        if line.strip():
+            rows.append(json.loads(line))
     return rows
 
 
@@ -484,6 +677,10 @@ def write_receipt(path: Path, payload: dict[str, Any]) -> None:
         json.dumps(payload.get("overlap_summary", {}), ensure_ascii=False, indent=2),
         "```",
         "",
+        "## Tools Mount Policy",
+        "",
+        f"`{payload['decode_contract'].get('tools_mount_policy')}`. A/B axes mount exact training-row tools; C/D axes mount generated catalog `_sg` groups for expected tools. Per-case JSON records include `mounted_tool_count`, `mounted_tool_names`, `mount_source`, and `mount_policy`.",
+        "",
         "## Non Claims",
         "",
         "- This receipt does not claim training, C6 acceptance, candidate comparison, V-PASS, S-PASS, or U-PASS.",
@@ -503,6 +700,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--adapter", type=Path)
     parser.add_argument("--base-only-smoke", action="store_true")
     parser.add_argument("--train-jsonl", type=Path)
+    parser.add_argument("--tool-catalog", type=Path, default=DEFAULT_TOOL_CATALOG)
     parser.add_argument("--receipt", type=Path)
     return parser
 
@@ -516,6 +714,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.adapter is None and not args.base_only_smoke:
         raise HarnessError("adapter_required_for_paired_probe")
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    train_rows = load_jsonl(args.train_jsonl) if args.train_jsonl else None
+    catalog_rows = load_jsonl(args.tool_catalog) if args.tool_catalog else None
+    tool_mounts = build_tool_mounts(cases, train_rows=train_rows, catalog_rows=catalog_rows)
     runner = MlxLmRunner()
 
     base = run_arm(
@@ -526,6 +727,7 @@ def main(argv: list[str] | None = None) -> int:
         contract=contract,
         output_dir=args.output_dir,
         runner=runner,
+        tool_mounts=tool_mounts,
     )
     payload: dict[str, Any] = {
         "status": "local_base_smoke_complete" if args.base_only_smoke else "local_paired_probe_complete",
@@ -543,6 +745,7 @@ def main(argv: list[str] | None = None) -> int:
             contract=contract,
             output_dir=args.output_dir,
             runner=runner,
+            tool_mounts=tool_mounts,
         )
         payload["adapter_summary"] = adapter
         payload["paired_summary"] = paired_summary(base, adapter)
@@ -551,7 +754,7 @@ def main(argv: list[str] | None = None) -> int:
             encoding="utf-8",
         )
     if args.train_jsonl:
-        payload["overlap_summary"] = overlap_summary(cases, load_jsonl(args.train_jsonl))
+        payload["overlap_summary"] = overlap_summary(cases, train_rows or [])
         (args.output_dir / "overlap-summary.json").write_text(
             json.dumps(payload["overlap_summary"], ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
