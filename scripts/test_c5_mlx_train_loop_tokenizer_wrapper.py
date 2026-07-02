@@ -46,3 +46,52 @@ def test_assistant_tokenization_uses_wrapped_hf_tokenizer_for_offsets():
     assert assistant_tokens == [ord(char) for char in "<tool_call>"]
     assert offsets == [(index, index + 1) for index, _ in enumerate("<tool_call>")]
     assert full_tokens[assistant_start : assistant_start + len(assistant_tokens)] == assistant_tokens
+
+
+def test_zero_trainable_token_loss_is_finite_and_reports_zero_ntoks():
+    c5_mlx_train_loop.ensure_mlx_runtime()
+
+    logits = c5_mlx_train_loop.mx.array([[[8.0, 0.0], [0.0, 8.0]]], dtype=c5_mlx_train_loop.mx.float32)
+    labels = c5_mlx_train_loop.mx.array([[-100, -100]], dtype=c5_mlx_train_loop.mx.int32)
+
+    loss, ntoks = c5_mlx_train_loop.maformac_masked_cross_entropy_from_logits(logits, labels)
+    c5_mlx_train_loop.mx.eval(loss, ntoks)
+
+    assert int(ntoks.item()) == 0
+    assert float(loss.item()) == 0.0
+
+
+class LongTokenDataset:
+    def __init__(self, tokens):
+        self.tokens = tokens
+
+    def __len__(self):
+        return 1
+
+    def __getitem__(self, index):
+        return {"sample_id": f"row-{index}"}
+
+    def process(self, record):
+        return self.tokens, [0 for _ in self.tokens]
+
+
+def test_loss_mask_preflight_rejects_measured_token_length_over_max_seq_length():
+    datasets = {
+        "train": LongTokenDataset([1, 2, 3]),
+        "valid": LongTokenDataset([]),
+        "test": LongTokenDataset([]),
+    }
+
+    try:
+        c5_mlx_train_loop.validate_maformac_loss_mask_datasets(
+            datasets,
+            require_train=True,
+            max_seq_length=2,
+        )
+    except c5_mlx_train_loop.LossMaskValidationError as error:
+        text = str(error)
+    else:
+        raise AssertionError("expected length gate to fail")
+
+    assert "token_length_exceeds_max_seq_length:train:1:3>2" in text
+    assert '"max_token_length": 3' in text

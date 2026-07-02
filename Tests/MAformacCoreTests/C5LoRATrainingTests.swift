@@ -867,6 +867,7 @@ final class C5LoRATrainingTests: XCTestCase {
         ]
 
         XCTAssertEqual(config.scale, 20)
+        XCTAssertEqual(config.maxSeqLength, 8192)
         XCTAssertEqual(config.learningRate, 0.0001)
         XCTAssertEqual(config.optimizer, "adamw")
         XCTAssertEqual(config.weightDecay, 0.01)
