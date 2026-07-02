@@ -338,3 +338,10 @@
 - %43 消减异源核对 REQUEST_CHANGES：抓到 GF-126（status 词表映射）未被 31 组吸收——一行修退 %45；其余映射 135/136、max_tokens/stop/D 挂载冲突消解全 PASS。%43 转 D 轴退化形态清单（wave-1 regression 锚细化）。
 - %45 接 GF-126 补 + DataGate global missing-surface hard gate（自身 residual 闭环）。
 - 🔴 **外部 blocker（磊哥项 +1）**：GitHub annotation「recent account payments failed or spending limit needs increased」——PR #27/#28 新 CI job 不启动。属账户 billing 层，worker/commander 不可修。晨报已追加。
+
+## D-038（2026-07-03 凌晨）通宵终收：v6.1 对照 + wave-1 proto 全量数据门 + GF 终审
+- **v6.1 EOS 对照收讫**：A 保持 15/15（协议记忆无损）、**重复病理 68/68→1/68**（GF-153 主目标达成）、B 持平、C/D 微降+empty 增=早停沉默化次级效应（wave-1 广覆盖下再评）；残余 4 parse_error+1 重复待下钻。PR #28 已开。
+- **wave-1 proto build 全量数据门首跑**：4500 样本 38.8s、**C5DataGate 全量 exit0 硬计数全零**（磊哥「数据门跑完」全量兑现，协议串模式）；工具覆盖 314/562 expected、395/562 mounted、55 组。🔴 暴露训练前必修 gap：max_token 8982>8192/length_violations 294/valid-test 行 under-supervised → 新 grill 议题（长行策略+valid/test 监督契约），与 wave-1 5 拍点同会话拍。
+- **GF 消减终审 APPROVE_FOR_UPLIFT**：GF-148 补入 G28 后映射 136/136 闭合（%43 两轮机械展开核对立功：GF-126→GF-148 各抓一漏）。
+- %45 DataGate missing_surface 硬门实装收讫（no-legacy exit65 blocked/legacy flag 显式豁免，17/17+11/11+81/81）。%43 INDEX×2 归档（36+11 行，纠 SPEC 计数）。
+- 通宵 goal 状态：**全部可兑现项已兑现**；不可兑现项均为真 blocker（云凭证/GitHub billing）已列晨报待磊哥。
