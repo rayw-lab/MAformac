@@ -3,6 +3,13 @@
 > 跨厂商 tmux 蜂群（claude-commander `%42` + 3 codex worker）。worker 自动压缩不丢工作。产出落 `~/Projects/agent-tmux-stack-research/runs/`。🔴 收稿以 **output file 为准非 worker ack**（`/swarm-commander` §3）；worker `status=pass` 必 commander 自核（§3）。
 
 ---
+## run 2026-07-03-n2n4-train-readiness（进行中，D-040 goal N0-N4）
+- **任务**: N2 PR head 重审 wave（外审收窄后旧 APPROVE 全作废）+ N3 GF rev3 + N4a E-2 降档实装+preflight strict exit0
+- **worker**: %43（#26 增量重审 `3b081823..e6a8849f` + #29 首轮 `5c68f945` + GF rev3，/tmp worktree 不动 uiue 树）/ %44（#27 `a400b01a` + #28 `49fa0b9b` 重审+mirror gate 复跑，/tmp worktree）/ %45（p5w 树新分支 E-2 降档挂载+valid/test 监督契约→DataGate exit0+preflight strict exit0，完成即 commit）
+- **SPEC**: `runs/2026-07-03-n2n4-train-readiness/SPEC-{43,44,45}-*.md`（inline SSOT 决策+file:line+可复跑命令；pre-mortem 联网/本地交叉+iceberg 纪律 inline）
+- **commander 侧**: N0 落账收窄（D-040 级联 6 文件）+ N1 PR #30（81 commits 纯 docs 推新分支收编）+ F-044 默认锁/配方锚落档 `docs/c5-training-readiness-grill/f044-default-lock-and-wave1-recipe-anchors-2026-07-03.md`
+- **产出**（待收）: `REREVIEW-PR26-e6a8849f.md` / `REVIEW-PR29-5c68f945.md` / `gf-reduction-rev3.md` / `REREVIEW-PR27-a400b01a.md` / `REREVIEW-PR28-49fa0b9b.md` / `RECEIPT-N4A-e2-downgrade-preflight.md`
+
 ## run 2026-06-30-uiue-main-status-review
 - **任务**: UIUE vs main 现状回顾 + grill 全量清单 + gitnexus 代码图谱 + 现状路线图
 - **worker**: %44 / %45 / %43 三路（零重叠 scope）
