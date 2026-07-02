@@ -1,0 +1,69 @@
+# contracts/subset-grouping.yaml — E-2 subset grouping contract
+# ---------------------------------------------------------------------------
+# authority: authored_design_input_not_derived
+# artifact_kind: subset_grouping_contract
+# phase: phase_1_construction_only
+# note: 功能分组语义=授权输入非派生物；generator 只能消费本文件，不能在代码中手写分组表。
+# ---------------------------------------------------------------------------
+meta:
+  authority: authored_design_input_not_derived
+  artifact_kind: subset_grouping_contract
+  phase: phase_1_construction_only
+  source_decision: XAUDIT-G7A-B1-commander-ruling
+  closure_policy:
+    mapping_sg_must_exist_in_catalog: true
+    every_catalog_seat_sg_must_be_mapped: true
+    new_seat_sg_requires_contract_update: true
+    runtime_trimming: forbidden
+
+single_group_policy:
+  seat_groups:
+    seat.heat:
+      - seat_belt_heat
+      - seat_belt_heat_temperature
+      - seat_heat
+      - seat_heat_mode
+      - seat_heat_temperature
+    seat.ventilation:
+      - seat_ventilation
+      - seat_ventilation_mode
+      - seat_ventilation_windspeed
+    seat.massage_force_time:
+      - seat_massage
+      - seat_massage_force
+      - seat_massage_time
+    seat.massage_mode_rhythm:
+      - seat_massage_mode
+      - seat_rhythm_mode
+    seat.posture_back_head:
+      - headrest_direction
+      - headrest_direction_adjust
+      - headrest_direction_ear_slice_adjust
+      - headrest_ear_slice_direction
+      - seat_backrest
+      - seat_lumbar_support
+      - seat_shoulder_support
+    seat.posture_base_leg:
+      - seat_adjustment_set_interface
+      - seat_cushion
+      - seat_feet_support
+      - seat_flank
+      - seat_folding_lock
+      - seat_leg_support
+      - seat_position
+      - seat_position_adjustment
+    seat.mode_memory_safety:
+      - headrest_audio_system
+      - headrest_audio_system_mode
+      - headrest_directional_broadcast
+      - seat_belt_comfort_adjuster
+      - seat_belt_vibration_alert
+      - seat_memory
+      - seat_memory_bind
+      - seat_mode
+  whole_domain_groups:
+    - door
+    - fragrance
+    - sunroof
+    - window
+    - wiper

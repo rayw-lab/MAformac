@@ -30,6 +30,7 @@ DISTRACTOR_POLICY = {
     "strategy": "same_sg_then_same_domain_then_other",
     "k": 3,
 }
+GROUPING_CONTRACT = "contracts/subset-grouping.yaml"
 NO_TOOL_OUTLET = {
     "type": "function",
     "function": {
@@ -54,62 +55,6 @@ NO_TOOL_OUTLET = {
         },
     },
 }
-
-SEAT_GROUPS = {
-    "seat.heat": [
-        "seat_belt_heat",
-        "seat_belt_heat_temperature",
-        "seat_heat",
-        "seat_heat_mode",
-        "seat_heat_temperature",
-    ],
-    "seat.ventilation": [
-        "seat_ventilation",
-        "seat_ventilation_mode",
-        "seat_ventilation_windspeed",
-    ],
-    "seat.massage_force_time": [
-        "seat_massage",
-        "seat_massage_force",
-        "seat_massage_time",
-    ],
-    "seat.massage_mode_rhythm": [
-        "seat_massage_mode",
-        "seat_rhythm_mode",
-    ],
-    "seat.posture_back_head": [
-        "headrest_direction",
-        "headrest_direction_adjust",
-        "headrest_direction_ear_slice_adjust",
-        "headrest_ear_slice_direction",
-        "seat_backrest",
-        "seat_lumbar_support",
-        "seat_shoulder_support",
-    ],
-    "seat.posture_base_leg": [
-        "seat_adjustment_set_interface",
-        "seat_cushion",
-        "seat_feet_support",
-        "seat_flank",
-        "seat_folding_lock",
-        "seat_leg_support",
-        "seat_position",
-        "seat_position_adjustment",
-    ],
-    "seat.mode_memory_safety": [
-        "headrest_audio_system",
-        "headrest_audio_system_mode",
-        "headrest_directional_broadcast",
-        "seat_belt_comfort_adjuster",
-        "seat_belt_vibration_alert",
-        "seat_memory",
-        "seat_memory_bind",
-        "seat_mode",
-    ],
-}
-
-WHOLE_DOMAIN_SINGLE_GROUPS = {"door", "fragrance", "sunroof", "window", "wiper"}
-
 
 def canonical_json(value) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -146,6 +91,46 @@ def read_catalog(path: Path) -> list[dict]:
     if errors:
         raise SystemExit("FAIL: invalid D-domain catalog:\n  " + "\n  ".join(errors[:20]))
     return data
+
+
+def read_grouping_contract(path: Path) -> tuple[dict[str, list[str]], set[str], str]:
+    if yaml is None:
+        raise SystemExit("FAIL: PyYAML is required to read subset grouping contract")
+    raw = path.read_bytes()
+    spec = yaml.safe_load(raw.decode("utf-8")) or {}
+    meta = spec.get("meta") or {}
+    if meta.get("authority") != "authored_design_input_not_derived":
+        raise SystemExit("FAIL: subset grouping contract authority must be authored_design_input_not_derived")
+    policy = spec.get("single_group_policy") or {}
+    seat_groups = policy.get("seat_groups")
+    whole_domain_groups = policy.get("whole_domain_groups")
+    if not isinstance(seat_groups, dict):
+        raise SystemExit("FAIL: subset grouping contract missing single_group_policy.seat_groups")
+    if not isinstance(whole_domain_groups, list):
+        raise SystemExit("FAIL: subset grouping contract missing single_group_policy.whole_domain_groups")
+    normalized_seat_groups: dict[str, list[str]] = {}
+    seen_sgs = set()
+    duplicates = set()
+    for group_id, sgs in seat_groups.items():
+        if not isinstance(group_id, str) or not group_id:
+            raise SystemExit("FAIL: subset grouping contract has empty seat group id")
+        if not isinstance(sgs, list) or not all(isinstance(sg, str) and sg for sg in sgs):
+            raise SystemExit(f"FAIL: subset grouping contract {group_id} must list non-empty _sg strings")
+        normalized_seat_groups[group_id] = list(sgs)
+        for sg in sgs:
+            if sg in seen_sgs:
+                duplicates.add(sg)
+            seen_sgs.add(sg)
+    if duplicates:
+        raise SystemExit(f"FAIL: subset grouping contract duplicates seat _sg entries: {sorted(duplicates)}")
+    whole_domains = set()
+    for domain in whole_domain_groups:
+        if not isinstance(domain, str) or not domain:
+            raise SystemExit("FAIL: subset grouping contract whole_domain_groups must list non-empty domain strings")
+        if domain in whole_domains:
+            raise SystemExit(f"FAIL: subset grouping contract duplicates whole domain: {domain}")
+        whole_domains.add(domain)
+    return normalized_seat_groups, whole_domains, hashlib.sha256(raw).hexdigest()
 
 
 def tool_id(item: dict) -> str:
@@ -186,25 +171,35 @@ def tools_by_domain(catalog: list[dict]) -> dict[str, list[dict]]:
     return {key: sorted(value, key=tool_id) for key, value in grouped.items()}
 
 
-def build_single_groups(catalog: list[dict]) -> list[tuple[str, list[dict]]]:
+def build_single_groups(catalog: list[dict], seat_groups: dict[str, list[str]],
+                        whole_domain_groups: set[str]) -> list[tuple[str, list[dict]]]:
     by_domain = tools_by_domain(catalog)
     by_sg = tools_by_sg(catalog)
     groups: list[tuple[str, list[dict]]] = []
 
     seat_sgs = {item["_sg"] for item in by_domain.get("seat", [])}
-    assigned_seat_sgs = {sg for sgs in SEAT_GROUPS.values() for sg in sgs}
-    if seat_sgs and seat_sgs != assigned_seat_sgs:
+    assigned_seat_sgs = {sg for sgs in seat_groups.values() for sg in sgs}
+    unknown_mapped_sgs = sorted(assigned_seat_sgs - set(by_sg))
+    if unknown_mapped_sgs:
+        raise SystemExit(f"FAIL: subset grouping contract maps _sg not in catalog: {unknown_mapped_sgs}")
+    if seat_sgs != assigned_seat_sgs:
         missing = sorted(seat_sgs - assigned_seat_sgs)
         extra = sorted(assigned_seat_sgs - seat_sgs)
-        raise SystemExit(f"FAIL: seat group coverage drift: missing={missing} extra={extra}")
+        raise SystemExit(
+            "FAIL: subset grouping contract seat _sg closure drift "
+            f"(new catalog _sg requires contract update): missing={missing} extra={extra}"
+        )
     if seat_sgs:
-        for group_id, sgs in sorted(SEAT_GROUPS.items()):
+        for group_id, sgs in sorted(seat_groups.items()):
             groups.append((group_id, sorted([tool for sg in sgs for tool in by_sg[sg]], key=tool_id)))
 
+    unknown_whole_domains = sorted(whole_domain_groups - set(by_domain))
+    if unknown_whole_domains:
+        raise SystemExit(f"FAIL: subset grouping contract maps domain not in catalog: {unknown_whole_domains}")
     for domain, items in sorted(by_domain.items()):
         if domain == "seat":
             continue
-        if domain in WHOLE_DOMAIN_SINGLE_GROUPS:
+        if domain in whole_domain_groups:
             groups.append((domain, items))
             continue
         for sg in sorted({item["_sg"] for item in items}):
@@ -322,12 +317,15 @@ def build_entry(group_id: str, mount_mode: str, tools: list[dict], count_tokens=
 
 def build_outputs(args) -> tuple[dict, dict, list[str]]:
     catalog_path = Path(args.catalog)
+    grouping_contract_path = Path(args.grouping_contract)
     catalog = read_catalog(catalog_path)
+    seat_groups, whole_domain_groups, grouping_contract_digest = read_grouping_contract(grouping_contract_path)
     count_tokens = load_tokenizer(args.tokenizer_mode, args.tokenizer_model) if args.verify_budget else None
 
     entries = []
     artifacts = []
-    for group_id, tools in build_single_groups(catalog):
+    single_groups = build_single_groups(catalog, seat_groups, whole_domain_groups)
+    for group_id, tools in single_groups:
         entry, artifact = build_entry(group_id, "single_group", tools, count_tokens, args.budget_cap)
         entries.append(entry)
         artifacts.append(artifact)
@@ -340,7 +338,7 @@ def build_outputs(args) -> tuple[dict, dict, list[str]]:
         artifacts.append(artifact)
 
     all_tool_ids = {tool_id(item) for item in catalog}
-    single_tool_ids = [tool_id(tool) for _, tools in build_single_groups(catalog) for tool in tools]
+    single_tool_ids = [tool_id(tool) for _, tools in single_groups for tool in tools]
     errors = []
     if len(single_tool_ids) != len(set(single_tool_ids)):
         errors.append("single_group tool coverage has duplicates")
@@ -369,6 +367,8 @@ def build_outputs(args) -> tuple[dict, dict, list[str]]:
             "subset_policy_id": POLICY_ID,
             "source_catalog": str(catalog_path),
             "source_catalog_sha256": hashlib.sha256(catalog_path.read_bytes()).hexdigest(),
+            "grouping_contract": str(grouping_contract_path),
+            "grouping_contract_digest": grouping_contract_digest,
             "tool_count": len(catalog),
             "tool_count_derivation": "len(generated/D_domain.tools.demo.json) over generated D-domain named-tool catalog",
             "qwen_format_version": QWEN_FORMAT_VERSION,
@@ -400,6 +400,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--catalog", default="generated/D_domain.tools.demo.json")
     parser.add_argument("--demo-scenarios", default="contracts/demo-scenarios.yaml")
+    parser.add_argument("--grouping-contract", default=GROUPING_CONTRACT)
     parser.add_argument("--output-dir", default="generated")
     parser.add_argument("--emit", action="store_true")
     parser.add_argument("--check", action="store_true")
