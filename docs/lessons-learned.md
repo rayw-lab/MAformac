@@ -221,3 +221,6 @@
 5. 🔴 **跨 LLM 开放归因强破框(对 codex-meta §31 的精细化)**:§31 说 cross-vendor≠cross-frame(核对性任务上换厂商仍共享 task frame)——但本次三轮辩证(Fable5→GPT-5.5→Fable5)每轮抓到上轮真漏(输入面/目的漂移 ↔ 重叠数据/基线断裂/decode 契约),因为**开放归因任务上不同 LLM 的先验框架决定「先看哪」**,frame 差异恰好成为资产。精细化判据:**核对性任务(字段对不对)跨厂商弱破框;开放性任务(为什么失败/还有什么)跨厂商强破框**——P0 级失败分析制度化走「双 LLM 独立写→交叉辩证→终版综合」(成本~1h)。
 6. **机械闯关元门**:v1-v5 五连机械修每次都对(D-025 快速通道无罪),但连续机械修≥3=「在给语义可疑之物铺路」的统计信号——若 v3 后做过一次 5 分钟 fit-spot,209 tokens 哨兵就会被扣住省两轮授权。修法=连续 3 次机械修→强制 fit-spot(「我在给什么铺路?它语义成立吗?」)。
 7. **哨兵数字行为学**:209 trainable tokens 在 preflight 里躺过全程、人机都读过、无人扣扳机——「数字可见≠数字有门」。修法=receipt 每个载力数字必有阈值门或显式 no_gate_by_design 标注。
+
+### L.5 tmux 消息静默丢失：send-keys 必 -l + 分离 Enter + capture 验证送达（磊哥 2026-07-02 纠）
+给 codex worker 发长消息用 `tmux send-keys -t %44 "长文本" Enter` 一条命令 → "not in a mode" exit 1 **静默失败**（后台跑更察觉不到），worker 空等 40min；磊哥另截图 catch「有时没按回车」（消息停输入框未提交）。修法四步硬 SOP：`-l` literal 发文本 → **单独一条命令发 Enter** → sleep → capture-pane 验证消息进对话流+状态 Working。worker 回写 %42 同病：轮询见 idle 但无 REPORT → capture 它 pane 看有无滞留回报，有则替它补 Enter。已进 swarm-commander 宪法 §9.x。
