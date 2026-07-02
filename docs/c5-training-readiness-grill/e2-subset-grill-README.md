@@ -7,7 +7,7 @@ created: 2026-07-02
 author: claude-commander（磊哥 6 维度 → 下探/扩展为 9 维度树）
 core_frame: 🔴 subset 不能制造新的 surface drift（磊哥定）——gate3 六轴同源是本轮宪法，每个决策先问「这会不会造出第二个面」
 seed_docs: docs/e2-subset-design-package-2026-07-02.md（E-lite 已 XAUDIT 修订）+ runs/2026-07-02-baseline-roadmap/L4-e2-subset-materials.md（真 tokenizer 实算）
-status: skeleton_created_workers_dispatched
+status: round_complete_pending_magnet_ratification
 ---
 
 # E-2 subset-policy grill round — 维度树（commander 下探版）
@@ -73,7 +73,8 @@ status: skeleton_created_workers_dispatched
 ## landing 骨架（grill-baseline-skeleton-upfront，收口填格）
 | 维度 | worker | 决策数 | 消减后 | ⭐待磊哥 | 状态 |
 |---|---|---|---|---|---|
-| D1/D2/D6 | W1 | — | — | — | dispatched |
-| D3/D4 | W2 | — | — | — | pending（M1 验收后） |
-| D5/D7/D8 | W3 | — | — | — | dispatched |
-| D9 | commander | — | — | — | in_progress |
+| D1/D2/D6 | W1(%44) | 11（S-001~011） | 并入 13 会聚组 | E2-A | ✅ done |
+| D3/D4 | W2(%43) | 8（S-101~108） | 并入 13 会聚组+§2 仲裁 | E2-B | ✅ done |
+| D5/D7/D8 | W3(%43) | 10（S-201~210） | 并入 13 会聚组 | E2-C/D | ✅ done |
+| D9 | commander | 14（SF-01~14） | 4 elephant 单列 | E2-E | ✅ done |
+| **综合** | commander | **43 → 13 会聚+1 仲裁+7 独立+4 elephant** | `e2-subset-SYNTHESIS.md` | **E2-A~E 五拍** | ✅ synthesized_pending_magnet |
