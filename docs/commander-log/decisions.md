@@ -326,3 +326,9 @@
 - **paired 配对当晚兑现价值**（磊哥六拍④）：B delta=-1、D delta=-10 暴露 tiny 过拟合窄化——无配对会把 B 11/15 误读「学到 73%」。base 带挂载 zero-shot（B 12/15/D 18/34）= base 锚首个同 harness 真值。wave-1 配方三含义：广覆盖+控 epoch / open-close 极性对称配比 / D 轴退化作 regression 锚。
 - **通宵 goal 盘点**：tiny 跑完✅（训练+probe2+verdict）/ 数据门✅（tiny 版 data_gate_ready+mock 端到端；wave-1 全量版待生成）/ A+ 五件✅ / 镜像门✅ / wave-1 🟡「只差凭证」（5 拍点包，live 路径代码 fail-closed=真 blocker）。
 - **%45 GAP_FOUND 证实 iceberg 扩散预判**：G7 生成行缺 tools/subset 字段且 C5DataGate projection 丢元数据 → 修复已派 %45。GF 消减 31 组初稿收讫待终审。PR #27（P12）已开；PR #26 复审派 %43；GF-153 EOS 监督实装派 %44。
+
+## D-036（2026-07-03 凌晨）收尾链：PR 双 APPROVE + G7 surface 闭环 + 晨报包
+- PR #26 复审 **APPROVE**（5 findings 逐条 file:line 复核）；PR #27 CI 一支 whitespace fail（%44 顺手修中）。**自合被 classifier 硬拒两次 → merge 留磊哥醒来一键**（审计记录+CI 状态全在案，不卡关键路径）。教训：tmux 消息与 gh 写操作勿混同一条命令（拒批连坐消息丢失）。
+- %45 G7 surface 修复闭环：生成行→DataGate projection→JSONL 候选行贯通 tools/mounted_tool_count/subset 三族 5 字段（21/21 行全带，`RECEIPT-P5W-G7-SURFACE.md` file:line 证据表）——第四轮 iceberg 扩散点当晚闭环，wave-1 数据 surface 与训练面对齐。
+- 晨报包落 `docs/handoffs/2026-07-03-overnight-v6-verdict-morning-brief.md`（goal 兑现账+醒来 5 拍）。lessons M.8~M.10（same-surface 维度分解表/复算工具假信号/paired 信息增益）。
+- 在途：%44 EOS 监督实装+whitespace 修；%43 GF 消减稿异源核对。

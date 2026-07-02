@@ -224,3 +224,12 @@
 
 ### L.5 tmux 消息静默丢失：send-keys 必 -l + 分离 Enter + capture 验证送达（磊哥 2026-07-02 纠）
 给 codex worker 发长消息用 `tmux send-keys -t %44 "长文本" Enter` 一条命令 → "not in a mode" exit 1 **静默失败**（后台跑更察觉不到），worker 空等 40min；磊哥另截图 catch「有时没按回车」（消息停输入框未提交）。修法四步硬 SOP：`-l` literal 发文本 → **单独一条命令发 Enter** → sleep → capture-pane 验证消息进对话流+状态 Working。worker 回写 %42 同病：轮询见 idle 但无 REPORT → capture 它 pane 看有无滞留回报，有则替它补 Enter。已进 swarm-commander 宪法 §9.x。
+
+### M.8 same-surface 是复合对象：维度分解表取代单数声称（2026-07-03 tools 挂载冰山）
+「同输入面/same harness」的单数名词掩盖 surface 的复合自由度（system/user 形态/think 块/**tools 挂载**/停止 token/decode 参数/tokenizer patch…）。v6 probe1 全 empty 即训练面带 E-2 挂载 737 token 而 probe 无挂载——契约语言每轮只验「已知维度」。修法=same-X 声称强制展开为 X 维度分解表（训练列 vs 评测列逐维打勾，新维度即追加）；生成数据的 surface 同表治理（G7 行级 tools/subset 字段贯通实装）。lineage：gate2 dead-field→v5 under-supervision→v6 tools-mount，同一 producer-consumer 冰山三层。
+
+### M.9 复算工具自身可注入假信号：span 测量纪律（GF-156）
+commander 用「另一渲染的长度」推 teacher-forcing span 起点得 14/18 假信号，几乎误导向「adapter 加载错位」；改用 assistant_tokenization 精确 start 后 17/17 满分。教训：排除法的每一步复算工具本身要先自证（对齐类复算必用与训练同源的定位函数，禁用近似推导）。
+
+### M.10 paired base 配对的信息增益实证（磊哥六拍④当晚兑现）
+v6 无配对时 B 11/15 会被读「学到 73%」；配对暴露 B delta=-1、D delta=-10（tiny 过拟合窄化）+ base 带挂载 zero-shot 真值（B 12/15、D 18/34）。单臂数字永远缺参照系——ablation 的字面义就是配对对照。
