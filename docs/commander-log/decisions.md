@@ -289,3 +289,10 @@
 - **%45 第二次卡死救援**：34min 零流动（0 in 0 out），rescue ladder 直接 kill 子进程 52386 → codex 重启 → SPEC-P12 self-contained 重派（含通宵 ADDENDUM：镜像门最高优先 + 硬三件 + grill 拆解自驱）。
 - **%44 P1 退单消息此前 send-keys 失败未送达**（"not in a mode" exit 1，教训：tmux send-keys 长消息必用 `-l` literal + 单独 Enter，发后必 capture-pane 验证送达）——已用 -l 重发，%44 开工修 truncate 前导换行 P1。
 - 拓扑：%45 P12（A+ 契约+镜像门）/ %44 P3H P1 修复 / %43 GF-W2 grill。审计=worker 交叉互审（磊哥令，本晚不派 hermes/gptpro）。
+
+## D-030（2026-07-03 凌晨）磊哥睡前令：worker 绝不闲置 + GF-W2 收割 + PR26 审计链
+- 磊哥令（睡前）：codex 额度管够，闲置 worker 填打杂活（文档维护/笔记/预研调查）——backlog 队列建于仓外 `runs/governance-fit-grill/BACKLOG.md`（GF-W3/wave-1 预研/P12 交叉审/handoff 草稿/MEMORY 素材/Phase B 预检 6 项）。
+- GF-W2 40 决策收割进主线 `docs/c5-training-readiness-grill/governance-fit-w2-decisions.md`（哨兵数字 12 field groups 门化清单 + readiness 四级词表 + landing fit-proof 五字段 + F-044 终稿 Q1-Q4 default：A=15/15、B=14/15+同族不连败、C 不硬凑、B 轴泄漏零容忍）。全 proposed 待磊哥 lock。
+- P3H P1 修复亲核 PASS（lstrip 前置+回归测试+尾切防御仍在+RECEIPT 完整）；PR #26 CI 双绿；自合被权限门拒 → 转 worker 交叉审制：%43 审 PR26（输出 P0/P1/P2 register 文件）→ APPROVE 后 merge。
+- %44 接冒烟棒：v5 训练环境=系统 python3.13（mlx-train-command.txt 一手），base-only 端到端冒烟（D 轴 2 case，不下行为结论）。
+- 🔴 GF-W1 疑点前置：decode 契约 max_tokens=80 vs D 轴多意图 case（C6-MP-028 期望 2 个 tool call）可能截断——已进 SPEC-GF-W1 D3 必专条。
