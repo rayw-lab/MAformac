@@ -249,3 +249,4 @@
 - **收敛点**（磊哥令「完成 hermes 审计修复后先停下来」）: #23 HIGH 修 → %45 delta 复验 → merge → 验收 → **停下等磊哥**。
 - **落点**: 本 D-023 + swarm-commander §8 补条 + swarm-runs UPDATE + MEMORY as-of
 - 🎉 **UPDATE（hermes 修复闭环收口，2026-07-02 深夜终态）**：#23 HIGH 修复（`actualUnsupportedClass` 三层可达+stats 账目，C6SubsetContextTests 18/0）→ 原审计员 delta 复验 **HIGH-RESOLVED** → MERGED `aac84de9` = **终态 main**。终验收（%45）= **PARTIAL_SIBLING_NOISE**：pull PASS / main 全机械门 PASS / hermes 三目标套件全绿（C5 53/0·C6Subset 18/0·G7 8/0）/ 全量 swift 唯一失败=已知 sibling UIUE fixture 噪声（pre-existing，M4 消解）——**main 范围绿**。当日终账：**13 支 PR 合流（#12-#23）+ 审计体系咬 9 真问题**（+S-210 第三层不可达）。🔴 **按磊哥指令停下**。桌上待磊哥：④ tiny-ablation 签字包（物理前置全齐，R7 draft Part B 就绪）/ M2 删除授权 / R7 续签（7-15 到期）/ 下个 hermes 审计点 / M4 UIUE（sibling 噪声根治点）。
+- **UPDATE（回报路由固化，2026-07-02）**：磊哥令——后续所有 worker 派单**必须显性写**「向 %42 汇报」（tmux-bridge 发 REPORT/PROGRESS/BLOCKED 到 commander pane），派单缺这句=不合格。已落宪法 §8 + memory 第 3 条强化 + 三 worker 常设通知（ACK-RPT42）。
