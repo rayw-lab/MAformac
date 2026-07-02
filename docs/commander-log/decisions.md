@@ -320,3 +320,9 @@
 - grill 两连发：GF-149~156（v3 tools-mount 契约）+ 第四轮 iceberg 报告（抽象两次：未枚举维度断裂 → same-surface 单数名词掩盖复合性；治理=surface 维度分解表；扩散=wave-1 generator surface 风险列拍点附加项）。
 - %44 接 harness v3 + v6-probe2 四轴重跑；GF-156 元认知（复算工具自身假信号：commander span 误差 14/18 几乎误导）。
 - 当日 REPORT 洪峰全收：P5W（labeler 桥接+mock 端到端+tiny 数据门 data_gate_ready 44 行）、P12 修复（63/63 测试+镜像门保持+bypass 探针转 FAIL+fit_proof=mechanism_true）、GF-W3 40 决策、cross-section drift 27 条（P1=14 待批量回写）。
+
+## D-035（2026-07-03 凌晨）v6 tiny-ablation verdict + 通宵 goal 主线兑现
+- **verdict 落档** `docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md`：A 轴 adapter **15/15 满分**（裁决-A 核心问题「A+ 契约是否解 v5 NO_TOOL」= **YES**，v5 四根因#1 坐实主导）；B 轴 11/15 FAIL_WITH_ATTRIBUTION（四败=2 close→open 极性翻转同族连败+2 细分设备混淆，与 tiny 44 行数据覆盖一一对应=数据稀疏非链路缺陷；阈值敏感性已列，终值不自拍）；C 4/4 observe；D report-only adapter 8 vs base 18。
+- **paired 配对当晚兑现价值**（磊哥六拍④）：B delta=-1、D delta=-10 暴露 tiny 过拟合窄化——无配对会把 B 11/15 误读「学到 73%」。base 带挂载 zero-shot（B 12/15/D 18/34）= base 锚首个同 harness 真值。wave-1 配方三含义：广覆盖+控 epoch / open-close 极性对称配比 / D 轴退化作 regression 锚。
+- **通宵 goal 盘点**：tiny 跑完✅（训练+probe2+verdict）/ 数据门✅（tiny 版 data_gate_ready+mock 端到端；wave-1 全量版待生成）/ A+ 五件✅ / 镜像门✅ / wave-1 🟡「只差凭证」（5 拍点包，live 路径代码 fail-closed=真 blocker）。
+- **%45 GAP_FOUND 证实 iceberg 扩散预判**：G7 生成行缺 tools/subset 字段且 C5DataGate projection 丢元数据 → 修复已派 %45。GF 消减 31 组初稿收讫待终审。PR #27（P12）已开；PR #26 复审派 %43；GF-153 EOS 监督实装派 %44。
