@@ -30,8 +30,8 @@ created: 2026-07-03 晨
 3. **open/close 极性对称配比**：B 轴四败中 2 条 close→open 极性翻转 = close 语义训练行稀疏（晨报中途拦截战报#3）；wave-1 生成配比强制 open/close 对称。
 4. **query/refusal/unsupported 负例**：D 轴 query→actuation（只读变控制）安全级风险 → 配方加只读查询负例（期望 no-call/readback）+ refusal/unsupported 负例；refusal_ratio 当前 0.0（`c5-training-receipt.md` Data 段）需按 grill 配比决策补。
 5. **D 轴退化 regression 锚**：base 带挂载 zero-shot D 18/34（`docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md:32`）进评测锚（见上表 D 行）。
-6. **控 epoch/early-stop**：tiny 44 行×~218 epoch 等效过拟合窄化（verdict:32）是反面教材；wave-1 训练配置须显式 early-stop 依据。
-7. **多 call 配对样本**：C 轴 v6.1 退化（4/4→2/4，verdict:48）提示 EOS 监督与多 call 序列的交互，wave-1 配方保证多 call 样本量足以让 stop 语义不误伤序列生成。
+6. **控 epoch/early-stop**：tiny 44 行×~218 epoch 等效过拟合窄化（`docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md:32`）是反面教材；wave-1 训练配置须显式 early-stop 依据。
+7. **多 call 配对样本**：C 轴 v6.1 退化（4/4→2/4，`docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md:48`）提示 EOS 监督与多 call 序列的交互，wave-1 配方保证多 call 样本量足以让 stop 语义不误伤序列生成。
 
 ## 三、train-readiness 验收定义（N4 收口口径，防再次过宽）
 

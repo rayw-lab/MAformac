@@ -3,14 +3,14 @@
 BLOCKED_INVALID_FOR_PARADIGM_VERDICT
 意思是：这次失败有效证明了 tiny 实验器材不成立，但不能证明 D-domain LoRA 范式失败，也不支持调 LR/rank/scale/clip/iters。
 路线图拆成 8 段：先 stop-the-line 重标，再修 loss/augmentation 契约，再修代码和 coverage gate，再重设计 tiny probe 四轴，之后才允许 v6 rerun、wave-1、formal LoRA，最后补 governance 的 fit-proof 列。
-校验：本轮只新增这一份文档，未触碰已有脏文件 docs/c5-training-readiness-grill/landing-matrix.md。未跑测试，因为是 docs-only 分析/路线图。磊哥，我的判断：**这不是单点 bug，是一类“门绿但目标语义没被训练/没被消费”的冰山问题。**  
+校验：本轮只新增这一份文档，未触碰已有脏文件 docs/c5-training-readiness-grill/landing-matrix.md。未跑测试，因为是 docs-only 分析/路线图。磊哥，我的判断：**这不是单点 bug，是一类“门绿但目标语义没被训练/没被消费”的冰山问题。**
 我建议你拍 **A**，但要加一个前置硬门：**assistant supervision coverage gate**，否则只修这一处，后面 wave-1/formal 还可能以别的形态复发。
 
 **两次抽象升级**
-1. **从症状到机制**  
+1. **从症状到机制**
    症状是 34/34 empty，模型重复 `NO_TOOL`。机制不是模型不会学，而是正样本只训了 `open_ac_cooling_mode` 这类孤立函数名，`<tool_call>`、JSON 骨架、`arguments`、闭合标签都被 `-100` 掩掉。NO_TOOL 却是完整输出，所以模型学到的唯一“完整句型”就是 NO_TOOL。
 
-2. **从机制到治理缺口**  
+2. **从机制到治理缺口**
    更大的问题是：`data_gate_ready`、`train_on_turn=true`、offset fixture、adapter 落盘、loss 下降，各自都能绿，但它们没有共同证明一句话：**模型实际被监督了下游 parser/harness 需要的完整输出对象。**
 
 **冰山扩散图**
@@ -28,22 +28,22 @@ BLOCKED_INVALID_FOR_PARADIGM_VERDICT
 | 管理流 | 机械问题被逐个闯过，语义问题最后暴露 | 每次真跑前要有“样本目标可学性”人工 spot-check |
 
 **我会这样回 commander**
-拍 **A**：`train_on_turn` 的语义改成 **prompt 掩、assistant turn 全训、think 仍掩**。  
+拍 **A**：`train_on_turn` 的语义改成 **prompt 掩、assistant turn 全训、think 仍掩**。
 B 只适合做回归测试或 coverage 枚举，不适合作为主实现，因为枚举 wrapper/name/args 容易继续漏掉格式细节。
 
 但 A 不能裸跑，补三条硬要求：
 
-1. 加 `assistant_supervision_coverage` 预检：  
+1. 加 `assistant_supervision_coverage` 预检：
    tool-call 正样本必须覆盖 `<tool_call>`、`</tool_call>`、JSON `{}`、`"name"`、函数名、`"arguments"`、参数 key/value；no-call 才训完整 `NO_TOOL`。
 
-2. 改概念名：  
+2. 改概念名：
    `functionName/argumentName/argumentValue` 归到 **augmentation**，不要再表达 loss mask。loss 只认 `assistant_full_except_think` / `no_tool_full` / `diagnostic_span_only`。
 
 3. 同 44 样本重跑仍需新授权，且只算 tiny adjudication 复跑；不允许顺手开 wave-1、调 LR/rank/阈值、扩样本。
 
 **要纠正一句**
-“范式未被证伪”这句话可以保留，但要窄化：  
-**D-domain/LoRA 路线未被证伪；当前 C5 trainable_v0 的监督契约已经被证伪。**  
+“范式未被证伪”这句话可以保留，但要窄化：
+**D-domain/LoRA 路线未被证伪；当前 C5 trainable_v0 的监督契约已经被证伪。**
 如果不这么写，后面很容易把一个真实 P0 包装成“只是实现小坑”。
 
 我的建议是：**拍 A + coverage gate + 同 44 样本 tiny 复跑**。这一步过不了，formal LoRA 长跑不该继续。⏺ 按 skill 执行——先补一手证据（扩散出的最重疑点：探针集与训练集的重叠度，这决定 tiny

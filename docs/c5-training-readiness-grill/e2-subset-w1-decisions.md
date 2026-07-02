@@ -48,7 +48,7 @@ tok = AutoTokenizer.from_pretrained("mlx-community/Qwen3-1.7B-4bit", local_files
 PY
 ```
 
-Catalog SHA-256: `22613d496198940bf774ddcaa921c1efa2d92038b85afe18e1c5081e0e9ce012`  
+Catalog SHA-256: `22613d496198940bf774ddcaa921c1efa2d92038b85afe18e1c5081e0e9ce012`
 Seat family: `126 tools / 35,698 tool tokens`。System prompt overhead: `29 tokens`。
 
 ### Seat `_sg` distribution

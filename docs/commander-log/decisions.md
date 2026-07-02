@@ -361,3 +361,11 @@
 - 训练风险收窄进配方锚：B 11/15 未达 draft 14/15（终值待 lock，verdict:29）；D 18/34→8/34→5/34 = LoRA 窄化/覆盖不足/安全语义退化；query→actuation（只读变控制）安全级零容忍。
 - 本地新发现：本分支落后远端同名分支 7 commits（`b24dafcd`…`02f0722f`，D22-D24 旧档），`rev-list origin/main..远端`=0（已全在 main）→ N1 推**新分支名**收编，不 force 不动 stale 远端。
 - **新 goal 路线（磊哥 /goal）**：N0 落账收窄→N1 docs 分支收编→N2 PR head 重审 wave（%43 #26增量+#29 / %44 #27#28；作者回避；≥1 实跑标 local verify 非 CI）→N3 GF rev3→N4 train-readiness 闭环验收（%45 E-2 降档挂载实装+preflight strict exit0+valid/test 监督契约；F-044 默认 14/15 标磊哥可异步 override）。人审仅 4 键：billing/云凭证/merge（攒一次性清单）/run-auth。worker 已 clear 重置=空白态，派单必 self-contained+L.5 四步送达+pre-mortem 联网/本地交叉验证 inline。
+
+## D-041（2026-07-03 上午）N2/N4a 中程收稿（执行中）
+- **N1 done**：PR #30 开出（81 commits 纯 docs，新分支 `commander-docs/20260703-absorption-closeout`，不动 stale 远端）。F-044 默认锁+配方锚落档 `docs/c5-training-readiness-grill/f044-default-lock-and-wave1-recipe-anchors-2026-07-03.md`。
+- **PR #27 重审 APPROVE**（%44，绑 head `a400b01a`，local 非 CI）：mirror gate 复跑 old v5 exit66×2 / new v6 exit0；消费层核到 `c5_mlx_train_loop.py:583-584,619-634`；P2 nuance=默认 old-v5 失败在 `loss_objective_profile_missing`，`under_supervision` 需 legacy 探针暴露。
+- **PR #28 重审 APPROVE（code delta）+ 🔴 claim correction**（%44，绑 head `49fa0b9b`）：EOS 实装正确（id 151645 单次监督坐实）；但独立复核 4 parse_error——**作者「非净退化」定性过宽，3 case 从 observed tool 退成 empty parse error**（`pr28-parse-error-recheck.json`）→ 与 D-040 外审收窄同向，v6.1 行为表述以此为准。
+- **N4a 确认（commander 独立复跑）**：%45 交付 PR #31（`ac7774e0`，stacked on #29）——E-2 降档（仅 `seat.massage_force_time` 组，target+first-sibling，`C5LoRATraining.swift:3181`）+ valid/test 监督契约（`supervisedEvaluationMLXRecord`，不改 must_not_train 语义）+ `--preflight-only` 门。**commander 亲跑 strict preflight exit0（records 4628/trainable 4628/tokens 44459 与 receipt 一致）**；summary `length_violation_count=0`/`max_token_length=7186`；DataGate `missing_surface_count=0`/`surface_field_pass=4500` no-legacy；消费层 grep 坐实 evaluate 吃 `maformac_masked_loss`（`c5_mlx_train_loop.py:595`）非 dead field。worktree clean（完成即 commit 守住）。
+- 🔴 诚实边界：prepare receipt 仍 `status: blocked`（validator_layer2/candidate_data_quality/fuse parity/endpoint parity 等 N4a scope 外债，%45 elephant 项如实列出）——N4 验收口径只声称「local 机械门绿」，不清 blocked 帐。
+- 在途：%43（#26 增量已抓 1 个 P1 merge blocker，将出 REQUEST_CHANGES→#29→GF rev3）/ %44（PR #30 docs 审）/ %45（N4c 配方锚×grill 已锁配比对齐+实装，防自拍冲突先 recall）。

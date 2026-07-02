@@ -95,4 +95,4 @@ reason:
 2. landing-matrix：裁决-A 行 → `experiment_invalid_relabeled_v6_pending`；gate2 行补「loss/augmentation 契约重构（Phase 1-2）」。
 3. lessons：M 段（consumer-anchored sufficiency / 哨兵数字行为学 / 机械闯关元门 / 双 LLM 失败分析——待本议题收口一并写）。
 4. F-044 修订随 Phase 3 落 grill。
-* 
+*
