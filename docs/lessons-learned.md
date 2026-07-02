@@ -204,3 +204,9 @@
 2. **交叉审对抗 fixture 是破「作者+commander 双盲」的标配**。实证×2:①gate2 反向 guard 只扫 `("train","valid")` 漏 test.jsonl——commander 当天亲读过那行也没扣出,%43 构造 test.jsonl 对抗 fixture 实跑才现形(XAUDIT-alpha FAIL+P0→一行修复+行为测试→P0-RESOLVED);②E-2 design 包被 %44 抓「六轴写成五方丢 train target 轴」。规律:静态读码抓不到「枚举少一项」类缺口,**构造反例实跑**才抓得到;grill/design 产物上抛前必过一轮异源对抗审。
 3. **staged PR 序(α→β→γ)+每支独立 CI+审计 = 回滚点保全**。γ 文档整编支(40 件)用「新支 off main 复制 port」而非 rebase 旧支,语义审用 hash 对比(35 逐字节一致+3 whitespace-only+2 带溯源 frontmatter)半小时收口——比人肉读 40 件快且可复算。
 4. **worker 主动回报纪律(磊哥 2026-07-02 定)**:每任务完成打 `REPORT|任务|status|产出|SHA|残留` 行,长任务每 ~5min 打 `PROGRESS` 行,blocker 立即 `BLOCKED` 行,不静默——commander 轮询成本降一半,漏收稿风险消除。已发三 worker 常设。
+
+## L. 外审执行位教训(2026-07-02, G7 hermes 终审)
+
+1. 🔴 **hermes-rescue subagent = 假异源陷阱**:实测 spawn `--model sonnet`(Claude 家族)非真 hermes GLM——用它做"跨厂商审计"= 同家族自审冒充异源(正是 0/34 假异源 judge 同病)。跨厂商审计必走 worker 在 codex CLI 显性调 `~/.codex/skills/hermes-cli-glm52-code`。磊哥截图 catch。
+2. **commander 直跑外部 LLM CLI 不可靠**:hermes 直跑回 284 字节废稿(无人盯守/无质检/background stdout 截断风险)——外审执行位必须是能"盯全程+质检+重试"的 worker(%44 首单即自带 attempt 编号+jq 提取+字节数/verdict 质检,范式正确)。timeout 上限 20 分钟(磊哥定)。
+3. **hermes CLI 本体损坏的诊断路径**:SyntaxError→查 git status 发现是中断的 stash pop 冲突现场(5 UU 文件)→ `git reset --merge` 可逆中止(git 在 pop 冲突时不丢 stash,stash@{0} 18 文件原封)→ import 自检恢复。别上来就改冲突标记——先判断是不是别人的半截操作现场。
