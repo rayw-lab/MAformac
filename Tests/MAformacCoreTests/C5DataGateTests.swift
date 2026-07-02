@@ -15,6 +15,50 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertEqual(receipt.proposedFix.autoApply, false)
         XCTAssertEqual(receipt.redactionStatus, "pass")
         XCTAssertTrue(receipt.maskingCoverage.functionName)
+        XCTAssertEqual(receipt.allowLegacyMissingSurface, true)
+        XCTAssertEqual(receipt.missingSurfaceCount, 1)
+        XCTAssertEqual(receipt.legacyMissingSurfaceAllowedCount, 1)
+    }
+
+    func testMissingSurfaceFieldsFailClosedWithoutLegacyFlag() throws {
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, jsonl: """
+        {"sample_id":"C5-MISSING-SURFACE","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-MISSING-SURFACE","parent_semantic_id":"parent:missing.surface","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.hasHardFailure)
+        XCTAssertEqual(receipt.allowLegacyMissingSurface, false)
+        XCTAssertEqual(receipt.missingSurfaceCount, 1)
+        XCTAssertEqual(receipt.legacyMissingSurfaceAllowedCount, 0)
+        XCTAssertEqual(receipt.surfaceFieldPass, 0)
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "missing_candidate_surface_fields" })
+        XCTAssertTrue(receipt.proposedFix.suggestions.contains { $0.contains("tools/mounted_tool_count/subset") })
+    }
+
+    func testLegacyMissingSurfaceRequiresExplicitFlagAndRecordsAllowance() throws {
+        let receipt = try makeReceipt(allowLegacyMissingSurface: true, jsonl: """
+        {"sample_id":"C5-LEGACY-SURFACE","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-LEGACY-SURFACE","parent_semantic_id":"parent:legacy.surface","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}}}
+        """)
+
+        XCTAssertEqual(receipt.status, "data_gate_ready")
+        XCTAssertFalse(receipt.hasHardFailure)
+        XCTAssertEqual(receipt.allowLegacyMissingSurface, true)
+        XCTAssertEqual(receipt.missingSurfaceCount, 1)
+        XCTAssertEqual(receipt.legacyMissingSurfaceAllowedCount, 1)
+        XCTAssertEqual(receipt.surfaceFieldPass, 0)
+    }
+
+    func testSurfaceFieldsPassFormalGateWhenPresent() throws {
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, jsonl: """
+        {"sample_id":"C5-SURFACE-PASS","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-PASS","parent_semantic_id":"parent:surface.pass","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "data_gate_ready")
+        XCTAssertFalse(receipt.hasHardFailure)
+        XCTAssertEqual(receipt.allowLegacyMissingSurface, false)
+        XCTAssertEqual(receipt.missingSurfaceCount, 0)
+        XCTAssertEqual(receipt.legacyMissingSurfaceAllowedCount, 0)
+        XCTAssertEqual(receipt.surfaceFieldPass, 1)
     }
 
     func testC6MustPassInTrainFails() throws {
@@ -164,6 +208,7 @@ final class C5DataGateTests: XCTestCase {
 
     private func makeReceipt(
         c6Cases: [C6BenchCase] = [],
+        allowLegacyMissingSurface: Bool = true,
         jsonl: String
     ) throws -> C5DataGateReceipt {
         let decoder = JSONDecoder()
@@ -174,7 +219,8 @@ final class C5DataGateTests: XCTestCase {
             sourceSnapshotDigest: "source-digest",
             sourceAuthorizationStatus: "authorized_fixture",
             formatContractVersion: "format-digest",
-            generatedAt: "2026-06-20T00:00:00Z"
+            generatedAt: "2026-06-20T00:00:00Z",
+            allowLegacyMissingSurface: allowLegacyMissingSurface
         )
         return C5DataGateValidator().receipt(candidates: candidates, c6Cases: c6Cases, context: context)
     }

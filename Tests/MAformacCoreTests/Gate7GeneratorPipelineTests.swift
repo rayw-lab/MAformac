@@ -59,7 +59,102 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
         XCTAssertEqual(sample.metadata.tokenCount, request.manifestEntry.toolTokens)
         XCTAssertEqual(sample.metadata.subsetContext.subsetGroupID, request.manifestEntry.groupID)
         XCTAssertEqual(sample.metadata.subsetContext.subsetPolicyID, request.manifestEntry.subsetPolicyID)
+        XCTAssertEqual(sample.tools.count, request.manifestEntry.toolIDsOrdered.count)
+        XCTAssertEqual(toolNames(sample.tools), request.manifestEntry.toolIDsOrdered)
         XCTAssertEqual(receipt.dataGateReceipt?.status, "data_gate_ready")
+    }
+
+    func testGate7SurfaceFieldsSurviveGeneratedSampleProjectionAndCandidateJSONRoundTrip() throws {
+        let manifest = try loadManifest()
+        let seed = try loadSeed(contractRowID: "c1_airControl_000167")
+        let entry = try loadCatalogEntry(named: seed.intent)
+        let request = try makeRequest(
+            manifest: manifest,
+            seed: seed,
+            toolEntry: entry,
+            valueType: "SPOT",
+            templateFamily: "gate7_surface_projection"
+        )
+        let pipeline = Gate7GeneratorPipeline(
+            generator: Gate7MockLLMProvider(
+                vendor: .openai,
+                responsesByStage: [.generator: Gate7ProviderResponse(status: .pass, utterances: diverseUtterances())]
+            ),
+            judge: Gate7MockLLMProvider(
+                vendor: .anthropic,
+                responsesByStage: [.judge: Gate7ProviderResponse(status: .pass)]
+            )
+        )
+
+        let receipt = try pipeline.run(request)
+        let sample = try XCTUnwrap(receipt.samples.first)
+        let candidate = try XCTUnwrap(Gate7DecontaminationGate.candidates(samples: receipt.samples, request: request).first)
+
+        XCTAssertEqual(receipt.status, .pass)
+        XCTAssertEqual(sample.tools, request.mountedTools)
+        XCTAssertEqual(candidate.tools, sample.tools)
+        XCTAssertEqual(candidate.mountedToolCount, request.manifestEntry.toolIDsOrdered.count)
+        XCTAssertEqual(candidate.subsetPolicyID, request.manifestEntry.subsetPolicyID)
+        XCTAssertEqual(candidate.subsetGroupID, request.manifestEntry.groupID)
+        XCTAssertEqual(candidate.subsetPolicyDigest, manifest.meta.groupingContractDigest)
+        XCTAssertTrue(toolNames(candidate.tools).contains(entry.function.name))
+
+        let roundTrip = try JSONDecoder().decode(C5DataGateCandidate.self, from: JSONEncoder().encode(candidate))
+        XCTAssertEqual(roundTrip.tools, candidate.tools)
+        XCTAssertEqual(roundTrip.mountedToolCount, candidate.mountedToolCount)
+        XCTAssertEqual(roundTrip.subsetPolicyID, candidate.subsetPolicyID)
+        XCTAssertEqual(roundTrip.subsetGroupID, candidate.subsetGroupID)
+        XCTAssertEqual(roundTrip.subsetPolicyDigest, candidate.subsetPolicyDigest)
+    }
+
+    func testDeterministicLabelerBridgesC1SlotsAndValuesIntoDdomainArguments() throws {
+        let manifest = try loadManifest()
+        let seed = try loadSeed(contractRowID: "c1_airControl_000167")
+        let entry = try loadCatalogEntry(named: seed.intent)
+        let request = try makeRequest(
+            manifest: manifest,
+            seed: seed,
+            toolEntry: entry,
+            valueType: "SPOT",
+            templateFamily: "gate7_c1_bridge"
+        )
+        let pipeline = Gate7GeneratorPipeline(
+            generator: Gate7MockLLMProvider(
+                vendor: .openai,
+                responsesByStage: [.generator: Gate7ProviderResponse(status: .pass, utterances: diverseUtterances())]
+            ),
+            judge: Gate7MockLLMProvider(
+                vendor: .anthropic,
+                responsesByStage: [.judge: Gate7ProviderResponse(status: .pass)]
+            )
+        )
+
+        let receipt = try pipeline.run(request)
+
+        XCTAssertEqual(receipt.status, .pass)
+        let firstCall = try XCTUnwrap(receipt.samples.first?.expectedToolCalls.first)
+        XCTAssertEqual(firstCall.name, "adjust_ac_temperature_to_number")
+        XCTAssertEqual(firstCall.arguments["adjustment_mode"], "摄氏度")
+        XCTAssertEqual(firstCall.arguments["direction"], "主驾")
+        XCTAssertEqual(firstCall.arguments["mode"], "制冷")
+        XCTAssertEqual(firstCall.arguments["temperature"], "22")
+        XCTAssertEqual(receipt.dataGateReceipt?.status, "data_gate_ready")
+    }
+
+    func testC1BridgeHandlesModeValueAndExpValueSlots() throws {
+        let modeSeed = try loadSeed(contractRowID: "c1_airControl_000021")
+        let modeEntry = try loadCatalogEntry(named: modeSeed.intent)
+        let modeArguments = Gate7C1ToolCallBridge.arguments(seed: modeSeed, toolEntry: modeEntry, variant: 0)
+
+        XCTAssertEqual(modeArguments["direction"], "主驾")
+        XCTAssertEqual(modeArguments["modeValue"], "快速")
+
+        let windowSeed = try loadSeed(contractRowID: "c1_carControl_000027")
+        let windowEntry = try loadCatalogEntry(named: windowSeed.intent)
+        let windowArguments = Gate7C1ToolCallBridge.arguments(seed: windowSeed, toolEntry: windowEntry, variant: 0)
+
+        XCTAssertEqual(windowArguments["position"], "主驾")
+        XCTAssertEqual(windowArguments["value"], "LITTLE")
     }
 
     func testExecutionContractRecordsParseErrorRetries() throws {
@@ -227,11 +322,78 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
             manifestEntry: entry,
             prompt: "construction-only stub prompt",
             targetToolName: target,
+            mountedTools: try mountedToolSchemas(entry: entry),
             device: "ac",
             valueType: "EXP",
             templateFamily: "gate7_fixture",
             parentSemanticIDPrefix: "gate7.ac"
         )
+    }
+
+    private func makeRequest(
+        manifest: Gate7SubsetManifest,
+        seed: C5SemanticSeed,
+        toolEntry: DDomainToolEntry,
+        valueType: String,
+        templateFamily: String
+    ) throws -> Gate7PipelineRequest {
+        let manifestEntry = try XCTUnwrap(manifest.entries.first { $0.toolIDsOrdered.contains(toolEntry.function.name) })
+        return Gate7PipelineRequest(
+            manifestMeta: manifest.meta,
+            manifestEntry: manifestEntry,
+            prompt: "construction-only C1 bridge prompt",
+            targetToolName: toolEntry.function.name,
+            targetSemanticSeed: seed,
+            targetToolEntry: toolEntry,
+            mountedTools: try mountedToolSchemas(entry: manifestEntry),
+            device: seed.device,
+            valueType: valueType,
+            templateFamily: templateFamily,
+            parentSemanticIDPrefix: "gate7.\(seed.device)"
+        )
+    }
+
+    private func loadSeed(contractRowID: String) throws -> C5SemanticSeed {
+        let url = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent("contracts/semantic-function-contract.jsonl")
+        let decoder = JSONDecoder()
+        for line in try String(contentsOf: url, encoding: .utf8).split(whereSeparator: \.isNewline) {
+            let seed = try decoder.decode(C5SemanticSeed.self, from: Data(String(line).utf8))
+            if seed.contractRowID == contractRowID {
+                return seed
+            }
+        }
+        throw XCTSkip("missing C1 seed \(contractRowID)")
+    }
+
+    private func loadCatalogEntry(named name: String) throws -> DDomainToolEntry {
+        let entries = try loadCatalog()
+        return try XCTUnwrap(entries.first { $0.function.name == name })
+    }
+
+    private func loadCatalog() throws -> [DDomainToolEntry] {
+        let url = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            .appendingPathComponent("generated/D_domain.tools.demo.json")
+        return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: url))
+    }
+
+    private func mountedToolSchemas(entry: Gate7SubsetManifest.Entry) throws -> [[String: JSONValue]] {
+        let catalog = try loadCatalog()
+        let catalogByName = Dictionary(catalog.map { ($0.function.name, $0) }, uniquingKeysWith: { first, _ in first })
+        return try entry.toolIDsOrdered.map { toolID in
+            let entry = try XCTUnwrap(catalogByName[toolID], "missing mounted tool \(toolID)")
+            return C5TrainingRenderer.dDomainToolSchema(entry)
+        }
+    }
+
+    private func toolNames(_ tools: [[String: JSONValue]]) -> [String] {
+        tools.compactMap { tool in
+            guard case let .object(function)? = tool["function"],
+                  case let .string(name)? = function["name"] else {
+                return nil
+            }
+            return name
+        }
     }
 
     private func diverseUtterances() -> [String] {

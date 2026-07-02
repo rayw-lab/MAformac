@@ -211,17 +211,20 @@ public struct Gate7SampleMetadata: Codable, Equatable, Sendable {
 public struct Gate7GeneratedSample: Equatable, Sendable {
     public var sampleID: String
     public var utterance: String
+    public var tools: [[String: JSONValue]]
     public var expectedToolCalls: [C6ToolCall]
     public var metadata: Gate7SampleMetadata
 
     public init(
         sampleID: String,
         utterance: String,
+        tools: [[String: JSONValue]] = [],
         expectedToolCalls: [C6ToolCall],
         metadata: Gate7SampleMetadata
     ) {
         self.sampleID = sampleID
         self.utterance = utterance
+        self.tools = tools
         self.expectedToolCalls = expectedToolCalls
         self.metadata = metadata
     }
@@ -232,6 +235,10 @@ public struct Gate7PipelineRequest: Sendable {
     public var manifestEntry: Gate7SubsetManifest.Entry
     public var prompt: String
     public var targetToolName: String
+    public var targetSemanticSeed: C5SemanticSeed?
+    public var targetToolEntry: DDomainToolEntry?
+    public var mountedTools: [[String: JSONValue]]
+    public var variantOffset: Int
     public var device: String
     public var valueType: String
     public var templateFamily: String
@@ -243,6 +250,10 @@ public struct Gate7PipelineRequest: Sendable {
         manifestEntry: Gate7SubsetManifest.Entry,
         prompt: String,
         targetToolName: String,
+        targetSemanticSeed: C5SemanticSeed? = nil,
+        targetToolEntry: DDomainToolEntry? = nil,
+        mountedTools: [[String: JSONValue]] = [],
+        variantOffset: Int = 0,
         device: String,
         valueType: String,
         templateFamily: String,
@@ -253,6 +264,10 @@ public struct Gate7PipelineRequest: Sendable {
         self.manifestEntry = manifestEntry
         self.prompt = prompt
         self.targetToolName = targetToolName
+        self.targetSemanticSeed = targetSemanticSeed
+        self.targetToolEntry = targetToolEntry
+        self.mountedTools = mountedTools
+        self.variantOffset = variantOffset
         self.device = device
         self.valueType = valueType
         self.templateFamily = templateFamily
@@ -403,6 +418,44 @@ public struct Gate7GeneratorPipeline: Sendable {
     }
 }
 
+public enum Gate7C1ToolCallBridge {
+    public static func arguments(
+        seed: C5SemanticSeed,
+        toolEntry: DDomainToolEntry,
+        variant: Int,
+        scopeCandidatesBySlot: [String: [String]] = [:],
+        scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
+    ) -> [String: String] {
+        let valueAugmentation = C5TrainingRenderer.augmentValue(seed: seed, variant: variant)
+        let slotAssignments = C5TrainingRenderer.slotAssignments(
+            seed: seed,
+            variant: variant,
+            value: valueAugmentation.value,
+            scopeCandidatesBySlot: scopeCandidatesBySlot,
+            scopeCandidatesByDeviceSlot: scopeCandidatesByDeviceSlot
+        )
+        let jsonArguments = C5TrainingRenderer.dDomainToolCallArguments(
+            seed: seed,
+            value: valueAugmentation.value,
+            slotAssignments: slotAssignments,
+            toolEntry: toolEntry,
+            variant: variant
+        )
+        return jsonArguments.compactMapValues(\.gate7ToolArgumentString)
+    }
+
+    public static func toolCall(
+        seed: C5SemanticSeed,
+        toolEntry: DDomainToolEntry,
+        variant: Int
+    ) -> C6ToolCall {
+        C6ToolCall(
+            name: toolEntry.function.name,
+            arguments: arguments(seed: seed, toolEntry: toolEntry, variant: variant)
+        )
+    }
+}
+
 public enum Gate7DeterministicLabeler {
     public static func samples(
         utterances: [String],
@@ -423,12 +476,40 @@ public enum Gate7DeterministicLabeler {
             subsetContext: subsetContext
         )
         return utterances.enumerated().map { offset, utterance in
-            Gate7GeneratedSample(
+            let expectedToolCall = expectedToolCall(request: request, variant: request.variantOffset + offset)
+            return Gate7GeneratedSample(
                 sampleID: "G7C-\(request.manifestEntry.groupID)-\(offset + 1)",
                 utterance: utterance,
-                expectedToolCalls: [C6ToolCall(name: request.targetToolName, arguments: [:])],
+                tools: request.mountedTools,
+                expectedToolCalls: [expectedToolCall],
                 metadata: metadata
             )
+        }
+    }
+
+    private static func expectedToolCall(request: Gate7PipelineRequest, variant: Int) -> C6ToolCall {
+        guard let seed = request.targetSemanticSeed,
+              let toolEntry = request.targetToolEntry else {
+            return C6ToolCall(name: request.targetToolName, arguments: [:])
+        }
+        return Gate7C1ToolCallBridge.toolCall(seed: seed, toolEntry: toolEntry, variant: variant)
+    }
+}
+
+private extension JSONValue {
+    var gate7ToolArgumentString: String? {
+        switch self {
+        case .string(let value):
+            return value
+        case .number(let value):
+            if value.rounded() == value {
+                return String(Int(value))
+            }
+            return String(value)
+        case .bool(let value):
+            return value ? "true" : "false"
+        case .object, .array, .null:
+            return nil
         }
     }
 }
@@ -527,11 +608,11 @@ public enum Gate7RedactionGate {
 }
 
 public enum Gate7DecontaminationGate {
-    public static func evaluate(
+    public static func candidates(
         samples: [Gate7GeneratedSample],
         request: Gate7PipelineRequest
-    ) -> C5DataGateReceipt {
-        let train = samples.enumerated().map { offset, sample in
+    ) -> [C5DataGateCandidate] {
+        samples.enumerated().map { offset, sample in
             C5DataGateCandidate(
                 sampleID: sample.sampleID,
                 split: "train",
@@ -552,9 +633,21 @@ public enum Gate7DecontaminationGate {
                 assistantText: "<tool_call>{}</tool_call>",
                 hasActionToolCall: true,
                 hasSharedWrapper: true,
-                masking: C5MaskingFlags(functionName: true, argumentName: true, argumentValue: true, trainOnTurn: true)
+                masking: C5MaskingFlags(functionName: true, argumentName: true, argumentValue: true, trainOnTurn: true),
+                tools: sample.tools,
+                mountedToolCount: sample.metadata.mountedToolCount,
+                subsetPolicyID: sample.metadata.subsetPolicyID,
+                subsetGroupID: sample.metadata.groupID,
+                subsetPolicyDigest: sample.metadata.subsetPolicyDigest
             )
         }
+    }
+
+    public static func evaluate(
+        samples: [Gate7GeneratedSample],
+        request: Gate7PipelineRequest
+    ) -> C5DataGateReceipt {
+        let train = candidates(samples: samples, request: request)
         let context = C5DataGateRunContext(
             sourceSnapshotDigest: request.manifestMeta.groupingContractDigest,
             sourceAuthorizationStatus: "authorized_fixture",

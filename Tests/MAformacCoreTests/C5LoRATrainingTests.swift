@@ -1706,7 +1706,8 @@ final class C5LoRATrainingTests: XCTestCase {
             sourceSnapshotDigest: "semantic-digest",
             sourceAuthorizationStatus: "authorized_c1_semantic_contract",
             formatContractVersion: "format-digest",
-            generatedAt: "2026-06-21T00:00:00Z"
+            generatedAt: "2026-06-21T00:00:00Z",
+            allowLegacyMissingSurface: true
         )
     }
 
