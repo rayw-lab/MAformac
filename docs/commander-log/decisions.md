@@ -283,3 +283,9 @@
 - **%44 P3H 亲核 catch P1 退单**：PR #26 结构/测试 5/5/fail-closed 均 PASS，但 `truncate_at_stop_token` 全文 find 截断 + 训练 target assistant 以 `\n\n<tool_call>` 开头 → commander 在其 worktree 复现：训练形态输出被截成空串、tools=[]，测试零覆盖。**v6 真跑会把学对了的模型判成全空 = v5 NO_TOOL 假象同构（harness 自制 invalid_probe）**。退单修法：前导空白剥离+回归测试+RECEIPT 补记+更新 PR。元认知：consumer-anchored sufficiency 活证第三例——truncate 机制测试全绿（mechanism-true）但没测「训练分布的真实输出形态」这个 fit 维度（fit-proven 缺位）；亲核必须拿【训练 target 的真实形态】喂 harness，不是拿 harness 自己的 fixture。
 - **governance-fit grill round 启动**（磊哥令「反思细化 grill 按范式组织」）：骨架 `docs/c5-training-readiness-grill/governance-fit-grill-README.md`（W1 契约细化 GF-0xx / W2 门与词表 GF-1xx / W3 制度 GF-2xx / commander 纵切 GF-Cxx）。W2 已派 %43（D4 哨兵数字门化清单 / D5 readiness 四级词表+fit-proof 列 / D6 F-044 终稿），SPEC=仓外 `runs/governance-fit-grill/SPEC-GF-W2.md`。W1/W3 等 %45/%44 空闲接力。
 - CURRENT 残段清理：原 5 件决策段台账化（全 CLOSED）、指针 D-001~027、handoff 指针刷新。
+
+## D-029（2026-07-02 深夜）通宵 run-auth 转写 + %45 救援重派 + 拓扑刷新
+- 磊哥 /goal 通宵全授权：**v6 tiny-ablation 真跑 + wave-1 数据真生成 + C5 数据门**解锁（verbal auth 转写 `docs/project/phase0/r-l17-human-review-evidence/v6-overnight-run-auth-2026-07-02.md`）；full wave-1 训练/C6 acceptance/candidate comparison 等仍 BLOCKED；四红线仍在（F-044 阈值用草案 default 跑，终值不自拍）。
+- **%45 第二次卡死救援**：34min 零流动（0 in 0 out），rescue ladder 直接 kill 子进程 52386 → codex 重启 → SPEC-P12 self-contained 重派（含通宵 ADDENDUM：镜像门最高优先 + 硬三件 + grill 拆解自驱）。
+- **%44 P1 退单消息此前 send-keys 失败未送达**（"not in a mode" exit 1，教训：tmux send-keys 长消息必用 `-l` literal + 单独 Enter，发后必 capture-pane 验证送达）——已用 -l 重发，%44 开工修 truncate 前导换行 P1。
+- 拓扑：%45 P12（A+ 契约+镜像门）/ %44 P3H P1 修复 / %43 GF-W2 grill。审计=worker 交叉互审（磊哥令，本晚不派 hermes/gptpro）。
