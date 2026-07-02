@@ -1,5 +1,5 @@
 ---
-status: draft_unsigned
+status: part_b_signed_run_authorized（Part A 续签仍 unsigned）
 artifact_kind: r7_renewal_template_and_tiny_ablation_run_auth_checklist
 authority: template_only_no_authorization（本文件存在≠任何授权；签字动作只能磊哥本人在【签字区】显式落笔）
 prepared_by: claude-commander（磊哥 D-019 指令：备模板不等 7-15，保持 draft/unsigned）
@@ -62,11 +62,11 @@ human_owner_signature: <未填>
 
 ### B.3 签字区（磊哥本人）
 ```
-tiny_ablation_run_auth_verdict: unsigned    # 磊哥改 signed_run_authorized
-authorized_on: <未填>
+tiny_ablation_run_auth_verdict: signed_run_authorized
+authorized_on: 2026-07-02
 authorized_scope: adjudication_A_tiny_ablation_only
-sample_count_approved: <未填，20-50>
-human_owner_signature: <未填>
+sample_count_approved: 40
+human_owner_signature: 磊哥（王磊）本人于 2026-07-02 对话原话「全部授权 推进tiny ablation 真跑」——在 commander 贴出签字包终版+run plan 全文并自证零 scope 扩张后授权；commander 代录口头授权，非代签。B.1 第 9 条（run 产物异源审计员）按「全部授权」默认=run 产物出稿后磊哥指定（hermes 下个审计点仍等磊哥通知）。
 ```
 
 ## Part C — 维护

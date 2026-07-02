@@ -250,3 +250,9 @@
 - **落点**: 本 D-023 + swarm-commander §8 补条 + swarm-runs UPDATE + MEMORY as-of
 - 🎉 **UPDATE（hermes 修复闭环收口，2026-07-02 深夜终态）**：#23 HIGH 修复（`actualUnsupportedClass` 三层可达+stats 账目，C6SubsetContextTests 18/0）→ 原审计员 delta 复验 **HIGH-RESOLVED** → MERGED `aac84de9` = **终态 main**。终验收（%45）= **PARTIAL_SIBLING_NOISE**：pull PASS / main 全机械门 PASS / hermes 三目标套件全绿（C5 53/0·C6Subset 18/0·G7 8/0）/ 全量 swift 唯一失败=已知 sibling UIUE fixture 噪声（pre-existing，M4 消解）——**main 范围绿**。当日终账：**13 支 PR 合流（#12-#23）+ 审计体系咬 9 真问题**（+S-210 第三层不可达）。🔴 **按磊哥指令停下**。桌上待磊哥：④ tiny-ablation 签字包（物理前置全齐，R7 draft Part B 就绪）/ M2 删除授权 / R7 续签（7-15 到期）/ 下个 hermes 审计点 / M4 UIUE（sibling 噪声根治点）。
 - **UPDATE（回报路由固化，2026-07-02）**：磊哥令——后续所有 worker 派单**必须显性写**「向 %42 汇报」（tmux-bridge 发 REPORT/PROGRESS/BLOCKED 到 commander pane），派单缺这句=不合格。已落宪法 §8 + memory 第 3 条强化 + 三 worker 常设通知（ACK-RPT42）。
+
+## D-024 🔴 tiny-ablation 真跑授权（磊哥「全部授权」）— R7 线第一次真训练动作点火
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Run-authorization ｜ **Owners**: 磊哥口头授权（原话「全部授权 推进tiny ablation 真跑」，签字包+run plan 全文贴出验 scope 后）/ commander 代录+执行编排
+- **授权范围**: 仅 `tiny-ablation-run-plan-adjudication-A.md` 全文（tiny-only：40 正例样本/rank16Mainline 渲染原样/34-case tool_call 探针/门=代码常量 empty<5/34）。**成功不自动开 wave-1；失败进 Dim10 branch 不改阈值不扩样本；重跑要新授权**。scoped waiver：sibling 噪声仅豁免本轮前置。
+- **执行链**: Step 0 harness 解锁小 PR（%45：`.real` 分支绑签字文档引用+测试→CI→审→merge）→ Step 1-4 真跑（worker 执行+每步 receipt 回 %42+commander 亲核）→ verdict 上抛磊哥。
+- **落点**: 签字区已录（B.3 signed_run_authorized/40）+ 本 D-024 + run 产物 `runs/tiny-ablation-adjudication-A/`

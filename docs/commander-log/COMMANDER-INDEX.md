@@ -37,7 +37,13 @@
 - **D-011** GPT Pro 第3家审 3 PR + 3 worker 修 + 磊哥拍 A merge（✅ Done，3 门 MERGED main=ab355f6c CI SUCCESS）：CI bug 根因（verify.yml 浅 clone 没 fetch head）；R7 守住
 - **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
 
-## 下一步（as-of 2026-07-02 深夜 D-019+：M1 done / RAT merged / G7 construction 进行中）
+## 下一步（as-of 2026-07-02 深夜 D-023：唯一关键路径 = PR #23 HIGH 修复 → 修完停下等磊哥）
+- **今日总账**：11 支 PR 合流 #12-#22（M1 四支 + RAT + G7 四支 + hermes 修复两支），main=`a8fcd245`；审计体系咬住 8 个真问题（guard test-split / gate8 工厂 / E-2 六轴 / G7A 手写表 / G7D policy 零校验[hermes] / C6+G7 dead fields[hermes] / XG7D 假验证[hermes 二层] / S-210 第三层不可达[交换审]）。
+- **进行中**：#23 HIGH 修复（%43 fresh 重启后自包含重派——它曾 47min 卡死，kill+npm 重装+重派救援，宪法 §8 PROVEN）→ %45 delta 复验 → merge → 验收 → 🔴 **停下等磊哥**（磊哥令）。
+- **冻结**：hermes 下个审计点等磊哥通知；M2 删除等磊哥；④ tiny-ablation 物理前置已齐（G7 全支+E-2 Phase-1 merged）等 #23 收口后上抛签字包（R7 draft B.1）。
+- **模式（D-021）**：commander=上帝视角只编排裁决记忆亲核；一切执行下沉 worker，角色随需流转；外审 worker 显性调技能 20min 上限。
+
+## 留史（as-of 2026-07-02 深夜 D-019+：M1 done / RAT merged / G7 construction 进行中）
 - **已收口**：M1 四支 PR 合流+验收 PASS main 范围（D-018）→ E-2 grill round 43 决策 locked_with_conditions（D-019）→ **RAT PR #16 merged，main=`af72a60a`**（磊哥条件一完成，spot audit CLEAR：删除行仅 stale 路由句/w-files 仅 status 级联）。
 - **进行中**：G7A(%45 manifest codegen+预算门 cap7200+grammar artifact) / G7B(%43 C6SubsetContext+六轴 receipt，🔴 硬要求=消费链行为证明否则 honest 标 adapter_receipt_proof_only) 双线写码 off `80ea379c`；**G7C 暂不开**（磊哥令：等 A/B 接口口径稳）。%44 RAT 后 standby。
 - 🔴 **冻结/HOLD**：敏感参数（7200 cap/digest 口径/degraded_clarify/C6 接入方式）改动必上抛磊哥；④ tiny-ablation HOLD（前置=G7+E2 Phase-1 merged，checklist 在 `R7-renewal-and-tiny-ablation-run-auth-DRAFT.md` draft/unsigned）；M2 只 dry-run；M3 延期。
