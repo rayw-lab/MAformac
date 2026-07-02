@@ -291,6 +291,9 @@ def parse_tool_calls(raw_output: str) -> dict[str, Any]:
         except json.JSONDecodeError:
             parse_errors.append({"offset": match.start(), "error": "json_decode"})
             continue
+        if not isinstance(payload, dict):
+            parse_errors.append({"offset": match.start(), "error": "tool_call_payload_not_object"})
+            continue
         name = payload.get("name")
         arguments = payload.get("arguments", {})
         if not isinstance(name, str) or not name:

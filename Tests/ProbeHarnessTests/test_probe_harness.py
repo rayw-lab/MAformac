@@ -198,6 +198,13 @@ class ProbeHarnessTests(unittest.TestCase):
         self.assertEqual(parsed["observed_tool_names"], ["open_ac"])
         self.assertEqual(parsed["tool_call_count"], 1)
 
+    def test_non_object_tool_call_payload_is_parse_error_not_crash(self):
+        parsed = harness.parse_tool_calls('<tool_call>"open_window"</tool_call>')
+
+        self.assertEqual(parsed["observed_tool_names"], [])
+        self.assertEqual(parsed["tool_call_count"], 0)
+        self.assertEqual(parsed["parse_errors"], [{"offset": 0, "error": "tool_call_payload_not_object"}])
+
     def test_paired_mode_requires_adapter_unless_base_only_smoke(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
