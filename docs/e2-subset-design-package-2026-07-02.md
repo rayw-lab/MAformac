@@ -1,5 +1,5 @@
 ---
-status: design_package_for_magnet_ratification
+status: ratified_locked_with_conditions（D-019：E2-1 8K/E2-2 E-lite/E2-3 Phase-1[construction only 硬条件二]/E2-4 建 schema 全 locked）
 artifact_kind: e2_subset_design_decision_package
 authority: proposal_not_ssot（磊哥细拍后落 grill SSOT + landing-matrix）
 created: 2026-07-02

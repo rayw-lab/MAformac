@@ -4,7 +4,7 @@ artifact_kind: grill_premortem_failure_modes
 dimension: D9 subset 特有失败模式（贯穿纵切）
 id_range: SF-01~SF-14
 round: e2-subset-grill（2026-07-02）
-status: proposed（待磊哥 lock）
+status: locked_by_magnet_2026-07-02（D-019，随 E2-E）
 author: claude-commander
 core_frame: subset 不能制造新的 surface drift（磊哥定）
 ---

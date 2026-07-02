@@ -3,7 +3,7 @@ authority: e2_subset_grill_synthesis
 artifact_kind: grill_round_synthesis_reduction
 round: e2-subset-grill（2026-07-02，磊哥 6 维度→9 维度树→4 路 43 决策）
 inputs: e2-subset-w1-decisions.md（S-001~011=11）/ e2-subset-w2-decisions.md（S-101~108=8）/ e2-subset-w3-decisions.md（S-201~210=10）/ e2-subset-commander-d9-premortem.md（SF-01~14）
-status: synthesized_pending_magnet_ratification
+status: ratified_locked_with_conditions（D-019 磊哥拍：条件一 ratification PR / 条件二 Phase-1 construction only 无 runtime-NLU 无真生成无 C6 acceptance）
 author: claude-commander（总监综合）
 ---
 

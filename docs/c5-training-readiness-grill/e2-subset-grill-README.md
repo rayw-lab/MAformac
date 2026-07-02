@@ -7,7 +7,7 @@ created: 2026-07-02
 author: claude-commander（磊哥 6 维度 → 下探/扩展为 9 维度树）
 core_frame: 🔴 subset 不能制造新的 surface drift（磊哥定）——gate3 六轴同源是本轮宪法，每个决策先问「这会不会造出第二个面」
 seed_docs: docs/e2-subset-design-package-2026-07-02.md（E-lite 已 XAUDIT 修订）+ runs/2026-07-02-baseline-roadmap/L4-e2-subset-materials.md（真 tokenizer 实算）
-status: round_complete_pending_magnet_ratification
+status: ratified_locked_with_conditions（D-019）
 ---
 
 # E-2 subset-policy grill round — 维度树（commander 下探版）

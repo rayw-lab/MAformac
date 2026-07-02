@@ -204,3 +204,12 @@
 - **教训沉淀**: lessons-learned **K 段 4 条**（per-branch CI≠全量验收 / 交叉审对抗 fixture 破双盲×2 实证 / staged PR+hash 语义审 / worker 主动回报纪律）。
 - **Consequences**: 训练前置基线全部在 main（gate2 token-masking 真 enforce + 反向 guard 三 split / gate8 562 工厂实算 / 28+2 件 grill 语料 / commander-log / 两基线文档 / CURRENT 新版）。M2 清理清单已备等授权执行；M3 D25 裁决=收（待开小 PR）；E-2 grill round 进行中（W1/W3 done + D9 done + W2 跑中 → 消减综合上抛）。
 - **落点**: 本 D-018 + lessons K + baseline-roadmap/CURRENT/MEMORY 同步刷
+
+## D-019 磊哥拍 E2-A~E locked（附 2 硬条件）+ gate7+E2 Phase-1 construction 立项 + ④暂不放 + M2/M3/R7 处置
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Decision-lock + Dispatch ｜ **Owners**: 磊哥全项拍板 / commander 拆解执行
+- **E2-A~E = locked_with_conditions**：原则全采纳。🔴 **条件一**：E-2 综合/设计包/README/D-018/CURRENT/baseline/blueprint/landing 刷新 → **一个小 PR 入 main**（「E-2 ratification + route-board refresh」PR，%44 执行 γ-port 模式 off main=`80ea379c`）。🔴 **条件二**：E2-D 只授权 **Phase-1 construction**——**不授权 runtime NLU / 不授权真生成 / 不授权 C6 acceptance**（写死进所有 SPEC）。
+- **gate7 pipeline + E-2 manifest 联动 = 立即开**：🔴 必须基于 origin/main=`80ea379c` **新 worktree**（禁止在 doc-absorption 主树写实现）。范围四件 = manifest codegen / grammar artifact 预编译 / C6 add-only schema / 六轴 digest receipt + gate7 generator pipeline 代码闭环（build 不 run）。切三片三 worktree 三 PR（M1 staged 模式）：G7A(%45)=E-2 manifest codegen+静态预算门+grammar artifact ｜ G7B(%43)=C6SubsetContext add-only schema+subset_failure_class+六轴 digest receipt ｜ G7C(%44，先做 ratification PR 再接)=generator 编排层（多源桩+vendor-enum G1 门+执行契约+四确定性门）。
+- **④ tiny-ablation run-auth = 暂不放**（磊哥：等 gate7 construction + E-2 Phase-1 **merged** 再授权，防 E 节点在 C/D 没物理闭环前点火）→ blueprint §4 节点序 E 前置条件更新。
+- **M2 = 只 dry-run 不删**（指挥官分支 E-2 docs/D-018 未进 main；等 ratification PR 合完再执行删除）。**M3 D25 = 延期**（非 LoRA 关键路径，不抢上下文）。
+- **R7 = 现在备续签/真跑签字模板不等 7-15**：commander 亲自产出 R7 renewal + tiny-ablation run-auth checklist，**状态保持 draft/unsigned**。
+- **落点**: 本 D-019 + E-2 全组文档 status→locked_with_conditions + landing-matrix 里程碑4 + SPEC-G7A/B/C + R7 renewal draft
