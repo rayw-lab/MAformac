@@ -240,3 +240,11 @@
 - **CLEAR 项**：分组血缘/双向闭包/562 并集/预算门/唯一 degraded pair/add-only 零侵入/六轴 receipt blocked/R7 无网络路径/G1 门/labeler LLM 零参与/四门/冻结参数——全项亲跑复现命令给证。
 - **辩证吸收**：P1/P2 全收（无一撞已决，均为实现漏）；steelman 零驳回。**修复三线**：%45 P1（policy authority 校验 + hermes probe 固化为永久测试）/ %43 P2-C6（补真消费禁删字段——两字段是 S-210 locked 的 expected 侧载体）/ %44 P2-G7（接行为或删+说理）。修后交换交叉审 + hermes delta 复审（%44 助理执行）→ staged merge。
 - **落点**: 本 D-022 + `HERMES-FINAL-AUDIT-G7.md`（%44 产出）+ 三修复 SPEC（tmux inline）
+
+## D-023 hermes findings 修复轮进展 + %43 卡死救援 + hermes 审计点冻结
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（#23 修复中=唯一关键路径）｜ **Type**: Fix-round + Ops-rescue ｜ **Owners**: commander 编排/三 worker 执行
+- **修复轮战果**: P1 PR #22（policy authority `e2-lite-v1` 双侧一致 commander 亲核 + hermes probe 固化永久测试）交换审 **A-/PASS → MERGED `487ec2b3`** ｜ P2-G7 PR #21（timeout/rawPayload 接进 receipt 行为非删）交换审 **B+/PASS_WITH_WATCH → MERGED `a8fcd245`**（watch：timeout=收尾归一化非抢占，Phase-1 全 mock 可接受；#22 watch：Swift 侧 authority 常量是 grep 验证的复写串，后续可加等值测试硬化）｜ P2-C6 PR #23 交换审（%45）**REQUEST_CHANGES/HIGH**（第 8 咬）：**S-210 第三层 `global_unsupported` 无可达成功路径**（正确拒识被误判 mismatch）+ MEDIUM stats 账目缺口 → %43 修复中。
+- 🔴 **%43 卡死救援实录（PROVEN 进宪法 §8）**: HIGH 修复中 %43 陷 **47 分钟死循环**（auto-compact 后自我 grounding 打转）。判定=行为探测（工作树零文件活动 20min+ / PROGRESS 消息排队送不进 / Working 计时仍走）；救援阶梯=ESC→双ESC→Ctrl-C 全失效（TUI 输入环死）→ `tmux display-message pane_pid` 找子进程 **kill codex 进程** → 重启触发 codex 自动升级→**半装**（缺 `@openai/codex-darwin-arm64`）→ 按报错 `npm install -g @openai/codex@latest` 重装 → fresh codex 自包含重派（SPEC 承上下文，工作树干净零丢失）。
+- **hermes 审计点冻结**（磊哥令）: 后续不安排 hermes 审计，下个点等磊哥通知；%44 助理 standby 解除。
+- **收敛点**（磊哥令「完成 hermes 审计修复后先停下来」）: #23 HIGH 修 → %45 delta 复验 → merge → 验收 → **停下等磊哥**。
+- **落点**: 本 D-023 + swarm-commander §8 补条 + swarm-runs UPDATE + MEMORY as-of

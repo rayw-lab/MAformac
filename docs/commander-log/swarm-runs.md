@@ -107,3 +107,4 @@
 - **G7 construction（进行中）**: G7A PR #18（manifest 18,260 entries/1 degraded pair；XAUDIT 抓 B1 手写表 BLOCKER → contract 文件模式修复中）/ G7B PR #17（XAUDIT CLEAR：消费链行为证明非 dead field，verdict 诚实 adapter_receipt_proof）/ G7C 暂缓（磊哥令等 A/B 口径稳）。
 - **纪律沉淀**: worker 回报纪律（REPORT/PROGRESS/BLOCKED 行）+ 3-worker 使用范式入 memory（磊哥点名满意）+ lessons K 段。
 - **收稿=文件+亲核**: 全部 receipt 关键声称经 commander gh/grep/亲跑抽核（562 三路复算 / self-test 复现 / 消费链测试亲读 / spot audit hash 对比）。
+- **UPDATE（2026-07-02 下午～深夜，G7+hermes 闭环段）**: G7A/B/C/D 四切片全合流（PR #17/#18/#19/#20，B1 手写表 BLOCKER 修复 contract 模式）→ hermes GLM-5.2 真异源终审 REQUEST_CHANGES（%44 助理执行位跑通；P1 policy 零校验 + P2×2 dead/no-op 字段；**二层 catch：XG7D 假验证被证伪**）→ 修复轮 PR #21/#22 MERGED（main=`a8fcd245`）+ #23 HIGH 返修中（S-210 第三层不可达，交换审第 8 咬）。**今日累计 11 支 PR 合流（#12-#22）+ 8 个真问题被审计体系咬住**。ops：%43 47min 卡死 kill 重启救援（宪法 §8 PROVEN）；假 hermes subagent 教训（宪法 §8）；外审执行位下沉 worker + 20min 上限 + 角色流转（D-021）。
