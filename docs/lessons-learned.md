@@ -224,6 +224,7 @@
 
 ### L.5 tmux 消息静默丢失：send-keys 必 -l + 分离 Enter + capture 验证送达（磊哥 2026-07-02 纠）
 给 codex worker 发长消息用 `tmux send-keys -t %44 "长文本" Enter` 一条命令 → "not in a mode" exit 1 **静默失败**（后台跑更察觉不到），worker 空等 40min；磊哥另截图 catch「有时没按回车」（消息停输入框未提交）。修法四步硬 SOP：`-l` literal 发文本 → **单独一条命令发 Enter** → sleep → capture-pane 验证消息进对话流+状态 Working。worker 回写 %42 同病：轮询见 idle 但无 REPORT → capture 它 pane 看有无滞留回报，有则替它补 Enter。已进 swarm-commander 宪法 §9.x。
+🔴 补（2026-07-03 磊哥截图 catch）：**滞留判别法**——capture 里 `›` 开头多行文本≠必是滞留（codex TUI 对话流里已提交的用户消息也以 `›` 回显）；真滞留的特征=消息在输入框位置（`›` 行下方紧跟 token 计数状态行）且 worker 无对应回复。**commander 自己的输入框也会滞留**（`[Pasted text #2]` 粘贴占位悬挂——heredoc/粘贴溢出到自己 pane），收工前 capture 自己 pane 自查一次。
 
 ### M.8 same-surface 是复合对象：维度分解表取代单数声称（2026-07-03 tools 挂载冰山）
 「同输入面/same harness」的单数名词掩盖 surface 的复合自由度（system/user 形态/think 块/**tools 挂载**/停止 token/decode 参数/tokenizer patch…）。v6 probe1 全 empty 即训练面带 E-2 挂载 737 token 而 probe 无挂载——契约语言每轮只验「已知维度」。修法=same-X 声称强制展开为 X 维度分解表（训练列 vs 评测列逐维打勾，新维度即追加）；生成数据的 surface 同表治理（G7 行级 tools/subset 字段贯通实装）。lineage：gate2 dead-field→v5 under-supervision→v6 tools-mount，同一 producer-consumer 冰山三层。
