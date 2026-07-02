@@ -111,10 +111,13 @@ class ProbeHarnessTests(unittest.TestCase):
                 runner=FakeRunner(),
             )
             paired = harness.paired_summary(base, adapter)
+            adapter_record = json.loads((output_dir / "adapter" / "01-CASE-1.json").read_text(encoding="utf-8"))
 
         self.assertEqual(base["empty_tool_call_outputs"], 2)
         self.assertEqual(adapter["empty_tool_call_outputs"], 0)
         self.assertEqual(paired["paired_axes"], [{"axis": "action", "base_empty": 2, "adapter_empty": 0, "delta": -2}])
+        self.assertEqual(adapter_record["raw_output"], adapter_record["raw_generation"])
+        self.assertEqual(adapter_record["truncated_output"], '<tool_call>{"name":"raise_ac_temperature_by_exp","arguments":{}}')
 
     def test_leading_newline_tool_call_survives_stop_truncation(self):
         raw = '\n\n<tool_call>{"name":"raise_ac_temperature_by_exp","arguments":{}}</tool_call>\n'
@@ -204,6 +207,29 @@ class ProbeHarnessTests(unittest.TestCase):
         self.assertEqual(parsed["observed_tool_names"], [])
         self.assertEqual(parsed["tool_call_count"], 0)
         self.assertEqual(parsed["parse_errors"], [{"offset": 0, "error": "tool_call_payload_not_object"}])
+
+    def test_tool_call_json_prefix_with_trailing_garbage_is_parse_error(self):
+        parsed = harness.parse_tool_calls('<tool_call>{"name":"open_window","arguments":{}}garbage</tool_call>')
+
+        self.assertEqual(parsed["observed_tool_names"], [])
+        self.assertEqual(parsed["tool_call_count"], 0)
+        self.assertEqual(parsed["parse_errors"], [{"offset": 0, "error": "json_trailing_garbage"}])
+
+    def test_valid_tool_call_object_remains_accepted(self):
+        parsed = harness.parse_tool_calls('<tool_call>{"name":"open_window","arguments":{}}</tool_call>')
+
+        self.assertEqual(parsed["observed_tool_names"], ["open_window"])
+        self.assertEqual(parsed["tool_call_count"], 1)
+        self.assertEqual(parsed["parse_errors"], [])
+
+    def test_primitive_tool_call_payloads_are_parse_errors_not_crashes(self):
+        for payload in ('"open_window"', '["open_window"]', "1", "null"):
+            with self.subTest(payload=payload):
+                parsed = harness.parse_tool_calls(f"<tool_call>{payload}</tool_call>")
+
+                self.assertEqual(parsed["observed_tool_names"], [])
+                self.assertEqual(parsed["tool_call_count"], 0)
+                self.assertEqual(parsed["parse_errors"], [{"offset": 0, "error": "tool_call_payload_not_object"}])
 
     def test_paired_mode_requires_adapter_unless_base_only_smoke(self):
         with tempfile.TemporaryDirectory() as tmp:

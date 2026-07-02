@@ -287,9 +287,14 @@ def parse_tool_calls(raw_output: str) -> dict[str, Any]:
     for match in TOOL_CALL_START_PATTERN.finditer(raw_output):
         candidate = raw_output[match.end() :]
         try:
-            payload, _ = decoder.raw_decode(candidate)
+            payload, consumed = decoder.raw_decode(candidate)
         except json.JSONDecodeError:
             parse_errors.append({"offset": match.start(), "error": "json_decode"})
+            continue
+        close_index = candidate.find("</tool_call>", consumed)
+        payload_boundary = close_index if close_index >= 0 else len(candidate)
+        if candidate[consumed:payload_boundary].strip():
+            parse_errors.append({"offset": match.start(), "error": "json_trailing_garbage"})
             continue
         if not isinstance(payload, dict):
             parse_errors.append({"offset": match.start(), "error": "tool_call_payload_not_object"})
@@ -512,7 +517,7 @@ def run_arm(
             "prompt": generation.prompt,
             "raw_generation": generation.raw_generation,
             "truncated_output": truncated_output,
-            "raw_output": truncated_output,
+            "raw_output": generation.raw_generation,
             "tool_calls": parse["tool_calls"],
             "has_tool_call": non_empty,
             "empty_tool_call_output": not non_empty,
