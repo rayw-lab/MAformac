@@ -47,7 +47,7 @@ attribution=tiny 44 行数据稀疏（「关闭」自然语义仅 2 训练行且
 | B | 11/15 | 11/15 | 0 |
 | C | 4/4 | 2/4 | -2（empty +1） |
 | D | 8/34 | 5/34 | -3（empty +3） |
-**重复病理：repeated_end 68/68 → 1/68**（EOS 监督生效，GF-153 主目标达成）；残余 4 parse_error + 1 重复（TRAP-LURE-001）待下钻。C/D 微降+empty 增=EOS 让模型对边缘 case 更早停（「沉默化」），tiny 规模下的次级效应，wave-1 广覆盖下再评。
+**重复病理：repeated_end 68/68 → 1/68**（EOS 监督生效，GF-153 主目标达成）；残余 4 parse_error 下钻定性（%44）：全是 malformed/截断 JSON，且这 4 case 在 v6 里本就 repeated-tail 不稳（v6 碰巧首 call 可解析）——EOS 把「无限重复」压成「早停截断」，是同一数据稀疏在不同 stop 语义下的两种表象，非净退化。C/D 微降+empty 增=EOS 让模型对边缘 case 更早停（「沉默化」），tiny 规模下的次级效应，wave-1 广覆盖下再评。
 
 ## 附录3：wave-1 proto build 全量数据门首跑（2026-07-03 凌晨，%45）
 - **build：4500 样本（train 4100/valid 400/test 128）38.8s**；工具覆盖 expected 314/562、mounted 395/562、55 subset 组、tools/row avg14.5 max48。
