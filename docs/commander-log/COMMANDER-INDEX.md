@@ -37,10 +37,11 @@
 - **D-011** GPT Pro 第3家审 3 PR + 3 worker 修 + 磊哥拍 A merge（✅ Done，3 门 MERGED main=ab355f6c CI SUCCESS）：CI bug 根因（verify.yml 浅 clone 没 fetch head）；R7 守住
 - **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
 
-## 下一步（as-of 2026-07-02 D-016：基线双文档已落，现状 HOLD 等磊哥 5 件）
-- 🔴 **起手读两基线**：`docs/baseline-roadmap-2026-07-02-pre-lora.md`（树/合并/PR 节点 M1-M4 + HOLD verdict）+ `docs/lora-loop-blueprint-2026-07-02.md`（gate 真实态 + 闭环总图 + 节点 A-H + 巨人肩膀矩阵）+ 刷新版 `docs/CURRENT.md`。
-- **磊哥 5 件**（同下 D-012 段①-⑤）+ 附注 R7 route-only **2026-07-15 到期**。拍⑤后走 M1 staged PR（α g2 / β g8 / γ 文档整编支）；M1 后可立项 gate7 pipeline 代码闭环（剩余最大 R7-safe construction）。
-- 新任 commander 接棒复审 D-015 = wave-1 全交付 CONFIRMED（2 条非 blocker 观察：P2 反向 guard 建议 + E-2 保守口径 103-138k）。
+## 下一步（as-of 2026-07-02 深夜 D-019+：M1 done / RAT merged / G7 construction 进行中）
+- **已收口**：M1 四支 PR 合流+验收 PASS main 范围（D-018）→ E-2 grill round 43 决策 locked_with_conditions（D-019）→ **RAT PR #16 merged，main=`af72a60a`**（磊哥条件一完成，spot audit CLEAR：删除行仅 stale 路由句/w-files 仅 status 级联）。
+- **进行中**：G7A(%45 manifest codegen+预算门 cap7200+grammar artifact) / G7B(%43 C6SubsetContext+六轴 receipt，🔴 硬要求=消费链行为证明否则 honest 标 adapter_receipt_proof_only) 双线写码 off `80ea379c`；**G7C 暂不开**（磊哥令：等 A/B 接口口径稳）。%44 RAT 后 standby。
+- 🔴 **冻结/HOLD**：敏感参数（7200 cap/digest 口径/degraded_clarify/C6 接入方式）改动必上抛磊哥；④ tiny-ablation HOLD（前置=G7+E2 Phase-1 merged，checklist 在 `R7-renewal-and-tiny-ablation-run-auth-DRAFT.md` draft/unsigned）；M2 只 dry-run；M3 延期。
+- 起手读：两基线（roadmap/blueprint）+ CURRENT + `e2-subset-SYNTHESIS.md`（13 会聚+1 仲裁+E2-A~E 已拍）。
 
 ## 留史（D-012 overnight pre-LoRA push — wave-1 done + gate2 P0 修复中，as-of 2026-07-02）
 - **wave-1 done**（D-013/D-014）：gate8 工具数=562+E-2(%44 `64c6f62f`,audit CLEAR) / grill Dim10(me `4c816445`)+Dim11/5(%43 `f9e67901`)(audit CLEAR) / tracking reconcile。🔴 **gate2 masking P0 假enforce**（对抗审计抓,commander 自跑 44/0 绿也漏=循环失守,D-014）→ %45 修复中（char→token post-tokenize + mlx-lm 真消费 + F-068 `--self-test-loss-mask` 门）
