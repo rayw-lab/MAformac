@@ -78,19 +78,23 @@ public struct C6SubsetEvalRun: Codable, Equatable, Sendable {
     public var base: C6EvalRun
     public var subsetContext: C6SubsetContext?
     public var subsetFailureClass: C6SubsetFailureClass
+    public var isModelFailure: Bool
 
     enum CodingKeys: String, CodingKey {
         case subsetFailureClass = "subset_failure_class"
+        case isModelFailure = "is_model_failure"
     }
 
     public init(
         base: C6EvalRun,
         subsetContext: C6SubsetContext? = nil,
-        subsetFailureClass: C6SubsetFailureClass = .none
+        subsetFailureClass: C6SubsetFailureClass = .none,
+        isModelFailure: Bool = false
     ) {
         self.base = base
         self.subsetContext = subsetContext
         self.subsetFailureClass = subsetFailureClass
+        self.isModelFailure = isModelFailure
     }
 
     public init(from decoder: Decoder) throws {
@@ -102,6 +106,7 @@ public struct C6SubsetEvalRun: Codable, Equatable, Sendable {
             C6SubsetFailureClass.self,
             forKey: .subsetFailureClass
         ) ?? .none
+        self.isModelFailure = try container.decodeIfPresent(Bool.self, forKey: .isModelFailure) ?? false
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -109,12 +114,14 @@ public struct C6SubsetEvalRun: Codable, Equatable, Sendable {
         try subsetContext?.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(subsetFailureClass, forKey: .subsetFailureClass)
+        try container.encode(isModelFailure, forKey: .isModelFailure)
     }
 }
 
 public enum C6SubsetFailureClass: String, Codable, Equatable, Sendable {
     case missingExpectedInMounted = "missing_expected_in_mounted"
     case actualNotInAllowed = "actual_not_in_allowed"
+    case unsupportedClassMismatch = "unsupported_class_mismatch"
     case none
 }
 
@@ -131,15 +138,38 @@ public struct C6SubsetGateAccounting: Equatable, Sendable {
 public struct C6SubsetFailureStats: Codable, Equatable, Sendable {
     public var missingExpectedInMountedCount: Int
     public var actualNotInAllowedCount: Int
+    public var unsupportedClassMismatchCount: Int
 
     enum CodingKeys: String, CodingKey {
         case missingExpectedInMountedCount = "missing_expected_in_mounted_count"
         case actualNotInAllowedCount = "actual_not_in_allowed_count"
+        case unsupportedClassMismatchCount = "unsupported_class_mismatch_count"
     }
 
-    public init(missingExpectedInMountedCount: Int, actualNotInAllowedCount: Int) {
+    public init(
+        missingExpectedInMountedCount: Int,
+        actualNotInAllowedCount: Int,
+        unsupportedClassMismatchCount: Int = 0
+    ) {
         self.missingExpectedInMountedCount = missingExpectedInMountedCount
         self.actualNotInAllowedCount = actualNotInAllowedCount
+        self.unsupportedClassMismatchCount = unsupportedClassMismatchCount
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.missingExpectedInMountedCount = try container.decodeIfPresent(
+            Int.self,
+            forKey: .missingExpectedInMountedCount
+        ) ?? 0
+        self.actualNotInAllowedCount = try container.decodeIfPresent(
+            Int.self,
+            forKey: .actualNotInAllowedCount
+        ) ?? 0
+        self.unsupportedClassMismatchCount = try container.decodeIfPresent(
+            Int.self,
+            forKey: .unsupportedClassMismatchCount
+        ) ?? 0
     }
 }
 
@@ -167,6 +197,7 @@ public extension C6BenchRunner {
         output: C6RuntimeOutput,
         mountedToolIDs: Set<String>,
         allowedToolIDs: Set<String>,
+        actualUnsupportedClass: C6ExpectedUnsupportedClass? = nil,
         runIndex: Int = 0
     ) throws -> C6SubsetEvalRun {
         let baseRun = try evaluate(case: subsetCase.base, output: output, runIndex: runIndex)
@@ -174,13 +205,18 @@ public extension C6BenchRunner {
             expectedToolCalls: subsetCase.base.expectedToolCalls,
             actualToolCalls: output.toolCalls,
             mountedToolIDs: mountedToolIDs,
-            allowedToolIDs: allowedToolIDs
+            allowedToolIDs: allowedToolIDs,
+            expectedUnsupportedClass: subsetCase.expectedUnsupportedClass,
+            actualUnsupportedClass: actualUnsupportedClass,
+            behaviorClass: C6CaseBehaviorClassResolver.resolve(subsetCase.base),
+            baseModelHardFailed: baseRun.gateResult.modelHardFailed
         )
         let runContext = subsetCase.subsetContext ?? C6SubsetContext()
         return C6SubsetEvalRun(
             base: baseRun,
             subsetContext: runContext.hasAnyField ? runContext : nil,
-            subsetFailureClass: accounting.subsetFailureClass
+            subsetFailureClass: accounting.subsetFailureClass,
+            isModelFailure: accounting.isModelFailure
         )
     }
 
@@ -196,13 +232,18 @@ public extension C6BenchRunner {
         )
         let missing = subsetRuns.filter { $0.subsetFailureClass == .missingExpectedInMounted }.count
         let actualNotAllowed = subsetRuns.filter { $0.subsetFailureClass == .actualNotInAllowed }.count
+        let unsupportedClassMismatch = subsetRuns.filter {
+            $0.subsetFailureClass == .unsupportedClassMismatch
+        }.count
         let stats = C6SubsetFailureStats(
             missingExpectedInMountedCount: missing,
-            actualNotInAllowedCount: actualNotAllowed
+            actualNotInAllowedCount: actualNotAllowed,
+            unsupportedClassMismatchCount: unsupportedClassMismatch
         )
-        let status = (missing == 0 && actualNotAllowed == 0)
-            ? baseSummary.status
-            : "construction_subset_blocked"
+        let hasSubsetFailure = subsetRuns.contains { $0.subsetFailureClass != .none }
+        let status = hasSubsetFailure
+            ? "construction_subset_blocked"
+            : baseSummary.status
         return C6SubsetSummary(status: status, baseSummary: baseSummary, subsetFailureStats: stats)
     }
 }
@@ -212,25 +253,69 @@ public enum C6SubsetGateClassifier {
         expectedToolCalls: [C6ToolCall],
         actualToolCalls: [C6ToolCall],
         mountedToolIDs: Set<String>,
-        allowedToolIDs: Set<String>
+        allowedToolIDs: Set<String>,
+        expectedUnsupportedClass: C6ExpectedUnsupportedClass? = nil,
+        actualUnsupportedClass: C6ExpectedUnsupportedClass? = nil,
+        behaviorClass: VehicleToolBehaviorClass? = nil,
+        baseModelHardFailed: Bool = false
     ) -> C6SubsetGateAccounting {
         let expectedIDs = Set(expectedToolCalls.map(\.name))
-        if !expectedIDs.subtracting(mountedToolIDs).isEmpty {
-            return C6SubsetGateAccounting(
-                subsetFailureClass: .missingExpectedInMounted,
-                isModelFailure: false
-            )
-        }
-
         let actualIDs = Set(actualToolCalls.map(\.name))
-        if !actualIDs.subtracting(allowedToolIDs).isEmpty {
+        let missingExpectedInMounted = !expectedIDs.subtracting(mountedToolIDs).isEmpty
+        let actualNotInAllowed = !actualIDs.subtracting(allowedToolIDs).isEmpty
+        let derivedUnsupportedClass = deriveUnsupportedClass(
+            expectedIDs: expectedIDs,
+            mountedToolIDs: mountedToolIDs,
+            actualUnsupportedClass: actualUnsupportedClass,
+            behaviorClass: behaviorClass
+        )
+
+        let subsetFailureClass: C6SubsetFailureClass
+        if let expectedUnsupportedClass {
+            if expectedUnsupportedClass != derivedUnsupportedClass {
+                subsetFailureClass = .unsupportedClassMismatch
+            } else if actualNotInAllowed {
+                subsetFailureClass = .actualNotInAllowed
+            } else {
+                subsetFailureClass = .none
+            }
+        } else if missingExpectedInMounted {
+            subsetFailureClass = .missingExpectedInMounted
+        } else if actualNotInAllowed {
+            subsetFailureClass = .actualNotInAllowed
+        } else {
+            subsetFailureClass = .none
+        }
+
+        if subsetFailureClass == .missingExpectedInMounted {
             return C6SubsetGateAccounting(
-                subsetFailureClass: .actualNotInAllowed,
+                subsetFailureClass: subsetFailureClass,
                 isModelFailure: false
             )
         }
 
-        return C6SubsetGateAccounting(subsetFailureClass: .none, isModelFailure: false)
+        return C6SubsetGateAccounting(
+            subsetFailureClass: subsetFailureClass,
+            isModelFailure: baseModelHardFailed || actualNotInAllowed
+        )
+    }
+
+    private static func deriveUnsupportedClass(
+        expectedIDs: Set<String>,
+        mountedToolIDs: Set<String>,
+        actualUnsupportedClass: C6ExpectedUnsupportedClass?,
+        behaviorClass: VehicleToolBehaviorClass?
+    ) -> C6ExpectedUnsupportedClass? {
+        if !expectedIDs.subtracting(mountedToolIDs).isEmpty {
+            return .groupOutOfMount
+        }
+        if let actualUnsupportedClass {
+            return actualUnsupportedClass
+        }
+        if behaviorClass == .refusalNoAvailableTool {
+            return .mvpUnsupported
+        }
+        return nil
     }
 }
 
