@@ -256,3 +256,9 @@
 - **授权范围**: 仅 `tiny-ablation-run-plan-adjudication-A.md` 全文（tiny-only：40 正例样本/rank16Mainline 渲染原样/34-case tool_call 探针/门=代码常量 empty<5/34）。**成功不自动开 wave-1；失败进 Dim10 branch 不改阈值不扩样本；重跑要新授权**。scoped waiver：sibling 噪声仅豁免本轮前置。
 - **执行链**: Step 0 harness 解锁小 PR（%45：`.real` 分支绑签字文档引用+测试→CI→审→merge）→ Step 1-4 真跑（worker 执行+每步 receipt 回 %42+commander 亲核）→ verdict 上抛磊哥。
 - **落点**: 签字区已录（B.3 signed_run_authorized/40）+ 本 D-024 + run 产物 `runs/tiny-ablation-adjudication-A/`
+
+## D-025 常设授权：run-blocking 机械 bug commander 直拍直修不上抛（磊哥「别老停下来」）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Standing-authorization ｜ **Owners**: 磊哥「能不能不要设置这么多阻塞点 顺畅跑起来 指挥官别老停下来」
+- **规则**: 已授权 run 期间遇 **机械性 blocker**（代码 bug/环境/工具链——不碰阈值/样本量/配方参数/scope 边界四红线）→ **commander 直接授权修复 + 固化测试 + 继续跑**，事后 receipt 汇报；四红线才上抛磊哥。BLOCKED 上抛从「默认动作」改为「仅四红线」。
+- **首例**: tiny-ablation Step2 exit 66——`'TokenizerWrapper' object is not callable`（mlx-lm `load()` 返回 wrapper 不可直调；gate2 修复期 self-test 合成 logits/Swift 测试 dummy model 均不触 tokenizer 真调用路径，第一次真跑才现形 = re-audit 残留 P1 预言的正确性残留，fail-closed 正确拦下）。修法=`getattr(tokenizer, "_tokenizer", tokenizer)` 兼容 + 单测。机械修复，非配方/阈值/scope 改动。
+- **落点**: 本 D-025 + 宪法 §8 补条 + run receipt
