@@ -154,3 +154,28 @@
 - **CLEAR（audit 确认）**: gate8（562 独立复算 + value-form 真 + E-2 真发现）/ grill Dim5/10/11（11 arxiv 全真 + BFCL 诚实 TODO）/ R7 无越界。
 - **落点**: `AUDIT-adversarial.md` + `landing-matrix.md §3` gate2 改 P0 + 本 D-014 + swarm-runs banner + task #5
 - 🟢 **UPDATE（异源 re-audit CONFIRMED，`AUDIT-fix-reaudit.md`）**：%45 gate2 P0 fix（commit `47ca8cda`）→ 异源对抗审计员复验 = **T-FIX-CONFIRMED / 0 P0（原 P0 已消解）**：训练在 `--require-maformac-loss-mask` 下真走 `maformac_masked_loss`+`maformac_iterate_batches`（非 stock default_loss，`--mask-prompt` 已删），token-level -100 真进 cross-entropy；char→token offset_mapping overlap 真做；循环失守转真 loss 数学门（commander+re-audit 双自跑 self-test `masked=0.00067 vs unmasked=2.667`）；「未真消费的层=无」。残留 P1 = 真 Qwen/MLX batch dump（R7-gated，fail-closed 不会静默退化成无 mask = 正确性残留非 enforce 残留，receipt 诚实标）+ P2（vestigial offset artifact 待 R7 清理）。**disaster-core fix 走完 D-014「≥1 异源审」闭环。task #5 循环验证 done。**
+
+## D-015 新指挥官接棒复审（fresh-context 异源，wave-1 全交付独立复现 CONFIRMED）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Handover-audit ｜ **Owners**: 磊哥「新指挥官亲自审计上任交付」/ 新 commander 亲核（不派 subagent，本体 fresh-context = 异源视角）
+- **Method（下钻消费/行为层，claim-vs-reality 第12变体纪律）**: git 一手（3 worktree SHA 全对上 `64c6f62f`/`47ca8cda`/`f9e67901`）+ 读消费层代码 + **亲跑** self-test/swift test + python 独立复算 + arxiv 外核抽 2。
+- **Verdict（逐件）**:
+  - **gate2 masking fix = T-FIX-CONFIRMED 独立复现**：训练/eval 真走 `maformac_masked_loss`+`maformac_iterate_batches`（`c5_mlx_train_loop.py:498-499/:512-516`）；loss 数学真 token-level（`mask=labels!=-100` → `ce*mask`）；**亲跑 self-test 数字精确复现** `masked=0.00067 vs unmasked=2.667, ntoks=2`；`--mask-prompt` 已清（仅注释+负断言）；char→token offset_mapping 全链 fail-closed（offsets 缺→raise / 子序列定位失败→raise / 旧 char-indexed `labels` 字段**显式禁止** `char_indexed_loss_mask_labels_forbidden` / trainable=0→exit66）；think span 后应用=think 恒胜；Swift `main.swift:186` 恒渲染 flag + 测试 `:960` 锁；swift test **45/0 亲跑绿**。残留 P1（真 Qwen batch dump R7-gated）定性诚实=正确性残留非 enforce 残留。
+  - **gate8 = CLEAR 独立复现**：562 三路复算一致（catalog len=562 / unique names=562 / 10 族分布加总 ac68+light113+screen75+door48+fragrance16+seat126+volume32+wiper27+window27+sunroof30=562）；value-form 具名真（`adjust_ac_temperature_to_max/_min/_exp/_no_value`）；anti-fake-green 测试真存在且 22/0 亲跑绿；**E-2 我复算更强**：full serialized 413k chars≈103-138k tokens（>声称 74-99k，口径差=序列化方式），「562 工具面超 Qwen3-1.7B context→10 族 subset 技术必需」结论只会更成立。
+  - **grill 补深 = CLEAR**：计数精确（A-134~150=17 / F-055~075=21 / F-076~095=20）；BFCL 诚实 `TODO-no-arxiv-found` 带理由；arxiv 外核抽 2/2 真（`2503.22673`=ActionStudio / `2409.03215`=xLAM，题目相关）；frontmatter 诚实 `proposed 待磊哥 lock`。
+  - **R7 = kept**：三 worktree 物理扫描零权重/adapter/生成语料产物；self-test 纯合成 logits 在 model load 前 early-return。
+  - **流程诚信**：两份审计档原文（S-NO-SHIP→T-FIX-CONFIRMED）与 decisions.md/handoff 转述一致无美化；D-013 被 D-014 supersede 的处理规范。
+- **新观察（非 blocker，2 条）**: ① **P2-弱化建议**：py 训练循环 mask 接线是三元条件（flag 缺省→静默走 stock `default_loss` 且此时零 mask，因 `--mask-prompt` 已删）；当前 enforce 依赖「Swift 渲染命令是唯一入口」+ 测试锁，成立但手拼命令场景脆弱——建议 R7 解锁改码窗口时加「数据含 loss_mask 而 flag 缺失→fail」反向门。② E-2 数字口径（297k vs 413k chars）建议 subset 决策时按我的保守口径（更大）估预算。
+- **Consequences**: 上任交付定性=诚实且高质量，5 件磊哥-gated 待决照旧（①masking design 岔口 ⭐override ②E-2 subset ③grill 维度10/11/5 lock ④T-2 tiny ablation run-auth ⑤wave-1 consolidation-to-main）。新 commander 接管指挥权。
+- **落点**: 本 D-015（审计过程全 inline，无独立报告文件）
+
+## D-016 基线路线图双文档落盘（树/合并路线 + LoRA 闭环鸟瞰）+ CURRENT 路由牌刷新
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Baseline-docs ｜ **Owners**: 磊哥「写此时此刻 baseline 路线图（若干份）」/ commander 编排 3 worker + 亲写
+- **Context**: 磊哥认可 gate2 design + 采纳外部审计口径（P1 real-model batch dump / P2 反向 guard[=D-015 观察①两审计独立撞出] / wave-1 PASS·true-run HOLD·consolidation staged-PR），命题：全树状态+合并节点+PR 节点+现状 verdict+3 worker 目录+文档级联+到 LoRA 训练结束的闭环鸟瞰+巨人肩膀（含 HF skills 截图 teardown）。
+- **执行**: 任务索引 #1-#7 → 3 worker 并行（%44 L1 全树盘点 read-only / %45 L2 hf-skills 验活+增量 fetch+teardown / %43 L3 训练闭环素材 8 块带 file:line）+ commander 亲核（gitnexus 发现论文 repo 已 vendor 在 `Tools/paper-to-skill-gate/`；重读 landing-matrix §3 + R7 signoff + SYNTHESIS-LORA §三）。收稿 catch：L3 §1 gate 态引 grill 树旧 landing-matrix 快照 = stale，综合时以主树 §3 reconcile 修正（claim-vs-reality 活例）。
+- **产出（3 份基线 + 1 手档）**:
+  - ⭐ `docs/baseline-roadmap-2026-07-02-pre-lora.md`：16 树矩阵（活跃 keep 6 / cleanup-safe 候选清单）+ 节点 M1(consolidation staged PR-α g2/β g8/γ 文档整编支[亲核 main 上 grill 语料仅 1/28 件])→M2(清理)→M3(D25)→M4(UIUE) + verdict **HOLD** + 3 worker 派工规则 + 文档级联指针表。🔴 关键防回退：g5/g6/g7 直合会删 main 新文件（L1 cherry+diff 坐实），绝不直合。
+  - ⭐ `docs/lora-loop-blueprint-2026-07-02.md`：8 gate+2 裁决真实态表 + 闭环总图（生成→门→裁决A→训→行为中门→C6 四层→candidate 裁决，✍️ 标磊哥授权点）+ run receipt 契约（借 hf-skills 六段拓扑本地化，drop hf_jobs/Hub/CUDA）+ 节点序 A-H + 巨人肩膀矩阵（树内 vendor Hammer/xLAM/When2Call/SemDeDup + raw home-llm 权重最高 + hf-skills ⭐10753 借形不借 runtime）。
+  - `docs/CURRENT.md` 全量重写（前版 D25 K1 时代 stale，supersede 说明保留）。
+  - 一手档：`runs/2026-07-02-baseline-roadmap/`（3 SPEC + L1/L2/L3 + DONE×3）。
+- **Consequences**: 现状 HOLD 直到磊哥 5 件决策；R7 route-only **2026-07-15 到期**入 5 件附注；gate7 pipeline 代码闭环 = 剩余最大 R7-safe construction（节点 C，M1 后可立项派 worker）；两基线文档随 M1-γ 进 main。
+- **落点**: 本 D-016 + 上述 3 文档 + task #1-#7 全 completed
