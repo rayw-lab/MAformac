@@ -139,9 +139,10 @@ struct C5TrainingCLI {
         let trainRecords = prepared.samples.filter { sample in
             sample.split == "train" && (sample.trainEligible || options.maskingStage == .smokeOnly)
         }
+        let devSelectionRecords = prepared.samples.filter { $0.split == "dev_selection" }
         try writeJSONL(trainRecords.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("train.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.prefix(128).map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
+        try writeJSONL(devSelectionRecords.map(\.supervisedEvaluationMLXRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
+        try writeJSONL(devSelectionRecords.prefix(128).map(\.supervisedEvaluationMLXRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
         let prettyEncoder = JSONEncoder()
         prettyEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         try prettyEncoder.encode(prepared.receipt).write(to: outputDir.appendingPathComponent("c5-training-receipt.json"))
