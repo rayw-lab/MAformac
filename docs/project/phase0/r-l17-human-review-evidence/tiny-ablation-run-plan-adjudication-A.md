@@ -80,3 +80,17 @@ swift run C5TrainingCLI prepare \
 1. **Step 1 命令的 `--masking-stage` 改为 `trainable_v0`**（main 已实装态）。训练循环层 token-level loss-mask 真消费不受影响（`--require-maformac-loss-mask` 恒渲染 + py preflight exit-66 兜底）。🔴 **「masking_complete_v1 argument_value 增广实装」= wave-1 硬前置缺口**，记入 landing-matrix gate2 行，不丢账。
 2. **Step 1 绿门（v3 权威）**：positive=40 + builder 自动 no-call 负例（4 条，保留——负例防全正例训崩）= **总 44 行**（落 harness 20-50 窗）、全行 loss_mask_present、`train_eligible={True:44}`、DataGate `data_gate_ready`、`mlx-data/train.jsonl` + `mlx-train-command.txt` 存在。
 3. **Step 4**：harness `sampleCount=44`。其余一切不变（40 正例语义/demo/d_domain/dev-selection 0/渲染原样/34-case 探针/门 <5/失败纪律/verdict receipt 诚实标「无 argument_value 增广」）。
+
+## §6 Addendum v4（磊哥 2026-07-02「按 v4」，NONFINITE 根因修复，授权/不授权全列）
+
+> 定性（磊哥接受）：非梯度爆炸——1024 截断把长记录的全部 trainable token（assistant 尾部）截没 → 整批 ntoks=0 → loss 除零 NaN。metrics 自动建议的 5e-5 fallback **不采纳**。
+
+**授权仅限四条**：
+1. 机械修：`maformac_masked_cross_entropy_from_logits` 对 ntoks==0 显式 fail-closed（报清「batch 无 trainable token」，不再 NaN）。
+2. Step1/训前加长度门：每条训练样本 token length ≤ max_seq_length，否则停。
+3. 渲染 `max_seq_length` 1024 → **8192**（对齐 E-2 运行时 8K 预算，训练面≡运行面）。
+4. 继续 v4 run：样本仍 40 positive + 4 no-call，Step4 sampleCount=44，34-case empty 门仍 **<5**。
+
+**不授权（红线原样）**：不降 LR / 不改 rank/scale/clip/iters / 不扩样本 / 不改阈值 / 不开 wave-1 / tiny 结果不得写成 formal train、C6 acceptance、candidate。
+
+🔴 **证据纪律（磊哥点名）**：receipt 长度证据必须**实测 token 计数**（当前日志 longest=1236；commander 早先「~4,000+」系 chars 换算推测，作废勿引）。
