@@ -351,3 +351,13 @@
 - parse_error 下钻定性收讫（%44）：4 case 全 malformed 截断且 v6 同 case 本就 repeated-tail 不稳——EOS 把「重复」压成「早停截断」，同源非净退化。
 - 三 worker 收工待命（pane 存活）。通宵账：**D-028~039 十二格决策、3 次训练（v6/v6.1）、2 轮 paired probe、4500 全量数据门、GF 137 决策（121+16）、grill 文件 5 份、iceberg 第四轮、PR×3 双审 APPROVE、drift 27 回写、lessons M.8-10、宪法/MEMORY 刷新**。
 - 等磊哥晨拍 0-5 项见晨报（billing/merge×3/wave-1 7 拍/GF lock/F-044 阈值）。
+
+## D-040（2026-07-03 晨）外审收窄吸收 + 新 goal N0-N4（Accepted，磊哥 /goal 纯自动授权；新任 commander 接管首格）
+- 磊哥转达外审对通宵收官账 4 点收窄，新任 commander 全部 live 亲核成立并落账（CURRENT/MEMORY/晨报 banner/lessons M.11 级联同步）：
+  1. **v6/v6.1 结论窄化**：A 15/15 保留（verdict:46）；v6.1 EOS 重复 68/68→1/68 真进展，但同帐 C 4/4→2/4、D 8/34→5/34、+4 parse_error（verdict:48-50）→ 表述=「EOS 改善重复病理，tiny 稀疏下 parse/早停/泛化退化残留」，禁「输出稳定」。
+  2. **PR 状态重写**：gh 亲核（2026-07-03 06:5x）#26-29 全 OPEN、latestReviews=0、verify FAILURE×2；head：#26=`e6a8849f`（旧 APPROVE 绑 `3b081823` 失效）/#27=`a400b01a`/#28=`49fa0b9b`/#29=`5c68f945`。纪律：本地 worker review≠GitHub review；billing 只解释失败原因，FAILURE 不写绿/不写 merge-ready；review artifact 必绑 head SHA，head 变即失效。
+  3. **P5W**：外审所指 dirty 现场已被 %45 收编（PR #29 worktree clean，live git 核）；残留=一轮绑 head 交叉审。
+  4. **wave-1 口径**：substrate built（4500 行）+ C5DataGate local pass 可说；builder receipt blocked + loss-mask preflight strict exit66（294 长行>8192 / valid-test under-supervised / 云生成+cross-vendor judge 未跑，verdict:55）→ **NOT train-ready**。
+- 训练风险收窄进配方锚：B 11/15 未达 draft 14/15（终值待 lock，verdict:29）；D 18/34→8/34→5/34 = LoRA 窄化/覆盖不足/安全语义退化；query→actuation（只读变控制）安全级零容忍。
+- 本地新发现：本分支落后远端同名分支 7 commits（`b24dafcd`…`02f0722f`，D22-D24 旧档），`rev-list origin/main..远端`=0（已全在 main）→ N1 推**新分支名**收编，不 force 不动 stale 远端。
+- **新 goal 路线（磊哥 /goal）**：N0 落账收窄→N1 docs 分支收编→N2 PR head 重审 wave（%43 #26增量+#29 / %44 #27#28；作者回避；≥1 实跑标 local verify 非 CI）→N3 GF rev3→N4 train-readiness 闭环验收（%45 E-2 降档挂载实装+preflight strict exit0+valid/test 监督契约；F-044 默认 14/15 标磊哥可异步 override）。人审仅 4 键：billing/云凭证/merge（攒一次性清单）/run-auth。worker 已 clear 重置=空白态，派单必 self-contained+L.5 四步送达+pre-mortem 联网/本地交叉验证 inline。

@@ -6,6 +6,8 @@ for: 磊哥醒来一页看全
 
 # 晨报 · 通宵 v6 链路（goal 兑现账）
 
+> 🔴 **SUPERSEDED NOTE（2026-07-03 晨，D-040 外审收窄）**：本晨报「PR 双审 APPROVE 待 merge」「数据门全量兑现」等表述已被收窄——live 实况 PR #26-29 全 OPEN/GitHub latestReviews=0/verify FAILURE、#26 head 已变 `e6a8849f` 需绑 head 重审；wave-1 NOT train-ready（preflight strict exit66）；v6.1 同帐 C 4/4→2/4、D 8/34→5/34、+4 parse_error。现行口径见 `docs/CURRENT.md` 当前阶段 + `docs/commander-log/decisions.md` D-040。正文为历史快照，不改。
+
 ## 一句话
 **tiny-ablation v6 跑完并出 verdict：A 轴（协议记忆）adapter 15/15 满分——「A+ 契约修复是否解 v5 NO_TOOL」= YES**；B 轴 11/15 归因数据稀疏（非链路缺陷）；paired 配对（您六拍④）当晚兑现价值（D 轴 delta -10 暴露 tiny 过拟合窄化，无配对会误读）。wave-1 推进到「只差凭证」。
 

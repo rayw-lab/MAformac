@@ -234,3 +234,6 @@ commander 用「另一渲染的长度」推 teacher-forcing span 起点得 14/18
 
 ### M.10 paired base 配对的信息增益实证（磊哥六拍④当晚兑现）
 v6 无配对时 B 11/15 会被读「学到 73%」；配对暴露 B delta=-1、D delta=-10（tiny 过拟合窄化）+ base 带挂载 zero-shot 真值（B 12/15、D 18/34）。单臂数字永远缺参照系——ablation 的字面义就是配对对照。
+
+### M.11 收官账表述过宽被外审逐条打回：完成度措辞五问（2026-07-03，D-040）
+通宵收官账四处过宽被磊哥转达的外审收窄：①「双审 APPROVE 可一键 merge」——本地 worker review ≠ GitHub review（live latestReviews=0），且旧 review 绑的 head（`3b081823`）被后续 hotfix push（`e6a8849f`）作废=**review artifact 必绑 head SHA，head 变即失效**；②「CI 待 billing 重跑即绿」——FAILURE check 不得预支为绿，billing 只是归因；③「数据门全量兑现」——DataGate local pass ≠ train-ready（preflight strict exit66 同帐在案）；④ v6.1「重复被压住」滑成「输出稳定」——C 4/4→2/4、D 8/34→5/34、+4 parse_error 是同帐并存事实，**改善与残留必须同句陈述**。根因=completion-claim-triage（计划态/执行态）在【收官汇报】场景复发：收官叙事的「可一键/已兑现」措辞天然向宽滑，且写晨报时无 Stop-hook 类机械门拦（cite-verify 只核数字有源，不核完成度语义）。修法=收官账每个完成度断言过**五问**：绑的哪个 head？哪个系统的 verdict（本地/GitHub）？门实际 exit code？改善项的同帐退化项列了吗？「可 X」是现在真可还是前置齐后才可？
