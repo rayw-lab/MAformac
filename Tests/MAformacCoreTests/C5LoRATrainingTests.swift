@@ -1197,10 +1197,14 @@ final class C5LoRATrainingTests: XCTestCase {
         )
     }
 
-    private func writeSubsetManifest(toolIDsOrdered: [String], to url: URL) throws {
+    private func writeSubsetManifest(
+        toolIDsOrdered: [String],
+        policyID: String = "e2-lite-v1",
+        to url: URL
+    ) throws {
         let encodedToolIDs = toolIDsOrdered.map { "\"\($0)\"" }.joined(separator: ",")
         let text = """
-        {"entries":[{"subset_policy_id":"test-policy","group_id":"test-group","mount_mode":"single_group","tool_ids_ordered":[\(encodedToolIDs)],"distractor_policy":{"strategy":"same_sg_then_same_domain_then_other","k":3}}]}
+        {"entries":[{"subset_policy_id":"\(policyID)","group_id":"test-group","mount_mode":"single_group","tool_ids_ordered":[\(encodedToolIDs)],"distractor_policy":{"strategy":"same_sg_then_same_domain_then_other","k":3}}]}
         """
         try text.write(to: url, atomically: true, encoding: .utf8)
     }
@@ -1334,6 +1338,23 @@ final class C5LoRATrainingTests: XCTestCase {
         )
         XCTAssertTrue(prepared.samples.isEmpty, "target not in any manifest single_group must fail closed")
         XCTAssertTrue(prepared.receipt.failureReceipt.contains("subset_manifest_target_missing"))
+    }
+
+    func testDDomainSubsetManifestWrongPolicyProbe() throws {
+        let catalog = try loadDemoCatalog()
+        let tempDir = try makeTemporaryDirectory()
+        let manifestURL = tempDir.appendingPathComponent("subset-policy-manifest.json")
+        let text = """
+        {"entries":[{"subset_policy_id":"e2-lite-v1","group_id":"test-good","mount_mode":"single_group","tool_ids_ordered":["open_ac","close_ac"],"distractor_policy":{"strategy":"same_sg_then_same_domain_then_other","k":3}},{"subset_policy_id":"wrong-policy","group_id":"test-wrong","mount_mode":"single_group","tool_ids_ordered":["close_ac"],"distractor_policy":{"strategy":"same_sg_then_same_domain_then_other","k":3}}]}
+        """
+        try text.write(to: manifestURL, atomically: true, encoding: .utf8)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")],
+            c6Cases: [], dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog, subsetPolicyManifestPath: manifestURL.path)
+        )
+        XCTAssertTrue(prepared.samples.isEmpty, "any wrong subset_policy_id must fail closed before mounting tools")
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("subset_policy_mismatch"))
     }
 
     // cut1: 值形态工具 emit value arg; device/action_primitive 不 emit(编码进名); arg 键 ∈ schema(additionalProperties:false)
