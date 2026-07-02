@@ -665,6 +665,10 @@ def locate_subsequence(haystack: list[int], needle: list[int]) -> int | None:
     return None
 
 
+def tokenizer_for_offsets(tokenizer):
+    return getattr(tokenizer, "_tokenizer", tokenizer)
+
+
 def assistant_tokenization(record: dict[str, Any], tokenizer) -> tuple[list[int], list[int], list[tuple[int, int]], int]:
     messages = record["messages"]
     tools = record.get("tools")
@@ -677,7 +681,8 @@ def assistant_tokenization(record: dict[str, Any], tokenizer) -> tuple[list[int]
         add_generation_prompt=add_generation_prompt,
         return_dict=False,
     )
-    encoded = tokenizer(
+    hf_tokenizer = tokenizer_for_offsets(tokenizer)
+    encoded = hf_tokenizer(
         assistant,
         add_special_tokens=False,
         return_offsets_mapping=True,
