@@ -304,6 +304,8 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(noCalls.allSatisfy { $0.split == "train" })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.targetToolPresent == false })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.counterfactualPairID.isEmpty == false })
+        XCTAssertTrue(noCalls.allSatisfy { !$0.tools.isEmpty })
+        XCTAssertTrue(noCalls.allSatisfy { $0.mountedToolCount == $0.tools.count })
     }
 
     func testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors() {
@@ -441,6 +443,85 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(actionSamples.allSatisfy { $0.candidateParentSemanticID != $0.seedParentSemanticID })
         XCTAssertFalse(actionSamples.contains { ($0.messages.first { $0.role == "user" }?.content ?? "").contains("device=") })
         XCTAssertFalse(actionSamples.contains { ($0.messages.first { $0.role == "user" }?.content ?? "").contains("primitive=") })
+    }
+
+    func testNaturalToolCallRowsOverrideUserOnlyWhenCanonicalTargetMatches() {
+        let seed = semanticSeed(id: "row-natural", fuzzy: true, free: false)
+        let canonical = C5TrainingDatasetBuilder().build(
+            seeds: [seed],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, surface: .frame)
+        ).samples[0]
+        let target = canonical.assistantPayload.trimmingCharacters(in: .whitespacesAndNewlines)
+        let natural = C5NaturalToolCallRecord(
+            contractRowID: "row-natural",
+            variant: 0,
+            user: "帮我开一下空调",
+            target: target,
+            generatorModelID: "hermes_glm",
+            generatorSourceVendor: "volcengine",
+            generatorCallID: "call-natural-1",
+            semanticJudgeModelID: "gptpro",
+            semanticJudgeCallID: "judge-natural-1",
+            promptHash: "prompt-natural"
+        )
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 1,
+                devSelectionRows: 0,
+                maxVariantsPerSeed: 1,
+                naturalToolCallRecords: [natural],
+                surface: .frame
+            )
+        )
+        let sample = prepared.samples[0]
+
+        XCTAssertEqual(sample.messages.first { $0.role == "user" }?.content, "帮我开一下空调")
+        XCTAssertEqual(sample.assistantPayload.trimmingCharacters(in: .whitespacesAndNewlines), target)
+        XCTAssertEqual(sample.generatorModelID, "hermes_glm")
+        XCTAssertEqual(sample.semanticJudgeModelID, "gptpro")
+        XCTAssertEqual(sample.lossObjectiveProfile, .assistantFullExceptThink)
+        XCTAssertEqual(sample.expectedToolCalls, canonical.expectedToolCalls)
+    }
+
+    func testNaturalToolCallRowsRejectWrongCanonicalArgumentValue() {
+        let fixture = canonicalNaturalToolCallFixture()
+        var arguments = fixture.call.arguments
+        arguments["value.offset"] = .string("OFF")
+        assertNaturalToolCallTargetMismatch(target: C5TrainingRenderer.renderToolCall(C5TrainingToolCall(name: fixture.call.name, arguments: arguments)))
+    }
+
+    func testNaturalToolCallRowsRejectMissingCanonicalArgumentKey() {
+        let fixture = canonicalNaturalToolCallFixture()
+        var arguments = fixture.call.arguments
+        arguments.removeValue(forKey: "value.offset")
+        assertNaturalToolCallTargetMismatch(target: C5TrainingRenderer.renderToolCall(C5TrainingToolCall(name: fixture.call.name, arguments: arguments)))
+    }
+
+    func testNaturalToolCallRowsRejectExtraCanonicalArgumentKey() {
+        let fixture = canonicalNaturalToolCallFixture()
+        var arguments = fixture.call.arguments
+        arguments["unexpected"] = .string("bypass")
+        assertNaturalToolCallTargetMismatch(target: C5TrainingRenderer.renderToolCall(C5TrainingToolCall(name: fixture.call.name, arguments: arguments)))
+    }
+
+    func testReceiptIncludesMachineReadableFitProofFrontmatter() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "fit-proof-row", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
+        )
+
+        XCTAssertEqual(prepared.receipt.fitProofLevel, "mechanism_true")
+        XCTAssertEqual(prepared.receipt.consumer, "Tools/C5TrainingCLI/c5_mlx_train_loop.py --require-maformac-loss-mask")
+        XCTAssertTrue(prepared.receipt.consumedArtifact.contains("loss_objective_profile"))
+        XCTAssertTrue(prepared.receipt.sufficiencyEvidence.contains("--allow-legacy-loss-objective"))
+        XCTAssertTrue(prepared.receipt.residualGap.contains("does not claim live training"))
     }
 
     func testFormalTrainingBlocksUnverifiedTrainingLoopSource() {
@@ -902,7 +983,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(config.keys == ["self_attn.q_proj", "self_attn.v_proj"])
     }
 
-    func testMLXRecordLossMaskEnforcesFunctionArgNameAndArgValueSpans() throws {
+    func testTrainsFullAssistantToolCallPayload() throws {
         let prepared = C5TrainingDatasetBuilder().build(
             seeds: [
                 semanticSeed(id: "loss-mask-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾")
@@ -919,10 +1000,17 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(record.lossMask.ignoreIndex, -100)
         XCTAssertEqual(record.lossMask.tokenLabelSource, "runtime_tokenizer_offsets")
         XCTAssertEqual(record.lossMask.enforcement, "token_labels_enforced_after_tokenization_with_think_mask")
-        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
-        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "argument_name" && $0.text == "position" })
-        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "argument_value" && $0.text == "主驾" })
+        XCTAssertEqual(record.lossMask.trainableAssistantEndToken, "<|im_end|>")
+        XCTAssertEqual(record.lossObjectiveProfile, .assistantFullExceptThink)
+        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.kind == "assistant_non_think_payload" && $0.text.contains("<tool_call>") })
+        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.text.contains("\"name\"") && $0.text.contains("\"arguments\"") })
+        XCTAssertTrue(record.lossMask.trainableSpans.contains { $0.text.contains("\"position\":\"主驾\"") })
+        XCTAssertEqual(prepared.receipt.supervisionCoverageDigest.status, "pass")
+        XCTAssertGreaterThanOrEqual(prepared.receipt.supervisionCoverageDigest.trainableNonThinkRatio, 0.90)
+        XCTAssertTrue(json.contains("\"loss_objective_profile\":\"assistant_full_except_think\""))
+        XCTAssertTrue(json.contains("\"augmentation_profile\""))
         XCTAssertTrue(json.contains("\"token_label_source\":\"runtime_tokenizer_offsets\""))
+        XCTAssertTrue(json.contains("\"trainable_assistant_end_token\":\"<|im_end|>\""))
         XCTAssertFalse(json.contains("\"labels\""))
     }
 
@@ -943,8 +1031,75 @@ final class C5LoRATrainingTests: XCTestCase {
 
         let supervised = sample.supervisedEvaluationMLXRecord.lossMask
         XCTAssertEqual(supervised.enforcement, "token_labels_enforced_after_tokenization_with_think_mask")
-        XCTAssertTrue(supervised.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
+        let expectedToolName = try XCTUnwrap(sample.expectedToolCalls.first?.name)
+        XCTAssertTrue(supervised.trainableSpans.contains { $0.text.contains(expectedToolName) })
         XCTAssertFalse(supervised.trainableSpans.isEmpty)
+    }
+
+    func testPromptAndUserRemainIgnored() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "prompt-ignore-row", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
+        )
+        let sample = prepared.samples[0]
+        let maskText = sample.lossMask.trainableSpans.map(\.text).joined(separator: "\n")
+
+        XCTAssertFalse(maskText.contains("MAformac 离线 mock"))
+        XCTAssertFalse(maskText.contains("device=ac"))
+        XCTAssertFalse(maskText.contains("请按这个语义执行"))
+        XCTAssertEqual(prepared.receipt.supervisionCoverageDigest.promptLeakageCount, 0)
+        XCTAssertEqual(prepared.receipt.supervisionCoverageDigest.userLeakageCount, 0)
+        XCTAssertEqual(prepared.receipt.supervisionCoverageDigest.systemLeakageCount, 0)
+    }
+
+    func testNoToolRowsFullNoToolOnly() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: (0..<20).map { semanticSeed(id: "no-tool-\($0)", fuzzy: true, free: false) },
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 20, devSelectionRows: 0)
+        )
+        let noTool = prepared.samples.first { $0.expectedToolCalls.isEmpty }!
+        let maskText = noTool.lossMask.trainableSpans.map(\.text).joined(separator: "\n")
+
+        XCTAssertEqual(noTool.lossObjectiveProfile, .noToolFull)
+        XCTAssertEqual(maskText.trimmingCharacters(in: .whitespacesAndNewlines), "NO_TOOL")
+        XCTAssertFalse(maskText.contains("<tool_call>"))
+    }
+
+    func testAugmentationFlagsDoNotDefineLossObjective() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "aug-row", fuzzy: true, free: false, slotKeys: [], valueType: "")],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
+        )
+        let sample = prepared.samples[0]
+
+        XCTAssertEqual(sample.lossObjectiveProfile, .assistantFullExceptThink)
+        XCTAssertFalse(sample.augmentationProfile.argumentValue)
+        XCTAssertTrue(sample.lossMask.trainableSpans.contains { $0.text.contains("<tool_call>") })
+        XCTAssertTrue(sample.lossMask.trainableSpans.contains { $0.text.contains("\"arguments\"") })
+    }
+
+    func testCoverageFailsWhenWrapperUntrained() {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "coverage-fail-row", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0)
+        )
+        var sample = prepared.samples[0]
+        sample.lossObjectiveProfile = .diagnosticSpanOnly
+        let digest = C5SupervisionCoverageDigest.evaluate(samples: [sample])
+
+        XCTAssertEqual(digest.status, "fail")
+        XCTAssertEqual(digest.parserCriticalStatus, "fail")
+        XCTAssertEqual(digest.ratioStatus, "fail")
+        XCTAssertTrue(digest.parserCriticalFailures.contains { $0.contains("parser_critical_untrained:<tool_call>") })
+        XCTAssertTrue(digest.failureReceipt.contains { $0.contains("assistant_non_think_trainable_ratio_below") })
     }
 
     func testThinkSpanIsAlwaysIgnoredByLossMaskEvenWhenToolCallSpanTrains() {
@@ -964,7 +1119,7 @@ final class C5LoRATrainingTests: XCTestCase {
 
         XCTAssertEqual(mask.maskedThinkSpans.count, 1)
         XCTAssertTrue(mask.maskedThinkSpans.contains { $0.text.contains("内部推理不要训练") })
-        XCTAssertTrue(mask.trainableSpans.contains { $0.kind == "function_name" && $0.text == "tool_call_frame" })
+        XCTAssertTrue(mask.trainableSpans.contains { $0.kind == "assistant_non_think_payload" && $0.text.contains("<tool_call>") })
         XCTAssertFalse(mask.trainableSpans.contains { $0.text.contains("内部推理") })
     }
 
@@ -980,6 +1135,7 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(mask.enforcement, "all_masked_not_train_eligible")
         XCTAssertTrue(mask.trainableSpans.isEmpty)
         XCTAssertEqual(mask.tokenLabelSource, "runtime_tokenizer_offsets")
+        XCTAssertNil(mask.trainableAssistantEndToken)
     }
 
     func testRenderedTrainCommandRequiresMAformacLossMaskPreflight() throws {
@@ -996,8 +1152,14 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(loop.contains("def validate_preflight_argv"))
         XCTAssertTrue(loop.contains("validate_preflight_argv(argv_list)\n        args = parse_args(argv_list)"))
         XCTAssertTrue(loop.contains("def validate_preflight_flags"))
+        XCTAssertTrue(loop.contains("parser.add_argument(\"--preflight-loss-mask-only\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("parser.add_argument(\"--allow-legacy-loss-objective\", action=\"store_true\")"))
         XCTAssertTrue(loop.contains("def guard_stock_loader_rejects_loss_mask"))
         XCTAssertTrue(loop.contains("loss_mask_present_but_flag_missing"))
+        XCTAssertTrue(loop.contains("loss_objective_profile_missing"))
+        XCTAssertTrue(loop.contains("legacy_loss_objective_allowed"))
+        XCTAssertTrue(loop.contains("assistant_end_token_supervision_missing"))
+        XCTAssertTrue(loop.contains("assistant_end_token_supervised_records"))
         XCTAssertTrue(loop.contains("def load_maformac_loss_mask_datasets"))
         XCTAssertTrue(loop.contains("def build_maformac_token_labels"))
         XCTAssertTrue(loop.contains("def maformac_masked_loss"))
@@ -1034,6 +1196,96 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(result.stderr.contains("--preflight-only requires --require-maformac-loss-mask"), result.stderr + result.stdout)
         XCTAssertFalse(result.stderr.contains("ModuleNotFoundError"), result.stderr + result.stdout)
         XCTAssertFalse(result.stderr.contains("Loading pretrained model"), result.stderr + result.stdout)
+    }
+
+    func testPythonTrainingLoopRejectsMissingLossObjectiveWhenMaskRequired() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
+        guard FileManager.default.fileExists(atPath: baseModelDir.appendingPathComponent("tokenizer_config.json").path) else {
+            throw XCTSkip("missing local Qwen3 tokenizer fixture; source-free CI skips this local integration proof")
+        }
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for loss objective fixture")
+        }
+        let temporary = try makeTemporaryDirectory()
+        let modelDir = temporary.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
+        try createTrainingTokenizerPatch(sourceDir: baseModelDir, outputDir: modelDir)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "missing_objective_full_toolcall", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, usesTrainingTokenizerPatch: true)
+        )
+        let row = try mlxRecordJSONWithoutLossObjective(sample: prepared.samples[0]) + "\n"
+        try row.write(to: temporary.appendingPathComponent("train.jsonl"), atomically: true, encoding: .utf8)
+
+        let commonArguments = [
+            repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+            "--model", modelDir.path,
+            "--data", temporary.path,
+            "--require-maformac-loss-mask",
+            "--preflight-loss-mask-only",
+            "--train",
+            "--allow-mlx-lm-version-mismatch"
+        ]
+        let failure = runProcess(executable: pythonExecutable, arguments: commonArguments, cwd: repoRoot)
+        XCTAssertEqual(failure.status, 66, failure.stderr + failure.stdout)
+        XCTAssertTrue(failure.stderr.contains("LOSS_MASK_PREFLIGHT_FAILED"), failure.stderr + failure.stdout)
+        XCTAssertTrue(failure.stderr.contains("loss_objective_profile_missing"), failure.stderr + failure.stdout)
+
+        let legacy = runProcess(
+            executable: pythonExecutable,
+            arguments: commonArguments + ["--allow-legacy-loss-objective"],
+            cwd: repoRoot
+        )
+        XCTAssertEqual(legacy.status, 0, legacy.stderr + legacy.stdout)
+        XCTAssertTrue(legacy.stdout.contains(#""legacy_loss_objective_allowed": true"#), legacy.stderr + legacy.stdout)
+        XCTAssertTrue(legacy.stdout.contains(#""legacy_loss_objective_record_count": 1"#), legacy.stderr + legacy.stdout)
+    }
+
+    func testPythonTrainingLoopSupervisesAssistantEndTokenAndRejectsMissingContract() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let baseModelDir = URL(fileURLWithPath: "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e", isDirectory: true)
+        guard FileManager.default.fileExists(atPath: baseModelDir.appendingPathComponent("tokenizer_config.json").path) else {
+            throw XCTSkip("missing local Qwen3 tokenizer fixture; source-free CI skips this local integration proof")
+        }
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for assistant end-token fixture")
+        }
+        let temporary = try makeTemporaryDirectory()
+        let modelDir = temporary.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
+        try createTrainingTokenizerPatch(sourceDir: baseModelDir, outputDir: modelDir)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [semanticSeed(id: "assistant_end_token_contract", fuzzy: true, free: false)],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, usesTrainingTokenizerPatch: true)
+        )
+
+        let commonArguments = [
+            repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+            "--model", modelDir.path,
+            "--data", temporary.path,
+            "--require-maformac-loss-mask",
+            "--preflight-loss-mask-only",
+            "--train",
+            "--allow-mlx-lm-version-mismatch"
+        ]
+
+        let validRow = try String(decoding: JSONEncoder().encode(prepared.samples[0].mlxRecord), as: UTF8.self) + "\n"
+        try validRow.write(to: temporary.appendingPathComponent("train.jsonl"), atomically: true, encoding: .utf8)
+        let success = runProcess(executable: pythonExecutable, arguments: commonArguments, cwd: repoRoot)
+        XCTAssertEqual(success.status, 0, success.stderr + success.stdout)
+        XCTAssertTrue(success.stdout.contains(#""assistant_end_token_supervised_records": 1"#), success.stderr + success.stdout)
+
+        let invalidRow = try mlxRecordJSONWithoutAssistantEndToken(sample: prepared.samples[0]) + "\n"
+        try invalidRow.write(to: temporary.appendingPathComponent("train.jsonl"), atomically: true, encoding: .utf8)
+        let failure = runProcess(executable: pythonExecutable, arguments: commonArguments, cwd: repoRoot)
+        XCTAssertEqual(failure.status, 66, failure.stderr + failure.stdout)
+        XCTAssertTrue(failure.stderr.contains("LOSS_MASK_PREFLIGHT_FAILED"), failure.stderr + failure.stdout)
+        XCTAssertTrue(failure.stderr.contains("assistant_end_token_supervision_missing"), failure.stderr + failure.stdout)
     }
 
     func testPythonTrainingLoopRejectsLossMaskRowsWhenFlagMissing() throws {
@@ -1494,6 +1746,7 @@ final class C5LoRATrainingTests: XCTestCase {
         let removed = noCall?.noCall?.removedToolID ?? ""
         XCTAssertEqual(removed, "open_ac", "cut5: removedToolID=被移除的 D-domain 目标工具名(非硬编码 tool_call_frame)")
         let toolNames = (noCall?.tools ?? []).compactMap { functionName($0) }
+        XCTAssertFalse(toolNames.isEmpty, "DataGate formal surface: no-call counterfactual still carries mounted distractor tools")
         XCTAssertFalse(toolNames.contains(removed), "cut5 真删: 目标工具物理不在 tools(非只 metadata removedToolID 声称)")
         XCTAssertEqual(noCall?.noCall?.targetToolPresent, false, "活样本: targetToolPresent=false 与产物一致(claim-vs-reality 铁律1)")
     }
@@ -1657,6 +1910,75 @@ final class C5LoRATrainingTests: XCTestCase {
                 candidateParentSemanticID: "external_untrusted_\(C6Hash.sha256Hex(Data(sample.sampleID.utf8)).prefix(16))"
             )
         }
+    }
+
+    private func canonicalNaturalToolCallFixture() -> (seed: C5SemanticSeed, call: C5TrainingToolCall) {
+        let seed = semanticSeed(id: "row-natural", fuzzy: true, free: false)
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, surface: .frame)
+        )
+        return (seed, prepared.samples[0].expectedToolCalls[0])
+    }
+
+    private func assertNaturalToolCallTargetMismatch(target: String, file: StaticString = #filePath, line: UInt = #line) {
+        let seed = semanticSeed(id: "row-natural", fuzzy: true, free: false)
+        let natural = C5NaturalToolCallRecord(
+            contractRowID: "row-natural",
+            variant: 0,
+            user: "帮我开一下空调",
+            target: target,
+            generatorModelID: "hermes_glm",
+            generatorSourceVendor: "volcengine",
+            generatorCallID: "call-natural-bypass",
+            semanticJudgeModelID: "gptpro",
+            semanticJudgeCallID: "judge-natural-bypass",
+            promptHash: "prompt-natural"
+        )
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(
+                targetPositiveRows: 1,
+                devSelectionRows: 0,
+                maxVariantsPerSeed: 1,
+                naturalToolCallRecords: [natural],
+                surface: .frame
+            )
+        )
+
+        XCTAssertTrue(prepared.samples.isEmpty, file: file, line: line)
+        XCTAssertTrue(prepared.receipt.failureReceipt.contains("natural_tool_call_target_mismatch"), file: file, line: line)
+    }
+
+    private func mlxRecordJSONWithoutLossObjective(sample: C5TrainingSample) throws -> String {
+        let data = try JSONEncoder().encode(sample.mlxRecord)
+        guard var object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            XCTFail("encoded mlx record is not a JSON object")
+            return "{}"
+        }
+        object.removeValue(forKey: "loss_objective_profile")
+        let patched = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        return String(decoding: patched, as: UTF8.self)
+    }
+
+    private func mlxRecordJSONWithoutAssistantEndToken(sample: C5TrainingSample) throws -> String {
+        let data = try JSONEncoder().encode(sample.mlxRecord)
+        guard var object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            XCTFail("encoded mlx record is not a JSON object")
+            return "{}"
+        }
+        guard var lossMask = object["loss_mask"] as? [String: Any] else {
+            XCTFail("encoded mlx record is missing loss_mask")
+            return "{}"
+        }
+        lossMask.removeValue(forKey: "trainable_assistant_end_token")
+        object["loss_mask"] = lossMask
+        let patched = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        return String(decoding: patched, as: UTF8.self)
     }
 
     private func routeBalancedSeeds(prefix: String) -> [C5SemanticSeed] {

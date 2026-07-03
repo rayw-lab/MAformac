@@ -204,3 +204,36 @@
 2. **交叉审对抗 fixture 是破「作者+commander 双盲」的标配**。实证×2:①gate2 反向 guard 只扫 `("train","valid")` 漏 test.jsonl——commander 当天亲读过那行也没扣出,%43 构造 test.jsonl 对抗 fixture 实跑才现形(XAUDIT-alpha FAIL+P0→一行修复+行为测试→P0-RESOLVED);②E-2 design 包被 %44 抓「六轴写成五方丢 train target 轴」。规律:静态读码抓不到「枚举少一项」类缺口,**构造反例实跑**才抓得到;grill/design 产物上抛前必过一轮异源对抗审。
 3. **staged PR 序(α→β→γ)+每支独立 CI+审计 = 回滚点保全**。γ 文档整编支(40 件)用「新支 off main 复制 port」而非 rebase 旧支,语义审用 hash 对比(35 逐字节一致+3 whitespace-only+2 带溯源 frontmatter)半小时收口——比人肉读 40 件快且可复算。
 4. **worker 主动回报纪律(磊哥 2026-07-02 定)**:每任务完成打 `REPORT|任务|status|产出|SHA|残留` 行,长任务每 ~5min 打 `PROGRESS` 行,blocker 立即 `BLOCKED` 行,不静默——commander 轮询成本降一半,漏收稿风险消除。已发三 worker 常设。
+
+## L. 外审执行位教训(2026-07-02, G7 hermes 终审)
+
+1. 🔴 **hermes-rescue subagent = 假异源陷阱**:实测 spawn `--model sonnet`(Claude 家族)非真 hermes GLM——用它做"跨厂商审计"= 同家族自审冒充异源(正是 0/34 假异源 judge 同病)。跨厂商审计必走 worker 在 codex CLI 显性调 `~/.codex/skills/hermes-cli-glm52-code`。磊哥截图 catch。
+2. **commander 直跑外部 LLM CLI 不可靠**:hermes 直跑回 284 字节废稿(无人盯守/无质检/background stdout 截断风险)——外审执行位必须是能"盯全程+质检+重试"的 worker(%44 首单即自带 attempt 编号+jq 提取+字节数/verdict 质检,范式正确)。timeout 上限 20 分钟(磊哥定)。
+3. **hermes CLI 本体损坏的诊断路径**:SyntaxError→查 git status 发现是中断的 stash pop 冲突现场(5 UU 文件)→ `git reset --merge` 可逆中止(git 在 pop 冲突时不丢 stash,stash@{0} 18 文件原封)→ import 自检恢复。别上来就改冲突标记——先判断是不是别人的半截操作现场。
+4. 🔴 **交叉审的「验证声称」本身要抽核（审计的审计）**:XG7D 交叉审声称亲跑验证「manifest 缺失/目标不在 group/policy 失配」三态 fail-closed 给 PASS_WITH_NOTES,但 hermes 亲构 wrong-policy probe 实跑证明**第三态从未被拦**(loader `C5LoRATraining.swift:2861` 取首 entry policy 零校验)——交叉审的第三态验证是假的(可能只构造了前两态 fixture 就外推)。修法:① 审计员回执必逐态贴【实跑命令+输出】非清单式声称 ② commander 收审计稿抽核「声称验过的最关键一态」③ 真异源(跨厂商)终审对 ship-blocking 面必做——同 runtime(codex)交叉审会共享盲区。这是 claim-vs-reality 铁律2「审计实跑一手」在【审计员自身产出】上的递归应用。
+
+## M. tiny-ablation v5 高价值失败 + 三轮跨 LLM 辩证元认知(2026-07-02)
+
+1. 🔴 **consumer-anchored sufficiency（充分性轴）**:项目验证哲学成熟轴=真实性(claim-vs-reality,可机械化);本次暴露正交的**充分性轴**(做的=下游消费者要的吗)——必须锚定消费者契约才可测。gate2 dead-field(产物没人消费)与本次(监督没喂够消费者所需)=**同一生产者-消费者契约的两半断裂**。修法:产物 frontmatter 声明 consumers/sufficiency_evidence + landing 加 fit-proof 列 + 审计 SPEC 模板加 fit 维度 + readiness 四级词表(mechanism-true/fit-proven/experiment-valid/behavior-proven)。
+2. **归因收敛偏差(commander 亲身)**:首轮 teardown 找到第一个能解释现象的根因(探针重叠 0/34)就收敛,**同一批数据里的更深根因(训练 user=协议串)近在手边没看**——GPT-5.5 看同样数据多问一层抓到。修法=**归因 loop-until-dry**:每轮问「同一批证据还支持什么别的根因」直到连续一轮无新增,而非首个可解释根因即收。
+3. **纪律场景索引过窄(commander 亲身)**:「同 harness 分层」是我参与锁死的 c5-recovery 纪律,却没应用到 F-044 自身(28/34 历史锚跨 harness)——规则绑死原生场景(C6 评测)不触发同型新场景(任何 baseline-candidate 比较)。修法=项目级铁律出现【同型结构】时主动泛化匹配(配对比较→同 harness;派生物→查工厂;声称→查消费)。
+4. **证据第二信息层(commander 亲身)**:probe 的 `NO_TOOL×27` 亲眼看过,注意力全在主信息(输出了 NO_TOOL)漏了第二层(重复 27 次到 token 上限=decode 契约/stop token 缺失)。修法=关键证据扫两遍:「它回答主问题什么」+「它还暴露什么别的」。
+5. 🔴 **跨 LLM 开放归因强破框(对 codex-meta §31 的精细化)**:§31 说 cross-vendor≠cross-frame(核对性任务上换厂商仍共享 task frame)——但本次三轮辩证(Fable5→GPT-5.5→Fable5)每轮抓到上轮真漏(输入面/目的漂移 ↔ 重叠数据/基线断裂/decode 契约),因为**开放归因任务上不同 LLM 的先验框架决定「先看哪」**,frame 差异恰好成为资产。精细化判据:**核对性任务(字段对不对)跨厂商弱破框;开放性任务(为什么失败/还有什么)跨厂商强破框**——P0 级失败分析制度化走「双 LLM 独立写→交叉辩证→终版综合」(成本~1h)。
+6. **机械闯关元门**:v1-v5 五连机械修每次都对(D-025 快速通道无罪),但连续机械修≥3=「在给语义可疑之物铺路」的统计信号——若 v3 后做过一次 5 分钟 fit-spot,209 tokens 哨兵就会被扣住省两轮授权。修法=连续 3 次机械修→强制 fit-spot(「我在给什么铺路?它语义成立吗?」)。
+7. **哨兵数字行为学**:209 trainable tokens 在 preflight 里躺过全程、人机都读过、无人扣扳机——「数字可见≠数字有门」。修法=receipt 每个载力数字必有阈值门或显式 no_gate_by_design 标注。
+
+### L.5 tmux 消息静默丢失：send-keys 必 -l + 分离 Enter + capture 验证送达（磊哥 2026-07-02 纠）
+给 codex worker 发长消息用 `tmux send-keys -t %44 "长文本" Enter` 一条命令 → "not in a mode" exit 1 **静默失败**（后台跑更察觉不到），worker 空等 40min；磊哥另截图 catch「有时没按回车」（消息停输入框未提交）。修法四步硬 SOP：`-l` literal 发文本 → **单独一条命令发 Enter** → sleep → capture-pane 验证消息进对话流+状态 Working。worker 回写 %42 同病：轮询见 idle 但无 REPORT → capture 它 pane 看有无滞留回报，有则替它补 Enter。已进 swarm-commander 宪法 §9.x。
+🔴 补（2026-07-03 磊哥截图 catch）：**滞留判别法**——capture 里 `›` 开头多行文本≠必是滞留（codex TUI 对话流里已提交的用户消息也以 `›` 回显）；真滞留的特征=消息在输入框位置（`›` 行下方紧跟 token 计数状态行）且 worker 无对应回复。**commander 自己的输入框也会滞留**（`[Pasted text #2]` 粘贴占位悬挂——heredoc/粘贴溢出到自己 pane），收工前 capture 自己 pane 自查一次。
+
+### M.8 same-surface 是复合对象：维度分解表取代单数声称（2026-07-03 tools 挂载冰山）
+「同输入面/same harness」的单数名词掩盖 surface 的复合自由度（system/user 形态/think 块/**tools 挂载**/停止 token/decode 参数/tokenizer patch…）。v6 probe1 全 empty 即训练面带 E-2 挂载 737 token 而 probe 无挂载——契约语言每轮只验「已知维度」。修法=same-X 声称强制展开为 X 维度分解表（训练列 vs 评测列逐维打勾，新维度即追加）；生成数据的 surface 同表治理（G7 行级 tools/subset 字段贯通实装）。lineage：gate2 dead-field→v5 under-supervision→v6 tools-mount，同一 producer-consumer 冰山三层。
+
+### M.9 复算工具自身可注入假信号：span 测量纪律（GF-156）
+commander 用「另一渲染的长度」推 teacher-forcing span 起点得 14/18 假信号，几乎误导向「adapter 加载错位」；改用 assistant_tokenization 精确 start 后 17/17 满分。教训：排除法的每一步复算工具本身要先自证（对齐类复算必用与训练同源的定位函数，禁用近似推导）。
+
+### M.10 paired base 配对的信息增益实证（磊哥六拍④当晚兑现）
+v6 无配对时 B 11/15 会被读「学到 73%」；配对暴露 B delta=-1、D delta=-10（tiny 过拟合窄化）+ base 带挂载 zero-shot 真值（B 12/15、D 18/34）。单臂数字永远缺参照系——ablation 的字面义就是配对对照。
+
+### M.11 收官账表述过宽被外审逐条打回：完成度措辞五问（2026-07-03，D-040）
+通宵收官账四处过宽被磊哥转达的外审收窄：①「双审 APPROVE 可一键 merge」——本地 worker review ≠ GitHub review（live latestReviews=0），且旧 review 绑的 head（`3b081823`）被后续 hotfix push（`e6a8849f`）作废=**review artifact 必绑 head SHA，head 变即失效**；②「CI 待 billing 重跑即绿」——FAILURE check 不得预支为绿，billing 只是归因；③「数据门全量兑现」——DataGate local pass ≠ train-ready（preflight strict exit66 同帐在案）；④ v6.1「重复被压住」滑成「输出稳定」——C 4/4→2/4、D 8/34→5/34、+4 parse_error 是同帐并存事实，**改善与残留必须同句陈述**。根因=completion-claim-triage（计划态/执行态）在【收官汇报】场景复发：收官叙事的「可一键/已兑现」措辞天然向宽滑，且写晨报时无 Stop-hook 类机械门拦（cite-verify 只核数字有源，不核完成度语义）。修法=收官账每个完成度断言过**五问**：绑的哪个 head？哪个系统的 verdict（本地/GitHub）？门实际 exit code？改善项的同帐退化项列了吗？「可 X」是现在真可还是前置齐后才可？

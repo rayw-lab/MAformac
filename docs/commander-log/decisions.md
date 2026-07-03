@@ -213,3 +213,179 @@
 - **M2 = 只 dry-run 不删**（指挥官分支 E-2 docs/D-018 未进 main；等 ratification PR 合完再执行删除）。**M3 D25 = 延期**（非 LoRA 关键路径，不抢上下文）。
 - **R7 = 现在备续签/真跑签字模板不等 7-15**：commander 亲自产出 R7 renewal + tiny-ablation run-auth checklist，**状态保持 draft/unsigned**。
 - **落点**: 本 D-019 + E-2 全组文档 status→locked_with_conditions + landing-matrix 里程碑4 + SPEC-G7A/B/C + R7 renewal draft
+- 🔴 **UPDATE（磊哥收敛顺序锁死，2026-07-02）**：① **#16 RAT PR 先行**：CI 绿 + spot audit + merge 是第一收敛点；G7A/G7B 可继续写**不得越过 RAT 合入 main**；🔴 **G7C 暂不开**（撤销 %44 接力指令，改 standby）——等 G7A manifest 接口 + G7B schema/receipt 口径稳定再建。② 🔴 **G7B 消费链硬要求**：禁 wrapper-only 字段存在——必须行为测试证明**现有 C6 消费链真读 subset 字段**（构造带字段 case→断言消费路径输出生效+消费点 file:line），否则回执 honest 标 `adapter_receipt_proof_only`，禁称「C6 schema fully integrated」（gate2 dead-field 教训的 enforce 化）。③ **敏感参数冻结上抛**：7200 cap / digest 口径 / degraded_clarify 策略 / C6 subset 接入方式——任何改动 BLOCKED 上抛磊哥人审，worker/commander 均禁自改。④ M2 仍只 dry-run；④tiny-ablation/R7 仍 HOLD。三 worker 已收指令确认。
+
+## D-020 G7A+G7B 审计绿合流 main + G7C 开闸 + G7D 补片（E-2 Phase-1 construction 收尾中）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Merge-milestone ｜ **Owners**: commander 按 D-019 收敛序执行
+- **合流（gh 一手核销）**: G7A PR #18（manifest codegen 18,260 entries + 预算门 cap7200 + grammar artifact；XAUDIT 抓 **B1 手写表 BLOCKER** → contract 文件模式修复 `contracts/subset-grouping.yaml`[authored_design_input 定性+双向闭包 fail-closed+S-201 entry 零动] → delta 复审 **B1-RESOLVED** entry payload 逐字节等价）→ `cc5b1aa8`+`c93efaee` ｜ G7B PR #17（C6SubsetContext add-only + 六轴 receipt；XAUDIT **CLEAR** 消费链行为证明非 dead field，verdict 诚实 `adapter_receipt_proof_plus_runner_extension_behavior_proof` 不称 fully integrated=守磊哥硬要求）→ `2b006b8a` = **当前 main**。
+- **进行中**: %45 merge 后验收（K.1 标配）→ 接 **G7D**（design 包 Phase-1 收尾：C5 训练样本 builder 按 manifest 装载 + 样本 metadata 记 digest[S-206/S-207 locked] + fail-closed 禁双路径）；%44 **G7C 开闸**（磊哥条件满足：A/B merged 接口稳定；SPEC 已补真实接口事实）。%43 待 C/D 落地接交叉审。
+- **审计战绩累计**: 本日交叉审/验收门共咬住 **5 个真问题**（gate2 dead field[前日]/guard 漏 test split/gate8 派生物没改工厂/E-2 包丢 train target 轴/G7A 手写表）——对抗 fixture + 验收 diff 门 双机制全部生效。
+- **冻结确认**: cap 7200/S-201 字段组/degraded_clarify/C6 add-only 接入——四项全程零改动（两轮审计逐项 grep 确认）。
+- **落点**: 本 D-020 + R7-draft B.1 前置表刷新 + SPEC-G7D
+- 🔴 **UPDATE（磊哥 2026-07-02：hermes 终审安排）**：E-2 subset-policy 实装 + gate7 generator pipeline 代码闭环两大任务**完成后**（G7C/G7D merged + 验收绿），安排 **hermes 跨厂商异源终审**（cross-vendor-final-audit 铁律：≥3 厂商并集，codex 交叉审已有 → hermes=第二厂商，范围 = G7A/B/C/D 全体 = manifest codegen/预算门/grammar artifact/C6 subset schema/六轴 receipt/generator 编排/C5 builder 装载）。**hermes 现在待命不派**；触发点 = 两大任务合流验收后。
+- 🟢 **UPDATE（G7C/G7D 合流 + hermes 终审触发，2026-07-02）**：G7C PR #19（XG7C CLEAR：R7 blocked_r7 桩/G1 同 vendor fail-closed/labeler LLM 零参与/四门行为全过）→ `0ff56e06` ｜ G7D PR #20（XG7D PASS_WITH_NOTES，唯一 P2-watch=`subset_policy_digest` 取整文件哈希 vs meta 内 grouping_contract_digest——**更强口径不冲突**，按磊哥 digest 冻结令报备存档不改）→ `1d822961` = **当前 main**。**两大任务（E-2 subset Phase-1 实装 + gate7 generator pipeline 代码闭环）全部合流**。%45 跑 merge 后验收中；🔴 **hermes 跨厂商终审已出击**（磊哥 standing order，background agent `hermes-g7-final-audit`，只读 worktree `MAformac-hermes-audit`@1d822961，范围 G7A/B/C/D 全体 + dead-field 同构扫描，产出 HERMES-FINAL-AUDIT-G7.md）。今日 PR 合流累计 **9 支**（#12-#20）。
+
+## D-021 外审执行位模式（磊哥定）：commander 只 tmux 掌控 worker，外审全下沉 worker，%44 升临时项目助理
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Collaboration-mode ｜ **Owners**: 磊哥三连指令
+- **模式**: ① commander **只通过 tmux 掌控 3 worker**，不自己直跑外部审计/外部 LLM 调用（subagent CC 也不用于此——hermes-rescue subagent spawn 的是 Claude 家族=假异源，已 shutdown_request 关闭 + kill %51 pane 保 2×2）② **GPT Pro 外审、hermes 异审全部交 worker 自己跑**（worker 在 codex CLI 显性调用 `~/.codex/skills/hermes-cli-glm52-code` / gptpro 技能——codex 环境 `--prompt-file` 正常且 worker 能盯全程重试）③ **%44 升级临时项目助理（外审协调官）**：外部调用执行+盯守+收产出+初步 findings 整理。
+- **佐证**: commander 直跑 hermes 两次：第一次 hermes CLI 本体 stash 冲突炸（已可逆修复：`git reset --merge` 中止失败 pop，stash@{0} 18 文件原封保留供磊哥重处理）；第二次回稿仅 **284 字节=废稿**（留档 `HERMES-FINAL-AUDIT-G7-commander-direct.md` 勿引）——印证 worker 盯守模式更可靠。
+- **落点**: 本 D-021 + %44 首单（hermes G7 终审，质检门 <2000 字节=废稿重试）+ memory 更新
+- 🔴 **UPDATE（磊哥泛化 D-021，2026-07-02）**：助理角色**只是临时**——commander 可**随时流转 3 worker 角色**：调研/设计/联网搜证/grill/脑暴/codex 自审/外部 gptpro-hermes 审计/**开发任务（最多）**/**架构设计（最多）**/数据-训练-评测-测试，**一切执行下沉 worker**；commander=纯编排+裁决+记忆+收稿亲核（「你就是上帝即可」）。角色帽子按任务派单时指定，不固定编制。
+
+## D-022 hermes GLM-5.2 终审收稿（REQUEST_CHANGES）+ 辩证吸收 + 三线修复派发
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（修复中）｜ **Type**: Cross-vendor-audit-absorption ｜ **Owners**: hermes 审 / commander 亲核裁决 / 三 worker 修
+- **hermes verdict = REQUEST_CHANGES**（真异源 GLM-5.2，%44 助理执行位跑通；产出磊哥手转）：**P0=0**。
+- **P1（ship-blocking，commander 亲核 `C5LoRATraining.swift:2861` 坐实）**：G7D loader 取首 entry 的 subset_policy_id 当真值**零校验**——wrong-policy manifest 被静默接受产样本（= SF-13 manifest 混训风险的入口）。hermes **亲手构造 wrong-policy probe 实跑暴露**（非读码推断）。🔴 **二层 catch**：XG7D 交叉审曾声称验过「policy 失配」三态给 PASS_WITH_NOTES——被 hermes 证伪 = **交叉审的验证声称本身也要抽核**（审计的审计，异源层级价值第 6+7 例）。
+- **P2×2**：C6 dead fields（`expectedUnsupportedClass` 只 decode 零消费 / `isModelFailure` 恒 false）+ G7 no-op（`timeoutMilliseconds` 未用 / `rawPayload` 只写不读）——dead-field 同构扫描的直接收获。
+- **CLEAR 项**：分组血缘/双向闭包/562 并集/预算门/唯一 degraded pair/add-only 零侵入/六轴 receipt blocked/R7 无网络路径/G1 门/labeler LLM 零参与/四门/冻结参数——全项亲跑复现命令给证。
+- **辩证吸收**：P1/P2 全收（无一撞已决，均为实现漏）；steelman 零驳回。**修复三线**：%45 P1（policy authority 校验 + hermes probe 固化为永久测试）/ %43 P2-C6（补真消费禁删字段——两字段是 S-210 locked 的 expected 侧载体）/ %44 P2-G7（接行为或删+说理）。修后交换交叉审 + hermes delta 复审（%44 助理执行）→ staged merge。
+- **落点**: 本 D-022 + `HERMES-FINAL-AUDIT-G7.md`（%44 产出）+ 三修复 SPEC（tmux inline）
+
+## D-023 hermes findings 修复轮进展 + %43 卡死救援 + hermes 审计点冻结
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（#23 修复中=唯一关键路径）｜ **Type**: Fix-round + Ops-rescue ｜ **Owners**: commander 编排/三 worker 执行
+- **修复轮战果**: P1 PR #22（policy authority `e2-lite-v1` 双侧一致 commander 亲核 + hermes probe 固化永久测试）交换审 **A-/PASS → MERGED `487ec2b3`** ｜ P2-G7 PR #21（timeout/rawPayload 接进 receipt 行为非删）交换审 **B+/PASS_WITH_WATCH → MERGED `a8fcd245`**（watch：timeout=收尾归一化非抢占，Phase-1 全 mock 可接受；#22 watch：Swift 侧 authority 常量是 grep 验证的复写串，后续可加等值测试硬化）｜ P2-C6 PR #23 交换审（%45）**REQUEST_CHANGES/HIGH**（第 8 咬）：**S-210 第三层 `global_unsupported` 无可达成功路径**（正确拒识被误判 mismatch）+ MEDIUM stats 账目缺口 → %43 修复中。
+- 🔴 **%43 卡死救援实录（PROVEN 进宪法 §8）**: HIGH 修复中 %43 陷 **47 分钟死循环**（auto-compact 后自我 grounding 打转）。判定=行为探测（工作树零文件活动 20min+ / PROGRESS 消息排队送不进 / Working 计时仍走）；救援阶梯=ESC→双ESC→Ctrl-C 全失效（TUI 输入环死）→ `tmux display-message pane_pid` 找子进程 **kill codex 进程** → 重启触发 codex 自动升级→**半装**（缺 `@openai/codex-darwin-arm64`）→ 按报错 `npm install -g @openai/codex@latest` 重装 → fresh codex 自包含重派（SPEC 承上下文，工作树干净零丢失）。
+- **hermes 审计点冻结**（磊哥令）: 后续不安排 hermes 审计，下个点等磊哥通知；%44 助理 standby 解除。
+- **收敛点**（磊哥令「完成 hermes 审计修复后先停下来」）: #23 HIGH 修 → %45 delta 复验 → merge → 验收 → **停下等磊哥**。
+- **落点**: 本 D-023 + swarm-commander §8 补条 + swarm-runs UPDATE + MEMORY as-of
+- 🎉 **UPDATE（hermes 修复闭环收口，2026-07-02 深夜终态）**：#23 HIGH 修复（`actualUnsupportedClass` 三层可达+stats 账目，C6SubsetContextTests 18/0）→ 原审计员 delta 复验 **HIGH-RESOLVED** → MERGED `aac84de9` = **终态 main**。终验收（%45）= **PARTIAL_SIBLING_NOISE**：pull PASS / main 全机械门 PASS / hermes 三目标套件全绿（C5 53/0·C6Subset 18/0·G7 8/0）/ 全量 swift 唯一失败=已知 sibling UIUE fixture 噪声（pre-existing，M4 消解）——**main 范围绿**。当日终账：**13 支 PR 合流（#12-#23）+ 审计体系咬 9 真问题**（+S-210 第三层不可达）。🔴 **按磊哥指令停下**。桌上待磊哥：④ tiny-ablation 签字包（物理前置全齐，R7 draft Part B 就绪）/ M2 删除授权 / R7 续签（7-15 到期）/ 下个 hermes 审计点 / M4 UIUE（sibling 噪声根治点）。
+- **UPDATE（回报路由固化，2026-07-02）**：磊哥令——后续所有 worker 派单**必须显性写**「向 %42 汇报」（tmux-bridge 发 REPORT/PROGRESS/BLOCKED 到 commander pane），派单缺这句=不合格。已落宪法 §8 + memory 第 3 条强化 + 三 worker 常设通知（ACK-RPT42）。
+
+## D-024 🔴 tiny-ablation 真跑授权（磊哥「全部授权」）— R7 线第一次真训练动作点火
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（执行中）｜ **Type**: Run-authorization ｜ **Owners**: 磊哥口头授权（原话「全部授权 推进tiny ablation 真跑」，签字包+run plan 全文贴出验 scope 后）/ commander 代录+执行编排
+- **授权范围**: 仅 `tiny-ablation-run-plan-adjudication-A.md` 全文（tiny-only：40 正例样本/rank16Mainline 渲染原样/34-case tool_call 探针/门=代码常量 empty<5/34）。**成功不自动开 wave-1；失败进 Dim10 branch 不改阈值不扩样本；重跑要新授权**。scoped waiver：sibling 噪声仅豁免本轮前置。
+- **执行链**: Step 0 harness 解锁小 PR（%45：`.real` 分支绑签字文档引用+测试→CI→审→merge）→ Step 1-4 真跑（worker 执行+每步 receipt 回 %42+commander 亲核）→ verdict 上抛磊哥。
+- **落点**: 签字区已录（B.3 signed_run_authorized/40）+ 本 D-024 + run 产物 `runs/tiny-ablation-adjudication-A/`
+
+## D-025 常设授权：run-blocking 机械 bug commander 直拍直修不上抛（磊哥「别老停下来」）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted ｜ **Type**: Standing-authorization ｜ **Owners**: 磊哥「能不能不要设置这么多阻塞点 顺畅跑起来 指挥官别老停下来」
+- **规则**: 已授权 run 期间遇 **机械性 blocker**（代码 bug/环境/工具链——不碰阈值/样本量/配方参数/scope 边界四红线）→ **commander 直接授权修复 + 固化测试 + 继续跑**，事后 receipt 汇报；四红线才上抛磊哥。BLOCKED 上抛从「默认动作」改为「仅四红线」。
+- **首例**: tiny-ablation Step2 exit 66——`'TokenizerWrapper' object is not callable`（mlx-lm `load()` 返回 wrapper 不可直调；gate2 修复期 self-test 合成 logits/Swift 测试 dummy model 均不触 tokenizer 真调用路径，第一次真跑才现形 = re-audit 残留 P1 预言的正确性残留，fail-closed 正确拦下）。修法=`getattr(tokenizer, "_tokenizer", tokenizer)` 兼容 + 单测。机械修复，非配方/阈值/scope 改动。
+- **落点**: 本 D-025 + 宪法 §8 补条 + run receipt
+
+## D-026 🔴 裁决-A verdict = BLOCKED（34/34 NO_TOOL 重复）+ 归因坐实 = masking span 语义误用（配方级，修复上抛）
+- **Date**: 2026-07-02 深夜 ｜ **Status**: Accepted（失败门纪律执行中，重跑等磊哥新授权）｜ **Type**: Adjudication-verdict + Dim10 归因 ｜ **Owners**: commander 亲核归因 / %45 执行 run
+- **run 全链实录**: v1 dev-selection 吸干→v2 masking_complete 未实装→v3 NONFINITE(1024 截断除零)→v4 8192 Metal OOM→v5(batch1/grad16+grad_checkpoint+seq5120) **600 iters 训练完成零 NONFINITE**（loss 2.11→0.16 区间震荡，adapter 落盘）→ 34-case 探针全 dump → harness real verdict = **blocked（emptyToolCallOutputs=34/34 ≥ 5）**。失败门纪律全程守（未改 LR/rank/scale/clip/iters/样本/阈值，未重跑，未开 wave-1）。
+- **归因（commander 一手下钻 train.jsonl+probe dump，非聚合推断）**: ① probe 显示模型**非沉默**——输出 `NO_TOOL.NO_TOOL...` 无限重复（与 θ-α 空输出不同型）② train.jsonl 44 条 positive 的 `trainable_spans` **只含 function_name 碎片**（例：71 字符 assistant 全文只放行 20 字符工具名；字符覆盖率 median 29.7% min 12%；全集仅 209 trainable tokens）——`<tool_call>` 包裹/JSON 骨架/闭合全被 -100 掩死 ③ 模型唯一被完整监督的输出形态=NO_TOOL → 学会且只会它。**根因 = P1-C 早已锁的「masking 三形态实为两类机制」被实现混淆：function/arg masking 本是【数据增广】（换名防死记），却被做成【loss span】（只训 name 碎片）；train_on_turn 的 loss-mask 正确语义 = 掩 prompt 训全 assistant turn（业界标准 SFT masking，home-llm 同款）**。
+- 🎯 **价值**: tiny-ablation 用 ~50 分钟真跑在 formal train 前抓出 masking 语义级配方缺陷——若直接 wave-1 = 第三次 0/34。裁决门体系再次自证。🔴 **措辞窄化（磊哥采纳 GPT-5.5 纠正 + 终版 teardown 四根因重标）**：verdict=`BLOCKED_INVALID_FOR_PARADIGM_VERDICT`——**D-domain/LoRA 路线未被证伪；当前 C5 trainable_v0 监督契约已被证伪（P0）；首跑实验设计（探针构成+输入面+基线锚）已被证伪（P0）**。v5 不得作为范式失败证据、不得据以调 LR/rank/scale/clip/iters。终版 teardown=`tiny-ablation-iceberg-teardown-FINAL-2026-07-02.md`（四根因/跨LLM辩证/Phase 0-7）。
+- **修复提案（配方红线，上抛磊哥）**: ⭐ **A**：trainable_spans 改为**整个 assistant 输出 span**（train_on_turn 正确语义；prompt 掩、assistant 全训；think span 仍掩=gate2 think-mask 保留；function/arg 碎片 span 语义归还给数据增广形态=wave-1 的 augmentation 实装）｜ B：显式枚举包裹+name+args 全 span（≈A 的枚举版）。两案都不动 LR/rank/scale/iters/样本/阈值。**重跑同 44 样本 = 磊哥新授权**（失败门纪律）。
+- **落点**: 本 D-026 + verdict.json/probe/RECEIPT-TINY-ABLATION 一手 + 上抛磊哥
+
+## D-027 磊哥六拍：v5 重标级联 + v6 契约重构 Phase 0-3 授权 + R7 续签（renewed 至 2026-07-23）
+- **Date**: 2026-07-02 ｜ **Status**: Accepted（Phase 0 done / Phase 1-3 三 worker 执行中）｜ **Type**: Decision-lock + Dispatch ｜ **Owners**: 磊哥六项全拍 + 「自动化推进，三 worker 已调 high 级别最优化利用」
+- **六拍**: ①重标 verdict 四 reason 采纳（服务止血防误判，级联 D-026/landing/F-044 防旧结论被引）②tiny 目的 both 分轴（A 器材/B 自然中文=硬门，C 观察/D 原 34 heldout report-only 禁作 hard gate；不许退回只测协议串）③A+ 契约（loss/augmentation 拆开；正例训 full assistant non-think；NO_TOOL 行训 full NO_TOOL；prompt/user/system/think 掩；train_on_turn 退役为兼容；coverage 门必证 parser-critical tokens；old v5 必 fail 新门/新数据必 pass）④base 配对重锚（28/34 仅 provenance；同 harness/decode/prompt 配对 paired delta+absolute 双门；decode 参数写死进 receipt）⑤Phase 0-3 授权 docs/code/test only ⑥R7 续签（Part A 代录 renewed 至 2026-07-23）。
+- **Phase 0 已落**: D-026 措辞窄化 / landing 里程碑5（裁决-A 重标+F-044 口径级联）/ R7 Part A 续签代录 + Part B 状态改 v5-consumed（v6 另签）。
+- **Phase 1-3 分工**: %45=契约+builder 主刀（枚举/full-assistant/coverage 双门/自反测试/B 轴自然行 builder 支持）｜ %44=探针 harness 固化（decode 契约/base 配对双臂/三口径 overlap receipt/仓内工具化+单测）｜ %43=4 轴探针集与 B 轴数据清单（从 C1 契约确定性抽取非 LLM 生成，防 C6 泄漏）+ F-044 修订草案。文件面三方不相交。
+- **落点**: 本 D-027 + 三 SPEC + FINAL teardown 档 §4 delta 逐项进 SPEC
+
+## D-028（2026-07-02 深夜）Phase 3 双收稿 + P3H P1 catch + governance-fit grill round 启动
+- **%43 P3D 收割**：v6 四轴探针设计三件套收进主线 `docs/c5-training-readiness-grill/v6-probe-design/`（commit `321634ba`）。commander 亲核：B 轴泄漏声称坐实（15 句 exact match C6 gold=0 / B 轴工具∩C6 工具=空 / c5-train-00001→c1_airControl_000018 配对一致）；C 轴 4/10 candidate_gap 诚实不硬凑（接受，放宽与否留 F-044-Q3 磊哥拍）；F-044 草案 = 标准 grill 格式 8 决策+Q1-Q4 open point。
+- **%44 P3H 亲核 catch P1 退单**：PR #26 结构/测试 5/5/fail-closed 均 PASS，但 `truncate_at_stop_token` 全文 find 截断 + 训练 target assistant 以 `\n\n<tool_call>` 开头 → commander 在其 worktree 复现：训练形态输出被截成空串、tools=[]，测试零覆盖。**v6 真跑会把学对了的模型判成全空 = v5 NO_TOOL 假象同构（harness 自制 invalid_probe）**。退单修法：前导空白剥离+回归测试+RECEIPT 补记+更新 PR。元认知：consumer-anchored sufficiency 活证第三例——truncate 机制测试全绿（mechanism-true）但没测「训练分布的真实输出形态」这个 fit 维度（fit-proven 缺位）；亲核必须拿【训练 target 的真实形态】喂 harness，不是拿 harness 自己的 fixture。
+- **governance-fit grill round 启动**（磊哥令「反思细化 grill 按范式组织」）：骨架 `docs/c5-training-readiness-grill/governance-fit-grill-README.md`（W1 契约细化 GF-0xx / W2 门与词表 GF-1xx / W3 制度 GF-2xx / commander 纵切 GF-Cxx）。W2 已派 %43（D4 哨兵数字门化清单 / D5 readiness 四级词表+fit-proof 列 / D6 F-044 终稿），SPEC=仓外 `runs/governance-fit-grill/SPEC-GF-W2.md`。W1/W3 等 %45/%44 空闲接力。
+- CURRENT 残段清理：原 5 件决策段台账化（全 CLOSED）、指针 D-001~027、handoff 指针刷新。
+
+## D-029（2026-07-02 深夜）通宵 run-auth 转写 + %45 救援重派 + 拓扑刷新
+- 磊哥 /goal 通宵全授权：**v6 tiny-ablation 真跑 + wave-1 数据真生成 + C5 数据门**解锁（verbal auth 转写 `docs/project/phase0/r-l17-human-review-evidence/v6-overnight-run-auth-2026-07-02.md`）；full wave-1 训练/C6 acceptance/candidate comparison 等仍 BLOCKED；四红线仍在（F-044 阈值用草案 default 跑，终值不自拍）。
+- **%45 第二次卡死救援**：34min 零流动（0 in 0 out），rescue ladder 直接 kill 子进程 52386 → codex 重启 → SPEC-P12 self-contained 重派（含通宵 ADDENDUM：镜像门最高优先 + 硬三件 + grill 拆解自驱）。
+- **%44 P1 退单消息此前 send-keys 失败未送达**（"not in a mode" exit 1，教训：tmux send-keys 长消息必用 `-l` literal + 单独 Enter，发后必 capture-pane 验证送达）——已用 -l 重发，%44 开工修 truncate 前导换行 P1。
+- 拓扑：%45 P12（A+ 契约+镜像门）/ %44 P3H P1 修复 / %43 GF-W2 grill。审计=worker 交叉互审（磊哥令，本晚不派 hermes/gptpro）。
+
+## D-030（2026-07-03 凌晨）磊哥睡前令：worker 绝不闲置 + GF-W2 收割 + PR26 审计链
+- 磊哥令（睡前）：codex 额度管够，闲置 worker 填打杂活（文档维护/笔记/预研调查）——backlog 队列建于仓外 `runs/governance-fit-grill/BACKLOG.md`（GF-W3/wave-1 预研/P12 交叉审/handoff 草稿/MEMORY 素材/Phase B 预检 6 项）。
+- GF-W2 40 决策收割进主线 `docs/c5-training-readiness-grill/governance-fit-w2-decisions.md`（哨兵数字 12 field groups 门化清单 + readiness 四级词表 + landing fit-proof 五字段 + F-044 终稿 Q1-Q4 default：A=15/15、B=14/15+同族不连败、C 不硬凑、B 轴泄漏零容忍）。全 proposed 待磊哥 lock。
+- P3H P1 修复亲核 PASS（lstrip 前置+回归测试+尾切防御仍在+RECEIPT 完整）；PR #26 CI 双绿；自合被权限门拒 → 转 worker 交叉审制：%43 审 PR26（输出 P0/P1/P2 register 文件）→ APPROVE 后 merge。
+- %44 接冒烟棒：v5 训练环境=系统 python3.13（mlx-train-command.txt 一手），base-only 端到端冒烟（D 轴 2 case，不下行为结论）。
+- 🔴 GF-W1 疑点前置：decode 契约 max_tokens=80 vs D 轴多意图 case（C6-MP-028 期望 2 个 tool call）可能截断——已进 SPEC-GF-W1 D3 必专条。
+
+## D-031（2026-07-03 凌晨）冒烟立功：输入面错配 P0 拦截 + P3H v2 修复包
+- **base-only 冒烟抓到 P0 级输入面错配**（v5 四根因 #3 harness 层复发，未污染正式 probe = 冒烟价值实证）：训练面 patched tokenizer 默认 no-think（`main.swift:497` template 条件改写，assistant 起手空 think 块），probe 冒烟 prompt 无 think 块 → base 自开 `<think>` 烧光 max_tokens=80 → empty。system prompt 两面一致（排除）。证据链+8 决策 grill 落 `docs/c5-training-readiness-grill/p3h-harness-v2-grill-2026-07-03.md`（GF-141~148，通宵按 ⭐default 推进待磊哥 lock）。
+- **%43 PR26 交叉审 REQUEST_CHANGES 收讫**（P1×2：paired 可静默降级 base-only / decode 契约缺 prompt/thinking/parser 字段；P2×3：raw 证据压缩/multi-call 丢失/PR scope drift）——P1-2 与输入面错配同根汇合，全部并入 P3H v2 修复包派 %44（GF-141~148 八项+重跑冒烟验证）。
+- **%44 冒烟顺带修了 mlx_lm 0.31.1 API 兼容**（generate 不吃 temp → sampler=None greedy+回归测试）。
+- merge PR #26 改为：v2 修复完成+%43 复审 APPROVE 后。
+
+## D-032（2026-07-03 凌晨）P12+P3Hv2 双亲核 PASS → tiny v6 训练+probe 开跑
+- **P12 镜像门 commander 亲核坐实**：old v5 exit **66**（44 行全 under_supervision，parser_critical_untrained 逐 fragment + ratio 0.12-0.37<0.90 归因精准）/ new v6 exit **0**（ratio=1.0，44/44 trainable，泄漏 0）。A+ 契约（磊哥六拍③）镜像验证达成。P12 诚实 PARTIAL（sibling UIUE fixture 5 失败=非 P12 范围已知噪声；GitNexus critical blast radius 已标注留 reviewer）。教训：亲核 exit code 勿用管道后 `$?`（测的是 tail）。
+- **P3H v2 亲核 PASS**：GF-141~148 全落地；输入面对齐坐实（prompt 空 think 块断言 fail-closed）；base honest 行为浮现（懂语义不懂协议格式）；GF-032/033 被架构消解（提取吃 raw_generation，stop 只影响展示字段）。
+- **GF-W1 40 决策收讫**（GF-001~040：consumer frontmatter/loss 枚举边界/decode 具体值；GF-030 拍 max_tokens 80 只留 historical，v6 用 160=与 GF-147 一致）。
+- **拓扑**：%44 接 SPEC-PCD（tiny v6 训练真跑 600 iters + paired 四轴 probe 68 case，verdict 留 commander）；%43 交叉审 P12 中；%45 wave-1 生成预研中。
+
+## D-033（2026-07-03 凌晨）P12 审 P1×2 分诊 + wave-1 决策包 + GF-W3 派发
+- **%43 P12 交叉审 REQUEST_CHANGES 收讫**（P0=0；P1-1 `legacy_missing` 绕过 A+ 显式契约[bypass 探针实证 PASS 1.0]；P1-2 natural rows 仅验 tool-name 可污染 gold；P2 receipt 缺 fit-proof 机读 frontmatter，level 应 mechanism_true）。**分诊：两 P1 不影响在跑 tiny v6 训练**（v6 数据无 natural rows + profile 字段显式），属 P12 merge 前必修（=wave-1 拍点#1 关键路径），排 %45 P5W 后接修。
+- **wave-1 磊哥 5 拍点决策包**落 `docs/c5-training-readiness-grill/wave1-owner-decision-package-2026-07-03.md`（基座冻结⭐P12修复后merge/云凭证[无default]/首波4.5k⭐/salvage重judge⭐/人工门staffing）。live 生成今晚推进到「只差凭证」。
+- 训练进度：iter 140 loss 4.48→0.52，LR warmup 正常（iter30 显示 0 = warmup 起点，疑点消解）。
+- 拓扑：%44 训练+probe 中 / %45 P5W（labeler 桥接+mock 端到端+数据门实跑）/ %43 GF-W3 制度官。
+
+## D-034（2026-07-03 凌晨）v6 probe 根因实锤=tools 挂载缺失 + 首个正面行为证据 + 第四轮 iceberg
+- v6 训练健康（600 iters loss 0.072、preflight 44/44 ratio1.0、NONFINITE=0），probe 全轴 empty → **四步排除法实锤根因=probe 无 tools 挂载**（训练渲染带 E-2 两级挂载 737 token，probe render_prompt 无 tools 参数）。teacher-forcing 17/17 满分 + 带挂载生成 A/B 轴全完美 = **模型学会了，D-domain 自然中文迁移首个正面样例**。v6 probe1 定性 INVALID_PROBE（GF-154，v5 重标同构）。
+- grill 两连发：GF-149~156（v3 tools-mount 契约）+ 第四轮 iceberg 报告（抽象两次：未枚举维度断裂 → same-surface 单数名词掩盖复合性；治理=surface 维度分解表；扩散=wave-1 generator surface 风险列拍点附加项）。
+- %44 接 harness v3 + v6-probe2 四轴重跑；GF-156 元认知（复算工具自身假信号：commander span 误差 14/18 几乎误导）。
+- 当日 REPORT 洪峰全收：P5W（labeler 桥接+mock 端到端+tiny 数据门 data_gate_ready 44 行）、P12 修复（63/63 测试+镜像门保持+bypass 探针转 FAIL+fit_proof=mechanism_true）、GF-W3 40 决策、cross-section drift 27 条（P1=14 待批量回写）。
+
+## D-035（2026-07-03 凌晨）v6 tiny-ablation verdict + 通宵 goal 主线兑现
+- **verdict 落档** `docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md`：A 轴 adapter **15/15 满分**（裁决-A 核心问题「A+ 契约是否解 v5 NO_TOOL」= **YES**，v5 四根因#1 坐实主导）；B 轴 11/15 FAIL_WITH_ATTRIBUTION（四败=2 close→open 极性翻转同族连败+2 细分设备混淆，与 tiny 44 行数据覆盖一一对应=数据稀疏非链路缺陷；阈值敏感性已列，终值不自拍）；C 4/4 observe；D report-only adapter 8 vs base 18。
+- **paired 配对当晚兑现价值**（磊哥六拍④）：B delta=-1、D delta=-10 暴露 tiny 过拟合窄化——无配对会把 B 11/15 误读「学到 73%」。base 带挂载 zero-shot（B 12/15/D 18/34）= base 锚首个同 harness 真值。wave-1 配方三含义：广覆盖+控 epoch / open-close 极性对称配比 / D 轴退化作 regression 锚。
+- **通宵 goal 盘点**：tiny 跑完✅（训练+probe2+verdict）/ 数据门✅（tiny 版 data_gate_ready+mock 端到端；wave-1 全量版待生成）/ A+ 五件✅ / 镜像门✅ / wave-1 🟡「只差凭证」（5 拍点包，live 路径代码 fail-closed=真 blocker）。
+- **%45 GAP_FOUND 证实 iceberg 扩散预判**：G7 生成行缺 tools/subset 字段且 C5DataGate projection 丢元数据 → 修复已派 %45。GF 消减 31 组初稿收讫待终审。PR #27（P12）已开；PR #26 复审派 %43；GF-153 EOS 监督实装派 %44。
+
+## D-036（2026-07-03 凌晨）收尾链：PR 双 APPROVE + G7 surface 闭环 + 晨报包
+- PR #26 复审 **APPROVE**（5 findings 逐条 file:line 复核）；PR #27 CI 一支 whitespace fail（%44 顺手修中）。**自合被 classifier 硬拒两次 → merge 留磊哥醒来一键**（审计记录+CI 状态全在案，不卡关键路径）。教训：tmux 消息与 gh 写操作勿混同一条命令（拒批连坐消息丢失）。
+- %45 G7 surface 修复闭环：生成行→DataGate projection→JSONL 候选行贯通 tools/mounted_tool_count/subset 三族 5 字段（21/21 行全带，`RECEIPT-P5W-G7-SURFACE.md` file:line 证据表）——第四轮 iceberg 扩散点当晚闭环，wave-1 数据 surface 与训练面对齐。
+- 晨报包落 `docs/handoffs/2026-07-03-overnight-v6-verdict-morning-brief.md`（goal 兑现账+醒来 5 拍）。lessons M.8~M.10（same-surface 维度分解表/复算工具假信号/paired 信息增益）。
+- 在途：%44 EOS 监督实装+whitespace 修；%43 GF 消减稿异源核对。
+
+## D-037（2026-07-03 凌晨）收尾轮：EOS v6.1 重训授权内推进 + 消减 GF-126 补 + 🔴 GitHub billing blocker
+- %44 GF-153 EOS 实装收讫（PR #28；v61 镜像 exit0、`<|im_end|>` id151645 单次监督、trainable 764→808、old v5 仍 exit66）→ 接 **v6.1 tiny 重训+probe 复刻**（run-auth 范围：tiny scope/四红线不动/单变量=EOS 增量；验证点=A 保持 15/15+重复病理消除）。
+- %43 消减异源核对 REQUEST_CHANGES：抓到 GF-126（status 词表映射）未被 31 组吸收——一行修退 %45；其余映射 135/136、max_tokens/stop/D 挂载冲突消解全 PASS。%43 转 D 轴退化形态清单（wave-1 regression 锚细化）。
+- %45 接 GF-126 补 + DataGate global missing-surface hard gate（自身 residual 闭环）。
+- 🔴 **外部 blocker（磊哥项 +1）**：GitHub annotation「recent account payments failed or spending limit needs increased」——PR #27/#28 新 CI job 不启动。属账户 billing 层，worker/commander 不可修。晨报已追加。
+
+## D-038（2026-07-03 凌晨）通宵终收：v6.1 对照 + wave-1 proto 全量数据门 + GF 终审
+- **v6.1 EOS 对照收讫**：A 保持 15/15（协议记忆无损）、**重复病理 68/68→1/68**（GF-153 主目标达成）、B 持平、C/D 微降+empty 增=早停沉默化次级效应（wave-1 广覆盖下再评）；残余 4 parse_error+1 重复待下钻。PR #28 已开。
+- **wave-1 proto build 全量数据门首跑**：4500 样本 38.8s、**C5DataGate 全量 exit0 硬计数全零**（磊哥「数据门跑完」全量兑现，协议串模式）；工具覆盖 314/562 expected、395/562 mounted、55 组。🔴 暴露训练前必修 gap：max_token 8982>8192/length_violations 294/valid-test 行 under-supervised → 新 grill 议题（长行策略+valid/test 监督契约），与 wave-1 5 拍点同会话拍。
+- **GF 消减终审 APPROVE_FOR_UPLIFT**：GF-148 补入 G28 后映射 136/136 闭合（%43 两轮机械展开核对立功：GF-126→GF-148 各抓一漏）。
+- %45 DataGate missing_surface 硬门实装收讫（no-legacy exit65 blocked/legacy flag 显式豁免，17/17+11/11+81/81）。%43 INDEX×2 归档（36+11 行，纠 SPEC 计数）。
+- 通宵 goal 状态：**全部可兑现项已兑现**；不可兑现项均为真 blocker（云凭证/GitHub billing）已列晨报待磊哥。
+
+## D-039（2026-07-03 凌晨）通宵收官终格
+- 长度 gap 量化解收讫（%45）：294 违规全出自 `seat.massage_force_time` 单组（E-2 已知 degraded 重灾族）；⭐E-2 降档挂载 target+first-sibling 294/294 收全且全量 max 1793（成本同降）——**E-2 grill 43 决策的降档设计直接解题**。已进 verdict 附录3+wave-1 拍点包（新增拍点 6 长行策略/7 valid-test 监督契约）。
+- parse_error 下钻定性收讫（%44）：4 case 全 malformed 截断且 v6 同 case 本就 repeated-tail 不稳——EOS 把「重复」压成「早停截断」，同源非净退化。
+- 三 worker 收工待命（pane 存活）。通宵账：**D-028~039 十二格决策、3 次训练（v6/v6.1）、2 轮 paired probe、4500 全量数据门、GF 137 决策（121+16）、grill 文件 5 份、iceberg 第四轮、PR×3 双审 APPROVE、drift 27 回写、lessons M.8-10、宪法/MEMORY 刷新**。
+- 等磊哥晨拍 0-5 项见晨报（billing/merge×3/wave-1 7 拍/GF lock/F-044 阈值）。
+
+## D-040（2026-07-03 晨）外审收窄吸收 + 新 goal N0-N4（Accepted，磊哥 /goal 纯自动授权；新任 commander 接管首格）
+- 磊哥转达外审对通宵收官账 4 点收窄，新任 commander 全部 live 亲核成立并落账（CURRENT/MEMORY/晨报 banner/lessons M.11 级联同步）：
+  1. **v6/v6.1 结论窄化**：A 15/15 保留（verdict:46）；v6.1 EOS 重复 68/68→1/68 真进展，但同帐 C 4/4→2/4、D 8/34→5/34、+4 parse_error（verdict:48-50）→ 表述=「EOS 改善重复病理，tiny 稀疏下 parse/早停/泛化退化残留」，禁「输出稳定」。
+  2. **PR 状态重写**：gh 亲核（2026-07-03 06:5x）#26-29 全 OPEN、latestReviews=0、verify FAILURE×2；head：#26=`e6a8849f`（旧 APPROVE 绑 `3b081823` 失效）/#27=`a400b01a`/#28=`49fa0b9b`/#29=`5c68f945`。纪律：本地 worker review≠GitHub review；billing 只解释失败原因，FAILURE 不写绿/不写 merge-ready；review artifact 必绑 head SHA，head 变即失效。
+  3. **P5W**：外审所指 dirty 现场已被 %45 收编（PR #29 worktree clean，live git 核）；残留=一轮绑 head 交叉审。
+  4. **wave-1 口径**：substrate built（4500 行）+ C5DataGate local pass 可说；builder receipt blocked + loss-mask preflight strict exit66（294 长行>8192 / valid-test under-supervised / 云生成+cross-vendor judge 未跑，verdict:55）→ **NOT train-ready**。
+- 训练风险收窄进配方锚：B 11/15 未达 draft 14/15（终值待 lock，verdict:29）；D 18/34→8/34→5/34 = LoRA 窄化/覆盖不足/安全语义退化；query→actuation（只读变控制）安全级零容忍。
+- 本地新发现：本分支落后远端同名分支 7 commits（`b24dafcd`…`02f0722f`，D22-D24 旧档），`rev-list origin/main..远端`=0（已全在 main）→ N1 推**新分支名**收编，不 force 不动 stale 远端。
+- **新 goal 路线（磊哥 /goal）**：N0 落账收窄→N1 docs 分支收编→N2 PR head 重审 wave（%43 #26增量+#29 / %44 #27#28；作者回避；≥1 实跑标 local verify 非 CI）→N3 GF rev3→N4 train-readiness 闭环验收（%45 E-2 降档挂载实装+preflight strict exit0+valid/test 监督契约；F-044 默认 14/15 标磊哥可异步 override）。人审仅 4 键：billing/云凭证/merge（攒一次性清单）/run-auth。worker 已 clear 重置=空白态，派单必 self-contained+L.5 四步送达+pre-mortem 联网/本地交叉验证 inline。
+
+## D-041（2026-07-03 上午）N2/N4a 中程收稿（执行中）
+- **N1 done**：PR #30 开出（81 commits 纯 docs，新分支 `commander-docs/20260703-absorption-closeout`，不动 stale 远端）。F-044 默认锁+配方锚落档 `docs/c5-training-readiness-grill/f044-default-lock-and-wave1-recipe-anchors-2026-07-03.md`。
+- **PR #27 重审 APPROVE**（%44，绑 head `a400b01a`，local 非 CI）：mirror gate 复跑 old v5 exit66×2 / new v6 exit0；消费层核到 `c5_mlx_train_loop.py:583-584,619-634`；P2 nuance=默认 old-v5 失败在 `loss_objective_profile_missing`，`under_supervision` 需 legacy 探针暴露。
+- **PR #28 重审 APPROVE（code delta）+ 🔴 claim correction**（%44，绑 head `49fa0b9b`）：EOS 实装正确（id 151645 单次监督坐实）；但独立复核 4 parse_error——**作者「非净退化」定性过宽，3 case 从 observed tool 退成 empty parse error**（`pr28-parse-error-recheck.json`）→ 与 D-040 外审收窄同向，v6.1 行为表述以此为准。
+- **N4a 确认（commander 独立复跑）**：%45 交付 PR #31（`ac7774e0`，stacked on #29）——E-2 降档（仅 `seat.massage_force_time` 组，target+first-sibling，`C5LoRATraining.swift:3181`）+ valid/test 监督契约（`supervisedEvaluationMLXRecord`，不改 must_not_train 语义）+ `--preflight-only` 门。**commander 亲跑 strict preflight exit0（records 4628/trainable 4628/tokens 44459 与 receipt 一致）**；summary `length_violation_count=0`/`max_token_length=7186`；DataGate `missing_surface_count=0`/`surface_field_pass=4500` no-legacy；消费层 grep 坐实 evaluate 吃 `maformac_masked_loss`（`c5_mlx_train_loop.py:595`）非 dead field。worktree clean（完成即 commit 守住）。
+- 🔴 诚实边界：prepare receipt 仍 `status: blocked`（validator_layer2/candidate_data_quality/fuse parity/endpoint parity 等 N4a scope 外债，%45 elephant 项如实列出）——N4 验收口径只声称「local 机械门绿」，不清 blocked 帐。
+- 在途：%43（#26 增量已抓 1 个 P1 merge blocker，将出 REQUEST_CHANGES→#29→GF rev3）/ %44（PR #30 docs 审）/ %45（N4c 配方锚×grill 已锁配比对齐+实装，防自拍冲突先 recall）。
+
+## D-042（2026-07-03 上午）N2 重审结果 + PR30 P0 处置 + N4c 三冲突裁决
+- **PR #30 被 %44 抓 P0**：声称「纯 docs」实混桥接代码/测试/fixture/openspec tasks → commander 处置 = 代码面回中 main tip（commit `3bb42613`）+ whitespace/f044 引用修 + PR body 改诚实态。🔴 **后续 ARCHEO（%44）纠正 commander 二次误判**：main tip **本就有** `partialAcceptPartialRefuse`+sharedSchema+`public_fixture_schema.v1.json`（D22/D23 孪生 commit 在 main，无 revert/supersede）→ 无需恢复 PR；merge-tree 保 main schema。**commander 教训：两点核验 loop 漏了 schema 路径 = 不完整核验产生第二个错误声称（「main 缺失104行」），被 worker 考古纠回——核验清单必须与 diff 文件清单逐一对齐，不得手抄漏项**。
+- **PR #30 CONFLICTING（双侧演化 65 重叠文件，M1-γ port 后分叉）**：不硬合。策略=分级整编（M1-γ 模式）：worker 出逐文件裁决表（keep-main/take-branch/union，doc-cascade T0-T6 分诊）→ main 切干净整编支 → 新 PR 替代。#30 现为备份/可见性载体，body 已标勿直接 merge。
+- **PR #26 REQUEST_CHANGES**（%43，绑 `e6a8849f`）：P1=parse_tool_calls() 用 raw_decode 忽略 consumed index → 合法 JSON 前缀+trailing garbage 记成成功 tool call（探针证据污染）；P2=raw_output 实为 truncated_output 命名混淆 → **%44（作者）修复中**（p3h worktree，修完 head 再变、%43 复核增量）。
+- **PR #29 REQUEST_CHANGES**（%43，绑 `5c68f945`）：P1×2=①missing_surface 硬门仅存在/计数校验，`tools:[{}]` 语义空可过 ②same-surface 未闭合（tool_name∈mounted 与 tool_schema_digest 相等性未 enforce）→ **%45（作者）修复中**（p5w 分支；🔴先不 rebase #31 防撞 %43 在审）。
+- **PR #31 首轮交叉审派 %43**（绑 `ac7774e0`，delta over #29；重点对抗审 dev_selection 投影泄漏/负例 quota=0 真不激活/#29 两 P1 在 delta 是否加重）。
+- **GF rev3 收讫**（%43）：`gf-reduction-rev3.md` APPROVE_FOR_UPLIFT，**136/136 canonical GF 恰好一次映射** + GF-126/148 吸收 + not_claimed 段诚实；status=`rev3_clean_default_lock_pending_leige_override`（默认 lock 磊哥异步可翻）。N3 done。
+- **N4c 三冲突裁决（commander，D-040 纯自动授权内）**：①query/refusal/unsupported 负例配额 **维持 deferred**（refusal_ratio_target=0.0 锁值不动；安全由 F-044 D 轴 query→actuation 零容忍 eval 门承接，与 gate7 §10.5「failure/unsupported/safety 映射 C6/eval 层」一致；候补激活留磊哥异步）②f044 文档跨分支可见性（随 docs 整编进 main 后 reconcile）③early-stop 可执行阈值留 run-auth grill（Q06），config 锚（checkpoints 50/100/150 + task_metric basis + human-pause）够 N4 口径。
+- **worker ops**：%45 pre-mortem 联网吹爆 context（codex「ran out of room」）→ ESC+`/new` 复活成功（救援梯新招式：context 爆=开新线程而非重启进程）；pre-mortem 任务改窄域后重排队。
+- **PR #31 首轮交叉审 REQUEST_CHANGES**（%43；🔴 head 漂移诚实处理：派单绑 `ac7774e0`，实际 head 已是 `722644d4`（N4c commit），正文绑实际 head——**commander 教训：同分支并行派活时 review 绑定的 head 必在派单时现查，别用派单前快照**）：①**关键对抗审过关**：dev_selection 无泄漏进 train.jsonl、must_not_train 语义未被改坏、E-2 降档仅 seat 组且 surface 自洽 ②Inherited P1=#29 DataGate 语义门（%45 修复中，rebase 后清）③P2×2 delta=N4c quota 只写 receipt 未 enforce dry-run 产出 + `--preflight-only` 互斥校验在 model load 之后（缺 transformers 时先死 ModuleNotFoundError 到不了门）→ 随 #29 修复批次一并给 %45。swift test 526/4skip/0fail（local verify）。
+
+## D-043（2026-07-03 午前）N2/N3/N4 全件收口 = **N4-ACCEPTED-LOCAL**（goal 兑现）
+- **修复-复核链全闭环（作者修/异源复核，全绑 head SHA）**：#26 P1 consumed-index → `edfc2198`（%44 修，%43 Fix Re-review 全 PASS：dirty-tail→json_trailing_garbage、20 unit OK）；#29 双 P1 → `871307d9`（%45 修：schema 语义校验+tool_name∈mounted+digest 闭合；%43 复核 APPROVE_FOR_PR29_P1_SCOPE，三 bypass 探针 exit65 全 fail-closed+正样本 exit0+N4A rerun 4500 行干净）；#31 双 P2+rebase → `f163eedf`（%45：quota_mismatch 硬门+preflight 旗子校验前移 exit64；%43 复核 APPROVE_FOR_PR31_DELTA，`--allow-mlx-lm-version-mismatch` 判定 pre-existing `c4a7d1a8` 默认关非后门）。
+- **N4 验收档落定**：`docs/c5-training-readiness-grill/n4-train-readiness-acceptance-2026-07-03.md`，verdict=**N4-ACCEPTED-LOCAL**——local 机械门全绿（commander 独立复跑 preflight exit0 + DataGate rerun + 语义门对抗探针）+ 配方锚/F-044 默认锁 + GF rev3 + premortem/runbook 门；**不清的帐如实列**：prepare receipt broader gates（validator_layer2/candidate_data_quality/fuse/endpoint parity）、云凭证（N5）、run-auth+R7（N6/N7）、CI billing、GitHub reviews=0。
+- **premortem 关键虎**：T1=mlx-lm#1348 hang（rank16+7modules+8192 触发面与本配置命中）→ 验证动作=2-iter 真训 smoke **只能在 run-auth 后作第一动作**（R7 边界内不做）；runbook 门清单 `WAVE1-TRAINING-RUNBOOK-GATES.md` 落 owner/阈值/命令。
+- **PR body 全刷新至诚实态**（%44 gh readback 核）：#26/#27/#28 各带「Local re-review status」段，明示 local verify 非 CI/reviews=0/billing/不声称 merge-ready。
+- **PR30 整编裁决表**（%43）：live overlap=66（我早前手算 65 少 1），keep-main 51 / take-branch 4 / union 11 → 整编支构建转 backlog（N5-prep）。
+- **worker ops 沉淀**：%45 context 爆→ESC+`/new` 复活；%44 误入 TRANSCRIPT 浏览态→`q` 退出（救援梯两新招）。
+- **磊哥 4 键待办不变**：billing → CI 重跑；merge 依赖序 #26→#27→#28→#29→#31（+整编后 docs PR）；云凭证；run-auth/R7。F-044/GF 默认锁可异步翻。

@@ -43,6 +43,7 @@ struct C5TrainingCLI {
             return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")))
         }()
         let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
+        let naturalToolCallRows = try options.naturalToolCallRowsURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5NaturalToolCallRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))
         let stateCells = try StateCellContractLookup(yaml: read(repoRoot, "contracts/state-cells.yaml"))
         let scopeCandidatesBySlot = C5ScopeCandidateCatalog.scopeCandidatesBySlot(from: stateCells)
@@ -78,6 +79,7 @@ struct C5TrainingCLI {
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
             generatedUtteranceRecords: generatedUtterances,
+            naturalToolCallRecords: naturalToolCallRows,
             scope: options.scope,
             surface: options.surface,
             dDomainCatalog: dDomainCatalog,
@@ -123,6 +125,7 @@ struct C5TrainingCLI {
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
             generatedUtteranceRecords: generatedUtterances,
+            naturalToolCallRecords: naturalToolCallRows,
             scope: options.scope,
             surface: options.surface,
             dDomainCatalog: dDomainCatalog,
@@ -208,6 +211,11 @@ struct C5TrainingCLI {
         receipt_version: \(receipt.receiptVersion)
         generated_at: \(receipt.generatedAt)
         acceptance_stage: \(receipt.acceptanceStage.rawValue)
+        fit_proof_level: \(receipt.fitProofLevel)
+        consumer: \(receipt.consumer)
+        consumed_artifact: \(receipt.consumedArtifact)
+        sufficiency_evidence: \(receipt.sufficiencyEvidence)
+        residual_gap: \(receipt.residualGap)
 
         ## Data
         - row_count: \(receipt.rowCount)
@@ -253,6 +261,11 @@ struct C5TrainingCLI {
         - candidate_lineage_parent_overlap: \(receipt.candidateDataQualityGate.lineageParentOverlap)
         - candidate_epoch_exposure_max: \(receipt.candidateDataQualityGate.epochExposureMax)
         - masking_coverage: train_on_turn=\(receipt.maskingCoverage.trainOnTurn), function_name=\(receipt.maskingCoverage.functionName), argument_name=\(receipt.maskingCoverage.argumentName), argument_value=\(receipt.maskingCoverage.argumentValue)
+        - supervision_coverage: \(receipt.supervisionCoverageDigest.status)
+        - supervision_parser_critical: \(receipt.supervisionCoverageDigest.parserCriticalStatus)
+        - supervision_ratio: \(String(format: "%.4f", receipt.supervisionCoverageDigest.trainableNonThinkRatio)) (threshold >= \(receipt.supervisionCoverageDigest.trainableRatioMinimum))
+        - supervision_prompt_user_system_leakage: prompt=\(receipt.supervisionCoverageDigest.promptLeakageCount), user=\(receipt.supervisionCoverageDigest.userLeakageCount), system=\(receipt.supervisionCoverageDigest.systemLeakageCount)
+        - supervision_think_leakage: \(receipt.supervisionCoverageDigest.thinkLeakageCount)
         - diagnostic_verdict: \(receipt.generalizationDiagnostic.diagnosticVerdict)
         - fuse_parity_gate: \(receipt.fuseParityGate.status)
         - fuse_toolcall_exact_delta_pp: \(String(format: "%.4f", receipt.fuseParityGate.toolCallExactDeltaPP))
@@ -529,6 +542,7 @@ private struct Options {
     var maskingStage: C5MaskingStage
     var baseModelDir: URL
     var generatedUtterancesURL: URL?
+    var naturalToolCallRowsURL: URL?
     var expectedOffsetArtifactSHA256: String?
     var allowRegeneratedOffsetArtifact: Bool
     var requireCandidateDataQualityGate: Bool
@@ -538,7 +552,7 @@ private struct Options {
     var surface: C5TrainingSurface
 
     init(arguments: [String]) throws {
-        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only] [--scope demo|full] [--surface d_domain|frame]"
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--natural-tool-call-rows PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only] [--scope demo|full] [--surface d_domain|frame]"
         guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -550,6 +564,7 @@ private struct Options {
         let defaultBaseModel = "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e"
         baseModelDir = URL(fileURLWithPath: ProcessInfo.processInfo.environment["MAFORMAC_BASE_MODEL_DIR"] ?? defaultBaseModel, isDirectory: true)
         generatedUtterancesURL = nil
+        naturalToolCallRowsURL = nil
         expectedOffsetArtifactSHA256 = nil
         allowRegeneratedOffsetArtifact = false
         requireCandidateDataQualityGate = false
@@ -581,6 +596,9 @@ private struct Options {
             case "--generated-utterances":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --generated-utterances value") }
                 generatedUtterancesURL = URL(fileURLWithPath: value)
+            case "--natural-tool-call-rows":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --natural-tool-call-rows value") }
+                naturalToolCallRowsURL = URL(fileURLWithPath: value)
             case "--expected-offset-artifact-sha256":
                 guard let value = iterator.next(), !value.isEmpty else { throw CLIError.usage("missing --expected-offset-artifact-sha256 value") }
                 expectedOffsetArtifactSHA256 = value
