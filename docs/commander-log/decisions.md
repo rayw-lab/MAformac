@@ -501,3 +501,8 @@
 - **repo 化派单（%44 执行中）**：token 预算 batcher（默认关）+ grad checkpoint 开关 + 边界 clear 正式进 repo + 单测 + snapshot 行为一致断言 → PR。
 - **候选 manifest 草案就绪（%43）**：`T1D-candidate-manifest-DRAFT.md`（五步结构+🔴 T1+memory-budget 资源门附录=维度三制度化），status=draft 等 D2combo 审 + owner 签。
 - **warmup lane subcc-1 交付**：50 行 + ledger 50/50 全覆盖（commander 亲核）+ 生成 receipt + 可复现 generate_batch.py + SHA256SUMS；%45 守望触发生效，机械门三件（datagate/diversity/c6-leakage）执行中。recovery-batch-01 order 草案亦出（sha `dae0c783…`）。
+
+## D-061（2026-07-03 晚）warmup batch-01 第一轮：硬化门咬住 lane 自铸 digest（门立功）+ rev2 回路（Accepted，执行中）
+- **lane subcc-1 交付**（50 行+ledger 50/50+可复现 generate_batch.py+SHA 绑定+独立自核 INDEPENDENT-CLEAR）且**五条诚实披露**——其中#4（tool_schema_digest 为 lane 对 mounted 22 工具 canonical json 的自派生 sha）被 %45 机械门精确咬住：**DataGate BLOCKED tool_schema_digest_mismatch×50**（FIX-PR29 digest 权威校验语义=禁 lane 自铸）；diversity PASS（p90-p10=9.0 长度带宽达标——canary WARN 教训已被 lane 吸收）、C6 probe pass、refusal=0 达标、极性对称、hash 非克隆真重算 mismatch=0。
+- **rev2 回路（N5E-011 语义）**：lane 换 2 行补 multi_call floor(2)（保总数 50 防 quota_mismatch 门）+ digest 改克隆模板原值；%45 出 controller sha 注入器（closes lane 披露#1 recipe/quota sha TODO）+ lane-prompt-package 加「禁 lane 自铸 digest」硬条款（下批免疫）→ 三门重跑 v2。
+- 元观察：**生成方诚实披露 + 消费方机械门 + 一轮修订回路**在 warmup 首批就完整跑通——批契约生态在自我执行。
