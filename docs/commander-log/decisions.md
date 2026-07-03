@@ -419,4 +419,10 @@
   4. **沉淀**：决策进 grill SSOT + 记忆（MEMORY/memory 文件）+ 元认知（新坑类型回流 lessons/rules）。
 - **判定「重要节点」**：新阶段开跑（如 wave-1 扩量/正式训练/C6 acceptance/UIUE 合流）、重大架构或范式选择、跨 PR 大改造、任何「拍完影响后续多步」的决策簇。小修/单文件/机械操作不套（防 over-ceremony）。
 - **立即适用对象 = wave-1 扩量节点（canary→4.5k）**：骨架已建 `docs/c5-training-readiness-grill/n5-expansion-grill-2026-07-03.md`（N5E- 系列）；%45 的 EXPANSION-PLAN-draft 与 canary 验收结果作弹药喂入，grill 后消减上抛磊哥拍（G4/G5/G9 议题在内）。
-- 级联：本规则进 COMMANDER-INDEX 下一步段 + 项目 memory（`maformac-important-node-grill-paradigm.md`）；CLAUDE.md §2 的增补随下轮 docs 同步（PR32 冻结不动）。
+- 级联：本规则进 COMMANDER-INDEX 下一步段 + 项目 memory（`feedback-commander-tacit-understanding.md` 默契第 3 条承载）；CLAUDE.md §2 的增补随下轮 docs 同步（PR32 冻结不动）。
+
+## D-048（2026-07-03 午后）canary 两轮收敛 **CANARY_PASS_EXPAND_OK** + N5E grill 消减锁定（D-046 首个完整跑通）
+- **canary 终态**：re-judge v2 = `CANARY_PASS_EXPAND_OK`（%43：ledger 60/60 全量对账重算——template_args/canary_args/args_diff 三向相等、value_changed=31 与 receipt 一致、改动行内容复核过、D8 帽内；rev2 sha `3ef37e02…` supersede rev1 `9045d9c8…`）。验收总报告=`N5-canary/CANARY-ACCEPTANCE-REPORT.md`（scope 干净：local/pre-training only；回路价值=**跨厂商 judge 抓住机械门抓不住的溯源缺陷，一轮修复收敛**）。
+- **N5E grill 消减锁定**（`docs/c5-training-readiness-grill/n5-expansion-grill-2026-07-03.md` §二-四）：12 题 = **10 default_locked**（C 混合形态 warmup N=50→75 / 批契约 rev2 五条款含 ledger fail-closed / quota SSOT=Gate7RecipeQuotaConfig / judge 抽样机械-语义分工+可执行状态机 / salvage A 两 stop gate（4500 全投影→3804 recovery+696 drop）/ diversity 双接线 / C6 每批探针 / lineage sha 绑定+pin 基座重验 / FAIL 回路 2 轮上限上抛）+ **2 磊哥键**（N5E-005 人工精度门 staffing / N5E-006 基座 pin 卡 merge 链）。cross-grill 修正全量吸收（CG44 六 P1 + CG45 合同层 P0「抽样假绿」→ **声称分层条款**：机械全量维才可出全量声称，语义抽样维禁升格）。
+- **landing 派发**：%45 BATCH-CONTRACT rev2（待派，锁定条款执笔）/ %43 JUDGE-SAMPLING rev2（在途）/ %44 lineage INDEX（在途）/ %45 M2 树盘点（在途 backlog）。
+- 元认知：**D-046「重要节点必 grill 范式」首个完整闭环当日跑通**（骨架 upfront→弹药 5 draft→cross-grill 对抗审→消减 lock→landing 派发），worker 出弹药+互审、commander 消减裁决、磊哥键单列不自拍——范式成立；且 canary 的 FAIL→修→PASS 一轮收敛为 N5E-011 回路条款提供了同日实证。
