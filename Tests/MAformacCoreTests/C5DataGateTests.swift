@@ -114,6 +114,36 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "tool_schema_digest_mismatch" })
     }
 
+    func testSurfaceManifestCatalogSchemaMustMatchMountedTools() throws {
+        let manifest = C5DataGateSurfaceManifest(
+            manifestFileDigest: "manifest-file-digest",
+            groupingContractDigest: "grouping-contract-digest",
+            entries: [
+                C5DataGateSurfaceManifestEntry(
+                    subsetPolicyID: "e2-lite-v1",
+                    subsetGroupID: "ac",
+                    toolIDsOrdered: ["set_cabin_ac"],
+                    toolSchemaDigest: "schema-digest"
+                )
+            ],
+            toolSchemasByName: [
+                "set_cabin_ac": [
+                    "type": .string("function"),
+                    "function": .object([
+                        "name": .string("set_cabin_ac"),
+                        "parameters": .object(["type": .string("object")])
+                    ])
+                ]
+            ]
+        )
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, surfaceManifest: manifest, jsonl: """
+        {"sample_id":"C5-SURFACE-CATALOG-DRIFT","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-CATALOG-DRIFT","parent_semantic_id":"parent:surface.catalog","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"manifest-file-digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "tool_schema_digest_mismatch" })
+    }
+
     func testSurfaceManifestAcceptsManifestFileOrGroupingDigest() throws {
         let manifest = C5DataGateSurfaceManifest(
             manifestFileDigest: "manifest-file-digest",

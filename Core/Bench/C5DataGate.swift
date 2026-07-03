@@ -300,15 +300,18 @@ public struct C5DataGateSurfaceManifest: Equatable, Sendable {
     public var manifestFileDigest: String
     public var groupingContractDigest: String?
     public var entries: [C5DataGateSurfaceManifestEntry]
+    public var toolSchemasByName: [String: [String: JSONValue]]
 
     public init(
         manifestFileDigest: String,
         groupingContractDigest: String? = nil,
-        entries: [C5DataGateSurfaceManifestEntry]
+        entries: [C5DataGateSurfaceManifestEntry],
+        toolSchemasByName: [String: [String: JSONValue]] = [:]
     ) {
         self.manifestFileDigest = manifestFileDigest
         self.groupingContractDigest = groupingContractDigest
         self.entries = entries
+        self.toolSchemasByName = toolSchemasByName
     }
 }
 
@@ -905,6 +908,12 @@ public struct C5DataGateValidator: Sendable {
            mountedToolNames == entry.toolIDsOrdered,
            toolSchemaDigest != entry.toolSchemaDigest {
             reasons.append("tool_schema_digest_mismatch")
+        }
+        if !manifest.toolSchemasByName.isEmpty {
+            let expectedSchemas = mountedToolNames.compactMap { manifest.toolSchemasByName[$0] }
+            if expectedSchemas.count != mountedToolNames.count || expectedSchemas != candidate.tools {
+                reasons.append("tool_schema_digest_mismatch")
+            }
         }
         return reasons
     }
