@@ -506,3 +506,9 @@
 - **lane subcc-1 交付**（50 行+ledger 50/50+可复现 generate_batch.py+SHA 绑定+独立自核 INDEPENDENT-CLEAR）且**五条诚实披露**——其中#4（tool_schema_digest 为 lane 对 mounted 22 工具 canonical json 的自派生 sha）被 %45 机械门精确咬住：**DataGate BLOCKED tool_schema_digest_mismatch×50**（FIX-PR29 digest 权威校验语义=禁 lane 自铸）；diversity PASS（p90-p10=9.0 长度带宽达标——canary WARN 教训已被 lane 吸收）、C6 probe pass、refusal=0 达标、极性对称、hash 非克隆真重算 mismatch=0。
 - **rev2 回路（N5E-011 语义）**：lane 换 2 行补 multi_call floor(2)（保总数 50 防 quota_mismatch 门）+ digest 改克隆模板原值；%45 出 controller sha 注入器（closes lane 披露#1 recipe/quota sha TODO）+ lane-prompt-package 加「禁 lane 自铸 digest」硬条款（下批免疫）→ 三门重跑 v2。
 - 元观察：**生成方诚实披露 + 消费方机械门 + 一轮修订回路**在 warmup 首批就完整跑通——批契约生态在自我执行。
+
+## D-062（2026-07-03 晚）multi-call 口径裁决（WAIVED→正式 dev 项）+ VPN 超时波救援（Accepted）
+- **lane rev2 交付**（digest 改克隆权威链值/multi-call 2 行/极性对称/near-dup 降至 0.815）+ 🔴 **关键风险 flag（lane 勘查 repo 实况）**：C5 训练渲染器 `renderToolCall` 为单 call、4500 底座零多意图先例、无多意图签名配方——lane 的 2 行 multi 用了 ad-hoc 签名约定。
+- **裁决**：ad-hoc 约定不许进数据 → **rev3 回退 0049/0050 为单 call**；batch-01 的 `multi_call_floor(2)` **WAIVED**（reason=pipeline_single_call_renderer_no_multi_recipe，documented residual 非 fail）；**multi-call 支持立为正式 dev 项**（渲染器/签名配方/DataGate 语义三件，落地后批次恢复 floor）——配方锚（多 call 配对样本）不丢，只是走正门。
+- **VPN 超时波**：磊哥开 VPN 触发三 worker「Request timed out」连环——救援法沉淀：**timeout→ESC 释放队列；若转「Conversation interrupted」→自足要点续跑重指令（先盘点半成品防重做）**；根因=网络层非 codex（进 worker 画像救援梯）。
+- lane 收官流程：rev3 交付后关闭（后续批次起新 lane）。
