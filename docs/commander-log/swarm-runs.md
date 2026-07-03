@@ -8,7 +8,8 @@
 - **worker**: %43（#26 增量重审 `3b081823..e6a8849f` + #29 首轮 `5c68f945` + GF rev3，/tmp worktree 不动 uiue 树）/ %44（#27 `a400b01a` + #28 `49fa0b9b` 重审+mirror gate 复跑，/tmp worktree）/ %45（p5w 树新分支 E-2 降档挂载+valid/test 监督契约→DataGate exit0+preflight strict exit0，完成即 commit）
 - **SPEC**: `runs/2026-07-03-n2n4-train-readiness/SPEC-{43,44,45}-*.md`（inline SSOT 决策+file:line+可复跑命令；pre-mortem 联网/本地交叉+iceberg 纪律 inline）
 - **commander 侧**: N0 落账收窄（D-040 级联 6 文件）+ N1 PR #30（81 commits 纯 docs 推新分支收编）+ F-044 默认锁/配方锚落档 `docs/c5-training-readiness-grill/f044-default-lock-and-wave1-recipe-anchors-2026-07-03.md`
-- **产出**（待收）: `REREVIEW-PR26-e6a8849f.md` / `REVIEW-PR29-5c68f945.md` / `gf-reduction-rev3.md` / `REREVIEW-PR27-a400b01a.md` / `REREVIEW-PR28-49fa0b9b.md` / `RECEIPT-N4A-e2-downgrade-preflight.md`
+- **产出**（全收，2026-07-03 午前 D-043 收口）: 重审 `REREVIEW-PR26-e6a8849f.md`(+Fix Re-review @edfc2198)/`REREVIEW-PR27-a400b01a.md`/`REREVIEW-PR28-49fa0b9b.md`(claim correction)/`REVIEW-PR29-5c68f945.md`(+@871307d9)/`REVIEW-PR31-ac7774e0.md`(+@f163eedf)/`REVIEW-PR30-docs.md`(P0 scope breach)；修复 `FIX-PR26-edfc2198.md`/`FIX-PR29-871307d9.md`/`FIX-PR31-f163eedf.md`；N4 `RECEIPT-N4A-e2-downgrade-preflight.md`/`RECEIPT-N4C-recipe-anchors.md`/`commander-recheck-preflight.log`(独立复跑)/`PREMORTEM-wave1-training.md`/`WAVE1-TRAINING-RUNBOOK-GATES.md`；治理 `gf-reduction-rev3.md`(136/136)/`ARCHEO-bridge-schema-verdict.md`/`PR30-integration-adjudication-table.md`(66 文件 51/4/11)。验收档=repo `docs/c5-training-readiness-grill/n4-train-readiness-acceptance-2026-07-03.md`（N4-ACCEPTED-LOCAL）
+- **worker 亮点**: %43 五轮审计全真 finding（#26 P1 consumed-index/#29 双 P1 bypass/#31 双 P2）+ head 漂移诚实处理；%44 抓 commander PR30 P0 + ARCHEO 纠 commander 二次误判 + premortem 预算纪律 7/8；%45 三修全一次过复核 + N4c 防自拍上抛 3 冲突。ops：%45 context 爆→`/new` 复活、%44 TRANSCRIPT 卡→`q` 退出
 
 ## run 2026-06-30-uiue-main-status-review
 - **任务**: UIUE vs main 现状回顾 + grill 全量清单 + gitnexus 代码图谱 + 现状路线图
