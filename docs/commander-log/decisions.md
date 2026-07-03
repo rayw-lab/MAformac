@@ -519,3 +519,8 @@
 - **TOOL-AUDIT（%43）**：judge_sampling_receipt.py 三 P1（分母边界/schema 完整性/sample_id membership）+P2 → %45 修（与注入器同批）。Wilson/状态机/fixture 复算 OK。
 - **T1D repo 化 = PR #38**（%44：token_budget/grad_checkpoint/boundary_clear 三控件+self-test flags+71/71 tests，honest body）；%44 转 RUNBOOK-V2（T1+资源门制度化）。
 - 元观察：**warmup 首批把批生态所有门都咬了一遍**（digest 权威链×2、quota 保护、multi-call 契约 vs 管道现实、工具质检）——每个 blocked 都是门在工作，零 blocked 泄漏进 judge/训练。
+
+## D-064（2026-07-03 晚）B01 机械门全绿（v3）+ 正式 judge 触发（Accepted，执行中）
+- **gates v3 = mechanical_gates_pass_local**（receipt sha `7a0c63f2…`）：controller 注入权威 `tool_schema_digest`（subset-policy-manifest 组值）后 DataGate `data_gate_ready`；diversity/C6 复用 rev3 pass。digest 线三轮（lane 自铸→克隆错字段→controller 注入）最终按 D-061 语义收口——**权威字段只能由权威侧产**。
+- **正式 judge 触发**（%43 按 JUDGE-SPEC-batch-01：机械维 50 全量+语义维 20/50 分层抽样+增维；声称分层两档措辞）；%45 收尾 receipt 计算器三 P1；%44 预产 batch-02..05 orders（judge PASS 后四 lane 并发就绪）。
+- RUNBOOK-V2 落档（T1+资源门制度化+D2combo 配方基线+multi-call dev 项挂账）；PR #38 审中。
