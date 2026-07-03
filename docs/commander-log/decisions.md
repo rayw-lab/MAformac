@@ -389,3 +389,14 @@
 - **PR30 整编裁决表**（%43）：live overlap=66（我早前手算 65 少 1），keep-main 51 / take-branch 4 / union 11 → 整编支构建转 backlog（N5-prep）。
 - **worker ops 沉淀**：%45 context 爆→ESC+`/new` 复活；%44 误入 TRANSCRIPT 浏览态→`q` 退出（救援梯两新招）。
 - **磊哥 4 键待办不变**：billing → CI 重跑；merge 依赖序 #26→#27→#28→#29→#31（+整编后 docs PR）；云凭证；run-auth/R7。F-044/GF 默认锁可异步翻。
+
+## D-044（2026-07-03 午）磊哥两步路线 lock（原话转译，Accepted）
+- **第一步 = 收干净工程面**：✅已达成——PR #32 整编支（`e01aa7c3`，26 branch-only+4 take-branch+11 union/keep-main 51 不碰/代码面两点 diff=0）经 %43 复核 **APPROVE_FOR_PR32_STATIC_DOC_INTEGRATION**，live **MERGEABLE**；#30 body 已改指向 #32（merge 后关 #30 留分支作历史备份）。→ 磊哥修 billing 后 **commander 动作=gh run rerun 重跑 #26/#27/#28/#29/#31/#32 的 verify**；**CI 真绿后按依赖序合：#26→#27→#28→#29→#31→#32(docs)**。
+- **第二步 = N5 只做 live 生成和 judge，不碰训练**（磊哥明确 scope）：云凭证到位 → **先小批 canary**（Anthropic generator + OpenAI judge）→ 过 DataGate / 语义 surface 门 / redaction / cross-vendor judge → 再扩 wave-1。**目标=生成候选数据质量，不是模型效果**。训练/R7 边界不变（run-auth 仍是独立键）。
+- commander 预备动作：%45 出 N5 canary runbook/config（construction-only，fail-closed 等凭证接线，不打云）；billing 修复信号到 → 立即 rerun checks 不再问。
+
+## D-045（2026-07-03 午）N5 canary 厂商实现定案（磊哥四连拍，Accepted，云凭证键就此解除）
+- **Anthropic 生成 = 后台 subagent Claude Code（模型 Opus）**（磊哥：「anthropic 生成 安排 subagent CLAUDECODE 跑」「后台运行哈 你开一个 subcc」「模型 OPUS」）；**OpenAI judge = codex worker 任选其一**（gpt-5.5，磊哥：「OPENAI Judge 就是 codex 随便选一个 worker」）。真跨厂商（Claude 家生成 / OpenAI 家评审），不再依赖云 API key——**4 键中的「云凭证」键就此解除**，剩 billing / merge / run-auth 三键。
+- 生成=磊哥亲自授权的 N5 第二步 scope（只生成+judge 不训练，目标=候选数据质量非模型效果，D-044）；R7 训练边界不变。
+- **canary 管道**：sub-CC（`canary-gen-anthropic`，后台）产 60 行（≥10 subset group 含 seat.massage_force_time，字段模板取自 N4A 真实样本行保 surface/digest 机械正确，只改 input_zh 自然口语中文/tool_call 值/generator 三族，open-close 极性对称，红线=不读 raw/无 PII 车型代号）→ commander 亲跑 C5DataGateCLI（含 FIX-PR29 硬化语义门+redaction）→ **%43 judge**（逐行 rubric：口语自然度/query↔tool_call 语义一致/值域/极性/协议串泄漏/脱敏/近重复）→ canary 验收报告 → 过了才扩 wave-1。
+- **PR #32 冻结在已复核 head `e01aa7c3`**（%43 APPROVE_FOR_PR32_STATIC_DOC_INTEGRATION，MERGEABLE）：D-044/D-045 不再 port 进去（防复核循环），留我分支+PR30 备份，随下轮 docs 同步进 main。
