@@ -1,14 +1,11 @@
 ---
 authority: grill_skeleton_tracking_not_ssot（决策 lock 后逐条回写 grill SSOT）
 series: N5E
-status: skeleton_upfront（D-046 常备规则第 1 步；弹药未齐，grill 未开跑）
+status: grill_expanded_reduced_default_locked（12 题：10 default_locked + N5E-005/006 磊哥键；2026-07-03 午后）
 decision_ref: D-044/D-045/D-046
 created: 2026-07-03 午后
-ammo_pending:
-  - N5-canary 验收三件套（生成 receipt / DataGate receipt / %43 judge verdict）
-  - "%45 EXPANSION-PLAN-draft.md（生成形态/quota 接线/judge 抽样/salvage/基座前置）"
-  - "%44 diversity-report + canary C6 leakage probe"
-grill_run_precondition: canary verdict 落地
+ammo_status: 全齐（5 draft + 2 cross-grill + canary v1 FAIL→v2 PASS 两轮实跑）
+canary_final: CANARY_PASS_EXPAND_OK（CANARY-ACCEPTANCE-REPORT.md，run 目录）
 ---
 
 # N5E · wave-1 扩量节点 grill（canary→4.5k）骨架
@@ -16,7 +13,7 @@ grill_run_precondition: canary verdict 落地
 > 按 D-046 常备规则：节点开始即建骨架，弹药喂入后 grill 展开 → 消减 → 磊哥 lock → 沉淀。
 > 回顾入口（每题 recall 已决）：拍点包 1-7（`docs/c5-training-readiness-grill/wave1-owner-decision-package-2026-07-03.md`）/ gate7「§10.4 生成配比/§10.5 bug→C6 映射」（p5w 树，行锚见 `docs/c5-training-readiness-grill/n5-canary-grill-2026-07-03.md:10`）/ quota 公式 locked（`docs/c5-training-readiness-grill/landing-matrix.md:69`）/ N5 canary grill G1-G9（`docs/c5-training-readiness-grill/n5-canary-grill-2026-07-03.md`）/ F-044 默认锁（`docs/c5-training-readiness-grill/f044-default-lock-and-wave1-recipe-anchors-2026-07-03.md`）/ D-042 负例 deferred 裁决。
 
-## 一、议题清单（占位，grill 时逐题展开；来源=G 系列升级 + 拍点包未决项）
+## 一、议题清单（historical：骨架期占位，终态见 §二决策矩阵）
 
 | ID | 议题 | 承接已决 | 状态 |
 |---|---|---|---|
@@ -42,7 +39,7 @@ grill_run_precondition: canary verdict 落地
 | N5E-001 | **C 混合形态**：controller 从 locked quota 出批次 manifest；4 条 sub-CC lane 并发；🔴 **warmup 首批 N=50**（canary 60 行已证该量级可控），微批 D9/A12 全 PASS 后升到 EXPANSION-PLAN §0 的每批 75 行（run 目录 EXPANSION-PLAN-draft.md，%45 实算）；按 green/expected/bad 三情景各设 KPI | CG44-P1-4（N 条件化）+P1-5（三情景+warmup KPI） | default_locked |
 | N5E-002 | **批任务契约 rev2**（%45 执笔）：①ledger（template_sample_id+args_diff）为生成方**硬产出 fail-closed**（缺=批直接 blocked，D-047 教训制度化，不靠中途补约束）②值优先不改+改值登记③**长度带宽下限进生成要求**（canary WARN 长度带宽的裁决落点（diversity-report-v2.md 长度分布 p90=11.1/p10=6.0，run 目录））④批 artifact SHA 绑定⑤diversity WARN → 显式 `paused_diversity` 状态（消 CG45-P1-3 无名 pause 态） | CG44-P1-6（SHA 绑定）+CG45-P1-3 | default_locked→rev2 执行 |
 | N5E-003 | quota SSOT=`Gate7RecipeQuotaConfig`（N4c 已实装 config 面），controller manifest 从其派生，禁手写第二份 | — | default_locked |
-| N5E-004 | judge 抽样：**机械可判维（D5 泄漏/D6 脱敏/D9 ledger 对账）下沉脚本全量跑；LLM judge 只审语义维（D1/D2/D8 等）按 family 抽样 min(50,max(20,10%))**；可执行 family_judge_status 状态机+Wilson 下界+next-action；warning 行拆结构性/语义性两类，硬включ上限+超限升级而非无界全审 | CG44-P1-1（状态机可执行化）+P1-2（warning 行拆分封顶）+P1-3（owner/tool 矩阵） | default_locked |
+| N5E-004 | judge 抽样：**机械可判维（D5 泄漏/D6 脱敏/D9 ledger 对账）下沉脚本全量跑；LLM judge 只审语义维（D1/D2/D8 等）按 family 抽样 min(50,max(20,10%))**；可执行 family_judge_status 状态机+Wilson 下界+next-action；warning 行拆结构性/语义性两类，硬性上限+超限升级而非无界全审 | CG44-P1-1（状态机可执行化）+P1-2（warning 行拆分封顶）+P1-3（owner/tool 矩阵） | default_locked |
 | **N5E-005** | 🔴 **磊哥键**：人工精度门 staffing——⭐磊哥本人按 sample size 抽检（拍点5 原 default）或拍「首波跳过人工门，数据门+judge 双机械门先行」 | — | **pending_leige** |
 | **N5E-006** | 🔴 **磊哥键（卡 merge 链）**：扩量启动前 pin merge 后 main SHA；controller 记录四元组（main_pin_sha/quota-config SHA/catalog-manifest SHA/vendor enum）；中途 main 变=旧批降级 candidate 不混正式 receipt | EXPANSION-PLAN §1 全文吸收 | **pending_leige（billing→merge 后自动满足）** |
 | N5E-007 | salvage=**A 全量重判入 recovery pool，两道 stop gate**：projection gate（4500 行全投影当前 schema，`direct_pass=0` 预期，🔴 禁 legacy flag 放行）→ rejudge/DataGate gate（全量 vendor-enum judge+DataGate）；3804 行仅作 10 族 recovery quota（`reuse_origin=pr3_generated_utterances_final`），696 非 10 族 unsupported/drop 不改写；旧文件 sha 冻结 `46a36018…` | SALVAGE-INVENTORY 实算（4500/3804/696/direct_pass=0 全一手） | default_locked |
