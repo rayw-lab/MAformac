@@ -1,5 +1,5 @@
 ---
-status: d24a_inventory_live_verified
+status: d24a_inventory_live_verified  # ⚠️ RETIRED 2026-06-30 (A 文档收敛): retire_when 已满足 (PR#7/#6/#8 已并 origin/main 771f48a, merge evidence recorded)；本 manifest 转历史 receipt，当前 D24 收口见 docs/CURRENT.md
 artifact_kind: uiue_absorption_manifest
 authority: d24_execution_receipt
 created_at: 2026-06-30

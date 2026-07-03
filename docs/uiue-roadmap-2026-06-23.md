@@ -1,6 +1,6 @@
 ---
 type: uiue-roadmap
-status: ACTIVE（UIUE 链路 A 推进 SSOT，3 fork 全拍 + D1-D7 grill 收口 + 盲评 11 复议并入，2026-06-23 升级；对齐 Q22 单源精神）
+status: HISTORICAL / external-only（2026-06-30 A 文档收敛降级：UIUE 非主线证据，路线以 CLAUDE §9 + parent roadmap 为准；UIUE 推进在隔离 worktree MAformac-uiue，本主线仓副本仅溯源）
 date: 2026-06-23
 author: Claude (CC0)
 upstream:
@@ -13,8 +13,6 @@ upstream:
   - raw/.../2026-06-22-uiue-ultracode/{README,GRILL-MASTER}.md
 note: 本档 = UIUE 链路 A（worktree uiue/visual-ssot-state-consume）的**推进事实源**。3 fork 已全拍（fork1 深空辉光 / fork2 ui-presentation 拆独立 / fork3 走 worktree）；D1-D7 grill + 盲评 11 复议已收口（grill-master §3 决策晶体）。Phase 进度见 §〇.0 进度快照。
 ---
-
-> 2026-06-27 更新：本文保留为历史推进事实源和溯源材料。8.C2 partial 之后的当前后续顺序，以 `docs/uiue-roadmap-2026-06-27-post-8c2-baseline.md` 为准；该新文档不替代 OpenSpec、grill 决策或 L3 人审。
 
 # 〇.0 进度快照（progress SSOT，2026-06-23 升级）
 

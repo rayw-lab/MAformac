@@ -4,10 +4,10 @@ artifact_kind: pre_lora_tree_pr_merge_roadmap
 authority: baseline_until_superseded（树/合并/PR 节点的当前权威路线；与 live git 冲突时以 live 为准并回写本文件）
 created: 2026-07-02
 author: claude-commander（新任，D-015 接棒复审后）
-as_of_main: 80ea379c（M1 收口 D-018：PR #12-#15 已 merge；前态 ab355f6c）
+as_of_main: 80ea379c（historical snapshot；后续 D-019~034 已 supersede，live main 以 git 为准）（M1 收口 D-018：PR #12-#15 已 merge；前态 ab355f6c）
 evidence: L1-tree-pr-doc-inventory.md（%44 read-only 盘点，2026-07-02）+ commander git/gh 亲核
 companion: docs/lora-loop-blueprint-2026-07-02.md（训练闭环鸟瞰，姊妹篇）
-expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only signoff 2026-07-15 到期前须复核
+expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only signoff 已续签至 2026-07-23（D-027）前须复核
 ---
 
 # 基线路线图（2026-07-02 此时此刻）— 树 / 合并 / PR 节点
@@ -22,8 +22,8 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 | 云端 PR | #1-#15 全 MERGED/CLOSED，**零 open**（#12 β/#13 α/#14 γ/#15 δ = M1 四支）|
 | wave-1 分支 | ✅ **全部已合流 main（D-018）**：g8-tool/g2-mask 经 PR #12/#13；grill 树 2 件 Dim 文档经 γ PR #14 port（原分支转 cleanup 候选进 M2 清单）|
 | 指挥官分支 | `codex/rebuild-c6-doc-absorption-20260624`（主树，**147 behind** main；ahead 数随本分支文档 commit 递增——本文初稿时 `7dd64a50`/14 ahead，D-016 commit 后 `629b1132`/15 ahead，**live 以 `git rev-list --left-right --count main...HEAD` 为准**；commander-log、C5 grill 语料、handoffs 全在此）|
-| R7 | route-only signed（2026-06-25，**expires 2026-07-15**）；candidate unsigned；retrain/真生成/真评测/uiue-merge/V-S-U-PASS 全 BLOCKED |
-| 磊哥决策态 | ①③⑤ **已拍 locked**（D-017「ABCDE都要做」）且 ⑤ 已执行完（D-018）；② 方向 locked、实装形态 = E-2 grill round 消减后上抛细拍；④ tiny-ablation run-auth **仍待磊哥**（R7 线唯一堵点）+ 附注 R7 signoff 2026-07-15 到期 |
+| R7 | route-only signed（2026-06-25，**renewed to 2026-07-23（D-027；candidate 仍 unsigned，真训/真生成/真评测/UIUE-merge/V-S-U-PASS 仍 blocked）**）；candidate unsigned；retrain/真生成/真评测/uiue-merge/V-S-U-PASS 全 BLOCKED |
+| 磊哥决策态 | ①③⑤ **已拍 locked**（D-017「ABCDE都要做」）且 ⑤ 已执行完（D-018）；② 方向 locked、实装形态 = E-2 grill round 消减后上抛细拍；④ tiny-ablation run-auth **仍待磊哥**（R7 线唯一堵点）+ 附注 R7 signoff 已续签至 2026-07-23 |
 
 ## §1 全树状态矩阵（16 worktree + 关键裸分支）
 
@@ -74,7 +74,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 节点 M3 — D25 K1 receipts PR（磊哥单独拍要不要）
  ▼
 （R7 线，与 M1-M3 正交）
-节点 T — 磊哥④ tiny-ablation run-auth → 裁决-A 真跑 → …（见姊妹篇闭环图）
+节点 T — ✅v5 已真跑（D-024 授权）→ 🔴 verdict=BLOCKED_INVALID_FOR_PARADIGM_VERDICT（四根因重标，FINAL teardown 档）→ v6 契约重构 Phase 0-3 进行中（D-027）→ v6 run-auth 另签
 节点 M4 — candidate signoff 之后：UIUE merge 立项、golden/voice 解锁（R7 blocks 列表逐项）
 ```
 
@@ -84,7 +84,7 @@ expires_when: wave-1 consolidation PR 合并后须刷新 §2/§3；R7 route-only
 
 - 三个 wave-1 树承载着已双审 CONFIRMED 但未拍板的产出 → 动它们 = 在磊哥拍板前改变证据现场。
 - g5/g6/g7 等清理候选零风险但也零收益紧迫性 → 攒到 M2 一次授权一次清，避免碎步破坏性操作。
-- 唯一有**时间压力**的是 R7 route-only signoff **2026-07-15 过期**：若 M1/T 节点拖过此日，需磊哥续签或重签（放进 5 件决策的附注）。
+- 唯一有**时间压力**的是 R7 route-only signoff **已续签至 2026-07-23（原 07-15 压力点消解）**：若 M1/T 节点拖过此日，需磊哥续签或重签（放进 5 件决策的附注）。
 
 ## §4 3 worker 工作目录（现状 + 派工规则）
 

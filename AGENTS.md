@@ -11,6 +11,8 @@
 3. 读 **`docs/README.md`**(文档地图)
 4. 读最近 **`docs/handoffs/`**(若有)
 
+若你是通过 `tmux-bridge` 收到 Claude commander 派发的 Codex worker，还必须同时遵守本项目 `CLAUDE.md` 的“跨厂商 tmux 蜂群入口”和全局 `/Users/wanglei/.codex/AGENTS.md §13`；收稿以指定 output file 为准，不靠 ack。
+
 ## 一句话项目
 
 MAformac = 纯端侧(macOS/iOS)、离线、Qwen3 小模型 + LoRA 的车控**方案演示助手**(给客户现场演示,**非量产/非真车控**)。北极星:**现场 5 分钟内听懂中文、反应快、不崩、看着惊艳、断网也能跑**。
@@ -33,7 +35,7 @@ MAformac = 纯端侧(macOS/iOS)、离线、Qwen3 小模型 + LoRA 的车控**方
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **MAformac-r5-uiue-current** (28033 symbols, 44101 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **MAformac-r5-main-current** (28497 symbols, 51005 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -56,10 +58,10 @@ This project is indexed by GitNexus as **MAformac-r5-uiue-current** (28033 symbo
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/MAformac-r5-uiue-current/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/MAformac-r5-uiue-current/clusters` | All functional areas |
-| `gitnexus://repo/MAformac-r5-uiue-current/processes` | All execution flows |
-| `gitnexus://repo/MAformac-r5-uiue-current/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/MAformac-r5-main-current/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/MAformac-r5-main-current/clusters` | All functional areas |
+| `gitnexus://repo/MAformac-r5-main-current/processes` | All execution flows |
+| `gitnexus://repo/MAformac-r5-main-current/process/{name}` | Step-by-step execution trace |
 
 ## CLI
 

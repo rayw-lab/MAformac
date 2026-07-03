@@ -1,5 +1,5 @@
 ---
-status: blocked_at_d24e_github_actions_billing_live_verified
+status: blocked_at_d24e_github_actions_billing_live_verified  # ⚠️ SUPERSEDED 2026-06-30 (A 文档收敛): PR#6/7/8 已并 origin/main 771f48a，D24E blocked 仅历史快照；当前 D24 收口见 docs/CURRENT.md Current Phase
 artifact_kind: d24e_blocker_continuation_receipt
 authority: local_closeout_receipt_not_runtime_contract
 created_at: 2026-06-30
