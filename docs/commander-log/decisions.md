@@ -477,3 +477,9 @@
 - **磊哥令**：自动驾驶推进 L1-L6 不逐步请示；三 worker 升 xhigh；worker context 完全不看（自动压缩可靠，尽管派）。
 - **T1D grill lock**（`docs/c5-training-readiness-grill/t1d-oom-grill-2026-07-03.md`，D-046 范式窄口径）：runbook D0-D7 矩阵全盘采纳 + 六条增量 lock——执行序 D0→分流 D1/D1b/D2→D4、D0 双假设判据（H-act vs H-sup 分阶段 memory profile 裁决）、D1b token 预算 batching 进矩阵（snapshot 副本实现不动 repo）、receipt 必 cite basis_id + 资源包络两列、`diagnostic_not_candidate` 词表、D5/D6 高风险域须磊哥单签。
 - **三线开火**：%44=T1D-D0（instrumentation，OOM 也算达标=拿崩点 profile）/ %45=L2 接线（hash 重算 fail-closed + refusal 锁值显式化去 CLI 默认 + controller warmup 批 manifest v1，新分支 off b33d8eba）/ %43=L4 CI 修（verify.yml push-event diff 基线）→转 T1D receipt 审位。L3 salvage 排 %45 队尾；L5 文档随收稿滚动；L6 卡 T1D PASS。
+
+## D-057（2026-07-03 傍晚）T1D-D0 收官：H-act 实锤 + H-cache 附加因子 + D7a 先行（Accepted，执行中）
+- **D0 一手（receipt sha `e8b79a33…`，%43 审 APPROVE，basis=CODE-2026-07-03+DATA-WAVE1-SUBSTRATE-v2）**：同 OOM 复现（exit134）；val_loss 3.081/val 峰值 9.91GB；**首个训练 batch [4,5025]=20,036 total tokens > val 采样最大 13,236，而其监督 token 仅 96 < val 采样最大 122** → **H-act 支持、H-sup 弱化**（监督面 2.56x 非第一因）。精确 train 峰值 indeterminate（Metal C++ abort 早于 post-forward 采样，如实记）。
+- **commander 附加观察（H-cache）**：profile 显示 val 全程 MLX cache≈**24.35GB** 且原样带入 train_step_enter；机器统一内存 **32GB**（sysctl 亲核）→ 进训练时仅剩 ~7GB 给 20k-token backward。
+- **裁决执行序**：**D7a 先行**（val→train 边界 mx.clear_cache + 可选 set_cache_limit，零配方变更零语义风险；PASS=重大[零配方解]，FAIL=H-cache 排除转 D1b token 预算 batching）。%44 执行中。
+- 并行：%43 L6 eval bundle 打包（其 READY_WITH_GAPS 自查的 gap）；%45 L2 接线进行中；PR #35（CI 修）已 merge（T1D 的 CODE basis 仍 pin b33d8eba 不受影响——pin 的意义）。PR #30 已关（#32 替代已并）。
