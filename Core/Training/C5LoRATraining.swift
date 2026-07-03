@@ -2825,11 +2825,12 @@ public enum C5TrainingRenderer {
 }
 
 public enum C5DerivedHashRecipe {
-    public static let hashRecipeRef = [
-        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/Core/Training/C5LoRATraining.swift:2834",
-        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/Core/Training/C5LoRATraining.swift:2846",
-        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/Core/Bench/C6VehicleToolBench.swift:2329-2331"
-    ].joined(separator: ";")
+    public static let hashRecipeAnchorTokens = [
+        "repo:Core/Training/C5LoRATraining.swift#C5DerivedHashRecipe.promptHash(utterance:)",
+        "repo:Core/Training/C5LoRATraining.swift#C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall:)",
+        "repo:Core/Bench/C6VehicleToolBench.swift#C6Hash.sha256Hex"
+    ]
+    public static let hashRecipeRef = hashRecipeAnchorTokens.joined(separator: ";")
 
     public static func promptHash(utterance: String) -> String {
         C6Hash.sha256Hex(Data(utterance.utf8))

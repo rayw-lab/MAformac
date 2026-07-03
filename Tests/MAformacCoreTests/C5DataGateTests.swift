@@ -2,6 +2,13 @@ import XCTest
 @testable import MAformacCore
 
 final class C5DataGateTests: XCTestCase {
+    func testHashRecipeRefIsRepoRelativeNotWorktreeAbsolute() {
+        XCTAssertFalse(C5DerivedHashRecipe.hashRecipeRef.contains("/Users/"))
+        XCTAssertFalse(C5DerivedHashRecipe.hashRecipeRef.contains("MAformac-p5w-wave1-bridge"))
+        XCTAssertTrue(C5DerivedHashRecipe.hashRecipeRef.contains("repo:Core/Training/C5LoRATraining.swift#C5DerivedHashRecipe.promptHash(utterance:)"))
+        XCTAssertTrue(C5DerivedHashRecipe.hashRecipeRef.contains("repo:Core/Bench/C6VehicleToolBench.swift#C6Hash.sha256Hex"))
+    }
+
     func testCleanReceiptIsDataGateReady() throws {
         let receipt = try makeReceipt(jsonl: """
         {"sample_id":"C5-OK-001","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-OK-001","parent_semantic_id":"parent:c5.ok.train","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"masking":{"function_name":true,"argument_name":true,"argument_value":true,"train_on_turn":true}}
