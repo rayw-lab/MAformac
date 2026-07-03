@@ -138,6 +138,15 @@ class MetricsWriter:
             self.handle.close()
 
 
+def validate_preflight_argv(argv: list[str]) -> None:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true")
+    args, _ = parser.parse_known_args(argv)
+    if args.preflight_only and not args.require_maformac_loss_mask:
+        raise ValueError("--preflight-only requires --require-maformac-loss-mask")
+
+
 def parse_args(argv: list[str]) -> types.SimpleNamespace:
     try:
         ensure_mlx_runtime()
@@ -161,6 +170,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--inspect-batches", type=int, default=0)
     parser.add_argument("--inspect-output", type=str, default=None)
     parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--preflight-loss-mask-only", action="store_true")
     parser.add_argument("--allow-legacy-loss-objective", action="store_true")
     parser.add_argument("--self-test-loss-mask", action="store_true")
@@ -185,6 +195,7 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "inspect_batches": 0,
             "inspect_output": None,
             "require_maformac_loss_mask": False,
+            "preflight_only": False,
             "preflight_loss_mask_only": False,
             "allow_legacy_loss_objective": False,
             "self_test_loss_mask": False,
@@ -195,6 +206,11 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             args[key] = value
 
     return types.SimpleNamespace(**args)
+
+
+def validate_preflight_flags(args: types.SimpleNamespace) -> None:
+    if args.preflight_only and not args.require_maformac_loss_mask:
+        raise ValueError("--preflight-only requires --require-maformac-loss-mask")
 
 
 def require_pinned_mlx_lm(allow_mismatch: bool) -> str:
@@ -1264,6 +1280,8 @@ def inspect_batches(args) -> None:
 
 
 def run(args) -> None:
+    validate_preflight_flags(args)
+
     if args.self_test_loss_mask:
         ensure_mlx_runtime()
         run_loss_mask_self_test()
@@ -1332,6 +1350,8 @@ def run(args) -> None:
                 f"ignored_tokens={loss_mask_summary['ignored_tokens']}",
                 flush=True,
             )
+            if args.preflight_only:
+                return
         else:
             train_set, valid_set, test_set = load_dataset(args, tokenizer)
         if args.train:
@@ -1347,10 +1367,16 @@ def run(args) -> None:
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    args = parse_args(list(argv if argv is not None else sys.argv[1:]))
     try:
+        argv_list = list(argv if argv is not None else sys.argv[1:])
+        validate_preflight_argv(argv_list)
+        args = parse_args(argv_list)
+        validate_preflight_flags(args)
         run(args)
         return 0
+    except ValueError as error:
+        print(str(error), file=sys.stderr)
+        return 64
     except NonFiniteTrainingError as error:
         print("NONFINITE_TRAINING_STOP " + json.dumps(error.payload, sort_keys=True), file=sys.stderr)
         return 70

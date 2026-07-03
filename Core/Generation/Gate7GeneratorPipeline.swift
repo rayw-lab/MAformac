@@ -703,6 +703,7 @@ public struct Gate7QuotaInput: Equatable, Sendable {
     public var demoFloor: Int
     public var safetyFloor: Int
     public var sparseFamilyFloor: Int?
+    public var recipeQuota: Gate7RecipeQuotaConfig
 
     public init(
         familyID: String,
@@ -710,7 +711,8 @@ public struct Gate7QuotaInput: Equatable, Sendable {
         bugPressure: Int,
         demoFloor: Int,
         safetyFloor: Int,
-        sparseFamilyFloor: Int? = nil
+        sparseFamilyFloor: Int? = nil,
+        recipeQuota: Gate7RecipeQuotaConfig = Gate7RecipeQuotaConfig()
     ) {
         self.familyID = familyID
         self.intentBaseline = intentBaseline
@@ -718,6 +720,52 @@ public struct Gate7QuotaInput: Equatable, Sendable {
         self.demoFloor = demoFloor
         self.safetyFloor = safetyFloor
         self.sparseFamilyFloor = sparseFamilyFloor
+        self.recipeQuota = recipeQuota
+    }
+}
+
+public struct Gate7RecipeQuotaConfig: Codable, Equatable, Sendable {
+    public var quotaSource: String
+    public var openClosePolarityMinPerDirection: Int
+    public var queryReadOnlyQuota: Int
+    public var unsupportedRefusalQuota: Int
+    public var safetyRefusalQuota: Int
+    public var negativeQuotaActivation: String
+    public var multiCallPairingMinimum: Int
+
+    public init(
+        quotaSource: String = "intent",
+        openClosePolarityMinPerDirection: Int = 0,
+        queryReadOnlyQuota: Int = 0,
+        unsupportedRefusalQuota: Int = 0,
+        safetyRefusalQuota: Int = 0,
+        negativeQuotaActivation: String = "deferred_refusal_ratio_zero_conflict",
+        multiCallPairingMinimum: Int = 0
+    ) {
+        self.quotaSource = quotaSource
+        self.openClosePolarityMinPerDirection = max(0, openClosePolarityMinPerDirection)
+        self.queryReadOnlyQuota = max(0, queryReadOnlyQuota)
+        self.unsupportedRefusalQuota = max(0, unsupportedRefusalQuota)
+        self.safetyRefusalQuota = max(0, safetyRefusalQuota)
+        self.negativeQuotaActivation = negativeQuotaActivation
+        self.multiCallPairingMinimum = max(0, multiCallPairingMinimum)
+    }
+
+    public static let wave1ConstructionAnchors = Gate7RecipeQuotaConfig(
+        quotaSource: "intent_bug_scene_recovery",
+        openClosePolarityMinPerDirection: 1,
+        queryReadOnlyQuota: 0,
+        unsupportedRefusalQuota: 0,
+        safetyRefusalQuota: 0,
+        negativeQuotaActivation: "deferred_refusal_ratio_zero_conflict",
+        multiCallPairingMinimum: 2
+    )
+
+    public var activeNegativeQuota: Int {
+        guard negativeQuotaActivation == "active" else {
+            return 0
+        }
+        return queryReadOnlyQuota + unsupportedRefusalQuota + safetyRefusalQuota
     }
 }
 
@@ -725,13 +773,21 @@ public struct Gate7QuotaAllocation: Equatable, Sendable {
     public var familyID: String
     public var quota: Int
     public var components: [String: Int]
+    public var quotaSource: String
+    public var negativeQuotaActivation: String
 }
 
 public enum Gate7QuotaCalculator {
     public static func allocate(_ inputs: [Gate7QuotaInput]) -> [Gate7QuotaAllocation] {
         inputs.map { input in
             let floor = max(input.demoFloor, input.safetyFloor, input.sparseFamilyFloor ?? 0)
-            let quota = max(input.intentBaseline + input.bugPressure, floor)
+            let polarityFloor = input.recipeQuota.openClosePolarityMinPerDirection * 2
+            let quota = max(
+                input.intentBaseline + input.bugPressure + input.recipeQuota.activeNegativeQuota,
+                floor,
+                polarityFloor,
+                input.recipeQuota.multiCallPairingMinimum
+            )
             return Gate7QuotaAllocation(
                 familyID: input.familyID,
                 quota: quota,
@@ -740,10 +796,48 @@ public enum Gate7QuotaCalculator {
                     "bug_pressure": input.bugPressure,
                     "demo_floor": input.demoFloor,
                     "safety_floor": input.safetyFloor,
-                    "sparse_family_floor": input.sparseFamilyFloor ?? 0
-                ]
+                    "sparse_family_floor": input.sparseFamilyFloor ?? 0,
+                    "open_close_polarity_floor": polarityFloor,
+                    "query_read_only_quota": input.recipeQuota.queryReadOnlyQuota,
+                    "unsupported_refusal_quota": input.recipeQuota.unsupportedRefusalQuota,
+                    "safety_refusal_quota": input.recipeQuota.safetyRefusalQuota,
+                    "active_negative_quota": input.recipeQuota.activeNegativeQuota,
+                    "multi_call_pairing_minimum": input.recipeQuota.multiCallPairingMinimum
+                ],
+                quotaSource: input.recipeQuota.quotaSource,
+                negativeQuotaActivation: input.recipeQuota.negativeQuotaActivation
             )
         }
+    }
+}
+
+public struct Gate7QuotaEnforcementResult: Equatable, Sendable {
+    public var status: Gate7PipelineStatus
+    public var reasons: [String]
+
+    public init(status: Gate7PipelineStatus, reasons: [String]) {
+        self.status = status
+        self.reasons = reasons
+    }
+}
+
+public enum Gate7QuotaEnforcer {
+    public static let mismatchReason = "quota_mismatch"
+
+    public static func enforce(
+        status: Gate7PipelineStatus,
+        reasons: [String],
+        allocatedQuota: Int,
+        actualGeneratedCount: Int
+    ) -> Gate7QuotaEnforcementResult {
+        guard allocatedQuota > actualGeneratedCount else {
+            return Gate7QuotaEnforcementResult(status: status, reasons: reasons)
+        }
+        var nextReasons = reasons
+        if !nextReasons.contains(mismatchReason) {
+            nextReasons.append(mismatchReason)
+        }
+        return Gate7QuotaEnforcementResult(status: .blocked, reasons: nextReasons)
     }
 }
 

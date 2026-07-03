@@ -474,6 +474,20 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         )
     }
 
+    public var supervisedEvaluationMLXRecord: C5MLXRecord {
+        var supervised = self
+        supervised.trainEligible = true
+        supervised.masking.trainOnTurn = true
+        return C5MLXRecord(
+            sampleID: sampleID,
+            messages: messages,
+            tools: tools,
+            lossObjectiveProfile: lossObjectiveProfile,
+            augmentationProfile: augmentationProfile,
+            lossMask: C5LossMaskBuilder.lossMask(for: supervised)
+        )
+    }
+
     public var lossMask: C5MLXLossMask {
         C5LossMaskBuilder.lossMask(for: self)
     }
@@ -1307,6 +1321,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
     public var trainingLoop: String
     public var keys: [String]
     public var secondaryExperiments: [String]
+    public var earlyStopBasis: String
+    public var earlyStopCheckpointSteps: [Int]
+    public var earlyStopPolicy: String
 
     enum CodingKeys: String, CodingKey {
         case model
@@ -1331,6 +1348,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         case trainingLoop = "training_loop"
         case keys
         case secondaryExperiments = "secondary_experiments"
+        case earlyStopBasis = "early_stop_basis"
+        case earlyStopCheckpointSteps = "early_stop_checkpoint_steps"
+        case earlyStopPolicy = "early_stop_policy"
         case lrScheduleStepUnit = "lr_schedule_step_unit"
         case optimizerUpdateSteps = "optimizer_update_steps"
         case renderedScheduleDecaySteps = "rendered_schedule_decay_steps"
@@ -1359,7 +1379,10 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         gradClipNorm: Double,
         trainingLoop: String,
         keys: [String],
-        secondaryExperiments: [String]
+        secondaryExperiments: [String],
+        earlyStopBasis: String = "task_metric_checkpoint_gate_not_val_loss",
+        earlyStopCheckpointSteps: [Int] = [50, 100, 150],
+        earlyStopPolicy: String = "human_pause_on_action_or_no_call_regression"
     ) {
         self.model = model
         self.fineTuneType = fineTuneType
@@ -1383,6 +1406,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         self.trainingLoop = trainingLoop
         self.keys = keys
         self.secondaryExperiments = secondaryExperiments
+        self.earlyStopBasis = earlyStopBasis
+        self.earlyStopCheckpointSteps = earlyStopCheckpointSteps
+        self.earlyStopPolicy = earlyStopPolicy
     }
 
     public init(from decoder: Decoder) throws {
@@ -1409,7 +1435,10 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             gradClipNorm: try container.decodeIfPresent(Double.self, forKey: .gradClipNorm) ?? 1.0,
             trainingLoop: try container.decodeIfPresent(String.self, forKey: .trainingLoop) ?? "maformac_c5_repo_loop_mlx_lm_0_31_1",
             keys: try container.decode([String].self, forKey: .keys),
-            secondaryExperiments: try container.decode([String].self, forKey: .secondaryExperiments)
+            secondaryExperiments: try container.decode([String].self, forKey: .secondaryExperiments),
+            earlyStopBasis: try container.decodeIfPresent(String.self, forKey: .earlyStopBasis) ?? "task_metric_checkpoint_gate_not_val_loss",
+            earlyStopCheckpointSteps: try container.decodeIfPresent([Int].self, forKey: .earlyStopCheckpointSteps) ?? [50, 100, 150],
+            earlyStopPolicy: try container.decodeIfPresent(String.self, forKey: .earlyStopPolicy) ?? "human_pause_on_action_or_no_call_regression"
         )
     }
 
@@ -1437,6 +1466,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         try container.encode(trainingLoop, forKey: .trainingLoop)
         try container.encode(keys, forKey: .keys)
         try container.encode(secondaryExperiments, forKey: .secondaryExperiments)
+        try container.encode(earlyStopBasis, forKey: .earlyStopBasis)
+        try container.encode(earlyStopCheckpointSteps, forKey: .earlyStopCheckpointSteps)
+        try container.encode(earlyStopPolicy, forKey: .earlyStopPolicy)
         try container.encode(lrScheduleStepUnit, forKey: .lrScheduleStepUnit)
         try container.encode(optimizerUpdateSteps, forKey: .optimizerUpdateSteps)
         try container.encode(renderedScheduleDecaySteps, forKey: .renderedScheduleDecaySteps)
@@ -1476,7 +1508,10 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             gradClipNorm: 1.0,
             trainingLoop: "maformac_c5_repo_loop_mlx_lm_0_31_1",
             keys: defaultProjectionKeys,
-            secondaryExperiments: ["rank32_confirmation", "dora_rank8_secondary"]
+            secondaryExperiments: ["rank32_confirmation", "dora_rank8_secondary"],
+            earlyStopBasis: "task_metric_checkpoint_gate_not_val_loss",
+            earlyStopCheckpointSteps: [50, 100, 150],
+            earlyStopPolicy: "human_pause_on_action_or_no_call_regression"
         )
     }
 
@@ -1506,6 +1541,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         # training_iterations: \(scheduleDecaySteps)
         # grad_accumulation_steps: \(gradAccumulationSteps)
         # optimizer_update_steps: \(optimizerUpdateSteps)
+        # early_stop_basis: \(earlyStopBasis)
+        # early_stop_checkpoint_steps: \(earlyStopCheckpointSteps.map(String.init).joined(separator: ","))
+        # early_stop_policy: \(earlyStopPolicy)
         model: '\(model.replacingOccurrences(of: "'", with: "''"))'
         fine_tune_type: \(fineTuneType)
         num_layers: \(numLayers)
@@ -3271,9 +3309,18 @@ public struct C5TrainingDatasetBuilder: Sendable {
         }
         let targetCount = Int((Double(trainPositives.count) * options.refusalRatioTarget / (1 - options.refusalRatioTarget)).rounded())
         let cappedCount = min(targetCount, Int(Double(trainPositives.count) * options.refusalRatioHardCap / (1 - options.refusalRatioHardCap)))
-        return trainPositives.prefix(max(0, cappedCount)).enumerated().map { index, positive in
+        var noCallSamples: [C5TrainingSample] = []
+        noCallSamples.reserveCapacity(max(0, cappedCount))
+        for positive in trainPositives where noCallSamples.count < max(0, cappedCount) {
             var sample = positive
-            sample.sampleID = "c5-nocall-\(String(format: "%05d", index + 1))"
+            // cut5 真删(claim-vs-reality 铁律1, 修 446 假删灾难 variant): 被移除的目标工具 = positive 的 expectedToolCalls 工具名,
+            // 从 sample.tools 物理删该工具(非只写 metadata removedToolID)。removedName 兼容 frame(tool_call_frame)/D-domain(intent)。
+            let removedName = positive.expectedToolCalls.first?.name ?? "tool_call_frame"
+            sample.tools = positive.tools.filter { Self.toolSchemaName($0) != removedName }
+            guard !sample.tools.isEmpty else {
+                continue
+            }
+            sample.sampleID = "c5-nocall-\(String(format: "%05d", noCallSamples.count + 1))"
             sample.splitOrigin = "paired_counterfactual_from_train"
             sample.bucket = "paired_counterfactual_refusal"
             sample.expectedToolCalls = []
@@ -3283,10 +3330,6 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 argumentName: positive.augmentationProfile.argumentName,
                 argumentValue: positive.augmentationProfile.argumentValue
             )
-            // cut5 真删(claim-vs-reality 铁律1, 修 446 假删灾难 variant): 被移除的目标工具 = positive 的 expectedToolCalls 工具名,
-            // 从 sample.tools 物理删该工具(非只写 metadata removedToolID)。removedName 兼容 frame(tool_call_frame)/D-domain(intent)。
-            let removedName = positive.expectedToolCalls.first?.name ?? "tool_call_frame"
-            sample.tools = positive.tools.filter { Self.toolSchemaName($0) != removedName }
             sample.mountedToolCount = sample.tools.count
             // 活样本断言: removedName 真不在 tools(targetToolPresent=false 与产物一致, 防 metadata 假声称)
             let targetStillPresent = sample.tools.contains { Self.toolSchemaName($0) == removedName }
@@ -3298,8 +3341,9 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 noCallReason: "paired_counterfactual_removed_target_tool"
             )
             sample.messages[sample.messages.count - 1] = C5TrainingMessage(role: "assistant", content: "\n\nNO_TOOL")
-            return sample
+            noCallSamples.append(sample)
         }
+        return noCallSamples
     }
 
     // tool schema dict → function.name(供 cut5 真删比对; nil = 非标准 schema)。
@@ -3365,26 +3409,37 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 FileHandle.standardError.write(Data("G7D_SUBSET_DISTRACTOR_POLICY_UNSUPPORTED intent=\(seed.intent) strategy=\(subsetEntry.distractorPolicy.strategy) — fail-closed skip\n".utf8))
                 return nil
             }
-            var mountedEntries: [DDomainToolEntry] = []
+            var manifestMountedEntries: [DDomainToolEntry] = []
             for toolID in subsetEntry.toolIDsOrdered {
                 guard let mountedEntry = catalogByName[toolID] else {
                     appendUnique("subset_manifest_catalog_mismatch", to: &failureReceipt)
                     FileHandle.standardError.write(Data("G7D_SUBSET_MOUNT_MISS group=\(subsetEntry.groupID) tool=\(toolID) — fail-closed skip\n".utf8))
                     return nil
                 }
-                mountedEntries.append(mountedEntry)
+                manifestMountedEntries.append(mountedEntry)
             }
             call = C5TrainingToolCall(
                 name: seed.intent,
                 arguments: C5TrainingRenderer.dDomainToolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments, toolEntry: entry, variant: variant)
             )
-            resolvedTools = mountedEntries.map(C5TrainingRenderer.dDomainToolSchema)
-            distractorIDs = manifestDistractorIDs(
+            let mountedEntries = degradedMountedEntriesIfNeeded(
                 target: entry,
-                catalog: catalog,
-                variant: variant,
-                policy: subsetEntry.distractorPolicy
+                manifestEntries: manifestMountedEntries,
+                subsetEntry: subsetEntry
             )
+            resolvedTools = mountedEntries.map(C5TrainingRenderer.dDomainToolSchema)
+            if mountedEntries.count < manifestMountedEntries.count {
+                distractorIDs = mountedEntries
+                    .map(\.function.name)
+                    .filter { $0 != entry.function.name }
+            } else {
+                distractorIDs = manifestDistractorIDs(
+                    target: entry,
+                    catalog: catalog,
+                    variant: variant,
+                    policy: subsetEntry.distractorPolicy
+                )
+            }
             subsetPolicyID = subsetEntry.subsetPolicyID.isEmpty ? subsetManifest.policyID : subsetEntry.subsetPolicyID
             subsetGroupID = subsetEntry.groupID
             mountedToolCount = resolvedTools.count
@@ -3485,6 +3540,23 @@ public struct C5TrainingDatasetBuilder: Sendable {
             mountedToolCount: mountedToolCount,
             subsetPolicyDigest: subsetPolicyDigest
         )
+    }
+
+    private func degradedMountedEntriesIfNeeded(
+        target: DDomainToolEntry,
+        manifestEntries: [DDomainToolEntry],
+        subsetEntry: C5SubsetPolicyManifest.Entry
+    ) -> [DDomainToolEntry] {
+        guard subsetEntry.groupID == "seat.massage_force_time" else {
+            return manifestEntries
+        }
+        guard let targetEntry = manifestEntries.first(where: { $0.function.name == target.function.name }) else {
+            return manifestEntries
+        }
+        guard let firstSibling = manifestEntries.first(where: { $0.function.name != target.function.name }) else {
+            return [targetEntry]
+        }
+        return [targetEntry, firstSibling]
     }
 
     private func manifestDistractorIDs(

@@ -304,6 +304,8 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(noCalls.allSatisfy { $0.split == "train" })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.targetToolPresent == false })
         XCTAssertTrue(noCalls.allSatisfy { $0.noCall?.counterfactualPairID.isEmpty == false })
+        XCTAssertTrue(noCalls.allSatisfy { !$0.tools.isEmpty })
+        XCTAssertTrue(noCalls.allSatisfy { $0.mountedToolCount == $0.tools.count })
     }
 
     func testThetaAlphaPositiveOnlySkipsNoCallRowsButKeepsDistractors() {
@@ -962,6 +964,12 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(config.renderYAML.contains("grad_clip_norm: 1.0"))
         XCTAssertTrue(config.renderYAML.contains("scale: 20.0"))
         XCTAssertTrue(config.renderYAML.contains("training_loop: maformac_c5_repo_loop_mlx_lm_0_31_1"))
+        XCTAssertEqual(config.earlyStopBasis, "task_metric_checkpoint_gate_not_val_loss")
+        XCTAssertEqual(config.earlyStopCheckpointSteps, [50, 100, 150])
+        XCTAssertEqual(config.earlyStopPolicy, "human_pause_on_action_or_no_call_regression")
+        XCTAssertTrue(config.renderYAML.contains("# early_stop_basis: task_metric_checkpoint_gate_not_val_loss"))
+        XCTAssertTrue(config.renderYAML.contains("# early_stop_checkpoint_steps: 50,100,150"))
+        XCTAssertTrue(config.renderYAML.contains("# early_stop_policy: human_pause_on_action_or_no_call_regression"))
         XCTAssertTrue(config.renderYAML.contains("learning_rate: 0.0001"))
         XCTAssertEqual(config.lrScheduleStepUnit, "optimizer_update")
         XCTAssertEqual(config.optimizerUpdateSteps, 150)
@@ -1004,6 +1012,28 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(json.contains("\"token_label_source\":\"runtime_tokenizer_offsets\""))
         XCTAssertTrue(json.contains("\"trainable_assistant_end_token\":\"<|im_end|>\""))
         XCTAssertFalse(json.contains("\"labels\""))
+    }
+
+    func testDevSelectionEvaluationRecordKeepsSupervisionWithoutChangingSplitGate() throws {
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [
+                semanticSeed(id: "eval-mask-row", fuzzy: true, free: false, slotKeys: ["position"], range: "position=主驾|副驾")
+            ],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 2, devSelectionRows: 1)
+        )
+        let sample = try XCTUnwrap(prepared.samples.first { $0.split == "dev_selection" })
+
+        XCTAssertFalse(sample.trainEligible)
+        XCTAssertTrue(sample.dataGateCandidate.mustNotTrain)
+        XCTAssertEqual(sample.mlxRecord.lossMask.enforcement, "all_masked_not_train_eligible")
+
+        let supervised = sample.supervisedEvaluationMLXRecord.lossMask
+        XCTAssertEqual(supervised.enforcement, "token_labels_enforced_after_tokenization_with_think_mask")
+        let expectedToolName = try XCTUnwrap(sample.expectedToolCalls.first?.name)
+        XCTAssertTrue(supervised.trainableSpans.contains { $0.text.contains(expectedToolName) })
+        XCTAssertFalse(supervised.trainableSpans.isEmpty)
     }
 
     func testPromptAndUserRemainIgnored() {
@@ -1119,6 +1149,9 @@ final class C5LoRATrainingTests: XCTestCase {
         let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
 
         XCTAssertTrue(loop.contains("parser.add_argument(\"--require-maformac-loss-mask\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("def validate_preflight_argv"))
+        XCTAssertTrue(loop.contains("validate_preflight_argv(argv_list)\n        args = parse_args(argv_list)"))
+        XCTAssertTrue(loop.contains("def validate_preflight_flags"))
         XCTAssertTrue(loop.contains("parser.add_argument(\"--preflight-loss-mask-only\", action=\"store_true\")"))
         XCTAssertTrue(loop.contains("parser.add_argument(\"--allow-legacy-loss-objective\", action=\"store_true\")"))
         XCTAssertTrue(loop.contains("def guard_stock_loader_rejects_loss_mask"))
@@ -1131,10 +1164,38 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(loop.contains("def build_maformac_token_labels"))
         XCTAssertTrue(loop.contains("def maformac_masked_loss"))
         XCTAssertTrue(loop.contains("loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss"))
+        XCTAssertTrue(loop.contains("parser.add_argument(\"--preflight-only\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("if args.preflight_only:\n                return"))
+        XCTAssertTrue(loop.contains("--preflight-only requires --require-maformac-loss-mask"))
         XCTAssertTrue(loop.contains("loss_mask = record.get(\"loss_mask\")"))
         XCTAssertTrue(loop.contains("char_indexed_loss_mask_labels_forbidden"))
         XCTAssertTrue(loop.contains("raise LossMaskValidationError"))
         XCTAssertTrue(loop.contains("LOSS_MASK_PREFLIGHT_FAILED"))
+    }
+
+    func testPythonPreflightOnlyRequiresLossMaskBeforeRuntimeImports() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for preflight-only flag order probe")
+        }
+
+        let result = runProcess(
+            executable: pythonExecutable,
+            arguments: [
+                repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+                "--model", "dummy-model-never-loaded",
+                "--data", "/tmp/maformac-preflight-order-never-read",
+                "--preflight-only",
+                "--allow-mlx-lm-version-mismatch"
+            ],
+            cwd: repoRoot
+        )
+
+        XCTAssertEqual(result.status, 64, result.stderr + result.stdout)
+        XCTAssertTrue(result.stderr.contains("--preflight-only requires --require-maformac-loss-mask"), result.stderr + result.stdout)
+        XCTAssertFalse(result.stderr.contains("ModuleNotFoundError"), result.stderr + result.stdout)
+        XCTAssertFalse(result.stderr.contains("Loading pretrained model"), result.stderr + result.stdout)
     }
 
     func testPythonTrainingLoopRejectsMissingLossObjectiveWhenMaskRequired() throws {
@@ -1547,6 +1608,36 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(positive.subsetPolicyDigest, try C6Hash.fileHash(url: manifestURL))
     }
 
+    func testDDomainE2DowngradesSeatMassageForceTimeToTargetAndFirstSibling() throws {
+        let catalog = try loadDemoCatalog()
+        let manifestEntry = try subsetManifestEntry(containing: "lower_seat_massage_force_little")
+        XCTAssertEqual(manifestEntry.groupID, "seat.massage_force_time")
+        let seed = rawSeed(
+            id: "seat-massage-force-1",
+            intent: "lower_seat_massage_force_little",
+            device: "seat_massage_force",
+            actionPrimitive: "decrease_by_exp",
+            valueType: "EXP",
+            slotKeys: ["mode", "position"]
+        )
+        let prepared = C5TrainingDatasetBuilder().build(
+            seeds: [seed],
+            c6Cases: [],
+            dataGateContext: context(),
+            options: C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        )
+
+        let positive = try XCTUnwrap(prepared.samples.first { $0.split == "train" })
+        let toolNames = positive.tools.compactMap { functionName($0) }
+        let expectedSibling = try XCTUnwrap(manifestEntry.toolIDsOrdered.first { $0 != "lower_seat_massage_force_little" })
+
+        XCTAssertEqual(toolNames, ["lower_seat_massage_force_little", expectedSibling])
+        XCTAssertEqual(positive.promptDistractorToolIDs, [expectedSibling])
+        XCTAssertEqual(positive.mountedToolCount, 2)
+        XCTAssertEqual(positive.subsetPolicyID, manifestEntry.subsetPolicyID)
+        XCTAssertEqual(positive.subsetGroupID, "seat.massage_force_time")
+    }
+
     func testDDomainDistractorsFollowManifestSameSGPriority() throws {
         let catalog = try loadDemoCatalog()
         let target = try XCTUnwrap(catalog.first { $0.function.name == "open_ac" })
@@ -1655,6 +1746,7 @@ final class C5LoRATrainingTests: XCTestCase {
         let removed = noCall?.noCall?.removedToolID ?? ""
         XCTAssertEqual(removed, "open_ac", "cut5: removedToolID=被移除的 D-domain 目标工具名(非硬编码 tool_call_frame)")
         let toolNames = (noCall?.tools ?? []).compactMap { functionName($0) }
+        XCTAssertFalse(toolNames.isEmpty, "DataGate formal surface: no-call counterfactual still carries mounted distractor tools")
         XCTAssertFalse(toolNames.contains(removed), "cut5 真删: 目标工具物理不在 tools(非只 metadata removedToolID 声称)")
         XCTAssertEqual(noCall?.noCall?.targetToolPresent, false, "活样本: targetToolPresent=false 与产物一致(claim-vs-reality 铁律1)")
     }

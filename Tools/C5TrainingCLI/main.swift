@@ -142,9 +142,10 @@ struct C5TrainingCLI {
         let trainRecords = prepared.samples.filter { sample in
             sample.split == "train" && (sample.trainEligible || options.maskingStage == .smokeOnly)
         }
+        let devSelectionRecords = prepared.samples.filter { $0.split == "dev_selection" }
         try writeJSONL(trainRecords.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("train.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.prefix(128).map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
+        try writeJSONL(devSelectionRecords.map(\.supervisedEvaluationMLXRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
+        try writeJSONL(devSelectionRecords.prefix(128).map(\.supervisedEvaluationMLXRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
         let prettyEncoder = JSONEncoder()
         prettyEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         try prettyEncoder.encode(prepared.receipt).write(to: outputDir.appendingPathComponent("c5-training-receipt.json"))
@@ -291,6 +292,9 @@ struct C5TrainingCLI {
         - optimizer_update_steps: \(receipt.mlxConfig.optimizerUpdateSteps)
         - rendered_schedule_decay_steps: \(receipt.mlxConfig.renderedScheduleDecaySteps)
         - rendered_warmup_steps: \(receipt.mlxConfig.renderedWarmupSteps)
+        - early_stop_basis: \(receipt.mlxConfig.earlyStopBasis)
+        - early_stop_checkpoint_steps: \(receipt.mlxConfig.earlyStopCheckpointSteps.map(String.init).joined(separator: ","))
+        - early_stop_policy: \(receipt.mlxConfig.earlyStopPolicy)
         - max_seq_length: \(receipt.mlxConfig.maxSeqLength)
         - keys: \(receipt.mlxConfig.keys.joined(separator: ", "))
 
