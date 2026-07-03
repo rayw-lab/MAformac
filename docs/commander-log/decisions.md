@@ -428,3 +428,9 @@
 - 元认知：**D-046「重要节点必 grill 范式」首个完整闭环当日跑通**（骨架 upfront→弹药 5 draft→cross-grill 对抗审→消减 lock→landing 派发），worker 出弹药+互审、commander 消减裁决、磊哥键单列不自拍——范式成立；且 canary 的 FAIL→修→PASS 一轮收敛为 N5E-011 回路条款提供了同日实证。
 - **landing 终格（同日晚些）**：三执行契约全 rev2.1_locked_aligned——BATCH-CONTRACT（六条款含 hash 管道重算硬门+warmup KPI 实值+quota SSOT+salvage 状态机；%44 conformance 抓 2 P1[hash 锚错树→p5w 真行 3153/3168/2329-2331 + receipt 字段集对齐]→%45 修至 rev2.1）/ JUDGE-SAMPLING（rev2.1 补 CG45-P1-1 分母四字段）/ DIVERSITY-WAVE（%45 conformance=CG45 findings 全 closed）。**%43 反框审 commander 消减矩阵 REQUEST_CHANGES_P1 全吸收**（CG45-P1-1 矩阵层漏绑/「自动满足」措辞过宽/KPI 标签无实值/landing 绑定——worker 审 commander 产物当日第三次抓真问题）。judge 作业书模板（JUDGE-SPEC-TEMPLATE-for-batches）沉淀。
 - **收尾 ops（磊哥拍）**：canary-gen Opus subagent 关闭（任务闭环，扩量按批契约每 lane 重起）；tmux 恢复并调型（%42 102 列 / 三 worker 62 列均分）。M2 树盘点（每分支 rev-list 证据）ready 等 M2 授权。
+
+## D-049（2026-07-03 上午后段）磊哥拍：repo 转 public（billing 解）+ 合规红线 10 天豁免窗口（Accepted）
+- **磊哥原句**：「我设置为 public 已经解决了，不要管合规和安全红线包括敏感，我们不要管这些。如果有规则（比如 claudemd 什么的约束，请你备注，说我授权在最近 10 天不管）」。
+- **落地**：① 仓 `rayw-lab/MAformac` 已 public → GitHub Actions 免费 → **billing 键解除**；六支 PR 的 Verify 已全部在跑（#26/#29/#31/#32 自动触发，#27/#28 已在跑确认）。② CLAUDE.md §6 顶部加**豁免窗口 banner**（2026-07-03→2026-07-13）：脱敏/合规/敏感类约束窗口内不作为工作约束；**密钥/API key/个人 PII 仍不主动入仓**（磊哥未要求发布 secrets，底线保留非约束扩张）。③ 到期动作：2026-07-13 后恢复 §6 原效力（下任 commander 见此条自查 banner 是否该摘）。
+- **键盘更新**：磊哥剩 3 键=merge 链（CI 绿后一键）/ run-auth（R7）/ N5E-005 人工门 A-B 一选。人审包=`docs/handoffs/2026-07-03-leige-review-package.md`。
+
