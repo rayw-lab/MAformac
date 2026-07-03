@@ -541,3 +541,9 @@
 - **四 lane 并发 spawn**（wave1-lane-subcc-2..5，Opus 后台，各 50 行）——batch-01 验证过的生态直接复用，铁律含「禁用 subset_policy_digest 值」的 batch-01 血泪条款。
 - **PR38 MERGED**（merge `26678346`；%43 REFIX-REVIEW PASS：marker 正规重产=查旧 commit 形态照产非手填）。
 - **CODE 基线迁移执行中**（%44 按其 checklist）：新 pin 候选=post-#38 main tip；必重跑门含 **T1D-D2combo smoke 用 repo config 正式面复跑**（= PR38 控件 e2e 实证，一石二鸟）；registry 更新走 diff 补丁（worker 不直改 commander 分支）。
+
+## D-068（2026-07-03 深夜）四批全交付 + runner P1 修复回路（Accepted，执行中）
+- **四 lane 全交付**（batch-02/03/04/05 各 50 行，共 200 行新候选）；judge SPEC 2-5 预产就绪（%43）。
+- **gates runner**（%45 一键化五步：注入→DataGate→diversity→C6→receipt，batch-01 fixture 复现绿）被 %43 审出 **P1：required 集不全**——缺 batch_self_audit.md 仍 exit0（绿 receipt 可在缺 lane 必备产物时发出）→ 修复五条（required 集/envelope/SHA 全集校验/injector 保全集/负 fixture）后连跑四批。**审计原话：runner 绿不能当 judge 触发直到修复**——门的门也要 fail-closed。
+- %44 CODE 迁移中（迁移 smoke 疑似 FAIL_TIMEOUT 诚实标注，等正式 report 再裁）。
+- lane 关闭排程：四 lane 交付确认后逐个 shutdown（磊哥令：Opus 用完即关）。
