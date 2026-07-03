@@ -395,6 +395,13 @@
 - **第二步 = N5 只做 live 生成和 judge，不碰训练**（磊哥明确 scope）：云凭证到位 → **先小批 canary**（Anthropic generator + OpenAI judge）→ 过 DataGate / 语义 surface 门 / redaction / cross-vendor judge → 再扩 wave-1。**目标=生成候选数据质量，不是模型效果**。训练/R7 边界不变（run-auth 仍是独立键）。
 - commander 预备动作：%45 出 N5 canary runbook/config（construction-only，fail-closed 等凭证接线，不打云）；billing 修复信号到 → 立即 rerun checks 不再问。
 
+## D-047（2026-07-03 午后）canary 第一轮 = **CANARY_FAIL（溯源门）**+ N5E-011 修复回路实跑（进行中）
+- 管道实跑账：sub-CC(Opus) 60 行落地（极性对称✓/可复现 `_gen_canary.py`）→ %44 diversity PASS（0 严重近重复）+ C6 leakage 0 交集 → commander 亲跑硬化 DataGate exit0（60/60 surface/redaction pass）→ **%43 正式 judge = CANARY_FAIL**（`N5-canary/canary-judge-verdict.md`）。
+- **败因定性（辩证收稿亲核成立）**：主败=D9/A12 溯源——43/60 非空 args 行改了值但生成 receipt 无逐行 value-changed ledger+template 指针（正是 commander G2 中途 SendMessage 补的约束，Claude 家生成器未完全执行，**OpenAI 家 judge 咬住=跨厂商真价值实证，DataGate 绿≠judge 绿**）。次要：D8 精确 L1 短令 10/60 超 15% 帽、D1 一行「品色」不自然。内容维度干净（D1 59/60、D2-D7 全 60/60、泄漏/脱敏零）。
+- **修复回路（N5E-011 live）**：resume 生成器补 `canary-value-ledger.jsonl`（template_sample_id+args_diff 逐行，从 `_gen_canary.py` 规格机械推导禁凭记忆）+ 修 D1 一行 + D8 改写 2-3 行 → commander 重跑 DataGate+diversity → %43 re-judge（D9/A12 按 ledger 核+改动行复核）。
+- 间隙 §10 执行：%43 出 JUDGE-SAMPLING-draft（N5E-004 弹药，基于其 60×13 维实测成本）；%45 SALVAGE-INVENTORY（N5E-007）；%44 DIVERSITY-GATE+WAVE-ACCEPTANCE（N5E-008/012）。
+- 元认知：**「生成器自己的 receipt 声称改了值」+「无逐行登记」= claim-vs-reality 在数据生成层的标准形态**——canary 门先于扩量抓住，正是 canary 的设计目的；扩量批契约（N5E-002）必须把 ledger 定为生成方硬产出（fail-closed），不靠中途补约束。
+
 ## D-045（2026-07-03 午）N5 canary 厂商实现定案（磊哥四连拍，Accepted，云凭证键就此解除）
 - **Anthropic 生成 = 后台 subagent Claude Code（模型 Opus）**（磊哥：「anthropic 生成 安排 subagent CLAUDECODE 跑」「后台运行哈 你开一个 subcc」「模型 OPUS」）；**OpenAI judge = codex worker 任选其一**（gpt-5.5，磊哥：「OPENAI Judge 就是 codex 随便选一个 worker」）。真跨厂商（Claude 家生成 / OpenAI 家评审），不再依赖云 API key——**4 键中的「云凭证」键就此解除**，剩 billing / merge / run-auth 三键。
 - 生成=磊哥亲自授权的 N5 第二步 scope（只生成+judge 不训练，目标=候选数据质量非模型效果，D-044）；R7 训练边界不变。
