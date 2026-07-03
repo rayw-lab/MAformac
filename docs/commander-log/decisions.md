@@ -547,3 +547,9 @@
 - **gates runner**（%45 一键化五步：注入→DataGate→diversity→C6→receipt，batch-01 fixture 复现绿）被 %43 审出 **P1：required 集不全**——缺 batch_self_audit.md 仍 exit0（绿 receipt 可在缺 lane 必备产物时发出）→ 修复五条（required 集/envelope/SHA 全集校验/injector 保全集/负 fixture）后连跑四批。**审计原话：runner 绿不能当 judge 触发直到修复**——门的门也要 fail-closed。
 - %44 CODE 迁移中（迁移 smoke 疑似 FAIL_TIMEOUT 诚实标注，等正式 report 再裁）。
 - lane 关闭排程：四 lane 交付确认后逐个 shutdown（磊哥令：Opus 用完即关）。
+
+## D-069（2026-07-03 深夜）四批机械门全绿 + lane 舰队收官 + 迁移 R2（Accepted，执行中）
+- **B02(v3)/B03/B04/B05 全部 mechanical_gates_pass_local**（runner P1 修复后 sha_set 5/5 完整集校验生效；B02 v3 supersede 修复前 receipt）——wave-1 新增 200 行候选全部过机械门，judge 瀑布开动（%43 B02 起）。
+- **四 Opus lane 全部 shutdown_request 已发**（磊哥令用完即关；lane 在写收官总结，写完即批准关闭——commander 盯紧确认逐个 terminated）。
+- **CODE 迁移 R2**（%44）：DATA v3 重建（新 pin 上重跑 prepare 补 hash_recomputed/hash_recipe_ref 字段——#36 硬化门咬旧 substrate 属预期耦合迁移）+ smoke watchdog 20→35min（上轮已 update@iter4 loss 2.66 有限，只差 save 窗口）。
+- **%45 转 corpus 汇总工具**（judge PASS 批增量并入 wave1-corpus-manifest，250 行目标）。
