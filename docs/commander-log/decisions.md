@@ -400,3 +400,14 @@
 - 生成=磊哥亲自授权的 N5 第二步 scope（只生成+judge 不训练，目标=候选数据质量非模型效果，D-044）；R7 训练边界不变。
 - **canary 管道**：sub-CC（`canary-gen-anthropic`，后台）产 60 行（≥10 subset group 含 seat.massage_force_time，字段模板取自 N4A 真实样本行保 surface/digest 机械正确，只改 input_zh 自然口语中文/tool_call 值/generator 三族，open-close 极性对称，红线=不读 raw/无 PII 车型代号）→ commander 亲跑 C5DataGateCLI（含 FIX-PR29 硬化语义门+redaction）→ **%43 judge**（逐行 rubric：口语自然度/query↔tool_call 语义一致/值域/极性/协议串泄漏/脱敏/近重复）→ canary 验收报告 → 过了才扩 wave-1。
 - **PR #32 冻结在已复核 head `e01aa7c3`**（%43 APPROVE_FOR_PR32_STATIC_DOC_INTEGRATION，MERGEABLE）：D-044/D-045 不再 port 进去（防复核循环），留我分支+PR30 备份，随下轮 docs 同步进 main。
+
+## D-046（2026-07-03 午后）常备规则：重要节点起手必 grill 范式（磊哥立，Accepted，永续生效）
+- **磊哥原话转译**：「后续每个比较重要的节点开始，都需要 grill 范式去展开，按之前规则生成 grill 体系文档，后续逐个消减，沉淀记忆和元认知」。
+- **落地为四步定式**（承接项目既有 grill 体系：`docs/c5-training-readiness-grill/` 编号系列 + 决策矩阵 + 消减表 + landing matrix + 磊哥 lock；`grill-with-docs` Step 0 先探测现有体系沿用不另起）：
+  1. **节点开始那一刻**：建 grill 骨架 upfront（编号系列占位 + 决策表头 + 消减表头 + landing 列，`grill-baseline-skeleton-upfront` 规则），弹药（调研/worker 方案/一手数据）喂进去而不是替代 grill；
+  2. **grill 展开**：commander 纵切 + worker fan-out 维度（c5-training-readiness 三官范式），每题先 recall 已决（`grill-recall-decisions-first`），决策矩阵带 file:line；
+  3. **逐个消减**：reduction 表 → 磊哥 lock（或纯自动授权下 ⭐default lock + pending_leige_override）；
+  4. **沉淀**：决策进 grill SSOT + 记忆（MEMORY/memory 文件）+ 元认知（新坑类型回流 lessons/rules）。
+- **判定「重要节点」**：新阶段开跑（如 wave-1 扩量/正式训练/C6 acceptance/UIUE 合流）、重大架构或范式选择、跨 PR 大改造、任何「拍完影响后续多步」的决策簇。小修/单文件/机械操作不套（防 over-ceremony）。
+- **立即适用对象 = wave-1 扩量节点（canary→4.5k）**：骨架已建 `docs/c5-training-readiness-grill/n5-expansion-grill-2026-07-03.md`（N5E- 系列）；%45 的 EXPANSION-PLAN-draft 与 canary 验收结果作弹药喂入，grill 后消减上抛磊哥拍（G4/G5/G9 议题在内）。
+- 级联：本规则进 COMMANDER-INDEX 下一步段 + 项目 memory（`maformac-important-node-grill-paradigm.md`）；CLAUDE.md §2 的增补随下轮 docs 同步（PR32 冻结不动）。

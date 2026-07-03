@@ -237,3 +237,6 @@ v6 无配对时 B 11/15 会被读「学到 73%」；配对暴露 B delta=-1、D 
 
 ### M.11 收官账表述过宽被外审逐条打回：完成度措辞五问（2026-07-03，D-040）
 通宵收官账四处过宽被磊哥转达的外审收窄：①「双审 APPROVE 可一键 merge」——本地 worker review ≠ GitHub review（live latestReviews=0），且旧 review 绑的 head（`3b081823`）被后续 hotfix push（`e6a8849f`）作废=**review artifact 必绑 head SHA，head 变即失效**；②「CI 待 billing 重跑即绿」——FAILURE check 不得预支为绿，billing 只是归因；③「数据门全量兑现」——DataGate local pass ≠ train-ready（preflight strict exit66 同帐在案）；④ v6.1「重复被压住」滑成「输出稳定」——C 4/4→2/4、D 8/34→5/34、+4 parse_error 是同帐并存事实，**改善与残留必须同句陈述**。根因=completion-claim-triage（计划态/执行态）在【收官汇报】场景复发：收官叙事的「可一键/已兑现」措辞天然向宽滑，且写晨报时无 Stop-hook 类机械门拦（cite-verify 只核数字有源，不核完成度语义）。修法=收官账每个完成度断言过**五问**：绑的哪个 head？哪个系统的 verdict（本地/GitHub）？门实际 exit code？改善项的同帐退化项列了吗？「可 X」是现在真可还是前置齐后才可？
+
+### M.12 worker 闲置被磊哥抓现行：idle-scan+backlog 机制化 + 总监默契（2026-07-03）
+N5 canary 期间 %43 的 judge SPEC 写好后被我晾着「等 canary 数据落地」~20min，磊哥抓现行（「不主动安排任务=让他们白拿工资，不允许」+「最大化复合总监能力」+「有的东西我不说你要懂」）。实际当时就有磨刀活可派：judge 校准预演（拿 N4A 协议串行跑 rubric，预期维1 FAIL=校准判别力+OpenAI 家反框挑 rubric 毛病）——事后补派证明真有价值。**机制固化三层**：全局 rule `~/.claude/rules/swarm-idle-scan-and-backlog.md`（每轮轮询强制 idle-scan/收 REPORT 自带下一单/backlog 池常备/复合总监三视角出题）+ 宪法 `swarm-commander.md §10` + 记忆 `feedback-commander-tacit-understanding.md`（默契八条：随口担心=深挖指令/人审键攒打包/收口自动沉淀等）。业界核证：Agent Teams self-claim task list 是同题拉模型解法，push 模型由 idle-scan 等效。
