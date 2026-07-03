@@ -488,3 +488,10 @@
 - **D7a 一手（receipt sha `1f5ee6a4…`）**：val_end cache 24.30GB → `mx.clear_cache` 后 **0** → 首个 train step 仍同点 Metal OOM（exit134）→ **H-cache 排除**（cache 是可回收红鲱鱼），H-act 独大：`[4,5025]`=20k padded tokens 的 backward activation 本体超 32GB 包络。两刀下来假设空间收敛干净（H-sup 弱化→H-cache 排除→H-act）。
 - **D1b 上场**（%44 执行中）：token 预算 batching @ snapshot 副本，预算=8192 padded（最长行独行），iters8 保 ≥1 optimizer update，效应 batch 语义变化如实注记（diagnostic 可接受，候选化另 spec）。
 - **L2 收官**：PR #36（`357255b8`，hash 重算 fail-closed+refusal 去默认 exit64+warmup manifest pin b33d8eba），%43 交叉审排队；**L6 bundle 打包收官**（A15/B15/C4/D34 case+manifest+可复跑 README，%43）。%45 转 L3 salvage adapter 执行中。
+
+## D-059（2026-07-03 晚）D1b FAIL=判定金贵（单行 6209+cache0 仍 OOM）→ D2combo；L2 merge；L3 投影收官（Accepted，执行中）
+- **D1b 一手（receipt sha `16c58931…`）**：token 预算 batching 实装正确生效（首个训练 micro-batch=[1,6209] 单行、cache 清后 0）——**仍 exit134 OOM** → 长序列 activation 项独大（attention seq² 方向浮出），batch 维度与 cache 维度双双排除。假设链三刀收敛：H-sup 弱化（D0）→ H-cache 排除（D7a）→ H-act 精化为「单长行 backward 自身超包络」（D1b）。
+- **裁决**：转 **D2+D1b 组合**（grad checkpointing + token 预算 8192 + 边界 clear；runbook D4 组合语义合法——单项已跑）；通过门加「最长行 7185 micro-batch 必须被覆盖」。%44 执行中。
+- **L2 merge**：PR #36 并入 main（%43 审 APPROVE_WITH_P2_RESIDUAL，0 P0/P1；P2=hash_recipe_ref 硬编码路径→%45 小 PR 修复中）；其 push-event fail 定性=分支老 verify.yml 结构病（#35 已在 main 修），PR-event 真跑绿。**T1D 的 CODE basis 仍 pin b33d8eba**。
+- **L3 投影收官**：`DONE_PROJECTION_PASS_DATAGATE_BLOCKED_EXPECTED`（%43 分类核在途：BLOCKED reason 是否全属设计语义 direct_pass=0 类）。
+- **wave-1 warmup 启动准备**：%45 产 batch-01-order（N=50，quota=Gate7RecipeQuotaConfig，pin b33d8eba）+ lane prompt 包 → commander spawn 生成 sub-CC（D-045 canary 模式复用）。
