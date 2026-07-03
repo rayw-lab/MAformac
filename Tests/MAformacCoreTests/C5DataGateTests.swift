@@ -61,6 +61,105 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertEqual(receipt.surfaceFieldPass, 1)
     }
 
+    func testMalformedToolsObjectFailsClosed() throws {
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, jsonl: """
+        {"sample_id":"C5-SURFACE-BYPASS-EMPTY","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-BYPASS-EMPTY","parent_semantic_id":"parent:surface.empty","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.hasHardFailure)
+        XCTAssertEqual(receipt.missingSurfaceCount, 0)
+        XCTAssertEqual(receipt.surfaceFieldPass, 0)
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "candidate_surface_invalid_tool_schema" })
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "candidate_surface_mounted_tool_count_mismatch" })
+    }
+
+    func testMissingFunctionNameFailsClosed() throws {
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, jsonl: """
+        {"sample_id":"C5-SURFACE-BYPASS-FUNCTION","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-BYPASS-FUNCTION","parent_semantic_id":"parent:surface.function","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "candidate_surface_invalid_tool_schema" })
+    }
+
+    func testActionToolMustBeMounted() throws {
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, jsonl: """
+        {"sample_id":"C5-SURFACE-WRONG-MOUNT","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-WRONG-MOUNT","parent_semantic_id":"parent:surface.wrong","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"close_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "tool_name_not_mounted" })
+    }
+
+    func testSurfaceManifestDigestAndMembersMustMatchSource() throws {
+        let manifest = C5DataGateSurfaceManifest(
+            manifestFileDigest: "manifest-file-digest",
+            groupingContractDigest: "grouping-contract-digest",
+            entries: [
+                C5DataGateSurfaceManifestEntry(
+                    subsetPolicyID: "e2-lite-v1",
+                    subsetGroupID: "ac",
+                    toolIDsOrdered: ["set_cabin_ac"],
+                    toolSchemaDigest: "schema-digest"
+                )
+            ]
+        )
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, surfaceManifest: manifest, jsonl: """
+        {"sample_id":"C5-SURFACE-DIGEST-DRIFT","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-DIGEST-DRIFT","parent_semantic_id":"parent:surface.digest","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"wrong-digest","tool_schema_digest":"wrong-schema-digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "subset_policy_digest_mismatch" })
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "tool_schema_digest_mismatch" })
+    }
+
+    func testSurfaceManifestAcceptsManifestFileOrGroupingDigest() throws {
+        let manifest = C5DataGateSurfaceManifest(
+            manifestFileDigest: "manifest-file-digest",
+            groupingContractDigest: "grouping-contract-digest",
+            entries: [
+                C5DataGateSurfaceManifestEntry(
+                    subsetPolicyID: "e2-lite-v1",
+                    subsetGroupID: "ac",
+                    toolIDsOrdered: ["set_cabin_ac"],
+                    toolSchemaDigest: "schema-digest"
+                )
+            ]
+        )
+        let receipt = try makeReceipt(allowLegacyMissingSurface: false, surfaceManifest: manifest, jsonl: """
+        {"sample_id":"C5-SURFACE-MANIFEST-PASS","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-MANIFEST-PASS","parent_semantic_id":"parent:surface.manifest.pass","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"grouping-contract-digest","tool_schema_digest":"schema-digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "data_gate_ready")
+        XCTAssertEqual(receipt.surfaceFieldPass, 1)
+    }
+
+    func testSurfaceManifestAllowsMountedSubsetButRejectsOutsider() throws {
+        let manifest = C5DataGateSurfaceManifest(
+            manifestFileDigest: "manifest-file-digest",
+            groupingContractDigest: "grouping-contract-digest",
+            entries: [
+                C5DataGateSurfaceManifestEntry(
+                    subsetPolicyID: "e2-lite-v1",
+                    subsetGroupID: "seat.massage_force_time",
+                    toolIDsOrdered: ["open_seat_massage", "adjust_seat_massage_force_to_gear", "close_seat_massage"],
+                    toolSchemaDigest: "full-schema-digest"
+                )
+            ]
+        )
+        let subsetReceipt = try makeReceipt(allowLegacyMissingSurface: false, surfaceManifest: manifest, jsonl: """
+        {"sample_id":"C5-SURFACE-SUBSET-PASS","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-SUBSET-PASS","parent_semantic_id":"parent:surface.subset.pass","must_not_train":false,"source_authorization":"authorized","input_zh":"打开座椅按摩","tool_call":{"wrapper":"tool_call","name":"open_seat_massage","arguments":{}},"tools":[{"type":"function","function":{"name":"open_seat_massage"}},{"type":"function","function":{"name":"adjust_seat_massage_force_to_gear"}}],"mounted_tool_count":2,"subset_policy_id":"e2-lite-v1","subset_group_id":"seat.massage_force_time","subset_policy_digest":"manifest-file-digest"}
+        """)
+        let outsiderReceipt = try makeReceipt(allowLegacyMissingSurface: false, surfaceManifest: manifest, jsonl: """
+        {"sample_id":"C5-SURFACE-OUTSIDER-BLOCK","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-OUTSIDER-BLOCK","parent_semantic_id":"parent:surface.outsider.block","must_not_train":false,"source_authorization":"authorized","input_zh":"打开座椅按摩","tool_call":{"wrapper":"tool_call","name":"open_seat_massage","arguments":{}},"tools":[{"type":"function","function":{"name":"open_seat_massage"}},{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":2,"subset_policy_id":"e2-lite-v1","subset_group_id":"seat.massage_force_time","subset_policy_digest":"manifest-file-digest"}
+        """)
+
+        XCTAssertEqual(subsetReceipt.status, "data_gate_ready")
+        XCTAssertEqual(outsiderReceipt.status, "blocked")
+        XCTAssertTrue(outsiderReceipt.failureReceipt.contains { $0.reason == "mounted_tool_names_manifest_mismatch" })
+    }
+
     func testC6MustPassInTrainFails() throws {
         let c6Case = protectedC6Case(caseID: "C6-MP-FIXTURE", semanticID: "c1_fixture_protected")
         let receipt = try makeReceipt(c6Cases: [c6Case], jsonl: """
@@ -209,6 +308,7 @@ final class C5DataGateTests: XCTestCase {
     private func makeReceipt(
         c6Cases: [C6BenchCase] = [],
         allowLegacyMissingSurface: Bool = true,
+        surfaceManifest: C5DataGateSurfaceManifest? = nil,
         jsonl: String
     ) throws -> C5DataGateReceipt {
         let decoder = JSONDecoder()
@@ -220,7 +320,8 @@ final class C5DataGateTests: XCTestCase {
             sourceAuthorizationStatus: "authorized_fixture",
             formatContractVersion: "format-digest",
             generatedAt: "2026-06-20T00:00:00Z",
-            allowLegacyMissingSurface: allowLegacyMissingSurface
+            allowLegacyMissingSurface: allowLegacyMissingSurface,
+            surfaceManifest: surfaceManifest
         )
         return C5DataGateValidator().receipt(candidates: candidates, c6Cases: c6Cases, context: context)
     }

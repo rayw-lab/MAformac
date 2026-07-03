@@ -26,12 +26,14 @@ struct C5DataGateCLI {
         let candidates = try options.candidatePaths.flatMap { try loadCandidates(path: $0) }
         let formatDigest = try C6Hash.fileHash(url: repoRoot.appendingPathComponent("contracts/qwen-tool-call-format.yaml"))
         let sourceDigest = try sourceSnapshotDigest(paths: options.sourceDigestPaths)
+        let surfaceManifest = try options.subsetPolicyManifestPath.map { try loadSurfaceManifest(path: $0) }
         let context = C5DataGateRunContext(
             sourceSnapshotDigest: sourceDigest,
             sourceAuthorizationStatus: options.sourceAuthorizationStatus,
             formatContractVersion: formatDigest,
             generatedAt: isoNow(),
-            allowLegacyMissingSurface: options.allowLegacyMissingSurface
+            allowLegacyMissingSurface: options.allowLegacyMissingSurface,
+            surfaceManifest: surfaceManifest
         )
         let validator = C5DataGateValidator()
         let receipt = validator.receipt(candidates: candidates, c6Cases: c6Cases, context: context)
@@ -64,6 +66,24 @@ struct C5DataGateCLI {
                 }
                 return candidate
             }
+    }
+
+    private static func loadSurfaceManifest(path: String) throws -> C5DataGateSurfaceManifest {
+        let url = URL(fileURLWithPath: path)
+        let raw = try Data(contentsOf: url)
+        let manifest = try JSONDecoder().decode(SubsetPolicyManifest.self, from: raw)
+        return C5DataGateSurfaceManifest(
+            manifestFileDigest: try C6Hash.fileHash(url: url),
+            groupingContractDigest: manifest.meta.groupingContractDigest,
+            entries: manifest.entries.map {
+                C5DataGateSurfaceManifestEntry(
+                    subsetPolicyID: $0.subsetPolicyID,
+                    subsetGroupID: $0.groupID,
+                    toolIDsOrdered: $0.toolIDsOrdered,
+                    toolSchemaDigest: $0.toolSchemaDigest
+                )
+            }
+        )
     }
 
     private static func splitHint(for path: String) -> String? {
@@ -149,6 +169,7 @@ private struct Options {
     var sourceDigestPaths: [String]
     var sourceAuthorizationStatus: String
     var allowLegacyMissingSurface: Bool
+    var subsetPolicyManifestPath: String?
 
     init(arguments: [String]) throws {
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -157,6 +178,7 @@ private struct Options {
         sourceDigestPaths = []
         sourceAuthorizationStatus = "unknown"
         allowLegacyMissingSurface = false
+        subsetPolicyManifestPath = nil
         var iterator = arguments.dropFirst().makeIterator()
         while let argument = iterator.next() {
             switch argument {
@@ -175,6 +197,9 @@ private struct Options {
             case "--output-dir":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --output-dir value") }
                 outputDir = value
+            case "--subset-policy-manifest-path":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --subset-policy-manifest-path value") }
+                subsetPolicyManifestPath = value
             case "--allow-legacy-missing-surface":
                 allowLegacyMissingSurface = true
             default:
@@ -182,10 +207,41 @@ private struct Options {
             }
         }
         if candidatePaths.isEmpty {
-            throw CLIError.usage("usage: C5DataGateCLI --candidates PATH[,PATH...] [--repo-root PATH] [--source-digest-path PATH] [--source-authorization STATUS] [--output-dir PATH] [--allow-legacy-missing-surface]")
+            throw CLIError.usage("usage: C5DataGateCLI --candidates PATH[,PATH...] [--repo-root PATH] [--source-digest-path PATH] [--source-authorization STATUS] [--output-dir PATH] [--subset-policy-manifest-path PATH] [--allow-legacy-missing-surface]")
         }
         if sourceDigestPaths.isEmpty {
             sourceDigestPaths = candidatePaths
+        }
+        let defaultManifestPath = repoRoot.appendingPathComponent("generated/subset-policy-manifest.json").path
+        if subsetPolicyManifestPath == nil && FileManager.default.fileExists(atPath: defaultManifestPath) {
+            subsetPolicyManifestPath = defaultManifestPath
+        }
+    }
+}
+
+private struct SubsetPolicyManifest: Decodable {
+    var meta: Meta
+    var entries: [Entry]
+
+    struct Meta: Decodable {
+        var groupingContractDigest: String
+
+        enum CodingKeys: String, CodingKey {
+            case groupingContractDigest = "grouping_contract_digest"
+        }
+    }
+
+    struct Entry: Decodable {
+        var subsetPolicyID: String
+        var groupID: String
+        var toolIDsOrdered: [String]
+        var toolSchemaDigest: String
+
+        enum CodingKeys: String, CodingKey {
+            case subsetPolicyID = "subset_policy_id"
+            case groupID = "group_id"
+            case toolIDsOrdered = "tool_ids_ordered"
+            case toolSchemaDigest = "tool_schema_digest"
         }
     }
 }

@@ -26,6 +26,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
     public var subsetPolicyID: String?
     public var subsetGroupID: String?
     public var subsetPolicyDigest: String?
+    public var toolSchemaDigest: String?
 
     enum CodingKeys: String, CodingKey {
         case sampleID = "sample_id"
@@ -64,6 +65,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
         case subsetPolicyID = "subset_policy_id"
         case subsetGroupID = "subset_group_id"
         case subsetPolicyDigest = "subset_policy_digest"
+        case toolSchemaDigest = "tool_schema_digest"
     }
 
     public init(
@@ -91,7 +93,8 @@ public struct C5DataGateCandidate: Codable, Sendable {
         mountedToolCount: Int? = nil,
         subsetPolicyID: String? = nil,
         subsetGroupID: String? = nil,
-        subsetPolicyDigest: String? = nil
+        subsetPolicyDigest: String? = nil,
+        toolSchemaDigest: String? = nil
     ) {
         self.sampleID = sampleID
         self.split = split
@@ -122,6 +125,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
         self.subsetPolicyID = subsetPolicyID
         self.subsetGroupID = subsetGroupID
         self.subsetPolicyDigest = subsetPolicyDigest
+        self.toolSchemaDigest = toolSchemaDigest
     }
 
     public init(from decoder: Decoder) throws {
@@ -183,6 +187,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
         self.subsetPolicyID = try container.decodeIfPresent(String.self, forKey: .subsetPolicyID)
         self.subsetGroupID = try container.decodeIfPresent(String.self, forKey: .subsetGroupID)
         self.subsetPolicyDigest = try container.decodeIfPresent(String.self, forKey: .subsetPolicyDigest)
+        self.toolSchemaDigest = try container.decodeIfPresent(String.self, forKey: .toolSchemaDigest)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -212,6 +217,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
         try container.encodeIfPresent(subsetPolicyID, forKey: .subsetPolicyID)
         try container.encodeIfPresent(subsetGroupID, forKey: .subsetGroupID)
         try container.encodeIfPresent(subsetPolicyDigest, forKey: .subsetPolicyDigest)
+        try container.encodeIfPresent(toolSchemaDigest, forKey: .toolSchemaDigest)
     }
 
     public var overlapParentSemanticID: String? {
@@ -271,19 +277,57 @@ public struct C5DataGateRunContext: Sendable {
     public var formatContractVersion: String
     public var generatedAt: String
     public var allowLegacyMissingSurface: Bool
+    public var surfaceManifest: C5DataGateSurfaceManifest?
 
     public init(
         sourceSnapshotDigest: String,
         sourceAuthorizationStatus: String,
         formatContractVersion: String,
         generatedAt: String,
-        allowLegacyMissingSurface: Bool = false
+        allowLegacyMissingSurface: Bool = false,
+        surfaceManifest: C5DataGateSurfaceManifest? = nil
     ) {
         self.sourceSnapshotDigest = sourceSnapshotDigest
         self.sourceAuthorizationStatus = sourceAuthorizationStatus
         self.formatContractVersion = formatContractVersion
         self.generatedAt = generatedAt
         self.allowLegacyMissingSurface = allowLegacyMissingSurface
+        self.surfaceManifest = surfaceManifest
+    }
+}
+
+public struct C5DataGateSurfaceManifest: Equatable, Sendable {
+    public var manifestFileDigest: String
+    public var groupingContractDigest: String?
+    public var entries: [C5DataGateSurfaceManifestEntry]
+
+    public init(
+        manifestFileDigest: String,
+        groupingContractDigest: String? = nil,
+        entries: [C5DataGateSurfaceManifestEntry]
+    ) {
+        self.manifestFileDigest = manifestFileDigest
+        self.groupingContractDigest = groupingContractDigest
+        self.entries = entries
+    }
+}
+
+public struct C5DataGateSurfaceManifestEntry: Equatable, Sendable {
+    public var subsetPolicyID: String
+    public var subsetGroupID: String
+    public var toolIDsOrdered: [String]
+    public var toolSchemaDigest: String
+
+    public init(
+        subsetPolicyID: String,
+        subsetGroupID: String,
+        toolIDsOrdered: [String],
+        toolSchemaDigest: String
+    ) {
+        self.subsetPolicyID = subsetPolicyID
+        self.subsetGroupID = subsetGroupID
+        self.toolIDsOrdered = toolIDsOrdered
+        self.toolSchemaDigest = toolSchemaDigest
     }
 }
 
@@ -351,8 +395,18 @@ public struct C5DataGateReceipt: Codable, Equatable, Sendable {
             || (trainHeldOutAxisOverlapRowCount ?? 0) > 0
             || !toolCallFormatFailures.isEmpty
             || failureReceipt.contains { $0.reason == "missing_candidate_surface_fields" }
+            || failureReceipt.contains { isSurfaceFailureReason($0.reason) }
             || failureReceipt.contains { $0.reason == "missing_train_device_axis_for_six_axis_split" }
             || redactionStatus == "fail"
+    }
+
+    private func isSurfaceFailureReason(_ reason: String) -> Bool {
+        reason.hasPrefix("candidate_surface_")
+            || reason.hasPrefix("subset_manifest_")
+            || reason.hasSuffix("_manifest_mismatch")
+            || reason.hasSuffix("_digest_mismatch")
+            || reason == "tool_name_not_mounted"
+            || reason == "duplicate_mounted_tool_name"
     }
 }
 
@@ -505,7 +559,16 @@ public struct C5DataGateValidator: Sendable {
             var isQuarantined = item.split == "quarantine"
             let missingSurfaceFields = missingSurfaceFields(candidate)
             if missingSurfaceFields.isEmpty {
-                surfaceFieldPass += 1
+                let semanticSurfaceFailures = semanticSurfaceFailures(candidate, context: context)
+                if semanticSurfaceFailures.isEmpty {
+                    surfaceFieldPass += 1
+                } else {
+                    for reason in semanticSurfaceFailures {
+                        let itemFailure = failure(candidate, split: item.split, reason: reason, severity: "P1")
+                        surfaceFailures.append(itemFailure)
+                        failures.append(itemFailure)
+                    }
+                }
             } else {
                 missingSurfaceCount += 1
                 if context.allowLegacyMissingSurface {
@@ -767,6 +830,94 @@ public struct C5DataGateValidator: Sendable {
         return fields
     }
 
+    private func semanticSurfaceFailures(_ candidate: C5DataGateCandidate, context: C5DataGateRunContext) -> [String] {
+        var reasons: [String] = []
+        let mounted = mountedToolNames(candidate)
+        reasons.append(contentsOf: mounted.reasons)
+        if let mountedToolCount = candidate.mountedToolCount, mountedToolCount != mounted.names.count {
+            reasons.append("candidate_surface_mounted_tool_count_mismatch")
+        }
+        if candidate.hasActionToolCall {
+            guard let toolName = candidate.toolName?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty else {
+                reasons.append("candidate_surface_missing_action_tool_name")
+                return uniqueReasons(reasons)
+            }
+            if !mounted.names.contains(toolName) {
+                reasons.append("tool_name_not_mounted")
+            }
+        }
+        if let manifest = context.surfaceManifest {
+            reasons.append(contentsOf: manifestSurfaceFailures(candidate, mountedToolNames: mounted.names, manifest: manifest))
+        }
+        return uniqueReasons(reasons)
+    }
+
+    private func mountedToolNames(_ candidate: C5DataGateCandidate) -> (names: [String], reasons: [String]) {
+        var names: [String] = []
+        var reasons: [String] = []
+        for tool in candidate.tools {
+            guard case .string("function")? = tool["type"],
+                  case .object(let function)? = tool["function"],
+                  case .string(let rawName)? = function["name"],
+                  let name = rawName.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty else {
+                reasons.append("candidate_surface_invalid_tool_schema")
+                continue
+            }
+            names.append(name)
+        }
+        if Set(names).count != names.count {
+            reasons.append("duplicate_mounted_tool_name")
+        }
+        return (names, reasons)
+    }
+
+    private func manifestSurfaceFailures(
+        _ candidate: C5DataGateCandidate,
+        mountedToolNames: [String],
+        manifest: C5DataGateSurfaceManifest
+    ) -> [String] {
+        var reasons: [String] = []
+        guard let subsetPolicyID = candidate.subsetPolicyID?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+              let subsetGroupID = candidate.subsetGroupID?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty else {
+            return reasons
+        }
+        let entries = manifest.entries.filter {
+            $0.subsetPolicyID == subsetPolicyID && $0.subsetGroupID == subsetGroupID
+        }
+        guard !entries.isEmpty else {
+            return ["subset_manifest_entry_missing"]
+        }
+        guard let entry = entries.first else {
+            return ["subset_manifest_entry_missing"]
+        }
+        let sourceToolNames = Set(entry.toolIDsOrdered)
+        if !Set(mountedToolNames).isSubset(of: sourceToolNames) {
+            reasons.append("mounted_tool_names_manifest_mismatch")
+            return reasons
+        }
+        if let subsetPolicyDigest = candidate.subsetPolicyDigest?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty {
+            let acceptedDigests = [manifest.manifestFileDigest, manifest.groupingContractDigest].compactMap { $0 }
+            if !acceptedDigests.contains(subsetPolicyDigest) {
+                reasons.append("subset_policy_digest_mismatch")
+            }
+        }
+        if let toolSchemaDigest = candidate.toolSchemaDigest?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+           mountedToolNames == entry.toolIDsOrdered,
+           toolSchemaDigest != entry.toolSchemaDigest {
+            reasons.append("tool_schema_digest_mismatch")
+        }
+        return reasons
+    }
+
+    private func uniqueReasons(_ reasons: [String]) -> [String] {
+        var seen: Set<String> = []
+        var result: [String] = []
+        for reason in reasons where seen.insert(reason).inserted {
+            result.append(reason)
+        }
+        return result
+    }
+
     private func suggestedFixes(failures: [C5DataGateFailure], sourceReady: Bool) -> [String] {
         var suggestions: [String] = []
         if !sourceReady {
@@ -789,6 +940,9 @@ public struct C5DataGateValidator: Sendable {
         }
         if failures.contains(where: { $0.reason == "missing_candidate_surface_fields" }) {
             suggestions.append("populate tools/mounted_tool_count/subset fields before formal wave-1 data gate, or rerun legacy fixtures with explicit allow_legacy_missing_surface")
+        }
+        if failures.contains(where: { $0.reason.hasPrefix("candidate_surface_") || $0.reason == "tool_name_not_mounted" || $0.reason == "duplicate_mounted_tool_name" || $0.reason.hasPrefix("subset_manifest_") || $0.reason.hasSuffix("_manifest_mismatch") || $0.reason.hasSuffix("_digest_mismatch") }) {
+            suggestions.append("rebuild mounted tool surface from subset manifest/catalog and keep tool_name, mounted_tool_count, subset digests, and tool_schema_digest same-source")
         }
         if failures.contains(where: { $0.reason == "redaction_violation" }) {
             suggestions.append("redact prohibited raw-source text before re-running gate")
