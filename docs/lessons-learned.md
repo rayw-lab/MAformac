@@ -240,3 +240,6 @@ v6 无配对时 B 11/15 会被读「学到 73%」；配对暴露 B delta=-1、D 
 
 ### M.12 worker 闲置被磊哥抓现行：idle-scan+backlog 机制化 + 总监默契（2026-07-03）
 N5 canary 期间 %43 的 judge SPEC 写好后被我晾着「等 canary 数据落地」~20min，磊哥抓现行（「不主动安排任务=让他们白拿工资，不允许」+「最大化复合总监能力」+「有的东西我不说你要懂」）。实际当时就有磨刀活可派：judge 校准预演（拿 N4A 协议串行跑 rubric，预期维1 FAIL=校准判别力+OpenAI 家反框挑 rubric 毛病）——事后补派证明真有价值。**机制固化三层**：全局 rule `~/.claude/rules/swarm-idle-scan-and-backlog.md`（每轮轮询强制 idle-scan/收 REPORT 自带下一单/backlog 池常备/复合总监三视角出题）+ 宪法 `swarm-commander.md §10` + 记忆 `feedback-commander-tacit-understanding.md`（默契八条：随口担心=深挖指令/人审键攒打包/收口自动沉淀等）。业界核证：Agent Teams self-claim task list 是同题拉模型解法，push 模型由 idle-scan 等效。
+
+### M.13 管道吃退出码：git 变更命令禁 `|tail` 链 `&&`（2026-07-03 commander 亲踩，D-050）
+rebase PR31 用 `git rebase origin/main 2>&1 | tail -2 && git push --force-with-lease`——rebase 冲突中断（非零退出）被管道尾 tail 的 exit 0 吞掉，&& 放行 push，把**截断分支推上远端**（缺冲突点之后全部 commit）。原 tip 立即 force 恢复零损害。修法：①git 变更类命令（rebase/merge/push/reset）**独立执行看退出码**，输出要裁剪就先落文件再 tail ②要链就 `set -o pipefail` ③冲突高风险 rebase 交作者 worker 解语义，commander 只做机械 fast-forward。与 foreground-batch（合并命令）相容但边界在此：**合并只读检查 OK，变更命令的成败判定不得被管道稀释**。

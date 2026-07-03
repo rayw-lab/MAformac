@@ -434,3 +434,9 @@
 - **落地**：① 仓 `rayw-lab/MAformac` 已 public → GitHub Actions 免费 → **billing 键解除**；六支 PR 的 Verify 已全部在跑（#26/#29/#31/#32 自动触发，#27/#28 已在跑确认）。② CLAUDE.md §6 顶部加**豁免窗口 banner**（2026-07-03→2026-07-13）：脱敏/合规/敏感类约束窗口内不作为工作约束；**密钥/API key/个人 PII 仍不主动入仓**（磊哥未要求发布 secrets，底线保留非约束扩张）。③ 到期动作：2026-07-13 后恢复 §6 原效力（下任 commander 见此条自查 banner 是否该摘）。
 - **键盘更新**：磊哥剩 3 键=merge 链（CI 绿后一键）/ run-auth（R7）/ N5E-005 人工门 A-B 一选。人审包=`docs/handoffs/2026-07-03-leige-review-package.md`。
 
+## D-050（2026-07-03 上午后段）磊哥四连授权 + merge 链执行（Accepted，执行中）
+- **磊哥四拍**：① **N5E-005 人工精度门 = PASS**（磊哥本人抽检 40+ 条 canary json，原话「我本人抽检通过 看了40多条json，通过」）② **六支 PR merge 推动**授权 ③ **run-auth 授权**（训练线解锁；第一动作=T1 hang 2-iter smoke per runbook）④ **M2 树清理授权**。
+- **merge 执行账（commander 亲手 gh merge，rebase 模式）**：#26 ✅ MERGED → #27 ✅ → 🔴 **#28 被 GitHub 连带关闭**（父分支 #27 删除副作用，不 retarget 而是 close）→ 本地 rebase 清重复补丁（唯一 delta=EOS commit `946fe49d`）→ **续开 #33 双绿 ✅ MERGED**；#29 ✅（吃一堑：**不 --delete-branch** 防 #31 连带关闭）；#32 ✅（docs 整编）；**#31 在途**：retarget main 后 DIRTY（main 已含 #27 同文件区）→ %45（作者）merge origin/main 语义解冲突 + 三验证（filter tests/strict preflight/DataGate）后普通 push。
+- 🔴 **commander 事故与恢复（进 lessons M.13）**：rebase #31 时用 `git rebase … | tail` 接 `&&`——**管道吃掉非零退出码**，冲突中断态被当成功，把**截断分支**（缺 N4a 后续 commit）force 推上远端；立即用原 tip `f163eedf` force 恢复，零窗口损害（期间无 CI/merge 消费该分支）。教训：git 变更类命令**禁止管道接 tail/grep 再链 &&**（或 set -o pipefail）。
+- PR28 push-event verify 失败分类=**结构性**（push 事件 diff 基线错误扫全史旧文件 whitespace，与 PR 增量无关；pull_request 事件真跑全绿）——workflow 的 push 触发面待修（backlog，非阻塞）。
+- **并行执行**：%44 M2 清理（live 重算 unique_vs_main 后删，绝不动主树/uiue/p5w）；%43 T1 smoke 执行包预备（等 merge-complete ping）；%45 #31 冲突解决。
