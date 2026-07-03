@@ -993,6 +993,9 @@ final class C5LoRATrainingTests: XCTestCase {
         let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
 
         XCTAssertTrue(loop.contains("parser.add_argument(\"--require-maformac-loss-mask\", action=\"store_true\")"))
+        XCTAssertTrue(loop.contains("def validate_preflight_argv"))
+        XCTAssertTrue(loop.contains("validate_preflight_argv(argv_list)\n        args = parse_args(argv_list)"))
+        XCTAssertTrue(loop.contains("def validate_preflight_flags"))
         XCTAssertTrue(loop.contains("def guard_stock_loader_rejects_loss_mask"))
         XCTAssertTrue(loop.contains("loss_mask_present_but_flag_missing"))
         XCTAssertTrue(loop.contains("def load_maformac_loss_mask_datasets"))
@@ -1006,6 +1009,31 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(loop.contains("char_indexed_loss_mask_labels_forbidden"))
         XCTAssertTrue(loop.contains("raise LossMaskValidationError"))
         XCTAssertTrue(loop.contains("LOSS_MASK_PREFLIGHT_FAILED"))
+    }
+
+    func testPythonPreflightOnlyRequiresLossMaskBeforeRuntimeImports() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for preflight-only flag order probe")
+        }
+
+        let result = runProcess(
+            executable: pythonExecutable,
+            arguments: [
+                repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+                "--model", "dummy-model-never-loaded",
+                "--data", "/tmp/maformac-preflight-order-never-read",
+                "--preflight-only",
+                "--allow-mlx-lm-version-mismatch"
+            ],
+            cwd: repoRoot
+        )
+
+        XCTAssertEqual(result.status, 64, result.stderr + result.stdout)
+        XCTAssertTrue(result.stderr.contains("--preflight-only requires --require-maformac-loss-mask"), result.stderr + result.stdout)
+        XCTAssertFalse(result.stderr.contains("ModuleNotFoundError"), result.stderr + result.stdout)
+        XCTAssertFalse(result.stderr.contains("Loading pretrained model"), result.stderr + result.stdout)
     }
 
     func testPythonTrainingLoopRejectsLossMaskRowsWhenFlagMissing() throws {

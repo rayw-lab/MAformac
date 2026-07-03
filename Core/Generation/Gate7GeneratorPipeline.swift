@@ -811,6 +811,36 @@ public enum Gate7QuotaCalculator {
     }
 }
 
+public struct Gate7QuotaEnforcementResult: Equatable, Sendable {
+    public var status: Gate7PipelineStatus
+    public var reasons: [String]
+
+    public init(status: Gate7PipelineStatus, reasons: [String]) {
+        self.status = status
+        self.reasons = reasons
+    }
+}
+
+public enum Gate7QuotaEnforcer {
+    public static let mismatchReason = "quota_mismatch"
+
+    public static func enforce(
+        status: Gate7PipelineStatus,
+        reasons: [String],
+        allocatedQuota: Int,
+        actualGeneratedCount: Int
+    ) -> Gate7QuotaEnforcementResult {
+        guard allocatedQuota > actualGeneratedCount else {
+            return Gate7QuotaEnforcementResult(status: status, reasons: reasons)
+        }
+        var nextReasons = reasons
+        if !nextReasons.contains(mismatchReason) {
+            nextReasons.append(mismatchReason)
+        }
+        return Gate7QuotaEnforcementResult(status: .blocked, reasons: nextReasons)
+    }
+}
+
 public enum Gate7PrecisionGate {
     public static func humanReviewSampleSize(candidateCount: Int) -> Int {
         guard candidateCount > 0 else {

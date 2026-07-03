@@ -315,6 +315,27 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
         XCTAssertTrue(Gate7PrecisionGate.shouldStopFamily(reviewed: 10, accepted: 7))
     }
 
+    func testRecipeQuotaMismatchBlocksDryRunStatus() {
+        let pass = Gate7QuotaEnforcer.enforce(
+            status: .pass,
+            reasons: [],
+            allocatedQuota: 2,
+            actualGeneratedCount: 2
+        )
+        XCTAssertEqual(pass.status, .pass)
+        XCTAssertTrue(pass.reasons.isEmpty)
+
+        let mismatch = Gate7QuotaEnforcer.enforce(
+            status: .pass,
+            reasons: ["diversity_length_distribution_too_narrow"],
+            allocatedQuota: 2,
+            actualGeneratedCount: 1
+        )
+        XCTAssertEqual(mismatch.status, .blocked)
+        XCTAssertTrue(mismatch.reasons.contains("quota_mismatch"))
+        XCTAssertTrue(mismatch.reasons.contains("diversity_length_distribution_too_narrow"))
+    }
+
     private func loadManifest() throws -> Gate7SubsetManifest {
         let url = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
             .appendingPathComponent("generated/subset-policy-manifest.json")
