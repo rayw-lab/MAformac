@@ -524,3 +524,8 @@
 - **gates v3 = mechanical_gates_pass_local**（receipt sha `7a0c63f2…`）：controller 注入权威 `tool_schema_digest`（subset-policy-manifest 组值）后 DataGate `data_gate_ready`；diversity/C6 复用 rev3 pass。digest 线三轮（lane 自铸→克隆错字段→controller 注入）最终按 D-061 语义收口——**权威字段只能由权威侧产**。
 - **正式 judge 触发**（%43 按 JUDGE-SPEC-batch-01：机械维 50 全量+语义维 20/50 分层抽样+增维；声称分层两档措辞）；%45 收尾 receipt 计算器三 P1；%44 预产 batch-02..05 orders（judge PASS 后四 lane 并发就绪）。
 - RUNBOOK-V2 落档（T1+资源门制度化+D2combo 配方基线+multi-call dev 项挂账）；PR #38 审中。
+
+## D-065（2026-07-03 晚）B01 judge=FAIL（D7 单维，内容满分）+ 行级注入修复回路（Accepted，执行中）
+- **judge 一手（%43，claim 纪律教科书级）**：机械维 D5/D6/D9/A10/A11/A12 全量 50 PASS + 语义抽样 20/50 全 PASS（含全部 16 改值行，D8 0/20）——**内容质量无 blocker**；唯一 FAIL=**D7 provenance**：controller 注入 round1 只 stamp 了 batch_manifest.json，50 行【行级】recipe/quota sha 仍 TODO。judge 另抓 trigger sha 引旧（commander 引 rev3 注入前 sha，judge 按盘上 v3 真值判=盘绑纪律）+ family 标签口径 warning（重算不硬 fail）。
+- **修复回路 round2（judge 限定 repair scope=D7 闭合）**：%45 注入器扩行级（50 行 stamp 两 sha + candidate_row_sha 重算 + ledger 同步 + SHA256SUMS + DataGate v4）→ %43 scoped re-judge（仅 D7+sha 闭合，内容维不重审）。N5E-011 两轮上限内。
+- 预告：re-judge PASS 即 batch-01 验收 → batch-02..05 四 lane 并发（orders 已备）。
