@@ -18,6 +18,7 @@ status: skeleton_dispatched
 - **决策单一权威** = 本目录（README + 各 worker 决策矩阵 + 综合 master）。
 - **上游 SSOT（grill 论据回溯）**：`runs/2026-06-30-lora-teardown/SYNTHESIS-LORA.md`（8 gate）+ `docs/c5-recovery-2026-06-22/`（0/34 复盘 + grill-decisions）+ `docs/project/phase0/r-l17-human-review-evidence/`（R-L17）+ `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`（范式）。
 - **范式样板** = `docs/grill-tournament/grill-decisions-master.md`（UIUE 215-grill 结构）+ `cascade-inventory.md`（landing matrix）。
+- **D-053/T1-OOM 最新补充（2026-07-03）**：T1 smoke 已真跑且 FAIL（Metal OOM before first optimizer update）。后续训练线先看三份新档：`t1-oom-premortem-iceberg-advice-2026-07-03.md`（结论口径）/ `t1-oom-diagnostic-runbook-2026-07-03.md`（T1D 诊断矩阵）/ `token-budget-supervision-ledger-2026-07-03.md`（token 长度账 vs 监督面账）。N4 local 绿不得再被引用为 formal train-ready。
 
 ## §1 🔴 双仓惨败回忆纪律（每条决策必过，定时回忆）
 

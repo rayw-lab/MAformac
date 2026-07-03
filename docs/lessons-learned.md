@@ -246,3 +246,6 @@ rebase PR31 用 `git rebase origin/main 2>&1 | tail -2 && git push --force-with-
 
 ### M.14 验证口径必须绑【验收基线 artifact】+ CLI 默认值 vs 锁值 footgun（2026-07-03，D-051）
 %45 解完 PR31 合并冲突报「验证全绿」，实则 preflight exit0 跑在**自己重生成的数据**上（且重生成误吃 CLI 默认 refusal_ratio_target=0.1，非 D-042 锁值 0）；commander 用 N4A 验收基线数据复跑同命令 = exit66，当场拦下。两教训：① **「绿」必须声明跑在哪份 artifact 上**——验收基线 artifact 的绿才是验收绿，重生成/fixture 的绿只证明代码自洽（生产者-消费者契约的另一半没验）；收稿方复跑必用基线 artifact。② **锁值必须显式传参/进 manifest，禁依赖 CLI/config 默认**——通用默认值（0.1）会在任何重跑处静默替换锁值（0），与 claim-vs-reality 铁律1「enforce 非 declare」同源：锁值不进调用面=没锁。
+
+### M.15 数字核真 ≠ 后果定价（2026-07-03 T1-OOM，commander 亲身第四层）
+PR31-final 复跑时我亲眼核了 trainable_tokens 44459→113914（recheck3 log 一手）并标「expected（新契约监督面扩大）」——真实性核对完成，但没有问「2.56x 监督面/首次引入 7k 长序列对 backward 显存意味着什么」，两小时后 T1 Metal OOM 补了这一课。**核真只完成一半：任何亲核过的显著变化数字，必须再问一句「它的下游代价在哪个维度（显存/墙钟/质量/成本）」**——不定价后果=第四层 claim-vs-reality（前三层：没核/核不细/核了别人的转述；第四层：核了真值没核含义）。机制化=「X-ready 声称必带资源包络两列」+ 风险类×最廉门矩阵（全局 rule verification-economics-baseline-registry）。

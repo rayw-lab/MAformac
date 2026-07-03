@@ -435,7 +435,7 @@
 - **键盘更新**：磊哥剩 3 键=merge 链（CI 绿后一键）/ run-auth（R7）/ N5E-005 人工门 A-B 一选。人审包=`docs/handoffs/2026-07-03-leige-review-package.md`。
 
 ## D-050（2026-07-03 上午后段）磊哥四连授权 + merge 链执行（Accepted，执行中）
-- **磊哥四拍**：① **N5E-005 人工精度门 = PASS**（磊哥本人抽检 40+ 条 canary json，原话「我本人抽检通过 看了40多条json，通过」）② **六支 PR merge 推动**授权 ③ **run-auth 授权**（训练线解锁；第一动作=T1 hang 2-iter smoke per runbook）④ **M2 树清理授权**。
+- **磊哥四拍**：① **N5E-005 人工精度门 = PASS**（磊哥本人抽检 40+ 条 canary json，原话「我本人抽检通过 看了40多条json，通过」）② **六支 PR merge 推动**授权 ③ **run-auth 授权**（训练线解锁；第一动作=T1 smoke；当时按 #1348 hang 风险命名，D-053 实跑改判 Metal OOM）④ **M2 树清理授权**。
 - **merge 执行账（commander 亲手 gh merge，rebase 模式）**：#26 ✅ MERGED → #27 ✅ → 🔴 **#28 被 GitHub 连带关闭**（父分支 #27 删除副作用，不 retarget 而是 close）→ 本地 rebase 清重复补丁（唯一 delta=EOS commit `946fe49d`）→ **续开 #33 双绿 ✅ MERGED**；#29 ✅（吃一堑：**不 --delete-branch** 防 #31 连带关闭）；#32 ✅（docs 整编）；**#31 在途**：retarget main 后 DIRTY（main 已含 #27 同文件区）→ %45（作者）merge origin/main 语义解冲突 + 三验证（filter tests/strict preflight/DataGate）后普通 push。
 - 🔴 **commander 事故与恢复（进 lessons M.13）**：rebase #31 时用 `git rebase … | tail` 接 `&&`——**管道吃掉非零退出码**，冲突中断态被当成功，把**截断分支**（缺 N4a 后续 commit）force 推上远端；立即用原 tip `f163eedf` force 恢复，零窗口损害（期间无 CI/merge 消费该分支）。教训：git 变更类命令**禁止管道接 tail/grep 再链 &&**（或 set -o pipefail）。
 - PR28 push-event verify 失败分类=**结构性**（push 事件 diff 基线错误扫全史旧文件 whitespace，与 PR 增量无关；pull_request 事件真跑全绿）——workflow 的 push 触发面待修（backlog，非阻塞）。
@@ -459,3 +459,16 @@
 - **T1 结果（%43，receipt sha `a6c1937e…`）**：pinned main `b33d8eba` + 新基线数据，val iteration1 loss=3.081 正常算出 → **METAL OOM 于首次 optimizer update 之前**；optimizer_update_count=0、adapter 未保存、watchdog 未触发（非 hang）。**T1_SMOKE_FAIL_METAL_OOM_BEFORE_OPTIMIZER_UPDATE**。
 - **定性**：premortem T1 防的是 #1348 hang，实跑暴露的是显存 OOM——同族（只有真 forward/backward 才暴露，preflight 静态检查永远看不见）；**T1 门在正式训练前拦下必炸点 = 门的设计目的达成**。修复是配方级议题（grad checkpointing/batch/val_batches/8192 显存压力 @M5），**按 D-046 应起 grill 不自拍**，等磊哥复盘后定。
 - **全线暂停**（磊哥「43 完成当前动作我们停下来复盘」）：三 worker 待命不派新活，训练线停在 T1 FAIL 待 grill。
+
+## D-054（2026-07-03 午后）T1-OOM pre-mortem + iceberg advice 落档（Accepted）
+- **磊哥追加要求**：用 `pre-mortem` + `bug-iceberg-teardown`，联网+本地深度确认，尤其核 token 爆面；并“落若干文档”给 commander 接。
+- **落档**：`docs/c5-training-readiness-grill/t1-oom-premortem-iceberg-advice-2026-07-03.md`（结论口径：不是“token 爆了所以项目降级”，而是 E-2 长度门有效 + T1 真实 backward memory blocker）/ `docs/c5-training-readiness-grill/t1-oom-diagnostic-runbook-2026-07-03.md`（T1D 一变量诊断矩阵：D0 instrumentation、D1 batch、D2 grad checkpoint、D3 validation cadence、D5/D6 高风险配方域）/ `docs/c5-training-readiness-grill/token-budget-supervision-ledger-2026-07-03.md`（双 token 账）。
+- **核心数字**：E-2 后长度仍绿（PR31 final/T1 `max_token_length=7185`，length violations=0），但监督面扩大为新风险（N4A `trainable_tokens=44459` → PR31 final/T1 `113914`，约 2.56x；总 token 近似不变，主要是 ignored→trainable 重分类）。后续 receipt 必须同时报 `max_token_length` 与 `trainable_tokens`，禁止用 length green 替代 train smoke green。
+- **状态词**：正式训练继续 **BLOCKED pending T1D**；诊断 pass 只能写 `T1D_DIAGNOSTIC_PASS_*`，不得写 train-ready/V-PASS。
+
+## D-055（2026-07-03 午后）认知升级维度三/四落地：验证经济学 + 基线一等公民（Accepted）
+- **对 codex 第一次升级三档的辩证**（升级档=`docs/c5-training-readiness-grill/cognitive-upgrade-dim34-verification-economics-2026-07-03.md`）：口径重述/双 token 账/一变量矩阵全接；三处推进——①H-act（长序列×batch4 activation 驻留，mlx-lm 按长度排序组 batch 使首个训练 batch 可能=最长 4 行；val 只 forward 故能过）vs H-sup（监督面扩大）双假设进 D0 判 ②矩阵增 **D1b token 预算 batching**（自有 maformac_iterate_batches 可实现按 token 总量组批：数据零丢失、比 batch=1 保吞吐、比 D5 保覆盖）③归因收窄（监督面扩大系 main 契约硬化 commit 所致，非 PR31-final 重建动作）。
+- **维度三（验证经济学）**：风险类×最廉门矩阵（缺格=elephant）；「X-ready」声称必带资源包络两列（peak memory/wall clock）——资源维与语义维同权。
+- **维度四（基线一等公民）**：`docs/BASELINE-REGISTRY.md` 建档（4 条 live basis + supersede 史 + 迁移三步）；receipt 必 cite basis_id，「绿」不写 basis=未验证。
+- **维度五（元回路契约）**：每次复盘产出 ①事实重述 ②机制补丁 ③≥1 系统原理候选 ④落点分层（维度1→项目档/维度2→lessons宪法/维度3+→全局 rules）⑤Elevate-or-Kill 自检。
+- 落点：全局 rule `~/.claude/rules/verification-economics-baseline-registry.md` + BASELINE-REGISTRY + lessons M.15（数字核真≠后果定价，commander 亲身）+ 编排蓝图 L1-L6（T1D 关键路径与 wave-1 生成并行）。codex 三档 + 本档一并 commit。
