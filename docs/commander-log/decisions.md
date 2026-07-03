@@ -401,6 +401,8 @@
 - **修复回路（N5E-011 live）**：resume 生成器补 `canary-value-ledger.jsonl`（template_sample_id+args_diff 逐行，从 `_gen_canary.py` 规格机械推导禁凭记忆）+ 修 D1 一行 + D8 改写 2-3 行 → commander 重跑 DataGate+diversity → %43 re-judge（D9/A12 按 ledger 核+改动行复核）。
 - 间隙 §10 执行：%43 出 JUDGE-SAMPLING-draft（N5E-004 弹药，基于其 60×13 维实测成本）；%45 SALVAGE-INVENTORY（N5E-007）；%44 DIVERSITY-GATE+WAVE-ACCEPTANCE（N5E-008/012）。
 - 元认知：**「生成器自己的 receipt 声称改了值」+「无逐行登记」= claim-vs-reality 在数据生成层的标准形态**——canary 门先于扩量抓住，正是 canary 的设计目的；扩量批契约（N5E-002）必须把 ledger 定为生成方硬产出（fail-closed），不靠中途补约束。
+- **修复回路第二格（同日）**：生成器补齐 `canary-value-ledger.jsonl`（60 行全覆盖/template 指针齐/value_changed=31，commander 亲核）+ D1/D8 行改写；commander 重跑 **DataGate v2 exit0**（60/60 surface/redaction pass）+ diversity v2=**WARN 仅长度带宽**（p90-p10=5.1<6，无近重复）+ C6 probe v2 pass。**commander 裁决：canary 不再翻改防无限回圈，长度带宽下限折进扩量批契约生成要求**（N5E-002）。%43 re-judge 在途。
+- **cross-grill 对抗审轮开跑（D-046 流程）**：%44 审 JUDGE-SAMPLING+EXPANSION-PLAN / %45（fresh 线程）审 DIVERSITY-GATE-AND-WAVE-ACCEPTANCE；产 CROSS-GRILL-{44,45}.md 喂 N5E 消减。
 
 ## D-045（2026-07-03 午）N5 canary 厂商实现定案（磊哥四连拍，Accepted，云凭证键就此解除）
 - **Anthropic 生成 = 后台 subagent Claude Code（模型 Opus）**（磊哥：「anthropic 生成 安排 subagent CLAUDECODE 跑」「后台运行哈 你开一个 subcc」「模型 OPUS」）；**OpenAI judge = codex worker 任选其一**（gpt-5.5，磊哥：「OPENAI Judge 就是 codex 随便选一个 worker」）。真跨厂商（Claude 家生成 / OpenAI 家评审），不再依赖云 API key——**4 键中的「云凭证」键就此解除**，剩 billing / merge / run-auth 三键。
