@@ -559,3 +559,8 @@
 - **commander 全量扫描定爆炸半径**（位置词提及 vs args 正则比对，200 行全查）：**仅 4 行中招**——b02 0007/0023（主驾；恰=抽样全中总体）、b03 0012（主驾）/0025（后排）、b04/b05 零命中。
 - **修复回路**：窄域修复 lane（wave1-repair-lane-1）只碰 4 行（语义判断后补槽/ledger 同步/receipt 修复段，lane 保语义判断权）；修后 %45 gates 重跑（b02 v4/b03 v2）→ %43 scoped 复审（D3 维全批位置行）。
 - **调度改序**：%43 先审干净批 B04→B05（不等修复）——批间独立乱序审=吞吐优化。
+
+## D-071（2026-07-03 深夜）CODE+DATA 耦合迁移 R2 = PASS，registry 首次正式迁移落地（Accepted）
+- **R2 五门全绿**（receipt=CODE-MIGRATION-R2-RECEIPT.md，commander 亲核）：新 pin `26678346` 上 DataGate data_gate_ready（DATA v3=PR38-final-n4a-recipe-build，hash 字段投影补齐）+ strict preflight 4628/4628（trainable_tokens 113745）+ **T1D-D2combo repo-config smoke：2 optimizer updates/adapter saved（sha `d6abc4cf…`）/OOM absent/峰值 17.87GB——PR38 三控件在正式 config 面 e2e 实证** + filter 111/0 + patch dry-run。
+- **BASELINE-REGISTRY 首次正式迁移执行**：CODE→`CODE-2026-07-03-PR38`（pin `26678346`）、DATA→`DATA-WAVE1-SUBSTRATE-v3`；旧行入 supersede 史（v2 blocked 于 #36 hash 门=预期耦合）。维度四机制从建档到首次真实迁移当日闭环。
+- 后续新工作（候选 manifest/wave 批次）一律 cite 新 basis_id；warmup 批（pin b33d8eba 生成）历史有效性标注保留。
