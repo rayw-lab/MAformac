@@ -1016,7 +1016,7 @@ public struct C5DataGateValidator: Sendable {
         let hashRecipeRef = candidate.hashRecipeRef?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
         if hashRecipeRef == nil {
             reasons.append("hash_recipe_ref_missing")
-        } else if hashRecipeRef?.contains("C5LoRATraining.swift:") != true || hashRecipeRef?.contains("C6VehicleToolBench.swift:2329") != true {
+        } else if !C5DerivedHashRecipe.hashRecipeAnchorTokens.allSatisfy({ hashRecipeRef?.contains($0) == true }) {
             reasons.append("hash_recipe_ref_invalid")
         }
         if candidate.hasActionToolCall {
