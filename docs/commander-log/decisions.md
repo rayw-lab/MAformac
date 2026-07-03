@@ -447,3 +447,10 @@
 - **裁决**：分支代码面（`9ad6ff2d`=main+N4a/N4c 特性）无罪；**merge 前置=按 N4A 配方旋钮（refusal_target=0 显式覆盖 CLI 默认）重建数据 + strict preflight/DataGate 全绿 + 与 N4A 基线逐字段对账表**（预期差标 expected，意外差停手）。执行中（PR31-final-n4a-recipe-build/）。
 - 🔴 **P1 隐患登记**：CLI 默认 refusal_ratio_target=0.1 与 D-042 锁值 0 相悖 = footgun——wave-1 controller manifest 须把锁值显式化（并入 N5E-003 quota SSOT 范围），修法等 grill 不自拍。
 - 元认知：**「收 REPORT 必用验收基线 artifact 亲核」再次救场**（训练线解锁前夜，错误 refusal 配比+契约错位数据差点进 lineage）；worker 的 fixture-green/重生成-green ≠ 基线-green。
+
+## D-052（2026-07-03 午）merge 链全部完成 + main pin + T1 smoke 触发（Accepted）
+- **六支全并**：#26（rebase）→ #27（rebase）→ #28 连带关闭→rebase 续开 **#33**（rebase 并）→ #29（rebase，留分支防连坐）→ #32（rebase）→ #31 连带关闭→merge-main 解冲突+N4A 配方重建全绿→续开 **#34**（含 merge commit 故 --merge 方式并，2026-07-03T03:32:45Z）。
+- **main pin SHA = `b33d8eba152e5326f69bbe85fc356b73419ee9c3`**（N5E-006 基座 pin 机械可校验态达成）。
+- **新验收基线 = `PR31-final-n4a-recipe-build/`**（N4A 配方旋钮重建于合并代码面：strict preflight exit0 4628/4628（commander recheck3 复跑一致，trainable_tokens=113914 系新契约监督面扩大=expected）/ DataGate exit0 rows 4500 / refusal 0/0 / E2 max_token 1326）；旧 `n4a-wave1-proto-build/` 降级 historical（契约硬化前产物）。
+- **T1 smoke 已触发**（%43，pinned main /tmp worktree + 新基线数据 + iters4/grad_accum4 + watchdog）。
+- workspace 终态（M2 done_after_salvage_closeout）：只剩 main / p5w / uiue 三棵 worktree，散件归档 M2-salvaged-files/。
