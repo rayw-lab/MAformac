@@ -33,20 +33,40 @@ grill_run_precondition: canary verdict 落地
 | N5E-011 | canary FAIL 回路：judge FAIL 行的处置（丢弃/修复重判/回喂生成器 prompt 改法）与再 canary 判据 | judge SPEC 门槛 ≥85% | ⬜ |
 | N5E-012 | 扩量验收门：4.5k 全量的 CANARY→WAVE 升级判据（机械门全绿 + judge 抽样 PASS 率 + family 停线零触发?） | F-044/runbook 门 | ⬜ |
 
-## 二、决策矩阵（grill 展开时逐题填）
+## 二、决策矩阵（2026-07-03 午后 grill 展开；弹药=5 draft + 2 cross-grill + canary 两轮实跑）
 
-| ID | 选项 | ⭐default | 量化 | 事实锚 | verdict |
-|---|---|---|---|---|---|
-| （待 grill） | | | | | |
+> 弹药文件（run 目录 `2026-07-03-n2n4-train-readiness/N5-canary/`）：EXPANSION-PLAN-draft / BATCH-CONTRACT-draft / SALVAGE-INVENTORY-draft / DIVERSITY-GATE-AND-WAVE-ACCEPTANCE-draft / JUDGE-SAMPLING-draft / CROSS-GRILL-44（0 P0 6 P1 3 P2）/ CROSS-GRILL-45（1 合同层 P0）/ canary-judge-verdict（v1 FAIL→v2 PASS）。
 
-## 三、消减表（grill 后填）
-
-| 消减组 | 吸收 ID | 映射验证 | 状态 |
+| ID | 锁定决策（⭐default，pending_leige_override 除注明磊哥键） | 吸收的 cross-grill 修正 | verdict |
 |---|---|---|---|
-| （待消减） | | | |
+| N5E-001 | **C 混合形态**：controller 从 locked quota 出批次 manifest；4 条 sub-CC lane 并发；🔴 **warmup 首批 N=50**（canary 60 行已证该量级可控），微批 D9/A12 全 PASS 后升到 EXPANSION-PLAN §0 的每批 75 行（run 目录 EXPANSION-PLAN-draft.md，%45 实算）；按 green/expected/bad 三情景各设 KPI | CG44-P1-4（N 条件化）+P1-5（三情景+warmup KPI） | default_locked |
+| N5E-002 | **批任务契约 rev2**（%45 执笔）：①ledger（template_sample_id+args_diff）为生成方**硬产出 fail-closed**（缺=批直接 blocked，D-047 教训制度化，不靠中途补约束）②值优先不改+改值登记③**长度带宽下限进生成要求**（canary WARN 长度带宽的裁决落点（diversity-report-v2.md 长度分布 p90=11.1/p10=6.0，run 目录））④批 artifact SHA 绑定⑤diversity WARN → 显式 `paused_diversity` 状态（消 CG45-P1-3 无名 pause 态） | CG44-P1-6（SHA 绑定）+CG45-P1-3 | default_locked→rev2 执行 |
+| N5E-003 | quota SSOT=`Gate7RecipeQuotaConfig`（N4c 已实装 config 面），controller manifest 从其派生，禁手写第二份 | — | default_locked |
+| N5E-004 | judge 抽样：**机械可判维（D5 泄漏/D6 脱敏/D9 ledger 对账）下沉脚本全量跑；LLM judge 只审语义维（D1/D2/D8 等）按 family 抽样 min(50,max(20,10%))**；可执行 family_judge_status 状态机+Wilson 下界+next-action；warning 行拆结构性/语义性两类，硬включ上限+超限升级而非无界全审 | CG44-P1-1（状态机可执行化）+P1-2（warning 行拆分封顶）+P1-3（owner/tool 矩阵） | default_locked |
+| **N5E-005** | 🔴 **磊哥键**：人工精度门 staffing——⭐磊哥本人按 sample size 抽检（拍点5 原 default）或拍「首波跳过人工门，数据门+judge 双机械门先行」 | — | **pending_leige** |
+| **N5E-006** | 🔴 **磊哥键（卡 merge 链）**：扩量启动前 pin merge 后 main SHA；controller 记录四元组（main_pin_sha/quota-config SHA/catalog-manifest SHA/vendor enum）；中途 main 变=旧批降级 candidate 不混正式 receipt | EXPANSION-PLAN §1 全文吸收 | **pending_leige（billing→merge 后自动满足）** |
+| N5E-007 | salvage=**A 全量重判入 recovery pool，两道 stop gate**：projection gate（4500 行全投影当前 schema，`direct_pass=0` 预期，🔴 禁 legacy flag 放行）→ rejudge/DataGate gate（全量 vendor-enum judge+DataGate）；3804 行仅作 10 族 recovery quota（`reuse_origin=pr3_generated_utterances_final`），696 非 10 族 unsupported/drop 不改写；旧文件 sha 冻结 `46a36018…` | SALVAGE-INVENTORY 实算（4500/3804/696/direct_pass=0 全一手） | default_locked |
+| N5E-008 | diversity **双接线**：controller 旁路脚本=每批/每 family 即时硬门（含长度带宽阈值）；Gate7 Swift port 在正式 4.5k 验收前完成（现 Gate7 只有 distinctRate+lengthBuckets，p5w 树 Gate7GeneratorPipeline.swift 行 517-555（%44 draft 亲核锚）） | %44 draft default 全吸收 | default_locked |
+| N5E-009 | C6 leakage：exact-ID probe **每批跑** + 全量收口再跑一次；任何交集>0=批 blocked | — | default_locked |
+| N5E-010 | lineage：每批三件套（生成 receipt/门 receipt/judge verdict）+INDEX sha256 绑定；🔴 数据进训练前必在 pin 基座重跑 DataGate（G8→制度） | CG44-P1-6 同源 | default_locked |
+| N5E-011 | FAIL 回路（canary 一轮收敛实证）：FAIL→**作者修**（生成器/契约按归属）→**scoped re-judge**（失败维+改动行，不全量重审）；同批 **2 轮不收敛→上抛 commander 裁决**（防无限回圈，同 canary「不再翻改」裁决先例） | — | default_locked |
+| N5E-012 | 扩量验收门（%44 判据 + CG45 P0 修正）：🔴 **声称分层**——机械全量维（DataGate/diversity 脚本/C6 probe/D5/D6/D9 脚本化对账）可出全量声称；语义抽样维只出「抽样置信」声称**禁升格全量**（CG45-P0-1 抽样假绿封堵）；判据=机械门全绿+judge 抽样 family 全≥0.8+无停线+整体抽样 PASS≥0.90+F-044 配方锚在位；措辞=`WAVE_EXPANSION_ACCEPTED_LOCAL`，非 train-ready/V-PASS；DataGate status 写死真实字符串（CG45-P1-2）；反例引用更新为 canary v1 历史态（CG45-P1-4） | CG45 P0-1/P1-2/P1-4 + %44 draft | default_locked |
 
-## 四、landing（lock 后填）
+## 三、消减表
 
-| ID | 落点（代码/配置/receipt/流程） | 状态 |
+| 消减组 | 吸收 | 状态 |
 |---|---|---|
-| （待 lock） | | |
+| R1 生成执行（形态/批契约/quota） | N5E-001、002、003 + CG44 P1 第4、5、6条 + CG45 P1-3 | default_locked，落点=BATCH-CONTRACT rev2 |
+| R2 评审体系（抽样/声称分层/人工门） | N5E-004 与 N5E-012 + CG44 P1 第1、2、3条 + CG45 P0-1、P1-2、P1-4；N5E-005 磊哥键 | default_locked（005 除外） |
+| R3 数据治理（salvage/diversity/leakage/lineage） | N5E-007、008、009、010 | default_locked |
+| R4 边界与回路（基座 pin/FAIL 回路） | N5E-006（磊哥键，卡 merge）/011 | 011 locked；006 pending |
+
+## 四、landing
+
+| 落点 | 承接 | 状态 |
+|---|---|---|
+| BATCH-CONTRACT rev2（%45） | N5E-001、002、003、008 条款执笔 | ⬜ 待派 |
+| JUDGE-SAMPLING rev2 → 可执行状态机（%43） | N5E-004 与 N5E-012 | ⬜ 待派（可并入 rev2 批契约附录） |
+| canary 三件套+INDEX 归档 | N5E-010 | 🔄 %43/%44 在产 |
+| 磊哥键打包 | N5E-005（人工门）+ N5E-006（基座 pin，billing→merge 后自动满足） | ⬜ 与 billing/merge/run-auth 同包上抛 |
+| 沉淀 | D-048（grill lock 记账）+ MEMORY as-of + N5E 骨架状态刷 | 🔄 本次 |
