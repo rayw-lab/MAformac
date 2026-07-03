@@ -529,3 +529,9 @@
 - **judge 一手（%43，claim 纪律教科书级）**：机械维 D5/D6/D9/A10/A11/A12 全量 50 PASS + 语义抽样 20/50 全 PASS（含全部 16 改值行，D8 0/20）——**内容质量无 blocker**；唯一 FAIL=**D7 provenance**：controller 注入 round1 只 stamp 了 batch_manifest.json，50 行【行级】recipe/quota sha 仍 TODO。judge 另抓 trigger sha 引旧（commander 引 rev3 注入前 sha，judge 按盘上 v3 真值判=盘绑纪律）+ family 标签口径 warning（重算不硬 fail）。
 - **修复回路 round2（judge 限定 repair scope=D7 闭合）**：%45 注入器扩行级（50 行 stamp 两 sha + candidate_row_sha 重算 + ledger 同步 + SHA256SUMS + DataGate v4）→ %43 scoped re-judge（仅 D7+sha 闭合，内容维不重审）。N5E-011 两轮上限内。
 - 预告：re-judge PASS 即 batch-01 验收 → batch-02..05 四 lane 并发（orders 已备）。
+
+## D-066（2026-07-03 晚）🎉 **warmup batch-01 验收 PASS**——wave-1 批生态全链首通（Accepted）
+- **Re-judge D7 @v4 = PASS**（%43，scoped：仅 provenance 闭合链复核）：50/50 行级 recipe/quota sha=manifest 绑定值、candidate_row_sha 重算匹配、ledger 对齐、SHA256SUMS 盘绑一致、DataGate v4 data_gate_ready。**终 claim 分层措辞**：机械/溯源 7 维=全量 PASS（盘绑 sha `34270ae1…` 池）；语义 5 维=20/50 抽样置信 PASS（禁升格）。
+- **batch-01 全链账**（一天内跑通的批生态）：lane 生成（3 rev：digest 硬化→multi-call 勘查回退→waiver 落证）→ 机械门（DataGate 4 轮咬 3 次真缺陷）→ 跨厂商 judge（FAIL D7 单维→controller 行级注入 round2→PASS）——**每一次 blocked 都是门在工作，内容质量全程满分（语义抽样 20/20）**。
+- **PR38-FIX 推进**（%44 正规重产 verification marker+证据包，新 head `43a6142d`；%43 scoped 复核中）。
+- 下一格：%45 的 B2-5-AUDIT（batch-02..05 包吸收今晚教训核查）落地后 → **四 lane 并发**（batch-02..05 各 50 行）。
