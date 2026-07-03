@@ -454,3 +454,8 @@
 - **新验收基线 = `PR31-final-n4a-recipe-build/`**（N4A 配方旋钮重建于合并代码面：strict preflight exit0 4628/4628（commander recheck3 复跑一致，trainable_tokens=113914 系新契约监督面扩大=expected）/ DataGate exit0 rows 4500 / refusal 0/0 / E2 max_token 1326）；旧 `n4a-wave1-proto-build/` 降级 historical（契约硬化前产物）。
 - **T1 smoke 已触发**（%43，pinned main /tmp worktree + 新基线数据 + iters4/grad_accum4 + watchdog）。
 - workspace 终态（M2 done_after_salvage_closeout）：只剩 main / p5w / uiue 三棵 worktree，散件归档 M2-salvaged-files/。
+
+## D-053（2026-07-03 午后）T1 smoke = FAIL（METAL OOM）+ 全线暂停复盘（磊哥令）
+- **T1 结果（%43，receipt sha `a6c1937e…`）**：pinned main `b33d8eba` + 新基线数据，val iteration1 loss=3.081 正常算出 → **METAL OOM 于首次 optimizer update 之前**；optimizer_update_count=0、adapter 未保存、watchdog 未触发（非 hang）。**T1_SMOKE_FAIL_METAL_OOM_BEFORE_OPTIMIZER_UPDATE**。
+- **定性**：premortem T1 防的是 #1348 hang，实跑暴露的是显存 OOM——同族（只有真 forward/backward 才暴露，preflight 静态检查永远看不见）；**T1 门在正式训练前拦下必炸点 = 门的设计目的达成**。修复是配方级议题（grad checkpointing/batch/val_batches/8192 显存压力 @M5），**按 D-046 应起 grill 不自拍**，等磊哥复盘后定。
+- **全线暂停**（磊哥「43 完成当前动作我们停下来复盘」）：三 worker 待命不派新活，训练线停在 T1 FAIL 待 grill。
