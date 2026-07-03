@@ -472,3 +472,8 @@
 - **维度四（基线一等公民）**：`docs/BASELINE-REGISTRY.md` 建档（4 条 live basis + supersede 史 + 迁移三步）；receipt 必 cite basis_id，「绿」不写 basis=未验证。
 - **维度五（元回路契约）**：每次复盘产出 ①事实重述 ②机制补丁 ③≥1 系统原理候选 ④落点分层（维度1→项目档/维度2→lessons宪法/维度3+→全局 rules）⑤Elevate-or-Kill 自检。
 - 落点：全局 rule `~/.claude/rules/verification-economics-baseline-registry.md` + BASELINE-REGISTRY + lessons M.15（数字核真≠后果定价，commander 亲身）+ 编排蓝图 L1-L6（T1D 关键路径与 wave-1 生成并行）。codex 三档 + 本档一并 commit。
+
+## D-056（2026-07-03 傍晚）goal=自动驾驶 L1-L6 + T1D grill lock + 三线开火（Accepted，磊哥 /goal）
+- **磊哥令**：自动驾驶推进 L1-L6 不逐步请示；三 worker 升 xhigh；worker context 完全不看（自动压缩可靠，尽管派）。
+- **T1D grill lock**（`docs/c5-training-readiness-grill/t1d-oom-grill-2026-07-03.md`，D-046 范式窄口径）：runbook D0-D7 矩阵全盘采纳 + 六条增量 lock——执行序 D0→分流 D1/D1b/D2→D4、D0 双假设判据（H-act vs H-sup 分阶段 memory profile 裁决）、D1b token 预算 batching 进矩阵（snapshot 副本实现不动 repo）、receipt 必 cite basis_id + 资源包络两列、`diagnostic_not_candidate` 词表、D5/D6 高风险域须磊哥单签。
+- **三线开火**：%44=T1D-D0（instrumentation，OOM 也算达标=拿崩点 profile）/ %45=L2 接线（hash 重算 fail-closed + refusal 锁值显式化去 CLI 默认 + controller warmup 批 manifest v1，新分支 off b33d8eba）/ %43=L4 CI 修（verify.yml push-event diff 基线）→转 T1D receipt 审位。L3 salvage 排 %45 队尾；L5 文档随收稿滚动；L6 卡 T1D PASS。
