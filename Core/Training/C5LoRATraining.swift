@@ -1380,6 +1380,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
     public var weightDecay: Double
     public var seed: Int
     public var gradClipNorm: Double
+    public var tokenBudgetPerBatch: Int?
+    public var gradCheckpoint: Bool
+    public var clearCacheBeforeTrain: Bool
     public var trainingLoop: String
     public var keys: [String]
     public var secondaryExperiments: [String]
@@ -1407,6 +1410,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         case weightDecay = "weight_decay"
         case seed
         case gradClipNorm = "grad_clip_norm"
+        case tokenBudgetPerBatch = "token_budget_per_batch"
+        case gradCheckpoint = "grad_checkpoint"
+        case clearCacheBeforeTrain = "clear_cache_before_train"
         case trainingLoop = "training_loop"
         case keys
         case secondaryExperiments = "secondary_experiments"
@@ -1439,6 +1445,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         weightDecay: Double,
         seed: Int,
         gradClipNorm: Double,
+        tokenBudgetPerBatch: Int? = nil,
+        gradCheckpoint: Bool = false,
+        clearCacheBeforeTrain: Bool = true,
         trainingLoop: String,
         keys: [String],
         secondaryExperiments: [String],
@@ -1465,6 +1474,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         self.weightDecay = weightDecay
         self.seed = seed
         self.gradClipNorm = gradClipNorm
+        self.tokenBudgetPerBatch = tokenBudgetPerBatch
+        self.gradCheckpoint = gradCheckpoint
+        self.clearCacheBeforeTrain = clearCacheBeforeTrain
         self.trainingLoop = trainingLoop
         self.keys = keys
         self.secondaryExperiments = secondaryExperiments
@@ -1495,6 +1507,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             weightDecay: try container.decodeIfPresent(Double.self, forKey: .weightDecay) ?? 0.01,
             seed: try container.decodeIfPresent(Int.self, forKey: .seed) ?? 0,
             gradClipNorm: try container.decodeIfPresent(Double.self, forKey: .gradClipNorm) ?? 1.0,
+            tokenBudgetPerBatch: try container.decodeIfPresent(Int.self, forKey: .tokenBudgetPerBatch),
+            gradCheckpoint: try container.decodeIfPresent(Bool.self, forKey: .gradCheckpoint) ?? false,
+            clearCacheBeforeTrain: try container.decodeIfPresent(Bool.self, forKey: .clearCacheBeforeTrain) ?? true,
             trainingLoop: try container.decodeIfPresent(String.self, forKey: .trainingLoop) ?? "maformac_c5_repo_loop_mlx_lm_0_31_1",
             keys: try container.decode([String].self, forKey: .keys),
             secondaryExperiments: try container.decode([String].self, forKey: .secondaryExperiments),
@@ -1525,6 +1540,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         try container.encode(weightDecay, forKey: .weightDecay)
         try container.encode(seed, forKey: .seed)
         try container.encode(gradClipNorm, forKey: .gradClipNorm)
+        try container.encodeIfPresent(tokenBudgetPerBatch, forKey: .tokenBudgetPerBatch)
+        try container.encode(gradCheckpoint, forKey: .gradCheckpoint)
+        try container.encode(clearCacheBeforeTrain, forKey: .clearCacheBeforeTrain)
         try container.encode(trainingLoop, forKey: .trainingLoop)
         try container.encode(keys, forKey: .keys)
         try container.encode(secondaryExperiments, forKey: .secondaryExperiments)
@@ -1568,6 +1586,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             weightDecay: 0.01,
             seed: 0,
             gradClipNorm: 1.0,
+            tokenBudgetPerBatch: nil,
+            gradCheckpoint: false,
+            clearCacheBeforeTrain: true,
             trainingLoop: "maformac_c5_repo_loop_mlx_lm_0_31_1",
             keys: defaultProjectionKeys,
             secondaryExperiments: ["rank32_confirmation", "dora_rank8_secondary"],
@@ -1597,11 +1618,16 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         max(1, Int((Double(optimizerUpdateSteps) * warmupFraction).rounded()))
     }
 
+    private var tokenBudgetPerBatchYAMLValue: String {
+        tokenBudgetPerBatch.map(String.init) ?? "null"
+    }
+
     public var renderYAML: String {
         """
         # mlx-lm lr_schedule steps are optimizer updates, not micro-iterations.
         # training_iterations: \(scheduleDecaySteps)
         # grad_accumulation_steps: \(gradAccumulationSteps)
+        # token_budget_per_batch: null means fixed row-count microbatches; when set, grad_accumulation_steps counts variable-size microbatches.
         # optimizer_update_steps: \(optimizerUpdateSteps)
         # early_stop_basis: \(earlyStopBasis)
         # early_stop_checkpoint_steps: \(earlyStopCheckpointSteps.map(String.init).joined(separator: ","))
@@ -1617,6 +1643,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             weight_decay: \(weightDecay)
         seed: \(seed)
         grad_clip_norm: \(gradClipNorm)
+        token_budget_per_batch: \(tokenBudgetPerBatchYAMLValue)
+        grad_checkpoint: \(gradCheckpoint)
+        clear_cache_before_train: \(clearCacheBeforeTrain)
         training_loop: \(trainingLoop)
         learning_rate: \(learningRate)
         lr_schedule:

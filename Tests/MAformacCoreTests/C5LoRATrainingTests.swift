@@ -980,6 +980,9 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(config.weightDecay, 0.01)
         XCTAssertEqual(config.seed, 0)
         XCTAssertEqual(config.gradClipNorm, 1.0)
+        XCTAssertNil(config.tokenBudgetPerBatch)
+        XCTAssertFalse(config.gradCheckpoint)
+        XCTAssertTrue(config.clearCacheBeforeTrain)
         XCTAssertEqual(config.trainingLoop, "maformac_c5_repo_loop_mlx_lm_0_31_1")
         XCTAssertTrue(config.excludesEmbeddingTargets)
         XCTAssertFalse(config.renderYAML.contains("alpha"))
@@ -988,6 +991,10 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(config.renderYAML.contains("optimizer: adamw"))
         XCTAssertTrue(config.renderYAML.contains("weight_decay: 0.01"))
         XCTAssertTrue(config.renderYAML.contains("grad_clip_norm: 1.0"))
+        XCTAssertTrue(config.renderYAML.contains("token_budget_per_batch: null"))
+        XCTAssertTrue(config.renderYAML.contains("grad_checkpoint: false"))
+        XCTAssertTrue(config.renderYAML.contains("clear_cache_before_train: true"))
+        XCTAssertTrue(config.renderYAML.contains("# token_budget_per_batch: null means fixed row-count microbatches; when set, grad_accumulation_steps counts variable-size microbatches."))
         XCTAssertTrue(config.renderYAML.contains("scale: 20.0"))
         XCTAssertTrue(config.renderYAML.contains("training_loop: maformac_c5_repo_loop_mlx_lm_0_31_1"))
         XCTAssertEqual(config.earlyStopBasis, "task_metric_checkpoint_gate_not_val_loss")
@@ -1007,6 +1014,12 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertEqual(Set(config.keys), Set(expectedProjectionKeys))
         XCTAssertEqual(config.keys.count, 7)
         XCTAssertFalse(config.keys == ["self_attn.q_proj", "self_attn.v_proj"])
+
+        var d2ComboConfig = config
+        d2ComboConfig.tokenBudgetPerBatch = 8192
+        d2ComboConfig.gradCheckpoint = true
+        XCTAssertTrue(d2ComboConfig.renderYAML.contains("token_budget_per_batch: 8192"))
+        XCTAssertTrue(d2ComboConfig.renderYAML.contains("grad_checkpoint: true"))
     }
 
     func testTrainsFullAssistantToolCallPayload() throws {
@@ -1169,6 +1182,15 @@ final class C5LoRATrainingTests: XCTestCase {
 
         XCTAssertTrue(cli.contains("--require-maformac-loss-mask \\"))
         XCTAssertFalse(cli.contains("--mask-prompt \\"))
+    }
+
+    func testRenderedTrainCommandSupportsT1DRepoizedSwitches() throws {
+        let cli = try readRepoFile("Tools/C5TrainingCLI/main.swift")
+
+        XCTAssertTrue(cli.contains("--token-budget-per-batch"))
+        XCTAssertTrue(cli.contains("--grad-checkpoint"))
+        XCTAssertTrue(cli.contains("--clear-cache-before-train"))
+        XCTAssertTrue(cli.contains("--disable-cache-clear-before-train"))
     }
 
     func testPythonTrainingLoopFailsClosedWhenLossMaskPreflightEnabled() throws {
@@ -1406,6 +1428,39 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(loop.contains("def maformac_masked_cross_entropy_from_logits"))
         XCTAssertTrue(loop.contains("def run_loss_mask_self_test"))
         XCTAssertTrue(loop.contains("\"event\": \"loss_mask_self_test\""))
+    }
+
+    func testPythonTrainingLoopHasTokenBudgetBatchSelfTest() throws {
+        let loop = try readRepoFile("Tools/C5TrainingCLI/c5_mlx_train_loop.py")
+
+        XCTAssertTrue(loop.contains("parser.add_argument(\"--token-budget-per-batch\", type=int, default=None)"))
+        XCTAssertTrue(loop.contains("def maformac_budget_batch_indices"))
+        XCTAssertTrue(loop.contains("def run_token_budget_batch_self_test"))
+        XCTAssertTrue(loop.contains("\"event\": \"token_budget_batch_self_test\""))
+        XCTAssertTrue(loop.contains("\"snapshot_fixture\": \"T1D-D2combo maformac_budget_batch_indices\""))
+        XCTAssertTrue(loop.contains("\"grad_accumulation_semantics\": \"variable_microbatch_rows_when_token_budget_per_batch_enabled\""))
+    }
+
+    func testPythonTokenBudgetBatchSelfTestRuns() throws {
+        let repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+        let pythonExecutable = "/opt/homebrew/opt/python@3.13/bin/python3.13"
+        guard FileManager.default.isExecutableFile(atPath: pythonExecutable) else {
+            throw XCTSkip("missing local python@3.13 executable for token-budget batcher self-test")
+        }
+
+        let result = runProcess(
+            executable: pythonExecutable,
+            arguments: [
+                repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path,
+                "--self-test-token-budget-batches"
+            ],
+            cwd: repoRoot
+        )
+
+        XCTAssertEqual(result.status, 0, result.stderr + result.stdout)
+        XCTAssertTrue(result.stdout.contains(#""event": "token_budget_batch_self_test""#), result.stdout)
+        XCTAssertTrue(result.stdout.contains(#""longest_row_single": true"#), result.stdout)
+        XCTAssertTrue(result.stdout.contains(#""groups": [[5, 0, 1], [2], [6], [4], [3]]"#), result.stdout)
     }
 
     func testGeneralizationDiagnosticAndFuseParityFailClosed() {
