@@ -3,6 +3,14 @@
 > 跨厂商 tmux 蜂群（claude-commander `%42` + 3 codex worker）。worker 自动压缩不丢工作。产出落 `~/Projects/agent-tmux-stack-research/runs/`。🔴 收稿以 **output file 为准非 worker ack**（`/swarm-commander` §3）；worker `status=pass` 必 commander 自核（§3）。
 
 ---
+## run 2026-07-03-n2n4-train-readiness（进行中，D-040 goal N0-N4）
+- **任务**: N2 PR head 重审 wave（外审收窄后旧 APPROVE 全作废）+ N3 GF rev3 + N4a E-2 降档实装+preflight strict exit0
+- **worker**: %43（#26 增量重审 `3b081823..e6a8849f` + #29 首轮 `5c68f945` + GF rev3，/tmp worktree 不动 uiue 树）/ %44（#27 `a400b01a` + #28 `49fa0b9b` 重审+mirror gate 复跑，/tmp worktree）/ %45（p5w 树新分支 E-2 降档挂载+valid/test 监督契约→DataGate exit0+preflight strict exit0，完成即 commit）
+- **SPEC**: `runs/2026-07-03-n2n4-train-readiness/SPEC-{43,44,45}-*.md`（inline SSOT 决策+file:line+可复跑命令；pre-mortem 联网/本地交叉+iceberg 纪律 inline）
+- **commander 侧**: N0 落账收窄（D-040 级联 6 文件）+ N1 PR #30（81 commits 纯 docs 推新分支收编）+ F-044 默认锁/配方锚落档 `docs/c5-training-readiness-grill/f044-default-lock-and-wave1-recipe-anchors-2026-07-03.md`
+- **产出**（全收，2026-07-03 午前 D-043 收口）: 重审 `REREVIEW-PR26-e6a8849f.md`(+Fix Re-review @edfc2198)/`REREVIEW-PR27-a400b01a.md`/`REREVIEW-PR28-49fa0b9b.md`(claim correction)/`REVIEW-PR29-5c68f945.md`(+@871307d9)/`REVIEW-PR31-ac7774e0.md`(+@f163eedf)/`REVIEW-PR30-docs.md`(P0 scope breach)；修复 `FIX-PR26-edfc2198.md`/`FIX-PR29-871307d9.md`/`FIX-PR31-f163eedf.md`；N4 `RECEIPT-N4A-e2-downgrade-preflight.md`/`RECEIPT-N4C-recipe-anchors.md`/`commander-recheck-preflight.log`(独立复跑)/`PREMORTEM-wave1-training.md`/`WAVE1-TRAINING-RUNBOOK-GATES.md`；治理 `gf-reduction-rev3.md`(136/136)/`ARCHEO-bridge-schema-verdict.md`/`PR30-integration-adjudication-table.md`(66 文件 51/4/11)。验收档=repo `docs/c5-training-readiness-grill/n4-train-readiness-acceptance-2026-07-03.md`（N4-ACCEPTED-LOCAL）
+- **worker 亮点**: %43 五轮审计全真 finding（#26 P1 consumed-index/#29 双 P1 bypass/#31 双 P2）+ head 漂移诚实处理；%44 抓 commander PR30 P0 + ARCHEO 纠 commander 二次误判 + premortem 预算纪律 7/8；%45 三修全一次过复核 + N4c 防自拍上抛 3 冲突。ops：%45 context 爆→`/new` 复活、%44 TRANSCRIPT 卡→`q` 退出
+
 ## run 2026-06-30-uiue-main-status-review
 - **任务**: UIUE vs main 现状回顾 + grill 全量清单 + gitnexus 代码图谱 + 现状路线图
 - **worker**: %44 / %45 / %43 三路（零重叠 scope）
@@ -98,3 +106,13 @@
 - 收稿 = `ls` output file，不信 ack；worker `status=pass` commander 自核
 - live > report：曾抓 D25「staged 未 commit」report stale（live 已 commit）
 - worker 自动压缩不丢工作 → 不因 context 低换人/调 scope
+
+## run 2026-07-02-baseline-roadmap（新任 commander：基线双文档 → M1 合流 → E-2 grill → G7 construction，一日三战）
+- **任务链**: 磊哥「写此时此刻 baseline 路线图」→「ABCDE 都要做」→「M1 合流验收」→「E-2 按 grill 范式深化」→ D-019 七项拍板 → G7 construction。
+- **产出（runs/2026-07-02-baseline-roadmap/ 30+ 文件）**: L1 全树盘点 / L2 hf-skills teardown / L3 训练闭环素材 / L4 E-2 真 tokenizer 实算 / TASK-LEDGER / M2-dryrun / SPEC×10 / RECEIPT×8 / XAUDIT×4。
+- **M1（D-018）**: PR #12/#13/#14/#15 staged 合流 main=`80ea379c` + 验收 PASS main 范围。拦截×3（guard 漏 test split / gate8 改派生物没改工厂 / E-2 包丢 train target 轴）。
+- **E-2 grill round（D-019）**: 9 维度树 → W1/W2/W3+D9 = 43 决策 → 13 会聚+1 仲裁（7,901 vs 7,200 cap → degraded_clarify）→ E2-A~E 磊哥 locked_with_conditions → RAT PR #16 merged main=`af72a60a`。
+- **G7 construction（进行中）**: G7A PR #18（manifest 18,260 entries/1 degraded pair；XAUDIT 抓 B1 手写表 BLOCKER → contract 文件模式修复中）/ G7B PR #17（XAUDIT CLEAR：消费链行为证明非 dead field，verdict 诚实 adapter_receipt_proof）/ G7C 暂缓（磊哥令等 A/B 口径稳）。
+- **纪律沉淀**: worker 回报纪律（REPORT/PROGRESS/BLOCKED 行）+ 3-worker 使用范式入 memory（磊哥点名满意）+ lessons K 段。
+- **收稿=文件+亲核**: 全部 receipt 关键声称经 commander gh/grep/亲跑抽核（562 三路复算 / self-test 复现 / 消费链测试亲读 / spot audit hash 对比）。
+- **UPDATE（2026-07-02 下午～深夜，G7+hermes 闭环段）**: G7A/B/C/D 四切片全合流（PR #17/#18/#19/#20，B1 手写表 BLOCKER 修复 contract 模式）→ hermes GLM-5.2 真异源终审 REQUEST_CHANGES（%44 助理执行位跑通；P1 policy 零校验 + P2×2 dead/no-op 字段；**二层 catch：XG7D 假验证被证伪**）→ 修复轮 PR #21/#22 MERGED（main=`a8fcd245`）+ #23 HIGH 返修中（S-210 第三层不可达，交换审第 8 咬）。**今日累计 11 支 PR 合流（#12-#22）+ 8 个真问题被审计体系咬住**。ops：%43 47min 卡死 kill 重启救援（宪法 §8 PROVEN）；假 hermes subagent 教训（宪法 §8）；外审执行位下沉 worker + 20min 上限 + 角色流转（D-021）。

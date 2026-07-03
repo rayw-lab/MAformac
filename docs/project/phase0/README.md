@@ -65,11 +65,12 @@ These files are not implementation, not OpenSpec archive, and not permission to 
 ## D20-D24 R5 Runtime/UIUE PR Absorption Pack
 
 - D20-D23 receipts and commander verdicts record proof-capped runtime-payload, UIUE consumer, public fixture corpus, shared schema/checker, and PR remote-truth work. They are local/static/unit/integration/OpenSpec/GitHub evidence only, not runtime/product readiness.
-- D24 absorption manifest: `r5-d24-uiue-absorption-manifest-2026-06-30.md`. It is the main-traceable inventory for PR #7/#6, local dirty split, UIUE source dispositions, broad PR #6 surfaces, and no-claim boundaries before merge.
+- D24 absorption manifest: `r5-d24-uiue-absorption-manifest-2026-06-30.md`. It is the main-traceable inventory for PR #7/#6, local dirty split, UIUE source dispositions, broad PR #6 surfaces, and no-claim boundaries.
 - UIUE source manifest: `/Users/wanglei/workspace/MAformac-uiue/docs/project/phase0/r5-d24-uiue-absorption-source-manifest-2026-06-30.md`. It remains source-side evidence and does not make UIUE docs/reports/tools current mainline proof by itself.
-- D24 merge order remains PR #7 first, then PR #6 after fresh re-probe/update/check. Branch deletion, runtime-ready, mobile, true-device, live API, V/S/U-PASS, A-2 complete, R5 complete, voice/model/golden/endpoint-ready claims remain explicitly out of scope.
+- D24 cloud merge is live-verified closed under proof cap: PR #7, PR #6, and PR #8 are merged, with final Verify success on `771f48ad1bbaf02740f71da2cf90ada02fc6f6c6`. Runtime-ready, mobile, true-device, live API, V/S/U-PASS, A-2 complete, R5 complete, voice/model/golden/endpoint-ready claims remain explicitly out of scope.
+- Next route: D25 K1 spike-ledger falsification for event gates `C082/C083/C182`, GPU/runtime contention `C096`, voice proof boundary `C117`, and model/parser/proof governance `C197/C207/C208`, then separate child plans for C5, C6, runtime backend, and golden/voice/UIUE only after K1 receipts.
 
 ## Current State
 
-- Status: skeletons created; D1-D10 route-control pack accepted by user verdict; default-scope G01-G28 decisions accepted and materialized as an active OpenSpec carrier; default-scope apply is authorized, same-vendor plan audit is absorbed, but physical implementation has not started.
-- Next step: execute `docs/superpowers/plans/2026-06-24-default-scope-apply.md`. Do not start retrain-c5, rebuild-c6 acceptance, demo-golden-run, voice, or UIUE merge before the physical default-scope apply gates pass.
+- Status: post-D24 route-control. D20-D24 runtime/UIUE absorption work is merged under proof cap, and `docs/CURRENT.md` plus `docs/superpowers/plans/2026-06-25-post-c6-backend-training-uiue-roadmap.md` now carry the D24 -> D25 -> post-K1 route.
+- Next step: run D25 as a bounded K1 spike-ledger lane. Do not start retrain-c5, C6 acceptance/comparison, broad runtime backend work, demo-golden-run, voice, or UIUE merge before D25 receipts and separate child-plan gates exist.
