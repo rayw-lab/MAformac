@@ -512,3 +512,10 @@
 - **裁决**：ad-hoc 约定不许进数据 → **rev3 回退 0049/0050 为单 call**；batch-01 的 `multi_call_floor(2)` **WAIVED**（reason=pipeline_single_call_renderer_no_multi_recipe，documented residual 非 fail）；**multi-call 支持立为正式 dev 项**（渲染器/签名配方/DataGate 语义三件，落地后批次恢复 floor）——配方锚（多 call 配对样本）不丢，只是走正门。
 - **VPN 超时波**：磊哥开 VPN 触发三 worker「Request timed out」连环——救援法沉淀：**timeout→ESC 释放队列；若转「Conversation interrupted」→自足要点续跑重指令（先盘点半成品防重做）**；根因=网络层非 codex（进 worker 画像救援梯）。
 - lane 收官流程：rev3 交付后关闭（后续批次起新 lane）。
+
+## D-063（2026-07-03 晚）batch-01 rev3 收官 + digest 语义错位根因 + repo 化 PR #38（Accepted，执行中）
+- **lane rev3 终态交付并关闭**（50 行/极性对称/near-dup 0.815 无回升/multi-call WAIVED 带 file:line 证据 `renderToolCall@C5LoRATraining.swift:2839`+`:3574-3575`+PR31 零多意图先例）。lane subcc-1 三轮回路（digest 硬化→multi-call 勘查回退→waiver 落证）收官，shutdown 已发。
+- **gates v2 仍 blocked（50/50 tool_schema_digest_mismatch）根因裁决**：lane 把 `subset_policy_digest` 值错映射进 `tool_schema_digest` 字段（语义错位；canary 未踩因其全字段逐字克隆）。修法=**controller 注入**（D-061 既定语义）：%45 注入器扩展逐行 stamp 权威 tool_schema_digest（源=subset-policy-manifest 组值/模板行同字段）→ DataGate v3。
+- **TOOL-AUDIT（%43）**：judge_sampling_receipt.py 三 P1（分母边界/schema 完整性/sample_id membership）+P2 → %45 修（与注入器同批）。Wilson/状态机/fixture 复算 OK。
+- **T1D repo 化 = PR #38**（%44：token_budget/grad_checkpoint/boundary_clear 三控件+self-test flags+71/71 tests，honest body）；%44 转 RUNBOOK-V2（T1+资源门制度化）。
+- 元观察：**warmup 首批把批生态所有门都咬了一遍**（digest 权威链×2、quota 保护、multi-call 契约 vs 管道现实、工具质检）——每个 blocked 都是门在工作，零 blocked 泄漏进 judge/训练。
