@@ -61,6 +61,28 @@ final class C5DataGateTests: XCTestCase {
         XCTAssertEqual(receipt.surfaceFieldPass, 1)
     }
 
+    func testMissingDerivedHashFieldsFailClosed() throws {
+        let receipt = try makeReceipt(autoHash: false, jsonl: """
+        {"sample_id":"C5-HASH-MISSING","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-HASH-MISSING","parent_semantic_id":"parent:hash.missing","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest"}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "prompt_hash_missing" })
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "hash_recipe_ref_missing" })
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "hash_recomputed_by_pipeline_missing_or_false" })
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "expected_tool_call_signature_missing" })
+    }
+
+    func testClonedTemplateHashFieldsFailClosed() throws {
+        let receipt = try makeReceipt(autoHash: false, jsonl: """
+        {"sample_id":"C5-HASH-CLONED","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-HASH-CLONED","parent_semantic_id":"parent:hash.cloned","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{"type":"function","function":{"name":"set_cabin_ac"}}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest","prompt_hash":"cloned-template-prompt-hash","expected_tool_call_signature":"cloned-template-signature","hash_recipe_ref":"Core/Training/C5LoRATraining.swift:C5DerivedHashRecipe.promptHash;Core/Training/C5LoRATraining.swift:C5DerivedHashRecipe.expectedToolCallSignature;Core/Bench/C6VehicleToolBench.swift:C6Hash.sha256Hex","hash_recomputed_by_pipeline":true}
+        """)
+
+        XCTAssertEqual(receipt.status, "blocked")
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "prompt_hash_mismatch" })
+        XCTAssertTrue(receipt.failureReceipt.contains { $0.reason == "expected_tool_call_signature_mismatch" })
+    }
+
     func testMalformedToolsObjectFailsClosed() throws {
         let receipt = try makeReceipt(allowLegacyMissingSurface: false, jsonl: """
         {"sample_id":"C5-SURFACE-BYPASS-EMPTY","split":"train","bucket":"tool_call_wrapper_format","case_id":"C5-SURFACE-BYPASS-EMPTY","parent_semantic_id":"parent:surface.empty","must_not_train":false,"source_authorization":"authorized","input_zh":"打开空调","tool_call":{"wrapper":"tool_call","name":"set_cabin_ac","arguments":{"power":"on"}},"tools":[{}],"mounted_tool_count":1,"subset_policy_id":"e2-lite-v1","subset_group_id":"ac","subset_policy_digest":"digest"}
@@ -339,11 +361,16 @@ final class C5DataGateTests: XCTestCase {
         c6Cases: [C6BenchCase] = [],
         allowLegacyMissingSurface: Bool = true,
         surfaceManifest: C5DataGateSurfaceManifest? = nil,
+        autoHash: Bool = true,
         jsonl: String
     ) throws -> C5DataGateReceipt {
         let decoder = JSONDecoder()
-        let candidates = try jsonl.split(whereSeparator: \.isNewline).map {
-            try decoder.decode(C5DataGateCandidate.self, from: Data(String($0).utf8))
+        let candidates = try jsonl.split(whereSeparator: \.isNewline).map { line in
+            var candidate = try decoder.decode(C5DataGateCandidate.self, from: Data(String(line).utf8))
+            if autoHash {
+                candidate = withValidDerivedHashes(candidate)
+            }
+            return candidate
         }
         let context = C5DataGateRunContext(
             sourceSnapshotDigest: "source-digest",
@@ -354,6 +381,19 @@ final class C5DataGateTests: XCTestCase {
             surfaceManifest: surfaceManifest
         )
         return C5DataGateValidator().receipt(candidates: candidates, c6Cases: c6Cases, context: context)
+    }
+
+    private func withValidDerivedHashes(_ candidate: C5DataGateCandidate) -> C5DataGateCandidate {
+        var candidate = candidate
+        candidate.promptHash = C5DerivedHashRecipe.promptHash(utterance: candidate.inputText)
+        candidate.hashRecipeRef = C5DerivedHashRecipe.hashRecipeRef
+        candidate.hashRecomputedByPipeline = true
+        if candidate.hasActionToolCall,
+           let renderedToolCall = candidate.renderedToolCall ?? C5DerivedHashRecipe.firstRenderedToolCall(in: candidate.assistantText) {
+            candidate.renderedToolCall = renderedToolCall
+            candidate.expectedToolCallSignature = C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall: renderedToolCall)
+        }
+        return candidate
     }
 
     private func assertAxisOverlap(axisKey: String, value: String, expectedReason: String) throws {

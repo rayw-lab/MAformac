@@ -30,6 +30,7 @@ struct C5TrainingCLI {
         if options.surface == .dDomain, options.scope != .demo {
             throw CLIError.usage("--scope full 是 skeleton(OOS/拒识白名单, 无完整 schema), 不支持 C5 D-domain 训练; 用 --scope demo(562 完整 schema)。full 全覆盖训练 = DEFERRED(retrain-c5)。")
         }
+        let refusalConfig = try options.resolvedRefusalRatioConfig()
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let patchedModelDir = outputDir.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
@@ -66,9 +67,9 @@ struct C5TrainingCLI {
         var buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
-            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
-            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
-            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
+            refusalRatioTarget: refusalConfig.refusalRatioTarget,
+            refusalRatioHardCap: refusalConfig.refusalRatioHardCap,
+            includeNoCallCounterfactuals: refusalConfig.includeNoCallCounterfactuals,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -111,9 +112,9 @@ struct C5TrainingCLI {
         buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
-            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
-            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
-            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
+            refusalRatioTarget: refusalConfig.refusalRatioTarget,
+            refusalRatioHardCap: refusalConfig.refusalRatioHardCap,
+            includeNoCallCounterfactuals: refusalConfig.includeNoCallCounterfactuals,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -548,11 +549,14 @@ private struct Options {
     var requireCandidateDataQualityGate: Bool
     var requireGeneratedUtteranceRecords: Bool
     var thetaAlphaPositiveOnly: Bool
+    var refusalRatioTarget: Double?
+    var refusalRatioHardCap: Double?
+    var batchManifestURL: URL?
     var scope: C5TrainingScope
     var surface: C5TrainingSurface
 
     init(arguments: [String]) throws {
-        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--natural-tool-call-rows PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only] [--scope demo|full] [--surface d_domain|frame]"
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--natural-tool-call-rows PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only | --refusal-ratio-target DOUBLE --refusal-ratio-hard-cap DOUBLE | --batch-manifest PATH] [--scope demo|full] [--surface d_domain|frame]"
         guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -570,6 +574,9 @@ private struct Options {
         requireCandidateDataQualityGate = false
         requireGeneratedUtteranceRecords = false
         thetaAlphaPositiveOnly = false
+        refusalRatioTarget = nil
+        refusalRatioHardCap = nil
+        batchManifestURL = nil
         scope = .demo
         surface = .dDomain
         var iterator = arguments.dropFirst(2).makeIterator()
@@ -610,6 +617,15 @@ private struct Options {
                 requireGeneratedUtteranceRecords = true
             case "--theta-alpha-positive-only":
                 thetaAlphaPositiveOnly = true
+            case "--refusal-ratio-target":
+                guard let value = iterator.next(), let doubleValue = Double(value) else { throw CLIError.usage("invalid --refusal-ratio-target value") }
+                refusalRatioTarget = doubleValue
+            case "--refusal-ratio-hard-cap":
+                guard let value = iterator.next(), let doubleValue = Double(value) else { throw CLIError.usage("invalid --refusal-ratio-hard-cap value") }
+                refusalRatioHardCap = doubleValue
+            case "--batch-manifest":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --batch-manifest value") }
+                batchManifestURL = URL(fileURLWithPath: value)
             case "--scope":
                 guard let value = iterator.next(), let parsed = C5TrainingScope(rawValue: value) else { throw CLIError.usage("invalid --scope value (demo|full)") }
                 scope = parsed
@@ -620,6 +636,39 @@ private struct Options {
                 throw CLIError.usage("unknown argument \(argument)")
             }
         }
+    }
+
+    func resolvedRefusalRatioConfig() throws -> C5ResolvedRefusalRatioConfig {
+        let manifest = try batchManifestURL.map(Self.readRefusalConfig)
+        do {
+            return try C5RefusalRatioResolver.resolve(
+                thetaAlphaPositiveOnly: thetaAlphaPositiveOnly,
+                explicitTarget: refusalRatioTarget,
+                explicitHardCap: refusalRatioHardCap,
+                manifestTarget: manifest?.refusalRatioTarget,
+                manifestHardCap: manifest?.refusalRatioHardCap
+            )
+        } catch let error as C5RefusalRatioResolutionError {
+            throw CLIError.usage(error.description)
+        }
+    }
+
+    private static func readRefusalConfig(from url: URL) throws -> RefusalManifestConfig {
+        do {
+            return try JSONDecoder().decode(RefusalManifestConfig.self, from: Data(contentsOf: url))
+        } catch {
+            throw CLIError.usage("invalid --batch-manifest refusal config: \(error)")
+        }
+    }
+}
+
+private struct RefusalManifestConfig: Decodable {
+    var refusalRatioTarget: Double?
+    var refusalRatioHardCap: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case refusalRatioTarget = "refusal_ratio_target"
+        case refusalRatioHardCap = "refusal_ratio_hard_cap"
     }
 }
 

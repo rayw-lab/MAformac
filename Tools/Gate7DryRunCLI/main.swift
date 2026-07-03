@@ -16,6 +16,8 @@ struct Gate7DryRunCLI {
             result.candidateRows,
             to: outputDir.appendingPathComponent(receipt.candidateRowsPath)
         )
+        try encoder.encode(result.batchManifest).write(to: outputDir.appendingPathComponent(receipt.batchManifestPath))
+        try encoder.encode(result.batchManifestDryRunReceipt).write(to: outputDir.appendingPathComponent(receipt.batchManifestDryRunReceiptPath))
         try encoder.encode(receipt).write(to: outputDir.appendingPathComponent("gate7-wave1-dry-run-receipt.json"))
         try renderMarkdown(receipt).write(
             to: outputDir.appendingPathComponent("gate7-wave1-dry-run-receipt.md"),
@@ -25,7 +27,8 @@ struct Gate7DryRunCLI {
 
         print("wrote \(outputDir.appendingPathComponent("gate7-wave1-dry-run-receipt.json").path)")
         print("wrote \(outputDir.appendingPathComponent("gate7-wave1-dry-run-receipt.md").path)")
-        print("status=\(receipt.pipelineStatus) samples=\(receipt.sampleCount) data_gate=\(receipt.dataGateStatus) quarantine=\(receipt.quarantineCount)")
+        print("wrote \(outputDir.appendingPathComponent(receipt.batchManifestPath).path)")
+        print("status=\(receipt.pipelineStatus) samples=\(receipt.sampleCount) data_gate=\(receipt.dataGateStatus) manifest=\(receipt.batchManifestDryRunStatus) quarantine=\(receipt.quarantineCount)")
     }
 
     private static func run(options: Options) throws -> DryRunResult {
@@ -76,7 +79,10 @@ struct Gate7DryRunCLI {
             mountedToolCount: mountedTools.count,
             subsetPolicyID: manifestEntry.subsetPolicyID,
             subsetGroupID: manifestEntry.groupID,
-            subsetPolicyDigest: manifest.meta.groupingContractDigest
+            subsetPolicyDigest: manifest.meta.groupingContractDigest,
+            promptHash: C5DerivedHashRecipe.promptHash(utterance: "quarantine dry-run sample"),
+            hashRecipeRef: C5DerivedHashRecipe.hashRecipeRef,
+            hashRecomputedByPipeline: true
         )
         let recipeQuota = Gate7RecipeQuotaConfig.wave1ConstructionAnchors
         let recipeAllocation = Gate7QuotaCalculator.allocate([
@@ -123,6 +129,17 @@ struct Gate7DryRunCLI {
             + request.heldOutCandidates
         let recipeAllocatedQuota = recipeAllocation?.quota ?? 0
         let recipeActualSampleCount = pipelineReceipt.samples.count
+        let batchManifest = Wave1BatchManifestBuilder.warmup(
+            batchID: options.batchID,
+            mainPinSHA: options.mainPinSHA,
+            laneID: options.laneID,
+            laneVendor: "anthropic",
+            generatorSourceVendor: "anthropic",
+            judgeSourceVendorRequired: "openai",
+            targetCount: 50,
+            quotaConfig: recipeQuota
+        )
+        let batchManifestDryRunReceipt = Wave1BatchManifestBuilder.validateDryRun(batchManifest)
         let quotaEnforcement = Gate7QuotaEnforcer.enforce(
             status: pipelineReceipt.status,
             reasons: pipelineReceipt.reasons,
@@ -146,6 +163,9 @@ struct Gate7DryRunCLI {
             dataGateRowCount: pipelineReceipt.dataGateReceipt?.rowCount ?? 0,
             quarantineCount: pipelineReceipt.dataGateReceipt?.quarantineCount ?? 0,
             candidateRowsPath: "gate7-wave1-candidates.jsonl",
+            batchManifestPath: "wave1-warmup-batch-manifest.json",
+            batchManifestDryRunReceiptPath: "wave1-warmup-batch-manifest-dry-run.json",
+            batchManifestDryRunStatus: batchManifestDryRunReceipt.status,
             candidateRowCount: candidateRows.count,
             rowsWithTools: candidateRows.filter { !$0.tools.isEmpty }.count,
             rowsWithMountedToolCount: candidateRows.filter { $0.mountedToolCount != nil }.count,
@@ -172,7 +192,12 @@ struct Gate7DryRunCLI {
             recipeSafetyRefusalQuota: recipeQuota.safetyRefusalQuota,
             recipeMultiCallPairingMinimum: recipeQuota.multiCallPairingMinimum
         )
-        return DryRunResult(receipt: receipt, candidateRows: candidateRows)
+        return DryRunResult(
+            receipt: receipt,
+            candidateRows: candidateRows,
+            batchManifest: batchManifest,
+            batchManifestDryRunReceipt: batchManifestDryRunReceipt
+        )
     }
 
     private static func loadSeed(repoRoot: URL, contractRowID: String) throws -> C5SemanticSeed {
@@ -245,6 +270,9 @@ struct Gate7DryRunCLI {
         - data_gate_row_count: \(receipt.dataGateRowCount)
         - quarantine_count: \(receipt.quarantineCount)
         - candidate_rows_path: \(receipt.candidateRowsPath)
+        - batch_manifest_path: \(receipt.batchManifestPath)
+        - batch_manifest_dry_run_receipt_path: \(receipt.batchManifestDryRunReceiptPath)
+        - batch_manifest_dry_run_status: \(receipt.batchManifestDryRunStatus)
         - candidate_row_count: \(receipt.candidateRowCount)
         - rows_with_tools: \(receipt.rowsWithTools)
         - rows_with_mounted_tool_count: \(receipt.rowsWithMountedToolCount)
@@ -283,6 +311,8 @@ struct Gate7DryRunCLI {
 struct DryRunResult {
     var receipt: DryRunReceipt
     var candidateRows: [C5DataGateCandidate]
+    var batchManifest: Wave1BatchManifest
+    var batchManifestDryRunReceipt: Wave1BatchManifestDryRunReceipt
 }
 
 struct DryRunReceipt: Codable, Equatable {
@@ -302,6 +332,9 @@ struct DryRunReceipt: Codable, Equatable {
     var dataGateRowCount: Int
     var quarantineCount: Int
     var candidateRowsPath: String
+    var batchManifestPath: String
+    var batchManifestDryRunReceiptPath: String
+    var batchManifestDryRunStatus: String
     var candidateRowCount: Int
     var rowsWithTools: Int
     var rowsWithMountedToolCount: Int
@@ -345,6 +378,9 @@ struct DryRunReceipt: Codable, Equatable {
         case dataGateRowCount = "data_gate_row_count"
         case quarantineCount = "quarantine_count"
         case candidateRowsPath = "candidate_rows_path"
+        case batchManifestPath = "batch_manifest_path"
+        case batchManifestDryRunReceiptPath = "batch_manifest_dry_run_receipt_path"
+        case batchManifestDryRunStatus = "batch_manifest_dry_run_status"
         case candidateRowCount = "candidate_row_count"
         case rowsWithTools = "rows_with_tools"
         case rowsWithMountedToolCount = "rows_with_mounted_tool_count"
@@ -378,6 +414,9 @@ struct Options {
     var outputDir: String
     var contractRowID: String
     var limit: Int
+    var batchID: String
+    var laneID: String
+    var mainPinSHA: String
 
     init(arguments: [String]) throws {
         repoRoot = FileManager.default.currentDirectoryPath
@@ -386,6 +425,9 @@ struct Options {
             .path
         contractRowID = "c1_airControl_000167"
         limit = 20
+        batchID = "wave1-warmup-0001"
+        laneID = "lane-1"
+        mainPinSHA = Wave1BatchManifestBuilder.defaultMainPinSHA
 
         var iterator = arguments.dropFirst().makeIterator()
         while let argument = iterator.next() {
@@ -402,6 +444,15 @@ struct Options {
             case "--limit":
                 guard let value = iterator.next(), let intValue = Int(value) else { throw CLIError.usage("invalid --limit value") }
                 limit = intValue
+            case "--batch-id":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --batch-id value") }
+                batchID = value
+            case "--lane-id":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --lane-id value") }
+                laneID = value
+            case "--main-pin-sha":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --main-pin-sha value") }
+                mainPinSHA = value
             default:
                 throw CLIError.usage("unknown argument \(argument)")
             }

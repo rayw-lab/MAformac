@@ -335,6 +335,32 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertTrue(prepared.receipt.frameSurfaced.contains("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows"))
     }
 
+    func testRefusalRatioResolverRequiresExplicitCliOrManifestValue() throws {
+        XCTAssertThrowsError(
+            try C5RefusalRatioResolver.resolve(
+                thetaAlphaPositiveOnly: false,
+                explicitTarget: nil,
+                explicitHardCap: nil,
+                manifestTarget: nil,
+                manifestHardCap: nil
+            )
+        ) { error in
+            XCTAssertEqual(error as? C5RefusalRatioResolutionError, .missingExplicitOrManifestValue)
+        }
+
+        let manifestLocked = try C5RefusalRatioResolver.resolve(
+            thetaAlphaPositiveOnly: false,
+            explicitTarget: nil,
+            explicitHardCap: nil,
+            manifestTarget: 0,
+            manifestHardCap: 0
+        )
+        XCTAssertEqual(manifestLocked.refusalRatioTarget, 0)
+        XCTAssertEqual(manifestLocked.refusalRatioHardCap, 0)
+        XCTAssertFalse(manifestLocked.includeNoCallCounterfactuals)
+        XCTAssertEqual(manifestLocked.source, "batch_manifest")
+    }
+
     func testAssistantDoubleNewlineOffsetFixtureCoversToolCallSpan() {
         let prepared = C5TrainingDatasetBuilder().build(
             seeds: [semanticSeed(id: "row1", fuzzy: true, free: false)],
