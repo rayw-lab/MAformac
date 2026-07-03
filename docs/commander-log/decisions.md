@@ -495,3 +495,9 @@
 - **L2 merge**：PR #36 并入 main（%43 审 APPROVE_WITH_P2_RESIDUAL，0 P0/P1；P2=hash_recipe_ref 硬编码路径→%45 小 PR 修复中）；其 push-event fail 定性=分支老 verify.yml 结构病（#35 已在 main 修），PR-event 真跑绿。**T1D 的 CODE basis 仍 pin b33d8eba**。
 - **L3 投影收官**：`DONE_PROJECTION_PASS_DATAGATE_BLOCKED_EXPECTED`（%43 分类核在途：BLOCKED reason 是否全属设计语义 direct_pass=0 类）。
 - **wave-1 warmup 启动准备**：%45 产 batch-01-order（N=50，quota=Gate7RecipeQuotaConfig，pin b33d8eba）+ lane prompt 包 → commander spawn 生成 sub-CC（D-045 canary 模式复用）。
+
+## D-060（2026-07-03 晚）🎉 T1D 四刀收敛 = **T1D_DIAGNOSTIC_PASS_D2COMBO** + warmup lane 交付（Accepted）
+- **D2combo 一手（receipt sha `42e94747…`，exit0）**：grad checkpoint + token 预算 8192 + 边界 cache clear → **optimizer_updates=2、loss/grad 有限、adapter 保存（sha `514ac84c…`）、OOM absent、最长行 [1,7201]/7185 覆盖、峰值 17.97GB**（32GB 包络内富余）。诊断链 D0（H-act 支持/H-sup 弱化）→D7a（H-cache 排除）→D1b（单行 6209 仍炸=attention seq² 精化）→D2combo（PASS）——四刀单变量教科书收敛；wave-1 substrate 上首次成功 optimizer update + adapter save。词表守住：`diagnostic_not_candidate`，train_order 为诊断态注记。
+- **repo 化派单（%44 执行中）**：token 预算 batcher（默认关）+ grad checkpoint 开关 + 边界 clear 正式进 repo + 单测 + snapshot 行为一致断言 → PR。
+- **候选 manifest 草案就绪（%43）**：`T1D-candidate-manifest-DRAFT.md`（五步结构+🔴 T1+memory-budget 资源门附录=维度三制度化），status=draft 等 D2combo 审 + owner 签。
+- **warmup lane subcc-1 交付**：50 行 + ledger 50/50 全覆盖（commander 亲核）+ 生成 receipt + 可复现 generate_batch.py + SHA256SUMS；%45 守望触发生效，机械门三件（datagate/diversity/c6-leakage）执行中。recovery-batch-01 order 草案亦出（sha `dae0c783…`）。
