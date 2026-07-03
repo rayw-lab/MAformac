@@ -535,3 +535,9 @@
 - **batch-01 全链账**（一天内跑通的批生态）：lane 生成（3 rev：digest 硬化→multi-call 勘查回退→waiver 落证）→ 机械门（DataGate 4 轮咬 3 次真缺陷）→ 跨厂商 judge（FAIL D7 单维→controller 行级注入 round2→PASS）——**每一次 blocked 都是门在工作，内容质量全程满分（语义抽样 20/20）**。
 - **PR38-FIX 推进**（%44 正规重产 verification marker+证据包，新 head `43a6142d`；%43 scoped 复核中）。
 - 下一格：%45 的 B2-5-AUDIT（batch-02..05 包吸收今晚教训核查）落地后 → **四 lane 并发**（batch-02..05 各 50 行）。
+
+## D-067（2026-07-03 晚）四 lane 并发起飞 + PR38 merge + CODE 基线迁移启动（Accepted，执行中）
+- **B2-5-AUDIT=pass_after_patch**（%45 直接修包不只提意见）：batch-02..05 packages 已吸收今晚全部教训（行级 sha 注入步/tool_schema_digest controller 注入硬条款/multi-call WAIVED/SHA256SUMS 盘绑纪律/quota 与 Gate7RecipeQuotaConfig 核算一致）。
+- **四 lane 并发 spawn**（wave1-lane-subcc-2..5，Opus 后台，各 50 行）——batch-01 验证过的生态直接复用，铁律含「禁用 subset_policy_digest 值」的 batch-01 血泪条款。
+- **PR38 MERGED**（merge `26678346`；%43 REFIX-REVIEW PASS：marker 正规重产=查旧 commit 形态照产非手填）。
+- **CODE 基线迁移执行中**（%44 按其 checklist）：新 pin 候选=post-#38 main tip；必重跑门含 **T1D-D2combo smoke 用 repo config 正式面复跑**（= PR38 控件 e2e 实证，一石二鸟）；registry 更新走 diff 补丁（worker 不直改 commander 分支）。
