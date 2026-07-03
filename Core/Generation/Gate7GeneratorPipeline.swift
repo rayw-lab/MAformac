@@ -613,7 +613,8 @@ public enum Gate7DecontaminationGate {
         request: Gate7PipelineRequest
     ) -> [C5DataGateCandidate] {
         samples.enumerated().map { offset, sample in
-            C5DataGateCandidate(
+            let renderedToolCall = sample.expectedToolCalls.first.map(Self.renderedToolCall)
+            return C5DataGateCandidate(
                 sampleID: sample.sampleID,
                 split: "train",
                 bucket: "gate7_candidate",
@@ -630,17 +631,29 @@ public enum Gate7DecontaminationGate {
                 mustNotTrain: false,
                 sourceAuthorization: "authorized_fixture",
                 inputText: sample.utterance,
-                assistantText: "<tool_call>{}</tool_call>",
-                hasActionToolCall: true,
-                hasSharedWrapper: true,
+                assistantText: renderedToolCall ?? "\n\nNO_TOOL",
+                hasActionToolCall: renderedToolCall != nil,
+                hasSharedWrapper: renderedToolCall != nil,
                 masking: C5MaskingFlags(functionName: true, argumentName: true, argumentValue: true, trainOnTurn: true),
                 tools: sample.tools,
                 mountedToolCount: sample.metadata.mountedToolCount,
                 subsetPolicyID: sample.metadata.subsetPolicyID,
                 subsetGroupID: sample.metadata.groupID,
-                subsetPolicyDigest: sample.metadata.subsetPolicyDigest
+                subsetPolicyDigest: sample.metadata.subsetPolicyDigest,
+                promptHash: C5DerivedHashRecipe.promptHash(utterance: sample.utterance),
+                expectedToolCallSignature: renderedToolCall.map(C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall:)),
+                hashRecipeRef: C5DerivedHashRecipe.hashRecipeRef,
+                hashRecomputedByPipeline: true,
+                renderedToolCall: renderedToolCall
             )
         }
+    }
+
+    private static func renderedToolCall(_ call: C6ToolCall) -> String {
+        C5DerivedHashRecipe.renderToolCall(
+            name: call.name,
+            arguments: call.arguments.mapValues { .string($0) }
+        )
     }
 
     public static func evaluate(
@@ -769,7 +782,7 @@ public struct Gate7RecipeQuotaConfig: Codable, Equatable, Sendable {
     }
 }
 
-public struct Gate7QuotaAllocation: Equatable, Sendable {
+public struct Gate7QuotaAllocation: Codable, Equatable, Sendable {
     public var familyID: String
     public var quota: Int
     public var components: [String: Int]
@@ -838,6 +851,184 @@ public enum Gate7QuotaEnforcer {
             nextReasons.append(mismatchReason)
         }
         return Gate7QuotaEnforcementResult(status: .blocked, reasons: nextReasons)
+    }
+}
+
+public struct Wave1BatchManifest: Codable, Equatable, Sendable {
+    public var manifestVersion: String
+    public var contractStatus: String
+    public var batchID: String
+    public var batchType: String
+    public var status: String
+    public var stateMachineState: String
+    public var allowedStates: [String]
+    public var proofClass: String
+    public var mainPinSHA: String
+    public var laneID: String
+    public var laneVendor: String
+    public var generatorSourceVendor: String
+    public var judgeSourceVendorRequired: String
+    public var targetCount: Int
+    public var warmupPhase: Bool
+    public var quotaConfigSource: String
+    public var quotaSource: String
+    public var quotaManualOverride: Bool
+    public var quotaAllocation: Gate7QuotaAllocation
+    public var quotaConfig: Gate7RecipeQuotaConfig
+    public var refusalRatioTarget: Double
+    public var refusalRatioHardCap: Double
+    public var hashRecipeRef: String
+    public var hashRecomputedByPipelineRequired: Bool
+    public var recoveryBatchTypes: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case manifestVersion = "manifest_version"
+        case contractStatus = "contract_status"
+        case batchID = "batch_id"
+        case batchType = "batch_type"
+        case status
+        case stateMachineState = "state_machine_state"
+        case allowedStates = "allowed_states"
+        case proofClass = "proof_class"
+        case mainPinSHA = "main_pin_sha"
+        case laneID = "lane_id"
+        case laneVendor = "lane_vendor"
+        case generatorSourceVendor = "generator_source_vendor"
+        case judgeSourceVendorRequired = "judge_source_vendor_required"
+        case targetCount = "target_count"
+        case warmupPhase = "warmup_phase"
+        case quotaConfigSource = "quota_config_source"
+        case quotaSource = "quota_source"
+        case quotaManualOverride = "quota_manual_override"
+        case quotaAllocation = "quota_allocation"
+        case quotaConfig = "quota_config"
+        case refusalRatioTarget = "refusal_ratio_target"
+        case refusalRatioHardCap = "refusal_ratio_hard_cap"
+        case hashRecipeRef = "hash_recipe_ref"
+        case hashRecomputedByPipelineRequired = "hash_recomputed_by_pipeline_required"
+        case recoveryBatchTypes = "recovery_batch_types"
+    }
+}
+
+public struct Wave1BatchManifestDryRunReceipt: Codable, Equatable, Sendable {
+    public var status: String
+    public var manifestVersion: String
+    public var batchID: String
+    public var targetCount: Int
+    public var quotaConfigSource: String
+    public var quotaManualOverride: Bool
+    public var refusalRatioTarget: Double
+    public var refusalRatioHardCap: Double
+    public var failureReasons: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case manifestVersion = "manifest_version"
+        case batchID = "batch_id"
+        case targetCount = "target_count"
+        case quotaConfigSource = "quota_config_source"
+        case quotaManualOverride = "quota_manual_override"
+        case refusalRatioTarget = "refusal_ratio_target"
+        case refusalRatioHardCap = "refusal_ratio_hard_cap"
+        case failureReasons = "failure_reasons"
+    }
+}
+
+public enum Wave1BatchManifestBuilder {
+    public static let manifestVersion = "wave1-batch-manifest.v1"
+    public static let contractStatus = "rev2.1_locked_aligned"
+    public static let quotaConfigSource = "Gate7RecipeQuotaConfig.wave1ConstructionAnchors"
+    public static let defaultMainPinSHA = "b33d8eba152e5326f69bbe85fc356b73419ee9c3"
+
+    public static func warmup(
+        batchID: String = "wave1-warmup-0001",
+        mainPinSHA: String = defaultMainPinSHA,
+        laneID: String = "lane-1",
+        laneVendor: String = "anthropic",
+        generatorSourceVendor: String = "anthropic",
+        judgeSourceVendorRequired: String = "openai",
+        targetCount: Int = 50,
+        quotaConfig: Gate7RecipeQuotaConfig = .wave1ConstructionAnchors
+    ) -> Wave1BatchManifest {
+        let allocation = Gate7QuotaCalculator.allocate([
+            Gate7QuotaInput(
+                familyID: batchID,
+                intentBaseline: max(0, targetCount),
+                bugPressure: 0,
+                demoFloor: 0,
+                safetyFloor: 0,
+                recipeQuota: quotaConfig
+            )
+        ]).first ?? Gate7QuotaAllocation(
+            familyID: batchID,
+            quota: max(0, targetCount),
+            components: [:],
+            quotaSource: quotaConfig.quotaSource,
+            negativeQuotaActivation: quotaConfig.negativeQuotaActivation
+        )
+        return Wave1BatchManifest(
+            manifestVersion: manifestVersion,
+            contractStatus: contractStatus,
+            batchID: batchID,
+            batchType: "standard_generation",
+            status: "gated",
+            stateMachineState: "ready_for_generation",
+            allowedStates: ["ready_for_generation", "paused_diversity", "blocked", "generated", "accepted"],
+            proofClass: "local_mock",
+            mainPinSHA: mainPinSHA,
+            laneID: laneID,
+            laneVendor: laneVendor,
+            generatorSourceVendor: generatorSourceVendor,
+            judgeSourceVendorRequired: judgeSourceVendorRequired,
+            targetCount: max(0, targetCount),
+            warmupPhase: true,
+            quotaConfigSource: quotaConfigSource,
+            quotaSource: allocation.quotaSource,
+            quotaManualOverride: false,
+            quotaAllocation: allocation,
+            quotaConfig: quotaConfig,
+            refusalRatioTarget: 0,
+            refusalRatioHardCap: 0,
+            hashRecipeRef: C5DerivedHashRecipe.hashRecipeRef,
+            hashRecomputedByPipelineRequired: true,
+            recoveryBatchTypes: ["recovery_projection", "recovery_rejudge_datagate"]
+        )
+    }
+
+    public static func validateDryRun(_ manifest: Wave1BatchManifest) -> Wave1BatchManifestDryRunReceipt {
+        var failures: [String] = []
+        if manifest.manifestVersion != manifestVersion {
+            failures.append("manifest_version_mismatch")
+        }
+        if manifest.contractStatus != contractStatus {
+            failures.append("contract_status_mismatch")
+        }
+        if manifest.targetCount != 50 || !manifest.warmupPhase {
+            failures.append("warmup_target_count_mismatch")
+        }
+        if manifest.mainPinSHA != defaultMainPinSHA {
+            failures.append("main_pin_sha_mismatch")
+        }
+        if manifest.quotaConfigSource != quotaConfigSource || manifest.quotaManualOverride {
+            failures.append("quota_not_derived_from_gate7_recipe_config")
+        }
+        if manifest.refusalRatioTarget != 0 || manifest.refusalRatioHardCap != 0 {
+            failures.append("refusal_ratio_lock_mismatch")
+        }
+        if manifest.hashRecipeRef.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !manifest.hashRecomputedByPipelineRequired {
+            failures.append("hash_recompute_contract_missing")
+        }
+        return Wave1BatchManifestDryRunReceipt(
+            status: failures.isEmpty ? "pass" : "blocked",
+            manifestVersion: manifest.manifestVersion,
+            batchID: manifest.batchID,
+            targetCount: manifest.targetCount,
+            quotaConfigSource: manifest.quotaConfigSource,
+            quotaManualOverride: manifest.quotaManualOverride,
+            refusalRatioTarget: manifest.refusalRatioTarget,
+            refusalRatioHardCap: manifest.refusalRatioHardCap,
+            failureReasons: failures
+        )
     }
 }
 

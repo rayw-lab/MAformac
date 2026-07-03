@@ -459,7 +459,11 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
             mountedToolCount: mountedToolCount,
             subsetPolicyID: subsetPolicyID,
             subsetGroupID: subsetGroupID,
-            subsetPolicyDigest: subsetPolicyDigest
+            subsetPolicyDigest: subsetPolicyDigest,
+            promptHash: promptHash,
+            expectedToolCallSignature: expectedToolCallSignature,
+            hashRecipeRef: C5DerivedHashRecipe.hashRecipeRef,
+            hashRecomputedByPipeline: true
         )
     }
 
@@ -955,6 +959,64 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.subsetPolicyManifestPath = subsetPolicyManifestPath
         self.scopeCandidatesBySlot = scopeCandidatesBySlot
         self.scopeCandidatesByDeviceSlot = scopeCandidatesByDeviceSlot
+    }
+}
+
+public struct C5ResolvedRefusalRatioConfig: Equatable, Sendable {
+    public var refusalRatioTarget: Double
+    public var refusalRatioHardCap: Double
+    public var includeNoCallCounterfactuals: Bool
+    public var source: String
+}
+
+public enum C5RefusalRatioResolutionError: Error, Equatable, CustomStringConvertible {
+    case missingExplicitOrManifestValue
+    case invalidRatio(field: String, value: Double)
+
+    public var description: String {
+        switch self {
+        case .missingExplicitOrManifestValue:
+            return "missing refusal_ratio_target/refusal_ratio_hard_cap: pass --refusal-ratio-target and --refusal-ratio-hard-cap, --theta-alpha-positive-only, or a batch manifest with locked refusal values"
+        case .invalidRatio(let field, let value):
+            return "invalid \(field) \(value): expected 0 <= value < 1"
+        }
+    }
+}
+
+public enum C5RefusalRatioResolver {
+    public static func resolve(
+        thetaAlphaPositiveOnly: Bool,
+        explicitTarget: Double?,
+        explicitHardCap: Double?,
+        manifestTarget: Double?,
+        manifestHardCap: Double?
+    ) throws -> C5ResolvedRefusalRatioConfig {
+        if thetaAlphaPositiveOnly {
+            return C5ResolvedRefusalRatioConfig(
+                refusalRatioTarget: 0,
+                refusalRatioHardCap: 0,
+                includeNoCallCounterfactuals: false,
+                source: "theta_alpha_positive_only"
+            )
+        }
+        guard let target = explicitTarget ?? manifestTarget,
+              let hardCap = explicitHardCap ?? manifestHardCap else {
+            throw C5RefusalRatioResolutionError.missingExplicitOrManifestValue
+        }
+        try validate(field: "refusal_ratio_target", value: target)
+        try validate(field: "refusal_ratio_hard_cap", value: hardCap)
+        return C5ResolvedRefusalRatioConfig(
+            refusalRatioTarget: target,
+            refusalRatioHardCap: hardCap,
+            includeNoCallCounterfactuals: target > 0 && hardCap > 0,
+            source: explicitTarget != nil || explicitHardCap != nil ? "explicit_cli" : "batch_manifest"
+        )
+    }
+
+    private static func validate(field: String, value: Double) throws {
+        guard value >= 0, value < 1 else {
+            throw C5RefusalRatioResolutionError.invalidRatio(field: field, value: value)
+        }
     }
 }
 
@@ -2364,11 +2426,7 @@ public enum C5LossMaskBuilder {
 
 public enum C5TrainingRenderer {
     public static func renderToolCall(_ call: C5TrainingToolCall) -> String {
-        let payload = C5CanonicalJSONObject.renderOrdered([
-            ("name", .string(call.name)),
-            ("arguments", .object(call.arguments))
-        ])
-        return "<tool_call>\(payload)</tool_call>"
+        C5DerivedHashRecipe.renderToolCall(name: call.name, arguments: call.arguments)
     }
 
     public static func parseRenderedToolCall(_ rendered: String) -> C5TrainingToolCall? {
@@ -2763,6 +2821,46 @@ public enum C5TrainingRenderer {
             guardCounter += 1
         }
         return (picked.map(\.function.name), picked.map(dDomainToolSchema))
+    }
+}
+
+public enum C5DerivedHashRecipe {
+    public static let hashRecipeRef = [
+        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/Core/Training/C5LoRATraining.swift:2834",
+        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/Core/Training/C5LoRATraining.swift:2846",
+        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/Core/Bench/C6VehicleToolBench.swift:2329-2331"
+    ].joined(separator: ";")
+
+    public static func promptHash(utterance: String) -> String {
+        C6Hash.sha256Hex(Data(utterance.utf8))
+    }
+
+    public static func renderToolCall(name: String, arguments: [String: JSONValue]) -> String {
+        let payload = C5CanonicalJSONObject.renderOrdered([
+            ("name", .string(name)),
+            ("arguments", .object(arguments))
+        ])
+        return "<tool_call>\(payload)</tool_call>"
+    }
+
+    public static func expectedToolCallSignature(renderedToolCall: String) -> String {
+        C6Hash.sha256Hex(Data(renderedToolCall.utf8))
+    }
+
+    public static func expectedToolCallSignature(name: String, arguments: [String: JSONValue]) -> String {
+        expectedToolCallSignature(renderedToolCall: renderToolCall(name: name, arguments: arguments))
+    }
+
+    public static func firstRenderedToolCall(in assistantText: String) -> String? {
+        let trimmed = assistantText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("<tool_call>"), trimmed.hasSuffix("</tool_call>") {
+            return trimmed
+        }
+        guard let start = assistantText.range(of: "<tool_call>"),
+              let end = assistantText.range(of: "</tool_call>", range: start.upperBound..<assistantText.endIndex) else {
+            return nil
+        }
+        return String(assistantText[start.lowerBound..<end.upperBound])
     }
 }
 
@@ -3482,7 +3580,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
         } else if generatedRecord?.promptHash.isEmpty == false {
             promptHash = generatedRecord?.promptHash ?? ""
         } else {
-            promptHash = C6Hash.sha256Hex(Data(utterance.utf8))
+            promptHash = C5DerivedHashRecipe.promptHash(utterance: utterance)
         }
         let candidateParentSemanticID = C5TrainingRenderer.candidateParentSemanticID(userUtterance: utterance, renderedToolCall: renderedToolCall)
         let augmentationProfile = C5AugmentationProfile(
@@ -3503,7 +3601,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             candidateCanonicalSemanticID: seed.canonicalSemanticID,
             candidateDedupeGroupID: seed.dedupeGroupID,
             device: seed.device,
-            expectedToolCallSignature: C6Hash.sha256Hex(Data(renderedToolCall.utf8)),
+            expectedToolCallSignature: C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall: renderedToolCall),
             routeTierSource: "route_deriver_v2_fc_flags_value_type",
             routeTier: seed.routeTier,
             executionTier: seed.execTier,
@@ -3591,7 +3689,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
     }
 }
 
-private enum C5CanonicalJSONObject {
+enum C5CanonicalJSONObject {
     static func render(_ object: [String: JSONValue]) -> String {
         let keys = object.keys.sorted()
         let body = keys.map { key in

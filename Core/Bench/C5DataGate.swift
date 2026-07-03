@@ -27,6 +27,11 @@ public struct C5DataGateCandidate: Codable, Sendable {
     public var subsetGroupID: String?
     public var subsetPolicyDigest: String?
     public var toolSchemaDigest: String?
+    public var promptHash: String?
+    public var expectedToolCallSignature: String?
+    public var hashRecipeRef: String?
+    public var hashRecomputedByPipeline: Bool?
+    public var renderedToolCall: String?
 
     enum CodingKeys: String, CodingKey {
         case sampleID = "sample_id"
@@ -66,6 +71,11 @@ public struct C5DataGateCandidate: Codable, Sendable {
         case subsetGroupID = "subset_group_id"
         case subsetPolicyDigest = "subset_policy_digest"
         case toolSchemaDigest = "tool_schema_digest"
+        case promptHash = "prompt_hash"
+        case expectedToolCallSignature = "expected_tool_call_signature"
+        case hashRecipeRef = "hash_recipe_ref"
+        case hashRecomputedByPipeline = "hash_recomputed_by_pipeline"
+        case renderedToolCall = "rendered_tool_call"
     }
 
     public init(
@@ -94,7 +104,12 @@ public struct C5DataGateCandidate: Codable, Sendable {
         subsetPolicyID: String? = nil,
         subsetGroupID: String? = nil,
         subsetPolicyDigest: String? = nil,
-        toolSchemaDigest: String? = nil
+        toolSchemaDigest: String? = nil,
+        promptHash: String? = nil,
+        expectedToolCallSignature: String? = nil,
+        hashRecipeRef: String? = nil,
+        hashRecomputedByPipeline: Bool? = nil,
+        renderedToolCall: String? = nil
     ) {
         self.sampleID = sampleID
         self.split = split
@@ -126,6 +141,11 @@ public struct C5DataGateCandidate: Codable, Sendable {
         self.subsetGroupID = subsetGroupID
         self.subsetPolicyDigest = subsetPolicyDigest
         self.toolSchemaDigest = toolSchemaDigest
+        self.promptHash = promptHash
+        self.expectedToolCallSignature = expectedToolCallSignature
+        self.hashRecipeRef = hashRecipeRef
+        self.hashRecomputedByPipeline = hashRecomputedByPipeline
+        self.renderedToolCall = renderedToolCall
     }
 
     public init(from decoder: Decoder) throws {
@@ -142,6 +162,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
         let toolCall = try container.decodeIfPresent(C5InlineToolCall.self, forKey: .toolCall)
         let expectedToolCalls = try container.decodeIfPresent([C5ExpectedToolCall].self, forKey: .expectedToolCalls)
             ?? C5LegacyExpected.decode(from: container)
+        let decodedAssistantText = try container.decodeIfPresent(String.self, forKey: .assistantText) ?? assistantText
         let explicitWrapper = toolCall?.wrapper == "tool_call"
         self.sampleID = sampleID
         self.split = try container.decodeIfPresent(String.self, forKey: .split)
@@ -176,7 +197,7 @@ public struct C5DataGateCandidate: Codable, Sendable {
             ?? container.decodeIfPresent(String.self, forKey: .queryTemplate)
             ?? messages.first { $0.role == "user" }?.content
             ?? ""
-        self.assistantText = try container.decodeIfPresent(String.self, forKey: .assistantText) ?? assistantText
+        self.assistantText = decodedAssistantText
         self.hasActionToolCall = try container.decodeIfPresent(Bool.self, forKey: .hasActionToolCall)
             ?? (!(expectedToolCalls ?? []).isEmpty || toolCall != nil)
         self.hasSharedWrapper = try container.decodeIfPresent(Bool.self, forKey: .hasSharedWrapper)
@@ -188,6 +209,14 @@ public struct C5DataGateCandidate: Codable, Sendable {
         self.subsetGroupID = try container.decodeIfPresent(String.self, forKey: .subsetGroupID)
         self.subsetPolicyDigest = try container.decodeIfPresent(String.self, forKey: .subsetPolicyDigest)
         self.toolSchemaDigest = try container.decodeIfPresent(String.self, forKey: .toolSchemaDigest)
+        self.promptHash = try container.decodeIfPresent(String.self, forKey: .promptHash)
+        self.expectedToolCallSignature = try container.decodeIfPresent(String.self, forKey: .expectedToolCallSignature)
+        self.hashRecipeRef = try container.decodeIfPresent(String.self, forKey: .hashRecipeRef)
+        self.hashRecomputedByPipeline = try container.decodeIfPresent(Bool.self, forKey: .hashRecomputedByPipeline)
+        self.renderedToolCall = try container.decodeIfPresent(String.self, forKey: .renderedToolCall)
+            ?? toolCall?.renderedToolCall
+            ?? expectedToolCalls?.first?.renderedToolCall
+            ?? C5DerivedHashRecipe.firstRenderedToolCall(in: decodedAssistantText)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -218,6 +247,11 @@ public struct C5DataGateCandidate: Codable, Sendable {
         try container.encodeIfPresent(subsetGroupID, forKey: .subsetGroupID)
         try container.encodeIfPresent(subsetPolicyDigest, forKey: .subsetPolicyDigest)
         try container.encodeIfPresent(toolSchemaDigest, forKey: .toolSchemaDigest)
+        try container.encodeIfPresent(promptHash, forKey: .promptHash)
+        try container.encodeIfPresent(expectedToolCallSignature, forKey: .expectedToolCallSignature)
+        try container.encodeIfPresent(hashRecipeRef, forKey: .hashRecipeRef)
+        try container.encodeIfPresent(hashRecomputedByPipeline, forKey: .hashRecomputedByPipeline)
+        try container.encodeIfPresent(renderedToolCall, forKey: .renderedToolCall)
     }
 
     public var overlapParentSemanticID: String? {
@@ -550,6 +584,7 @@ public struct C5DataGateValidator: Sendable {
         var redactionFailures: [C5DataGateFailure] = []
         var missingAxisMetadataFailures: [C5DataGateFailure] = []
         var surfaceFailures: [C5DataGateFailure] = []
+        var hashFailures: [C5DataGateFailure] = []
         var missingSurfaceCount = 0
         var legacyMissingSurfaceAllowedCount = 0
         var surfaceFieldPass = 0
@@ -628,6 +663,11 @@ public struct C5DataGateValidator: Sendable {
             if isQuarantined {
                 quarantineCount += 1
             }
+            for reason in hashConsistencyFailures(candidate) {
+                let itemFailure = failure(candidate, split: item.split, reason: reason, severity: "P0")
+                hashFailures.append(itemFailure)
+                failures.append(itemFailure)
+            }
         }
 
         let coverage = C5MaskingCoverage(
@@ -643,7 +683,7 @@ public struct C5DataGateValidator: Sendable {
             $0.split == "train" && ($0.candidate.overlapParentSemanticID.map(trainOverlapParents.contains) == true)
         }.count
         let status: String
-        if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || trainHeldOutAxisOverlapCount > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty || !missingAxisMetadataFailures.isEmpty || !surfaceFailures.isEmpty {
+        if mustNotTrainViolations > 0 || hardTrainOverlap > 0 || trainHeldOutAxisOverlapCount > 0 || !formatFailures.isEmpty || !redactionFailures.isEmpty || !missingAxisMetadataFailures.isEmpty || !surfaceFailures.isEmpty || !hashFailures.isEmpty {
             status = "blocked"
         } else if sourceReady {
             status = "data_gate_ready"
@@ -956,7 +996,43 @@ public struct C5DataGateValidator: Sendable {
         if failures.contains(where: { $0.reason == "redaction_violation" }) {
             suggestions.append("redact prohibited raw-source text before re-running gate")
         }
+        if failures.contains(where: { $0.reason.hasPrefix("prompt_hash_") || $0.reason.hasPrefix("expected_tool_call_signature_") || $0.reason.hasPrefix("hash_") }) {
+            suggestions.append("recompute prompt_hash and expected_tool_call_signature in the generation pipeline using C5DerivedHashRecipe before DataGate")
+        }
         return suggestions
+    }
+
+    private func hashConsistencyFailures(_ candidate: C5DataGateCandidate) -> [String] {
+        var reasons: [String] = []
+        let promptHash = candidate.promptHash?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        if promptHash == nil {
+            reasons.append("prompt_hash_missing")
+        } else if promptHash != C5DerivedHashRecipe.promptHash(utterance: candidate.inputText) {
+            reasons.append("prompt_hash_mismatch")
+        }
+        if candidate.hashRecomputedByPipeline != true {
+            reasons.append("hash_recomputed_by_pipeline_missing_or_false")
+        }
+        let hashRecipeRef = candidate.hashRecipeRef?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        if hashRecipeRef == nil {
+            reasons.append("hash_recipe_ref_missing")
+        } else if hashRecipeRef?.contains("C5LoRATraining.swift:") != true || hashRecipeRef?.contains("C6VehicleToolBench.swift:2329") != true {
+            reasons.append("hash_recipe_ref_invalid")
+        }
+        if candidate.hasActionToolCall {
+            let expectedSignature = candidate.expectedToolCallSignature?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+            if expectedSignature == nil {
+                reasons.append("expected_tool_call_signature_missing")
+            } else if let renderedToolCall = candidate.renderedToolCall ?? C5DerivedHashRecipe.firstRenderedToolCall(in: candidate.assistantText) {
+                let recomputed = C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall: renderedToolCall)
+                if expectedSignature != recomputed {
+                    reasons.append("expected_tool_call_signature_mismatch")
+                }
+            } else {
+                reasons.append("expected_tool_call_signature_unrenderable")
+            }
+        }
+        return uniqueReasons(reasons)
     }
 }
 
@@ -973,7 +1049,14 @@ private struct C5ChatMessage: Decodable {
 private struct C5InlineToolCall: Decodable {
     var wrapper: String?
     var name: String?
-    var arguments: [String: C5LooseJSON]?
+    var arguments: [String: JSONValue]?
+
+    var renderedToolCall: String? {
+        guard let name, !name.isEmpty else {
+            return nil
+        }
+        return C5DerivedHashRecipe.renderToolCall(name: name, arguments: arguments ?? [:])
+    }
 }
 
 private struct C5DataGateCandidateValue: Decodable {
@@ -983,7 +1066,15 @@ private struct C5DataGateCandidateValue: Decodable {
 private struct C5ExpectedToolCall: Decodable {
     var name: String?
     var toolName: String?
-    var arguments: [String: C5LooseJSON]?
+    var arguments: [String: JSONValue]?
+
+    var renderedToolCall: String? {
+        let resolvedName = (name ?? toolName)?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+        guard let resolvedName else {
+            return nil
+        }
+        return C5DerivedHashRecipe.renderToolCall(name: resolvedName, arguments: arguments ?? [:])
+    }
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -1010,40 +1101,12 @@ private struct C5LegacyExpectedPayload: Decodable {
 private struct C5LegacyFrame: Decodable {
     var type: String
     var toolName: String?
-    var arguments: [String: C5LooseJSON]?
+    var arguments: [String: JSONValue]?
 
     enum CodingKeys: String, CodingKey {
         case type
         case toolName = "tool_name"
         case arguments
-    }
-}
-
-private enum C5LooseJSON: Decodable, Equatable {
-    case string(String)
-    case number(Double)
-    case bool(Bool)
-    case object
-    case array
-    case null
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if container.decodeNil() {
-            self = .null
-        } else if let value = try? container.decode(String.self) {
-            self = .string(value)
-        } else if let value = try? container.decode(Double.self) {
-            self = .number(value)
-        } else if let value = try? container.decode(Bool.self) {
-            self = .bool(value)
-        } else if (try? container.decode([String: C5LooseJSON].self)) != nil {
-            self = .object
-        } else if (try? container.decode([C5LooseJSON].self)) != nil {
-            self = .array
-        } else {
-            self = .null
-        }
     }
 }
 

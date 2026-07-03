@@ -98,6 +98,11 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
         XCTAssertEqual(candidate.subsetGroupID, request.manifestEntry.groupID)
         XCTAssertEqual(candidate.subsetPolicyDigest, manifest.meta.groupingContractDigest)
         XCTAssertTrue(toolNames(candidate.tools).contains(entry.function.name))
+        XCTAssertEqual(candidate.promptHash, C5DerivedHashRecipe.promptHash(utterance: sample.utterance))
+        let renderedToolCall = try XCTUnwrap(candidate.renderedToolCall)
+        XCTAssertEqual(candidate.expectedToolCallSignature, C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall: renderedToolCall))
+        XCTAssertEqual(candidate.hashRecipeRef, C5DerivedHashRecipe.hashRecipeRef)
+        XCTAssertEqual(candidate.hashRecomputedByPipeline, true)
 
         let roundTrip = try JSONDecoder().decode(C5DataGateCandidate.self, from: JSONEncoder().encode(candidate))
         XCTAssertEqual(roundTrip.tools, candidate.tools)
@@ -105,6 +110,37 @@ final class Gate7GeneratorPipelineTests: XCTestCase {
         XCTAssertEqual(roundTrip.subsetPolicyID, candidate.subsetPolicyID)
         XCTAssertEqual(roundTrip.subsetGroupID, candidate.subsetGroupID)
         XCTAssertEqual(roundTrip.subsetPolicyDigest, candidate.subsetPolicyDigest)
+        XCTAssertEqual(roundTrip.promptHash, candidate.promptHash)
+        XCTAssertEqual(roundTrip.expectedToolCallSignature, candidate.expectedToolCallSignature)
+        XCTAssertEqual(roundTrip.hashRecipeRef, candidate.hashRecipeRef)
+        XCTAssertEqual(roundTrip.hashRecomputedByPipeline, candidate.hashRecomputedByPipeline)
+    }
+
+    func testWave1WarmupBatchManifestBuilderUsesLockedQuotaAndRefusalZero() {
+        let manifest = Wave1BatchManifestBuilder.warmup(
+            batchID: "wave1-warmup-0001",
+            mainPinSHA: Wave1BatchManifestBuilder.defaultMainPinSHA,
+            laneID: "lane-a"
+        )
+        let receipt = Wave1BatchManifestBuilder.validateDryRun(manifest)
+
+        XCTAssertEqual(manifest.manifestVersion, "wave1-batch-manifest.v1")
+        XCTAssertEqual(manifest.contractStatus, "rev2.1_locked_aligned")
+        XCTAssertEqual(manifest.batchType, "standard_generation")
+        XCTAssertEqual(manifest.targetCount, 50)
+        XCTAssertTrue(manifest.warmupPhase)
+        XCTAssertEqual(manifest.mainPinSHA, "b33d8eba152e5326f69bbe85fc356b73419ee9c3")
+        XCTAssertEqual(manifest.quotaConfigSource, "Gate7RecipeQuotaConfig.wave1ConstructionAnchors")
+        XCTAssertEqual(manifest.quotaConfig, .wave1ConstructionAnchors)
+        XCTAssertFalse(manifest.quotaManualOverride)
+        XCTAssertEqual(manifest.refusalRatioTarget, 0)
+        XCTAssertEqual(manifest.refusalRatioHardCap, 0)
+        XCTAssertTrue(manifest.allowedStates.contains("paused_diversity"))
+        XCTAssertEqual(manifest.recoveryBatchTypes, ["recovery_projection", "recovery_rejudge_datagate"])
+        XCTAssertEqual(manifest.quotaAllocation.quotaSource, Gate7RecipeQuotaConfig.wave1ConstructionAnchors.quotaSource)
+        XCTAssertEqual(manifest.quotaAllocation.quota, 50)
+        XCTAssertEqual(receipt.status, "pass")
+        XCTAssertTrue(receipt.failureReasons.isEmpty)
     }
 
     func testDeterministicLabelerBridgesC1SlotsAndValuesIntoDdomainArguments() throws {
