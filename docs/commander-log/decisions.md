@@ -483,3 +483,8 @@
 - **commander 附加观察（H-cache）**：profile 显示 val 全程 MLX cache≈**24.35GB** 且原样带入 train_step_enter；机器统一内存 **32GB**（sysctl 亲核）→ 进训练时仅剩 ~7GB 给 20k-token backward。
 - **裁决执行序**：**D7a 先行**（val→train 边界 mx.clear_cache + 可选 set_cache_limit，零配方变更零语义风险；PASS=重大[零配方解]，FAIL=H-cache 排除转 D1b token 预算 batching）。%44 执行中。
 - 并行：%43 L6 eval bundle 打包（其 READY_WITH_GAPS 自查的 gap）；%45 L2 接线进行中；PR #35（CI 修）已 merge（T1D 的 CODE basis 仍 pin b33d8eba 不受影响——pin 的意义）。PR #30 已关（#32 替代已并）。
+
+## D-058（2026-07-03 傍晚）D7a=H-cache 排除 + D1b 上场；L2/L6 收官（Accepted，执行中）
+- **D7a 一手（receipt sha `1f5ee6a4…`）**：val_end cache 24.30GB → `mx.clear_cache` 后 **0** → 首个 train step 仍同点 Metal OOM（exit134）→ **H-cache 排除**（cache 是可回收红鲱鱼），H-act 独大：`[4,5025]`=20k padded tokens 的 backward activation 本体超 32GB 包络。两刀下来假设空间收敛干净（H-sup 弱化→H-cache 排除→H-act）。
+- **D1b 上场**（%44 执行中）：token 预算 batching @ snapshot 副本，预算=8192 padded（最长行独行），iters8 保 ≥1 optimizer update，效应 batch 语义变化如实注记（diagnostic 可接受，候选化另 spec）。
+- **L2 收官**：PR #36（`357255b8`，hash 重算 fail-closed+refusal 去默认 exit64+warmup manifest pin b33d8eba），%43 交叉审排队；**L6 bundle 打包收官**（A15/B15/C4/D34 case+manifest+可复跑 README，%43）。%45 转 L3 salvage adapter 执行中。
