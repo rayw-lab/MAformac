@@ -553,3 +553,9 @@
 - **四 Opus lane 全部 shutdown_request 已发**（磊哥令用完即关；lane 在写收官总结，写完即批准关闭——commander 盯紧确认逐个 terminated）。
 - **CODE 迁移 R2**（%44）：DATA v3 重建（新 pin 上重跑 prepare 补 hash_recomputed/hash_recipe_ref 字段——#36 硬化门咬旧 substrate 属预期耦合迁移）+ smoke watchdog 20→35min（上轮已 update@iter4 loss 2.66 有限，只差 save 窗口）。
 - **%45 转 corpus 汇总工具**（judge PASS 批增量并入 wave1-corpus-manifest，250 行目标）。
+
+## D-070（2026-07-03 深夜）B02 judge FAIL=首个真语义缺陷（D3 位置槽漏）+ 精确定界修复（Accepted，执行中）
+- **B02 judge FAIL（%43）**：机械/溯源 7 维全量 50 全过；语义抽样 D3 抓 2/20——话术说「主驾」但 expected args 漏 `position` 槽（真内容缺陷，机械门原理上抓不到=judge 抽样存在的意义）。
+- **commander 全量扫描定爆炸半径**（位置词提及 vs args 正则比对，200 行全查）：**仅 4 行中招**——b02 0007/0023（主驾；恰=抽样全中总体）、b03 0012（主驾）/0025（后排）、b04/b05 零命中。
+- **修复回路**：窄域修复 lane（wave1-repair-lane-1）只碰 4 行（语义判断后补槽/ledger 同步/receipt 修复段，lane 保语义判断权）；修后 %45 gates 重跑（b02 v4/b03 v2）→ %43 scoped 复审（D3 维全批位置行）。
+- **调度改序**：%43 先审干净批 B04→B05（不等修复）——批间独立乱序审=吞吐优化。
