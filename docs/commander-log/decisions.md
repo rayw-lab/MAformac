@@ -440,3 +440,10 @@
 - 🔴 **commander 事故与恢复（进 lessons M.13）**：rebase #31 时用 `git rebase … | tail` 接 `&&`——**管道吃掉非零退出码**，冲突中断态被当成功，把**截断分支**（缺 N4a 后续 commit）force 推上远端；立即用原 tip `f163eedf` force 恢复，零窗口损害（期间无 CI/merge 消费该分支）。教训：git 变更类命令**禁止管道接 tail/grep 再链 &&**（或 set -o pipefail）。
 - PR28 push-event verify 失败分类=**结构性**（push 事件 diff 基线错误扫全史旧文件 whitespace，与 PR 增量无关；pull_request 事件真跑全绿）——workflow 的 push 触发面待修（backlog，非阻塞）。
 - **并行执行**：%44 M2 清理（live 重算 unique_vs_main 后删，绝不动主树/uiue/p5w）；%43 T1 smoke 执行包预备（等 merge-complete ping）；%45 #31 冲突解决。
+
+## D-051（2026-07-03 午）PR31 合并前置的 claim-vs-reality 现场：commander 基线复跑拦下「假绿」（Accepted，执行中）
+- **时序**：%45 报 PR31-MERGE-READY「验证全绿」→ commander 用【N4A 验收基线数据】独立复跑 strict preflight = **exit66**（loss_objective_profile_missing×全部 train 行）→ 质询三问 → %45 诚实自纠（「prior-green invalid，是我的验证口径错误」）：其 exit0 跑在**重生成数据**上非基线数据，且重生成误用 **CLI 默认 refusal_ratio_target=0.1**（`Tools/C5TrainingCLI/main.swift:69/114` 通用默认）而非 D-042/N4A 锁值 0。
+- **根因（%45 ROOTCAUSE 档，commit 级）**：旧 N4A 数据 exit66 = main 侧契约硬化两 commit（`73b6e360` loss_objective_profile 严格化 + `458820fa` assistant_end_token）合法 supersede；4500→4511=重生成净差（+411 no-call refusal −400 旧 positive）非基线原地漂移。
+- **裁决**：分支代码面（`9ad6ff2d`=main+N4a/N4c 特性）无罪；**merge 前置=按 N4A 配方旋钮（refusal_target=0 显式覆盖 CLI 默认）重建数据 + strict preflight/DataGate 全绿 + 与 N4A 基线逐字段对账表**（预期差标 expected，意外差停手）。执行中（PR31-final-n4a-recipe-build/）。
+- 🔴 **P1 隐患登记**：CLI 默认 refusal_ratio_target=0.1 与 D-042 锁值 0 相悖 = footgun——wave-1 controller manifest 须把锁值显式化（并入 N5E-003 quota SSOT 范围），修法等 grill 不自拍。
+- 元认知：**「收 REPORT 必用验收基线 artifact 亲核」再次救场**（训练线解锁前夜，错误 refusal 配比+契约错位数据差点进 lineage）；worker 的 fixture-green/重生成-green ≠ 基线-green。

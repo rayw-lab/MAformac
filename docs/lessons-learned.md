@@ -243,3 +243,6 @@ N5 canary 期间 %43 的 judge SPEC 写好后被我晾着「等 canary 数据落
 
 ### M.13 管道吃退出码：git 变更命令禁 `|tail` 链 `&&`（2026-07-03 commander 亲踩，D-050）
 rebase PR31 用 `git rebase origin/main 2>&1 | tail -2 && git push --force-with-lease`——rebase 冲突中断（非零退出）被管道尾 tail 的 exit 0 吞掉，&& 放行 push，把**截断分支推上远端**（缺冲突点之后全部 commit）。原 tip 立即 force 恢复零损害。修法：①git 变更类命令（rebase/merge/push/reset）**独立执行看退出码**，输出要裁剪就先落文件再 tail ②要链就 `set -o pipefail` ③冲突高风险 rebase 交作者 worker 解语义，commander 只做机械 fast-forward。与 foreground-batch（合并命令）相容但边界在此：**合并只读检查 OK，变更命令的成败判定不得被管道稀释**。
+
+### M.14 验证口径必须绑【验收基线 artifact】+ CLI 默认值 vs 锁值 footgun（2026-07-03，D-051）
+%45 解完 PR31 合并冲突报「验证全绿」，实则 preflight exit0 跑在**自己重生成的数据**上（且重生成误吃 CLI 默认 refusal_ratio_target=0.1，非 D-042 锁值 0）；commander 用 N4A 验收基线数据复跑同命令 = exit66，当场拦下。两教训：① **「绿」必须声明跑在哪份 artifact 上**——验收基线 artifact 的绿才是验收绿，重生成/fixture 的绿只证明代码自洽（生产者-消费者契约的另一半没验）；收稿方复跑必用基线 artifact。② **锁值必须显式传参/进 manifest，禁依赖 CLI/config 默认**——通用默认值（0.1）会在任何重跑处静默替换锁值（0），与 claim-vs-reality 铁律1「enforce 非 declare」同源：锁值不进调用面=没锁。
