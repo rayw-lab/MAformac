@@ -181,7 +181,12 @@ struct C5TrainingCLI {
     }
 
     private static func renderTrainCommand(repoRoot: URL, outputDir: URL, config: C5MLXLoRAConfig) -> String {
-        """
+        let repoizedFlags = ([
+            config.tokenBudgetPerBatch.map { "  --token-budget-per-batch \($0)" },
+            config.gradCheckpoint ? "  --grad-checkpoint" : nil,
+            config.clearCacheBeforeTrain ? "  --clear-cache-before-train" : "  --disable-cache-clear-before-train"
+        ] as [String?]).compactMap { $0 }.joined(separator: " \\\n")
+        return """
         \(pythonExecutable) \\
           \(repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path) \\
           --train \\
@@ -198,6 +203,7 @@ struct C5TrainingCLI {
           --max-seq-length \(config.maxSeqLength) \\
           --grad-clip-norm \(config.gradClipNorm) \\
           --nonfinite-fallback-lr 5e-5 \\
+        \(repoizedFlags) \\
           --metrics-jsonl \(outputDir.appendingPathComponent("metrics.jsonl").path) \\
           --source-snapshot-output \(outputDir.appendingPathComponent("c5_mlx_train_loop.snapshot.py").path) \\
           --adapter-path \(outputDir.appendingPathComponent("adapters-rank16").path)
@@ -284,6 +290,9 @@ struct C5TrainingCLI {
         - optimizer: \(receipt.mlxConfig.optimizer)
         - weight_decay: \(receipt.mlxConfig.weightDecay)
         - grad_clip_norm: \(receipt.mlxConfig.gradClipNorm)
+        - token_budget_per_batch: \(receipt.mlxConfig.tokenBudgetPerBatch.map(String.init) ?? "null")
+        - grad_checkpoint: \(receipt.mlxConfig.gradCheckpoint)
+        - clear_cache_before_train: \(receipt.mlxConfig.clearCacheBeforeTrain)
         - training_loop: \(receipt.mlxConfig.trainingLoop)
         - learning_rate: \(receipt.mlxConfig.learningRate)
         - lr_schedule: \(receipt.mlxConfig.lrSchedule)

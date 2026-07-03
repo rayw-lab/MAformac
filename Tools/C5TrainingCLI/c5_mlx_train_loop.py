@@ -174,6 +174,10 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--preflight-loss-mask-only", action="store_true")
     parser.add_argument("--allow-legacy-loss-objective", action="store_true")
     parser.add_argument("--self-test-loss-mask", action="store_true")
+    parser.add_argument("--self-test-token-budget-batches", action="store_true")
+    parser.add_argument("--token-budget-per-batch", type=int, default=None)
+    parser.add_argument("--clear-cache-before-train", dest="clear_cache_before_train", action="store_true", default=None)
+    parser.add_argument("--disable-cache-clear-before-train", dest="clear_cache_before_train", action="store_false")
     args = vars(parser.parse_args(argv))
 
     config_path = args.get("config")
@@ -199,6 +203,9 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "preflight_loss_mask_only": False,
             "allow_legacy_loss_objective": False,
             "self_test_loss_mask": False,
+            "self_test_token_budget_batches": False,
+            "token_budget_per_batch": None,
+            "clear_cache_before_train": True,
         }
     )
     for key, value in defaults.items():
@@ -237,6 +244,26 @@ def file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def mlx_cache_memory_bytes() -> int | None:
+    if mx is None:
+        return None
+    if hasattr(mx, "get_cache_memory"):
+        return int(mx.get_cache_memory())
+    if hasattr(mx, "metal") and hasattr(mx.metal, "get_cache_memory"):
+        return int(mx.metal.get_cache_memory())
+    return None
+
+
+def clear_mlx_cache() -> str:
+    if hasattr(mx, "clear_cache"):
+        mx.clear_cache()
+        return "mx.clear_cache"
+    if hasattr(mx, "metal") and hasattr(mx.metal, "clear_cache"):
+        mx.metal.clear_cache()
+        return "mx.metal.clear_cache"
+    raise RuntimeError("MLX cache clear API unavailable")
+
+
 def global_grad_norm(grads: Any) -> mx.array:
     def add_square_sum(acc, grad):
         grad = grad.astype(mx.float32)
@@ -273,6 +300,7 @@ def clipped_train(
     disable_grad_clip: bool = False,
     stock_update_inside_compile: bool = False,
     nonfinite_fallback_lr: float = DEFAULT_NONFINITE_FALLBACK_LR,
+    clear_cache_before_train: bool = True,
 ):
     if args is None:
         args = TrainingArgs()
@@ -401,6 +429,20 @@ def clipped_train(
                             "iteration": it,
                             "val_loss": val_loss,
                             "val_time": val_time,
+                        }
+                    )
+            if clear_cache_before_train and mx.metal.is_available():
+                before_cache = mlx_cache_memory_bytes()
+                clear_api = clear_mlx_cache()
+                after_cache = mlx_cache_memory_bytes()
+                if rank == 0 and metrics:
+                    metrics.write(
+                        {
+                            "event": "cache_cleared_before_train",
+                            "iteration": it,
+                            "clear_api": clear_api,
+                            "before_cache_bytes": before_cache,
+                            "after_cache_bytes": after_cache,
                         }
                     )
             tic = time.perf_counter()
@@ -590,6 +632,11 @@ def train_model(args, model: nn.Module, train_set, valid_set, metrics: MetricsWr
     else:
         raise ValueError(f"Unsupported optimizer: {optimizer_name}")
     opt = opt_class(learning_rate=lr, **optimizer_config)
+    iterate_batches_fn = (
+        partial(maformac_iterate_batches, token_budget_per_batch=args.token_budget_per_batch)
+        if args.require_maformac_loss_mask
+        else stock_iterate_batches
+    )
 
     clipped_train(
         model=model,
@@ -598,16 +645,22 @@ def train_model(args, model: nn.Module, train_set, valid_set, metrics: MetricsWr
         train_dataset=CacheDataset(train_set),
         val_dataset=CacheDataset(valid_set) if valid_set else None,
         loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss,
-        iterate_batches=maformac_iterate_batches if args.require_maformac_loss_mask else stock_iterate_batches,
+        iterate_batches=iterate_batches_fn,
         metrics=metrics,
         grad_clip_norm=args.grad_clip_norm,
         disable_grad_clip=args.disable_grad_clip,
         stock_update_inside_compile=args.stock_update_inside_compile,
         nonfinite_fallback_lr=args.nonfinite_fallback_lr,
+        clear_cache_before_train=args.clear_cache_before_train,
     )
 
 
 def evaluate_model(args, model: nn.Module, test_set):
+    iterate_batches_fn = (
+        partial(maformac_iterate_batches, token_budget_per_batch=args.token_budget_per_batch)
+        if args.require_maformac_loss_mask
+        else stock_iterate_batches
+    )
     test_loss = evaluate(
         model=model,
         dataset=CacheDataset(test_set),
@@ -615,7 +668,7 @@ def evaluate_model(args, model: nn.Module, test_set):
         batch_size=args.batch_size,
         num_batches=args.test_batches,
         max_seq_length=args.max_seq_length,
-        iterate_batches=maformac_iterate_batches if args.require_maformac_loss_mask else stock_iterate_batches,
+        iterate_batches=iterate_batches_fn,
     )
     print(f"Test loss {test_loss:.3f}, Test ppl {math.exp(test_loss):.3f}.", flush=True)
 
@@ -1006,6 +1059,44 @@ def maformac_masked_loss(model, batch, token_labels):
     return maformac_masked_cross_entropy_from_logits(logits, labels)
 
 
+def maformac_padded_batch_length(token_length: int, max_seq_length: int) -> int:
+    pad_to = 32
+    padded = 1 + pad_to * ((token_length + pad_to - 1) // pad_to)
+    return min(padded, max_seq_length)
+
+
+def maformac_budget_batch_indices(
+    dataset,
+    sorted_indices: list[int],
+    batch_size: int,
+    max_seq_length: int,
+    token_budget_per_batch: int,
+) -> list[list[int]]:
+    if token_budget_per_batch < 1:
+        raise ValueError("token_budget_per_batch must be positive")
+    groups: list[list[int]] = []
+    current: list[int] = []
+    current_padded_len = 0
+
+    for index in sorted_indices:
+        token_length = min(len(dataset[index][0]), max_seq_length)
+        row_padded_len = maformac_padded_batch_length(token_length, max_seq_length)
+        next_padded_len = max(current_padded_len, row_padded_len)
+        next_total = next_padded_len * (len(current) + 1)
+        if current and (
+            len(current) >= batch_size or next_total > token_budget_per_batch
+        ):
+            groups.append(current)
+            current = []
+            current_padded_len = 0
+        current.append(index)
+        current_padded_len = max(current_padded_len, row_padded_len)
+
+    if current:
+        groups.append(current)
+    return groups
+
+
 def maformac_iterate_batches(
     dataset,
     batch_size,
@@ -1013,13 +1104,19 @@ def maformac_iterate_batches(
     loop=False,
     seed=None,
     comm_group=None,
+    token_budget_per_batch: int | None = None,
 ):
     len_fn = lambda idx: len(dataset[idx][0])
     idx = sorted(range(len(dataset)), key=len_fn)
-    if len(dataset) < batch_size:
+    if token_budget_per_batch is None:
+        if len(dataset) < batch_size:
+            raise ValueError(
+                f"Dataset must have at least batch_size={batch_size}"
+                f" examples but only has {len(dataset)}."
+            )
+    elif len(dataset) < 1:
         raise ValueError(
-            f"Dataset must have at least batch_size={batch_size}"
-            f" examples but only has {len(dataset)}."
+            f"Dataset must have at least 1 example but only has {len(dataset)}."
         )
 
     if comm_group is not None:
@@ -1031,16 +1128,31 @@ def maformac_iterate_batches(
     if batch_size % step != 0:
         raise ValueError("The batch size must be divisible by the number of workers")
 
-    batch_idx = [
-        idx[i + offset : i + offset + batch_size : step]
-        for i in range(0, len(idx) - batch_size + 1, batch_size)
-    ]
+    if token_budget_per_batch is None:
+        batch_idx = [
+            idx[i + offset : i + offset + batch_size : step]
+            for i in range(0, len(idx) - batch_size + 1, batch_size)
+        ]
+    else:
+        batch_idx = maformac_budget_batch_indices(
+            dataset=dataset,
+            sorted_indices=idx,
+            batch_size=batch_size,
+            max_seq_length=max_seq_length,
+            token_budget_per_batch=token_budget_per_batch,
+        )
     if seed:
         np.random.seed(seed)
     while True:
         indices = np.random.permutation(len(batch_idx))
         for i in indices:
-            rows = [dataset[j] for j in batch_idx[i]]
+            if token_budget_per_batch is None:
+                row_indices = batch_idx[i]
+            else:
+                row_indices = batch_idx[i][offset::step]
+            if not row_indices:
+                continue
+            rows = [dataset[j] for j in row_indices]
             batch_tokens, batch_labels = zip(*rows)
             lengths = [len(tokens) for tokens in batch_tokens]
             if max(lengths) > max_seq_length:
@@ -1053,9 +1165,10 @@ def maformac_iterate_batches(
             pad_to = 32
             max_length_in_batch = 1 + pad_to * ((max(lengths) + pad_to - 1) // pad_to)
             max_length_in_batch = min(max_length_in_batch, max_seq_length)
-            batch_arr = np.zeros((batch_size // step, max_length_in_batch), np.int32)
-            label_arr = np.full((batch_size // step, max_length_in_batch), -100, np.int32)
-            for j in range(batch_size // step):
+            microbatch_size = len(row_indices)
+            batch_arr = np.zeros((microbatch_size, max_length_in_batch), np.int32)
+            label_arr = np.full((microbatch_size, max_length_in_batch), -100, np.int32)
+            for j in range(microbatch_size):
                 truncated_length = min(lengths[j], max_seq_length)
                 batch_arr[j, :truncated_length] = batch_tokens[j][:truncated_length]
                 label_arr[j, :truncated_length] = batch_labels[j][:truncated_length]
@@ -1251,6 +1364,49 @@ def run_loss_mask_self_test() -> None:
     )
 
 
+def run_token_budget_batch_self_test() -> None:
+    lengths = [120, 1600, 6188, 7185, 7184, 90, 7183]
+    dataset = [([index] * length, [index] * length) for index, length in enumerate(lengths)]
+    sorted_indices = sorted(range(len(dataset)), key=lambda idx: len(dataset[idx][0]))
+    groups = maformac_budget_batch_indices(
+        dataset=dataset,
+        sorted_indices=sorted_indices,
+        batch_size=4,
+        max_seq_length=8192,
+        token_budget_per_batch=8192,
+    )
+    padded_totals = [
+        maformac_padded_batch_length(max(len(dataset[index][0]) for index in group), 8192) * len(group)
+        for group in groups
+    ]
+    expected_groups = [[5, 0, 1], [2], [6], [4], [3]]
+    longest_row_single = any(group == [3] for group in groups)
+    if groups != expected_groups:
+        raise AssertionError(f"unexpected token budget groups: {groups}")
+    if any(total > 8192 for total in padded_totals):
+        raise AssertionError(f"padded token budget exceeded: {padded_totals}")
+    if not longest_row_single:
+        raise AssertionError(f"longest row was not isolated: {groups}")
+    if groups[0] != [5, 0, 1]:
+        raise AssertionError(f"stable sorted order changed: {groups[0]}")
+    print(
+        json.dumps(
+            {
+                "event": "token_budget_batch_self_test",
+                "status": "pass",
+                "token_budget_per_batch": 8192,
+                "groups": groups,
+                "padded_totals": padded_totals,
+                "longest_row_single": longest_row_single,
+                "snapshot_fixture": "T1D-D2combo maformac_budget_batch_indices",
+                "grad_accumulation_semantics": "variable_microbatch_rows_when_token_budget_per_batch_enabled",
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
+
+
 def inspect_batches(args) -> None:
     tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
     train_set, _, _ = load_dataset(args, tokenizer)
@@ -1282,6 +1438,10 @@ def inspect_batches(args) -> None:
 def run(args) -> None:
     validate_preflight_flags(args)
 
+    if args.self_test_token_budget_batches:
+        run_token_budget_batch_self_test()
+        return
+
     if args.self_test_loss_mask:
         ensure_mlx_runtime()
         run_loss_mask_self_test()
@@ -1307,7 +1467,10 @@ def run(args) -> None:
         f"(mlx-lm={version}, script_sha256={script_sha256}, "
         f"grad_clip_norm={args.grad_clip_norm}, "
         f"clip_disabled={args.disable_grad_clip}, "
-        f"stock_update_inside_compile={args.stock_update_inside_compile})",
+        f"stock_update_inside_compile={args.stock_update_inside_compile}, "
+        f"grad_checkpoint={args.grad_checkpoint}, "
+        f"token_budget_per_batch={args.token_budget_per_batch}, "
+        f"clear_cache_before_train={args.clear_cache_before_train})",
         flush=True,
     )
 
@@ -1332,8 +1495,16 @@ def run(args) -> None:
                 "training_loop_source_sha256": script_sha256,
                 "source_snapshot": str(source_snapshot) if source_snapshot else None,
                 "disable_grad_clip": args.disable_grad_clip,
+                "grad_checkpoint": args.grad_checkpoint,
                 "grad_clip_norm": args.grad_clip_norm,
                 "stock_update_inside_compile": args.stock_update_inside_compile,
+                "token_budget_per_batch": args.token_budget_per_batch,
+                "clear_cache_before_train": args.clear_cache_before_train,
+                "grad_accumulation_semantics": (
+                    "variable_microbatch_rows_when_token_budget_per_batch_enabled"
+                    if args.token_budget_per_batch
+                    else "fixed_batch_size_rows"
+                ),
             }
         )
         print("Loading pretrained model", flush=True)
