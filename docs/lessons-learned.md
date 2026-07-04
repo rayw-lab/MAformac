@@ -249,3 +249,27 @@ rebase PR31 用 `git rebase origin/main 2>&1 | tail -2 && git push --force-with-
 
 ### M.15 数字核真 ≠ 后果定价（2026-07-03 T1-OOM，commander 亲身第四层）
 PR31-final 复跑时我亲眼核了 trainable_tokens 44459→113914（recheck3 log 一手）并标「expected（新契约监督面扩大）」——真实性核对完成，但没有问「2.56x 监督面/首次引入 7k 长序列对 backward 显存意味着什么」，两小时后 T1 Metal OOM 补了这一课。**核真只完成一半：任何亲核过的显著变化数字，必须再问一句「它的下游代价在哪个维度（显存/墙钟/质量/成本）」**——不定价后果=第四层 claim-vs-reality（前三层：没核/核不细/核了别人的转述；第四层：核了真值没核含义）。机制化=「X-ready 声称必带资源包络两列」+ 风险类×最廉门矩阵（全局 rule verification-economics-baseline-registry）。
+
+### M.23 资源包络绑定宿主环境基线 + 挂起比崩溃更隐蔽（2026-07-04 R2b 首跑 swap-hang，D-092）
+R2b 短训首跑：起跑时系统已用 23.7/34.4GB（5 codex+CC+13 天残留进程），训练进程膨胀至 25GB→swap 18GB 满→UN 态挂起 32 分钟（首 val 卡 4%，R2a 同步骤 70s）——磊哥「感觉没有自动化推进」才发现。三层失误：①**包络 basis 含宿主环境**（R2a 峰值 17.97 是空机数字；起跑前必查 free ≥ 包络峰值+3GB，不足先清理=起跑 checklist 硬门）②**M.15 复发**（亲核 tokens +11.8% 写进决策却没定价内存/环境含义——核真≠定价第二次同坑）③**watchdog 的 val 阶段盲区**（process_peak 读 train_report，val 期间全 NA；「进程活着」≠「进程在动」——修=首 val 完成 deadline 断言[锚=实测 70s×4]，UN 态+无进展=杀并报，不等 checkpoint deadline 11300s）。**挂起（UN/swap）比崩溃（OOM）更隐蔽**：不崩不报错就是不动，资源门矩阵要同时覆盖两种失败形态。
+
+### M.22 转换步守恒门：管线每个转换步必须有输入输出守恒断言（2026-07-04 split 静默丢弃 584 行，D-091）
+R2b 组装→渲染转换步：584 修复行因缺 split 字段被渲染分桶规则静默丢弃（若入训=修复数据 90% 不进训练=整轮白训），scanner/DataGate/preflight 三门全没抓到——**它们都在转换步单侧**（上游门看组装产物问题未显现；下游门只验「拿到的行可训」不知「应有多少行」）。commander 手工行数对账才拦下。三层修：①L1 字段规整+断言 ②L2 管线缺「候选 schema→训练样本 schema」显式升格校验步（隐式约定在每个新组件上必断）③L3 **每个转换步必须有守恒断言**（输入总量==输出分桶之和，fail-closed 进 runbook/receipt）——与 0/34 tool-surface 双源、A2 链路 parity 同族定律；verification-economics 风险矩阵补「转换步守恒」格。触发扳机：任何「A 产物 → B 产物」的转换代码（渲染/分桶/合并/过滤/投影），写完第一件事=写守恒断言。
+
+### M.21 约束物化定律：没被物化成机械可查状态的约束会在流水中蒸发（2026-07-04 R2b 一日三同构，D-090 三层发散）
+R2b 拆批流水一天内三次同构暴露：①numeric_value_constant 写在 evidence prose 里 vs judge 按结构化字段判（两 lane 独立同坑）②worker「完成」以落盘自认 vs REPORT 送达才算（多 worker 反复）③airoutlet/wind 配额是 W10 notes 里一句 prose→四个批次 0/6 彻底蒸发，而 set_interface_vs_defog 有 mandatory_first/carry 状态标签→全程被追踪只差 1。**定律：约束的可追踪性=它的物化程度**——prose 约束必丢，结构化状态（字段/tag/账行/断言）才存活。三条修法：①任何进配方/order 的量化约束必物化（floor tag+required 数字段+locked-floors.json 账行）②拆解流水必配套跨批累计账门（局部达标≠全局达标是拆解自带的新风险面；每批 accept 跑秒级累计 mini-账）③规格进 order 时逐条口径编译（一句话两读的必须拍死成断言表达式，如 query 保护行的 query-side 严格口径）。与 M.19（表示层信息量<标签信息量=不可学）同一定律的组织版、claim-vs-reality 铁律 1（enforce 非 declare）同源。
+
+### M.20 指挥官会话也是单点故障：长跑轮询方式决定断点半径 + tmux 送达判据=Working 态（2026-07-04 R2a 断点接手，D-084）
+R2a 短训期间上任 commander 会话用「`sleep 540` 前台串行轮询」盯训练（会话 jsonl f35d9026 一手），23:52 掉登录整会话卡死——训练本体因 **nohup+watchdog+档案链**设计毫发无损跑完（02:57 150/150 updates），新会话从 STATUS-BOARD/receipt/verdict-skeleton/decisions 完全重建指挥态并补账 T8（eval→verdict→brief）。三教训：① **长跑监控别把整 turn 押在前台 sleep 上**——sleep 窗口内会话态（login/网络）任何抖动=整段丢；长等待用后台任务+完成通知，前台只做短查（与 foreground-batch 规则互补：那条治「短检查碎步后台」，本条治「长等待占前台」）。② **无人值守三件套（nohup 训练 + watchdog 停线 + receipt/STATUS-BOARD 档案链）的价值在会话崩溃时兑现**：commander 会话可抛弃、档案链不可少——「压缩失忆第一恢复点」同时是「会话死亡第一恢复点」。③ **tmux 派单送达判据=capture 到「Working」状态**，文本回显在输入框≠已提交（send-keys 文本后必须单独补 Enter 并回读验证；本次磊哥手按 Enter 纠正）。
+
+### M.19 矛盾监督穿透全部机械门：同输入双标签=监督一致性门必须常设（2026-07-03 F044 FAIL 根因，D-080）
+F044 round1 A 轴「系统性极性反转」下钻到底=**训练数据矛盾监督**：同协议串 `set_mode`（无极性信息）28 行监督 open/16 行监督 close（c5-train-00001 vs 01057 输入逐字同、标签反）；W6 全量扫描发现同类歧义 329 组/波及 ~686 行（14%）遍布 device 面。它穿过了 DataGate/strict preflight/corpus judge 全部门——**没有任何一格检查「同输入→监督唯一」**。与 0/34 灾难的「矛盾监督」同类病第二次发作。修法：① 监督一致性扫描器常设进 DataGate（分组 key 必含 归一化输入+state+mount 集+safety class+slot defaults+split+basis，防把合法状态差异误判矛盾——codex 修正）② 归因纪律：「模型学反了」是错误表述，模型学的就是矛盾分布（greedy 坍缩到某分支）——**行为异常先查数据一致性再怪模型**③ 表示层信息量 < 标签信息量 = 结构性不可学（协议串丢极性维度），修在渲染/契约不在训练。
+
+### M.18 分布内指标对分布结构缺陷天然盲（2026-07-03，D-079/D-080，维度三系统原理）
+val loss 0.019/DataGate 绿/preflight 绿全都检测不了「分布本身的洞与自相矛盾」——负例真空（class 全 positive）是**洞**、矛盾监督是**自矛盾**，都是分布结构属性而非行内质量属性；val split 与 train 同分布所以 val loss 对此天然盲（在矛盾分布上照样收敛得很漂亮）。**能到达这类缺陷的只有两种门：out-of-recipe 行为评测（F044 短训评=4h 到达）+ 分布结构审计（配比矩阵/一致性扫描=分钟级到达）**。后者更廉价——本该前置：WD-14 盘出「class 全 positive」时若当 blocker 而非 backlog，可省一轮短训。修法：数据资产验收=行内质量（judge）+分布形状（class×family 矩阵 vs 目标行为面交叉）双维，进短训评入口 gate。
+
+### M.17 评分器/执行脚本也是 basis：锚数字必须绑 scorer 口径，已验证脚本 fork 不变异（2026-07-03，D-079/D-080）
+① D 轴锚 18/34 是 v6 scorer（name-only 序敏感）口径；我先用自铸 exact-match（name+args）快评得 4/34，差点把「口径差异」误判成「灾难退化」——用 v6 同款 scorer 复算 base=18/34 与锚**精确一致**（可比性自证法：换 scorer 前先复现锚）。锚/阈值的 basis 绑定包括【评分器版本+match 规则】。② 执行脚本同理：round1 已验证的 f044-third-run.sh 是冻结 artifact（receipt 引用其路径），round2 改动走 **fork 副本+头部血缘注释+diff 声明+sha 进 receipt**，不原地 sed 变异（codex 建议辩证采纳+参数化合成）。
+
+### M.16 门自身的判据也是 basis 绑定 + 门上线前过 grill（2026-07-03 watchdog 两连误杀，D-077）
+run-auth 后短训两连被自家 watchdog 误杀（训练本身两次全健康，损失 2+4 分钟）：第一跑采「系统 `virtual_memory().used`」（起点 21.81GB）对比「训练进程 MLX peak×1.25」推导的 22.34 阈=**采样源与阈值推导口径混用**，2 分钟触发；修复后第二跑，新加的系统辅助阈 30.0 在 val 阶段（系统 used 已 29.52，本机 3 codex worker 共存）上量即触发再杀=**触发面没在真实运行环境标定**。三教训：① **门的判据=一种 basis 绑定**——监控采样源必须与阈值推导同 lane 同口径（进程 peak 阈只能配进程 peak 采样；正确源就在 train loop metrics `peak_memory` 字段，`c5_mlx_train_loop.py` `mx.get_peak_memory()`）；② **门保护训练，grill 保护门**——停线判据的保护面语义/触发面标定/环境共存 corner case 必须先过 grill 再上线（F044-WD grill 系列即此补课），门的误杀同样是失败，幸而到达早（2+4 分钟 vs 9.4h 后误杀）；③ **收稿方核「门类工具」的正确姿势**——跑单测+扫判据关键词不够，必核「每个判据的采样源语义与其阈值出处是否同口径」+「触发面在目标环境的实测起点距阈多远」（21.81 vs 22.34、29.52 vs 30.0，两次贴线都是上线前一眼可见）。全局机制化=verification-economics rule「门判据 basis 绑定」腿。

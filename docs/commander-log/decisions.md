@@ -564,3 +564,137 @@
 - **R2 五门全绿**（receipt=CODE-MIGRATION-R2-RECEIPT.md，commander 亲核）：新 pin `26678346` 上 DataGate data_gate_ready（DATA v3=PR38-final-n4a-recipe-build，hash 字段投影补齐）+ strict preflight 4628/4628（trainable_tokens 113745）+ **T1D-D2combo repo-config smoke：2 optimizer updates/adapter saved（sha `d6abc4cf…`）/OOM absent/峰值 17.87GB——PR38 三控件在正式 config 面 e2e 实证** + filter 111/0 + patch dry-run。
 - **BASELINE-REGISTRY 首次正式迁移执行**：CODE→`CODE-2026-07-03-PR38`（pin `26678346`）、DATA→`DATA-WAVE1-SUBSTRATE-v3`；旧行入 supersede 史（v2 blocked 于 #36 hash 门=预期耦合）。维度四机制从建档到首次真实迁移当日闭环。
 - 后续新工作（候选 manifest/wave 批次）一律 cite 新 basis_id；warmup 批（pin b33d8eba 生成）历史有效性标注保留。
+
+## D-072（2026-07-03 深夜）B04/B05 judge 双 PASS + CAND-FINAL 收稿 + repair lane 4 行修复完成（Accepted）
+- **B04/B05 judge PASS（%43，commander 亲核 verdict 文件）**：两批均机械/溯源 7 维（D5/D6/D7/D9/A10/A11/A12）**全量 50/50 过** + 语义 5 维（D1-D4/D8）**分层抽样 20/50 零失败**；声称分层纪律全对（Tier1 full mechanical 绑 pool sha / Tier2 sampled-confidence 明示禁升格全 50 语义声称）。已知记录项：gates v1 receipt `basis.candidate_sha256` 是 controller 注入前旧值（stale），但 resource_envelope/SHA256SUMS/judge 重算三路均绑当前 pool——写入 verdict warning 不阻塞。
+- **T1D-candidate-manifest-FINAL 收稿（%44，commander 亲核）**：`candidate_manifest_ready_pending_step4_step5`；basis 正确 cite `CODE-2026-07-03-PR38`（pin `26678346`）+ `DATA-WAVE1-SUBSTRATE-v3`；五步 1-3 DONE（manifest 固定/R2 门重跑/repo-config smoke 峰值 17.87GB）；步4 F-044 短训评（等 wave-1 corpus）+ 步5 owner run-auth（磊哥键）PENDING；claim boundary 干净（NOT CLAIMED: train-ready/C6/V-S-U）。
+- **repair lane（wave1-repair-lane-1）完成**：4 行全修（0007/0023/0012 补 position:主驾、0025 补 position:后排，槽名照同批 16 个 sibling 实际 schema 未臆造）；派生函数逐字复刻 generate_batch.py 且先在 50 未改动行 100% 复现现存 sha 才应用；非目标行 48/48 字节一致×2 lane；独立边界核查零残留（commander 定界 4 行已穷尽）。**未擅改跨 lane 职责**：batch_manifest.artifact_shas / controller 注入 receipt / gates 快照声明 stale 待 %45 重跑刷新（正确边界判断）。lane shutdown（磊哥令用完即关，回 2×2）。
+- **下一步**：%45 gates 重跑（b02 v4/b03 v2）→ %43 scoped D3 复审（全批位置行）→ corpus 汇总 250 行。
+
+## D-074（2026-07-03 深夜）CORPUS-250-FINAL corpus_ready = wave-1 warmup 语料资产收口（Accepted）
+- **%45 交付**：`wave1-corpus-final/`（corpus 250 行 + manifest + CORPUS-250-FINAL-RECEIPT.md）；staging 200 中间态保留（B03 PASS 后才并入，included_rows=250/expected_remaining_rows=0）。
+- **三方核验闭环**：① %43 交叉核 `CORPUS-250-CROSSCHECK.md` PASS_WITH_NOTES——corpus/manifest 双 sha 复算 match、五批池 sha 与 verdict+gates 三方 match（b01 `eee76baf…`/b02 `2b75ba96…`/b03 `85f8067c…`/b04 `bbdae53e…`/b05 `90398f5c…`）、B02 声称保持 scoped 不升格、B04/B05 gates v1 stale basis 已知项不阻塞（envelope/SHA256SUMS/verdict 重算三路绑定）；② commander 点核=250 行/sha `e6ff61cb…` 一致/五批各 50（python 分布复算）。
+- **claim 边界**：corpus_ready 仅指 250 行 warmup 语料资产完成；不声称 train-ready/C6/V-PASS/run 授权。
+- **L6 依赖链现态**：candidate manifest ✅ + corpus 250 ✅ + F044 harness ✅（worktree 已持久化）→ 只剩 %44 渲染 MLX 数据面+门重跑+TODO 回填（F044-DATA-READY，在途）→ 磊哥 run-auth 单键。
+
+## D-075（2026-07-03 深夜）F044-DATA-READY 双人核绿 = L6 全前置就绪，停在磊哥 run-auth 单键（Accepted）
+- **%44 交付**：DATA-v3 + corpus 250 渲染 MLX 数据面（combined 4750=4500+250 / train 4350=4100+250 / valid 400 / test 128）+ DataGate exit0（must_not_train 0/parent_overlap 0）+ strict preflight exit0 + PREP 三 TODO 全回填（余两处 TODO 字样=守卫说明文字）；receipt 命令绑持久 worktree 可复跑，claim=`data_ready_preflight_pass_no_train`。
+- **commander 独立复跑 strict preflight（今日抓假绿同款动作）**：records=4878 / trainable_records=4878 / trainable_tokens=119579 / max_token 账与 receipt 逐数一致 / exit0 / script_sha `9714f6f2…`=PR38 loop / banner 确认三控件（grad_checkpoint+token_budget 8192+clear_cache）。数字自洽链：4750+128=4878 ✅、tokens 113745→119579（+5.1%，与 corpus 行增量 5.56% 同量级，微批峰值由 token_budget 控制不受总量影响）。
+- **L6 终态**：candidate manifest（步1-3 绿）+ corpus 250（三方核）+ F044 harness（dry-run 验证）+ 数据面（双人核绿）= **全前置就绪，唯一剩余人键 = 磊哥 F-044 短训评 run-auth（step4 执行 + step5 owner 签）**。签后命令序列=PREP §4.2 preflight gate→§4.3 短训→§4.4 A/B/D 评测，停线/包络照 §6。
+
+## D-076（2026-07-03 深夜）L3-SALVAGE-REJUDGE SPEC 收稿（design-only）+ run-auth 签字包备妥（Accepted）
+- **SPEC-L3-SALVAGE-REJUDGE.md（%43）收稿亲核**：3804 accepted/696 unsupported 分池铁律（denominator 纪律）+ 8 项 legacy 差异闭合硬门（family_id/row 契约/hash repo-anchor 归一/D9-A12 ledger 重建/🔴 旧 PR3 Hermes 同厂商 verdict 作废仅历史=cross-vendor 纪律正确）+ 分层抽样 305 行（**commander 复算**：10 族分布总和=3804 ✅、逐族 sample=rev2.1 公式 ✅、总样本 305 ✅，含小族全审 0 容错）+ 机械 10 门先于 LLM judge fail-closed + P0-P6 执行计划（owner 分工含 %44 second-judge 触发规则）+ 成本（机械 5-20min/语义 90-150min/≤2 修复轮）+ 停线与声称词表模板。**执行=未来显式派单**（P0/P1 owner=%45 projection adapter 补齐，在其 SCALE-PLAN 后排program）。
+- **RUN-AUTH-PACKAGE 写就**（`runs/.../RUN-AUTH-PACKAGE-F044.md`，≤40 行签字包）：签什么/就绪证据/资源预算/验收门/停线/签字方式，供磊哥一眼审。
+
+## D-077（2026-07-03 傍晚）磊哥 run-auth F044 approve 签收 + 第一跑被 watchdog 误杀（判据口径 P1）→ 修门重跑（Accepted，执行中）
+- **磊哥签**：「run-auth F044 approve」+「gogogo」；同时磊哥 catch **双入口歧义**（PREP §4.3 普通 `|tee` 版 vs watchdog unattended form，签字包只写「§4.3」可能被执行成无 watchdog 版）→ 已锁：RUN-AUTH-PACKAGE + PREP 双处标注「🔴 唯一授权入口=watchdog form」。
+- **开跑前坐实**：watchdog 单测 2/2 OK（我第一次 discover 姿势错报 0 tests，分目录重跑坐实——%44 无假绿）；PREP §4.2 preflight gate 10/10 OK。
+- **第一跑（run dir `F044-shorttrain-run-20260703T171454+0800`）**：起跑健康（PID 89176/preflight 4878/119579 与双人核一致/iters 600 开训/trainable 1.013%），**~2 分钟后被 watchdog 误杀**：`memory_fail_threshold_exceeded`——**判据口径 P1**：watchdog 采 `psutil.virtual_memory().used`（系统总内存，起点 21.81GB）对比 22.34 阈，但 22.34=R2 训练进程 MLX peak 17.87×1.25 推导，**口径混用系统 used 必超**。训练本身零问题（mlx 无 OOM，死在首个 train_report 前，损失 2 分钟）。~~附带发现：BLOCKED receipt trigger evidence 序列化 bug（字段全 None）~~ **ERRATA（WD-AMMO-44 纠正）**：「evidence 全 None」是 **commander 自己的 jq 读法错**（读 `.trigger.evidence`，实际 schema 是顶层 `.evidence`）——%44 live 复读第二跑 receipt 证明 evidence 完整（且 `system_memory_used_gb=34.07` >32GB 物理=psutil used 在 macOS 含压缩语义扭曲，成为 WD-1 强弹药）。教训：**指控产物 bug 前先核自己的读法**（读法=另一种 basis 绑定）。
+- **元教训（verification-economics「数字核真≠语义核对」在门自身复发）**：22.34 数字对、语义口径错——我收 WATCHDOG 稿时亲跑了单测、扫了判据关键词，**没核「采样源与阈值推导是否同口径」**；且正确口径数据源就在 train loop（`c5_mlx_train_loop.py:534` `mx.get_peak_memory()/1e9`→`:556` metrics `peak_memory` 字段）。门的判据=一种 basis 绑定，阈值与采样必须绑同一 lane。
+- **修复回路**：%44 紧急修三件（主判据改读 metrics `peak_memory` 同口径/系统内存降辅助判据独立 30GB 阈/修 receipt evidence 序列化）+ 三 fixture 单测（含本次误杀场景回归）→ commander 亲核单测 → 新 run dir 重跑。
+- **第二跑也被杀（4min）**：修正后的辅助阈 30.0 在 val 阶段被系统 used（触发时 34.07>32GB 物理）击穿——触发面没在真实环境（3 codex 共存工作站）标定。磊哥令按 grill 范式补课。
+
+## D-078（2026-07-03 傍晚）F044-WD grill 15 题全消减（三 worker xhigh 弹药）+ 第三跑起跑存活（Accepted，执行中）
+- **grill 范式全程走完**（磊哥令「grill 是核心拆解驱动力」）：骨架四层 15 题（技术判据/corner case/openspec 体系/愿景）→ 三 worker 并行弹药（WD-AMMO-43 联网+本地双证 / 44 全可执行结论+第三跑 wrapper / 45 体系+jq 一手盘点）→ 全消减 locked → WD-15 commander 拍。档=`docs/c5-training-readiness-grill/f044-shorttrain-watchdog-env-grill-2026-07-03.md`。
+- **载力决策**：WD-1 系统 used 永不 hard kill（psutil/Apple/MLX 三方外证：used 非训练健康信号，「调阈=把口径错误往后推」）；WD-3 quiet_observer_mode（worker 常驻仅 ~1.7GB 非主风险，突发工具负载才是）+ 三层停线（训练硬故障杀/进程 peak 杀/系统压力 warn→先降载）；WD-8 thermal 不设 hard fail+checkpoint 实测重校+continuation 必新 run；WD-9 PASS 三层拆（train-health/artifact/behavior，exit0≠可用，eval fresh process）；WD-10 verdict 四层决策树**预落档**（`F044-VERDICT-DECISION-TREE.md`）；WD-11 MODEL 候选 lane 治理（封顶 shorttrain_behavior_gate_pass）；WD-12 corpus 不回写契约 SSOT；WD-14 🔴纠偏=10 族顶层全覆盖、真空白=负例/安全/already_state/多意图（class 全 positive）——下一 wave 优先补「不乱控」。
+- **元认知升级已落**：全局 rule verification-economics 新腿「门判据 basis 绑定+grill 保护门」；lessons M.16；ERRATA=「receipt evidence None」是 commander 自己 jq 读法错（%44 双证纠正）。
+- **第三跑起跑存活**（`f044-third-run.sh`=caffeinate -is+watchdog supervisor 自愈+磁盘 guard；PROCESS_PEAK 22.34 主判据/SYSTEM 999 禁用/interval 15s）：elapsed 166s **越过前两次误杀点**（61s/120s），系统 used 33.94 不再触发（WD-1 生效），watchdog 自查 trainer alive，metrics 事件流正常。三 worker 已 ACK 进 quiet_observer_mode。下一观测点=首个 train_report（process peak 数据流）→ checkpoint 50。
+- **训练收官（21:51，~14040s）**：150/150 updates 精确命中/nonfinite 0/峰值 max 17.974GB/val loss 3.09→0.161→0.042→**0.019** 单调降/train loss 0.06/6 checkpoint+final adapter/零停线零 supervisor 重启。artifact 层闭合=`F044-TRAIN-RECEIPT.md`（全 sha 绑定，snapshot sha=PR38 源码 sha 逐字一致；claim 封顶 train_health）。
+- **eval 首跑 fail-fast 插曲（mount 源错，非模型问题）**：PREP §4.4 staged 命令把 `--train-jsonl` 指向 train split，但 A/B case 的 mount 源行（source_sample_id c5-train-00001..）**设计上就在 valid split**（A 轴语义=分布内泛化非死记；我全查 30 case 落点+新旧 train 交集 4100=split 未被洗，corpus 250 纯追加）→ 改传 samples 全集（4750 行全含 tools）重起成功。小教训：**staged 命令 dry-run 只验了 `--help` 没验语义面**（mount 查找），进 verdict receipt 注明+PREP §4.4 该行修正。
+## D-092（2026-07-04 ~16:00）R2b swap-hang/电脑死机归档 + 训练执行官重建蜂群架构（Accepted，执行中）
+- **事故链**：15:34 首跑 `F044-shorttrain-run-20260704T145141+0800` 因 swap-hang 归档为 `F044-shorttrain-run-20260704T145141+0800-HUNG-ARCHIVED`；15:52 二跑期间电脑死机，`F044-shorttrain-run-20260704T153413+0800` 归档为 `F044-shorttrain-run-20260704T153413+0800-CRASH-ARCHIVED`。两段均不得写 train-health / artifact pass / behavior pass。
+- **新架构**：重建蜂群 `ma-status-swarm`，职责拆为 `%0` commander 观察位（纯编排/记账/省额度，不持训练进程）、`%1` 训练执行官（训练归 worker 线程，持 run + watchdog + monitor）、`%2-%5` 训练窗任务/旁路支持。原则=训练资源和 commander token 预算解耦，且给用户交互与系统内存留余量。
+- **第三跑起跑**：run=`F044-shorttrain-run-20260704T155204+0800` 于 ~16:00 在 `%1` 线程起跑，活动指针=`R2B-EXECUTOR-ACTIVE-RUN.path`；后续 receipt 只认 155204 活跃 run，不继承 HUNG/CRASH 段绿灯。
+- **M.23 引用**：本次落 `docs/lessons-learned.md` M.23——资源包络必须绑定宿主环境基线；挂起（swap/UN/无进展）比崩溃更隐蔽，必须用起跑前余量门 + val 阶段进展 deadline 覆盖。
+
+## D-091（2026-07-04 15:55）R2b 短训起跑（T-C）：split 静默丢弃 P0 拦截修复 + T-B 全绿双人核（Accepted，训练中）
+- 🔴 **P0 拦截（白训事故未遂）**：T-B 首渲染行数对账抓到 584/585 修复行 split=None 被渲染分桶静默丢弃（若入训=修复数据 90% 不进训练）；三门（scanner/DataGate/preflight）全在转换步单侧未覆盖。修复=%45 组装器 split 规整（imputed 585 全列 id）+fail-closed 断言；%44 渲染加**行数守恒断言**（5499==5099+400，首用即 pass）→ M.22 转换步守恒门定律落 lessons。
+- **T-B 全绿（五条件②✅）**：scanner 0 矛盾/DataGate ready 5499/strict preflight commander 复跑逐数一致（5627 records/133,692 trainable tokens[+11.8% vs R2a]/max 7196/exit0 双侧同）。
+- **T-C 起跑**：run=`F044-shorttrain-run-20260704T145141+0800`，combined sha `3b76d497…`，watchdog form（22.34/999/15s），188s 越历史误杀点，首 val 计算中。预计 ~4-4.5h 训完（~20:30）。
+- 前置面同步全绿：五条件③（T3-PREMORTEM 8T 全 disposed 0 open）；扩充轨 base 锚建成（53 case base 29/53，节省 verdict 后关键路径）；receipt 模板×2+正式配方推演（%45 在算 iters 档位）。
+
+## D-090（2026-07-04 下午）750 预账 gap 处置：locked 必含项 +23 行 supplement + 族分布偏离显式 deviation（Accepted，执行中）
+- **%44 预账+gap 精查（两连档）**：750 行/class/family/query 账全对+全局唯一 ✓；但 R2B-1 locked 必含项未锁齐——**airoutlet/wind 0/6 组**（整个 floor 无人做=批次 order 传导断层最重处）、set_interface_vs_defog 7/8、query_ac_temperature_vs_adjust 严格口径 1/10；全局 pair 137/140。
+- **拍板**：①supplement micro-batch +23 行（%61 codex 生成，_SUP_ 前缀）：set_interface 第 8 组+airoutlet/wind 6 组+query 保护行补到 10（**严格口径**=query-side query_ac_temperature 行，MP-029 直接防线不容宽算）②**W10 §2 全表族分布 rebalance（+72 行）本轮不做，显式 deviation**：欠采族 ac/screen/window/atmos/seat 计 72 行 vs 超采 volume/wiper——理由=短训快速轮先验证 contrastive 方向有效性（单变量哲学同 D-082 B+），R2b eval B 轴若证方向有效但量不足→R2c 全表补满；本 supplement 已覆盖 A/B 轴最痛三必含点。
+- **根因两层记档**：批次 order 只传导 floor 触达组数、未传导 per-family contrastive 行数配额；commander order 转正亲核时漏核此维（核了 class/query/carry）。修=终账门（merger）现含 per-floor 断言；R2c/正式配方的 order 必带 contrastive 行数配额列。
+- 流程账：批 4 judge 并行中；supplement 走完整门链+judge 抽样；merger 终账（773 行）复跑后才组装训练。
+
+## D-089（2026-07-04 下午）ERRATA R2B-DOOR-ERRATA-01：撤销 lane-h FAIL_DOOR_CONTRACT（judge 假阳性，根子=commander 传播未亲核的 worker 附带断言）（Accepted）
+- **事实修正**：door 族在 C1 契约**真实存在 18 个 intent**（open_car_door/close_car_door/open_door_little/open_door_by_number/adjust_door_to_number/set_door_speed_to_number/set_door_speed_to_gear/lock_door/unlock_door/pause_car_door 等，commander grep semantic-function-contract.jsonl 亲核）——D-087 记账中「door 族无通用车门工具，只有 tailgate/fuel_tank_cap/window_lock」**为错误断言，就此作废**。
+- **错误链**：lane-a（S1）报 query intent 问题时**附带**此断言 → commander 核了主断言（query intent 全契约 5 个 ✓）但未核附带断言 → 写进 D-087「新事实收录」+lane-h/lane-i 派单内联+批 3 judge spec 的 door_contract 硬门 → judge 按污染 spec 判 lane-h 假 FAIL（7 行 expected+16 行 mounted 实际全部契约合法）。
+- **污染面盘点**：lane-h=假 FAIL 撤销重判中（数据无罪零修复）；lane-i=幸免（生成时自读契约用对了 21 个 door positive，2 个 unsupported 是 query 式话术=正确——**SSOT 精读纪律救了生成层**）；批 4 judge spec 预实例化指令中同款错误事实由 commander 在派单时更正。
+- 🔴 **元教训（claim-vs-reality commander 侧实证，进 memory）**：worker 的【附带断言】与【主断言】要分开对待——主断言核了不等于附带断言可信；任何要进裁决/派单内联/judge 硬门的「契约事实」必须 commander 亲 grep 一手，不论来源多可信。本案与 F1（judge 抓 lane 真缺陷）互为镜像：门链双向纠错能力实证（判官抓 lane 的错 + commander 亲核抓判官 spec 的错）。
+
+## D-088（2026-07-04 午）full-750 order 转正 + S2 四批滚动骨架（磊哥两拍点授权「自己把握」；「拆拆拆」=方法论层任务拆解[磊哥澄清]，批次 4×150=commander 技术自拍非磊哥指令）（Accepted）
+- **S1 judge 收官**：lane-b **PASS_WITH_NOTES**（D-087 正确落地/pair 全合规/声称分层守住）；lane-a **FAIL_SAMPLED_SEMANTIC**（F1=win_to_1 pair 031/032 极性+数值双漂移违 near-parallel 单线索铁律，judge 定修法=032 数值持恒；%45 codex 窄修中→%43 scoped re-judge）。判官质量注：F1 缺陷行内 near_parallel_evidence 自认「+number differ」=可见于 artifact。
+- **full-750 order 转正**（%61 草案，commander 逐表亲核）：class 总账 750=440p+76q+46r+62a+74u+52f 自洽；D-087 query 五 bucket（ac_temp16/ac_wind16/volume22/frag_amount11/frag_mode11=76）只落有 intent 族；每族 75 行、S2 每族补 60；contrastive 280 目标（S1 实产 74，S2 min 206）；mandatory_first（set_interface_vs_defog ≥8 pair groups，S2 首 lane 开头先交 4 fresh）+ screen 两 priority_high 前两 lane 完成；envelope 候选 27.0% 如实标（train-pack 下采样机制在 %45 组装器）。
+- **S2 执行骨架（R2B-10 locked）**：4 批×2 lane×75 滚动闭环（生成→注入→门→judge→窄修→accept），批间流水，最高危前置批 1，Opus lane 纯生成用完即关（feedback-opus-generation-only），批 accept 前不 spawn 下下批。起跑条件=S1 全绿（F1 re-judge PASS）。
+- S1 便宜批经济学收账：150 行拦下 8 类问题（quota 契约墙/门工具口径×2/重产回归/W17 case 四项/W16 cap bug/replay 缺源/win_to_1 pair 漂移），全部在 600 行大批量之前修复——拆批的价值实证。
+
+## D-087（2026-07-04 上午）R2B-QUERY-RECLASS-01：query quota 契约不可行改判 unsupported（Accepted，双 lane 已下发）
+- **lane-b 上抛契约级 blocker，commander 亲核契约坐实且比上报更严**：全契约 query intent 仅 5 个（ac_temperature/ac_windspeed/current_volume/amount_of_fragrance/mode_of_fragrance）——batch-order「每族 2 query」在 lane-b 3/5 族（screen/wiper/sunroof_sunshade）与 **lane-a 4/5 族（seat/window/door/atmosphere_lamp）**无契约根基。
+- **裁决（按 lane-package 铁律「无 mounted query_* 禁伪造」）**：无 query intent 族的 query 槽改判 `unsupported`（query 式话术→NO_TOOL+no_call(no_available_query_tool)，target_tool_present=false）=MP-029 安全边界高价值负例；有 intent 的保留（lane-a ac 2=query_ac_temperature[MP-029 保护性正例必做]+query_ac_windspeed；lane-b volume 2 变体+fragrance 2）。终分布 lane-a 45/2/5/5/13/5、lane-b 45/4/5/5/11/5；S1 合计 query 6+no-call 44（候选态 30.6% 合法，%45 组装器训练前统一下采样=机制已锁）。batch_manifest 必带 deviation 字段引本 ref。
+- **元教训（quota 设计也要 cite 契约一手）**：batch-order 的 per-family query quota 是凭「每族都该有 query」假设写的，没核契约 query 可用面——与 M.19「表示层信息量<标签信息量=结构性不可学」同族：**配额层要求量>契约供给量=结构性不可行**，生成前一格 cite 就能拦。lane-b 按铁律停手上抛而非伪造=lane 纪律正面实证。
+- 级联：%44 机械门 class 预期表/%43 judge spec class 分布/W10 §3 S1 表数字过期（记 deviation 不改历史档正文）。
+
+## D-086（2026-07-04 上午）R2b grill 九题一次性全消减 locked + 执行序定盘（Accepted，执行中）
+- **弹药五源齐收（全亲核 sha/内容）**：%43 premortem delta（8 tiger/4 PT/4 elephant+训前 gate packet 六件+四轴停线表，sha `6ed5d8cf` 亲算一致）/ %61 W9（C1 一手行提取三近邻族+pair 上限 16/16/12）/ %45 W10（recipe rev3：750 修复包 contrastive 280 行 10 族逐族定量+负例 envelope+replay 15% 分层表+窗口外推 ~4h18m）/ %62 W11（eval 双轨硬化+锚过渡 M.17）/ %44 W12（scanner 进 C5DataGate Swift 主路径实装草案，挂 R3）。
+- **R2B-1~9 全 locked**（`f044-r2b-grill-2026-07-04.md` 状态列+消减记录）。载力拍板：①S1 150=生成生态校准批不 micro-train，训练一次 full pack（~5612 行外推 ~4h18m）②replay 物理复制不动训练脚本（M.17）③MP-029 数据治本+L1 guard 兜底不替代 ④eval 双轨（原 bundle 判 D-085 门保锚 + W11 扩充旁路重建 base 锚；query zero-tolerance 跨两轨计入 qa=0）⑤%43 gate packet 六件=训前硬门、机械门先行 judge 后行。
+- **%43 T6 辩证收**（不推翻磊哥 D-085、不迎合 codex）：B>9=R2b 推进门（磊哥拍）+ B 10-13 wording=`B_MOVED_NOT_PASS`（%43 建议）——分层声称两立。
+- 🔴 **R2b PASS 声称上限（磊哥晨语锁进 grill 前言）**：只证「R2a 两个残余靶点被短训修复」，不证全 10 族自然语义/产品验收/正式训练无条件放行。
+
+## D-085（2026-07-04 晨）磊哥三键全拍：R2b 门锁定 + R2b 开跑授权 + A 轴 15/15 底线终裁（Accepted，磊哥原话「全部同意」）
+- **R2b 短训门锁定（从 proposal 升格 locked）**：A≥12/15 + **B>9/15（zero delta 即 FAIL）** + D≥18/34 不退化 + query→actuation=0（零容忍，即使 A≥12 也不放行）+ 极性 open→close/close→open **双向单列报告**。源=F044-R2-VERDICT.md §R2b 门（codex 辩证吸收+三层升维判据）。
+- **A 轴 15/15 底线终裁**：15/15 底线只适用 tiny 死记验证场景；泛化训练短训评 A 轴门=12/15（R2-6 挂起项收口，f044-round2-grill R2-6 同步回写）。
+- **R2b 开跑授权（弹药收齐后自驱推进整链）**：grill 骨架（f044-r2b-grill-2026-07-04.md，骨架 upfront）→ 弹药消减（5 worker 在途：%43 premortem delta/%61 pair 规格/%45 recipe rev3/%62 eval 硬化/%44 DataGate 实装草案）→ 配方定稿 → 数据生成+三静态门全绿（矛盾 0 证明/DataGate/strict preflight）→ 短训 → eval → verdict。🔴 正式全量训练仍条件化：R2b verdict 达门 + D-080 五条框架继续有效。
+- eval bundle 口径待 R2b grill 消减（原 bundle 保锚 vs W11 扩充；扩必重测 base 锚，M.17），不预拍。
+
+## D-084（2026-07-04 晨）R2 verdict=F044_R2_FAIL 分层（A 主效应确认+D 收复但 A<12+qa=1）；正式训练不起（条件①不满足）；转 R2b；三层升维定近邻靶点（Accepted）
+- **断点接手**：上任指挥官会话（f35d9026）23:52 Iter90 轮询时掉登录卡死；训练由 nohup+watchdog 无人值守跑完（02:57，150/150 updates/val 0.0247/峰值 17.974/零停线）；新 commander 会话从档案链（STATUS-BOARD/receipt/skeleton/decisions）完全重建，T8 eval→verdict→brief 补账完成。**无人值守链路健壮性正面实证**。
+- **eval 亲跑**（fresh process ~9min，mount 一致性门 exit0）+ 三列分报：A **3/15→10/15（+7）**、B 9/15→9/15（0）、D **18/34→18/34**（round1 -7 全收复）；B/D base 锚精确复现=口径自证。机械极性全扫：**open→close 反转 9→0**（round1 病理消除）；close→open 2 例（A-013/014，与近邻混淆纠缠）。**query→actuation：MP-029 仍 1 例**（查温→adjust_ac_temperature_to_number，华氏度幻参；D-082 B+ 方案拍定时已预告=预期内，负例批 R2b 补门）。
+- **放行线判定（D-080 五条之①）**：A 10<12 ❌ + qa=1 ❌ → 不达放行线 → 🔴 **正式全量训练不起**，等磊哥晨间拍。R2-10 终止条款执行：不连训第三轮，转 R2b/R3。
+- **单变量归因闭环**：D-081 重渲染治本的直接效应实证（矛盾 329→0 → A+7+反转清零+D 收复）——D-083 mount 回滚保住的可归因性兑现。verdict=`F044-shorttrain-run-20260703T231823+0800/F044-R2-VERDICT.md`（basis 全绑：samples `59f2f74e`/adapter `62ba5f66`/cases `95a74ab2`；⚠️ 骨架旧载 `5d00ff81` 为 rollback 前 stale sha 已标注）。
+- 🔴 **三层升维定近邻靶点（磊哥晨间点拨，方法论=R2a 极性修复同构）**：剩余失败（A 残余 5+B 全 6=interface/defog/defrost、airoutlet/wind 近邻混淆）逐层判——**L1 表示可学性：维度没丢**（W6 区分度审计：interface/defog 由 device/primitive 可见区分、airoutlet/wind 由 device 可分，`W6-DATA-LEARNABILITY-AUDIT.md:139-140`；重渲染后 exact 冲突=0）→ 不是再渲染一刀的事；**L2 训练配方=主战场**（W6 覆盖读数 interface_vs_defog 104 样本/6 标签、airoutlet_vs_wind 46/5=对比信号稀薄 `:149-150`；W6 明示一致性清零后 coverage 才能安全加量 `:155`）→ R2b=近邻 contrastive pairs+负例六件套（%45 已备）+自然语料近邻分离；**L3 产品兜底**（协议串产品线走 L1 规则层、受限解码+mount 白名单双轨、10 族约定）吸收残余，但 qa 零容忍仍须 L2 治本。eval 公平性注：近邻 lure 本就 mount 在工具列表内=判定面设计如此。
+- 元教训沉淀：M.20（commander 会话也是单点故障：长 sleep 串行轮询把整 turn 押在 login 态上；无人值守设计+档案链=会话可抛弃）+ tmux 派单送达判据=「Working 状态」非「文本回显」（磊哥手按 Enter 纠正）。
+
+## D-083（2026-07-04 ~02:00）R2a 短训起跑（红线内 1 小时余量，单变量纪律保全）（Accepted，执行中）
+- **mount 擅改回滚闭环**：%44 回滚后 commander 亲核 mount diff=**0 行**（数量+集合双零，4750 对齐）；ignored_tokens 17,028,936（vs round1 +0.2%=恰为 action 段 prompt 增量，两谜底闭合）；**唯一变量=action 段+同集合 seeded shuffle**。%44 的 mount 重构设计留 receipt R3-proposal 段待 grill。
+- **起跑前门链全绿**：R2-DATA-READY receipt（action 断言 4500/250 分明+DataGate+preflight）+ **commander 独立复跑 preflight 逐数一致**（4878/4878/119571/17028936/exit0）。
+- **R2a 起跑**（`f044-round2-run.sh` env override 数据面=r2-data-ready/mlx-data；watchdog 参数同 round1 修正版）：181s 越过全部历史误杀点，**首 optimizer update 已出**，系统 used 33.9 无触发。预计 ~4h（至 ~06:00）。
+- 训练窗口计划：~04:30 checkpoint 100 中测（%43 SOP：adapter 单臂 A 轴 15 case v2 ≤6min，A<8=提前停信号/≥12=主效应确认）→ 完成后 eval（%62 三列分报工具+%61 A-v2 case+mount 源=r2-data-ready samples）→ verdict（%43 骨架）→ morning brief。全员 quiet 已广播。R2b 弹药备齐（%45 负例批包六件套）。
+
+## D-082（2026-07-04 凌晨）重渲染落地全绿 + R2 训练面拍 B+ 方案（Accepted，执行中）
+- **%44 重渲染交付 commander 亲核全绿**：4500/4500 user 带 `action=<action_code>` 段（样例逐字=拍板格式）；重渲染后扫描 **矛盾 329→0 组**（`pass_no_contradictions`，group 4144→4346=action 入 key 分组更细）；mount seeded shuffle 生效（open_first 292/close_first 250/lower_first 168）；MLX 账 4100/400/128 结构对。fork 脚本 `f044-round2-run.sh` commander 亲做（参数化+血缘 sha 双向，diff 恰两处，round1 脚本零触碰）。
+- **R2 训练面拍=B+**：主训=重渲染 substrate 4500+旧 corpus 250（自然句不受渲染影响；单变量=矛盾修复，效应可归因，稳过 03:00 红线）；**负例批不上今晚关键路径**（premortem T2/T8：~40 行负例在 2.2 epoch 改变 qa 行为期望低；subCC 并行生成留 R2b 明天补门）。预期：R2a 验证 A 轴极性修复主效应，qa/MP-029 类可能仍 FAIL（如实分层报，R2b 完整配方过门）。
+- 在途：%44 组合渲染+门链（r2-data-ready）；%61 A case v2 正式重产；%62 triage 落盘待收；%43 oracle 落盘待收+待切 rerender review。
+- **执行链补记（2026-07-04 00:45-01:30）**：①r2-data-ready 首版 strict preflight 咬住 `loss_mask_missing`（fail-closed 正确），%44 修复后全绿（4878/4878/trainable 119571 vs round1 119579 差-8=action 段在 prompt 侧不进监督面，receipt Token Delta Note 解释合格）；②🔴 **commander 抓 P1=mount 挂载面被擅改**：ignored_tokens 17M→7.7M 降 55% 无解释→下钻两版 samples 逐 sample diff=4468/4750 行 mount 集合变化、平均 13.85→4.85 工具——我只拍了 shuffle 顺序，集合重构=未拍板第二变量（毁单变量归因+叠毁 eval 可比性）→ 指令回滚（只留 action 段+同集合 shuffle），重构设计留 R3-proposal 段。**元教训：派单词「mount 均衡」被 worker 扩大执行成「mount 重构」——收稿数字定价纪律（M.15）再次拦截：55% 降幅不解释不放行。** ③%43 异源审 APPROVE 终版+MIDTEST-SOP/verdict 骨架交付；W7 triage 329/329 全真矛盾三方闭环；oracle 6 风险注册采纳。
+
+## D-081（2026-07-03 深夜）R2-1 拍板=重渲染治本（矛盾监督修复路线，通宵成败手）（Accepted，执行中）
+- **W6 全量扫描+teardown（%61）**：矛盾 329 组/波及 686 行（train 269+dev_selection 60=**val split 也被污染，val loss 假漂亮成因闭环**）；file:line 定位=C1 契约无罪（`contracts/semantic-function-contract.jsonl` :17 `open_mode`/:21 `close_mode`，**commander 亲核实文一致**）、丢失在 `Core/Training/C5LoRATraining.swift:1829-1855 renderUserUtterance`（**commander 亲核实文**：user 只渲染 device/primitive/value/slots/suffix，无 action 段；assistant :2667 用 seed.intent=信息不对称）；329 组全 `NO_UNIQUE_LABEL_UNDER_CURRENT_RENDERING`。
+- **拍板依据三源**：W6 推荐 1（重渲染）+ %43 premortem T1（无 source-backed winner 就停清洗）+ commander 判「清洗选侧=删合法能力面（close 类全灭）不可接受」。**否决清洗，拍重渲染**：user 串插 `action=<action_code>` + mount seeded shuffle（T3 同刀）+ 全量重渲染 + 扫描器 0 矛盾证明；A 轴 case 同格式重产（旧 A 锚失效→paired base 当场重建；B/D 锚不动）。
+- **执行位**：%44 渲染器+重渲染+扫描（最高优先）；%61 A case 重产工具+T7 mount 一致性断言；%62 分诊单继续（价值转为「确认无真单侧错误标签」）；%45 rev2 在产；subCC 待新格式后生成负例批。premortem 9 tiger 的 T1/T3/T7 已进执行 spec，T2/T4/T5 进 recipe rev2 spec，T8/T9 落 checkpoint 50/100 行为中测（A 轴 15 case 快测，不达标提前停省时）。
+- 时间轴重排（重渲染比清洗重 ~40min）：红线 03:00 起跑仍可达；03:30 fallback 保底线不变。
+
+## D-080（2026-07-03 夜）通宵 9h 作战定盘：三段门框架 + 矛盾监督根因 + 五 worker 拉满 + 正式训练条件化授权（Accepted，执行中）
+- **根因升级（改写 D-079 归因）**：A 轴反转=**矛盾监督**（同协议串 `set_mode` 28 行 open/16 行 close 双标签，c5-train-00001 vs 01057 一手；ac 族 open28:close16 反证「配比失衡」假设）——协议串表示丢极性维度；DataGate 缺监督一致性门；eval bundle A/B 纯 ac 族偏斜。三坐实=`f044-fail-baseline-reflection-2026-07-03.md`。
+- **演绎树落档**（磊哥令「倒推成功因素/100% 信心」）：`lora-success-factors-deduction-2026-07-03.md` 17 条必要条件树+验证器映射；codex 四修正全接受（当前已知树非全量/scanner key 收严含 state-mount-safety-slot-split-basis/non-regression 分级 protected-hard+product-weighted/双轨不洗白不升格）；**三段门框架=静态可学性→短训行为门→产品兜底验收**。
+- **通宵 plan（writing-plans 正式档）**：`docs/superpowers/plans/2026-07-03-f044-round2-overnight-9h.md`（Task1-9+时间轴红线 短训≤03:00+运维线元认知/记忆/级联）；supersede TONIGHT-PLAN-9H.md；STATUS-BOARD.md 建（抗 compact+worker 对齐）。
+- **五 worker 拓扑**（pane 事故修复：%59/%60 错位杀除，右列 5 均衡，%42 保 2/3）：%61=W6 矛盾清单限时1h+teardown / %62=W7 eval v2 双轨设计（R3）/ %43=premortem+oracle / %44=扫描器+清洗脚本（gen-harden 285 行已收：极性 pair builder+负例 class 契约推导 query=query_* 调用、refusal/unsupported/already_state=NO_TOOL）/ %45=recipe rev2（rev1 750 行两段已收）。subCC 留生成 lane。
+- 🔴 **正式训练条件化授权**（磊哥 goal set 原话「如果进度令你满意，我授权进入正式训练」）：commander 自设从严五条（R2 放行线 A≥12 极性反转0 D≥18 qa0 / 三静态门全绿 / premortem 无未处置 tiger / 同配方仅扩 iters / 包络可行）全满足才起，已写进 plan Global Constraints。
+- 今晚 eval 原 bundle 保锚（base 三锚 A3/B9/D18 复现值为可比性自证标尺）；R2 FAIL→停训转 R3（渲染重构+bundle v2），不连训第三轮。
+
+## D-079（2026-07-03 深夜）F044 短训评 verdict = **F044_FAIL 四重**（behavior gate 拦下候选晋级；训练管线无罪；短训评制度 KEEP）（Accepted）
+- **train-health + artifact 双层 PASS**（150/150 updates/nonfinite 0/峰值 17.974/val 0.019/全 sha 绑定 F044-TRAIN-RECEIPT.md）→ **behavior 层四重 FAIL**（v6 同款评分器口径，base 同 harness 配对）：A **6/15**（底线 15/15；9 例系统性 open→close 极性反转，训练分布约定 set_mode→open 44 行亲核=真配方缺陷非 case 约定）/ B **9/15 zero delta**（base 也 9/15，自然映射零提升）/ D **11/34 vs base 18/34 退化 -7**（形态=v6「LoRA 语义族碰撞」精确复现：raise/lower/little 被 adjust_to 吸收 10+ 例、window to/by 混淆、幻造工具名）/ **query→actuation 1 例安全级**（C6-MP-029 查温→设 9℃，corpus 零 query 负例的直接兑现）。verdict=`F044-shorttrain-run-20260703T175733+0800/F044-VERDICT.md`，按预落档决策树处置零临场拍。
+- 🔴 **评分口径插曲（差点误判）**：我先用自铸 exact-match（name+args）快评得 D 4/34 vs 锚 18/34「巨大退化」，核 v6 锚口径=**name-only 序敏感**——同款 scorer 复算 base=**18/34 与锚精确一致**（可比性自证），adapter=11/34。**锚数字必须绑评分器口径，scorer 也是 basis**（M.17）。
+- **eval mount 插曲**：PREP §4.4 staged 命令 --train-jsonl 指 train split，A/B mount 源行设计在 valid → fail-fast 后改 samples 全集重起（split 未被洗亲核：新 train=旧 4100+corpus250 纯追加）。
+- **处置**：候选晋级 BLOCKED（step4=FAIL 不进 step5）；三 worker 拉满转 wave-2——%43 verdict 对抗复核+D 形态靶点表 / %44 生成器硬化（极性对称+负例生成+机械修正）/ %45 WAVE2-RECIPE-PLAN（族×class 配比表=下一立项 SSOT 草案）。
+- **制度正面**：3h54m 短训+20min eval 在正式训练前实证暴露配方三结构缺口（极性/负例/语义族）=失败到达点经济学最佳案例；F044 短训评常设门 KEEP；且 WD-14 盘点（class 全 positive）与 v6 配方锚 6 条全部被本次失败互证——**grill/盘点的预言力兑现**。
+
+- **WD-4 实测重校（elapsed 810s，run dir `F044-shorttrain-run-20260703T175733+0800` metrics 一手）**：iter 30/600、**8 optimizer updates**（前两跑=0）、train loss 0.295、**process peak 17.87GB=与 R2 预算账 17.868956778 精准一致**（vs 阈 22.34 余量足，watchdog 主判据正常读流）、it/s 0.045→**全程预计 ≈3.7h**（vs 保守 9.4h，快 2.5x；≈89s/update vs 保守 226s——R2 均摊含 setup 的保守性坐实）；checkpoint 50（=200 iters）预计起跑后 ~74min。wall clock envelope 42375s 不改（更宽松），预算表在 verdict receipt 按实测重写。
+- **修复后池锚（收 %45/%43 稿时亲核绑定用）**：b02 candidates.jsonl `2b75ba96…82d6a14` / b03 candidates.jsonl `85f8067c…9fa0fa9b`（repair lane 终稿报告 + commander 本机 shasum 重算逐字一致，4 行 position 槽实值抽验正确）——gates v4/v2 receipt 与 B03 judge verdict 必须绑这两个 sha，绑旧值=跑在未修复池上打回。
+
+## D-073（2026-07-03 深夜）B02/B03 修复回路收口 → **warmup 五批 250 行全部 accepted**（Accepted）
+- **B02 gates v4 + scoped D3 re-judge PASS（commander 亲核）**：verdict 绑修复池锚 `2b75ba96…` 逐字一致；scope 纪律正确=D3 only（修复行 0007/0023 逐行 PASS）+ 全批位置词扫描 5 行位置行 0 残留；机械 7 维引用 B02-GATES-RECEIPT-v4（mechanical_gates_pass_local + DataGate/diversity/C6 v4 全绿）不重跑；D1/D2/D4/D8 保留原抽样证据不越权重审。**B02 就此 accepted（分层声称）**。注：ledger args_diff 的 value "1"→"3" 为生成时已登记模板变更（value_changed=true 原有），position null→主驾 为修复增量，两者并存自洽非矛盾。
+- B03 gates v2 已落（receipt+datagate/diversity/c6-leakage v2 齐）；B03 全量 judge %43 在途（从未 judge 过，机械 7 维全量 50+语义抽样 20 必含修复行 0012/0025）。
+- **B03 judge PASS（%43，commander 亲核 verdict）**：机械 7 维 50/50 全量（引 gates v2 全绿）+ 语义 5 维抽样 20/50 零失败；池锚 `85f8067c…` 与 commander 本机重算逐字一致；抽样含修复行 0012/0025（repair_required 置顶，args 主驾/后排与 commander 抽验一致）；judge 独立 D3 位置扫描=window 位置词行 14/残留 0 + **entity 词行 23（尾门/后备箱/油箱盖/舒适进出）正确判定为工具/实体路由、不需要 position 槽**（语义判别专业，无过杀）；warnings none（gates v2 修复后重产无 stale basis）。**至此 warmup 五批 B01-B05 共 250 行全部 accepted（分层声称）**——B01 验收 PASS、B02 gates v4+scoped D3、B03 gates v2+全量 judge、B04/B05 全量 judge。
+- **F044-PREP 收稿（%44，commander 亲核）**：`prep_ready_pending_corpus_manifest_and_owner_run_auth`，质量高——短训 config=R2 repo 正式面（dry-run 解析验证 10 字段全对）/train-loop `--help` 冒烟过/eval harness 持久拷贝+20 单测 OK/A15+B15+C4+D34=68 case 静态计数+sha 绑定/F-044 阈值照 default lock（A 15/15 底线、B 14/15、D base 18/34 锚、query→actuation 零容忍、C observation）/停线三段+资源包络（peak warn 19.66/fail 22.34/hard 32GB；150 updates 保守 9.4h 上界，checkpoint 50/100/150 强制重校）/prep 零训练零推理。**commander 两 catch**：① P2=pinned worktree 在 `/tmp/maformac-code-basis-pr38-26678346`（/tmp 系统会清，短训距今可能数小时+）→ 续单迁持久位置——**已修复关闭**（`$RUN_ROOT/code-basis-pr38-worktree`，commander 本机 rev-parse HEAD=`26678346` 一致，PREP 四处回写+重建命令备查）；② corpus 250 落地后还差「渲染 MLX data dir + DataGate/preflight 重跑 + 回填 3 个 TODO」一步机械活 → 预派 %44（依赖 %45 CORPUS-250-FINAL），使磊哥 run-auth 真一键。
