@@ -8,7 +8,13 @@
 - **协作**：磊哥拍板；我指挥 3 codex worker（tmux-bridge swarm）；worker 自动压缩不丢工作（不关注 worker context 高低）。
 - **协议**：`/swarm-commander` 宪法 + 本图谱 + `SOUL.md`。🔴 **复杂步骤先纯文本讲计划 → 磊哥说"继续" → 纯工具执行**（防我自己 malformed：工具调用前不堆长文本）。
 
-## 当前阶段（as-of 2026-07-02，🎉 3 训练前置门已 merge 落 main + verified（main=ab355f6c CI SUCCESS）D-011）
+## 当前阶段（as-of 2026-07-05，D-107 Codex App 接管执行基线 + Phase 0/1 启动令，Opus4.8 commander）
+- **C5 结论锚 D-106**：qa 三轮可比真数 adapter `any_tool_call_fail`=9/9/9=模型固有 actuation prior 硬墙，adapter-only 数据法两轮（R3 堆量/R4 改挂载）未撬动；scanner 硬化后旧「9→8→10 恶化」叙事作废。
+- **D-107（磊哥拍）**：从 D-106 开新执行锚——baseline=`docs/baseline-roadmap-2026-07-05-c5-d106.md`（planning，非契约）；Codex App worker 接管执行基线，commander 纯编排；formal 1800 **HOLD pending Phase 1-4**；R-L17=`route-only signed / candidate signoff unsigned`；第一执行单=**Phase 1 ONLY**（scanner hardening 正式化 + 6 label authority 冲突裁决表→repo 可复跑 gate）。stoplines：不训练/不生成数据/不启动 formal/不 merge UIUE/不碰 `Core/Training`。
+- **swarm 拓扑（as-of 2026-07-05）**：commander=`%0` @ ma-status-swarm；worker=`%6`/`%7`（codex gpt-5.5 xhigh @ MAformac）；磊哥授权按需扩到 **4-5 codex worker**（额度将重置无约束）；**commander 纯编排管理，grill 推进 + 红队对抗审计 + gate 实装全下沉 worker**（磊哥 2026-07-05 令）。
+- **详**：`decisions.md` D-105/D-106/D-107 + baseline 全文；tmux 启动脚本 `~/Projects/agent-tmux-stack-research/scripts/start-ma-swarm.sh`。
+
+## 【历史】当前阶段（as-of 2026-07-02，🎉 3 训练前置门已 merge 落 main + verified（main=ab355f6c CI SUCCESS）D-011）
 
 > 🔴 **grill 已收口**（332 决策，两轮 audit 0 P0，SYNTHESIS `grill_complete_pending_human_signoff`）→ 磊哥批准「5 ❌ gate → 3 worker 编排」（**D-006**）：①建 3 worktree（`MAformac-g6/g5/g7`）②写 3 份 D22 派单（inline grill 决策 + **gitnexus 要求** + **grill 消减** + **teardown 扩散**纪律）③subagent CC 双审（派单 + 回稿）。**5 gate**：W1(`%44`/g6)=gate6 四层阈值化 E-002~006 + 裁决-B F-043 ／ W2(`%45`/g5)=gate5 六轴 held-out D-016 + 裁决-A F-044（%45 codex@MAformac，grill 后空闲；%43 留 UIUE 不动） ／ W3(**hermes**/g7)=gate7 云 generator D-031~037。**守 R7**：全 construction（build code/spec/harness + fixture 单测），retrain-c5 真训练/真数据生成/candidate eval 仍 BLOCKED。SSOT `docs/c5-training-readiness-grill/`，详 `decisions.md` D-006/D-007。
 > 🔴 **最新（2026-07-01 收口）**：**5 gate construction → PR #9(gate5 六轴+裁决A)/#10(gate6 四层+裁决B)/#11(gate7 云generator design) 待磊哥 merge**（D-007 lock；codex 交叉审抓 gate6 P0 假绿分母 runs.count→修 case 覆盖 CLEAR 75 绿；gate7 Opus subagent 反思前数据集挖【假异源 judge 前一次 gen+judge 都 hermes 100% same-vendor】+ 修【0/34 口径:生成产了 4306 中文, 根因训练侧】= **D-008**）。**grounded grill round**（**D-009/D-010**）：本 session 经验发现驱动 110 新决策（W1 配比 D-096~125/W2 质量 A-096~133/W3 语料 E-096~130/commander F-048~054）magnet 全 lock，回写 gate7 §10。**数据 scoping 齐**（WS1 562 生成 scope 5994 / WS2 bug 语料 1730/4053）。🔴 **retrain-c5 真训练/真生成仍 R7 BLOCKED**（candidate signoff 才 lift；gate7 别背 0/34 锅）。🔴 **API 故障应对**：subagent CC/hermes proxy 层 socket 挂 → codex tmux 活 pane 交叉审/顶替（**F-052**，磊哥「三者等效」）。详 `decisions.md` D-006~010 + `swarm-runs`。
@@ -36,6 +42,8 @@
 - **D-010** grounded 净新载力 ⭐ locked（Accepted，磊哥「全部同意」）+ 回写 gate7 §10
 - **D-011** GPT Pro 第3家审 3 PR + 3 worker 修 + 磊哥拍 A merge（✅ Done，3 门 MERGED main=ab355f6c CI SUCCESS）：CI bug 根因（verify.yml 浅 clone 没 fetch head）；R7 守住
 - **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
+- **D-013~D-106** 见 `decisions.md`（决策史完整）：wave-1/M1 consolidation/tiny-ablation/N0-N5E/canary/F044 四次起跑事故/mount-invalid 翻案 D-097/R2b-R3-R4/scanner-authority 翻案 D-105/D-106 结论锚（qa 9/9/9 硬墙）
+- **D-107** 🔴 Codex App 接管执行基线 + Phase 0/1 启动令（Accepted，磊哥拍）：baseline=`docs/baseline-roadmap-2026-07-05-c5-d106.md`；formal 1800 HOLD pending Phase 1-4；R-L17 route-only signed/candidate unsigned；第一单=Phase 1 ONLY（scanner hardening 正式化 + 6 label authority 冲突裁决表→repo 可复跑 gate）；stoplines=不训练/不生成数据/不启动 formal/不 merge UIUE/不碰 Core/Training
 
 ## 下一步（D-040 外审收窄后，goal=N0-N4 自动推进，as-of 2026-07-03 晨）
 

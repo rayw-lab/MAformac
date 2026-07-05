@@ -273,3 +273,24 @@ val loss 0.019/DataGate 绿/preflight 绿全都检测不了「分布本身的洞
 
 ### M.16 门自身的判据也是 basis 绑定 + 门上线前过 grill（2026-07-03 watchdog 两连误杀，D-077）
 run-auth 后短训两连被自家 watchdog 误杀（训练本身两次全健康，损失 2+4 分钟）：第一跑采「系统 `virtual_memory().used`」（起点 21.81GB）对比「训练进程 MLX peak×1.25」推导的 22.34 阈=**采样源与阈值推导口径混用**，2 分钟触发；修复后第二跑，新加的系统辅助阈 30.0 在 val 阶段（系统 used 已 29.52，本机 3 codex worker 共存）上量即触发再杀=**触发面没在真实运行环境标定**。三教训：① **门的判据=一种 basis 绑定**——监控采样源必须与阈值推导同 lane 同口径（进程 peak 阈只能配进程 peak 采样；正确源就在 train loop metrics `peak_memory` 字段，`c5_mlx_train_loop.py` `mx.get_peak_memory()`）；② **门保护训练，grill 保护门**——停线判据的保护面语义/触发面标定/环境共存 corner case 必须先过 grill 再上线（F044-WD grill 系列即此补课），门的误杀同样是失败，幸而到达早（2+4 分钟 vs 9.4h 后误杀）；③ **收稿方核「门类工具」的正确姿势**——跑单测+扫判据关键词不够，必核「每个判据的采样源语义与其阈值出处是否同口径」+「触发面在目标环境的实测起点距阈多远」（21.81 vs 22.34、29.52 vs 30.0，两次贴线都是上线前一眼可见）。全局机制化=verification-economics rule「门判据 basis 绑定」腿。
+
+## M.24 worker 产出对抗配对（磊哥 2026-07-04 夜定；全局 rule=~/.claude/rules/worker-output-adversarial-pairing.md）
+codex/worker 的脑暴/调研/计划=单 frame 草稿非结论。收稿即交叉派异 worker 对抗 grill（cite-verify+steelman+缺维扫描），commander 只信合成。三层核验体系：D-089 亲核（我信了什么）/本条互核（它漏了什么）/cross-vendor 终审（体系漏了什么）。实证：R3-AMMO-1 对抗深挖翻掉三轮误诊断（11/64 eval case mount-invalid=量尺坏非模型差，唯 cite 到 probe JSON 一手才见）。
+
+## M.25 进程/送达探测 pattern 也是 basis：ps grep 与浅截 pane 都不能当真相（2026-07-04，SEC1 秘书稿+总监审定）
+ps grep `mlx_lm` 匹配不到 repo wrapper `c5_mlx_train_loop.py` 一度误判训练死亡；同日 `tail -2` 浅截 pane 两次把 Working 中的 worker 误判为 idle/未提交。修法：①训练活性优先级=active-run pointer+exact command basename+run-dir metrics/heartbeat/train log mtime > 单次 ps grep ②起跑 receipt 必写 exact process identity（脚本名/pid/run dir/heartbeat path）③tmux 判据=capture-pane -S 深截+grep Working/REPORT，禁 tail-2 ④ps/pane/心跳冲突时先信 run-dir 心跳。
+
+## M.26 runtime guard 必须 profile 化，豁免必须签核（2026-07-04 R3 watchdog 三段演进，D-099~D-102+OPT2/X7）
+同一套 redline 服务不了三场景：day 3GB/120s（护磊哥日常）/night 2.0GB/180s+pct4 即杀（磊哥让渡 GUI 余量）/unattended（night runtime+更硬 Launch Packet 纪律）。安静窗是可达性合同非道德要求——满负荷蜂群必有 CLI/python burst，「零扰动 20min」与「全自动多 worker」结构性冲突（当夜死锁实证）。豁免纪律：micro-swapouts 64MiB 豁免已总监签核（量级 2+ 数量级低于 M.23 螺旋、只作用于起跑判、飞行 swap-growth kill 不受影响）；quiet-window waiver 为一次性有争议豁免不作先例（D-102）；formal swap>1GB 必上抛磊哥（D-094 条款升硬门）；pct4 未实装时 night/unattended profile 禁假绿（X7 P0，已修 sha e8257fab）。
+
+## M.27 秘书机制：级联/记忆/元认知由秘书起草，权威落笔 commander 审后执行（2026-07-04 磊哥建制，SEC1 首单）
+秘书=级联跟踪和记忆草稿官，不是隐形决策官。草稿必带 DRAFT_FOR_REVIEW+non_claims+证据锚；一次性 waiver/ERRATA/未部署配置必须保留争议与 stopline，不得包装成已锁原则；未审草稿不得被后续派单当 authority 引。全局 ~/.claude/ 资产秘书只到草稿层。SEC1 首单实证：CURRENT.md STALE_MAJOR 被秘书抓出（路由牌停在 7-03 T1 OOM 态，当夜翻案/R3 全不在），diff 草稿经总监按实况微调落地。
+
+## M.28 commander 决策计划也必须过对抗审；红队不只审 worker（2026-07-05 Phase1，D-109）
+D-107~110 收口中最刺眼的不是 worker gate 出问题，而是 redteam 审 commander topology 抓到真 P1：baseline §5 的 `default-scope current-head gate` 被 STATUS 写成「W34 另账」未给 owner——若 commander 只按 scanner+label authority 收口就漏了 baseline 自己的 Phase1 hard acceptance。X5（D-102）审 commander 链已证「审我的单子抓真账」，本轮再成立。修法：①commander 的重大决策计划/phase closeout/launch readiness 必派异源 worker adversarial audit（§12 对抗配对对 commander 有效）②redteam 审三层=decision wording/scope topology/gate robustness，不只审 worker 产物 ③收到 AMBER/P1 必先消或显式 amend baseline/STATUS，不得把 AMBER 包装成 clean。锚 `redteam/phase1-adversarial-audit.md` RT-P1-A-001 + D-109。
+
+## M.29 gate 的 coverage 也是 hard precondition：checked_count=0 绿=「空满足陷阱」在 repo gate 层复发（2026-07-05 Phase1，D-109）
+Phase1 eval gate 已复现 9/9/9+invalid exit67+mount exit66，但 redteam 用空 fixture 证明两门在 zero-coverage 时仍 rc0 PASS（checked_count=0/scanned_records=0）——G.3「空集合→通过」+ claim-vs-reality 铁律2「空满足陷阱」在新门层复发。规则在场仍复发=enforce>自觉。修法：①任何 hard gate 必有先验集合非空证明（checked_count>0/scanned_records>0/manifest expected minimum）②zero-coverage/bad manifest 统一 exit65，不与 semantic fail exit66/67 混账 ③gate receipt 必报 coverage 数，PASS without coverage=invalid receipt。锚 `redteam/phase1-adversarial-audit.md` RT-P1-C-001 + eval reconcile 修复。
+
+## M.30 重大决策即便磊哥已倾向同意也必须 grill 拆解+对抗审+终拍（2026-07-05 Phase4=B，D-108/D-109）
+D-108 磊哥已拍「Phase4 可以选 B」，live decision Accepted；但元认知层不能把一句「同意」当跳过 grill/审计的理由——磊哥当场重申「重大决策必须 grill 拆解 + 必须审计决策计划」，遂派 grill 拆解 B（phase4b 六子决策）+ redteam 审决策计划（抓 W34 gap+manifest disposition）。D-046「重要节点必 grill」延伸：会影响后续多步的决策簇（gate semantics/formal path/架构）必有骨架+弹药+消减+对抗审+终拍，「磊哥同意」是 owner decision signal 非执行 clean proof。执行层禁把 `runtime-gated qa safety` 写成 `adapter learned qa`、禁把 formal path unlocked 写成 formal auto-start。锚 `grill/phase4b-formal-decompose-grill.md` + `redteam/phase1-audit-round2-final.md` + D-108/D-109。

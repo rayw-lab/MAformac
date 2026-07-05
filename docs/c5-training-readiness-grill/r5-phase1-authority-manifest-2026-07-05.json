@@ -1,0 +1,33 @@
+{
+  "artifact_kind": "r5_phase1_authority_manifest",
+  "authority": "D-107 Phase 1 scanner and label authority gate manifest",
+  "run_id": "2026-07-03-n2n4-train-readiness",
+  "authority_level": "current_phase1_gate",
+  "case_kind": "qa_qneg_guard_trainpack_eval_sources",
+  "include_globs": [
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/r3-lanes/R3-QNEG/candidates.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/r3-lanes/R4-QNEG-ISO/candidates.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r2b-trainpack/c5-training-samples.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r3-trainpack/c5-training-samples.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/c5-training-samples.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/L6-eval-bundle-r2b-expansion/cases-Q-query-hard.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/L6-eval-bundle-r2b-expansion/cases-B-neighbor-expansion.jsonl"
+  ],
+  "exclude_globs": [
+    "*/probe-output*/*",
+    "*/probe-case-lint-reports/*",
+    "*/original-gate/probe-cases-abd-a-v2-b-d-64.jsonl"
+  ],
+  "historical_globs": [
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/TD-eval-run155204-ready/original-gate/probe-cases-abd-a-v2-b-d-64.jsonl"
+  ],
+  "derivative_globs": [
+    "*/probe-output*/*",
+    "*/probe-case-lint-reports/*"
+  ],
+  "source_globs": [
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r2b-trainpack/c5-training-samples.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r3-trainpack/c5-training-samples.jsonl",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/c5-training-samples.jsonl"
+  ]
+}

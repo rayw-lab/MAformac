@@ -1,0 +1,116 @@
+{
+  "artifact_kind": "r5_label_authority_decisions",
+  "authority": "D-107 Phase 1 decision table, not training data",
+  "source_report": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/R5-LABEL-AUTHORITY-AUDIT.md",
+  "decisions": [
+    {
+      "id": "LABEL-AUTH-001",
+      "input": "现在音量是多少",
+      "status": "decided",
+      "canonical_expected_tool_calls": [
+        {
+          "name": "query_current_volume",
+          "arguments": {}
+        }
+      ],
+      "fix_side": "absent-query counterfactual side",
+      "rule": "Do not reuse this exact input as NO_TOOL. Rewrite the counterfactual input or change expected to query_current_volume."
+    },
+    {
+      "id": "LABEL-AUTH-002",
+      "input": "device=ac_set_interface; primitive=power_on; action=open_screen_page; slots=direction:主驾; 请按这个语义执行",
+      "status": "decided",
+      "canonical_expected_tool_calls": [
+        {
+          "name": "open_ac_set_interface",
+          "arguments": {
+            "direction": "主驾"
+          }
+        }
+      ],
+      "fix_side": "expansion case expected arguments"
+    },
+    {
+      "id": "LABEL-AUTH-003",
+      "input": "device=defrost_mode; primitive=set_mode; action=open_mode; slots=no_slots; 请按这个语义执行",
+      "status": "historical_v2_excluded",
+      "canonical_expected_tool_calls": [
+        {
+          "name": "open_defrost_mode",
+          "arguments": {}
+        }
+      ],
+      "fix_side": "exclude D-097-pre-v3 original-gate artifacts from current scanners"
+    },
+    {
+      "id": "LABEL-AUTH-004",
+      "input": "device=ac_windspeed; primitive=increase_by_exp; action=increase_value_little; slots=fanSpeed:fanSpeed_value_1; 请按这个语义执行",
+      "status": "historical_v2_excluded",
+      "canonical_expected_tool_calls": [
+        {
+          "name": "raise_ac_windspeed_by_exp",
+          "arguments": {
+            "fanSpeed": "fanSpeed_value_1"
+          }
+        }
+      ],
+      "fix_side": "exclude D-097-pre-v3 original-gate artifacts from current scanners"
+    },
+    {
+      "id": "LABEL-AUTH-005",
+      "input": "打开天窗",
+      "status": "pending_leige_key",
+      "canonical_expected_tool_calls": null,
+      "owner_key": "default_scope: no-arg vs position=全车"
+    },
+    {
+      "id": "LABEL-AUTH-006",
+      "input": "天窗开一点",
+      "status": "decided",
+      "canonical_expected_tool_calls": [
+        {
+          "name": "open_sunroof_little",
+          "arguments": {
+            "value": "LITTLE"
+          }
+        }
+      ],
+      "fix_side": "R3/R4 qneg side"
+    },
+    {
+      "id": "LABEL-AUTH-007",
+      "input": "打开遮阳帘",
+      "status": "pending_leige_key",
+      "canonical_expected_tool_calls": null,
+      "owner_key": "default_scope: no-arg vs position=全车"
+    },
+    {
+      "id": "LABEL-AUTH-008",
+      "input": "关闭遮阳帘",
+      "status": "pending_leige_key",
+      "canonical_expected_tool_calls": null,
+      "owner_key": "default_scope: no-arg vs position=全车"
+    },
+    {
+      "id": "LABEL-AUTH-009",
+      "input": "遮阳帘开一点",
+      "status": "decided",
+      "canonical_expected_tool_calls": [
+        {
+          "name": "open_sunshade_little",
+          "arguments": {
+            "value": "LITTLE"
+          }
+        }
+      ],
+      "fix_side": "R3/R4 qneg side"
+    },
+    {
+      "id": "LABEL-AUTH-010",
+      "input": "把天窗关上",
+      "status": "pending_leige_key",
+      "canonical_expected_tool_calls": null,
+      "owner_key": "default_scope: no-arg vs position=全车"
+    }
+  ]
+}
