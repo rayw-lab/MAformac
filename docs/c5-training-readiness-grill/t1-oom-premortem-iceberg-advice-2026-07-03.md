@@ -102,4 +102,3 @@ run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-
 - `token 爆了所以降级`
 - `N4 绿所以可以正式训`
 - `demo 项目所以可以跳过 smoke`
-

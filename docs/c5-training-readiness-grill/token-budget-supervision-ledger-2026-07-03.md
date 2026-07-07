@@ -80,4 +80,3 @@ PR31 final 的契约硬化消费了：
 可直接贴：
 
 > 这次不是用户 20 字 prompt 的问题。E-2 已经把最长样本从 8982 收到 7185/7186，length violation 为 0。新的风险是 PR31 final 把真实监督面从 44459 trainable tokens 扩到 113914，约 2.56x；这让原本 rank16+7modules+8192+batch4 的训练配方在首个 backward 前后暴露 Metal OOM。下一步要做 T1D 显存诊断，不是再泛泛降长行，也不是降低验收标准。
-

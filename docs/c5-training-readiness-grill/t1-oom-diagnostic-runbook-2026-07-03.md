@@ -95,4 +95,3 @@ run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-
 验收：optimizer_update_count>=1 + finite loss/grad + adapter_saved=true + OOM absent。
 proof_class=diagnostic_not_candidate；禁止写 train-ready/V-PASS。
 ```
-
