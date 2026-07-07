@@ -857,3 +857,85 @@
 - **next（全下沉 worker，commander 编排+裁决）**：reduction（worker 综合 4 lane + 前序已决 D-106/D-108/W15/W16）→ Hermes 跨厂商审 reduction → 实施计划（worker）→ Opus 审实施计划 → 文档级联（秘书 worker，commander 过一道）。
 - **non-claims**：不是 candidate signoff / 不是 V-PASS / 不是 C6 acceptance / 不是 runtime 已实装（W20A 未写码）/ 不是 formal 结果达标。
 - **证据锚**：grill SSOT `runs/2026-07-06-c5-runtime-mainpath-grill/`（GRILL-README + lane-1~4）；诊断一手 `runs/2026-07-06-c5-training-vpass/tail1200-original-v3-paired-report.md` + `.../adapter/35-C6-MP-006.json`；W15 `.../w15-t1-action-question-rootcause-grill.md`；W16 `.../w16-restricted-decoding-toolname-grill.md`；D-106（decisions.md:794）/D-108（:815）。
+
+## D-112（2026-07-07，Codex/commander 蜂群 closeout）W20A closeout 前置收束：脏区分组、upstream/main 双调和、两轮 grill 定稿、外审吸收、1800 confirmed-not-ready、终审条件失败
+
+- **repo truth（snapshot-bound，不作永恒 live claim）**：本条按 2026-07-07 约 11:05 CST 本地探测快照书写。`landing-checklist.md` 最新 SEC probe 记录 `HEAD=381ae735`、branch `codex/rebuild-c6-doc-absorption-20260624`、`ahead 189`、worktree clean；本 worker 复核 `git status --short --branch` 同为 `[ahead 189]` 且无 dirty 行。该 truth 只绑定本快照，后续 push/commit/PR 需重新 probe。
+
+- **HEAD 演进链（`6a4b6b82..HEAD` 载力段）**：
+  - `178da86d` D-111 honest-frozen-closeout 文档级联。
+  - `ed69a935` W19B `RuntimeAdapterMountReceipt` 防假绿门。
+  - `72fd2ac0` W18 decode allowlist guard + trainpack 渲染 action/seeded-shuffle 收基线。
+  - `ed63180d` main worktree iOS build 默认修回 + XSWAP-23 归档 + agent/tooling 指针。
+  - `e87e2a00` upstream merge（B=merge，不 rebase）。
+  - `ffd3ab89` fixture manifest 4 sha drift 修正。
+  - `ad9283cf` main merge（18 冲突解、G7D 语义化、plugin refs 撤追踪；commit message 记录历史 `swift test 567/0 + make verify` 绿）。
+  - `ed3a5a96` MT2 basis_id gate 初版（外审🔴3）。
+  - `ab92bd8c` MT3 30 run 判定性证据冻结入仓（外审🔴4）。
+  - `e6738d6b` MT5 GitNexus MUST/NEVER 降级为 advisory（外审🔴5）。
+  - `0c8b0e69` MT1 qa 9/9/9 回归证据链 repo-relative 入仓（外审🔴1）。
+  - `381ae735` MT2-FIX basis_id gate 覆盖 docs receipts。
+  - `214f8d84` 终审 W21-P2-02 吸收：subset manifest tool_ids_ordered 唯一性断言。
+  - 注：`ad9283cf` 合入 main，故 `6a4b6b82..HEAD` 全量会展开大量 UIUE/P5W/main 历史；D-112 只记录 closeout 载力段，不把 main 历史逐条重述。
+
+- 🔴 **脏区 triage 四组分 commit 决策（Accepted，commit 已落）**：
+  - **A 组 = D-111 文档级联/governance/OpenSpec notes**：范围包括 `CURRENT`、baseline roadmap、grill README/reduction、commander index/decisions/RUNS-CASCADE、handoffs、war-room、OpenSpec 状态等；性质是 honest-frozen-closeout、formal host-HOLD/not-launched、runs pointer 与 proof-class 级联，不混代码语义。已落 `178da86d`。
+  - **B 组 = D-111 RuntimeAdapterMountReceipt 防假绿门**：`Core/Execution/RuntimeAdapterMountReceipt.swift` + tests，硬编码 candidate `unsigned`、`adapter_learned_qa=false`、runtime QA safety 不升格，并让 `validate()` fail-closed。已落 `ed69a935`。
+  - **C 组 = C5 trainpack/render/decode dirty code**：`C5LoRATraining` action/polarity/seeded shuffle、`ToolCallFrame` allowlist guard、对应 C5/C3 tests。已落 `72fd2ac0`。
+  - **D 组 = misc support/pointers/misplaced report**：`.xcodebuildmcp/`、agent/plugin pointers、`runs/README.md`、XSWAP-23 报告归档。已落 `ed63180d`；后续 `ad9283cf` 按 main 决策撤追踪 `Tools/agent-platform-plugin-refs/*`，避免本仓跟踪本机绝对 symlink。
+  - 🔴 **provenance caveat（必须保留到最终落仓件）**：W1 triage 与 W21 P2-01 均点名：frozen trainpack 已有 `action=...` 与 `mount_order_strategy=seeded_shuffle` 形态，formal/tail run 消费的是冻结 trainpack sha/rows，不是当前 dirty code 现场重生成；因此不能声称 `6a4b6b82` clean code 可复现冻结 trainpack。C 组 commit 只能作为未来再生成/可复现性修复或 provenance 补洞；若要把它作为既有 formal/tail artifact basis，必须重冻或显式改 provenance。
+
+- 🔴 **upstream 调和决策：选 B = merge，非 rebase（Accepted，merge 已落）**：
+  - 依据 W5：upstream 原 behind 7 / ahead 122；`--cherry-pick` 口径显示远端 7 个里 6 个与本地早期 D22/D23/D24 patch-id 等价，真正远端独有主要是 `.github/workflows/verify.yml` self-hosted verify runner 变更。
+  - 选择 **merge 远端进本地**，不 rebase 本地 122 commit，理由是 decisions/lessons/receipts 大量按 commit sha 做 basis；rebase 会重写 D-064~D-111 决策链 sha，重锚代价大于一个 merge commit。
+  - 已落 `e87e2a00`，父提交为 `ed63180d` 与 `02f0722f`。4 个冲突 `docs/CURRENT.md`、`docs/project/phase0/README.md`、`r5-d24-route-control-pr-merge-closeout...`、`r5-d24-uiue-absorption-manifest...` 全取本地演进版；远端独有 `.github/workflows/verify.yml` 与 `public_fixture_schema.v1.json` 随 merge 进入。
+
+- 🔴 **W20A grill 两遍收口（Accepted for implementation planning；G 项待磊哥拍）**：
+  - **R1 综合**：`grill-r1-synthesis/cross-review.md` 完成 17 题 cross-review，形成 14 条 CONSENSUS、3 条 DISPUTE/需拍项、4 个双盲缺维吸收方向，并把 persona 现场 runbook/allow-avoid/out-of-claim 边界纳入候选落点。
+  - **R2 双红队**：`R2-FINAL-DECISIONS.md` 定稿，lineage = grill-topics(17) → A/B 双卷 + persona → cross-review(14C/3D, cite 9/9 TRUE) → R1 draft → R2 红队双路（甲 P0=0/P1=3、乙 P0=0/P1=3）→ final。
+  - **R2 3 个 P1 修订全部吸收**：
+    1. mounted catalog 与 562 识别全集彻底分离：`ir_map_fingerprint`（562 识别全集）与 `mounted_demo_catalog_sha`（W20A claimed runtime surface）双 artifact；mounted catalog 只取 W20A claimed demo surface（direct-value AC 温度数值类为核），并加 execution-cell 全命中、avoid-list 交叉校验、receipt 双 sha。
+    2. receipt 扩字段必须 bump `runtime_adapter_mount_receipt.v2`；validate 精确校验 schemaVersion；`runtime_target` 由 readback XCTest helper 从实际 destination 探测生成；Mac helper 伪写 ios_sim 必 fail；v1 只 decode 历史 evidence。
+    3. W20A P1-S2 scope 内直接修 `decodeNonStreamingCompletion(allowedToolNames:)`，复用 `decode(_:)` guard，消灭而非绕过 W18 P1，并加 static guard + 未挂 catalog/by_exp/lock_ac 行为负例。
+  - **G3 撤销**：helper 直接修已并入 W20A scope，G3「W18 P1 节奏：先修 vs conditional-moot」不再需磊哥拍。
+  - **待磊哥拍项剩 G1/G2/G4/G5/G6**：G1 iOS 实测门是否保留；G2 malformed/unsupported 兜底 TTS 文案；G4 demo 话术 allow/avoid 进 operator runbook；G5 对外是否展示 axis-D 聚合数；G6 RT-6 无真异源时是否由磊哥/人审签 accepted residual。
+  - **non-claim**：R2 final 仍是 planning/governance 定稿，非写码授权；G1/G2/G4/G5/G6 未拍前，不得写成 W20A implementation approved。
+
+- 🔴 **main merge 决策与执行（Accepted，commit 已落；green 口径需按 W21 收窄）**：
+  - 已落 `ad9283cf`，把 `main` 合入本分支。
+  - 18 个冲突已解：authority 文档以本分支 HEAD 为主，E2 子集决策取 main ratified 态，`Makefile`/`.gitignore` union，`C5LoRATraining` 中 seeded_shuffle 与 subset 正交功能双保，`C5LoRATrainingTests` 保留两边测试意图，`CURRENT`/`COMMANDER-INDEX`/`decisions`/`lessons` 避免旧 main 截断 D-064~D-112 链。
+  - G7D 语义化：将 G7D 相关断言随 `mount_order_strategy` 语义化，避免把 seeded shuffle 与 subset manifest gate 混成同一语义。
+  - plugin refs 撤追踪：`Tools/agent-platform-plugin-refs/*` 按 main 决策撤追踪，避免本机 Codex plugin cache 绝对 symlink 进入主仓历史。
+  - `ad9283cf` commit message 中的 `swift test 567/0 + make verify` 只作为**历史时点 local/unit/build-script proof**。W21 终审已判当前 closeout green 不能直接沿用该 stale green；最终 green 必须以 MT commits 后 fresh `make verify` 解除。
+
+- 🔴 **1800 口径澄清（W14 CONFIRMED；confirmed/not-ready）**：
+  - W14 对 W2 数据报告给 `CONFIRMED`：`1800` 一手口径 = **formal training iterations / iters**，不是「1800 条训练样本」。证据锚：`docs/commander-log/decisions.md:729` 写 `1800 iters`；formal config/launch conditions 也写 `iters 1800 / updates 450 / warmup 36`。
+  - frozen trainpack = **5653 行**，sha256 = `fa5690400f67db9ef237dabdb489f58d1ab69961f14d6733d79f9bd7cad33823`，静态包口径为 `ready-static`。
+  - formal 1800 当前口径仍为 **not-ready**：host gate HOLD、new/retry run-auth 待重确认、无 current real trainer pid/watchdog；D-111 后 formal 1800 是保留的 evidence-run 目标，不是 C5 closeout 主路，也不能修 action-question 14/18 register 覆盖缺口。
+  - 禁止写「1800 条训练数据 ok」「formal 1800 已过」「formal 1800 DEFER」等混淆句。
+
+- 🔴 **MT1-MT5 外审吸收段（外审真问题入仓/入门，commit 已落）**：
+  - **MT1 / 外审🔴1 CI 仓外依赖**：`0c8b0e69` 把 qa 9/9/9 回归证据链入仓并改 repo-relative，目标是 CI 任意机器可绿可红，消除仓外单机 runs 依赖。
+  - **MT2 / 外审🔴3 basis_id 无牙**：`ed3a5a96` 给 receipt basis_id 规则装机械门；`381ae735` follow-up 把 docs receipts 纳入 basis_id check，修正初版覆盖不足。
+  - **MT3 / 外审🔴4 证据单机**：`ab92bd8c` 将 30 个 run 的判定性小文件冻结入 `docs/evidence-frozen/`，每 run 有 `MANIFEST.sha256`，空/已清 run 有 `EMPTY-NOTE.md`，大文件留仓外 hash+路径+体积记录。
+  - **MT4 / 三状态板并行**：常设秘书产 `closeout/mt4-statusboard-convergence-draft.md`，收敛为 `docs/CURRENT.md` 唯一活路由牌正文、MEMORY as-of 一行态+指向 CURRENT、run 内 `STATUS-BOARD.md` 标 run-local scope。
+  - **MT5 / 外审🔴5 GitNexus MUST/NEVER 错位**：`e6738d6b` 将 GitNexus MUST/NEVER 降级为 advisory 措辞，避免宪法级措辞无机械门承接。
+  - 外审🔴2 merge 悬置被判为 commander 工作中间态，已由 `ad9283cf` main merge + W21 覆核承接；不单独生成修复 commit。
+
+- 🔴 **W21 终审结果：CONDITIONAL_FAIL_CLOSEOUT（P1 blocker）**：
+  - W21 verdict = `CONDITIONAL_FAIL_CLOSEOUT`，grade=`P1_BLOCKER`，P0=0。
+  - P1：当前不能签「main merge 后全量 swift test 567/0 + make verify 绿」作为最终 closeout green。W21 fresh `swift test` 通过 `567/0`，但 fresh `make verify` 失败在 `diff` gate（`scripts/test_query_zero_tolerance.py` diff），且当时 worktree 有 MT 系列未提交/未跟踪改动。
+  - 最小解除动作：收口 MT1/MT2/MT3 等 dirty 改动（commit 或回滚）→ 重新跑 `make verify`，必须无 diff gate failure → 刷新 `git status --short --branch` → 更新 `MASTER-STATUS.md`/PR body，把 green 绑定到 fresh rerun 时间和 log。
+  - 本 D-112 v3 只记录 W21 blocker 与解除路径，不声称 blocker 已解除；若后续已 fresh verify，需另以新 receipt/commit 追加。
+
+- **`.xcodebuildmcp/config.yaml` 修回 main 默认（Accepted）**：W1 triage 指出 `.xcodebuildmcp/config.yaml` 一度指向 `MAformac-uiue` 与 `iPhone 17 Pro Max`，污染 main worktree 默认；已在 `ed63180d` 修回 `projectPath=/Users/wanglei/workspace/MAformac/MAformac.xcodeproj`、`scheme=MAformacIOS`、`simulatorName=iPhone 17 Pro`。
+
+- **XSWAP-23-fix.md 归档 phase0，不跨 worktree（Accepted）**：W1 triage 判定 `XSWAP-23-fix.md` 是隔壁 `MAformac-p2c6` / PR23 验证报告，误落 MAformac root；本轮不跨 worktree 移动，改为当前仓归档到 `docs/project/phase0/xswap-23-fix-delta-reverification-2026-07-02.md`，由 `ed63180d` 入仓。
+
+- 🔴 **push / PR 状态（snapshot-bound live-verified）**：
+  - 当前本地分支相对 `origin/codex/rebuild-c6-doc-absorption-20260624` = `ahead 189`，说明 `ad9283cf` 之后 MT 系列 commit 尚未全部同步到该 upstream ref。
+  - `gh pr list --head codex/rebuild-c6-doc-absorption-20260624 --state all` 当前只返回历史 PR **#7 MERGED**（`R5 D22-D23 main runtime payload corpus and shared schema under proof cap`），未发现新的 open PR。后续 push/开 PR 仍是 commander stop/go 动作；本 D 条不替代 push 授权。
+
+- **non-claims**：本 D 条不声称 candidate signed；不声称 V-PASS；不声称 formal 1800 已起跑或已过门；不声称 `6a4b6b82` clean code 可复现冻结 trainpack；不声称 W20A runtime 接线已实装；不声称 G1/G2/G4/G5/G6 已由磊哥拍；不把 `swift test 567/0` / `make verify` 升格为 runtime/mobile/true-device/live acceptance；不声称 W21 P1 已解除；不声称新 PR 已打开。
+
+- **证据锚**：`closeout/landing-checklist.md`；`final-audit/report.md`；W1 `/dirty-triage/report.md`；W2 `/data-1800-check/report.md`；W5 `/remote-reconcile/report.md`；W10 `/main-conflict-prep/report.md`；R1/R2 `/grill-r1-synthesis/cross-review.md`、`R2-FINAL-DECISIONS.md`；`MASTER-STATUS.md`；current git `git status --short --branch`; `git log --oneline 6a4b6b82..HEAD`; `gh pr list --head codex/rebuild-c6-doc-absorption-20260624 --state all --json ...`。
