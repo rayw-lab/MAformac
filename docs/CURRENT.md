@@ -2,17 +2,29 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-06（D-111 honest-frozen-closeout 定调）
-last_verified_origin_main: f4af8ccf（含 #12-#25 合流；head_truth_rule 以 live git 为准）
+updated: 2026-07-07（PR #40 merged + register grill 20/20 全拍后态）
+last_verified_origin_main: b2a25da7（PR #40 merge commit；head_truth_rule 以 live git 为准）
 branch: codex/rebuild-c6-doc-absorption-20260624
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "formal 1800 host gate PASS/waiver、正式 1800 起跑/停止/完成、UIUE merge 路线变化、或任何 D-10x 决策改变 launch authority 时，必须刷新。"
+expires_when: "register 窗 S4 生成启动或 run-auth 拍点"
 ---
 
 # CURRENT — MAformac 当前路由牌
 
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
+
+## 当前阶段（2026-07-07：**register 补洞窗计划相 v3 定稿；PR #39/#40 均已 MERGED 进 main**）
+
+🔴 **本节 supersede 下方 D-111 honest-frozen-closeout 旧态段**。本文件只作 router-only 指针，不复制 register grill 20 条正文；裁决全文、消费清单和计划以 run-dir SSOT 为准。
+
+- **PR 真态（live-verified via `gh pr view`）**：PR #39 `MERGED`（merge commit `3744d9da`）；PR #40 `MERGED`（W20A 8 stage 收口 + D-112/D-113 + register S0/S1 scanner v3，merge commit `b2a25da7`）。W20A 仍只证明 `runtime_path_reachable`，不签 candidate、不升格 V-PASS/C6 acceptance/mobile/true-device。
+- **register grill 20/20 全拍**：SSOT=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/PARADIGM-LEDGER.md`；一页消费清单=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/FINAL-LIST.md`。口径：Q13 golden boundary、Q16 机械前置+阈值、Q19 A supersede 均已拍；不把 20 条正文搬进 `CURRENT.md`。
+- **实施计划 v3 定稿**：计划=`runs/2026-07-07-w20a-grill-closeout/register-window/IMPL-PLAN-v3.md`，status=`XFRAME_ABSORBED_PENDING_RUNAUTH`；S7c `learnability micro-probe` 已由磊哥 3B 拍为必跑前置，不再作为 run-auth 可选项。
+- **决策指针**：D-112 / D-113 见 `docs/commander-log/decisions.md`。注意 D-113 是指针式落库：goal 层 supersede，data/candidate 层仍 `PENDING_GATES`，旧 tail1200/R3-QNEG-clean basis 在新门全绿前仍是回退承重墙。
+- **交接指针**：`docs/commander-log/COMMANDER-HANDOVER-2026-07-07.md`。
+
+📌 **下一步**：S2 golden boundary 已拍补录中；S3 生成 SPEC 待 run-auth。S8 训练点火还必须满足 S7c PASS + run-auth + host HOLD resolved + W20A S8FIX attack-suite PASS；缺任一保持 `BLOCKED/PARTIAL`，不得写 candidate signed、C5 V-PASS、C6 acceptance 或 mobile/true-device acceptance。
 
 ## 当前阶段（2026-07-06：**C5 收尾定调 A = honest-frozen-closeout（D-111 磊哥拍）**；不重训 1800；candidate unsigned）
 
