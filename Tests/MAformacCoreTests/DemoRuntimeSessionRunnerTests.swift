@@ -46,6 +46,30 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
+    func testFrameDecoderDoesNotBlockMainActorDuringBackendWork() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine()
+        let frame = acPowerFrame(id: "cmd-async-decoder", traceID: "trace-async-decoder")
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: trace,
+            speech: speech,
+            frameDecoder: { _ in
+                await Task.detached {
+                    return frame
+                }.value
+            },
+            alignsFrameStateRevisionToStore: false
+        )
+
+        let payload = try await runner.run(text: "打开空调")
+
+        XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
+    }
+
+    @MainActor
     func testRuntimePayloadRedactsPrivateTraceMarkersFromAppFacingEntry() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()

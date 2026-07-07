@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class DemoRuntimeSessionRunner {
-    public typealias FrameDecoder = (String) throws -> ToolCallFrame
+    public typealias FrameDecoder = (String) async throws -> ToolCallFrame
 
     private let store: DemoVehicleStateStore
     private let pipeline: C3ExecutionPipeline
@@ -36,17 +36,19 @@ public final class DemoRuntimeSessionRunner {
         speech: any SpeechSynthesisEngine
     ) throws -> DemoRuntimeSessionRunner {
         let bundle = DemoRuntimeContractBundle.singleCommandDemoDefault
+        let router = DemoNLURouter(backend: FastPathDemoToolPlanBackend())
         return DemoRuntimeSessionRunner(
             store: store,
             pipeline: try bundle.makePipeline(),
             traceLogger: traceLogger,
-            speech: speech
+            speech: speech,
+            frameDecoder: { text in try await router.decode(text: text) }
         )
     }
 
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
-        var frame = try frameDecoder(text)
+        var frame = try await frameDecoder(text)
         if alignsFrameStateRevisionToStore {
             frame.stateRevision = store.currentRevision
         }
