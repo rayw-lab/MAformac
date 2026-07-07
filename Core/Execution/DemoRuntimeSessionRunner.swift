@@ -49,7 +49,15 @@ public final class DemoRuntimeSessionRunner {
 
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
-        var frame = try await frameDecoder(text)
+        let frameResult: ToolCallFrame
+        do {
+            frameResult = try await frameDecoder(text)
+        } catch let failure as DDomainToolPlanFailure {
+            return unsupportedPayload(finiteReason: failure.finiteReason)
+        }
+
+        var frame = frameResult
+        recordProjectionTraceIfNeeded(for: frame)
         if alignsFrameStateRevisionToStore {
             frame.stateRevision = store.currentRevision
         }
@@ -101,12 +109,75 @@ public final class DemoRuntimeSessionRunner {
         )
     }
 
+    private func unsupportedPayload(finiteReason: String) -> RuntimePresentationPayload {
+        let traceID = UUID().uuidString
+        let turnID = "unsupported-\(traceID)"
+        let dialogText = "这个我先记下来，稍后帮您处理"
+        traceLogger.recordGuard(
+            traceID: traceID,
+            message: "unsupported_tool_plan",
+            attributes: TraceAttributes(
+                guardReason: "unsupported_tool_plan",
+                finiteReason: finiteReason
+            )
+        )
+        speech.speak(dialogText)
+        let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: traceID)
+        return RuntimePresentationPayload(
+            traceID: traceID,
+            turnID: turnID,
+            eventID: "\(turnID):runtime-presentation",
+            isTerminal: true,
+            outcome: DemoRuntimeOutcome(result: .refusalNoAvailableTool, reason: finiteReason),
+            proofClass: .localUnit,
+            cards: store.presentationCells,
+            readbacks: [],
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: finiteReason
+            ),
+            traceEnvelope: traceEnvelope,
+            timestamp: timestampProvider()
+        )
+    }
+
+    private func recordProjectionTraceIfNeeded(for frame: ToolCallFrame) {
+        guard rawPayloadBool(frame.rawPayload, key: "slot_projected") == true else {
+            return
+        }
+        traceLogger.recordDecode(
+            traceID: frame.traceID,
+            message: "slot_projected",
+            attributes: TraceAttributes(
+                candidateSource: frame.candidateSource,
+                rawPayloadHash: rawPayloadString(frame.rawPayload, key: "raw_arguments_sha256"),
+                slotProjected: true
+            )
+        )
+    }
+
     private func traceEnvelopeForCurrentTurn(traceID: String) -> TraceEnvelope? {
         guard let inMemory = traceLogger as? InMemoryTraceLogger else {
             return nil
         }
         let entries = inMemory.entries.filter { $0.traceID == traceID }
         return TraceEnvelope(traceID: traceID, entries: entries)
+    }
+
+    private func rawPayloadString(_ value: JSONValue, key: String) -> String? {
+        guard case .object(let object) = value,
+              case .string(let string)? = object[key] else {
+            return nil
+        }
+        return string
+    }
+
+    private func rawPayloadBool(_ value: JSONValue, key: String) -> Bool? {
+        guard case .object(let object) = value,
+              case .bool(let bool)? = object[key] else {
+            return nil
+        }
+        return bool
     }
 }
 
