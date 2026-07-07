@@ -98,6 +98,11 @@ def mounted_tool_names(row: Json) -> list[str]:
     direct = row.get("mounted_tool_names")
     if isinstance(direct, list):
         return [str(value) for value in direct if isinstance(value, str) and value]
+    shape = row.get("mounted_tool_shape")
+    if isinstance(shape, dict):
+        mounted = shape.get("mounted_tools")
+        if isinstance(mounted, list):
+            return [str(value) for value in mounted if isinstance(value, str) and value]
     return tool_names_from_tools(row.get("tools"))
 
 

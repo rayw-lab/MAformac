@@ -357,6 +357,8 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var candidateDedupeGroupID: String
     public var device: String = ""
     public var expectedToolCallSignature: String
+    public var hashRecipeRef: String? = C5DerivedHashRecipe.hashRecipeRef
+    public var hashRecomputedByPipeline: Bool? = true
     public var routeTierSource: String
     public var routeTier: C5RouteTier
     public var executionTier: String
@@ -399,6 +401,8 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case candidateDedupeGroupID = "candidate_dedupe_group_id"
         case device
         case expectedToolCallSignature = "expected_tool_call_signature"
+        case hashRecipeRef = "hash_recipe_ref"
+        case hashRecomputedByPipeline = "hash_recomputed_by_pipeline"
         case routeTierSource = "route_tier_source"
         case routeTier = "route_tier"
         case executionTier = "execution_tier"
@@ -3562,6 +3566,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let subsetGroupID: String?
         let mountedToolCount: Int?
         let subsetPolicyDigest: String?
+        let dDomainTargetEntry: DDomainToolEntry?
         if surface == .dDomain, !catalog.isEmpty {
             // 🔴 P1(GPT Pro+GLM 审计共识): catalog 非空但 intent 缺失 = 铁律5 fail-CLOSED(skip 返 nil, 不 fallback frame 污染 A2 surface);
             // scope filter 已保证命中, 此分支是 defensive。旧实现 stderr+frame fallback 会让 dDomain 调用者误以为产 D-domain 实混入 frame。
@@ -3620,6 +3625,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             subsetGroupID = subsetEntry.groupID
             mountedToolCount = resolvedTools.count
             subsetPolicyDigest = subsetManifest.digest
+            dDomainTargetEntry = entry
         } else {
             // frame legacy(catalog 空 OR surface=.frame): strangler 向后兼容(唯一 frame 入口, 非 dDomain miss fallback)
             call = C5TrainingToolCall(
@@ -3639,17 +3645,24 @@ public struct C5TrainingDatasetBuilder: Sendable {
             subsetGroupID = nil
             mountedToolCount = nil
             subsetPolicyDigest = nil
+            dDomainTargetEntry = nil
         }
         let sampleID = "c5-train-\(String(format: "%05d", ordinal + 1))"
-        let renderedToolCall: String
-        let finalCall = call
+        let finalCall: C5TrainingToolCall
         if let naturalToolCallRecord {
-            guard let parsed = C5TrainingRenderer.parseRenderedToolCall(naturalToolCallRecord.target), parsed == call else {
-                appendUnique("natural_tool_call_target_mismatch", to: &failureReceipt)
+            guard let parsed = naturalToolCallOverride(
+                record: naturalToolCallRecord,
+                fallbackCall: call,
+                dDomainTargetEntry: dDomainTargetEntry,
+                failureReceipt: &failureReceipt
+            ) else {
                 return nil
             }
+            finalCall = parsed
+        } else {
+            finalCall = call
         }
-        renderedToolCall = C5TrainingRenderer.renderToolCall(call)
+        let renderedToolCall = C5TrainingRenderer.renderToolCall(finalCall)
         let assistant = "\n\n" + renderedToolCall
         let localUtterance = C5TrainingRenderer.renderUserUtterance(seed: seed, variant: variant, valueText: valueAugmentation.utteranceValueText, slotAssignments: slotAssignments)
         let utterance = naturalToolCallRecord?.user ?? generatedRecord?.utterance ?? localUtterance
@@ -3718,6 +3731,63 @@ public struct C5TrainingDatasetBuilder: Sendable {
             mountedToolCount: mountedToolCount,
             subsetPolicyDigest: subsetPolicyDigest
         )
+    }
+
+    private func naturalToolCallOverride(
+        record: C5NaturalToolCallRecord,
+        fallbackCall: C5TrainingToolCall,
+        dDomainTargetEntry: DDomainToolEntry?,
+        failureReceipt: inout [String]
+    ) -> C5TrainingToolCall? {
+        guard let parsed = C5TrainingRenderer.parseRenderedToolCall(record.target) else {
+            appendUnique("natural_tool_call_target_parse_failed", to: &failureReceipt)
+            return nil
+        }
+        guard let dDomainTargetEntry else {
+            guard parsed == fallbackCall else {
+                appendUnique("natural_tool_call_target_mismatch", to: &failureReceipt)
+                return nil
+            }
+            return parsed
+        }
+        guard parsed.name == fallbackCall.name else {
+            appendUnique("natural_tool_call_target_name_mismatch", to: &failureReceipt)
+            return nil
+        }
+        guard Self.arguments(parsed.arguments, areAllowedBy: dDomainTargetEntry) else {
+            appendUnique("natural_tool_call_target_arguments_schema_mismatch", to: &failureReceipt)
+            return nil
+        }
+        return parsed
+    }
+
+    private static func arguments(_ arguments: [String: JSONValue], areAllowedBy entry: DDomainToolEntry) -> Bool {
+        guard case let .object(parameters) = entry.function.parameters,
+              case let .object(properties)? = parameters["properties"] else {
+            return arguments.isEmpty
+        }
+        for (key, value) in arguments {
+            guard let schema = properties[key] else {
+                return false
+            }
+            if case let .object(schemaObject) = schema,
+               case let .array(enumValues)? = schemaObject["enum"],
+               !enumValues.isEmpty {
+                guard case let .string(text) = value else {
+                    return false
+                }
+                let allowed = Set(enumValues.compactMap { item -> String? in
+                    if case let .string(candidate) = item {
+                        return candidate
+                    }
+                    return nil
+                })
+                if !allowed.contains(text) {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     private func degradedMountedEntriesIfNeeded(
