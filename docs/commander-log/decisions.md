@@ -1012,3 +1012,18 @@
 - `w20a-impl-reviews/s8-review.md`：S8R verdict=`REFUTED`。
 - `w20a-impl-reviews/s8fix-review.md`：S8FR verdict=`AMENDED`；三 P0 CLOSED；攻击套件 3×BLOCKED；extraction + claim gate PASS。
 - `w20a-impl-reviews/selftest-log.md`：current HEAD 3×BLOCKED；vulnerable basis 3×LEAKED。
+
+---
+
+## D-114：register 窗待磊哥包四拍落定（run-auth 条件式 / Q18 缓拍 / 承重墙+S10 分流 / host HOLD 不 waiver）
+
+- date: 2026-07-07（下午，Fable5 commander @%13 蜂群第二场）
+- 磊哥原话逐条（tmux 直拍）：
+  1. 「S7c PASS 后 run-auth：我给！」→ **run-auth 条件式预授权**：S7c learnability micro-probe（IMPL-PLAN v3 必跑前置）PASS 即视为 S8 1800-iters run-auth 生效，无需再等一轮拍板。S7c FAIL 则不触发，回 IMPL-PLAN v3 失败分支。
+  2. 「Q18 分支：现在不拍，等 S10 触发后按失败类型分流。」→ Q18 保持条件式，不预拍。
+  3. 「默认保持 tail1200 / R3-QNEG-clean 是承重墙。S10 全绿再 data supersede；S10 不绿就先分类：runtime qa fail 修 guard/harness；coverage debt 才开新 data repair；coverage 足但 action-question 仍 fail 才判 causal bet falsified；holdout 塌就走话术收窄或新窗口，不给 waiver。」→ **S10 失败四类分流处置表落定**（与 IMPL-PLAN v3 §S10 失败出口对齐并升级为磊哥拍板级）。
+  4. 「不建议默认给 host-waiver-key。waiver 会污染失败归因，后面 S8 如果不理想，很难判断是模型/数据问题还是资源环境问题。只有时间窗口极硬、你愿意承担归因不干净时才给 waiver。」→ **host HOLD 解法 = ⭐A 关重 GUI 后 fresh resample PASS**；waiver-key 仅时间窗口极硬时例外且归因不干净由决策者显式承担。
+- 消费口径：
+  - S8 点火五布尔改写为：S7c receipt PASS（=run-auth 生效）+ host fresh resample PASS（非 waiver）+ W20A mechanical green receipt + S7b causal-bet receipt + IMPL-PLAN v3 gates。
+  - holdout 塌 = 话术收窄或新窗口，**waiver 通道对 holdout 关闭**（比 v3 更严，以本条为准）。
+- 级联：CURRENT.md 待磊哥段收敛（仅剩条件式项）；STATUS-BOARD（run dir 2026-07-07-ma-opt-refactor）；MEMORY as-of 下轮刷新时并入。

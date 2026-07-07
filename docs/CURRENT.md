@@ -24,7 +24,7 @@ expires_when: "register 窗 S4 生成启动或 run-auth 拍点"
 - **决策指针**：D-112 / D-113 见 `docs/commander-log/decisions.md`。注意 D-113 是指针式落库：goal 层 supersede，data/candidate 层仍 `PENDING_GATES`，旧 tail1200/R3-QNEG-clean basis 在新门全绿前仍是回退承重墙。
 - **交接指针**：`docs/commander-log/COMMANDER-HANDOVER-2026-07-07.md`。
 
-📌 **下一步**：S2 golden boundary 已拍补录中；S3 生成 SPEC 待 run-auth。S8 训练点火还必须满足 S7c PASS + run-auth + host HOLD resolved + W20A S8FIX attack-suite PASS；缺任一保持 `BLOCKED/PARTIAL`，不得写 candidate signed、C5 V-PASS、C6 acceptance 或 mobile/true-device acceptance。
+📌 **下一步**：S2 golden boundary 已拍补录完（golden 50 全绿 rows=50 pairs=10 boundary=10，Python runner 口径）；S3 生成 SPEC 可备稿。🔴 **D-114（2026-07-07 下午磊哥四拍，见 decisions.md）**：① run-auth **条件式预授权**——S7c learnability micro-probe PASS 即生效，无需再拍 ② Q18 现在不拍，S10 触发后按失败类型分流 ③ tail1200/R3-QNEG-clean 承重墙默认保持，S10 全绿才 data supersede；S10 不绿四类分流（runtime qa fail→修 guard/harness / coverage debt→新 data repair / coverage 足但 action-question 仍 fail→judge causal bet falsified / holdout 塌→话术收窄或新窗口，**waiver 通道对 holdout 关闭**）④ host HOLD ⭐关重 GUI fresh resample PASS，**不默认 waiver-key**（污染归因），时间窗口极硬才例外。S8 点火五布尔=S7c PASS(=run-auth 生效) + host fresh resample PASS + W20A mechanical green receipt + S7b causal-bet receipt + IMPL-PLAN v3 gates；缺任一保持 `BLOCKED/PARTIAL`，不得写 candidate signed、C5 V-PASS、C6 acceptance 或 mobile/true-device acceptance。
 
 ## 当前阶段（2026-07-06：**C5 收尾定调 A = honest-frozen-closeout（D-111 磊哥拍）**；不重训 1800；candidate unsigned）
 
