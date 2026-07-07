@@ -1057,3 +1057,6 @@
 - **Q-03=A（S4 硬前置）**：修 register_classifier 扩 can_question 三形态（可以吗/能把…吗/行不行）+ golden fixture 补 shape 覆盖（原 50 行判定不动只新增）+ 回归测试。约束：S4 HOLD 至解锁判据机械绿；仅非语义修复（🔴禁把 can_question 判成 imperative 逃避）；触碰 Q13/SPEC 语义必须再上抛。解锁判据=q03-blocker-verify.md Minimum unblock criteria 四条。
 - **物理清理**：批1（Reports 32→1）/批3（phase0 retire 4）/批4（paper-to-skill-gate 28→10）/批6（93 件 retire_trigger）授权按 guard 自动执行（digest/restore 前置+no-touch 豁免单批 commit）；批2（evidence-frozen tarball）/批5（dev/spike-e3 退仓）待引用核+restore/backup 证明后磊哥一行确认。
 - 级联：roadmap 五门（MG-7=C 定界）/ BATCH1 ballot 标 RATIFIED / S4 HOLD 态。
+
+### D-116 amend（2026-07-07 晚）：hermes 额度尽退场，S4 生成位再变更
+阵容变更（磊哥）：%26 hermes→codex(gpt-5.5 xhigh)、%31 hermes→**Claude Opus 4.8 worker**。S4/S5 生成位：hermes×2 → **⭐Opus worker(%31) 生成 + codex judge 盲判**（异源保持；实质回到 IMPL-PLAN-v3 原设计的 Opus 生成质量假设，审计一「GLM 质量无基线」P0 随之消解）。终阵容=5 codex + 1 Opus。
