@@ -1037,3 +1037,9 @@
   - **N3 批（保守版）**：Reports 31 tracked 文件退仓与 frozen 重复 tarball 化——本轮只落 migration plan + digest/重复清单，实际执行等磊哥单独点头。
   - **N4 批**：openspec 11 active change 补 `status:` 字段（disposition 机械源），字段方案草案呈磊哥过目后落。
 - 关联：任务① 合成件=run dir `2026-07-07-ma-opt-refactor/out/COMMANDER-SYNTHESIS-v1.md`（10 结论 grill 拆解 + 双红队审计后修订 v2 再执行）。
+
+### D-115 补记（2026-07-07 下午）：N1/N4 正文过目已批
+
+磊哥原话「N1 批 / N4 批」。生效：
+- N1 正文批：proof-class 走 Option A（Slice A/C 用 public `PresentationProofClass`；Option B provider 内部枚举等真 MCP 执行获批再引入）；落点=新 openspec change `define-external-tool-provider-boundary`（四件套）+ 接受后 ADR 指针。
+- N4 正文批：`status:` 单字段首刀 + 6 枚举 + 11 change 初值表（run dir `2026-07-07-ma-opt-refactor/out/n4-openspec-status-field-draft.md`）；门=`openspec validate --all --strict` 全绿。
