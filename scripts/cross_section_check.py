@@ -17,6 +17,7 @@ import glob
 import json
 import os
 import re
+import subprocess
 import sys
 
 # pG4 基线文档组（路径白名单，相对 repo root）
@@ -51,6 +52,56 @@ CALIBER_ANCHORS = {
 }
 # 锚后紧跟赋值（允许中间至多一个「数」字 + 空白 + = ＝ : ：），再抓整数
 INT_AFTER = re.compile(r"^\s*数?\s*[=＝:：]\s*\**\s*(\d{2,4})")
+
+RECEIPT_BASIS = re.compile(r"\b(basis_id|basis)\s*:")
+
+
+def git_paths(root, *args):
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", root, *args],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return []
+    return [line.strip() for line in out.splitlines() if line.strip()]
+
+
+def changed_receipt_paths(root):
+    paths = set()
+    paths.update(git_paths(root, "diff", "--name-only", "--diff-filter=AM", "HEAD", "--"))
+    paths.update(git_paths(root, "diff", "--cached", "--name-only", "--diff-filter=AM", "--"))
+    paths.update(git_paths(root, "ls-files", "--others", "--exclude-standard"))
+    result = []
+    for rel in sorted(paths):
+        name = os.path.basename(rel)
+        if not rel.endswith(".md"):
+            continue
+        if "RECEIPT" not in name and "receipt" not in name:
+            continue
+        if rel.startswith("docs/"):
+            continue
+        if rel.startswith("runs/") and re.search(r"(^|/)README\.md$", rel):
+            continue
+        result.append(rel)
+    return result
+
+
+def receipt_basis_violations(root):
+    violations = []
+    checked = []
+    for rel in changed_receipt_paths(root):
+        path = os.path.join(root, rel)
+        try:
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+        except OSError:
+            continue
+        checked.append(rel)
+        if not RECEIPT_BASIS.search(text):
+            violations.append(rel)
+    return checked, violations
 
 
 def main():
@@ -103,13 +154,17 @@ def main():
         if len(valmap) > 1:
             drifts.append({"anchor": kw, "distinct_values": {v: locs for v, locs in sorted(valmap.items())}})
 
+    receipt_basis_checked, receipt_basis_missing = receipt_basis_violations(root)
+
     out = {
         "baseline_files": [os.path.relpath(p, root) for p in files],
         "anchors_checked": ANCHOR_KEYWORDS,
         "caliber_anchors_checked": sorted(CALIBER_ANCHORS),
+        "receipt_basis_checked": receipt_basis_checked,
+        "receipt_basis_missing": receipt_basis_missing,
         "drifts": drifts,
         "caliber_violations": caliber_violations,
-        "consistent": len(drifts) == 0 and len(caliber_violations) == 0,
+        "consistent": len(drifts) == 0 and len(caliber_violations) == 0 and len(receipt_basis_missing) == 0,
     }
     print(json.dumps(out, sort_keys=True, ensure_ascii=False, indent=2))
     return 0 if out["consistent"] else 1
