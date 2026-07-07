@@ -1,5 +1,5 @@
 # Qwen tool-call 格式单一源（#39，Q2 磊哥定）
-# C3 runtime 已在 dev/spike-e3 锁定 mlx-swift-lm .json format；
+# C3 runtime 已锁定 mlx-swift-lm .json format（历史证据 dev/spike-e3 已退仓，溯源=~/workspace/raw/05-Projects/MAformac/spike-e3-backup-20260707 + SHA256SUMS.txt，批5 D-117）；
 # C5 训练样本生成与 C6 bench harness 只引用本文件，禁各写一套，防 train/runtime/bench silent 失真。
 # ---------------------------------------------------------------------------
 # 🔴 D-domain surface（2026-06-23 范式翻案级联，paradigm §1-§2 + §14；A2 已落地）:
