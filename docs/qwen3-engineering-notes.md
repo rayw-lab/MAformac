@@ -1,5 +1,7 @@
 # Qwen3-1.7B 端侧工程硬约束与参考
 
+> ⚠️ **provenance（2026-06-30 A 文档收敛）**：Qwen3 端侧工程教训参考料，非当前路线 SSOT；最新训练/surface 决策见范式权威 + `CLAUDE.md §9`，本文仅作工程溯源。
+
 > **定位**:Qwen3-1.7B + MLX 端侧工具调用的工程教训 + 外网经验 + 38 repo 肩膀。是 `define-execution-contract` / `define-capability-contract` / `define-lora-pipeline` / `define-vehicle-tool-bench` 的**权威输入**(propose 时引用)。
 > **来源**:Codex 调研(2026-06-18,外网 + 38 repo 交叉)+ CC Step1 实证(见 `project/brainstorm-2026-06-17-demo-mvp.md §5 模块1`)。
 > **核心判断**:Qwen3-1.7B 值得用、不降级 是对的;但「能吐工具格式」是**入场券不是终点**——真正要工程化的是 **restraint / parser hygiene / context budget / LoRA 样本边界**。

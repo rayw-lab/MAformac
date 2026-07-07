@@ -270,9 +270,29 @@ def load_tokenizer(mode: str, model: str):
     raise SystemExit(f"FAIL: unknown tokenizer mode: {mode}")
 
 
+def duplicate_values(values: list[str]) -> list[str]:
+    seen = set()
+    duplicates = []
+    for value in values:
+        if value in seen and value not in duplicates:
+            duplicates.append(value)
+        seen.add(value)
+    return duplicates
+
+
+def assert_unique_tool_ids_ordered(group_id: str, mount_mode: str, ordered_ids: list[str]) -> None:
+    duplicates = duplicate_values(ordered_ids)
+    if duplicates:
+        raise AssertionError(
+            f"tool_ids_ordered duplicate in {mount_mode}:{group_id}: "
+            + ", ".join(duplicates[:20])
+        )
+
+
 def build_entry(group_id: str, mount_mode: str, tools: list[dict], count_tokens=None, cap: int = TOOL_TOKENS_CAP,
                 extra=None) -> tuple[dict, dict]:
     ordered_ids = [tool_id(item) for item in tools]
+    assert_unique_tool_ids_ordered(group_id, mount_mode, ordered_ids)
     schemas = [tool_schema(item) for item in tools]
     prompt_schemas = [prompt_tool_schema(item) for item in tools]
     artifact = {
@@ -342,6 +362,13 @@ def build_outputs(args) -> tuple[dict, dict, list[str]]:
     errors = []
     if len(single_tool_ids) != len(set(single_tool_ids)):
         errors.append("single_group tool coverage has duplicates")
+    for entry in entries:
+        duplicates = duplicate_values(entry["tool_ids_ordered"])
+        if duplicates:
+            errors.append(
+                f"tool_ids_ordered duplicate in {entry['mount_mode']}:{entry['group_id']}: "
+                + ", ".join(duplicates[:20])
+            )
     if set(single_tool_ids) != all_tool_ids:
         errors.append(
             f"single_group tool coverage mismatch: missing={len(all_tool_ids - set(single_tool_ids))} "
@@ -412,7 +439,12 @@ def main() -> int:
 
     if args.verify_budget and args.tokenizer_mode == "none":
         args.tokenizer_mode = "qwen"
-    manifest, artifact_doc, errors = build_outputs(args)
+    try:
+        manifest, artifact_doc, errors = build_outputs(args)
+    except AssertionError as exc:
+        print("FAIL subset manifest generation:", file=sys.stderr)
+        print(f"  {exc}", file=sys.stderr)
+        return 1
     if errors:
         print("FAIL subset manifest generation:", file=sys.stderr)
         for error in errors:

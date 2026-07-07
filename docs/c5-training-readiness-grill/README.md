@@ -12,12 +12,15 @@ status: skeleton_dispatched
 
 > 🔴 **本文 = C5 训练就绪 grill 的待 grill + 已拍单一权威**。3 codex worker + commander 脑暴 300-500 关键决策，覆盖 C5 训练前节点的方方面面（经验教训/论文/算法/语料 + teardown+pre-mortem 出的维度）。按 UIUE 215-grill 范式（决策矩阵 + 消减表 + 评分表）。磊哥人审拍板。
 > **Goal**：推进到「C5 可开始 LoRA 训练前节点」——把 8 道 gate（SYNTHESIS-LORA §三）+ R-L17 候选签名前置补齐到「万事俱备、只欠按训练键」。守 D-003 铁律「严禁跳 gate 直接训」（R7 signoff：retrain-c5 + data generation 仍 BLOCKED，到节点为止）。
+> **2026-07-05 晚状态补记**：C5 formal 1800 已从“训练前节点”推进到 launch flow，但当前 **NO-GO/HOST_GATE_HOLD/NOT_LAUNCHED**。run-auth 已接受，command v2 与 watchdog v2 已收敛；host 三采样低于 21GB，未给 `host-waiver-key`。本 grill 目录继续承担决策/消减/防惨败账，不得把 run-auth、static packet、GitNexus analyze 或 formal evidence-run 写成 candidate/C6/V-PASS。
 
 ## §0 SSOT 声明 + 推进事实源
 
 - **决策单一权威** = 本目录（README + 各 worker 决策矩阵 + 综合 master）。
 - **上游 SSOT（grill 论据回溯）**：`runs/2026-06-30-lora-teardown/SYNTHESIS-LORA.md`（8 gate）+ `docs/c5-recovery-2026-06-22/`（0/34 复盘 + grill-decisions）+ `docs/project/phase0/r-l17-human-review-evidence/`（R-L17）+ `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md`（范式）。
 - **范式样板** = `docs/grill-tournament/grill-decisions-master.md`（UIUE 215-grill 结构）+ `cascade-inventory.md`（landing matrix）。
+- **D-053/T1-OOM 最新补充（2026-07-03）**：T1 smoke 已真跑且 FAIL（Metal OOM before first optimizer update）。后续训练线先看三份新档：`t1-oom-premortem-iceberg-advice-2026-07-03.md`（结论口径）/ `t1-oom-diagnostic-runbook-2026-07-03.md`（T1D 诊断矩阵）/ `token-budget-supervision-ledger-2026-07-03.md`（token 长度账 vs 监督面账）。N4 local 绿不得再被引用为 formal train-ready。
+- **D-108/D-110 后 formal launch 最新补充（2026-07-05 晚）**：Phase 4=B 允许 formal evidence-run；Phase 1/Launch Packet static gates clear；W-G2/W-H2 消减旧 launch-command/watchdog lane 矛盾；active blocker 只剩 host PASS/waiver + runtime armed proof。当前状态板：`~/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/secretary/STATUS-BOARD.md`。
 
 ## §1 🔴 双仓惨败回忆纪律（每条决策必过，定时回忆）
 

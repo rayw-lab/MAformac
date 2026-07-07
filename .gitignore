@@ -64,6 +64,10 @@ Reports/*
 .dispatch/
 .cc-connect/
 
+# Commander run nest pointer: keep only the hand-written README in git.
+runs/*
+!runs/README.md
+
 # machine-specific symlinks to local Codex plugin cache (not project source)
 Tools/agent-platform-plugin-refs/
 # generated AI reference images (42M, regenerable from gptimage2-anchor-set/*.md prompts; kept local)

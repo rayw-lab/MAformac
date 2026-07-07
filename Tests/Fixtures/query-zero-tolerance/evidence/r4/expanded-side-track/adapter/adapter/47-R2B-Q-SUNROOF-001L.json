@@ -1,0 +1,49 @@
+{
+  "index": 47,
+  "case_id": "R2B-Q-SUNROOF-001L",
+  "axis": "Q",
+  "behavior_class": "tool_call",
+  "input_zh": "把天窗关到一半",
+  "expected_tool_calls": [
+    {
+      "name": "close_sunroof_to_number",
+      "arguments": {
+        "value": "50"
+      }
+    }
+  ],
+  "mounted_tool_count": 8,
+  "mounted_tool_names": [
+    "close_sunroof",
+    "close_sunroof_by_number",
+    "close_sunroof_little",
+    "close_sunroof_to_number",
+    "open_sunroof",
+    "open_sunroof_by_number",
+    "open_sunroof_little",
+    "open_sunroof_to_number"
+  ],
+  "mount_source": "catalog_sg:sunroof",
+  "mount_policy": "e2_sg_full_group",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_sunroof\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_sunroof_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_sunroof_little\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_sunroof_to_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_sunroof\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_sunroof_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_sunroof_little\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_sunroof_to_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"position\": {\"enum\": [\"全车\", \"前排\", \"后排\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\n把天窗关到一半<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>{\"name\":\"close_sunroof_to_number\",\"arguments\":{\"value\":\"50\"}}</tool_call>",
+  "truncated_output": "<tool_call>{\"name\":\"close_sunroof_to_number\",\"arguments\":{\"value\":\"50\"}}",
+  "raw_output": "<tool_call>{\"name\":\"close_sunroof_to_number\",\"arguments\":{\"value\":\"50\"}}</tool_call>",
+  "tool_calls": [
+    {
+      "name": "close_sunroof_to_number",
+      "arguments": {
+        "value": "50"
+      }
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 649,
+  "observed_tool_names": [
+    "close_sunroof_to_number"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

@@ -599,19 +599,121 @@ git diff --check
 
 Expected: all OpenSpec items pass and whitespace check exits 0.
 
+## Post-D24 Bird's-Eye Route
+
+2026-06-30 update: D24 closed the PR absorption/merge lane under proof cap. It did not close runtime readiness or R5 completion.
+
+```mermaid
+flowchart TD
+    A["D24: local/cloud absorption + PR merge closeout"] --> B["D25: K1 spike-ledger falsification"]
+    B --> C{"K1 returns P0/P1 blocker?"}
+    C -- "yes" --> D["fix or keep blocked; do not promote implementation"]
+    C -- "no" --> E["R5 proof-capped closeout candidate"]
+    E --> F["C5 retrain child plan: entry gates -> data -> train -> candidate signoff"]
+    E --> G["C6 child plan: model-quality acceptance/comparison after signed candidate"]
+    E --> H["Runtime backend child plan: text/mic/card/cancel -> runtime -> PresentationSnapshot"]
+    E --> I["Golden/voice/UIUE child plan: stable IDs + separate proof classes"]
+    E --> J["Optional CI parity hardening: shared schema/fixture drift guard"]
+```
+
+### D24 Closed Lane
+
+| Item | Status | Proof / note |
+|---|---|---|
+| PR #7 main route/doc/runtime absorption | `MERGED` | merge commit `b7b901b32b22f2895464faa497234d3ae46dc7dd` |
+| PR #6 UIUE absorption | `MERGED` | merge commit `08032412b2ba8edb350259ccec8c70717ccb561d` |
+| PR #8 post-audit CI whitespace proof fix | `MERGED` | merge commit `771f48ad1bbaf02740f71da2cf90ada02fc6f6c6` |
+| Final cloud Verify | `SUCCESS` | run `28431421039` on `771f48ad1bbaf02740f71da2cf90ada02fc6f6c6` |
+| GitHub-hosted macOS billing | `not_fixed` | D24 used temporary self-hosted Actions proof, then cleaned it up |
+
+D24 proof class: `local`, `unit`, `docs_local`, `github_actions_self_hosted`, and `github_cloud_merge_truth`. This is not `runtime`, `mobile`, `true_device`, `live_api`, `V-PASS`, `S-PASS`, `U-PASS`, `A-2 complete`, or `R5 complete`.
+
+### Runtime-Grill Accounting
+
+| Class | Count | Route disposition |
+|---|---:|---|
+| Proof-bearing rows | 55 | Keep as proof-capped receipts; do not upgrade proof class without new evidence |
+| Merge-only rows | 111 | Absorbed by D24 merge; merge is not new runtime proof |
+| Human decision rows | 11 | 3 accepted, 8 backlog |
+| K1 spike rows | 8 | D25 bounded falsification lane: `C082`, `C083`, `C096`, `C117`, `C182`, `C197`, `C207`, `C208` |
+| F1 future guard rows | 29 | Preserve as future boundary; not R5 closeout evidence |
+| Drop | 1 | Retain dropped disposition |
+| Total runtime-related rows | 215 | R5 remains proof-capped until K1 receipts and final closeout reconcile land |
+
+### D25 Scope
+
+D25 is not a general runtime implementation dispatch. It is a K1 spike-ledger lane:
+
+1. For each K1 row, state the hypothesis being falsified.
+2. Run the smallest local/static/unit proof needed to classify it.
+3. Exit each row as `PASS`, `PARTIAL`, or `BLOCKED` with proof class.
+4. Record whether the row is promoted, stays spike-only, or remains blocked.
+5. Stop if any P0/P1 finding invalidates the R5 closeout thesis.
+
+D25 does not need a new 215-row grill. The existing grill matrix is detailed enough to explain why these eight rows are not direct implementation tasks. What D25 must add is an executable spike card per row: user story, minimal falsification action, proof class, and exit state.
+
+#### D25 Execution Clusters
+
+| Cluster | Rows | Purpose |
+|---|---|---|
+| Event gate matrix | `C082`, `C083`, `C182` | Decide whether card-changing, readback-ready, and TTS lifecycle states belong in the shared event vocabulary or remain derivable from snapshots. |
+| GPU/runtime contention | `C096` | Bound whether presentation shader/GPU work can interfere with MLX runtime enough to become a gate. |
+| Voice proof boundary | `C117` | Decide what premium Mandarin voice preflight/fallback can prove, without claiming voice readiness. |
+| Model/parser/proof governance | `C197`, `C207`, `C208` | Keep parser repair, endpoint decode parity, and Mac-dev grammar fixtures in the correct proof lane. |
+
+#### D25 User Stories
+
+| Row | User story | Minimal falsification target | Exit rule |
+|---|---|---|---|
+| `C082` | As a UI presentation consumer, I need to know whether `cardsDidStartChanging` is an independent event gate so UIUE does not infer animation start from card diffs. | If current snapshots/state transitions already expose a stable "start changing" signal, do not add an event; otherwise keep a shared event candidate. | `PASS` = no event needed or event need proven; `PARTIAL/BLOCKED` = keep spike-only with missing evidence named. |
+| `C083` | As a readback/TTS consumer, I need to know whether `readbackReady` is an independent gate so UI/TTS never reads stale or incomplete readbacks. | If readback arrays plus terminal snapshots are enough, do not add a gate; otherwise promote a typed ready signal candidate. | Same receipt shape as `C082`; no implementation without proof. |
+| `C096` | As a现场 demo operator, I need to know whether shader/GPU effects contend with MLX runtime enough to damage perceived responsiveness. | Run or design the smallest perf proof that can classify this as R5 blocker, future perf lane, or fallback-only risk. | `PASS` = bounded as non-blocking or guarded by fallback; `PARTIAL/BLOCKED` = future perf lane with exact missing runtime data. |
+| `C117` | As a现场 demo operator, I need premium Mandarin voice preflight and fallback boundaries so an unavailable high-quality voice is not reported as voice-ready. | Verify whether this belongs to D25 closeout or future voice lane; record that UI `voiceState` is not true TTS proof. | Usually `future_lane` unless a current receipt proves a minimal preflight boundary. |
+| `C182` | As a bridge contract owner, I need one event-kind matrix for `cards_did_start_changing`, `readback_ready`, `tts_start`, and `tts_end` so C082/C083/TTS lifecycle do not create a third mapper. | Reconcile C082/C083 with TTS lifecycle states as one vocabulary decision. | `PASS` = unified decision recorded; `PARTIAL/BLOCKED` = event matrix remains spike-only. |
+| `C197` | As a runtime adapter owner, I need to know whether C3 parser fallback/repair belongs in the runtime adapter error feedback strategy so repair is not displayed as generic unsupported/crash. | Check current C3/runtime outcome taxonomy; if insufficient, route to future runtime/model lane instead of R5 hard implementation. | `PASS` = current taxonomy sufficient or future-lane boundary clear; otherwise blocked with missing adapter/model evidence. |
+| `C207` | As a C6/model evaluator, I need endpoint decode parity stats for `toolCall`, content JSON, parser repair, and false tool calls so aggregate scores do not hide model failure modes. | Decide whether D25 only records the proof boundary or creates a future C6 metric requirement. | Expected exit is future C6/model lane unless current evidence proves a no-op boundary. |
+| `C208` | As a proof-governance owner, I need Mac dev Outlines/XGrammar fixtures marked `dev_only` so they cannot be cited as iOS/runtime proof. | Check receipt/proof-class/schema wording for dev-only containment; add only the minimal guard if missing in a later dispatch. | `PASS` = no-promotion guard is clear; `PARTIAL/BLOCKED` = exact missing guard identified. |
+
+#### D25 Receipt Contract
+
+Each D25 row receipt must include:
+
+```yaml
+row_id: C082
+cluster: event_gate_matrix
+status: PASS | PARTIAL | BLOCKED
+proof_class: local_static | local_unit | runtime_probe | docs_local
+evidence:
+  - path:line or command output summary
+promotion_decision: promote | keep_spike_only | future_lane | blocked
+non_claims:
+  - no runtime_ready
+  - no mobile
+  - no true_device
+  - no V_PASS
+```
+
+### After K1 Child Plans
+
+If D25 finds no P0/P1 blocker, split work into independent child plans instead of reopening one broad runtime train:
+
+1. **R5 closeout candidate:** reconcile D1-D25 receipts, non-claims, and remaining future/human ledgers.
+2. **C5 retrain:** define physical entry gates, data generation authorization, train-health, adapter candidate, and signoff.
+3. **C6 acceptance/comparison:** run only after a signed C5 candidate and explicit authorization.
+4. **Runtime backend:** implement iOS/macOS runtime wiring against the accepted Runtime -> Presentation contract; full model-backed execution waits for model/C6 proof.
+5. **Golden/voice/UIUE:** freeze stable IDs, add voice proof, and connect UIUE only with separate proof classes.
+6. **CI hardening:** optionally promote sibling schema/fixture parity from local evidence to a CI gate.
+
 ## Final Route Summary
 
-1. Now: baseline docs plus this parent plan.
-2. External audit: GPT Pro challenged downgrade risk and over-engineering risk; route/plan and C6 bench/source-free P1/P2 fixes are absorbed in the tracked absorption ledger.
-3. Next grill: accept or edit the parent route and bridge-first thesis using the absorbed audit verdict.
-4. First contract: propose `define-runtime-presentation-bridge`.
-5. Model lane: C5 data/retrain/candidate only after entry gates.
-6. C6 lane: acceptance/comparison only after candidate signoff and explicit run authorization.
-7. Backend lane: full iOS/macOS runtime implementation after bridge contract and aligned with model/C6 proof.
-8. UIUE/voice/golden lane: connect after stable IDs and separate proof classes; visual-only UIUE can remain isolated.
+1. D24 is closed only for PR absorption/merge under proof cap.
+2. D25 is the immediate next lane: K1 spike-ledger falsification, not broad runtime code.
+3. R5 can become a proof-capped closeout candidate only after D25 receipts show no P0/P1 blocker.
+4. C5/C6/runtime backend/golden-voice-UIUE must remain separate child plans with their own proof classes and stop conditions.
+5. Runtime readiness remains open until a later backend/model/voice/golden proof chain exists.
 
 ## Self-Review
 
-- Spec coverage: the plan covers current branch truth, Long-run 2 closeout boundary, bridge-first contract, C5/C6 gates, backend/UIUE ordering, GPT Pro external architecture audit, and no-goal proof classes.
+- Spec coverage: the plan covers current branch truth, Long-run 2 closeout boundary, bridge-first contract, D24 closeout truth, D25 K1 routing, C5/C6 gates, backend/UIUE ordering, GPT Pro external architecture audit, and no-goal proof classes.
 - Placeholder scan: no placeholder task is used as execution permission; downstream child plans are gated behind external audit and grill rather than represented as empty deliverables.
 - Type consistency: bridge names are consistently `DemoInteractionEvent`, `DemoRuntimeResult`, `PresentationSnapshot`, and `TraceEnvelope`.

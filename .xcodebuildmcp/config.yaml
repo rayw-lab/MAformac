@@ -1,11 +1,10 @@
 schemaVersion: 1
 sessionDefaultsProfiles:
   ios:
-    projectPath: /Users/wanglei/workspace/MAformac-uiue/MAformac.xcodeproj
+    projectPath: /Users/wanglei/workspace/MAformac/MAformac.xcodeproj
     scheme: MAformacIOS
     configuration: Debug
-    simulatorName: iPhone 17 Pro Max
-    simulatorId: 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D
+    simulatorName: iPhone 17 Pro
     useLatestOS: true
     simulatorPlatform: iOS Simulator
 activeSessionDefaultsProfile: ios

@@ -1,0 +1,48 @@
+# Gate7 wave-1 mock dry-run receipt
+
+- generated_at: 2026-07-03T08:24:47Z
+- proof_class: local_mock
+- repo_root: /Users/wanglei/workspace/MAformac-p5w-wave1-bridge
+- target_contract_row_id: c1_airControl_000167
+- target_tool_name: adjust_ac_temperature_to_number
+- generator_vendor: anthropic
+- judge_vendor: openai
+- requested_limit: 50
+- pipeline_status: PASS
+- reasons: []
+- sample_count: 50
+- first_expected_tool_call: adjust_ac_temperature_to_number ["temperature": "22", "mode": "制冷", "adjustment_mode": "摄氏度", "direction": "主驾"]
+- data_gate_status: data_gate_ready
+- data_gate_row_count: 51
+- quarantine_count: 1
+- candidate_rows_path: gate7-wave1-candidates.jsonl
+- batch_manifest_path: wave1-warmup-batch-manifest.json
+- batch_manifest_dry_run_receipt_path: wave1-warmup-batch-manifest-dry-run.json
+- batch_manifest_dry_run_status: pass
+- candidate_row_count: 51
+- rows_with_tools: 51
+- rows_with_mounted_tool_count: 51
+- rows_with_subset_policy_id: 51
+- rows_with_subset_group_id: 51
+- rows_with_subset_policy_digest: 51
+- mounted_tool_count: 22
+- subset_policy_id: e2-lite-v1
+- subset_group_id: scene.scene1
+- subset_policy_digest: c72329fce65678a72d95319d618570469ce3149cb96a092fe59e9a6cc7c0c530
+- data_gate_allow_legacy_missing_surface: false
+- data_gate_missing_surface_count: 0
+- data_gate_legacy_missing_surface_allowed_count: 0
+- data_gate_surface_field_pass: 51
+- data_gate_hard_failure: false
+- data_gate_failure_reasons: []
+- recipe_quota_source: intent_bug_scene_recovery
+- recipe_allocated_quota: 50
+- recipe_actual_sample_count: 50
+- recipe_open_close_polarity_min_per_direction: 1
+- recipe_negative_quota_activation: deferred_refusal_ratio_zero_conflict
+- recipe_query_read_only_quota: 0
+- recipe_unsupported_refusal_quota: 0
+- recipe_safety_refusal_quota: 0
+- recipe_multi_call_pairing_minimum: 2
+
+Boundary: mock provider only; no live cloud generation and no training.

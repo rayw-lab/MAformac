@@ -1,0 +1,382 @@
+{
+  "allow_legacy_missing_surface" : false,
+  "bucket_counts" : {
+    "dev_selection" : 400,
+    "train" : 4111
+  },
+  "detected_parent_semantic_overlap_count" : 0,
+  "failure_receipt" : [
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_63b84f1bfa18dc29",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00050",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_7105de030a1f7c37",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00051",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_eefd18f85f6724fb",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00052",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_f7834d17af4a3b2a",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00053",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_43609c2420fb0645",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00054",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_5738e709f1ed455c",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00055",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_2afb4b2ad7869c52",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00056",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_f4d8f730975850bb",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00057",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_9facdb7833133bf0",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00058",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_c1bbbc91f3cba31b",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00059",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_1e98794ff9dba7b7",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00060",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_00698ebf58491738",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00061",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_faa3d0f9f0cb625d",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00211",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_40d7b9eda448851c",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00212",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_12f66c8dc09b8612",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00213",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_9a4fcab18ba1b2cd",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00214",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_46a3c0475fe6f9da",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00215",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_b1173a44cadd92b8",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00216",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_b904d5f7a8b95e60",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00217",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_fbd7d8db45516813",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00218",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_d4cc8b5d9482da60",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00219",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_5430de4e7c304aac",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00220",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_c7ea6b7a35c78bac",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00221",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_dcbb258b36cc2229",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00222",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_f752c2a6add44557",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00372",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_e54a9a51ac3a013c",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00373",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_064f3cefcf1d8274",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00374",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_08c449fe3185c3d9",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00375",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_3ff234fa37ce98b4",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00376",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_a0b0c110b2cf92d7",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00377",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_cc71501c100ceb1d",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00378",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_f68618aaaccda1e9",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00379",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_d963ea7f49c36c30",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00380",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_c6d9281eb7c47563",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00381",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_95bf7a7c82fb4695",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00382",
+      "severity" : "P1",
+      "split" : "train"
+    },
+    {
+      "bucket" : "paired_counterfactual_refusal",
+      "parent_semantic_id" : "cand_sem_91158c85e8d2f77a",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "c5-nocall-00383",
+      "severity" : "P1",
+      "split" : "train"
+    }
+  ],
+  "format_contract_version" : "0bc0403464b9953d50cd159fc05678d010cbcb4b2ec50688a5e1e8a53e1037ff",
+  "generated_at" : "2026-07-03T02:53:44Z",
+  "held_out_axis_overlaps" : [
+    {
+      "axis" : "parent_semantic_id",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "device",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "tool_name",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "value_type",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "template_family",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "generator_source",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    }
+  ],
+  "legacy_missing_surface_allowed_count" : 0,
+  "masking_coverage" : {
+    "argument_name" : true,
+    "argument_value" : true,
+    "function_name" : true,
+    "train_on_turn" : true
+  },
+  "missing_surface_count" : 36,
+  "must_not_train_violations" : 0,
+  "proposed_fix" : {
+    "auto_apply" : false,
+    "suggestions" : [
+      "populate tools/mounted_tool_count/subset fields before formal wave-1 data gate, or rerun legacy fixtures with explicit allow_legacy_missing_surface"
+    ]
+  },
+  "quarantine_count" : 0,
+  "receipt_version" : "c5-data-gate.v1",
+  "redaction_status" : "pass",
+  "row_count" : 4511,
+  "source_authorization_status" : "authorized_c1_semantic_contract",
+  "source_snapshot_digest" : "1018eeeb6f64654d013afafe8c0d57cfed2522b827c8d24ad50d5a0c25c94d0d",
+  "split_whitelist" : [
+    "train",
+    "heldout",
+    "must_pass",
+    "c6_base",
+    "dev_selection",
+    "quarantine"
+  ],
+  "status" : "blocked",
+  "surface_field_pass" : 4475,
+  "tool_call_format_failures" : [
+
+  ],
+  "tool_call_format_pass" : 3700,
+  "train_held_out_axis_overlap_count" : 0,
+  "train_held_out_axis_overlap_row_count" : 0,
+  "train_parent_semantic_overlap" : 0
+}

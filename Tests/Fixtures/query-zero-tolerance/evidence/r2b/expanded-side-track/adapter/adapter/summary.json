@@ -1,0 +1,728 @@
+{
+  "arm": "adapter",
+  "model": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/PR38-final-n4a-recipe-build/qwen3-1_7b-training-tokenizer-patched",
+  "adapter": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/F044-shorttrain-run-20260704T155204+0800/adapters-rank16",
+  "decode_contract": {
+    "temperature": 0.0,
+    "max_tokens": 160,
+    "stop_tokens": [
+      "</tool_call>",
+      "\n",
+      "\n\n",
+      "\r\n"
+    ],
+    "tokenizer_wrapper": "mlx_lm_tokenizer_wrapper",
+    "prompt_skeleton_id": "qwen3_patched_no_think_chat_template",
+    "thinking": "no_think_block",
+    "parser_id": "p3h_tool_call_json_ordered_v2",
+    "tool_call_cardinality": "ordered_multi_call",
+    "output_boundary": "raw_generation_and_truncated_output",
+    "tools_mount_policy": "p3h_v3_training_row_or_e2_sg_catalog"
+  },
+  "case_count": 53,
+  "empty_tool_call_outputs": 0,
+  "non_empty_tool_call_outputs": 53,
+  "axis_summary": {
+    "B": {
+      "case_count": 26,
+      "empty_tool_call_outputs": 0,
+      "non_empty_tool_call_outputs": 26
+    },
+    "Q": {
+      "case_count": 27,
+      "empty_tool_call_outputs": 0,
+      "non_empty_tool_call_outputs": 27
+    }
+  },
+  "results": [
+    {
+      "case_id": "R2B-BN1-001P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01041",
+      "elapsed_ms": 1449
+    },
+    {
+      "case_id": "R2B-BN1-001N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01041",
+      "elapsed_ms": 488
+    },
+    {
+      "case_id": "R2B-BN1-002P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01042",
+      "elapsed_ms": 539
+    },
+    {
+      "case_id": "R2B-BN1-002N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01042",
+      "elapsed_ms": 522
+    },
+    {
+      "case_id": "R2B-BN1-003P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01043",
+      "elapsed_ms": 506
+    },
+    {
+      "case_id": "R2B-BN1-003N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01043",
+      "elapsed_ms": 489
+    },
+    {
+      "case_id": "R2B-BN1-004P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01044",
+      "elapsed_ms": 546
+    },
+    {
+      "case_id": "R2B-BN1-004N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_ac_set_interface"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01044",
+      "elapsed_ms": 529
+    },
+    {
+      "case_id": "R2B-BN2-001P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_defog_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-00009",
+      "elapsed_ms": 407
+    },
+    {
+      "case_id": "R2B-BN2-001N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_defog_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-00009",
+      "elapsed_ms": 425
+    },
+    {
+      "case_id": "R2B-BN2-002P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_defog_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01071",
+      "elapsed_ms": 406
+    },
+    {
+      "case_id": "R2B-BN2-002N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_defog_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01071",
+      "elapsed_ms": 426
+    },
+    {
+      "case_id": "R2B-BN2-003P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_defrost_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-00013",
+      "elapsed_ms": 406
+    },
+    {
+      "case_id": "R2B-BN2-003N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_defrost_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-00013",
+      "elapsed_ms": 423
+    },
+    {
+      "case_id": "R2B-BN2-004P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_defrost_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01075",
+      "elapsed_ms": 416
+    },
+    {
+      "case_id": "R2B-BN2-004N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_defrost_mode"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01075",
+      "elapsed_ms": 425
+    },
+    {
+      "case_id": "R2B-BN3-001P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_airoutlet"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01049",
+      "elapsed_ms": 556
+    },
+    {
+      "case_id": "R2B-BN3-001N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_airoutlet"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01049",
+      "elapsed_ms": 549
+    },
+    {
+      "case_id": "R2B-BN3-002P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_airoutlet"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01050",
+      "elapsed_ms": 596
+    },
+    {
+      "case_id": "R2B-BN3-002N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_airoutlet"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01050",
+      "elapsed_ms": 585
+    },
+    {
+      "case_id": "R2B-BN3-003P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_airoutlet"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01051",
+      "elapsed_ms": 557
+    },
+    {
+      "case_id": "R2B-BN3-003N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_airoutlet"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "train_row:c5-train-01051",
+      "elapsed_ms": 564
+    },
+    {
+      "case_id": "R2B-BN3-004P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_ac_wind_direction_to_value"
+      ],
+      "mounted_tool_count": 3,
+      "mount_source": "train_row:c5-train-00017",
+      "elapsed_ms": 885
+    },
+    {
+      "case_id": "R2B-BN3-004N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_ac_wind_direction_to_value"
+      ],
+      "mounted_tool_count": 3,
+      "mount_source": "train_row:c5-train-00017",
+      "elapsed_ms": 968
+    },
+    {
+      "case_id": "R2B-BN3-005P",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "raise_ac_windspeed_by_exp"
+      ],
+      "mounted_tool_count": 10,
+      "mount_source": "train_row:c5-train-00019",
+      "elapsed_ms": 1610
+    },
+    {
+      "case_id": "R2B-BN3-005N",
+      "axis": "B",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "raise_ac_windspeed_by_number"
+      ],
+      "mounted_tool_count": 10,
+      "mount_source": "train_row:c5-train-00019",
+      "elapsed_ms": 1542
+    },
+    {
+      "case_id": "R2B-Q-AC-TEMP-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "query_ac_temperature"
+      ],
+      "mounted_tool_count": 10,
+      "mount_source": "catalog_sg:ac_temperature",
+      "elapsed_ms": 1456
+    },
+    {
+      "case_id": "R2B-Q-AC-TEMP-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_ac_temperature_to_number"
+      ],
+      "mounted_tool_count": 10,
+      "mount_source": "catalog_sg:ac_temperature",
+      "elapsed_ms": 1611
+    },
+    {
+      "case_id": "R2B-Q-AC-WIND-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "query_ac_windspeed"
+      ],
+      "mounted_tool_count": 10,
+      "mount_source": "catalog_sg:ac_windspeed",
+      "elapsed_ms": 1464
+    },
+    {
+      "case_id": "R2B-Q-AC-WIND-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_ac_windspeed_to_number"
+      ],
+      "mounted_tool_count": 10,
+      "mount_source": "catalog_sg:ac_windspeed",
+      "elapsed_ms": 1616
+    },
+    {
+      "case_id": "R2B-Q-SEAT-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_seat_heat_temperature_to_number"
+      ],
+      "mounted_tool_count": 23,
+      "mount_source": "case.tools",
+      "elapsed_ms": 3002
+    },
+    {
+      "case_id": "R2B-Q-SEAT-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_seat_heat_temperature_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:seat_heat_temperature",
+      "elapsed_ms": 1304
+    },
+    {
+      "case_id": "R2B-Q-WINDOW-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_window"
+      ],
+      "mounted_tool_count": 27,
+      "mount_source": "case.tools",
+      "elapsed_ms": 2326
+    },
+    {
+      "case_id": "R2B-Q-WINDOW-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_window_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:window",
+      "elapsed_ms": 1086
+    },
+    {
+      "case_id": "R2B-Q-DOOR-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_comfortable_entry_exit"
+      ],
+      "mounted_tool_count": 48,
+      "mount_source": "case.tools",
+      "elapsed_ms": 3224
+    },
+    {
+      "case_id": "R2B-Q-DOOR-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_tailgate_height_to_number"
+      ],
+      "mounted_tool_count": 5,
+      "mount_source": "catalog_sg:tailgate_height",
+      "elapsed_ms": 519
+    },
+    {
+      "case_id": "R2B-Q-LIGHT-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_atmosphere_lamp"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "case.tools",
+      "elapsed_ms": 940
+    },
+    {
+      "case_id": "R2B-Q-LIGHT-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_atmosphere_lamp"
+      ],
+      "mounted_tool_count": 2,
+      "mount_source": "catalog_sg:atmosphere_lamp",
+      "elapsed_ms": 930
+    },
+    {
+      "case_id": "R2B-Q-SCREEN-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_screen_brightness_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "case.tools",
+      "elapsed_ms": 1476
+    },
+    {
+      "case_id": "R2B-Q-SCREEN-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_screen_brightness_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:screen_brightness",
+      "elapsed_ms": 1461
+    },
+    {
+      "case_id": "R2B-Q-VOLUME-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "query_current_volume"
+      ],
+      "mounted_tool_count": 1,
+      "mount_source": "catalog_sg:current_volume",
+      "elapsed_ms": 504
+    },
+    {
+      "case_id": "R2B-Q-VOLUME-001AQ",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_volume_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "case.tools",
+      "elapsed_ms": 2262
+    },
+    {
+      "case_id": "R2B-Q-VOLUME-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_volume_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:volume",
+      "elapsed_ms": 2285
+    },
+    {
+      "case_id": "R2B-Q-WIPER-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_wiper"
+      ],
+      "mounted_tool_count": 27,
+      "mount_source": "case.tools",
+      "elapsed_ms": 1385
+    },
+    {
+      "case_id": "R2B-Q-WIPER-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_wiper_speed_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:wiper_speed",
+      "elapsed_ms": 735
+    },
+    {
+      "case_id": "R2B-Q-SUNROOF-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "open_sunroof"
+      ],
+      "mounted_tool_count": 30,
+      "mount_source": "case.tools",
+      "elapsed_ms": 1330
+    },
+    {
+      "case_id": "R2B-Q-SUNROOF-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_sunroof_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:sunroof",
+      "elapsed_ms": 640
+    },
+    {
+      "case_id": "R2B-Q-SUNSHADE-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_sunroof"
+      ],
+      "mounted_tool_count": 30,
+      "mount_source": "case.tools",
+      "elapsed_ms": 1335
+    },
+    {
+      "case_id": "R2B-Q-SUNSHADE-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "close_sunshade_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:sunshade",
+      "elapsed_ms": 654
+    },
+    {
+      "case_id": "R2B-Q-FRAGRANCE-AMOUNT-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "query_amount_of_fragrance"
+      ],
+      "mounted_tool_count": 1,
+      "mount_source": "catalog_sg:amount_of_fragrance",
+      "elapsed_ms": 369
+    },
+    {
+      "case_id": "R2B-Q-FRAGRANCE-AMOUNT-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "adjust_fragrance_intensity_to_number"
+      ],
+      "mounted_tool_count": 8,
+      "mount_source": "catalog_sg:fragrance_intensity",
+      "elapsed_ms": 664
+    },
+    {
+      "case_id": "R2B-Q-FRAGRANCE-MODE-001Q",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "query_mode_of_fragrance"
+      ],
+      "mounted_tool_count": 1,
+      "mount_source": "catalog_sg:mode_of_fragrance",
+      "elapsed_ms": 359
+    },
+    {
+      "case_id": "R2B-Q-FRAGRANCE-MODE-001L",
+      "axis": "Q",
+      "has_tool_call": true,
+      "empty_tool_call_output": false,
+      "tool_call_count": 1,
+      "observed_tool_names": [
+        "switch_fragrance_mode"
+      ],
+      "mounted_tool_count": 1,
+      "mount_source": "catalog_sg:fragrance_mode",
+      "elapsed_ms": 395
+    }
+  ]
+}

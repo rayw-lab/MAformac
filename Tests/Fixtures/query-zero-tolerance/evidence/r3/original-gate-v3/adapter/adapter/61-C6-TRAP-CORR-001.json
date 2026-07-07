@@ -1,0 +1,45 @@
+{
+  "index": 61,
+  "case_id": "C6-TRAP-CORR-001",
+  "axis": "D",
+  "behavior_class": "tool_call",
+  "input_zh": "不是车窗，是屏幕亮度调暗",
+  "expected_tool_calls": [
+    {
+      "arguments": {},
+      "name": "lower_screen_brightness_little"
+    }
+  ],
+  "mounted_tool_count": 8,
+  "mounted_tool_names": [
+    "adjust_screen_brightness_to_gear",
+    "adjust_screen_brightness_to_max",
+    "adjust_screen_brightness_to_min",
+    "adjust_screen_brightness_to_number",
+    "lower_screen_brightness_by_number",
+    "lower_screen_brightness_little",
+    "raise_screen_brightness_by_number",
+    "raise_screen_brightness_little"
+  ],
+  "mount_source": "catalog_sg:screen_brightness",
+  "mount_policy": "e2_sg_full_group",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_screen_brightness_to_gear\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_screen_brightness_to_max\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_screen_brightness_to_min\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_screen_brightness_to_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"lower_screen_brightness_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"lower_screen_brightness_little\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"raise_screen_brightness_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"PERCENT\", \"SPOT\"]}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"raise_screen_brightness_little\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"screen_type\": {\"enum\": [\"一排右屏\", \"一排屏\", \"一排左屏\", \"三排中屏\", \"三排右屏\", \"三排吸顶屏\", \"三排屏\", \"三排左屏\", \"中控屏\", \"主驾屏\", \"二排中屏\", \"二排右屏\", \"二排右扶手屏\", \"二排吸顶屏\", \"二排屏\", \"二排左屏\", \"二排左扶手屏\", \"二排扶手屏\", \"仪表屏\", \"全车屏\", \"前两排中屏\", \"前两排右屏\", \"前两排屏\", \"前两排左屏\", \"前排屏\", \"副驾屏\", \"右侧屏\", \"右前屏\", \"右后屏\", \"后两排中屏\", \"后两排右屏\", \"后两排屏\", \"后两排左屏\", \"后排屏\", \"多媒体屏\", \"娱乐屏\", \"左侧屏\", \"左前屏\", \"左后屏\", \"最后一排中屏\", \"最后一排右屏\", \"最后一排屏\", \"最后一排左屏\", \"空调屏\", \"远端屏\", \"长联屏\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\n不是车窗，是屏幕亮度调暗<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>{\"name\":\"lower_screen_brightness_by_number\",\"arguments\":{}}</tool_call>",
+  "truncated_output": "<tool_call>{\"name\":\"lower_screen_brightness_by_number\",\"arguments\":{}}",
+  "raw_output": "<tool_call>{\"name\":\"lower_screen_brightness_by_number\",\"arguments\":{}}</tool_call>",
+  "tool_calls": [
+    {
+      "name": "lower_screen_brightness_by_number",
+      "arguments": {}
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 1427,
+  "observed_tool_names": [
+    "lower_screen_brightness_by_number"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

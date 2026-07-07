@@ -76,6 +76,7 @@ public enum ToolCandidateSource: String, Codable, Equatable, Sendable {
 
 public enum SchemaInvalidReason: Equatable, Sendable {
     case unknownTool(String)
+    case unknownToolName(String)
     case missingField(String)
     case typeMismatch(String)
     case outOfRange(String)
@@ -107,17 +108,20 @@ public struct ToolCallDecodeInput: Equatable, Sendable {
     public var finishReason: DecodeFinishReason
     public var stopReason: String?
     public var toolCallCount: Int
+    public var allowedToolNames: Set<String>
 
     public init(
         content: String,
         finishReason: DecodeFinishReason = .stop,
         stopReason: String? = nil,
-        toolCallCount: Int = 1
+        toolCallCount: Int = 1,
+        allowedToolNames: Set<String> = []
     ) {
         self.content = content
         self.finishReason = finishReason
         self.stopReason = stopReason
         self.toolCallCount = toolCallCount
+        self.allowedToolNames = allowedToolNames
     }
 }
 
@@ -308,7 +312,11 @@ public struct ToolCallCandidateDecoder: Sendable {
         guard input.toolCallCount <= 1 else {
             throw ToolExecutionError.schemaInvalid(.multipleFrames)
         }
-        return try decodeContentFallback(input.content)
+        let frame = try decodeContentFallback(input.content)
+        if !input.allowedToolNames.isEmpty && !input.allowedToolNames.contains(frame.toolName) {
+            throw ToolExecutionError.schemaInvalid(.unknownToolName(frame.toolName))
+        }
+        return frame
     }
 
     public func decodeContentFallback(_ content: String) throws -> ToolCallFrame {
@@ -333,6 +341,7 @@ public struct ToolCallCandidateDecoder: Sendable {
         guard allowedActionPrimitives.contains(actionPrimitive) else {
             throw ToolExecutionError.schemaInvalid(.unknownEnum("action_primitive"))
         }
+        let toolName = try decodeToolName(from: object)
 
         let slots = try decodeStringMap(object["slot"], field: "slot") ?? [:]
         let value = try decodeValue(object["value"])
@@ -344,7 +353,7 @@ public struct ToolCallCandidateDecoder: Sendable {
         return ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.\(device)",
-            toolName: "vehicle_control",
+            toolName: toolName,
             device: device,
             actionPrimitive: actionPrimitive,
             slots: slots,
@@ -353,6 +362,20 @@ public struct ToolCallCandidateDecoder: Sendable {
             candidateSource: .contentFallback,
             rawPayload: try JSONDecoder().decode(JSONValue.self, from: data)
         )
+    }
+
+    private func decodeToolName(from object: [String: Any]) throws -> String {
+        let raw = object["tool_name"] ?? object["toolName"] ?? object["name"]
+        guard let raw else {
+            return "vehicle_control"
+        }
+        guard let toolName = raw as? String else {
+            throw ToolExecutionError.schemaInvalid(.typeMismatch("tool_name"))
+        }
+        guard !toolName.isEmpty else {
+            throw ToolExecutionError.schemaInvalid(.missingField("tool_name"))
+        }
+        return toolName
     }
 
     public func decodeNonStreamingCompletion(_ completion: String) throws -> ToolCallFrame {

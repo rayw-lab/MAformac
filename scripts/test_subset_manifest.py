@@ -11,6 +11,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "gen_subset_manifest.py"
+sys.path.insert(0, str(ROOT / "scripts"))
+import gen_subset_manifest as manifest_generator
 
 
 def run_cmd(args, cwd=ROOT, expect_ok=True):
@@ -130,6 +132,19 @@ def test_budget_gate_fails_closed_for_over_cap_single_group():
         assert "budget cap fail-closed" in result.stderr
 
 
+def test_build_entry_asserts_tool_ids_ordered_unique():
+    duplicate_tools = [
+        tool("duplicate_ac_tool", "ac", "ac", "ac", {}),
+        tool("duplicate_ac_tool", "ac", "ac", "ac", {}),
+    ]
+    try:
+        manifest_generator.build_entry("ac", "single_group", duplicate_tools)
+    except AssertionError as exc:
+        assert "tool_ids_ordered duplicate in single_group:ac: duplicate_ac_tool" in str(exc)
+    else:
+        raise AssertionError("build_entry accepted duplicate tool_ids_ordered")
+
+
 def test_grouping_contract_seat_closure_fails_closed():
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
@@ -221,6 +236,7 @@ def main() -> int:
         test_real_catalog_single_group_coverage_and_digest_identity,
         test_fixture_digest_stable,
         test_budget_gate_fails_closed_for_over_cap_single_group,
+        test_build_entry_asserts_tool_ids_ordered_unique,
         test_grouping_contract_seat_closure_fails_closed,
     ]
     for test in tests:

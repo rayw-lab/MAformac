@@ -1601,10 +1601,11 @@ final class C5LoRATrainingTests: XCTestCase {
         try text.write(to: url, atomically: true, encoding: .utf8)
     }
 
-    private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", valueType: String = "EXP", slotKeys: [String] = ["device"]) -> C5SemanticSeed {
+    private func rawSeed(id: String, intent: String, device: String, actionPrimitive: String = "power_on", actionCode: String? = nil, valueType: String = "EXP", slotKeys: [String] = ["device"]) -> C5SemanticSeed {
         let encodedSlotKeys = slotKeys.map { "\"\($0)\"" }.joined(separator: ",")
+        let encodedActionCode = actionCode ?? intent
         let json = """
-        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"\(intent)","intent":"\(intent)","service":"x","exec_tier":"L2","fc_flags":{"fuzzy":false,"free":false},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"x","source_sheet":"x","source_row_no":1,"range":""}
+        {"contract_row_id":"\(id)","canonical_semantic_id":"sem-\(id)","dedupe_group_id":"dedupe-\(id)","dedupe_role":"primary","device":"\(device)","action_primitive":"\(actionPrimitive)","action_code":"\(encodedActionCode)","intent":"\(intent)","service":"x","exec_tier":"L2","fc_flags":{"fuzzy":false,"free":false},"slot_keys":[\(encodedSlotKeys)],"value":{"ref":"ZERO","direct":"+","offset":"ON","type":"\(valueType)"},"source_domain":"x","source_sheet":"x","source_row_no":1,"range":""}
         """
         return try! JSONDecoder().decode(C5SemanticSeed.self, from: Data(json.utf8))
     }
@@ -1654,6 +1655,61 @@ final class C5LoRATrainingTests: XCTestCase {
         XCTAssertFalse(toolNames.contains(where: { $0.hasPrefix("irrelevant_") }), "distractor 改同族 D-domain, 非 irrelevant 占位")
     }
 
+    func testProtocolUtteranceIncludesActionCodeToSeparateSameSlotsOpenClose() {
+        let openSeed = rawSeed(id: "open-mode", intent: "open_mode", device: "ac_cooling_mode", actionPrimitive: "set_mode", valueType: "", slotKeys: ["mode"])
+        let closeSeed = rawSeed(id: "close-mode", intent: "close_mode", device: "ac_cooling_mode", actionPrimitive: "set_mode", valueType: "", slotKeys: ["mode"])
+
+        let openText = C5TrainingRenderer.renderUserUtterance(seed: openSeed, variant: 0, valueText: "", slotAssignments: ["mode": "cooling"])
+        let closeText = C5TrainingRenderer.renderUserUtterance(seed: closeSeed, variant: 0, valueText: "", slotAssignments: ["mode": "cooling"])
+
+        XCTAssertTrue(openText.contains("device=ac_cooling_mode; primitive=set_mode; action=open_mode; slots=mode:cooling;"))
+        XCTAssertTrue(closeText.contains("device=ac_cooling_mode; primitive=set_mode; action=close_mode; slots=mode:cooling;"))
+        XCTAssertNotEqual(openText, closeText, "同 device/primitive/slots 的正反极性必须在 user protocol 串可区分")
+    }
+
+    func testProtocolUtteranceFallsBackToIntentActionPrefixWhenActionCodeMissing() {
+        let seed = rawSeed(id: "fallback-action", intent: "lower_ac_temperature_little", device: "ac_temperature", actionPrimitive: "adjust_little", actionCode: "", valueType: "EXP", slotKeys: [])
+
+        let text = C5TrainingRenderer.renderUserUtterance(seed: seed, variant: 0, valueText: "", slotAssignments: [:])
+
+        XCTAssertTrue(text.contains("action=lower;"), "action_code 缺失时用 intent 动作前缀兜底")
+    }
+
+    func testProtocolUtteranceFallsBackToNonPolarityIntentActionPrefix() {
+        let pauseSeed = rawSeed(id: "pause-seat-mode", intent: "pause_seat_mode", device: "seat_mode", actionPrimitive: "set_mode", actionCode: "", valueType: "", slotKeys: ["mode", "modeValue"])
+        let saveSeed = rawSeed(id: "save-seat-mode", intent: "save_seat_mode", device: "seat_mode", actionPrimitive: "set_mode", actionCode: "", valueType: "", slotKeys: ["mode", "modeValue"])
+
+        let pauseText = C5TrainingRenderer.renderUserUtterance(seed: pauseSeed, variant: 0, valueText: "", slotAssignments: ["mode": "座椅记忆模式", "modeValue": "位置1"])
+        let saveText = C5TrainingRenderer.renderUserUtterance(seed: saveSeed, variant: 0, valueText: "", slotAssignments: ["mode": "座椅记忆模式", "modeValue": "位置1"])
+
+        XCTAssertTrue(pauseText.contains("action=pause;"))
+        XCTAssertTrue(saveText.contains("action=save;"))
+        XCTAssertNotEqual(pauseText, saveText, "action_code 为空时非 open/close 极性动作也必须用 intent 首段区分")
+    }
+
+    func testProtocolUtteranceCorrectsContradictoryPolarityPrefixFromIntent() {
+        let seed = rawSeed(id: "fragrance-open-mode", intent: "open_fragrance", device: "fragrance", actionPrimitive: "set_mode", actionCode: "close_mode", valueType: "", slotKeys: ["mode"])
+
+        let text = C5TrainingRenderer.renderUserUtterance(seed: seed, variant: 0, valueText: "", slotAssignments: ["mode": "若云模式"])
+
+        XCTAssertTrue(text.contains("action=open_mode;"), "intent=open_* 但 action_code=close_* 时，user protocol 串必须保留 open 极性")
+        XCTAssertFalse(text.contains("action=close_mode;"), "不能把 open_fragrance 渲染成 close 极性")
+    }
+
+    func testDDomainSamplesCarrySeededShuffleMountOrderStrategy() throws {
+        let catalog = try loadDemoCatalog()
+        let seed = semanticSeed(id: "ac-1", fuzzy: false, free: false, device: "ac")
+        let options = C5TrainingBuildOptions(targetPositiveRows: 1, devSelectionRows: 0, includeNoCallCounterfactuals: false, surface: .dDomain, dDomainCatalog: catalog)
+        let first = C5TrainingDatasetBuilder().build(seeds: [seed], c6Cases: [], dataGateContext: context(), options: options)
+        let second = C5TrainingDatasetBuilder().build(seeds: [seed], c6Cases: [], dataGateContext: context(), options: options)
+
+        let firstSample = try XCTUnwrap(first.samples.first { $0.split == "train" })
+        let secondSample = try XCTUnwrap(second.samples.first { $0.split == "train" })
+
+        XCTAssertEqual(firstSample.mountOrderStrategy, "seeded_shuffle")
+        XCTAssertEqual(firstSample.tools.compactMap(functionName), secondSample.tools.compactMap(functionName), "sample_id 派生 shuffle 必须可复现")
+    }
+
     // cut2: 同族 distractor ∈ 562 catalog(非 irrelevant 占位), 不含目标自身
     func testDDomainDistractorsAreRealCatalogToolsSameFamily() throws {
         let catalog = try loadDemoCatalog()
@@ -1682,7 +1738,11 @@ final class C5LoRATrainingTests: XCTestCase {
         )
         let positive = try XCTUnwrap(prepared.samples.first { $0.split == "train" })
         let toolNames = positive.tools.compactMap { functionName($0) }
-        XCTAssertEqual(toolNames, manifestEntry.toolIDsOrdered, "G7D: mounted prompt tools follow manifest tool_ids_ordered exactly")
+        // G7D 语义随 R3 seeded_shuffle 收基线调整：挂载【集合】仍严格来自 manifest tool_ids_ordered；
+        // 渲染【顺序】按 mount_order_strategy=seeded_shuffle 以 sampleID 确定性洗牌（冻结 trainpack fa5690…3823 实证形态）。
+        XCTAssertEqual(Set(toolNames), Set(manifestEntry.toolIDsOrdered), "G7D: mounted prompt tool set follows manifest tool_ids_ordered")
+        XCTAssertEqual(toolNames.count, manifestEntry.toolIDsOrdered.count, "G7D: seeded shuffle 不增删不重复工具")
+        XCTAssertEqual(positive.mountOrderStrategy, "seeded_shuffle", "G7D: 顺序偏离 manifest 序必须由 mount_order_strategy 显式声明")
         XCTAssertEqual(positive.subsetPolicyID, manifestEntry.subsetPolicyID)
         XCTAssertEqual(positive.subsetGroupID, manifestEntry.groupID)
         XCTAssertEqual(positive.mountedToolCount, manifestEntry.toolIDsOrdered.count)

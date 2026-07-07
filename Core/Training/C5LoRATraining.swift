@@ -379,6 +379,7 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var expectedToolCalls: [C5TrainingToolCall]
     public var noCall: C5NoCallMetadata?
     public var promptDistractorToolIDs: [String]
+    public var mountOrderStrategy: String? = nil
     public var subsetPolicyID: String? = nil
     public var subsetGroupID: String? = nil
     public var mountedToolCount: Int? = nil
@@ -420,6 +421,7 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case expectedToolCalls = "expected_tool_calls"
         case noCall = "no_call"
         case promptDistractorToolIDs = "prompt_distractor_tool_ids"
+        case mountOrderStrategy = "mount_order_strategy"
         case subsetPolicyID = "subset_policy_id"
         case subsetGroupID = "subset_group_id"
         case mountedToolCount = "mounted_tool_count"
@@ -2500,10 +2502,56 @@ public enum C5TrainingRenderer {
             "这是离线演示的单跳请求"
         ]
         let suffix = suffixes[variant % suffixes.count]
+        let actionText = actionCodeForPrompt(seed: seed)
         if valueText.isEmpty {
-            return "device=\(seed.device); primitive=\(seed.actionPrimitive); slots=\(slotText); \(suffix)"
+            return "device=\(seed.device); primitive=\(seed.actionPrimitive); action=\(actionText); slots=\(slotText); \(suffix)"
         }
-        return "device=\(seed.device); primitive=\(seed.actionPrimitive); value=\(valueText); slots=\(slotText); \(suffix)"
+        return "device=\(seed.device); primitive=\(seed.actionPrimitive); action=\(actionText); value=\(valueText); slots=\(slotText); \(suffix)"
+    }
+
+    private static func actionCodeForPrompt(seed: C5SemanticSeed) -> String {
+        let actionCode = seed.actionCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !actionCode.isEmpty {
+            if let intentPrefix = polarityPrefix(seed.intent),
+               let actionPrefix = polarityPrefix(actionCode),
+               intentPrefix != actionPrefix {
+                let suffix = actionCode.dropFirst(actionPrefix.count)
+                return intentPrefix + suffix
+            }
+            return actionCode
+        }
+        if let prefix = seed.intent.split(separator: "_").first, !prefix.isEmpty {
+            return String(prefix)
+        }
+        return seed.actionPrimitive
+    }
+
+    private static func polarityPrefix(_ text: String) -> String? {
+        for prefix in ["open", "close", "raise", "lower"] where text.hasPrefix(prefix + "_") || text == prefix {
+            return prefix
+        }
+        return nil
+    }
+
+    public static func seededShuffleTools(_ tools: [[String: JSONValue]], sampleID: String) -> [[String: JSONValue]] {
+        tools.sorted { lhs, rhs in
+            let lhsName = toolSchemaName(lhs)
+            let rhsName = toolSchemaName(rhs)
+            let lhsKey = C6Hash.sha256Hex(Data("\(sampleID)|\(lhsName)".utf8))
+            let rhsKey = C6Hash.sha256Hex(Data("\(sampleID)|\(rhsName)".utf8))
+            if lhsKey == rhsKey {
+                return lhsName < rhsName
+            }
+            return lhsKey < rhsKey
+        }
+    }
+
+    private static func toolSchemaName(_ tool: [String: JSONValue]) -> String {
+        guard case let .object(function)? = tool["function"],
+              case let .string(name)? = function["name"] else {
+            return ""
+        }
+        return name
     }
 
     public static func candidateParentSemanticID(userUtterance: String, renderedToolCall: String) -> String {
@@ -3592,6 +3640,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             mountedToolCount = nil
             subsetPolicyDigest = nil
         }
+        let sampleID = "c5-train-\(String(format: "%05d", ordinal + 1))"
         let renderedToolCall: String
         let finalCall = call
         if let naturalToolCallRecord {
@@ -3619,7 +3668,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             argumentValue: valueAugmentation.didAugment
         )
         return C5TrainingSample(
-            sampleID: "c5-train-\(String(format: "%05d", ordinal + 1))",
+            sampleID: sampleID,
             split: "train",
             splitOrigin: "protocol_seed_train",
             bucket: "semantic_protocol_augmented",
@@ -3659,10 +3708,11 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 C5TrainingMessage(role: "user", content: utterance),
                 C5TrainingMessage(role: "assistant", content: assistant)
             ],
-            tools: resolvedTools,
+            tools: C5TrainingRenderer.seededShuffleTools(resolvedTools, sampleID: sampleID),
             expectedToolCalls: [finalCall],
             noCall: nil,
             promptDistractorToolIDs: distractorIDs,
+            mountOrderStrategy: "seeded_shuffle",
             subsetPolicyID: subsetPolicyID,
             subsetGroupID: subsetGroupID,
             mountedToolCount: mountedToolCount,

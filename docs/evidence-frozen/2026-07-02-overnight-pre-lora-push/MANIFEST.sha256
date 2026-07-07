@@ -1,0 +1,7 @@
+# MANIFEST.sha256 for 2026-07-02-overnight-pre-lora-push
+# copied files: sha256  bytes  relative_path
+70eedc1cf98a8a917e1cc04977afcf532ba7195e70d571fd4ec2802f6d9eb42c  3225  RECEIPT-43.md
+9f5f8f4dc204582addbfa5abb24aff2c22fa40abc9d1b4d4b969c5b0b0815a5e  5253  RECEIPT-44.md
+beb36b3138a7132a7c94cabb42385f5ef704e5a77d8ba6686cdd6d52ea28d3b6  5123  RECEIPT-45-fix.md
+ea1adfcc81e477a615c42b7dc33c71fbc799e0c19928797d64b97d04877cd4a9  4247  RECEIPT-45.md
+# external large files not copied: sha256  bytes  relative_path  absolute_path

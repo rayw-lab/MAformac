@@ -1,0 +1,43 @@
+{
+  "index": 6,
+  "case_id": "P3D-A-006",
+  "axis": "A",
+  "behavior_class": "tool_call",
+  "input_zh": "device=ac_heating_mode; primitive=set_mode; action=open_position_mode; slots=direction:主驾; 请按这个语义执行",
+  "expected_tool_calls": [
+    {
+      "name": "open_ac_heating_mode",
+      "arguments": {
+        "direction": "三区"
+      }
+    }
+  ],
+  "mounted_tool_count": 2,
+  "mounted_tool_names": [
+    "open_ac_heating_mode",
+    "close_ac_heating_mode"
+  ],
+  "mount_source": "train_row:c5-train-00006",
+  "mount_policy": "training_row_tools_exact",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_ac_heating_mode\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"modeValue\": {\"enum\": [\"中挡\", \"低挡\", \"强力\", \"快速\", \"最大\", \"最小\", \"自动\", \"高挡\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_ac_heating_mode\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"modeValue\": {\"enum\": [\"中挡\", \"低挡\", \"强力\", \"快速\", \"最大\", \"最小\", \"自动\", \"高挡\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\ndevice=ac_heating_mode; primitive=set_mode; action=open_position_mode; slots=direction:主驾; 请按这个语义执行<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>{\"name\":\"open_ac_heating_mode\",\"arguments\":{\"direction\":\"主驾\"}}</tool_call>",
+  "truncated_output": "<tool_call>{\"name\":\"open_ac_heating_mode\",\"arguments\":{\"direction\":\"主驾\"}}",
+  "raw_output": "<tool_call>{\"name\":\"open_ac_heating_mode\",\"arguments\":{\"direction\":\"主驾\"}}</tool_call>",
+  "tool_calls": [
+    {
+      "name": "open_ac_heating_mode",
+      "arguments": {
+        "direction": "主驾"
+      }
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 585,
+  "observed_tool_names": [
+    "open_ac_heating_mode"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

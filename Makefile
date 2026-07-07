@@ -24,7 +24,7 @@ GENERATED_DOMAIN := \
 	generated/subset-policy-manifest.json \
 	generated/subset-grammar-artifacts.json
 
-.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test clean-venv
+.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -68,6 +68,11 @@ verify-default-scope: .venv/.deps.stamp
 	$(PYTHON) scripts/check_c5_c2_scope_parity.py
 	$(PYTHON) scripts/check_scope_origin_single_source.py
 
+verify-c5-phase1-gates: .venv/.deps.stamp
+	$(PYTHON) scripts/test_query_zero_tolerance.py
+	$(PYTHON) scripts/test_eval_mount_validity.py
+	$(PYTHON) scripts/test_label_authority_conflicts.py
+
 # source-free: 只校验已提交产物(JSONL/YAML/coverage/state-cells/manifest)自洽与引用,
 # 不依赖 raw xlsx 快照(别人 clone 仓无 snapshot 也能验契约). verify-refs 只读 manifest+committed, 不读源表.
 verify-generated: .venv/.deps.stamp verify-refs test
@@ -78,6 +83,9 @@ test: .venv/.deps.stamp
 	$(PYTHON) scripts/test_fc_flags.py
 	$(PYTHON) scripts/test_tool_name_sanitize.py
 	$(PYTHON) scripts/test_check_c6_case_shape.py
+	$(PYTHON) scripts/test_query_zero_tolerance.py
+	$(PYTHON) scripts/test_eval_mount_validity.py
+	$(PYTHON) scripts/test_label_authority_conflicts.py
 	$(PYTHON) scripts/test_c6_bench_cli.py
 	$(PYTHON) scripts/test_subset_manifest.py
 
@@ -86,8 +94,6 @@ verify-source: .venv/.deps.stamp
 
 regen: .venv/.deps.stamp
 	$(PYTHON) scripts/gen_c1.py
-	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
-	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
 	$(PYTHON) scripts/gen_tool_contract.py --contract contracts/semantic-function-contract.jsonl --output-dir generated
 	$(PYTHON) scripts/gen_family_allowlist.py --emit --output-dir generated
 	HF_HUB_OFFLINE=1 $(PYTHON_TOKENIZER) scripts/gen_subset_manifest.py --emit --verify-budget --budget-cap 7200 --tokenizer-mode qwen --output-dir generated

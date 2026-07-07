@@ -43,4 +43,41 @@ final class C3DecodeCompletionMetaTests: XCTestCase {
         let frame = try decoder.decode(ToolCallDecodeInput(content: content))
         XCTAssertEqual(frame.device, "window")
     }
+
+    func testUnknownToolNameIsRejectedWhenAllowlistIsProvided() {
+        let decoder = ToolCallCandidateDecoder(contentFallbackEnabled: true)
+        let content = #"{"tool_name":"switch_screen_content_to_number","device":"screen_content","action_primitive":"set_mode","slot":{"screen_type":"中控屏","mode":"导航"},"state_revision":0}"#
+        let input = ToolCallDecodeInput(
+            content: content,
+            allowedToolNames: ["switch_screen_content"]
+        )
+
+        XCTAssertThrowsError(try decoder.decode(input)) { error in
+            XCTAssertEqual(
+                error as? ToolExecutionError,
+                .schemaInvalid(.unknownToolName("switch_screen_content_to_number"))
+            )
+        }
+    }
+
+    func testAllowedToolNamePassesWhenAllowlistContainsExactName() throws {
+        let decoder = ToolCallCandidateDecoder(contentFallbackEnabled: true)
+        let content = #"{"tool_name":"open_window","device":"window","action_primitive":"power_on","slot":{"position":"主驾"},"state_revision":0}"#
+        let input = ToolCallDecodeInput(
+            content: content,
+            allowedToolNames: ["open_window", "close_window"]
+        )
+
+        let frame = try decoder.decode(input)
+        XCTAssertEqual(frame.toolName, "open_window")
+        XCTAssertEqual(frame.device, "window")
+    }
+
+    func testEmptyAllowedToolNamesKeepsLegacyBehaviorForUnknownNames() throws {
+        let decoder = ToolCallCandidateDecoder(contentFallbackEnabled: true)
+        let content = #"{"tool_name":"switch_screen_content_to_number","device":"screen_content","action_primitive":"set_mode","slot":{"screen_type":"中控屏","mode":"导航"},"state_revision":0}"#
+
+        let frame = try decoder.decode(ToolCallDecodeInput(content: content))
+        XCTAssertEqual(frame.toolName, "switch_screen_content_to_number")
+    }
 }

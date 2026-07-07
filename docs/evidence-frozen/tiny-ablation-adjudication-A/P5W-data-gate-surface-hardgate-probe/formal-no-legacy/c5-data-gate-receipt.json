@@ -1,0 +1,102 @@
+{
+  "allow_legacy_missing_surface" : false,
+  "bucket_counts" : {
+    "train" : 1
+  },
+  "detected_parent_semantic_overlap_count" : 0,
+  "failure_receipt" : [
+    {
+      "bucket" : "tool_call_wrapper_format",
+      "case_id" : "P5W-MISSING-SURFACE",
+      "parent_semantic_id" : "p5w.missing.surface",
+      "reason" : "missing_candidate_surface_fields",
+      "sample_id" : "P5W-MISSING-SURFACE",
+      "severity" : "P1",
+      "split" : "train"
+    }
+  ],
+  "format_contract_version" : "0bc0403464b9953d50cd159fc05678d010cbcb4b2ec50688a5e1e8a53e1037ff",
+  "generated_at" : "2026-07-02T17:59:15Z",
+  "held_out_axis_overlaps" : [
+    {
+      "axis" : "parent_semantic_id",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "device",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "tool_name",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "value_type",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "template_family",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    },
+    {
+      "axis" : "generator_source",
+      "overlapping_values" : [
+
+      ],
+      "train_overlap_count" : 0
+    }
+  ],
+  "legacy_missing_surface_allowed_count" : 0,
+  "masking_coverage" : {
+    "argument_name" : false,
+    "argument_value" : false,
+    "function_name" : false,
+    "train_on_turn" : false
+  },
+  "missing_surface_count" : 1,
+  "must_not_train_violations" : 0,
+  "proposed_fix" : {
+    "auto_apply" : false,
+    "suggestions" : [
+      "populate tools/mounted_tool_count/subset fields before formal wave-1 data gate, or rerun legacy fixtures with explicit allow_legacy_missing_surface"
+    ]
+  },
+  "quarantine_count" : 0,
+  "receipt_version" : "c5-data-gate.v1",
+  "redaction_status" : "pass",
+  "row_count" : 1,
+  "source_authorization_status" : "authorized_probe",
+  "source_snapshot_digest" : "ed1a2f45c0a49773d0f8de87e29f7db0ca5fe43af83ef360a58154617b6c838f",
+  "split_whitelist" : [
+    "train",
+    "heldout",
+    "must_pass",
+    "c6_base",
+    "dev_selection",
+    "quarantine"
+  ],
+  "status" : "blocked",
+  "surface_field_pass" : 0,
+  "tool_call_format_failures" : [
+
+  ],
+  "tool_call_format_pass" : 1,
+  "train_held_out_axis_overlap_count" : 0,
+  "train_held_out_axis_overlap_row_count" : 0,
+  "train_parent_semantic_overlap" : 0
+}

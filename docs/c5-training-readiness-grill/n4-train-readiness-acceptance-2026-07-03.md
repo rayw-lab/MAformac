@@ -9,6 +9,8 @@ run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-
 
 # N4 wave-1 train-readiness 验收（2026-07-03）
 
+> **Postscript（D-053/D-054）**：本文件的 N4 结论仍只表示 local mechanical acceptance，不表示 formal train-ready。run-auth 后 T1 smoke 已实跑并改判为 Metal OOM before first optimizer update（非 hang）；后续训练线以 `t1-oom-premortem-iceberg-advice-2026-07-03.md`、`t1-oom-diagnostic-runbook-2026-07-03.md`、`token-budget-supervision-ledger-2026-07-03.md` 为最新指针。
+
 ## 1. 验收口径（先说不声称什么）
 
 **声称**：wave-1 **local** train-readiness 机械门全绿 + 语义门加固 + 配方锚落档。
@@ -45,6 +47,6 @@ run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-
 
 1. 🔴 run-auth（磊哥显式签）+ R7 candidate signoff（route-only 至 2026-07-23）。
 2. 🔴 云凭证（Anthropic generator + OpenAI judge）→ N5 live 生成 + cross-vendor judge + validator_layer2/candidate_data_quality 债。
-3. run-auth 后第一动作 = **T1 hang 验证 2-iter 真训 smoke**（runbook 门 T1 清单；R7 边界内不做）。
+3. run-auth 后第一动作 = **T1 smoke**（N4 时按 #1348 hang 风险命名；D-053 已实跑改判为 Metal OOM before first optimizer update）。
 4. F-044 默认值与 GF lock 均 pending_leige_override（默认已锁，可异步翻）。
 5. GitHub billing 修复 → CI 重跑；merge 键（#26→#27→#28→#29→#31 依赖序）在磊哥。
