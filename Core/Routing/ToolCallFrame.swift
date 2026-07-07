@@ -378,10 +378,13 @@ public struct ToolCallCandidateDecoder: Sendable {
         return toolName
     }
 
-    public func decodeNonStreamingCompletion(_ completion: String) throws -> ToolCallFrame {
+    public func decodeNonStreamingCompletion(
+        _ completion: String,
+        allowedToolNames: Set<String> = []
+    ) throws -> ToolCallFrame {
         let stripped = stripThinking(from: completion)
         let candidate = extractFencedJSON(from: stripped) ?? stripped.trimmingCharacters(in: .whitespacesAndNewlines)
-        var frame = try decodeContentFallback(candidate)
+        var frame = try decode(ToolCallDecodeInput(content: candidate, allowedToolNames: allowedToolNames))
         frame.candidateSource = .parserRepair
         return frame
     }
