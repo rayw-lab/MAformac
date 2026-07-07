@@ -46,6 +46,27 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
+    func testDefaultRunnerUsesInjectedModelRouterForDDomainText() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine()
+        let completion = #"<tool_call>{"name":"adjust_ac_temperature_to_number","arguments":{"temperature":"26"}}</tool_call>"#
+        let runner = try DemoRuntimeSessionRunner.defaultRunner(
+            store: store,
+            traceLogger: trace,
+            speech: speech,
+            modelBackend: DDomainToolPlanBackend(completionProvider: { _ in completion })
+        )
+
+        let payload = try await runner.run(text: "空调调到26度")
+
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+        XCTAssertTrue(payload.readbacks.contains { $0.key == "ac.temp_setpoint[主驾]" && $0.actualValue == "26" })
+        XCTAssertEqual(payload.reconciliation.safeReason, "c2_readback_verified")
+    }
+
+    @MainActor
     func testFrameDecoderDoesNotBlockMainActorDuringBackendWork() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
