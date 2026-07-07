@@ -1,0 +1,293 @@
+{
+  "basis": {
+    "batch_id": "warmup-batch-04",
+    "batch_label": "B04",
+    "builder_manifest_sha256": "d6471622d56d68a360500337b368e727664b0b30beec72eab9e5b7d2397ada25",
+    "candidate_sha256": "001cdd3ee15a03dc70b623f839807b497773475ae0adef498ff75428584d5f43",
+    "order_sha256": "c2a3a6cab26a40d104e335658e972afbac4c3ec68688024c4dafb1db863057e6",
+    "repo_head": "266783468ac38542574ea4787bec650d16ba6b02",
+    "version": 1
+  },
+  "basis_id": "e6fc85949bf6bc77bad87f47fddd38e7a5728262a3b7a8601ea602cd6c4acf07",
+  "batch_dir": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04",
+  "batch_id": "warmup-batch-04",
+  "batch_label": "B04",
+  "builder_manifest_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/builder-dryrun/wave1-warmup-batch-manifest.json",
+  "controller_closure": {
+    "candidate_row_sha_rows_ok": 50,
+    "ledger_candidate_row_sha_rows_ok": 50,
+    "ledger_row_count": 50,
+    "quota_config_sha_expected": "sha256:011387d640046b0a5a77d6cbb702cc81548c652cc9ad04149c7af8601bf1de23",
+    "quota_config_sha_rows_ok": 50,
+    "recipe_manifest_sha_expected": "sha256:d6471622d56d68a360500337b368e727664b0b30beec72eab9e5b7d2397ada25",
+    "recipe_manifest_sha_rows_ok": 50,
+    "row_count": 50
+  },
+  "ended_at": "2026-07-03T07:56:21.682214Z",
+  "gate_outputs": {
+    "c6_json": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/c6-leakage-v1/c6-leakage-probe.json",
+      "sha256": "4a3901d039d7ec0569192afe33cad118bd264ff6b4be9d557f176fc7b1108b3a"
+    },
+    "datagate_json": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/datagate-v1/c5-data-gate-receipt.json",
+      "sha256": "28d20a213c460cdd9e5c98267106acf98d6ceb6c230a9017f0cd9c0d9d70ffee"
+    },
+    "datagate_md": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/datagate-v1/c5-data-gate-receipt.md",
+      "sha256": "69553419990c0458e6113bf0625d1fcda15859c33f2bc9d93bd26872a1d99c63"
+    },
+    "diversity_json": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/diversity-v1/diversity-report.json",
+      "sha256": "90bb46d27144d51a1638e450dc3bb742cdf4e06d964c3d9833526a1c38aec95e"
+    },
+    "diversity_md": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/diversity-v1/diversity-report.md",
+      "sha256": "481aaef0309cd633a96346d1ea283221efc8ddb152c46cfbfac082f09d655f41"
+    },
+    "runner_receipt_json": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/B04-GATES-RECEIPT-v1.json",
+      "sha256": "external_after_final_write"
+    },
+    "runner_receipt_md": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/B04-GATES-RECEIPT-v1.md",
+      "sha256": "external_after_final_write"
+    }
+  },
+  "lane_dir": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4",
+  "order_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/batch-04-order.json",
+  "proof_class": "local/pre_training_mechanical_gates",
+  "receipt_version": "run_batch_gates.v1",
+  "repo_head": "266783468ac38542574ea4787bec650d16ba6b02",
+  "repo_root": "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge",
+  "residual": "This receipt does not assert judge pass, train-ready, V-PASS, or run authorization.",
+  "resource_envelope": {
+    "duration_sec": 0.898,
+    "ended_at": "2026-07-03T07:56:21.682214Z",
+    "files": {
+      "batch_manifest": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/batch_manifest.json",
+        "sha256": "dfd5f82397a060a176a69bb2fc6d83b8dd073fb52a1e667f9fbbef0e52cf2d55",
+        "size_bytes": 85028
+      },
+      "batch_self_audit": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/batch_self_audit.md",
+        "sha256": "02066a6dc11721b5db4aaf521b6637a57595dd44689b1d8ee6e3229a23d2f099",
+        "size_bytes": 6086
+      },
+      "builder_manifest": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/builder-dryrun/wave1-warmup-batch-manifest.json",
+        "sha256": "d6471622d56d68a360500337b368e727664b0b30beec72eab9e5b7d2397ada25",
+        "size_bytes": 2206
+      },
+      "candidates": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/candidates.jsonl",
+        "sha256": "bbdae53e301bd8cb1b867f2a10ee15d7cb2672bd2ea66681b8d2f247562b5027",
+        "size_bytes": 878722
+      },
+      "controller_receipt": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/controller-sha-injection-receipt.json",
+        "sha256": "0899a7878bc56ae71c07dd58eb7ba9e1ad79c926fb6a5dbfbc7ea6e9234c5091",
+        "size_bytes": 79907
+      },
+      "generation_receipt": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/generation_receipt.md",
+        "sha256": "6ca147a5e6a4a6416318f62be3cb56bdd9c2b6b358b9539cd80f33a3ebc5a1f8",
+        "size_bytes": 3305
+      },
+      "ledger": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/value_change_ledger.jsonl",
+        "sha256": "77d7322e5e7827cf35009ec802720261637b9a1a082866cee642ec62583a14e4",
+        "size_bytes": 30235
+      },
+      "order": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/batch-04-order.json",
+        "sha256": "c2a3a6cab26a40d104e335658e972afbac4c3ec68688024c4dafb1db863057e6",
+        "size_bytes": 15617
+      },
+      "sha256sums": {
+        "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/SHA256SUMS.txt",
+        "sha256": "2dc88b1905325073b420e55c569abd199c734af3641429b68f6718b46b7d413c",
+        "size_bytes": 435
+      }
+    },
+    "host": "wangleideMacBook-Pro-3.local",
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.9.6",
+    "row_count": 50,
+    "started_at": "2026-07-03T07:56:20.797938Z"
+  },
+  "sha256sums_closure": {
+    "entries": [
+      {
+        "actual_sha256": "bbdae53e301bd8cb1b867f2a10ee15d7cb2672bd2ea66681b8d2f247562b5027",
+        "listed_sha256": "bbdae53e301bd8cb1b867f2a10ee15d7cb2672bd2ea66681b8d2f247562b5027",
+        "match": true,
+        "path": "candidates.jsonl"
+      },
+      {
+        "actual_sha256": "77d7322e5e7827cf35009ec802720261637b9a1a082866cee642ec62583a14e4",
+        "listed_sha256": "77d7322e5e7827cf35009ec802720261637b9a1a082866cee642ec62583a14e4",
+        "match": true,
+        "path": "value_change_ledger.jsonl"
+      },
+      {
+        "actual_sha256": "dfd5f82397a060a176a69bb2fc6d83b8dd073fb52a1e667f9fbbef0e52cf2d55",
+        "listed_sha256": "dfd5f82397a060a176a69bb2fc6d83b8dd073fb52a1e667f9fbbef0e52cf2d55",
+        "match": true,
+        "path": "batch_manifest.json"
+      },
+      {
+        "actual_sha256": "02066a6dc11721b5db4aaf521b6637a57595dd44689b1d8ee6e3229a23d2f099",
+        "listed_sha256": "02066a6dc11721b5db4aaf521b6637a57595dd44689b1d8ee6e3229a23d2f099",
+        "match": true,
+        "path": "batch_self_audit.md"
+      },
+      {
+        "actual_sha256": "6ca147a5e6a4a6416318f62be3cb56bdd9c2b6b358b9539cd80f33a3ebc5a1f8",
+        "listed_sha256": "6ca147a5e6a4a6416318f62be3cb56bdd9c2b6b358b9539cd80f33a3ebc5a1f8",
+        "match": true,
+        "path": "generation_receipt.md"
+      }
+    ],
+    "entry_count": 5,
+    "missing_required_entries": [],
+    "missing_required_files": [],
+    "required_entries": [
+      "batch_manifest.json",
+      "batch_self_audit.md",
+      "candidates.jsonl",
+      "generation_receipt.md",
+      "value_change_ledger.jsonl"
+    ],
+    "status": "pass"
+  },
+  "started_at": "2026-07-03T07:56:20.797938Z",
+  "status": "mechanical_gates_pass_local",
+  "steps": [
+    {
+      "name": "preflight",
+      "note": "required inputs present",
+      "status": "pass"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "-m",
+        "py_compile",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/tools/inject_controller_shas.py"
+      ],
+      "duration_sec": 0.018,
+      "exit_code": 0,
+      "name": "inject_tool_py_compile",
+      "note": "",
+      "output_tail": "",
+      "status": "pass"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/tools/inject_controller_shas.py",
+        "--order",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/batch-04-order.json",
+        "--builder-manifest",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/builder-dryrun/wave1-warmup-batch-manifest.json",
+        "--lane-manifest",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/batch_manifest.json",
+        "--candidate-jsonl",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/candidates.jsonl",
+        "--ledger-jsonl",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/value_change_ledger.jsonl",
+        "--subset-policy-manifest",
+        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/generated/subset-policy-manifest.json",
+        "--sha256sums",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/SHA256SUMS.txt",
+        "--normalize-tool-schema-digest",
+        "--stamp-row-controller-shas",
+        "--receipt",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/controller-sha-injection-receipt.json",
+        "--force"
+      ],
+      "duration_sec": 0.113,
+      "exit_code": 0,
+      "name": "controller_row_sha_injection",
+      "note": "",
+      "output_tail": "status=injected recipe_manifest_sha=sha256:d6471622d56d68a360500337b368e727664b0b30beec72eab9e5b7d2397ada25 quota_config_sha=sha256:011387d640046b0a5a77d6cbb702cc81548c652cc9ad04149c7af8601bf1de23\nwrote /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/controller-sha-injection-receipt.json\nupdated /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/batch_manifest.json",
+      "status": "pass"
+    },
+    {
+      "name": "controller_closure_verify",
+      "note": "rows=50 row_sha=50/50 ledger=50/50",
+      "status": "pass"
+    },
+    {
+      "command": [
+        "swift",
+        "run",
+        "C5DataGateCLI",
+        "--candidates",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/candidates.jsonl",
+        "--source-digest-path",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/candidates.jsonl",
+        "--source-digest-path",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/value_change_ledger.jsonl",
+        "--source-digest-path",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/batch_manifest.json",
+        "--source-digest-path",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/generation_receipt.md",
+        "--source-digest-path",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/SHA256SUMS.txt",
+        "--source-digest-path",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/controller-sha-injection-receipt.json",
+        "--source-authorization",
+        "authorized_wave1_warmup_generation_controller_runner_v1",
+        "--output-dir",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/datagate-v1"
+      ],
+      "duration_sec": 0.684,
+      "exit_code": 0,
+      "name": "datagate",
+      "note": "status=data_gate_ready",
+      "output_tail": "Building for debugging...\n[0/3] Write swift-version--58304C5D6DBC2206.txt\nBuild of product 'C5DataGateCLI' complete! (0.08s)\nwrote /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/datagate-v1/c5-data-gate-receipt.json\nwrote /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/datagate-v1/c5-data-gate-receipt.md\nstatus=data_gate_ready rows=50 must_not_train_violations=0 train_parent_semantic_overlap=0 quarantine=0",
+      "status": "pass"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-canary/tools/canary_diversity_check.py",
+        "--input",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/candidates.jsonl",
+        "--output-md",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/diversity-v1/diversity-report.md",
+        "--output-json",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/diversity-v1/diversity-report.json"
+      ],
+      "duration_sec": 0.032,
+      "exit_code": 0,
+      "name": "diversity",
+      "note": "status=PASS",
+      "output_tail": "status=PASS records=50 missing_text=0 warning_pairs=0 severe_pairs=0\nwrote /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/diversity-v1/diversity-report.md\nwrote /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/diversity-v1/diversity-report.json",
+      "status": "pass"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-canary/tools/canary_c6_leakage_probe.py",
+        "--canary-jsonl",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/candidates.jsonl",
+        "--c6-jsonl",
+        "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/contracts/c6-bench-cases.jsonl",
+        "--output",
+        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/c6-leakage-v1/c6-leakage-probe.json"
+      ],
+      "duration_sec": 0.027,
+      "exit_code": 0,
+      "name": "c6_leakage_probe",
+      "note": "status=pass",
+      "output_tail": "status=pass c6_case_count=57 sample_case_id_count=100 intersections=0\nwrote /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-04/lane-subcc-4/gates/c6-leakage-v1/c6-leakage-probe.json",
+      "status": "pass"
+    }
+  ],
+  "verdict_summary": "PASS: controller injection, DataGate, diversity, and C6 leakage gates all passed locally.",
+  "version": 1
+}

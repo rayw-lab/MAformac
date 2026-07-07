@@ -1,0 +1,11 @@
+# MANIFEST.sha256 for 2026-07-05-phase1-scanner-authority-gates
+# copied files: sha256  bytes  relative_path
+4578c84ad9b8905cea790a09b371190d63e7afd0443ef3211d257c9604633dfe  4708  STATUS-BOARD.md
+b8a3abbcddc99a31aa1188b132fee3bb6d9114f6771faeb62f84e07f83205b8d  2683  eval/launchpacket-frozen/FREEZE-REPORT.md
+c77b19e8be0aedc1c0cad0be395bebf7aeb5689f442880dc1b77460b1a873e33  2226  eval/launchpacket-frozen/formal-receipt-template.md
+d12b7c6147581de18649657edb285c230ca9fc33527198aee5481b85748ec728  3165  eval/launchpacket-v2-draft/formal-receipt-template.md
+# external large files not copied: sha256  bytes  relative_path  absolute_path
+fe23881d2863421530a707b725999a3ecfe92334cf36d79493f99c3a9e777127  2692251  grill/cleanup-file-snapshot-before/r3-lanes/R4-QNEG-ISO/candidates.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-phase1-scanner-authority-gates/grill/cleanup-file-snapshot-before/r3-lanes/R4-QNEG-ISO/candidates.jsonl
+3b76d49767e650b2cf5d41a3dd6b527932c1e2e2500bb249ac917303380f84e0  67380679  grill/cleanup-file-snapshot-before/wave2-fix/r2b-trainpack/c5-training-samples.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-phase1-scanner-authority-gates/grill/cleanup-file-snapshot-before/wave2-fix/r2b-trainpack/c5-training-samples.jsonl
+7c8c6b6f8b58b9c2fb0cb7a9319e82c92cd275645830d25cc67421a0b719fdf3  68535201  grill/cleanup-file-snapshot-before/wave2-fix/r3-trainpack/c5-training-samples.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-phase1-scanner-authority-gates/grill/cleanup-file-snapshot-before/wave2-fix/r3-trainpack/c5-training-samples.jsonl
+9d4bc2d25ae77325e23fd985a4b556627ac85fb53c53a2e7f2e816b5c96d1782  70072930  grill/cleanup-file-snapshot-before/wave2-fix/r4-trainpack/c5-training-samples.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-phase1-scanner-authority-gates/grill/cleanup-file-snapshot-before/wave2-fix/r4-trainpack/c5-training-samples.jsonl

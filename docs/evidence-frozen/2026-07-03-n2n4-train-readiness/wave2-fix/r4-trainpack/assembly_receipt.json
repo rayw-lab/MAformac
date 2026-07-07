@@ -1,0 +1,181 @@
+{
+  "artifact_kind": "r4_trainpack_append_assembly_receipt",
+  "authority": {
+    "base_rule": "R2b 5499 pack only; do not use R3 pack as base",
+    "judge": "R4-QNEG-ISO PASS_WITH_NOTES accepted by owner GO"
+  },
+  "counts": {
+    "action_rows": 5342,
+    "effective_row_count": 5653,
+    "input_row_conservation": {
+      "actual_output_rows": 5653,
+      "expected_output_rows": 5653,
+      "r2b_rows": 5499,
+      "r4_qneg_iso_rows": 154,
+      "status": "pass"
+    },
+    "no_call_denominator_excluding_query_tool_rows": 5506,
+    "no_call_rows": 164,
+    "other_rows": 0,
+    "query_tool_call_rows": 147,
+    "r4_qneg_iso_class_counts": {
+      "action_rows": 36,
+      "no_call_rows": 108,
+      "other_rows": 0,
+      "query_tool_call_rows": 10
+    },
+    "refusal_no_call_ratio": 0.029786,
+    "refusal_no_call_ratio_percent": 2.9786,
+    "split_counts": {
+      "dev_selection": 400,
+      "train": 5253
+    }
+  },
+  "guards": {
+    "downstream_static_gates": "pass",
+    "duplicate_sample_id_count": 0,
+    "m22_row_conservation_status": "pass",
+    "no_adapter_saved": true,
+    "no_optimizer_update_run": true,
+    "r2b_pack_used_as_base": true,
+    "r2b_prefix_byte_preserved": true,
+    "r2b_replay_and_protected_rows_preserved_by_base_byte_copy": true,
+    "r2b_replay_rows_regenerated": false,
+    "r3_pack_double_qneg_prevented": true,
+    "r3_pack_used_as_base": false,
+    "r4_qneg_iso_split_counts": {
+      "train": 154
+    },
+    "r4_qneg_iso_split_required": "train",
+    "r4_qneg_iso_split_status": "pass",
+    "r4_suffix_byte_preserved": true
+  },
+  "inputs": {
+    "r2b_combined": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r2b-trainpack/c5-training-samples.jsonl",
+    "r2b_combined_sha256": "3b76d49767e650b2cf5d41a3dd6b527932c1e2e2500bb249ac917303380f84e0",
+    "r2b_rows": 5499,
+    "r3_pack_path_exists_but_not_used_as_base": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r3-trainpack/c5-training-samples.jsonl",
+    "r4_mount_iso_max_prompt_token_count": 7530,
+    "r4_mount_iso_receipt": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/r3-lanes/R4-QNEG-ISO/mount_isomorphize_receipt.json",
+    "r4_mount_iso_receipt_sha256": "130e38d60dcccf9044e6832bde1dd4faab766bf788d043f2f8a61d343b31c7a8",
+    "r4_qneg_iso": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/r3-lanes/R4-QNEG-ISO/candidates.jsonl",
+    "r4_qneg_iso_rows": 154,
+    "r4_qneg_iso_sha256": "fe23881d2863421530a707b725999a3ecfe92334cf36d79493f99c3a9e777127"
+  },
+  "mode": "byte_preserving_append_r2b_pack_plus_r4_qneg_iso",
+  "output": {
+    "assembly_receipt_json": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/assembly_receipt.json",
+    "assembly_receipt_sha256_note": "self hash is recorded in SHA256SUMS.txt to avoid self-referential JSON drift",
+    "combined_samples_jsonl": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/c5-training-samples.jsonl",
+    "combined_samples_sha256": "9d4bc2d25ae77325e23fd985a4b556627ac85fb53c53a2e7f2e816b5c96d1782"
+  },
+  "proof_class": "local_file_assembly_no_train_no_model",
+  "sha256": {
+    "c5-training-samples.jsonl": "9d4bc2d25ae77325e23fd985a4b556627ac85fb53c53a2e7f2e816b5c96d1782",
+    "cumulative-floor-r4.json": "53502be1d5f848311b6a6a8f50f5792a8eea750a5365871bc3ca051b18cdc66c",
+    "cumulative-floor-r4.md": "e590c5aa51cfff5d201ded48889cd540a9e3e2601abb4c70fd70d733d256c185",
+    "datagate/c5-data-gate-receipt.json": "eec97289a76e005d17b6a21ea0e82b5417036ff2b0be29b8cabd8cf659b52eb7",
+    "datagate/c5-data-gate-receipt.md": "ebfd8531547f6d44fc16eb2c2159df711a78d023427d11409d294e334a8f25da",
+    "mlx-data/test.jsonl": "ed7a78567156468e7fb951e84073e852cbdfe8f859fe43544a1b8f0a006cdcc2",
+    "mlx-data/train.jsonl": "a9ee9e8536bce74396d307e4f845c549f97191eaf1a628792b7e056745b0a414",
+    "mlx-data/valid.jsonl": "df1e356d210e9658918aceb65a1c8f1c0e813412ac63ce830ed80f9362eab897",
+    "mount-order-balance-report.json": "2bbba8c4d7d025c243df1968c97516fe4f82351a9c999f8c264d560adb006445",
+    "render-data-summary.json": "2c009e92b24ecc0c547e161b915710c5805027d5d96882e2ef544299ae828222",
+    "samples/c5-training-samples.jsonl": "39a3c278b7a7ea0054d7c1c99899b7b85f19fb378e5911296c27cd68055a8f33",
+    "strict-preflight.metrics.jsonl": "2d961654bd4340391fa31f7a80c3e923637726608098d253f7d7a6f99d99d756",
+    "supervision-consistency-contradictions.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "supervision-consistency-summary.json": "a91b26f0e62e366e3c32239b6b5eac00ceea67970be3c79004220014008dbaab"
+  },
+  "static_gates": {
+    "datagate": {
+      "bucket_counts": {
+        "dev_selection": 400,
+        "train": 5253
+      },
+      "must_not_train_violations": 0,
+      "quarantine_count": 0,
+      "receipt_json": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/datagate/c5-data-gate-receipt.json",
+      "redaction_status": "pass",
+      "row_count": 5653,
+      "status": "data_gate_ready",
+      "tool_call_format_failures_count": 0,
+      "tool_call_format_pass": 5089,
+      "train_parent_semantic_overlap": 0
+    },
+    "locked_floors_monotonic": {
+      "blocking_red": null,
+      "green": null,
+      "red_advisory": null,
+      "red_floor_ids": null,
+      "report_json": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/cumulative-floor-r4.json",
+      "report_md": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/cumulative-floor-r4.md",
+      "status": "GREEN"
+    },
+    "render_row_conservation": {
+      "input_samples_total": 5653,
+      "missing_split_or_unrendered_rows": 0,
+      "mount_count_diff_rows": 0,
+      "mount_tool_name_set_diff_rows": 0,
+      "render_summary": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/render-data-summary.json",
+      "status": "pass",
+      "test_mlx_records": 128,
+      "train_mlx_records": 5253,
+      "train_plus_valid_records": 5653,
+      "valid_mlx_records": 400
+    },
+    "strict_preflight": {
+      "ignored_tokens": 18843918,
+      "length_violations": 0,
+      "max_seq_length": 8192,
+      "max_token_length": 7530,
+      "metrics_jsonl": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/wave2-fix/r4-trainpack/strict-preflight.metrics.jsonl",
+      "parser_critical_status": "pass",
+      "ratio_status": "pass",
+      "records": 5781,
+      "splits": {
+        "test": {
+          "assistant_end_token_supervised_records": 128,
+          "ignored_label_records": 128,
+          "ignored_tokens": 327456,
+          "max_token_length": 7191,
+          "records": 128,
+          "trainable_records": 128,
+          "trainable_tokens": 2883
+        },
+        "train": {
+          "assistant_end_token_supervised_records": 5253,
+          "ignored_label_records": 5253,
+          "ignored_tokens": 17264625,
+          "max_token_length": 7530,
+          "records": 5253,
+          "trainable_records": 5253,
+          "trainable_tokens": 123018
+        },
+        "valid": {
+          "assistant_end_token_supervised_records": 400,
+          "ignored_label_records": 400,
+          "ignored_tokens": 1251837,
+          "max_token_length": 7191,
+          "records": 400,
+          "trainable_records": 400,
+          "trainable_tokens": 9112
+        }
+      },
+      "status": "pass",
+      "trainable_records": 5781,
+      "trainable_tokens": 135013,
+      "training_loop_source_sha256": "9714f6f2700a4c0f77be6bfdc005d291a894e858606a87a1a3838fd9a8f71748"
+    },
+    "supervision_consistency": {
+      "close_first": 899,
+      "contradiction_group_count": 0,
+      "contradiction_row_count": 0,
+      "mount_order_status": "pass",
+      "open_first": 912,
+      "status": "pass_no_contradictions",
+      "total_rows": 5653,
+      "unbalanced_mount_order_pair_count": 0
+    }
+  },
+  "status": "r4_data_ready_static_gates_pass_no_train"
+}

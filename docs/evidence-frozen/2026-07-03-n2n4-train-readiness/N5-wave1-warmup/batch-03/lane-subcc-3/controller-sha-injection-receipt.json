@@ -1,0 +1,76 @@
+{
+  "after": {
+    "quota_config_sha": "sha256:011387d640046b0a5a77d6cbb702cc81548c652cc9ad04149c7af8601bf1de23",
+    "recipe_manifest_sha": "sha256:c7fef12fd2d3462065cd8e626388a632cbb09a33c892d372210db4b055923adb"
+  },
+  "batch_id": "warmup-batch-03",
+  "before": {
+    "quota_config_sha": "sha256:011387d640046b0a5a77d6cbb702cc81548c652cc9ad04149c7af8601bf1de23",
+    "recipe_manifest_sha": "sha256:c7fef12fd2d3462065cd8e626388a632cbb09a33c892d372210db4b055923adb"
+  },
+  "controller_normalization_round2": {
+    "candidate_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/lane-subcc-3/candidates.jsonl",
+    "candidate_rows_checked": 50,
+    "diff_rows": [],
+    "ledger_fields_updated": [
+      "candidate_row_sha"
+    ],
+    "ledger_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/lane-subcc-3/value_change_ledger.jsonl",
+    "ledger_rows_checked": 50,
+    "quota_config_sha": "sha256:011387d640046b0a5a77d6cbb702cc81548c652cc9ad04149c7af8601bf1de23",
+    "recipe_manifest_sha": "sha256:c7fef12fd2d3462065cd8e626388a632cbb09a33c892d372210db4b055923adb",
+    "rows_changed": 0,
+    "source": "controller recipe_manifest_sha/quota_config_sha",
+    "status": "stamped"
+  },
+  "controller_normalization_step": {
+    "candidate_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/lane-subcc-3/candidates.jsonl",
+    "candidate_rows_checked": 50,
+    "diff_rows": [],
+    "ledger_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/lane-subcc-3/value_change_ledger.jsonl",
+    "ledger_rows_checked": 50,
+    "rows_changed": 0,
+    "source": "generated/subset-policy-manifest.json entries[].tool_schema_digest",
+    "status": "normalized",
+    "subset_manifest_path": "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge/generated/subset-policy-manifest.json",
+    "subset_manifest_sha256": "f3a9c49109ffb33b06d233038787ca1fdad8a750d7f7d9f917738c4a83878f61"
+  },
+  "generated_at": "2026-07-03T08:37:19.065169Z",
+  "input_paths": {
+    "builder_manifest": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/builder-dryrun/wave1-warmup-batch-manifest.json",
+    "lane_manifest": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/lane-subcc-3/batch_manifest.json",
+    "order": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/batch-03-order.json"
+  },
+  "lane_manifest_sha256_after": "a40c3cc139d33cb3ab47e539c68d4edcdb17d258426c607e9b9849ed265167e3",
+  "lane_manifest_written": true,
+  "main_pin_sha": "b33d8eba152e5326f69bbe85fc356b73419ee9c3",
+  "proof_class": "local/controller-overlay",
+  "quota_config_sha": "sha256:011387d640046b0a5a77d6cbb702cc81548c652cc9ad04149c7af8601bf1de23",
+  "quota_config_sha_basis": "sha256(canonical JSON of builder_manifest.quota_config)",
+  "receipt_version": "controller-sha-injection.v2",
+  "recipe_manifest_sha": "sha256:c7fef12fd2d3462065cd8e626388a632cbb09a33c892d372210db4b055923adb",
+  "recipe_manifest_sha_basis": "sha256(raw builder manifest file bytes)",
+  "sha256sums_after": {
+    "batch_manifest.json": "a40c3cc139d33cb3ab47e539c68d4edcdb17d258426c607e9b9849ed265167e3",
+    "batch_self_audit.md": "7e66cc765d283bc44a7b8583c49db98f8a75d30a833175caf23515be02b453eb",
+    "candidates.jsonl": "85f8067c5c040bad2bcf38f88b569b2c90c991f7aa09d6e9f5cb7abd59a0fa9b",
+    "generation_receipt.md": "092919204c05bdf6a8da1d8abe2d3c6e968009e22688eacf68ade80c1d4a4b98",
+    "value_change_ledger.jsonl": "8e92bf306eeeb68656565f7a91db10135e2a3471ad4b94e4de3b96788be3b01d"
+  },
+  "sha256sums_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/N5-wave1-warmup/batch-03/lane-subcc-3/SHA256SUMS.txt",
+  "sha256sums_sha256_after": "9c864db462bbeb8422d2254bc06cf6835b011ba4802ef56123d5793990ebf6e8",
+  "status": "injected",
+  "warnings": [
+    "lane manifest has no top-level quota_config; quota_config_sha derived from builder manifest only"
+  ],
+  "repair_event": "judge_D3_position_slot_omission_fix",
+  "repair_event_sample_ids": [
+    "warmup-batch-03-subcc-3-0012",
+    "warmup-batch-03-subcc-3-0025"
+  ],
+  "gates_rerun_receipt": "gates/B03-GATES-RECEIPT-v2.md",
+  "supersedes_gate_receipts": [
+    "B03-GATES-RECEIPT-v1"
+  ],
+  "basis_pin": "b33d8eba152e5326f69bbe85fc356b73419ee9c3"
+}

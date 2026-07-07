@@ -1,0 +1,57 @@
+{
+  "basis_id" : "l3-salvage:pr3:46a3601856ba:semantic:a242ba0c62fe:catalog:22613d496198:manifest:f3a9c49109ff",
+  "data_gate" : {
+    "allow_legacy_missing_surface" : false,
+    "failure_reason_counts" : {
+      "missing_candidate_surface_fields" : 696
+    },
+    "hash_failure_count" : 0,
+    "legacy_missing_surface_allowed_count" : 0,
+    "missing_surface_count" : 696,
+    "quarantine_count" : 4500,
+    "row_count" : 4500,
+    "status" : "blocked",
+    "surface_field_pass" : 3804,
+    "tool_call_format_pass" : 0
+  },
+  "data_gate_receipt_json_path" : "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/L3-salvage/c5-data-gate-receipt.json",
+  "data_gate_receipt_markdown_path" : "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/L3-salvage/c5-data-gate-receipt.md",
+  "expected_source_sha256" : "46a3601856bacd975076817b988835ea9d5bd1f90d021246c1b4de0617dda604",
+  "generated_at" : "2026-07-03T04:55:08Z",
+  "legacy_flag_used" : false,
+  "mapped_10_family_count" : 3804,
+  "no_training_input_written" : true,
+  "observed_source_sha256" : "46a3601856bacd975076817b988835ea9d5bd1f90d021246c1b4de0617dda604",
+  "projected_candidates_path" : "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/L3-salvage/projected-candidates.jsonl",
+  "projection_gate_status" : "pass",
+  "projection_receipt_path" : "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/L3-salvage/l3-salvage-projection-receipt.json",
+  "proof_class" : "local",
+  "quota_source" : "recovery",
+  "raw_direct_pass_count" : 0,
+  "reason_counts" : {
+    "intent_not_in_10_family_catalog" : 696
+  },
+  "receipt_version" : "l3-salvage-projection.v1",
+  "repo_root" : "/Users/wanglei/workspace/MAformac-p5w-wave1-bridge",
+  "resource_envelope" : {
+    "d_domain_catalog_sha256" : "22613d496198940bf774ddcaa921c1efa2d92038b85afe18e1c5081e0e9ce012",
+    "max_mounted_tool_count" : 48,
+    "projected_bytes" : 55749484,
+    "projected_line_count" : 4500,
+    "projected_sha256" : "783692ea37271b4595dcb1f25cc401b4a285b5a98c89ad1385b499051310e02c",
+    "semantic_contract_sha256" : "a242ba0c62fecda08f860e583176b99e13ca4c6708e0313f1d76cb98f77d0814",
+    "source_bytes" : 1849198,
+    "source_line_count" : 4500,
+    "subset_manifest_sha256" : "f3a9c49109ffb33b06d233038787ca1fdad8a750d7f7d9f917738c4a83878f61"
+  },
+  "reuse_origin" : "pr3_generated_utterances_final",
+  "row_count" : 4500,
+  "source_path" : "/Users/wanglei/workspace/MAformac/Reports/c5-remediation-wave-20260621T2013-pr3-full/generated-utterances-final.jsonl",
+  "source_prompt_hash_matches_recomputed" : 4500,
+  "source_sha256_frozen" : true,
+  "status" : "projection_pass_data_gate_blocked",
+  "training_input_paths_written" : [
+
+  ],
+  "unsupported_drop_count" : 696
+}

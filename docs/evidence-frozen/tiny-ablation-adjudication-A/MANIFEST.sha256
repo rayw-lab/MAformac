@@ -1,0 +1,66 @@
+# MANIFEST.sha256 for tiny-ablation-adjudication-A
+# copied files: sha256  bytes  relative_path
+c915fd2ca44eb2f92b879685a62417fa12de5597aca193c40c04fe005eb9f2d8  22080  P12-v6-build/c5-training-receipt.json
+dac87c2fee56bf193111a74e610b7f5c2facdd3d5df3ba3bfe997c3814c5129d  5167  P12-v6-build/c5-training-receipt.md
+badd782e6cffd7230ac30550cd600a1f0ae7e4d61142e28ac9d50b896d36f218  22272  P12-v61-build/c5-training-receipt.json
+e9e74f7964422b82b8c285e9f8d76461bd0e02f3aee09fe50127da7bec8b03c2  5275  P12-v61-build/c5-training-receipt.md
+f4332b52db3ea2a43c46c811717421e726a10b703c87de261a7b8bc9c0d45a47  2480  P5W-data-gate-surface-hardgate-probe/formal-no-legacy/c5-data-gate-receipt.json
+3cb6de2f1b3b831a6d2dc1b6c0cdb9aa796a45ec3a77a42f6bde2e178da8ebf5  1249  P5W-data-gate-surface-hardgate-probe/formal-no-legacy/c5-data-gate-receipt.md
+f88030f0a6d8d1014e44954ea54e462bb5b83bf30b1bdfb98ab1e4d80b00cb20  2038  P5W-data-gate-surface-hardgate-probe/legacy-allowed/c5-data-gate-receipt.json
+7f37f32c74ea3fce389545061de0ffaada487318bd68dc5ad5d80240c14676b5  1005  P5W-data-gate-surface-hardgate-probe/legacy-allowed/c5-data-gate-receipt.md
+f11642c895cd56654fbe761a983aacd50282b3982c20a7dbd542e889f703e197  814  P5W-gate7-dry-run/gate7-wave1-dry-run-receipt.json
+b28035a1c82578136a15c496553003ead9961698e7c71c347cfac7021549e304  756  P5W-gate7-dry-run/gate7-wave1-dry-run-receipt.md
+cb1e4c5f0a53eb88012fda64049d0c4e23440dee8e0261108bec3b0dba398484  1280  P5W-gate7-surface-dry-run/gate7-wave1-dry-run-receipt.json
+dbead741be90ea543e1e0df96310431a4b49289a05dc7a5bd70eece8de20f2eb  1170  P5W-gate7-surface-dry-run/gate7-wave1-dry-run-receipt.md
+3eab47b04e73b312aea792451b1fd0911be39b078ea3e569d69c1d2df4da4066  1468  P5W-gate7-surface-hardgate-dry-run/gate7-wave1-dry-run-receipt.json
+4cb7e882532e5c54011110aff102c79cc6eff29491ef18c8fd518cc962d06311  1342  P5W-gate7-surface-hardgate-dry-run/gate7-wave1-dry-run-receipt.md
+1ef4ecf575a285ade05775db62d0c334439bf7db2ca0a16523fb549858c52544  1899  P5W-p12-v6-data-gate/c5-data-gate-receipt.json
+295de981f7a353b03b500407c9d3a665e12628122ba6fc155da5fe87676b5b10  882  P5W-p12-v6-data-gate/c5-data-gate-receipt.md
+5f58d0ab1d21bfff1d68b05f6e8df0ae1fbbd446d66e99557d94c28662caa560  18125  RECEIPT-P12-loss-contract.md
+7c5d99e5ebde64a1f9e553326db06f5cf52ac3f76227d5753f3914c43a009962  3412  RECEIPT-P3H-V3-TOOLS-MOUNT.md
+174cd91c7ab1a5209d9b9205e441a338989cc5ef1e396ad91d905cbaebb731ac  3764  RECEIPT-P5W-DATAGATE-SURFACE-HARDGATE.md
+0f8c3ea9a48531cd01f0fdd708f63c87ea28e7cb95d1c5c418268864d6cec9b8  5746  RECEIPT-P5W-G7-SURFACE.md
+9286f8cdd9c828e0f8922935164c213b5c4e2547409d418ffc28201548781ddb  5668  RECEIPT-P5W.md
+9686436397d87f869cf4c8f3c59b4d514906c3794da14cd11d7f53d6e7f0dcf8  23110  RECEIPT-TINY-ABLATION.md
+573906f094d0a245980725f2ff5763b4bcf5d7d249156558abefe8060087b6dd  8223  RECEIPT-V6-TRAIN-PROBE.md
+8382fefed37e2d41a59ce26966bf41a05cbaf282e4a11c3255557ba155bb77fc  5911  RECEIPT-WAVE1-PROTO-BUILD.md
+5489b29b4f97e68b850babcfecff94eb32ecdf882cc4b4af5bbf3af43658e4ac  26525  build-v2-blocked/c5-training-receipt.json
+87d17563d6771a04d3e50dab17ae01b86f3709bfcec96ae249e395a30e031a6a  7364  build-v2-blocked/c5-training-receipt.md
+29c2739884d5661b2023d55bbb3e408a20ef8d5878421008d030c696bbb52304  26518  build-v3-nonfinite-1024/c5-training-receipt.json
+8e91618566bbb58b473a8e7d3c57503e865e47e67ee62751ba78a6a768eb4b4f  7357  build-v3-nonfinite-1024/c5-training-receipt.md
+406e10f8ab117cdb156ef9690a38a42a0116714aaedbfecc7234c174bcc7517f  26518  build/c5-training-receipt.json
+f3b602578f52f32468696cb04508f9d175aae29dc717d1a1045fc4c640b711c1  7357  build/c5-training-receipt.md
+f59fe47b77e13d652b7a2649c7800e5b40d17bf37bb394d24af3bb8bae4cc2b8  17763  v6-probe2/probe-output/receipt.md
+80e9ed89b040e05f7294be05d049f08c54a6787696faaa9c19c346d27abad81d  17412  v6/probe-output/receipt.md
+91ab2ff19a7c893c8267b1bfa31eb07cc9522053d6a85d296d7312c112b285f2  9273  v61/RECEIPT-V61-TRAIN-PROBE.md
+8c9aed41b0791d808a997299c06353a272ea7ce83cde9a4c9a51671a6634f1ff  17756  v61/probe-output/receipt.md
+96a2fefe6e7ef4423522080048328905493c3f4fcc8281701345d0bf3286a7b0  584  verdict.json
+879341b01c82efde4b1a74e67898d51dc8a818773f5ff5718ca9b760a9c3abbb  1939  wave1-proto-build/c5-data-gate/c5-data-gate-receipt.json
+0add0f0de00c0c7f36cf414702b12bbe540a625fb8a1ef9f62a2cc25ea2d6a1b  914  wave1-proto-build/c5-data-gate/c5-data-gate-receipt.md
+94bfb2b0ae46b57abfecad9af29fce81f7152baa23f9d23c5504614e146845cd  22218  wave1-proto-build/c5-training-receipt.json
+5313329613fb4677384df9191d1ece896cc0a66e477e2e4a932443ab7a82a661  5204  wave1-proto-build/c5-training-receipt.md
+# external large files not copied: sha256  bytes  relative_path  absolute_path
+8e245f91302db02a26f3d790b2dbc4b12cb9b3fce2ee9026a7b92ca5edbd2e9c  69772950  build/adapters-rank16-v5-seq5120-gradckpt/0000100_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/0000100_adapters.safetensors
+cd95522a6ccf03f0422cead38e9e7414dacffebef0953f3c2521c9cb6f7e6309  69772950  build/adapters-rank16-v5-seq5120-gradckpt/0000200_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/0000200_adapters.safetensors
+7d54ffdb370b6e4e1e3395b1907b020efdf36b922d91fbc281b01dc63e810e0d  69772950  build/adapters-rank16-v5-seq5120-gradckpt/0000300_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/0000300_adapters.safetensors
+d71725837473e034fd15eee743e1dfa2c467445ce288c0f0fc5849d2684a877a  69772950  build/adapters-rank16-v5-seq5120-gradckpt/0000400_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/0000400_adapters.safetensors
+c5cd7e942992490086630c30a3a522ceb18b21462856c69fb339f59c8cf07a43  69772950  build/adapters-rank16-v5-seq5120-gradckpt/0000500_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/0000500_adapters.safetensors
+ddac62b10ad76ed7e9542795a9b95134a95115aa6f9604e051068beddb1fc76a  69772950  build/adapters-rank16-v5-seq5120-gradckpt/0000600_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/0000600_adapters.safetensors
+ddac62b10ad76ed7e9542795a9b95134a95115aa6f9604e051068beddb1fc76a  69772950  build/adapters-rank16-v5-seq5120-gradckpt/adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/build/adapters-rank16-v5-seq5120-gradckpt/adapters.safetensors
+0bbb80219bfe97daac79c267ef06074afb5dc2d37f4752afa49c913b86d3b588  69772950  v6/adapters-rank16/0000100_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/0000100_adapters.safetensors
+f90e108f61fbc46368508b0c177d37bcf43f87da8b9bfd8afcf2ce7e6d1638a4  69772950  v6/adapters-rank16/0000200_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/0000200_adapters.safetensors
+33cd345a9d4d44b7b121a3a251420415d74d3e9e0ab60c5287f3be57a138a7d7  69772950  v6/adapters-rank16/0000300_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/0000300_adapters.safetensors
+9134a52be79f9946f00d0278d7f1da0904e3620dd5d1a034e91dfed2667427b0  69772950  v6/adapters-rank16/0000400_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/0000400_adapters.safetensors
+824fba767c9aa0991488c35803959eaa7aad6758900399c56571f4b6e4f2024f  69772950  v6/adapters-rank16/0000500_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/0000500_adapters.safetensors
+8a1cf250b5a2477a3cc272d15983ed374590615f755c7204977f3077f3d40340  69772950  v6/adapters-rank16/0000600_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/0000600_adapters.safetensors
+8a1cf250b5a2477a3cc272d15983ed374590615f755c7204977f3077f3d40340  69772950  v6/adapters-rank16/adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v6/adapters-rank16/adapters.safetensors
+b31e69fc7be1f1e76e20261a8791deaf4c56fff26055901572fe4e32f687779b  69772950  v61/adapters-rank16/0000100_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/0000100_adapters.safetensors
+9844fcef724cbc54bc806e43636c2da10f147ba512db1b37a505a3ecfb2352be  69772950  v61/adapters-rank16/0000200_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/0000200_adapters.safetensors
+f551737cf58dc103c211000b78dcda865fb13dcfaf627304ab23f8085539f5bd  69772950  v61/adapters-rank16/0000300_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/0000300_adapters.safetensors
+db95f45a7453c537249f2a6bd3dd64d452ef402eab2f5aaeacdeae8a88c22c6b  69772950  v61/adapters-rank16/0000400_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/0000400_adapters.safetensors
+a7ebc5db4a362c893a99c661f216bb48e766c0794327675d2bf17af865447230  69772950  v61/adapters-rank16/0000500_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/0000500_adapters.safetensors
+df12393985b8380481f369cad05c60dc68abcec62b475560dfac82ecef511544  69772950  v61/adapters-rank16/0000600_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/0000600_adapters.safetensors
+df12393985b8380481f369cad05c60dc68abcec62b475560dfac82ecef511544  69772950  v61/adapters-rank16/adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/v61/adapters-rank16/adapters.safetensors
+2010401c92a2952bab93ec61354fcd38d78c0deab96d939e8b634876ed3e53bf  54567852  wave1-proto-build/mlx-data/train.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/wave1-proto-build/mlx-data/train.jsonl
+c4b09c24454c8ffd7716586212b041b76f3c0ca83a8bc6a2e9e55646208d9c00  4404180  wave1-proto-build/mlx-data/valid.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/wave1-proto-build/mlx-data/valid.jsonl
+e8dc438d1f2bc3cc9d249ad7c019b30f039921afc1341fd1f3576245e110e2d4  64378123  wave1-proto-build/samples/c5-training-samples.jsonl  /Users/wanglei/Projects/agent-tmux-stack-research/runs/tiny-ablation-adjudication-A/wave1-proto-build/samples/c5-training-samples.jsonl

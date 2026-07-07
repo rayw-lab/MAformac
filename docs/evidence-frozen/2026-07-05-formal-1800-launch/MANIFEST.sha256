@@ -1,0 +1,33 @@
+# MANIFEST.sha256 for 2026-07-05-formal-1800-launch
+# copied files: sha256  bytes  relative_path
+3d016f115050184b243716de289669e2d773fc00d9d4070b61a544b9b97aa817  4020  formal-run-20260705T230428+0800/LAUNCH-HOLD-RECEIPT.md
+16e2ec8a9040442e7c79184378a1aee066ff3c5867f7399ca81f34ad0dfb133e  3800  formal-run-20260705T230616+0800/LAUNCH-HOLD-RECEIPT.md
+641db82b979223c54564a18354b85561f9501becac68a2f46fd95a1a4160cc19  3186  formal-run-20260705T232357+0800/LAUNCH-HOLD-RECEIPT.md
+eb32c1bf5ff2e232d85c59814462aa544ab9a395d132254657975de3631960f8  3565  formal-run-20260705T232357+0800/LAUNCH-STARTED-RECEIPT.md
+ae425f0b0eccd2cfc35d49f64b6756f3b9fd5e8bd9801ef22676947f41935005  1420  formal-run-20260705T234208+0800/FORMAL-TRAIN-RECEIPT.md
+08b3008b12475422e231762584658a1fc7062419dc668359e560c4e9d8b51f0a  617  formal-run-20260705T234208+0800/LAUNCH-STARTED-RECEIPT.md
+29c1e62dfcb8528455865a627b6400abf141bb22253b8b9d14c94f867f8263bd  485  formal-run-20260705T234208+0800/LR-GATE-PASS-RECEIPT.md
+42b9341a8d5d5de9f7c9d7213c7f4a44e43b684e7901deb38192889eef556c26  757  formal-run-20260706T090316+0800-tail1200-full-envelope/LIVE-RECEIPT.md
+74afe11419b4e53dd3caf7461d79ad5cb1c4f55627958a85e41ec01d7f0efe0b  2355  formal-run-20260706T090552+0800-tail1200-full-envelope/LIVE-RECEIPT.md
+c72fc296961851e9aba4519c8c636928398c2287d895c00c0e38c5b71cca99bc  4913  formal-run-20260706T090552+0800-tail1200-full-envelope/TAIL1200-ITER600-FINAL-RECEIPT-L-CN.md
+08f5865cb63cc3063cd19562e6946626d2f2ed12e002fc3ee101fbc5ea6a572f  6679  host/host-baseline-receipt.md
+e915b6305733f19c14ade336c006c8de859f1a61775f76f1d6d396f523baf093  8201  monitor/checkpoint600-receipt-consistency-audit-L-AJ.md
+3af42fbacbf46ae899c10bb1374339cf788d58fd537b07d5d0bcc23436c64270  10215  monitor/final-hold-receipt-consistency-audit-L-AZ.md
+01b765d2d0104f54d642575d2793deecd1fab9a1c6d9f491dda83726551a836c  7692  monitor/iter1000-receipt-consistency-audit-L-AO.md
+caf817754e02bda3aff1cc4bdfe9d04d1ee15fc69fcfd6b9eea4566b757b853e  8335  monitor/iter1200-checkpoint-receipt-consistency-audit-L-AQ.md
+306776588316a59e5a58fe9b1cd7c7768209f9c1a05c822b242aee78da40a5e0  6799  monitor/iter1400-receipt-consistency-audit-L-AT.md
+edf946222d17d365065039a3aef6356fd0664b606f0a78238b0e6dd56bc32ecb  7491  monitor/iter1600-receipt-consistency-audit-L-AX.md
+4d08ae7a63c60d17d5a28d3459f73a16c7ad828418bb63f9c20a033bbd486857  7481  monitor/iter800-receipt-consistency-audit-L-AM.md
+099ce41afd7e3bad31ce7247ae8b80457d7b78d84db64589f85aae30898fa183  7486  monitor/live-lr-receipt-audit-L-W.md
+222e4d00a541c70ccdc2d6e4f5f3ad53073a85191ff5621527031fd26cb514f5  11381  monitor/pre-final-proof-promotion-grill-L-AU.md
+e6e2c76cd7e7635a3103faaba4c4c1b41f5d76571167c5d8909aee7ae2aa61fd  4252  monitor/tail1200-iter600-final-cascade-audit-L-CO.md
+da79b41a3801081d3dba95e3d1cc2271622646cc36cb4bbecd01e798dec36237  2962  secretary/HOST-WAIVER-RECEIPT-user-2026-07-05-memory-more-ok.md
+477231d80e719e576b75b422766d6b331c896016765114976c6650b1944a544c  33817  secretary/STATUS-BOARD.md
+285951517a81173b61d188f9819c021af38d377e7d1c5d6f1876f2b603af4d51  2831  secretary/status-cascade-final-hold-update.md
+# external large files not copied: sha256  bytes  relative_path  absolute_path
+40348545f68d352228bbc98b88f964a10f1d39fb39c43a0df50df7e654e0b511  69772950  formal-run-20260705T234208+0800/adapters-rank16/0000600_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/formal-run-20260705T234208+0800/adapters-rank16/0000600_adapters.safetensors
+f594e5e50c328119ab071800020474f144bfe133be68b24efe918ae5e6dee753  69772950  formal-run-20260705T234208+0800/adapters-rank16/0001200_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/formal-run-20260705T234208+0800/adapters-rank16/0001200_adapters.safetensors
+f594e5e50c328119ab071800020474f144bfe133be68b24efe918ae5e6dee753  69772950  formal-run-20260705T234208+0800/adapters-rank16/adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/formal-run-20260705T234208+0800/adapters-rank16/adapters.safetensors
+293619a1625d285dd41764ac8d79f5284c27131ed7588e87008ebaf0407dfbc4  69772950  formal-run-20260706T090552+0800-tail1200-full-envelope/adapters-rank16/0000300_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/formal-run-20260706T090552+0800-tail1200-full-envelope/adapters-rank16/0000300_adapters.safetensors
+9373fd4174922c4e697f188e24756758ec5a236eb6ae944dfaf115450363d8d6  69772950  formal-run-20260706T090552+0800-tail1200-full-envelope/adapters-rank16/0000600_adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/formal-run-20260706T090552+0800-tail1200-full-envelope/adapters-rank16/0000600_adapters.safetensors
+9373fd4174922c4e697f188e24756758ec5a236eb6ae944dfaf115450363d8d6  69772950  formal-run-20260706T090552+0800-tail1200-full-envelope/adapters-rank16/adapters.safetensors  /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/formal-run-20260706T090552+0800-tail1200-full-envelope/adapters-rank16/adapters.safetensors
