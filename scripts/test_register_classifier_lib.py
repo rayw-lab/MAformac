@@ -30,6 +30,7 @@ def assert_case(
 def main() -> int:
     failures: list[str] = []
     failures += assert_case("你能不能控制车窗", "can_question", is_meta=True)
+    failures += assert_case("你能不能懂我座椅不舒服", "can_question", is_meta=True)
     failures += assert_case("能不能打开车窗", "can_question")
     failures += assert_case("能不能帮我把车窗打开", "can_question", hedged_overlay=True)
     failures += assert_case("能不能看下车窗开着吗", "status_query")
