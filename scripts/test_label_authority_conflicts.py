@@ -289,6 +289,103 @@ def main() -> int:
         if "meta_capability_question_must_be_non_mutating" not in meta_mutating_result.stdout:
             failures.append("expected meta capability non-mutating error in stdout")
 
+        mixed_legacy_new_ok = root / "mixed-legacy-new-ok.jsonl"
+        mixed_legacy_new_ok.write_text(
+            "\n".join(
+                json.dumps(item, ensure_ascii=False)
+                for item in [
+                    row("legacy-inferred", "打开车窗", [{"name": "open_window", "arguments": {}}]),
+                    row(
+                        "new-explicit",
+                        "打开空调",
+                        [{"name": "open_ac", "arguments": {}}],
+                        generated_by="register-window-fixture",
+                        register="imperative",
+                        risk_tier="R0",
+                    ),
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [mixed_legacy_new_ok])
+        mixed_ok_result = run_checker(manifest)
+        if mixed_ok_result.returncode != 0:
+            failures.append(f"expected mixed legacy/new explicit metadata to pass, got {mixed_ok_result.returncode}: {mixed_ok_result.stderr}")
+        else:
+            payload = json.loads(mixed_ok_result.stdout)
+            if payload.get("warning_count") != 2:
+                failures.append(f"expected two legacy inferred warnings, got {payload.get('warning_count')}")
+            if len(payload.get("warnings") or []) != 2:
+                failures.append("expected receipt warnings array with two entries")
+            if "legacy row missing explicit register metadata" not in mixed_ok_result.stderr:
+                failures.append("expected legacy register warning on stderr")
+            if "legacy row missing explicit risk_tier metadata" not in mixed_ok_result.stderr:
+                failures.append("expected legacy risk_tier warning on stderr")
+
+        legacy_with_old_global_switch = root / "legacy-with-old-global-switch.jsonl"
+        legacy_with_old_global_switch.write_text(
+            json.dumps(row("legacy-global-switch", "打开车窗", [{"name": "open_window", "arguments": {}}]), ensure_ascii=False)
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [legacy_with_old_global_switch], extra={"require_explicit_register_risk_metadata": True})
+        old_switch_result = run_checker(manifest)
+        if old_switch_result.returncode != 0:
+            failures.append(f"expected legacy row to ignore old global metadata switch, got {old_switch_result.returncode}: {old_switch_result.stderr}")
+        else:
+            payload = json.loads(old_switch_result.stdout)
+            if payload.get("warning_count") != 2:
+                failures.append(f"expected old-switch legacy warning_count=2, got {payload.get('warning_count')}")
+
+        mixed_legacy_new_bad = root / "mixed-legacy-new-bad.jsonl"
+        mixed_legacy_new_bad.write_text(
+            "\n".join(
+                json.dumps(item, ensure_ascii=False)
+                for item in [
+                    row("legacy-inferred", "打开车窗", [{"name": "open_window", "arguments": {}}]),
+                    row(
+                        "new-missing-metadata",
+                        "打开空调",
+                        [{"name": "open_ac", "arguments": {}}],
+                        generated_by="register-window-fixture",
+                    ),
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [mixed_legacy_new_bad])
+        mixed_bad_result = run_checker(manifest)
+        if mixed_bad_result.returncode != 65:
+            failures.append(f"expected new row missing metadata rc=65, got {mixed_bad_result.returncode}")
+        if "legacy row missing explicit register metadata" not in mixed_bad_result.stderr:
+            failures.append("expected legacy row warning before mixed manifest failure")
+        if "missing explicit register metadata for new row source" not in mixed_bad_result.stderr:
+            failures.append("expected new row missing metadata manifest error")
+
+        null_register = root / "null-register.jsonl"
+        null_register.write_text(
+            json.dumps(
+                row(
+                    "null-register",
+                    "打开车窗",
+                    [{"name": "open_window", "arguments": {}}],
+                    register=None,
+                    risk_tier="R0",
+                ),
+                ensure_ascii=False,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [null_register])
+        null_register_result = run_checker(manifest)
+        if null_register_result.returncode != 65:
+            failures.append(f"expected null register rc=65, got {null_register_result.returncode}")
+        if "invalid explicit register metadata" not in null_register_result.stderr:
+            failures.append("expected null register to fail as invalid explicit metadata")
+
     if failures:
         print("test_label_authority_conflicts FAILED", file=sys.stderr)
         for failure in failures:
