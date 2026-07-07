@@ -1072,3 +1072,10 @@
 - **A0 crash 修复**（7619e591）：FastPath noMatch 逃逸 CONFIRMED（TDD 探针先证）→ 2 行 catch→unsupportedPayload。全量 598/0。
 - **基建级联**（a91b6ede，磊哥批 A-F+豁免 30 天）：CLAUDE §3/§4/§6/§9+CURRENT 刷新、GitNexus 重索引 35887、MT5 advisory 恢复。
 - **机制沉淀**：BATCH2 ballot 5 题就绪（recall 移出 5 已拍）；S5 SPEC+judge 协议双件备好；lessons 候选=生成位 LLM 的 deterministic 逃逸倾向（v1 实证：生成任务默认反射写脚本拼壳,修法=派单显式亲笔+judge 话术维度）；worker 治理=管道≤5/context<15% 退役/CC-TUI C-m 提交/codex 可内部 spawn subagent（磊哥诀窍）/in-process subagent 走宿主代理会挂→tmux 绕代理起（磊哥 SOP）。
+
+## D-119：通宵链授权（磊哥 2026-07-07 24:00 /goal 拍板）
+
+- 磊哥原话：「通宵链批准 S8自主推进 可以S8，记得我们的干活的流程哈 grill什么的 五个worker都可以用」+「不合盖现在 不要被合盖夸大影响了」。
+- 授权内容：s4 补产 judge→S6 重组装 404→S6 复审→S7 十门→S7b receipt→host fresh resample→S7c probe（PASS=run-auth 生效 D-114）→五布尔+S8 门 hard gates 全核→**全绿才点火 S8 1800 iters**。任一门红=停在门上记诚实账，零临场拍板（预置决策树=IMPL-PLAN v3 失败分支+D-114 四类分流）。
+- **lid_mlx_behavior 降级 informational**（磊哥 waive：今晚不合盖+segmented_restart_first 兜底在；S8-LAUNCH-GATE v2 该 blocker 按本条豁免，实验后续窗口补做）。
+- 流程纪律不因通宵松动：产出方≠审方/judge 盲判/receipt 绑 basis/candidate 恒 unsigned。
