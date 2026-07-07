@@ -339,3 +339,6 @@ cascade-inventory T5「75 件」清单（2026-06-23）直接执行会错：B4a r
 
 ## M.45 commander 自身 git 操作两连事故（M.40 的 commander 变体，2026-07-07）
 ①`git add -A docs/` 过宽把 untracked macos 草稿计划卷进 B4b commit（违反 C3 no-stage 锁定，hermes R9 预言）；②修复时 `git commit --amend` 没核 HEAD——HEAD 已是 B5，amend 把 B5 改成 B4b message 混入 plan 移除，reflog 链 `325d371a→8b7b6c33` 三 commit 错乱；终以 `git reset --mixed` 回 B1c 重建三批（`cae99ee1/82cb6367/b73b5f71`）修复。修法：① stage 用显式 pathspec 禁 `add -A` 目录级宽扫 ②amend 前必跑 `git log -1 --oneline` 核 HEAD 是目标 commit ③正面：分支未 push + 单人 commit 是本次可安全重建的前提——push 前修历史的窗口价值。
+
+## M.46 probe 量尺的分母前置检查：阈值推导必须绑触发面实况（2026-07-08 S7c 停线实证）
+S7c learnability probe 判 FAIL 的唯一原因：threshold=3（预声明「30 行中 3 行移动=最小可检信号」）要求 no_tool_delta≥3，但实选 30 行的 baseline no_tool_count=2——**结构性不可能达标**。模型实际学动（no_tool 2→0 清零+target_action 25→30）。时序核清：threshold 00:20 预声明早于 baseline eval 02:24=校准失误非 post-hoc 操纵。异源审计支持 delta≥min(threshold, baseline_count) 诚实化重判（4 条件：保留原 FAIL receipt/eval 来源显式/commander 签名/磊哥知悉）。修法（验证经济学「门自身判据也是 basis 绑定」M.16 家族第三例）：**阈值预声明时必须同步声明它假设的分母下限，selector 把该下限做成选行约束**（如「所选 subset 的 baseline no_tool≥threshold」）——量尺与触发面在设计时刻绑定,不是跑完才发现除不动。另记:train-on-eval 微过拟合探针的信号表述=「问题行修复率」非「绝对分」（30/30 含记忆效应,learnability 证据=5/5 问题行翻正）。
