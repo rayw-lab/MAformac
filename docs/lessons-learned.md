@@ -321,3 +321,6 @@ W20A R2 两支红队独立攻击 R1，同步抓到同一个核心错位：把 `i
 
 ## M.39 zsh 数组是 1-indexed：tmux 派单循环禁 bash 式下标，送达验证要按派单清单对账（2026-07-07 SMUX）
 本轮 SMUX 派单踩到 shell 语义差：bash 风格从 `i=0` 取数组元素，在 zsh 下 `${A[0]}` 为空，`tmux send-keys -t ""` 会落到 active pane（commander 自己），于是空单进入自己输入框并被 Enter 提交成假用户消息；末位 worker 因数组下标错位漏派。`SMUX-NOTES.md` 已把此事标为 PROVEN-CANDIDATE，并给出修法：禁索引数组派单，改逐条显式命令或 `for pair in "%11:spec1" ...` 字符串切分；send-keys 后必须 capture 验证全部目标 pane，按派单清单对账，不是看已有几个 pane 在 Working（`SMUX-NOTES.md:1-3`）。修法：tmux-bridge/SMUX 派单脚本默认不用 zsh 数组下标；若必须用数组，显式 `emulate -L zsh` 后从 1 开始，或切到 bash 执行；回稿协议继续走 read → message → read → keys Enter。锚：`SMUX-NOTES.md:1-3`。
+
+## M.40 单工作树双 worker 近邻 commit 必撞：一个 reset HEAD~2 会把邻座 commit 一起撸掉（2026-07-07 SEC15R/boundary 补录事故）
+两 worker 在同一工作树近时间窗各自 commit（%11 boundary 补录 bf099441、%25 docs 修正 e21244d2 插在中间），%11 收尾想重组自己的 commit 跑了 `reset HEAD~2`——把 %25 的 commit 一起撸掉（内容退回 working tree M 态，幸 reflog+工作树无损，commander 兜底重 commit）。修法：①同工作树多 worker 期间，**派单红线加「禁 reset/rebase/amend 任何非自己 SHA 的 commit；重组历史是 commander 独占操作」**②commander 收稿时 `git log` 对账各 worker 声称的 SHA 是否仍在 HEAD 链（reflog 是第一取证点）③近邻 commit 需求高时错峰派单或 staged-merge（M.11/单工作树纪律的 commit 层补丁）。锚：reflog `reset: moving to HEAD~2` + 重组后链 1e02f178/753b236c + 兜底 commit。
