@@ -1049,3 +1049,11 @@
 - date: 2026-07-07（傍晚）
 - 磊哥拍：①push 批准（opt/streamline-macos-20260707）②commander 亲笔融合 baseline roadmap = `docs/roadmap-2026-07-07-macos-closure-baseline.md`（三线调度→macOS app 全功能闭环五门；基线文档组成员，两轮 worker 审计后终版）③**不派 Opus**：S4/S5 生成改 hermes(glm-5.2, 2 实例) 生成 + codex judge 盲判（保异源：生成≠判≠同厂商），supersede IMPL-PLAN-v3 附录「Opus 仅生成」分工④worker 阵容调整 4 codex + 2 hermes（%26/%31=hermes，pane 亲核）。
 - 关联纠错：「可执行 136」口径废弃（task3 teardown 亲核：136=ir_map adjust 前缀子分类计数；真值=semantic contract 可执行 2 / mounted 1 / 120 格仅 1 格可演）。
+
+## D-117：BATCH1 grill 20 项全拍 + Q-03=A + 物理清理分批授权（磊哥 2026-07-07 晚一次性拍）
+
+- 磊哥原话拍法：「A 然后BATCH1 全按⭐：MG-7=C, MG-9=A, MG-2=C, MG-5=C，其余 P0 全按⭐。Q-03：S4 继续 HOLD；只允许 classifier/skeleton 非语义修复，禁止把 can_question 改成 imperative 来逃避；若必须改 Q13/SPEC 语义再上抛我。物理清理：批1/3/4/6 按 guard 自动；批2/5 等引用核+restore/backup 证明后再给一行确认」
+- **BATCH1（指针式落库，逐题⭐内容=run dir `2026-07-07-ma-opt-refactor/grill-skeleton/BATCH1-GRILL-BALLOT.md`，本拍后该文件状态=RATIFIED）**：MG-7=C（全功能闭环=Phase1 车控+文本主交互+AVSpeechSynthesizer TTS；真 ASR/MCP 不进硬门；「惊艳」只进 operator review 非机械门）；MG-9=A；MG-2=C；MG-5=C；其余 15 P0 按 ballot ⭐。
+- **Q-03=A（S4 硬前置）**：修 register_classifier 扩 can_question 三形态（可以吗/能把…吗/行不行）+ golden fixture 补 shape 覆盖（原 50 行判定不动只新增）+ 回归测试。约束：S4 HOLD 至解锁判据机械绿；仅非语义修复（🔴禁把 can_question 判成 imperative 逃避）；触碰 Q13/SPEC 语义必须再上抛。解锁判据=q03-blocker-verify.md Minimum unblock criteria 四条。
+- **物理清理**：批1（Reports 32→1）/批3（phase0 retire 4）/批4（paper-to-skill-gate 28→10）/批6（93 件 retire_trigger）授权按 guard 自动执行（digest/restore 前置+no-touch 豁免单批 commit）；批2（evidence-frozen tarball）/批5（dev/spike-e3 退仓）待引用核+restore/backup 证明后磊哥一行确认。
+- 级联：roadmap 五门（MG-7=C 定界）/ BATCH1 ballot 标 RATIFIED / S4 HOLD 态。
