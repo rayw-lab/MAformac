@@ -72,6 +72,7 @@ public enum ToolCandidateSource: String, Codable, Equatable, Sendable {
     case contentFallback = "content_fallback"
     case parserRepair = "parser_repair"
     case fastPath = "fast_path"
+    case modelRouter = "model_router"
 }
 
 public enum SchemaInvalidReason: Equatable, Sendable {
