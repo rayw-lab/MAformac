@@ -162,6 +162,20 @@ public enum ToolContractNormalizer {
         return try JSONDecoder().decode([String: DDomainIRMapEntry].self, from: Data(contentsOf: url))
     }
 
+    public static func compiledIRMap() -> [String: DDomainIRMapEntry] {
+        DDomainIRMap.irMapCompiled
+    }
+
+    public static func compiledIRMapFingerprint() -> String {
+        DDomainIRMap.irMapCompiledFingerprint
+    }
+
+    public static func irMapFingerprint(_ irMap: [String: DDomainIRMapEntry]) throws -> String {
+        var data = try C6CanonicalJSON.encode(irMap)
+        data.append(0x0A)
+        return C6Hash.sha256Hex(data)
+    }
+
     public static func normalize(_ call: C6ToolCall, irMap: [String: DDomainIRMapEntry] = [:]) -> [ToolContractIR] {
         // 优先 D-domain 具名工具名查表(562); 旧 surface(frame + 6 set_cabin_*) strangler 保留, S4/S5 迁后删。
         if let entry = irMap[call.name] {
