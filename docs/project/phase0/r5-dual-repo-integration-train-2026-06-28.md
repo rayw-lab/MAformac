@@ -5,6 +5,8 @@ artifact_kind: dual_repo_integration_receipt
 created_at: 2026-06-28
 proof_class_ceiling: docs/local + local_unit + local_static + openspec_contract
 authority: integration_receipt_not_runtime_contract
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D6 双仓 integration train receipt

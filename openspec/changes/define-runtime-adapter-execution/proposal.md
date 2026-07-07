@@ -1,3 +1,7 @@
+status: `active_contract_carrier`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 ## Why
 
 D11 left `C061` as a future runtime adapter boundary and `C005` as current local mock executor/store ownership only. D12 added standalone Runtime Adapter V0 local/unit code-backed proof, but it did not put the adapter on the `C3ExecutionPipeline` execution path.

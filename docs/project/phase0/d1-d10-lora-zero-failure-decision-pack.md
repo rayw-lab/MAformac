@@ -1,10 +1,13 @@
 ---
-status: accepted_user_verdicts
+status: retired
 artifact_kind: phase0_decision_pack
 authority: route_control_not_ssot
 retire_trigger: "Retire after phase0-d1-d10-closeout.md records all D1-D10 user verdicts and the accepted carrier map."
 expires: "2026-07-15"
 ---
+
+
+> **RETIRED (2026-07-07)**: Closeout records all D1-D10 user verdicts and accepted carrier map. See `physical-cleanup-execution-pack.md` batch 3.
 
 # D1-D10 LoRA Zero-Failure Decision Pack
 

@@ -1,5 +1,9 @@
 # Handoff 2026-06-19 — 基座内化 + 全量重构推翻重来(决策已拍,待 openspec-propose)
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 ## 一句话状态
 深度内化 4 金钥匙基座 → 磊哥拍**全量重构 A**(推翻旧 7-change);新 N-change 路线已提议**待磊哥最终拍** → 拍后加载 `openspec-propose` 立 **C1 契约 SSOT**。本 session 收尾 clear。
 

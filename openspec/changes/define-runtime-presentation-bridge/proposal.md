@@ -1,3 +1,7 @@
+status: `active_contract_carrier`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 ## Why
 
 Mainline currently has UIUE bridge semantics, runtime vocabulary, and route-board expectations split across separate documents, while `docs/CURRENT.md` still records the Runtime -> Presentation bridge as `not_proposed`. This change creates the mainline-visible, contract-only carrier accepted by human review so C01/C03/C06/C18 can move out of vague owner-trigger blocker state without claiming runtime readiness.

@@ -30,9 +30,20 @@ def assert_case(
 def main() -> int:
     failures: list[str] = []
     failures += assert_case("你能不能控制车窗", "can_question", is_meta=True)
+    failures += assert_case("你能不能懂我座椅不舒服", "can_question", is_meta=True)
     failures += assert_case("能不能打开车窗", "can_question")
     failures += assert_case("能不能帮我把车窗打开", "can_question", hedged_overlay=True)
+    failures += assert_case("空调温度调低可以吗", "can_question")
+    failures += assert_case("能把音量调大一点吗", "can_question")
+    failures += assert_case("空调关了行不行", "can_question")
+    failures += assert_case("屏幕不是刚调到最暗了嘛，别再调了", "imperative")
+    failures += assert_case("车窗不是早就关好了吗，别再关了", "imperative")
+    failures += assert_case("别再调低空调温度了嘛", "imperative")
+    failures += assert_case("不是让你把空调关了嘛", "imperative")
+    failures += assert_case("空调关了嘛", "imperative")
     failures += assert_case("能不能看下车窗开着吗", "status_query")
+    failures += assert_case("现在空调开着吗", "status_query")
+    failures += assert_case("你能不能控制空调", "can_question", is_meta=True)
     failures += assert_case("麻烦打开车窗", "hedged_request", hedged_overlay=True)
     failures += assert_case("车窗已经开着了", "already_state_assertion")
 

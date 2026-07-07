@@ -5,6 +5,8 @@ repo: /Users/wanglei/workspace/MAformac-uiue
 status: DONE
 proof_class: docs_local + openspec_local
 created_at: 2026-06-29
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D19 Gate5 - UIUE Durability Guard Authority

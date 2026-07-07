@@ -4,6 +4,8 @@ repo: /Users/wanglei/workspace/MAformac
 status: LOCAL_VALIDATION_PASS_PENDING_AUDIT
 proof_class: docs_local + local_static + local_unit + openspec_local
 created_at: 2026-06-29
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D16+D17 Main-Side Reconcile

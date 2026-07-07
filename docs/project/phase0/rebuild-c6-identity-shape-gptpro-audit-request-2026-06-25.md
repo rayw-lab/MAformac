@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # GPT Pro Audit Request - Rebuild-C6 Identity Shape - 2026-06-25
 
 ## Requested Verdict

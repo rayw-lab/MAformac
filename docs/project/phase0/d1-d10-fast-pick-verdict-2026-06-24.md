@@ -1,11 +1,14 @@
 ---
-status: accepted_user_verdict_archive
+status: retired_pending_openspec_carriers
 artifact_kind: phase0_fast_pick_archive
 authority: archive_not_ssot
 decision_source: docs/project/phase0/phase0-d1-d10-user-decision-record.md
 retire_trigger: "Retire after Phase 0 D1-D10 closeout and OpenSpec carrier acceptance supersede this archive."
 expires: "2026-07-15"
 ---
+
+
+> **RETIRED-PENDING (2026-07-07)**: Phase 0 D1-D10 closeout recorded. OpenSpec carriers still `active_construction` — full retire deferred to carriers archived. See `physical-cleanup-execution-pack.md` batch 3.
 
 # D1-D10 Fast-Pick Verdict Archive
 

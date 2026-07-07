@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # R5 D14 Gate 2 - Runtime Adapter Residual Code Receipt
 
 Date: 2026-06-29

@@ -1,5 +1,9 @@
 # Dispatch - C3 debt cleanup + C6 OpenSpec archive long run
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 > 派 Codex(long-runner)。磊哥手动粘贴。
 > 目标 = 结束 P0 C6 收尾后的 OpenSpec archive：先诚实处理 C3 `7.3 Qwen3 sampling` 剩余任务，再 archive C3；随后复核 P0-3/P0-4 closeout，archive C6。不要把 `Complete` 状态词当成 archive 证据，必须实跑 archive + 对账。
 

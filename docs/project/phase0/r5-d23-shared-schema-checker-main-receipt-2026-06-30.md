@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # R5 D23 Shared Public Fixture Schema Checker Main Receipt
 
 Status: Gate1 main local closure passed under proof cap. Gate-level Hermes/Claude Code audits were skipped by user override for D23; post-gate review is one Codex subagent xhigh audit, then GPT Pro after fixes/push.

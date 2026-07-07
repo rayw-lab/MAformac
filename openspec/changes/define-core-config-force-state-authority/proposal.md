@@ -1,3 +1,7 @@
+status: `active_contract_carrier`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 ## Why
 
 D15 已经把 Runtime -> Presentation payload 合同收在 main，但 R5 route map 仍把 `C018` Core config / `SceneMacroRegistry` 和 `C052` production/runtime force-state 留作 deferred owner lanes。D17 如果在没有 main-owned authority 的情况下继续，会被迫让 UIUE 猜 shared config、force-state 名称和 proof 边界，形成第二事实源。

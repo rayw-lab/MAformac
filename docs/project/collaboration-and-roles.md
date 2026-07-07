@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # MAformac 协作分工与推进机制
 
 > 配套 `CLAUDE.md`(项目宪法)。本文件定义**谁干什么、超长任务怎么用 harness 管控、agent 间怎么交接**。状态:candidate(随项目演进更新)。

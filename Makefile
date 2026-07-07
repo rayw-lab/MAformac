@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -35,7 +35,7 @@ GENERATED_SWIFT := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test verify-contentview-wiring
+verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register diff test verify-contentview-wiring
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
@@ -70,6 +70,10 @@ verify-default-scope: .venv/.deps.stamp
 	$(PYTHON) scripts/check_default_scope_ssot.py
 	$(PYTHON) scripts/check_c5_c2_scope_parity.py
 	$(PYTHON) scripts/check_scope_origin_single_source.py
+
+verify-register:
+	PYTHONPATH=scripts python3 scripts/test_register_classifier_lib.py
+	PYTHONPATH=scripts python3 scripts/test_register_classifier_golden.py
 
 verify-c5-phase1-gates: .venv/.deps.stamp
 	$(PYTHON) scripts/test_query_zero_tolerance.py

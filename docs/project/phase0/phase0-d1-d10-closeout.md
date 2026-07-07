@@ -1,10 +1,13 @@
 ---
-status: accepted_user_decisions_partial_closeout
+status: retired_pending_openspec_carriers
 artifact_kind: phase0_closeout
 authority: closeout_record_not_ssot
 retire_trigger: "Retire after D1-D10 are accepted/rejected by user verdict and OpenSpec carriers are either accepted, superseded, or archived."
 expires: "2026-07-15"
 ---
+
+
+> **RETIRED-PENDING (2026-07-07)**: D1-D10 user decisions accepted (pending=[]). OpenSpec carriers still `active_construction` — full retire deferred to carriers archived. See `physical-cleanup-execution-pack.md` batch 3.
 
 # Phase 0 D1-D10 Closeout
 

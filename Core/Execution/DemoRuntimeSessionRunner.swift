@@ -54,6 +54,8 @@ public final class DemoRuntimeSessionRunner {
             frameResult = try await frameDecoder(text)
         } catch let failure as DDomainToolPlanFailure {
             return unsupportedPayload(finiteReason: failure.finiteReason)
+        } catch FastPathIntentError.noMatch {
+            return unsupportedPayload(finiteReason: "fast_path_no_match")
         }
 
         var frame = frameResult

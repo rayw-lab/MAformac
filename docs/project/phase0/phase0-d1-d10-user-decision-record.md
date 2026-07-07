@@ -1,11 +1,14 @@
 ---
-status: user_decisions_accepted
+status: retired
 artifact_kind: user_decision_record
 authority: user_verdict_record_not_ssot
 pending_user_decision: []
 retire_trigger: "Retire after all D1-D10 rows are non-pending and phase0-d1-d10-closeout.md records the accepted final state."
 expires: "2026-07-15"
 ---
+
+
+> **RETIRED (2026-07-07)**: All D1-D10 rows non-pending (pending=[]) and closeout records accepted state. See `physical-cleanup-execution-pack.md` batch 3.
 
 # Phase 0 D1-D10 User Decision Record
 

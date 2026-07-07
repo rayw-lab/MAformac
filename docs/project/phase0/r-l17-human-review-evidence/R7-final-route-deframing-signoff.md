@@ -31,6 +31,8 @@ route_deframing_blocked_by_rebuild_c6: false
 r1_r6_evidence_policy: "feed_forward_historical_for_route_only; full evidence required before candidate signoff"
 retire_trigger: "Retire after candidate signoff supersedes route-only signoff or after reviewed artifact is archived."
 expires: "2026-07-15"
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R7 Final Route Deframing Signoff

@@ -20,15 +20,18 @@ _CAN_SHELL_RE = re.compile(
     r"^(?:你|您|系统|助手|这个系统|这个助手)?(?:能不能|能否|可否|可以不可以|可不可以|能不能够|能不能帮我|能帮我|可以帮我)"
 )
 _HEDGED_RE = re.compile(r"(帮我|帮忙|麻烦|劳驾|拜托|可以帮我|能不能帮我|能帮我)")
-_META_VERB_RE = re.compile(r"^(?:帮我|帮忙)?(?:控制|操控|操作|支持|处理|管理|识别|理解|执行)(?:一下|下)?")
+_META_VERB_RE = re.compile(r"^(?:帮我|帮忙)?(?:控制|操控|操作|支持|处理|管理|识别|理解|懂|执行)(?:一下|下)?")
 _ACTION_RE = re.compile(
-    r"(打开|关上|关闭|调到|调至|调高|调低|升高|降低|开一下|关一下|开个|关个|切到|切换|设置|设成)"
+    r"(打开|关上|关闭|关掉|关了|调到|调至|调高|调低|调大|调小|升高|降低|开一下|关一下|开个|关个|切到|切换|设置|设成)"
 )
 _STATUS_RE = re.compile(
     r"(现在|目前|当前|状态|多少|几档|几度|有没有|是否|是不是|开着|关着|运行|在吗|亮着|看下|查下|查询|看看)"
 )
-_QUESTION_RE = re.compile(r"(吗|么|嘛|呢|是否|是不是|有没有|多少|几档|几度|可不可以|能不能|能否|可否)")
+_QUESTION_RE = re.compile(r"(吗|么|嘛|呢|是否|是不是|有没有|多少|几档|几度|可不可以|可以吗|行不行|能不能|能否|可否)")
+_CAN_MARKER_RE = re.compile(r"(可以吗|可以么|可以嘛|可以不|行不行|行吗|行么|能把|能帮我?把|可不可以|能不能|能否|可否|成不成|好不好)")
 _ALREADY_RE = re.compile(r"(已经|已|早就|本来就).*(开着|关着|打开|关闭|调到|在运行|亮着)")
+_RHETORICAL_NOOP_RE = re.compile(r"(?:不是|早就|已经|已|刚|本来).*(?:吗|嘛).*(?:别再|不要再|不用再|别|不要|不用)")
+_NEGATIVE_IMPERATIVE_RE = re.compile(r"^(?:别|不要|不用)(?:再)?")
 
 
 @dataclass(frozen=True)
@@ -89,6 +92,18 @@ def classify_register(text: str) -> RegisterClassification:
     if _STATUS_RE.search(inner) and (_QUESTION_RE.search(normalized) or "看下" in inner or "查下" in inner):
         return RegisterClassification(
             register="status_query",
+            is_meta_capability_question=False,
+            hedged_overlay=hedged_overlay,
+        )
+
+    if (
+        _ACTION_RE.search(inner)
+        and _CAN_MARKER_RE.search(normalized)
+        and not _RHETORICAL_NOOP_RE.search(normalized)
+        and not _NEGATIVE_IMPERATIVE_RE.search(inner)
+    ):
+        return RegisterClassification(
+            register="can_question",
             is_meta_capability_question=False,
             hedged_overlay=hedged_overlay,
         )

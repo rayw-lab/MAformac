@@ -5,6 +5,8 @@ authority: run_plan_locked_no_scope_expansion（磊哥签 R7 Part B 后按本 pl
 created: 2026-07-02
 companion: R7-renewal-and-tiny-ablation-run-auth-DRAFT.md（签字包）
 as_of_main: aac84de9
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # 裁决-A tiny-ablation 最终 run plan（tiny-only，零 scope 扩张）

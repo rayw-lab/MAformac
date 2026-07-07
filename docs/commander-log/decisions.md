@@ -1012,3 +1012,63 @@
 - `w20a-impl-reviews/s8-review.md`：S8R verdict=`REFUTED`。
 - `w20a-impl-reviews/s8fix-review.md`：S8FR verdict=`AMENDED`；三 P0 CLOSED；攻击套件 3×BLOCKED；extraction + claim gate PASS。
 - `w20a-impl-reviews/selftest-log.md`：current HEAD 3×BLOCKED；vulnerable basis 3×LEAKED。
+
+---
+
+## D-114：register 窗待磊哥包四拍落定（run-auth 条件式 / Q18 缓拍 / 承重墙+S10 分流 / host HOLD 不 waiver）
+
+- date: 2026-07-07（下午，Fable5 commander @%13 蜂群第二场）
+- 磊哥原话逐条（tmux 直拍）：
+  1. 「S7c PASS 后 run-auth：我给！」→ **run-auth 条件式预授权**：S7c learnability micro-probe（IMPL-PLAN v3 必跑前置）PASS 即视为 S8 1800-iters run-auth 生效，无需再等一轮拍板。S7c FAIL 则不触发，回 IMPL-PLAN v3 失败分支。
+  2. 「Q18 分支：现在不拍，等 S10 触发后按失败类型分流。」→ Q18 保持条件式，不预拍。
+  3. 「默认保持 tail1200 / R3-QNEG-clean 是承重墙。S10 全绿再 data supersede；S10 不绿就先分类：runtime qa fail 修 guard/harness；coverage debt 才开新 data repair；coverage 足但 action-question 仍 fail 才判 causal bet falsified；holdout 塌就走话术收窄或新窗口，不给 waiver。」→ **S10 失败四类分流处置表落定**（与 IMPL-PLAN v3 §S10 失败出口对齐并升级为磊哥拍板级）。
+  4. 「不建议默认给 host-waiver-key。waiver 会污染失败归因，后面 S8 如果不理想，很难判断是模型/数据问题还是资源环境问题。只有时间窗口极硬、你愿意承担归因不干净时才给 waiver。」→ **host HOLD 解法 = ⭐A 关重 GUI 后 fresh resample PASS**；waiver-key 仅时间窗口极硬时例外且归因不干净由决策者显式承担。
+- 消费口径：
+  - S8 点火五布尔改写为：S7c receipt PASS（=run-auth 生效）+ host fresh resample PASS（非 waiver）+ W20A mechanical green receipt + S7b causal-bet receipt + IMPL-PLAN v3 gates。
+  - holdout 塌 = 话术收窄或新窗口，**waiver 通道对 holdout 关闭**（比 v3 更严，以本条为准）。
+- 级联：CURRENT.md 待磊哥段收敛（仅剩条件式项）；STATUS-BOARD（run dir 2026-07-07-ma-opt-refactor）；MEMORY as-of 下轮刷新时并入。
+
+## D-115：任务①（全项目精简与架构优化）N1-N4 四项磊哥全批（照 commander ⭐ 推荐）
+
+- date: 2026-07-07（下午）
+- 磊哥原话：「N1-N4全部同意你的推荐」。逐项生效：
+  - **N1 批**：MCP decision note——旧「MCP 走 Capability 同构」（brainstorm-2026-06-17）显式 amend 为「vehicle `Capability` + domain-neutral `ToolProvider` 并行，guard/executor 等价边界保留」。note 起草后仍呈磊哥过目正文再落 openspec/docs。
+  - **N2 知情确认**：M.33 iOS ir_map 缺陷随 Q2=C 冻结封存，iOS 二期再修；修复成本三档估算存档（run dir `out/m33-ios-irmap-status.md`）。
+  - **N3 批（保守版）**：Reports 31 tracked 文件退仓与 frozen 重复 tarball 化——本轮只落 migration plan + digest/重复清单，实际执行等磊哥单独点头。
+  - **N4 批**：openspec 11 active change 补 `status:` 字段（disposition 机械源），字段方案草案呈磊哥过目后落。
+- 关联：任务① 合成件=run dir `2026-07-07-ma-opt-refactor/out/COMMANDER-SYNTHESIS-v1.md`（10 结论 grill 拆解 + 双红队审计后修订 v2 再执行）。
+
+### D-115 补记（2026-07-07 下午）：N1/N4 正文过目已批
+
+磊哥原话「N1 批 / N4 批」。生效：
+- N1 正文批：proof-class 走 Option A（Slice A/C 用 public `PresentationProofClass`；Option B provider 内部枚举等真 MCP 执行获批再引入）；落点=新 openspec change `define-external-tool-provider-boundary`（四件套）+ 接受后 ADR 指针。
+- N4 正文批：`status:` 单字段首刀 + 6 枚举 + 11 change 初值表（run dir `2026-07-07-ma-opt-refactor/out/n4-openspec-status-field-draft.md`）；门=`openspec validate --all --strict` 全绿。
+
+## D-116：融合基线 roadmap 落库 + S4/S5 生成执行方变更（Opus→hermes 生成 + codex judge）
+
+- date: 2026-07-07（傍晚）
+- 磊哥拍：①push 批准（opt/streamline-macos-20260707）②commander 亲笔融合 baseline roadmap = `docs/roadmap-2026-07-07-macos-closure-baseline.md`（三线调度→macOS app 全功能闭环五门；基线文档组成员，两轮 worker 审计后终版）③**不派 Opus**：S4/S5 生成改 hermes(glm-5.2, 2 实例) 生成 + codex judge 盲判（保异源：生成≠判≠同厂商），supersede IMPL-PLAN-v3 附录「Opus 仅生成」分工④worker 阵容调整 4 codex + 2 hermes（%26/%31=hermes，pane 亲核）。
+- 关联纠错：「可执行 136」口径废弃（task3 teardown 亲核：136=ir_map adjust 前缀子分类计数；真值=semantic contract 可执行 2 / mounted 1 / 120 格仅 1 格可演）。
+
+## D-117：BATCH1 grill 20 项全拍 + Q-03=A + 物理清理分批授权（磊哥 2026-07-07 晚一次性拍）
+
+- 磊哥原话拍法：「A 然后BATCH1 全按⭐：MG-7=C, MG-9=A, MG-2=C, MG-5=C，其余 P0 全按⭐。Q-03：S4 继续 HOLD；只允许 classifier/skeleton 非语义修复，禁止把 can_question 改成 imperative 来逃避；若必须改 Q13/SPEC 语义再上抛我。物理清理：批1/3/4/6 按 guard 自动；批2/5 等引用核+restore/backup 证明后再给一行确认」
+- **BATCH1（指针式落库，逐题⭐内容=run dir `2026-07-07-ma-opt-refactor/grill-skeleton/BATCH1-GRILL-BALLOT.md`，本拍后该文件状态=RATIFIED）**：MG-7=C（全功能闭环=Phase1 车控+文本主交互+AVSpeechSynthesizer TTS；真 ASR/MCP 不进硬门；「惊艳」只进 operator review 非机械门）；MG-9=A；MG-2=C；MG-5=C；其余 15 P0 按 ballot ⭐。
+- **Q-03=A（S4 硬前置）**：修 register_classifier 扩 can_question 三形态（可以吗/能把…吗/行不行）+ golden fixture 补 shape 覆盖（原 50 行判定不动只新增）+ 回归测试。约束：S4 HOLD 至解锁判据机械绿；仅非语义修复（🔴禁把 can_question 判成 imperative 逃避）；触碰 Q13/SPEC 语义必须再上抛。解锁判据=q03-blocker-verify.md Minimum unblock criteria 四条。
+- **物理清理**：批1（Reports 32→1）/批3（phase0 retire 4）/批4（paper-to-skill-gate 28→10）/批6（93 件 retire_trigger）授权按 guard 自动执行（digest/restore 前置+no-touch 豁免单批 commit）；批2（evidence-frozen tarball）/批5（dev/spike-e3 退仓）待引用核+restore/backup 证明后磊哥一行确认。
+- 级联：roadmap 五门（MG-7=C 定界）/ BATCH1 ballot 标 RATIFIED / S4 HOLD 态。
+
+### D-116 amend（2026-07-07 晚）：hermes 额度尽退场，S4 生成位再变更
+阵容变更（磊哥）：%26 hermes→codex(gpt-5.5 xhigh)、%31 hermes→**Claude Opus 4.8 worker**。S4/S5 生成位：hermes×2 → **⭐Opus worker(%31) 生成 + codex judge 盲判**（异源保持；实质回到 IMPL-PLAN-v3 原设计的 Opus 生成质量假设，审计一「GLM 质量无基线」P0 随之消解）。终阵容=5 codex + 1 Opus。
+
+## D-118 补：§6 脱敏豁免窗口延长（磊哥 2026-07-07 晚拍）
+原 D-049 十天窗口（2026-07-03→07-13）延长为 **30 天（至 2026-08-02）**，其余条款不变（密钥/API key/个人 PII 底线保留）。基建文档级联 A-F 同批执行（CLAUDE §9 推进事实源/§4 Q2=C+MG-7=C/§3 表/CURRENT 刷新/gitignore/GitNexus rerun）。
+
+## D-118：执行相总账（2026-07-07 晚，Fable5 commander 二场收官）
+
+- **物理清理 6/6 全执行**（D-117 授权）：批1 Reports 32→1(aaeb43e5)/批2 evidence-frozen 551→tarball 826KB+restore 实测 551/551(4d338370)/批3 phase0 retire 分级 2+2(afdaa872)/批4 paper-to-skill-gate 28→10(e43dadc1)/批5 spike-e3 13→0+仓外备份+SHA256SUMS+qwen yaml 溯源标注(dde64dbf)/批6 91 件 retire_trigger(30eb4a40)。tracked -611。post-cleanup fullgate 597/0。
+- **Q-03 三轮审计收敛**（0e235848）：v1 过宽（审计抓误吸反问 6 行）→v2 收窄不足（commander 亲测抓单独反问）→v3 `_CAN_MARKER_RE` 显式 can 标记。golden 62 行（原 50 一字未动+12 SHAPE）。存量 manifest changed_total=0。
+- **S4 工艺循环**：v1（Opus 生成）judge 工艺 FAIL（deterministic 模板拼接 26/50 集中+schema 三缺）→ 生成位 Fable 5 low（绕代理，Opus 5h 额度尽,磊哥拍 A）→ v2 亲笔创作 50/50 unique 结构签名+装配管线分工 → judge 复判全维 PASS → **commander 签工艺 PASS** → S5 session-1 点火（120 条）。
+- **A0 crash 修复**（7619e591）：FastPath noMatch 逃逸 CONFIRMED（TDD 探针先证）→ 2 行 catch→unsupportedPayload。全量 598/0。
+- **基建级联**（a91b6ede，磊哥批 A-F+豁免 30 天）：CLAUDE §3/§4/§6/§9+CURRENT 刷新、GitNexus 重索引 35887、MT5 advisory 恢复。
+- **机制沉淀**：BATCH2 ballot 5 题就绪（recall 移出 5 已拍）；S5 SPEC+judge 协议双件备好；lessons 候选=生成位 LLM 的 deterministic 逃逸倾向（v1 实证：生成任务默认反射写脚本拼壳,修法=派单显式亲笔+judge 话术维度）；worker 治理=管道≤5/context<15% 退役/CC-TUI C-m 提交/codex 可内部 spawn subagent（磊哥诀窍）/in-process subagent 走宿主代理会挂→tmux 绕代理起（磊哥 SOP）。

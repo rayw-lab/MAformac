@@ -19,6 +19,8 @@ non_claims:
   - no V-PASS
   - no S-PASS
   - no U-PASS
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # Mainline Runtime Presentation Bridge Unblock - 2026-06-28

@@ -1,5 +1,9 @@
 # 00 证据账本
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 本文列出本次二次调研实际使用的主要证据。分为三层：官方/一手源、本地 repo 源码、本地调研报告。后续写 PRD/SRD/spec 时，优先引用一手源和本地源码，再引用本地报告结论。
 
 边界前提：MAformac 是 Master Agent for Mac，是磊哥个人自用、装在自己 Mac/iPhone 上、给客户演示方案能力的离线 demo。这里引用 VSS、KUKSA、Canals、Eclipse SDV 等资料，是为了借命名、schema、状态建模、trace、eval 和边界判断，不是要做真实车机、真车控制、量产座舱或客户侧交付系统。

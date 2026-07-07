@@ -7,6 +7,8 @@ owner: codex_d24_executor
 repo: /Users/wanglei/workspace/MAformac-uiue
 proof_class: local_static + github_api_remote_truth + docs_local
 retire_when: "D24 closeout lands and PR #6 merge evidence is recorded, or a newer D24 source manifest supersedes this file."
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D24 UIUE Absorption Source Manifest

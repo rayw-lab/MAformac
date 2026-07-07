@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # UIUE R5 Proof-Governance Receipt Schema
 
 Date: 2026-06-28

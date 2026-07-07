@@ -2,17 +2,41 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-06（D-111 honest-frozen-closeout 定调）
-last_verified_origin_main: f4af8ccf（含 #12-#25 合流；head_truth_rule 以 live git 为准）
+updated: 2026-07-07晚
+last_verified_origin_main: b2a25da7（PR #40 merge commit；head_truth_rule 以 live git 为准）
 branch: codex/rebuild-c6-doc-absorption-20260624
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "formal 1800 host gate PASS/waiver、正式 1800 起跑/停止/完成、UIUE merge 路线变化、或任何 D-10x 决策改变 launch authority 时，必须刷新。"
+expires_when: "S4 首批 judge 工艺 PASS 或 S7c 触发"
 ---
 
 # CURRENT — MAformac 当前路由牌
 
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
+
+## 当前阶段（2026-07-07晚：**S4 生产相开跑；清理 6/6 收口；第二批 grill READY**）
+
+🔴 **本节 supersede 下方 2026-07-07 register 补洞窗计划相旧态段**。本文件只作 router-only 指针；推进事实源以 roadmap v3、decisions D-114~D-118 和 run-dir board 为准。
+
+- **roadmap v3 指针**：`docs/roadmap-2026-07-07-macos-closure-baseline.md` = 三线融合基线 v3（两轮审计毕）；决策入口 = `docs/commander-log/decisions.md` D-114~D-118。
+- **任务①精简收口**：终审 GO，分支 `opt/streamline-macos-20260707`；物理清理 6 批完成，tracked -611；fullgate 597/0。
+- **任务② register 窗**：S4 生产相已开跑；Q-03 三轮收敛；golden 62 行；run-auth 条件式 = S7c PASS 生效；五管道阵容运行，`%34` judge 待命。
+- **任务③能力面**：能力面已立项；task3 teardown 真值为 `ir_map=562` / `mounted=1` / 120 格仅 1 格可演；BATCH1 19 题已拍，MG-7=C；第二批 grill READY。
+- **非声明**：当前仍不得写 candidate signed、C5 V-PASS、C6 acceptance、mobile/true-device acceptance 或 UIUE/voice readiness。
+
+📌 **下一步**：S4 首批样本生成与 judge 工艺验证；S7c 触发后才按 D-114 run-auth 条件式推进。
+
+## 【历史】2026-07-07：register 补洞窗计划相 v3 定稿；PR #39/#40 均已 MERGED 进 main
+
+🔴 **本节 supersede 下方 D-111 honest-frozen-closeout 旧态段**。本文件只作 router-only 指针，不复制 register grill 20 条正文；裁决全文、消费清单和计划以 run-dir SSOT 为准。
+
+- **PR 真态（live-verified via `gh pr view`）**：PR #39 `MERGED`（merge commit `3744d9da`）；PR #40 `MERGED`（W20A 8 stage 收口 + D-112/D-113 + register S0/S1 scanner v3，merge commit `b2a25da7`）。W20A 仍只证明 `runtime_path_reachable`，不签 candidate、不升格 V-PASS/C6 acceptance/mobile/true-device。
+- **register grill 20/20 全拍**：SSOT=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/PARADIGM-LEDGER.md`；一页消费清单=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/FINAL-LIST.md`。口径：Q13 golden boundary、Q16 机械前置+阈值、Q19 A supersede 均已拍；不把 20 条正文搬进 `CURRENT.md`。
+- **实施计划 v3 定稿**：计划=`runs/2026-07-07-w20a-grill-closeout/register-window/IMPL-PLAN-v3.md`，status=`XFRAME_ABSORBED_PENDING_RUNAUTH`；S7c `learnability micro-probe` 已由磊哥 3B 拍为必跑前置，不再作为 run-auth 可选项。
+- **决策指针**：D-112 / D-113 见 `docs/commander-log/decisions.md`。注意 D-113 是指针式落库：goal 层 supersede，data/candidate 层仍 `PENDING_GATES`，旧 tail1200/R3-QNEG-clean basis 在新门全绿前仍是回退承重墙。
+- **交接指针**：`docs/commander-log/COMMANDER-HANDOVER-2026-07-07.md`。
+
+📌 **下一步**：S2 golden boundary 已拍补录完（golden 50 全绿 rows=50 pairs=10 boundary=10，Python runner 口径）；S3 生成 SPEC 可备稿。🔴 **D-114（2026-07-07 下午磊哥四拍，见 decisions.md）**：① run-auth **条件式预授权**——S7c learnability micro-probe PASS 即生效，无需再拍 ② Q18 现在不拍，S10 触发后按失败类型分流 ③ tail1200/R3-QNEG-clean 承重墙默认保持，S10 全绿才 data supersede；S10 不绿四类分流（runtime qa fail→修 guard/harness / coverage debt→新 data repair / coverage 足但 action-question 仍 fail→judge causal bet falsified / holdout 塌→话术收窄或新窗口，**waiver 通道对 holdout 关闭**）④ host HOLD ⭐关重 GUI fresh resample PASS，**不默认 waiver-key**（污染归因），时间窗口极硬才例外。S8 点火五布尔=S7c PASS(=run-auth 生效) + host fresh resample PASS + W20A mechanical green receipt + S7b causal-bet receipt + IMPL-PLAN v3 gates；缺任一保持 `BLOCKED/PARTIAL`，不得写 candidate signed、C5 V-PASS、C6 acceptance 或 mobile/true-device acceptance。
 
 ## 当前阶段（2026-07-06：**C5 收尾定调 A = honest-frozen-closeout（D-111 磊哥拍）**；不重训 1800；candidate unsigned）
 

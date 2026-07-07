@@ -5,6 +5,8 @@ repo: /Users/wanglei/workspace/MAformac-uiue
 status: DONE_UNDER_HERMES_ROUND2_PASS
 proof_class: local_unit + local_static + openspec_local
 created_at: 2026-06-29
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D19 Gate6 - UIUE Durability Guard Code And Tests

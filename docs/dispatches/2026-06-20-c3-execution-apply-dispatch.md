@@ -1,5 +1,9 @@
 # Dispatch — C3 `define-execution-contract` APPLY(按已对齐 propose 实装 Swift,TDD 长跑)
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 > 派 Codex(long-runner + TDD)。磊哥手动粘贴。
 > **形态 = OpenSpec apply(写 Swift 实现代码,满足已 archive 的 spec)。propose 已对齐(两层 CC 审计 READY-FOR-APPLY),本次照 `tasks.md` 逐 group TDD 实装。**
 

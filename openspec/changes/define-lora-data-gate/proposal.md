@@ -1,3 +1,7 @@
+status: `active_contract_carrier`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 ## Why
 
 C6 已经归档并把 demo must-pass / gold cases 标成 `must_not_train`，但 P1-C LoRA 训练前还缺一个机器可复跑的数据入口门来证明训练候选没有污染 C6、heldout 或 raw source。C5 data gate 先做，是为了让后续 LoRA train 只消费被 receipt 明确放行的数据，而不是把格式通过或样本非空误写成训练就绪。

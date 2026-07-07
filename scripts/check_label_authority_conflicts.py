@@ -34,6 +34,26 @@ COUNTERFACTUAL_FIELDS = {
     "source_expected_signature",
     "case_expected_signature",
 }
+NEW_ROW_SOURCE_MARKER_KEYS = (
+    "generated_by",
+    "generator",
+    "generator_id",
+    "generator_run_id",
+    "generation_batch_id",
+    "generation_run_id",
+    "register_window_batch_id",
+    "register_window_generator",
+    "register_window_generator_id",
+    "register_window_source",
+    "register_window_source_kind",
+    "batch",
+    "batch_source",
+    "batch_generator",
+    "row_source",
+    "row_source_kind",
+    "source_marker",
+)
+LEGACY_SOURCE_MARKER_VALUES = {"legacy", "historical", "existing", "baseline", "fixture_legacy"}
 
 
 class ManifestValidationError(RuntimeError):
@@ -159,29 +179,78 @@ def explicit_metadata_required(manifest: Json) -> bool:
     )
 
 
-def metadata_value(row: Json, keys: tuple[str, ...]) -> Any:
-    containers = [
-        row,
-        row.get("metadata"),
-        row.get("tags"),
-        row.get("label_metadata"),
-        row.get("register_metadata"),
+def metadata_field(row: Json, keys: tuple[str, ...]) -> tuple[bool, Any, str | None]:
+    containers: list[tuple[str, Any]] = [
+        ("row", row),
+        ("metadata", row.get("metadata")),
+        ("tags", row.get("tags")),
+        ("label_metadata", row.get("label_metadata")),
+        ("register_metadata", row.get("register_metadata")),
     ]
-    for container in containers:
+    for container_name, container in containers:
         if not isinstance(container, dict):
             continue
         for key in keys:
             if key in container:
-                return container.get(key)
-    return None
+                field_path = key if container_name == "row" else f"{container_name}.{key}"
+                return True, container.get(key), field_path
+    return False, None, None
 
 
-def sample_register(row: Json, manifest: Json, path: Path, line_no: int) -> Json:
+def metadata_value(row: Json, keys: tuple[str, ...]) -> Any:
+    _, value, _ = metadata_field(row, keys)
+    return value
+
+
+def row_source_marker(row: Json) -> tuple[bool, str | None, Any]:
+    present, value, field_path = metadata_field(row, NEW_ROW_SOURCE_MARKER_KEYS)
+    if not present:
+        return False, None, None
+    marker = str(value).strip().lower() if value is not None else ""
+    if marker in LEGACY_SOURCE_MARKER_VALUES:
+        return False, field_path, value
+    return True, field_path, value
+
+
+def row_requires_explicit_metadata(row: Json, _manifest: Json) -> bool:
+    return row_source_marker(row)[0]
+
+
+def case_identity(row: Json) -> str | None:
+    return row.get("case_id") or row.get("sample_id") or row.get("source_sample_id")
+
+
+def warn_legacy_inferred(
+    warnings: list[Json],
+    row: Json,
+    path: Path,
+    line_no: int,
+    field: str,
+    inferred_value: str,
+) -> None:
+    warning = {
+        "type": "legacy_inferred_metadata",
+        "field": field,
+        "inferred_value": inferred_value,
+        "source": "inferred_regex",
+        "path": str(path),
+        "line_no": line_no,
+        "case_id": case_identity(row),
+        "message": f"legacy row missing explicit {field} metadata; inferred {field}={inferred_value}",
+    }
+    warnings.append(warning)
+    print(f"warning: {path}:{line_no}: {warning['message']}", file=sys.stderr)
+
+
+def sample_register(row: Json, manifest: Json, path: Path, line_no: int, warnings: list[Json]) -> Json:
     classification = classify_register(input_text(row))
-    explicit = metadata_value(row, ("register",))
-    if explicit is None:
-        if explicit_metadata_required(manifest):
-            manifest_error(f"{path}:{line_no}: missing explicit register metadata")
+    has_explicit, explicit, _ = metadata_field(row, ("register",))
+    if not has_explicit:
+        if row_requires_explicit_metadata(row, manifest):
+            marker_present, marker_field, marker_value = row_source_marker(row)
+            marker = f"{marker_field}={marker_value!r}" if marker_present else "manifest_require_explicit"
+            manifest_error(f"{path}:{line_no}: missing explicit register metadata for new row source {marker}")
+        warn_legacy_inferred(warnings, row, path, line_no, "register", classification.register)
         return {
             "register": classification.register,
             "is_meta_capability_question": classification.is_meta_capability_question,
@@ -189,6 +258,8 @@ def sample_register(row: Json, manifest: Json, path: Path, line_no: int) -> Json
             "register_source": "inferred_regex",
         }
     register = str(explicit)
+    if explicit is None or not register.strip():
+        manifest_error(f"{path}:{line_no}: invalid explicit register metadata {explicit!r}")
     if register not in REGISTER_ENUM:
         manifest_error(f"{path}:{line_no}: unknown register {register!r}")
     return {
@@ -229,13 +300,19 @@ def infer_risk_tier(row: Json) -> str:
     return "R0"
 
 
-def sample_risk_tier(row: Json, manifest: Json, path: Path, line_no: int) -> Json:
-    explicit = metadata_value(row, ("risk_tier", "risk_level"))
-    if explicit is None:
-        if explicit_metadata_required(manifest):
-            manifest_error(f"{path}:{line_no}: missing explicit risk_tier metadata")
-        return {"risk_tier": infer_risk_tier(row), "risk_tier_source": "inferred_regex"}
+def sample_risk_tier(row: Json, manifest: Json, path: Path, line_no: int, warnings: list[Json]) -> Json:
+    has_explicit, explicit, _ = metadata_field(row, ("risk_tier", "risk_level"))
+    if not has_explicit:
+        inferred = infer_risk_tier(row)
+        if row_requires_explicit_metadata(row, manifest):
+            marker_present, marker_field, marker_value = row_source_marker(row)
+            marker = f"{marker_field}={marker_value!r}" if marker_present else "manifest_require_explicit"
+            manifest_error(f"{path}:{line_no}: missing explicit risk_tier metadata for new row source {marker}")
+        warn_legacy_inferred(warnings, row, path, line_no, "risk_tier", inferred)
+        return {"risk_tier": inferred, "risk_tier_source": "inferred_regex"}
     risk_tier = str(explicit)
+    if explicit is None or not risk_tier.strip():
+        manifest_error(f"{path}:{line_no}: invalid explicit risk_tier metadata {explicit!r}")
     if risk_tier not in RISK_TIER_ENUM:
         manifest_error(f"{path}:{line_no}: unknown risk_tier {risk_tier!r}")
     return {"risk_tier": risk_tier, "risk_tier_source": "metadata"}
@@ -361,6 +438,7 @@ def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], exclu
     legacy_labels_by_input: dict[str, dict[str, Json]] = defaultdict(dict)
     source_errors: list[Json] = []
     meta_capability_errors: list[Json] = []
+    warnings: list[Json] = []
     source_counts: dict[str, int] = defaultdict(int)
     risk_source_counts: dict[str, int] = defaultdict(int)
     total_rows = 0
@@ -372,8 +450,8 @@ def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], exclu
                 continue
             expected = canonical_expected_calls(row)
             signature = expected_signature(expected)
-            register_info = sample_register(row, manifest, path, line_no)
-            risk_info = sample_risk_tier(row, manifest, path, line_no)
+            register_info = sample_register(row, manifest, path, line_no, warnings)
+            risk_info = sample_risk_tier(row, manifest, path, line_no, warnings)
             source_counts[str(register_info["register_source"])] += 1
             risk_source_counts[str(risk_info["risk_tier_source"])] += 1
             if register_info["is_meta_capability_question"] and (expected or row.get("expected_state_delta")):
@@ -513,6 +591,9 @@ def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], exclu
     conflict_counts: dict[str, int] = defaultdict(int)
     for conflict in conflicts:
         conflict_counts[str(conflict["status"])] += 1
+    warning_counts: dict[str, int] = defaultdict(int)
+    for warning in warnings:
+        warning_counts[str(warning["type"])] += 1
     status = "pass" if not conflicts and not source_errors and not meta_capability_errors else "fail"
     return {
         "artifact_kind": "label_authority_conflict_scan",
@@ -547,6 +628,10 @@ def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], exclu
         "legal_register_or_risk_split_allowed": legal_split_allowed[:50],
         "register_source_counts": dict(sorted(source_counts.items())),
         "risk_tier_source_counts": dict(sorted(risk_source_counts.items())),
+        "warning_count": len(warnings),
+        "warning_status_counts": dict(sorted(warning_counts.items())),
+        "legacy_inferred_warning_count": warning_counts.get("legacy_inferred_metadata", 0),
+        "warnings": warnings,
         "source_authority_error_count": len(source_errors),
         "meta_capability_error_count": len(meta_capability_errors),
         "status": status,

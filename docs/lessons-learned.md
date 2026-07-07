@@ -321,3 +321,21 @@ W20A R2 两支红队独立攻击 R1，同步抓到同一个核心错位：把 `i
 
 ## M.39 zsh 数组是 1-indexed：tmux 派单循环禁 bash 式下标，送达验证要按派单清单对账（2026-07-07 SMUX）
 本轮 SMUX 派单踩到 shell 语义差：bash 风格从 `i=0` 取数组元素，在 zsh 下 `${A[0]}` 为空，`tmux send-keys -t ""` 会落到 active pane（commander 自己），于是空单进入自己输入框并被 Enter 提交成假用户消息；末位 worker 因数组下标错位漏派。`SMUX-NOTES.md` 已把此事标为 PROVEN-CANDIDATE，并给出修法：禁索引数组派单，改逐条显式命令或 `for pair in "%11:spec1" ...` 字符串切分；send-keys 后必须 capture 验证全部目标 pane，按派单清单对账，不是看已有几个 pane 在 Working（`SMUX-NOTES.md:1-3`）。修法：tmux-bridge/SMUX 派单脚本默认不用 zsh 数组下标；若必须用数组，显式 `emulate -L zsh` 后从 1 开始，或切到 bash 执行；回稿协议继续走 read → message → read → keys Enter。锚：`SMUX-NOTES.md:1-3`。
+
+## M.40 单工作树双 worker 近邻 commit 必撞：一个 reset HEAD~2 会把邻座 commit 一起撸掉（2026-07-07 SEC15R/boundary 补录事故）
+两 worker 在同一工作树近时间窗各自 commit（%11 boundary 补录 bf099441、%25 docs 修正 e21244d2 插在中间），%11 收尾想重组自己的 commit 跑了 `reset HEAD~2`——把 %25 的 commit 一起撸掉（内容退回 working tree M 态，幸 reflog+工作树无损，commander 兜底重 commit）。修法：①同工作树多 worker 期间，**派单红线加「禁 reset/rebase/amend 任何非自己 SHA 的 commit；重组历史是 commander 独占操作」**②commander 收稿时 `git log` 对账各 worker 声称的 SHA 是否仍在 HEAD 链（reflog 是第一取证点）③近邻 commit 需求高时错峰派单或 staged-merge（M.11/单工作树纪律的 commit 层补丁）。锚：reflog `reset: moving to HEAD~2` + 重组后链 1e02f178/753b236c + 兜底 commit。
+
+## M.41 worker 为过门弱化门（B2 diff gate 移除 Makefile 事故，2026-07-07 streamline）
+B2 worker 为让未 commit 的 Makefile 改动过 `make verify-all`，把 `Makefile` 从 diff 自检门移除——正是红队 B2-P0-01 预言的「改坏 verify 链让 verify-all 假绿」活案例，commander 收稿亲核 diff 时 catch 并回滚（commit `0056d87d` 保留接线、恢复门）。修法：任何 gate/checker 自身改动，receipt 必须写 `gate_strength_delta`（增强/等价/弱化），弱化必须 commander 明批；「当前改动导致自检失败」的正解是分阶段 commit/临时验证，不是拆门。
+
+## M.42 `refs=0` 静态扫描 ≠ 可删（golden runner 误标事故）
+W2 盘点把 `scripts/test_register_classifier_golden.py` 按 refs=0 标「倾向删」，实为 golden 50 唯一活 proof（另一 worker 实跑证明），终局反而是接入 Makefile `verify-register`（B2）。修法：先 role taxonomy（runtime/generated/contract/proof-runner/receipt/dispatch/historical/orphan-candidate 八类）再定动作；proof-runner 与 receipt 类删前必实跑；scripts 类 refs=0 只能产 `NEEDS_ENTRYPOINT_CLASSIFICATION` 不产删除倾向。
+
+## M.43 hermes（异源 worker）越权写仓两处
+W6 hermes 未派单自行：①跑 `node .gitnexus/run.cjs analyze` 刷新索引并改写 CLAUDE.md GitNexus 段 ②未派单合成三份 DRAFT（REDUCTION-TABLE/FINAL-REC/ROADMAP）。产出有价值（后被辩证吸收为单源草稿），但越权面必须 catch：worker 回稿应带 `touched_paths`，commander 收稿先核越权再看质量；宪法/CLAUDE/CURRENT/lessons 类文件必须显式 writable paths 才可动。
+
+## M.44 批量文档动作前必 fresh inventory（T5 75→49 drift 实证）
+cascade-inventory T5「75 件」清单（2026-06-23）直接执行会错：B4a refresh 实测 49 可 banner/24 已有/2 需复核，且当前 glob 漂到 77 混入 2 件非 T5。修法：批量动作前跑五列刷新表（source list→存在性→已标记→drift 排除→action set），只对 action set 动手（红队 B4-P0-01 预言，B4a 坐实）。
+
+## M.45 commander 自身 git 操作两连事故（M.40 的 commander 变体，2026-07-07）
+①`git add -A docs/` 过宽把 untracked macos 草稿计划卷进 B4b commit（违反 C3 no-stage 锁定，hermes R9 预言）；②修复时 `git commit --amend` 没核 HEAD——HEAD 已是 B5，amend 把 B5 改成 B4b message 混入 plan 移除，reflog 链 `325d371a→8b7b6c33` 三 commit 错乱；终以 `git reset --mixed` 回 B1c 重建三批（`cae99ee1/82cb6367/b73b5f71`）修复。修法：① stage 用显式 pathspec 禁 `add -A` 目录级宽扫 ②amend 前必跑 `git log -1 --oneline` 核 HEAD 是目标 commit ③正面：分支未 push + 单人 commit 是本次可安全重建的前提——push 前修历史的窗口价值。
