@@ -1060,3 +1060,6 @@
 
 ### D-116 amend（2026-07-07 晚）：hermes 额度尽退场，S4 生成位再变更
 阵容变更（磊哥）：%26 hermes→codex(gpt-5.5 xhigh)、%31 hermes→**Claude Opus 4.8 worker**。S4/S5 生成位：hermes×2 → **⭐Opus worker(%31) 生成 + codex judge 盲判**（异源保持；实质回到 IMPL-PLAN-v3 原设计的 Opus 生成质量假设，审计一「GLM 质量无基线」P0 随之消解）。终阵容=5 codex + 1 Opus。
+
+## D-118 补：§6 脱敏豁免窗口延长（磊哥 2026-07-07 晚拍）
+原 D-049 十天窗口（2026-07-03→07-13）延长为 **30 天（至 2026-08-02）**，其余条款不变（密钥/API key/个人 PII 底线保留）。基建文档级联 A-F 同批执行（CLAUDE §9 推进事实源/§4 Q2=C+MG-7=C/§3 表/CURRENT 刷新/gitignore/GitNexus rerun）。
