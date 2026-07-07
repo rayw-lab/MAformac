@@ -125,7 +125,7 @@
       "familyCoverage": [
         "window.position"
       ],
-      "sha256": "ed6a5dae7a87e52a98181cf7429643afbc40ab85acf681b2923d3dcfc6fbe1e6",
+      "sha256": "6705d11f4a9a95bdba4ff40870fca36694efd276460a0461d574cca89abd4bad",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v1.json",
       "consumerRepo": "MAformac-uiue",
@@ -146,7 +146,7 @@
       "familyCoverage": [
         "screen.brightness"
       ],
-      "sha256": "f358b9162fc86d6d1366e06e1d4c4307337f46e7d81d17a104ab0feaa5747e7a",
+      "sha256": "353b82b0296de88f50f7df99aeee96b522011eeae52f525c5b91307ff00ad4a2",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v1.json",
       "consumerRepo": "MAformac-uiue",
@@ -167,7 +167,7 @@
       "familyCoverage": [
         "ambient.brightness"
       ],
-      "sha256": "717c187cb0bb97c3d802cc4e83d378405104cc464edd325b6478318ee9f1ea7f",
+      "sha256": "627831b05009ab264a2d948fe6be438bc0169ea291b38d540b14c2fdce867488",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ambient_brightness_runtime_public_payload.v1.json",
       "consumerRepo": "MAformac-uiue",
@@ -189,7 +189,7 @@
         "window.position",
         "already_state_noop"
       ],
-      "sha256": "f64650e29d2fd3bd138f46379ff863b40cbcc4fc8a801a77540a90c79158791a",
+      "sha256": "ea30e51535fb552da30ca9ca522198b35f69babf804852c0ab40cafb59794112",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_noop_runtime_public_payload.v1.json",
       "consumerRepo": "MAformac-uiue",
