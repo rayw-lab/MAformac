@@ -262,22 +262,22 @@ D-106 root-cause baseline + D-110 formal-path update
 
 ### Work items
 
-1. **Scanner hardening 正式化**  
+1. **Scanner hardening 正式化**
    把 R5 hardened rule 变成 repo 内可复跑 gate：expected=[] 时任何 observed tool call 都 fail；invalid tool name 与 actuation 分账。
 
-2. **Label authority conflict 清零**  
-   先处理 6 个 primary qa/qneg/guard 冲突，尤其 `现在音量是多少`：应走 `query_current_volume`，不是 `NO_TOOL`。  
+2. **Label authority conflict 清零**
+   先处理 6 个 primary qa/qneg/guard 冲突，尤其 `现在音量是多少`：应走 `query_current_volume`，不是 `NO_TOOL`。
    R5 authority audit 已给口径：改 absent-query counterfactual 侧，不改 qguard/query 侧。
 
-3. **Default-scope canonical 拍点**  
+3. **Default-scope canonical 拍点**
    天窗/遮阳帘类 no-arg vs `position=全车`、`value=LITTLE` 必须统一；这不是模型能学会的“歧义”，是标签一致性问题。
 
-4. **Default-scope current-head gate**  
+4. **Default-scope current-head gate**
    W34 证明 default-scope 核心实现和三道机械门在当时 local pass，但历史 receipt 绑定旧 head 且当前树 dirty。候选晋级前必须在最终 candidate head 重跑 `make verify-default-scope` 或三脚本等价门，并把 runtime `scope_origin` 语义和 R2b data 面分账。
 
    > 🔴 **AMEND（D-109，2026-07-05）**：本项（W34 current-head 重跑）**归 candidate-promotion gate，不是 Phase 1 completion gate**——Phase 1 时尚无 final candidate head（formal 训练才产），此项在 Phase 1 不可满足。**Phase 1 completion 只负责 default_scope canonical 决策（磊哥 LEIGE_KEY）+ label authority conflict 清零（真 manifest rc0）**；W34 current-head rerun 在 final candidate head/data/adapter sha 冻结后（Phase 5/6 candidate promotion）执行。依据 `redteam/phase1-audit-round2-final.md` E + `grill/phase4b-formal-decompose-grill.md §5`。
 
-5. **Gate 输出四分账**  
+5. **Gate 输出四分账**
    `expected-empty any_tool_call_fail`、`actuation_fail`、`invalid_fail`、`query_expected_actuation` 分开报。
 
 ### Stop conditions

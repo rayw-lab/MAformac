@@ -44,33 +44,33 @@ run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-
 
 ### Tigers
 
-1. **T1-OOM 是正式训练硬 blocker**  
+1. **T1-OOM 是正式训练硬 blocker**
    没有 optimizer update，没有 finite loss/grad row，没有 adapter save。任何 full train 都不能从这里向前推。
 
-2. **训练显存门缺失**  
+2. **训练显存门缺失**
    N4 preflight 证明的是静态数据/长度/语义门，不证明真实 backward 可跑。T1 说明 `preflight pass` 与 `train smoke pass` 必须分账。
 
-3. **token 账被混用**  
+3. **token 账被混用**
    E-2 解决的是 `max_token_length` 过 8192；PR31 final 增加的是 `trainable_tokens` 和监督覆盖。前者是上下文长度问题，后者影响 loss/backward 工作量。两者都叫 token 会误导调度。
 
-4. **配方风险变量过多**  
+4. **配方风险变量过多**
    当前同时高配：rank16、7 modules、8192、batch4、val_batches=25、新监督面。若直接多变量乱改，下一轮即使绿也不知道是哪一项救了命。
 
-5. **CLI/manifest 默认值 footgun 已经咬过一次**  
+5. **CLI/manifest 默认值 footgun 已经咬过一次**
    refusal 默认 0.1 顶掉锁值 0 的事故说明：T1D 后所有配方变体必须 manifest 显式化，禁止凭 CLI 默认。
 
 ### Paper-Tigers
 
-1. **“演示提示词 20 字，所以不会爆”**  
+1. **“演示提示词 20 字，所以不会爆”**
    这只约束用户输入长度，不约束工具 schema、训练样本渲染、LoRA backward 显存。
 
-2. **“E-2 失败了”**  
+2. **“E-2 失败了”**
    不成立。当前 `max_token_length=7185/7186 < 8192`，length violation 是 0。E-2 对长行生效了。
 
-3. **“把 val_batches 降到 0 就好了”**  
+3. **“把 val_batches 降到 0 就好了”**
    只能作为诊断项，不能单独当解法。公开 issue 里 val_batches 0/1/25 都可能挂；我们本地 OOM 发生在 validation 后，但根可能仍在训练 backward。
 
-4. **“打开 grad checkpoint 就稳了”**  
+4. **“打开 grad checkpoint 就稳了”**
    官方建议它省 activation memory，但公开 issue 证明它不是万能药。可以试，但不能跳过 smoke 门。
 
 ### Elephant

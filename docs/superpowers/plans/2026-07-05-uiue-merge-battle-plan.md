@@ -245,14 +245,14 @@ The system SHALL define the Runtime -> Presentation public payload schema in mai
 
 #### Scenario: Payload uses only public top-level fields
 
-GIVEN a Runtime -> Presentation payload is serialized  
-WHEN a consumer validates it  
+GIVEN a Runtime -> Presentation payload is serialized
+WHEN a consumer validates it
 THEN the payload SHALL contain only `schemaVersion`, `traceID`, `turnID`, `eventID`, `isTerminal`, `outcome`, `proofClass`, `cards`, `cardSemantics`, `readbacks`, `reconciliation`, and `traceEnvelope` at top level.
 
 #### Scenario: Unknown public field fails closed
 
-GIVEN a payload contains an unknown top-level field or an unknown `cards[]` field  
-WHEN the UIUE fixture consumer decodes it  
+GIVEN a payload contains an unknown top-level field or an unknown `cards[]` field
+WHEN the UIUE fixture consumer decodes it
 THEN decoding SHALL fail closed.
 
 ### Requirement: Public Payload Excludes Volatile And Private Runtime Fields
@@ -261,14 +261,14 @@ The system SHALL omit top-level and card-level timestamps from the public payloa
 
 #### Scenario: Public projection strips volatility
 
-GIVEN main generates a public fixture from a runtime payload  
-WHEN public projection is written  
+GIVEN main generates a public fixture from a runtime payload
+WHEN public projection is written
 THEN top-level `timestamp` and `cards[].timestamp` SHALL be absent.
 
 #### Scenario: Private runtime markers are rejected
 
-GIVEN a payload contains adapter-private or durable/raw markers  
-WHEN main or UIUE validates it  
+GIVEN a payload contains adapter-private or durable/raw markers
+WHEN main or UIUE validates it
 THEN validation SHALL reject `DemoRuntimeAdapter`, `RuntimeAdapterBox`, request fingerprints, ledger internals, raw runtime store, raw model output, and training receipt markers.
 
 ### Requirement: UIUE Consumes Main-Owned Fixture Schema Without Invention
@@ -277,14 +277,14 @@ The system SHALL require UIUE to consume only fields, result names, proof classe
 
 #### Scenario: Schema/manifest/corpus parity is mandatory
 
-GIVEN `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json` or `manifest.json` changes in main  
-WHEN UIUE copies or consumes fixtures  
+GIVEN `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json` or `manifest.json` changes in main
+WHEN UIUE copies or consumes fixtures
 THEN UIUE SHALL either copy the schema/manifest/fixture corpus unchanged or fail parity review.
 
 #### Scenario: New UIUE field requests start in main contract
 
-GIVEN UIUE needs a new shared field, result, visual-state meaning, or fixture hash  
-WHEN it is not already in the main-owned schema  
+GIVEN UIUE needs a new shared field, result, visual-state meaning, or fixture hash
+WHEN it is not already in the main-owned schema
 THEN UIUE SHALL request a main-owned contract update before consuming it.
 
 ### Requirement: Runtime-Generated Fixture Visual State Is Contract-Owned
@@ -293,14 +293,14 @@ The system SHALL treat `cards[].visualState` in shared runtime-generated fixture
 
 #### Scenario: visualState drift is reported
 
-GIVEN main and UIUE differ on `cards[].visualState` for the same fixture case  
-WHEN parity validation runs  
+GIVEN main and UIUE differ on `cards[].visualState` for the same fixture case
+WHEN parity validation runs
 THEN the difference SHALL be reported as contract drift, not silently normalized.
 
 #### Scenario: visualState decision converges hashes
 
-GIVEN the project decides terminal accepted/readback-verified fixtures use either `changing` or `normal`  
-WHEN the decision is recorded  
+GIVEN the project decides terminal accepted/readback-verified fixtures use either `changing` or `normal`
+WHEN the decision is recorded
 THEN main fixture JSON, UIUE copied fixture JSON, and manifest sha values SHALL converge to that single value.
 
 ### Requirement: Ten-Family Runtime Payload Smoke Covers W50 Display Surface
@@ -309,20 +309,20 @@ The system SHALL provide a model-free 10-family Runtime -> Presentation smoke co
 
 #### Scenario: 10-family payload fixtures exist
 
-GIVEN W50 defines the display families AC, seat, window, door, ambient light, screen, volume, wiper, sunroof/sunshade, and fragrance  
-WHEN main generates or accepts RuntimePresentationPayload fixtures  
+GIVEN W50 defines the display families AC, seat, window, door, ambient light, screen, volume, wiper, sunroof/sunshade, and fragrance
+WHEN main generates or accepts RuntimePresentationPayload fixtures
 THEN the fixture corpus SHALL include at least one accepted payload per family, each with at least one matching `cards[]` entry and one Chinese readback.
 
 #### Scenario: UIUE consumer decodes all W50 fixtures
 
-GIVEN the 10-family fixture corpus exists  
-WHEN the UIUE fixture consumer decodes it  
+GIVEN the 10-family fixture corpus exists
+WHEN the UIUE fixture consumer decodes it
 THEN every fixture SHALL decode with the main-owned public schema, proof cap, private-marker deny-list, card key, and readback intact.
 
 #### Scenario: Simulator smoke is case-defined
 
-GIVEN the fixture corpus is decoded successfully  
-WHEN simulator/mock smoke runs on the dedicated UIUE simulator  
+GIVEN the fixture corpus is decoded successfully
+WHEN simulator/mock smoke runs on the dedicated UIUE simulator
 THEN each family SHALL show a visible card label and visible readback text, and the result SHALL remain simulator/mock proof only.
 
 ### Requirement: Proof Class Remains Capped
@@ -331,8 +331,8 @@ The system SHALL cap Runtime -> Presentation public fixture proof at local/stati
 
 #### Scenario: Fixture decode does not upgrade proof
 
-GIVEN UIUE decodes all public fixtures  
-WHEN docs or UI copy describe the result  
+GIVEN UIUE decodes all public fixtures
+WHEN docs or UI copy describe the result
 THEN the claim SHALL NOT be runtime-ready, mobile, true-device, live API, UIUE merge, V/S/U-PASS, voice-ready, model-ready, golden-ready, endpoint-ready, or A-2 complete.
 
 ## 5. Validation Gates
