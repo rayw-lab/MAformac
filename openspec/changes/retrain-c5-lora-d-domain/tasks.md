@@ -5,6 +5,7 @@ incremental，禁大爆炸；守 rank16Mainline scale=20 / LR 1e-4（不重开�
 -->
 
 > Phase 0 boundary: unchecked future tasks are not apply authorization. D1-D10 user verdicts are accepted in `docs/project/phase0/phase0-d1-d10-user-decision-record.md`, but this draft remains non-executable until OpenSpec propose acceptance, R-L17 handling, and physical evidence gates are recorded. It does not authorize data generation, training, model-quality evaluation, endpoint-ready claims, demo-golden-run, voice, or UIUE merge.
+> 2026-07-05 晚 operational note: formal 1800 launch flow is tracked in run-dir receipts, not in this draft task list. Current launch receipt state is `RUN_AUTH_ACCEPTED / COMMAND_V2_CLEAR / WATCHDOG_V2_CLEAR / HOST_GATE_HOLD / NOT_LAUNCHED`; candidate remains unsigned.
 
 ## 1. 前置依赖
 

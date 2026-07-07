@@ -842,3 +842,18 @@
 - 🔴 **execution guardrails**（plan §Execution Guardrails）：①编辑前 snapshot 当前 manifest 输出 ②优先改 source candidate 层再 regenerate 派生 trainpack（若有可靠 generator path）；无则按 plan 列的 exact file:line 同步直改 JSONL ③Batch1 后跑 checker（strict full 预期 conflict=4 剩 005/007/008/010；deferred 预期 rc0）④Batch2 Scheme A 后跑 full manifest checker **要求 rc0** ⑤**不 train/build/commit**（commander 收口统一 commit）⑥不碰 Core/Training。
 - **收口后**：真 manifest rc0 → redteam 复审执行结果（rc0 + 抽查编辑正确 + 无误改）→ commander 亲核 git diff → **Phase 1 clean** → commit → Launch Packet 冻结（R3-QNEG-clean）→ 磊哥 recipe-key + run-auth → formal 1800。
 - **证据锚**：`grill/data-cleanup-plan-DRAFT.md`（Batch1/Batch2 Scheme A 逐行 + rc0 推演）；D-109 disposition。
+
+
+## D-111（2026-07-06，Opus4.8 commander，磊哥拍 A）C5 runtime 收尾主路定调=honest-frozen-closeout；qa/action-question 两面分诊；不重训 1800；执行全下沉 5 worker（Accepted）
+
+- **接棒语境**：新会话 commander 起手（`/swarm-commander`），goal=C5 收尾主路。磊哥令「重大决策必 grill 拆解 + 对抗审计 + 文档级联 + 执行全下沉 5 worker（commander 只编排+项目管理）」。worker 拓扑亲核=4 Opus（%11/%12/%14/%15）+ 1 Hermes（%16）；旧 pane label 写 codex 全 stale，派单用 pane id。
+- **诊断锚（一手 eval，commander 亲核）**：tail1200 iter600 = true-query 10/10、action-question **14/18**（<R3 17/18 退化）。direct-value 同构实证 `C6-MP-006「空调调到24度」→ adjust_ac_temperature_to_number{temperature:24}` ✅（axis A 15/15），带 arguments 幻觉（direction/mode 瞎填）；EXP 感受词系统反向（有点冷→降温）。runtime T1 **0/18**（FastPathIntentEngine 只认「打开空调」，无慢路）。
+- 🔴 **qa vs action-question 两面分诊（grounding 核心 reconcile，此前 handoff 混淆）**：
+  - **qa（over-actuation）**：D-106 三轮 **9/9/9** 硬墙=模型固有 actuation prior（base 也失败 4 族），数据撬不动 → D-108 B runtime-gated 已 waive。
+  - **action-question（under-action）**：14/18，根因=trainpack `能不能` register 0 覆盖（W15）；**D-108 B 不覆盖**（runtime qa 门结构上补不出缺失 tool call，W15+Lane4 坐实）。
+- 🔴 **战略分叉（诚实）**：runtime 接线（W20A）能让 direct-value「调到26度」在 app 生效，但 **≠ C5 training V-PASS 达成**（action-question under-action 接线不改 14/18）。磊哥「1800 正式训练不希望大动（除非重大漏洞）」→ 不重训补 register → action-question 本轮 DEFER。
+- 🔴 **定调=A honest-frozen-closeout（磊哥拍 A）**：① 冻结 tail1200 unsigned artifact（不重训）② runtime 接线 W20A 让 demo direct-value 可演（S1 async 缝→S2 DemoNLURouter 必经 guarded decode `ToolCallFrame.swift:306`→S3 LLMBackend）③ Lane2 slot 白名单投影防 arguments 幻觉现场出丑 ④ 三缺陷（EXP 反向/arguments 幻觉/action-question under-action）显式 DEFER ledger ⑤ 机械防假绿门（`RuntimeAdapterMountReceipt.validate()` 硬编码 unsigned + grep 门 0 命中 V-PASS/signed）。**不重训、不强求 V-PASS、candidate 保持 unsigned**。
+- **4 lane grill 收敛（独立对抗，file:line 已核）**：SSOT=`runs/2026-07-06-c5-runtime-mainpath-grill/`。Lane1（W18/W19B 非 W20A 硬前置可并行；接线 S1-S3；residual R1 反解码器存在性）+ Lane2（不加独立 argument-guard 层，slot 白名单投影归 W20A 映射层）+ Lane3（两缺陷均 DEFERRED 非 blocker + 显式 deferred 契约）+ Lane4（接线只 claim runtime_path_reachable 非 V-PASS + DoD honest-frozen-closeout + validate() 防假绿）。
+- **next（全下沉 worker，commander 编排+裁决）**：reduction（worker 综合 4 lane + 前序已决 D-106/D-108/W15/W16）→ Hermes 跨厂商审 reduction → 实施计划（worker）→ Opus 审实施计划 → 文档级联（秘书 worker，commander 过一道）。
+- **non-claims**：不是 candidate signoff / 不是 V-PASS / 不是 C6 acceptance / 不是 runtime 已实装（W20A 未写码）/ 不是 formal 结果达标。
+- **证据锚**：grill SSOT `runs/2026-07-06-c5-runtime-mainpath-grill/`（GRILL-README + lane-1~4）；诊断一手 `runs/2026-07-06-c5-training-vpass/tail1200-original-v3-paired-report.md` + `.../adapter/35-C6-MP-006.json`；W15 `.../w15-t1-action-question-rootcause-grill.md`；W16 `.../w16-restricted-decoding-toolname-grill.md`；D-106（decisions.md:794）/D-108（:815）。

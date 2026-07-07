@@ -63,3 +63,7 @@ Reports/*
 .playwright-mcp/
 .dispatch/
 .cc-connect/
+
+# Commander run nest pointer: keep only the hand-written README in git.
+runs/*
+!runs/README.md

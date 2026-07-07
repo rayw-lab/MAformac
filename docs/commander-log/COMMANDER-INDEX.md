@@ -1,18 +1,32 @@
 # COMMANDER-INDEX — MAformac 指挥官记忆图谱（单一入口 / 冷启动锚点）
 
-> 🔴 **起手必读 + 每次自动压缩后必读**。我（Claude）是 MAformac 这条线的【指挥官】（claude-commander，pane `%42` @ ma-status-swarm），指挥 3 个 codex worker（自动压缩不丢工作）。本图谱补 MAformac 缺失的【**指挥官决策层**】，**指向（不复制）**现有 grill SSOT / CURRENT / handoff / MEMORY。
+> 🔴 **起手必读 + 每次自动压缩后必读**。我（Claude）是 MAformac 这条线的【指挥官】（claude-commander，pane `%0` @ ma-status-swarm），指挥 codex worker（自动压缩不丢工作）。本图谱补 MAformac 缺失的【**指挥官决策层**】，**指向（不复制）**现有 grill SSOT / CURRENT / handoff / MEMORY。
 > **抗失忆机制**（2026 best practice，github-first 搜证）：① 每重大决策**立即写** `decisions.md`（definition of done，不等压缩抢救）② 本 INDEX = bootstrap manifest（事实层「做过啥/在哪」）+ `SOUL.md` = 心法层（「我是谁/怎么做事」）③ markdown + git（grep 可达，无锁定）。压缩后：读 INDEX 恢复事实，读 SOUL 恢复心智。
 
 ## 我是谁（身份 scope）
 - **角色**：MAformac 线指挥官（commander），**非 worker**。只协调 / 综合 / 裁决 / 终审，不写 worker 内容。
-- **协作**：磊哥拍板；我指挥 3 codex worker（tmux-bridge swarm）；worker 自动压缩不丢工作（不关注 worker context 高低）。
+- **协作**：磊哥拍板；我指挥 1 个 Claude Code Opus + 4 个 Codex worker（tmux-bridge swarm）；worker 自动压缩不丢工作（不关注 worker context 高低）。
 - **协议**：`/swarm-commander` 宪法 + 本图谱 + `SOUL.md`。🔴 **复杂步骤先纯文本讲计划 → 磊哥说"继续" → 纯工具执行**（防我自己 malformed：工具调用前不堆长文本）。
 
-## 当前阶段（as-of 2026-07-05，D-107 Codex App 接管执行基线 + Phase 0/1 启动令，Opus4.8 commander）
-- **C5 结论锚 D-106**：qa 三轮可比真数 adapter `any_tool_call_fail`=9/9/9=模型固有 actuation prior 硬墙，adapter-only 数据法两轮（R3 堆量/R4 改挂载）未撬动；scanner 硬化后旧「9→8→10 恶化」叙事作废。
-- **D-107（磊哥拍）**：从 D-106 开新执行锚——baseline=`docs/baseline-roadmap-2026-07-05-c5-d106.md`（planning，非契约）；Codex App worker 接管执行基线，commander 纯编排；formal 1800 **HOLD pending Phase 1-4**；R-L17=`route-only signed / candidate signoff unsigned`；第一执行单=**Phase 1 ONLY**（scanner hardening 正式化 + 6 label authority 冲突裁决表→repo 可复跑 gate）。stoplines：不训练/不生成数据/不启动 formal/不 merge UIUE/不碰 `Core/Training`。
-- **swarm 拓扑（as-of 2026-07-05）**：commander=`%0` @ ma-status-swarm；worker=`%6`/`%7`（codex gpt-5.5 xhigh @ MAformac）；磊哥授权按需扩到 **4-5 codex worker**（额度将重置无约束）；**commander 纯编排管理，grill 推进 + 红队对抗审计 + gate 实装全下沉 worker**（磊哥 2026-07-05 令）。
-- **详**：`decisions.md` D-105/D-106/D-107 + baseline 全文；tmux 启动脚本 `~/Projects/agent-tmux-stack-research/scripts/start-ma-swarm.sh`。
+## 当前阶段（as-of 2026-07-06，C5 runtime 收尾主路 grill 定调 A；Opus4.8 commander @ pane %13；CC 2.1.201）
+
+- 🎯 **定调 A = honest-frozen-closeout（D-111 磊哥拍）**：冻结 **tail1200 iter600** unsigned artifact（`adapter_basis_sha 9373fd41…`，**不重训**）+ runtime 接线 **W20A** 让 demo direct-value「调到26度」在 app 可演（superaudit CONDITIONAL_GO 91/100 已过，实装需 run-auth）+ 三缺陷显式 DEFER + candidate 保持 **unsigned** + **不强求 V-PASS**。
+- 🔴 **qa vs action-question 两面分诊（此前 handoff 混淆，已 reconcile）**：**qa**（over-actuation，D-106 三轮 **9/9/9** 硬墙=模型固有 actuation prior，数据撬不动）→ D-108 B runtime-gated 已 waive；**action-question**（**14/18** under-action，根因 trainpack `能不能` register 0 覆盖 W15）→ D-108 B **不覆盖**（runtime qa 门结构上补不出缺失 tool call），**本轮 DEFER**。
+- 🔴 **formal 1800 = 磊哥 goal 保留（P1-3=A 并行，非 DEFER）**：tail1200 honest-frozen-closeout 与 formal 1800 正式训练**并行**；formal 1800 仍是磊哥保留 goal，**待 run-auth**（host-gate 状态见下方【历史】as-of 2026-07-05 块）。**禁写 formal-1800-DEFER。**
+- 🔴 **R1 反解码器 = bench-only**（`ToolContractCompiler.swift:167/normalizeDDomain:204` covers 562，runtime 未接）→ W20A 扩桥层（复用 bench normalizer + `<tool_call>` parser + IR→ToolCallFrame 桥，不走 `decode:306`）。**最高风险=`d_domain_ir_map.json` iOS 不 bundle**（`project.pbxproj:155-168` Resources 双空 + 加载器 `loadIRMap(repoRoot:)` iOS 沙盒不可达）→ 方案 ⭐C 编译成 Swift 常量（W20A 硬前置）。
+- **当前 swarm 拓扑（2026-07-06 亲核）**：commander **%13**（Claude Opus）；**5 worker 全 Claude Opus** `%11/%12/%14/%15/%16`（%16 原 Hermes 已换 Claude，无 Hermes）；**%10 不用**；`%0`=ma-status-swarm codex-commander（另 session）。§我是谁 的 `%0`/1Claude+4Codex 是跨 session 历史定义（本 grill 线 commander=%13）。对抗审计=fresh Opus 独立 + superaudit 补严格度（磊哥定，不执着跨厂商）。
+- **红线（本轮 grill+计划，未实装）**：不训练/eval/push/commit（收口统一）/data-patch/不重训 1800/candidate unsigned/不碰 Core/Training。W20A 是**计划**未写实现码，实装需磊哥放行。
+- **详**：`runs/2026-07-06-c5-runtime-mainpath-grill/`（STATUS-BOARD + GRILL-README + lane-1~4 + grill-reduction + impl-plan v3 + superaudit + 各 probe）+ `decisions.md` D-111。
+
+## 【历史】当前阶段（as-of 2026-07-05 晚，run-auth accepted；formal 1800 **NO-GO/HOST_GATE_HOLD**；Opus4.8 commander/CC 2.1.201）
+- 🎉 **Phase 1 CLEAN**：量尺（scanner/mount-validity/label authority 三门 repo gate + Makefile `verify-c5-phase1-gates` rc0）+ 数据清零（真 manifest label authority rc0，conflict 10→0/source_err 31→0/row 守恒 17166）+ default_scope=Scheme A no-arg（D-110 磊哥拍）。commit `6a4b6b82`（surgical，不含 Core/Training 旧 dirt）。redteam 独立复审 GREEN。
+- **Phase 4 D-085=B（D-108 磊哥拍）**：runtime-gated qa safety，formal evidence-run path 解锁；禁写 `adapter_learned_qa=true`；candidate 仍 unsigned。
+- **recipe=R3-QNEG-clean**；Launch Packet 六件冻结（`runs/2026-07-05-phase1-scanner-authority-gates/eval/launchpacket-frozen/`，绑 sha `fa5690400f67`/5653/commit 6a4b6b82，LR 450 fixture rc0）。
+- **run-auth 已接受，但 launch 未起**：W-G2 command v2 clear；W-H2 watchdog v2 clear but not armed；host 三次采样均 FAIL（17.867/18.554/18.554GB < 21GB，swap 约 0.29GB PASS 不足以放行）；无 `host-waiver-key`；无 trainer pid / watchdog armed / first-real LR。
+- **当前唯一下一步**：磊哥关闭重 GUI 后 fresh host resample 到 PASS，或显式给 `host-waiver-key`；之后才可由 commander 指派 high Codex executor 起 formal 1800。`不要停` = 继续走门，不是绕过 host fail-closed。
+- **当前 swarm 拓扑（2026-07-05 晚）**：commander `%0` @ ma-status-swarm；claudecode `%11`；worker `%12` Opus/%13 codex-worker-1/%14 codex-worker-2/%15 codex-worker-3/%16 codex-worker-4。旧 `%6~%10` 拓扑只作历史。
+- **GitNexus 节点已跑完**：W-K4 `node .gitnexus/run.cjs analyze` rc0/18s，index 更新到 current commit `6a4b6b8`，30002 symbols / 52715 relationships / 300 flows；AGENTS/CLAUDE generated GitNexus block 已随之更新。此为 tooling receipt，不是 launch/candidate 进展；host-HOLD 窗口不再 reindex。
+- **详**：baseline §0.3 + `~/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/secretary/STATUS-BOARD.md` + `EVIDENCE-INDEX.md`。
 
 ## 【历史】当前阶段（as-of 2026-07-02，🎉 3 训练前置门已 merge 落 main + verified（main=ab355f6c CI SUCCESS）D-011）
 
@@ -44,6 +58,10 @@
 - **D-012** 🔴 今夜推进到 LoRA 训练前节点（Accepted，进行中）：五相编排（调研→脑暴设计→计划→实施→循环验证）+ 3 worker + 双方 subagent，死守 R7（真训练/真生成 blocked，边界上抛磊哥签）
 - **D-013~D-106** 见 `decisions.md`（决策史完整）：wave-1/M1 consolidation/tiny-ablation/N0-N5E/canary/F044 四次起跑事故/mount-invalid 翻案 D-097/R2b-R3-R4/scanner-authority 翻案 D-105/D-106 结论锚（qa 9/9/9 硬墙）
 - **D-107** 🔴 Codex App 接管执行基线 + Phase 0/1 启动令（Accepted，磊哥拍）：baseline=`docs/baseline-roadmap-2026-07-05-c5-d106.md`；formal 1800 HOLD pending Phase 1-4；R-L17 route-only signed/candidate unsigned；第一单=Phase 1 ONLY（scanner hardening 正式化 + 6 label authority 冲突裁决表→repo 可复跑 gate）；stoplines=不训练/不生成数据/不启动 formal/不 merge UIUE/不碰 Core/Training
+- **D-108** 🔴 Phase 4 D-085=B runtime-gated qa safety（Accepted，磊哥拍「Phase4 可以选 B 我同意」）：A/B/D 满分候选先晋级 + qa 由 runtime 安全门兜底（禁写 adapter learned qa）；formal 训练路径解锁；仍守 R-L17 candidate unsigned + Launch Packet/host/watchdog 前置
+- **D-109** 采纳 phase4b 决策计划 + Phase 1 disposition + W34 amend（Accepted，grill 拆解+redteam 审已足）：门 landing done / 真 manifest label authority=HARD gate（rc0 才 clean，非 advisory）/ W34→candidate-promotion gate（baseline §5 amend）/ data stopline breach 保留门+记 M 教训
+- **D-110** 🔴 default_scope=Scheme A no-arg + 授权 Phase 1 数据清零（Accepted，磊哥拍「A，授权执行清零」）：005/007/008/010 删 position:全车→no-arg；清零真 manifest rc0（conflict10→0/source_err31→0/守恒17166）；编辑既有 qneg/counterfactual 非生成新样本；commander 亲核+redteam GREEN 复审 → commit 6a4b6b82
+- **D-111** 🔴 C5 runtime 收尾主路定调=honest-frozen-closeout（Accepted，磊哥拍 A）：冻结 tail1200 unsigned 不重训 + W20A 接线 demo direct-value 可演（superaudit CONDITIONAL_GO 91/100，实装需 run-auth）+ 三缺陷 DEFER + candidate unsigned + 不强求 V-PASS；qa（9/9/9 D-108 B waive）vs action-question（14/18 under-action 本轮 DEFER）两面分诊；formal 1800=goal 保留（P1-3=A 并行，非 DEFER）待 run-auth；执行全下沉 5 Claude Opus worker（commander 只编排+裁决）。SSOT=`runs/2026-07-06-c5-runtime-mainpath-grill/`（注：D-111 正文若他处记「4 Opus+1 Hermes」是派单当时快照，最新亲核=5 全 Claude Opus）
 
 ## 下一步（D-040 外审收窄后，goal=N0-N4 自动推进，as-of 2026-07-03 晨）
 
@@ -70,9 +88,9 @@
 
 ## swarm worker 拓扑（🔴 pane id 唯一，防 label 误射 probe）
 - 我 = `%42` commander-status @ ma-status-swarm
-- `%44` codex-1 @ MAformac ｜ `%45` codex-3 @ MAformac ｜ `%43` codex-2 @ MAformac-uiue
-- ⚠️ label `codex-1/2/3` 在旧 `agents_probe_215413` session 重名 → 派单**必用 pane id**
-- 产出落 `~/Projects/agent-tmux-stack-research/runs/`（见 `swarm-runs.md`）
+- 🔴 **worker 全 kill（2026-07-05 记忆审计夜，tmux 有 bug 待磊哥重开）**；重开后 pane id 更新（历史用过 `%6~%10`=5 codex / 更早 `%44/%45/%43`）
+- ⚠️ 派单**必用 pane id 不用 label**（`codex-N` 在旧 `agents_probe` session 重名）
+- 产出落 `~/Projects/agent-tmux-stack-research/runs/`；递归维护/证据级联见 `docs/commander-log/RUNS-CASCADE.md`（旧 `swarm-runs.md` 仅作历史编排索引）。
 
 ## 起手读链（压缩后恢复上下文，顺序）
 1. **本 INDEX**（指挥官决策层：做过啥/在哪）

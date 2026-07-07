@@ -1,3 +1,5 @@
+> **Historical status note 2026-07-05**: this PR5 candidate-run change is prior evidence and not current formal-1800 launch authorization. Current formal-1800 run-auth was accepted, but host gate remained HOLD, no trainer pid existed, watchdog was not armed, formal remains evidence-run-only, and candidate remains unsigned.
+
 ## Why
 
 `define-lora-training` is now archived as the method/data-readiness contract, but MAformac still has no signed LoRA candidate. PR5 must turn PR3 natural-Chinese trainable data plus the PR2 verified repo training loop into a candidate run without repeating prior false-green risks: `scale=32` silently overriding the grill source, offset artifacts drifting, C6 release sets being used for selection, dynamic-only behavior being mistaken for endpoint readiness, or same-source Codex audits signing the candidate.

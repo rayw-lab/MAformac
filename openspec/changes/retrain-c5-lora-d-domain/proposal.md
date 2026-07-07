@@ -3,6 +3,7 @@
 > **守 agree-before-build：人审定 propose 前不进 apply、不写实现代码、不跑训练。** 决策权威源见下。
 >
 > 🔴🔴 **DEFERRED 延后（磊哥 2026-06-23「训练 + 后端开发延后」决策）**：本 change 的【训练 / 数据生成 / 评测】部分**延后不排期，A2 之后独立重新立项**。**仅 §2.1「训练样本 surface 翻案 → D-domain」(code-only) 属 A2、随 `migrate-d-domain-tool-surface` 完成**；§2.2 四类自然中文数据生成 / §3 实际重训(跑权重) / §4 C6 候选评测 = **DEFERRED**。A2 阶段 C5 样本生成器代码**只预留 D-domain shape 接口**——不生成语料、不调云 generator、不跑 judge、不实际重训。
+> **2026-07-05 晚 operational note**：当前 formal 1800 走仓外 run-dir receipt，不由本 draft change 授权或签候选。最新 receipt 状态为 `RUN_AUTH_ACCEPTED / COMMAND_V2_CLEAR / WATCHDOG_V2_CLEAR / HOST_GATE_HOLD / NOT_LAUNCHED`，见 `~/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/secretary/STATUS-BOARD.md`。不得把 run-auth、static packet、GitNexus analyze 或 formal evidence-run plan 写成本 change apply、candidate signoff、C6 acceptance 或 V-PASS。
 
 ## Why
 

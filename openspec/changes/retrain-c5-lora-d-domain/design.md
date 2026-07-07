@@ -1,6 +1,7 @@
 # Retrain C5 LoRA D-Domain Design
 
 > DRAFT. This design records Architecture Decisions for the post-A2 C5 retrain proposal. It is not permission to generate data, run training, evaluate model quality, claim endpoint readiness, execute demo-golden-run, run voice, or merge UIUE.
+> Status note 2026-07-05: formal-1800 run-auth was accepted, but this was not a launch; host gate remained HOLD, no trainer pid existed, watchdog was not armed, formal remains evidence-run-only, and candidate remains unsigned. This note is operational context, not a design requirement.
 
 ## Scope
 

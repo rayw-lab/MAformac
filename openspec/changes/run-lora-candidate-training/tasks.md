@@ -1,3 +1,5 @@
+> **Historical status note 2026-07-05**: checked PR5 work below is prior evidence, not current formal-1800 launch proof. Current formal-1800 run-auth was accepted, but launch did not start: host gate HOLD, no trainer pid, no watchdog arm, and candidate remains unsigned.
+
 ## 1. 5a Change Chain And Preconditions
 
 - [x] 1.1 Verify `define-lora-training` is archived and `openspec/specs/lora-training/spec.md` is the active method contract. Verification: `openspec list --json` no longer lists `define-lora-training`, archive path exists, and `openspec validate --all --strict` passes.
