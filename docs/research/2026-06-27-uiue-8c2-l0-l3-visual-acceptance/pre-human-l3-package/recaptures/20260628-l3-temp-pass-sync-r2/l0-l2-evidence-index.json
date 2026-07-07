@@ -1,0 +1,145 @@
+{
+  "status": "recaptured_20260628_l3_temp_pass_sync_r2",
+  "generated_at_utc": "2026-06-28T00:33:36Z",
+  "proof_class_boundary": "simulator_l0_runtime_truth + local_pixel_metric; L3 temporary pass is human spot-review only",
+  "new_recaptures": [
+    {
+      "case_id": "main_cooling_ivory",
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_ivory.png",
+      "sha256": "0aefa6366fb2203214c60a7df3a3a69a4fd8a8f23f7aa3a67c1c67193e034357",
+      "bytes": 3968048,
+      "pixel_size": {
+        "width": 1320,
+        "height": 2868
+      },
+      "theme": "ivory",
+      "state": "cooling",
+      "anchor": "continuous_stage_no_black_line + cooling",
+      "capture_command": "xcrun simctl terminate 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios; xcrun simctl launch 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios -mockSnapshot cooling -mockTheme ivory; xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_ivory.png",
+      "captured_at_utc": "2026-06-28T00:33:36Z",
+      "proof_class": "simulator_l0_runtime_truth_recapture"
+    },
+    {
+      "case_id": "main_cooling_deep_space",
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_deep_space.png",
+      "sha256": "c43fec23fea7f8af8d7a166072c0cd0603d4b9cf2eb1ca7b6e000155e2fa0dde",
+      "bytes": 2993413,
+      "pixel_size": {
+        "width": 1320,
+        "height": 2868
+      },
+      "theme": "deepSpace",
+      "state": "cooling",
+      "anchor": "deep_space + cooling",
+      "capture_command": "xcrun simctl terminate 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios; xcrun simctl launch 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios -mockSnapshot cooling -mockTheme deepSpace; xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_deep_space.png",
+      "captured_at_utc": "2026-06-28T00:33:36Z",
+      "proof_class": "simulator_l0_runtime_truth_recapture"
+    },
+    {
+      "case_id": "main_heating_ivory",
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_ivory.png",
+      "sha256": "69fcf934d4454bb21ac7a952c71ea7b303e6e21bb1d26c3126066481c587b9f5",
+      "bytes": 3969465,
+      "pixel_size": {
+        "width": 1320,
+        "height": 2868
+      },
+      "theme": "ivory",
+      "state": "heating",
+      "anchor": "heating",
+      "capture_command": "xcrun simctl terminate 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios; xcrun simctl launch 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios -mockSnapshot heating -mockTheme ivory; xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_ivory.png",
+      "captured_at_utc": "2026-06-28T00:33:36Z",
+      "proof_class": "simulator_l0_runtime_truth_recapture"
+    },
+    {
+      "case_id": "main_heating_deep_space",
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_deep_space.png",
+      "sha256": "68dcf167f030879c1f4a10bb6dd94c98158461c86f6c357bfa2b895794251240",
+      "bytes": 2987920,
+      "pixel_size": {
+        "width": 1320,
+        "height": 2868
+      },
+      "theme": "deepSpace",
+      "state": "heating",
+      "anchor": "deep_space + heating gold-gray edge",
+      "capture_command": "xcrun simctl terminate 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios; xcrun simctl launch 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios -mockSnapshot heating -mockTheme deepSpace; xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_deep_space.png",
+      "captured_at_utc": "2026-06-28T00:33:36Z",
+      "proof_class": "simulator_l0_runtime_truth_recapture"
+    },
+    {
+      "case_id": "capsule_video_loop_deep_space",
+      "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+      "sha256": "a4676e720793e914dd5635788d6004d083431f3a5f7f79406c1a94e108f1caab",
+      "bytes": 3030377,
+      "pixel_size": {
+        "width": 1320,
+        "height": 2868
+      },
+      "theme": "deepSpace",
+      "state": "capsule videoLoop",
+      "anchor": "capsule diorama",
+      "capture_command": "xcrun simctl terminate 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios; xcrun simctl launch 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D lab.rayw.MAformac.ios -mockSnapshot cooling -mockTheme deepSpace; xcrun simctl io 9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D screenshot docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+      "captured_at_utc": "2026-06-28T00:33:36Z",
+      "proof_class": "simulator_l0_runtime_truth_recapture"
+    }
+  ],
+  "metrics": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/metrics/l2-visual-metrics.json",
+  "crops_and_strips": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/metrics/generated-crops-and-strips.json",
+  "supersedes_for_review": [
+    {
+      "old": "recaptures/20260628-l3-temp-pass-sync/*",
+      "new": "recaptures/20260628-l3-temp-pass-sync-r2/*",
+      "reason": "first recapture reused the same running app pid, so cooling/heating launch arguments were stale"
+    },
+    {
+      "old": "screenshots/l0-simctl/main_cooling_ivory.png",
+      "new": "recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_ivory.png"
+    },
+    {
+      "old": "screenshots/l0-simctl/main_cooling_deep_space.png",
+      "new": "recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_deep_space.png"
+    },
+    {
+      "old": "screenshots/l0-simctl/main_heating_ivory.png",
+      "new": "recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_ivory.png"
+    },
+    {
+      "old": "no prior dedicated deep-space heating L0",
+      "new": "recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_deep_space.png"
+    },
+    {
+      "old": "screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+      "new": "recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/capsule_video_loop_deep_space.png"
+    }
+  ],
+  "human_l3_temporary_pass_reference": {
+    "source": "磊哥 feedback in controller thread: L3 通过了暂时",
+    "meaning": "temporary human spot-review pass only",
+    "non_claims": [
+      "not final V-PASS",
+      "not mobile",
+      "not true_device",
+      "not runtime-ready",
+      "not voice-ready",
+      "not A-2 complete",
+      "does not close 8.C2"
+    ]
+  },
+  "deep_space_heating_gold_gray_followup_reference": {
+    "path": "Reports/uiue-8c2-deep-space-heating-edge-20260628/screenshots/deep-space-heating-gold-gray-edge-xcodebuildmcp.jpg",
+    "sha256": "4979033017593bd0b571eab16fa5db0a717179ffa92121ef4ba379c6feb449be"
+  },
+  "legacy_still_referenced": [
+    "safety_refusal_ivory",
+    "cold_start_ivory",
+    "u17_golden_path_deep_space",
+    "UI tree logs and R2b checker receipts from previous package remain historical/supporting evidence"
+  ],
+  "non_claims": [
+    "not V-PASS",
+    "not mobile/true_device",
+    "not runtime/voice/model readiness",
+    "does not close 8.C2"
+  ]
+}

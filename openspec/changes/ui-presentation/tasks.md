@@ -1,7 +1,7 @@
 <!--
 PROPOSE-ACTIVE (2026-06-24, 磊哥拍 B 严格 OpenSpec·文档先行防返工) — proposal/design/tasks/spec 已填实(5 Req/29 Scenario, validate 绿)。锁 iOS26/macOS26(那轮拍 A, pre-mortem 坐实)。
 依赖序：本 change = UIUE 前端，依赖 migrate-d-domain([1] A2 已并 main PR#3) 但不依赖 LoRA 训练。
-apply 状态: Phase 1b ✅done / Phase 3 D7 已 apply(commit 6a3e3f9 追认) / Phase 4 契约文档先行, 代码 apply 待后端 default_scope 落 main。
+apply 状态: Phase 1b ✅done / Phase 3 D7 已 apply(commit 6a3e3f9 追认) / A-2 Phase 3/4/5/6 simulator/mock proof 已落锚；Phase 2 visual acceptance `8.A/8.C2` 暂缓且保持 open。旧 `default_scope` 依赖仍按 1.3 独立 carrier，不再阻塞 A-2 mock-frontstage Phase 4 receipt。
 incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/uiue-roadmap-2026-06-23.md。
 锁 iOS26 决策 + pre-mortem 一手见 docs/research/2026-06-24-ios26-lock-d7-premortem/。
 -->
@@ -50,11 +50,11 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ## 6. 验收
 
-- [ ] 6.1 `swift test`（含 UIValueTypeMapper 单测）+ `xcodebuild` 两端 BUILD SUCCEEDED。
-- [ ] 6.2 7 态各自独立渲染分支（无 `== .satisfied` 二值 / 无 default 吞态）—— `check-no-binary-visualstate.sh` 机械保证。
-- [ ] 6.3 视觉值全从 DesignTokens/tokens.md 取（grep 无硬编 hex）；无 `#available(iOS17/18)` 版本守卫—— `check-platform-vs-version-guard.sh` 机械保证。
+- [x] 6.1 `swift test`（含 UIValueTypeMapper 单测）+ `xcodebuild` 两端 BUILD SUCCEEDED（receipt: `docs/research/2026-06-25-a2-execution/a2-mechanical-verification-receipt.md`）。
+- [x] 6.2 7 态各自独立渲染分支（无 `== .satisfied` 二值 / 无 default 吞态）—— `check-no-binary-visualstate.sh` 机械保证（2026-06-26 rerun pass）。
+- [x] 6.3 视觉值全从 DesignTokens/tokens.md 取（grep 无硬编 hex）；无 `#available(iOS17/18)` 版本守卫—— `check-platform-vs-version-guard.sh` 机械保证（2026-06-26 grep + gate pass）。
 - [ ] 6.4 5-gate：simctl 14 张满屏单态（**非 gallery 缩略**，gallery 只内循环）→ 磊哥审美 5 gate 全 PASS。
-- [ ] 6.5 spec ADDED `ui-presentation` 经 `openspec validate --strict`（✅ 2026-06-24 绿）。
+- [x] 6.5 spec ADDED `ui-presentation` 经 `openspec validate --strict`（2026-06-26 `openspec validate ui-presentation --strict` pass）。
 
 ## 7. D8 默认主驾 + L3+ 思考链路 + 交互边界（2026-06-24 grill 收口，grill-master §3 D8）
 
@@ -85,3 +85,141 @@ incremental（每 Phase 一个小 PR），禁大爆炸。Phase 映射见 docs/ui
 
 ### 7.F 触摸交互（✅ 已拍）
 - [x] 7.F1 P1 触摸 = **B 极简查看** ✅（磊哥 2026-06-24「可能会戳，不确定」→ B 落实：点卡高亮+tooltip，无调节逻辑，卡片只读非控制器，戳了有反馈保险）
+
+## 8. 完整 demo 交互原型实装（A-2，SD18-25 + 触控/控制台/氛围灯 consolidated AD-14，全 mock 前台，consumes A-1 bridge accepted）
+
+> 🔴 **范围扩到完整 demo 交互**（磊哥 2026-06-25，SD7 amendment）：视觉 + 触摸 + 语音 + state 联动 + 演绎控制台 + 氛围灯炸场 + capsule，**全 mock 前台**（不接真 NLU/ASR/TTS/LoRA/runtime backend，后续接线 DEFERRED）。消费 A-1 bridge（mock snapshot）。落 spec 4 个 mock-frontstage Requirement（mock interaction / expanded controls mock state / demo control panel / ambient edge burst）。实装 order：8.A 连续舞台 → **8.D 触控+state 联动+语音推理 mock** → **8.E 演绎控制台 mock** → **8.F 氛围灯炸场** → 8.B capsule → 8.C 验收。完整实施计划 = `docs/superpowers/plans/2026-06-25-a2-step2-uipresentation.md` v3（含巨人肩膀 adopt + 每 Phase codex 审计 + anchor 像素对比）。
+
+### 8.A 连续舞台核心（直接做，不依赖 capsule spike）
+- [ ] 8.A1 ContentView 三屏连续舞台重构（**去 divider 黑线** / 去品牌 MAformac / 设置刷新右上 standalone / orb-对话-车控-mic 四 zone，SD18 V7）
+- [ ] 8.A2 tokens.md hex 定稿（米白 / 7态亮底加深 / 制冷热）DRAFT→FROZEN + `DesignTokens.swift` 同步（间距 §6/字体 §3.1/圆角 §7/theme §8）
+- [ ] 8.A3 制冷热 sibling 渲染（消费 bridge `sibling_cells`，`ac.mode`→蓝/红 + range bar + mode 图标，SD20）+ `SemanticColorMapper` 契约存在性
+- [ ] 8.A4 CC1 activeCell 主值切（非 normal 态取 bridge `active_cell` 优先 primary，SD19）+ 契约存在性测试
+- [ ] 8.A5 层级 + 滚动（z-order / mic dock `contentInset` / 手动滚暂停 scrollTo / fade 按 active 非位置，SD22）
+- [ ] 8.A6 边界态（**移除 ContentView TextField 纯语音** / portrait lock / 文案 30 字 truncate / 族外 blocked_hard，SD23）
+- [ ] 8.A7 注意力优先级 + 次要族 fade（V8）+ V9 `FamilyIconMapper`（全 SF Symbols 契约存在性）
+
+> 2026-06-26 v72 PARTIAL evidence: `docs/research/2026-06-25-a2-execution/phase-2-main-stage-receipt.md#additional-v72-atmosphere--ac-scrub-pass` records iPhone screenshots, 4-zone anchor compare, AC fixed hero, toned standby typography, particle/halo atmosphere, and `ThermalRangeBar` scrub code. Runtime UI snapshot sees `vehicle-card-family.ac` with `25℃`; automated drag proof remains blocked by simulator tooling (`FBSimulatorHIDEvent` no touch-move, `idb` absent). Keep 8.A and 8.C2 unchecked until visual-acceptance 5-gate plus anchor-level human review passes.
+
+### 8.B context capsule diorama（spike-gated，SD24/25）
+- [x] 8.B1 🔴 capsule route spike（🔴 **模拟器观感对比** A 视频 loop vs C-lite，量观感 + 像不像 anchor；**GPU/帧率真机验证 DEFERRED → 真机阶段**，磊哥 2026-06-25 拍「不真机用 iOS 模拟器」；模拟器不渲染 glass 折射/specular[paper-tiger]→route A 视频 photoreal 不打折/C-lite glass 质感打折；**U31 实证不预拍 / U30 砍重折射 shader**）
+- [x] 8.B2 capsule 资产（route 定后：C-lite 分层 stills/CoreML 深度 或 A video loop）
+- [x] 8.B3 `ContextCapsule` view（消费 bridge `context` 四维 + crossfade 切换 + **预加载防卡顿** + 图标在 capsule 外）
+- [x] 8.B4 adopt Vortex（`.smoke` 尾气 / `.rain` 雨 / `.snow` 雪 / 星光）+ native `.glassEffect` 壳（守 U30，不在 always-on capsule 跑 Inferno 折射 shader）
+
+### 8.C 验收（A-2 收口）
+- [x] 8.C1 swift test 0fail + `xcodebuild -scheme MAformacMac/MAformacIOS` 两端绿 + `make verify-all` exit0
+- [ ] 8.C2 visual-acceptance **L0-L3**（AD-15/U32-U37）：L0 on-screen simctl 真截图 + L1 zone sentinel PASS/WARN/FAIL + L2 OCR/contrast（SSIM 证据）+ **L3 人工 5-gate（米白/深空，~~投屏环境 V10~~ → 手持环境，投屏 DELETE C0）** + anchor-set 对比（连续舞台无黑线 / 制冷热 / capsule diorama）。当前保持 open；既有 P2/P3 证据只强化局部 simulator/local proof，不关闭 L3 human 5-gate。
+
+> 2026-06-26 P2 outer-ring validation reran `swift test`, macOS `xcodebuild`, and `make verify-all`: all PASS. This reinforces `8.C1` only. `8.C2` stays open because visual-acceptance 5-gate and anchor-level human review are not closed. Closeout ledger: `docs/research/2026-06-25-a2-execution/a2-phase-closeout-receipt.md`.
+
+### 8.D 触控 + state 联动 + 语音推理（全 mock，SD6/SD7，plan Phase 3）
+- [x] 8.D1 `ValueControlView` 交互回调（dial/percent ± 步进 / stepper 段位 / toggle 切 / badge 循环 → `ValueControlActions`；adopt **axiom-swiftui** binding/gesture + **IceCubesApp** 交互参考）
+- [x] 8.D2 `ExpandedFamilyCard`/`ExpandedCellRowView` 接回调 → mock store（`store.applyMockTransition(DemoMockTransition(key:desiredValue:source:.user))` → snapshot 刷新 → 卡片+numericText 联动）
+- [x] 8.D3 🔴 `applyMockTransition` visualState 修复（值真变化→`.changing`/`.satisfied`，非只 `"on"`→`.normal`；否则触控联动假绿）+ clamp/cycle **复用 `ValueRangeMapper`**（dial 18-32/percent 0-100/stepper 档/badge 8 色，防漂移）+ 测试
+- [x] 8.D4 语音推理 mock 预设（「26→冷了→升温」mock 响应读当前 mock 态；摘要卡只读 SD23 7.F1；静默无 TTS）
+
+> 2026-06-26 P2 inner-loop evidence: Phase 3 receipt records simulator tap `AC card -> expanded increase`, with UI tree changing `空调 26℃` to `空调 27℃`. This closed the stepper/mock-state path for 8.D1-8.D3 and SD6; at that point 8.D4/SD7 stayed open pending voice-reasoning mock and drag/operator-pass evidence.
+
+> 2026-06-26 P3 follow-up evidence: `MicDock` now exposes a mock submit route and `applyMockVoiceColdIntent` reads the current AC mock cell before applying `26℃ -> 28℃` through `DemoVehicleStateStore`. Simulator UI tree proves `按住说话` tap changes `空调 26℃` to `空调 28℃` and appends `我有点冷了 / 当前 26℃，已为您升到 28℃` without connecting true ASR/TTS/LoRA/backend. Drag remains `operator-pass pending`, not automated V-PASS.
+
+### 8.E 演绎控制台（全 mock force，SD13-15/SD8，plan Phase 4）
+- [x] 8.E1 `DemoControlPanel` 控制中心式竖排模块卡（常态/整车/环境/座舱；adopt **axiom-design** HIG control center + **IceCubesApp/ShipSwift**；iOS26 glass 功能层 + material）
+- [x] 8.E2 整车/环境 force **mock context**（speed/gear segmented + weather/time_period 互斥 → bridge force-context AD-RPB-014，不碰 state-cells.yaml）
+- [x] 8.E3 常态卡 + `AllStateSheet`（33 base 按 10 族分组网格弹窗）+ `NormalRunPreset` 一键复位（=DemoReset）
+- [x] 8.E4 SD8 设置面板（主题切 deepSpace↔ivory 实时 + 场景宏 force `#if DEMO_MODE`）+ 刷新复位
+
+> 2026-06-26 P1/P2 reconciliation: Phase 4 commit `564d0c0` anchored the control-panel receipt and screenshots, matching coverage SD13/SD14/SD15/RPB-52. At that point the P2 simulator probe opened the settings sheet, but tapping `演绎控制台` returned to the main stage instead of presenting `DemoControlPanel`, so 8.E4 stayed open until the P3 follow-up below.
+
+> 2026-06-26 P3 follow-up evidence: commit `fix(uiue): close phase4 settings control route` queues the demo-control sheet after settings dismiss; simulator UI tree proves settings→control-panel route, deepSpace theme tab switch, rain macro state mutation, and reset back to idle. Receipt: `docs/research/2026-06-25-a2-execution/phase-4-control-panel-receipt.md#p3-follow-up-settings-route--theme--macro--reset-closure`.
+
+### 8.F 氛围灯炸场（SD4，plan Phase 5）
+- [x] 8.F1 `AmbientCardGradient` 卡片渐变（P2 已含 8.A 氛围灯卡）+ `AmbientEdgeBurst` 边缘 5s 爆发（adopt **Vortex** Canvas 粒子 + **SwiftUIShaders/open-swiftui-animations**；`allowsHitTesting(false)` 守 U30 不跑 Inferno 折射）
+
+### 8.G 视觉验收门 hardening + 长跑流程机制（AD-15 / U32-U37，2026-06-26 codex ~15h 长跑复盘）
+
+**A 视觉门契约**：
+- [x] 8.G1 visual-acceptance **L0-L3 门定义**（L0 runtime-truth 字段 / L1 sentinel PASS/WARN/FAIL / L2 OCR+contrast+SSIM / L3 人工 5-gate enum）落 spec + 8.C2 验收口径（AD-15）
+- [x] 8.G2 一进两出 **8 态 VUI 矩阵测试**（U37）：`DemoRuntimeResultKind.allCases` 每态 视觉态+话术+动效+TTS+proof，禁 default 吞，复用 `FamilyDisplaysTests` 闭合模式
+
+**B 流程机制**（回写流程文档，非本 change spec）：
+- [x] 8.G3 `plan v3 heavy-work 段` + 全局 `heavy-work` skill 回写：long-run stop-rule（2 轮无新 proof-class 收口）/ 截图链路纪律（必 on-screen simctl 禁 off-screen ImageRenderer）/ proof-class budget
+
+**C 代码**：
+- [x] 8.G4 `Tools/checks/phase2_zone_compare.py` 输出 RMSE → PASS/WARN/FAIL + stop-rule（U33）
+- [x] 8.G5 ContentView Grid 固定列 ✅ **已实装**（2026-06-26 核：codex 长跑 `VehicleCardsGrid` 用 `Grid + GridRow`（`App/ContentView.swift:1504`），零 LazyVGrid，pre-commit `contentview-wiring` 实跑确认；D5 C22「:40 仍 LazyVGrid」= stale 已 supersede）
+- [x] 8.G6 `state-cells` 的 `ui_value_type` 消费侧派生 projection（复用 `UIValueTypeMapper`，不写回 producer contract，守 spec R2/AD-2）+ 清 active Core/Tests 残留 `hvac.*` 命名债（历史 v0/capabilities refs 保留为 archived/historical）
+- [x] 8.G7 取证 receipt `evidence_kind` enum（tap_step/toggle/badge_cycle/continuous_drag/terminal_visual_only，U36）+ 代表族自动化样本矩阵（风量/座椅/车窗/灯光各 1 条）
+- [x] 8.G8 Reduce Motion 降级路径（U35）：粒子/氛围灯/orb 降级 + 禁动效态跑 5gate + 静态「在思考」反馈
+- [x] 8.G9 UIUE 工程项实装（U14-U18）：Mac AnyLayout 并排 / HTML+Preview 4 类反例 / iPhone 触觉 / snapshot+黄金路径 XCUITest / 客户物料不上架
+  - [x] 8.G9a local/unit（U14/U15/U16/U18/U44）：U14 Mac split 只加契约测试和本地检查；U15 反例 fixture + DebugGallery 静态镜像；U16 触觉 policy 仅允许 iOS userTouch；U18 distribution boundary guard 仅允许 personal/internal self-use；U44 无投屏 Liquid Glass inventory 锁 MicDock/ContextCapsule/DemoControlPanel 三处 glass surface，内容卡继续禁 glass。
+  - [x] 8.G9b（U17）：已新增 `MAformacIOSUITests` UI test target + 最小黄金路径 XCUITest + on-screen `simctl io screenshot` L0 截图包；proof class 限 simulator L0 smoke，不关 `8.C2` / L3 / V-PASS。
+
+### 8.H post-8.C2 formal grill amendment cascade（2026-06-27，docs-only gate boundary）
+
+> Authority: `docs/grill-tournament/uiue-r0-r2-grill-decisions-2026-06-27.md`。本节只把人审通过的 R0-R2 canonical groups 级联成 OpenSpec 可观察 gate / proof boundary，不搬 70 条 Cxx 原文，不授权实现，不关闭 `8.C2`。
+
+- [ ] 8.H1 R1 Interaction Integrity 前置门：后续若声明交互真值通过，必须有 `family` / `ui_value_type` / `gesture` / `writeback` / `summary_readback` / `proof_class` 矩阵；只读/过程态不得显示假 affordance。
+- [ ] 8.H2 `StateCellInteractionPolicy` / consumer projection 边界：可点性、range、enum/options、readback 必须从现有 mapper/contract 派生，SHALL NOT 在 view 内新增第三份 value/range/enum SSOT。
+- [ ] 8.H3 `verify-uiue-interactions` 仅为 UIUE 专门门候选；进入长期 gate 前必须另有 grill 决策，SHALL NOT 直接塞入全局 `make verify-all`。
+- [ ] 8.H4 R2 视觉重跑前置：R1 交互矩阵、R2b Layout Integrity / Visual Spacing、VPA 四态、capsule asset governance 均需有明确 owner/proof/defer 状态；本任务不勾 `8.C2`。
+- [ ] 8.H5 R2b Layout Integrity / Visual Spacing 只挡结构 bug：遮挡、留白、zone budget、safe-area、右侧按钮外置、胶囊居中、mic dock 不遮卡片；SHALL NOT 作为审美或 L3 裁判。
+- [ ] 8.H6 Capsule/VPA proof split：context/data proof、layout proof、diorama aesthetic/L3 proof 分层记录；GPT Image 2 / anchor 只作方向，不作工程结构或最终验收 authority。
+
+### 8.I D17 UIUE Runtime -> Presentation consumer train（2026-06-29，D15/D16 main authority consumer）
+
+> Authority: main D15 payload contract, main D16 Core config / force-state authority, Gate4R `d17_release_gate: open`. Proof cap remains local/unit/simulator_mock. No UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, or A-2 claim.
+
+- [x] 8.I1 Gate5 authority: define UIUE consumer boundary for D15 `RuntimePresentationPayload` / `PresentationReconciliation` and D16 stable Core config / SceneMacroRegistry / force-context names.
+- [x] 8.I2 Gate5 forbid UIUE-invented shared fields, enum values, proof classes, Core config truth, force-state truth, private adapter fields, raw runtime/model/training fields, and `DemoForceStateContext` decode/constructor surfaces.
+- [x] 8.I3 Gate6 implement UIUE consumer mapping and local/unit fail-closed tests for unknown schema/proof/reconciliation/config/macro/force-context/presentation names.
+- [x] 8.I4 Gate7 run UIUE consumer verifier and optional simulator/local visual smoke under proof cap.
+- [x] 8.I5 Gate8 reconcile dual repo route map, burndown, grill/ledger cascade, final Claude Code adversarial audit, and exact-path commits.
+
+### 8.J D19 UIUE durability guard train（2026-06-29，D18 proof-governance / deny-list consumer）
+
+> Authority: main D18 local durable adapter/C3 authority and Gate4 private payload boundary verifier. D19 consumes D18 only as proof-governance and deny-list guardrails. No UIUE durable ledger consumption, UIUE merge, runtime-ready, mobile, true-device, live API, V-PASS, S-PASS, U-PASS, A-2, voice/model/golden/endpoint, or R5 complete claim.
+
+- [x] 8.J1 Gate5 authority: define UIUE durability guard boundary for D18 proof-governance and deny-list semantics only.
+- [x] 8.J2 Gate5 forbid UIUE consumption of durable ledger, persistent ledger, adapter ledger, `local_durable_adapter_ledger`, request/parent fingerprints, success/failure ledger, settled parent plan, raw runtime store, raw model output, training receipt, adapter-local private names, and D18 storage/schema internals.
+- [x] 8.J3 Gate6 implement UIUE local/unit fail-closed guard tests for D18 durable/private names and readiness/proof-cap non-promotion.
+- [x] 8.J4 Gate7 update route/burndown/reconcile docs under proof cap.
+- [x] 8.J5 Gate8 final reconcile and blind audits across D18+D19 Gates1-8.
+
+Gate8 final audit truth: Hermes round3 over Gates7-8 anchored PASS with P0/P1/P2 empty and one lower-severity route wording correction fixed afterward. Claude Code blind final audit anchored PASS with P0/P1 empty and P2 durable private-marker redaction fixed afterward in main. Codex native blind final audit anchored FAIL/P1 for stale Gate8 task/receipt/route-map ledger state; this was fixed post-audit under the operator one-round final-audit policy and must not be described as Codex PASS.
+
+### 8.K D21 UIUE Runtime Presentation Payload Fixture Consumer（2026-06-30，D20/D21 supertrain）
+
+> Authority: main D20 app runtime-entry bridge and main D15 `RuntimePresentationPayload` public contract. UIUE consumes only presentation-safe public JSON fixtures into `PresentationSnapshot`. No main private Swift imports, no durable/runtime internals, no UIUE merge, no runtime-ready, no mobile, no true-device, no live API, no V-PASS/S-PASS/U-PASS, no A-2, no voice/model/golden/endpoint, and no R5 complete claim.
+
+- [x] 8.K1 Implement UIUE-local public JSON fixture consumer for `schemaVersion`, `traceID`, `turnID`, `eventID`, `isTerminal`, `outcome`, `proofClass`, `cards`, `cardSemantics`, `readbacks`, `reconciliation`, and `traceEnvelope`.
+- [x] 8.K2 Fail closed on unknown top-level fields, unknown nested fields, unknown schema/proof/outcome/reconciliation values, and forbidden private/durable markers.
+- [x] 8.K3 Decode the cross-repo public fixtures into `PresentationSnapshot` and preserve UIUE proof caps.
+- [x] 8.K4 Record and validate the public fixture sha256 manifest shared with main.
+- [x] 8.K5 Carry Gate3 audit truth as `hermes_fail_fixed_post_audit` because the only P1 was untracked fixture packaging fixed by exact-path staging and local validation, without rerunning Hermes.
+- [x] 8.K6 Decode refusal safety, runtime error, reconciliation mismatch, and partial-accept/refuse fixtures without consuming main private Swift types or durable/runtime internals.
+- [x] 8.K7 Map `partial_accept_partial_refuse` and all allowed proofClass labels explicitly; unknown or future proof labels must fail closed instead of defaulting to `.localMock`.
+
+### 8.L D22 Expanded Runtime Presentation Payload Corpus（2026-06-30，D22 supertrain）
+
+> Authority: main D22 public fixture manifest and main-owned local generator tests. UIUE consumes only copied presentation-safe public JSON fixtures into `PresentationSnapshot`. No main private Swift imports, no durable/runtime internals, no UIUE merge, no runtime-ready, no mobile, no true-device, no live API, no V-PASS/S-PASS/U-PASS, no A-2, no voice/model/golden/endpoint, and no R5 complete claim.
+
+- [x] 8.L1 Sync the D22 9-fixture public corpus and manifest from main without modifying fixture payload content in UIUE.
+- [x] 8.L2 Decode and assert D22 manifest metadata: `caseID`, `fixtureClass`, `result`, `familyCoverage`, and `proofClass`.
+- [x] 8.L3 Map accepted multi-family fixtures for window position, screen brightness, and ambient brightness into `PresentationSnapshot` active cells, scope origins, readbacks, result kind, and proof class.
+- [x] 8.L4 Preserve D20/D21 refusal, runtime-error, reconciliation mismatch, partial accept/refuse, unknown field, unknown proof, and private/durable marker fail-closed coverage.
+- [x] 8.L5 Keep noop coverage contract-bound to main's current public encoding: `accepted_tool_call` plus `familyCoverage: already_state_noop` and revision/readback evidence; do not invent a UIUE-only shared result.
+- [x] 8.L6 Record the bounded R5 runtime-presentation grill crosswalk in the D22 UIUE receipt and keep human/product, voice/model/golden, mobile/true-device/live, endpoint, and merge lanes deferred.
+- [x] 8.L7 Fix first GPT Pro PR-pair P2 post-audit by rejecting `cards[].timestamp` in the fixture consumer because main's public projection strips card timestamps.
+
+### 8.M D23 Shared Public Fixture Schema Checker（2026-06-30，D23 supertrain）
+
+> Authority: main-owned `Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json` copied into UIUE for local consumer/parity proof. UIUE may be stricter locally but must not invent shared fields, result names, proof classes, or consume main private Swift/durable/runtime/raw internals.
+
+- [x] 8.M1 Copy/adopt the main-owned public fixture schema artifact without modifying schema content in UIUE.
+- [x] 8.M2 Bind the UIUE manifest to the shared schema artifact with sha256, owner path, consumer path, and update rule.
+- [x] 8.M3 Validate schema-driven fixture count/names, fixture classes, proof classes, allowed results, public top-level fields, forbidden top-level/card timestamps, private/durable/raw marker denial, proof cap, and non-claims.
+- [x] 8.M4 Prove schema `allowedResults` map through `RuntimePresentationConsumerMapping.localResultKind` without adding UIUE-only shared result names.
+- [x] 8.M5 Add local sibling main parity coverage and receipt-level `diff -qr` evidence for the public fixture/schema corpus.
+- [x] 8.M6 Record D23 review policy truth: no Gate Hermes/Claude Code audit by user override; post-gate review is Codex subagent xhigh, then GPT Pro after fixes/push, without turning advisory review into proof class or readiness.
+- [x] 8.L8 Record first GPT Pro audits as `REQUEST_CHANGES` fixed post-audit; user requested a post-fix GPT Pro rerun after push, without changing the first audit result into PASS.

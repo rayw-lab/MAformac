@@ -299,7 +299,8 @@
     "purpose": "10 族 191 device explicit allowlist — S1 codegen scope 单源（demo=10族 / full=全集）",
     "scope_tier_detail": "DEFERRED — positive/unsupported/safety/followup 四类 LoRA 数据细分属 retrain-c5（A2 code-only 仅 demo/oos scope）",
     "source": "docs/research/2026-06-22-mvp-10family-device-boundary.md §1 + paradigm §14:224（磊哥 2026-06-23 终拍 562）",
-    "tool_count": "TBD — S1 codegen value-form 实算（paradigm §16 议题7 命名框架；562=intent 非工具数）",
+    "tool_count": 562,
+    "tool_count_derivation": "ToolContractCompiler.loadDDomainCatalog(repoRoot:).count over generated/D_domain.tools.demo.json; value-form expanded D-domain named tool catalog, not demo_intents reuse.",
     "verify_command": "python3 scripts/gen_family_allowlist.py --check"
   },
   "out_of_scope": {

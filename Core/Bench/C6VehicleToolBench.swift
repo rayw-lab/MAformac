@@ -296,6 +296,98 @@ public enum C6ExternalLayer: String, Codable, CaseIterable, Equatable, Sendable 
     case safety
 }
 
+public enum C6ThresholdStatus: String, Codable, Equatable, Sendable {
+    case pass
+    case blocked
+}
+
+public struct C6LayerThreshold: Codable, Equatable, Sendable {
+    public var layer: C6ExternalLayer
+    public var minimumPassRate: Double
+    public var requiresCases: Bool
+    public var failOnAnyHardFailure: Bool
+    public var failOnAnyNoToolFalsePositive: Bool
+    public var coreFamilyExtinctionGuardEnabled: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case layer
+        case minimumPassRate = "minimum_pass_rate"
+        case requiresCases = "requires_cases"
+        case failOnAnyHardFailure = "fail_on_any_hard_failure"
+        case failOnAnyNoToolFalsePositive = "fail_on_any_no_tool_false_positive"
+        case coreFamilyExtinctionGuardEnabled = "core_family_extinction_guard_enabled"
+    }
+}
+
+public enum C6LayerThresholdTable {
+    public static let defaults: [C6LayerThreshold] = [
+        C6LayerThreshold(
+            layer: .golden,
+            minimumPassRate: 1.0,
+            requiresCases: true,
+            failOnAnyHardFailure: true,
+            failOnAnyNoToolFalsePositive: true,
+            coreFamilyExtinctionGuardEnabled: false
+        ),
+        C6LayerThreshold(
+            layer: .demoFuzz,
+            minimumPassRate: 0.8,
+            requiresCases: true,
+            failOnAnyHardFailure: false,
+            failOnAnyNoToolFalsePositive: true,
+            coreFamilyExtinctionGuardEnabled: false
+        ),
+        C6LayerThreshold(
+            layer: .unsupported,
+            minimumPassRate: 1.0,
+            requiresCases: true,
+            failOnAnyHardFailure: true,
+            failOnAnyNoToolFalsePositive: true,
+            coreFamilyExtinctionGuardEnabled: false
+        ),
+        C6LayerThreshold(
+            layer: .safety,
+            minimumPassRate: 1.0,
+            requiresCases: true,
+            failOnAnyHardFailure: true,
+            failOnAnyNoToolFalsePositive: true,
+            coreFamilyExtinctionGuardEnabled: false
+        ),
+    ]
+
+    public static func threshold(for layer: C6ExternalLayer) -> C6LayerThreshold {
+        defaults.first { $0.layer == layer } ?? C6LayerThreshold(
+            layer: layer,
+            minimumPassRate: 1.0,
+            requiresCases: true,
+            failOnAnyHardFailure: true,
+            failOnAnyNoToolFalsePositive: true,
+            coreFamilyExtinctionGuardEnabled: false
+        )
+    }
+}
+
+public struct C6PositiveActionThreshold: Codable, Equatable, Sendable {
+    public var minimumPassRate: Double
+    public var maximumEmptyOutputRate: Double
+    public var maximumNoOpOutputRate: Double
+
+    enum CodingKeys: String, CodingKey {
+        case minimumPassRate = "minimum_pass_rate"
+        case maximumEmptyOutputRate = "maximum_empty_output_rate"
+        case maximumNoOpOutputRate = "maximum_no_op_output_rate"
+    }
+}
+
+public enum C6PositiveActionThresholdTable {
+    // TODO-lock: formal grill lock may relax OOD/silence probes; default is conservative fail-closed.
+    public static let `default` = C6PositiveActionThreshold(
+        minimumPassRate: 1.0,
+        maximumEmptyOutputRate: 0.0,
+        maximumNoOpOutputRate: 0.0
+    )
+}
+
 public enum C6ExternalLayerSelector {
     public static func layer(for item: C6BenchCase) -> C6ExternalLayer {
         if !item.sourceRefs.riskRuleIDs.isEmpty || item.behaviorClass == .refusalSafetyOrPolicy {
@@ -661,6 +753,10 @@ public struct C6GateResult: Codable, Equatable, Sendable {
     public var unexpectedMutationKeys: [String]
     public var judge: C6JudgeScore?
     public var scopeOriginEvidence: [String: String]
+    public var modelHardPassBasis: [String]
+    public var readbackExcludedFromModelHardPass: Bool
+    public var toolOutputWasNoOp: Bool
+    public var toolOutputTextWasEmpty: Bool
 
     enum CodingKeys: String, CodingKey {
         case toolCallSetMatch = "tool_call_set_match"
@@ -677,6 +773,72 @@ public struct C6GateResult: Codable, Equatable, Sendable {
         case unexpectedMutationKeys = "unexpected_mutation_keys"
         case judge
         case scopeOriginEvidence = "scope_origin_evidence"
+        case modelHardPassBasis = "model_hard_pass_basis"
+        case readbackExcludedFromModelHardPass = "readback_excluded_from_model_hard_pass"
+        case toolOutputWasNoOp = "tool_output_was_no_op"
+        case toolOutputTextWasEmpty = "tool_output_text_was_empty"
+    }
+
+    public init(
+        toolCallSetMatch: Bool,
+        noToolFalsePositiveCount: Int,
+        stateDeltaMatch: Bool,
+        readbackMatch: Bool,
+        clarifyMatch: Bool,
+        hardFailed: Bool,
+        failureClasses: [C6FailureClass],
+        modelHardFailed: Bool,
+        readbackHardFailed: Bool,
+        appliedWrites: [StateWrite],
+        dependencyWriteKeys: [String],
+        unexpectedMutationKeys: [String],
+        judge: C6JudgeScore?,
+        scopeOriginEvidence: [String: String],
+        modelHardPassBasis: [String] = [],
+        readbackExcludedFromModelHardPass: Bool = false,
+        toolOutputWasNoOp: Bool = false,
+        toolOutputTextWasEmpty: Bool = false
+    ) {
+        self.toolCallSetMatch = toolCallSetMatch
+        self.noToolFalsePositiveCount = noToolFalsePositiveCount
+        self.stateDeltaMatch = stateDeltaMatch
+        self.readbackMatch = readbackMatch
+        self.clarifyMatch = clarifyMatch
+        self.hardFailed = hardFailed
+        self.failureClasses = failureClasses
+        self.modelHardFailed = modelHardFailed
+        self.readbackHardFailed = readbackHardFailed
+        self.appliedWrites = appliedWrites
+        self.dependencyWriteKeys = dependencyWriteKeys
+        self.unexpectedMutationKeys = unexpectedMutationKeys
+        self.judge = judge
+        self.scopeOriginEvidence = scopeOriginEvidence
+        self.modelHardPassBasis = modelHardPassBasis
+        self.readbackExcludedFromModelHardPass = readbackExcludedFromModelHardPass
+        self.toolOutputWasNoOp = toolOutputWasNoOp
+        self.toolOutputTextWasEmpty = toolOutputTextWasEmpty
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        toolCallSetMatch = try container.decode(Bool.self, forKey: .toolCallSetMatch)
+        noToolFalsePositiveCount = try container.decode(Int.self, forKey: .noToolFalsePositiveCount)
+        stateDeltaMatch = try container.decode(Bool.self, forKey: .stateDeltaMatch)
+        readbackMatch = try container.decode(Bool.self, forKey: .readbackMatch)
+        clarifyMatch = try container.decode(Bool.self, forKey: .clarifyMatch)
+        hardFailed = try container.decode(Bool.self, forKey: .hardFailed)
+        failureClasses = try container.decode([C6FailureClass].self, forKey: .failureClasses)
+        modelHardFailed = try container.decode(Bool.self, forKey: .modelHardFailed)
+        readbackHardFailed = try container.decode(Bool.self, forKey: .readbackHardFailed)
+        appliedWrites = try container.decodeIfPresent([StateWrite].self, forKey: .appliedWrites) ?? []
+        dependencyWriteKeys = try container.decodeIfPresent([String].self, forKey: .dependencyWriteKeys) ?? []
+        unexpectedMutationKeys = try container.decodeIfPresent([String].self, forKey: .unexpectedMutationKeys) ?? []
+        judge = try container.decodeIfPresent(C6JudgeScore.self, forKey: .judge)
+        scopeOriginEvidence = try container.decodeIfPresent([String: String].self, forKey: .scopeOriginEvidence) ?? [:]
+        modelHardPassBasis = try container.decodeIfPresent([String].self, forKey: .modelHardPassBasis) ?? []
+        readbackExcludedFromModelHardPass = try container.decodeIfPresent(Bool.self, forKey: .readbackExcludedFromModelHardPass) ?? false
+        toolOutputWasNoOp = try container.decodeIfPresent(Bool.self, forKey: .toolOutputWasNoOp) ?? false
+        toolOutputTextWasEmpty = try container.decodeIfPresent(Bool.self, forKey: .toolOutputTextWasEmpty) ?? false
     }
 }
 
@@ -771,22 +933,179 @@ public struct C6ExternalLayerStats: Codable, Equatable, Sendable {
     public var caseCount: Int
     public var runCount: Int
     public var hardFailureCount: Int
+    public var noToolFalsePositiveCount: Int
+    public var passRate: Double
+    public var missingRunCaseIDs: [String]
+    public var threshold: C6LayerThreshold
+    public var status: C6ThresholdStatus
+    public var blockedReasons: [String]
 
     enum CodingKeys: String, CodingKey {
         case layer
         case caseCount = "case_count"
         case runCount = "run_count"
         case hardFailureCount = "hard_failure_count"
+        case noToolFalsePositiveCount = "no_tool_false_positive_count"
+        case passRate = "pass_rate"
+        case missingRunCaseIDs = "missing_run_case_ids"
+        case threshold
+        case status
+        case blockedReasons = "blocked_reasons"
+    }
+
+    public init(
+        layer: C6ExternalLayer,
+        caseCount: Int,
+        runCount: Int,
+        hardFailureCount: Int,
+        noToolFalsePositiveCount: Int = 0,
+        passRate: Double = 0,
+        missingRunCaseIDs: [String] = [],
+        threshold: C6LayerThreshold? = nil,
+        status: C6ThresholdStatus = .pass,
+        blockedReasons: [String] = []
+    ) {
+        self.layer = layer
+        self.caseCount = caseCount
+        self.runCount = runCount
+        self.hardFailureCount = hardFailureCount
+        self.noToolFalsePositiveCount = noToolFalsePositiveCount
+        self.passRate = passRate
+        self.missingRunCaseIDs = missingRunCaseIDs
+        self.threshold = threshold ?? C6LayerThresholdTable.threshold(for: layer)
+        self.status = status
+        self.blockedReasons = blockedReasons
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        layer = try container.decode(C6ExternalLayer.self, forKey: .layer)
+        caseCount = try container.decode(Int.self, forKey: .caseCount)
+        runCount = try container.decode(Int.self, forKey: .runCount)
+        hardFailureCount = try container.decode(Int.self, forKey: .hardFailureCount)
+        noToolFalsePositiveCount = try container.decodeIfPresent(Int.self, forKey: .noToolFalsePositiveCount) ?? 0
+        passRate = try container.decodeIfPresent(Double.self, forKey: .passRate) ?? 0
+        missingRunCaseIDs = try container.decodeIfPresent([String].self, forKey: .missingRunCaseIDs) ?? []
+        threshold = try container.decodeIfPresent(C6LayerThreshold.self, forKey: .threshold) ?? C6LayerThresholdTable.threshold(for: layer)
+        status = try container.decodeIfPresent(C6ThresholdStatus.self, forKey: .status) ?? .pass
+        blockedReasons = try container.decodeIfPresent([String].self, forKey: .blockedReasons) ?? []
+    }
+}
+
+public struct C6PositiveActionInvariant: Codable, Equatable, Sendable {
+    public var behaviorClass: VehicleToolBehaviorClass
+    public var caseCount: Int
+    public var runCount: Int
+    public var hardFailureCount: Int
+    public var passRate: Double
+    public var minimumPassRate: Double
+    public var maximumEmptyOutputRate: Double
+    public var maximumNoOpOutputRate: Double
+    public var emptyOutputCount: Int
+    public var emptyOutputRate: Double
+    public var noOpOutputCount: Int
+    public var noOpOutputRate: Double
+    public var missingRunCaseIDs: [String]
+    public var status: C6ThresholdStatus
+    public var blockedReasons: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case behaviorClass = "behavior_class"
+        case caseCount = "case_count"
+        case runCount = "run_count"
+        case hardFailureCount = "hard_failure_count"
+        case passRate = "pass_rate"
+        case minimumPassRate = "minimum_pass_rate"
+        case maximumEmptyOutputRate = "maximum_empty_output_rate"
+        case maximumNoOpOutputRate = "maximum_no_op_output_rate"
+        case emptyOutputCount = "empty_output_count"
+        case emptyOutputRate = "empty_output_rate"
+        case noOpOutputCount = "no_op_output_count"
+        case noOpOutputRate = "no_op_output_rate"
+        case missingRunCaseIDs = "missing_run_case_ids"
+        case status
+        case blockedReasons = "blocked_reasons"
+    }
+
+    public static let legacyDefault = C6PositiveActionInvariant(
+        behaviorClass: .toolCall,
+        caseCount: 0,
+        runCount: 0,
+        hardFailureCount: 0,
+        passRate: 0,
+        minimumPassRate: C6PositiveActionThresholdTable.default.minimumPassRate,
+        maximumEmptyOutputRate: C6PositiveActionThresholdTable.default.maximumEmptyOutputRate,
+        maximumNoOpOutputRate: C6PositiveActionThresholdTable.default.maximumNoOpOutputRate,
+        emptyOutputCount: 0,
+        emptyOutputRate: 0,
+        noOpOutputCount: 0,
+        noOpOutputRate: 0,
+        missingRunCaseIDs: [],
+        status: .pass,
+        blockedReasons: []
+    )
+
+    public init(
+        behaviorClass: VehicleToolBehaviorClass,
+        caseCount: Int,
+        runCount: Int,
+        hardFailureCount: Int,
+        passRate: Double,
+        minimumPassRate: Double,
+        maximumEmptyOutputRate: Double,
+        maximumNoOpOutputRate: Double,
+        emptyOutputCount: Int,
+        emptyOutputRate: Double,
+        noOpOutputCount: Int,
+        noOpOutputRate: Double,
+        missingRunCaseIDs: [String],
+        status: C6ThresholdStatus,
+        blockedReasons: [String]
+    ) {
+        self.behaviorClass = behaviorClass
+        self.caseCount = caseCount
+        self.runCount = runCount
+        self.hardFailureCount = hardFailureCount
+        self.passRate = passRate
+        self.minimumPassRate = minimumPassRate
+        self.maximumEmptyOutputRate = maximumEmptyOutputRate
+        self.maximumNoOpOutputRate = maximumNoOpOutputRate
+        self.emptyOutputCount = emptyOutputCount
+        self.emptyOutputRate = emptyOutputRate
+        self.noOpOutputCount = noOpOutputCount
+        self.noOpOutputRate = noOpOutputRate
+        self.missingRunCaseIDs = missingRunCaseIDs
+        self.status = status
+        self.blockedReasons = blockedReasons
     }
 }
 
 public struct C6DenominatorReport: Codable, Equatable, Sendable {
     public var unresolvedBehaviorClassCaseIDs: [String]
     public var layerCaseIDs: [String: [String]]
+    public var orphanRunCaseIDs: [String]
 
     enum CodingKeys: String, CodingKey {
         case unresolvedBehaviorClassCaseIDs = "unresolved_behavior_class_case_ids"
         case layerCaseIDs = "layer_case_ids"
+        case orphanRunCaseIDs = "orphan_run_case_ids"
+    }
+
+    public init(
+        unresolvedBehaviorClassCaseIDs: [String],
+        layerCaseIDs: [String: [String]],
+        orphanRunCaseIDs: [String] = []
+    ) {
+        self.unresolvedBehaviorClassCaseIDs = unresolvedBehaviorClassCaseIDs
+        self.layerCaseIDs = layerCaseIDs
+        self.orphanRunCaseIDs = orphanRunCaseIDs
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        unresolvedBehaviorClassCaseIDs = try container.decodeIfPresent([String].self, forKey: .unresolvedBehaviorClassCaseIDs) ?? []
+        layerCaseIDs = try container.decodeIfPresent([String: [String]].self, forKey: .layerCaseIDs) ?? [:]
+        orphanRunCaseIDs = try container.decodeIfPresent([String].self, forKey: .orphanRunCaseIDs) ?? []
     }
 }
 
@@ -803,8 +1122,8 @@ public struct C6Summary: Codable, Equatable, Sendable {
     public var contractBundleFingerprint: C6ContractBundleFingerprintRecord
     public var totalCases: Int
     public var totalRuns: Int
-    // Legacy compatibility field. Rebuild-C6 construction reports per-layer stats in
-    // `externalLayerStats`; active thresholds and base anchors remain deferred.
+    // Legacy compatibility field. Four-layer threshold status is reported through
+    // `externalLayerStats`; base anchors remain deferred.
     public var IrrelAcc: Double
     public var IrrelAccThreshold: Double
     public var contractCoverageScore: Double
@@ -813,6 +1132,7 @@ public struct C6Summary: Codable, Equatable, Sendable {
     public var noToolFalsePositiveCount: Int
     public var behaviorClassStats: [VehicleToolBehaviorClassStats]
     public var externalLayerStats: [C6ExternalLayerStats]
+    public var positiveActionInvariant: C6PositiveActionInvariant
     public var denominatorReport: C6DenominatorReport
     public var perCaseStats: [C6PerCaseStats]
     public var evalRuns: [C6EvalRun]
@@ -838,9 +1158,93 @@ public struct C6Summary: Codable, Equatable, Sendable {
         case noToolFalsePositiveCount = "no_tool_false_positive_count"
         case behaviorClassStats = "behavior_class_stats"
         case externalLayerStats = "external_layer_stats"
+        case positiveActionInvariant = "positive_action_invariant"
         case denominatorReport = "denominator_report"
         case perCaseStats = "per_case_stats"
         case evalRuns = "eval_runs"
+    }
+
+    public init(
+        status: String,
+        modelID: String,
+        modelArtifactDigest: String,
+        tokenizerDigest: String,
+        loraAdapterID: String,
+        loraCheckpointID: String,
+        loraAdapterDigest: String,
+        qwenToolCallFormatVersion: String,
+        contractDigest: String,
+        contractBundleFingerprint: C6ContractBundleFingerprintRecord,
+        totalCases: Int,
+        totalRuns: Int,
+        IrrelAcc: Double,
+        IrrelAccThreshold: Double,
+        contractCoverageScore: Double,
+        scenarioScore: Double,
+        hardFailureCount: Int,
+        noToolFalsePositiveCount: Int,
+        behaviorClassStats: [VehicleToolBehaviorClassStats],
+        externalLayerStats: [C6ExternalLayerStats],
+        positiveActionInvariant: C6PositiveActionInvariant,
+        denominatorReport: C6DenominatorReport,
+        perCaseStats: [C6PerCaseStats],
+        evalRuns: [C6EvalRun]
+    ) {
+        self.status = status
+        self.modelID = modelID
+        self.modelArtifactDigest = modelArtifactDigest
+        self.tokenizerDigest = tokenizerDigest
+        self.loraAdapterID = loraAdapterID
+        self.loraCheckpointID = loraCheckpointID
+        self.loraAdapterDigest = loraAdapterDigest
+        self.qwenToolCallFormatVersion = qwenToolCallFormatVersion
+        self.contractDigest = contractDigest
+        self.contractBundleFingerprint = contractBundleFingerprint
+        self.totalCases = totalCases
+        self.totalRuns = totalRuns
+        self.IrrelAcc = IrrelAcc
+        self.IrrelAccThreshold = IrrelAccThreshold
+        self.contractCoverageScore = contractCoverageScore
+        self.scenarioScore = scenarioScore
+        self.hardFailureCount = hardFailureCount
+        self.noToolFalsePositiveCount = noToolFalsePositiveCount
+        self.behaviorClassStats = behaviorClassStats
+        self.externalLayerStats = externalLayerStats
+        self.positiveActionInvariant = positiveActionInvariant
+        self.denominatorReport = denominatorReport
+        self.perCaseStats = perCaseStats
+        self.evalRuns = evalRuns
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        status = try container.decode(String.self, forKey: .status)
+        modelID = try container.decode(String.self, forKey: .modelID)
+        modelArtifactDigest = try container.decode(String.self, forKey: .modelArtifactDigest)
+        tokenizerDigest = try container.decode(String.self, forKey: .tokenizerDigest)
+        loraAdapterID = try container.decodeIfPresent(String.self, forKey: .loraAdapterID) ?? ""
+        loraCheckpointID = try container.decodeIfPresent(String.self, forKey: .loraCheckpointID) ?? ""
+        loraAdapterDigest = try container.decodeIfPresent(String.self, forKey: .loraAdapterDigest) ?? ""
+        qwenToolCallFormatVersion = try container.decode(String.self, forKey: .qwenToolCallFormatVersion)
+        contractDigest = try container.decode(String.self, forKey: .contractDigest)
+        contractBundleFingerprint = try container.decode(C6ContractBundleFingerprintRecord.self, forKey: .contractBundleFingerprint)
+        totalCases = try container.decode(Int.self, forKey: .totalCases)
+        totalRuns = try container.decode(Int.self, forKey: .totalRuns)
+        IrrelAcc = try container.decode(Double.self, forKey: .IrrelAcc)
+        IrrelAccThreshold = try container.decode(Double.self, forKey: .IrrelAccThreshold)
+        contractCoverageScore = try container.decode(Double.self, forKey: .contractCoverageScore)
+        scenarioScore = try container.decode(Double.self, forKey: .scenarioScore)
+        hardFailureCount = try container.decode(Int.self, forKey: .hardFailureCount)
+        noToolFalsePositiveCount = try container.decode(Int.self, forKey: .noToolFalsePositiveCount)
+        behaviorClassStats = try container.decodeIfPresent([VehicleToolBehaviorClassStats].self, forKey: .behaviorClassStats) ?? []
+        externalLayerStats = try container.decodeIfPresent([C6ExternalLayerStats].self, forKey: .externalLayerStats) ?? []
+        positiveActionInvariant = try container.decodeIfPresent(C6PositiveActionInvariant.self, forKey: .positiveActionInvariant) ?? .legacyDefault
+        denominatorReport = try container.decodeIfPresent(C6DenominatorReport.self, forKey: .denominatorReport) ?? C6DenominatorReport(
+            unresolvedBehaviorClassCaseIDs: [],
+            layerCaseIDs: [:]
+        )
+        perCaseStats = try container.decodeIfPresent([C6PerCaseStats].self, forKey: .perCaseStats) ?? []
+        evalRuns = try container.decodeIfPresent([C6EvalRun].self, forKey: .evalRuns) ?? []
     }
 }
 
@@ -1384,7 +1788,11 @@ public struct C6BenchRunner: Sendable {
             dependencyWriteKeys: C6AppliedWriteComparator.dependencyWriteKeys(appliedWrites),
             unexpectedMutationKeys: unexpectedMutationKeys,
             judge: nil,
-            scopeOriginEvidence: scopeOriginEvidence
+            scopeOriginEvidence: scopeOriginEvidence,
+            modelHardPassBasis: ["parser", "tool_call", "no_call", "state_delta", "clarify", "refusal"],
+            readbackExcludedFromModelHardPass: readbackApplicable,
+            toolOutputWasNoOp: output.toolCalls.isEmpty,
+            toolOutputTextWasEmpty: output.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         )
     }
 
@@ -1406,7 +1814,8 @@ public struct C6BenchRunner: Sendable {
         let falsePositiveCount = runs.map(\.gateResult.noToolFalsePositiveCount).reduce(0, +)
         let behaviorStats = Self.behaviorClassStats(cases: cases, runsByCase: runsByCase)
         let layerStats = Self.externalLayerStats(cases: cases, runsByCase: runsByCase)
-        let denominatorReport = Self.denominatorReport(cases: cases)
+        let positiveInvariant = Self.positiveActionInvariant(cases: cases, runsByCase: runsByCase)
+        let denominatorReport = Self.denominatorReport(cases: cases, runs: runs)
         let perCase = runsByCase.keys.sorted().map { caseID in
             let items = runsByCase[caseID] ?? []
             let hardPasses = items.map { $0.gateResult.hardFailed ? 0.0 : 1.0 }
@@ -1420,7 +1829,11 @@ public struct C6BenchRunner: Sendable {
                 elapsedVarianceMs: C6Stats.variance(elapsed)
             )
         }
-        let status = "local_construction_report"
+        let status = Self.summaryStatus(
+            layerStats: layerStats,
+            positiveInvariant: positiveInvariant,
+            denominatorReport: denominatorReport
+        )
         return C6Summary(
             status: status,
             modelID: modelID,
@@ -1442,6 +1855,7 @@ public struct C6BenchRunner: Sendable {
             noToolFalsePositiveCount: falsePositiveCount,
             behaviorClassStats: behaviorStats,
             externalLayerStats: layerStats,
+            positiveActionInvariant: positiveInvariant,
             denominatorReport: denominatorReport,
             perCaseStats: perCase,
             evalRuns: runs.sorted { ($0.caseID, $0.runID) < ($1.caseID, $1.runID) }
@@ -1476,29 +1890,166 @@ public struct C6BenchRunner: Sendable {
         runsByCase: [String: [C6EvalRun]]
     ) -> [C6ExternalLayerStats] {
         let grouped = Dictionary(grouping: cases, by: { C6ExternalLayerSelector.layer(for: $0) })
-        return grouped.keys.sorted { $0.rawValue < $1.rawValue }.map { layer in
+        return C6LayerThresholdTable.defaults.map { threshold in
+            let layer = threshold.layer
             let items = grouped[layer] ?? []
             let runs = items.flatMap { runsByCase[$0.caseID] ?? [] }
+            let hardFailureCount = runs.filter(\.gateResult.hardFailed).count
+            let noToolFalsePositiveCount = runs.map(\.gateResult.noToolFalsePositiveCount).reduce(0, +)
+            let missingRunCaseIDs = items.filter { (runsByCase[$0.caseID] ?? []).isEmpty }.map(\.caseID).sorted()
+            let passCount = items.filter { item in
+                let itemRuns = runsByCase[item.caseID] ?? []
+                return !itemRuns.isEmpty && itemRuns.allSatisfy { !$0.gateResult.hardFailed }
+            }.count
+            let passRate = items.isEmpty ? 0 : Double(passCount) / Double(items.count)
+            let reasons = Self.layerBlockedReasons(
+                threshold: threshold,
+                caseCount: items.count,
+                runCount: runs.count,
+                missingRunCaseCount: missingRunCaseIDs.count,
+                hardFailureCount: hardFailureCount,
+                noToolFalsePositiveCount: noToolFalsePositiveCount,
+                passRate: passRate
+            )
             return C6ExternalLayerStats(
                 layer: layer,
                 caseCount: items.count,
                 runCount: runs.count,
-                hardFailureCount: runs.filter(\.gateResult.hardFailed).count
+                hardFailureCount: hardFailureCount,
+                noToolFalsePositiveCount: noToolFalsePositiveCount,
+                passRate: passRate,
+                missingRunCaseIDs: missingRunCaseIDs,
+                threshold: threshold,
+                status: reasons.isEmpty ? .pass : .blocked,
+                blockedReasons: reasons
             )
         }
     }
 
-    private static func denominatorReport(cases: [C6BenchCase]) -> C6DenominatorReport {
+    private static func positiveActionInvariant(
+        cases: [C6BenchCase],
+        runsByCase: [String: [C6EvalRun]]
+    ) -> C6PositiveActionInvariant {
+        let items = cases.filter { C6CaseBehaviorClassResolver.resolve($0) == .toolCall }
+        let runs = items.flatMap { runsByCase[$0.caseID] ?? [] }
+        let hardFailureCount = runs.filter(\.gateResult.hardFailed).count
+        let missingRunCaseIDs = items.filter { (runsByCase[$0.caseID] ?? []).isEmpty }.map(\.caseID).sorted()
+        let passCount = items.filter { item in
+            let itemRuns = runsByCase[item.caseID] ?? []
+            return !itemRuns.isEmpty && itemRuns.allSatisfy { !$0.gateResult.hardFailed }
+        }.count
+        let passRate = items.isEmpty ? 0 : Double(passCount) / Double(items.count)
+        let emptyOutputCount = runs.filter { run in
+            run.gateResult.toolOutputWasNoOp && run.gateResult.toolOutputTextWasEmpty
+        }.count
+        let noOpOutputCount = runs.filter(\.gateResult.toolOutputWasNoOp).count
+        let emptyOutputRate = runs.isEmpty ? 0 : Double(emptyOutputCount) / Double(runs.count)
+        let noOpOutputRate = runs.isEmpty ? 0 : Double(noOpOutputCount) / Double(runs.count)
+        let threshold = C6PositiveActionThresholdTable.default
+        var reasons: [String] = []
+        if items.isEmpty {
+            reasons.append("no_positive_action_cases")
+        }
+        if runs.isEmpty {
+            reasons.append("no_positive_action_runs")
+        }
+        if !missingRunCaseIDs.isEmpty {
+            reasons.append("case_missing_runs")
+            reasons.append("incomplete_coverage")
+        }
+        if hardFailureCount > 0 {
+            reasons.append("positive_action_hard_failure")
+        }
+        if passRate < threshold.minimumPassRate {
+            reasons.append("positive_action_pass_rate_below_threshold")
+        }
+        if emptyOutputRate > threshold.maximumEmptyOutputRate {
+            reasons.append("empty_output_rate_above_threshold")
+        }
+        if noOpOutputRate > threshold.maximumNoOpOutputRate {
+            reasons.append("no_op_output_rate_above_threshold")
+        }
+
+        return C6PositiveActionInvariant(
+            behaviorClass: .toolCall,
+            caseCount: items.count,
+            runCount: runs.count,
+            hardFailureCount: hardFailureCount,
+            passRate: passRate,
+            minimumPassRate: threshold.minimumPassRate,
+            maximumEmptyOutputRate: threshold.maximumEmptyOutputRate,
+            maximumNoOpOutputRate: threshold.maximumNoOpOutputRate,
+            emptyOutputCount: emptyOutputCount,
+            emptyOutputRate: emptyOutputRate,
+            noOpOutputCount: noOpOutputCount,
+            noOpOutputRate: noOpOutputRate,
+            missingRunCaseIDs: missingRunCaseIDs,
+            status: reasons.isEmpty ? .pass : .blocked,
+            blockedReasons: reasons
+        )
+    }
+
+    private static func layerBlockedReasons(
+        threshold: C6LayerThreshold,
+        caseCount: Int,
+        runCount: Int,
+        missingRunCaseCount: Int,
+        hardFailureCount: Int,
+        noToolFalsePositiveCount: Int,
+        passRate: Double
+    ) -> [String] {
+        var reasons: [String] = []
+        if threshold.requiresCases && caseCount == 0 {
+            reasons.append("no_layer_cases")
+        }
+        if threshold.requiresCases && runCount == 0 {
+            reasons.append("no_layer_runs")
+        }
+        if missingRunCaseCount > 0 {
+            reasons.append("case_missing_runs")
+            reasons.append("incomplete_coverage")
+        }
+        if threshold.failOnAnyHardFailure && hardFailureCount > 0 {
+            reasons.append("hard_failure")
+        }
+        if threshold.failOnAnyNoToolFalsePositive && noToolFalsePositiveCount > 0 {
+            reasons.append("no_tool_false_positive")
+        }
+        if passRate < threshold.minimumPassRate {
+            reasons.append("pass_rate_below_threshold")
+        }
+        return reasons
+    }
+
+    private static func summaryStatus(
+        layerStats: [C6ExternalLayerStats],
+        positiveInvariant: C6PositiveActionInvariant,
+        denominatorReport: C6DenominatorReport
+    ) -> String {
+        let layerBlocked = layerStats.contains { $0.status == .blocked }
+        let positiveBlocked = positiveInvariant.status == .blocked
+        let orphanBlocked = !denominatorReport.orphanRunCaseIDs.isEmpty
+        return layerBlocked || positiveBlocked || orphanBlocked
+            ? "construction_four_layer_threshold_blocked"
+            : "construction_four_layer_threshold_pass"
+    }
+
+    private static func denominatorReport(cases: [C6BenchCase], runs: [C6EvalRun]) -> C6DenominatorReport {
+        let knownCaseIDs = Set(cases.map(\.caseID))
         let unresolvedBehaviorClassCaseIDs = cases
             .filter { C6CaseBehaviorClassResolver.resolve($0) == nil && $0.tags.bucket != .coverage }
             .map(\.caseID)
             .sorted()
         let layerCaseIDs = Dictionary(grouping: cases, by: { C6ExternalLayerSelector.layer(for: $0).rawValue })
             .mapValues { items in items.map(\.caseID).sorted() }
+        let orphanRunCaseIDs = Set(runs.map(\.caseID))
+            .subtracting(knownCaseIDs)
+            .sorted()
 
         return C6DenominatorReport(
             unresolvedBehaviorClassCaseIDs: unresolvedBehaviorClassCaseIDs,
-            layerCaseIDs: layerCaseIDs
+            layerCaseIDs: layerCaseIDs,
+            orphanRunCaseIDs: orphanRunCaseIDs
         )
     }
 

@@ -1,0 +1,1 @@
+L1 sentinel stop-rule: if repeated runs add no new proof class or artifact and only tune the same L1 metric/crop, stop and close as PARTIAL/FAIL instead of continuing. L1 blocks collapse only; it does not sign aesthetics or replace L3.

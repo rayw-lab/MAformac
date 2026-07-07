@@ -3,7 +3,7 @@ type: e2_subset_grill_worker_decisions
 worker: W1-loading-strategy
 id_range: S-001~060
 scope: D1 device-group 粒度 + D2 top-2 跨族 + D6 multi-intent 装载
-status: PROPOSED_WITH_BUDGET_GATES
+status: ratified_locked_with_conditions（D-019）
 date: 2026-07-02
 proof_class: local tokenizer + local sqlite readonly stats + local code teardown + web references
 non_claims: no training, no generated data, no C6 acceptance, no runtime implementation, no cloud LLM
@@ -13,7 +13,7 @@ non_claims: no training, no generated data, no C6 acceptance, no runtime impleme
 
 ## Verdict
 
-W1 verdict: `PROPOSED_WITH_BUDGET_GATES`。
+W1 verdict: `RATIFIED_LOCKED_WITH_CONDITIONS`（D-019）。
 
 - D1 推荐“两级粒度”：单候选 slow path 可用 seat 功能组；D2 top-2 / cross-family 必须退回精确 `_sg` micro-group + 静态 pair budget。原因是一手 tokenizer 显示粗功能组会爆 8K，而精确 `_sg` 两两组合当前全部低于 8K。
 - D2 推荐 top-2 来源先走确定性 NLU/clarifyTag/本地检索 spike，不把 cloud embedding 放进 runtime；top-2 挂载必须由同一 manifest 同源驱动 train / C6 / runtime / grammar / audit。
@@ -184,17 +184,17 @@ Interpretation：历史同句共现支持 D2 必须能处理 `seat+ac`、`seat+v
 
 | ID | 议题 | 选项 | ⭐推荐 | 依据 | status | 防惨败列 |
 | --- | --- | --- | --- | --- | --- | --- |
-| S-001 | D1.1 seat group 基础粒度 | A 全部精确 `_sg`; B 粗功能组; C 单候选功能组 + top-2 `_sg` micro-group | C | 粗 `massage_rhythm=10,734` / `posture_adjust=10,357` 爆 8K；精确 `_sg` pair 全过 8K，但最坏 7,901 | proposed | P1/P6/P8：同一 ToolContract/训练/C6/runtime，禁止各层自造粒度 |
-| S-002 | D1.1 seat 单候选推荐组 | 7 组：heat / ventilation / massage_force_time / massage_mode_rhythm / posture_back_head / posture_base_leg / mode_memory_safety | 接受，限单候选 slow path | 7 组均 <=7,206 tokens；比全 seat 35,698 可控 | proposed | P7/P9：先 token 实测再定 scorer；不能靠直觉分组 |
+| S-001 | D1.1 seat group 基础粒度 | A 全部精确 `_sg`; B 粗功能组; C 单候选功能组 + top-2 `_sg` micro-group | C | 粗 `massage_rhythm=10,734` / `posture_adjust=10,357` 爆 8K；精确 `_sg` pair 全过 8K，但最坏 7,901 | locked_with_conditions | P1/P6/P8：同一 ToolContract/训练/C6/runtime，禁止各层自造粒度 |
+| S-002 | D1.1 seat 单候选推荐组 | 7 组：heat / ventilation / massage_force_time / massage_mode_rhythm / posture_back_head / posture_base_leg / mode_memory_safety | 接受，限单候选 slow path | 7 组均 <=7,206 tokens；比全 seat 35,698 可控 | locked_with_conditions | P7/P9：先 token 实测再定 scorer；不能靠直觉分组 |
 | S-003 | D1.1 粗功能组 | 允许 `massage_rhythm` / `posture_adjust` 合组，或继续切分 | reject 粗组 | 两组单组已 >8K，top-2 更不可能稳态 | decided-for-W1 | P7/P8：真实数据重算；训练/eval/runtime 同一问题框架 |
-| S-004 | D1.2 group SSOT | A 手写 group 表; B 从 `generated/D_domain.tools.demo.json` 的 `_domain/_sg/_ir` codegen manifest | B | `ToolContractCompiler` 读取 generated catalog；`gen_tool_contract.py` 已产 `_ir.device/_domain/_sg` | proposed | P1/P2/P6：单一 compiler，物理删不该出现的 tools，训练==C6==runtime |
-| S-005 | D1.3 too fine vs too coarse 判据 | A 只看单组 token; B 加 max pair token + miss risk + co-occurrence | B | 单组 pass 不能推出 top-2 pass；功能组 pair 已爆 10K+ | proposed | P3/P7/P9：label conflict hard gate；用真实 score 判断 |
-| S-006 | D1.4 bug DB co-occurrence | A 当 group authority; B 只当 tie-breaker/telemetry | B | live `bugs` 表 0；其它表显示 `seat+ac/volume/window` 高频但不是 SSOT | proposed | P7/P8 + raw 边界：只用统计，不把原文带入产出 |
-| S-007 | D2.1 top-2 来源 | A 云 embedding; B deterministic NLU/clarifyTag; C 本地 lexical/embedding spike | B 为主，C 可 spike；A 禁 runtime | R7 no cloud；TinyAgent 证明 retrieval 可行但默认 embedding 不适配端侧 | proposed | P1/P8：retrieval 只能服务同源 manifest，不另立 prompt/tools |
-| S-008 | D2.2 top-2 budget | A 推荐功能组 pair; B 精确 `_sg` pair + static budget fail-closed | B | 精确 `_sg` pair 最坏 7,901 with system；功能组 pair 最坏 11,220 | proposed | P5/P6/P7：NO_TOOL/empty collapse 防线；训练/C6/runtime 同预算 |
-| S-009 | D2.3 train 同源 | A 训练 prompt 自己选 distractors; B manifest 决定 target + optional second-family distractors + digest | B | C5 `sameFamilyDistractors` 已按 `_sg/_domain` 逐级选 distractors；TinyAgent 也要求 retrieved tools 覆盖 gold | proposed | P1/P2/P3/P6：gold tool missing 必须 hard fail |
-| S-010 | D2.4 wrong-family recovery | A runtime 静默裁剪; B 记录 `routing_miss`，一次 retry/clarify，禁止假绿 | B | Hammer/BFCL 都显示 irrelevant/wrong function 是核心风险；项目 P5 禁混淆 NO_TOOL | proposed | P5/P7/P9：错误要可观测，scorer 不能把错族当成功 |
-| S-011 | D6 multi-intent 装载 | A 单句 multi-intent 训练; B 连续两句分句独立装载; C 单句跨族走 D2 top-2/clarify | B + C | E-024 已锁 C5 前不训练 one-sentence multi-intent；D6 README 要 splitter per sentence 和 per-step digest | proposed | P6/P8/P9：连续任务只验装载链路，不偷换为 C5 多意图训练 |
+| S-004 | D1.2 group SSOT | A 手写 group 表; B 从 `generated/D_domain.tools.demo.json` 的 `_domain/_sg/_ir` codegen manifest | B | `ToolContractCompiler` 读取 generated catalog；`gen_tool_contract.py` 已产 `_ir.device/_domain/_sg` | locked_with_conditions | P1/P2/P6：单一 compiler，物理删不该出现的 tools，训练==C6==runtime |
+| S-005 | D1.3 too fine vs too coarse 判据 | A 只看单组 token; B 加 max pair token + miss risk + co-occurrence | B | 单组 pass 不能推出 top-2 pass；功能组 pair 已爆 10K+ | locked_with_conditions | P3/P7/P9：label conflict hard gate；用真实 score 判断 |
+| S-006 | D1.4 bug DB co-occurrence | A 当 group authority; B 只当 tie-breaker/telemetry | B | live `bugs` 表 0；其它表显示 `seat+ac/volume/window` 高频但不是 SSOT | locked_with_conditions | P7/P8 + raw 边界：只用统计，不把原文带入产出 |
+| S-007 | D2.1 top-2 来源 | A 云 embedding; B deterministic NLU/clarifyTag; C 本地 lexical/embedding spike | B 为主，C 可 spike；A 禁 runtime | R7 no cloud；TinyAgent 证明 retrieval 可行但默认 embedding 不适配端侧 | locked_with_conditions | P1/P8：retrieval 只能服务同源 manifest，不另立 prompt/tools |
+| S-008 | D2.2 top-2 budget | A 推荐功能组 pair; B 精确 `_sg` pair + static budget fail-closed | B | 精确 `_sg` pair 最坏 7,901 with system；功能组 pair 最坏 11,220 | locked_with_conditions | P5/P6/P7：NO_TOOL/empty collapse 防线；训练/C6/runtime 同预算 |
+| S-009 | D2.3 train 同源 | A 训练 prompt 自己选 distractors; B manifest 决定 target + optional second-family distractors + digest | B | C5 `sameFamilyDistractors` 已按 `_sg/_domain` 逐级选 distractors；TinyAgent 也要求 retrieved tools 覆盖 gold | locked_with_conditions | P1/P2/P3/P6：gold tool missing 必须 hard fail |
+| S-010 | D2.4 wrong-family recovery | A runtime 静默裁剪; B 记录 `routing_miss`，一次 retry/clarify，禁止假绿 | B | Hammer/BFCL 都显示 irrelevant/wrong function 是核心风险；项目 P5 禁混淆 NO_TOOL | locked_with_conditions | P5/P7/P9：错误要可观测，scorer 不能把错族当成功 |
+| S-011 | D6 multi-intent 装载 | A 单句 multi-intent 训练; B 连续两句分句独立装载; C 单句跨族走 D2 top-2/clarify | B + C | E-024 已锁 C5 前不训练 one-sentence multi-intent；D6 README 要 splitter per sentence 和 per-step digest | locked_with_conditions | P6/P8/P9：连续任务只验装载链路，不偷换为 C5 多意图训练 |
 
 ## Handoff To W2/W3
 

@@ -1,0 +1,72 @@
+[
+  {
+    "case_id": "main_cooling_ivory",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_ivory.png",
+    "sha256": "0aefa6366fb2203214c60a7df3a3a69a4fd8a8f23f7aa3a67c1c67193e034357",
+    "bytes": 3968048,
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "theme": "ivory",
+    "state": "cooling",
+    "captured_at_utc": "2026-06-28T00:33:36Z",
+    "proof_class": "simulator_l0_runtime_truth_recapture"
+  },
+  {
+    "case_id": "main_cooling_deep_space",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_cooling_deep_space.png",
+    "sha256": "c43fec23fea7f8af8d7a166072c0cd0603d4b9cf2eb1ca7b6e000155e2fa0dde",
+    "bytes": 2993413,
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "theme": "deepSpace",
+    "state": "cooling",
+    "captured_at_utc": "2026-06-28T00:33:36Z",
+    "proof_class": "simulator_l0_runtime_truth_recapture"
+  },
+  {
+    "case_id": "main_heating_ivory",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_ivory.png",
+    "sha256": "69fcf934d4454bb21ac7a952c71ea7b303e6e21bb1d26c3126066481c587b9f5",
+    "bytes": 3969465,
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "theme": "ivory",
+    "state": "heating",
+    "captured_at_utc": "2026-06-28T00:33:36Z",
+    "proof_class": "simulator_l0_runtime_truth_recapture"
+  },
+  {
+    "case_id": "main_heating_deep_space",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/main_heating_deep_space.png",
+    "sha256": "68dcf167f030879c1f4a10bb6dd94c98158461c86f6c357bfa2b895794251240",
+    "bytes": 2987920,
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "theme": "deepSpace",
+    "state": "heating",
+    "captured_at_utc": "2026-06-28T00:33:36Z",
+    "proof_class": "simulator_l0_runtime_truth_recapture"
+  },
+  {
+    "case_id": "capsule_video_loop_deep_space",
+    "path": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/screenshots/l0-simctl/capsule_video_loop_deep_space.png",
+    "sha256": "a4676e720793e914dd5635788d6004d083431f3a5f7f79406c1a94e108f1caab",
+    "bytes": 3030377,
+    "pixel_size": {
+      "width": 1320,
+      "height": 2868
+    },
+    "theme": "deepSpace",
+    "state": "capsule videoLoop",
+    "captured_at_utc": "2026-06-28T00:33:36Z",
+    "proof_class": "simulator_l0_runtime_truth_recapture"
+  }
+]

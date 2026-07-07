@@ -30,6 +30,7 @@ MANIFEST_YAML = CONTRACTS_DIR / "source-snapshot-manifest.yaml"
 L1_ALLOWLIST_YAML = CONTRACTS_DIR / "l1-demo-allowlist.yaml"
 RISK_POLICY_YAML = CONTRACTS_DIR / "risk-policy.yaml"
 DEMO_SCENARIOS_YAML = CONTRACTS_DIR / "demo-scenarios.yaml"
+SUBSET_GROUPING_YAML = CONTRACTS_DIR / "subset-grouping.yaml"
 
 UNRESOLVED_LIMIT = 0.02
 FORBIDDEN_SUBSTRINGS = [
@@ -150,7 +151,7 @@ def verify_range_classification(rows: list[dict[str, Any]]) -> None:
 
 
 def verify_leak_scan() -> None:
-    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML, RISK_POLICY_YAML, DEMO_SCENARIOS_YAML]
+    paths = [CONTRACT_JSONL, FOLLOWUP_JSONL, QUARANTINE_JSONL, FUNCTION_SPEC_YAML, COVERAGE_REPORT, STATE_CELLS_YAML, MANIFEST_YAML, L1_ALLOWLIST_YAML, RISK_POLICY_YAML, DEMO_SCENARIOS_YAML, SUBSET_GROUPING_YAML]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         for marker in FORBIDDEN_SUBSTRINGS:
@@ -166,6 +167,67 @@ def verify_leak_scan() -> None:
     )
     if result.stdout.strip():
         raise C1Error(f"xlsx files tracked in git:\n{result.stdout}")
+
+
+def verify_subset_grouping_contract() -> str:
+    """E-2 grouping contract: authored input + catalog closure, not generator-owned table."""
+    spec = safe_load_yaml(SUBSET_GROUPING_YAML)
+    meta = spec.get("meta", {})
+    if meta.get("authority") != "authored_design_input_not_derived":
+        raise C1Error("subset-grouping: meta.authority must be authored_design_input_not_derived")
+    if meta.get("artifact_kind") != "subset_grouping_contract":
+        raise C1Error("subset-grouping: meta.artifact_kind must be subset_grouping_contract")
+    policy = spec.get("single_group_policy", {})
+    seat_groups = policy.get("seat_groups")
+    whole_domain_groups = policy.get("whole_domain_groups")
+    if not isinstance(seat_groups, dict):
+        raise C1Error("subset-grouping: single_group_policy.seat_groups missing")
+    if not isinstance(whole_domain_groups, list):
+        raise C1Error("subset-grouping: single_group_policy.whole_domain_groups missing")
+
+    assigned_seat_sgs: set[str] = set()
+    duplicate_sgs: set[str] = set()
+    for group_id, sgs in seat_groups.items():
+        if not isinstance(group_id, str) or not group_id:
+            raise C1Error("subset-grouping: empty seat group id")
+        if not isinstance(sgs, list) or not sgs:
+            raise C1Error(f"subset-grouping: {group_id} must list seat _sg values")
+        for sg in sgs:
+            if not isinstance(sg, str) or not sg:
+                raise C1Error(f"subset-grouping: {group_id} has non-string/empty _sg")
+            if sg in assigned_seat_sgs:
+                duplicate_sgs.add(sg)
+            assigned_seat_sgs.add(sg)
+    if duplicate_sgs:
+        raise C1Error(f"subset-grouping: duplicate seat _sg mapping {sorted(duplicate_sgs)}")
+
+    whole_domains = set()
+    for domain in whole_domain_groups:
+        if not isinstance(domain, str) or not domain:
+            raise C1Error("subset-grouping: whole_domain_groups contains non-string/empty value")
+        if domain in whole_domains:
+            raise C1Error(f"subset-grouping: duplicate whole domain {domain}")
+        whole_domains.add(domain)
+
+    catalog_path = CONTRACTS_DIR.parent / "generated" / "D_domain.tools.demo.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    catalog_sgs = {item["_sg"] for item in catalog}
+    seat_sgs = {item["_sg"] for item in catalog if item["_domain"] == "seat"}
+    domains = {item["_domain"] for item in catalog}
+    unknown_sgs = assigned_seat_sgs - catalog_sgs
+    missing_seat_sgs = seat_sgs - assigned_seat_sgs
+    extra_seat_sgs = assigned_seat_sgs - seat_sgs
+    unknown_domains = whole_domains - domains
+    if unknown_sgs:
+        raise C1Error(f"subset-grouping: mapped _sg not in catalog {sorted(unknown_sgs)}")
+    if missing_seat_sgs or extra_seat_sgs:
+        raise C1Error(
+            "subset-grouping: seat _sg closure drift "
+            f"missing={sorted(missing_seat_sgs)} extra={sorted(extra_seat_sgs)}"
+        )
+    if unknown_domains:
+        raise C1Error(f"subset-grouping: whole domain not in catalog {sorted(unknown_domains)}")
+    return f"seat_groups={len(seat_groups)} seat_sgs={len(seat_sgs)} whole_domains={len(whole_domains)}"
 
 
 def verify_state_cells() -> str:
@@ -430,6 +492,7 @@ def main() -> int:
         l1_line = f" l1_closure=ok (L1_rows={l1_count})"
     risk_levels = verify_risk_policy()
     demo_beats = verify_demo_scenarios(rows, transitions)
+    subset_grouping = verify_subset_grouping_contract()
     print("schema=ok")
     print("refs=ok")
     print("ledger=ok")
@@ -438,6 +501,7 @@ def main() -> int:
     print(f"state_cells=ok (c1_c2_closure={state_cells_closure}){l1_line}")
     print(f"risk_policy=ok (levels={risk_levels})")
     print(f"demo_scenarios=ok (beats={demo_beats}, status=C6-seed)")
+    print(f"subset_grouping=ok ({subset_grouping})")
     return 0
 
 

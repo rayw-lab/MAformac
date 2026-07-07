@@ -23,37 +23,100 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any, Iterable
 
-import mlx.core as mx
-import mlx.nn as nn
-import mlx.optimizers as optim
-import numpy as np
-import yaml
-from mlx.nn.utils import average_gradients
-from mlx.utils import tree_flatten, tree_map, tree_reduce
-from tqdm import tqdm
-from transformers import AutoTokenizer
-
-from mlx_lm.lora import CONFIG_DEFAULTS, build_parser, yaml_loader
-from mlx_lm.tuner.datasets import CacheDataset, load_dataset
-from mlx_lm.tuner.trainer import TrainingArgs, default_loss, evaluate, grad_checkpoint
-from mlx_lm.tuner.trainer import iterate_batches as stock_iterate_batches
-from mlx_lm.tuner.utils import (
-    build_schedule,
-    linear_to_lora_layers,
-    print_trainable_parameters,
-)
-from mlx_lm.utils import load, save_config
-
 
 REQUIRED_MLX_LM_VERSION = "0.31.1"
 DEFAULT_GRAD_CLIP_NORM = 1.0
 DEFAULT_NONFINITE_FALLBACK_LR = 5e-5
+ASSISTANT_END_TOKEN = "<|im_end|>"
+
+mx = nn = optim = np = yaml = None
+average_gradients = tree_flatten = tree_map = tree_reduce = None
+tqdm = AutoTokenizer = None
+CONFIG_DEFAULTS = build_parser = yaml_loader = None
+CacheDataset = load_dataset = None
+TrainingArgs = default_loss = evaluate = grad_checkpoint = None
+stock_iterate_batches = None
+build_schedule = linear_to_lora_layers = print_trainable_parameters = None
+load = save_config = None
+
+
+def ensure_mlx_runtime() -> None:
+    global mx, nn, optim, np, yaml
+    global average_gradients, tree_flatten, tree_map, tree_reduce
+    global tqdm, AutoTokenizer
+    global CONFIG_DEFAULTS, build_parser, yaml_loader
+    global CacheDataset, load_dataset
+    global TrainingArgs, default_loss, evaluate, grad_checkpoint, stock_iterate_batches
+    global build_schedule, linear_to_lora_layers, print_trainable_parameters
+    global load, save_config
+
+    if mx is not None:
+        return
+
+    import mlx.core as _mx
+    import mlx.nn as _nn
+    import mlx.optimizers as _optim
+    import numpy as _np
+    import yaml as _yaml
+    from mlx.nn.utils import average_gradients as _average_gradients
+    from mlx.utils import tree_flatten as _tree_flatten
+    from mlx.utils import tree_map as _tree_map
+    from mlx.utils import tree_reduce as _tree_reduce
+    from tqdm import tqdm as _tqdm
+    from transformers import AutoTokenizer as _AutoTokenizer
+
+    from mlx_lm.lora import CONFIG_DEFAULTS as _CONFIG_DEFAULTS
+    from mlx_lm.lora import build_parser as _build_parser
+    from mlx_lm.lora import yaml_loader as _yaml_loader
+    from mlx_lm.tuner.datasets import CacheDataset as _CacheDataset
+    from mlx_lm.tuner.datasets import load_dataset as _load_dataset
+    from mlx_lm.tuner.trainer import TrainingArgs as _TrainingArgs
+    from mlx_lm.tuner.trainer import default_loss as _default_loss
+    from mlx_lm.tuner.trainer import evaluate as _evaluate
+    from mlx_lm.tuner.trainer import grad_checkpoint as _grad_checkpoint
+    from mlx_lm.tuner.trainer import iterate_batches as _stock_iterate_batches
+    from mlx_lm.tuner.utils import build_schedule as _build_schedule
+    from mlx_lm.tuner.utils import linear_to_lora_layers as _linear_to_lora_layers
+    from mlx_lm.tuner.utils import print_trainable_parameters as _print_trainable_parameters
+    from mlx_lm.utils import load as _load
+    from mlx_lm.utils import save_config as _save_config
+
+    mx = _mx
+    nn = _nn
+    optim = _optim
+    np = _np
+    yaml = _yaml
+    average_gradients = _average_gradients
+    tree_flatten = _tree_flatten
+    tree_map = _tree_map
+    tree_reduce = _tree_reduce
+    tqdm = _tqdm
+    AutoTokenizer = _AutoTokenizer
+    CONFIG_DEFAULTS = _CONFIG_DEFAULTS
+    build_parser = _build_parser
+    yaml_loader = _yaml_loader
+    CacheDataset = _CacheDataset
+    load_dataset = _load_dataset
+    TrainingArgs = _TrainingArgs
+    default_loss = _default_loss
+    evaluate = _evaluate
+    grad_checkpoint = _grad_checkpoint
+    stock_iterate_batches = _stock_iterate_batches
+    build_schedule = _build_schedule
+    linear_to_lora_layers = _linear_to_lora_layers
+    print_trainable_parameters = _print_trainable_parameters
+    load = _load
+    save_config = _save_config
 
 
 class NonFiniteTrainingError(RuntimeError):
     def __init__(self, payload: dict[str, Any]):
         super().__init__(json.dumps(payload, ensure_ascii=False, sort_keys=True))
         self.payload = payload
+
+
+class LossMaskValidationError(RuntimeError):
+    pass
 
 
 class MetricsWriter:
@@ -75,8 +138,28 @@ class MetricsWriter:
             self.handle.close()
 
 
+def validate_preflight_argv(argv: list[str]) -> None:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true")
+    args, _ = parser.parse_known_args(argv)
+    if args.preflight_only and not args.require_maformac_loss_mask:
+        raise ValueError("--preflight-only requires --require-maformac-loss-mask")
+
+
 def parse_args(argv: list[str]) -> types.SimpleNamespace:
-    parser = build_parser()
+    try:
+        ensure_mlx_runtime()
+        parser = build_parser()
+        defaults = dict(CONFIG_DEFAULTS)
+    except ModuleNotFoundError:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--config", type=str, default=None)
+        parser.add_argument("--model", type=str, default=None)
+        parser.add_argument("--data", type=str, default=None)
+        parser.add_argument("--train", action="store_true")
+        parser.add_argument("--test", action="store_true")
+        defaults = {}
     parser.add_argument("--grad-clip-norm", type=float, default=None)
     parser.add_argument("--disable-grad-clip", action="store_true")
     parser.add_argument("--stock-update-inside-compile", action="store_true")
@@ -86,10 +169,20 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
     parser.add_argument("--allow-mlx-lm-version-mismatch", action="store_true")
     parser.add_argument("--inspect-batches", type=int, default=0)
     parser.add_argument("--inspect-output", type=str, default=None)
+    parser.add_argument("--require-maformac-loss-mask", action="store_true")
+    parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--preflight-loss-mask-only", action="store_true")
+    parser.add_argument("--allow-legacy-loss-objective", action="store_true")
+    parser.add_argument("--self-test-loss-mask", action="store_true")
+    parser.add_argument("--self-test-token-budget-batches", action="store_true")
+    parser.add_argument("--token-budget-per-batch", type=int, default=None)
+    parser.add_argument("--clear-cache-before-train", dest="clear_cache_before_train", action="store_true", default=None)
+    parser.add_argument("--disable-cache-clear-before-train", dest="clear_cache_before_train", action="store_false")
     args = vars(parser.parse_args(argv))
 
     config_path = args.get("config")
     if config_path:
+        ensure_mlx_runtime()
         print("Loading configuration file", config_path)
         with open(config_path, "r", encoding="utf-8") as file:
             config = yaml.load(file, yaml_loader)
@@ -97,7 +190,6 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             if args.get(key, None) is None:
                 args[key] = value
 
-    defaults = dict(CONFIG_DEFAULTS)
     defaults.update(
         {
             "grad_clip_norm": DEFAULT_GRAD_CLIP_NORM,
@@ -106,6 +198,14 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             "nonfinite_fallback_lr": DEFAULT_NONFINITE_FALLBACK_LR,
             "inspect_batches": 0,
             "inspect_output": None,
+            "require_maformac_loss_mask": False,
+            "preflight_only": False,
+            "preflight_loss_mask_only": False,
+            "allow_legacy_loss_objective": False,
+            "self_test_loss_mask": False,
+            "self_test_token_budget_batches": False,
+            "token_budget_per_batch": None,
+            "clear_cache_before_train": True,
         }
     )
     for key, value in defaults.items():
@@ -113,6 +213,11 @@ def parse_args(argv: list[str]) -> types.SimpleNamespace:
             args[key] = value
 
     return types.SimpleNamespace(**args)
+
+
+def validate_preflight_flags(args: types.SimpleNamespace) -> None:
+    if args.preflight_only and not args.require_maformac_loss_mask:
+        raise ValueError("--preflight-only requires --require-maformac-loss-mask")
 
 
 def require_pinned_mlx_lm(allow_mismatch: bool) -> str:
@@ -137,6 +242,26 @@ def file_sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def mlx_cache_memory_bytes() -> int | None:
+    if mx is None:
+        return None
+    if hasattr(mx, "get_cache_memory"):
+        return int(mx.get_cache_memory())
+    if hasattr(mx, "metal") and hasattr(mx.metal, "get_cache_memory"):
+        return int(mx.metal.get_cache_memory())
+    return None
+
+
+def clear_mlx_cache() -> str:
+    if hasattr(mx, "clear_cache"):
+        mx.clear_cache()
+        return "mx.clear_cache"
+    if hasattr(mx, "metal") and hasattr(mx.metal, "clear_cache"):
+        mx.metal.clear_cache()
+        return "mx.metal.clear_cache"
+    raise RuntimeError("MLX cache clear API unavailable")
 
 
 def global_grad_norm(grads: Any) -> mx.array:
@@ -167,15 +292,23 @@ def clipped_train(
     optimizer,
     train_dataset,
     val_dataset=None,
-    args: TrainingArgs = TrainingArgs(),
-    loss: callable = default_loss,
-    iterate_batches: callable = stock_iterate_batches,
+    args=None,
+    loss: callable | None = None,
+    iterate_batches: callable | None = None,
     metrics: MetricsWriter | None = None,
     grad_clip_norm: float = DEFAULT_GRAD_CLIP_NORM,
     disable_grad_clip: bool = False,
     stock_update_inside_compile: bool = False,
     nonfinite_fallback_lr: float = DEFAULT_NONFINITE_FALLBACK_LR,
+    clear_cache_before_train: bool = True,
 ):
+    if args is None:
+        args = TrainingArgs()
+    if loss is None:
+        loss = default_loss
+    if iterate_batches is None:
+        iterate_batches = stock_iterate_batches
+
     if mx.metal.is_available():
         mx.set_wired_limit(mx.device_info()["max_recommended_working_set_size"])
     print(f"Starting training..., iters: {args.iters}", flush=True)
@@ -298,6 +431,20 @@ def clipped_train(
                             "val_time": val_time,
                         }
                     )
+            if clear_cache_before_train and mx.metal.is_available():
+                before_cache = mlx_cache_memory_bytes()
+                clear_api = clear_mlx_cache()
+                after_cache = mlx_cache_memory_bytes()
+                if rank == 0 and metrics:
+                    metrics.write(
+                        {
+                            "event": "cache_cleared_before_train",
+                            "iteration": it,
+                            "clear_api": clear_api,
+                            "before_cache_bytes": before_cache,
+                            "after_cache_bytes": after_cache,
+                        }
+                    )
             tic = time.perf_counter()
 
         do_update = it % grad_accum_steps == 0
@@ -316,6 +463,11 @@ def clipped_train(
             mx.eval(lvalue, toks, grad_accum)
 
         loss_value = to_float(lvalue)
+        token_count_value = to_float(toks)
+        if token_count_value <= 0:
+            raise LossMaskValidationError(
+                f"batch_trainable_tokens_zero:iteration={it}:max_seq_length={args.max_seq_length}"
+            )
         update_loss_values.append(loss_value)
         loss_finite = math.isfinite(loss_value)
         grad_norm_value = to_float(grad_norm_preclip) if do_update else None
@@ -480,6 +632,11 @@ def train_model(args, model: nn.Module, train_set, valid_set, metrics: MetricsWr
     else:
         raise ValueError(f"Unsupported optimizer: {optimizer_name}")
     opt = opt_class(learning_rate=lr, **optimizer_config)
+    iterate_batches_fn = (
+        partial(maformac_iterate_batches, token_budget_per_batch=args.token_budget_per_batch)
+        if args.require_maformac_loss_mask
+        else stock_iterate_batches
+    )
 
     clipped_train(
         model=model,
@@ -487,21 +644,31 @@ def train_model(args, model: nn.Module, train_set, valid_set, metrics: MetricsWr
         optimizer=opt,
         train_dataset=CacheDataset(train_set),
         val_dataset=CacheDataset(valid_set) if valid_set else None,
+        loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss,
+        iterate_batches=iterate_batches_fn,
         metrics=metrics,
         grad_clip_norm=args.grad_clip_norm,
         disable_grad_clip=args.disable_grad_clip,
         stock_update_inside_compile=args.stock_update_inside_compile,
         nonfinite_fallback_lr=args.nonfinite_fallback_lr,
+        clear_cache_before_train=args.clear_cache_before_train,
     )
 
 
 def evaluate_model(args, model: nn.Module, test_set):
+    iterate_batches_fn = (
+        partial(maformac_iterate_batches, token_budget_per_batch=args.token_budget_per_batch)
+        if args.require_maformac_loss_mask
+        else stock_iterate_batches
+    )
     test_loss = evaluate(
         model=model,
         dataset=CacheDataset(test_set),
+        loss=maformac_masked_loss if args.require_maformac_loss_mask else default_loss,
         batch_size=args.batch_size,
         num_batches=args.test_batches,
         max_seq_length=args.max_seq_length,
+        iterate_batches=iterate_batches_fn,
     )
     print(f"Test loss {test_loss:.3f}, Test ppl {math.exp(test_loss):.3f}.", flush=True)
 
@@ -517,6 +684,727 @@ def batch_signature(batch_index: int, batch_tuple: Any) -> dict[str, Any]:
         "token_sum": int(batch_np.sum()),
         "token_nonzero": int(np.count_nonzero(batch_np)),
     }
+
+
+def guard_stock_loader_rejects_loss_mask(args) -> None:
+    data_root = Path(args.data)
+    for split in ("train", "valid", "test"):
+        path = data_root / f"{split}.jsonl"
+        if not path.exists():
+            continue
+        with path.open("r", encoding="utf-8") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(record, dict) and "loss_mask" in record:
+                    raise LossMaskValidationError("loss_mask_present_but_flag_missing")
+
+
+class MAformacLossMaskDataset:
+    def __init__(self, data: list[dict[str, Any]], tokenizer, allow_legacy_loss_objective: bool = False):
+        self._data = data
+        self.tokenizer = tokenizer
+        self.allow_legacy_loss_objective = allow_legacy_loss_objective
+
+    def process(self, record: dict[str, Any]):
+        return build_maformac_token_labels(record, self.tokenizer, self.allow_legacy_loss_objective)
+
+    def __getitem__(self, idx: int):
+        return self._data[idx]
+
+    def __len__(self):
+        return len(self._data)
+
+
+def read_jsonl_records(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    rows = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if not line.strip():
+                continue
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError as error:
+                raise LossMaskValidationError(f"{path.name}:{line_number}:json_decode:{error.msg}") from error
+    return rows
+
+
+def locate_subsequence(haystack: list[int], needle: list[int]) -> int | None:
+    if not needle:
+        return None
+    limit = len(haystack) - len(needle)
+    for start in range(0, limit + 1):
+        if haystack[start : start + len(needle)] == needle:
+            return start
+    return None
+
+
+def required_assistant_end_token(loss_mask: dict[str, Any]) -> str:
+    token = loss_mask.get("trainable_assistant_end_token")
+    if token != ASSISTANT_END_TOKEN:
+        raise LossMaskValidationError("assistant_end_token_supervision_missing")
+    return token
+
+
+def token_id_for_text(tokenizer, token_text: str) -> int:
+    convert = getattr(tokenizer, "convert_tokens_to_ids", None)
+    if callable(convert):
+        token_id = convert(token_text)
+        if isinstance(token_id, int) and token_id >= 0:
+            return token_id
+    encoded = tokenizer(token_text, add_special_tokens=False)
+    token_ids = encoded.get("input_ids") if isinstance(encoded, dict) else encoded
+    if isinstance(token_ids, list) and len(token_ids) == 1 and isinstance(token_ids[0], int):
+        return token_ids[0]
+    raise LossMaskValidationError(f"assistant_end_token_id_unresolved:{token_text}")
+
+
+def assistant_end_token_index(
+    tokens: list[int],
+    assistant_start: int,
+    assistant_token_count: int,
+    tokenizer,
+    token_text: str,
+) -> int:
+    token_id = token_id_for_text(tokenizer, token_text)
+    expected = assistant_start + assistant_token_count
+    search_end = min(len(tokens), expected + 8)
+    for index in range(expected, search_end):
+        if tokens[index] == token_id:
+            return index
+    raise LossMaskValidationError(f"assistant_end_token_not_found_after_assistant:{token_text}")
+
+
+def tokenizer_for_offsets(tokenizer):
+    candidate = getattr(tokenizer, "_tokenizer", tokenizer)
+    return candidate if callable(candidate) else tokenizer
+
+
+def assistant_tokenization(record: dict[str, Any], tokenizer) -> tuple[list[int], list[int], list[tuple[int, int]], int]:
+    messages = record["messages"]
+    tools = record.get("tools")
+    assistant = messages[-1]["content"]
+    full_tokens = tokenizer.apply_chat_template(messages, tools=tools, return_dict=False)
+    add_generation_prompt = messages[-1].get("role") == "assistant"
+    prompt_tokens = tokenizer.apply_chat_template(
+        messages[:-1],
+        tools=tools,
+        add_generation_prompt=add_generation_prompt,
+        return_dict=False,
+    )
+    hf_tokenizer = tokenizer_for_offsets(tokenizer)
+    encoded = hf_tokenizer(
+        assistant,
+        add_special_tokens=False,
+        return_offsets_mapping=True,
+    )
+    assistant_tokens = encoded["input_ids"]
+    offsets = encoded.get("offset_mapping")
+    if offsets is None:
+        raise LossMaskValidationError("tokenizer_offset_mapping_missing")
+
+    start = len(prompt_tokens)
+    if full_tokens[start : start + len(assistant_tokens)] != assistant_tokens:
+        found = locate_subsequence(full_tokens, assistant_tokens)
+        if found is None:
+            raise LossMaskValidationError("assistant_token_subsequence_not_found")
+        start = found
+    return full_tokens, assistant_tokens, [(int(s), int(e)) for s, e in offsets], start
+
+
+def token_indices_for_span(offsets: list[tuple[int, int]], span: dict[str, Any]) -> list[int]:
+    start = int(span["start"])
+    end = int(span["end"])
+    return [
+        index
+        for index, (token_start, token_end) in enumerate(offsets)
+        if token_start < end and start < token_end
+    ]
+
+
+def assistant_content(record: dict[str, Any]) -> str:
+    messages = record.get("messages") or []
+    for message in reversed(messages):
+        if message.get("role") == "assistant":
+            return str(message.get("content") or "")
+    return ""
+
+
+def think_ranges(text: str) -> list[tuple[int, int]]:
+    ranges: list[tuple[int, int]] = []
+    cursor = 0
+    while True:
+        start = text.find("<think>", cursor)
+        if start < 0:
+            break
+        end = text.find("</think>", start + len("<think>"))
+        if end < 0:
+            break
+        end += len("</think>")
+        ranges.append((start, end))
+        cursor = end
+    return ranges
+
+
+def non_think_ranges(text: str) -> list[tuple[int, int]]:
+    ranges: list[tuple[int, int]] = []
+    cursor = 0
+    for start, end in think_ranges(text):
+        if cursor < start:
+            ranges.append((cursor, start))
+        cursor = max(cursor, end)
+    if cursor < len(text):
+        ranges.append((cursor, len(text)))
+    return ranges
+
+
+def span_ranges(loss_mask: dict[str, Any], key: str) -> list[tuple[int, int]]:
+    ranges: list[tuple[int, int]] = []
+    for span in loss_mask.get(key, []):
+        try:
+            start = int(span["start"])
+            end = int(span["end"])
+        except Exception as error:
+            raise LossMaskValidationError(f"{key}_span_invalid") from error
+        if start < 0 or end <= start:
+            raise LossMaskValidationError(f"{key}_span_bounds_invalid")
+        ranges.append((start, end))
+    return ranges
+
+
+def span_covers(ranges: list[tuple[int, int]], start: int, end: int) -> bool:
+    return any(span_start <= start and end <= span_end for span_start, span_end in ranges)
+
+
+def covered_char_count(target_ranges: list[tuple[int, int]], trainable_ranges: list[tuple[int, int]]) -> int:
+    covered: set[int] = set()
+    for start, end in target_ranges:
+        for index in range(start, end):
+            if any(train_start <= index < train_end for train_start, train_end in trainable_ranges):
+                covered.add(index)
+    return len(covered)
+
+
+def parser_critical_fragments(record: dict[str, Any], assistant: str) -> list[str]:
+    if "NO_TOOL" in assistant:
+        return ["NO_TOOL"]
+    fragments = ["<tool_call>", "</tool_call>", "{", "}", '"name"', '"arguments"']
+    try:
+        payload_start = assistant.index("<tool_call>") + len("<tool_call>")
+        payload_end = assistant.index("</tool_call>", payload_start)
+        payload = json.loads(assistant[payload_start:payload_end])
+        if isinstance(payload, dict):
+            name = payload.get("name")
+            if isinstance(name, str) and name:
+                fragments.append(name)
+            arguments = payload.get("arguments")
+            if isinstance(arguments, dict):
+                for key, value in arguments.items():
+                    fragments.append(f'"{key}"')
+                    if isinstance(value, str) and value:
+                        fragments.append(value)
+                    elif isinstance(value, (int, float, bool)):
+                        fragments.append(str(value).lower() if isinstance(value, bool) else str(value))
+    except Exception:
+        fragments.append("tool_call_json_payload_parseable")
+    return sorted(set(fragment for fragment in fragments if fragment))
+
+
+def validate_record_supervision_coverage(record: dict[str, Any], allow_legacy_loss_objective: bool = False) -> dict[str, Any]:
+    loss_mask = record.get("loss_mask")
+    if not isinstance(loss_mask, dict):
+        raise LossMaskValidationError("loss_mask_missing")
+    assistant = assistant_content(record)
+    if not assistant:
+        raise LossMaskValidationError("assistant_message_missing")
+    objective = record.get("loss_objective_profile")
+    if objective in {"functionName", "argumentName", "argumentValue", "function_name", "argument_name", "argument_value"}:
+        raise LossMaskValidationError("loss_objective_profile_uses_augmentation_name")
+    legacy_loss_objective = False
+    if objective is None:
+        if not allow_legacy_loss_objective:
+            raise LossMaskValidationError("loss_objective_profile_missing")
+        objective = "legacy_missing"
+        legacy_loss_objective = True
+    elif objective == "legacy_missing":
+        if not allow_legacy_loss_objective:
+            raise LossMaskValidationError("legacy_loss_objective_not_allowed")
+        legacy_loss_objective = True
+    if objective not in {"assistant_full_except_think", "no_tool_full", "diagnostic_span_only", "legacy_missing"}:
+        raise LossMaskValidationError(f"loss_objective_profile_unknown:{objective}")
+    augmentation = record.get("augmentation_profile", {})
+    if isinstance(augmentation, dict) and "train_on_turn" in augmentation:
+        raise LossMaskValidationError("augmentation_profile_mixed_train_on_turn")
+    assistant_end_token = None
+    if loss_mask.get("enforcement") != "all_masked_not_train_eligible":
+        assistant_end_token = required_assistant_end_token(loss_mask)
+
+    trainable = span_ranges(loss_mask, "trainable_spans")
+    masked_think = span_ranges(loss_mask, "masked_think_spans")
+    non_think = non_think_ranges(assistant)
+    trainable_non_think = covered_char_count(non_think, trainable)
+    assistant_non_think = sum(end - start for start, end in non_think)
+    ratio = 1.0 if assistant_non_think == 0 else trainable_non_think / assistant_non_think
+    errors: list[str] = []
+    if objective != "diagnostic_span_only":
+        for fragment in parser_critical_fragments(record, assistant):
+            position = assistant.find(fragment)
+            if position < 0:
+                errors.append(f"parser_critical_missing:{fragment}")
+                continue
+            if not span_covers(trainable, position, position + len(fragment)):
+                errors.append(f"parser_critical_untrained:{fragment}")
+    if ratio < 0.90:
+        errors.append(f"assistant_non_think_trainable_ratio_below_0.90:{ratio:.4f}")
+    if any(span_start < think_end and think_start < span_end for think_start, think_end in masked_think for span_start, span_end in trainable):
+        errors.append("think_span_trainable_leakage")
+    if errors:
+        raise LossMaskValidationError("under_supervision:" + ",".join(errors[:12]))
+    return {
+        "assistant_non_think_chars": assistant_non_think,
+        "trainable_non_think_chars": trainable_non_think,
+        "trainable_non_think_ratio": ratio,
+        "parser_critical_status": "pass",
+        "ratio_status": "pass",
+        "legacy_loss_objective": legacy_loss_objective,
+        "assistant_end_token_supervision": "declared" if assistant_end_token is not None else "not_applicable_all_masked",
+        "trainable_assistant_end_token": assistant_end_token,
+        "gate_contract": {
+            "parser_critical": "threshold=all_required_fragments_trainable",
+            "assistant_non_think_trainable_ratio": "threshold>=0.90",
+            "assistant_end_token_supervision": "threshold=<|im_end|> declared and token-labeled",
+            "prompt_user_system_leakage": "threshold=0",
+            "think_leakage": "threshold=0",
+            "record_counts": "no_gate_by_design_observability_only",
+        },
+    }
+
+
+def build_maformac_token_labels(record: dict[str, Any], tokenizer, allow_legacy_loss_objective: bool = False) -> tuple[list[int], list[int]]:
+    loss_mask = record.get("loss_mask")
+    if not isinstance(loss_mask, dict):
+        raise LossMaskValidationError("loss_mask_missing")
+    if loss_mask.get("ignore_index", -100) != -100:
+        raise LossMaskValidationError("ignore_index_not_minus_100")
+    if "labels" in loss_mask:
+        raise LossMaskValidationError("char_indexed_loss_mask_labels_forbidden")
+    record["_maformac_supervision_coverage"] = validate_record_supervision_coverage(
+        record,
+        allow_legacy_loss_objective=allow_legacy_loss_objective,
+    )
+
+    tokens, assistant_tokens, offsets, assistant_start = assistant_tokenization(record, tokenizer)
+    labels = [-100] * len(tokens)
+    trainable_token_count = 0
+    assistant_end_index: int | None = None
+
+    for span in loss_mask.get("trainable_spans", []):
+        for assistant_index in token_indices_for_span(offsets, span):
+            full_index = assistant_start + assistant_index
+            if 0 <= full_index < len(tokens):
+                labels[full_index] = int(tokens[full_index])
+                trainable_token_count += 1
+
+    for span in loss_mask.get("masked_think_spans", []):
+        for assistant_index in token_indices_for_span(offsets, span):
+            full_index = assistant_start + assistant_index
+            if 0 <= full_index < len(labels):
+                labels[full_index] = -100
+
+    if loss_mask.get("enforcement") != "all_masked_not_train_eligible":
+        assistant_end_token = required_assistant_end_token(loss_mask)
+        assistant_end_index = assistant_end_token_index(
+            tokens,
+            assistant_start,
+            len(assistant_tokens),
+            tokenizer,
+            assistant_end_token,
+        )
+        labels[assistant_end_index] = int(tokens[assistant_end_index])
+
+    if loss_mask.get("enforcement") != "all_masked_not_train_eligible" and not any(label != -100 for label in labels):
+        raise LossMaskValidationError("token_trainable_labels_missing")
+    if len(labels) != len(tokens):
+        raise LossMaskValidationError("token_label_count_mismatch")
+    record["_maformac_token_mask_summary"] = {
+        "tokens": len(tokens),
+        "trainable_tokens": sum(1 for label in labels if label != -100),
+        "ignored_tokens": sum(1 for label in labels if label == -100),
+        "trainable_span_tokens_before_think_mask": trainable_token_count,
+        "assistant_end_token_supervised": assistant_end_index is not None,
+        "assistant_end_token_index": assistant_end_index,
+    }
+    return tokens, labels
+
+
+def maformac_masked_cross_entropy_from_logits(logits, token_labels, ignore_index: int = -100):
+    mask = token_labels != ignore_index
+    safe_targets = mx.where(mask, token_labels, 0)
+    ce = nn.losses.cross_entropy(logits, safe_targets) * mask
+    ntoks = mask.sum()
+    safe_ntoks = mx.maximum(ntoks, mx.array(1, dtype=ntoks.dtype))
+    return ce.astype(mx.float32).sum() / safe_ntoks, ntoks
+
+
+def maformac_masked_loss(model, batch, token_labels):
+    inputs = batch[:, :-1]
+    labels = token_labels[:, 1:]
+    logits = model(inputs)
+    return maformac_masked_cross_entropy_from_logits(logits, labels)
+
+
+def maformac_padded_batch_length(token_length: int, max_seq_length: int) -> int:
+    pad_to = 32
+    padded = 1 + pad_to * ((token_length + pad_to - 1) // pad_to)
+    return min(padded, max_seq_length)
+
+
+def maformac_budget_batch_indices(
+    dataset,
+    sorted_indices: list[int],
+    batch_size: int,
+    max_seq_length: int,
+    token_budget_per_batch: int,
+) -> list[list[int]]:
+    if token_budget_per_batch < 1:
+        raise ValueError("token_budget_per_batch must be positive")
+    groups: list[list[int]] = []
+    current: list[int] = []
+    current_padded_len = 0
+
+    for index in sorted_indices:
+        token_length = min(len(dataset[index][0]), max_seq_length)
+        row_padded_len = maformac_padded_batch_length(token_length, max_seq_length)
+        next_padded_len = max(current_padded_len, row_padded_len)
+        next_total = next_padded_len * (len(current) + 1)
+        if current and (
+            len(current) >= batch_size or next_total > token_budget_per_batch
+        ):
+            groups.append(current)
+            current = []
+            current_padded_len = 0
+        current.append(index)
+        current_padded_len = max(current_padded_len, row_padded_len)
+
+    if current:
+        groups.append(current)
+    return groups
+
+
+def maformac_iterate_batches(
+    dataset,
+    batch_size,
+    max_seq_length,
+    loop=False,
+    seed=None,
+    comm_group=None,
+    token_budget_per_batch: int | None = None,
+):
+    len_fn = lambda idx: len(dataset[idx][0])
+    idx = sorted(range(len(dataset)), key=len_fn)
+    if token_budget_per_batch is None:
+        if len(dataset) < batch_size:
+            raise ValueError(
+                f"Dataset must have at least batch_size={batch_size}"
+                f" examples but only has {len(dataset)}."
+            )
+    elif len(dataset) < 1:
+        raise ValueError(
+            f"Dataset must have at least 1 example but only has {len(dataset)}."
+        )
+
+    if comm_group is not None:
+        offset = comm_group.rank()
+        step = comm_group.size()
+    else:
+        offset = 0
+        step = 1
+    if batch_size % step != 0:
+        raise ValueError("The batch size must be divisible by the number of workers")
+
+    if token_budget_per_batch is None:
+        batch_idx = [
+            idx[i + offset : i + offset + batch_size : step]
+            for i in range(0, len(idx) - batch_size + 1, batch_size)
+        ]
+    else:
+        batch_idx = maformac_budget_batch_indices(
+            dataset=dataset,
+            sorted_indices=idx,
+            batch_size=batch_size,
+            max_seq_length=max_seq_length,
+            token_budget_per_batch=token_budget_per_batch,
+        )
+    if seed:
+        np.random.seed(seed)
+    while True:
+        indices = np.random.permutation(len(batch_idx))
+        for i in indices:
+            if token_budget_per_batch is None:
+                row_indices = batch_idx[i]
+            else:
+                row_indices = batch_idx[i][offset::step]
+            if not row_indices:
+                continue
+            rows = [dataset[j] for j in row_indices]
+            batch_tokens, batch_labels = zip(*rows)
+            lengths = [len(tokens) for tokens in batch_tokens]
+            if max(lengths) > max_seq_length:
+                print(
+                    f"[WARNING] Some sequences are longer than {max_seq_length} tokens. "
+                    f"The longest sentence {max(lengths)} will be truncated to {max_seq_length}. "
+                    "Consider pre-splitting your data to save memory.",
+                    flush=True,
+                )
+            pad_to = 32
+            max_length_in_batch = 1 + pad_to * ((max(lengths) + pad_to - 1) // pad_to)
+            max_length_in_batch = min(max_length_in_batch, max_seq_length)
+            microbatch_size = len(row_indices)
+            batch_arr = np.zeros((microbatch_size, max_length_in_batch), np.int32)
+            label_arr = np.full((microbatch_size, max_length_in_batch), -100, np.int32)
+            for j in range(microbatch_size):
+                truncated_length = min(lengths[j], max_seq_length)
+                batch_arr[j, :truncated_length] = batch_tokens[j][:truncated_length]
+                label_arr[j, :truncated_length] = batch_labels[j][:truncated_length]
+            yield mx.array(batch_arr), mx.array(label_arr)
+        if not loop:
+            break
+
+
+def load_maformac_loss_mask_datasets(args, tokenizer):
+    root = Path(args.data)
+    if not root.exists():
+        raise LossMaskValidationError(f"maformac_loss_mask_data_dir_missing:{root}")
+    records = {
+        "train": read_jsonl_records(root / "train.jsonl"),
+        "valid": read_jsonl_records(root / "valid.jsonl"),
+        "test": read_jsonl_records(root / "test.jsonl"),
+    }
+    if args.train and len(records["train"]) == 0:
+        raise ValueError("Training set not found or empty. Must provide training set for fine-tuning.")
+    if args.train and len(records["valid"]) == 0:
+        print("Warning: Validation set not found or empty. Training will proceed without validation.", flush=True)
+    if args.test and len(records["test"]) == 0:
+        raise ValueError("Test set not found or empty. Must provide test set for evaluation.")
+
+    datasets = {
+        split: MAformacLossMaskDataset(
+            rows,
+            tokenizer,
+            allow_legacy_loss_objective=bool(args.allow_legacy_loss_objective),
+        )
+        for split, rows in records.items()
+    }
+    summary = validate_maformac_loss_mask_datasets(
+        datasets,
+        require_train=bool(args.train),
+        max_seq_length=args.max_seq_length,
+    )
+    return datasets["train"], datasets["valid"], datasets["test"], summary
+
+
+def validate_maformac_loss_mask_datasets(
+    datasets: dict[str, MAformacLossMaskDataset],
+    require_train: bool,
+    max_seq_length: int | None = None,
+) -> dict[str, Any]:
+    summary: dict[str, Any] = {
+        "event": "maformac_loss_mask_preflight",
+        "records": 0,
+        "trainable_records": 0,
+        "ignored_label_records": 0,
+        "trainable_tokens": 0,
+        "ignored_tokens": 0,
+        "assistant_end_token_supervised_records": 0,
+        "legacy_loss_objective_allowed": any(dataset.allow_legacy_loss_objective for dataset in datasets.values()),
+        "legacy_loss_objective_record_count": 0,
+        "max_seq_length": max_seq_length,
+        "max_token_length": 0,
+        "length_violations": [],
+        "supervision_coverage_digest": {
+            "assistant_non_think_chars": 0,
+            "trainable_non_think_chars": 0,
+            "min_trainable_non_think_ratio": None,
+            "parser_critical_status": "pass",
+            "ratio_status": "pass",
+            "gate_contract": {
+                "parser_critical": "threshold=all_required_fragments_trainable",
+                "assistant_non_think_trainable_ratio": "threshold>=0.90",
+                "prompt_user_system_leakage": "threshold=0",
+                "think_leakage": "threshold=0",
+                "record_counts": "no_gate_by_design_observability_only",
+            },
+        },
+        "splits": {},
+    }
+    errors: list[str] = []
+    for split, dataset in datasets.items():
+        split_summary = {
+            "records": len(dataset),
+            "trainable_records": 0,
+            "ignored_label_records": 0,
+            "trainable_tokens": 0,
+            "ignored_tokens": 0,
+            "assistant_end_token_supervised_records": 0,
+            "max_token_length": 0,
+        }
+        for index in range(len(dataset)):
+            try:
+                tokens, labels = dataset.process(dataset[index])
+            except Exception as error:
+                errors.append(f"{split}:{index + 1}:{error}")
+                continue
+            token_length = len(tokens)
+            split_summary["max_token_length"] = max(split_summary["max_token_length"], token_length)
+            summary["max_token_length"] = max(summary["max_token_length"], token_length)
+            if max_seq_length is not None and token_length > max_seq_length:
+                summary["length_violations"].append(
+                    {
+                        "split": split,
+                        "row": index + 1,
+                        "token_length": token_length,
+                        "max_seq_length": max_seq_length,
+                    }
+                )
+            trainable = sum(1 for label in labels if label != -100)
+            ignored = sum(1 for label in labels if label == -100)
+            if trainable > 0:
+                split_summary["trainable_records"] += 1
+                split_summary["trainable_tokens"] += trainable
+            if ignored > 0:
+                split_summary["ignored_label_records"] += 1
+                split_summary["ignored_tokens"] += ignored
+            coverage = dataset[index].get("_maformac_supervision_coverage", {})
+            digest = summary["supervision_coverage_digest"]
+            digest["assistant_non_think_chars"] += int(coverage.get("assistant_non_think_chars", 0))
+            digest["trainable_non_think_chars"] += int(coverage.get("trainable_non_think_chars", 0))
+            ratio = coverage.get("trainable_non_think_ratio")
+            if ratio is not None:
+                digest["min_trainable_non_think_ratio"] = ratio if digest["min_trainable_non_think_ratio"] is None else min(digest["min_trainable_non_think_ratio"], ratio)
+            if coverage.get("legacy_loss_objective") is True:
+                summary["legacy_loss_objective_record_count"] += 1
+            token_summary = dataset[index].get("_maformac_token_mask_summary", {})
+            if token_summary.get("assistant_end_token_supervised") is True:
+                split_summary["assistant_end_token_supervised_records"] += 1
+        for key in ["records", "trainable_records", "ignored_label_records", "trainable_tokens", "ignored_tokens"]:
+            summary[key] += split_summary[key]
+        summary["assistant_end_token_supervised_records"] += split_summary["assistant_end_token_supervised_records"]
+        summary["splits"][split] = split_summary
+
+    if require_train and datasets["train"].__len__() == 0:
+        errors.append("train.jsonl_empty")
+    if require_train and summary["splits"]["train"]["trainable_tokens"] == 0:
+        errors.append("trainable_loss_mask_tokens_missing")
+    if summary["trainable_records"] != summary["assistant_end_token_supervised_records"]:
+        errors.append(
+            "assistant_end_token_supervised_record_count_mismatch:"
+            f"{summary['assistant_end_token_supervised_records']}/{summary['trainable_records']}"
+        )
+    if summary["length_violations"]:
+        for violation in summary["length_violations"][:25]:
+            errors.append(
+                "token_length_exceeds_max_seq_length:"
+                f"{violation['split']}:{violation['row']}:"
+                f"{violation['token_length']}>{violation['max_seq_length']}"
+            )
+    if errors:
+        raise LossMaskValidationError(json.dumps({"errors": errors[:25], "summary": summary}, ensure_ascii=False, sort_keys=True))
+    return summary
+
+
+def run_loss_mask_self_test() -> None:
+    logits = mx.array(
+        [
+            [
+                [8.0, 0.0, 0.0],
+                [0.0, 8.0, 0.0],
+                [0.0, 0.0, 8.0],
+            ]
+        ],
+        dtype=mx.float32,
+    )
+    labels = mx.array([[0, -100, 2]], dtype=mx.int32)
+    masked_loss, ntoks = maformac_masked_cross_entropy_from_logits(logits, labels)
+    zero_loss, zero_ntoks = maformac_masked_cross_entropy_from_logits(
+        logits,
+        mx.array([[-100, -100, -100]], dtype=mx.int32),
+    )
+    unmasked_loss, _ = maformac_masked_cross_entropy_from_logits(
+        logits,
+        mx.array([[0, 2, 2]], dtype=mx.int32),
+    )
+    mx.eval(masked_loss, zero_loss, unmasked_loss, ntoks, zero_ntoks)
+    if int(ntoks.item()) != 2:
+        raise AssertionError(f"expected 2 trainable tokens, got {int(ntoks.item())}")
+    if int(zero_ntoks.item()) != 0:
+        raise AssertionError(f"expected 0 trainable tokens for all-ignore labels, got {int(zero_ntoks.item())}")
+    if not math.isfinite(float(zero_loss.item())):
+        raise AssertionError("zero-token loss must remain finite before explicit fail-closed guard")
+    if not float(masked_loss.item()) < float(unmasked_loss.item()):
+        raise AssertionError("masked token still contributed to loss")
+    print(
+        json.dumps(
+            {
+                "event": "loss_mask_self_test",
+                "status": "pass",
+                "trainable_tokens": int(ntoks.item()),
+                "zero_token_fail_closed_guard": "finite_loss_zero_ntoks",
+                "masked_loss": float(masked_loss.item()),
+                "unmasked_loss": float(unmasked_loss.item()),
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
+
+
+def run_token_budget_batch_self_test() -> None:
+    lengths = [120, 1600, 6188, 7185, 7184, 90, 7183]
+    dataset = [([index] * length, [index] * length) for index, length in enumerate(lengths)]
+    sorted_indices = sorted(range(len(dataset)), key=lambda idx: len(dataset[idx][0]))
+    groups = maformac_budget_batch_indices(
+        dataset=dataset,
+        sorted_indices=sorted_indices,
+        batch_size=4,
+        max_seq_length=8192,
+        token_budget_per_batch=8192,
+    )
+    padded_totals = [
+        maformac_padded_batch_length(max(len(dataset[index][0]) for index in group), 8192) * len(group)
+        for group in groups
+    ]
+    expected_groups = [[5, 0, 1], [2], [6], [4], [3]]
+    longest_row_single = any(group == [3] for group in groups)
+    if groups != expected_groups:
+        raise AssertionError(f"unexpected token budget groups: {groups}")
+    if any(total > 8192 for total in padded_totals):
+        raise AssertionError(f"padded token budget exceeded: {padded_totals}")
+    if not longest_row_single:
+        raise AssertionError(f"longest row was not isolated: {groups}")
+    if groups[0] != [5, 0, 1]:
+        raise AssertionError(f"stable sorted order changed: {groups[0]}")
+    print(
+        json.dumps(
+            {
+                "event": "token_budget_batch_self_test",
+                "status": "pass",
+                "token_budget_per_batch": 8192,
+                "groups": groups,
+                "padded_totals": padded_totals,
+                "longest_row_single": longest_row_single,
+                "snapshot_fixture": "T1D-D2combo maformac_budget_batch_indices",
+                "grad_accumulation_semantics": "variable_microbatch_rows_when_token_budget_per_batch_enabled",
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
 
 
 def inspect_batches(args) -> None:
@@ -548,6 +1436,21 @@ def inspect_batches(args) -> None:
 
 
 def run(args) -> None:
+    validate_preflight_flags(args)
+
+    if args.self_test_token_budget_batches:
+        run_token_budget_batch_self_test()
+        return
+
+    if args.self_test_loss_mask:
+        ensure_mlx_runtime()
+        run_loss_mask_self_test()
+        return
+
+    if not args.require_maformac_loss_mask:
+        guard_stock_loader_rejects_loss_mask(args)
+
+    ensure_mlx_runtime()
     version = require_pinned_mlx_lm(args.allow_mlx_lm_version_mismatch)
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
     np.random.seed(args.seed)
@@ -564,12 +1467,22 @@ def run(args) -> None:
         f"(mlx-lm={version}, script_sha256={script_sha256}, "
         f"grad_clip_norm={args.grad_clip_norm}, "
         f"clip_disabled={args.disable_grad_clip}, "
-        f"stock_update_inside_compile={args.stock_update_inside_compile})",
+        f"stock_update_inside_compile={args.stock_update_inside_compile}, "
+        f"grad_checkpoint={args.grad_checkpoint}, "
+        f"token_budget_per_batch={args.token_budget_per_batch}, "
+        f"clear_cache_before_train={args.clear_cache_before_train})",
         flush=True,
     )
 
     if args.inspect_batches:
         inspect_batches(args)
+        return
+    if args.preflight_loss_mask_only:
+        if not args.require_maformac_loss_mask:
+            raise LossMaskValidationError("preflight_loss_mask_only_requires_require_maformac_loss_mask")
+        tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
+        _, _, _, loss_mask_summary = load_maformac_loss_mask_datasets(args, tokenizer)
+        print(json.dumps(loss_mask_summary, ensure_ascii=False, sort_keys=True), flush=True)
         return
 
     metrics = MetricsWriter(args.metrics_jsonl)
@@ -582,14 +1495,36 @@ def run(args) -> None:
                 "training_loop_source_sha256": script_sha256,
                 "source_snapshot": str(source_snapshot) if source_snapshot else None,
                 "disable_grad_clip": args.disable_grad_clip,
+                "grad_checkpoint": args.grad_checkpoint,
                 "grad_clip_norm": args.grad_clip_norm,
                 "stock_update_inside_compile": args.stock_update_inside_compile,
+                "token_budget_per_batch": args.token_budget_per_batch,
+                "clear_cache_before_train": args.clear_cache_before_train,
+                "grad_accumulation_semantics": (
+                    "variable_microbatch_rows_when_token_budget_per_batch_enabled"
+                    if args.token_budget_per_batch
+                    else "fixed_batch_size_rows"
+                ),
             }
         )
         print("Loading pretrained model", flush=True)
         model, tokenizer = load(args.model, tokenizer_config={"trust_remote_code": True})
         print("Loading datasets", flush=True)
-        train_set, valid_set, test_set = load_dataset(args, tokenizer)
+        if args.require_maformac_loss_mask:
+            train_set, valid_set, test_set, loss_mask_summary = load_maformac_loss_mask_datasets(args, tokenizer)
+            metrics.write(loss_mask_summary)
+            print(
+                "MAformac token loss_mask preflight "
+                f"records={loss_mask_summary['records']} "
+                f"trainable_records={loss_mask_summary['trainable_records']} "
+                f"trainable_tokens={loss_mask_summary['trainable_tokens']} "
+                f"ignored_tokens={loss_mask_summary['ignored_tokens']}",
+                flush=True,
+            )
+            if args.preflight_only:
+                return
+        else:
+            train_set, valid_set, test_set = load_dataset(args, tokenizer)
         if args.train:
             print("Training", flush=True)
             train_model(args, model, train_set, valid_set, metrics)
@@ -603,13 +1538,22 @@ def run(args) -> None:
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    args = parse_args(list(argv if argv is not None else sys.argv[1:]))
     try:
+        argv_list = list(argv if argv is not None else sys.argv[1:])
+        validate_preflight_argv(argv_list)
+        args = parse_args(argv_list)
+        validate_preflight_flags(args)
         run(args)
         return 0
+    except ValueError as error:
+        print(str(error), file=sys.stderr)
+        return 64
     except NonFiniteTrainingError as error:
         print("NONFINITE_TRAINING_STOP " + json.dumps(error.payload, sort_keys=True), file=sys.stderr)
         return 70
+    except LossMaskValidationError as error:
+        print(f"LOSS_MASK_PREFLIGHT_FAILED {error}", file=sys.stderr)
+        return 66
 
 
 if __name__ == "__main__":

@@ -30,6 +30,7 @@ struct C5TrainingCLI {
         if options.surface == .dDomain, options.scope != .demo {
             throw CLIError.usage("--scope full 是 skeleton(OOS/拒识白名单, 无完整 schema), 不支持 C5 D-domain 训练; 用 --scope demo(562 完整 schema)。full 全覆盖训练 = DEFERRED(retrain-c5)。")
         }
+        let refusalConfig = try options.resolvedRefusalRatioConfig()
         let outputDir = URL(fileURLWithPath: options.outputDir, isDirectory: true)
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let patchedModelDir = outputDir.appendingPathComponent("qwen3-1_7b-training-tokenizer-patched", isDirectory: true)
@@ -43,6 +44,7 @@ struct C5TrainingCLI {
             return try JSONDecoder().decode([DDomainToolEntry].self, from: Data(contentsOf: repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")))
         }()
         let generatedUtterances = try options.generatedUtterancesURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5GeneratedUtteranceRecord.self) } ?? []
+        let naturalToolCallRows = try options.naturalToolCallRowsURL.map { try decodeJSONL(String(contentsOf: $0, encoding: .utf8), as: C5NaturalToolCallRecord.self) } ?? []
         let c6Cases = try C6DatasetCodec().decodeJSONL(read(repoRoot, "contracts/c6-bench-cases.jsonl"))
         let stateCells = try StateCellContractLookup(yaml: read(repoRoot, "contracts/state-cells.yaml"))
         let scopeCandidatesBySlot = C5ScopeCandidateCatalog.scopeCandidatesBySlot(from: stateCells)
@@ -65,9 +67,9 @@ struct C5TrainingCLI {
         var buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
-            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
-            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
-            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
+            refusalRatioTarget: refusalConfig.refusalRatioTarget,
+            refusalRatioHardCap: refusalConfig.refusalRatioHardCap,
+            includeNoCallCounterfactuals: refusalConfig.includeNoCallCounterfactuals,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -78,6 +80,7 @@ struct C5TrainingCLI {
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
             generatedUtteranceRecords: generatedUtterances,
+            naturalToolCallRecords: naturalToolCallRows,
             scope: options.scope,
             surface: options.surface,
             dDomainCatalog: dDomainCatalog,
@@ -109,9 +112,9 @@ struct C5TrainingCLI {
         buildOptions = C5TrainingBuildOptions(
             targetPositiveRows: options.targetPositiveRows,
             devSelectionRows: options.devSelectionRows,
-            refusalRatioTarget: options.thetaAlphaPositiveOnly ? 0 : 0.10,
-            refusalRatioHardCap: options.thetaAlphaPositiveOnly ? 0 : 0.20,
-            includeNoCallCounterfactuals: !options.thetaAlphaPositiveOnly,
+            refusalRatioTarget: refusalConfig.refusalRatioTarget,
+            refusalRatioHardCap: refusalConfig.refusalRatioHardCap,
+            includeNoCallCounterfactuals: refusalConfig.includeNoCallCounterfactuals,
             maskingStage: options.maskingStage,
             usesTrainingTokenizerPatch: true,
             modelOverride: patchedModelDir.path,
@@ -123,6 +126,7 @@ struct C5TrainingCLI {
             requireCandidateDataQualityGate: options.requireCandidateDataQualityGate,
             requireGeneratedUtteranceRecords: options.requireGeneratedUtteranceRecords,
             generatedUtteranceRecords: generatedUtterances,
+            naturalToolCallRecords: naturalToolCallRows,
             scope: options.scope,
             surface: options.surface,
             dDomainCatalog: dDomainCatalog,
@@ -139,9 +143,10 @@ struct C5TrainingCLI {
         let trainRecords = prepared.samples.filter { sample in
             sample.split == "train" && (sample.trainEligible || options.maskingStage == .smokeOnly)
         }
+        let devSelectionRecords = prepared.samples.filter { $0.split == "dev_selection" }
         try writeJSONL(trainRecords.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("train.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
-        try writeJSONL(prepared.samples.filter { $0.split == "dev_selection" }.prefix(128).map(\.mlxRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
+        try writeJSONL(devSelectionRecords.map(\.supervisedEvaluationMLXRecord), encoder: encoder, url: mlxDir.appendingPathComponent("valid.jsonl"))
+        try writeJSONL(devSelectionRecords.prefix(128).map(\.supervisedEvaluationMLXRecord), encoder: encoder, url: mlxDir.appendingPathComponent("test.jsonl"))
         let prettyEncoder = JSONEncoder()
         prettyEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         try prettyEncoder.encode(prepared.receipt).write(to: outputDir.appendingPathComponent("c5-training-receipt.json"))
@@ -176,14 +181,19 @@ struct C5TrainingCLI {
     }
 
     private static func renderTrainCommand(repoRoot: URL, outputDir: URL, config: C5MLXLoRAConfig) -> String {
-        """
+        let repoizedFlags = ([
+            config.tokenBudgetPerBatch.map { "  --token-budget-per-batch \($0)" },
+            config.gradCheckpoint ? "  --grad-checkpoint" : nil,
+            config.clearCacheBeforeTrain ? "  --clear-cache-before-train" : "  --disable-cache-clear-before-train"
+        ] as [String?]).compactMap { $0 }.joined(separator: " \\\n")
+        return """
         \(pythonExecutable) \\
           \(repoRoot.appendingPathComponent("Tools/C5TrainingCLI/c5_mlx_train_loop.py").path) \\
           --train \\
           --model \(config.model) \\
           --data \(outputDir.appendingPathComponent("mlx-data").path) \\
           --config \(outputDir.appendingPathComponent("mlx-lora-config.yaml").path) \\
-          --mask-prompt \\
+          --require-maformac-loss-mask \\
           --num-layers \(config.numLayers) \\
           --batch-size \(config.batchSize) \\
           --grad-accumulation-steps \(config.gradAccumulationSteps) \\
@@ -193,6 +203,7 @@ struct C5TrainingCLI {
           --max-seq-length \(config.maxSeqLength) \\
           --grad-clip-norm \(config.gradClipNorm) \\
           --nonfinite-fallback-lr 5e-5 \\
+        \(repoizedFlags) \\
           --metrics-jsonl \(outputDir.appendingPathComponent("metrics.jsonl").path) \\
           --source-snapshot-output \(outputDir.appendingPathComponent("c5_mlx_train_loop.snapshot.py").path) \\
           --adapter-path \(outputDir.appendingPathComponent("adapters-rank16").path)
@@ -207,6 +218,11 @@ struct C5TrainingCLI {
         receipt_version: \(receipt.receiptVersion)
         generated_at: \(receipt.generatedAt)
         acceptance_stage: \(receipt.acceptanceStage.rawValue)
+        fit_proof_level: \(receipt.fitProofLevel)
+        consumer: \(receipt.consumer)
+        consumed_artifact: \(receipt.consumedArtifact)
+        sufficiency_evidence: \(receipt.sufficiencyEvidence)
+        residual_gap: \(receipt.residualGap)
 
         ## Data
         - row_count: \(receipt.rowCount)
@@ -252,6 +268,11 @@ struct C5TrainingCLI {
         - candidate_lineage_parent_overlap: \(receipt.candidateDataQualityGate.lineageParentOverlap)
         - candidate_epoch_exposure_max: \(receipt.candidateDataQualityGate.epochExposureMax)
         - masking_coverage: train_on_turn=\(receipt.maskingCoverage.trainOnTurn), function_name=\(receipt.maskingCoverage.functionName), argument_name=\(receipt.maskingCoverage.argumentName), argument_value=\(receipt.maskingCoverage.argumentValue)
+        - supervision_coverage: \(receipt.supervisionCoverageDigest.status)
+        - supervision_parser_critical: \(receipt.supervisionCoverageDigest.parserCriticalStatus)
+        - supervision_ratio: \(String(format: "%.4f", receipt.supervisionCoverageDigest.trainableNonThinkRatio)) (threshold >= \(receipt.supervisionCoverageDigest.trainableRatioMinimum))
+        - supervision_prompt_user_system_leakage: prompt=\(receipt.supervisionCoverageDigest.promptLeakageCount), user=\(receipt.supervisionCoverageDigest.userLeakageCount), system=\(receipt.supervisionCoverageDigest.systemLeakageCount)
+        - supervision_think_leakage: \(receipt.supervisionCoverageDigest.thinkLeakageCount)
         - diagnostic_verdict: \(receipt.generalizationDiagnostic.diagnosticVerdict)
         - fuse_parity_gate: \(receipt.fuseParityGate.status)
         - fuse_toolcall_exact_delta_pp: \(String(format: "%.4f", receipt.fuseParityGate.toolCallExactDeltaPP))
@@ -269,6 +290,9 @@ struct C5TrainingCLI {
         - optimizer: \(receipt.mlxConfig.optimizer)
         - weight_decay: \(receipt.mlxConfig.weightDecay)
         - grad_clip_norm: \(receipt.mlxConfig.gradClipNorm)
+        - token_budget_per_batch: \(receipt.mlxConfig.tokenBudgetPerBatch.map(String.init) ?? "null")
+        - grad_checkpoint: \(receipt.mlxConfig.gradCheckpoint)
+        - clear_cache_before_train: \(receipt.mlxConfig.clearCacheBeforeTrain)
         - training_loop: \(receipt.mlxConfig.trainingLoop)
         - learning_rate: \(receipt.mlxConfig.learningRate)
         - lr_schedule: \(receipt.mlxConfig.lrSchedule)
@@ -278,6 +302,9 @@ struct C5TrainingCLI {
         - optimizer_update_steps: \(receipt.mlxConfig.optimizerUpdateSteps)
         - rendered_schedule_decay_steps: \(receipt.mlxConfig.renderedScheduleDecaySteps)
         - rendered_warmup_steps: \(receipt.mlxConfig.renderedWarmupSteps)
+        - early_stop_basis: \(receipt.mlxConfig.earlyStopBasis)
+        - early_stop_checkpoint_steps: \(receipt.mlxConfig.earlyStopCheckpointSteps.map(String.init).joined(separator: ","))
+        - early_stop_policy: \(receipt.mlxConfig.earlyStopPolicy)
         - max_seq_length: \(receipt.mlxConfig.maxSeqLength)
         - keys: \(receipt.mlxConfig.keys.joined(separator: ", "))
 
@@ -525,16 +552,20 @@ private struct Options {
     var maskingStage: C5MaskingStage
     var baseModelDir: URL
     var generatedUtterancesURL: URL?
+    var naturalToolCallRowsURL: URL?
     var expectedOffsetArtifactSHA256: String?
     var allowRegeneratedOffsetArtifact: Bool
     var requireCandidateDataQualityGate: Bool
     var requireGeneratedUtteranceRecords: Bool
     var thetaAlphaPositiveOnly: Bool
+    var refusalRatioTarget: Double?
+    var refusalRatioHardCap: Double?
+    var batchManifestURL: URL?
     var scope: C5TrainingScope
     var surface: C5TrainingSurface
 
     init(arguments: [String]) throws {
-        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only] [--scope demo|full] [--surface d_domain|frame]"
+        let usage = "usage: C5TrainingCLI prepare [--repo-root PATH] [--output-dir PATH] [--target-positive N] [--dev-selection N] [--masking-stage STAGE] [--base-model-dir PATH] [--generated-utterances PATH] [--natural-tool-call-rows PATH] [--expected-offset-artifact-sha256 SHA256] [--allow-regenerated-offset-artifact] [--require-candidate-data-quality] [--require-generated-utterances] [--theta-alpha-positive-only | --refusal-ratio-target DOUBLE --refusal-ratio-hard-cap DOUBLE | --batch-manifest PATH] [--scope demo|full] [--surface d_domain|frame]"
         guard arguments.count >= 2 else { throw CLIError.usage(usage) }
         command = arguments[1]
         repoRoot = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
@@ -546,11 +577,15 @@ private struct Options {
         let defaultBaseModel = "/Users/wanglei/.cache/huggingface/hub/models--mlx-community--Qwen3-1.7B-4bit/snapshots/3b1b1768f8f8cf8351c712464f906e86c2b8269e"
         baseModelDir = URL(fileURLWithPath: ProcessInfo.processInfo.environment["MAFORMAC_BASE_MODEL_DIR"] ?? defaultBaseModel, isDirectory: true)
         generatedUtterancesURL = nil
+        naturalToolCallRowsURL = nil
         expectedOffsetArtifactSHA256 = nil
         allowRegeneratedOffsetArtifact = false
         requireCandidateDataQualityGate = false
         requireGeneratedUtteranceRecords = false
         thetaAlphaPositiveOnly = false
+        refusalRatioTarget = nil
+        refusalRatioHardCap = nil
+        batchManifestURL = nil
         scope = .demo
         surface = .dDomain
         var iterator = arguments.dropFirst(2).makeIterator()
@@ -577,6 +612,9 @@ private struct Options {
             case "--generated-utterances":
                 guard let value = iterator.next() else { throw CLIError.usage("missing --generated-utterances value") }
                 generatedUtterancesURL = URL(fileURLWithPath: value)
+            case "--natural-tool-call-rows":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --natural-tool-call-rows value") }
+                naturalToolCallRowsURL = URL(fileURLWithPath: value)
             case "--expected-offset-artifact-sha256":
                 guard let value = iterator.next(), !value.isEmpty else { throw CLIError.usage("missing --expected-offset-artifact-sha256 value") }
                 expectedOffsetArtifactSHA256 = value
@@ -588,6 +626,15 @@ private struct Options {
                 requireGeneratedUtteranceRecords = true
             case "--theta-alpha-positive-only":
                 thetaAlphaPositiveOnly = true
+            case "--refusal-ratio-target":
+                guard let value = iterator.next(), let doubleValue = Double(value) else { throw CLIError.usage("invalid --refusal-ratio-target value") }
+                refusalRatioTarget = doubleValue
+            case "--refusal-ratio-hard-cap":
+                guard let value = iterator.next(), let doubleValue = Double(value) else { throw CLIError.usage("invalid --refusal-ratio-hard-cap value") }
+                refusalRatioHardCap = doubleValue
+            case "--batch-manifest":
+                guard let value = iterator.next() else { throw CLIError.usage("missing --batch-manifest value") }
+                batchManifestURL = URL(fileURLWithPath: value)
             case "--scope":
                 guard let value = iterator.next(), let parsed = C5TrainingScope(rawValue: value) else { throw CLIError.usage("invalid --scope value (demo|full)") }
                 scope = parsed
@@ -598,6 +645,39 @@ private struct Options {
                 throw CLIError.usage("unknown argument \(argument)")
             }
         }
+    }
+
+    func resolvedRefusalRatioConfig() throws -> C5ResolvedRefusalRatioConfig {
+        let manifest = try batchManifestURL.map(Self.readRefusalConfig)
+        do {
+            return try C5RefusalRatioResolver.resolve(
+                thetaAlphaPositiveOnly: thetaAlphaPositiveOnly,
+                explicitTarget: refusalRatioTarget,
+                explicitHardCap: refusalRatioHardCap,
+                manifestTarget: manifest?.refusalRatioTarget,
+                manifestHardCap: manifest?.refusalRatioHardCap
+            )
+        } catch let error as C5RefusalRatioResolutionError {
+            throw CLIError.usage(error.description)
+        }
+    }
+
+    private static func readRefusalConfig(from url: URL) throws -> RefusalManifestConfig {
+        do {
+            return try JSONDecoder().decode(RefusalManifestConfig.self, from: Data(contentsOf: url))
+        } catch {
+            throw CLIError.usage("invalid --batch-manifest refusal config: \(error)")
+        }
+    }
+}
+
+private struct RefusalManifestConfig: Decodable {
+    var refusalRatioTarget: Double?
+    var refusalRatioHardCap: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case refusalRatioTarget = "refusal_ratio_target"
+        case refusalRatioHardCap = "refusal_ratio_hard_cap"
     }
 }
 

@@ -166,8 +166,8 @@
 | U20 | R2-G13 | 二期 domain 切换 | ⭐落域对话驱动非 tab（tab/抽屉是 5min 迷路高发区）| 🔴待续批（二期方向位）| Q19/Q35 |
 | U21 | R3-G1 | barge-in 打断方式 | ⭐PTT 物理打断（非 VAD 自动；false barge-in 比 missed 更伤，会议室 VAD 误触=穿帮）| 🔴待续批 | Q36 |
 | U22 | R3-G2 | TTFA 策略 | ⭐先做满掩盖术 immediate ack（端侧难达 300ms，visual ack 把 1000ms 感觉成 500ms）| 🔴待续批 | Q36 |
-| U23 | R3-G3 | 暗底投屏 | ⭐保暗底 + 投屏模式秒键 ⌃P 切提亮（8bit 投影把暗渐变变灰 banding）| 🔴待续批 | Q34 |
-| U24 | R3-G4 | 投屏链路 | ⭐USB-C/HDMI 有线（AirPlay 仅 fallback；AirPlay 30-80ms 抖动+Wi-Fi 掉线）| 🔴待续批 | Q34 |
+| U23 | R3-G3 | 暗底投屏 | 🟡 **投屏维度 DELETE（C0 投屏全删，2026-06-26）**：⌃P 投屏切提亮作废；**暗底深空保留**（V6/U11） | 🟡 部分 superseded by C0（视觉门 grill U35）| Q34 |
+| U24 | R3-G4 | 投屏链路 | 🔪 **DELETE（C0 投屏全删，2026-06-26）**：USB-C/AirPlay 投屏链路不做（demo 手持演示） | 🔪 superseded by C0（视觉门 grill）| Q34 |
 | U25 | R3-G5 | 锁域可视化 | ⭐仅一枚当前域锁域胶囊（topic_stack 面包屑抢视觉增负荷）| 🔴待续批（二期方向位）| Q35 |
 | U26 | R3-G6 | 卡片渲染分发 | ⭐enum+switch(value.type) 非 AnyView（AnyView 破类型 diff 渲染慢）| 🔴待续批 | Q31 |
 | U27 | R3-G7 | 降级反馈粒度 | ⭐三触发器各自 UX+banner+ETA（单 boolean 反模式）→ CTX：状态四态分开（clarify/unsupported/safety/crash）消费 DemoVisualState 7 态 | 🟡待续批 | Q35 |
@@ -176,7 +176,35 @@
 | U30 | R3-G10 | orb shader 复杂度 | ⭐核心 native MeshGradient（必 `#available`，CTX）shader 仅氛围层（layerEffect 最贵与 mlx 抢 GPU 掉 50%）| 🟡待续批 | Q36/Q38 |
 | U31 | R3-G11 | 接真模型才能定 | （清单非投票）真实 TTFA/think tag 形态/thermal 曲线/shader 有效性/stopSpeaking delegate = 第四轮实证锚点 → CTX：**spike 实证项不拍** | 🟡待续批 | Q36/Q38 |
 
+### U32-U37 视觉验收门 hardening + 长跑流程机制（2026-06-26，codex ~15h 长跑复盘）
+> 一手 SSOT = `docs/grill-tournament/uiue-visual-gate-harden-grill-decisions.md`（engineering-contract mode + pre-mortem oracle 核证）。背景：codex A-2 长跑 Phase 2 像素 RMSE 死循环 v1→v72 不收敛实证。范围校准：投屏全删（supersede V10 投屏维度）/ demo 非车载工程 / ABC 揉一个 change 不降级。
+
+| U | 议题 | 结论 / 状态 | 挂 Q |
+|---|---|---|---|
+| U32 | 视觉验收门分层 L0-L3 + 门/证据定位（L0+L3 真门 / L1+L2 哨兵证据，SSIM 非审美门，L3 人工唯一审美终裁） | 🟡 框架拍 2026-06-26 | Q38 |
+| U33 | L1 zone_compare 语义降级 PASS/WARN/FAIL + long-run stop-rule（非 RMSE 逼近分；修脚本语义≠推翻像素门） | ✅ 已拍 | Q38 |
+| U34 | L2 指标 SSIM+OCR+WCAG contrast / LPIPS 不上 | ✅ 已拍 | Q38 |
+| U35 | negative-space 进门维度：进门只加 Reduce Motion（+5gate 复跑+静态思考反馈）；Contrast/字体已 L2/L3 覆盖；Dynamic Type/Color-blind/中文截断/多语言/RTL/晕动 DEFERRED | ✅ 拍定 2026-06-26 | Q38 |
+| U36 | 交互取证按控件动作分（tap_step/toggle/badge_cycle 自动化 · continuous_drag[仅 AC hero]operator-pass · force_state=terminal_visual_only 禁当过程 proof）+ 代表族矩阵防单样本外推 | ✅ 拍定 2026-06-26 | Q38 |
+| U37 | 一进两出：复用 PresentationSnapshot 不新建三类 + presentation derivation 只读 snapshot（mutation 层写 store 必回灌下一帧）+ 8 态 VUI 矩阵穷尽测试无 default | ✅ 拍定 2026-06-26 | Q38 |
+
+### U38+ 8.G9 拆包 + Liquid Glass hardening（2026-06-27，互动 grill）
+> 一手 SSOT = `docs/grill-tournament/uiue-8g9-and-liquid-glass-hardening-grill-decisions.md`。范围：8.G9 是否拆包、U14-U18 怎么落、以及是否新增不含投屏的 Liquid Glass hardening spike；新增 2026 iOS 前端趋势调研只作 research_not_ssot 输入，不改 grill/OpenSpec authority。
+
+| U | 议题 | 结论 / 状态 | 挂 Q |
+|---|---|---|---|
+| U38 | 8.G9 是否继续 U14-U18 一包做，还是拆成低风险项 + U17 单独小计划 | ✅ 拍定 2026-06-27：拆。`8.G9a` 先闭合 U14/U15/U16/U18；U17 `snapshot + 黄金路径 XCUITest` 单独 scoped plan，避免无现成 UI test target 拖住低风险项；不勾 `tasks.md`，不关 8.C2/V-PASS | Q32/Q34/Q35/Q37/Q38 |
+| U39 | U17 如何拆才不让单测/manifest 冒充黄金路径 XCUITest | ✅ 拍定 2026-06-27：拆 `U17a` / `U17b`，但 `U17b` 不无限 deferred。`U17a` 冻结 `golden_path_manifest` + existing launch args（`-mockSnapshot` / `-forceVisualState` / `golden_path_id`）+ unit matrix；`U17b` 单独建 UI test target + 最小 XCUITest + on-screen `simctl` L0 截图包；`8.G9` 不因 U17a 绿而整体勾选 | Q37/Q38 |
+| U40 | U14 Mac AnyLayout 已部分落地后是否继续改布局本体 | ✅ 拍定 2026-06-27：不继续改 Mac 布局本体，只补契约/测试/receipt。U14 gate 收窄为 Mac split path：保 `stageBody -> usesMacSplit -> AnyLayout(HStackLayout) -> .macPanorama`，禁 `NavigationSplitView` / adaptive `LazyVGrid` / Mac split 由 `sizeClass` 驱动；不得全仓禁 `sizeClass`，非 macOS `phoneScroll` 现有列数逻辑可保留 | Q32/Q38 |
+| U41 | U15 HTML/Preview 4 类反例落哪一层，防双份 UI 逻辑 | ✅ 拍定 2026-06-27：Preview/DebugGallery 是主可见入口，HTML 只能是同 fixture 静态镜像。新增 `U15CounterexampleFixtures`，四类 customer-visible 反例取 `clarifyMissingSlot` / `refusalNoAvailableTool` / `refusalSafetyOrPolicy` / `partialAcceptPartialRefuse`；消费同一 `PresentationSnapshot` / 8 态 matrix；HTML 禁独立状态机/视觉判断/文案 | Q35/Q38 |
+| U42 | U16 iPhone 触觉如何加且不扩大验收边界 | ✅ 拍定 2026-06-27：加 iOS-only `PresentationHapticPolicy` + `U16HapticPolicyTests`；`interactionSource == .userTouch` 才允许 `.selection/.success/.impactSoft` intent，mock/force-state/voice/snapshot refresh 必须 `.none`；macOS 永远 `.none`；不做真机触觉验收门 | Q34/Q38 |
+| U43 | U18 不上架物料的真实落点强度 | ✅ 拍定 2026-06-27：降为轻量 distribution boundary guard。当前 personal/internal self-use only；no App Store/TestFlight/external customer package/release readiness claim；不新增 release/customer checklist，不生成 store screenshots/privacy nutrition/store description/release notes | Q33/Q38 |
+| U44 | 是否新增不含投屏的 Liquid Glass hardening spike | ✅ 拍定 2026-06-27：新增无投屏 hardening spike；inventory 三处 `.glassEffect()`（MicDock/ContextCapsule/DemoControlPanel），检查 Reduce Transparency/低亮/对比度/iOS26.x；`GlassEffectContainer` 不一刀切，只有同层多 glass siblings 或证据成立才加；内容卡继续禁 glass | Q32/Q38 |
+| U45 | 编号与收口策略 | ✅ 拍定 2026-06-27：继续单一 U38+ 文档，不新第二 SSOT、不新 Q；U44 先不新 OpenSpec change；最终产 scoped implementation prompt：8.G9a 做 U14/U15/U16/U18 + U44 轻量 hardening，8.G9b 单独做 U17 XCUITest/L0 | Q38 |
+
 > **U-续批纪律（CTX U1-U31 关键拍板）**：U5 Metal 一期做 / U6 补麦克风 key+memory entitlement（非缺整个 plist，仓内已有 xcodeproj+2 app target）/ U8 演示编排并入 demo-golden-run 不单独 change / U10·U27 状态四态分开（clarify/unsupported/safety/crash，消费 DemoVisualState 7 态）/ U12 XcodeGen 降 P1 / U13 卡片按 10 族 family_card_id / U19 iOS18 API 必 `#available` / U28 中文 TTS 锁普通话（iOS18 confirmed/iOS26 preflight）/ U30 MeshGradient 必 `#available` / U31 spike 实证项不拍。
+
+> 🔴 **U11-U31 一把过收口（磊哥 2026-06-26，UIUE grill 彻底收口）**：上方 U11-U31 表 🔴/🟡 旧状态列**以本 banner 为准**。**活跃组全 ⭐ 拍定**：U12 XcodeGen 降 P1 / U13 卡片按 10 族 / **U14 Mac AnyLayout 不用 SplitView** / **U15 HTML+Preview 补 4 类反例** / **U16 触觉 Mac 不做 iPhone 加分** / **U17 snapshot+黄金路径 XCUITest**（衔接 U32-U37 视觉门）/ **U18 客户物料不上架** / U19 #available+iOS17 fallback / U26 enum+switch(value.type) 非 AnyView（已实装 UIValueTypeMapper/ValueControlView）/ U27 四态分开 / U30 MeshGradient+shader 仅氛围层（部分 Phase5）。**DEFERRED 独立立项**：voice U21/U22/U28 + U29(golden-run)。**二期方向位**：U20/U25。**已定不拍**：U11✅已落(tokens.md) / U23·U24 🔪DELETE(投屏 C0) / U31 spike 不拍。
 
 ### D1-D7 视觉/聚焦/数据/双端/动效/炸场深度 grill 决策晶体（2026-06-23，二次深 grill + 盲评复议 + A2 影响确认）
 
@@ -189,7 +217,7 @@
 | D2 | 展开/聚焦 | ExpandTrigger enum + FocusController 单点 + ExpansionAnimation(默认 opacityScale, gated matchedGeometry) + MAX_CONCURRENT_EXPANSIONS=1 | C10 折叠+角标(keep) / C8 子 device 优先级(keep) / C7 展开布局 / C9 展开并发(weak) / 🔴 prerequisite family_priority.json | **C8 数据源已就位**：A2 产 `generated/family-device-allowlist.json`（10 族含 device_count+intent_count+**row_count**，如 ac 族 25device/68intent/212row）→ demo 用 row_count 作高频代理（见复议 #7） |
 | D3 | 卡片渲染/value.type | ui_value_type 派生字段(state-cells，**数据 type≠UI value.type**) + @ViewBuilder 穷尽 switch + GPUBudgetCoordinator + FamilyCardLayout | C12 原生控件(strong 21.7) / C11 enum+switch 非 AnyView(solid) / C13 GPU 错峰(keep) / C3 分发实现(weak, AnyView 性能需 spike) | 🔴 **C11 待 UIUE 补派生字段**：A2 `state-cells.yaml` 有 type/unit/execution_range，**无 ui_value_type**（UIUE 加）；命名清债 A2 部分完成（`ac.power` 新命名 7 处，**残留 2 处 `hvac.*`** 待清） |
 | D4 | 双端 demo | 🔴 Mac+iPhone **两独立纯端侧 demo 实例**（iPhone 脱机独立全功能接语音）；TransportKind{none,bonjour}（删 sharedFile 镜像） | 磊哥纠正推翻镜像（D1.Q1.4 SUPERSEDED-BY D4）/ C17 Bonjour 机制(solid) / C16 竖屏内容(weak) / C4 双独立 | A2 不碰；两端共享 A2 的 D-domain IR + state-cells（端态自包含，无后端） |
-| D5 | 状态切换动效 | matchedGeometry 状态切换(macOS 可用，现 passed) vs 跨栈 zoom(unavailable)；Grid 非 LazyVGrid；promotion_criteria 5 条；ripple↔gate ungate 解循环依赖 | C21 matchedGeometry 不用 zoom(strong 均分 23.2，facts 峰值 25@round-03) / C22 Grid(strong) / C25 gated upgrade(solid) / C23 opacityScale 兜底(keep) | 🔴 **C22 待 UIUE 改**：`ContentView:40` 仍 `LazyVGrid(.adaptive(minimum:160))`（A2 不碰视觉，UIUE 改 Grid 固定列） |
+| D5 | 状态切换动效 | matchedGeometry 状态切换(macOS 可用，现 passed) vs 跨栈 zoom(unavailable)；Grid 非 LazyVGrid；promotion_criteria 5 条；ripple↔gate ungate 解循环依赖 | C21 matchedGeometry 不用 zoom(strong 均分 23.2，facts 峰值 25@round-03) / C22 Grid(strong) / C25 gated upgrade(solid) / C23 opacityScale 兜底(keep) | ✅ **C22 已实装**（2026-06-26 核：codex 长跑 ContentView 已 `Grid + GridRow`（`App/ContentView.swift:1504`），零 LazyVGrid，pre-commit contentview-wiring 实跑确认；旧「:40 仍 LazyVGrid」stale supersede） |
 | D6 | 炸场/降级 | shader-inventory + wow-choreography 4 段 + tts-policy + **双通道降级**（关键态用颜色/数值/图标承载，动画只锦上添花） | 🔴 C30 稳>炸(strong 23.3，升横切) / C28 TTS 视觉先行(strong) / C26 shader fallback(strong) / C29 断网 morph(keep) / Codex catch CC 3 处 claim-vs-reality | A2 不碰 |
 | **D7（新增，盲评 GAP-2）** | **7 态逐态视觉消费** | 🔴 **DemoVisualState 7 态各自正面渲染**（normal/satisfied/changing/blocked_with_alternative/blocked_hard/unsafe/unknown），**四态分开**（clarify 琥珀 ≠ unsupported 灰 ≠ safety 红 ≠ crash 灰）；消费 trace guardReason/readbackResult | 盲评 GAP-2：grill 漏「7 态逐态视觉」单独决策（ContentView:122 头号现役债）；tokens.md §2 已落 7 态色映射（待磊哥审冻结） | 🔴 **D7 头号待 UIUE 补**：`ContentView:122/:126` 仍 `cell.visualState == .satisfied ? green : gray`（7 态压绿/灰二值）；A2 不碰视觉，UIUE 链路 A 补全 7 态穷尽 switch |
 
@@ -238,6 +266,8 @@
   - **裂缝⑥ 全车 fan-out 前端 ✅拍（c 聚合卡+范围 badge）**：显式全车 → **1 聚合卡（不分裂 N 张，A2）+ 「全车」范围 badge**（青标签，范围一眼可见）。磊哥拍 c（a 纯文字：跟单开看着一样 / b 4 座位指示点：过度 / **⭐c badge 简洁直观**）。不违反 D8.5 `MAX_CONCURRENT_HIGHLIGHTS=1`（聚合 1 卡=单点）。
   - **用户故事④ 多轮叠加 scope ✅拍（a 升级聚合）**：「打开车窗」(主驾)→「副驾也打开」(G20 显式二轮) → 卡片**升级聚合成范围词**（「前排车窗 100%」，跟全车聚合同逻辑），非双角标。视觉一致：多 scope 都聚合成范围词（前排/全车）。
 - **UIUE 消费（G28，G22 不进后端 blocker）**：ui-presentation **读 state-cells `default_scope`** 渲染默认 scope 卡片（非全车 fan-out）；合流 rebase main 拿 `default_scope` 字段。**change 归属 ✅拍：独立 `define-demo-default-scope` change**（G24，磊哥 2026-06-24 拍——default_scope 跨 C3/Compiler/C6/C5/UIUE 多方依赖，独立 change 单一职责），UIUE tasks 依赖此 change。
+
+> 🔴 **Phase 4 实装 grill（CC 接手从 0 重做，2026-06-24）→ 一手 `docs/grill-tournament/uiue-phase4-grill-decisions.md`**：D7（7态）+ D8 裂缝⑤⑥④ 的实装收口。**P4-D1 ⭐C''** = 三阶段 ui-presentation incremental apply（4a 接线+scope角标+低风险炸场 numericText/breathe｜4b value.type 控件 spike｜4c 聚焦暂缓）+ pre-commit `displays(from:)` gate + 14 force-state artifact。🔴 **辩证 catch（codex-answer-grill two-layer）**：4a UIUE 渲染**落 ui-presentation**（消费契约，spec 已锁 value.type+scope 角标），define-demo-default-scope 是其**依赖（后端产 default_scope 字段）非落点**——codex 曾混淆「依赖 vs 落点」+ 误判「value.type 没锁需新建 change」；正解**不新建 change**。背景：前任接线工作树未提交被 reset 丢失（git 不可恢复），CC 接手重做。
 
 ### D7 补强 grill 清单（DA0-DA8，2026-06-24，D7 收尾打磨 + cite-verify 翻盘 codex DA1）
 
@@ -397,12 +427,12 @@
 |---|---|---|---|
 | Q30 | UIUE 30+ findings 逐条三分（U11-U31 续批）| 🟡 | P1 |
 | Q31 | 10 族 mock cards 由 state-cells/tool-card map 支撑（U3/U13/U26）| 🟡 | P0 |
-| Q32 | 深空辉光暗底三屏 + native SwiftUI 保留/调整/重起（U2/U5/U7/U11/U14）| 🟡 | P2 |
-| Q34 | 现场 SOP Mac-primary 消除 vs preflight/fallback（U1/U16/U23/U24）| 🟡 | P1 |
-| Q35 | 三层路由 UI 态可视化（U10/U15/U20/U25/U27）| 🟡 | P1 |
+| Q32 | 深空辉光暗底三屏 + native SwiftUI 保留/调整/重起（U2/U5/U7/U11/U14/U40/U44）| 🟡 | P2 |
+| Q34 | 现场 SOP Mac-primary 消除 vs preflight/fallback（U1/U16/U23/U24/U42）| 🟡 | P1 |
+| Q35 | 三层路由 UI 态可视化（U10/U15/U20/U25/U27/U41）| 🟡 | P1 |
 | Q36 | Voice UI MVP 状态机（U21/U22/U28/U30/U31）| 🔴 | P1 |
-| Q37 | demo-golden-run 五幕编排锚合同/C6（U4/U8/U9/U17/U29）| 🟡 | P0 |
-| Q38 | 组件 adoption gate + 真实查看环境验收（U9/U30/U31）| 🟡 | P1 |
+| Q37 | demo-golden-run 五幕编排锚合同/C6（U4/U8/U9/U17/U29/U39）| 🟡 | P0 |
+| Q38 | 组件 adoption gate + 真实查看环境验收（U9/U30/U31/U38）| 🟡 | P1 |
 | Q40 | deterministic scenario macros 如何避免变成隐藏 planner / 绕过 B1/B2/F1（场景宏防隐藏 planner，G6）| 🟡 | P1 |
 > UIX 优先级：Q33(✅已拍·能跑硬前置) > Q30(10 族重筛) > Q31/Q37(炸场核心)；Q40 场景宏随 G6 首批 4 宏磊哥点选时拍；其余炸场细节随 demo 落地。
 

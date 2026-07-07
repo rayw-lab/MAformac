@@ -1,0 +1,86 @@
+[
+  {
+    "case_id": "main_cooling_ivory",
+    "avg_luminance": 0.9114,
+    "std_luminance": 0.1491,
+    "p05_luminance": 0.698,
+    "p95_luminance": 0.9725,
+    "p95_minus_p05_contrast_proxy": 0.2745,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "metric is regression/readability evidence only; it does not sign L3 aesthetics"
+  },
+  {
+    "case_id": "main_cooling_deep_space",
+    "avg_luminance": 0.192,
+    "std_luminance": 0.1559,
+    "p05_luminance": 0.0706,
+    "p95_luminance": 0.5216,
+    "p95_minus_p05_contrast_proxy": 0.451,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "metric is regression/readability evidence only; it does not sign L3 aesthetics"
+  },
+  {
+    "case_id": "main_heating_ivory",
+    "avg_luminance": 0.9105,
+    "std_luminance": 0.15,
+    "p05_luminance": 0.6941,
+    "p95_luminance": 0.9725,
+    "p95_minus_p05_contrast_proxy": 0.2784,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "metric is regression/readability evidence only; it does not sign L3 aesthetics"
+  },
+  {
+    "case_id": "main_heating_deep_space",
+    "avg_luminance": 0.1921,
+    "std_luminance": 0.1558,
+    "p05_luminance": 0.0706,
+    "p95_luminance": 0.5216,
+    "p95_minus_p05_contrast_proxy": 0.451,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "metric is regression/readability evidence only; it does not sign L3 aesthetics"
+  },
+  {
+    "case_id": "capsule_video_loop_deep_space",
+    "avg_luminance": 0.1899,
+    "std_luminance": 0.153,
+    "p05_luminance": 0.0706,
+    "p95_luminance": 0.5176,
+    "p95_minus_p05_contrast_proxy": 0.4471,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "metric is regression/readability evidence only; it does not sign L3 aesthetics"
+  },
+  {
+    "comparison_id": "ivory-cooling-vs-heating-ac-card",
+    "left": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/main_cooling_ivory-ac-card.png",
+    "right": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/main_heating_ivory-ac-card.png",
+    "mse_rgb_resized": 0.02572,
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "MSE is regression evidence only, not aesthetic pass/fail"
+  },
+  {
+    "comparison_id": "deep-space-cooling-vs-heating-ac-card",
+    "left": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/main_cooling_deep_space-ac-card.png",
+    "right": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/main_heating_deep_space-ac-card.png",
+    "mse_rgb_resized": 0.042016,
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "MSE is regression evidence only, not aesthetic pass/fail"
+  },
+  {
+    "comparison_id": "capsule-diorama-vs-deep-space-top-stage",
+    "left": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/capsule_video_loop_deep_space-top-stage.png",
+    "right": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/recaptures/20260628-l3-temp-pass-sync-r2/crops/main_cooling_deep_space-top-stage.png",
+    "mse_rgb_resized": 0.002069,
+    "proof_class": "local_pixel_metric_from_recaptured_simctl_screenshot",
+    "non_claim": "MSE is regression evidence only, not aesthetic pass/fail"
+  }
+]

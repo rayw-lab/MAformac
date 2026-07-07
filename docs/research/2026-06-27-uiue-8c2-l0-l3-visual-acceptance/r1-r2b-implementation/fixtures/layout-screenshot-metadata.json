@@ -1,0 +1,15 @@
+{
+  "captured_at": "2026-06-27T21:20:12+08:00",
+  "path": "fixture-only/no-screenshot.png",
+  "pixel_size": {
+    "width": 1290,
+    "height": 2796
+  },
+  "scale": 3,
+  "viewport_points": {
+    "width": 430,
+    "height": 932
+  },
+  "source": "local_fixture_metadata_not_l0_screenshot",
+  "proof_class": "local"
+}

@@ -1,0 +1,22 @@
+{
+  "device": {
+    "name": "iPhone 17 Pro Max",
+    "udid": "9E9EC0D0-E4EF-4D29-AAE5-911EB3F02D6D",
+    "runtime": "iOS Simulator"
+  },
+  "launchArg": "-goldenPathID uiue_g9b_ac_success_deep_space",
+  "theme": "deepSpace",
+  "ui_tree_evidence": "u17-ui-tree.txt",
+  "screenshot_path": "u17-golden-path-simctl.png",
+  "proof_class": "simulator_l0_runtime_truth",
+  "screenshot_source": "on_screen_simctl_io_booted_screenshot",
+  "capture_command": "xcrun simctl io booted screenshot u17-golden-path-simctl.png",
+  "ui_tree_source": "XCUITest stdout debugDescription markers",
+  "claims_not_made": [
+    "mobile",
+    "true_device",
+    "L3",
+    "V-PASS",
+    "A-2 complete"
+  ]
+}

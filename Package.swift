@@ -12,7 +12,8 @@ let package = Package(
         .library(name: "MAformacCore", targets: ["MAformacCore"]),
         .executable(name: "C5DataGateCLI", targets: ["C5DataGateCLI"]),
         .executable(name: "C5TrainingCLI", targets: ["C5TrainingCLI"]),
-        .executable(name: "C6BenchCLI", targets: ["C6BenchCLI"])
+        .executable(name: "C6BenchCLI", targets: ["C6BenchCLI"]),
+        .executable(name: "Gate7DryRunCLI", targets: ["Gate7DryRunCLI"])
     ],
     targets: [
         .target(
@@ -69,6 +70,11 @@ let package = Package(
                 "c5_mask_offset_fixture.py",
                 "c5_mlx_train_loop.verification.json"
             ]
+        ),
+        .executableTarget(
+            name: "Gate7DryRunCLI",
+            dependencies: ["MAformacCore"],
+            path: "Tools/Gate7DryRunCLI"
         )
     ]
 )

@@ -117,7 +117,11 @@ public final class DemoVehicleStateStore {
     }
 
     public func cell(for key: String) -> DemoVehicleStateCell? {
-        cellsByKey[key]
+        cellsByKey[key] ?? legacyCompatibilityCell(for: key)
+    }
+
+    public func replaceCells(_ cells: [DemoVehicleStateCell]) {
+        cellsByKey = Dictionary(uniqueKeysWithValues: cells.map { ($0.key, $0) })
     }
 
     @discardableResult
@@ -130,6 +134,7 @@ public final class DemoVehicleStateStore {
                 spokenText: "状态未定义"
             )
         }
+        let oldValue = cell.actualValue
         if cell.actualValue == transition.desiredValue {
             return DemoActionReadback(
                 key: cell.key,
@@ -143,7 +148,11 @@ public final class DemoVehicleStateStore {
         cell.source = transition.source
         cell.revision += 1
         cell.timestamp = Date()
-        cell.visualState = transition.desiredValue == "on" ? .satisfied : .normal
+        cell.visualState = Self.visualStateAfterMockTransition(
+            oldValue: oldValue,
+            desiredValue: transition.desiredValue,
+            previousState: cell.visualState
+        )
         cellsByKey[transition.key] = cell
 
         return DemoActionReadback(
@@ -154,12 +163,28 @@ public final class DemoVehicleStateStore {
         )
     }
 
+    private static func visualStateAfterMockTransition(
+        oldValue: String,
+        desiredValue: String,
+        previousState: DemoVisualState
+    ) -> DemoVisualState {
+        if desiredValue == oldValue {
+            return previousState
+        }
+        if ["on", "open", "unlocked", "unmuted"].contains(desiredValue) {
+            return .satisfied
+        }
+        if ["off", "closed", "locked", "muted"].contains(desiredValue) {
+            return .normal
+        }
+        return .changing
+    }
+
     public func reset() {
         cellsByKey = Dictionary(uniqueKeysWithValues: Self.defaultCells().map { ($0.key, $0) })
     }
 
     public static let legacyDisplayCompatibilityKeys: Set<String> = [
-        "hvac.temperature",
         "seat.driver.heat",
         "seat.driver.ventilation",
         "window.driver",
@@ -168,6 +193,13 @@ public final class DemoVehicleStateStore {
         "fan.speed"
     ]
 
+    private static let archivedComfortQueryStateCellAlias = ["hvac", "temperature"].joined(separator: ".")
+
+    private func legacyCompatibilityCell(for key: String) -> DemoVehicleStateCell? {
+        guard key == Self.archivedComfortQueryStateCellAlias else { return nil }
+        return cellsByKey["ac.temp_setpoint[主驾]"]
+    }
+
     public static func defaultCells() -> [DemoVehicleStateCell] {
         [
             DemoVehicleStateCell(key: "ac.power", actualValue: "off"),
@@ -175,6 +207,7 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "ac.temp_setpoint[副驾]", actualValue: "24"),
             DemoVehicleStateCell(key: "ac.temp_setpoint[左后]", actualValue: "24"),
             DemoVehicleStateCell(key: "ac.temp_setpoint[右后]", actualValue: "24"),
+            DemoVehicleStateCell(key: "ac.mode", actualValue: "制冷"),
             DemoVehicleStateCell(key: "ac.fan_speed[主驾]", actualValue: "1"),
             DemoVehicleStateCell(key: "window.position[主驾]", actualValue: "0"),
             DemoVehicleStateCell(key: "window.position[副驾]", actualValue: "0"),
@@ -185,10 +218,13 @@ public final class DemoVehicleStateStore {
             DemoVehicleStateCell(key: "ambient.color", actualValue: "白"),
             DemoVehicleStateCell(key: "seat.heat_level[主驾]", actualValue: "0"),
             DemoVehicleStateCell(key: "seat.vent_level[主驾]", actualValue: "0"),
+            DemoVehicleStateCell(key: "seat.massage_mode", actualValue: "波浪模式"),
             DemoVehicleStateCell(key: "seat.backrest_angle[主驾]", actualValue: "50"),
+            DemoVehicleStateCell(key: "volume.mode", actualValue: "现代"),
+            DemoVehicleStateCell(key: "wiper.mode", actualValue: "手动模式"),
+            DemoVehicleStateCell(key: "fragrance.mode", actualValue: "若云模式"),
             DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
             DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P"),
-            DemoVehicleStateCell(key: "hvac.temperature", actualValue: "24"),
             DemoVehicleStateCell(key: "seat.driver.heat", actualValue: "off"),
             DemoVehicleStateCell(key: "seat.driver.ventilation", actualValue: "0"),
             DemoVehicleStateCell(key: "window.driver", actualValue: "closed"),
@@ -199,13 +235,29 @@ public final class DemoVehicleStateStore {
     }
 
     public static func spokenText(for cell: DemoVehicleStateCell) -> String {
+        let scopedKey = ScopedStateKey(cell.key)
+        let catalog = StateCellPresentationCatalog.shared
+        if let rendered = catalog.renderReadback(
+            stateKey: cell.key,
+            scope: scopedKey.scope,
+            value: cell.actualValue
+        ) {
+            return rendered
+        }
+
         switch (cell.key, cell.actualValue) {
         case ("ac.power", "on"):
             return "空调已打开"
         case ("ac.power", "off"):
             return "空调已关闭"
         default:
-            return "\(cell.key) 当前为 \(cell.actualValue)"
+            let valueType = UIValueTypeMapper.mappedUIValueType(forBase: scopedKey.base) ?? .badge
+            let displayValue = VehicleCardDisplay.valueText(for: cell.actualValue, base: scopedKey.base, type: valueType)
+            let title = catalog.displayTitle(for: scopedKey.base)
+            guard title != scopedKey.base else {
+                return "\(cell.key) 当前为 \(cell.actualValue)"
+            }
+            return "\(title)\(displayValue)"
         }
     }
 }

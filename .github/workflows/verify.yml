@@ -26,7 +26,10 @@ jobs:
         run: make verify-ci
 
       - name: Check whitespace
-        run: git diff --check
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch --no-tags --depth=1 origin "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}"
+          git diff --check "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
 
       - name: Write head-bound CI receipt
         run: |
@@ -40,11 +43,12 @@ jobs:
             "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "change_id": "define-demo-default-scope",
             "proof_class": "ci_source_free",
+            "event_name": "${GITHUB_EVENT_NAME}",
             "head_commit": "${GITHUB_SHA}",
             "dirty_worktree": ${dirty_worktree},
             "commands": [
               "make verify-ci",
-              "git diff --check"
+              "git diff --check (pull_request only; skipped on push)"
             ],
             "claim_boundaries": [
               "source-free CI proof only",

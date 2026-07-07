@@ -1,0 +1,2 @@
+case	anchor	l1_verdict	reason	max_zone	max_rmse	warn_threshold	fail_threshold	stop_rule	context_rmse	orb_rmse	dialogue_rmse	controls_rmse
+capsule_video_loop_deep_space	capsule_video_loop_deep_space-anchor.png	WARN	context_rmse=0.222121 >= warn_threshold=0.180000	context	0.222121	0.180000	0.300000	L1 sentinel stop-rule: if repeated runs add no new proof class or artifact and only tune the same L1 metric/crop, stop and close as PARTIAL/FAIL instead of continuing. L1 blocks collapse only; it does not sign aesthetics or replace L3.	0.222121	0.110436	0.123163	0.190116

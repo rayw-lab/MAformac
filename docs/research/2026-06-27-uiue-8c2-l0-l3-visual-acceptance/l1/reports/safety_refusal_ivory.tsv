@@ -1,0 +1,2 @@
+case	anchor	l1_verdict	reason	max_zone	max_rmse	warn_threshold	fail_threshold	stop_rule	context_rmse	orb_rmse	dialogue_rmse	controls_rmse
+safety_refusal_ivory	safety_refusal_ivory-anchor.png	PASS	max_rmse=0.179655 < warn_threshold=0.180000	controls	0.179655	0.180000	0.300000	L1 sentinel stop-rule: if repeated runs add no new proof class or artifact and only tune the same L1 metric/crop, stop and close as PARTIAL/FAIL instead of continuing. L1 blocks collapse only; it does not sign aesthetics or replace L3.	0.166021	0.077567	0.174252	0.179655

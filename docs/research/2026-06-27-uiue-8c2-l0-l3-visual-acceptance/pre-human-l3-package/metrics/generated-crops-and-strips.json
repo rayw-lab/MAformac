@@ -1,0 +1,42 @@
+{
+  "crops": [
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/anchor-strip-capsule-diorama.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/anchor-strip-continuous-stage-no-black-line.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/anchor-strip-cooling-vs-heating.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/capsule_video_loop_deep_space-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/capsule_video_loop_deep_space-mic-dock.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/capsule_video_loop_deep_space-orb-dialogue.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/capsule_video_loop_deep_space-top-band.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/capsule_video_loop_deep_space-vehicle-cards.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/cold_start_ivory-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/cold_start_ivory-mic-dock.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/cold_start_ivory-orb-dialogue.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/cold_start_ivory-top-band.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/cold_start_ivory-vehicle-cards.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_deep_space-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_deep_space-mic-dock.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_deep_space-orb-dialogue.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_deep_space-top-band.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_deep_space-vehicle-cards.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_ivory-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_ivory-mic-dock.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_ivory-orb-dialogue.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_ivory-top-band.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_ivory-vehicle-cards.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_heating_ivory-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_heating_ivory-mic-dock.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_heating_ivory-orb-dialogue.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_heating_ivory-top-band.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_heating_ivory-vehicle-cards.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/safety_refusal_ivory-ac-card.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/safety_refusal_ivory-mic-dock.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/safety_refusal_ivory-orb-dialogue.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/safety_refusal_ivory-top-band.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/safety_refusal_ivory-vehicle-cards.png"
+  ],
+  "strips": [
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/anchor-strip-continuous-stage-no-black-line.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/anchor-strip-cooling-vs-heating.png",
+    "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/anchor-strip-capsule-diorama.png"
+  ]
+}

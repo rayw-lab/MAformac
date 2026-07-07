@@ -16,7 +16,7 @@
       "key": "screen.brightness[中控屏]",
       "revision": 1,
       "source": "mock",
-      "visualState": "normal"
+      "visualState": "changing"
     }
   ],
   "eventID": "turn-d22-screen-brightness-1:runtime-presentation",

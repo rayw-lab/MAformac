@@ -1,0 +1,104 @@
+[
+  {
+    "case_id": "capsule_video_loop_deep_space",
+    "avg_luminance": 0.1937,
+    "std_luminance": 0.1578,
+    "p05_luminance": 0.0706,
+    "p95_luminance": 0.5241,
+    "p95_minus_p05_contrast_proxy": 0.4535,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "case_id": "cold_start_ivory",
+    "avg_luminance": 0.9133,
+    "std_luminance": 0.149,
+    "p05_luminance": 0.7183,
+    "p95_luminance": 0.9739,
+    "p95_minus_p05_contrast_proxy": 0.2556,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "case_id": "main_cooling_deep_space",
+    "avg_luminance": 0.1945,
+    "std_luminance": 0.1583,
+    "p05_luminance": 0.0706,
+    "p95_luminance": 0.5272,
+    "p95_minus_p05_contrast_proxy": 0.4566,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "case_id": "main_cooling_ivory",
+    "avg_luminance": 0.9122,
+    "std_luminance": 0.148,
+    "p05_luminance": 0.7116,
+    "p95_luminance": 0.9737,
+    "p95_minus_p05_contrast_proxy": 0.2621,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "case_id": "main_heating_ivory",
+    "avg_luminance": 0.9103,
+    "std_luminance": 0.1501,
+    "p05_luminance": 0.71,
+    "p95_luminance": 0.9737,
+    "p95_minus_p05_contrast_proxy": 0.2637,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "case_id": "safety_refusal_ivory",
+    "avg_luminance": 0.9174,
+    "std_luminance": 0.1427,
+    "p05_luminance": 0.7121,
+    "p95_luminance": 0.9841,
+    "p95_minus_p05_contrast_proxy": 0.2719,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "case_id": "u17_golden_path_deep_space",
+    "avg_luminance": 0.1946,
+    "std_luminance": 0.1582,
+    "p05_luminance": 0.0706,
+    "p95_luminance": 0.5221,
+    "p95_minus_p05_contrast_proxy": 0.4515,
+    "max_dark_row_fraction_center": 0.0,
+    "continuous_black_line_scan": "PASS",
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "contrast proxy and dark-line scan do not sign L3 aesthetics"
+  },
+  {
+    "comparison_id": "ac-card-cooling-vs-heating",
+    "left": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_ivory-ac-card.png",
+    "right": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_heating_ivory-ac-card.png",
+    "ssim_luma_simple": 0.8784,
+    "mse_rgb_resized": 0.031121,
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "SSIM/MSE are regression evidence only, not aesthetic pass/fail"
+  },
+  {
+    "comparison_id": "capsule-top-band-cLite-vs-videoLoop",
+    "left": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/main_cooling_deep_space-top-band.png",
+    "right": "docs/research/2026-06-27-uiue-8c2-l0-l3-visual-acceptance/pre-human-l3-package/crops/capsule_video_loop_deep_space-top-band.png",
+    "ssim_luma_simple": 0.9056,
+    "mse_rgb_resized": 0.005341,
+    "proof_class": "local_pixel_metric_from_simctl_screenshot",
+    "non_claim": "SSIM/MSE are regression evidence only, not aesthetic pass/fail"
+  }
+]

@@ -1,0 +1,72 @@
+Attributes: Application, 0x114320c80, pid: 60039, label: 'MAformac'
+Element subtree:
+ →Application, 0x114320c80, pid: 60039, label: 'MAformac'
+    Window (Main), 0x114320dc0, {{0.0, 0.0}, {440.0, 956.0}}
+      Other, 0x114320f00, {{0.0, 0.0}, {440.0, 956.0}}
+        Other, 0x114321040, {{0.0, 0.0}, {440.0, 956.0}}
+          Other, 0x114321180, {{0.0, 0.0}, {440.0, 956.0}}
+            Other, 0x1143212c0, {{0.0, 0.0}, {440.0, 956.0}}
+              Image, 0x114321400, {{50.0, 56.0}, {314.0, 108.0}}, identifier: 'context-band', label: '环境胶囊，日间，晴，0公里每小时，P挡'
+              StaticText, 0x114321540, {{49.3, 96.0}, {341.3, 285.7}}, identifier: 'demo-orb', label: '助手状态，我在听...'
+              ScrollView, 0x114321680, {{22.0, 336.0}, {396.0, 124.0}}, identifier: 'dialogue-stream'
+                Other, 0x1143217c0, {{22.0, 336.0}, {396.0, 124.0}}
+                  StaticText, 0x114321900, {{341.3, 380.0}, {59.7, 18.0}}, label: '我有点冷'
+                  StaticText, 0x114321a40, {{39.0, 428.0}, {113.3, 18.0}}, label: '已为您调到 26℃'
+              ScrollView, 0x114321b80, {{22.0, 484.0}, {396.0, 356.0}}, identifier: 'vehicle-cards'
+                Other, 0x114321cc0, {{22.0, 484.0}, {396.0, 532.0}}
+                  Button, 0x114321e00, {{36.4, 488.3}, {179.2, 189.3}}, identifier: 'vehicle-card-family.ac', label: '空调 26℃ 执行中', value: 26℃
+                    StaticText, 0x114321f40, {{50.7, 507.2}, {32.6, 19.7}}, label: '空调'
+                    Image, 0x114322080, {{177.2, 504.6}, {22.1, 24.8}}, identifier: 'snowflake', label: 'Snow Flurry'
+                    StaticText, 0x1143221c0, {{50.7, 541.6}, {71.9, 66.2}}, label: '26'
+                    StaticText, 0x114322300, {{128.7, 570.8}, {25.5, 28.8}}, label: '°C'
+                    Other, 0x114322440, {{50.7, 615.9}, {150.7, 24.4}}, label: '调节空调温度', value: 26℃
+                    StaticText, 0x114322580, {{50.7, 648.5}, {58.7, 14.6}}, label: '制冷 · 自动'
+                  Button, 0x1143226c0, {{236.0, 490.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.seat', label: '座椅 2挡 待命'
+                    Image, 0x114322800, {{244.7, 507.3}, {24.3, 21.7}}, identifier: 'carseat.left', label: 'carseat.left'
+                    StaticText, 0x114322940, {{279.0, 498.0}, {28.0, 17.0}}, label: '座椅'
+                    StaticText, 0x114322a80, {{279.0, 517.0}, {31.3, 21.7}}, label: '2挡'
+                    Image, 0x114322bc0, {{384.0, 511.0}, {9.0, 15.0}}, identifier: 'chevron.right', label: 'Forward'
+                  Button, 0x114322d00, {{236.0, 562.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.window', label: '车窗 60% 已满足'
+                    Image, 0x114322e40, {{245.3, 581.0}, {23.3, 18.7}}, identifier: 'rectangle.split.3x1', label: 'Column View'
+                    StaticText, 0x114322f80, {{279.0, 570.0}, {28.0, 17.0}}, label: '车窗'
+                    StaticText, 0x1143230c0, {{279.0, 589.0}, {39.3, 21.7}}, label: '60%'
+                  Button, 0x114323200, {{236.0, 634.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.volume', label: '音量 38% 待命'
+                    Image, 0x114323340, {{245.3, 653.3}, {23.3, 17.7}}, identifier: 'speaker.wave.2', label: 'Volume High'
+                    StaticText, 0x114323480, {{279.0, 642.0}, {28.0, 17.0}}, label: '音量'
+                    StaticText, 0x1143235c0, {{279.0, 661.0}, {39.0, 21.7}}, label: '38%'
+                  Button, 0x114323700, {{38.0, 684.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.ambient', label: '氛围灯 浅蓝紫 已满足'
+                    Image, 0x114323840, {{52.3, 699.7}, {13.7, 23.7}}, identifier: 'lightbulb', label: 'lightbulb'
+                    StaticText, 0x114323980, {{81.0, 692.0}, {28.0, 17.0}}, label: '氛围'
+                    StaticText, 0x114323ac0, {{107.0, 711.0}, {50.7, 20.3}}, label: '浅蓝紫'
+                    Image, 0x114323c00, {{196.0, 704.3}, {9.0, 15.0}}, identifier: 'chevron.right', label: 'Forward'
+                  Button, 0x114323d40, {{236.0, 706.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.screen', label: '屏幕 65% 待命'
+                    Image, 0x114323e80, {{245.0, 724.0}, {24.3, 20.7}}, identifier: 'display', label: 'Mac'
+                    StaticText, 0x114328000, {{279.0, 714.0}, {28.0, 17.0}}, label: '屏幕'
+                    StaticText, 0x114328140, {{279.0, 733.0}, {38.7, 21.7}}, label: '65%'
+                  Button, 0x114328280, {{38.0, 756.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.wiper', label: '雨刮 开 待命'
+                    Image, 0x1143283c0, {{44.0, 774.0}, {29.7, 21.0}}, identifier: 'windshield.front.and.wiper', label: 'windshield.front.and.wiper'
+                    StaticText, 0x114328500, {{81.0, 764.0}, {28.0, 17.0}}, label: '雨刮'
+                    StaticText, 0x114328640, {{81.0, 783.0}, {18.0, 21.7}}, label: '开'
+                    Image, 0x114328780, {{196.0, 777.0}, {9.0, 15.0}}, identifier: 'chevron.right', label: 'Forward'
+                  Button, 0x1143288c0, {{236.0, 778.0}, {166.0, 64.0}}, identifier: 'vehicle-card-family.door', label: '车门 关 待命'
+                    Image, 0x114328a00, {{249.0, 795.7}, {16.0, 21.3}}, identifier: 'door.left.hand.open', label: 'door.left.hand.open'
+                    StaticText, 0x114328b40, {{279.0, 786.0}, {28.0, 17.0}}, label: '车门'
+                    StaticText, 0x114328c80, {{279.0, 805.0}, {18.0, 21.7}}, label: '关'
+                  Button, 0x114328dc0, {{38.0, 828.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.sunroofShade', label: '天窗遮阳 0% 待命'
+                    Image, 0x114328f00, {{47.7, 845.0}, {22.3, 22.3}}, identifier: 'sun.max', label: 'Brightness Higher'
+                    StaticText, 0x114329040, {{81.0, 836.0}, {55.7, 17.0}}, label: '天窗遮阳'
+                    StaticText, 0x114329180, {{81.0, 855.0}, {27.7, 21.7}}, label: '0%'
+                  Button, 0x1143292c0, {{38.0, 900.0}, {176.0, 64.0}}, identifier: 'vehicle-card-family.fragrance', label: '香氛 关 待命'
+                    Image, 0x114329400, {{48.3, 919.0}, {21.3, 19.0}}, identifier: 'leaf', label: 'leaf'
+                    StaticText, 0x114329540, {{81.0, 908.0}, {28.0, 17.0}}, label: '香氛'
+                    StaticText, 0x114329680, {{81.0, 927.0}, {18.0, 21.7}}, label: '关'
+              Button, 0x1143297c0, {{328.0, 58.0}, {46.0, 46.0}}, identifier: 'settings-refresh-controls', label: '复位'
+              Button, 0x114329900, {{386.0, 58.0}, {46.0, 46.0}}, identifier: 'settings-refresh-controls', label: '设置'
+              Button, 0x114329a40, {{35.0, 888.0}, {370.0, 42.0}}, identifier: 'mic-dock-safe-area', label: '按住说话'
+Path to element:
+ →Application, 0x114320c80, pid: 60039, label: 'MAformac'
+Query chain:
+ →Find: Target Application 'lab.rayw.MAformac.ios'
+  Output: {
+    Application, 0x114329b80, pid: 60039, label: 'MAformac'
+  }

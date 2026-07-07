@@ -277,6 +277,56 @@ public struct C5TrainingToolCall: Codable, Equatable, Sendable {
     }
 }
 
+public enum C5LossObjectiveProfile: String, Codable, CaseIterable, Sendable {
+    case assistantFullExceptThink = "assistant_full_except_think"
+    case noToolFull = "no_tool_full"
+    case diagnosticSpanOnly = "diagnostic_span_only"
+}
+
+public struct C5AugmentationProfile: Codable, Equatable, Sendable {
+    public var functionName: Bool
+    public var argumentName: Bool
+    public var argumentValue: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case functionName = "function_name"
+        case argumentName = "argument_name"
+        case argumentValue = "argument_value"
+    }
+
+    public init(functionName: Bool = false, argumentName: Bool = false, argumentValue: Bool = false) {
+        self.functionName = functionName
+        self.argumentName = argumentName
+        self.argumentValue = argumentValue
+    }
+}
+
+public struct C5NaturalToolCallRecord: Codable, Equatable, Sendable {
+    public var contractRowID: String
+    public var variant: Int
+    public var user: String
+    public var target: String
+    public var generatorModelID: String
+    public var generatorSourceVendor: String?
+    public var generatorCallID: String
+    public var semanticJudgeModelID: String
+    public var semanticJudgeCallID: String
+    public var promptHash: String
+
+    enum CodingKeys: String, CodingKey {
+        case contractRowID = "contract_row_id"
+        case variant
+        case user
+        case target
+        case generatorModelID = "generator_model_id"
+        case generatorSourceVendor = "generator_source_vendor"
+        case generatorCallID = "generator_call_id"
+        case semanticJudgeModelID = "semantic_judge_model_id"
+        case semanticJudgeCallID = "semantic_judge_call_id"
+        case promptHash = "prompt_hash"
+    }
+}
+
 public struct C5NoCallMetadata: Codable, Equatable, Sendable {
     public var counterfactualPairID: String
     public var targetToolPresent: Bool
@@ -305,17 +355,21 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var candidateParentSemanticID: String
     public var candidateCanonicalSemanticID: String
     public var candidateDedupeGroupID: String
+    public var device: String = ""
     public var expectedToolCallSignature: String
     public var routeTierSource: String
     public var routeTier: C5RouteTier
     public var executionTier: String
     public var utteranceSource: C5UtteranceSource
     public var valueStrategy: C5ValueStrategy
+    public var lossObjectiveProfile: C5LossObjectiveProfile
+    public var augmentationProfile: C5AugmentationProfile
     public var maskingStage: C5MaskingStage
     public var trainEligible: Bool
     public var masking: C5MaskingFlags
     public var acceptanceStage: C5AcceptanceStage
     public var generatorModelID: String
+    public var generatorSourceVendor: String? = nil
     public var generatorCallID: String
     public var semanticJudgeModelID: String
     public var semanticJudgeCallID: String
@@ -326,6 +380,10 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
     public var noCall: C5NoCallMetadata?
     public var promptDistractorToolIDs: [String]
     public var mountOrderStrategy: String? = nil
+    public var subsetPolicyID: String? = nil
+    public var subsetGroupID: String? = nil
+    public var mountedToolCount: Int? = nil
+    public var subsetPolicyDigest: String? = nil
 
     enum CodingKeys: String, CodingKey {
         case sampleID = "sample_id"
@@ -339,17 +397,21 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case candidateParentSemanticID = "candidate_parent_semantic_id"
         case candidateCanonicalSemanticID = "candidate_canonical_semantic_id"
         case candidateDedupeGroupID = "candidate_dedupe_group_id"
+        case device
         case expectedToolCallSignature = "expected_tool_call_signature"
         case routeTierSource = "route_tier_source"
         case routeTier = "route_tier"
         case executionTier = "execution_tier"
         case utteranceSource = "utterance_source"
         case valueStrategy = "value_strategy"
+        case lossObjectiveProfile = "loss_objective_profile"
+        case augmentationProfile = "augmentation_profile"
         case maskingStage = "masking_stage"
         case trainEligible = "train_eligible"
         case masking
         case acceptanceStage = "acceptance_stage"
         case generatorModelID = "generator_model_id"
+        case generatorSourceVendor = "generator_source_vendor"
         case generatorCallID = "generator_call_id"
         case semanticJudgeModelID = "semantic_judge_model_id"
         case semanticJudgeCallID = "semantic_judge_call_id"
@@ -360,6 +422,10 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
         case noCall = "no_call"
         case promptDistractorToolIDs = "prompt_distractor_tool_ids"
         case mountOrderStrategy = "mount_order_strategy"
+        case subsetPolicyID = "subset_policy_id"
+        case subsetGroupID = "subset_group_id"
+        case mountedToolCount = "mounted_tool_count"
+        case subsetPolicyDigest = "subset_policy_digest"
     }
 
     public var assistantPayload: String {
@@ -377,24 +443,129 @@ public struct C5TrainingSample: Codable, Equatable, Sendable {
             caseID: sampleID,
             parentSemanticID: parentSemanticID,
             candidateParentSemanticID: candidateParentSemanticID,
+            device: device,
+            toolName: expectedToolCalls.first?.name,
+            valueType: valueStrategy.rawValue,
+            templateFamily: utteranceSource.rawValue,
+            generatorSource: generatorSourceVendor ?? generatorModelID,
+            generatorModelID: generatorModelID,
+            generatorSourceVendor: generatorSourceVendor,
             mustNotTrain: split != "train",
             sourceAuthorization: "authorized_c1_semantic_contract",
             inputText: messages.first(where: { $0.role == "user" })?.content ?? "",
             assistantText: assistantPayload,
             hasActionToolCall: !expectedToolCalls.isEmpty,
             hasSharedWrapper: assistantPayload.contains("<tool_call>"),
-            masking: masking
+            masking: masking,
+            tools: tools,
+            mountedToolCount: mountedToolCount,
+            subsetPolicyID: subsetPolicyID,
+            subsetGroupID: subsetGroupID,
+            subsetPolicyDigest: subsetPolicyDigest,
+            promptHash: promptHash,
+            expectedToolCallSignature: expectedToolCallSignature,
+            hashRecipeRef: C5DerivedHashRecipe.hashRecipeRef,
+            hashRecomputedByPipeline: true
         )
     }
 
     public var mlxRecord: C5MLXRecord {
-        C5MLXRecord(messages: messages, tools: tools)
+        C5MLXRecord(
+            sampleID: sampleID,
+            messages: messages,
+            tools: tools,
+            lossObjectiveProfile: lossObjectiveProfile,
+            augmentationProfile: augmentationProfile,
+            lossMask: lossMask
+        )
+    }
+
+    public var supervisedEvaluationMLXRecord: C5MLXRecord {
+        var supervised = self
+        supervised.trainEligible = true
+        supervised.masking.trainOnTurn = true
+        return C5MLXRecord(
+            sampleID: sampleID,
+            messages: messages,
+            tools: tools,
+            lossObjectiveProfile: lossObjectiveProfile,
+            augmentationProfile: augmentationProfile,
+            lossMask: C5LossMaskBuilder.lossMask(for: supervised)
+        )
+    }
+
+    public var lossMask: C5MLXLossMask {
+        C5LossMaskBuilder.lossMask(for: self)
     }
 }
 
 public struct C5MLXRecord: Codable, Equatable, Sendable {
+    public var sampleID: String
     public var messages: [C5TrainingMessage]
     public var tools: [[String: JSONValue]]
+    public var lossObjectiveProfile: C5LossObjectiveProfile
+    public var augmentationProfile: C5AugmentationProfile
+    public var lossMask: C5MLXLossMask
+
+    enum CodingKeys: String, CodingKey {
+        case sampleID = "sample_id"
+        case messages
+        case tools
+        case lossObjectiveProfile = "loss_objective_profile"
+        case augmentationProfile = "augmentation_profile"
+        case lossMask = "loss_mask"
+    }
+}
+
+public struct C5MLXLossMaskSpan: Codable, Equatable, Sendable {
+    public var kind: String
+    public var start: Int
+    public var end: Int
+    public var text: String
+
+    public init(kind: String, start: Int, end: Int, text: String) {
+        self.kind = kind
+        self.start = start
+        self.end = end
+        self.text = text
+    }
+}
+
+public struct C5MLXLossMask: Codable, Equatable, Sendable {
+    public static let ignoreIndex = -100
+    public static let assistantEndToken = "<|im_end|>"
+
+    public var ignoreIndex: Int
+    public var trainableSpans: [C5MLXLossMaskSpan]
+    public var maskedThinkSpans: [C5MLXLossMaskSpan]
+    public var enforcement: String
+    public var tokenLabelSource: String
+    public var trainableAssistantEndToken: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ignoreIndex = "ignore_index"
+        case trainableSpans = "trainable_spans"
+        case maskedThinkSpans = "masked_think_spans"
+        case enforcement
+        case tokenLabelSource = "token_label_source"
+        case trainableAssistantEndToken = "trainable_assistant_end_token"
+    }
+
+    public init(
+        ignoreIndex: Int = C5MLXLossMask.ignoreIndex,
+        trainableSpans: [C5MLXLossMaskSpan],
+        maskedThinkSpans: [C5MLXLossMaskSpan],
+        enforcement: String,
+        tokenLabelSource: String = "runtime_tokenizer_offsets",
+        trainableAssistantEndToken: String? = C5MLXLossMask.assistantEndToken
+    ) {
+        self.ignoreIndex = ignoreIndex
+        self.trainableSpans = trainableSpans
+        self.maskedThinkSpans = maskedThinkSpans
+        self.enforcement = enforcement
+        self.tokenLabelSource = tokenLabelSource
+        self.trainableAssistantEndToken = trainableAssistantEndToken
+    }
 }
 
 public struct C5ValueAugmentation: Equatable, Sendable {
@@ -725,10 +896,12 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
     public var requireCandidateDataQualityGate: Bool
     public var requireGeneratedUtteranceRecords: Bool
     public var generatedUtteranceRecords: [C5GeneratedUtteranceRecord]
+    public var naturalToolCallRecords: [C5NaturalToolCallRecord]
     // paradigm §1 D-domain surface(S4): scope=10 族 562 / full 全集; surface=具名工具/frame strangler; dDomainCatalog 由 CLI 注入(空→frame legacy 回退)。
     public var scope: C5TrainingScope
     public var surface: C5TrainingSurface
     public var dDomainCatalog: [DDomainToolEntry]
+    public var subsetPolicyManifestPath: String?
     public var scopeCandidatesBySlot: [String: [String]]
     public var scopeCandidatesByDeviceSlot: [String: [String: [String]]]
 
@@ -753,9 +926,11 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         requireCandidateDataQualityGate: Bool = false,
         requireGeneratedUtteranceRecords: Bool = false,
         generatedUtteranceRecords: [C5GeneratedUtteranceRecord] = [],
+        naturalToolCallRecords: [C5NaturalToolCallRecord] = [],
         scope: C5TrainingScope = .demo,
         surface: C5TrainingSurface = .dDomain,
         dDomainCatalog: [DDomainToolEntry] = [],
+        subsetPolicyManifestPath: String? = "generated/subset-policy-manifest.json",
         scopeCandidatesBySlot: [String: [String]] = [:],
         scopeCandidatesByDeviceSlot: [String: [String: [String]]] = [:]
     ) {
@@ -779,11 +954,105 @@ public struct C5TrainingBuildOptions: Equatable, Sendable {
         self.requireCandidateDataQualityGate = requireCandidateDataQualityGate
         self.requireGeneratedUtteranceRecords = requireGeneratedUtteranceRecords
         self.generatedUtteranceRecords = generatedUtteranceRecords
+        self.naturalToolCallRecords = naturalToolCallRecords
         self.scope = scope
         self.surface = surface
         self.dDomainCatalog = dDomainCatalog
+        self.subsetPolicyManifestPath = subsetPolicyManifestPath
         self.scopeCandidatesBySlot = scopeCandidatesBySlot
         self.scopeCandidatesByDeviceSlot = scopeCandidatesByDeviceSlot
+    }
+}
+
+public struct C5ResolvedRefusalRatioConfig: Equatable, Sendable {
+    public var refusalRatioTarget: Double
+    public var refusalRatioHardCap: Double
+    public var includeNoCallCounterfactuals: Bool
+    public var source: String
+}
+
+public enum C5RefusalRatioResolutionError: Error, Equatable, CustomStringConvertible {
+    case missingExplicitOrManifestValue
+    case invalidRatio(field: String, value: Double)
+
+    public var description: String {
+        switch self {
+        case .missingExplicitOrManifestValue:
+            return "missing refusal_ratio_target/refusal_ratio_hard_cap: pass --refusal-ratio-target and --refusal-ratio-hard-cap, --theta-alpha-positive-only, or a batch manifest with locked refusal values"
+        case .invalidRatio(let field, let value):
+            return "invalid \(field) \(value): expected 0 <= value < 1"
+        }
+    }
+}
+
+public enum C5RefusalRatioResolver {
+    public static func resolve(
+        thetaAlphaPositiveOnly: Bool,
+        explicitTarget: Double?,
+        explicitHardCap: Double?,
+        manifestTarget: Double?,
+        manifestHardCap: Double?
+    ) throws -> C5ResolvedRefusalRatioConfig {
+        if thetaAlphaPositiveOnly {
+            return C5ResolvedRefusalRatioConfig(
+                refusalRatioTarget: 0,
+                refusalRatioHardCap: 0,
+                includeNoCallCounterfactuals: false,
+                source: "theta_alpha_positive_only"
+            )
+        }
+        guard let target = explicitTarget ?? manifestTarget,
+              let hardCap = explicitHardCap ?? manifestHardCap else {
+            throw C5RefusalRatioResolutionError.missingExplicitOrManifestValue
+        }
+        try validate(field: "refusal_ratio_target", value: target)
+        try validate(field: "refusal_ratio_hard_cap", value: hardCap)
+        return C5ResolvedRefusalRatioConfig(
+            refusalRatioTarget: target,
+            refusalRatioHardCap: hardCap,
+            includeNoCallCounterfactuals: target > 0 && hardCap > 0,
+            source: explicitTarget != nil || explicitHardCap != nil ? "explicit_cli" : "batch_manifest"
+        )
+    }
+
+    private static func validate(field: String, value: Double) throws {
+        guard value >= 0, value < 1 else {
+            throw C5RefusalRatioResolutionError.invalidRatio(field: field, value: value)
+        }
+    }
+}
+
+private struct C5LoadedSubsetPolicyManifest: Sendable {
+    var policyID: String
+    var digest: String
+    var singleGroupEntriesByToolID: [String: C5SubsetPolicyManifest.Entry]
+}
+
+private struct C5SubsetPolicyManifest: Decodable, Sendable {
+    // Policy authority source: scripts/gen_subset_manifest.py:24 POLICY_ID.
+    static let expectedPolicyID = "e2-lite-v1"
+
+    var entries: [Entry]
+
+    struct Entry: Decodable, Sendable {
+        var subsetPolicyID: String
+        var groupID: String
+        var mountMode: String
+        var toolIDsOrdered: [String]
+        var distractorPolicy: DistractorPolicy
+
+        enum CodingKeys: String, CodingKey {
+            case subsetPolicyID = "subset_policy_id"
+            case groupID = "group_id"
+            case mountMode = "mount_mode"
+            case toolIDsOrdered = "tool_ids_ordered"
+            case distractorPolicy = "distractor_policy"
+        }
+    }
+
+    struct DistractorPolicy: Decodable, Sendable {
+        var strategy: String
+        var k: Int
     }
 }
 
@@ -805,6 +1074,7 @@ public struct C5GeneratedUtteranceRecord: Codable, Equatable, Sendable {
     public var variant: Int
     public var utterance: String
     public var generatorModelID: String
+    public var generatorSourceVendor: String? = nil
     public var generatorCallID: String
     public var semanticJudgeModelID: String
     public var semanticJudgeCallID: String
@@ -816,6 +1086,7 @@ public struct C5GeneratedUtteranceRecord: Codable, Equatable, Sendable {
         case variant
         case utterance
         case generatorModelID = "generator_model_id"
+        case generatorSourceVendor = "generator_source_vendor"
         case generatorCallID = "generator_call_id"
         case semanticJudgeModelID = "semantic_judge_model_id"
         case semanticJudgeCallID = "semantic_judge_call_id"
@@ -1111,9 +1382,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
     public var weightDecay: Double
     public var seed: Int
     public var gradClipNorm: Double
+    public var tokenBudgetPerBatch: Int?
+    public var gradCheckpoint: Bool
+    public var clearCacheBeforeTrain: Bool
     public var trainingLoop: String
     public var keys: [String]
     public var secondaryExperiments: [String]
+    public var earlyStopBasis: String
+    public var earlyStopCheckpointSteps: [Int]
+    public var earlyStopPolicy: String
 
     enum CodingKeys: String, CodingKey {
         case model
@@ -1135,9 +1412,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         case weightDecay = "weight_decay"
         case seed
         case gradClipNorm = "grad_clip_norm"
+        case tokenBudgetPerBatch = "token_budget_per_batch"
+        case gradCheckpoint = "grad_checkpoint"
+        case clearCacheBeforeTrain = "clear_cache_before_train"
         case trainingLoop = "training_loop"
         case keys
         case secondaryExperiments = "secondary_experiments"
+        case earlyStopBasis = "early_stop_basis"
+        case earlyStopCheckpointSteps = "early_stop_checkpoint_steps"
+        case earlyStopPolicy = "early_stop_policy"
         case lrScheduleStepUnit = "lr_schedule_step_unit"
         case optimizerUpdateSteps = "optimizer_update_steps"
         case renderedScheduleDecaySteps = "rendered_schedule_decay_steps"
@@ -1164,9 +1447,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         weightDecay: Double,
         seed: Int,
         gradClipNorm: Double,
+        tokenBudgetPerBatch: Int? = nil,
+        gradCheckpoint: Bool = false,
+        clearCacheBeforeTrain: Bool = true,
         trainingLoop: String,
         keys: [String],
-        secondaryExperiments: [String]
+        secondaryExperiments: [String],
+        earlyStopBasis: String = "task_metric_checkpoint_gate_not_val_loss",
+        earlyStopCheckpointSteps: [Int] = [50, 100, 150],
+        earlyStopPolicy: String = "human_pause_on_action_or_no_call_regression"
     ) {
         self.model = model
         self.fineTuneType = fineTuneType
@@ -1187,9 +1476,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         self.weightDecay = weightDecay
         self.seed = seed
         self.gradClipNorm = gradClipNorm
+        self.tokenBudgetPerBatch = tokenBudgetPerBatch
+        self.gradCheckpoint = gradCheckpoint
+        self.clearCacheBeforeTrain = clearCacheBeforeTrain
         self.trainingLoop = trainingLoop
         self.keys = keys
         self.secondaryExperiments = secondaryExperiments
+        self.earlyStopBasis = earlyStopBasis
+        self.earlyStopCheckpointSteps = earlyStopCheckpointSteps
+        self.earlyStopPolicy = earlyStopPolicy
     }
 
     public init(from decoder: Decoder) throws {
@@ -1214,9 +1509,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             weightDecay: try container.decodeIfPresent(Double.self, forKey: .weightDecay) ?? 0.01,
             seed: try container.decodeIfPresent(Int.self, forKey: .seed) ?? 0,
             gradClipNorm: try container.decodeIfPresent(Double.self, forKey: .gradClipNorm) ?? 1.0,
+            tokenBudgetPerBatch: try container.decodeIfPresent(Int.self, forKey: .tokenBudgetPerBatch),
+            gradCheckpoint: try container.decodeIfPresent(Bool.self, forKey: .gradCheckpoint) ?? false,
+            clearCacheBeforeTrain: try container.decodeIfPresent(Bool.self, forKey: .clearCacheBeforeTrain) ?? true,
             trainingLoop: try container.decodeIfPresent(String.self, forKey: .trainingLoop) ?? "maformac_c5_repo_loop_mlx_lm_0_31_1",
             keys: try container.decode([String].self, forKey: .keys),
-            secondaryExperiments: try container.decode([String].self, forKey: .secondaryExperiments)
+            secondaryExperiments: try container.decode([String].self, forKey: .secondaryExperiments),
+            earlyStopBasis: try container.decodeIfPresent(String.self, forKey: .earlyStopBasis) ?? "task_metric_checkpoint_gate_not_val_loss",
+            earlyStopCheckpointSteps: try container.decodeIfPresent([Int].self, forKey: .earlyStopCheckpointSteps) ?? [50, 100, 150],
+            earlyStopPolicy: try container.decodeIfPresent(String.self, forKey: .earlyStopPolicy) ?? "human_pause_on_action_or_no_call_regression"
         )
     }
 
@@ -1241,9 +1542,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         try container.encode(weightDecay, forKey: .weightDecay)
         try container.encode(seed, forKey: .seed)
         try container.encode(gradClipNorm, forKey: .gradClipNorm)
+        try container.encodeIfPresent(tokenBudgetPerBatch, forKey: .tokenBudgetPerBatch)
+        try container.encode(gradCheckpoint, forKey: .gradCheckpoint)
+        try container.encode(clearCacheBeforeTrain, forKey: .clearCacheBeforeTrain)
         try container.encode(trainingLoop, forKey: .trainingLoop)
         try container.encode(keys, forKey: .keys)
         try container.encode(secondaryExperiments, forKey: .secondaryExperiments)
+        try container.encode(earlyStopBasis, forKey: .earlyStopBasis)
+        try container.encode(earlyStopCheckpointSteps, forKey: .earlyStopCheckpointSteps)
+        try container.encode(earlyStopPolicy, forKey: .earlyStopPolicy)
         try container.encode(lrScheduleStepUnit, forKey: .lrScheduleStepUnit)
         try container.encode(optimizerUpdateSteps, forKey: .optimizerUpdateSteps)
         try container.encode(renderedScheduleDecaySteps, forKey: .renderedScheduleDecaySteps)
@@ -1260,7 +1567,7 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         "mlp.down_proj"
     ]
 
-    public static func rank16Mainline(model: String = "mlx-community/Qwen3-1.7B-4bit", maxSeqLength: Int = 1024) -> C5MLXLoRAConfig {
+    public static func rank16Mainline(model: String = "mlx-community/Qwen3-1.7B-4bit", maxSeqLength: Int = 8192) -> C5MLXLoRAConfig {
         C5MLXLoRAConfig(
             model: model,
             fineTuneType: "lora",
@@ -1281,9 +1588,15 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             weightDecay: 0.01,
             seed: 0,
             gradClipNorm: 1.0,
+            tokenBudgetPerBatch: nil,
+            gradCheckpoint: false,
+            clearCacheBeforeTrain: true,
             trainingLoop: "maformac_c5_repo_loop_mlx_lm_0_31_1",
             keys: defaultProjectionKeys,
-            secondaryExperiments: ["rank32_confirmation", "dora_rank8_secondary"]
+            secondaryExperiments: ["rank32_confirmation", "dora_rank8_secondary"],
+            earlyStopBasis: "task_metric_checkpoint_gate_not_val_loss",
+            earlyStopCheckpointSteps: [50, 100, 150],
+            earlyStopPolicy: "human_pause_on_action_or_no_call_regression"
         )
     }
 
@@ -1307,12 +1620,20 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
         max(1, Int((Double(optimizerUpdateSteps) * warmupFraction).rounded()))
     }
 
+    private var tokenBudgetPerBatchYAMLValue: String {
+        tokenBudgetPerBatch.map(String.init) ?? "null"
+    }
+
     public var renderYAML: String {
         """
         # mlx-lm lr_schedule steps are optimizer updates, not micro-iterations.
         # training_iterations: \(scheduleDecaySteps)
         # grad_accumulation_steps: \(gradAccumulationSteps)
+        # token_budget_per_batch: null means fixed row-count microbatches; when set, grad_accumulation_steps counts variable-size microbatches.
         # optimizer_update_steps: \(optimizerUpdateSteps)
+        # early_stop_basis: \(earlyStopBasis)
+        # early_stop_checkpoint_steps: \(earlyStopCheckpointSteps.map(String.init).joined(separator: ","))
+        # early_stop_policy: \(earlyStopPolicy)
         model: '\(model.replacingOccurrences(of: "'", with: "''"))'
         fine_tune_type: \(fineTuneType)
         num_layers: \(numLayers)
@@ -1324,6 +1645,9 @@ public struct C5MLXLoRAConfig: Codable, Equatable, Sendable {
             weight_decay: \(weightDecay)
         seed: \(seed)
         grad_clip_norm: \(gradClipNorm)
+        token_budget_per_batch: \(tokenBudgetPerBatchYAMLValue)
+        grad_checkpoint: \(gradCheckpoint)
+        clear_cache_before_train: \(clearCacheBeforeTrain)
         training_loop: \(trainingLoop)
         learning_rate: \(learningRate)
         lr_schedule:
@@ -1734,10 +2058,141 @@ public struct C5EndpointTokenizerParityGate: Codable, Equatable, Sendable {
     }
 }
 
+public struct C5SupervisionCoverageDigest: Codable, Equatable, Sendable {
+    public var status: String
+    public var parserCriticalStatus: String
+    public var ratioStatus: String
+    public var trainableRatioMinimum: Double
+    public var assistantNonThinkCharCount: Int
+    public var trainableNonThinkCharCount: Int
+    public var trainableNonThinkRatio: Double
+    public var promptLeakageCount: Int
+    public var userLeakageCount: Int
+    public var systemLeakageCount: Int
+    public var thinkLeakageCount: Int
+    public var parserCriticalFailures: [String]
+    public var failureReceipt: [String]
+    public var gateContract: [String: String]
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case parserCriticalStatus = "parser_critical_status"
+        case ratioStatus = "ratio_status"
+        case trainableRatioMinimum = "trainable_ratio_minimum"
+        case assistantNonThinkCharCount = "assistant_non_think_char_count"
+        case trainableNonThinkCharCount = "trainable_non_think_char_count"
+        case trainableNonThinkRatio = "trainable_non_think_ratio"
+        case promptLeakageCount = "prompt_leakage_count"
+        case userLeakageCount = "user_leakage_count"
+        case systemLeakageCount = "system_leakage_count"
+        case thinkLeakageCount = "think_leakage_count"
+        case parserCriticalFailures = "parser_critical_failures"
+        case failureReceipt = "failure_receipt"
+        case gateContract = "gate_contract"
+    }
+
+    public static func evaluate(samples: [C5TrainingSample], trainableRatioMinimum: Double = 0.90) -> C5SupervisionCoverageDigest {
+        var assistantNonThinkChars = 0
+        var trainableNonThinkChars = 0
+        var parserFailures: [String] = []
+        var thinkLeakageCount = 0
+
+        for sample in samples where sample.trainEligible {
+            let assistant = sample.assistantPayload
+            let thinkSpans = C5LossMaskBuilder.thinkBlockSpans(in: assistant)
+            let nonThinkSpans = C5LossMaskBuilder.nonThinkSpans(in: assistant, excluding: thinkSpans)
+            assistantNonThinkChars += nonThinkSpans.reduce(0) { $0 + ($1.end - $1.start) }
+            let trainableRanges = sample.lossMask.trainableSpans.map { $0.start..<$0.end }
+            trainableNonThinkChars += countCoveredCharacters(in: nonThinkSpans, by: trainableRanges)
+            thinkLeakageCount += thinkSpans.reduce(0) { count, span in
+                count + (trainableRanges.contains { $0.lowerBound < span.end && span.start < $0.upperBound } ? 1 : 0)
+            }
+
+            if !sample.expectedToolCalls.isEmpty {
+                let required = parserCriticalFragments(for: sample)
+                for fragment in required where !fragment.isEmpty {
+                    guard let range = assistant.range(of: fragment) else {
+                        parserFailures.append("\(sample.sampleID):parser_critical_missing:\(fragment)")
+                        continue
+                    }
+                    let start = assistant.distance(from: assistant.startIndex, to: range.lowerBound)
+                    let end = assistant.distance(from: assistant.startIndex, to: range.upperBound)
+                    if !trainableRanges.contains(where: { $0.lowerBound <= start && end <= $0.upperBound }) {
+                        parserFailures.append("\(sample.sampleID):parser_critical_untrained:\(fragment)")
+                    }
+                }
+            } else if !sample.assistantPayload.contains("NO_TOOL") {
+                parserFailures.append("\(sample.sampleID):no_tool_payload_missing")
+            }
+        }
+
+        let ratio = assistantNonThinkChars == 0 ? 1.0 : Double(trainableNonThinkChars) / Double(assistantNonThinkChars)
+        var failures = parserFailures
+        if ratio < trainableRatioMinimum {
+            failures.append("assistant_non_think_trainable_ratio_below_\(trainableRatioMinimum)")
+        }
+        if thinkLeakageCount > 0 {
+            failures.append("think_leakage_count_nonzero")
+        }
+        return C5SupervisionCoverageDigest(
+            status: failures.isEmpty ? "pass" : "fail",
+            parserCriticalStatus: parserFailures.isEmpty ? "pass" : "fail",
+            ratioStatus: ratio >= trainableRatioMinimum ? "pass" : "fail",
+            trainableRatioMinimum: trainableRatioMinimum,
+            assistantNonThinkCharCount: assistantNonThinkChars,
+            trainableNonThinkCharCount: trainableNonThinkChars,
+            trainableNonThinkRatio: ratio,
+            promptLeakageCount: 0,
+            userLeakageCount: 0,
+            systemLeakageCount: 0,
+            thinkLeakageCount: thinkLeakageCount,
+            parserCriticalFailures: parserFailures,
+            failureReceipt: failures,
+            gateContract: [
+                "parser_critical": "threshold=all_required_fragments_trainable",
+                "assistant_non_think_trainable_ratio": "threshold>=\(trainableRatioMinimum)",
+                "prompt_user_system_leakage": "threshold=0",
+                "think_leakage": "threshold=0"
+            ]
+        )
+    }
+
+    private static func parserCriticalFragments(for sample: C5TrainingSample) -> [String] {
+        var fragments = ["<tool_call>", "</tool_call>", "{", "}", "\"name\"", "\"arguments\""]
+        for call in sample.expectedToolCalls {
+            fragments.append(call.name)
+            for key in call.arguments.keys.sorted() {
+                fragments.append("\"\(key)\"")
+            }
+            for value in call.arguments.values {
+                fragments.append(contentsOf: C5LossMaskBuilder.scalarValueStrings(value))
+            }
+        }
+        return Array(Set(fragments)).sorted()
+    }
+
+    private static func countCoveredCharacters(in spans: [C5MLXLossMaskSpan], by ranges: [Range<Int>]) -> Int {
+        var covered = Set<Int>()
+        for span in spans {
+            for index in span.start..<span.end {
+                if ranges.contains(where: { $0.contains(index) }) {
+                    covered.insert(index)
+                }
+            }
+        }
+        return covered.count
+    }
+}
+
 public struct C5TrainingReceipt: Codable, Equatable, Sendable {
     public var receiptVersion: String
     public var generatedAt: String
     public var status: String
+    public var fitProofLevel: String
+    public var consumer: String
+    public var consumedArtifact: String
+    public var sufficiencyEvidence: String
+    public var residualGap: String
     public var sourceRefs: [String]
     public var discoveryFindings: [String]
     public var frameSurfaced: [String]
@@ -1756,6 +2211,7 @@ public struct C5TrainingReceipt: Codable, Equatable, Sendable {
     public var smokeChainRecordCount: Int
     public var maskingStageCounts: [String: Int]
     public var maskingCoverage: C5MaskingCoverage
+    public var supervisionCoverageDigest: C5SupervisionCoverageDigest
     public var acceptanceStage: C5AcceptanceStage
     public var trainingMethodContractAuthority: C5TrainingMethodContractAuthority
     public var offsetFixture: C5MaskOffsetFixture
@@ -1777,6 +2233,11 @@ public struct C5TrainingReceipt: Codable, Equatable, Sendable {
         case receiptVersion = "receipt_version"
         case generatedAt = "generated_at"
         case status
+        case fitProofLevel = "fit_proof_level"
+        case consumer
+        case consumedArtifact = "consumed_artifact"
+        case sufficiencyEvidence = "sufficiency_evidence"
+        case residualGap = "residual_gap"
         case sourceRefs = "source_refs"
         case discoveryFindings = "discovery_findings"
         case frameSurfaced = "frame_surfaced"
@@ -1795,6 +2256,7 @@ public struct C5TrainingReceipt: Codable, Equatable, Sendable {
         case smokeChainRecordCount = "smoke_chain_record_count"
         case maskingStageCounts = "masking_stage_counts"
         case maskingCoverage = "masking_coverage"
+        case supervisionCoverageDigest = "supervision_coverage_digest"
         case acceptanceStage = "acceptance_stage"
         case trainingMethodContractAuthority = "training_method_contract_authority"
         case offsetFixture = "offset_fixture"
@@ -1819,13 +2281,202 @@ public struct C5PreparedTrainingDataset: Equatable, Sendable {
     public var receipt: C5TrainingReceipt
 }
 
+public enum C5LossMaskBuilder {
+    public static func lossMask(for sample: C5TrainingSample) -> C5MLXLossMask {
+        let assistant = sample.assistantPayload
+        let thinkSpans = thinkBlockSpans(in: assistant)
+        guard sample.trainEligible, sample.masking.trainOnTurn else {
+            return C5MLXLossMask(
+                trainableSpans: [],
+                maskedThinkSpans: thinkSpans,
+                enforcement: "all_masked_not_train_eligible",
+                trainableAssistantEndToken: nil
+            )
+        }
+
+        let trainableSpans: [C5MLXLossMaskSpan]
+        switch sample.lossObjectiveProfile {
+        case .assistantFullExceptThink, .noToolFull:
+            trainableSpans = nonThinkSpans(in: assistant, excluding: thinkSpans)
+        case .diagnosticSpanOnly:
+            trainableSpans = diagnosticSpans(for: sample, in: assistant)
+        }
+
+        return C5MLXLossMask(
+            trainableSpans: trainableSpans.sorted { lhs, rhs in
+                lhs.start == rhs.start ? lhs.end < rhs.end : lhs.start < rhs.start
+            },
+            maskedThinkSpans: thinkSpans,
+            enforcement: "token_labels_enforced_after_tokenization_with_think_mask"
+        )
+    }
+
+    public static func nonThinkSpans(in assistant: String, excluding thinkSpans: [C5MLXLossMaskSpan]) -> [C5MLXLossMaskSpan] {
+        guard !assistant.isEmpty else {
+            return []
+        }
+        let sortedThink = thinkSpans.sorted { $0.start < $1.start }
+        var spans: [C5MLXLossMaskSpan] = []
+        var cursor = 0
+        for think in sortedThink {
+            if cursor < think.start {
+                spans.append(span(kind: "assistant_non_think_payload", start: cursor, end: think.start, in: assistant))
+            }
+            cursor = max(cursor, think.end)
+        }
+        if cursor < assistant.count {
+            spans.append(span(kind: "assistant_non_think_payload", start: cursor, end: assistant.count, in: assistant))
+        }
+        return spans.filter { !$0.text.isEmpty }
+    }
+
+    private static func diagnosticSpans(for sample: C5TrainingSample, in assistant: String) -> [C5MLXLossMaskSpan] {
+        var trainableSpans: [C5MLXLossMaskSpan] = []
+        if sample.expectedToolCalls.isEmpty {
+            markAllOccurrences(
+                of: "NO_TOOL",
+                kind: "no_tool_label",
+                in: assistant,
+                spans: &trainableSpans
+            )
+        } else {
+            for call in sample.expectedToolCalls {
+                if sample.augmentationProfile.functionName {
+                    markAllOccurrences(
+                        of: call.name,
+                        kind: "function_name",
+                        in: assistant,
+                        spans: &trainableSpans
+                    )
+                }
+                if sample.augmentationProfile.argumentName {
+                    for key in call.arguments.keys.sorted() {
+                        markJSONStringOccurrences(
+                            key,
+                            kind: "argument_name",
+                            in: assistant,
+                            spans: &trainableSpans
+                        )
+                    }
+                }
+                if sample.augmentationProfile.argumentValue {
+                    for value in call.arguments.values {
+                        for text in scalarValueStrings(value) {
+                            markAllOccurrences(
+                                of: text,
+                                kind: "argument_value",
+                                in: assistant,
+                                spans: &trainableSpans
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        return trainableSpans
+    }
+
+    private static func markJSONStringOccurrences(
+        _ text: String,
+        kind: String,
+        in haystack: String,
+        spans: inout [C5MLXLossMaskSpan]
+    ) {
+        markAllOccurrences(of: "\"\(text)\"", kind: kind, in: haystack, spans: &spans, trimQuotes: true)
+    }
+
+    private static func markAllOccurrences(
+        of needle: String,
+        kind: String,
+        in haystack: String,
+        spans: inout [C5MLXLossMaskSpan],
+        trimQuotes: Bool = false
+    ) {
+        guard !needle.isEmpty else {
+            return
+        }
+        var searchStart = haystack.startIndex
+        while let range = haystack.range(of: needle, range: searchStart..<haystack.endIndex) {
+            let effectiveRange: Range<String.Index>
+            if trimQuotes, needle.hasPrefix("\""), needle.hasSuffix("\""), needle.count >= 2 {
+                effectiveRange = haystack.index(after: range.lowerBound)..<haystack.index(before: range.upperBound)
+            } else {
+                effectiveRange = range
+            }
+            let start = haystack.distance(from: haystack.startIndex, to: effectiveRange.lowerBound)
+            let end = haystack.distance(from: haystack.startIndex, to: effectiveRange.upperBound)
+            spans.append(C5MLXLossMaskSpan(kind: kind, start: start, end: end, text: String(haystack[effectiveRange])))
+            searchStart = range.upperBound
+        }
+    }
+
+    public static func scalarValueStrings(_ value: JSONValue) -> [String] {
+        switch value {
+        case .string(let text):
+            return text.isEmpty ? [] : [text]
+        case .number(let number):
+            if number.rounded() == number {
+                return [String(Int(number))]
+            }
+            return [String(number)]
+        case .bool(let bool):
+            return [bool ? "true" : "false"]
+        case .object(let object):
+            return object.values.flatMap(scalarValueStrings)
+        case .array(let values):
+            return values.flatMap(scalarValueStrings)
+        case .null:
+            return []
+        }
+    }
+
+    public static func thinkBlockSpans(in text: String) -> [C5MLXLossMaskSpan] {
+        var spans: [C5MLXLossMaskSpan] = []
+        var searchStart = text.startIndex
+        while let open = text.range(of: "<think>", range: searchStart..<text.endIndex) {
+            let afterOpen = open.upperBound
+            guard let close = text.range(of: "</think>", range: afterOpen..<text.endIndex) else {
+                break
+            }
+            let end = close.upperBound
+            let startOffset = text.distance(from: text.startIndex, to: open.lowerBound)
+            let endOffset = text.distance(from: text.startIndex, to: end)
+            spans.append(C5MLXLossMaskSpan(kind: "think_span", start: startOffset, end: endOffset, text: String(text[open.lowerBound..<end])))
+            searchStart = end
+        }
+        return spans
+    }
+
+    private static func span(kind: String, start: Int, end: Int, in text: String) -> C5MLXLossMaskSpan {
+        let lower = text.index(text.startIndex, offsetBy: start)
+        let upper = text.index(text.startIndex, offsetBy: end)
+        return C5MLXLossMaskSpan(kind: kind, start: start, end: end, text: String(text[lower..<upper]))
+    }
+
+}
+
 public enum C5TrainingRenderer {
     public static func renderToolCall(_ call: C5TrainingToolCall) -> String {
-        let payload = C5CanonicalJSONObject.renderOrdered([
-            ("name", .string(call.name)),
-            ("arguments", .object(call.arguments))
-        ])
-        return "<tool_call>\(payload)</tool_call>"
+        C5DerivedHashRecipe.renderToolCall(name: call.name, arguments: call.arguments)
+    }
+
+    public static func parseRenderedToolCall(_ rendered: String) -> C5TrainingToolCall? {
+        let trimmed = rendered.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.hasPrefix("<tool_call>"), trimmed.hasSuffix("</tool_call>") else {
+            return nil
+        }
+        let jsonStart = trimmed.index(trimmed.startIndex, offsetBy: "<tool_call>".count)
+        let jsonEnd = trimmed.index(trimmed.endIndex, offsetBy: -"</tool_call>".count)
+        let jsonText = String(trimmed[jsonStart..<jsonEnd])
+        struct Payload: Decodable {
+            var name: String
+            var arguments: [String: JSONValue]
+        }
+        guard let data = jsonText.data(using: .utf8),
+              let payload = try? JSONDecoder().decode(Payload.self, from: data) else {
+            return nil
+        }
+        return C5TrainingToolCall(name: payload.name, arguments: payload.arguments)
     }
 
     public static func renderUserUtterance(seed: C5SemanticSeed, variant: Int, valueText: String, slotAssignments: [String: String]) -> String {
@@ -2250,6 +2901,47 @@ public enum C5TrainingRenderer {
     }
 }
 
+public enum C5DerivedHashRecipe {
+    public static let hashRecipeAnchorTokens = [
+        "repo:Core/Training/C5LoRATraining.swift#C5DerivedHashRecipe.promptHash(utterance:)",
+        "repo:Core/Training/C5LoRATraining.swift#C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall:)",
+        "repo:Core/Bench/C6VehicleToolBench.swift#C6Hash.sha256Hex"
+    ]
+    public static let hashRecipeRef = hashRecipeAnchorTokens.joined(separator: ";")
+
+    public static func promptHash(utterance: String) -> String {
+        C6Hash.sha256Hex(Data(utterance.utf8))
+    }
+
+    public static func renderToolCall(name: String, arguments: [String: JSONValue]) -> String {
+        let payload = C5CanonicalJSONObject.renderOrdered([
+            ("name", .string(name)),
+            ("arguments", .object(arguments))
+        ])
+        return "<tool_call>\(payload)</tool_call>"
+    }
+
+    public static func expectedToolCallSignature(renderedToolCall: String) -> String {
+        C6Hash.sha256Hex(Data(renderedToolCall.utf8))
+    }
+
+    public static func expectedToolCallSignature(name: String, arguments: [String: JSONValue]) -> String {
+        expectedToolCallSignature(renderedToolCall: renderToolCall(name: name, arguments: arguments))
+    }
+
+    public static func firstRenderedToolCall(in assistantText: String) -> String? {
+        let trimmed = assistantText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("<tool_call>"), trimmed.hasSuffix("</tool_call>") {
+            return trimmed
+        }
+        guard let start = assistantText.range(of: "<tool_call>"),
+              let end = assistantText.range(of: "</tool_call>", range: start.upperBound..<assistantText.endIndex) else {
+            return nil
+        }
+        return String(assistantText[start.lowerBound..<end.upperBound])
+    }
+}
+
 public struct C5TrainingDatasetBuilder: Sendable {
     public init() {}
 
@@ -2259,7 +2951,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
         dataGateContext: C5DataGateRunContext,
         options: C5TrainingBuildOptions = C5TrainingBuildOptions()
     ) -> C5PreparedTrainingDataset {
-        let positiveSamples = buildPositiveSamples(seeds: seeds, options: options)
+        let positiveResult = buildPositiveSamples(seeds: seeds, options: options)
+        let positiveSamples = positiveResult.samples
         let positiveWithDev = assignDevSelection(samples: positiveSamples, count: options.devSelectionRows)
         let noCalls = options.includeNoCallCounterfactuals
             ? buildNoCallSamples(from: positiveWithDev.filter { $0.split == "train" }, options: options)
@@ -2308,7 +3001,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             lineageParentOverlap: dataGateReceipt.trainParentSemanticOverlap
         )
         let trainingMethodAuthority = C5TrainingMethodContractAuthority.evaluate()
-        var hardFailures: [String] = []
+        var hardFailures: [String] = positiveResult.failureReceipt
         if dataGateReceipt.status == "blocked" {
             hardFailures.append("data_gate_blocked")
         }
@@ -2338,10 +3031,15 @@ public struct C5TrainingDatasetBuilder: Sendable {
         if options.requireCandidateDataQualityGate && candidateDataQuality.status != "pass" {
             hardFailures.append(contentsOf: candidateDataQuality.failureReceipt)
         }
+        let lossMaskFailures = validateLossMaskEnforcement(samples: samples)
+        let supervisionCoverageDigest = C5SupervisionCoverageDigest.evaluate(samples: samples)
         let generatorOrchestration = buildGeneratorOrchestrationReceipt(samples: samples)
         let validatorSummary = buildValidatorSummary(dataGateReceipt: dataGateReceipt, offsetFixture: offsetFixture, samples: samples)
         let lineageSummary = buildLineageSummary(samples: samples)
-        var formalStep2Failures = generatorOrchestration.failureReceipt + validatorSummary.failureReceipt + lineageSummary.failureReceipt
+        var formalStep2Failures = lossMaskFailures + generatorOrchestration.failureReceipt + validatorSummary.failureReceipt + lineageSummary.failureReceipt
+        if supervisionCoverageDigest.status != "pass" {
+            formalStep2Failures.append(contentsOf: supervisionCoverageDigest.failureReceipt)
+        }
         if !coverage.functionName || !coverage.argumentName || !coverage.argumentValue {
             formalStep2Failures.append("masking_complete_augmentation_not_implemented")
         }
@@ -2375,7 +3073,8 @@ public struct C5TrainingDatasetBuilder: Sendable {
             "C6 release gate remains final-only; this receipt cannot claim model-quality V-PASS without a real C6 diff",
             "Mac behavior parity and true-device candidate V-PASS are reported separately",
             "endpoint tokenizer byte parity is a candidate gate; training-tokenizer patch alone does not prove mlx-swift render parity",
-            "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training"
+            "formal training requires verified repo loop source state; tracked_unverified loop sources are blocked before candidate training",
+            "mlx-data records carry loss_mask trainable/think char spans plus trainable_assistant_end_token; c5_mlx_train_loop tokenizes records and constructs token-level labels with ignore_index=-100"
         ]
         if !options.includeNoCallCounterfactuals || options.refusalRatioTarget == 0 {
             frameSurfaced.append("theta-alpha positive-only scope excludes theta-beta refusal/no-call rows")
@@ -2384,6 +3083,11 @@ public struct C5TrainingDatasetBuilder: Sendable {
             receiptVersion: "c5-lora-training.v1",
             generatedAt: options.generatedAt,
             status: receiptStatus,
+            fitProofLevel: "mechanism_true",
+            consumer: "Tools/C5TrainingCLI/c5_mlx_train_loop.py --require-maformac-loss-mask",
+            consumedArtifact: "mlx-data JSONL loss_objective_profile + loss_mask.trainable_spans + loss_mask.masked_think_spans + loss_mask.trainable_assistant_end_token",
+            sufficiencyEvidence: "prepare emits objective-separated loss records; preflight fails closed on missing objectives/end-token supervision unless --allow-legacy-loss-objective is explicit for objectives; repo training loop converts spans plus assistant <|im_end|> to token labels before loss",
+            residualGap: "prepare receipt does not claim live training, C6 model-quality V-PASS, endpoint byte parity, or true-device acceptance",
             sourceRefs: [
                 "docs/p1c-training-grill-decisions.md:103-408",
                 "docs/research/2026-06-21-c5-generator-selection-probe.md:37-54",
@@ -2398,15 +3102,17 @@ public struct C5TrainingDatasetBuilder: Sendable {
             discoveryFindings: [
                 "route_tier is derived from normalized C1 fc_flags, not execution-tier metadata",
                 "stock mlx-lm training has no enable_thinking injection point in tuner datasets path",
-                "assistant content uses double-newline prefix so stock mask offset trains the tool_call span instead of swallowing its first bytes"
+                "stock mlx-lm mask_prompt is only a contiguous completion offset; MAformac training loop overrides dataset/iterate/loss for token-level span masks"
             ],
             frameSurfaced: frameSurfaced,
             physicalFields: [
                 "route_tier_source", "route_tier", "utterance_source", "value_strategy", "masking_stage", "train_eligible",
                 "generator_model_id", "generator_call_id", "semantic_judge_model_id", "semantic_judge_call_id", "prompt_hash",
                 "augmentation_parent_id", "lineage_group_id", "split_origin", "candidate_dedupe_group_id", "expected_tool_call_signature",
+                "subset_policy_id", "subset_group_id", "mounted_tool_count", "subset_policy_digest",
                 "counterfactual_pair_id", "acceptance_stage", "training_method_contract_authority", "offset_artifact_authority", "generator_orchestration", "validator_summary", "lineage_summary",
-                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity"
+                "scale_authority_resolution", "candidate_data_quality_gate", "generalization_diagnostic", "fuse_parity_gate", "endpoint_tokenizer_parity", "loss_objective_profile", "augmentation_profile",
+                "supervision_coverage_digest", "loss_mask.trainable_spans", "loss_mask.masked_think_spans", "loss_mask.trainable_assistant_end_token"
             ],
             failureReceipt: hardFailures + formalStep2Failures,
             rowCount: samples.count,
@@ -2422,6 +3128,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             smokeChainRecordCount: smokeChainRecordCount,
             maskingStageCounts: maskingStageCounts,
             maskingCoverage: coverage,
+            supervisionCoverageDigest: supervisionCoverageDigest,
             acceptanceStage: acceptanceStage,
             trainingMethodContractAuthority: trainingMethodAuthority,
             offsetFixture: offsetFixture,
@@ -2517,6 +3224,46 @@ public struct C5TrainingDatasetBuilder: Sendable {
         )
     }
 
+    private func validateLossMaskEnforcement(samples: [C5TrainingSample]) -> [String] {
+        var failures: [String] = []
+        for sample in samples where sample.trainEligible {
+            let mask = sample.lossMask
+            if mask.trainableAssistantEndToken != C5MLXLossMask.assistantEndToken {
+                failures.append("loss_mask_assistant_end_token_supervision_missing_\(sample.sampleID)")
+            }
+            for span in mask.maskedThinkSpans {
+                if span.start < 0 || span.end > sample.assistantPayload.count || span.start >= span.end {
+                    failures.append("loss_mask_think_span_bounds_invalid_\(sample.sampleID)")
+                }
+                if mask.trainableSpans.contains(where: { trainable in
+                    trainable.start < span.end && span.start < trainable.end
+                }) {
+                    failures.append("loss_mask_trainable_span_overlaps_think_\(sample.sampleID)")
+                }
+            }
+            for span in mask.trainableSpans where span.start < 0 || span.end > sample.assistantPayload.count || span.start >= span.end {
+                failures.append("loss_mask_trainable_span_bounds_invalid_\(sample.sampleID)")
+            }
+            if sample.expectedToolCalls.isEmpty {
+                if sample.lossObjectiveProfile != .noToolFull {
+                    failures.append("loss_objective_profile_no_tool_mismatch_\(sample.sampleID)")
+                }
+                if !mask.trainableSpans.contains(where: { $0.text.contains("NO_TOOL") }) {
+                    failures.append("loss_mask_no_tool_label_missing_\(sample.sampleID)")
+                }
+            } else {
+                if sample.lossObjectiveProfile != .assistantFullExceptThink {
+                    failures.append("loss_objective_profile_tool_call_mismatch_\(sample.sampleID)")
+                }
+                let parserCritical = ["<tool_call>", "</tool_call>", "\"name\"", "\"arguments\""]
+                for required in parserCritical where !mask.trainableSpans.contains(where: { $0.text.contains(required) }) {
+                    failures.append("loss_mask_parser_critical_span_missing_\(required)_\(sample.sampleID)")
+                }
+            }
+        }
+        return failures
+    }
+
     private func buildLineageSummary(samples: [C5TrainingSample]) -> C5LineageSummary {
         let actionSamples = samples.filter { !$0.expectedToolCalls.isEmpty }
         let inheritedCount = actionSamples.filter {
@@ -2541,7 +3288,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
         )
     }
 
-    private func buildPositiveSamples(seeds: [C5SemanticSeed], options: C5TrainingBuildOptions) -> [C5TrainingSample] {
+    private struct PositiveBuildResult {
+        var samples: [C5TrainingSample]
+        var failureReceipt: [String]
+    }
+
+    private func buildPositiveSamples(seeds: [C5SemanticSeed], options: C5TrainingBuildOptions) -> PositiveBuildResult {
         // paradigm §1 scope: demo→10 族 562 intent allowlist(seed.intent ∈ catalog names); 空 catalog→不过滤(frame legacy 向后兼容)
         let catalogNames = Set(options.dDomainCatalog.map(\.function.name))
         let scopedSeeds: [C5SemanticSeed]
@@ -2552,6 +3304,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
             scopedSeeds = seeds
         }
         let catalogByName = Dictionary(options.dDomainCatalog.map { ($0.function.name, $0) }, uniquingKeysWith: { first, _ in first })
+        let manifestResult = loadSubsetPolicyManifestIfRequired(options: options, catalogByName: catalogByName)
         let eligible = scopedSeeds.filter { !$0.device.isEmpty && !$0.actionPrimitive.isEmpty }
         let grouped = Dictionary(grouping: eligible, by: \.routeTier)
         var generatedByKey: [String: C5GeneratedUtteranceRecord] = [:]
@@ -2561,18 +3314,89 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 generatedByKey[key] = record
             }
         }
+        var naturalRowsByKey: [String: C5NaturalToolCallRecord] = [:]
+        for record in options.naturalToolCallRecords {
+            let key = generatedRecordKey(contractRowID: record.contractRowID, variant: record.variant)
+            if naturalRowsByKey[key] == nil {
+                naturalRowsByKey[key] = record
+            }
+        }
         var usedVariantKeys: Set<String> = []
         let ruleTarget = max(1, Int(Double(options.targetPositiveRows) * 0.075))
         let fcTarget = max(0, options.targetPositiveRows - ruleTarget)
         var samples: [C5TrainingSample] = []
-        samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
-        samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
-        samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
+        var sampleFailures = manifestResult.failures
+        if manifestResult.manifest == nil, !sampleFailures.isEmpty {
+            return PositiveBuildResult(samples: [], failureReceipt: Array(Set(sampleFailures)).sorted())
+        }
+        samples.append(contentsOf: variants(from: grouped[.fcL3, default: []], target: fcTarget / 4, options: options, generatedByKey: generatedByKey, naturalRowsByKey: naturalRowsByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.fcL2, default: []], target: max(0, fcTarget - samples.count), options: options, generatedByKey: generatedByKey, naturalRowsByKey: naturalRowsByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
+        samples.append(contentsOf: variants(from: grouped[.ruleL1, default: []], target: ruleTarget, options: options, generatedByKey: generatedByKey, naturalRowsByKey: naturalRowsByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
         if samples.count < options.targetPositiveRows {
             let remaining = options.targetPositiveRows - samples.count
-            samples.append(contentsOf: variants(from: eligible, target: remaining, options: options, generatedByKey: generatedByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, sampleOffset: samples.count))
+            samples.append(contentsOf: variants(from: eligible, target: remaining, options: options, generatedByKey: generatedByKey, naturalRowsByKey: naturalRowsByKey, usedVariantKeys: &usedVariantKeys, catalogByName: catalogByName, subsetManifest: manifestResult.manifest, failureReceipt: &sampleFailures, sampleOffset: samples.count))
         }
-        return Array(samples.prefix(options.targetPositiveRows))
+        return PositiveBuildResult(samples: Array(samples.prefix(options.targetPositiveRows)), failureReceipt: Array(Set(sampleFailures)).sorted())
+    }
+
+    private func loadSubsetPolicyManifestIfRequired(
+        options: C5TrainingBuildOptions,
+        catalogByName: [String: DDomainToolEntry]
+    ) -> (manifest: C5LoadedSubsetPolicyManifest?, failures: [String]) {
+        guard options.surface == .dDomain, !options.dDomainCatalog.isEmpty else {
+            return (nil, [])
+        }
+        guard let path = options.subsetPolicyManifestPath, !path.isEmpty else {
+            FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_MISSING path unset — fail-closed\n".utf8))
+            return (nil, ["subset_manifest_missing"])
+        }
+        let url = path.hasPrefix("/")
+            ? URL(fileURLWithPath: path)
+            : URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true).appendingPathComponent(path)
+        do {
+            let data = try Data(contentsOf: url)
+            let decoded = try JSONDecoder().decode(C5SubsetPolicyManifest.self, from: data)
+            let observedPolicyIDs = Set(decoded.entries.map(\.subsetPolicyID))
+            guard observedPolicyIDs.count == 1, observedPolicyIDs.first == C5SubsetPolicyManifest.expectedPolicyID else {
+                let observed = observedPolicyIDs.sorted().joined(separator: ",")
+                FileHandle.standardError.write(Data("G7D_SUBSET_POLICY_MISMATCH path=\(url.path) expected=\(C5SubsetPolicyManifest.expectedPolicyID) observed=\(observed.isEmpty ? "<none>" : observed) — fail-closed\n".utf8))
+                return (nil, ["subset_policy_mismatch"])
+            }
+            let singleGroupEntries = decoded.entries.filter { $0.mountMode == "single_group" }
+            guard !singleGroupEntries.isEmpty else {
+                FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_EMPTY path=\(url.path) no single_group entries — fail-closed\n".utf8))
+                return (nil, ["subset_manifest_no_single_group_entries"])
+            }
+            var entriesByToolID: [String: C5SubsetPolicyManifest.Entry] = [:]
+            var failures: [String] = []
+            for entry in singleGroupEntries {
+                for toolID in entry.toolIDsOrdered {
+                    guard catalogByName[toolID] != nil else {
+                        appendUnique("subset_manifest_catalog_mismatch", to: &failures)
+                        continue
+                    }
+                    if entriesByToolID[toolID] == nil {
+                        entriesByToolID[toolID] = entry
+                    }
+                }
+            }
+            guard failures.isEmpty else {
+                FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_CLOSURE_FAIL path=\(url.path) failures=\(failures.joined(separator: ",")) — fail-closed\n".utf8))
+                return (nil, failures)
+            }
+            let policyID = singleGroupEntries.first?.subsetPolicyID ?? C5SubsetPolicyManifest.expectedPolicyID
+            return (
+                C5LoadedSubsetPolicyManifest(
+                    policyID: policyID,
+                    digest: C6Hash.sha256Hex(data),
+                    singleGroupEntriesByToolID: entriesByToolID
+                ),
+                []
+            )
+        } catch {
+            FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_MISSING path=\(url.path) error=\(error.localizedDescription) — fail-closed\n".utf8))
+            return (nil, ["subset_manifest_missing"])
+        }
     }
 
     private func variants(
@@ -2580,8 +3404,11 @@ public struct C5TrainingDatasetBuilder: Sendable {
         target: Int,
         options: C5TrainingBuildOptions,
         generatedByKey: [String: C5GeneratedUtteranceRecord],
+        naturalRowsByKey: [String: C5NaturalToolCallRecord],
         usedVariantKeys: inout Set<String>,
         catalogByName: [String: DDomainToolEntry],
+        subsetManifest: C5LoadedSubsetPolicyManifest?,
+        failureReceipt: inout [String],
         sampleOffset: Int = 0
     ) -> [C5TrainingSample] {
         guard !seeds.isEmpty, target > 0 else {
@@ -2597,6 +3424,7 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     continue
                 }
                 let generated = generatedByKey[key]
+                let naturalRow = naturalRowsByKey[key]
                 if options.requireGeneratedUtteranceRecords && generated == nil {
                     continue
                 }
@@ -2608,9 +3436,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
                     ordinal: sampleOffset + result.count,
                     maskingStage: options.maskingStage,
                     generatedRecord: generated,
+                    naturalToolCallRecord: naturalRow,
                     surface: options.surface,
                     catalog: options.dDomainCatalog,
                     catalogByName: catalogByName,
+                    subsetManifest: subsetManifest,
+                    failureReceipt: &failureReceipt,
                     scopeCandidatesBySlot: options.scopeCandidatesBySlot,
                     scopeCandidatesByDeviceSlot: options.scopeCandidatesByDeviceSlot
                 ) {
@@ -2620,6 +3451,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
             variant += 1
         }
         return result
+    }
+
+    private func appendUnique(_ failure: String, to failures: inout [String]) {
+        if !failures.contains(failure) {
+            failures.append(failure)
+        }
     }
 
     private func generatedRecordKey(contractRowID: String, variant: Int) -> String {
@@ -2648,16 +3485,28 @@ public struct C5TrainingDatasetBuilder: Sendable {
         }
         let targetCount = Int((Double(trainPositives.count) * options.refusalRatioTarget / (1 - options.refusalRatioTarget)).rounded())
         let cappedCount = min(targetCount, Int(Double(trainPositives.count) * options.refusalRatioHardCap / (1 - options.refusalRatioHardCap)))
-        return trainPositives.prefix(max(0, cappedCount)).enumerated().map { index, positive in
+        var noCallSamples: [C5TrainingSample] = []
+        noCallSamples.reserveCapacity(max(0, cappedCount))
+        for positive in trainPositives where noCallSamples.count < max(0, cappedCount) {
             var sample = positive
-            sample.sampleID = "c5-nocall-\(String(format: "%05d", index + 1))"
-            sample.splitOrigin = "paired_counterfactual_from_train"
-            sample.bucket = "paired_counterfactual_refusal"
-            sample.expectedToolCalls = []
             // cut5 真删(claim-vs-reality 铁律1, 修 446 假删灾难 variant): 被移除的目标工具 = positive 的 expectedToolCalls 工具名,
             // 从 sample.tools 物理删该工具(非只写 metadata removedToolID)。removedName 兼容 frame(tool_call_frame)/D-domain(intent)。
             let removedName = positive.expectedToolCalls.first?.name ?? "tool_call_frame"
             sample.tools = positive.tools.filter { Self.toolSchemaName($0) != removedName }
+            guard !sample.tools.isEmpty else {
+                continue
+            }
+            sample.sampleID = "c5-nocall-\(String(format: "%05d", noCallSamples.count + 1))"
+            sample.splitOrigin = "paired_counterfactual_from_train"
+            sample.bucket = "paired_counterfactual_refusal"
+            sample.expectedToolCalls = []
+            sample.lossObjectiveProfile = .noToolFull
+            sample.augmentationProfile = C5AugmentationProfile(
+                functionName: positive.augmentationProfile.functionName,
+                argumentName: positive.augmentationProfile.argumentName,
+                argumentValue: positive.augmentationProfile.argumentValue
+            )
+            sample.mountedToolCount = sample.tools.count
             // 活样本断言: removedName 真不在 tools(targetToolPresent=false 与产物一致, 防 metadata 假声称)
             let targetStillPresent = sample.tools.contains { Self.toolSchemaName($0) == removedName }
             sample.noCall = C5NoCallMetadata(
@@ -2668,8 +3517,9 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 noCallReason: "paired_counterfactual_removed_target_tool"
             )
             sample.messages[sample.messages.count - 1] = C5TrainingMessage(role: "assistant", content: "\n\nNO_TOOL")
-            return sample
+            noCallSamples.append(sample)
         }
+        return noCallSamples
     }
 
     // tool schema dict → function.name(供 cut5 真删比对; nil = 非标准 schema)。
@@ -2687,9 +3537,12 @@ public struct C5TrainingDatasetBuilder: Sendable {
         ordinal: Int,
         maskingStage: C5MaskingStage,
         generatedRecord: C5GeneratedUtteranceRecord?,
+        naturalToolCallRecord: C5NaturalToolCallRecord?,
         surface: C5TrainingSurface,
         catalog: [DDomainToolEntry],
         catalogByName: [String: DDomainToolEntry],
+        subsetManifest: C5LoadedSubsetPolicyManifest?,
+        failureReceipt: inout [String],
         scopeCandidatesBySlot: [String: [String]],
         scopeCandidatesByDeviceSlot: [String: [String: [String]]]
     ) -> C5TrainingSample? {
@@ -2705,20 +3558,68 @@ public struct C5TrainingDatasetBuilder: Sendable {
         let call: C5TrainingToolCall
         let resolvedTools: [[String: JSONValue]]
         let distractorIDs: [String]
+        let subsetPolicyID: String?
+        let subsetGroupID: String?
+        let mountedToolCount: Int?
+        let subsetPolicyDigest: String?
         if surface == .dDomain, !catalog.isEmpty {
             // 🔴 P1(GPT Pro+GLM 审计共识): catalog 非空但 intent 缺失 = 铁律5 fail-CLOSED(skip 返 nil, 不 fallback frame 污染 A2 surface);
             // scope filter 已保证命中, 此分支是 defensive。旧实现 stderr+frame fallback 会让 dDomain 调用者误以为产 D-domain 实混入 frame。
             guard let entry = catalogByName[seed.intent] else {
+                appendUnique("ddomain_catalog_target_missing", to: &failureReceipt)
                 FileHandle.standardError.write(Data("S4_DDOMAIN_MISS intent=\(seed.intent) not in catalog(\(catalog.count)) — fail-closed skip(不 fallback frame), scope filter should prevent\n".utf8))
                 return nil
+            }
+            guard let subsetManifest else {
+                appendUnique("subset_manifest_missing", to: &failureReceipt)
+                FileHandle.standardError.write(Data("G7D_SUBSET_MANIFEST_MISSING intent=\(seed.intent) — fail-closed skip\n".utf8))
+                return nil
+            }
+            guard let subsetEntry = subsetManifest.singleGroupEntriesByToolID[seed.intent] else {
+                appendUnique("subset_manifest_target_missing", to: &failureReceipt)
+                FileHandle.standardError.write(Data("G7D_SUBSET_TARGET_MISS intent=\(seed.intent) — fail-closed skip\n".utf8))
+                return nil
+            }
+            guard subsetEntry.distractorPolicy.strategy == "same_sg_then_same_domain_then_other" else {
+                appendUnique("subset_manifest_distractor_policy_unsupported", to: &failureReceipt)
+                FileHandle.standardError.write(Data("G7D_SUBSET_DISTRACTOR_POLICY_UNSUPPORTED intent=\(seed.intent) strategy=\(subsetEntry.distractorPolicy.strategy) — fail-closed skip\n".utf8))
+                return nil
+            }
+            var manifestMountedEntries: [DDomainToolEntry] = []
+            for toolID in subsetEntry.toolIDsOrdered {
+                guard let mountedEntry = catalogByName[toolID] else {
+                    appendUnique("subset_manifest_catalog_mismatch", to: &failureReceipt)
+                    FileHandle.standardError.write(Data("G7D_SUBSET_MOUNT_MISS group=\(subsetEntry.groupID) tool=\(toolID) — fail-closed skip\n".utf8))
+                    return nil
+                }
+                manifestMountedEntries.append(mountedEntry)
             }
             call = C5TrainingToolCall(
                 name: seed.intent,
                 arguments: C5TrainingRenderer.dDomainToolCallArguments(seed: seed, value: valueAugmentation.value, slotAssignments: slotAssignments, toolEntry: entry, variant: variant)
             )
-            let distractors = C5TrainingRenderer.sameFamilyDistractors(target: entry, catalog: catalog, variant: variant)
-            resolvedTools = [C5TrainingRenderer.dDomainToolSchema(entry)] + distractors.schemas
-            distractorIDs = distractors.ids
+            let mountedEntries = degradedMountedEntriesIfNeeded(
+                target: entry,
+                manifestEntries: manifestMountedEntries,
+                subsetEntry: subsetEntry
+            )
+            resolvedTools = mountedEntries.map(C5TrainingRenderer.dDomainToolSchema)
+            if mountedEntries.count < manifestMountedEntries.count {
+                distractorIDs = mountedEntries
+                    .map(\.function.name)
+                    .filter { $0 != entry.function.name }
+            } else {
+                distractorIDs = manifestDistractorIDs(
+                    target: entry,
+                    catalog: catalog,
+                    variant: variant,
+                    policy: subsetEntry.distractorPolicy
+                )
+            }
+            subsetPolicyID = subsetEntry.subsetPolicyID.isEmpty ? subsetManifest.policyID : subsetEntry.subsetPolicyID
+            subsetGroupID = subsetEntry.groupID
+            mountedToolCount = resolvedTools.count
+            subsetPolicyDigest = subsetManifest.digest
         } else {
             // frame legacy(catalog 空 OR surface=.frame): strangler 向后兼容(唯一 frame 入口, 非 dDomain miss fallback)
             call = C5TrainingToolCall(
@@ -2734,14 +3635,38 @@ public struct C5TrainingDatasetBuilder: Sendable {
             let distractors = C5TrainingRenderer.distractorToolSchemas(variant: variant)
             resolvedTools = C5TrainingRenderer.toolCallFrameToolSchema(seeds: [seed]) + distractors.schemas
             distractorIDs = distractors.ids
+            subsetPolicyID = nil
+            subsetGroupID = nil
+            mountedToolCount = nil
+            subsetPolicyDigest = nil
         }
         let sampleID = "c5-train-\(String(format: "%05d", ordinal + 1))"
-        let renderedToolCall = C5TrainingRenderer.renderToolCall(call)
+        let renderedToolCall: String
+        let finalCall = call
+        if let naturalToolCallRecord {
+            guard let parsed = C5TrainingRenderer.parseRenderedToolCall(naturalToolCallRecord.target), parsed == call else {
+                appendUnique("natural_tool_call_target_mismatch", to: &failureReceipt)
+                return nil
+            }
+        }
+        renderedToolCall = C5TrainingRenderer.renderToolCall(call)
         let assistant = "\n\n" + renderedToolCall
         let localUtterance = C5TrainingRenderer.renderUserUtterance(seed: seed, variant: variant, valueText: valueAugmentation.utteranceValueText, slotAssignments: slotAssignments)
-        let utterance = generatedRecord?.utterance ?? localUtterance
-        let promptHash = generatedRecord?.promptHash.isEmpty == false ? generatedRecord?.promptHash ?? "" : C6Hash.sha256Hex(Data(utterance.utf8))
+        let utterance = naturalToolCallRecord?.user ?? generatedRecord?.utterance ?? localUtterance
+        let promptHash: String
+        if let naturalToolCallRecord, !naturalToolCallRecord.promptHash.isEmpty {
+            promptHash = naturalToolCallRecord.promptHash
+        } else if generatedRecord?.promptHash.isEmpty == false {
+            promptHash = generatedRecord?.promptHash ?? ""
+        } else {
+            promptHash = C5DerivedHashRecipe.promptHash(utterance: utterance)
+        }
         let candidateParentSemanticID = C5TrainingRenderer.candidateParentSemanticID(userUtterance: utterance, renderedToolCall: renderedToolCall)
+        let augmentationProfile = C5AugmentationProfile(
+            functionName: !distractorIDs.isEmpty,
+            argumentName: !distractorIDs.isEmpty,
+            argumentValue: valueAugmentation.didAugment
+        )
         return C5TrainingSample(
             sampleID: sampleID,
             split: "train",
@@ -2754,25 +3679,29 @@ public struct C5TrainingDatasetBuilder: Sendable {
             candidateParentSemanticID: candidateParentSemanticID,
             candidateCanonicalSemanticID: seed.canonicalSemanticID,
             candidateDedupeGroupID: seed.dedupeGroupID,
-            expectedToolCallSignature: C6Hash.sha256Hex(Data(renderedToolCall.utf8)),
+            device: seed.device,
+            expectedToolCallSignature: C5DerivedHashRecipe.expectedToolCallSignature(renderedToolCall: renderedToolCall),
             routeTierSource: "route_deriver_v2_fc_flags_value_type",
             routeTier: seed.routeTier,
             executionTier: seed.execTier,
-            utteranceSource: generatedRecord == nil ? .singleTurnSeed : .llmAugmented,
+            utteranceSource: generatedRecord == nil && naturalToolCallRecord == nil ? .singleTurnSeed : .llmAugmented,
             valueStrategy: seed.valueStrategy,
+            lossObjectiveProfile: .assistantFullExceptThink,
+            augmentationProfile: augmentationProfile,
             maskingStage: maskingStage,
             trainEligible: maskingStage.trainEligible,
             masking: C5MaskingFlags(
-                functionName: !distractorIDs.isEmpty,
-                argumentName: !distractorIDs.isEmpty,
-                argumentValue: valueAugmentation.didAugment,
+                functionName: augmentationProfile.functionName,
+                argumentName: augmentationProfile.argumentName,
+                argumentValue: augmentationProfile.argumentValue,
                 trainOnTurn: maskingStage != .smokeOnly
             ),
             acceptanceStage: maskingStage == .smokeOnly ? .trainHealth : .trainableV0,
-            generatorModelID: generatedRecord?.generatorModelID ?? "deterministic_semantic_protocol_v1",
-            generatorCallID: generatedRecord?.generatorCallID ?? "local-contract-\(seed.contractRowID)-v\(variant)",
-            semanticJudgeModelID: generatedRecord?.semanticJudgeModelID ?? "",
-            semanticJudgeCallID: generatedRecord?.semanticJudgeCallID ?? "",
+            generatorModelID: naturalToolCallRecord?.generatorModelID ?? generatedRecord?.generatorModelID ?? "deterministic_semantic_protocol_v1",
+            generatorSourceVendor: naturalToolCallRecord?.generatorSourceVendor ?? generatedRecord?.generatorSourceVendor,
+            generatorCallID: naturalToolCallRecord?.generatorCallID ?? generatedRecord?.generatorCallID ?? "local-contract-\(seed.contractRowID)-v\(variant)",
+            semanticJudgeModelID: naturalToolCallRecord?.semanticJudgeModelID ?? generatedRecord?.semanticJudgeModelID ?? "",
+            semanticJudgeCallID: naturalToolCallRecord?.semanticJudgeCallID ?? generatedRecord?.semanticJudgeCallID ?? "",
             promptHash: promptHash,
             messages: [
                 C5TrainingMessage(role: "system", content: "你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。"),
@@ -2780,15 +3709,67 @@ public struct C5TrainingDatasetBuilder: Sendable {
                 C5TrainingMessage(role: "assistant", content: assistant)
             ],
             tools: C5TrainingRenderer.seededShuffleTools(resolvedTools, sampleID: sampleID),
-            expectedToolCalls: [call],
+            expectedToolCalls: [finalCall],
             noCall: nil,
             promptDistractorToolIDs: distractorIDs,
-            mountOrderStrategy: "seeded_shuffle"
+            mountOrderStrategy: "seeded_shuffle",
+            subsetPolicyID: subsetPolicyID,
+            subsetGroupID: subsetGroupID,
+            mountedToolCount: mountedToolCount,
+            subsetPolicyDigest: subsetPolicyDigest
         )
+    }
+
+    private func degradedMountedEntriesIfNeeded(
+        target: DDomainToolEntry,
+        manifestEntries: [DDomainToolEntry],
+        subsetEntry: C5SubsetPolicyManifest.Entry
+    ) -> [DDomainToolEntry] {
+        guard subsetEntry.groupID == "seat.massage_force_time" else {
+            return manifestEntries
+        }
+        guard let targetEntry = manifestEntries.first(where: { $0.function.name == target.function.name }) else {
+            return manifestEntries
+        }
+        guard let firstSibling = manifestEntries.first(where: { $0.function.name != target.function.name }) else {
+            return [targetEntry]
+        }
+        return [targetEntry, firstSibling]
+    }
+
+    private func manifestDistractorIDs(
+        target: DDomainToolEntry,
+        catalog: [DDomainToolEntry],
+        variant: Int,
+        policy: C5SubsetPolicyManifest.DistractorPolicy
+    ) -> [String] {
+        let pool = catalog.filter { $0.function.name != target.function.name }
+        guard !pool.isEmpty, policy.k > 0 else {
+            return []
+        }
+        let sameGroup = pool.filter { $0.sg == target.sg }.sorted { $0.function.name < $1.function.name }
+        let sameDomain = pool.filter { $0.sg != target.sg && $0.domain == target.domain }.sorted { $0.function.name < $1.function.name }
+        let others = pool.filter { $0.domain != target.domain }.sorted { $0.function.name < $1.function.name }
+        let ranked = sameGroup + sameDomain + others
+        guard !ranked.isEmpty else {
+            return []
+        }
+        var picked: [String] = []
+        var idx = variant % ranked.count
+        var guardCounter = 0
+        while picked.count < min(policy.k, ranked.count) && guardCounter < ranked.count * 2 {
+            let name = ranked[idx % ranked.count].function.name
+            if !picked.contains(name) {
+                picked.append(name)
+            }
+            idx += 1
+            guardCounter += 1
+        }
+        return picked
     }
 }
 
-private enum C5CanonicalJSONObject {
+enum C5CanonicalJSONObject {
     static func render(_ object: [String: JSONValue]) -> String {
         let keys = object.keys.sorted()
         let body = keys.map { key in

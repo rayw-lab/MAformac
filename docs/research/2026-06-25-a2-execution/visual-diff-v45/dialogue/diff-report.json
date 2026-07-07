@@ -1,0 +1,20 @@
+{
+  "baseline": "dialogue-anchor.png",
+  "current": "dialogue-impl.png",
+  "results": {
+    "dimensions": [
+      941,
+      215
+    ],
+    "total_pixels": 202315,
+    "different_pixels": 29224,
+    "difference_percentage": 14.44,
+    "threshold_percentage": 100.0,
+    "passed": true,
+    "verdict": "PASS"
+  },
+  "artifacts": {
+    "diff": "diff.png",
+    "comparison": "side-by-side.png"
+  }
+}

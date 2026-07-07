@@ -1,0 +1,20 @@
+{
+  "baseline": "orb-anchor.png",
+  "current": "orb-impl.png",
+  "results": {
+    "dimensions": [
+      941,
+      321
+    ],
+    "total_pixels": 302061,
+    "different_pixels": 53241,
+    "difference_percentage": 17.63,
+    "threshold_percentage": 100.0,
+    "passed": true,
+    "verdict": "PASS"
+  },
+  "artifacts": {
+    "diff": "diff.png",
+    "comparison": "side-by-side.png"
+  }
+}

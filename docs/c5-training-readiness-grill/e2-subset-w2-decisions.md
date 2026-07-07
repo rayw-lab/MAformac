@@ -3,7 +3,7 @@ artifact_kind: e2_subset_grill_worker_2_budget_degrade_decisions
 worker: W2-budget-downgrade
 scope: D3 8K overlimit fallback + D4 scene macro fallback
 id_range: S-101~160
-status: proposed_first_round
+status: ratified_locked_with_conditions（D-019）
 created: 2026-07-02
 proof_class: local_static + local_offline_tokenizer + local_catalog_scene_probe + web_research
 non_claims: no_training_no_generation_no_cloud_llm_no_commit
@@ -11,7 +11,7 @@ non_claims: no_training_no_generation_no_cloud_llm_no_commit
 
 # E-2 subset W2 预算降级官决策矩阵
 
-W2 verdict: `PROPOSED_WITH_BUDGET_GATES`。
+W2 verdict: `RATIFIED_LOCKED_WITH_CONDITIONS`（D-019）。
 
 核心判断：8K 不是“工具 catalog ≤8192 就能跑”。真实慢路预算必须从同一个 tokenizer 实算：
 
@@ -118,14 +118,14 @@ PY
 
 | ID | 议题 | 选项 A/B/C | ⭐推荐 | 论据(file:line 或 URL+日期) | 状态 | 🔴防惨败列 cite P1-P9 |
 |---|---|---|---|---|---|---|
-| S-101 | 3a fallback chain 排序 | A 直接 32K；B runtime 动态裁剪；C manifest 静态链：device-group → top-2 `_sg` pair → scene macro → clarify/NO_TOOL | ⭐C | E-lite seed 已写降级链与 scene macro 同 manifest：`docs/e2-subset-design-package-2026-07-02.md:33-43`；L4 指出 8K 只有部分族直装：`L4-e2-subset-materials.md:75-92`。 | proposed | 防 32K 逃避端侧目标、runtime 动态裁剪漂移；P1/P2/P6/P8。 |
-| S-102 | 3b 超限检测时点 | A runtime 发现超限后 trim；B manifest build static gate；C 只 warning | ⭐B | Phase-1 是 construction only 且 receipt 必含 digest/失配 BLOCKED：`docs/e2-subset-design-package-2026-07-02.md:43-46`；dynamic trim 会让 train/C6/runtime 面不同。 | proposed | 防 metadata 绿灯、运行时偷删工具；P2/P6/P7/P9。 |
-| S-103 | 3c 8K 预算公式 | A 只算 tools+system；B 算 system+tools+user；C 算 system 29 + 3轮 DialogueState 101 + user reserve + generation headroom + digest reserve | ⭐C，build cap=`7200` tool tokens | 本轮离线 tokenizer 实算 exact tool budget `7541`，policy+digest `7358`；home-llm 默认 context 8192 / max_tokens 512：`docs/research/2026-06-19-home-llm-teardown.md:55`。 | proposed | 防“7901 with system”假过 8K；P7/P8/P9。 |
-| S-104 | 3d KV 预热与 prefix 稳定 | A 每轮换 group 且期待 cache；B 只预热全量大 prompt；C per manifest/group/macro 预热，静态 tools/system 前置，动态 DialogueState 最后；group 切换视为冷启动/显式重预热 | ⭐C | home-llm `_cache_prompt` 预热系统 prompt+工具+态，且静态前动态后：`docs/research/2026-06-19-home-llm-teardown.md:47-48`, `:81-82`；vLLM/SGLang/OpenAI/Anthropic 均基于稳定 prefix 缓存（W2-WEB-01~06）。 | proposed | 防把缓存收益当免费、把动态 trim 当无代价；P6/P7/P8。 |
-| S-105 | 4a scene macro 与 C2 关系 | A scene macro 自己定义状态和执行边界；B demo yaml 手写 tool list；C scene macro 只引用 C2 state-cells + C1/C2 codegen 派生 tool group，manifest 记录 digest | ⭐C | C2 拥有 execution_range/readback：`openspec/specs/scenario-state-protocol/spec.md:6-21`；demo-scenarios 明确 c1_ref 是系统侧 IR，D-domain tool name 后续 codegen 回填，禁止手写：`contracts/demo-scenarios.yaml:13-20`。 | proposed | 防第二 SSOT 和执行边界漂移；P1/P2/P6。 |
-| S-106 | 4b scene macro 触发 | A runtime 低置信自动随意切；B 只由 presenter console 强制；C Phase-1 只做 schema/digest；Phase-2 允许 `presenter_forced_scene` 优先，`low_pre_route_confidence` 只进入显式 fallback receipt | ⭐C | 当前 Phase-1 不含 runtime NLU 预路由实装：`docs/e2-subset-design-package-2026-07-02.md:45-47`；demo 5 幕是 must-pass 路径：`openspec/specs/demo-experience/spec.md:33-45`。 | proposed | 防把 construction 文档偷换成 runtime 行为；P6/P8/P9。 |
-| S-107 | 4c macro 内容与预算 | A 五幕合成 mega macro；B 每个 scene 只挂 expected tools；C 每 scene/act 挂 `_sg` union，字段含 `scene_id/act_id/group_ids/tool_ids_digest/token_count/required_state_cells/budget_result`，cap=`7200` | ⭐C | 本轮 `_sg` union 实算 scene1=6049、scene2=5893、scene3/4=1757、scene5=702 tool tokens，均可进 7200；L4 要求 scene subset 同源生成 train/eval/runtime：`L4-e2-subset-materials.md:239-246`。 | proposed | 防只挂答案工具训练作弊，也防 mega macro 爆预算；P1/P3/P6/P7。 |
-| S-108 | 4d macro-out utterance 边界 | A scene 外一律 global unsupported；B scene 外 runtime 静默重路由；C 三层出口：`group_out_of_mount` 可澄清/切 macro，`mvp_unsupported` 明确 10 族外，`global_unsupported` 非车控；safety 独立更高优先级 | ⭐C | C2/工具执行要求错误不冒充成功、readback 才算成功：`tool-execution/spec.md:137-160`；demo safety scene 要优雅拒识：`contracts/demo-scenarios.yaml:135-150`；W3 同源门也把 NO_TOOL 出口列为核心防线。 | proposed | 防 scene 外误伤成“我不会”，也防重路由假绿；P5/P6/P8/P9。 |
+| S-101 | 3a fallback chain 排序 | A 直接 32K；B runtime 动态裁剪；C manifest 静态链：device-group → top-2 `_sg` pair → scene macro → clarify/NO_TOOL | ⭐C | E-lite seed 已写降级链与 scene macro 同 manifest：`docs/e2-subset-design-package-2026-07-02.md:33-43`；L4 指出 8K 只有部分族直装：`L4-e2-subset-materials.md:75-92`。 | locked_with_conditions | 防 32K 逃避端侧目标、runtime 动态裁剪漂移；P1/P2/P6/P8。 |
+| S-102 | 3b 超限检测时点 | A runtime 发现超限后 trim；B manifest build static gate；C 只 warning | ⭐B | Phase-1 是 construction only 且 receipt 必含 digest/失配 BLOCKED：`docs/e2-subset-design-package-2026-07-02.md:43-46`；dynamic trim 会让 train/C6/runtime 面不同。 | locked_with_conditions | 防 metadata 绿灯、运行时偷删工具；P2/P6/P7/P9。 |
+| S-103 | 3c 8K 预算公式 | A 只算 tools+system；B 算 system+tools+user；C 算 system 29 + 3轮 DialogueState 101 + user reserve + generation headroom + digest reserve | ⭐C，build cap=`7200` tool tokens | 本轮离线 tokenizer 实算 exact tool budget `7541`，policy+digest `7358`；home-llm 默认 context 8192 / max_tokens 512：`docs/research/2026-06-19-home-llm-teardown.md:55`。 | locked_with_conditions | 防“7901 with system”假过 8K；P7/P8/P9。 |
+| S-104 | 3d KV 预热与 prefix 稳定 | A 每轮换 group 且期待 cache；B 只预热全量大 prompt；C per manifest/group/macro 预热，静态 tools/system 前置，动态 DialogueState 最后；group 切换视为冷启动/显式重预热 | ⭐C | home-llm `_cache_prompt` 预热系统 prompt+工具+态，且静态前动态后：`docs/research/2026-06-19-home-llm-teardown.md:47-48`, `:81-82`；vLLM/SGLang/OpenAI/Anthropic 均基于稳定 prefix 缓存（W2-WEB-01~06）。 | locked_with_conditions | 防把缓存收益当免费、把动态 trim 当无代价；P6/P7/P8。 |
+| S-105 | 4a scene macro 与 C2 关系 | A scene macro 自己定义状态和执行边界；B demo yaml 手写 tool list；C scene macro 只引用 C2 state-cells + C1/C2 codegen 派生 tool group，manifest 记录 digest | ⭐C | C2 拥有 execution_range/readback：`openspec/specs/scenario-state-protocol/spec.md:6-21`；demo-scenarios 明确 c1_ref 是系统侧 IR，D-domain tool name 后续 codegen 回填，禁止手写：`contracts/demo-scenarios.yaml:13-20`。 | locked_with_conditions | 防第二 SSOT 和执行边界漂移；P1/P2/P6。 |
+| S-106 | 4b scene macro 触发 | A runtime 低置信自动随意切；B 只由 presenter console 强制；C Phase-1 只做 schema/digest；Phase-2 允许 `presenter_forced_scene` 优先，`low_pre_route_confidence` 只进入显式 fallback receipt | ⭐C | 当前 Phase-1 不含 runtime NLU 预路由实装：`docs/e2-subset-design-package-2026-07-02.md:45-47`；demo 5 幕是 must-pass 路径：`openspec/specs/demo-experience/spec.md:33-45`。 | locked_with_conditions | 防把 construction 文档偷换成 runtime 行为；P6/P8/P9。 |
+| S-107 | 4c macro 内容与预算 | A 五幕合成 mega macro；B 每个 scene 只挂 expected tools；C 每 scene/act 挂 `_sg` union，字段含 `scene_id/act_id/group_ids/tool_ids_digest/token_count/required_state_cells/budget_result`，cap=`7200` | ⭐C | 本轮 `_sg` union 实算 scene1=6049、scene2=5893、scene3/4=1757、scene5=702 tool tokens，均可进 7200；L4 要求 scene subset 同源生成 train/eval/runtime：`L4-e2-subset-materials.md:239-246`。 | locked_with_conditions | 防只挂答案工具训练作弊，也防 mega macro 爆预算；P1/P3/P6/P7。 |
+| S-108 | 4d macro-out utterance 边界 | A scene 外一律 global unsupported；B scene 外 runtime 静默重路由；C 三层出口：`group_out_of_mount` 可澄清/切 macro，`mvp_unsupported` 明确 10 族外，`global_unsupported` 非车控；safety 独立更高优先级 | ⭐C | C2/工具执行要求错误不冒充成功、readback 才算成功：`tool-execution/spec.md:137-160`；demo safety scene 要优雅拒识：`contracts/demo-scenarios.yaml:135-150`；W3 同源门也把 NO_TOOL 出口列为核心防线。 | locked_with_conditions | 防 scene 外误伤成“我不会”，也防重路由假绿；P5/P6/P8/P9。 |
 
 ## Landing 草案
 
