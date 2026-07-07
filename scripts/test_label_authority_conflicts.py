@@ -157,6 +157,138 @@ def main() -> int:
         if bad_manifest_result.returncode != 65:
             failures.append(f"expected bad manifest rc=65, got {bad_manifest_result.returncode}")
 
+        register_split = root / "register-split.jsonl"
+        register_split.write_text(
+            "\n".join(
+                json.dumps(item, ensure_ascii=False)
+                for item in [
+                    row(
+                        "can-action",
+                        "能不能打开车窗",
+                        [{"name": "open_window", "arguments": {}}],
+                        register="can_question",
+                        risk_tier="R0",
+                    ),
+                    row(
+                        "imperative-counterpart",
+                        "能不能打开车窗",
+                        [],
+                        register="imperative",
+                        risk_tier="R0",
+                    ),
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [register_split])
+        register_split_result = run_checker(manifest)
+        if register_split_result.returncode != 0:
+            failures.append(f"expected register split to pass, got {register_split_result.returncode}: {register_split_result.stdout}")
+        if '"legal_register_or_risk_split_allowed_count": 1' not in register_split_result.stdout:
+            failures.append("expected register split receipt to count one legal split")
+
+        same_register = root / "same-register.jsonl"
+        same_register.write_text(
+            "\n".join(
+                json.dumps(item, ensure_ascii=False)
+                for item in [
+                    row(
+                        "action-1",
+                        "能不能打开车窗",
+                        [{"name": "open_window", "arguments": {}}],
+                        register="can_question",
+                        risk_tier="R0",
+                    ),
+                    row(
+                        "action-2",
+                        "能不能打开车窗",
+                        [],
+                        register="can_question",
+                        risk_tier="R0",
+                    ),
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [same_register])
+        same_register_result = run_checker(manifest)
+        if same_register_result.returncode != 2:
+            failures.append(f"expected same register/risk conflict rc=2, got {same_register_result.returncode}")
+
+        risk_split = root / "risk-split.jsonl"
+        risk_split.write_text(
+            "\n".join(
+                json.dumps(item, ensure_ascii=False)
+                for item in [
+                    row(
+                        "moving-door-r0",
+                        "行驶中打开车门",
+                        [{"name": "open_car_door", "arguments": {}}],
+                        register="imperative",
+                        risk_tier="R0",
+                    ),
+                    row(
+                        "moving-door-r2",
+                        "行驶中打开车门",
+                        [],
+                        register="imperative",
+                        risk_tier="R2",
+                    ),
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [risk_split])
+        risk_split_result = run_checker(manifest)
+        if risk_split_result.returncode != 0:
+            failures.append(f"expected risk split to pass, got {risk_split_result.returncode}: {risk_split_result.stdout}")
+
+        unknown_register = root / "unknown-register.jsonl"
+        unknown_register.write_text(
+            json.dumps(
+                row(
+                    "unknown-register",
+                    "打开车窗",
+                    [{"name": "open_window", "arguments": {}}],
+                    register="unknown",
+                    risk_tier="R0",
+                ),
+                ensure_ascii=False,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [unknown_register])
+        unknown_register_result = run_checker(manifest)
+        if unknown_register_result.returncode != 65:
+            failures.append(f"expected unknown register rc=65, got {unknown_register_result.returncode}")
+        if "unknown register" not in unknown_register_result.stderr:
+            failures.append("expected unknown register manifest error in stderr")
+
+        meta_mutating = root / "meta-mutating.jsonl"
+        meta_mutating.write_text(
+            json.dumps(
+                row(
+                    "meta-mutating",
+                    "你能不能控制车窗",
+                    [{"name": "open_window", "arguments": {}}],
+                    risk_tier="R0",
+                ),
+                ensure_ascii=False,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        write_manifest(manifest, [meta_mutating])
+        meta_mutating_result = run_checker(manifest)
+        if meta_mutating_result.returncode != 2:
+            failures.append(f"expected meta capability mutating rc=2, got {meta_mutating_result.returncode}")
+        if "meta_capability_question_must_be_non_mutating" not in meta_mutating_result.stdout:
+            failures.append("expected meta capability non-mutating error in stdout")
+
     if failures:
         print("test_label_authority_conflicts FAILED", file=sys.stderr)
         for failure in failures:

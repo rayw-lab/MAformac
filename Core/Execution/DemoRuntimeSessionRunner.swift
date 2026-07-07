@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 public final class DemoRuntimeSessionRunner {
-    public typealias FrameDecoder = (String) throws -> ToolCallFrame
+    public typealias FrameDecoder = (String) async throws -> ToolCallFrame
 
     private let store: DemoVehicleStateStore
     private let pipeline: C3ExecutionPipeline
@@ -33,20 +33,31 @@ public final class DemoRuntimeSessionRunner {
     public static func defaultRunner(
         store: DemoVehicleStateStore,
         traceLogger: any TraceLogger,
-        speech: any SpeechSynthesisEngine
+        speech: any SpeechSynthesisEngine,
+        modelBackend: any LLMBackend = FastPathDemoToolPlanBackend()
     ) throws -> DemoRuntimeSessionRunner {
         let bundle = DemoRuntimeContractBundle.singleCommandDemoDefault
+        let router = DemoNLURouter(backend: modelBackend)
         return DemoRuntimeSessionRunner(
             store: store,
             pipeline: try bundle.makePipeline(),
             traceLogger: traceLogger,
-            speech: speech
+            speech: speech,
+            frameDecoder: { text in try await router.decode(text: text) }
         )
     }
 
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
-        var frame = try frameDecoder(text)
+        let frameResult: ToolCallFrame
+        do {
+            frameResult = try await frameDecoder(text)
+        } catch let failure as DDomainToolPlanFailure {
+            return unsupportedPayload(finiteReason: failure.finiteReason)
+        }
+
+        var frame = frameResult
+        recordProjectionTraceIfNeeded(for: frame)
         if alignsFrameStateRevisionToStore {
             frame.stateRevision = store.currentRevision
         }
@@ -98,12 +109,75 @@ public final class DemoRuntimeSessionRunner {
         )
     }
 
+    private func unsupportedPayload(finiteReason: String) -> RuntimePresentationPayload {
+        let traceID = UUID().uuidString
+        let turnID = "unsupported-\(traceID)"
+        let dialogText = "这个我先记下来，稍后帮您处理"
+        traceLogger.recordGuard(
+            traceID: traceID,
+            message: "unsupported_tool_plan",
+            attributes: TraceAttributes(
+                guardReason: "unsupported_tool_plan",
+                finiteReason: finiteReason
+            )
+        )
+        speech.speak(dialogText)
+        let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: traceID)
+        return RuntimePresentationPayload(
+            traceID: traceID,
+            turnID: turnID,
+            eventID: "\(turnID):runtime-presentation",
+            isTerminal: true,
+            outcome: DemoRuntimeOutcome(result: .refusalNoAvailableTool, reason: finiteReason),
+            proofClass: .localUnit,
+            cards: store.presentationCells,
+            readbacks: [],
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: finiteReason
+            ),
+            traceEnvelope: traceEnvelope,
+            timestamp: timestampProvider()
+        )
+    }
+
+    private func recordProjectionTraceIfNeeded(for frame: ToolCallFrame) {
+        guard rawPayloadBool(frame.rawPayload, key: "slot_projected") == true else {
+            return
+        }
+        traceLogger.recordDecode(
+            traceID: frame.traceID,
+            message: "slot_projected",
+            attributes: TraceAttributes(
+                candidateSource: frame.candidateSource,
+                rawPayloadHash: rawPayloadString(frame.rawPayload, key: "raw_arguments_sha256"),
+                slotProjected: true
+            )
+        )
+    }
+
     private func traceEnvelopeForCurrentTurn(traceID: String) -> TraceEnvelope? {
         guard let inMemory = traceLogger as? InMemoryTraceLogger else {
             return nil
         }
         let entries = inMemory.entries.filter { $0.traceID == traceID }
         return TraceEnvelope(traceID: traceID, entries: entries)
+    }
+
+    private func rawPayloadString(_ value: JSONValue, key: String) -> String? {
+        guard case .object(let object) = value,
+              case .string(let string)? = object[key] else {
+            return nil
+        }
+        return string
+    }
+
+    private func rawPayloadBool(_ value: JSONValue, key: String) -> Bool? {
+        guard case .object(let object) = value,
+              case .bool(let bool)? = object[key] else {
+            return nil
+        }
+        return bool
     }
 }
 
@@ -138,6 +212,7 @@ public struct DemoRuntimeContractBundle: Sendable {
     public static let singleCommandDemoDefault = DemoRuntimeContractBundle(
         semanticJSONL: """
         {"contract_row_id":"runtime_app_ac_power_on","device":"ac","action_primitive":"power_on","slot":"device","slot_keys":[],"clarify_tag":"explicit","risk":"","exec_tier":"L1","execution_range_ref":"ac.power","value":{"ref":"","direct":"","offset":"on","type":"STATE"}}
+        {"contract_row_id":"runtime_app_ac_temperature_adjust_to_number","device":"ac_temperature","action_primitive":"adjust_to_number","slot":"temperature","slot_keys":[],"clarify_tag":"explicit","risk":"","exec_tier":"L1","execution_range_ref":"ac.temp_setpoint","value":{"ref":"","direct":"","offset":"","type":""}}
         """,
         stateCellsYAML: """
         cells:
@@ -146,6 +221,14 @@ public struct DemoRuntimeContractBundle: Sendable {
             values: [off, on]
             default: off
             readback_zh: 空调{已关闭|已打开}
+          - id: ac.temp_setpoint
+            type: int
+            unit: celsius
+            scope: [主驾, 副驾, 左后, 右后, 全车]
+            default_scope: 主驾
+            execution_range: {min: 18, max: 32, step: 1}
+            default: 24
+            readback_zh: "{温区}空调温度{值}度"
         """,
         riskPolicyYAML: """
         forbidden:

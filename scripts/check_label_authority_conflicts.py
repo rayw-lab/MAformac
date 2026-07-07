@@ -13,9 +13,14 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from register_classifier import REGISTER_ENUM, classify_register
+
 
 Json = dict[str, Any]
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SCANNER_VERSION = "r5-register-window-v3-preassembly-register-risk-key"
+RISK_TIER_ENUM = ("R0", "R1", "R2")
+FINAL_AUTHORITY_RESERVED_SLOTS = ("mounted_tool_shape", "target_tool_present")
 REQUIRED_MANIFEST_FIELDS = {
     "include_globs",
     "exclude_globs",
@@ -29,6 +34,10 @@ COUNTERFACTUAL_FIELDS = {
     "source_expected_signature",
     "case_expected_signature",
 }
+
+
+class ManifestValidationError(RuntimeError):
+    pass
 
 
 def stable_json(value: Any) -> str:
@@ -54,8 +63,7 @@ def read_jsonl(path: Path):
 
 
 def manifest_error(message: str) -> None:
-    print(f"manifest_error: {message}", file=sys.stderr)
-    raise SystemExit(65)
+    raise ManifestValidationError(message)
 
 
 def role_content(row: Json, role: str) -> str:
@@ -141,6 +149,108 @@ def load_manifest(path: Path) -> Json:
     if not isinstance(manifest.get("authority_level"), str) or not manifest["authority_level"]:
         manifest_error(f"{path}: authority_level must be a nonempty string")
     return manifest
+
+
+def explicit_metadata_required(manifest: Json) -> bool:
+    return bool(
+        manifest.get("require_explicit_register_risk_metadata")
+        or manifest.get("requires_explicit_register_risk_metadata")
+        or manifest.get("register_risk_metadata_required")
+    )
+
+
+def metadata_value(row: Json, keys: tuple[str, ...]) -> Any:
+    containers = [
+        row,
+        row.get("metadata"),
+        row.get("tags"),
+        row.get("label_metadata"),
+        row.get("register_metadata"),
+    ]
+    for container in containers:
+        if not isinstance(container, dict):
+            continue
+        for key in keys:
+            if key in container:
+                return container.get(key)
+    return None
+
+
+def sample_register(row: Json, manifest: Json, path: Path, line_no: int) -> Json:
+    classification = classify_register(input_text(row))
+    explicit = metadata_value(row, ("register",))
+    if explicit is None:
+        if explicit_metadata_required(manifest):
+            manifest_error(f"{path}:{line_no}: missing explicit register metadata")
+        return {
+            "register": classification.register,
+            "is_meta_capability_question": classification.is_meta_capability_question,
+            "hedged_overlay": classification.hedged_overlay,
+            "register_source": "inferred_regex",
+        }
+    register = str(explicit)
+    if register not in REGISTER_ENUM:
+        manifest_error(f"{path}:{line_no}: unknown register {register!r}")
+    return {
+        "register": register,
+        "is_meta_capability_question": classification.is_meta_capability_question,
+        "hedged_overlay": classification.hedged_overlay,
+        "register_source": "metadata",
+    }
+
+
+def numeric_speed(row: Json) -> float:
+    pre_state = row.get("pre_state")
+    if isinstance(pre_state, dict):
+        raw = pre_state.get("vehicle.speed")
+        try:
+            return float(raw)
+        except (TypeError, ValueError):
+            return 0.0
+    return 0.0
+
+
+def expected_call_names(row: Json) -> str:
+    return " ".join(item["name"] for item in canonical_expected_calls(row))
+
+
+def infer_risk_tier(row: Json) -> str:
+    text = input_text(row)
+    call_names = expected_call_names(row)
+    source_refs = row.get("source_refs")
+    risk_rule_ids = source_refs.get("risk_rule_ids") if isinstance(source_refs, dict) else None
+    moving_context = numeric_speed(row) > 0 or re.search(r"(行驶中|高速|车速|开车时)", text)
+    door_action = re.search(r"(车门|开门|后备箱|尾门)", text + " " + call_names)
+    if risk_rule_ids or (moving_context and door_action):
+        return "R2"
+    broad_window = re.search(r"(全部|所有|全车)", text) and re.search(r"(车窗|天窗|遮阳帘)", text + " " + call_names)
+    if broad_window:
+        return "R1"
+    return "R0"
+
+
+def sample_risk_tier(row: Json, manifest: Json, path: Path, line_no: int) -> Json:
+    explicit = metadata_value(row, ("risk_tier", "risk_level"))
+    if explicit is None:
+        if explicit_metadata_required(manifest):
+            manifest_error(f"{path}:{line_no}: missing explicit risk_tier metadata")
+        return {"risk_tier": infer_risk_tier(row), "risk_tier_source": "inferred_regex"}
+    risk_tier = str(explicit)
+    if risk_tier not in RISK_TIER_ENUM:
+        manifest_error(f"{path}:{line_no}: unknown risk_tier {risk_tier!r}")
+    return {"risk_tier": risk_tier, "risk_tier_source": "metadata"}
+
+
+def pre_assembly_key_payload(normalized_input: str, register: str, risk_tier: str) -> Json:
+    return {
+        "normalized_input": normalized_input,
+        "register": register,
+        "risk_tier": risk_tier,
+    }
+
+
+def pre_assembly_key_v2(normalized_input: str, register: str, risk_tier: str) -> str:
+    return stable_json(pre_assembly_key_payload(normalized_input, register, risk_tier))
 
 
 def expand_globs(patterns: list[str], base_dir: Path) -> list[Path]:
@@ -247,16 +357,41 @@ def source_authority_errors(row: Json, source_index: dict[str, Json], case_signa
 
 def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], excluded_paths: list[str]) -> Json:
     groups: dict[str, Json] = {}
-    labels_by_input: dict[str, dict[str, Json]] = defaultdict(dict)
+    labels_by_key: dict[str, dict[str, Json]] = defaultdict(dict)
+    legacy_labels_by_input: dict[str, dict[str, Json]] = defaultdict(dict)
     source_errors: list[Json] = []
-    row_count = 0
+    meta_capability_errors: list[Json] = []
+    source_counts: dict[str, int] = defaultdict(int)
+    risk_source_counts: dict[str, int] = defaultdict(int)
+    total_rows = 0
     for path in paths:
         for line_no, row in read_jsonl(path):
+            total_rows += 1
             text = input_text(row)
             if not text:
                 continue
             expected = canonical_expected_calls(row)
             signature = expected_signature(expected)
+            register_info = sample_register(row, manifest, path, line_no)
+            risk_info = sample_risk_tier(row, manifest, path, line_no)
+            source_counts[str(register_info["register_source"])] += 1
+            risk_source_counts[str(risk_info["risk_tier_source"])] += 1
+            if register_info["is_meta_capability_question"] and (expected or row.get("expected_state_delta")):
+                meta_capability_errors.append(
+                    {
+                        "path": str(path),
+                        "line_no": line_no,
+                        "case_id": row.get("case_id") or row.get("sample_id"),
+                        "input": text,
+                        "register": register_info["register"],
+                        "risk_tier": risk_info["risk_tier"],
+                        "register_source": register_info["register_source"],
+                        "risk_tier_source": risk_info["risk_tier_source"],
+                        "expected_tool_calls": expected,
+                        "expected_state_delta": row.get("expected_state_delta") or {},
+                        "status": "meta_capability_question_must_be_non_mutating",
+                    }
+                )
             row_source_errors = source_authority_errors(row, source_index, signature)
             if row_source_errors:
                 source_errors.append(
@@ -272,26 +407,46 @@ def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], exclu
                     }
                 )
             normalized = normalize_text(text)
-            row_count += 1
-            group = groups.setdefault(
+            key_payload = pre_assembly_key_payload(
                 normalized,
+                str(register_info["register"]),
+                str(risk_info["risk_tier"]),
+            )
+            key = stable_json(key_payload)
+            group = groups.setdefault(
+                key,
                 {
                     "input": text,
                     "normalized_input": normalized,
+                    "pre_assembly_key_v2": key,
+                    "pre_assembly_key_v2_payload": key_payload,
+                    "register": register_info["register"],
+                    "risk_tier": risk_info["risk_tier"],
+                    "register_sources": set(),
+                    "risk_tier_sources": set(),
                     "rows": [],
                     "labels": [],
                 },
             )
+            group["register_sources"].add(register_info["register_source"])
+            group["risk_tier_sources"].add(risk_info["risk_tier_source"])
             group["rows"].append(
                 {
                     "path": str(path),
                     "line_no": line_no,
                     "case_id": row.get("case_id") or row.get("sample_id"),
+                    "register": register_info["register"],
+                    "risk_tier": risk_info["risk_tier"],
+                    "register_source": register_info["register_source"],
+                    "risk_tier_source": risk_info["risk_tier_source"],
+                    "is_meta_capability_question": register_info["is_meta_capability_question"],
+                    "hedged_overlay": register_info["hedged_overlay"],
+                    "pre_assembly_key_v2": key,
                     "expected_tool_calls": expected,
                     "expected_signature": signature,
                 }
             )
-            labels = labels_by_input[normalized]
+            labels = labels_by_key[key]
             labels.setdefault(
                 signature,
                 {
@@ -304,47 +459,99 @@ def scan(paths: list[Path], manifest: Json, source_index: dict[str, Json], exclu
             labels[signature]["count"] += 1
             if len(labels[signature]["examples"]) < 5:
                 labels[signature]["examples"].append({"path": str(path), "line_no": line_no})
+            legacy_labels = legacy_labels_by_input[normalized]
+            legacy_labels.setdefault(
+                signature,
+                {
+                    "label_signature": signature,
+                    "expected_tool_calls": expected,
+                    "count": 0,
+                },
+            )
+            legacy_labels[signature]["count"] += 1
 
     conflicts: list[Json] = []
-    for normalized, group in groups.items():
-        labels = sorted(labels_by_input[normalized].values(), key=lambda item: item["label_signature"])
+    for _, group in groups.items():
+        labels = sorted(labels_by_key[group["pre_assembly_key_v2"]].values(), key=lambda item: item["label_signature"])
         group["labels"] = labels
         if len(labels) <= 1:
             continue
         conflicts.append(
             {
                 "input": group["input"],
-                "normalized_input": normalized,
+                "normalized_input": group["normalized_input"],
+                "pre_assembly_key_v2": group["pre_assembly_key_v2"],
+                "pre_assembly_key_v2_payload": group["pre_assembly_key_v2_payload"],
+                "register": group["register"],
+                "risk_tier": group["risk_tier"],
+                "register_source": "+".join(sorted(group["register_sources"])),
+                "risk_tier_source": "+".join(sorted(group["risk_tier_sources"])),
                 "status": "conflicting_expected_signatures",
                 "labels": labels,
                 "rows": group["rows"][:20],
             }
         )
 
+    legacy_conflicts: list[Json] = []
+    for normalized, labels_by_signature in legacy_labels_by_input.items():
+        if len(labels_by_signature) <= 1:
+            continue
+        legacy_conflicts.append(
+            {
+                "normalized_input": normalized,
+                "label_signature_count": len(labels_by_signature),
+                "labels": sorted(labels_by_signature.values(), key=lambda item: item["label_signature"]),
+            }
+        )
+    current_conflict_inputs = {str(conflict["normalized_input"]) for conflict in conflicts}
+    legal_split_allowed = [
+        conflict
+        for conflict in legacy_conflicts
+        if str(conflict["normalized_input"]) not in current_conflict_inputs
+    ]
+
     conflict_counts: dict[str, int] = defaultdict(int)
     for conflict in conflicts:
         conflict_counts[str(conflict["status"])] += 1
+    status = "pass" if not conflicts and not source_errors and not meta_capability_errors else "fail"
     return {
         "artifact_kind": "label_authority_conflict_scan",
-        "scanner_version": "r5-d107-manifest-source-authority-v2",
+        "scanner_version": SCANNER_VERSION,
+        "basis_id": manifest.get("basis_id") or manifest.get("run_id"),
+        "pre_assembly_key_v2_schema": {
+            "key_fields": ["normalized_input", "register", "risk_tier"],
+            "reserved_final_authority_key_v3_slots": list(FINAL_AUTHORITY_RESERVED_SLOTS),
+            "reserved_slots_filled_in_s1": False,
+        },
         "manifest": {
             "run_id": manifest.get("run_id"),
+            "basis_id": manifest.get("basis_id"),
             "authority_level": manifest.get("authority_level"),
             "case_kind": manifest.get("case_kind"),
             "include_globs": manifest.get("include_globs"),
             "exclude_globs": manifest.get("exclude_globs"),
             "historical_globs": manifest.get("historical_globs"),
             "derivative_globs": manifest.get("derivative_globs", []),
+            "require_explicit_register_risk_metadata": explicit_metadata_required(manifest),
         },
         "inputs": [str(path) for path in paths],
         "excluded_paths": excluded_paths,
-        "row_count": row_count,
-        "unique_input_count": len(groups),
+        "total_rows": total_rows,
+        "row_count": total_rows,
+        "unique_input_count": len(legacy_labels_by_input),
+        "unique_pre_assembly_key_count": len(groups),
         "conflict_input_count": len(conflicts),
         "conflict_status_counts": dict(sorted(conflict_counts.items())),
+        "legacy_v1_conflict_input_count": len(legacy_conflicts),
+        "legal_register_or_risk_split_allowed_count": len(legal_split_allowed),
+        "legal_register_or_risk_split_allowed": legal_split_allowed[:50],
+        "register_source_counts": dict(sorted(source_counts.items())),
+        "risk_tier_source_counts": dict(sorted(risk_source_counts.items())),
         "source_authority_error_count": len(source_errors),
-        "status": "pass" if not conflicts and not source_errors else "fail",
+        "meta_capability_error_count": len(meta_capability_errors),
+        "status": status,
         "source_authority_errors": source_errors,
+        "meta_capability_errors": meta_capability_errors,
         "conflicts": conflicts,
     }
 
@@ -357,10 +564,14 @@ def main() -> int:
     parser.add_argument("--audit-historical", action="store_true", help="Scan historical_globs into a separate audit run")
     args = parser.parse_args()
 
-    manifest = load_manifest(args.manifest)
-    paths, excluded_paths = manifest_paths(manifest, args.manifest, include_historical=args.audit_historical)
-    sources = load_source_index(source_paths(manifest, args.manifest))
-    result = scan(paths, manifest, sources, excluded_paths)
+    try:
+        manifest = load_manifest(args.manifest)
+        paths, excluded_paths = manifest_paths(manifest, args.manifest, include_historical=args.audit_historical)
+        sources = load_source_index(source_paths(manifest, args.manifest))
+        result = scan(paths, manifest, sources, excluded_paths)
+    except ManifestValidationError as exc:
+        print(f"manifest_error: {exc}", file=sys.stderr)
+        return 65
     text = json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True)
     if args.out_json:
         args.out_json.parent.mkdir(parents=True, exist_ok=True)

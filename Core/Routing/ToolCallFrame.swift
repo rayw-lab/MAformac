@@ -72,6 +72,7 @@ public enum ToolCandidateSource: String, Codable, Equatable, Sendable {
     case contentFallback = "content_fallback"
     case parserRepair = "parser_repair"
     case fastPath = "fast_path"
+    case modelRouter = "model_router"
 }
 
 public enum SchemaInvalidReason: Equatable, Sendable {
@@ -378,10 +379,13 @@ public struct ToolCallCandidateDecoder: Sendable {
         return toolName
     }
 
-    public func decodeNonStreamingCompletion(_ completion: String) throws -> ToolCallFrame {
+    public func decodeNonStreamingCompletion(
+        _ completion: String,
+        allowedToolNames: Set<String> = []
+    ) throws -> ToolCallFrame {
         let stripped = stripThinking(from: completion)
         let candidate = extractFencedJSON(from: stripped) ?? stripped.trimmingCharacters(in: .whitespacesAndNewlines)
-        var frame = try decodeContentFallback(candidate)
+        var frame = try decode(ToolCallDecodeInput(content: candidate, allowedToolNames: allowedToolNames))
         frame.candidateSource = .parserRepair
         return frame
     }

@@ -590,14 +590,15 @@ public struct C3ExecutionPipeline: Sendable {
             let sign = frame.value.direct == "-" || frame.actionPrimitive.hasPrefix("decrease") ? -1 : 1
             return current + sign * step
         case "SPOT", "PERCENT":
-            if let numeric = Int(frame.value.offset) {
+            let numericValue = frame.value.offset.isEmpty ? frame.value.direct : frame.value.offset
+            if let numeric = Int(numericValue) {
                 if frame.value.ref == "CUR" {
                     let sign = frame.value.direct == "-" ? -1 : 1
                     return current + sign * numeric
                 }
                 return numeric
             }
-            if let gear = cell.gearMap[frame.value.offset] {
+            if let gear = cell.gearMap[numericValue] {
                 return gear
             }
             throw ToolExecutionError.schemaInvalid(.typeMismatch("value.offset"))

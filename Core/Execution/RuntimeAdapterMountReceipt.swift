@@ -17,6 +17,8 @@ public enum RuntimeAdapterRuntimeQASafety: String, Codable, Equatable, Sendable 
 public enum RuntimeAdapterMountReceiptValidationError: Error, Equatable, Sendable {
     case missingRequiredField(String)
     case invalidNonClaim(String)
+    case invalidSchemaVersion(String)
+    case runtimeTargetMismatch(expected: String, actual: String)
 }
 
 public struct RuntimeAdapterMountNonClaims: Codable, Equatable, Sendable {
@@ -58,9 +60,10 @@ public struct RuntimeAdapterMountNonClaims: Codable, Equatable, Sendable {
 }
 
 public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
-    public static let schemaVersion = "runtime_adapter_mount_receipt.v1"
+    public static let schemaVersion = "runtime_adapter_mount_receipt.v2"
 
     public var schemaVersion: String
+    public var runtimeTarget: String
     public var mountVerdict: RuntimeAdapterMountVerdict
     public var adapterSha: String
     public var adapterConfigSha: String
@@ -70,6 +73,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
     public var codeHeadSha: String
     public var trainpackSha: String
     public var decodeContractID: String
+    public var irMapFingerprint: String
     public var mountedToolCatalogSha: String
     public var caseLedgerRef: String
     public var provenance: DemoRuntimeAdapterProvenance
@@ -78,6 +82,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case schemaVersion = "schema_version"
+        case runtimeTarget = "runtime_target"
         case mountVerdict = "mount_verdict"
         case adapterSha = "adapter_sha"
         case adapterConfigSha = "adapter_config_sha"
@@ -87,7 +92,8 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
         case codeHeadSha = "code_head_sha"
         case trainpackSha = "trainpack_sha"
         case decodeContractID = "decode_contract_id"
-        case mountedToolCatalogSha = "mounted_tool_catalog_sha"
+        case irMapFingerprint = "ir_map_fingerprint"
+        case mountedToolCatalogSha = "mounted_demo_catalog_sha"
         case caseLedgerRef = "case_ledger_ref"
         case provenance
         case mountedAt = "mounted_at"
@@ -96,6 +102,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
 
     public init(
         schemaVersion: String = RuntimeAdapterMountReceipt.schemaVersion,
+        runtimeTarget: String,
         mountVerdict: RuntimeAdapterMountVerdict,
         adapterSha: String,
         adapterConfigSha: String,
@@ -105,6 +112,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
         codeHeadSha: String,
         trainpackSha: String,
         decodeContractID: String,
+        irMapFingerprint: String,
         mountedToolCatalogSha: String,
         caseLedgerRef: String,
         provenance: DemoRuntimeAdapterProvenance,
@@ -112,6 +120,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
         nonClaims: RuntimeAdapterMountNonClaims = .defaultOpen
     ) throws {
         self.schemaVersion = schemaVersion
+        self.runtimeTarget = runtimeTarget
         self.mountVerdict = mountVerdict
         self.adapterSha = adapterSha
         self.adapterConfigSha = adapterConfigSha
@@ -121,6 +130,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
         self.codeHeadSha = codeHeadSha
         self.trainpackSha = trainpackSha
         self.decodeContractID = decodeContractID
+        self.irMapFingerprint = irMapFingerprint
         self.mountedToolCatalogSha = mountedToolCatalogSha
         self.caseLedgerRef = caseLedgerRef
         self.provenance = provenance
@@ -132,6 +142,10 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.schemaVersion = try container.decode(String.self, forKey: .schemaVersion)
+        guard schemaVersion == Self.schemaVersion else {
+            throw RuntimeAdapterMountReceiptValidationError.invalidSchemaVersion(schemaVersion)
+        }
+        self.runtimeTarget = try container.decodeIfPresent(String.self, forKey: .runtimeTarget) ?? ""
         self.mountVerdict = try container.decode(RuntimeAdapterMountVerdict.self, forKey: .mountVerdict)
         self.adapterSha = try container.decode(String.self, forKey: .adapterSha)
         self.adapterConfigSha = try container.decode(String.self, forKey: .adapterConfigSha)
@@ -141,6 +155,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
         self.codeHeadSha = try container.decode(String.self, forKey: .codeHeadSha)
         self.trainpackSha = try container.decode(String.self, forKey: .trainpackSha)
         self.decodeContractID = try container.decode(String.self, forKey: .decodeContractID)
+        self.irMapFingerprint = try container.decodeIfPresent(String.self, forKey: .irMapFingerprint) ?? ""
         self.mountedToolCatalogSha = try container.decode(String.self, forKey: .mountedToolCatalogSha)
         self.caseLedgerRef = try container.decode(String.self, forKey: .caseLedgerRef)
         self.provenance = try container.decode(DemoRuntimeAdapterProvenance.self, forKey: .provenance)
@@ -151,6 +166,10 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
 
     public func validate() throws {
         try Self.requireNonEmpty(schemaVersion, field: "schema_version")
+        guard schemaVersion == Self.schemaVersion else {
+            throw RuntimeAdapterMountReceiptValidationError.invalidSchemaVersion(schemaVersion)
+        }
+        try Self.requireNonEmpty(runtimeTarget, field: "runtime_target")
         try Self.requireNonEmpty(adapterSha, field: "adapter_sha")
         try Self.requireNonEmpty(adapterConfigSha, field: "adapter_config_sha")
         try Self.requireNonEmpty(baseModelID, field: "base_model_id")
@@ -159,7 +178,8 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
         try Self.requireNonEmpty(codeHeadSha, field: "code_head_sha")
         try Self.requireNonEmpty(trainpackSha, field: "trainpack_sha")
         try Self.requireNonEmpty(decodeContractID, field: "decode_contract_id")
-        try Self.requireNonEmpty(mountedToolCatalogSha, field: "mounted_tool_catalog_sha")
+        try Self.requireNonEmpty(irMapFingerprint, field: "ir_map_fingerprint")
+        try Self.requireNonEmpty(mountedToolCatalogSha, field: "mounted_demo_catalog_sha")
         try Self.requireNonEmpty(caseLedgerRef, field: "case_ledger_ref")
         try Self.requireNonEmpty(mountedAt, field: "mounted_at")
         guard nonClaims.adapterLearnedQA == false else {
@@ -188,6 +208,7 @@ public struct RuntimeAdapterMountReceipt: Codable, Equatable, Sendable {
 
 public struct RuntimeAdapterMountReceiptBuilder: Equatable, Sendable {
     public var mountVerdict: RuntimeAdapterMountVerdict = .blocked
+    public var runtimeTarget: String?
     public var adapterSha: String?
     public var adapterConfigSha: String?
     public var baseModelID: String?
@@ -196,6 +217,7 @@ public struct RuntimeAdapterMountReceiptBuilder: Equatable, Sendable {
     public var codeHeadSha: String?
     public var trainpackSha: String?
     public var decodeContractID: String?
+    public var irMapFingerprint: String?
     public var mountedToolCatalogSha: String?
     public var caseLedgerRef: String?
     public var provenance: DemoRuntimeAdapterProvenance = .firstExecution
@@ -205,6 +227,7 @@ public struct RuntimeAdapterMountReceiptBuilder: Equatable, Sendable {
 
     public func build() throws -> RuntimeAdapterMountReceipt {
         try RuntimeAdapterMountReceipt(
+            runtimeTarget: try required(runtimeTarget, field: "runtime_target"),
             mountVerdict: mountVerdict,
             adapterSha: try required(adapterSha, field: "adapter_sha"),
             adapterConfigSha: try required(adapterConfigSha, field: "adapter_config_sha"),
@@ -214,7 +237,8 @@ public struct RuntimeAdapterMountReceiptBuilder: Equatable, Sendable {
             codeHeadSha: try required(codeHeadSha, field: "code_head_sha"),
             trainpackSha: try required(trainpackSha, field: "trainpack_sha"),
             decodeContractID: try required(decodeContractID, field: "decode_contract_id"),
-            mountedToolCatalogSha: try required(mountedToolCatalogSha, field: "mounted_tool_catalog_sha"),
+            irMapFingerprint: try required(irMapFingerprint, field: "ir_map_fingerprint"),
+            mountedToolCatalogSha: try required(mountedToolCatalogSha, field: "mounted_demo_catalog_sha"),
             caseLedgerRef: try required(caseLedgerRef, field: "case_ledger_ref"),
             provenance: provenance,
             mountedAt: try required(mountedAt, field: "mounted_at")
@@ -229,5 +253,21 @@ public struct RuntimeAdapterMountReceiptBuilder: Equatable, Sendable {
             throw RuntimeAdapterMountReceiptValidationError.missingRequiredField(field)
         }
         return value
+    }
+}
+
+public struct RuntimeAdapterMountReceiptV1HistoricalEvidence: Codable, Equatable, Sendable {
+    public var schemaVersion: String
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.schemaVersion = try container.decode(String.self, forKey: .schemaVersion)
+        guard schemaVersion == "runtime_adapter_mount_receipt.v1" else {
+            throw RuntimeAdapterMountReceiptValidationError.invalidSchemaVersion(schemaVersion)
+        }
     }
 }

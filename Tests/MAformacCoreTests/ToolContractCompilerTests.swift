@@ -74,6 +74,17 @@ final class ToolContractCompilerTests: XCTestCase {
         XCTAssertEqual(irs.first?.value.type, "SPOT")
     }
 
+    func testCompiledDDomainIRMapCountIs562() {
+        XCTAssertEqual(DDomainIRMap.irMapCompiled.count, 562, "compiled ir_map must cover the full D-domain recognition surface")
+        XCTAssertEqual(DDomainIRMap.irMapCompiled["adjust_ac_temperature_to_number"]?.device, "ac_temperature")
+    }
+
+    func testCompiledDDomainIRMapFingerprintMatchesGeneratedJSON() throws {
+        let fileIRMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        XCTAssertEqual(DDomainIRMap.irMapCompiledFingerprint, try ToolContractNormalizer.irMapFingerprint(fileIRMap))
+        XCTAssertEqual(DDomainIRMap.irMapCompiledFingerprint, ToolContractNormalizer.compiledIRMapFingerprint())
+    }
+
     func testNormalizeDDomainMultiPrimitiveDisambiguation() throws {
         let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
         // adjust_atmosphere_lamp_brightness_to_number: primitives [adjust_to_number, by_percent]

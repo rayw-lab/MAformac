@@ -24,6 +24,9 @@ GENERATED_DOMAIN := \
 	generated/subset-policy-manifest.json \
 	generated/subset-grammar-artifacts.json
 
+GENERATED_SWIFT := \
+	Core/Contracts/DDomainIRMap.generated.swift
+
 .PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
@@ -111,7 +114,7 @@ verify-refs: .venv/.deps.stamp
 HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml contracts/subset-grouping.yaml
 
 diff:
-	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(GENERATED_DOMAIN) $(HANDWRITTEN_CONTRACTS) scripts Makefile
+	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(GENERATED_DOMAIN) $(GENERATED_SWIFT) $(HANDWRITTEN_CONTRACTS) scripts Makefile
 
 clean-venv:
 	rm -rf .venv

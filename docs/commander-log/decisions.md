@@ -939,3 +939,76 @@
 - **non-claims**：本 D 条不声称 candidate signed；不声称 V-PASS；不声称 formal 1800 已起跑或已过门；不声称 `6a4b6b82` clean code 可复现冻结 trainpack；不声称 W20A runtime 接线已实装；不声称 G1/G2/G4/G5/G6 已由磊哥拍；不把 `swift test 567/0` / `make verify` 升格为 runtime/mobile/true-device/live acceptance；不声称 W21 P1 已解除；不声称新 PR 已打开。
 
 - **证据锚**：`closeout/landing-checklist.md`；`final-audit/report.md`；W1 `/dirty-triage/report.md`；W2 `/data-1800-check/report.md`；W5 `/remote-reconcile/report.md`；W10 `/main-conflict-prep/report.md`；R1/R2 `/grill-r1-synthesis/cross-review.md`、`R2-FINAL-DECISIONS.md`；`MASTER-STATUS.md`；current git `git status --short --branch`; `git log --oneline 6a4b6b82..HEAD`; `gh pr list --head codex/rebuild-c6-doc-absorption-20260624 --state all --json ...`。
+
+## D-113（2026-07-07，register 补洞窗 grill 20/20 全拍 → 计划相定稿）指针式落库、formal 1800 goal supersede 分层、W20A 收口
+
+- **磊哥全拍键**：2026-07-07 register grill **20/20 裁决批准**（含 Q13 golden boundary、Q16 机械前置+分型阈值、Q19 A supersede）。
+- **SSOT 指针**：20 裁决全文=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/PARADIGM-LEDGER.md`；一页消费清单=同目录 `FINAL-LIST.md`；实施计划定稿=`register-window/IMPL-PLAN-v2.md`（12 stage，双红队 2P0+8P1 全吸收，REDTEAM_ABSORBED_PENDING_RUNAUTH）；消减表=`REDUCTION-TABLE-v1.md`。
+- **计划相态**：v1→双红队（甲 2P0+5P1/乙 4P1）→v2 定稿。磊哥仅 4 项 hard gate：①S2 golden boundary ~10 条 ratify ②run-auth ③host HOLD 解法 ④S10 触发 Q18②/③分支知情确认。补洞前不跑中间档训练。
+
+
+- 🔴 **register 补洞窗正式从 grill 决策相进入计划相（Accepted）**：
+  - 20 题 grill 已按 R1-R4 四轮收口，范围覆盖：金标 ratify/overturn、risk/register 分层、action-question 窗口边界、监督形态、分桶与防死记、DataGate/meta 判定、scanner v3 时序、生成工艺、重冻/验收/回退、Q19 账务、Q20 落库分层。
+  - 磊哥已全拍 20/20：特别确认 Q13 golden boundary 需磊哥抽约 10 条 ratify；Q16 六机械前置缺一即 BLOCKED 且不产可读行为数字、NO_TOOL fail=0/wrong-name≤1/holdout 相对差/non_EXP_D_regressions=0；Q19 采用 A 案。
+  - 下一阶段仍不是直接训练，而是计划件修订：`IMPL-PLAN-v1.md` 已出，双红队已回，v2 修订中；补洞前不得跑中间档训练。
+  - 任何新数据训练都必须作为 `register-window new recipe run`，绑定新 Launch Packet、scanner v3、DataGate、runtime_qa_safety receipt、三臂 eval、claim envelope 和红队审计。
+
+- 🔴 **20 裁决采用指针式落库，不复制全文（Accepted）**：
+  - `decisions.md` 只落一条 D-113：记录窗口立项、20 裁决 source pointer、磊哥全拍键、Q19 supersede 链、W20A 当前态、计划 lineage、Q20 分层落点。
+  - 20 条完整裁决全文留在 run-local ledger：`register-window/grill-20/PARADIGM-LEDGER.md`；一页消费清单留 `register-window/grill-20/FINAL-LIST.md`。
+  - `docs/CURRENT.md` 只放活动窗指针和过期条件；不复制 20 条正文。
+
+- 🔴 **Q19 formal 1800 goal supersede 链分层（Accepted）**：
+  - **goal 层立即 supersede**：旧口径「R3-QNEG-clean 5653 冻结包上的 formal 1800 goal」立即标记为由 `register-window new recipe run` 这个达成体承接/实现。语义是 **A = 达成体 + 显式 supersede 链**，不是两个 formal 1800 并存。
+  - **data/candidate 层 pending**：旧 tail1200 / R3-QNEG-clean basis 在新门全绿前**不标 data-basis superseded**。旧 basis 继续是 demo 主路和回退承重墙，直到新 recipe 通过机械门、行为门、holdout、qa safety、receipt、三臂 eval 和红队复核后才迁移。
+  - **registry 层两事件**：即刻登记 goal supersede event；新 data basis 只预登记为 `pending_gates`。失败 run 以 `FAILED_UNSIGNED` / `PARTIAL_BEHAVIOR` 等状态入 registry，不污染旧 basis。
+  - **non-claim**：D-113 不声称 formal 1800 已完成、不声称新 candidate signed、不声称 tail1200 已被替换、不声称 register 训练已启动。
+
+- 🔴 **W20A 当前态作为 register 计划前置上下文（Accepted）**：
+  - W20A 已走完 8 stage 实装链；Stage 8 先被 S8R `REFUTED`，因为 Mac SwiftPM 可伪造 `ios_sim` receipt 过 claim gate、iOS xcodebuild 只跑 stdout stub、claim-envelope 不验 stdout。
+  - S8FIX 后 S8FR 复核为 `AMENDED`：三条 S8R P0 false-green 攻击面均 **CLOSED**；攻击套件在 current HEAD 上为 `ATTACK1=BLOCKED / ATTACK2=BLOCKED / ATTACK3=BLOCKED`，在 vulnerable basis 上为 3×LEAKED，证明攻击套件有判别力。
+  - 当前 W20A S8FIX 证据面还包含：RuntimeAdapterMountReceiptTests 6/0、W20ARuntimeReadbackTests 4/0、claim-envelope tests PASS、xcodebuild iOS Simulator readback PASS、extraction + claim gate PASS；S8FR 记录 closeout 路径必须是 `xcodebuild stdout -> extract receipt -> claim gate`。
+  - W20A 全量回归面记录为 **597 tests / 0 failures**；register-window 的 S8 训练启动必须消费 W20A S8FIX 机械绿 receipt，不能只消费 prose “已收口”。
+
+- 🔴 **实施计划 lineage：v1 → 双红队 → v2 修订中（Accepted）**：
+  - `IMPL-PLAN-v1.md` 是 10 stage 计划草稿，status=`DRAFT_PENDING_REDTEAM`。
+  - 红队甲 `plan-rt-a.md`：P0=2 / P1=5。两 P0 已采信并转 %16 修 v2：final label-authority key 缺 `mounted_tool_shape/target_tool_present` 上下文；S10 `runtime_qa_safety receipt` 无生产 stage。
+  - 红队乙 `plan-rt-b.md`：P0=0 / P1=4。P1 指向 Q4/Q7 renderer ack/register variants 缺 stage、DEFER registry 缺强制产物、W20A S8FIX 攻击套件只写 prose precondition、S9 holdout 生成/Opus 边界未拍定。
+  - 汇总 lineage：双红队合计 **2 P0 + 8 unique P1**（A/B 均触及 holdout/S9 生成归属，合并去重一次）。v2 必须补齐：final authority key、S9b runtime_qa_safety、base arm snapshot、holdout eval provenance、defer registry、Q4/Q7 ack backlog/S11、W20A attack-suite hard preflight、schedule blocker receipt。
+
+- 🔴 **Q20 落库分层表（Accepted）**：
+
+| Landing tier | 落什么 | 不落什么 |
+|---|---|---|
+| `docs/commander-log/decisions.md` D-113 | 单条 ADR：register-window 进入计划相、20 裁决指针、磊哥 20/20 全拍键、Q19 goal/data 分层 supersede、W20A S8FIX 当前态、计划 lineage | 不复制 20 条全文，不写执行细节，不签新 candidate |
+| `docs/CURRENT.md` | 活动窗指针：`register-window/grill-20/PARADIGM-LEDGER.md` + `FINAL-LIST.md` + `IMPL-PLAN-v2`；`expires_when=register 窗关闭或 basis 迁移发生` | 不写长裁决正文 |
+| `BASELINE-REGISTRY.md` | goal 层 supersede event；data basis pending gates 预登记；失败/partial run 事件态 | 不提前把旧 tail1200 / R3-QNEG-clean 标 data superseded |
+| `register-window/grill-20/PARADIGM-LEDGER.md` | 20 裁决全文、R1-R4 元教训、终卷元记录 | 不升格为全局 SSOT |
+| `register-window/grill-20/FINAL-LIST.md` | 20 裁决消费清单，供计划/执行/审计映射 | 不替代 ledger 全文 |
+| `lessons-learned.md` | 只落元教训候选：R1 答非所问/dispatch-inline grill 变体；S8 REFUTED 行为层审计；Q15 schema 权威错位/F044 上游防线；Q16 机械门假绿防 anchor | 不搬技术细节表 |
+| MEMORY as-of | 一段短态：D-113 指针、register-window 计划相、W20A S8FIX 三 P0 closed、IMPL-PLAN v2 修订中 | 不复制 ledger |
+
+### 20 裁决指针摘要
+
+- R1 Q1-Q5：ratify action-question 金标但强制配对负例；risk tier 优先于 register 并显式元数据；本窗只补 can_question_action + hedged_request 正例与门链负例；R0 监督 target 保持纯协议串，ack 归 renderer；约 400 条按 demo 10 族、holdout 与双负例义务组织。
+- R2 Q6-Q10：生产 enum 保持五类，DataGate 加 meta-capability 非 mutating 断言；R1 confirm 为 renderer register 变体；三字段顶层且 scanner v3 先行；status_query 新正例出窗而配对负例入窗；首批 50 全语义校准后批量 +20/50 抽检，单次重冻。
+- R3 Q11-Q15：holdout 三腿防线、值随机化三点一致、meta-FAQ 判定脚本+golden fixture、judge rubric 防自标、schema 字段权威归属表；`mounted_tool_shape/target_tool_present` 权威在组装层，不给 generator stamp。
+- R4 Q16-Q20：机械前置缺一即 BLOCKED 且不产出可读数字；三臂全跑但增补桶 new-only diagnostic 不进同尺分；tail1200 主路承重墙在新门全绿前不 data supersede；Q19 采用 A 达成体 + 显式 supersede 链；D-113/CURRENT/registry/ledger/lessons/MEMORY 分层落库。
+
+### 当前执行态
+
+- **计划相 owner**：RW-PLAN / IMPL-PLAN %16；消减表 %14；FINAL-LIST %12；D-113 草稿本文件由 worker 升 v2。
+- **红队门**：PLAN-RT-A/B 已回；2 P0 全采信并转 %16 修 v2。v2 出稿后再按 commander 要求决定是否二次审。
+- **W20A 并行态**：S8R `REFUTED` 已经 S8FIX+S8FR 翻转为三 P0 CLOSED，但 closeout wording 必须保留 `AMENDED` 残留：xcodebuild stdout 需 extraction step，iOS receipt 口径不得误称 live-head-bound。
+- **启动红线**：register-window 不因 D-113 落库自动启动训练；S8 train 仍需 W20A mechanical green receipt、run-auth、host HOLD 解法和 IMPL-PLAN v2 gates。
+
+### Evidence anchors
+
+- `register-window/grill-20/PARADIGM-LEDGER.md` R1-R4 裁决段。
+- `register-window/grill-20/FINAL-LIST.md`：顶部记录“磊哥 2026-07-07 全拍（20/20 裁决批准，含 Q13 golden boundary/Q16 阈值/Q19 A supersede）”。
+- `register-window/IMPL-PLAN-v1.md`：10 stage 计划草稿，status=`DRAFT_PENDING_REDTEAM`。
+- `register-window/plan-rt-a.md`：P0=2/P1=5；两 P0 为 final key mount context 与 runtime_qa_safety receipt 生产 stage。
+- `register-window/plan-rt-b.md`：P0=0/P1=4；四 P1 为 Q4/Q7 ack、DEFER registry、W20A attack-suite preflight、S9 holdout/Opus 边界。
+- `w20a-impl-reviews/s8-review.md`：S8R verdict=`REFUTED`。
+- `w20a-impl-reviews/s8fix-review.md`：S8FR verdict=`AMENDED`；三 P0 CLOSED；攻击套件 3×BLOCKED；extraction + claim gate PASS。
+- `w20a-impl-reviews/selftest-log.md`：current HEAD 3×BLOCKED；vulnerable basis 3×LEAKED。

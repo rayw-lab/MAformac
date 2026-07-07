@@ -36,6 +36,9 @@ public struct TraceAttributes: Codable, Equatable, Sendable {
     public var repairUsed: Bool?
     public var guardReason: String?
     public var readbackResult: TraceReadbackResult?
+    public var finiteReason: String?
+    public var rawPayloadHash: String?
+    public var slotProjected: Bool?
 
     public init(
         candidateSource: ToolCandidateSource? = nil,
@@ -43,7 +46,10 @@ public struct TraceAttributes: Codable, Equatable, Sendable {
         stopReason: String? = nil,
         repairUsed: Bool? = nil,
         guardReason: String? = nil,
-        readbackResult: TraceReadbackResult? = nil
+        readbackResult: TraceReadbackResult? = nil,
+        finiteReason: String? = nil,
+        rawPayloadHash: String? = nil,
+        slotProjected: Bool? = nil
     ) {
         self.candidateSource = candidateSource
         self.toolCallCount = toolCallCount
@@ -51,6 +57,9 @@ public struct TraceAttributes: Codable, Equatable, Sendable {
         self.repairUsed = repairUsed
         self.guardReason = guardReason
         self.readbackResult = readbackResult
+        self.finiteReason = finiteReason
+        self.rawPayloadHash = rawPayloadHash
+        self.slotProjected = slotProjected
     }
 }
 
