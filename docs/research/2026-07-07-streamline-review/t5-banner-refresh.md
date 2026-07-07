@@ -1,7 +1,7 @@
 # T5 Banner Refresh Preflight（B4a）
 
-日期：2026-07-07  
-范围：重验 `docs/grill-tournament/cascade-inventory.md §T5` 的历史快照 banner 批。  
+日期：2026-07-07
+范围：重验 `docs/grill-tournament/cascade-inventory.md §T5` 的历史快照 banner 批。
 约束：只读盘点；不改任何被盘点 docs 正文；不 `git add` / `git commit`。
 
 ## 结论
