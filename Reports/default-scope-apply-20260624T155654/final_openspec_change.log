@@ -1,4 +1,0 @@
-$ openspec validate define-demo-default-scope --strict
-Change 'define-demo-default-scope' is valid
-
-exit_code=0
