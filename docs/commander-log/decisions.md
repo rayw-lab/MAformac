@@ -1027,3 +1027,13 @@
   - S8 点火五布尔改写为：S7c receipt PASS（=run-auth 生效）+ host fresh resample PASS（非 waiver）+ W20A mechanical green receipt + S7b causal-bet receipt + IMPL-PLAN v3 gates。
   - holdout 塌 = 话术收窄或新窗口，**waiver 通道对 holdout 关闭**（比 v3 更严，以本条为准）。
 - 级联：CURRENT.md 待磊哥段收敛（仅剩条件式项）；STATUS-BOARD（run dir 2026-07-07-ma-opt-refactor）；MEMORY as-of 下轮刷新时并入。
+
+## D-115：任务①（全项目精简与架构优化）N1-N4 四项磊哥全批（照 commander ⭐ 推荐）
+
+- date: 2026-07-07（下午）
+- 磊哥原话：「N1-N4全部同意你的推荐」。逐项生效：
+  - **N1 批**：MCP decision note——旧「MCP 走 Capability 同构」（brainstorm-2026-06-17）显式 amend 为「vehicle `Capability` + domain-neutral `ToolProvider` 并行，guard/executor 等价边界保留」。note 起草后仍呈磊哥过目正文再落 openspec/docs。
+  - **N2 知情确认**：M.33 iOS ir_map 缺陷随 Q2=C 冻结封存，iOS 二期再修；修复成本三档估算存档（run dir `out/m33-ios-irmap-status.md`）。
+  - **N3 批（保守版）**：Reports 31 tracked 文件退仓与 frozen 重复 tarball 化——本轮只落 migration plan + digest/重复清单，实际执行等磊哥单独点头。
+  - **N4 批**：openspec 11 active change 补 `status:` 字段（disposition 机械源），字段方案草案呈磊哥过目后落。
+- 关联：任务① 合成件=run dir `2026-07-07-ma-opt-refactor/out/COMMANDER-SYNTHESIS-v1.md`（10 结论 grill 拆解 + 双红队审计后修订 v2 再执行）。
