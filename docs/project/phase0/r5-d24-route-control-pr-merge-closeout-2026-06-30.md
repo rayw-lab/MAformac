@@ -17,6 +17,8 @@ nonclaims:
   - not_true_device
   - not_live_api
   - not_v_pass
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D24 Route-Control PR Merge Closeout

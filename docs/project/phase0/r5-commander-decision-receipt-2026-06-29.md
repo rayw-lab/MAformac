@@ -6,6 +6,8 @@ created_at: 2026-06-29
 proof_class_ceiling: human_decision_record + docs/local + local_static
 authority: commander_human_decision_record_not_runtime_contract
 human_authorization: "磊哥已明确：全部授权同意，人审过了。"
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D8 Commander Decision Receipt

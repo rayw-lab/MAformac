@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # R5 D22 Runtime Payload Corpus Expansion Main Receipt
 
 Status: Gate1-Gate4 local closure passed; Hermes gate audits 1-4 passed with P0/P1 empty. First GPT Pro PR-pair audits returned `REQUEST_CHANGES`; owned fixes are applied post-audit and a user-requested post-fix GPT Pro rerun is pending after push.

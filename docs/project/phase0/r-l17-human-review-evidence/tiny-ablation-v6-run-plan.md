@@ -3,6 +3,8 @@ authority: run_plan_under_v6_overnight_auth
 run_auth: v6-overnight-run-auth-2026-07-02.md（磊哥 verbal 转写）
 created: 2026-07-02 深夜
 status: staged_pending_phase123_closeout
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # v6 tiny-ablation + wave-1 数据 执行计划（通宵）

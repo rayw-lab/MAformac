@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # R5 D16 Gate 4 - Core Config / Force-State Upstream Verifier
 
 Date: 2026-06-29

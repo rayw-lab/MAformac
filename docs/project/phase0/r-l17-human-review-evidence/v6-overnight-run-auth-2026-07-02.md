@@ -4,6 +4,8 @@ signer: 磊哥（human owner，verbal via /goal 指令）
 transcribed_by: claude-commander %42
 signed_at: 2026-07-02 深夜
 scope: v6 tiny-ablation rerun + wave-1 数据真生成 + C5 数据门
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # v6 通宵 run-auth（磊哥 verbal 转写）

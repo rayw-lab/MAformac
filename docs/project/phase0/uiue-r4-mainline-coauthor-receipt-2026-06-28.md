@@ -17,6 +17,8 @@ non_claims:
   - no golden-ready
   - no endpoint-ready
   - no V-PASS
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # UIUE R4 Mainline Co-Author Receipt - Superseded

@@ -13,6 +13,8 @@ cloud_prs:
 verdict: MERGE_AFTER_GATES
 proof_class: local_static + github_api_remote_truth + github_docs_oracle
 retire_when: "D24 execution receipt lands, PR #7/#6 are merged or superseded, or user chooses a different merge strategy."
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D24 本地 + 云端 + 双 Repo 全面吸收合并方案

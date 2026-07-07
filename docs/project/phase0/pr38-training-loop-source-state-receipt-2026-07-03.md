@@ -8,6 +8,8 @@ pr: 38
 branch: codex/t1d-repoize-d2combo-20260703
 head_under_test: 2f71a4ad5506c8223df42fb7f660f44cc5364e2e
 review_source: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/REVIEW-PR38.md
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # PR38 Training Loop Source-State Receipt

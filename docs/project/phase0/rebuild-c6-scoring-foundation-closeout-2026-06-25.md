@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # Rebuild-C6 Scoring Foundation Closeout - 2026-06-25
 
 ## Verdict

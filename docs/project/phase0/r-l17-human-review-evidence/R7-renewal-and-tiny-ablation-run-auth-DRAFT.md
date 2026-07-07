@@ -6,6 +6,8 @@ prepared_by: claude-commander（磊哥 D-019 指令：备模板不等 7-15，保
 prepared_on: 2026-07-02
 supersedes: 无（与 R7-final-route-deframing-signoff.md 并存；签署后本文件转正式 signoff 文件）
 predecessor: R7-final-route-deframing-signoff.md（route-only signed 2026-06-25，expires 2026-07-15）
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R7 续签 + 裁决-A tiny-ablation run-auth（模板，draft/unsigned）

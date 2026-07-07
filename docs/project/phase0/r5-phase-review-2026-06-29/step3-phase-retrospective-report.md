@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # Step 3 - R5 D1-D12 Phase Retrospective
 
 label: UIUE_R5_D1_D12_PHASE_RETROSPECTIVE

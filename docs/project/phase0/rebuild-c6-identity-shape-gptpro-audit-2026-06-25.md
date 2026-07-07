@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 可下载 Markdown 文件： [pr_audit_7.md](sandbox:/mnt/data/pr_audit_7.md)
 
 # PR #7 深度代码审计简报 — Long-run 2 Rebuild-C6 Identity + Behavior Shape Closeout

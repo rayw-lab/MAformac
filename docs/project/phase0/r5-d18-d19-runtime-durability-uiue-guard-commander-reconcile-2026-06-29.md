@@ -5,6 +5,8 @@ repo: /Users/wanglei/workspace/MAformac
 status: DONE_UNDER_PROOF_CAP_WITH_FINAL_AUDIT_FAIL_FIXED
 proof_class: docs_local + local_static + local_unit + local_integration + openspec_local + gitnexus_static + hermes_audits + claude_code_audit + codex_subagent_audit
 created_at: 2026-06-29
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
 ---
 
 # R5 D18+D19 Main-Side Reconcile

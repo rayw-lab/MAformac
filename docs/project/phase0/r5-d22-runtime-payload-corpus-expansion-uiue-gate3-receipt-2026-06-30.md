@@ -1,3 +1,8 @@
+---
+retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
+expires: "2026-08-15"
+---
+
 # R5 D22 Runtime Payload Corpus Expansion UIUE Gate3 Receipt
 
 Status: Gate3 local validation passed; Hermes gate audit PASS with P0/P1 empty. First GPT Pro PR-pair audits returned `REQUEST_CHANGES`; owned UIUE guard fixes are applied post-audit and a user-requested post-fix GPT Pro rerun is pending after push.
