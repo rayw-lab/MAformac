@@ -1,3 +1,7 @@
+status: `historical_superseded`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 > **Historical status note 2026-07-05**: this PR5 candidate-run change is prior evidence and not current formal-1800 launch authorization. Current formal-1800 run-auth was accepted, but host gate remained HOLD, no trainer pid existed, watchdog was not armed, formal remains evidence-run-only, and candidate remains unsigned.
 
 ## Why

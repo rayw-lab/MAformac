@@ -1,3 +1,7 @@
+status: `active_construction`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 ## Why
 
 Accepted G01-G28 default-scope decisions establish that omitted scope in demo utterances must resolve through C2 `default_scope`, not `全车`, not `all`, and not YAML order such as `scope.first`.

@@ -1,3 +1,7 @@
+status: `draft_needs_human_propose`
+status_source: `D-115/N4`
+status_updated: `2026-07-07`
+
 > DRAFT SKELETON（2026-06-24 Q1-Q4 文档吸收版，待人审 propose）
 >
 > This change is an OpenSpec carrier for rebuilding C6 as the trusted yardstick before C5 retraining. It is documentation absorption only until propose acceptance and route gates are satisfied.
