@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-07（PR #40 merged + register grill 20/20 全拍后态）
+updated: 2026-07-07晚
 last_verified_origin_main: b2a25da7（PR #40 merge commit；head_truth_rule 以 live git 为准）
 branch: codex/rebuild-c6-doc-absorption-20260624
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "register 窗 S4 生成启动或 run-auth 拍点"
+expires_when: "S4 首批 judge 工艺 PASS 或 S7c 触发"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,7 +14,19 @@ expires_when: "register 窗 S4 生成启动或 run-auth 拍点"
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-07：**register 补洞窗计划相 v3 定稿；PR #39/#40 均已 MERGED 进 main**）
+## 当前阶段（2026-07-07晚：**S4 生产相开跑；清理 6/6 收口；第二批 grill READY**）
+
+🔴 **本节 supersede 下方 2026-07-07 register 补洞窗计划相旧态段**。本文件只作 router-only 指针；推进事实源以 roadmap v3、decisions D-114~D-118 和 run-dir board 为准。
+
+- **roadmap v3 指针**：`docs/roadmap-2026-07-07-macos-closure-baseline.md` = 三线融合基线 v3（两轮审计毕）；决策入口 = `docs/commander-log/decisions.md` D-114~D-118。
+- **任务①精简收口**：终审 GO，分支 `opt/streamline-macos-20260707`；物理清理 6 批完成，tracked -611；fullgate 597/0。
+- **任务② register 窗**：S4 生产相已开跑；Q-03 三轮收敛；golden 62 行；run-auth 条件式 = S7c PASS 生效；五管道阵容运行，`%34` judge 待命。
+- **任务③能力面**：能力面已立项；task3 teardown 真值为 `ir_map=562` / `mounted=1` / 120 格仅 1 格可演；BATCH1 19 题已拍，MG-7=C；第二批 grill READY。
+- **非声明**：当前仍不得写 candidate signed、C5 V-PASS、C6 acceptance、mobile/true-device acceptance 或 UIUE/voice readiness。
+
+📌 **下一步**：S4 首批样本生成与 judge 工艺验证；S7c 触发后才按 D-114 run-auth 条件式推进。
+
+## 【历史】2026-07-07：register 补洞窗计划相 v3 定稿；PR #39/#40 均已 MERGED 进 main
 
 🔴 **本节 supersede 下方 D-111 honest-frozen-closeout 旧态段**。本文件只作 router-only 指针，不复制 register grill 20 条正文；裁决全文、消费清单和计划以 run-dir SSOT 为准。
 
