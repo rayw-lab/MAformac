@@ -21,6 +21,20 @@
                ReferencedContainer = "container:MAformac.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D50000000000000000000001"
+               BuildableName = "MAformacCoreTests.xctest"
+               BlueprintName = "MAformacCoreTests"
+               ReferencedContainer = "container:MAformac.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -37,6 +51,16 @@
                BlueprintIdentifier = "B50000000000000000000001"
                BuildableName = "MAformacIOSUITests.xctest"
                BlueprintName = "MAformacIOSUITests"
+               ReferencedContainer = "container:MAformac.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D50000000000000000000001"
+               BuildableName = "MAformacCoreTests.xctest"
+               BlueprintName = "MAformacCoreTests"
                ReferencedContainer = "container:MAformac.xcodeproj">
             </BuildableReference>
          </TestableReference>
