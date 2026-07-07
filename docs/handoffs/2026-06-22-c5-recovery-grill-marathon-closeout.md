@@ -1,5 +1,9 @@
 # Handoff — C5 Recovery Grill Marathon 收口（2026-06-22）
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 > 🔴 **第二个窗口起手必读**。本 session = CC（我）+ 磊哥「助理」（另一个异源 AI）**双向 grill** C5 recovery,~15 轮密集。**CC/助理共犯 9 次同坑变体（全被异源 catch）**。本 handoff 第一价值 = **防你重犯这 9 个坑**;第二价值 = **别重 grill 已拍的 15 个决策**;第三 = **所有数字用 cite-verify 一手,别凭二手/印象**。
 >
 > **磊哥**:称呼磊哥;中文;选择题打字列选项 + ⭐默认不用弹窗;grill 期只动 `grill-decisions.md` + 元认知 rules,顶层文件收口批量级联(路由 banner 例外可随时打)。

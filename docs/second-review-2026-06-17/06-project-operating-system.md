@@ -1,5 +1,9 @@
 # 06 项目组织推进方式
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 ## 问题判断
 
 verdict=clear：MAformac 现在还不是一个成型软件项目，只是一个刚建立的项目文件夹，加上一批参考 repo 和调研文档。后续 PRD、SRD、系统代码架构、spec、contracts、评测合同都还没有定。如果马上写 Swift app，短期会快，几天后会在能力命名、schema、模型路线、UI 状态、测试口径上反复返工。

@@ -1,5 +1,9 @@
 # Dispatch — P0-2 C6 model artifact fingerprint
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 > 派 Codex(long-runner + TDD)。磊哥手动粘贴。
 > 形态 = 在未 archive 的 C6 `define-vehicle-tool-bench` change 内补 delta + Swift 实装。P0-1 readback gate 已完成；本次只做 P0-2，不 archive C6。
 

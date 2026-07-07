@@ -1,5 +1,9 @@
 # Handoff 2026-06-19 — C1/C2 契约 SSOT propose+审+整改闭环 → apply 阶段 A 派 codex
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 ## 一句话状态
 全量重构落地:`define-c1c2-contract`(C1+C2)**propose done + GPT Pro 审 + F1-F5 整改全闭环**(PR#2)。apply **阶段 A(C1 codegen)已派 codex 后台跑**;**阶段 B(挖数据定 L1/C2,精度活)待 fresh session**。
 

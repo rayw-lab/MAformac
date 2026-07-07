@@ -1,5 +1,9 @@
 # change3 整改 dispatch — GPT Pro 审计 REQUEST_CHANGES 闭环
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 ## 0. 路由元信息
 - **TO**:Codex(长跑 TDD,**隔离 git worktree**)
 - **FROM**:CC(协调者 / Layer1 self-audit)

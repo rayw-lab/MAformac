@@ -1,5 +1,9 @@
 # Claude Code 三痛点(失忆 / max-effort 仍浅思 / 不深入代码)外部工程实践 vs 磊哥 harness — ultracode 综合官报告
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 > 调研日期 2026-06-22 · 7 路 finder + 综合官 probe 收敛 · 落点 `docs/research/2026-06-22-claudecode-amnesia-shallow-harness/`
 > 一手档:`lens1`~`lens7` 各 .md(每路 summary + findings + 每条 source + pre-mortem)。本 README = 二手综合(对比矩阵 + steelman + 决策 + grill 弹药)。
 > **综合官亲核(非引 finder)**:本机已 grep/cat 坐实 4 条 load-bearing 事实(见 §0.1),用于给下面所有结论盖一手源章。

@@ -1,5 +1,9 @@
 # Handoff 2026-06-19 — change3 PR #1 + GPT Pro 审计 REQUEST_CHANGES(待整改)
 
+> ⚠️ **HISTORICAL 快照（T5）—— 文档级联 banner（2026-07-07 B4b）**
+> 本文是 `docs/grill-tournament/cascade-inventory.md §T5` 标记的历史快照，当前仅保留溯源/交接价值；supersede 指针以 `docs/grill-tournament/cascade-inventory.md` 的 T5 账本为准。
+> **活基线** = `CLAUDE.md §9` + `docs/grill-tournament/grill-decisions-master.md` + `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md` + `docs/grill-tournament/cascade-inventory.md`。正文保留供溯源，勿据此推进。
+
 ## 一句话状态
 change3 已开 PR #1(OPEN)+ GPT Pro(gpt-5.5 pro)8 维审计 verdict=**REQUEST_CHANGES**(catch 出 F2 真 bug)。CC1 已辩证分类(真 bug 必修 / 已知范围部分采纳 / 工程择优)。**下一步 = 写整改 dispatch 派 Codex**(上次写到一半被工具 bug 打断未存成,需重写)。
 
