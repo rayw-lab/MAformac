@@ -1043,3 +1043,9 @@
 磊哥原话「N1 批 / N4 批」。生效：
 - N1 正文批：proof-class 走 Option A（Slice A/C 用 public `PresentationProofClass`；Option B provider 内部枚举等真 MCP 执行获批再引入）；落点=新 openspec change `define-external-tool-provider-boundary`（四件套）+ 接受后 ADR 指针。
 - N4 正文批：`status:` 单字段首刀 + 6 枚举 + 11 change 初值表（run dir `2026-07-07-ma-opt-refactor/out/n4-openspec-status-field-draft.md`）；门=`openspec validate --all --strict` 全绿。
+
+## D-116：融合基线 roadmap 落库 + S4/S5 生成执行方变更（Opus→hermes 生成 + codex judge）
+
+- date: 2026-07-07（傍晚）
+- 磊哥拍：①push 批准（opt/streamline-macos-20260707）②commander 亲笔融合 baseline roadmap = `docs/roadmap-2026-07-07-macos-closure-baseline.md`（三线调度→macOS app 全功能闭环五门；基线文档组成员，两轮 worker 审计后终版）③**不派 Opus**：S4/S5 生成改 hermes(glm-5.2, 2 实例) 生成 + codex judge 盲判（保异源：生成≠判≠同厂商），supersede IMPL-PLAN-v3 附录「Opus 仅生成」分工④worker 阵容调整 4 codex + 2 hermes（%26/%31=hermes，pane 亲核）。
+- 关联纠错：「可执行 136」口径废弃（task3 teardown 亲核：136=ir_map adjust 前缀子分类计数；真值=semantic contract 可执行 2 / mounted 1 / 120 格仅 1 格可演）。

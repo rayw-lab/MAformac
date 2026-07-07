@@ -71,7 +71,7 @@ macOS app 全功能闭环 = A 的载体 × B 的模型 × C 的能力面 SSOT，
 
 ## 五、执行编排（6 worker 常备，无 Opus）
 
-- **组成**：5 codex（gpt-5.5）+ 1 hermes（GLM，异源位）。角色灵活（磊哥拍）：hermes 默认承担【异源生成（S4/S5）/ 跨厂商审计 / 冰山 teardown】，codex 承担【judge 盲判 / 机械门 / 实装 / 红队】。
+- **组成（磊哥 2026-07-07 调整，pane 亲核）**：4 codex（gpt-5.5 @%28/%29/%30/%27）+ **2 hermes**（glm-5.2 @%26/%31，异源位加倍）。角色灵活（磊哥拍）：hermes 双实例默认承担【异源生成（S4/S5 可并行两路）/ 跨厂商审计 / 冰山 teardown】，codex 承担【judge 盲判 / 机械门 / 实装 / 红队】——S4 生成吞吐随 2 hermes 提升，生成与 judge 仍严格异源。
 - **纪律**（本 session PROVEN 全继承）：worker 零 commit 权；SPEC 文件+短消息；收稿三验+载力断言亲核；gate 自身改动必附 `gate_strength_delta`（M.41）；批量 docs 动作前 fresh inventory（M.44）；commander stage 用显式 pathspec、amend 前核 HEAD（M.45）。
 - **优先级仲裁**：Line B > Line A > Line C（弹药类并行不占关键路径）；S7c PASS 触发全员让路 S8 链。
 
