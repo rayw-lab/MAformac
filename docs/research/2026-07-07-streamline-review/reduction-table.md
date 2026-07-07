@@ -1,5 +1,6 @@
 ---
 authority: reduction_table_v1
+as_of_head: 11a03436（后续 commit 后须刷新本表 commit 账）
 status: final_reduction_table_for_streamline_review
 proof_class: local_repo_truth_plus_commander_synthesis_v2
 claim_cap: docs_local_reduction_only
