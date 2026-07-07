@@ -10,9 +10,12 @@
 #     工具数未拍待 value-form 实算（10 族 = 191 device / 562 intent / 2159 行 / 54.1%，但 562=intent 非工具数；
 #       source: docs/research/2026-06-22-mvp-10family-device-boundary.md:39（2159/3990=54.1%）+ paradigm §14:228-231；562 = 磊哥 2026-06-23 终拍权威，534 系列已废）。
 # 保留本文件作旧 surface 示范 / eval refs / voice aliases 溯源，勿当权威 surface 派生源。升级目标见 paradigm §15-§17。
+# ⚠️ B1c 澄清（2026-07-07 streamline，零删除只加注释）：下方 state/source_of_truth/notes 为 v1 时期的机器字段【历史原样保留】，
+#   与文件头 HISTORICAL banner 冲突时以 banner 为准——本文件【不是】现行 SSOT；现行权威见 banner 第 2 行（C1 jsonl + paradigm）。
+#   勿让脚本/agent 消费下方 source_of_truth 字段作权威判定（W3 盘点 catch 的第二 SSOT 气味，docs/research/2026-07-07-streamline-review/contracts-header-and-orphan-generated.md）。
 version: 1
-state: active
-source_of_truth: contracts/capabilities.yaml
+state: active  # HISTORICAL 字段原样保留，非现行状态声明（见上方 B1c 澄清）
+source_of_truth: contracts/capabilities.yaml  # HISTORICAL 自指，已被 C1 SSOT supersede（见文件头 banner）
 notes:
   - "MAformac Phase1 MVP vehicle capability contract."
   - "This file is the single manually maintained source for tool schemas, UI cards, eval refs, trace schema, voice aliases, and LoRA labels."
