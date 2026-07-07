@@ -1,6 +1,6 @@
 ---
 authority: baseline_roadmap（基线文档组成员；与 CLAUDE.md/OpenSpec specs/grill SSOT 冲突时让位并须回写）
-status: active_baseline_v2（审计一 codex+hermes 双源 3P0 已吸收；待审计二）
+status: active_baseline_v3（两轮审计毕：审计一 3P0+审计二 3P0 全吸收——P0-3 以 v3/S3 正文级联替换闭合非仅头部指针）
 author: claude-commander (Fable5, 磊哥拍板「亲自编写」2026-07-07 傍晚)
 basis: opt/streamline-macos-20260707 @ e0f2f89d + w20a run dir S3-FINAL + 终审 FINAL-SESSION-AUDIT=GO
 supersedes: 本文件是三线融合首版；任务①②③各自的 run-dir 计划（SYNTHESIS-v2 / IMPL-PLAN-v3 / task3 弹药）保持有效，本文件是其上的融合调度层
@@ -56,7 +56,13 @@ macOS app 全功能闭环 = A 的载体 × B 的模型 × C 的能力面 SSOT，
 
 > 弹药已回稿（run dir `out/task3-capability-iceberg-teardown.md`，P0=0/P1=2）：四道墙级联 reject 链坐实（FastPath 字面量→mounted 1→semantic 2→state cells 2）；T1 crash 逃逸（转 Line A0 快修）；T3 兜底话术单一不分族（HIGH，撞北极星，进 C3）；范式层三提案=DemoCapabilityMatrix SSOT / 扩面三路分诊 / GracefulFallbackGate 三道门。
 
-1. **C1 立项 grill**（弹药已回，进模块 grill 总清单）：走重大派单范式（grill+红队成对）——议题：能力面 SSOT 落哪 / 兜底话术验收门 / 🔴**挂载决策框架预拍**（审计一 hermes P0-2 吸收：C2 不能等 S10 出来才现场想「敢挂多少」——C1 必须预拍决策表【S10 的 hedged/can-question 出手率 X% → 挂载批次规模映射】，S10 verdict 一出即按表执行，磊哥只拍表不拍临场）。
+1. **C1 立项 grill**（弹药已回，进模块 grill 总清单）：走重大派单范式（grill+红队成对）——议题：能力面 SSOT 落哪 / 兜底话术验收门 / 🔴**挂载决策表（审计二 P0-2 吸收：骨架现在定型，⭐草案进 BATCH1 拍板）**：
+   | S10 hedged+can-question 联合出手率 | 挂载批 | 备注 |
+   |---|---|---|
+   | <40% | 0（不扩，回 S10 分流处置） | 模型不支撑 |
+   | 40-70% | 3 族主 cell（空调/车窗/座椅） | 保守首批+兜底话术兜边缘 |
+   | >70% | 10 族主 cell 全批 | 每族 1 主工具，非全 562 |
+   出手率口径=S9 三臂 eval 的结构化字段（非 prose）；表本身磊哥 BATCH1 拍，S10 出数即按表执行零临场。
 2. **C2 扩挂载第一批**：依赖 **Line B S10 verdict**（新 adapter 对 hedged/can-question 的真实出手率决定敢挂多少）+ **Line A A1**（载体干净）。mounted 1→N 是「有意改变用户可见 demo 行为」= **磊哥拍**。
 3. **C3 兜底链路验收**：被拒语料的端上呈现（UI/TTS 话术）过「不丢脸」门——探针语料「我希望把窗户打开50%」进 S4 golden/eval 候选（已拍）。
 
@@ -66,7 +72,7 @@ macOS app 全功能闭环 = A 的载体 × B 的模型 × C 的能力面 SSOT，
 1. **模型门**：S10 verdict receipt（结构化字段非 prose）+ `make verify-c5-phase1-gates` rc0 + qa safety receipt 文件存在且 schema 过 checker——S10 receipt 的机械 checker 在 S9b 实装时固化（M-MODEL grill 议题）。
 2. **能力面门**：DemoCapabilityMatrix SSOT 文件落地后 `python3 scripts/check_capability_matrix.py`（C1 grill 拍落点后实装）——每格 执行/拒识/兜底 显式，不允许 unknown 格。
 3. **架构门**：`make verify-all` rc0 + `make verify-register` rc0 + A1 验收（`git diff --name-only` 无 App/C3 命中 + targeted tests）+ A3 后全量 swift test `Executed N>597, 0 failures`。
-4. **演示门**：golden-run 脚本 exit 0（demo-scenarios 全场景 + 兜底话术分族断言）+ A2 evidence validator PASS（`check-macos-demo-evidence.py`，proof cap=`local/mac_runtime_smoke` 起步）。
+4. **演示门**：golden-run 脚本 exit 0（demo-scenarios 全场景 + 兜底话术分族断言）+ A2 evidence validator PASS（`check-macos-demo-evidence.py`，proof cap=`local/mac_runtime_smoke` 起步）。golden-run 当前未实现（审计二 P0-1 诚实标注）：其 command/receipt schema（scenario_id×结局×readback×proof_class 四字段/场景）由 M-DEMO grill 拍板后的实装单产出，本门在此前记 `PENDING_IMPLEMENTATION` 不记绿。
 5. **诚实门**：强词 grep 0 命中（V-PASS/runtime-ready/mobile/true_device 只许 non-claim 语境）+ candidate 状态字段=unsigned 直到 R-L17 G1-G5 artifact 齐。
 
 ## 五、执行编排（6 worker 常备，无 Opus）
