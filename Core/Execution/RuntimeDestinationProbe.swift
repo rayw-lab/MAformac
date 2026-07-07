@@ -35,7 +35,11 @@ public enum RuntimeDestinationProbe {
 
     public static func validate(stdoutArtifact url: URL, receipt: RuntimeAdapterMountReceipt) throws {
         let stdout = try String(contentsOf: url, encoding: .utf8)
-        guard stdout.contains("runtime_target=\(receipt.runtimeTarget)") else {
+        guard stdout.contains("runtime_target=\(receipt.runtimeTarget)"),
+              stdout.contains("xcodebuild test"),
+              stdout.contains("platform=iOS Simulator,name=iPhone 17 Pro"),
+              stdout.contains("Test Suite 'W20ARuntimeReadbackTests' passed"),
+              stdout.contains("** TEST SUCCEEDED **") else {
             throw RuntimeAdapterMountReceiptValidationError.runtimeTargetMismatch(
                 expected: receipt.runtimeTarget,
                 actual: stdout.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -3,6 +3,7 @@ import json
 import pathlib
 import re
 import sys
+import base64
 
 FORBIDDEN_PATTERNS = [
     re.compile(r"\bV-PASS\s+achieved\b", re.IGNORECASE),
@@ -29,6 +30,32 @@ def load_receipt(root: pathlib.Path) -> dict:
     if not receipt_path.exists():
         raise ValueError("missing runtime-adapter-mount-receipt.v2.json")
     return json.loads(receipt_path.read_text(encoding="utf-8"))
+
+
+RECEIPT_MARKER = "W20A_RUNTIME_RECEIPT_JSON_BASE64="
+
+
+def validate_xcode_stdout(root: pathlib.Path, receipt: dict) -> None:
+    stdout_path = root / "ios-destination-stdout.log"
+    if not stdout_path.exists():
+        raise ValueError("missing ios-destination-stdout.log")
+    stdout = stdout_path.read_text(encoding="utf-8", errors="replace")
+    required = [
+        "xcodebuild test",
+        "platform=iOS Simulator,name=iPhone 17 Pro",
+        "Test Suite 'W20ARuntimeReadbackTests' passed",
+        "runtime_target=ios_sim",
+        "** TEST SUCCEEDED **",
+    ]
+    for marker in required:
+        if marker not in stdout:
+            raise ValueError(f"iOS destination stdout missing marker: {marker}")
+    matches = re.findall(rf"{RECEIPT_MARKER}([A-Za-z0-9+/=]+)", stdout)
+    if not matches:
+        raise ValueError("iOS destination stdout missing runtime receipt artifact marker")
+    emitted_receipt = json.loads(base64.b64decode(matches[-1]).decode("utf-8"))
+    if emitted_receipt != receipt:
+        raise ValueError("receipt artifact does not match iOS destination stdout receipt marker")
 
 
 def main(argv: list[str]) -> int:
@@ -62,9 +89,10 @@ def main(argv: list[str]) -> int:
     if non_claims.get("candidate_status") != "unsigned":
         return fail("candidate_status must be unsigned")
 
-    stdout_path = root / "ios-destination-stdout.log"
-    if stdout_path.exists() and "runtime_target=ios_sim" not in stdout_path.read_text(encoding="utf-8", errors="replace"):
-        return fail("iOS destination stdout does not match runtime_target=ios_sim")
+    try:
+        validate_xcode_stdout(root, receipt)
+    except Exception as exc:
+        return fail(str(exc))
 
     print("PASS W20A claim envelope")
     return 0
