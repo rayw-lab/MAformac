@@ -80,9 +80,9 @@ def changed_receipt_paths(root):
             continue
         if "RECEIPT" not in name and "receipt" not in name:
             continue
-        if rel.startswith("docs/"):
+        if rel.startswith("docs/evidence-frozen/"):
             continue
-        if rel.startswith("runs/") and re.search(r"(^|/)README\.md$", rel):
+        if rel == "runs/README.md":
             continue
         result.append(rel)
     return result
