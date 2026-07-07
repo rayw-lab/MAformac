@@ -1,0 +1,42 @@
+{
+  "index": 39,
+  "case_id": "C6-MP-010",
+  "axis": "D",
+  "behavior_class": "tool_call",
+  "input_zh": "氛围灯调成红色",
+  "expected_tool_calls": [
+    {
+      "arguments": {
+        "value": "红"
+      },
+      "name": "switch_atmosphere_lamp_color"
+    }
+  ],
+  "mounted_tool_count": 1,
+  "mounted_tool_names": [
+    "switch_atmosphere_lamp_color"
+  ],
+  "mount_source": "catalog_sg:atmosphere_lamp_color",
+  "mount_policy": "e2_sg_full_group",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"switch_atmosphere_lamp_color\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"name\": {\"enum\": [\"中央通道氛围灯\", \"仪表板氛围灯\", \"轮廓氛围灯\", \"门板氛围灯\", \"面发光氛围灯\"], \"type\": \"string\"}, \"position\": {\"enum\": [\"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"右侧\", \"右前\", \"右后\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四门\", \"左侧\", \"左前\", \"左后\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排中\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\", \"脚部\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"SPOT\"]}}, \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\n氛围灯调成红色<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>{\"name\":\"switch_atmosphere_lamp_color\",\"arguments\":{\"value\":\"红色\"}}</tool_call>",
+  "truncated_output": "<tool_call>{\"name\":\"switch_atmosphere_lamp_color\",\"arguments\":{\"value\":\"红色\"}}",
+  "raw_output": "<tool_call>{\"name\":\"switch_atmosphere_lamp_color\",\"arguments\":{\"value\":\"红色\"}}</tool_call>",
+  "tool_calls": [
+    {
+      "name": "switch_atmosphere_lamp_color",
+      "arguments": {
+        "value": "红色"
+      }
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 488,
+  "observed_tool_names": [
+    "switch_atmosphere_lamp_color"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

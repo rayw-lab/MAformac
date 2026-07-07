@@ -1,0 +1,41 @@
+{
+  "index": 20,
+  "case_id": "R2B-BN3-002N",
+  "axis": "B",
+  "behavior_class": "tool_call",
+  "input_zh": "打开主驾空调出风口",
+  "expected_tool_calls": [
+    {
+      "name": "open_airoutlet",
+      "arguments": {}
+    }
+  ],
+  "mounted_tool_count": 2,
+  "mounted_tool_names": [
+    "open_airoutlet",
+    "close_airoutlet"
+  ],
+  "mount_source": "train_row:c5-train-01050",
+  "mount_policy": "training_row_tools_exact",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_airoutlet\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"中央\", \"主驾\", \"主驾右\", \"主驾左\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"前排中\", \"前排中央右\", \"前排中央左\", \"副驾\", \"副驾右\", \"副驾左\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排中\", \"第一排中央右\", \"第一排中央左\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排中央右\", \"第二排中央左\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_airoutlet\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"中央\", \"主驾\", \"主驾右\", \"主驾左\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"前排中\", \"前排中央右\", \"前排中央左\", \"副驾\", \"副驾右\", \"副驾左\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排中\", \"第一排中央右\", \"第一排中央左\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排中央右\", \"第二排中央左\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\n打开主驾空调出风口<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>\n{\"name\": \"open_airoutlet\", \"arguments\": {\"direction\": \"主驾\"}}\n</tool_call>",
+  "truncated_output": "<tool_call>",
+  "raw_output": "<tool_call>\n{\"name\": \"open_airoutlet\", \"arguments\": {\"direction\": \"主驾\"}}\n</tool_call>",
+  "tool_calls": [
+    {
+      "name": "open_airoutlet",
+      "arguments": {
+        "direction": "主驾"
+      }
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 594,
+  "observed_tool_names": [
+    "open_airoutlet"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

@@ -1,0 +1,51 @@
+{
+  "index": 25,
+  "case_id": "R2B-BN3-005P",
+  "axis": "B",
+  "behavior_class": "tool_call",
+  "input_zh": "device=ac_windspeed; primitive=increase_by_exp; action=increase_value_little; slots=fanSpeed:fanSpeed_value_1; 请按这个语义执行",
+  "expected_tool_calls": [
+    {
+      "name": "raise_ac_windspeed_by_exp",
+      "arguments": {
+        "fanSpeed": "fanSpeed_value_1"
+      }
+    }
+  ],
+  "mounted_tool_count": 10,
+  "mounted_tool_names": [
+    "query_ac_windspeed",
+    "adjust_ac_windspeed_to_exp",
+    "raise_ac_windspeed_by_exp",
+    "lower_ac_windspeed_by_exp",
+    "raise_ac_windspeed_by_number",
+    "adjust_ac_windspeed_to_min",
+    "adjust_ac_windspeed_no_value",
+    "adjust_ac_windspeed_to_max",
+    "lower_ac_windspeed_by_number",
+    "adjust_ac_windspeed_to_number"
+  ],
+  "mount_source": "train_row:c5-train-00019",
+  "mount_policy": "training_row_tools_exact",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"query_ac_windspeed\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_ac_windspeed_to_exp\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"raise_ac_windspeed_by_exp\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"lower_ac_windspeed_by_exp\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"raise_ac_windspeed_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_ac_windspeed_to_min\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_ac_windspeed_no_value\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_ac_windspeed_to_max\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"lower_ac_windspeed_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_ac_windspeed_to_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"direction\": {\"enum\": [\"三区\", \"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"单区\", \"双区\", \"右侧\", \"右前\", \"右后\", \"右温区\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四区\", \"左侧\", \"左前\", \"左后\", \"左温区\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\"], \"type\": \"string\"}, \"fanSpeed\": {\"type\": \"string\"}, \"mode\": {\"enum\": [\"制冷\", \"制热\", \"除湿\", \"除雾\", \"除霜\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\ndevice=ac_windspeed; primitive=increase_by_exp; action=increase_value_little; slots=fanSpeed:fanSpeed_value_1; 请按这个语义执行<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>{\"name\":\"raise_ac_windspeed_by_exp\",\"arguments\":{\"fanSpeed\":\"fanSpeed_value_1\"}}</tool_call>",
+  "truncated_output": "<tool_call>{\"name\":\"raise_ac_windspeed_by_exp\",\"arguments\":{\"fanSpeed\":\"fanSpeed_value_1\"}}",
+  "raw_output": "<tool_call>{\"name\":\"raise_ac_windspeed_by_exp\",\"arguments\":{\"fanSpeed\":\"fanSpeed_value_1\"}}</tool_call>",
+  "tool_calls": [
+    {
+      "name": "raise_ac_windspeed_by_exp",
+      "arguments": {
+        "fanSpeed": "fanSpeed_value_1"
+      }
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 1628,
+  "observed_tool_names": [
+    "raise_ac_windspeed_by_exp"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

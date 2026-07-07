@@ -174,20 +174,19 @@ This project is indexed by GitNexus as **MAformac-r5-main-current** (30002 symbo
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
-## Always Do
+> ⚠️ 措辞校准（2026-07-07 外审🔴5 吸收）：下述条款为**强烈建议（advisory）**，无 hook/CI 机械承接（按 rules-vs-skill 判据，宪法级 MUST/NEVER 必须配机械门，否则降级为建议措辞防「零执行力错位」）。真机械门 = `make verify` 链 + pre-commit checkers + swift test；GitNexus 是辅助导航层。
 
-- **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
-- **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "main"})`.
-- **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
-- When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
+## 建议做（advisory）
 
-## Never Do
+- **改重要 symbol 前跑 impact 分析**：`impact({target: "symbolName", direction: "upstream"})` 看 blast radius（direct callers/affected processes/risk）。
+- **大改动 commit 前跑 `detect_changes()`** 核影响面；回归对比默认分支：`detect_changes({scope: "compare", base_ref: "main"})`。
+- impact 返回 HIGH/CRITICAL 时向用户提示再动。
+- 探索陌生代码优先 `query({query: "concept"})`（按执行流分组）；单 symbol 全景用 `context({name: "symbolName"})`。
 
-- NEVER edit a function, class, or method without first running `impact` on it.
-- NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
-- NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
-- NEVER commit changes without running `detect_changes()` to check affected scope.
+## 建议不做（advisory）
+
+- 别用裸 find-and-replace 改名 symbol——`rename` 懂调用图。
+- 别忽视 impact 的 HIGH/CRITICAL 警告。
 
 ## Resources
 

@@ -13,12 +13,34 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CHECKER = REPO_ROOT / "scripts" / "check_query_zero_tolerance.py"
 CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
+# Repo-relative fixtures first（外审 2026-07-07 🔴1：仓外单机路径致 CI 必红/本机假绿双向失真）;
+# 仓外 R5 run 目录仅作可选补充源（本机存在时校验两份一致性由 freeze 流程负责，此处不依赖）。
+FIXTURE_ROOT = REPO_ROOT / "Tests" / "Fixtures" / "query-zero-tolerance"
 R5_ROOT = Path("/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness")
-HARDENED_JSONS = [
-    ("r2b", R5_ROOT / "TD-eval-run155204-ready/query-zero-tolerance-hardened-r2b.json"),
-    ("r3", R5_ROOT / "TD-eval-r3train-ready/query-zero-tolerance-hardened-r3.json"),
-    ("r4", R5_ROOT / "TD-eval-r4train-ready/query-zero-tolerance-hardened-r4.json"),
-]
+_R5_FALLBACKS = {
+    "r2b": R5_ROOT / "TD-eval-run155204-ready/query-zero-tolerance-hardened-r2b.json",
+    "r3": R5_ROOT / "TD-eval-r3train-ready/query-zero-tolerance-hardened-r3.json",
+    "r4": R5_ROOT / "TD-eval-r4train-ready/query-zero-tolerance-hardened-r4.json",
+}
+
+
+def _hardened_json(tag: str) -> Path:
+    repo_copy = FIXTURE_ROOT / f"query-zero-tolerance-hardened-{tag}.json"
+    if repo_copy.exists():
+        return repo_copy
+    return _R5_FALLBACKS[tag]
+
+
+HARDENED_JSONS = [(tag, _hardened_json(tag)) for tag in ("r2b", "r3", "r4")]
+
+
+def regression_input_path(raw: str) -> str:
+    path = Path(raw)
+    if path.is_absolute():
+        return str(path)
+    if raw.startswith("Tests/Fixtures/"):
+        return str(REPO_ROOT / path)
+    return raw
 
 
 def write_json(path: Path, value: object) -> None:
@@ -197,7 +219,9 @@ def main() -> int:
                 "--allow-fail-exit-zero",
             ]
             for item in hardened["inputs"]:
-                cmd.extend(["--scan", "|".join([item["track"], item["arm"], item["case_jsonl"], item["probe_dir"]])])
+                case_jsonl = regression_input_path(item["case_jsonl"])
+                probe_dir = regression_input_path(item["probe_dir"])
+                cmd.extend(["--scan", "|".join([item["track"], item["arm"], case_jsonl, probe_dir])])
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
             if result.returncode != 0:
                 failures.append(f"{label} 9/9/9 regression returned {result.returncode}: {result.stderr}")

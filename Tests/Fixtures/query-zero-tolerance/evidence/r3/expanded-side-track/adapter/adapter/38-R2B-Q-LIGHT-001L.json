@@ -1,0 +1,39 @@
+{
+  "index": 38,
+  "case_id": "R2B-Q-LIGHT-001L",
+  "axis": "Q",
+  "behavior_class": "tool_call",
+  "input_zh": "打开氛围灯",
+  "expected_tool_calls": [
+    {
+      "name": "open_atmosphere_lamp",
+      "arguments": {}
+    }
+  ],
+  "mounted_tool_count": 2,
+  "mounted_tool_names": [
+    "close_atmosphere_lamp",
+    "open_atmosphere_lamp"
+  ],
+  "mount_source": "catalog_sg:atmosphere_lamp",
+  "mount_policy": "e2_sg_full_group",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_atmosphere_lamp\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"color\": {\"enum\": [\"万紫千红\", \"冰蓝色\", \"冷白色\", \"冷色\", \"冷蓝色\", \"品色\", \"天蓝色\", \"姹紫嫣红\", \"婴儿蓝\", \"星辰大海\", \"春意盎然\", \"暖白色\", \"暖色\", \"暖蓝色\", \"月光白\", \"棕色\", \"橘粉色\", \"橘红色\", \"橙色\", \"橙黄色\", \"正紫色\", \"正红色\", \"水碧山青\", \"浅绿色\", \"浅蓝色\", \"淡粉色\", \"淡紫色\", \"淡青色\", \"淡黄色\", \"深粉色\", \"深蓝色\", \"琥珀色\", \"白色\", \"白雪皑皑\", \"碧海蓝天\", \"秋色宜人\", \"粉红色\", \"粉色\", \"紫气东来\", \"紫红色\", \"紫色\", \"红橙色\", \"红紫色\", \"红色\", \"绚丽多彩\", \"绿色\", \"草绿色\", \"蓝紫色\", \"蓝绿色\", \"蓝色\", \"薄荷绿\", \"蜜桃色\", \"酒绿色\", \"酷炫紫色\", \"金碧辉煌\", \"随机\", \"青色\", \"靛色\", \"靛蓝色\", \"香芋紫\", \"骄阳似火\", \"黄色\", \"黑色\"], \"type\": \"string\"}, \"mode\": {\"enum\": [\"关联大屏UI模式\", \"关联示廓灯模式\", \"关联驾驶模式\", \"冰川模式\", \"分区同步模式\", \"功能联动模式\", \"动态呼吸模式\", \"动态模式\", \"单色动态模式\", \"单色呼吸模式\", \"单色模式\", \"单色静态模式\", \"双色模式\", \"呼吸律动模式\", \"呼吸模式\", \"声浪模式\", \"多彩动态模式\", \"多彩呼吸模式\", \"多彩模式\", \"多彩流光模式\", \"多彩静态模式\", \"多色流光模式\", \"多色渐变模式\", \"常亮模式\", \"无级调色模式\", \"欢送模式\", \"流动模式\", \"流水模式\", \"渐变模式\", \"空调温度联动模式\", \"自动模式\", \"自定义模式\", \"超速预警模式\", \"跟随车灯功能模式\", \"车速律动模式\", \"迎宾模式\", \"闪烁模式\", \"随行驶状态模式\", \"静态模式\", \"音乐律动模式\", \"驾驶模式\", \"默认模式\"], \"type\": \"string\"}, \"name\": {\"enum\": [\"中央通道氛围灯\", \"仪表板氛围灯\", \"轮廓氛围灯\", \"门板氛围灯\", \"面发光氛围灯\"], \"type\": \"string\"}, \"position\": {\"enum\": [\"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"右侧\", \"右前\", \"右后\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四门\", \"左侧\", \"左前\", \"左后\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排中\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\", \"脚部\"], \"type\": \"string\"}}, \"type\": \"object\"}}}\n{\"type\": \"function\", \"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_atmosphere_lamp\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"color\": {\"enum\": [\"万紫千红\", \"冰蓝色\", \"冷白色\", \"冷色\", \"冷蓝色\", \"品色\", \"天蓝色\", \"姹紫嫣红\", \"婴儿蓝\", \"星辰大海\", \"春意盎然\", \"暖白色\", \"暖色\", \"暖蓝色\", \"月光白\", \"棕色\", \"橘粉色\", \"橘红色\", \"橙色\", \"橙黄色\", \"正紫色\", \"正红色\", \"水碧山青\", \"浅绿色\", \"浅蓝色\", \"淡粉色\", \"淡紫色\", \"淡青色\", \"淡黄色\", \"深粉色\", \"深蓝色\", \"琥珀色\", \"白色\", \"白雪皑皑\", \"碧海蓝天\", \"秋色宜人\", \"粉红色\", \"粉色\", \"紫气东来\", \"紫红色\", \"紫色\", \"红橙色\", \"红紫色\", \"红色\", \"绚丽多彩\", \"绿色\", \"草绿色\", \"蓝紫色\", \"蓝绿色\", \"蓝色\", \"薄荷绿\", \"蜜桃色\", \"酒绿色\", \"酷炫紫色\", \"金碧辉煌\", \"随机\", \"青色\", \"靛色\", \"靛蓝色\", \"香芋紫\", \"骄阳似火\", \"黄色\", \"黑色\"], \"type\": \"string\"}, \"mode\": {\"enum\": [\"关联大屏UI模式\", \"关联示廓灯模式\", \"关联驾驶模式\", \"冰川模式\", \"分区同步模式\", \"功能联动模式\", \"动态呼吸模式\", \"动态模式\", \"单色动态模式\", \"单色呼吸模式\", \"单色模式\", \"单色静态模式\", \"双色模式\", \"呼吸律动模式\", \"呼吸模式\", \"声浪模式\", \"多彩动态模式\", \"多彩呼吸模式\", \"多彩模式\", \"多彩流光模式\", \"多彩静态模式\", \"多色流光模式\", \"多色渐变模式\", \"常亮模式\", \"无级调色模式\", \"欢送模式\", \"流动模式\", \"流水模式\", \"渐变模式\", \"空调温度联动模式\", \"自动模式\", \"自定义模式\", \"超速预警模式\", \"跟随车灯功能模式\", \"车速律动模式\", \"迎宾模式\", \"闪烁模式\", \"随行驶状态模式\", \"静态模式\", \"音乐律动模式\", \"驾驶模式\", \"默认模式\"], \"type\": \"string\"}, \"name\": {\"enum\": [\"中央通道氛围灯\", \"仪表板氛围灯\", \"轮廓氛围灯\", \"门板氛围灯\", \"面发光氛围灯\"], \"type\": \"string\"}, \"position\": {\"enum\": [\"主驾\", \"全车\", \"前两排\", \"前两排中\", \"前两排右\", \"前两排左\", \"前排\", \"副驾\", \"右侧\", \"右前\", \"右后\", \"后两排\", \"后两排中\", \"后两排右\", \"后两排左\", \"后排\", \"四门\", \"左侧\", \"左前\", \"左后\", \"最后一排\", \"最后一排中\", \"最后一排右\", \"最后一排左\", \"第一排\", \"第一排中\", \"第一排右\", \"第一排左\", \"第三排\", \"第三排中\", \"第三排右\", \"第三排左\", \"第二排\", \"第二排中\", \"第二排右\", \"第二排左\", \"脚部\"], \"type\": \"string\"}}, \"type\": \"object\"}}}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\n打开氛围灯<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>{\"name\":\"open_atmosphere_lamp\",\"arguments\":{}}</tool_call>",
+  "truncated_output": "<tool_call>{\"name\":\"open_atmosphere_lamp\",\"arguments\":{}}",
+  "raw_output": "<tool_call>{\"name\":\"open_atmosphere_lamp\",\"arguments\":{}}</tool_call>",
+  "tool_calls": [
+    {
+      "name": "open_atmosphere_lamp",
+      "arguments": {}
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 955,
+  "observed_tool_names": [
+    "open_atmosphere_lamp"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}

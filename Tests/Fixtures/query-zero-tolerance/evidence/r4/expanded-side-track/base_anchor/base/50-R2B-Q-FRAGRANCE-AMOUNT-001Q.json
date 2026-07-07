@@ -1,0 +1,53 @@
+{
+  "index": 50,
+  "case_id": "R2B-Q-FRAGRANCE-AMOUNT-001Q",
+  "axis": "Q",
+  "behavior_class": "tool_call",
+  "input_zh": "香氛现在还有多少",
+  "expected_tool_calls": [
+    {
+      "name": "query_amount_of_fragrance",
+      "arguments": {}
+    }
+  ],
+  "mounted_tool_count": 16,
+  "mounted_tool_names": [
+    "adjust_fragrance_intensity_to_number",
+    "query_amount_of_fragrance",
+    "set_fragrance_time",
+    "close_fragrance_set_interface",
+    "adjust_fragrance_intensity_to_min",
+    "open_fragrance",
+    "switch_fragrance_mode",
+    "raise_fragrance_intensity_little",
+    "lower_fragrance_intensity_by_number",
+    "adjust_fragrance_intensity_to_gear",
+    "lower_fragrance_intensity_little",
+    "open_fragrance_set_interface",
+    "query_mode_of_fragrance",
+    "close_fragrance",
+    "raise_fragrance_intensity_by_number",
+    "adjust_fragrance_intensity_to_max"
+  ],
+  "mount_source": "case.tools",
+  "mount_policy": "case_embedded_tools",
+  "prompt": "<|im_start|>system\n你是 MAformac 离线 mock 车控演示助手。控制路径只输出 tool_call 包裹或 NO_TOOL。\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_fragrance_intensity_to_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"SPOT\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"query_amount_of_fragrance\", \"parameters\": {\"additionalProperties\": false, \"properties\": {}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"set_fragrance_time\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"minute\": {\"type\": \"string\"}, \"second\": {\"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_fragrance_set_interface\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"name\": {\"enum\": [\"香氛模式设置\", \"香氛浓度设置\", \"香氛设置\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_fragrance_intensity_to_min\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_fragrance\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"天堂模式\", \"宁静模式\", \"探索模式\", \"智能模式\", \"沐风模式\", \"治愈舒缓\", \"浓郁模式\", \"淡香模式\", \"清新模式\", \"琥珀模式\", \"白茶模式\", \"花园模式\", \"若云模式\", \"迎宾模式\", \"运动激情\", \"远行模式\", \"风铃模式\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"switch_fragrance_mode\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"value\": {\"type\": \"string\", \"value_form\": [\"SPOT\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"raise_fragrance_intensity_little\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"lower_fragrance_intensity_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"SPOT\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_fragrance_intensity_to_gear\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"lower_fragrance_intensity_little\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"open_fragrance_set_interface\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"name\": {\"enum\": [\"香氛模式设置\", \"香氛浓度设置\", \"香氛设置\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"query_mode_of_fragrance\", \"parameters\": {\"additionalProperties\": false, \"properties\": {}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"close_fragrance\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"天堂模式\", \"宁静模式\", \"探索模式\", \"智能模式\", \"沐风模式\", \"治愈舒缓\", \"浓郁模式\", \"淡香模式\", \"清新模式\", \"琥珀模式\", \"白茶模式\", \"花园模式\", \"若云模式\", \"迎宾模式\", \"运动激情\", \"远行模式\", \"风铃模式\"], \"type\": \"string\"}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"raise_fragrance_intensity_by_number\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\", \"天堂模式\", \"宁静模式\", \"探索模式\", \"智能模式\", \"沐风模式\", \"治愈舒缓\", \"浓郁模式\", \"淡香模式\", \"清新模式\", \"琥珀模式\", \"白茶模式\", \"花园模式\", \"若云模式\", \"迎宾模式\", \"运动激情\", \"远行模式\", \"风铃模式\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"SPOT\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n{\"function\": {\"description\": \"D-domain vehicle-control tool (intent==tool name) derived from semantic contract.\", \"name\": \"adjust_fragrance_intensity_to_max\", \"parameters\": {\"additionalProperties\": false, \"properties\": {\"mode\": {\"enum\": [\"mode\"], \"type\": \"string\"}, \"value\": {\"type\": \"string\", \"value_form\": [\"EXP\"]}}, \"type\": \"object\"}}, \"type\": \"function\"}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call><|im_end|>\n<|im_start|>user\n香氛现在还有多少<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+  "raw_generation": "<tool_call>\n{\"name\": \"query_amount_of_fragrance\", \"arguments\": {}}\n</tool_call>",
+  "truncated_output": "<tool_call>",
+  "raw_output": "<tool_call>\n{\"name\": \"query_amount_of_fragrance\", \"arguments\": {}}\n</tool_call>",
+  "tool_calls": [
+    {
+      "name": "query_amount_of_fragrance",
+      "arguments": {}
+    }
+  ],
+  "has_tool_call": true,
+  "empty_tool_call_output": false,
+  "elapsed_ms": 901,
+  "observed_tool_names": [
+    "query_amount_of_fragrance"
+  ],
+  "tool_call_count": 1,
+  "parse_errors": [],
+  "has_tail_after_last_tool_call": false
+}
