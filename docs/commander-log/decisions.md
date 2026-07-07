@@ -1063,3 +1063,12 @@
 
 ## D-118 补：§6 脱敏豁免窗口延长（磊哥 2026-07-07 晚拍）
 原 D-049 十天窗口（2026-07-03→07-13）延长为 **30 天（至 2026-08-02）**，其余条款不变（密钥/API key/个人 PII 底线保留）。基建文档级联 A-F 同批执行（CLAUDE §9 推进事实源/§4 Q2=C+MG-7=C/§3 表/CURRENT 刷新/gitignore/GitNexus rerun）。
+
+## D-118：执行相总账（2026-07-07 晚，Fable5 commander 二场收官）
+
+- **物理清理 6/6 全执行**（D-117 授权）：批1 Reports 32→1(aaeb43e5)/批2 evidence-frozen 551→tarball 826KB+restore 实测 551/551(4d338370)/批3 phase0 retire 分级 2+2(afdaa872)/批4 paper-to-skill-gate 28→10(e43dadc1)/批5 spike-e3 13→0+仓外备份+SHA256SUMS+qwen yaml 溯源标注(dde64dbf)/批6 91 件 retire_trigger(30eb4a40)。tracked -611。post-cleanup fullgate 597/0。
+- **Q-03 三轮审计收敛**（0e235848）：v1 过宽（审计抓误吸反问 6 行）→v2 收窄不足（commander 亲测抓单独反问）→v3 `_CAN_MARKER_RE` 显式 can 标记。golden 62 行（原 50 一字未动+12 SHAPE）。存量 manifest changed_total=0。
+- **S4 工艺循环**：v1（Opus 生成）judge 工艺 FAIL（deterministic 模板拼接 26/50 集中+schema 三缺）→ 生成位 Fable 5 low（绕代理，Opus 5h 额度尽,磊哥拍 A）→ v2 亲笔创作 50/50 unique 结构签名+装配管线分工 → judge 复判全维 PASS → **commander 签工艺 PASS** → S5 session-1 点火（120 条）。
+- **A0 crash 修复**（7619e591）：FastPath noMatch 逃逸 CONFIRMED（TDD 探针先证）→ 2 行 catch→unsupportedPayload。全量 598/0。
+- **基建级联**（a91b6ede，磊哥批 A-F+豁免 30 天）：CLAUDE §3/§4/§6/§9+CURRENT 刷新、GitNexus 重索引 35887、MT5 advisory 恢复。
+- **机制沉淀**：BATCH2 ballot 5 题就绪（recall 移出 5 已拍）；S5 SPEC+judge 协议双件备好；lessons 候选=生成位 LLM 的 deterministic 逃逸倾向（v1 实证：生成任务默认反射写脚本拼壳,修法=派单显式亲笔+judge 话术维度）；worker 治理=管道≤5/context<15% 退役/CC-TUI C-m 提交/codex 可内部 spawn subagent（磊哥诀窍）/in-process subagent 走宿主代理会挂→tmux 绕代理起（磊哥 SOP）。
