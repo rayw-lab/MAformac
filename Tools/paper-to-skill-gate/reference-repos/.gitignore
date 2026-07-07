@@ -1,4 +1,0 @@
-# External research clones are local-only evidence.
-# Do not vendor upstream repositories into MAformac.
-*
-!.gitignore

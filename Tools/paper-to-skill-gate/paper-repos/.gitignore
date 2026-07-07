@@ -1,4 +1,0 @@
-# Official paper repos cloned for local-only teardown.
-# Do not vendor upstream repositories into MAformac.
-*
-!.gitignore
