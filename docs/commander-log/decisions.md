@@ -1079,3 +1079,6 @@
 - 授权内容：s4 补产 judge→S6 重组装 404→S6 复审→S7 十门→S7b receipt→host fresh resample→S7c probe（PASS=run-auth 生效 D-114）→五布尔+S8 门 hard gates 全核→**全绿才点火 S8 1800 iters**。任一门红=停在门上记诚实账，零临场拍板（预置决策树=IMPL-PLAN v3 失败分支+D-114 四类分流）。
 - **lid_mlx_behavior 降级 informational**（磊哥 waive：今晚不合盖+segmented_restart_first 兜底在；S8-LAUNCH-GATE v2 该 blocker 按本条豁免，实验后续窗口补做）。
 - 流程纪律不因通宵松动：产出方≠审方/judge 盲判/receipt 绑 basis/candidate 恒 unsigned。
+
+### D-119 执行账补记（2026-07-08 05:2x，通宵链终态）
+链条实况：S5 补产 66 judge PASS→S6 精确 404 双审 PASS（42 surplus 归档）→S7 十门全 PASS（G8 拒 stale-150 生效；BASE_MODEL_DIR 双源核准；接缝修复 commit 0a5a30c9=S8 code basis）→S8 配方（450 updates/warmup36 比例重算 sha 0d2a9696）+launch packet 冻结→host PASS（D-098 精化谓词裁决,receipt 录）→S7b 签→**S7c 三跑停线**：OOM（batch4 撞长行）→环境排除（20GB free 仍炸）→OOM-DIAGNOSIS 坐实 CONFIG_PARITY_GAP（缺 --token-budget-per-batch 8192+--grad-checkpoint）→Option A parity 修复→训练成功（target_action 25→30 满分/no_tool 2→0 清零）→**receipt_gen 判 FAIL：no_tool_delta=2<threshold 3,而 baseline no_tool_count=2=数学不可能达标（量尺触发面与阈值推导口径错位,R3-AMMO-1/M.16 同族）**。按 S7b one-shot falsification+commander_cannot_loosen 停线,S8 未点火。晨报 MORNING-REPORT-20260708.md 三选项（⭐A 量尺诚实化重判/B 重选 subset/C 分流）备件齐,等磊哥一字拍。
