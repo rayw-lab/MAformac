@@ -1139,3 +1139,10 @@
 - **D1a 编码开工**（计划 v2 吸收 DRT 红队 P1×7 后）：T1 token 层（Opus %8，build 窗内）/ T4 交互契约（codex worktree）/ T6a+T6b anchor 截图包（codex，23:30 资源锁前抢跑）已派；T7 动效片（招牌①②+基础三件+MX1 21 项迁移）T1 后接 Opus 位。资源窗铁律：S8 active 禁 full build/XCUITest/截图。
 - **before 基线存档**：磊哥贴当前 Mac app 实况（「好丑」：卡片标题截断/布局挤压/右缘裁切）→ `run dir d1a-harness/before-baseline-ugly-20260708.png`，作 T3 before/after 对比素材。
 - holdout 链态：v3 merged 61（33/9/10/9 全过门）J3 终判在途；J2 剔 8 亲裁（新对句推翻 032/044 救回）。
+
+## D-127：holdout 战役收官——J4 全绿 61/61 + sha 冻结 + canonical 落位（2026-07-08 晚，D-124 链闭环）
+
+- 判定链终态：J1 47/64 → 修复战役（FP 三方双盲剔10救3+register 修4+补10 per-bucket）→ J2 全量 56/64（新对句推翻 032/044 救回，commander 亲裁剔 8）→ 补 5（预检零撞）→ J3 58/61（3 行低频工具 expected args 病）→ HF1 args 修正（value=2/20/暖香槟金，utterance/桶/register 零动）→ **J4 复核全绿 JUDGE_PASS_61_of_61**（judge_coverage semantic 61/61 + args_repair 3/3 CONFIRMED）。
+- **冻结**：sha256 `77853caea4598f334fb4a7ed89eafc348746adf333d647306aa94f0b68da2f64`，61 行，四桶 33/9/10/9 全过门（≥32/8/8/8）；canonical=`s8-gates/s9-eval-freeze/holdout/eval-holdout.jsonl`（幂等脚本 holdout-freeze.sh，freeze-receipt.md 带 v1→v2→v3 lineage 链+CASES/MANIFEST 联动指针）；旧版全标 lineage_only。
+- 实证沉淀：exposure checker（语序层）实战四连（v2 预检 1 撞/v3 零撞/J2 扫 8/J3 复扫 FP dismiss）=判别力田间验证；「J 轮全量重判非只判新行」（HQ5 裁决）两次翻出增量对句=范式正确。
+- S9 弹药态：holdout FROZEN + 三 checker 落位（exposure 已入仓 c4dfb247+S10 第 7 门已实装模板）+ exact commands 冻结 + Q-SR 字段已入 runbook/S10 模板。S9 只等 S8 训完出 adapter。
