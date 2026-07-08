@@ -42,9 +42,49 @@ struct CardWaterfallEntrance: ViewModifier {
     }
 }
 
+/// 招牌② 卡内 icon/value 独立入场（TX7 修②；teardown §5.2「icon/value 在卡 70% opacity 时 80ms 入场」）。
+///
+/// 内容入场延迟 = 卡延迟 `min(i*18,120)` + 卡 spring 的 70% 处（`contentAtOpacityFraction*cardSpringMS`），
+/// 淡入 `contentFadeMS=80ms`。RM 降级 = 随卡单次 fade（无独立延迟）。
+struct CardContentEntrance: ViewModifier {
+    let index: Int
+    let isActive: Bool
+    let reduceMotion: Bool
+
+    @State private var visible = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(reduceMotion || visible ? 1 : 0)
+            .onAppear { animateIn() }
+            .onChange(of: isActive) { _, active in
+                if active { visible = false; animateIn() }
+            }
+    }
+
+    private func animateIn() {
+        if reduceMotion {
+            withAnimation(.easeOut(duration: MotionAnimationFactory.seconds(MotionTimings.Waterfall.reduceMotionFadeMS))) {
+                visible = true
+            }
+            return
+        }
+        let cardDelay = MotionTimings.Waterfall.cardDelayMS(index: index)
+        let contentDelay = cardDelay + MotionTimings.Waterfall.contentAtOpacityFraction * MotionTimings.Waterfall.cardSpringMS
+        withAnimation(.easeOut(duration: MotionAnimationFactory.seconds(MotionTimings.Waterfall.contentFadeMS))
+            .delay(MotionAnimationFactory.seconds(contentDelay))) {
+            visible = true
+        }
+    }
+}
+
 extension View {
     /// 招牌② 瀑布入场（便捷挂载）。
     func cardWaterfallEntrance(index: Int, isActive: Bool, reduceMotion: Bool) -> some View {
         modifier(CardWaterfallEntrance(index: index, isActive: isActive, reduceMotion: reduceMotion))
+    }
+    /// 招牌② 卡内 icon/value 独立入场（70% opacity 时 80ms）。
+    func cardContentEntrance(index: Int, isActive: Bool, reduceMotion: Bool) -> some View {
+        modifier(CardContentEntrance(index: index, isActive: isActive, reduceMotion: reduceMotion))
     }
 }
