@@ -1353,8 +1353,17 @@ struct DeepSpaceBackground: View {
 struct StageAtmosphereLayer: View {
     var theme: PresentationTheme
     var orbState: PresentationOrbState
+    /// 三档预算（RSB §3.4）；默认 fullShowcase 保 L0 parity=138。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// budget 感知的 stage 粒子数（reduceMotion 强制 L2=0）。
+    private var effectiveStageParticleCount: Int {
+        PresentationReducedMotionPolicy.particleCount(kind: .stage,
+                                                      reduceMotion: reduceMotion,
+                                                      budget: motionBudget)
+    }
 
     var body: some View {
         Group {
@@ -1390,7 +1399,7 @@ struct StageAtmosphereLayer: View {
 
     private func particleCanvas(size: CGSize, phase: TimeInterval) -> some View {
         Canvas { context, canvasSize in
-            for index in 0..<138 {
+            for index in 0..<max(effectiveStageParticleCount, 0) {
                 let xSeed = CGFloat((index * 43 + 17) % 997) / 997
                 let ySeed = CGFloat((index * 61 + 29) % 991) / 991
                 let drift = CGFloat(sin(phase * 0.18 + Double(index) * 0.37))
