@@ -1092,3 +1092,11 @@
 - **点火实况（2026-07-08 08:2x）**：recert 双产物机械生成（receipt_recertification.py self-test PASS，数字全来自两输入 receipt 零手写）→盖章（RECERT-RECEIPT.md sha `44dd5b08…`/JSON sha `cba16d43…`）→dry-run 正负三测（BLOCKED 拒/PENDING 拒/盖章版 launch_allowed=true）→五 boolean 全绿→**S8 正式 1800 点火 pid 57625**（recipe sha 0d2a9696 冻结链核准，masking preflight 4628 records/113273 trainable_tokens）→哨兵 armed pid 57890（interval 300s/deadline 900s/内存 alert 18.0-20.7-23.8GB 不 kill/completion_first，含 stop_event 3 字段最小补丁）。
 - **非声明**：candidate 恒 unsigned；probe 是 learnability 信号非泛化证明；S8 完成后仍需 S9 三臂 eval→S9b→S10 verdict；不声明 C5 V-PASS/C6 acceptance。
 - 证据链：run dir `s8-gates/s7c/`（骨架/双答卷/决策/审计入 A-PATH-DECISIONS.md 头部清单）+ `s8-flight/s8-formal-1800-20260708/s8-launch-basis-receipt.json`。
+
+## D-121：任务④（macOS app UIUE+runtime）立项 + roadmap v4 + S8 两次中断账（磊哥 2026-07-08 晨拍）
+
+- 磊哥原话：「这三个任务结合 macosapp的 UIUE和runtime【任务④】你都存个档吧 写个粗的路线图计划？之前有个计划 是最终目标推动macosAPP闭环」+「反正我听你的 是否需要一个计划或者实施路径图」。
+- **commander 判断：不新造计划**——`docs/roadmap-2026-07-07-macos-closure-baseline.md` 就是磊哥点到的那个计划（最终目标=macOS app 全功能闭环）。做 **v4 增量**：①Line B 执行态刷新（S4-S7 全绿→S7c recert D-120→S8 两次中断留档）②任务④编入成 **Line D（UIUE+runtime）**：D-UI（UIUE macOS 适配，commander 亲笔主刀铁律 feedback-uiue-no-codex）+ D-RT（runtime 接线：adapter/AVSpeechSynthesizer TTS 硬门内、真 ASR stretch，按 MG-7=C 框定）；推进式 D0 grill→D1 UIUE 专场→D2 接线→D3 彩排 ③§七 粗路线图（四线时序一页图：关键路径=Line B，人工节点=S8 重启令+D1 专场）④编排/键位段刷新（ma7 5codex+1hermes 绕代理；当前唯一关键路径键=S8 重启令）。
+- **S8 两次中断账（诚实留档）**：r1 pid 57625 于 iter 170 被 lid-sleep 杀（磊哥晨间恢复环境，O2 风险现实执行；哨兵正确分类 INTERRUPTED_TRUE_NO_PROGRESS/resumable；loss 2.746→0.19 训练本体健康）；r2 pid 40993 由 commander 在得知「磊哥故意中断要用机」后主动停（OPERATOR-PAUSE-RECEIPT.md）。两次均 iter<600 无 checkpoint→重启=全新完整 1800，无 stale-schedule 风险。**当前态=S8 待磊哥晚间窗口一句话重启。**
+- **蜂群重建**：ma6 随环境重启消失→ma7 新建（%0 commander + 5 codex %1/%5/%2/%3/%4 + hermes %6，全员绕代理 env -u 启动，逐 pane capture 亲核）。
+- 白天派单面（磊哥授权「反正我听你的」）：Line C C1 grill 骨架+能力面矩阵×2、S9 预备件（stop_event checker+mount-validity 门）、秘书（ballot 整理+CLAUDE §9 终稿）、对抗审计位（含 roadmap v4 异源审——commander 亲笔件必审）、hermes 只读一致性核查。全部不占训练资源。
