@@ -1904,6 +1904,8 @@ struct VehicleStateCard: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .help(reason)
+                    // B⑤ fallback 不丢脸卡：reason badge 滑入(x -4→0，40-160ms)，兜底态入场契约（teardown §5.4）
+                    .fallbackBadgeTransition(visible: true, reduceMotion: reduceMotion)
             }
         }
     }
