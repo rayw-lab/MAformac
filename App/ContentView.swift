@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 struct ContentView: View {
     @Bindable var store: DemoVehicleStateStore
@@ -1037,51 +1040,249 @@ struct MicDock: View {
     var theme: PresentationTheme
     var state: PresentationVoiceState
     var onMockVoiceSubmit: () -> Void = {}
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isPressing = false
+    @State private var isCancelled = false
+    @State private var pressStartedInside = false
+    @FocusState private var isFocused: Bool
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var isListening: Bool { state == .listening || isPressing }
+    private let permissionPreflightStatus: MicPermissionPreflightStatus = .stubDisabledGuidance
+    private var micLabel: String {
+        if isCancelled { return "已取消" }
+        switch state {
+        case .speaking:
+            return "正在回应"
+        case .transcribing:
+            return "正在整理"
+        case .listening:
+            return "松开发送"
+        case .idle:
+            return isPressing ? "松开发送" : "按住说话 · Option+Space"
+        }
+    }
 
     var body: some View {
-        Button(action: onMockVoiceSubmit) {
-            HStack(spacing: 16) {
-                Circle()
-                    .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
-                    .frame(width: 16, height: 16)
-                    .shadow(color: DesignTokens.glowCyan.opacity(isListening ? 0.65 : 0.35), radius: isListening ? 12 : 6)
-                Text(isListening ? "松开发送" : "按住说话")
-                    .font(.system(size: 21, weight: .semibold, design: .rounded))
-                    .foregroundStyle(palette.inkPrimary)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity)
-                WaveformMark(active: isListening, theme: theme)
-                    .frame(width: 58, height: 42)
-            }
-            .padding(.horizontal, 22)
-            .background(.regularMaterial, in: Capsule())
-            .glassEffect()
-            .overlay {
-                Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
-            }
-            .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
-            .scaleEffect(isPressing ? 1.018 : 1.0)
+        GeometryReader { proxy in
+            micChrome
+                .contentShape(Capsule())
+                .gesture(pressGesture(in: proxy.size))
         }
-        .buttonStyle(.plain)
-        .onLongPressGesture(minimumDuration: 0.05, maximumDistance: 28) {
-        } onPressingChanged: { pressing in
-            if reduceMotion {
-                isPressing = pressing
-            } else {
-                withAnimation(.snappy(duration: 0.18)) {
-                    isPressing = pressing
+        .focusable(true)
+        .focused($isFocused)
+        .onChange(of: isFocused) { _, focused in
+            if !focused { cancelPress() } // drag-out/失焦 cancel，D0G-033/D0G-034。
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { cancelPress() }
+        }
+        .micDockExitCommand(cancelPress)
+        .overlay { macKeyMonitor }
+        .accessibilityIdentifier("mic-dock")
+        .accessibilityLabel(micLabel)
+        .accessibilityHint(permissionPreflightStatus.guidance)
+    }
+
+    private var micChrome: some View {
+        HStack(spacing: 16) {
+            Circle()
+                .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
+                .frame(width: 16, height: 16)
+                .shadow(color: DesignTokens.glowCyan.opacity(isListening ? 0.65 : 0.35), radius: isListening ? 12 : 6)
+            Text(micLabel)
+                .font(.system(size: 21, weight: .semibold, design: .rounded))
+                .foregroundStyle(palette.inkPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.74)
+                .frame(maxWidth: .infinity)
+            WaveformMark(active: isListening, theme: theme)
+                .frame(width: 58, height: 42)
+        }
+        .padding(.horizontal, 22)
+        .background(.regularMaterial, in: Capsule())
+        .glassEffect()
+        .overlay {
+            Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
+        }
+        .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
+        .scaleEffect(isPressing ? 1.018 : 1.0)
+    }
+
+    private func pressGesture(in size: CGSize) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let inside = CGRect(origin: .zero, size: size).contains(value.location)
+                if !pressStartedInside && inside {
+                    pressStartedInside = true
+                    startPress()
+                } else if pressStartedInside && !inside {
+                    cancelPress()
                 }
             }
+            .onEnded { value in
+                let inside = CGRect(origin: .zero, size: size).contains(value.location)
+                guard pressStartedInside, inside else {
+                    cancelPress()
+                    return
+                }
+                commitPress()
+            }
+    }
+
+    private func startPress() {
+        isFocused = true
+        isCancelled = false
+        setPressing(true)
+    }
+
+    private func commitPress() {
+        guard isPressing else { return }
+        setPressing(false)
+        pressStartedInside = false
+        isFocused = false
+        onMockVoiceSubmit()
+    }
+
+    private func cancelPress() {
+        guard isPressing || pressStartedInside else { return }
+        setPressing(false)
+        pressStartedInside = false
+        isFocused = false
+        isCancelled = true
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 650_000_000)
+            isCancelled = false
         }
-        .accessibilityIdentifier("mic-dock")
-        .accessibilityLabel("按住说话")
+    }
+
+    private func setPressing(_ pressing: Bool) {
+        if reduceMotion {
+            isPressing = pressing
+        } else {
+            withAnimation(.snappy(duration: 0.18)) {
+                isPressing = pressing
+            }
+        }
+    }
+
+    @ViewBuilder private var macKeyMonitor: some View {
+        #if os(macOS)
+        MacPushToTalkKeyMonitor(
+            onStart: startPress,
+            onCommit: commitPress,
+            onCancel: cancelPress
+        )
+        .frame(width: 0, height: 0)
+        #endif
     }
 }
+
+enum MicPermissionPreflightStatus: String {
+    case stubDisabledGuidance
+
+    var guidance: String {
+        switch self {
+        case .stubDisabledGuidance:
+            return "麦克风权限预检接缝已保留；无权限时应禁用并显示指引，不作为现场失败。"
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func micDockExitCommand(_ action: @escaping () -> Void) -> some View {
+        #if os(macOS)
+        self.onExitCommand(perform: action)
+        #else
+        self
+        #endif
+    }
+}
+
+#if os(macOS)
+private struct MacPushToTalkKeyMonitor: NSViewRepresentable {
+    var onStart: () -> Void
+    var onCommit: () -> Void
+    var onCancel: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onStart: onStart, onCommit: onCommit, onCancel: onCancel)
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        context.coordinator.install()
+        return NSView(frame: .zero)
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        context.coordinator.onStart = onStart
+        context.coordinator.onCommit = onCommit
+        context.coordinator.onCancel = onCancel
+    }
+
+    static func dismantleNSView(_ nsView: NSView, coordinator: Coordinator) {
+        coordinator.uninstall()
+    }
+
+    final class Coordinator {
+        private let optionSpaceKeyCode: UInt16 = 49
+        private let escapeKeyCode: UInt16 = 53
+        private var monitor: Any?
+        private var optionSpaceDown = false
+        var onStart: () -> Void
+        var onCommit: () -> Void
+        var onCancel: () -> Void
+
+        init(onStart: @escaping () -> Void, onCommit: @escaping () -> Void, onCancel: @escaping () -> Void) {
+            self.onStart = onStart
+            self.onCommit = onCommit
+            self.onCancel = onCancel
+        }
+
+        func install() {
+            guard monitor == nil else { return }
+            monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { [weak self] event in
+                self?.handle(event) ?? event
+            }
+        }
+
+        func uninstall() {
+            if let monitor {
+                NSEvent.removeMonitor(monitor)
+            }
+            monitor = nil
+        }
+
+        private func handle(_ event: NSEvent) -> NSEvent? {
+            if event.type == .keyDown, event.keyCode == escapeKeyCode {
+                optionSpaceDown = false
+                onCancel()
+                return nil
+            }
+
+            if event.keyCode == optionSpaceKeyCode {
+                if event.type == .keyDown,
+                   event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.option),
+                   !event.isARepeat,
+                   !optionSpaceDown {
+                    optionSpaceDown = true
+                    onStart()
+                    return nil
+                }
+                if event.type == .keyUp, optionSpaceDown {
+                    optionSpaceDown = false
+                    onCommit()
+                    return nil
+                }
+            }
+
+            return event
+        }
+    }
+}
+#endif
 
 struct WaveformMark: View {
     var active: Bool
@@ -1720,6 +1921,11 @@ struct VehicleStateCard: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var breathe = false
+    @State private var isHovered = false
+    @State private var showsDwellTooltip = false
+    @State private var hoverTask: Task<Void, Never>?
+    @FocusState private var isKeyboardFocused: Bool
+    private let hoverDwellNanoseconds: UInt64 = 800_000_000
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var appearance: CardAppearance { CardAppearance.of(display.visualState, theme: theme) }
@@ -1737,6 +1943,17 @@ struct VehicleStateCard: View {
     private var edgeAccentColor: Color {
         usesDeepSpaceHeatingEdge ? DesignTokens.semanticWarmGoldGray : effectiveAppearance.border
     }
+    private var hoverActive: Bool {
+        isHovered && !isKeyboardFocused // keyboard focus wins hover, D0G-031.
+    }
+    private var interactionScale: CGFloat {
+        if isKeyboardFocused { return 1.014 }
+        if hoverActive { return 1.01 }
+        return 1
+    }
+    private var interactionLift: CGFloat {
+        isKeyboardFocused ? 7 : (hoverActive ? 4 : 0)
+    }
 
     var body: some View {
         Button {
@@ -1746,10 +1963,92 @@ struct VehicleStateCard: View {
         }
         .buttonStyle(.plain)
         .opacity(isFaded ? 0.96 : 1.0)
-        .scaleEffect(isHero ? 1.018 : 1.0, anchor: .center)
+        .scaleEffect((isHero ? 1.018 : 1.0) * interactionScale, anchor: .center)
+        .offset(y: -interactionLift)
+        .overlay { interactionOutline }
+        .overlay(alignment: .topLeading) { dwellTooltip }
+        .focusable(true)
+        .focused($isKeyboardFocused)
+        .onHover(perform: updateHover)
+        .onChange(of: isKeyboardFocused) { _, focused in
+            if focused {
+                showsDwellTooltip = false
+            }
+        }
+        .onChange(of: display.visualState) { _, _ in
+            resetHoverPresentation()
+        }
+        .onChange(of: display.accessibilityKey) { _, _ in
+            resetHoverPresentation()
+        }
         .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: isHero)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: hoverActive)
+        .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: isKeyboardFocused)
+        .help(helpText)
         .accessibilityIdentifier("vehicle-card-\(display.accessibilityKey)")
         .accessibilityLabel("\(display.title) \(display.valueText) \(a11yState)")
+    }
+
+    @ViewBuilder private var interactionOutline: some View {
+        if isKeyboardFocused || hoverActive {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .strokeBorder(
+                    isKeyboardFocused ? DesignTokens.semanticCoolBright : palette.hairline.opacity(0.84),
+                    lineWidth: isKeyboardFocused ? 2.4 : 1.3
+                )
+                .shadow(
+                    color: DesignTokens.semanticCoolBright.opacity(isKeyboardFocused ? 0.26 : 0.14),
+                    radius: isKeyboardFocused ? 10 : 5
+                )
+                .allowsHitTesting(false)
+        }
+    }
+
+    @ViewBuilder private var dwellTooltip: some View {
+        if showsDwellTooltip, hoverActive {
+            Text(helpText)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(palette.inkPrimary)
+                .lineLimit(1)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(palette.surface.opacity(theme == .ivory ? 0.96 : 0.88), in: Capsule())
+                .overlay {
+                    Capsule().strokeBorder(palette.hairline, lineWidth: 0.6)
+                }
+                .padding(10)
+                .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                .allowsHitTesting(false)
+        }
+    }
+
+    private var helpText: String {
+        if let reason = display.reason, !reason.isEmpty {
+            return reason
+        }
+        return "\(display.title)：Enter 或 Space 查看详情"
+    }
+
+    private func updateHover(_ hovering: Bool) {
+        isHovered = hovering
+        hoverTask?.cancel()
+        hoverTask = nil
+        if hovering {
+            hoverTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: hoverDwellNanoseconds)
+                guard !Task.isCancelled else { return }
+                showsDwellTooltip = isHovered && !isKeyboardFocused
+            }
+        } else {
+            showsDwellTooltip = false
+        }
+    }
+
+    private func resetHoverPresentation() {
+        isHovered = false
+        showsDwellTooltip = false
+        hoverTask?.cancel()
+        hoverTask = nil
     }
 
     private var cardContent: some View {
