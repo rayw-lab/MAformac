@@ -1153,3 +1153,9 @@
 - **集成门全绿**：全量 swift test **625/0**（563 基线+62 新增：contrast 9+T4 交互 4+T5 runtime 7+其余组件测试）+ make verify-all rc0。receipt 文件归位 run dir 防仓根污染。
 - T7 链（T2B 主文件+T7c 动效收尾，b0b22346→cc6c9972+，592/0 in-worktree）**未收编**——等 TXB 追加 P1×2 修完+对抗审终版+commander 视觉亲核后单独收（visual-swap 组件明确等 5 Gate 验收不盲换）。
 - 每片全程：worktree 隔离+TDD+对抗审（producer≠auditor）+修复+闭环复核——D1a 编码日范式跑通实证。
+
+## D-129：T7 链收编——D1a 全链落进工作分支（2026-07-08 晚）
+
+- merge-tree 快验 rc0 后收编 T7（1800d4c5，6+ commits：动效 SSOT/招牌①②组件/T2 七态债清偿/主文件接线/三档 motion budget/D0G-005 终序/TXB 双修）。
+- **集成门全绿：全量 swift test 656/0**（625→656，T7 链 +31 测）+ verify-all rc0。TXL 台账 28 findings P1 13/13 CLOSED 为收编前提。
+- D1a 编码日终态：T1+T4+T5+T7（含 T2/T2B/T7b/T7c）**五片全在 opt/streamline**，656/0。剩余=接缝 pass T7d（readback 真流/hover 契约/坐标精修）+ visual-swap 验收（B③④，等 5 Gate）+ T3 hero（Opus 片待排）+ app-run snapshot（idle 窗）+ commander/磊哥视觉亲核门。
