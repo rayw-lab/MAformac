@@ -1082,3 +1082,13 @@
 
 ### D-119 执行账补记（2026-07-08 05:2x，通宵链终态）
 链条实况：S5 补产 66 judge PASS→S6 精确 404 双审 PASS（42 surplus 归档）→S7 十门全 PASS（G8 拒 stale-150 生效；BASE_MODEL_DIR 双源核准；接缝修复 commit 0a5a30c9=S8 code basis）→S8 配方（450 updates/warmup36 比例重算 sha 0d2a9696）+launch packet 冻结→host PASS（D-098 精化谓词裁决,receipt 录）→S7b 签→**S7c 三跑停线**：OOM（batch4 撞长行）→环境排除（20GB free 仍炸）→OOM-DIAGNOSIS 坐实 CONFIG_PARITY_GAP（缺 --token-budget-per-batch 8192+--grad-checkpoint）→Option A parity 修复→训练成功（target_action 25→30 满分/no_tool 2→0 清零）→**receipt_gen 判 FAIL：no_tool_delta=2<threshold 3,而 baseline no_tool_count=2=数学不可能达标（量尺触发面与阈值推导口径错位,R3-AMMO-1/M.16 同族）**。按 S7b one-shot falsification+commander_cannot_loosen 停线,S8 未点火。晨报 MORNING-REPORT-20260708.md 三选项（⭐A 量尺诚实化重判/B 重选 subset/C 分流）备件齐,等磊哥一字拍。
+
+## D-120：S7c 量尺诚实化重判（Option A）grill 收口 + 审计后 S8 点火（磊哥 2026-07-08 晨拍）
+
+- 磊哥原话拍法：「A」+「A 后的决策要grill分解 加审计哈」+「五个worker做完就停下，现在开始不再派单」。
+- **A 语境边界**：原 FAIL 证据一字不动（`S7C-PROBE-RECEIPT.md` probe_pass:false + `receipt_gen_rerun2.json` status:FAIL 保留）；A=承认 threshold=3 对 baseline_no_tool_count=2 结构性不可达（校准失误非 post-hoc，threshold 声明于 baseline 测量前），非放宽标准。STOPLINE-RULING-AUDIT 四条件全落：①原 FAIL 保留 ②eval 来源显式声明（train-on-eval/memorization_caveat/learnability=5of5 非 30of30）③commander 机械盖章 ④磊哥知悉=A 拍本身。
+- **grill 范式执行**：骨架 A-PATH-GRILL-SKELETON.md（已决 R1-R10 + 未决 GA-1~10）→ 双 worker 独立作答交叉（%34 grill 对手 + %26 独立深挖）+ %30 五 boolean 只读盘点 + %31 秘书 → commander 裁决收口 A-PATH-DECISIONS.md（AD-1~10）→ subagent 对抗审计（磊哥停派单令后不占 worker）。
+- **对抗审计 AUDIT_FAIL→findings 全清**（三层升维实证：审计抓到 1P0+2P1 全为真）：P0-1 resume_runbook 实现与 AD-6 v1 裁决相反→commander 亲核 scheduler 数学后**修正 AD-6 为 v2**（mlx cosine_decay 无相位偏移，精确续位 config-only 不可实现；v2=首 LR 续位+重锚 cosine+warmup 0，restart 段 LR 门改三断言，runbook 补对齐段）；P1-1 recert 盖章荣誉制→launch_s8.sh:341 加 PENDING_COMMANDER_STAMP 机械拒绝谓词（正负双测）；P1-2 run-dir 覆盖→exit 70 守护。
+- **点火实况（2026-07-08 08:2x）**：recert 双产物机械生成（receipt_recertification.py self-test PASS，数字全来自两输入 receipt 零手写）→盖章（RECERT-RECEIPT.md sha `44dd5b08…`/JSON sha `cba16d43…`）→dry-run 正负三测（BLOCKED 拒/PENDING 拒/盖章版 launch_allowed=true）→五 boolean 全绿→**S8 正式 1800 点火 pid 57625**（recipe sha 0d2a9696 冻结链核准，masking preflight 4628 records/113273 trainable_tokens）→哨兵 armed pid 57890（interval 300s/deadline 900s/内存 alert 18.0-20.7-23.8GB 不 kill/completion_first，含 stop_event 3 字段最小补丁）。
+- **非声明**：candidate 恒 unsigned；probe 是 learnability 信号非泛化证明；S8 完成后仍需 S9 三臂 eval→S9b→S10 verdict；不声明 C5 V-PASS/C6 acceptance。
+- 证据链：run dir `s8-gates/s7c/`（骨架/双答卷/决策/审计入 A-PATH-DECISIONS.md 头部清单）+ `s8-flight/s8-formal-1800-20260708/s8-launch-basis-receipt.json`。

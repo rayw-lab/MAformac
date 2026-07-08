@@ -342,3 +342,9 @@ cascade-inventory T5「75 件」清单（2026-06-23）直接执行会错：B4a r
 
 ## M.46 probe 量尺的分母前置检查：阈值推导必须绑触发面实况（2026-07-08 S7c 停线实证）
 S7c learnability probe 判 FAIL 的唯一原因：threshold=3（预声明「30 行中 3 行移动=最小可检信号」）要求 no_tool_delta≥3，但实选 30 行的 baseline no_tool_count=2——**结构性不可能达标**。模型实际学动（no_tool 2→0 清零+target_action 25→30）。时序核清：threshold 00:20 预声明早于 baseline eval 02:24=校准失误非 post-hoc 操纵。异源审计支持 delta≥min(threshold, baseline_count) 诚实化重判（4 条件：保留原 FAIL receipt/eval 来源显式/commander 签名/磊哥知悉）。修法（验证经济学「门自身判据也是 basis 绑定」M.16 家族第三例）：**阈值预声明时必须同步声明它假设的分母下限，selector 把该下限做成选行约束**（如「所选 subset 的 baseline no_tool≥threshold」）——量尺与触发面在设计时刻绑定,不是跑完才发现除不动。另记:train-on-eval 微过拟合探针的信号表述=「问题行修复率」非「绝对分」（30/30 含记忆效应,learnability 证据=5/5 问题行翻正）。
+
+## M.47 裁决 worker 分歧时凭「方案描述」推可行性 = claim-vs-reality 新变体（2026-07-08 AD-6 v1 实证）
+
+双 worker 在 restart LR 语义上真分歧（重 warmup vs 精确续位），commander 裁决采「精确续位」，理由（LR 门兼容）技术成立——但**没下钻「精确续位在 config-only 层能否实现」**：mlx `cosine_decay` 无相位偏移参数，中途起跳的 cosine 尾段不是另一个 cosine（`schedulers.py:83-86` 数学），worker 原文自注「cannot do this by config alone」被裁决忽略。结果=裁决落地件（resume_runbook）与裁决相反，被对抗审计抓 P0。
+- **修法**：裁决分歧采某方案前，扣「该方案在当前约束（不改代码/不动冻结件）下**可实现吗**」——把 worker 的实现约束自注当 load-bearing 事实核，不当脚注跳过。方案的「理论最优」≠「约束下可行」。
+- **正面**：对抗审计（producer≠auditor）+ commander 亲核数学 = 两层防线都起效；AD-6 v2 修正后守住 incident-2 全部防线（禁 stale 150/12、首 LR 不回 peak、禁重跑 1800）。磊哥「A 后决策要 grill 分解加审计」流程直接拦下了带病点火。
