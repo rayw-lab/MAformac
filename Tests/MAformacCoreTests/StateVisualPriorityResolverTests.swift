@@ -4,34 +4,35 @@ import XCTest
 /// D1a T2 —— 状态视觉优先级 resolver 单测（D0G-005）。
 final class StateVisualPriorityResolverTests: XCTestCase {
 
-    /// D0G-005 权威链：safety > crash > changing > (attention) > satisfied > normal。
+    /// D0G-005 commander 终序：safety > crash > clarify > changing > selected/hover > unsupported > satisfied > normal。
     func testAuthoritativeChainOrdering() {
         let R = StateVisualPriorityResolver.self
         XCTAssertTrue(R.dominates(.unsafe, over: .unknown), "safety > crash")
-        XCTAssertTrue(R.dominates(.unknown, over: .changing), "crash > changing")
-        XCTAssertTrue(R.dominates(.changing, over: .satisfied), "changing > satisfied")
+        XCTAssertTrue(R.dominates(.unknown, over: .blocked_with_alternative), "crash > clarify")
+        XCTAssertTrue(R.dominates(.blocked_with_alternative, over: .changing), "clarify > changing（停留等人响应）")
+        XCTAssertTrue(R.dominates(.changing, over: .blocked_hard), "changing > unsupported")
+        XCTAssertTrue(R.dominates(.blocked_hard, over: .satisfied), "unsupported > satisfied")
         XCTAssertTrue(R.dominates(.satisfied, over: .normal), "satisfied > normal")
         // safety 永远最高，不被 changing 覆盖（DGA-075）
         XCTAssertTrue(R.dominates(.unsafe, over: .changing))
         XCTAssertTrue(R.dominates(.unsafe, over: .satisfied))
     }
 
-    func testAttentionStatesBelowChangingAboveSatisfied() {
+    func testClarifyAboveChangingUnsupportedBelowHover() {
         let R = StateVisualPriorityResolver.self
-        // clarify / unsupported 在 changing 之下、satisfied 之上（attention 层）
-        XCTAssertTrue(R.dominates(.changing, over: .blocked_with_alternative))
-        XCTAssertTrue(R.dominates(.blocked_with_alternative, over: .satisfied))
-        XCTAssertTrue(R.dominates(.blocked_hard, over: .satisfied))
-        // clarify 优先于 unsupported（需确认 > 已拒识）
-        XCTAssertTrue(R.dominates(.blocked_with_alternative, over: .blocked_hard))
+        // clarify 停留等人响应 → 排 changing 上
+        XCTAssertTrue(R.dominates(.blocked_with_alternative, over: .changing))
+        // unsupported 静默终态 → 排 selected/hover 下、satisfied 上
+        XCTAssertGreaterThan(R.priority(.blocked_hard), R.interactionSelectedHoverPriority)
+        XCTAssertLessThan(R.priority(.blocked_hard), R.priority(.satisfied))
     }
 
-    func testSelectedHoverBetweenChangingAndSatisfied() {
-        // 交互层介于 changing(2) 与 satisfied(6)
+    func testSelectedHoverBetweenChangingAndUnsupported() {
+        // 交互层介于 changing(3) 与 unsupported(5)
         XCTAssertGreaterThan(StateVisualPriorityResolver.interactionSelectedHoverPriority,
                              StateVisualPriorityResolver.priority(.changing))
         XCTAssertLessThan(StateVisualPriorityResolver.interactionSelectedHoverPriority,
-                          StateVisualPriorityResolver.priority(.satisfied))
+                          StateVisualPriorityResolver.priority(.blocked_hard))
     }
 
     func testDominantAmong() {
