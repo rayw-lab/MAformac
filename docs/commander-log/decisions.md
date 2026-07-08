@@ -1100,3 +1100,42 @@
 - **S8 两次中断账（诚实留档）**：r1 pid 57625 于 iter 170 被 lid-sleep 杀（磊哥晨间恢复环境，O2 风险现实执行；哨兵正确分类 INTERRUPTED_TRUE_NO_PROGRESS/resumable；loss 2.746→0.19 训练本体健康）；r2 pid 40993 由 commander 在得知「磊哥故意中断要用机」后主动停（OPERATOR-PAUSE-RECEIPT.md）。两次均 iter<600 无 checkpoint→重启=全新完整 1800，无 stale-schedule 风险。**当前态=S8 待磊哥晚间窗口一句话重启。**
 - **蜂群重建**：ma6 随环境重启消失→ma7 新建（%0 commander + 5 codex %1/%5/%2/%3/%4 + hermes %6，全员绕代理 env -u 启动，逐 pane capture 亲核）。
 - 白天派单面（磊哥授权「反正我听你的」）：Line C C1 grill 骨架+能力面矩阵×2、S9 预备件（stop_event checker+mount-validity 门）、秘书（ballot 整理+CLAUDE §9 终稿）、对抗审计位（含 roadmap v4 异源审——commander 亲笔件必审）、hermes 只读一致性核查。全部不占训练资源。
+
+## D-122：S9 holdout 生成席位磊哥拍 A（Opus 独立生成位）+ ma8 蜂群重建 + 白天二轮对抗审在跑（磊哥 2026-07-08 午拍）
+
+- 磊哥原话：「⭐A：Fable/Opus 独立生成位 这个同意，opus来做，思考强度high，不需要绕过代理，claudecode不需要绕过代理」。s9-holdout-gen-plan.md 三选（NEEDS_LEIGE）就此 RATIFIED_A；B（codex 生成+hermes judge）留 fallback，C 仍禁作主路径。
+- **执行态**：ma8 window 1（opus-holdout）起 Claude Code Opus 4.8 effort high（不绕代理，磊哥明示 claude 不需要 env -u）；OPUS-H1 派单已发（N=64 优先/最低 56，四桶 primary≥32·topic_fronted≥8·negative≥8·particle_tail≥8，8 主形态族每族≥3，≥8 家族覆盖，expected_tool_calls 语义填非一律空，schema 逐字段 inline，禁读 S4/S5 prompt·产物·trainpack 保独立性）。产物落 s8-gates/s9-holdout/（raw.jsonl + generation-receipt.md）。生成后 session 即关（用完即关，feedback-opus-generation-only）。raw 未 judge 未冻结——进 composite manifest 前须 codex 盲判全审（plan §3.3 质量门）+ sha 冻结。
+- **蜂群重建账**：ma7 随磊哥掉线失效→ma8 新建（window 0：%0 commander 位 + 左列下 %5 hermes glm-5.2 + 右列 5 codex gpt-5.5 %1/%4/%6/%2/%3，codex/hermes 绕代理，逐 pane capture 亲核）。布局坑：commander 曾手动 resize-window 240x64 超磊哥客户端 211x44 → 第 5 codex 屏幕外「只看到 4 个」；修=window-size latest 跟随客户端 + new-window 抢焦点后 select-window 切回。
+- **白天二轮执行账**：首轮六单（W1 矩阵 v2 四类重构/W2 rc 提案 v2 P1×3 全 CLOSED/W3 exposure checker RED→GREEN+S10 第 7 门草案/W4 S8 重启预检三测全过+一行点火命令/W5 hermes S9 冻结命令 liveness 0 drift/W6 秘书两草稿 v2）5-9 分钟全交付；二轮对抗配对全员在跑（A1 %2审矩阵/A2 %1审rc/A3 %6审checker/A4 %3审秘书稿/A5 hermes审点火链/A6 %4 D0骨架已决核实）。收稿裁决待记。
+- 待磊哥键（剩二）：S8 重启令（晚间窗口）+ ballot 一屏（BATCH2 5 题+INFRA 7 决策+Q-SR）。
+
+## D-123：磊哥双签——矩阵 v3 签 SSOT + BATCH2/BATCH-INFRA 全星标 + Q-SR=A（磊哥 2026-07-08 傍晚拍）
+
+- 磊哥原话：「先矩阵 v3，后 ballot+Q-SR，矩阵 v3 我支持签，ballot+Q-SR我也授权签署」+「BATCH2/BATCH-INFRA 全按星标，Q-SR=A」。
+- **矩阵 v3 签署**：`runs/2026-07-08-daywork/capability-matrix-v3.md`（四类分类学 safety_or_clarify_reject=0 / unmounted_name_rejected=36 / fast_path_no_match_fallback=82 / 执行 1+1，120 守恒；闭合复核 CLOSED_READY_FOR_LEIGE）内容 RATIFIED 为 **DemoCapabilityMatrix SSOT**；落仓位置（docs/ vs contracts/）与 checker 实装留 C1 grill 拍落点（roadmap 汇合点门 2 承接）。
+- **BATCH2 5 题按星标 RATIFIED**：MG-8=B（fallback 完整轻量体系：reason enum + family/status + fallback script SSOT + 双指标）/ MG-1=B（S10 前只预铺，S10 后按出手率挂 0/3/10 族）/ B2-UI-11=C（分名 `visual_l3_operator_review` / `capability_l3_human_gate`，禁裸 L3）/ MG-3=B（S10 verdict+A1+matrix/readback/fallback 四门前置，前置只预铺）/ MG-6=A（macOS proof 三层 `local/mac_runtime_smoke`/`desktop_operator_equivalent`/`operator-pass` 均不升格）。
+- **BATCH-INFRA 15 问全 A，收敛 7 决策 RATIFIED**：INFRA-D1 worktree_policy / D2 dirty_receipt_template / D4 verify_matrix / D5 sentinel_set / D6 test_layering（L0 contract→L1 golden-run→L2 audit→XCUITest 延后）/ D7 tools_enforce（macOS 派单内嵌三硬规则+named `macos` profile 但 active 仍 iOS）/ D8 rename_guard。
+- **Q-SR=A**：C2 三档表「联合出手率」公式 = `min(hedged 出手率, can-question 出手率)`（磊哥知悉 F-6 澄清后拍：BATCH1 拍的是表结构，公式字段本次新拍）。字段落 S9 runbook/S10 模板为结构化输出=worker 实装单。
+- 级联：ballots-for-leige.md → RATIFIED；源 BATCH2/BATCH-INFRA ballot 文件标注；roadmap v5 §六 两键消费；MG-8 reason enum 与矩阵 v3 四类咬合进 C1 grill 弹药。
+
+## D-124：holdout 修复战役——grill 消减六裁决 + FP 三方双盲合成（剔10/救3）+ 计划 v2（2026-07-08 傍晚）
+
+- 磊哥 A 拍（修+剔+补到全桶达标）后按 grill 范式全流程：骨架（HQ1-6 + 已决 R1-R8）→ worker 对抗作答（HG1 推翻 commander 两处：near-dup 实为 13 行非 7[被 reason 前缀截断误导]；register 不造新枚举用已有 `imperative`+register_subtype，防炸 REGISTER_ENUM/label-authority checker）→ 消减表 RATIFIED → 实施计划 → 红队 EXECUTABLE_WITH_FIXES（P0=0 P1=5：FP 独立性/per-bucket 补数/checker 语义签名盲区/守恒断言加强/canonical sha 绑定——全吸收）。
+- **FP 三方双盲合成**（commander/codex/hermes 独立盲判+预声明合成规则）：剔 10 真撞 / 救回 3（s9h-032 checker 字符集假阳・双意图复合句 / s9h-037 位置槽不同 signature 不同 / s9h-044 train 是高速安全拒识 expected=[] 与 holdout 常规 mutating 语义相反）。hermes 的「15vs十五=diff-args」机械字面票不采。
+- **v2 终账**：存量 54（47 PASS+3 救回+4 particle register 修复）→ 补生成 per-bucket 10 行（topic+3/particle+5/primary+1/negative+1）→ 终态 64=34/10/11/9 全过门（含抗再撞余量）。执行序=Step2 register 脚本修复（commander 亲做+worker 复核）→ Step3 Opus 重开补生成（预检门）→ J2 全量重判 → sha 冻结+canonical 联动 → 三臂。
+- 一手：run dir holdout-repair-{grill-skeleton,impl-plan}.md + holdout-neardup-fp-{review-commander,review-w6,trainpack-view,synthesis}.md + holdout-plan-redteam.md。
+
+## D-125：磊哥拍 BATCH-D0-1 全批⭐（D0 UIUE grill 收口）+ 编码分工令（磊哥 2026-07-08 晚拍）
+
+- 磊哥原话：「43个全部同意」（呈报表尾号 D0G-043，语义=D0-GRILL-INDEX 未决题全按⭐默认拍）+「但是opus开发时候务必注意强视觉啊」+「要用我们tools目录的巨人的肩膀」+「你做好规划」。
+- **D0 grill RATIFIED**：D0-GRILL-INDEX.md（BALLOT_READY_POST_AUDIT，162 题细拆→53 合成，DGX 对抗审过：162/162 零丢题/伪已决 9/9 真/误并已修）全部未决题按⭐默认 RATIFIED。关键拍定：七态逐态正面渲染三通道红只给 unsafe / RM 停循环动效保双通道 / RT 内容实心化 / L2 contrast 机器门 / 状态优先级 safety>crash>changing>selected>satisfied / minWindow 保 5×2+warning / **右栏 macFeaturedContent AC hero 主次混排弃均匀 5 列** / orb Mac 尺度先定不降 phone / ivory 强制不跟系统 / token 是 floor / 内容卡走实心（regularMaterial=方法论债）/ MicDock=mouseDown+Option+Space / hover 只 presentation 不伪装业务态 / 性能 D0 只拍采样方法 / TTS preflight 无 premium 不 fail / runtime event 永远赢 force-state / 六类错误映射 / D1a 必先产 Mac anchor 截图包。steelman 4 题磊哥知悉后仍⭐（DGX 注记呈报过）。
+- **编码分工令**：UIUE 视觉代码=**Opus 位**（阵容一 codex 换 opus medium；「务必注意强视觉」=aesthetic 5 Gate+历史 anchor 质感下限+还原实查）；codex=交互/逻辑/runtime；commander=grill 主刀+视觉决策+亲核验收。**Tools 巨人肩膀强制**：`Tools/agent-platform-plugin-refs/`（build-macos-apps/build-ios-apps 插件 SKILL+references，宪法 §3 明文「做 SwiftUI/macOS/Liquid Glass 前先读」）+ `Tools/skills/`（INDEX）——派单必内联硬规则+强制照做非参考（persona-dispatch 铁律）。
+- 后续链（磊哥同晚纠偏「grill 后面是什么」+30min 范式回顾令）：消减表级联 → D1a 实施计划（拍定内联）→ 红队审计划 → 才编码。
+
+## D-126：招牌微交互双拍定 + D1a 编码开工 + 自主推进窗（磊哥 2026-07-08 晚拍）
+
+- 磊哥：「招牌①②都可以啊 都很棒」+「你自己自动推进哈 不要停下来 我2小时内回来」。
+- **招牌微交互 RATIFIED**：①orb→卡片能量流动线（每指令核心叙事：识别完→青紫能量线→命中卡→点亮形变，单 Canvas 层）②10 卡入场瀑布（开场 hook：delay i×18ms 封顶 120ms，180ms spring）。基础动效三件（数值滚动/fallback 不丢脸卡/MicDock 拾起）随 T7 全做。参数规格=RS-A `showcase-microinteraction-teardown.md`（Raycast/Things/Arc/Linear 参数级拆解）。
+- **D1a 编码开工**（计划 v2 吸收 DRT 红队 P1×7 后）：T1 token 层（Opus %8，build 窗内）/ T4 交互契约（codex worktree）/ T6a+T6b anchor 截图包（codex，23:30 资源锁前抢跑）已派；T7 动效片（招牌①②+基础三件+MX1 21 项迁移）T1 后接 Opus 位。资源窗铁律：S8 active 禁 full build/XCUITest/截图。
+- **before 基线存档**：磊哥贴当前 Mac app 实况（「好丑」：卡片标题截断/布局挤压/右缘裁切）→ `run dir d1a-harness/before-baseline-ugly-20260708.png`，作 T3 before/after 对比素材。
+- holdout 链态：v3 merged 61（33/9/10/9 全过门）J3 终判在途；J2 剔 8 亲裁（新对句推翻 032/044 救回）。
