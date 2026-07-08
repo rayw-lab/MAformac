@@ -1114,11 +1114,19 @@ struct DemoOrbView: View {
     var theme: PresentationTheme
     var state: PresentationOrbState
     var forceReduceMotion = false
+    /// 三档动效预算（RSB §3.4）；默认 fullShowcase 保 L0 现状 parity。runtime/MLX active 时降档。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
+    /// budget 感知的 orb 粒子数（reduceMotion 强制 L2 独立于 GPU budget，D0G-002/RSB §5.3）。
+    private var effectiveOrbParticleCount: Int {
+        PresentationReducedMotionPolicy.particleCount(kind: .orb,
+                                                      reduceMotion: effectiveReduceMotion,
+                                                      budget: motionBudget)
+    }
     private var diameter: CGFloat {
         switch state {
         case .idle: return 88
@@ -1227,7 +1235,8 @@ struct DemoOrbView: View {
                         .accessibilityHidden(true)
                 }
                 if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: effectiveReduceMotion) {
-                    OrbParticleField(diameter: diameter, phase: phase, theme: theme)
+                    OrbParticleField(diameter: diameter, phase: phase, theme: theme,
+                                     particleCount: effectiveOrbParticleCount)
                 }
             }
             .frame(width: diameter, height: diameter)
@@ -1268,11 +1277,13 @@ struct OrbParticleField: View {
     var diameter: CGFloat
     var phase: TimeInterval
     var theme: PresentationTheme
+    /// 粒子数由三档 budget 控制（RSB §3.4：L0 72 / L1 48 / L2 0-24）；默认 72 保 L0 现状 parity。
+    var particleCount: Int = 72
 
     var body: some View {
         Canvas { context, size in
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            for index in 0..<72 {
+            for index in 0..<max(particleCount, 0) {
                 let xSeed = CGFloat((index * 37 + 19) % 101) / 50.5 - 1
                 let ySeed = CGFloat((index * 61 + 7) % 101) / 50.5 - 1
                 let drift = CGFloat(sin(phase * 0.34 + Double(index) * 0.71))
