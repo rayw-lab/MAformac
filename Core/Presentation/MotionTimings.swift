@@ -60,6 +60,12 @@ enum MotionTimings {
         /// 最后一张卡总时长 = 延迟封顶 120 + spring 180 = 300ms（开场，允许 300-420）。
         static let totalMS: Double = 300
         static let isOpener: Bool = true
+
+        /// 重放判据（TXB 修②）：重放代号变化才真触发重入场（reset/开场 ContentView 递增代号）。
+        /// 旧「isActive:false + stable .id」恒不触发；此助手让 view 与测试同源判定。
+        static func shouldReplay(previous: Int, current: Int) -> Bool {
+            previous != current
+        }
     }
 
     // MARK: 基础 · 数值滚动确认（teardown §5.3）

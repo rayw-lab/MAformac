@@ -9,8 +9,9 @@ import SwiftUI
 /// 用法：卡片 `.modifier(CardWaterfallEntrance(index: i, isActive: waterfallPlaying, reduceMotion: rm))`。
 struct CardWaterfallEntrance: ViewModifier {
     let index: Int
-    /// 入场序号触发信号（开场/reset 时置真触发一次）。
-    let isActive: Bool
+    /// 重放代号（TXB 修②）：开场/reset 时 ContentView **递增**此值 → onChange 真触发重入场。
+    /// 旧「isActive:false + stable .id」不会重放（id 稳定=view 不重建，onAppear 不再触发）——已修。
+    let replayToken: Int
     let reduceMotion: Bool
 
     @State private var appeared = false
@@ -21,8 +22,11 @@ struct CardWaterfallEntrance: ViewModifier {
             .scaleEffect(reduceMotion || appeared ? 1 : MotionTimings.Waterfall.cardStartScale)
             .offset(y: reduceMotion || appeared ? 0 : MotionTimings.Waterfall.cardStartTranslateY)
             .onAppear { animateIn() }
-            .onChange(of: isActive) { _, active in
-                if active { appeared = false; animateIn() }
+            .onChange(of: replayToken) { old, new in
+                if MotionTimings.Waterfall.shouldReplay(previous: old, current: new) {
+                    appeared = false
+                    animateIn()
+                }
             }
     }
 
@@ -48,7 +52,7 @@ struct CardWaterfallEntrance: ViewModifier {
 /// 淡入 `contentFadeMS=80ms`。RM 降级 = 随卡单次 fade（无独立延迟）。
 struct CardContentEntrance: ViewModifier {
     let index: Int
-    let isActive: Bool
+    let replayToken: Int
     let reduceMotion: Bool
 
     @State private var visible = false
@@ -57,8 +61,11 @@ struct CardContentEntrance: ViewModifier {
         content
             .opacity(reduceMotion || visible ? 1 : 0)
             .onAppear { animateIn() }
-            .onChange(of: isActive) { _, active in
-                if active { visible = false; animateIn() }
+            .onChange(of: replayToken) { old, new in
+                if MotionTimings.Waterfall.shouldReplay(previous: old, current: new) {
+                    visible = false
+                    animateIn()
+                }
             }
     }
 
@@ -79,12 +86,12 @@ struct CardContentEntrance: ViewModifier {
 }
 
 extension View {
-    /// 招牌② 瀑布入场（便捷挂载）。
-    func cardWaterfallEntrance(index: Int, isActive: Bool, reduceMotion: Bool) -> some View {
-        modifier(CardWaterfallEntrance(index: index, isActive: isActive, reduceMotion: reduceMotion))
+    /// 招牌② 瀑布入场（便捷挂载）。`replayToken` 递增触发重入场（reset/开场）。
+    func cardWaterfallEntrance(index: Int, replayToken: Int, reduceMotion: Bool) -> some View {
+        modifier(CardWaterfallEntrance(index: index, replayToken: replayToken, reduceMotion: reduceMotion))
     }
     /// 招牌② 卡内 icon/value 独立入场（70% opacity 时 80ms）。
-    func cardContentEntrance(index: Int, isActive: Bool, reduceMotion: Bool) -> some View {
-        modifier(CardContentEntrance(index: index, isActive: isActive, reduceMotion: reduceMotion))
+    func cardContentEntrance(index: Int, replayToken: Int, reduceMotion: Bool) -> some View {
+        modifier(CardContentEntrance(index: index, replayToken: replayToken, reduceMotion: reduceMotion))
     }
 }

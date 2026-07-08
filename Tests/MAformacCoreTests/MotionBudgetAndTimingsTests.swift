@@ -140,6 +140,13 @@ final class MotionBudgetAndTimingsTests: XCTestCase {
         XCTAssertEqual(MotionTimings.EnergyLine.lineCurve, .cubic(0.16, 1, 0.3, 1))
     }
 
+    func testWaterfallShouldReplayOnGenerationChange() {
+        // TXB 修②：重放代号变化才真触发重入场（旧 isActive:false+stable id 恒不触发）。
+        XCTAssertFalse(MotionTimings.Waterfall.shouldReplay(previous: 0, current: 0), "代号不变不重放")
+        XCTAssertTrue(MotionTimings.Waterfall.shouldReplay(previous: 0, current: 1), "代号递增真重放")
+        XCTAssertTrue(MotionTimings.Waterfall.shouldReplay(previous: 3, current: 4))
+    }
+
     func testMicDockWaveParams() {
         XCTAssertEqual(MotionTimings.MicDock.waveBarCount, 3)
         XCTAssertEqual(MotionTimings.MicDock.wavePhaseOffsetsMS, [0, 80, 160])

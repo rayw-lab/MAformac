@@ -170,13 +170,11 @@ struct VehicleCardDisplay: Identifiable, Equatable {
         }
     }
 
+    /// 族态 dominant —— **委托单一 SSOT `StateVisualPriorityResolver`**（TXB 修①）。
+    /// 旧硬编码序（unsafe>clarify>unsupported>crash>changing）与 commander 终序漂移，已消除；
+    /// 现与 `StateVisualPriorityResolver` 同源（终序 safety>crash>clarify>changing>hover>unsupported>satisfied）。
     private static func dominantVisualState(_ states: [DemoVisualState]) -> DemoVisualState {
-        for state in [DemoVisualState.unsafe, .blocked_with_alternative, .blocked_hard, .unknown, .changing, .satisfied] {
-            if states.contains(state) {
-                return state
-            }
-        }
-        return .normal
+        StateVisualPriorityResolver.dominant(among: states) ?? .normal
     }
 
     // MARK: - 10 族全景常驻摘要层（AD-9/10/11）

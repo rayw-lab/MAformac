@@ -65,4 +65,19 @@ final class StateVisualPriorityResolverTests: XCTestCase {
         let all = DemoVisualState.allCases.map { StateVisualPriorityResolver.priority($0) }
         XCTAssertEqual(Set(all).count, all.count, "7 态优先级两两不同")
     }
+
+    /// TXB 修①：防两处排序器漂移 —— `UIValueTypeMapper.dominantVisualState` 现委托本 resolver。
+    /// 断言 resolver.dominant 给 commander 终序结果（正是旧硬编码序违反的几对）。
+    func testDominantMatchesCommanderOrderNotOldHardcoded() {
+        // 旧序 clarify > crash（错）；终序 crash > clarify
+        XCTAssertEqual(StateVisualPriorityResolver.dominant(among: [.blocked_with_alternative, .unknown]), .unknown,
+                       "crash 支配 clarify（旧序反了）")
+        // 旧序 unsupported > changing（错）；终序 changing > unsupported
+        XCTAssertEqual(StateVisualPriorityResolver.dominant(among: [.blocked_hard, .changing]), .changing,
+                       "changing 支配 unsupported（旧序反了）")
+        // 旧序 unsupported > crash（错）；终序 crash > unsupported
+        XCTAssertEqual(StateVisualPriorityResolver.dominant(among: [.blocked_hard, .unknown]), .unknown)
+        // safety 恒赢
+        XCTAssertEqual(StateVisualPriorityResolver.dominant(among: [.unsafe, .blocked_with_alternative, .changing]), .unsafe)
+    }
 }

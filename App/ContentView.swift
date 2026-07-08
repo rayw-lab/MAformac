@@ -15,6 +15,8 @@ struct ContentView: View {
     @State private var messages: [DialogueMessage]
     @State private var ambientBurst: AmbientBurstTrigger?
     @State private var didTriggerInitialAmbientBurst = false
+    /// 招牌② 瀑布重放代号：reset/开场递增 → 卡真重入场（TXB 修②）。
+    @State private var waterfallGeneration = 0
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
     private let forceReduceMotion: Bool
@@ -150,7 +152,8 @@ struct ContentView: View {
                     layout: .macPanorama,
                     bottomInset: 0,
                     onTapFamily: { focus.toggle($0) },
-                    onValueScrub: applyMockTransition
+                    onValueScrub: applyMockTransition,
+                    waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, 64)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -168,7 +171,8 @@ struct ContentView: View {
                     layout: .phoneScroll,
                     bottomInset: bottomDockInset(for: size),
                     onTapFamily: { focus.toggle($0) },
-                    onValueScrub: applyMockTransition
+                    onValueScrub: applyMockTransition,
+                    waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, vehicleControlsTopPadding(for: size))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -303,6 +307,7 @@ struct ContentView: View {
     }
 
     private func applySnapshot(_ preset: SnapshotPreset) {
+        waterfallGeneration += 1   // 招牌②：开场/reset/换场景 → 卡真重入场（TXB 修②）
         withAnimation(.snappy(duration: 0.32)) {
             let state = Self.phase2State(for: preset)
             snapshot = state.snapshot
@@ -408,6 +413,7 @@ struct ContentView: View {
     }
 
     private func applyNormalRunPreset() {
+        waterfallGeneration += 1   // 招牌②：reset-normal → 卡真重入场（TXB 修②）
         controlPanelState = DemoControlPanelState()
         let cells = normalRunCells()
         applySnapshotCells(
@@ -1517,6 +1523,9 @@ struct VehicleCardsGrid: View {
     /// 招牌② 瀑布入场的 reduceMotion 守卫（D0G-002）。
     @Environment(\.accessibilityReduceMotion) private var gridReduceMotion
 
+    /// 招牌② 重放代号（reset/开场递增触发重入场，TXB 修②）。
+    var waterfallGeneration: Int = 0
+
     #if !os(macOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
@@ -1713,9 +1722,9 @@ struct VehicleCardsGrid: View {
                             onTap: onTapFamily,
                             onValueScrub: onValueScrub
                         )
-                        // 招牌②：10 卡入场瀑布（onAppear 触发；reset 改 .id 重建即重播）
+                        // 招牌②：10 卡入场瀑布（onAppear 首播；reset/开场 waterfallGeneration 递增真重播，TXB 修②）
                         .cardWaterfallEntrance(index: waterfallIndex(of: display),
-                                               isActive: false,
+                                               replayToken: waterfallGeneration,
                                                reduceMotion: gridReduceMotion)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
