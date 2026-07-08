@@ -1494,9 +1494,17 @@ struct VehicleCardsGrid: View {
 
     @State private var isUserScrolling = false
 
+    /// 招牌② 瀑布入场的 reduceMotion 守卫（D0G-002）。
+    @Environment(\.accessibilityReduceMotion) private var gridReduceMotion
+
     #if !os(macOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
+
+    /// 卡在全集里的扁平序号（招牌② 瀑布 delay = min(i*18ms,120ms)）。
+    private func waterfallIndex(of display: VehicleCardDisplay) -> Int {
+        displays.firstIndex { $0.id == display.id } ?? 0
+    }
 
     private var columnCount: Int {
         switch layout {
@@ -1685,6 +1693,10 @@ struct VehicleCardsGrid: View {
                             onTap: onTapFamily,
                             onValueScrub: onValueScrub
                         )
+                        // 招牌②：10 卡入场瀑布（onAppear 触发；reset 改 .id 重建即重播）
+                        .cardWaterfallEntrance(index: waterfallIndex(of: display),
+                                               isActive: false,
+                                               reduceMotion: gridReduceMotion)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -1864,11 +1876,14 @@ struct VehicleStateCard: View {
             }
 
             if let reason = display.reason {
+                // D0G-006：clarify/兜底态 reason 卡内展示；tooltip 与卡内文案【同源】(同一 reason 串)，
+                // 截断时 hover 悬停展开全文，**无二次执行按钮**（澄清不放独立 action）。
                 Text(reason)
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(palette.inkDim)
                     .lineLimit(1)
                     .truncationMode(.tail)
+                    .help(reason)
             }
         }
     }
