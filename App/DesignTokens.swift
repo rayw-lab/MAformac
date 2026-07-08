@@ -172,9 +172,15 @@ enum DesignTokens {
         DesignTokenValues.colorsetName(for: state)
     }
 
-    /// 态 → colorset `Color`（从 Asset Catalog 取；bundle 缺 set 时回落语义边框色，不 crash）。
+    /// 态 → 语义强调 `Color`，**按 `theme` 参数确定性解析**（TX1 修复，T1 对抗审 P1）。
+    ///
+    /// 🔴 **不走 `Color(name:bundle:)` 解析 Asset colorset**——那依赖【环境 colorScheme】，
+    /// 与 D0G-017「ivory 强制不跟系统」冲突：系统处于 dark 时，即便 theme=ivory，环境 colorScheme
+    /// 仍可能是 dark → colorset 会渗入 deepSpace(dark) appearance。故本访问器直接从 Core
+    /// `DesignTokenValues.token(for:theme:).border`（纯值，按 theme 参数 keyed）取色，**env 无关**。
+    /// Asset Catalog colorset 仍作 HA2 P1-1 设计侧产物（名映射见 `stateColorsetName`），运行时不靠它解析。
     static func stateColor(for state: DemoVisualState, theme: PresentationTheme) -> Color {
-        Color(stateColorsetName(for: state), bundle: .main)
+        Color(token: DesignTokenValues.token(for: state, theme: theme.tokenID).border)
     }
 }
 
@@ -185,6 +191,11 @@ extension Color {
         let g = Double((hex24 >> 8) & 0xFF) / 255
         let b = Double(hex24 & 0xFF) / 255
         self.init(.sRGB, red: r, green: g, blue: b, opacity: opacity)
+    }
+
+    /// Core `TokenRGB`（纯值 SSOT）→ SwiftUI `Color`（env 无关，sRGB 确定性）。
+    init(token: TokenRGB, opacity: Double = 1.0) {
+        self.init(.sRGB, red: token.r, green: token.g, blue: token.b, opacity: opacity)
     }
 }
 
