@@ -1516,8 +1516,17 @@ struct VehicleCardsGrid: View {
     }
 
     private var activeFamily: FamilyCardID? {
-        displays.first { $0.activeCell != nil }?.familyCardID ??
-            displays.first { $0.visualState != .normal }?.familyCardID
+        if let active = displays.first(where: { $0.activeCell != nil }) {
+            return active.familyCardID
+        }
+        // 清偿二值压缩债（D7/D0G-005）：按状态优先级 resolver 选【主导态】卡，
+        // 而非 binary「首个非 normal」（satisfied 在 unsafe 前时旧逻辑会误选 satisfied）。
+        let states = displays.map { $0.visualState }
+        if let idx = StateVisualPriorityResolver.featuredIndex(states: states),
+           displays[idx].visualState != .normal {
+            return displays[idx].familyCardID
+        }
+        return nil
     }
 
     private var featuredHeroFamily: FamilyCardID {
