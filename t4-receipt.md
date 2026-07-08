@@ -34,9 +34,9 @@
 
 ## Validation
 
-- `gitnexus impact VehicleStateCard --repo MAformac-r5-main-current --direction upstream --file App/ContentView.swift --depth 2 --summary-only` -> LOW, impactedCount 8.
-- `gitnexus impact MicDock --repo MAformac-r5-main-current --direction upstream --file App/ContentView.swift --depth 2 --summary-only` -> LOW, impactedCount 4.
-- `gitnexus impact ContentView --repo MAformac-r5-main-current --direction upstream --file App/ContentView.swift --depth 2 --summary-only` -> LOW, impactedCount 3.
+- `gitnexus impact VehicleStateCard --repo MAformac-r5-main-current --direction upstream --file App/ContentView.swift --depth 2 --summary-only` -> LOW, impactedCount 8, processes_affected 0.
+- `gitnexus impact MicDock --repo MAformac-r5-main-current --direction upstream --file App/ContentView.swift --depth 2 --summary-only` -> LOW, impactedCount 4, processes_affected 0.
+- `gitnexus impact ContentView --repo MAformac-r5-main-current --direction upstream --file App/ContentView.swift --depth 2 --summary-only` -> HIGH, impactedCount 140, direct 3, processes_affected 0. Meaning: `ContentView` is a shared large view file with broad structural blast radius; this is not a claim that the T4 leaf changes themselves are high-risk.
 - TDD red run before implementation: `swift test --filter T4MacInteractionContractTests` -> 13 expected failures.
 - `swift test --filter T4MacInteractionContractTests` -> passed, 3 tests, 0 failures.
 - `swift build` -> passed. SwiftPM emitted existing unhandled-file warnings for repository files/test artifacts.
@@ -44,7 +44,7 @@
 - First concurrent iOS build-for-testing attempt hit DerivedData `build.db` lock; sequential retry below passed.
 - `xcodebuild -project MAformac.xcodeproj -scheme MAformacIOS -configuration Debug -destination 'generic/platform=iOS Simulator' build-for-testing` -> `** TEST BUILD SUCCEEDED **`.
 - `xcodebuild -project MAformac.xcodeproj -scheme MAformacIOS -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' test -only-testing:MAformacIOSUITests/T4MacInteractionUITests` -> `** TEST SUCCEEDED **`, 1 UI test executed as authored skip under iOS host, 0 failures.
-- `gitnexus detect-changes --repo MAformac-r5-main-current` -> 1 file, 39 symbols, 0 affected processes, risk low.
+- T4F fresh `gitnexus detect-changes --repo MAformac-r5-main-current --scope working` after the P1 fixes -> 2 files, 12 symbols, 0 affected processes, risk low.
 
 ## XCUITest Status
 
