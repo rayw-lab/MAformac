@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var messages: [DialogueMessage]
     @State private var ambientBurst: AmbientBurstTrigger?
     @State private var didTriggerInitialAmbientBurst = false
+    /// 招牌② 瀑布重放代号：reset/开场递增 → 卡真重入场（TXB 修②）。
+    @State private var waterfallGeneration = 0
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
     private let forceReduceMotion: Bool
@@ -153,7 +155,8 @@ struct ContentView: View {
                     layout: .macPanorama,
                     bottomInset: 0,
                     onTapFamily: { focus.toggle($0) },
-                    onValueScrub: applyMockTransition
+                    onValueScrub: applyMockTransition,
+                    waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, 64)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -171,7 +174,8 @@ struct ContentView: View {
                     layout: .phoneScroll,
                     bottomInset: bottomDockInset(for: size),
                     onTapFamily: { focus.toggle($0) },
-                    onValueScrub: applyMockTransition
+                    onValueScrub: applyMockTransition,
+                    waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, vehicleControlsTopPadding(for: size))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -306,6 +310,7 @@ struct ContentView: View {
     }
 
     private func applySnapshot(_ preset: SnapshotPreset) {
+        waterfallGeneration += 1   // 招牌②：开场/reset/换场景 → 卡真重入场（TXB 修②）
         withAnimation(.snappy(duration: 0.32)) {
             let state = Self.phase2State(for: preset)
             snapshot = state.snapshot
@@ -411,6 +416,7 @@ struct ContentView: View {
     }
 
     private func applyNormalRunPreset() {
+        waterfallGeneration += 1   // 招牌②：reset-normal → 卡真重入场（TXB 修②）
         controlPanelState = DemoControlPanelState()
         let cells = normalRunCells()
         applySnapshotCells(
@@ -1315,11 +1321,19 @@ struct DemoOrbView: View {
     var theme: PresentationTheme
     var state: PresentationOrbState
     var forceReduceMotion = false
+    /// 三档动效预算（RSB §3.4）；默认 fullShowcase 保 L0 现状 parity。runtime/MLX active 时降档。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
+    /// budget 感知的 orb 粒子数（reduceMotion 强制 L2 独立于 GPU budget，D0G-002/RSB §5.3）。
+    private var effectiveOrbParticleCount: Int {
+        PresentationReducedMotionPolicy.particleCount(kind: .orb,
+                                                      reduceMotion: effectiveReduceMotion,
+                                                      budget: motionBudget)
+    }
     private var diameter: CGFloat {
         switch state {
         case .idle: return 88
@@ -1428,7 +1442,8 @@ struct DemoOrbView: View {
                         .accessibilityHidden(true)
                 }
                 if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: effectiveReduceMotion) {
-                    OrbParticleField(diameter: diameter, phase: phase, theme: theme)
+                    OrbParticleField(diameter: diameter, phase: phase, theme: theme,
+                                     particleCount: effectiveOrbParticleCount)
                 }
             }
             .frame(width: diameter, height: diameter)
@@ -1469,11 +1484,13 @@ struct OrbParticleField: View {
     var diameter: CGFloat
     var phase: TimeInterval
     var theme: PresentationTheme
+    /// 粒子数由三档 budget 控制（RSB §3.4：L0 72 / L1 48 / L2 0-24）；默认 72 保 L0 现状 parity。
+    var particleCount: Int = 72
 
     var body: some View {
         Canvas { context, size in
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            for index in 0..<72 {
+            for index in 0..<max(particleCount, 0) {
                 let xSeed = CGFloat((index * 37 + 19) % 101) / 50.5 - 1
                 let ySeed = CGFloat((index * 61 + 7) % 101) / 50.5 - 1
                 let drift = CGFloat(sin(phase * 0.34 + Double(index) * 0.71))
@@ -1543,8 +1560,17 @@ struct DeepSpaceBackground: View {
 struct StageAtmosphereLayer: View {
     var theme: PresentationTheme
     var orbState: PresentationOrbState
+    /// 三档预算（RSB §3.4）；默认 fullShowcase 保 L0 parity=138。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// budget 感知的 stage 粒子数（reduceMotion 强制 L2=0）。
+    private var effectiveStageParticleCount: Int {
+        PresentationReducedMotionPolicy.particleCount(kind: .stage,
+                                                      reduceMotion: reduceMotion,
+                                                      budget: motionBudget)
+    }
 
     var body: some View {
         Group {
@@ -1580,7 +1606,7 @@ struct StageAtmosphereLayer: View {
 
     private func particleCanvas(size: CGSize, phase: TimeInterval) -> some View {
         Canvas { context, canvasSize in
-            for index in 0..<138 {
+            for index in 0..<max(effectiveStageParticleCount, 0) {
                 let xSeed = CGFloat((index * 43 + 17) % 997) / 997
                 let ySeed = CGFloat((index * 61 + 29) % 991) / 991
                 let drift = CGFloat(sin(phase * 0.18 + Double(index) * 0.37))
@@ -1695,9 +1721,20 @@ struct VehicleCardsGrid: View {
 
     @State private var isUserScrolling = false
 
+    /// 招牌② 瀑布入场的 reduceMotion 守卫（D0G-002）。
+    @Environment(\.accessibilityReduceMotion) private var gridReduceMotion
+
+    /// 招牌② 重放代号（reset/开场递增触发重入场，TXB 修②）。
+    var waterfallGeneration: Int = 0
+
     #if !os(macOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
+
+    /// 卡在全集里的扁平序号（招牌② 瀑布 delay = min(i*18ms,120ms)）。
+    private func waterfallIndex(of display: VehicleCardDisplay) -> Int {
+        displays.firstIndex { $0.id == display.id } ?? 0
+    }
 
     private var columnCount: Int {
         switch layout {
@@ -1717,8 +1754,17 @@ struct VehicleCardsGrid: View {
     }
 
     private var activeFamily: FamilyCardID? {
-        displays.first { $0.activeCell != nil }?.familyCardID ??
-            displays.first { $0.visualState != .normal }?.familyCardID
+        if let active = displays.first(where: { $0.activeCell != nil }) {
+            return active.familyCardID
+        }
+        // 清偿二值压缩债（D7/D0G-005）：按状态优先级 resolver 选【主导态】卡，
+        // 而非 binary「首个非 normal」（satisfied 在 unsafe 前时旧逻辑会误选 satisfied）。
+        let states = displays.map { $0.visualState }
+        if let idx = StateVisualPriorityResolver.featuredIndex(states: states),
+           displays[idx].visualState != .normal {
+            return displays[idx].familyCardID
+        }
+        return nil
     }
 
     private var featuredHeroFamily: FamilyCardID {
@@ -1877,6 +1923,10 @@ struct VehicleCardsGrid: View {
                             onTap: onTapFamily,
                             onValueScrub: onValueScrub
                         )
+                        // 招牌②：10 卡入场瀑布（onAppear 首播；reset/开场 waterfallGeneration 递增真重播，TXB 修②）
+                        .cardWaterfallEntrance(index: waterfallIndex(of: display),
+                                               replayToken: waterfallGeneration,
+                                               reduceMotion: gridReduceMotion)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -2154,11 +2204,16 @@ struct VehicleStateCard: View {
             }
 
             if let reason = display.reason {
+                // D0G-006：clarify/兜底态 reason 卡内展示；tooltip 与卡内文案【同源】(同一 reason 串)，
+                // 截断时 hover 悬停展开全文，**无二次执行按钮**（澄清不放独立 action）。
                 Text(reason)
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(palette.inkDim)
                     .lineLimit(1)
                     .truncationMode(.tail)
+                    .help(reason)
+                    // B⑤ fallback 不丢脸卡：reason badge 滑入(x -4→0，40-160ms)，兜底态入场契约（teardown §5.4）
+                    .fallbackBadgeTransition(visible: true, reduceMotion: reduceMotion)
             }
         }
     }

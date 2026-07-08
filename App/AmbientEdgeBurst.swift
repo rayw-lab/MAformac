@@ -16,8 +16,15 @@ struct AmbientEdgeBurst: View {
     let trigger: AmbientBurstTrigger
     var theme: PresentationTheme
     var onFinished: (UUID) -> Void
+    /// 三档预算（RSB §3.4）；默认 fullShowcase 保 L0 parity（burst 250/310）。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// budget 感知有效档（reduceMotion 强制 L2：allowBurstParticles=false）。
+    private var effectiveBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: reduceMotion, requested: motionBudget)
+    }
 
     private var gradient: [Color] {
         let mapped = DesignTokens.ambientGradient(named: trigger.colorName)
@@ -56,8 +63,10 @@ struct AmbientEdgeBurst: View {
                         phase.animation
                     }
 
-                    if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
-                        AmbientParticleCanvas(trigger: trigger, colors: gradient, theme: theme)
+                    if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion),
+                       effectiveBudget.allowBurstParticles {
+                        AmbientParticleCanvas(trigger: trigger, colors: gradient, theme: theme,
+                                              motionBudget: effectiveBudget)
                     }
                 } else {
                     edgeGlow(size: size, phase: .linger)
@@ -342,6 +351,8 @@ private struct AmbientParticleCanvas: View {
     let trigger: AmbientBurstTrigger
     let colors: [Color]
     var theme: PresentationTheme
+    /// L0 用 theme count(250/310)保 parity；L1/L2 用 budget.burstParticleCount(120/0)降档。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 45.0)) { timeline in
@@ -361,7 +372,9 @@ private struct AmbientParticleCanvas: View {
         context.blendMode = theme == .deepSpace ? .plusLighter : .normal
         let minSide = min(size.width, size.height)
         let edgeDepth = max(50, minSide * (theme == .ivory ? 0.20 : 0.24))
-        let count = theme == .ivory ? 250 : 310
+        let base = theme == .ivory ? 250 : 310
+        // L0 保 theme 原值（parity）；降档用 budget 值（120/0）
+        let count = motionBudget.level == .fullShowcase ? base : motionBudget.burstParticleCount
         let seed = Double(abs(trigger.id.uuidString.hashValue % 10_000))
         let rampIn = min(1, progress / 0.10)
         let fadeOut = pow(max(0, 1 - progress), theme == .ivory ? 1.35 : 1.12)
