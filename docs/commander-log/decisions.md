@@ -1146,3 +1146,10 @@
 - **冻结**：sha256 `77853caea4598f334fb4a7ed89eafc348746adf333d647306aa94f0b68da2f64`，61 行，四桶 33/9/10/9 全过门（≥32/8/8/8）；canonical=`s8-gates/s9-eval-freeze/holdout/eval-holdout.jsonl`（幂等脚本 holdout-freeze.sh，freeze-receipt.md 带 v1→v2→v3 lineage 链+CASES/MANIFEST 联动指针）；旧版全标 lineage_only。
 - 实证沉淀：exposure checker（语序层）实战四连（v2 预检 1 撞/v3 零撞/J2 扫 8/J3 复扫 FP dismiss）=判别力田间验证；「J 轮全量重判非只判新行」（HQ5 裁决）两次翻出增量对句=范式正确。
 - S9 弹药态：holdout FROZEN + 三 checker 落位（exposure 已入仓 c4dfb247+S10 第 7 门已实装模板）+ exact commands 冻结 + Q-SR 字段已入 runbook/S10 模板。S9 只等 S8 训完出 adapter。
+
+## D-128：D1a 首批三片集成收编（T1→T4→T5，2026-07-08 晚）
+
+- IN1/IN2 两轮只读预演（merge-tree 全 rc0+零重叠）后 commander 亲手集成：T1 token 层（389a4a8a，TX1 审+T7 顺路修 theme 确定性）→ T4 交互契约（42dfeb2b 含 T4F 修+T4V 闭环+receipt 措辞）→ T5 runtime 呈现（af7ac5d7 含 T5F 修+T5V 闭环）。
+- **集成门全绿**：全量 swift test **625/0**（563 基线+62 新增：contrast 9+T4 交互 4+T5 runtime 7+其余组件测试）+ make verify-all rc0。receipt 文件归位 run dir 防仓根污染。
+- T7 链（T2B 主文件+T7c 动效收尾，b0b22346→cc6c9972+，592/0 in-worktree）**未收编**——等 TXB 追加 P1×2 修完+对抗审终版+commander 视觉亲核后单独收（visual-swap 组件明确等 5 Gate 验收不盲换）。
+- 每片全程：worktree 隔离+TDD+对抗审（producer≠auditor）+修复+闭环复核——D1a 编码日范式跑通实证。
