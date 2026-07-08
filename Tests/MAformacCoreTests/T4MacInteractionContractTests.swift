@@ -35,6 +35,10 @@ final class T4MacInteractionContractTests: XCTestCase {
         XCTAssertTrue(card.contains("hoverDwellNanoseconds"))
         XCTAssertTrue(card.contains("keyboard focus wins hover"))
         XCTAssertTrue(card.contains("display.visualState"))
+        XCTAssertTrue(card.contains(".onChange(of: display.visualState)"))
+        XCTAssertTrue(card.contains(".onChange(of: display.accessibilityKey)"))
+        XCTAssertTrue(card.contains("resetHoverPresentation()"))
+        XCTAssertTrue(card.contains("hoverTask = nil"))
         XCTAssertFalse(card.contains("display.visualState ="))
         XCTAssertFalse(card.contains("visualState ="))
     }
@@ -59,8 +63,22 @@ final class T4MacInteractionContractTests: XCTestCase {
         XCTAssertTrue(mic.contains("optionSpaceKeyCode"))
         XCTAssertTrue(mic.contains("escapeKeyCode"))
         XCTAssertTrue(mic.contains("drag-out/失焦 cancel"))
+        XCTAssertTrue(mic.contains("@Environment(\\.scenePhase)"))
+        XCTAssertTrue(mic.contains(".onChange(of: scenePhase)"))
+        XCTAssertTrue(mic.contains("phase != .active"))
+        XCTAssertTrue(mic.contains("isFocused = true"))
+        XCTAssertTrue(mic.contains("isFocused = false"))
         XCTAssertTrue(mic.contains("permissionPreflightStatus"))
         XCTAssertFalse(mic.contains("Button(action: onMockVoiceSubmit)"))
         XCTAssertFalse(mic.contains(".onLongPressGesture"))
+    }
+
+    func testExpandedLayerIdentifierMatchesT4MacXCUITestExpectation() throws {
+        let expanded = try source(at: "App/ExpandedFamilyCard.swift")
+        let uiTest = try source(at: "MAformacIOSUITests/T4MacInteractionUITests.swift")
+
+        XCTAssertTrue(expanded.contains("expanded-\\(display.family.rawValue)"))
+        XCTAssertTrue(expanded.contains("expanded-\\(display.family.rawValue)-close"))
+        XCTAssertTrue(uiTest.contains("\"expanded-ac\""))
     }
 }

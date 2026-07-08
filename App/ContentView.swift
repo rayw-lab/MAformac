@@ -1040,6 +1040,7 @@ struct MicDock: View {
     var theme: PresentationTheme
     var state: PresentationVoiceState
     var onMockVoiceSubmit: () -> Void = {}
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isPressing = false
     @State private var isCancelled = false
@@ -1073,6 +1074,9 @@ struct MicDock: View {
         .focused($isFocused)
         .onChange(of: isFocused) { _, focused in
             if !focused { cancelPress() } // drag-out/失焦 cancel，D0G-033/D0G-034。
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { cancelPress() }
         }
         .micDockExitCommand(cancelPress)
         .overlay { macKeyMonitor }
@@ -1128,6 +1132,7 @@ struct MicDock: View {
     }
 
     private func startPress() {
+        isFocused = true
         isCancelled = false
         setPressing(true)
     }
@@ -1136,6 +1141,7 @@ struct MicDock: View {
         guard isPressing else { return }
         setPressing(false)
         pressStartedInside = false
+        isFocused = false
         onMockVoiceSubmit()
     }
 
@@ -1143,6 +1149,7 @@ struct MicDock: View {
         guard isPressing || pressStartedInside else { return }
         setPressing(false)
         pressStartedInside = false
+        isFocused = false
         isCancelled = true
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 650_000_000)
@@ -1968,6 +1975,12 @@ struct VehicleStateCard: View {
                 showsDwellTooltip = false
             }
         }
+        .onChange(of: display.visualState) { _, _ in
+            resetHoverPresentation()
+        }
+        .onChange(of: display.accessibilityKey) { _, _ in
+            resetHoverPresentation()
+        }
         .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: isHero)
         .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: hoverActive)
         .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: isKeyboardFocused)
@@ -2019,6 +2032,7 @@ struct VehicleStateCard: View {
     private func updateHover(_ hovering: Bool) {
         isHovered = hovering
         hoverTask?.cancel()
+        hoverTask = nil
         if hovering {
             hoverTask = Task { @MainActor in
                 try? await Task.sleep(nanoseconds: hoverDwellNanoseconds)
@@ -2028,6 +2042,13 @@ struct VehicleStateCard: View {
         } else {
             showsDwellTooltip = false
         }
+    }
+
+    private func resetHoverPresentation() {
+        isHovered = false
+        showsDwellTooltip = false
+        hoverTask?.cancel()
+        hoverTask = nil
     }
 
     private var cardContent: some View {
