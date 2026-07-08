@@ -26,6 +26,7 @@ final class T5RuntimePresentationTests: XCTestCase {
 
     func testRuntimeEventWinsForceStateAndForceStateCarriesDemoForceMarker() {
         let orchestrator = T5PresentationOrchestrator()
+        let resolver: any T5PresentationResolving = orchestrator
         let force = T5PresentationEvent.forceState(.unsafe)
         let runtime = T5PresentationEvent.runtime(
             snapshot: StagePresentationSnapshot(
@@ -39,18 +40,31 @@ final class T5RuntimePresentationTests: XCTestCase {
         XCTAssertEqual(orchestrator.resolve(current: nil, incoming: orchestrator.firstFrame()).source, .idlePanorama)
         XCTAssertEqual(orchestrator.resolve(current: nil, incoming: force).source, .demoForce)
         XCTAssertEqual(orchestrator.resolve(current: force, incoming: runtime).source, .runtime)
+        XCTAssertEqual(resolver.resolvePresentation(current: runtime, incoming: force).source, .runtime)
         XCTAssertEqual(force.sourceMarker, "DEMO_FORCE")
     }
 
     func testCardSchedulerMergesToLatestReadbackAndStaggersNonCriticalCards() {
         let scheduler = T5CardChangeScheduler()
         let scheduled = scheduler.schedule([
-            T5CardChange(cardID: "ac", state: .changing, readbackID: "rb-old", revision: 1),
-            T5CardChange(cardID: "seat", state: .changing, readbackID: "rb-new", revision: 2),
-            T5CardChange(cardID: "screen", state: .satisfied, readbackID: "rb-new", revision: 2)
+            T5CardChange(cardID: "ac", state: .changing, readbackID: "rb-old", revision: 1, readbackEpoch: 10),
+            T5CardChange(cardID: "seat", state: .changing, readbackID: "rb-new", revision: 2, readbackEpoch: 20),
+            T5CardChange(cardID: "screen", state: .satisfied, readbackID: "rb-new", revision: 2, readbackEpoch: 20)
         ])
 
         XCTAssertEqual(scheduled.map(\.readbackID), ["rb-new", "rb-new", "rb-new"])
+        XCTAssertEqual(scheduled.map(\.delayMilliseconds), [120, 170, 220])
+    }
+
+    func testCardSchedulerBreaksEqualRevisionTiesByReadbackEpochThenInputOrder() {
+        let scheduler = T5CardChangeScheduler()
+        let scheduled = scheduler.schedule([
+            T5CardChange(cardID: "ac", state: .changing, readbackID: "rb-first", revision: 7, readbackEpoch: 100),
+            T5CardChange(cardID: "seat", state: .changing, readbackID: "rb-latest", revision: 7, readbackEpoch: 101),
+            T5CardChange(cardID: "screen", state: .satisfied, readbackID: "rb-tie-last", revision: 7, readbackEpoch: 101)
+        ])
+
+        XCTAssertEqual(scheduled.map(\.readbackID), ["rb-tie-last", "rb-tie-last", "rb-tie-last"])
         XCTAssertEqual(scheduled.map(\.delayMilliseconds), [120, 170, 220])
     }
 
@@ -71,12 +85,17 @@ final class T5RuntimePresentationTests: XCTestCase {
         let engine = T5RecordingCancellableSpeechEngine()
         let coordinator = T5ReadbackSpeechCoordinator(engine: engine)
 
-        coordinator.handle(T5ReadbackText(id: "rb-1", text: "第一条"))
-        coordinator.handle(T5ReadbackText(id: "rb-2", text: "第二条"))
+        _ = coordinator.handle(T5ReadbackText(id: "rb-1", text: "第一条"))
+        let update = coordinator.handle(T5ReadbackText(id: "rb-2", text: "第二条"))
 
         XCTAssertEqual(engine.cancelledIDs, ["rb-1"])
         XCTAssertEqual(engine.spoken, [T5ReadbackText(id: "rb-1", text: "第一条"), T5ReadbackText(id: "rb-2", text: "第二条")])
         XCTAssertEqual(coordinator.activeTextID, "rb-2")
+        XCTAssertEqual(update.cancelledTextID, "rb-1")
+        XCTAssertEqual(update.pendingBadge, T5ReadbackPendingBadge(readbackID: "rb-2", isPending: true, receiptKind: "tts_readback_pending"))
+        XCTAssertEqual(coordinator.pendingBadge?.readbackID, "rb-2")
+        XCTAssertTrue(coordinator.markSpeechSynchronized(textID: "rb-2"))
+        XCTAssertNil(coordinator.pendingBadge)
     }
 
     func testTTSPreflightRecordsFallbackAndMutedWithoutFailingForPremiumVoice() {

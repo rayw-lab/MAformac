@@ -145,11 +145,32 @@ struct T5PresentationOrchestrator: Sendable {
     }
 }
 
+/// Boundary seam for the eventual App/runtime mount point.
+///
+/// T5 owns only the presentation precedence contract. The concrete T2/App wiring
+/// should depend on this protocol instead of bypassing `resolvePresentation`.
+protocol T5PresentationResolving: Sendable {
+    func resolvePresentation(
+        current: T5PresentationEvent?,
+        incoming: T5PresentationEvent
+    ) -> T5PresentationEvent
+}
+
+extension T5PresentationOrchestrator: T5PresentationResolving {
+    func resolvePresentation(
+        current: T5PresentationEvent?,
+        incoming: T5PresentationEvent
+    ) -> T5PresentationEvent {
+        resolve(current: current, incoming: incoming)
+    }
+}
+
 struct T5CardChange: Equatable, Sendable {
     var cardID: String
     var state: DemoVisualState
     var readbackID: String
     var revision: Int
+    var readbackEpoch: Int
     var isCrash: Bool
 
     init(
@@ -157,12 +178,14 @@ struct T5CardChange: Equatable, Sendable {
         state: DemoVisualState,
         readbackID: String,
         revision: Int,
+        readbackEpoch: Int = 0,
         isCrash: Bool = false
     ) {
         self.cardID = cardID
         self.state = state
         self.readbackID = readbackID
         self.revision = revision
+        self.readbackEpoch = readbackEpoch
         self.isCrash = isCrash
     }
 }
@@ -177,9 +200,7 @@ struct T5ScheduledCardChange: Equatable, Sendable {
 struct T5CardChangeScheduler: Sendable {
     func schedule(_ changes: [T5CardChange]) -> [T5ScheduledCardChange] {
         guard !changes.isEmpty else { return [] }
-        let latestReadbackID = changes.max { lhs, rhs in
-            lhs.revision < rhs.revision
-        }?.readbackID ?? changes[changes.endIndex - 1].readbackID
+        let latestReadbackID = Self.latestReadbackID(in: changes)
 
         let nonCriticalCount = changes.filter { !Self.isImmediate($0) }.count
         var nonCriticalIndex = 0
@@ -201,6 +222,20 @@ struct T5CardChangeScheduler: Sendable {
         }
     }
 
+    private static func latestReadbackID(in changes: [T5CardChange]) -> String {
+        changes.enumerated().max { lhs, rhs in
+            let left = lhs.element
+            let right = rhs.element
+            if left.revision != right.revision {
+                return left.revision < right.revision
+            }
+            if left.readbackEpoch != right.readbackEpoch {
+                return left.readbackEpoch < right.readbackEpoch
+            }
+            return lhs.offset < rhs.offset
+        }?.element.readbackID ?? changes[changes.endIndex - 1].readbackID
+    }
+
     private static func isImmediate(_ change: T5CardChange) -> Bool {
         change.state == .unsafe || change.isCrash
     }
@@ -214,6 +249,18 @@ struct T5CardChangeScheduler: Sendable {
 struct T5ReadbackText: Equatable, Sendable {
     var id: String
     var text: String
+}
+
+struct T5ReadbackPendingBadge: Equatable, Sendable {
+    var readbackID: String
+    var isPending: Bool
+    var receiptKind: String
+}
+
+struct T5ReadbackSpeechUpdate: Equatable, Sendable {
+    var activeTextID: String
+    var cancelledTextID: String?
+    var pendingBadge: T5ReadbackPendingBadge
 }
 
 protocol T5CancellableSpeechEngine: AnyObject, Sendable {
@@ -237,17 +284,39 @@ final class T5RecordingCancellableSpeechEngine: T5CancellableSpeechEngine, @unch
 final class T5ReadbackSpeechCoordinator: @unchecked Sendable {
     private let engine: any T5CancellableSpeechEngine
     private(set) var activeTextID: String?
+    private(set) var pendingBadge: T5ReadbackPendingBadge?
 
     init(engine: any T5CancellableSpeechEngine) {
         self.engine = engine
     }
 
-    func handle(_ readback: T5ReadbackText) {
+    func handle(_ readback: T5ReadbackText) -> T5ReadbackSpeechUpdate {
+        let cancelledTextID: String?
         if let activeTextID, activeTextID != readback.id {
             engine.cancel(textID: activeTextID)
+            cancelledTextID = activeTextID
+        } else {
+            cancelledTextID = nil
         }
         activeTextID = readback.id
+        let badge = T5ReadbackPendingBadge(
+            readbackID: readback.id,
+            isPending: true,
+            receiptKind: "tts_readback_pending"
+        )
+        pendingBadge = badge
         engine.speak(readback)
+        return T5ReadbackSpeechUpdate(
+            activeTextID: readback.id,
+            cancelledTextID: cancelledTextID,
+            pendingBadge: badge
+        )
+    }
+
+    func markSpeechSynchronized(textID: String) -> Bool {
+        guard activeTextID == textID else { return false }
+        pendingBadge = nil
+        return true
     }
 }
 
