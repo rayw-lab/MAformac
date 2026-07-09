@@ -1159,3 +1159,9 @@
 - merge-tree 快验 rc0 后收编 T7（1800d4c5，6+ commits：动效 SSOT/招牌①②组件/T2 七态债清偿/主文件接线/三档 motion budget/D0G-005 终序/TXB 双修）。
 - **集成门全绿：全量 swift test 656/0**（625→656，T7 链 +31 测）+ verify-all rc0。TXL 台账 28 findings P1 13/13 CLOSED 为收编前提。
 - D1a 编码日终态：T1+T4+T5+T7（含 T2/T2B/T7b/T7c）**五片全在 opt/streamline**，656/0。剩余=接缝 pass T7d（readback 真流/hover 契约/坐标精修）+ visual-swap 验收（B③④，等 5 Gate）+ T3 hero（Opus 片待排）+ app-run snapshot（idle 窗）+ commander/磊哥视觉亲核门。
+
+## D-130：session 收口——worker 阵容新规（禁 claude 系）+ ma10 交接（磊哥 2026-07-09 傍晚拍）
+
+- 磊哥原话：「沉淀六件套 新session新开ma10 后续worker不允许用claude系列，只能hermes+codex，生成器后续如果有内容我们就用hermes glm」。
+- **阵容新规（supersede D-122 Opus 生成位/D-125 Opus 视觉位惯例）**：ma10 起 worker=hermes+codex only；生成器任务（语料/话术创作）=hermes glm（生成方≠判方纪律不变：hermes 生成→codex judge）；UIUE 视觉=commander 亲笔加重+codex 按参数级规格实装（codex 不独立主刀视觉仍有效）。memory 已落 feedback-worker-roster-no-claude。
+- **收口终态（诚实）**：S8 r3 **从未点火**（昨晚 24:00 键未落，preflight/一行命令/一键 checklist 三件全备仍有效）；D1a 五片（T1/T4/T5/T7 链）已集成 opt/streamline **656/0**（D-128/129）；holdout FROZEN（D-127）；C1 ballot 38 题+P1 批 39 题备好未拍；T7d 接缝 pass 未执行（昨晚派单遇 session 中断）；T3 hero/visual-swap 验收/视觉亲核/T6 idle 重拍待新 session。ahead 35 未 push。
