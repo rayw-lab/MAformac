@@ -42,6 +42,8 @@ struct ContentView: View {
     @State private var t5PresentationEvent: T5PresentationEvent?
     @State private var energyLineSignal: RuntimeReadbackSignal?
     @State private var energyLineTriggerToken = 0
+    @State private var mockVoiceScriptIndex = 0
+    @State private var mockVoiceResponseTask: Task<Void, Never>?
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
     private let requestedMotionBudget: PresentationMotionBudget
@@ -442,6 +444,96 @@ struct ContentView: View {
     }
 
     private func applyMockVoiceColdIntent() {
+        mockVoiceResponseTask?.cancel()
+        let utterance = MockVoicePresetScript.utterance(at: mockVoiceScriptIndex)
+        mockVoiceScriptIndex += 1
+        guard let plan = MockVoicePresetPlanner.plan(
+            utterance: utterance,
+            cells: snapshot.storeCells,
+            context: snapshot.context,
+            priorReadbacks: snapshot.readbacks
+        ) else {
+            applyLegacyMockVoiceColdIntent()
+            return
+        }
+        messages.append(DialogueMessage(role: .user, text: utterance))
+        switch plan.timing {
+        case .eventDriven:
+            commitMockVoicePlan(plan)
+        case let .safetyFixed(milliseconds):
+            applyMockVoiceThinkingState(for: plan)
+            mockVoiceResponseTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: UInt64(milliseconds) * 1_000_000)
+                guard !Task.isCancelled else { return }
+                commitMockVoicePlan(plan)
+            }
+        }
+    }
+
+    private func applyMockVoiceThinkingState(for plan: MockVoicePresetPlan) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.24), reduceMotion: effectiveReduceMotion)) {
+            snapshot = StagePresentationSnapshot(
+                traceId: snapshot.traceId,
+                storeCells: snapshot.storeCells,
+                activeCells: plan.activeCells,
+                refusedCell: plan.refusedCell,
+                scopeOrigins: snapshot.scopeOrigins.merging(plan.scopeOrigins) { _, new in new },
+                context: snapshot.context,
+                orbState: .think,
+                voiceState: .transcribing,
+                dialogText: "正在判断安全状态",
+                readbacks: snapshot.readbacks,
+                resultKind: nil,
+                proofClass: .simulatorMock
+            )
+        }
+    }
+
+    private func commitMockVoicePlan(_ plan: MockVoicePresetPlan) {
+        store.replaceCells(plan.cells)
+        var scopeOrigins = snapshot.scopeOrigins
+        for (key, origin) in plan.scopeOrigins {
+            scopeOrigins[key] = origin
+        }
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+            let nextSnapshot = StagePresentationSnapshot.from(
+                store: store,
+                activeCells: plan.activeCells,
+                context: snapshot.context,
+                resultKind: plan.resultKind,
+                traceId: snapshot.traceId,
+                refusedCell: plan.refusedCell,
+                scopeOrigins: scopeOrigins,
+                orbState: plan.orbState,
+                voiceState: plan.voiceState,
+                dialogText: plan.dialogText,
+                readbacks: snapshot.readbacks + plan.readbacks,
+                proofClass: plan.proofClass
+            )
+            // T7d 接线点：voice readback 走 T5 runtime event，runtime event wins force-state。
+            snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(plan.readbacks.last!))
+            messages.append(assistantMessage(for: plan))
+        }
+    }
+
+    private func assistantMessage(for plan: MockVoicePresetPlan) -> DialogueMessage {
+        let emphasis: String?
+        let tint: ThermalTint
+        switch plan.presetID {
+        case .acOnTemp24:
+            emphasis = "24度"
+            tint = .cooling
+        case .movingDoorSafetyRefusal, .movingTailgateSafetyRefusal:
+            emphasis = "安全"
+            tint = .heating
+        default:
+            emphasis = nil
+            tint = .cooling
+        }
+        return DialogueMessage(role: .assistant, text: plan.dialogText, emphasis: emphasis, emphasisTint: tint)
+    }
+
+    private func applyLegacyMockVoiceColdIntent() {
         let key = primaryACSetpointKey(in: snapshot.storeCells)
         let currentTemp = Int(cellValue(key, in: snapshot.storeCells) ?? "") ?? 26
         let targetTemp = Int(ValueRangeMapper.clamp(Double(currentTemp + 2), forBase: "ac.temp_setpoint"))
@@ -477,7 +569,6 @@ struct ContentView: View {
                 readbacks: snapshot.readbacks + [readback],
                 proofClass: .simulatorMock
             )
-            // T7d 接线点：voice readback 走 T5 runtime event，runtime event wins force-state。
             snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(readback))
             messages.append(DialogueMessage(role: .user, text: "我有点冷了"))
             messages.append(DialogueMessage(
