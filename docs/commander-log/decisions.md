@@ -1175,3 +1175,13 @@
 - **lessons 落笔**：M.48-M.56 九新条 + M.24/M.30/M.35 三子条款（commit `6fb57270`，H3 秘书稿过审）。
 - **杂账**：before-baseline-ugly png 实况缺失（D-126 该行 stale，对比素材改 T6a idle 重拍）；hermes 一次 HTTP 429 turn 中断（重试恢复，秒级损失）。
 - **在途**：T7e-B（ContentView call-site 清偿）/ D1HR / T6R idle 截图包 / PF1 性能采样 / L1-AUDIT。**未动**：S8 未点火（磊哥令不着急）/ C1 ballot 待拍 / M-DEMO ballot 待拍 / visual-swap 未切换 / 无 5 Gate/operator-pass 声称。
+
+## D-132：ma10/ma11 下半场收编账——14 收编 656→731/0 + 验证门升级 + 三事故治理（2026-07-09 深夜）
+
+- **终态（live 亲核）**：主干 opt/streamline @ `a9b94c23`，全量 swift test **731/0（6 skipped）** + make verify-all rc0 + xcodebuild MAformacMac BUILD SUCCEEDED；全天 first-parent **14 次收编** 656→731 零回退，ahead 77 未 push。这是 local/test/build 级技术收口，**不是** 5 Gate/operator-pass/V-PASS。
+- **下半场六片**（上半场 8 片见 D-131）：⑨ST1+RT2F（merge `380c2b1e`，两 demo 炸点修死：MP-01 AC-on 假 no-op→真关闭 / MP-04 parked 开门落 legacy 升温→fail-closed；ST1-AUDIT=PASS_WITH_P1_RESIDUALS，proof=planner→store 层非 app/T5/TTS 真端到端）⑩T6R+T6R2 idle 采集 dry-run 包（merge `c548bb68`，24 截图项+PF1 三档 trace 合体+隐私 fail-closed；T6R2-VERIFY=FIX-CONFIRMED；**dry-run plan ready 非「成品」**，real capture=0）⑪RT2G multi-readback 逐条 T5 event（merge `d54c3b90`，审 REQUEST_CHANGES P1×3）→ ⑬**RT2GF 修复**（merge `a9b94c23`：per-write 状态闭环+事件驱动背压队列+单条回归锁；RT2GF-AUDIT P0=0/P1=0）⑫D1HR hero 基线 regen+macOS XCUITest wiring（merge `42f21d2e`；审出 proof-class 升格+pbxproj 越界 iOS signing）→ ⑭**D1HRF 修正**（merge `02e0b313`：proof 降格 local+mac_runtime_smoke / **iOS signing revert**（Q2=C 冻结守住）/ checklist 修到 operator 粒度；D1HRF-AUDIT=PASS_WITH_P2_DOC_HYGIENE）。
+- **三事故治理（全部当场闭环）**：①分支事故=RT2G 派单未写死 worktree 路径，w4 在主树切分支（零文件损失，主树归位+分支重置；教训=派单必须 repo path+branch+worktree 三写死）②配对失误=commander 让 w3 自审自产 checklist（findings 转 w4 独立复核；微单不豁免 producer≠auditor）③**两次「报告齐全忘 commit」**（ST1/RT2GF 同坑；教训=REPORT 模板加 commit sha 硬字段，交付定义=落盘 commit）。
+- **H12 台账治理**：PARTIAL_WITH_STATIC_CLOSURE_PASS——10 段 merge membership 全 PASS；指出 ledger 行序非时序/门数字混 producer 与 post-merge basis/H1 顶表 stale（已升 CLOSED 补 closed_by）。后续台账加 `producer_gate/post_merge_gate/gate_basis/closed_by` 字段。
+- **秘书链**：SEC2→SEC2-AUDIT（抓 stale）→SEC3 收口包→SEC3-AUDIT（LAND_AFTER_STALE_PATCH）→commander 亲落带正（D1HR 审终值 P1=3/P2=5 非 pack 的 P1=2）。当天推进快过秘书两次=收口期秘书稿必须 capture_at 与落笔时点 diff。
+- **hermes 席位**：glm+doubao 双额度尽（11 单完整交付后倒下）；今晚全部审计=codex 互审（producer≠auditor 守住），**cross-vendor 异源缺口记账待回补**。
+- **在途/待磊哥键不变**：S8 点火/C1 ballot 38 题/M-DEMO ballot 5 题/D1 左栏专场令+⭐参数（规格 v2 已备经审）/idle 窗（采集包 dry-run ready 一键跑）。**Non-claims**：无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行；idle 采集未实跑。
