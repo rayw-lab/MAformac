@@ -2,6 +2,17 @@ import XCTest
 @testable import MAformacCore
 
 final class T5RuntimePresentationTests: XCTestCase {
+    private var repoRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private func source(at path: String) throws -> String {
+        try String(contentsOf: repoRoot.appendingPathComponent(path), encoding: .utf8)
+    }
+
     func testSixRuntimeErrorsMapToVisualStatesAndReceiptRows() {
         let expectations: [(T5RuntimePresentationFault, DemoVisualState, Bool, T5ErrorScope, String)] = [
             (.timeout, .unknown, true, .globalRetryableCrash, "crash_retryable_timeout"),
@@ -111,5 +122,52 @@ final class T5RuntimePresentationTests: XCTestCase {
         XCTAssertEqual(preflight.voiceRoute, .fallback)
         XCTAssertTrue(preflight.warnings.contains(.premiumVoiceMissing))
         XCTAssertTrue(preflight.warnings.contains(.outputMuted))
+    }
+
+    func testTTSPreflightFailsOnlyWhenNoChineseVoiceIsAvailable() {
+        let premiumMissing = T5TTSPreflight.check(
+            synthesizerAvailable: true,
+            preferredVoiceAvailable: true,
+            fallbackVoiceAvailable: true,
+            outputMuted: false,
+            premiumVoiceAvailable: false
+        )
+        XCTAssertEqual(premiumMissing.status, .passWithWarnings)
+        XCTAssertEqual(premiumMissing.voiceRoute, .preferred)
+        XCTAssertTrue(premiumMissing.warnings.contains(.premiumVoiceMissing))
+
+        let noChineseVoice = T5TTSPreflight.check(
+            synthesizerAvailable: true,
+            preferredVoiceAvailable: false,
+            fallbackVoiceAvailable: false,
+            outputMuted: false,
+            premiumVoiceAvailable: false
+        )
+        XCTAssertEqual(noChineseVoice.status, .fail)
+        XCTAssertEqual(noChineseVoice.voiceRoute, .unavailable)
+        XCTAssertTrue(noChineseVoice.warnings.isEmpty)
+    }
+
+    func testTTSPreflightToolingEmitsRequiredReceiptAndMakeTarget() throws {
+        let script = try source(at: "scripts/check_tts_preflight.swift")
+        let makefile = try source(at: "Makefile")
+
+        for field in [
+            "preferred_zh_CN",
+            "fallback_zh",
+            "premium_zh_CN",
+            "voice_count",
+            "disposition"
+        ] {
+            XCTAssertTrue(script.contains(field), field)
+        }
+
+        XCTAssertTrue(script.contains("premium_zh_CN_missing"))
+        XCTAssertTrue(script.contains(#"disposition = "warning""#))
+        XCTAssertTrue(script.contains(#"disposition = "fail""#))
+        XCTAssertTrue(script.contains("exit(66)"))
+        XCTAssertTrue(script.contains("encoder.outputFormatting = [.prettyPrinted, .sortedKeys]"))
+        XCTAssertTrue(makefile.contains("check-tts-preflight:"))
+        XCTAssertTrue(makefile.contains("swift scripts/check_tts_preflight.swift"))
     }
 }
