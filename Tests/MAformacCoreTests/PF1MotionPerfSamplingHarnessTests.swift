@@ -16,7 +16,7 @@ final class PF1MotionPerfSamplingHarnessTests: XCTestCase {
         try String(contentsOf: repoRoot.appendingPathComponent(path), encoding: .utf8)
     }
 
-    func testPF1SamplingManifestPinsTwentyOnePointsAndBudgetTriplet() throws {
+    func testPF1SamplingManifestPinsTwentyFivePointsAndBudgetTriplet() throws {
         let raw = try JSONSerialization.jsonObject(
             with: data(at: "Tools/checks/motion-perf-sampling-points.json")
         ) as? [String: Any]
@@ -25,7 +25,7 @@ final class PF1MotionPerfSamplingHarnessTests: XCTestCase {
         XCTAssertEqual(manifest["authority"] as? String, "D0G-035_sampling_method_only")
 
         let points = try XCTUnwrap(manifest["sampling_points"] as? [[String: Any]])
-        XCTAssertEqual(points.count, 21)
+        XCTAssertEqual(points.count, 25)
         XCTAssertTrue(points.allSatisfy { $0["capture"] as? String == "pending_idle_window" })
 
         let ids = Set(points.compactMap { $0["id"] as? String })
@@ -38,9 +38,13 @@ final class PF1MotionPerfSamplingHarnessTests: XCTestCase {
             "orb.particle_field_l0_72",
             "orb.particle_field_l1_48",
             "orb.particle_field_l2_24",
+            "value.rolling_number_hero_numeric_text",
+            "card.fallback_badge_transition",
+            "ambient_burst.particle_canvas_deep_space_l0_310",
             "context_capsule.timeline_body",
             "context_capsule.vortex_layers",
-            "context_capsule.canvas_fallback_layers"
+            "context_capsule.canvas_fallback_layers",
+            "mic_dock.press_scale"
         ] {
             XCTAssertTrue(ids.contains(required), "missing PF1 sampling point \(required)")
         }
@@ -51,9 +55,14 @@ final class PF1MotionPerfSamplingHarnessTests: XCTestCase {
             return (level, item)
         })
 
+        XCTAssertEqual(byLevel["fullShowcase"]?["fps_target"] as? Int, 30)
+        XCTAssertEqual(byLevel["balancedDemo"]?["fps_target"] as? Int, 30)
+        XCTAssertEqual(byLevel["trainSafeStatic"]?["fps_target"] as? Int, 15)
         XCTAssertEqual(byLevel["fullShowcase"]?["orb_particle_count"] as? Int, 72)
         XCTAssertEqual(byLevel["balancedDemo"]?["orb_particle_count"] as? Int, 48)
         XCTAssertEqual(byLevel["trainSafeStatic"]?["orb_particle_count"] as? Int, 24)
+        XCTAssertEqual(byLevel["fullShowcase"]?["burst_particle_count"] as? Int, 250)
+        XCTAssertEqual(byLevel["fullShowcase"]?["burst_particle_count_deep_space"] as? Int, 310)
         XCTAssertEqual(byLevel["fullShowcase"]?["context_capsule_mode"] as? String, "animated")
         XCTAssertEqual(byLevel["balancedDemo"]?["context_capsule_mode"] as? String, "lowFPS")
         XCTAssertEqual(byLevel["trainSafeStatic"]?["context_capsule_mode"] as? String, "staticImage")
