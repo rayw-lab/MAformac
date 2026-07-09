@@ -242,7 +242,7 @@ v6 无配对时 B 11/15 会被读「学到 73%」；配对暴露 B delta=-1、D 
 N5 canary 期间 %43 的 judge SPEC 写好后被我晾着「等 canary 数据落地」~20min，磊哥抓现行（「不主动安排任务=让他们白拿工资，不允许」+「最大化复合总监能力」+「有的东西我不说你要懂」）。实际当时就有磨刀活可派：judge 校准预演（拿 N4A 协议串行跑 rubric，预期维1 FAIL=校准判别力+OpenAI 家反框挑 rubric 毛病）——事后补派证明真有价值。**机制固化三层**：全局 rule `~/.claude/rules/swarm-idle-scan-and-backlog.md`（每轮轮询强制 idle-scan/收 REPORT 自带下一单/backlog 池常备/复合总监三视角出题）+ 宪法 `swarm-commander.md §10` + 记忆 `feedback-commander-tacit-understanding.md`（默契八条：随口担心=深挖指令/人审键攒打包/收口自动沉淀等）。业界核证：Agent Teams self-claim task list 是同题拉模型解法，push 模型由 idle-scan 等效。
 
 ### M.13 管道吃退出码：git 变更命令禁 `|tail` 链 `&&`（2026-07-03 commander 亲踩，D-050）
-rebase PR31 用 `git rebase origin/main 2>&1 | tail -2 && git push --force-with-lease`——rebase 冲突中断（非零退出）被管道尾 tail 的 exit 0 吞掉，&& 放行 push，把**截断分支推上远端**（缺冲突点之后全部 commit）。原 tip 立即 force 恢复零损害。修法：①git 变更类命令（rebase/merge/push/reset）**独立执行看退出码**，输出要裁剪就先落文件再 tail ②要链就 `set -o pipefail` ③冲突高风险 rebase 交作者 worker 解语义，commander 只做机械 fast-forward。与 foreground-batch（合并命令）相容但边界在此：**合并只读检查 OK，变更命令的成败判定不得被管道稀释**。
+rebase PR31 用 `git rebase origin/main 2>&1 | tail -2 && git push --force-with-lease`——rebase 冲突中断（非零退出）被管道尾 tail 的 exit 0 吞掉，&& 放行 push，把**截断分支推上远端**（缺冲突点之后全部 commit）。原 tip 立即 force 恢复零损害。修法：①git 变更类命令（rebase/merge/push/reset）**独立执行看退出码**，输出要裁剪就先落文件再 tail ②要链就 `set -o pipefail` ③冲突高风险 rebase 交作者 worker 解语义，commander 只做机械 fast-forward。与 foreground-batch（合并命令）相容但边界在此：**合并只读检查 OK，变更命令的成败判定不得被管道稀释**。**build/test 门子条款（2026-07-09 ma10）**：`xcodebuild | tail`/`swift test | grep` 同病——hard gate 的 rc 是 build/test 本体的不是管道尾的；门证据会从「命令是否通过」滑成「最后几行是否好看」。hard gate 独立执行保 `$?`，或落日志再裁剪（锚 `runs/2026-07-09-ma10-uiue-runtime/reports/T7EB-AUDIT.md:22`）。
 
 ### M.14 验证口径必须绑【验收基线 artifact】+ CLI 默认值 vs 锁值 footgun（2026-07-03，D-051）
 %45 解完 PR31 合并冲突报「验证全绿」，实则 preflight exit0 跑在**自己重生成的数据**上（且重生成误吃 CLI 默认 refusal_ratio_target=0.1，非 D-042 锁值 0）；commander 用 N4A 验收基线数据复跑同命令 = exit66，当场拦下。两教训：① **「绿」必须声明跑在哪份 artifact 上**——验收基线 artifact 的绿才是验收绿，重生成/fixture 的绿只证明代码自洽（生产者-消费者契约的另一半没验）；收稿方复跑必用基线 artifact。② **锁值必须显式传参/进 manifest，禁依赖 CLI/config 默认**——通用默认值（0.1）会在任何重跑处静默替换锁值（0），与 claim-vs-reality 铁律1「enforce 非 declare」同源：锁值不进调用面=没锁。
@@ -375,3 +375,15 @@ judge FAIL 的原因是 expected schema/slot 非样本本身；顺手改 utteran
 
 ## M.56 worker REPORT 是线索不是 claim gate（2026-07-08 paradigm card；M.25/M.52 三件套）
 蜂群吞吐高，REPORT 是低成本回执可能滞后于 live file/runtime；关键数字/sha/测试门只从 REPORT 复制=把 prose 写成事实。REPORT 只作索引，载力断言必回一手（文件/stdout/sha/jsonl 行数/live git HEAD）。与 M.25（探测 pattern 也是 basis）/M.52（receipt stale）构成蜂群产出验证三件套。锚 `daywork/COMMANDER-PARADIGM-CARD.md:8-13`。
+
+## M.57 SwiftPM 绿 ≠ App target 绿：收编门必须覆盖真实消费 target（2026-07-09 ma10 T7e-B 收编事故）
+T7e-A 与 T7e-B 分别给 `ExpandedFamilyCard` 加 `forceReduceMotion`，单看各 producer diff 都合理，git 在主干 merge 树把两处 stored property 自动合并成重复声明；`swift test` 三轮全绿（SwiftPM 不编该 App target），只有 `xcodebuild -scheme MAformacMac` 抓到 rc65（invalid redeclaration）。收编后对抗审（producer≠auditor）抓获，commander 直修一行。修法：**收编签收门固定三件 = swift test + make verify-all + xcodebuild MAformacMac（取真 rc）**；任何 App/SwiftUI target 改动或 merge 树，不得只拿 SwiftPM 结果签收。M.33「验证环境≠消费环境」+ M.37「auto-merge 绿≠契约未破」的收编层合体新例。锚 `runs/2026-07-09-ma10-uiue-runtime/reports/T7EB-AUDIT.md:13-23` + findings-ledger-ma10 P0 事故账。
+
+## M.58 demo preset 前置不满足要 fail-closed，禁回落 legacy happy path（2026-07-09 RT2 对抗审）
+mock preset 已识别 utterance 后，前置状态不满足**不是 no-match**：MP-04「打开车门」parked 时 planner 返回 nil 被 ContentView legacy cold path 接走→错演成空调升温；MP-01「关空调」在 ac.power=on 时假 no-op 播「已经是关闭的了」（状态感知语义反向）。两者都是 demo 现场炸点级。修法：recognized preset 的 precondition miss 必须显式 `preconditionFailed`（播提示/正确兜底）或 ContentView 层 fail-closed；operator 状态准备失误不能被 legacy happy path 隐式吞掉。锚 `runs/2026-07-09-ma10-uiue-runtime/reports/RT2-AUDIT.md:15-36`。
+
+## M.59 异源审计位也有 quota 预算：大审前探额度留余量（2026-07-09 hermes 席位事故）
+hermes glm 5h quota 中途打满，RT2 对抗审 died mid-task 目标 report 未产出，改派 codex 补位——「异源审」从质量加成变成排程单点。修法：P0/收编前大审派单先探 quota/reset；长审留余量或拆段交付；关键审计位预置 codex fallback；临近 quota cliff 不排唯一异源终审。当日 hermes 完整交付 11 单后倒下，fallback 救场但异源性缺口已发生（收口 cross-vendor 终审回补）。锚 findings-ledger-ma10 hermes 席位账。
+
+## M.60 真文件假内容比假路径更危险：cite-verify 必核值不只核行存在（2026-07-09 H6 mock 表审计）
+H6 弹药表引用的文件与行族全真，内容被写歪：`demo-scenarios.yaml:60` 只有 4 条 utterance 却把自造的「空调关一下」标成原文；MP-03 Turn1 无 `expected_readback_zh` 字段却把「车窗已打开」说成 yaml 口语化原文——finder 编造经典型（真锚假值），浅层 cite 核「行存在」必漏。修法：file:line cite 读实际值；YAML 数组逐元素比对；字段不存在显式写「无该字段」；contract original / local paraphrase / local dialog copy / structured readback 四类分栏禁混标。claim-vs-reality「value-in-source」在弹药表层的实证。锚 `reports/H6-AUDIT-RT2-PLAN.md:18-19,58-63`。
