@@ -42,6 +42,26 @@ final class MockVoicePresetPlannerTests: XCTestCase {
     }
 
     @MainActor
+    func testMP01WhenACIsOnReturnsClosePlanInsteadOfFalseNoop() throws {
+        let plan = try XCTUnwrap(MockVoicePresetPlanner.plan(
+            utterance: "关空调",
+            cells: [
+                DemoVehicleStateCell(key: "ac.power", actualValue: "on", revision: 4, visualState: .satisfied),
+                DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "24")
+            ],
+            context: .idle,
+            priorReadbacks: []
+        ))
+
+        XCTAssertEqual(plan.presetID, .acClose)
+        XCTAssertEqual(plan.resultKind, .acceptedToolCall)
+        XCTAssertEqual(plan.dialogText, "空调已关闭")
+        XCTAssertEqual(plan.cells.first { $0.key == "ac.power" }?.actualValue, "off")
+        XCTAssertEqual(plan.cells.first { $0.key == "ac.power" }?.visualState, .normal)
+        XCTAssertEqual(plan.readbacks.map(\.spokenText), ["空调已关闭"])
+    }
+
+    @MainActor
     func testMP02MultiIntentWritesPowerAndTemperatureWithTwoReadbacks() throws {
         let plan = try XCTUnwrap(MockVoicePresetPlanner.plan(
             utterance: "打开空调把温度调到24度",
@@ -149,8 +169,30 @@ final class MockVoicePresetPlannerTests: XCTestCase {
     }
 
     @MainActor
-    func testMP04DoesNotTriggerSafetyPresetWhenVehicleIsParked() {
-        let plan = MockVoicePresetPlanner.plan(
+    func testMP04ParkedTailgateUtteranceFailsClosedInsteadOfFallingBackToLegacy() throws {
+        let plan = try XCTUnwrap(MockVoicePresetPlanner.plan(
+            utterance: "开个后备箱",
+            cells: [
+                DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
+                DemoVehicleStateCell(key: "vehicle.gear", actualValue: "P")
+            ],
+            context: .idle,
+            priorReadbacks: []
+        ))
+
+        XCTAssertEqual(plan.presetID, .movingTailgatePreconditionFailed)
+        XCTAssertEqual(plan.resultKind, .clarifyMissingSlot)
+        XCTAssertEqual(plan.dialogText, "当前非行驶态, 这条安全演示暂不执行")
+        XCTAssertEqual(plan.cells.first { $0.key == "door.tailgate_height" }?.actualValue, "0")
+        XCTAssertEqual(plan.cells.first { $0.key == "door.tailgate_height" }?.visualState, .blocked_with_alternative)
+        XCTAssertEqual(plan.refusedCell, "door.tailgate_height")
+        XCTAssertEqual(plan.readbacks.last?.key, "door.tailgate_height")
+        XCTAssertEqual(plan.timing, .eventDriven)
+    }
+
+    @MainActor
+    func testMP04ParkedDoorUtteranceFailsClosedInsteadOfFallingBackToLegacy() throws {
+        let plan = try XCTUnwrap(MockVoicePresetPlanner.plan(
             utterance: "打开车门",
             cells: [
                 DemoVehicleStateCell(key: "vehicle.speed", actualValue: "0"),
@@ -158,8 +200,15 @@ final class MockVoicePresetPlannerTests: XCTestCase {
             ],
             context: .idle,
             priorReadbacks: []
-        )
+        ))
 
-        XCTAssertNil(plan)
+        XCTAssertEqual(plan.presetID, .movingDoorPreconditionFailed)
+        XCTAssertEqual(plan.resultKind, .clarifyMissingSlot)
+        XCTAssertEqual(plan.dialogText, "当前非行驶态, 这条安全演示暂不执行")
+        XCTAssertEqual(plan.cells.first { $0.key == "door.car_door" }?.actualValue, "closed")
+        XCTAssertEqual(plan.cells.first { $0.key == "door.car_door" }?.visualState, .blocked_with_alternative)
+        XCTAssertEqual(plan.refusedCell, "door.car_door")
+        XCTAssertEqual(plan.readbacks.last?.key, "door.car_door")
+        XCTAssertEqual(plan.timing, .eventDriven)
     }
 }
