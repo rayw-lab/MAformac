@@ -81,4 +81,21 @@ final class T4MacInteractionContractTests: XCTestCase {
         XCTAssertTrue(expanded.contains("expanded-\\(display.family.rawValue)-close"))
         XCTAssertTrue(uiTest.contains("\"expanded-ac\""))
     }
+
+    func testExpandedLayerPropagatesForceReduceMotionToInternalControls() throws {
+        let expanded = try source(at: "App/ExpandedFamilyCard.swift")
+        let valueControl = try source(at: "App/ValueControlView.swift")
+
+        XCTAssertTrue(expanded.contains("var forceReduceMotion = false"))
+        XCTAssertTrue(expanded.contains("@Environment(\\.accessibilityReduceMotion)"))
+        XCTAssertTrue(expanded.contains("private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }"))
+        XCTAssertTrue(expanded.contains("forceReduceMotion: effectiveReduceMotion"))
+        XCTAssertTrue(expanded.contains("forceReduceMotion: forceReduceMotion"))
+
+        XCTAssertTrue(valueControl.contains("var forceReduceMotion = false"))
+        XCTAssertTrue(valueControl.contains("@Environment(\\.accessibilityReduceMotion)"))
+        XCTAssertTrue(valueControl.contains("private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }"))
+        XCTAssertTrue(valueControl.contains("forceReduceMotion: effectiveReduceMotion"))
+        XCTAssertTrue(valueControl.contains("effectiveReduceMotion ? 0 : 6"))
+    }
 }
