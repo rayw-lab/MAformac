@@ -18,6 +18,7 @@ struct EnergyLineOverlay: View {
     var budget: PresentationMotionBudget = .preset(.fullShowcase)
     var themeCyan: Color = DesignTokens.glowCyan
     var themeViolet: Color = DesignTokens.glowViolet
+    var onCompletion: () -> Void = {}
 
     /// 0…1 线 trim 进度。
     @State private var trim: CGFloat = 0
@@ -25,12 +26,15 @@ struct EnergyLineOverlay: View {
     @State private var orbGlow: CGFloat = 0
     /// 0…1 目标卡 ring pulse 进度（210-340ms，opacity 0→.22→0）。
     @State private var cardPulse: CGFloat = 0
+    /// 0…1 completion gate；只用于 SwiftUI animation completion 推进队列。
+    @State private var completionProgress: CGFloat = 0
 
     /// 是否允许 glow/blur 软层（budget + RM 双门）。
     private var allowsGlow: Bool { !reduceMotion && budget.allowLargeBlurAndShadow }
 
     var body: some View {
         Canvas { context, _ in
+            _ = completionProgress
             var path = Path()
             path.move(to: from)
             // 单条二次贝塞尔（青紫渐变能量线），控制点上抬形成弧线
@@ -93,6 +97,11 @@ struct EnergyLineOverlay: View {
 
     private func fire() {
         reset()
+        runCompletionGate(
+            durationMS: reduceMotion
+                ? MotionTimings.EnergyLine.cardPulseDurationMS
+                : Double(MotionTimings.EnergyLine.totalMS)
+        )
         if reduceMotion {
             // RM：直接点亮头部（无流动、无 pulse），瞬时呈现
             withAnimation(.easeOut(duration: MotionAnimationFactory.seconds(MotionTimings.EnergyLine.cardPulseDurationMS))) {
@@ -118,9 +127,22 @@ struct EnergyLineOverlay: View {
         }
     }
 
+    private func runCompletionGate(durationMS: Double) {
+        completionProgress = 0
+        withAnimation(
+            .linear(duration: MotionAnimationFactory.seconds(durationMS)),
+            completionCriteria: .logicallyComplete
+        ) {
+            completionProgress = 1
+        } completion: {
+            onCompletion()
+        }
+    }
+
     private func reset() {
         trim = 0
         orbGlow = 0
         cardPulse = 0
+        completionProgress = 0
     }
 }

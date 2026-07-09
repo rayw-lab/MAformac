@@ -12,6 +12,18 @@ final class T7DEnergyLineWiringSourceTests: XCTestCase {
         try String(contentsOf: repoRoot.appendingPathComponent(path), encoding: .utf8)
     }
 
+    private func section(in source: String, from start: String, until end: String) throws -> String {
+        guard let startRange = source.range(of: start) else {
+            XCTFail("missing section start: \(start)")
+            return ""
+        }
+        let tail = source[startRange.lowerBound...]
+        guard let endRange = tail.range(of: end) else {
+            return String(tail)
+        }
+        return String(tail[..<endRange.lowerBound])
+    }
+
     func testContentViewWiresEnergyLineToT5RuntimeReadbackAndFeatureFlag() throws {
         let source = try source(at: "App/ContentView.swift")
 
@@ -23,7 +35,35 @@ final class T7DEnergyLineWiringSourceTests: XCTestCase {
         XCTAssertTrue(source.contains("energyLineTriggerToken += 1"))
         XCTAssertTrue(source.contains("readbackRuntimeID(readback)"))
         XCTAssertTrue(source.contains("RuntimeReadbackEventSequence.steps"))
+        XCTAssertTrue(source.contains("initialStoreCells: initialStoreCells"))
+        XCTAssertTrue(source.contains("runtimeReadbackQueue.start(steps)"))
+        XCTAssertTrue(source.contains("completeRuntimeReadbackStep(readbackID: signal.readbackID)"))
         XCTAssertFalse(source.contains("plan.readbacks.last!"))
+    }
+
+    func testRuntimeReadbackConsumerUsesCompletionBackpressureNotTaskYield() throws {
+        let contentSource = try source(at: "App/ContentView.swift")
+        let commit = try section(
+            in: contentSource,
+            from: "private func commitRuntimeReadbackSteps",
+            until: "private func applyRuntimeReadbackStep"
+        )
+        let apply = try section(
+            in: contentSource,
+            from: "private func applyRuntimeReadbackStep",
+            until: "private func shouldWaitForEnergyLine"
+        )
+        let overlay = try source(at: "App/Motion/EnergyLineOverlay.swift")
+
+        XCTAssertTrue(commit.contains("runtimeReadbackQueue.start(steps)"))
+        XCTAssertTrue(commit.contains("applyRuntimeReadbackStep(firstStep)"))
+        XCTAssertFalse(commit.contains("steps.dropFirst()"))
+        XCTAssertFalse(commit.contains("Task.yield()"))
+        XCTAssertTrue(apply.contains("speech.speak(step.speechText.text)"))
+        XCTAssertTrue(apply.contains("completeRuntimeReadbackStep(readbackID: step.event.readbackID)"))
+        XCTAssertTrue(overlay.contains("var onCompletion: () -> Void = {}"))
+        XCTAssertTrue(overlay.contains("completionCriteria: .logicallyComplete"))
+        XCTAssertTrue(overlay.contains("onCompletion()"))
     }
 
     func testGeometryUsesAnchorsForOrbAndCards() throws {

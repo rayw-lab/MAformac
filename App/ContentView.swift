@@ -44,6 +44,7 @@ struct ContentView: View {
     @State private var energyLineTriggerToken = 0
     @State private var mockVoiceScriptIndex = 0
     @State private var mockVoiceResponseTask: Task<Void, Never>?
+    @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
     private let requestedMotionBudget: PresentationMotionBudget
@@ -390,6 +391,7 @@ struct ContentView: View {
     }
 
     private func applySnapshot(_ preset: SnapshotPreset) {
+        runtimeReadbackQueue.cancel()
         waterfallGeneration += 1   // 招牌②：开场/reset/换场景 → 卡真重入场（TXB 修②）
         withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: effectiveReduceMotion)) {
             let state = Self.phase2State(for: preset)
@@ -445,6 +447,7 @@ struct ContentView: View {
 
     private func applyMockVoiceColdIntent() {
         mockVoiceResponseTask?.cancel()
+        runtimeReadbackQueue.cancel()
         let utterance = MockVoicePresetScript.utterance(at: mockVoiceScriptIndex)
         mockVoiceScriptIndex += 1
         guard let plan = MockVoicePresetPlanner.plan(
@@ -490,6 +493,7 @@ struct ContentView: View {
     }
 
     private func commitMockVoicePlan(_ plan: MockVoicePresetPlan) {
+        let initialStoreCells = snapshot.storeCells
         let priorReadbacks = snapshot.readbacks
         store.replaceCells(plan.cells)
         var scopeOrigins = snapshot.scopeOrigins
@@ -512,6 +516,7 @@ struct ContentView: View {
         )
         let readbackSteps = RuntimeReadbackEventSequence.steps(
             snapshot: nextSnapshot,
+            initialStoreCells: initialStoreCells,
             priorReadbacks: priorReadbacks,
             readbacks: plan.readbacks
         )
@@ -678,6 +683,7 @@ struct ContentView: View {
         activeCells: [FamilyCardID: String],
         dialogText: String
     ) {
+        runtimeReadbackQueue.cancel()
         store.replaceCells(cells)
         withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
             snapshot = StagePresentationSnapshot.from(
@@ -761,8 +767,16 @@ struct ContentView: View {
                     to: CGPoint(x: targetFrame.midX, y: targetFrame.midY),
                     triggerToken: energyLineTriggerToken,
                     reduceMotion: effectiveReduceMotion,
-                    budget: runtimeMotionBudget
+                    budget: runtimeMotionBudget,
+                    onCompletion: {
+                        completeRuntimeReadbackStep(readbackID: signal.readbackID)
+                    }
                 )
+            } else if visualSwapEnabled, let signal = energyLineSignal {
+                Color.clear
+                    .onAppear {
+                        completeRuntimeReadbackStep(readbackID: signal.readbackID)
+                    }
             }
         }
         .allowsHitTesting(false)
@@ -777,13 +791,23 @@ struct ContentView: View {
     }
 
     private func resolveRuntimeReadbackSnapshot(_ incoming: T5PresentationEvent) -> StagePresentationSnapshot {
+        resolveRuntimeReadbackEvent(incoming).snapshot
+    }
+
+    private struct RuntimeReadbackResolution {
+        var snapshot: StagePresentationSnapshot
+        var signal: RuntimeReadbackSignal?
+    }
+
+    private func resolveRuntimeReadbackEvent(_ incoming: T5PresentationEvent) -> RuntimeReadbackResolution {
         let resolved = T5PresentationOrchestrator().resolve(current: t5PresentationEvent, incoming: incoming)
         t5PresentationEvent = resolved
-        if let signal = RuntimeReadbackSignal.from(event: resolved) {
+        let signal = RuntimeReadbackSignal.from(event: resolved)
+        if let signal {
             energyLineSignal = signal
             energyLineTriggerToken += 1
         }
-        return resolved.snapshot
+        return RuntimeReadbackResolution(snapshot: resolved.snapshot, signal: signal)
     }
 
     private func readbackRuntimeID(_ readback: DemoActionReadback) -> String {
@@ -794,7 +818,7 @@ struct ContentView: View {
         _ steps: [RuntimeReadbackEventStep],
         fallbackSnapshot: StagePresentationSnapshot
     ) {
-        guard let firstStep = steps.first else {
+        guard let firstStep = runtimeReadbackQueue.start(steps) else {
             withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
                 snapshot = fallbackSnapshot
             }
@@ -802,22 +826,27 @@ struct ContentView: View {
         }
 
         applyRuntimeReadbackStep(firstStep)
-        guard steps.count > 1 else { return }
-
-        mockVoiceResponseTask = Task { @MainActor in
-            for step in steps.dropFirst() {
-                await Task.yield()
-                guard !Task.isCancelled else { return }
-                applyRuntimeReadbackStep(step)
-            }
-        }
     }
 
     private func applyRuntimeReadbackStep(_ step: RuntimeReadbackEventStep) {
+        let resolution = resolveRuntimeReadbackEvent(step.event)
         withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
-            snapshot = resolveRuntimeReadbackSnapshot(step.event)
+            snapshot = resolution.snapshot
         }
         _ = speech.speak(step.speechText.text)
+        guard shouldWaitForEnergyLine(signal: resolution.signal) else {
+            completeRuntimeReadbackStep(readbackID: step.event.readbackID)
+            return
+        }
+    }
+
+    private func shouldWaitForEnergyLine(signal: RuntimeReadbackSignal?) -> Bool {
+        visualSwapEnabled && RuntimeReadbackSignalRouter.shouldFireEnergyLine(signal)
+    }
+
+    private func completeRuntimeReadbackStep(readbackID: String? = nil) {
+        guard let nextStep = runtimeReadbackQueue.completeInFlight(readbackID: readbackID) else { return }
+        applyRuntimeReadbackStep(nextStep)
     }
 
     private func upsertCell(
