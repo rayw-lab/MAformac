@@ -490,30 +490,33 @@ struct ContentView: View {
     }
 
     private func commitMockVoicePlan(_ plan: MockVoicePresetPlan) {
+        let priorReadbacks = snapshot.readbacks
         store.replaceCells(plan.cells)
         var scopeOrigins = snapshot.scopeOrigins
         for (key, origin) in plan.scopeOrigins {
             scopeOrigins[key] = origin
         }
-        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
-            let nextSnapshot = StagePresentationSnapshot.from(
-                store: store,
-                activeCells: plan.activeCells,
-                context: snapshot.context,
-                resultKind: plan.resultKind,
-                traceId: snapshot.traceId,
-                refusedCell: plan.refusedCell,
-                scopeOrigins: scopeOrigins,
-                orbState: plan.orbState,
-                voiceState: plan.voiceState,
-                dialogText: plan.dialogText,
-                readbacks: snapshot.readbacks + plan.readbacks,
-                proofClass: plan.proofClass
-            )
-            // T7d 接线点：voice readback 走 T5 runtime event，runtime event wins force-state。
-            snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(plan.readbacks.last!))
-            messages.append(assistantMessage(for: plan))
-        }
+        let nextSnapshot = StagePresentationSnapshot.from(
+            store: store,
+            activeCells: plan.activeCells,
+            context: snapshot.context,
+            resultKind: plan.resultKind,
+            traceId: snapshot.traceId,
+            refusedCell: plan.refusedCell,
+            scopeOrigins: scopeOrigins,
+            orbState: plan.orbState,
+            voiceState: plan.voiceState,
+            dialogText: plan.dialogText,
+            readbacks: priorReadbacks + plan.readbacks,
+            proofClass: plan.proofClass
+        )
+        let readbackSteps = RuntimeReadbackEventSequence.steps(
+            snapshot: nextSnapshot,
+            priorReadbacks: priorReadbacks,
+            readbacks: plan.readbacks
+        )
+        commitRuntimeReadbackSteps(readbackSteps, fallbackSnapshot: nextSnapshot)
+        messages.append(assistantMessage(for: plan))
     }
 
     private func assistantMessage(for plan: MockVoicePresetPlan) -> DialogueMessage {
@@ -770,6 +773,10 @@ struct ContentView: View {
         readbackID: String
     ) -> StagePresentationSnapshot {
         let incoming = T5PresentationEvent.runtime(snapshot: nextSnapshot, readbackID: readbackID)
+        return resolveRuntimeReadbackSnapshot(incoming)
+    }
+
+    private func resolveRuntimeReadbackSnapshot(_ incoming: T5PresentationEvent) -> StagePresentationSnapshot {
         let resolved = T5PresentationOrchestrator().resolve(current: t5PresentationEvent, incoming: incoming)
         t5PresentationEvent = resolved
         if let signal = RuntimeReadbackSignal.from(event: resolved) {
@@ -780,7 +787,37 @@ struct ContentView: View {
     }
 
     private func readbackRuntimeID(_ readback: DemoActionReadback) -> String {
-        "\(readback.key)#\(readback.revision)"
+        RuntimeReadbackEventSequence.readbackRuntimeID(readback)
+    }
+
+    private func commitRuntimeReadbackSteps(
+        _ steps: [RuntimeReadbackEventStep],
+        fallbackSnapshot: StagePresentationSnapshot
+    ) {
+        guard let firstStep = steps.first else {
+            withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+                snapshot = fallbackSnapshot
+            }
+            return
+        }
+
+        applyRuntimeReadbackStep(firstStep)
+        guard steps.count > 1 else { return }
+
+        mockVoiceResponseTask = Task { @MainActor in
+            for step in steps.dropFirst() {
+                await Task.yield()
+                guard !Task.isCancelled else { return }
+                applyRuntimeReadbackStep(step)
+            }
+        }
+    }
+
+    private func applyRuntimeReadbackStep(_ step: RuntimeReadbackEventStep) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+            snapshot = resolveRuntimeReadbackSnapshot(step.event)
+        }
+        _ = speech.speak(step.speechText.text)
     }
 
     private func upsertCell(

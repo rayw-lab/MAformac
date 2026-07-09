@@ -22,6 +22,8 @@ final class T7DEnergyLineWiringSourceTests: XCTestCase {
         XCTAssertTrue(source.contains("T5PresentationEvent.runtime(snapshot: nextSnapshot, readbackID: readbackID)"))
         XCTAssertTrue(source.contains("energyLineTriggerToken += 1"))
         XCTAssertTrue(source.contains("readbackRuntimeID(readback)"))
+        XCTAssertTrue(source.contains("RuntimeReadbackEventSequence.steps"))
+        XCTAssertFalse(source.contains("plan.readbacks.last!"))
     }
 
     func testGeometryUsesAnchorsForOrbAndCards() throws {
