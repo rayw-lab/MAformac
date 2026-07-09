@@ -8,7 +8,6 @@ struct ExpandedFamilyCard: View {
     let onDismiss: () -> Void
     var forceReduceMotion = false
     var onMockTransition: (String, String) -> Void = { _, _ in }
-    var forceReduceMotion = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
