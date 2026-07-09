@@ -110,6 +110,37 @@ struct PresentationMotionBudget: Codable, Equatable, Sendable {
     }
 }
 
+enum MotionBudgetLaunchArgumentSelector {
+    static let flag = "-motionBudget"
+
+    static func requestedBudget(arguments: [String]) -> PresentationMotionBudget {
+        .preset(requestedLevel(arguments: arguments))
+    }
+
+    static func requestedLevel(arguments: [String]) -> PresentationMotionBudgetLevel {
+        guard let rawValue = value(after: flag, in: arguments) else {
+            return .fullShowcase
+        }
+        switch rawValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "full":
+            return .fullShowcase
+        case "balanced":
+            return .balancedDemo
+        case "static":
+            return .trainSafeStatic
+        default:
+            return .fullShowcase
+        }
+    }
+
+    private static func value(after flag: String, in arguments: [String]) -> String? {
+        guard let index = arguments.firstIndex(of: flag), index + 1 < arguments.count else {
+            return nil
+        }
+        return arguments[index + 1]
+    }
+}
+
 /// budget 决议：把 reduceMotion（accessibility）+ runtime reason 合成有效档（RSB §3.3/§5.3）。
 extension PresentationReducedMotionPolicy {
     /// reduceMotion 开 → 强制 `trainSafeStatic`（无循环、静态，保语义可读）；

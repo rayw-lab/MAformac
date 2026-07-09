@@ -42,6 +42,13 @@ final class T7EBContentViewAccessibilityCallsiteTests: XCTestCase {
         XCTAssertTrue(source.contains("budget: runtimeMotionBudget"))
     }
 
+    func testMAformacAppPassesSelectedMotionBudgetIntoContentView() throws {
+        let source = try source(at: "App/MAformacApp.swift")
+
+        XCTAssertTrue(source.contains("motionBudget: DebugLaunchArguments.motionBudget"))
+        XCTAssertTrue(source.contains("motionBudget: .preset(.fullShowcase)"))
+    }
+
     func testContentViewDiscreteWithAnimationCallsitesUseReduceMotionGuard() throws {
         let source = try source(at: "App/ContentView.swift")
 

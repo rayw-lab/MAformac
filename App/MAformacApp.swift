@@ -61,6 +61,7 @@ struct MAformacApp: App {
                 initialAmbientBurstColor: DebugLaunchArguments.ambientBurstColor,
                 initialContext: DebugLaunchArguments.mockContext,
                 contextCapsuleRoute: DebugLaunchArguments.contextCapsuleRoute,
+                motionBudget: DebugLaunchArguments.motionBudget,
                 forceReduceMotion: DebugLaunchArguments.forceReduceMotion,
                 visualSwapEnabled: DebugLaunchArguments.visualSwapEnabled
             )
@@ -72,6 +73,7 @@ struct MAformacApp: App {
             store: vehicleStore,
             traceLogger: traceLogger,
             speech: speech,
+            motionBudget: .preset(.fullShowcase),
             visualSwapEnabled: T7DVisualSwapFeature.isEnabled()
         )
             #if os(macOS)
@@ -106,6 +108,10 @@ enum DebugLaunchArguments {
 
     static var visualSwapEnabled: Bool {
         T7DVisualSwapFeature.isEnabled()
+    }
+
+    static var motionBudget: PresentationMotionBudget {
+        MotionBudgetLaunchArgumentSelector.requestedBudget(arguments: ProcessInfo.processInfo.arguments)
     }
 
     static var mockSnapshot: SnapshotPreset {
