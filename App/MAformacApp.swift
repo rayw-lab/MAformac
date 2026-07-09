@@ -54,10 +54,16 @@ struct MAformacApp: App {
                 initialAmbientBurstColor: DebugLaunchArguments.ambientBurstColor,
                 initialContext: DebugLaunchArguments.mockContext,
                 contextCapsuleRoute: DebugLaunchArguments.contextCapsuleRoute,
-                forceReduceMotion: DebugLaunchArguments.forceReduceMotion
+                forceReduceMotion: DebugLaunchArguments.forceReduceMotion,
+                visualSwapEnabled: DebugLaunchArguments.visualSwapEnabled
             )
         #else
-        ContentView(store: vehicleStore, traceLogger: traceLogger, speech: speech)
+        ContentView(
+            store: vehicleStore,
+            traceLogger: traceLogger,
+            speech: speech,
+            visualSwapEnabled: T7DVisualSwapFeature.isEnabled()
+        )
         #endif
     }
 }
@@ -83,6 +89,10 @@ enum DebugLaunchArguments {
     static var forceReduceMotion: Bool {
         ProcessInfo.processInfo.arguments.contains("-forceReduceMotion") ||
         ProcessInfo.processInfo.environment["FORCE_REDUCE_MOTION"] == "1"
+    }
+
+    static var visualSwapEnabled: Bool {
+        T7DVisualSwapFeature.isEnabled()
     }
 
     static var mockSnapshot: SnapshotPreset {

@@ -20,9 +20,14 @@ struct ContentView: View {
     @State private var didTriggerInitialAmbientBurst = false
     /// 招牌② 瀑布重放代号：reset/开场递增 → 卡真重入场（TXB 修②）。
     @State private var waterfallGeneration = 0
+    /// T7d：T5 runtime readback 事件 → EnergyLine 触发 token（runtime wins force-state）。
+    @State private var t5PresentationEvent: T5PresentationEvent?
+    @State private var energyLineSignal: RuntimeReadbackSignal?
+    @State private var energyLineTriggerToken = 0
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
     private let forceReduceMotion: Bool
+    private let visualSwapEnabled: Bool
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     init(
@@ -34,7 +39,8 @@ struct ContentView: View {
         initialAmbientBurstColor: String? = nil,
         initialContext: DemoContext? = nil,
         contextCapsuleRoute: ContextCapsuleRoute = .cLite,
-        forceReduceMotion: Bool = false
+        forceReduceMotion: Bool = false,
+        visualSwapEnabled: Bool = false
     ) {
         self.store = store
         self.traceLogger = traceLogger
@@ -42,6 +48,7 @@ struct ContentView: View {
         self.initialAmbientBurstColor = initialAmbientBurstColor
         self.contextCapsuleRoute = contextCapsuleRoute
         self.forceReduceMotion = forceReduceMotion
+        self.visualSwapEnabled = visualSwapEnabled
         let initial = Self.phase2State(for: initialPreset)
         var snapshot = initial.snapshot
         if let initialContext {
@@ -115,6 +122,10 @@ struct ContentView: View {
                         .transition(.opacity)
                 }
             }
+            .overlayPreferenceValue(EnergyLineFramePreferenceKey.self) { frames in
+                energyLineOverlay(frames: frames)
+                    .zIndex(11)
+            }
         }
         .preferredColorScheme(theme.colorScheme)
         .onAppear(perform: triggerInitialAmbientBurstIfNeeded)
@@ -165,6 +176,7 @@ struct ContentView: View {
             VStack(alignment: .leading, spacing: 10) {
                 topContextBand(size: size, showsControls: true)
                 DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
+                    .energyLineOrbAnchor()
                     .frame(maxWidth: .infinity)
                     .frame(height: orbHeight(for: size))
                 DialogueStream(messages: messages, theme: theme)
@@ -189,6 +201,7 @@ struct ContentView: View {
                 .padding(.trailing, 86)
             Spacer(minLength: 12)
             DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
+                .energyLineOrbAnchor()
                 .frame(maxWidth: .infinity)
             DialogueStream(messages: messages, theme: theme)
                 .frame(minHeight: 240, maxHeight: 330)
@@ -342,7 +355,7 @@ struct ContentView: View {
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = .explicit
         withAnimation(.snappy(duration: 0.28)) {
-            snapshot = StagePresentationSnapshot.from(
+            let nextSnapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [family: key],
                 context: snapshot.context,
@@ -355,6 +368,8 @@ struct ContentView: View {
                 readbacks: snapshot.readbacks + [readback],
                 proofClass: .simulatorMock
             )
+            // T7d 接线点：scrub/readback 走 T5 runtime event，不再走 EnergyLine stub。
+            snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(readback))
         }
         if let burstColor {
             triggerAmbientBurst(colorName: burstColor)
@@ -384,7 +399,7 @@ struct ContentView: View {
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = scopeOrigins[key] ?? .defaulted
         withAnimation(.snappy(duration: 0.30)) {
-            snapshot = StagePresentationSnapshot.from(
+            let nextSnapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [.ac: key],
                 context: snapshot.context,
@@ -397,6 +412,8 @@ struct ContentView: View {
                 readbacks: snapshot.readbacks + [readback],
                 proofClass: .simulatorMock
             )
+            // T7d 接线点：voice readback 走 T5 runtime event，runtime event wins force-state。
+            snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(readback))
             messages.append(DialogueMessage(role: .user, text: "我有点冷了"))
             messages.append(DialogueMessage(
                 role: .assistant,
@@ -568,6 +585,46 @@ struct ContentView: View {
         withAnimation(.easeOut(duration: 0.18)) {
             ambientBurst = nil
         }
+    }
+
+    @ViewBuilder
+    private func energyLineOverlay(frames: EnergyLineFramePreferences) -> some View {
+        GeometryReader { proxy in
+            if visualSwapEnabled,
+               let signal = energyLineSignal,
+               let orb = frames.orb,
+               let target = frames.cards[signal.targetFamilyID] {
+                let orbFrame = proxy[orb]
+                let targetFrame = proxy[target]
+                // T7d 接线点：真实 anchor frame，resize/minWindow 下不使用硬编码坐标。
+                EnergyLineOverlay(
+                    from: CGPoint(x: orbFrame.midX, y: orbFrame.midY),
+                    to: CGPoint(x: targetFrame.midX, y: targetFrame.midY),
+                    triggerToken: energyLineTriggerToken,
+                    reduceMotion: effectiveReduceMotion,
+                    budget: .preset(.fullShowcase)
+                )
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func resolveRuntimeReadbackSnapshot(
+        _ nextSnapshot: StagePresentationSnapshot,
+        readbackID: String
+    ) -> StagePresentationSnapshot {
+        let incoming = T5PresentationEvent.runtime(snapshot: nextSnapshot, readbackID: readbackID)
+        let resolved = T5PresentationOrchestrator().resolve(current: t5PresentationEvent, incoming: incoming)
+        t5PresentationEvent = resolved
+        if let signal = RuntimeReadbackSignal.from(event: resolved) {
+            energyLineSignal = signal
+            energyLineTriggerToken += 1
+        }
+        return resolved.snapshot
+    }
+
+    private func readbackRuntimeID(_ readback: DemoActionReadback) -> String {
+        "\(readback.key)#\(readback.revision)"
     }
 
     private func upsertCell(
@@ -1859,6 +1916,7 @@ struct VehicleCardsGrid: View {
                             onTap: onTapFamily,
                             onValueScrub: onValueScrub
                         )
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                     ForEach(displays(for: leftFeaturedFamilies(excluding: heroFamily))) { display in
@@ -1871,6 +1929,7 @@ struct VehicleCardsGrid: View {
                             onTap: onTapFamily,
                             onValueScrub: onValueScrub
                         )
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -1887,6 +1946,7 @@ struct VehicleCardsGrid: View {
                             onTap: onTapFamily,
                             onValueScrub: onValueScrub
                         )
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -1927,6 +1987,7 @@ struct VehicleCardsGrid: View {
                         .cardWaterfallEntrance(index: waterfallIndex(of: display),
                                                replayToken: waterfallGeneration,
                                                reduceMotion: gridReduceMotion)
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }

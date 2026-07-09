@@ -11,8 +11,8 @@ struct EnergyLineOverlay: View {
     let from: CGPoint
     /// 目标卡中心（视图坐标）。
     let to: CGPoint
-    /// 触发信号（识别完成置真）。
-    let isFiring: Bool
+    /// 触发信号（识别完成/readback 事件递增）。
+    let triggerToken: Int
     let reduceMotion: Bool
     /// 三档预算：`allowLargeBlurAndShadow=false`(L1/L2) 时关 glow/blow 底层软描边，静态档关 pulse（TX7 修①）。
     var budget: PresentationMotionBudget = .preset(.fullShowcase)
@@ -21,6 +21,8 @@ struct EnergyLineOverlay: View {
 
     /// 0…1 线 trim 进度。
     @State private var trim: CGFloat = 0
+    /// 0…1 orb glow 进度（0-90ms，scale 1→1.08 + opacity +0.18）。
+    @State private var orbGlow: CGFloat = 0
     /// 0…1 目标卡 ring pulse 进度（210-340ms，opacity 0→.22→0）。
     @State private var cardPulse: CGFloat = 0
 
@@ -38,6 +40,19 @@ struct EnergyLineOverlay: View {
             let gradient = GraphicsContext.Shading.linearGradient(
                 Gradient(colors: [themeViolet.opacity(0.0), themeViolet, themeCyan]),
                 startPoint: from, endPoint: to)
+
+            if orbGlow > 0 {
+                let scale = 1 + (MotionTimings.EnergyLine.orbGlowScale - 1) * orbGlow
+                let radius = 21 * CGFloat(scale)
+                let opacity = Double(0.18 * (1 - orbGlow * 0.2))
+                let glow = Path(ellipseIn: CGRect(x: from.x - radius,
+                                                  y: from.y - radius,
+                                                  width: radius * 2,
+                                                  height: radius * 2))
+                context.fill(glow, with: .color(themeViolet.opacity(opacity)))
+                context.stroke(glow, with: .color(themeCyan.opacity(opacity * 0.85)),
+                               style: StrokeStyle(lineWidth: 1.5))
+            }
 
             if trim > 0 {
                 let trimmed = path.trimmedPath(from: 0, to: trim)
@@ -65,21 +80,29 @@ struct EnergyLineOverlay: View {
             }
         }
         .allowsHitTesting(false)
-        .onChange(of: isFiring) { _, firing in
-            guard firing else { trim = 0; cardPulse = 0; return }
+        .onChange(of: triggerToken) { _, token in
+            guard token > 0 else { reset() ; return }
             fire()
+        }
+        .onAppear {
+            if triggerToken > 0 {
+                fire()
+            }
         }
     }
 
     private func fire() {
-        trim = 0
-        cardPulse = 0
+        reset()
         if reduceMotion {
             // RM：直接点亮头部（无流动、无 pulse），瞬时呈现
             withAnimation(.easeOut(duration: MotionAnimationFactory.seconds(MotionTimings.EnergyLine.cardPulseDurationMS))) {
                 trim = 1
             }
             return
+        }
+        // 0-90ms orb glow，scale 1→1.08 +0.18 opacity
+        withAnimation(.easeOut(duration: MotionAnimationFactory.seconds(MotionTimings.EnergyLine.orbGlowMS))) {
+            orbGlow = 1
         }
         // 70-260ms line trim，cubic(.16,1,.3,1)
         let dur = MotionTimings.EnergyLine.lineTrimEndMS - MotionTimings.EnergyLine.lineTrimStartMS
@@ -93,5 +116,11 @@ struct EnergyLineOverlay: View {
         withAnimation(.easeOut(duration: MotionAnimationFactory.seconds(MotionTimings.EnergyLine.cardPulseDurationMS)).delay(pulseDelay)) {
             cardPulse = 1
         }
+    }
+
+    private func reset() {
+        trim = 0
+        orbGlow = 0
+        cardPulse = 0
     }
 }
