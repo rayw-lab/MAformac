@@ -26,6 +26,7 @@ struct ContentView: View {
     let speech: any SpeechSynthesisEngine
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var snapshot: StagePresentationSnapshot
     @State private var theme: PresentationTheme
     @State private var focus = FocusController()
@@ -43,9 +44,16 @@ struct ContentView: View {
     @State private var energyLineTriggerToken = 0
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
+    private let requestedMotionBudget: PresentationMotionBudget
     private let forceReduceMotion: Bool
     private let visualSwapEnabled: Bool
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
+    private var runtimeMotionBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(
+            reduceMotion: effectiveReduceMotion,
+            requested: requestedMotionBudget
+        )
+    }
 
     init(
         store: DemoVehicleStateStore,
@@ -56,6 +64,7 @@ struct ContentView: View {
         initialAmbientBurstColor: String? = nil,
         initialContext: DemoContext? = nil,
         contextCapsuleRoute: ContextCapsuleRoute = .cLite,
+        motionBudget: PresentationMotionBudget = .preset(.fullShowcase),
         forceReduceMotion: Bool = false,
         visualSwapEnabled: Bool = false
     ) {
@@ -64,6 +73,7 @@ struct ContentView: View {
         self.speech = speech
         self.initialAmbientBurstColor = initialAmbientBurstColor
         self.contextCapsuleRoute = contextCapsuleRoute
+        self.requestedMotionBudget = motionBudget
         self.forceReduceMotion = forceReduceMotion
         self.visualSwapEnabled = visualSwapEnabled
         let initial = Self.phase2State(for: initialPreset)
@@ -101,7 +111,7 @@ struct ContentView: View {
             let size = proxy.size
             ZStack(alignment: .topTrailing) {
                 DeepSpaceBackground(theme: theme)
-                StageAtmosphereLayer(theme: theme, orbState: snapshot.orbState)
+                StageAtmosphereLayer(theme: theme, orbState: snapshot.orbState, motionBudget: runtimeMotionBudget)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
 
@@ -190,6 +200,7 @@ struct ContentView: View {
                     bottomInset: 0,
                     onTapFamily: { focus.toggle($0) },
                     onValueScrub: applyMockTransition,
+                    forceReduceMotion: forceReduceMotion,
                     waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, 64)
@@ -198,11 +209,11 @@ struct ContentView: View {
         } else {
             VStack(alignment: .leading, spacing: 10) {
                 topContextBand(size: size, showsControls: true)
-                DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
+                DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion, motionBudget: runtimeMotionBudget)
                     .energyLineOrbAnchor()
                     .frame(maxWidth: .infinity)
                     .frame(height: orbHeight(for: size))
-                DialogueStream(messages: messages, theme: theme)
+                DialogueStream(messages: messages, theme: theme, forceReduceMotion: forceReduceMotion)
                     .frame(height: dialogueHeight(for: size))
                 VehicleCardsGrid(displays: familyDisplays,
                     theme: theme,
@@ -210,6 +221,7 @@ struct ContentView: View {
                     bottomInset: bottomDockInset(for: size),
                     onTapFamily: { focus.toggle($0) },
                     onValueScrub: applyMockTransition,
+                    forceReduceMotion: forceReduceMotion,
                     waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, vehicleControlsTopPadding(for: size))
@@ -223,13 +235,13 @@ struct ContentView: View {
             topContextBand(size: size)
                 .padding(.trailing, 86)
             Spacer(minLength: 12)
-            DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
+            DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion, motionBudget: runtimeMotionBudget)
                 .energyLineOrbAnchor()
                 .frame(maxWidth: .infinity)
-            DialogueStream(messages: messages, theme: theme)
+            DialogueStream(messages: messages, theme: theme, forceReduceMotion: forceReduceMotion)
                 .frame(minHeight: 240, maxHeight: 330)
             Spacer(minLength: 28)
-            MicDock(theme: theme, state: snapshot.voiceState, onMockVoiceSubmit: applyMockVoiceColdIntent)
+            MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: applyMockVoiceColdIntent)
                 .frame(maxWidth: .infinity, minHeight: 76, maxHeight: 80)
                 .padding(.bottom, 10)
         }
@@ -318,7 +330,7 @@ struct ContentView: View {
         let split = usesMacSplit(size: size)
         if !split {
             HStack {
-                MicDock(theme: theme, state: snapshot.voiceState, onMockVoiceSubmit: applyMockVoiceColdIntent)
+                MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: applyMockVoiceColdIntent)
                     .frame(maxWidth: min(780, size.width - 70), minHeight: 70, maxHeight: 74)
             }
             .padding(.horizontal, horizontalPadding(for: size))
@@ -332,18 +344,27 @@ struct ContentView: View {
     @ViewBuilder
     private func expandedOverlay(_ family: FamilyCardID) -> some View {
         ZStack {
-            Rectangle()
-                .fill(.ultraThinMaterial)
+            expandedOverlayBackdrop
                 .ignoresSafeArea()
                 .onTapGesture { focus.dismiss() }
                 .accessibilityLabel("收起展开卡")
             ExpandedFamilyCard(
                 display: ExpandedFamilyDisplay.make(for: family, from: snapshot.storeCells),
                 onDismiss: { focus.dismiss() },
+                forceReduceMotion: forceReduceMotion,
                 onMockTransition: { key, desiredValue in
                     applyMockTransition(family: family, key: key, desiredValue: desiredValue)
                 }
             )
+        }
+    }
+
+    @ViewBuilder
+    private var expandedOverlayBackdrop: some View {
+        if reduceTransparency {
+            Rectangle().fill(DesignTokens.reduceTransparencyBackdropFill(for: theme))
+        } else {
+            Rectangle().fill(.ultraThinMaterial)
         }
     }
 
@@ -368,7 +389,7 @@ struct ContentView: View {
 
     private func applySnapshot(_ preset: SnapshotPreset) {
         waterfallGeneration += 1   // 招牌②：开场/reset/换场景 → 卡真重入场（TXB 修②）
-        withAnimation(.snappy(duration: 0.32)) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: effectiveReduceMotion)) {
             let state = Self.phase2State(for: preset)
             snapshot = state.snapshot
             messages = state.messages
@@ -398,7 +419,7 @@ struct ContentView: View {
         )
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = .explicit
-        withAnimation(.snappy(duration: 0.28)) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
             let nextSnapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [family: key],
@@ -442,7 +463,7 @@ struct ContentView: View {
         )
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = scopeOrigins[key] ?? .defaulted
-        withAnimation(.snappy(duration: 0.30)) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
             let nextSnapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [.ac: key],
@@ -564,7 +585,7 @@ struct ContentView: View {
         dialogText: String
     ) {
         store.replaceCells(cells)
-        withAnimation(.snappy(duration: 0.28)) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
             snapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: activeCells,
@@ -626,7 +647,7 @@ struct ContentView: View {
 
     private func clearAmbientBurst(id: UUID) {
         guard ambientBurst?.id == id else { return }
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(MotionAnimationFactory.guarded(.easeOut(duration: 0.18), reduceMotion: effectiveReduceMotion)) {
             ambientBurst = nil
         }
     }
@@ -646,7 +667,7 @@ struct ContentView: View {
                     to: CGPoint(x: targetFrame.midX, y: targetFrame.midY),
                     triggerToken: energyLineTriggerToken,
                     reduceMotion: effectiveReduceMotion,
-                    budget: .preset(.fullShowcase)
+                    budget: runtimeMotionBudget
                 )
             }
         }
@@ -1004,9 +1025,12 @@ struct DialogueMessage: Identifiable, Equatable {
 struct DialogueStream: View {
     let messages: [DialogueMessage]
     var theme: PresentationTheme
+    var forceReduceMotion = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isAtBottom = true
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     var body: some View {
         GeometryReader { geometry in
@@ -1034,7 +1058,7 @@ struct DialogueStream: View {
                 )
                 .onChange(of: messages.last?.id) { _, id in
                     guard isAtBottom, let id else { return }
-                    withAnimation(.snappy(duration: 0.22)) {
+                    withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.22), reduceMotion: effectiveReduceMotion)) {
                         proxy.scrollTo(id, anchor: .bottom)
                     }
                 }
@@ -1146,15 +1170,18 @@ struct DialogueBubbleTail: Shape {
 struct MicDock: View {
     var theme: PresentationTheme
     var state: PresentationVoiceState
+    var forceReduceMotion = false
     var onMockVoiceSubmit: () -> Void = {}
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var isPressing = false
     @State private var isCancelled = false
     @State private var pressStartedInside = false
     @FocusState private var isFocused: Bool
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
     private var isListening: Bool { state == .listening || isPressing }
     private let permissionPreflightStatus: MicPermissionPreflightStatus = .stubDisabledGuidance
     private var micLabel: String {
@@ -1192,7 +1219,29 @@ struct MicDock: View {
         .accessibilityHint(permissionPreflightStatus.guidance)
     }
 
+    @ViewBuilder
     private var micChrome: some View {
+        let content = micChromeContent
+            .padding(.horizontal, 22)
+            .overlay {
+                Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
+            }
+            .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
+            .scaleEffect(isPressing ? 1.018 : 1.0)
+
+        if reduceTransparency {
+            content
+                .background {
+                    Capsule().fill(DesignTokens.reduceTransparencyChromeFill(for: theme))
+                }
+        } else {
+            content
+                .background(.regularMaterial, in: Capsule())
+                .glassEffect()
+        }
+    }
+
+    private var micChromeContent: some View {
         HStack(spacing: 16) {
             Circle()
                 .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
@@ -1204,17 +1253,9 @@ struct MicDock: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.74)
                 .frame(maxWidth: .infinity)
-            WaveformMark(active: isListening, theme: theme)
+            WaveformMark(active: isListening, theme: theme, forceReduceMotion: forceReduceMotion)
                 .frame(width: 58, height: 42)
         }
-        .padding(.horizontal, 22)
-        .background(.regularMaterial, in: Capsule())
-        .glassEffect()
-        .overlay {
-            Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
-        }
-        .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
-        .scaleEffect(isPressing ? 1.018 : 1.0)
     }
 
     private func pressGesture(in size: CGSize) -> some Gesture {
@@ -1265,7 +1306,7 @@ struct MicDock: View {
     }
 
     private func setPressing(_ pressing: Bool) {
-        if reduceMotion {
+        if effectiveReduceMotion {
             isPressing = pressing
         } else {
             withAnimation(.snappy(duration: 0.18)) {
@@ -1394,8 +1435,10 @@ private struct MacPushToTalkKeyMonitor: NSViewRepresentable {
 struct WaveformMark: View {
     var active: Bool
     var theme: PresentationTheme
+    var forceReduceMotion = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     private var barHeights: [CGFloat] {
         active ? [14, 24, 34, 28, 20, 12] : [10, 18, 26, 22, 15, 10]
@@ -1408,7 +1451,7 @@ struct WaveformMark: View {
                     .fill(DesignTokens.palette(for: theme).inkPrimary.opacity(index == 0 || index == 5 ? 0.46 : 0.92))
                     .frame(width: 4, height: barHeights[index])
                     .animation(
-                        reduceMotion ? nil : .easeInOut(duration: 0.42).repeatForever(autoreverses: true).delay(Double(index) * 0.04),
+                        effectiveReduceMotion ? nil : .easeInOut(duration: 0.42).repeatForever(autoreverses: true).delay(Double(index) * 0.04),
                         value: active
                     )
             }
@@ -1429,6 +1472,9 @@ struct DemoOrbView: View {
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
+    private var effectiveMotionBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: effectiveReduceMotion, requested: motionBudget)
+    }
     /// budget 感知的 orb 粒子数（reduceMotion 强制 L2 独立于 GPU budget，D0G-002/RSB §5.3）。
     private var effectiveOrbParticleCount: Int {
         PresentationReducedMotionPolicy.particleCount(kind: .orb,
@@ -1445,8 +1491,8 @@ struct DemoOrbView: View {
 
     var body: some View {
         Group {
-            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion) {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion, budget: motionBudget) {
+                TimelineView(.animation(minimumInterval: PresentationReducedMotionPolicy.frameInterval(reduceMotion: effectiveReduceMotion, budget: motionBudget))) { timeline in
                     orbBody(phase: timeline.date.timeIntervalSinceReferenceDate)
                 }
             } else {
@@ -1458,7 +1504,7 @@ struct DemoOrbView: View {
     }
 
     private func orbBody(phase: TimeInterval) -> some View {
-        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion)
+        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion, budget: effectiveMotionBudget)
             ? 1 + sin(phase * 1.8) * 0.025
             : 1
 
@@ -1479,7 +1525,7 @@ struct DemoOrbView: View {
                     )
                     .frame(width: diameter * 1.36, height: diameter * 1.36)
                     .blur(radius: 3)
-                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion) ? 1 + sin(phase * 0.9) * 0.012 : 1)
+                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion, budget: effectiveMotionBudget) ? 1 + sin(phase * 0.9) * 0.012 : 1)
                 Circle()
                     .fill(
                         RadialGradient(
@@ -1542,7 +1588,7 @@ struct DemoOrbView: View {
                         .symbolRenderingMode(.hierarchical)
                         .accessibilityHidden(true)
                 }
-                if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: effectiveReduceMotion) {
+                if effectiveOrbParticleCount > 0 {
                     OrbParticleField(diameter: diameter, phase: phase, theme: theme,
                                      particleCount: effectiveOrbParticleCount)
                 }
@@ -1665,6 +1711,9 @@ struct StageAtmosphereLayer: View {
     var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var effectiveMotionBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: reduceMotion, requested: motionBudget)
+    }
 
     /// budget 感知的 stage 粒子数（reduceMotion 强制 L2=0）。
     private var effectiveStageParticleCount: Int {
@@ -1675,8 +1724,8 @@ struct StageAtmosphereLayer: View {
 
     var body: some View {
         Group {
-            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion, budget: motionBudget) {
+                TimelineView(.animation(minimumInterval: PresentationReducedMotionPolicy.frameInterval(reduceMotion: reduceMotion, budget: motionBudget))) { timeline in
                     GeometryReader { proxy in
                         atmosphereContent(
                             size: proxy.size,
@@ -1698,7 +1747,7 @@ struct StageAtmosphereLayer: View {
     @ViewBuilder
     private func atmosphereContent(size: CGSize, phase: TimeInterval, showParticles: Bool) -> some View {
         ZStack {
-            if showParticles, PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
+            if showParticles, effectiveMotionBudget.stageParticleCount > 0 {
                 particleCanvas(size: size, phase: phase)
             }
             edgeSheen(size: size, phase: phase)
@@ -1819,11 +1868,13 @@ struct VehicleCardsGrid: View {
     var bottomInset: CGFloat = 108
     var onTapFamily: (FamilyCardID) -> Void = { _ in }
     var onValueScrub: (FamilyCardID, String, String) -> Void = { _, _, _ in }
+    var forceReduceMotion = false
 
     @State private var isUserScrolling = false
 
     /// 招牌② 瀑布入场的 reduceMotion 守卫（D0G-002）。
     @Environment(\.accessibilityReduceMotion) private var gridReduceMotion
+    private var gridEffectiveReduceMotion: Bool { gridReduceMotion || forceReduceMotion }
 
     /// 招牌② 重放代号（reset/开场递增触发重入场，TXB 修②）。
     var waterfallGeneration: Int = 0
@@ -1957,11 +2008,12 @@ struct VehicleCardsGrid: View {
                         isFaded: false,
                         layout: layout,
                         onTap: onTapFamily,
-                        onValueScrub: onValueScrub
+                        onValueScrub: onValueScrub,
+                        forceReduceMotion: forceReduceMotion
                     )
                     .cardWaterfallEntrance(index: 0,
                                            replayToken: waterfallGeneration,
-                                           reduceMotion: gridReduceMotion)
+                                           reduceMotion: gridEffectiveReduceMotion)
                     .id(display.familyCardID?.rawValue ?? display.id)
                     .frame(width: heroWidth, alignment: .topLeading)
                     .frame(maxHeight: .infinity, alignment: .topLeading)
@@ -1980,11 +2032,12 @@ struct VehicleCardsGrid: View {
                                         isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                                         layout: layout,
                                         onTap: onTapFamily,
-                                        onValueScrub: onValueScrub
+                                        onValueScrub: onValueScrub,
+                                        forceReduceMotion: forceReduceMotion
                                     )
                                     .cardWaterfallEntrance(index: macSecondaryWaterfallIndex(row: rowIndex, column: columnIndex),
                                                            replayToken: waterfallGeneration,
-                                                           reduceMotion: gridReduceMotion)
+                                                           reduceMotion: gridEffectiveReduceMotion)
                                     .energyLineCardAnchor(family: display.familyCardID)
                                     .id(display.familyCardID?.rawValue ?? display.id)
                                 }
@@ -2034,7 +2087,8 @@ struct VehicleCardsGrid: View {
                             isFaded: false,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
                         .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
@@ -2047,7 +2101,8 @@ struct VehicleCardsGrid: View {
                             isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
                         .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
@@ -2064,7 +2119,8 @@ struct VehicleCardsGrid: View {
                             isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
                         .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
@@ -2101,12 +2157,13 @@ struct VehicleCardsGrid: View {
                             isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
                         // 招牌②：10 卡入场瀑布（onAppear 首播；reset/开场 waterfallGeneration 递增真重播，TXB 修②）
                         .cardWaterfallEntrance(index: waterfallIndex(of: display),
                                                replayToken: waterfallGeneration,
-                                               reduceMotion: gridReduceMotion)
+                                               reduceMotion: gridEffectiveReduceMotion)
                         .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
@@ -2134,7 +2191,7 @@ struct VehicleCardsGrid: View {
     private func scrollActiveIntoView(_ proxy: ScrollViewProxy) {
         guard !isUserScrolling, let id = activeFamilyID else { return }
         DispatchQueue.main.async {
-            withAnimation(.snappy(duration: 0.32)) {
+            withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: gridEffectiveReduceMotion)) {
                 proxy.scrollTo(id, anchor: .top)
             }
         }
@@ -2149,8 +2206,10 @@ struct VehicleStateCard: View {
     var layout: VehicleCardsGridLayout = .phoneScroll
     var onTap: (FamilyCardID) -> Void = { _ in }
     var onValueScrub: (FamilyCardID, String, String) -> Void = { _, _, _ in }
+    var forceReduceMotion = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var breathe = false
     @State private var isHovered = false
     @State private var showsDwellTooltip = false
@@ -2159,6 +2218,7 @@ struct VehicleStateCard: View {
     private let hoverDwellNanoseconds: UInt64 = 800_000_000
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
     private var appearance: CardAppearance { CardAppearance.of(display.visualState, theme: theme) }
     private var effectiveAppearance: CardAppearance {
         isFaded ? CardAppearance.of(.normal, theme: theme) : appearance
@@ -2212,9 +2272,9 @@ struct VehicleStateCard: View {
         .onChange(of: display.accessibilityKey) { _, _ in
             resetHoverPresentation()
         }
-        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: isHero)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: hoverActive)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: isKeyboardFocused)
+        .animation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: effectiveReduceMotion), value: isHero)
+        .animation(MotionAnimationFactory.guarded(.snappy(duration: 0.18), reduceMotion: effectiveReduceMotion), value: hoverActive)
+        .animation(MotionAnimationFactory.guarded(.snappy(duration: 0.18), reduceMotion: effectiveReduceMotion), value: isKeyboardFocused)
         .help(helpText)
         .accessibilityIdentifier("vehicle-card-\(display.accessibilityKey)")
         .accessibilityLabel("\(display.title) \(display.valueText) \(a11yState)")
@@ -2304,7 +2364,7 @@ struct VehicleStateCard: View {
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .onAppear { updateBreathe() }
             .onChange(of: glowActive) { _, _ in updateBreathe() }
-            .onChange(of: reduceMotion) { _, _ in updateBreathe() }
+            .onChange(of: effectiveReduceMotion) { _, _ in updateBreathe() }
     }
 
     private var cardSpecularLayer: some View {
@@ -2396,7 +2456,7 @@ struct VehicleStateCard: View {
                     .truncationMode(.tail)
                     .help(reason)
                     // B⑤ fallback 不丢脸卡：reason badge 滑入(x -4→0，40-160ms)，兜底态入场契约（teardown §5.4）
-                    .fallbackBadgeTransition(visible: true, reduceMotion: reduceMotion)
+                    .fallbackBadgeTransition(visible: true, reduceMotion: effectiveReduceMotion)
             }
         }
     }
@@ -2446,7 +2506,7 @@ struct VehicleStateCard: View {
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                 .foregroundStyle(valueColor)
                 .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .snappy, value: display.valueText)
+                .animation(MotionAnimationFactory.guarded(.snappy, reduceMotion: effectiveReduceMotion), value: display.valueText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
                 .truncationMode(.tail)
@@ -2462,7 +2522,7 @@ struct VehicleStateCard: View {
                 .font(.system(size: standardValueSize, weight: standardValueWeight, design: .rounded))
                 .foregroundStyle(valueColor)
                 .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .snappy, value: display.valueText)
+                .animation(MotionAnimationFactory.guarded(.snappy, reduceMotion: effectiveReduceMotion), value: display.valueText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.58)
                 .truncationMode(.tail)
@@ -2513,8 +2573,7 @@ struct VehicleStateCard: View {
 
     @ViewBuilder private var cardBackground: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(.regularMaterial)
+            cardMaterialBase
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(palette.surfaceElevated.opacity(surfaceOpacity))
             LinearGradient(colors: [
@@ -2531,6 +2590,16 @@ struct VehicleStateCard: View {
                 LinearGradient(colors: DesignTokens.thermalGradient(for: thermalTint).map { $0.opacity(theme == .ivory ? (isHero ? 0.105 : 0.055) : 0.16) },
                                startPoint: .leading, endPoint: .trailing)
             }
+        }
+    }
+
+    @ViewBuilder private var cardMaterialBase: some View {
+        if reduceTransparency {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(DesignTokens.reduceTransparencyCardFill(for: theme))
+        } else {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(.regularMaterial)
         }
     }
 
@@ -2786,7 +2855,7 @@ struct VehicleStateCard: View {
     }
 
     private func updateBreathe() {
-        guard PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion), glowActive || isHero else {
+        guard PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion), glowActive || isHero else {
             breathe = false
             return
         }

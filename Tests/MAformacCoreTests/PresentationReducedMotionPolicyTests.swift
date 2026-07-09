@@ -32,11 +32,13 @@ final class PresentationReducedMotionPolicyTests: XCTestCase {
 
     func testReduceMotionDisablesContinuousAnimationAndParticles() {
         XCTAssertFalse(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: true))
+        XCTAssertFalse(PresentationReducedMotionPolicy.allowsDiscreteAnimation(reduceMotion: true))
         XCTAssertFalse(PresentationReducedMotionPolicy.allowsParticles(reduceMotion: true))
     }
 
     func testNormalMotionAllowsContinuousAnimationAndParticles() {
         XCTAssertTrue(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: false))
+        XCTAssertTrue(PresentationReducedMotionPolicy.allowsDiscreteAnimation(reduceMotion: false))
         XCTAssertTrue(PresentationReducedMotionPolicy.allowsParticles(reduceMotion: false))
     }
 

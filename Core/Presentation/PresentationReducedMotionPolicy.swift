@@ -32,6 +32,10 @@ enum PresentationReducedMotionPolicy {
         !reduceMotion
     }
 
+    static func allowsDiscreteAnimation(reduceMotion: Bool) -> Bool {
+        !reduceMotion
+    }
+
     static func allowsParticles(reduceMotion: Bool) -> Bool {
         !reduceMotion
     }
