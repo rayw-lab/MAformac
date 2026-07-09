@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-07晚
-last_verified_origin_main: b2a25da7（PR #40 merge commit；head_truth_rule 以 live git 为准）
-branch: codex/rebuild-c6-doc-absorption-20260624
+updated: 2026-07-09夜（D-131 ma10 Wave1 收编日）
+last_verified_head: d40d19c3（opt/streamline-macos-20260707，ahead 47 未 push；head_truth_rule 以 live git 为准）
+branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "S4 首批 judge 工艺 PASS 或 S7c 触发"
+expires_when: "S8 r3 点火 或 T7e-B/D1HR/RT2 收编完成（Line D Wave 2 收口）"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,7 +14,21 @@ expires_when: "S4 首批 judge 工艺 PASS 或 S7c 触发"
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-07晚：**S4 生产相开跑；清理 6/6 收口；第二批 grill READY**）
+## 当前阶段（2026-07-09夜：**ma10 Wave 1 收编日——Line D 五席拉满，主干 656→690/0 三连收编**）
+
+🔴 **本节 supersede 下方 2026-07-07晚 S4 段及更早全部旧态段**。推进事实源 = roadmap v5 + decisions **D-114~D-131** + run dir `runs/2026-07-09-ma10-uiue-runtime/`（findings-ledger-ma10 + reports/）。
+
+- **蜂群**：ma10 = 4 codex + 1 hermes（D-130 新规首战，零 claude worker）；hermes 一席四型活（异源审/生成/秘书/缺口扫描）。
+- **任务④ Line D（本日主战）**：三连收编全绿——T7d 接缝（merge `8ed74010`，665/0）→ T3 hero（均匀 5 列→hero 左柱+3×3，merge `87e5b49d`，676/0）→ w2 runtime 叠层链（TTS fail-open+六类错误映射 T5 单源+DialogueState+TTS preflight 门，merge `d40d19c3`，**690/0**）。三场对抗审 P0=0。在途：T7e-B（ContentView call-site 清偿）/ D1HR（SSIM 基线对 hero 重生成）/ T6R（idle 截图包，隐私防呆内置）/ PF1（性能采样）/ RT2（mock 预设，弹药+施工预案备好等 T7e-B）。
+- **任务②**：S8 r3 **未点火**（磊哥令不着急；点火三件仍备）；holdout FROZEN（D-127）不动。
+- **任务③**：C1 ballot 38 题 + M-DEMO ballot 5 题备好待磊哥拍。
+- **任务①**：Line A 无新动作（A3 曾有隔离执行，主树不扩 scope）。
+- **新 stopline（D1H 裁决）**：自动化门禁依赖/写入 OS 全局 accessibility 态（`com.apple.universalaccess`）——非确定性设计错误 + 用户机可见副作用；一律进程内环境注入，OS 真开关走查=operator 手动 checklist。
+- **非声明**：visual-swap 未切换（默认 off 等 5 Gate）；无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行。
+
+📌 **下一步**：T7e-B/D1HR/T6R/PF1 收编 → RT2 施工 → idle 窗（截图+5 Gate 亲核+visual-swap 切换验收）→ 磊哥两 ballot → S8 点火键。
+
+## 【历史】2026-07-07晚：S4 生产相开跑；清理 6/6 收口；第二批 grill READY
 
 🔴 **本节 supersede 下方 2026-07-07 register 补洞窗计划相旧态段**。本文件只作 router-only 指针；推进事实源以 roadmap v3、decisions D-114~D-118 和 run-dir board 为准。
 

@@ -1165,3 +1165,13 @@
 - 磊哥原话：「沉淀六件套 新session新开ma10 后续worker不允许用claude系列，只能hermes+codex，生成器后续如果有内容我们就用hermes glm」。
 - **阵容新规（supersede D-122 Opus 生成位/D-125 Opus 视觉位惯例）**：ma10 起 worker=hermes+codex only；生成器任务（语料/话术创作）=hermes glm（生成方≠判方纪律不变：hermes 生成→codex judge）；UIUE 视觉=commander 亲笔加重+codex 按参数级规格实装（codex 不独立主刀视觉仍有效）。memory 已落 feedback-worker-roster-no-claude。
 - **收口终态（诚实）**：S8 r3 **从未点火**（昨晚 24:00 键未落，preflight/一行命令/一键 checklist 三件全备仍有效）；D1a 五片（T1/T4/T5/T7 链）已集成 opt/streamline **656/0**（D-128/129）；holdout FROZEN（D-127）；C1 ballot 38 题+P1 批 39 题备好未拍；T7d 接缝 pass 未执行（昨晚派单遇 session 中断）；T3 hero/visual-swap 验收/视觉亲核/T6 idle 重拍待新 session。ahead 35 未 push。
+
+## D-131：ma10 Wave 1 收编日——D1a 接缝/hero/runtime 三线全收 + lessons 落笔 + D1H 裁决（2026-07-09）
+
+- **阵容首战**：ma10 = 4 codex + 1 hermes（D-130 新规首战，零 claude worker）。hermes 一席扛四型活：异源审计（RT1/T7eA/L1）+ 生成位（H2 台本/H6 mock 预设表）+ 秘书（H3 lessons/H7 级联稿）+ 缺口扫描（H1 P1×2+P2×6 亲核零编造）；codex 内部 subagent 实战立功（w1 审计双 lane 分工，architect lane 抓接缝断裂）。
+- **收编账（主干 opt/streamline，每步 commander 亲跑集成门）**：656 → **T7d 接缝**（EnergyLine 真 readback 流经 T5 orchestrator/anchorPreference 坐标/visual-swap flag 默认 off；merge `8ed74010`，665/0）→ **T3 hero**（macPanorama 均匀 5 列→hero 左柱 0.32+3×3；hero 槽固定 .ac 防跳动；T3-AUDIT P0=0 规格 11 项全 PASS+anchor 接缝 live 复核；fee5de62→rebase a2bd781c→merge `87e5b49d`，676/0）→ **w2 runtime 叠层链**（RT1 readback→TTS fail-open+六类错误映射+DialogueState / T7e-A 组件侧 RM/RT/budget 清偿 / RT3 TTS preflight 门 make check-tts-preflight / RT1F 审计修复含六类映射收敛 T5 单源+drift guard；merge `d40d19c3`，**690/0+verify-all rc0**）。HEAD=`d40d19c3`，ahead 47 未 push。
+- **审计链**：RT1-AUDIT/T7EA-AUDIT/T3-AUDIT 三场全 P0=0；H6-AUDIT 抓 hermes 弹药 P0×2（自造 utterance 变体标 yaml 原文+虚构 readback 锚=finder 编造经典型，真文件假内容）；commander 驳回 w1 一条 P1（RuntimePresentationErrorClass 时序 artifact，live grep 坐实主干已有）。
+- **D1H blocker 裁决**：w3 卡 TCC 写 universalaccess → 不追权限：磊哥用机中翻全局三开关=可见副作用（M.51）+ 自动门依赖机器全局态=非确定性设计错误；改**进程内环境注入**（8 组合含 RM+RT），OS 真开关降 operator checklist，defaults 只读探测进 receipt；负例四门（U17 SSIM/L2/U32/三开关脚本）全证有牙。D1HR（rebase+基线对 hero 布局重生成）在途。
+- **lessons 落笔**：M.48-M.56 九新条 + M.24/M.30/M.35 三子条款（commit `6fb57270`，H3 秘书稿过审）。
+- **杂账**：before-baseline-ugly png 实况缺失（D-126 该行 stale，对比素材改 T6a idle 重拍）；hermes 一次 HTTP 429 turn 中断（重试恢复，秒级损失）。
+- **在途**：T7e-B（ContentView call-site 清偿）/ D1HR / T6R idle 截图包 / PF1 性能采样 / L1-AUDIT。**未动**：S8 未点火（磊哥令不着急）/ C1 ballot 待拍 / M-DEMO ballot 待拍 / visual-swap 未切换 / 无 5 Gate/operator-pass 声称。
