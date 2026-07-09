@@ -63,6 +63,48 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
             launchArguments: ["-goldenPathID", "uiue_g9b_ac_success_deep_space"],
             expectedIdentifiers: ["context-band", "demo-orb", "dialogue-stream", "vehicle-cards"],
             expectedTreeText: ["空调", "26℃", "按住说话"]
+        ),
+        "force_state_normal_mac_hero": VisualCase(
+            id: "force_state_normal_mac_hero",
+            launchArguments: ["-forceVisualState", "normal", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "normal", "空调"]
+        ),
+        "force_state_satisfied_mac_hero": VisualCase(
+            id: "force_state_satisfied_mac_hero",
+            launchArguments: ["-forceVisualState", "satisfied", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "satisfied", "空调"]
+        ),
+        "force_state_changing_mac_hero": VisualCase(
+            id: "force_state_changing_mac_hero",
+            launchArguments: ["-forceVisualState", "changing", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "changing", "空调"]
+        ),
+        "force_state_blocked_with_alternative_mac_hero": VisualCase(
+            id: "force_state_blocked_with_alternative_mac_hero",
+            launchArguments: ["-forceVisualState", "blocked_with_alternative", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "blocked_with_alternative", "最低18℃"]
+        ),
+        "force_state_blocked_hard_mac_hero": VisualCase(
+            id: "force_state_blocked_hard_mac_hero",
+            launchArguments: ["-forceVisualState", "blocked_hard", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "blocked_hard", "后排无独立温控"]
+        ),
+        "force_state_unsafe_mac_hero": VisualCase(
+            id: "force_state_unsafe_mac_hero",
+            launchArguments: ["-forceVisualState", "unsafe", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "unsafe", "行驶中禁止开启"]
+        ),
+        "force_state_unknown_mac_hero": VisualCase(
+            id: "force_state_unknown_mac_hero",
+            launchArguments: ["-forceVisualState", "unknown", "-forceTheme", "ivory"],
+            expectedIdentifiers: ["vehicle-cards-mac-panorama"],
+            expectedTreeText: ["force-state", "unknown", "状态读取失败"]
         )
     ]
 
@@ -529,7 +571,9 @@ final class UIC2VisualAcceptanceUITests: XCTestCase {
                 "Missing accessibility identifier: \(identifier)"
             )
         }
-        XCTAssertTrue(waitForAnyIdentifier(["mic-dock", "mic-dock-safe-area"], in: app))
+        if visualCase.expectedIdentifiers.contains("context-band") {
+            XCTAssertTrue(waitForAnyIdentifier(["mic-dock", "mic-dock-safe-area"], in: app))
+        }
 
         let tree = app.debugDescription
         for expectedText in visualCase.expectedTreeText {

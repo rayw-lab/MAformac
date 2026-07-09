@@ -75,7 +75,7 @@ struct ForcedStateScreen: View {
                 VehicleCardsGrid(displays: VehicleCardDisplay.familyDisplays(
                     from: DebugVisualState.forcedScenarioCells(state),
                     reasons: { DebugVisualState.forcedReason(forKey: $0, state: state) }
-                ), theme: theme)
+                ), theme: theme, layout: .macPanorama)
             }
             .padding(20)
         }

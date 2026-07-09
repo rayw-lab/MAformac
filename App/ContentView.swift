@@ -3,6 +3,23 @@ import SwiftUI
 import AppKit
 #endif
 
+enum T3MacWindowContract {
+    static let minWidth: CGFloat = 1280
+    static let minHeight: CGFloat = 800
+    static let warningText = "窗口低于演示安全尺寸，10 卡已保留，视觉可能压缩"
+
+    static func heroWidth(forContentWidth contentWidth: CGFloat) -> CGFloat {
+        let usesNarrowBand = contentWidth < 900
+        let ratio: CGFloat = usesNarrowBand ? 0.28 : 0.32
+        let lowerBound: CGFloat = usesNarrowBand ? 240 : 260
+        return min(340, max(lowerBound, contentWidth * ratio))
+    }
+
+    static func shouldShowWarning(_ size: CGSize) -> Bool {
+        size.width < T3MacWindowContract.minWidth || size.height < T3MacWindowContract.minHeight
+    }
+}
+
 struct ContentView: View {
     @Bindable var store: DemoVehicleStateStore
     let traceLogger: InMemoryTraceLogger
@@ -108,6 +125,12 @@ struct ContentView: View {
                     expandedOverlay(family)
                         .zIndex(10)
                         .transition(.opacity.combined(with: .scale(scale: 0.92)))
+                }
+
+                if T3MacWindowContract.shouldShowWarning(size) {
+                    minWindowWarningBanner(size: size)
+                        .padding(.top, topControlsTopPadding(for: size) + 2)
+                        .zIndex(9)
                 }
 
             }
@@ -267,6 +290,27 @@ struct ContentView: View {
         }
         .frame(width: width, height: height)
         .clipShape(Capsule())
+    }
+
+    private func minWindowWarningBanner(size: CGSize) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12, weight: .semibold))
+            Text(T3MacWindowContract.warningText)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+        }
+        .foregroundStyle(DesignTokens.palette(for: theme).inkPrimary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(DesignTokens.stateOffline.opacity(theme == .ivory ? 0.18 : 0.22), in: Capsule())
+        .overlay {
+            Capsule().strokeBorder(DesignTokens.stateOffline.opacity(0.52), lineWidth: 0.7)
+        }
+        .shadow(color: DesignTokens.stateOffline.opacity(0.18), radius: 8, y: 4)
+        .frame(maxWidth: max(280, min(size.width * 0.48, 520)))
+        .accessibilityIdentifier("t3-min-window-warning")
     }
 
     @ViewBuilder
@@ -1850,7 +1894,7 @@ struct VehicleCardsGrid: View {
     var body: some View {
         Group {
             if layout == .macPanorama {
-                gridContent
+                macFeaturedContent
                     .accessibilityIdentifier("vehicle-cards-mac-panorama")
             } else {
                 ScrollViewReader { proxy in
@@ -1894,6 +1938,82 @@ struct VehicleCardsGrid: View {
 
     private var gridContent: some View {
         compactGridContent(for: displays)
+    }
+
+    private var macFeaturedContent: some View {
+        GeometryReader { proxy in
+            let trailingInset: CGFloat = 16
+            let available = max(0, proxy.size.width - trailingInset)
+            let gap: CGFloat = 14
+            let heroWidth = macHeroColumnWidth(for: available)
+            let secondaryWidth = max(0, available - gap - heroWidth)
+            let heroFamily = featuredHeroFamily
+            HStack(alignment: .top, spacing: gap) {
+                if let display = display(for: heroFamily) {
+                    VehicleStateCard(
+                        display: display,
+                        theme: theme,
+                        isHero: true,
+                        isFaded: false,
+                        layout: layout,
+                        onTap: onTapFamily,
+                        onValueScrub: onValueScrub
+                    )
+                    .cardWaterfallEntrance(index: 0,
+                                           replayToken: waterfallGeneration,
+                                           reduceMotion: gridReduceMotion)
+                    .id(display.familyCardID?.rawValue ?? display.id)
+                    .frame(width: heroWidth, alignment: .topLeading)
+                    .frame(maxHeight: .infinity, alignment: .topLeading)
+                    .energyLineCardAnchor(family: display.familyCardID)
+                }
+
+                Grid(alignment: .topLeading, horizontalSpacing: 12, verticalSpacing: 12) {
+                    ForEach(Array(macSecondaryRows.enumerated()), id: \.offset) { rowIndex, families in
+                        GridRow {
+                            ForEach(Array(families.enumerated()), id: \.element) { columnIndex, family in
+                                if let display = display(for: family) {
+                                    VehicleStateCard(
+                                        display: display,
+                                        theme: theme,
+                                        isHero: false,
+                                        isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
+                                        layout: layout,
+                                        onTap: onTapFamily,
+                                        onValueScrub: onValueScrub
+                                    )
+                                    .cardWaterfallEntrance(index: macSecondaryWaterfallIndex(row: rowIndex, column: columnIndex),
+                                                           replayToken: waterfallGeneration,
+                                                           reduceMotion: gridReduceMotion)
+                                    .energyLineCardAnchor(family: display.familyCardID)
+                                    .id(display.familyCardID?.rawValue ?? display.id)
+                                }
+                            }
+                        }
+                    }
+                }
+                .frame(width: secondaryWidth, alignment: .topLeading)
+            }
+            .padding(.trailing, trailingInset)
+        }
+    }
+
+    private func macHeroColumnWidth(for contentWidth: CGFloat) -> CGFloat {
+        T3MacWindowContract.heroWidth(forContentWidth: contentWidth)
+    }
+
+    private var macSecondaryFamilies: [FamilyCardID] {
+        FamilyCardID.displayOrder.filter { $0 != featuredHeroFamily }
+    }
+
+    private var macSecondaryRows: [[FamilyCardID]] {
+        stride(from: 0, to: macSecondaryFamilies.count, by: 3).map { index in
+            Array(macSecondaryFamilies[index ..< min(index + 3, macSecondaryFamilies.count)])
+        }
+    }
+
+    private func macSecondaryWaterfallIndex(row: Int, column: Int) -> Int {
+        return row * 3 + column + 1
     }
 
     private var phoneFeaturedContent: some View {
@@ -2236,6 +2356,7 @@ struct VehicleStateCard: View {
                         .font(.system(size: isHero ? 16 : 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(palette.inkPrimary)
                         .lineLimit(1)
+                        .minimumScaleFactor(isHero ? 0.85 : 0.78)
                         .truncationMode(.tail)
                     if let badge = display.scopeBadge {
                         scopeBadgeView(badge)
@@ -2271,6 +2392,7 @@ struct VehicleStateCard: View {
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(palette.inkDim)
                     .lineLimit(1)
+                    .minimumScaleFactor(isHero ? 0.85 : 0.75)
                     .truncationMode(.tail)
                     .help(reason)
                     // B⑤ fallback 不丢脸卡：reason badge 滑入(x -4→0，40-160ms)，兜底态入场契约（teardown §5.4）
