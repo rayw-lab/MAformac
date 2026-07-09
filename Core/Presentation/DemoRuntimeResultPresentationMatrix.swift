@@ -27,6 +27,17 @@ enum RuntimePresentationErrorClass: String, CaseIterable, Equatable, Sendable {
     case clarify
     case crash
     case noMatch = "no_match"
+
+    var t5Fault: T5RuntimePresentationFault {
+        switch self {
+        case .unsupported: return .unsupported
+        case .unmounted: return .unmounted
+        case .safety: return .safetyRefusal(cardKey: "__matrix_related_card__")
+        case .clarify: return .clarify
+        case .crash: return .crash
+        case .noMatch: return .noMatch
+        }
+    }
 }
 
 struct RuntimePresentationErrorEntry: Equatable, Sendable {
@@ -48,61 +59,92 @@ enum DemoRuntimeResultPresentationMatrix {
     }
 
     static func errorEntry(for errorClass: RuntimePresentationErrorClass) -> RuntimePresentationErrorEntry {
+        let t5Row = T5RuntimeErrorVisualMapper.map(errorClass.t5Fault)
         switch errorClass {
         case .unsupported:
             return RuntimePresentationErrorEntry(
                 errorClass: errorClass,
-                resultKind: .refusalNoAvailableTool,
-                visualState: .blocked_hard,
+                resultKind: resultKind(for: t5Row),
+                visualState: t5Row.visualState,
                 dialogText: "这个功能当前演示环境暂不支持",
-                motionKind: .refusalShake,
-                receiptKind: "unsupported"
+                motionKind: motionKind(for: t5Row),
+                receiptKind: t5Row.receiptKind
             )
         case .unmounted:
             return RuntimePresentationErrorEntry(
                 errorClass: errorClass,
-                resultKind: .refusalNoAvailableTool,
-                visualState: .blocked_hard,
+                resultKind: resultKind(for: t5Row),
+                visualState: t5Row.visualState,
                 dialogText: "这个功能当前还没有挂载到演示车控",
-                motionKind: .refusalShake,
-                receiptKind: "unmounted"
+                motionKind: motionKind(for: t5Row),
+                receiptKind: t5Row.receiptKind
             )
         case .safety:
             return RuntimePresentationErrorEntry(
                 errorClass: errorClass,
-                resultKind: .refusalSafetyOrPolicy,
-                visualState: .unsafe,
+                resultKind: resultKind(for: t5Row),
+                visualState: t5Row.visualState,
                 dialogText: "为了安全，当前状态下不能这样操作",
-                motionKind: .safetyPulse,
-                receiptKind: "safety"
+                motionKind: motionKind(for: t5Row),
+                receiptKind: t5Row.receiptKind
             )
         case .clarify:
             return RuntimePresentationErrorEntry(
                 errorClass: errorClass,
-                resultKind: .clarifyMissingSlot,
-                visualState: .blocked_with_alternative,
+                resultKind: resultKind(for: t5Row),
+                visualState: t5Row.visualState,
                 dialogText: "需要确认具体位置后我再执行",
-                motionKind: .clarificationPulse,
-                receiptKind: "clarify"
+                motionKind: motionKind(for: t5Row),
+                receiptKind: t5Row.receiptKind
             )
         case .crash:
             return RuntimePresentationErrorEntry(
                 errorClass: errorClass,
-                resultKind: .runtimeError,
-                visualState: .unknown,
+                resultKind: resultKind(for: t5Row),
+                visualState: t5Row.visualState,
                 dialogText: "刚才处理失败，请重试",
-                motionKind: .staticError,
-                receiptKind: "crash"
+                motionKind: motionKind(for: t5Row),
+                receiptKind: t5Row.receiptKind
             )
         case .noMatch:
             return RuntimePresentationErrorEntry(
                 errorClass: errorClass,
-                resultKind: .refusalNoAvailableTool,
-                visualState: .blocked_hard,
+                resultKind: resultKind(for: t5Row),
+                visualState: t5Row.visualState,
                 dialogText: "这个我先记下来，稍后帮您处理",
-                motionKind: .refusalShake,
-                receiptKind: "no_match"
+                motionKind: motionKind(for: t5Row),
+                receiptKind: t5Row.receiptKind
             )
+        }
+    }
+
+    private static func resultKind(for row: T5ErrorVisualReceiptRow) -> DemoRuntimeResultKind {
+        switch row.scope {
+        case .globalRetryableCrash:
+            return .runtimeError
+        case .unsupportedLocked:
+            return .refusalNoAvailableTool
+        case .clarify:
+            return .clarifyMissingSlot
+        case .relatedCardOnly:
+            return .refusalSafetyOrPolicy
+        case .ttsDegraded:
+            return .partialAcceptPartialRefuse
+        }
+    }
+
+    private static func motionKind(for row: T5ErrorVisualReceiptRow) -> PresentationMotionKind {
+        switch row.scope {
+        case .globalRetryableCrash:
+            return .staticError
+        case .unsupportedLocked:
+            return .refusalShake
+        case .clarify:
+            return .clarificationPulse
+        case .relatedCardOnly:
+            return .safetyPulse
+        case .ttsDegraded:
+            return .partialResult
         }
     }
 

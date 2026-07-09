@@ -2,6 +2,11 @@ import AVFoundation
 import Foundation
 
 enum T5RuntimePresentationFault: Equatable, Hashable, Sendable {
+    case unsupported
+    case unmounted
+    case clarify
+    case crash
+    case noMatch
     case timeout
     case emptyResponse
     case malformedPayload
@@ -10,6 +15,11 @@ enum T5RuntimePresentationFault: Equatable, Hashable, Sendable {
     case ttsFailure
 
     static let allReceiptCases: [T5RuntimePresentationFault] = [
+        .unsupported,
+        .unmounted,
+        .clarify,
+        .crash,
+        .noMatch,
         .timeout,
         .emptyResponse,
         .malformedPayload,
@@ -22,6 +32,7 @@ enum T5RuntimePresentationFault: Equatable, Hashable, Sendable {
 enum T5ErrorScope: Equatable, Sendable {
     case globalRetryableCrash
     case unsupportedLocked
+    case clarify
     case relatedCardOnly(String)
     case ttsDegraded
 }
@@ -37,6 +48,22 @@ struct T5ErrorVisualReceiptRow: Equatable, Sendable {
 enum T5RuntimeErrorVisualMapper {
     static func map(_ fault: T5RuntimePresentationFault) -> T5ErrorVisualReceiptRow {
         switch fault {
+        case .unsupported:
+            return unsupported(fault, receiptKind: "unsupported")
+        case .unmounted:
+            return unsupported(fault, receiptKind: "unmounted")
+        case .clarify:
+            return T5ErrorVisualReceiptRow(
+                fault: fault,
+                visualState: .blocked_with_alternative,
+                isRetryable: false,
+                scope: .clarify,
+                receiptKind: "clarify"
+            )
+        case .crash:
+            return retryableCrash(fault, receiptKind: "crash")
+        case .noMatch:
+            return unsupported(fault, receiptKind: "no_match")
         case .timeout:
             return retryableCrash(fault, receiptKind: "crash_retryable_timeout")
         case .emptyResponse:
@@ -68,6 +95,19 @@ enum T5RuntimeErrorVisualMapper {
                 receiptKind: "tts_degraded_non_crash"
             )
         }
+    }
+
+    private static func unsupported(
+        _ fault: T5RuntimePresentationFault,
+        receiptKind: String
+    ) -> T5ErrorVisualReceiptRow {
+        T5ErrorVisualReceiptRow(
+            fault: fault,
+            visualState: .blocked_hard,
+            isRetryable: false,
+            scope: .unsupportedLocked,
+            receiptKind: receiptKind
+        )
     }
 
     private static func retryableCrash(

@@ -13,8 +13,13 @@ final class T5RuntimePresentationTests: XCTestCase {
         try String(contentsOf: repoRoot.appendingPathComponent(path), encoding: .utf8)
     }
 
-    func testSixRuntimeErrorsMapToVisualStatesAndReceiptRows() {
+    func testRuntimeErrorsMapToVisualStatesAndReceiptRows() {
         let expectations: [(T5RuntimePresentationFault, DemoVisualState, Bool, T5ErrorScope, String)] = [
+            (.unsupported, .blocked_hard, false, .unsupportedLocked, "unsupported"),
+            (.unmounted, .blocked_hard, false, .unsupportedLocked, "unmounted"),
+            (.clarify, .blocked_with_alternative, false, .clarify, "clarify"),
+            (.crash, .unknown, true, .globalRetryableCrash, "crash"),
+            (.noMatch, .blocked_hard, false, .unsupportedLocked, "no_match"),
             (.timeout, .unknown, true, .globalRetryableCrash, "crash_retryable_timeout"),
             (.emptyResponse, .unknown, true, .globalRetryableCrash, "crash_retryable_empty"),
             (.malformedPayload, .unknown, true, .globalRetryableCrash, "crash_retryable_malformed"),
