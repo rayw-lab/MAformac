@@ -39,6 +39,56 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
         }
     }
 
+    func testSixRuntimeErrorClassesMapToPresentationStates() {
+        let expected: [(RuntimePresentationErrorClass, DemoRuntimeResultKind, DemoVisualState, PresentationMotionKind, String)] = [
+            (.unsupported, .refusalNoAvailableTool, .blocked_hard, .refusalShake, "unsupported"),
+            (.unmounted, .refusalNoAvailableTool, .blocked_hard, .refusalShake, "unmounted"),
+            (.safety, .refusalSafetyOrPolicy, .unsafe, .safetyPulse, "safety_related_card_only"),
+            (.clarify, .clarifyMissingSlot, .blocked_with_alternative, .clarificationPulse, "clarify"),
+            (.crash, .runtimeError, .unknown, .staticError, "crash"),
+            (.noMatch, .refusalNoAvailableTool, .blocked_hard, .refusalShake, "no_match")
+        ]
+
+        XCTAssertEqual(DemoRuntimeResultPresentationMatrix.allErrorEntries.map(\.errorClass), RuntimePresentationErrorClass.allCases)
+
+        for (errorClass, resultKind, visualState, motionKind, receiptKind) in expected {
+            let entry = DemoRuntimeResultPresentationMatrix.errorEntry(for: errorClass)
+
+            XCTAssertEqual(entry.resultKind, resultKind, errorClass.rawValue)
+            XCTAssertEqual(entry.visualState, visualState, errorClass.rawValue)
+            XCTAssertEqual(entry.motionKind, motionKind, errorClass.rawValue)
+            XCTAssertEqual(entry.receiptKind, receiptKind, errorClass.rawValue)
+            XCTAssertFalse(entry.dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+    }
+
+    func testRuntimeErrorClassProjectionUsesT5MapperAsSingleSource() {
+        for errorClass in RuntimePresentationErrorClass.allCases {
+            let matrixEntry = DemoRuntimeResultPresentationMatrix.errorEntry(for: errorClass)
+            let t5Row = T5RuntimeErrorVisualMapper.map(errorClass.t5Fault)
+
+            XCTAssertEqual(matrixEntry.visualState, t5Row.visualState, errorClass.rawValue)
+            XCTAssertEqual(matrixEntry.receiptKind, t5Row.receiptKind, errorClass.rawValue)
+            switch t5Row.scope {
+            case .globalRetryableCrash:
+                XCTAssertEqual(matrixEntry.resultKind, .runtimeError, errorClass.rawValue)
+                XCTAssertEqual(matrixEntry.motionKind, .staticError, errorClass.rawValue)
+            case .unsupportedLocked:
+                XCTAssertEqual(matrixEntry.resultKind, .refusalNoAvailableTool, errorClass.rawValue)
+                XCTAssertEqual(matrixEntry.motionKind, .refusalShake, errorClass.rawValue)
+            case .clarify:
+                XCTAssertEqual(matrixEntry.resultKind, .clarifyMissingSlot, errorClass.rawValue)
+                XCTAssertEqual(matrixEntry.motionKind, .clarificationPulse, errorClass.rawValue)
+            case .relatedCardOnly:
+                XCTAssertEqual(matrixEntry.resultKind, .refusalSafetyOrPolicy, errorClass.rawValue)
+                XCTAssertEqual(matrixEntry.motionKind, .safetyPulse, errorClass.rawValue)
+            case .ttsDegraded:
+                XCTAssertEqual(matrixEntry.resultKind, .partialAcceptPartialRefuse, errorClass.rawValue)
+                XCTAssertEqual(matrixEntry.motionKind, .partialResult, errorClass.rawValue)
+            }
+        }
+    }
+
     func testMatrixSourceDoesNotUseDefaultSwitchFallback() throws {
         let sourceURL = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

@@ -42,8 +42,7 @@ public final class DemoWalkingSkeleton {
         let readback = try actionExecutor.applyMockTransition(frame, store: store)
         traceLogger.recordExecute(traceID: frame.traceID, message: "\(readback.key)=\(readback.actualValue)")
         traceLogger.recordReadback(traceID: frame.traceID, message: readback.spokenText)
-        speech.speak(readback.spokenText)
+        _ = speech.speak(readback.spokenText)
         return readback
     }
 }
-

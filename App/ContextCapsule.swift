@@ -14,6 +14,7 @@ struct ContextCapsuleView: View {
     var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var rainSystem = VortexSystem.rain.makeUniqueCopy()
     @State private var smokeSystem = VortexSystem.smoke.makeUniqueCopy()
 
@@ -78,14 +79,27 @@ struct ContextCapsuleView: View {
     }
 
     private var capsuleChrome: some View {
-        Capsule()
-            .fill(Color.clear)
-            .glassEffect(.regular, in: Capsule())
-            .opacity(theme == .ivory ? 0.34 : 0.55)
+        capsuleChromeBase
+            .opacity(reduceTransparency ? 1.0 : (theme == .ivory ? 0.34 : 0.55))
             .overlay {
-                Capsule().strokeBorder(Color.white.opacity(theme == .ivory ? 0.16 : 0.12), lineWidth: 0.8)
+                Capsule().strokeBorder(
+                    DesignTokens.contextCapsuleChromeStroke(theme: theme, reduceTransparency: reduceTransparency),
+                    lineWidth: reduceTransparency ? 1.1 : 0.8
+                )
             }
             .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private var capsuleChromeBase: some View {
+        if reduceTransparency {
+            Capsule()
+                .fill(DesignTokens.contextCapsuleChromeFill(theme: theme, reduceTransparency: true))
+        } else {
+            Capsule()
+                .fill(DesignTokens.contextCapsuleChromeFill(theme: theme, reduceTransparency: false))
+                .glassEffect(.regular, in: Capsule())
+        }
     }
 
     @ViewBuilder

@@ -67,6 +67,90 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
+    func testTTSFailureDoesNotBlockVisualReadbackPresentation() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine(nextResult: .failed(reason: "synthesizer_busy"))
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: trace,
+            speech: speech
+        )
+
+        let payload = try await runner.run(text: "打开空调")
+
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(payload.reconciliation.status, .verified)
+        XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
+        XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
+        XCTAssertTrue(trace.entries.contains { entry in
+            entry.stage == .readback
+                && entry.message == "tts_fail_open:synthesizer_busy"
+                && entry.attributes.readbackResult == .failed
+        })
+    }
+
+    @MainActor
+    func testRunnerUpdatesShortTermDialogueStateFromMockReadback() async throws {
+        let store = DemoVehicleStateStore()
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: InMemoryTraceLogger(),
+            speech: RecordingSpeechSynthesisEngine()
+        )
+
+        _ = try await runner.run(text: "打开空调")
+        let state = runner.currentDialogueState
+
+        XCTAssertEqual(state.turns.map(\.role), [.user, .assistant])
+        XCTAssertEqual(state.turns.map(\.text), ["打开空调", "空调已打开"])
+        XCTAssertEqual(state.focusEntity, "ac")
+        XCTAssertEqual(state.lastReadback?.key, "ac.power")
+    }
+
+    @MainActor
+    func testUnsupportedTurnKeepsPreviousFocusEntityForShortTermSemantics() async throws {
+        let store = DemoVehicleStateStore()
+        let initialState = DialogueState(
+            turns: [
+                DialogueTurn(role: .user, text: "打开空调"),
+                DialogueTurn(role: .assistant, text: "空调已打开")
+            ],
+            focusEntity: "ac",
+            lastReadback: DemoActionReadback(
+                key: "ac.power",
+                actualValue: "on",
+                revision: 1,
+                spokenText: "空调已打开"
+            ),
+            maxTurns: 3
+        )
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: InMemoryTraceLogger(),
+            speech: RecordingSpeechSynthesisEngine(),
+            frameDecoder: { text in throw FastPathIntentError.noMatch(text) },
+            dialogueState: initialState
+        )
+
+        let payload = try await runner.run(text: "顺便安排一个火箭座椅")
+        let state = runner.currentDialogueState
+
+        XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
+        XCTAssertEqual(payload.outcome.reason, "fast_path_no_match")
+        XCTAssertEqual(state.focusEntity, "ac")
+        XCTAssertEqual(state.lastReadback?.key, "ac.power")
+        XCTAssertEqual(
+            state.turns.map(\.text),
+            ["空调已打开", "顺便安排一个火箭座椅", "这个我先记下来，稍后帮您处理"]
+        )
+    }
+
+    @MainActor
     func testFrameDecoderDoesNotBlockMainActorDuringBackendWork() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()

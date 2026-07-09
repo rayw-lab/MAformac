@@ -157,6 +157,30 @@ enum DesignTokens {
         }
     }
 
+    /// ContextCapsule 的 reduceTransparency 实心 chrome fallback。
+    /// token 层只给颜色语义；是否替换 `.glassEffect` 由渲染层结合系统开关决定。
+    static func contextCapsuleChromeFill(theme: PresentationTheme, reduceTransparency: Bool) -> Color {
+        guard reduceTransparency else { return .clear }
+        switch theme {
+        case .ivory:
+            return palette(for: theme).surfaceElevated.opacity(0.92)
+        case .deepSpace:
+            return bgDeepest.opacity(0.86)
+        }
+    }
+
+    static func contextCapsuleChromeStroke(theme: PresentationTheme, reduceTransparency: Bool) -> Color {
+        guard reduceTransparency else {
+            return Color.white.opacity(theme == .ivory ? 0.16 : 0.12)
+        }
+        switch theme {
+        case .ivory:
+            return glowCyan.opacity(0.26)
+        case .deepSpace:
+            return glowCyan.opacity(0.34)
+        }
+    }
+
     // MARK: 动效时长（tokens.md §4）
     static let ambientBurstDuration: TimeInterval = 5.0
 

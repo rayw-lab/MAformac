@@ -7,6 +7,11 @@ struct ExpandedFamilyCard: View {
     let display: ExpandedFamilyDisplay
     let onDismiss: () -> Void
     var onMockTransition: (String, String) -> Void = { _, _ in }
+    var forceReduceMotion = false
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -29,7 +34,11 @@ struct ExpandedFamilyCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 ForEach(display.rows) { row in
-                    ExpandedCellRowView(row: row, onMockTransition: onMockTransition)
+                    ExpandedCellRowView(
+                        row: row,
+                        forceReduceMotion: effectiveReduceMotion,
+                        onMockTransition: onMockTransition
+                    )
                     if row.id != display.rows.last?.id {
                         Divider().overlay(DesignTokens.inkDim2.opacity(0.2))
                     }
@@ -56,6 +65,7 @@ struct ExpandedFamilyCard: View {
 /// 单行：device label + 图形控件（穷尽 `ValueControlView`）+ 态图标（双通道）。
 struct ExpandedCellRowView: View {
     let row: ExpandedCellRow
+    var forceReduceMotion = false
     var onMockTransition: (String, String) -> Void = { _, _ in }
     private var appearance: CardAppearance { CardAppearance.of(row.visualState) }
 
@@ -81,6 +91,7 @@ struct ExpandedCellRowView: View {
                 badgeStyle: row.badgeStyle,
                 badgeOptions: badgeOptions,
                 primaryActionIdentifier: primaryActionIdentifier,
+                forceReduceMotion: forceReduceMotion,
                 actions: actions
             )
             .frame(maxWidth: 130, minHeight: 56)

@@ -54,7 +54,13 @@ struct AmbientEdgeBurst: View {
         GeometryReader { proxy in
             let size = proxy.size
             ZStack {
-                TimedAmbientEdgeGlow(trigger: trigger, colors: gradient, theme: theme, reduceMotion: reduceMotion)
+                TimedAmbientEdgeGlow(
+                    trigger: trigger,
+                    colors: gradient,
+                    theme: theme,
+                    reduceMotion: reduceMotion,
+                    allowLargeBlurAndShadow: effectiveBudget.allowLargeBlurAndShadow
+                )
 
                 if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
                     PhaseAnimator(AmbientBurstPhase.allCases, trigger: trigger.id) { phase in
@@ -93,6 +99,10 @@ struct AmbientEdgeBurst: View {
         let ringInset = max(6, width * 0.018)
         let ringCorner = min(width * 0.105, 72)
         let energy = theme == .ivory ? 0.78 : 1.0
+        let allowLargeBlurAndShadow = effectiveBudget.allowLargeBlurAndShadow
+        let primaryShadowRadius = allowLargeBlurAndShadow ? phase.shadowRadius : 0
+        let secondaryShadowRadius = allowLargeBlurAndShadow ? phase.shadowRadius * 1.55 : 0
+        let accentBlurRadius = allowLargeBlurAndShadow ? 1.2 : 0
 
         ZStack {
             VStack(spacing: 0) {
@@ -135,13 +145,13 @@ struct AmbientEdgeBurst: View {
                     lineWidth: phase.ringWidth
                 )
                 .padding(ringInset)
-                .shadow(color: primary.opacity(phase.ringOpacity * 0.92 * energy), radius: phase.shadowRadius, y: 0)
-                .shadow(color: secondary.opacity(phase.ringOpacity * 0.60 * energy), radius: phase.shadowRadius * 1.55, y: 0)
+                .shadow(color: primary.opacity(phase.ringOpacity * 0.92 * energy), radius: primaryShadowRadius, y: 0)
+                .shadow(color: secondary.opacity(phase.ringOpacity * 0.60 * energy), radius: secondaryShadowRadius, y: 0)
 
             RoundedRectangle(cornerRadius: ringCorner + 12, style: .continuous)
                 .strokeBorder(primary.opacity(phase.ringOpacity * 0.28 * energy), lineWidth: 1)
                 .padding(ringInset + 12)
-                .blur(radius: 1.2)
+                .blur(radius: accentBlurRadius)
 
             RadialGradient(
                 colors: [
@@ -236,6 +246,7 @@ private struct TimedAmbientEdgeGlow: View {
     let colors: [Color]
     var theme: PresentationTheme
     var reduceMotion = false
+    var allowLargeBlurAndShadow = true
 
     var body: some View {
         Group {
@@ -268,6 +279,9 @@ private struct TimedAmbientEdgeGlow: View {
         let ringInset = max(4, minSide * 0.012)
         let ringCorner = min(minSide * 0.115, 78)
         let base = theme == .ivory ? 0.94 : 1.12
+        let primaryShadowRadius: CGFloat = allowLargeBlurAndShadow ? 34 : 0
+        let secondaryShadowRadius: CGFloat = allowLargeBlurAndShadow ? 64 : 0
+        let accentBlurRadius: CGFloat = allowLargeBlurAndShadow ? 1.8 : 0
 
         ZStack {
             VStack(spacing: 0) {
@@ -334,13 +348,13 @@ private struct TimedAmbientEdgeGlow: View {
                     lineWidth: 7
                 )
                 .padding(ringInset)
-                .shadow(color: primary.opacity(0.96 * energy * base), radius: 34)
-                .shadow(color: primary.opacity(0.54 * energy * base), radius: 64)
+                .shadow(color: primary.opacity(0.96 * energy * base), radius: primaryShadowRadius)
+                .shadow(color: primary.opacity(0.54 * energy * base), radius: secondaryShadowRadius)
 
             RoundedRectangle(cornerRadius: ringCorner + 18, style: .continuous)
                 .strokeBorder(primary.opacity(0.45 * energy * base), lineWidth: 2)
                 .padding(ringInset + 16)
-                .blur(radius: 1.8)
+                .blur(radius: accentBlurRadius)
         }
         .opacity(energy)
         .blendMode(theme == .deepSpace ? .plusLighter : .normal)

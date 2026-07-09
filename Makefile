@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci swift-test verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -47,6 +47,9 @@ verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface ver
 
 swift-test:
 	swift test
+
+check-tts-preflight:
+	@swift scripts/check_tts_preflight.swift
 
 # UIUE 接线 enforce 进 CI（gptpro 跨厂商审 P0-2：原只在 .githooks/pre-commit 本地，CI 不跑）。
 # bash 调用避免 executable bit 漏洞；防 ContentView 接线丢失（前任 proof 图丢根因）。
