@@ -64,12 +64,13 @@ final class RuntimeReadbackSignalTests: XCTestCase {
 
     @MainActor
     func testMP02RuntimeSequenceEmitsTwoT5EventsInReadbackOrder() throws {
+        let initialCells = [
+            DemoVehicleStateCell(key: "ac.power", actualValue: "off", revision: 2),
+            DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "22", revision: 2)
+        ]
         let plan = try XCTUnwrap(MockVoicePresetPlanner.plan(
             utterance: "打开空调把温度调到24度",
-            cells: [
-                DemoVehicleStateCell(key: "ac.power", actualValue: "off", revision: 2),
-                DemoVehicleStateCell(key: "ac.temp_setpoint[主驾]", actualValue: "22", revision: 2)
-            ],
+            cells: initialCells,
             context: .idle,
             priorReadbacks: []
         ))
@@ -89,6 +90,7 @@ final class RuntimeReadbackSignalTests: XCTestCase {
 
         let steps = RuntimeReadbackEventSequence.steps(
             snapshot: finalSnapshot,
+            initialStoreCells: initialCells,
             priorReadbacks: [],
             readbacks: plan.readbacks
         )
@@ -100,9 +102,50 @@ final class RuntimeReadbackSignalTests: XCTestCase {
         XCTAssertEqual(steps.map(\.speechText.text), ["空调已打开", "空调已打开, 温度24度"])
         XCTAssertEqual(steps[0].event.snapshot.readbacks.map(\.key), ["ac.power"])
         XCTAssertEqual(steps[1].event.snapshot.readbacks.map(\.key), ["ac.power", "ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(cellValue("ac.power", in: steps[0].event.snapshot), "on")
+        XCTAssertEqual(cellValue("ac.temp_setpoint[主驾]", in: steps[0].event.snapshot), "22")
+        XCTAssertEqual(steps[0].event.snapshot.activeCells[.ac], "ac.power")
+        XCTAssertEqual(cellValue("ac.power", in: steps[1].event.snapshot), "on")
+        XCTAssertEqual(cellValue("ac.temp_setpoint[主驾]", in: steps[1].event.snapshot), "24")
+        XCTAssertEqual(steps[1].event.snapshot.activeCells[.ac], "ac.temp_setpoint[主驾]")
 
         let signals = steps.compactMap { RuntimeReadbackSignal.from(event: $0.event) }
         XCTAssertEqual(signals.map(\.readbackID), expectedIDs)
         XCTAssertEqual(signals.map(\.targetFamilyID), ["ac", "ac"])
+    }
+
+    func testRuntimeReadbackQueueRequiresCompletionBeforeAdvancing() throws {
+        let snapshot = StagePresentationSnapshot(storeCells: [])
+        let steps = [
+            RuntimeReadbackEventStep(
+                event: .runtime(snapshot: snapshot, readbackID: "rb-1"),
+                speechText: T5ReadbackText(id: "rb-1", text: "第一条")
+            ),
+            RuntimeReadbackEventStep(
+                event: .runtime(snapshot: snapshot, readbackID: "rb-2"),
+                speechText: T5ReadbackText(id: "rb-2", text: "第二条")
+            )
+        ]
+        var queue = RuntimeReadbackEventQueue()
+
+        XCTAssertEqual(queue.start(steps)?.event.readbackID, "rb-1")
+        XCTAssertEqual(queue.inFlightReadbackID, "rb-1")
+        XCTAssertEqual(queue.pendingCount, 1)
+        XCTAssertNil(queue.completeInFlight(readbackID: "rb-2"))
+        XCTAssertEqual(queue.inFlightReadbackID, "rb-1")
+        XCTAssertEqual(queue.pendingCount, 1)
+
+        XCTAssertEqual(queue.completeInFlight(readbackID: "rb-1")?.event.readbackID, "rb-2")
+        XCTAssertEqual(queue.inFlightReadbackID, "rb-2")
+        XCTAssertEqual(queue.pendingCount, 0)
+        XCTAssertNil(queue.completeInFlight(readbackID: "rb-1"))
+        XCTAssertEqual(queue.inFlightReadbackID, "rb-2")
+
+        XCTAssertNil(queue.completeInFlight(readbackID: "rb-2"))
+        XCTAssertTrue(queue.isIdle)
+    }
+
+    private func cellValue(_ key: String, in snapshot: StagePresentationSnapshot) -> String? {
+        snapshot.storeCells.first { $0.key == key }?.actualValue
     }
 }
