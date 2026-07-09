@@ -10,12 +10,13 @@
       "orb_particle_count": 72,
       "stage_particle_count": 138,
       "burst_particle_count": 250,
+      "burst_particle_count_deep_space": 310,
       "context_capsule_mode": "animated",
       "sampling_round": "pf1_fullShowcase"
     },
     {
       "level": "balancedDemo",
-      "fps_target": 24,
+      "fps_target": 30,
       "burst_fps_target": 30,
       "orb_particle_count": 48,
       "stage_particle_count": 64,
@@ -139,6 +140,20 @@
       "capture": "pending_idle_window"
     },
     {
+      "id": "value.rolling_number_hero_numeric_text",
+      "source_path": "App/Motion/RollingNumberText.swift",
+      "anchor": "RollingNumberText / hero value contentTransition(.numericText)",
+      "coverage": "hero_value_rolling_number",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "card.fallback_badge_transition",
+      "source_path": "App/Motion/FallbackCardMotion.swift",
+      "anchor": "FallbackBadgeTransition / fallbackBadgeTransition",
+      "coverage": "fallback_badge_transition",
+      "capture": "pending_idle_window"
+    },
+    {
       "id": "ambient_burst.phase_animator",
       "source_path": "App/AmbientEdgeBurst.swift",
       "anchor": "AmbientEdgeBurst PhaseAnimator",
@@ -157,6 +172,16 @@
       "source_path": "App/AmbientEdgeBurst.swift",
       "anchor": "AmbientEdgeBurstParticleCanvas",
       "coverage": "ambient_burst",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "ambient_burst.particle_canvas_deep_space_l0_310",
+      "source_path": "App/AmbientEdgeBurst.swift",
+      "anchor": "AmbientParticleCanvas theme == .deepSpace base=310",
+      "coverage": "ambient_burst_theme_parity",
+      "budget_level": "fullShowcase",
+      "theme": "deepSpace",
+      "particle_count": 310,
       "capture": "pending_idle_window"
     },
     {
@@ -185,6 +210,13 @@
       "source_path": "App/Motion/MicDockWaveform.swift",
       "anchor": "MicDockWaveform Canvas",
       "coverage": "mic_dock",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "mic_dock.press_scale",
+      "source_path": "App/ContentView.swift",
+      "anchor": "MicDock press scaleEffect / setPressing animation",
+      "coverage": "mic_dock_press_scale",
       "capture": "pending_idle_window"
     }
   ],
