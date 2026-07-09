@@ -11,6 +11,7 @@ public final class DemoRuntimeSessionRunner {
     private let frameDecoder: FrameDecoder
     private let alignsFrameStateRevisionToStore: Bool
     private let timestampProvider: () -> Date
+    private var dialogueState: DialogueState
 
     public init(
         store: DemoVehicleStateStore,
@@ -19,6 +20,7 @@ public final class DemoRuntimeSessionRunner {
         speech: any SpeechSynthesisEngine,
         frameDecoder: @escaping FrameDecoder = { try FastPathIntentEngine().decode($0) },
         alignsFrameStateRevisionToStore: Bool = true,
+        dialogueState: DialogueState = DialogueState(),
         timestampProvider: @escaping () -> Date = Date.init
     ) {
         self.store = store
@@ -27,6 +29,7 @@ public final class DemoRuntimeSessionRunner {
         self.speech = speech
         self.frameDecoder = frameDecoder
         self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
+        self.dialogueState = dialogueState
         self.timestampProvider = timestampProvider
     }
 
@@ -49,6 +52,7 @@ public final class DemoRuntimeSessionRunner {
 
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
+        dialogueState.recordUserText(text)
         let frameResult: ToolCallFrame
         do {
             frameResult = try await frameDecoder(text)
@@ -79,7 +83,16 @@ public final class DemoRuntimeSessionRunner {
         }
         let dialogText = result.readbacks.map(\.spokenText).joined(separator: "；")
         if !dialogText.isEmpty {
-            speech.speak(dialogText)
+            let speechResult = speech.speak(dialogText)
+            if !speechResult.didEnqueue {
+                traceLogger.recordReadback(
+                    traceID: result.traceID,
+                    message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
+                    attributes: TraceAttributes(readbackResult: .failed)
+                )
+            }
+            dialogueState.recordAssistantText(dialogText)
+            dialogueState.recordReadbacks(result.readbacks)
         }
 
         let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: result.traceID)
@@ -115,6 +128,7 @@ public final class DemoRuntimeSessionRunner {
         let traceID = UUID().uuidString
         let turnID = "unsupported-\(traceID)"
         let dialogText = "这个我先记下来，稍后帮您处理"
+        dialogueState.recordAssistantText(dialogText)
         traceLogger.recordGuard(
             traceID: traceID,
             message: "unsupported_tool_plan",
@@ -123,7 +137,14 @@ public final class DemoRuntimeSessionRunner {
                 finiteReason: finiteReason
             )
         )
-        speech.speak(dialogText)
+        let speechResult = speech.speak(dialogText)
+        if !speechResult.didEnqueue {
+            traceLogger.recordReadback(
+                traceID: traceID,
+                message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
+                attributes: TraceAttributes(readbackResult: .failed)
+            )
+        }
         let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: traceID)
         return RuntimePresentationPayload(
             traceID: traceID,
@@ -141,6 +162,10 @@ public final class DemoRuntimeSessionRunner {
             traceEnvelope: traceEnvelope,
             timestamp: timestampProvider()
         )
+    }
+
+    public var currentDialogueState: DialogueState {
+        dialogueState
     }
 
     private func recordProjectionTraceIfNeeded(for frame: ToolCallFrame) {

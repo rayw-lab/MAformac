@@ -67,6 +67,51 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
+    func testTTSFailureDoesNotBlockVisualReadbackPresentation() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine(nextResult: .failed(reason: "synthesizer_busy"))
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: trace,
+            speech: speech
+        )
+
+        let payload = try await runner.run(text: "打开空调")
+
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(payload.reconciliation.status, .verified)
+        XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
+        XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
+        XCTAssertTrue(trace.entries.contains { entry in
+            entry.stage == .readback
+                && entry.message == "tts_fail_open:synthesizer_busy"
+                && entry.attributes.readbackResult == .failed
+        })
+    }
+
+    @MainActor
+    func testRunnerUpdatesShortTermDialogueStateFromMockReadback() async throws {
+        let store = DemoVehicleStateStore()
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: InMemoryTraceLogger(),
+            speech: RecordingSpeechSynthesisEngine()
+        )
+
+        _ = try await runner.run(text: "打开空调")
+        let state = runner.currentDialogueState
+
+        XCTAssertEqual(state.turns.map(\.role), [.user, .assistant])
+        XCTAssertEqual(state.turns.map(\.text), ["打开空调", "空调已打开"])
+        XCTAssertEqual(state.focusEntity, "ac")
+        XCTAssertEqual(state.lastReadback?.key, "ac.power")
+    }
+
+    @MainActor
     func testFrameDecoderDoesNotBlockMainActorDuringBackendWork() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()

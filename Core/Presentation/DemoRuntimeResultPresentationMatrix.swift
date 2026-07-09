@@ -20,9 +20,90 @@ struct DemoRuntimeResultPresentationEntry: Equatable, Sendable {
     let proofClass: StagePresentationProofClass
 }
 
+enum RuntimePresentationErrorClass: String, CaseIterable, Equatable, Sendable {
+    case unsupported
+    case unmounted
+    case safety
+    case clarify
+    case crash
+    case noMatch = "no_match"
+}
+
+struct RuntimePresentationErrorEntry: Equatable, Sendable {
+    var errorClass: RuntimePresentationErrorClass
+    var resultKind: DemoRuntimeResultKind
+    var visualState: DemoVisualState
+    var dialogText: String
+    var motionKind: PresentationMotionKind
+    var receiptKind: String
+}
+
 enum DemoRuntimeResultPresentationMatrix {
     static var allEntries: [DemoRuntimeResultPresentationEntry] {
         DemoRuntimeResultKind.allCases.map { entry(for: $0) }
+    }
+
+    static var allErrorEntries: [RuntimePresentationErrorEntry] {
+        RuntimePresentationErrorClass.allCases.map { errorEntry(for: $0) }
+    }
+
+    static func errorEntry(for errorClass: RuntimePresentationErrorClass) -> RuntimePresentationErrorEntry {
+        switch errorClass {
+        case .unsupported:
+            return RuntimePresentationErrorEntry(
+                errorClass: errorClass,
+                resultKind: .refusalNoAvailableTool,
+                visualState: .blocked_hard,
+                dialogText: "这个功能当前演示环境暂不支持",
+                motionKind: .refusalShake,
+                receiptKind: "unsupported"
+            )
+        case .unmounted:
+            return RuntimePresentationErrorEntry(
+                errorClass: errorClass,
+                resultKind: .refusalNoAvailableTool,
+                visualState: .blocked_hard,
+                dialogText: "这个功能当前还没有挂载到演示车控",
+                motionKind: .refusalShake,
+                receiptKind: "unmounted"
+            )
+        case .safety:
+            return RuntimePresentationErrorEntry(
+                errorClass: errorClass,
+                resultKind: .refusalSafetyOrPolicy,
+                visualState: .unsafe,
+                dialogText: "为了安全，当前状态下不能这样操作",
+                motionKind: .safetyPulse,
+                receiptKind: "safety"
+            )
+        case .clarify:
+            return RuntimePresentationErrorEntry(
+                errorClass: errorClass,
+                resultKind: .clarifyMissingSlot,
+                visualState: .blocked_with_alternative,
+                dialogText: "需要确认具体位置后我再执行",
+                motionKind: .clarificationPulse,
+                receiptKind: "clarify"
+            )
+        case .crash:
+            return RuntimePresentationErrorEntry(
+                errorClass: errorClass,
+                resultKind: .runtimeError,
+                visualState: .unknown,
+                dialogText: "刚才处理失败，请重试",
+                motionKind: .staticError,
+                receiptKind: "crash"
+            )
+        case .noMatch:
+            return RuntimePresentationErrorEntry(
+                errorClass: errorClass,
+                resultKind: .refusalNoAvailableTool,
+                visualState: .blocked_hard,
+                dialogText: "这个我先记下来，稍后帮您处理",
+                motionKind: .refusalShake,
+                receiptKind: "no_match"
+            )
+        }
     }
 
     static func entry(for kind: DemoRuntimeResultKind) -> DemoRuntimeResultPresentationEntry {

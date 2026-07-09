@@ -39,6 +39,29 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
         }
     }
 
+    func testSixRuntimeErrorClassesMapToPresentationStates() {
+        let expected: [(RuntimePresentationErrorClass, DemoRuntimeResultKind, DemoVisualState, PresentationMotionKind, String)] = [
+            (.unsupported, .refusalNoAvailableTool, .blocked_hard, .refusalShake, "unsupported"),
+            (.unmounted, .refusalNoAvailableTool, .blocked_hard, .refusalShake, "unmounted"),
+            (.safety, .refusalSafetyOrPolicy, .unsafe, .safetyPulse, "safety"),
+            (.clarify, .clarifyMissingSlot, .blocked_with_alternative, .clarificationPulse, "clarify"),
+            (.crash, .runtimeError, .unknown, .staticError, "crash"),
+            (.noMatch, .refusalNoAvailableTool, .blocked_hard, .refusalShake, "no_match")
+        ]
+
+        XCTAssertEqual(DemoRuntimeResultPresentationMatrix.allErrorEntries.map(\.errorClass), RuntimePresentationErrorClass.allCases)
+
+        for (errorClass, resultKind, visualState, motionKind, receiptKind) in expected {
+            let entry = DemoRuntimeResultPresentationMatrix.errorEntry(for: errorClass)
+
+            XCTAssertEqual(entry.resultKind, resultKind, errorClass.rawValue)
+            XCTAssertEqual(entry.visualState, visualState, errorClass.rawValue)
+            XCTAssertEqual(entry.motionKind, motionKind, errorClass.rawValue)
+            XCTAssertEqual(entry.receiptKind, receiptKind, errorClass.rawValue)
+            XCTAssertFalse(entry.dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+    }
+
     func testMatrixSourceDoesNotUseDefaultSwitchFallback() throws {
         let sourceURL = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
