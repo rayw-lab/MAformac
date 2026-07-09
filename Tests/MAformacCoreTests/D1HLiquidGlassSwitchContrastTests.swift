@@ -8,39 +8,15 @@ final class D1HLiquidGlassSwitchContrastTests: XCTestCase {
         let forceBadSample = ProcessInfo.processInfo.environment[badSampleEnvKey] == "1"
 
         for combination in D1HAccessibilitySwitchCombination.allCases {
-            for theme in TokenThemeID.allCases {
-                for state in DemoVisualState.allCases {
-                    let base = DesignTokenValues.token(for: state, theme: theme)
-                    let token = combination.requiresReducedVariant ? base.reducedVariant(on: theme) : base
-                    let background = token.effectiveBackground(on: theme)
-                    let ink = forceBadSample && combination == .allOn && state == .unsafe
-                        ? background
-                        : theme.inkPrimary
-                    let ratio = ink.contrastRatio(against: background)
-
-                    XCTAssertGreaterThanOrEqual(
-                        ratio,
-                        DesignTokenValues.bodyTextMinContrast,
-                        "L2 contrast failed: combination=\(combination.id) theme=\(theme.rawValue) state=\(state.rawValue) ratio=\(String(format: "%.2f", ratio))"
-                    )
-
-                    if combination.reduceMotion {
-                        XCTAssertFalse(token.isLoopAnimation, "reduceMotion combination must stop loop animation: \(combination.id)/\(state.rawValue)")
-                    }
-                    if combination.reduceTransparency {
-                        XCTAssertEqual(token.backgroundAlpha, 1.0, "reduceTransparency combination must solidify background: \(combination.id)/\(state.rawValue)")
-                    }
-                    if combination.increaseContrast {
-                        let borderRatio = theme.inkPrimary.contrastRatio(against: token.effectiveBorder(on: theme))
-                        XCTAssertGreaterThanOrEqual(
-                            max(ratio, borderRatio),
-                            DesignTokenValues.bodyTextMinContrast,
-                            "increaseContrast combination must keep at least one strong foreground/background edge"
-                        )
-                    }
-                }
-            }
+            assertContrastGreen(for: combination, forceBadSample: forceBadSample)
         }
+    }
+
+    func testL2ContrastStaysGreenForInjectedEnvironmentCombination() {
+        assertContrastGreen(
+            for: D1HAccessibilitySwitchCombination.fromProcessEnvironment(),
+            forceBadSample: ProcessInfo.processInfo.environment[badSampleEnvKey] == "1"
+        )
     }
 
     func testL2ContrastGateRejectsInjectedBadCombination() {
@@ -50,6 +26,41 @@ final class D1HLiquidGlassSwitchContrastTests: XCTestCase {
             failures.contains { $0.contains("combination=reduceTransparency+increaseContrast+reduceMotion") && $0.contains("state=unsafe") },
             "Injected bad L2 contrast sample must be caught"
         )
+    }
+
+    private func assertContrastGreen(for combination: D1HAccessibilitySwitchCombination, forceBadSample: Bool) {
+        for theme in TokenThemeID.allCases {
+            for state in DemoVisualState.allCases {
+                let base = DesignTokenValues.token(for: state, theme: theme)
+                let token = combination.requiresReducedVariant ? base.reducedVariant(on: theme) : base
+                let background = token.effectiveBackground(on: theme)
+                let ink = forceBadSample && combination == .allOn && state == .unsafe
+                    ? background
+                    : theme.inkPrimary
+                let ratio = ink.contrastRatio(against: background)
+
+                XCTAssertGreaterThanOrEqual(
+                    ratio,
+                    DesignTokenValues.bodyTextMinContrast,
+                    "L2 contrast failed: combination=\(combination.id) theme=\(theme.rawValue) state=\(state.rawValue) ratio=\(String(format: "%.2f", ratio))"
+                )
+
+                if combination.reduceMotion {
+                    XCTAssertFalse(token.isLoopAnimation, "reduceMotion combination must stop loop animation: \(combination.id)/\(state.rawValue)")
+                }
+                if combination.reduceTransparency {
+                    XCTAssertEqual(token.backgroundAlpha, 1.0, "reduceTransparency combination must solidify background: \(combination.id)/\(state.rawValue)")
+                }
+                if combination.increaseContrast {
+                    let borderRatio = theme.inkPrimary.contrastRatio(against: token.effectiveBorder(on: theme))
+                    XCTAssertGreaterThanOrEqual(
+                        max(ratio, borderRatio),
+                        DesignTokenValues.bodyTextMinContrast,
+                        "increaseContrast combination must keep at least one strong foreground/background edge"
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -86,6 +97,15 @@ private struct D1HAccessibilitySwitchCombination: Equatable {
         increaseContrast: true,
         reduceMotion: true
     )
+
+    static func fromProcessEnvironment() -> D1HAccessibilitySwitchCombination {
+        let environment = ProcessInfo.processInfo.environment
+        return D1HAccessibilitySwitchCombination(
+            reduceTransparency: environment["D1H_A11Y_REDUCE_TRANSPARENCY"] == "1",
+            increaseContrast: environment["D1H_A11Y_INCREASE_CONTRAST"] == "1",
+            reduceMotion: environment["D1H_A11Y_REDUCE_MOTION"] == "1"
+        )
+    }
 
     static func failuresWithInjectedBadSample() -> [String] {
         var failures: [String] = []

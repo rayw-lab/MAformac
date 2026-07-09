@@ -53,6 +53,17 @@ final class U17HeadlessSnapshotSSIMTests: XCTestCase {
         )
     }
 
+    func testU17AccessibilityInjectedHeadlessSnapshotsRenderAllStates() throws {
+        let injection = D1HAccessibilityInjection.fromProcessEnvironment()
+
+        for state in DemoVisualState.allCases {
+            let image = try renderSnapshot(state: state, accessibility: injection)
+            XCTAssertEqual(image.width, Int(size.width))
+            XCTAssertEqual(image.height, Int(size.height))
+            XCTAssertGreaterThan(Set(image.values.map { Int(($0 * 255).rounded()) }).count, 8)
+        }
+    }
+
     private func configuredThreshold() -> Double {
         ProcessInfo.processInfo.environment[thresholdEnvKey].flatMap(Double.init) ?? 0.995
     }
@@ -74,9 +85,18 @@ final class U17HeadlessSnapshotSSIMTests: XCTestCase {
             .appendingPathComponent("Fixtures", isDirectory: true)
     }
 
-    private func renderSnapshot(state: DemoVisualState, forceBadSample: Bool = false) throws -> LuminanceImage {
+    private func renderSnapshot(
+        state: DemoVisualState,
+        forceBadSample: Bool = false,
+        accessibility: D1HAccessibilityInjection = .defaultOff
+    ) throws -> LuminanceImage {
         let token = DesignTokenValues.token(for: state, theme: .deepSpace)
-        let content = U17HeadlessStateCard(state: state, token: token, forceBadSample: forceBadSample)
+        let content = U17HeadlessStateCard(
+            state: state,
+            token: token,
+            forceBadSample: forceBadSample,
+            accessibility: accessibility
+        )
             .frame(width: size.width, height: size.height)
 
         let renderer = ImageRenderer(content: content)
@@ -95,15 +115,16 @@ private struct U17HeadlessStateCard: View {
     let state: DemoVisualState
     let token: SemanticStateToken
     let forceBadSample: Bool
+    let accessibility: D1HAccessibilityInjection
 
     var body: some View {
         ZStack {
             Color(rgb: TokenThemeID.deepSpace.surface)
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color(rgb: token.effectiveBackground(on: .deepSpace)))
+                .fill(Color(rgb: renderedToken.effectiveBackground(on: .deepSpace)))
                 .overlay {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color(rgb: token.effectiveBorder(on: .deepSpace)), lineWidth: 5)
+                        .stroke(Color(rgb: renderedToken.effectiveBorder(on: .deepSpace)), lineWidth: accessibility.increaseContrast ? 7 : 5)
                 }
                 .padding(12)
             stateBands
@@ -114,6 +135,10 @@ private struct U17HeadlessStateCard: View {
                     .offset(x: 34, y: -10)
             }
         }
+    }
+
+    private var renderedToken: SemanticStateToken {
+        accessibility.reduceTransparency || accessibility.reduceMotion ? token.reducedVariant(on: .deepSpace) : token
     }
 
     private var stateBands: some View {
@@ -130,12 +155,33 @@ private struct U17HeadlessStateCard: View {
     private func rowColor(row: Int, stateIndex: Int) -> TokenRGB {
         switch row {
         case 0:
-            return token.border
+            return renderedToken.border
         case 1:
-            return token.backgroundTint.composited(over: TokenThemeID.deepSpace.inkPrimary, alpha: 0.38 + Double(stateIndex) * 0.025)
+            let alpha = accessibility.increaseContrast ? 0.52 : 0.38
+            return renderedToken.backgroundTint.composited(over: TokenThemeID.deepSpace.inkPrimary, alpha: alpha + Double(stateIndex) * 0.025)
         default:
-            return TokenThemeID.deepSpace.inkPrimary.composited(over: token.effectiveBackground(on: .deepSpace), alpha: 0.72)
+            return TokenThemeID.deepSpace.inkPrimary.composited(over: renderedToken.effectiveBackground(on: .deepSpace), alpha: 0.72)
         }
+    }
+}
+
+private struct D1HAccessibilityInjection {
+    static let reduceTransparencyEnvKey = "D1H_A11Y_REDUCE_TRANSPARENCY"
+    static let increaseContrastEnvKey = "D1H_A11Y_INCREASE_CONTRAST"
+    static let reduceMotionEnvKey = "D1H_A11Y_REDUCE_MOTION"
+    static let defaultOff = D1HAccessibilityInjection(reduceTransparency: false, increaseContrast: false, reduceMotion: false)
+
+    let reduceTransparency: Bool
+    let increaseContrast: Bool
+    let reduceMotion: Bool
+
+    static func fromProcessEnvironment() -> D1HAccessibilityInjection {
+        let environment = ProcessInfo.processInfo.environment
+        return D1HAccessibilityInjection(
+            reduceTransparency: environment[reduceTransparencyEnvKey] == "1",
+            increaseContrast: environment[increaseContrastEnvKey] == "1",
+            reduceMotion: environment[reduceMotionEnvKey] == "1"
+        )
     }
 }
 

@@ -15,51 +15,15 @@ mkdir -p "$RECEIPT_DIR"
 DOMAIN="com.apple.universalaccess"
 KEYS=(reduceTransparency increaseContrast reduceMotion)
 
-ORIGINAL_reduceTransparency=""
-ORIGINAL_increaseContrast=""
-ORIGINAL_reduceMotion=""
-HAD_reduceTransparency=0
-HAD_increaseContrast=0
-HAD_reduceMotion=0
-
 read_pref() {
   local key="$1"
+  local value
   if value="$(defaults read "$DOMAIN" "$key" 2>/dev/null)"; then
-    eval "ORIGINAL_${key}=\"\$value\""
-    eval "HAD_${key}=1"
+    echo "$value"
   else
-    eval "ORIGINAL_${key}=\"\""
-    eval "HAD_${key}=0"
+    echo "missing"
   fi
 }
-
-write_pref() {
-  local key="$1"
-  local enabled="$2"
-  defaults write "$DOMAIN" "$key" -bool "$enabled"
-}
-
-restore_pref() {
-  local key="$1"
-  local had_var="HAD_${key}"
-  local original_var="ORIGINAL_${key}"
-  if [[ "${!had_var}" == "1" ]]; then
-    defaults write "$DOMAIN" "$key" "${!original_var}"
-  else
-    defaults delete "$DOMAIN" "$key" >/dev/null 2>&1 || true
-  fi
-}
-
-restore_all() {
-  for key in "${KEYS[@]}"; do
-    restore_pref "$key"
-  done
-}
-trap restore_all EXIT
-
-for key in "${KEYS[@]}"; do
-  read_pref "$key"
-done
 
 run_swift_gate() {
   local label="$1"
@@ -83,14 +47,50 @@ run_swift_gate() {
   return "$rc"
 }
 
+record_current_os_switches() {
+  {
+    echo "## OS Switch Probe"
+    echo
+    echo "- probe_class: read_only_defaults"
+    echo "- writes: forbidden"
+    echo "- reduceTransparency: \`$(read_pref reduceTransparency)\`"
+    echo "- increaseContrast: \`$(read_pref increaseContrast)\`"
+    echo "- reduceMotion: \`$(read_pref reduceMotion)\`"
+    echo
+  } >>"$RECEIPT"
+}
+
+run_injected_gate() {
+  local label="$1"
+  local reduce_transparency="$2"
+  local increase_contrast="$3"
+  local reduce_motion="$4"
+  shift 4
+  {
+    echo "## Injection $label"
+    echo
+    echo "- D1H_A11Y_REDUCE_TRANSPARENCY: \`$reduce_transparency\`"
+    echo "- D1H_A11Y_INCREASE_CONTRAST: \`$increase_contrast\`"
+    echo "- D1H_A11Y_REDUCE_MOTION: \`$reduce_motion\`"
+    echo
+  } >>"$RECEIPT"
+  D1H_A11Y_REDUCE_TRANSPARENCY="$reduce_transparency" \
+    D1H_A11Y_INCREASE_CONTRAST="$increase_contrast" \
+    D1H_A11Y_REDUCE_MOTION="$reduce_motion" \
+    run_swift_gate "$label" "$@"
+}
+
 {
   echo "# D1H 三开关走查 receipt"
   echo
   echo "- captured_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo "- proof_class: local"
   echo "- mode: $([[ "$NEGATIVE_MODE" == "1" ]] && echo negative_self_test || echo walkthrough)"
+  echo "- os_switch_mode: read_only_probe_no_writes"
   echo
 } >"$RECEIPT"
+
+record_current_os_switches
 
 if [[ "$NEGATIVE_MODE" == "1" ]]; then
   if D1H_U17_FORCE_BAD_SAMPLE=changing run_swift_gate \
@@ -125,22 +125,33 @@ if [[ "$NEGATIVE_MODE" == "1" ]]; then
   exit 0
 fi
 
-for key in "${KEYS[@]}"; do
-  for candidate in "${KEYS[@]}"; do
-    if [[ "$candidate" == "$key" ]]; then
-      write_pref "$candidate" true
-    else
-      write_pref "$candidate" false
-    fi
-  done
+LABELS=(default reduceTransparency increaseContrast reduceMotion reduceTransparency+reduceMotion reduceTransparency+increaseContrast reduceMotion+increaseContrast allOn)
+RT_VALUES=(0 1 0 0 1 1 0 1)
+IC_VALUES=(0 0 1 0 0 1 1 1)
+RM_VALUES=(0 0 0 1 1 0 1 1)
 
-  run_swift_gate \
-    "switch-${key}-u17-ssim" \
-    swift test --filter U17HeadlessSnapshotSSIMTests/testU17SevenStateHeadlessSnapshotsMatchSSIMBaselines
-  run_swift_gate \
-    "switch-${key}-l2-contrast" \
-    swift test --filter D1HLiquidGlassSwitchContrastTests/testL2ContrastStaysGreenAcrossThreeSwitchCombinations
+for index in "${!LABELS[@]}"; do
+  label="${LABELS[$index]}"
+  rt="${RT_VALUES[$index]}"
+  ic="${IC_VALUES[$index]}"
+  rm="${RM_VALUES[$index]}"
+
+  run_injected_gate \
+    "switch-${label}-u17-injected-render" \
+    "$rt" "$ic" "$rm" \
+    swift test --filter U17HeadlessSnapshotSSIMTests/testU17AccessibilityInjectedHeadlessSnapshotsRenderAllStates
+  run_injected_gate \
+    "switch-${label}-l2-contrast" \
+    "$rt" "$ic" "$rm" \
+    swift test --filter D1HLiquidGlassSwitchContrastTests/testL2ContrastStaysGreenForInjectedEnvironmentCombination
 done
 
-restore_all
+{
+  echo "## Operator Manual Checklist"
+  echo
+  echo "- checklist: \`docs/grill-checklist/d1h-three-switch-operator-checklist.md\`"
+  echo "- status: manual_operator_step_only"
+  echo "- non_claim: this script does not write OS accessibility settings and does not claim true-device or desktop_operator_equivalent pass"
+} >>"$RECEIPT"
+
 echo "D1H_THREE_SWITCH_WALKTHROUGH_PASS receipt=$RECEIPT"
