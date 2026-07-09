@@ -2,11 +2,14 @@ import Foundation
 
 enum MockVoicePresetID: String, CaseIterable, Equatable, Sendable {
     case acAlreadyOffNoop = "mp01_ac_already_off_noop"
+    case acClose = "mp01_ac_close"
     case acOnTemp24 = "mp02_ac_on_temp_24"
     case windowOpen = "mp03_window_open"
     case windowOpenMore = "mp03_window_open_more"
     case movingDoorSafetyRefusal = "mp04_moving_door_safety_refusal"
     case movingTailgateSafetyRefusal = "mp04_moving_tailgate_safety_refusal"
+    case movingDoorPreconditionFailed = "mp04_moving_door_precondition_failed"
+    case movingTailgatePreconditionFailed = "mp04_moving_tailgate_precondition_failed"
 }
 
 enum MockVoiceUtteranceSource: String, Equatable, Sendable {
@@ -90,8 +93,12 @@ enum MockVoicePresetPlanner {
         case .windowOpenMore:
             return windowOpenMorePlan(route: route, utterance: utterance, cells: sourceCells, priorReadbacks: priorReadbacks)
         case .movingDoorSafetyRefusal, .movingTailgateSafetyRefusal:
-            guard isMoving(context: context, cells: sourceCells) else { return nil }
+            guard isMoving(context: context, cells: sourceCells) else {
+                return movingPreconditionFailedPlan(route: route, utterance: utterance, cells: sourceCells)
+            }
             return movingSafetyRefusalPlan(route: route, utterance: utterance, cells: sourceCells)
+        case .acClose, .movingDoorPreconditionFailed, .movingTailgatePreconditionFailed:
+            return nil
         }
     }
 
@@ -102,8 +109,11 @@ enum MockVoicePresetPlanner {
     ) -> MockVoicePresetPlan {
         let key = "ac.power"
         let current = cell(for: key, in: sourceCells)?.actualValue ?? "off"
+        guard current == "off" else {
+            return acClosePlan(route: route, utterance: utterance, cells: sourceCells)
+        }
         let revision = cell(for: key, in: sourceCells)?.revision ?? currentRevision(in: sourceCells)
-        let dialog = current == "off" ? "空调已经是关闭的了" : "空调已经是关闭的了"
+        let dialog = "空调已经是关闭的了"
         let readback = DemoActionReadback(key: key, actualValue: current, revision: revision, spokenText: dialog)
         return basePlan(
             route: route,
@@ -114,6 +124,28 @@ enum MockVoicePresetPlanner {
             readbacks: [readback],
             activeCells: [.ac: key],
             resultKind: .alreadyStateNoop,
+            scopeOrigins: [key: .explicit],
+            timing: .eventDriven
+        )
+    }
+
+    private static func acClosePlan(
+        route: Route,
+        utterance: String,
+        cells sourceCells: [DemoVehicleStateCell]
+    ) -> MockVoicePresetPlan {
+        var cells = sourceCells
+        let key = "ac.power"
+        let readback = apply(key: key, value: "off", visualState: .normal, in: &cells, spokenText: "空调已关闭")
+        return basePlan(
+            route: Route(presetID: .acClose, source: route.source),
+            utterance: utterance,
+            dialogText: "空调已关闭",
+            dialogCopySource: .stateCellsStructuredReadback,
+            cells: cells,
+            readbacks: [readback],
+            activeCells: [.ac: key],
+            resultKind: .acceptedToolCall,
             scopeOrigins: [key: .explicit],
             timing: .eventDriven
         )
@@ -214,6 +246,38 @@ enum MockVoicePresetPlanner {
             resultKind: .refusalSafetyOrPolicy,
             scopeOrigins: [key: .explicit],
             timing: .safetyFixed(milliseconds: 1000)
+        )
+    }
+
+    private static func movingPreconditionFailedPlan(
+        route: Route,
+        utterance: String,
+        cells sourceCells: [DemoVehicleStateCell]
+    ) -> MockVoicePresetPlan {
+        var cells = sourceCells
+        let isTailgate = route.presetID == .movingTailgateSafetyRefusal
+        let key = isTailgate ? "door.tailgate_height" : "door.car_door"
+        ensureCell(key: key, in: &cells)
+        markCell(key: key, visualState: .blocked_with_alternative, in: &cells)
+        let current = cell(for: key, in: cells)?.actualValue ?? defaultValue(for: key)
+        let revision = cell(for: key, in: cells)?.revision ?? currentRevision(in: cells)
+        let dialog = "当前非行驶态, 这条安全演示暂不执行"
+        let readback = DemoActionReadback(key: key, actualValue: current, revision: revision, spokenText: dialog)
+        return basePlan(
+            route: Route(
+                presetID: isTailgate ? .movingTailgatePreconditionFailed : .movingDoorPreconditionFailed,
+                source: route.source
+            ),
+            utterance: utterance,
+            dialogText: dialog,
+            dialogCopySource: .localDialogCopy,
+            cells: cells,
+            readbacks: [readback],
+            activeCells: [.door: key],
+            refusedCell: key,
+            resultKind: .clarifyMissingSlot,
+            scopeOrigins: [key: .explicit],
+            timing: .eventDriven
         )
     }
 
