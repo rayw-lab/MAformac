@@ -28,8 +28,14 @@ final class U17GoldenPathUITests: XCTestCase {
 
         let tree = try writeUITree(for: app, to: evidenceDirectory)
         XCTAssertTrue(tree.contains("context-band"))
+        #if os(macOS)
+        XCTAssertTrue(tree.contains("mic-dock"))
+        XCTAssertTrue(tree.contains("vehicle-cards-mac-panorama"))
+        XCTAssertTrue(tree.contains("空调 26℃"))
+        #else
         XCTAssertTrue(tree.contains("mic-dock-safe-area"))
         XCTAssertTrue(tree.contains("vehicle-card-family."))
+        #endif
     }
 
     @MainActor
@@ -56,7 +62,12 @@ final class U17GoldenPathUITests: XCTestCase {
 
         let expectedReadback = forceBadPath ? "D1H_BAD_SAMPLE_SHOULD_NOT_RENDER" : "空调已经是关闭的了"
         XCTAssertTrue(waitForTreeText(expectedReadback, in: app), "mock readback should appear after voice trigger")
+        #if os(macOS)
+        XCTAssertTrue(waitForTreeText("vehicle-cards-mac-panorama", in: app))
+        XCTAssertTrue(waitForTreeText("空调 26℃", in: app))
+        #else
         XCTAssertTrue(waitForAnyElement(["vehicle-card-family.ac", "vehicle-card-ac"], in: app))
+        #endif
     }
 
     func testU32ThroughU37NegativeSwitchIsAuthored() throws {
