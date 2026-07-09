@@ -7,9 +7,16 @@ struct MAformacApp: App {
     private let speech = AVSpeechSynthesisEngine()
 
     var body: some Scene {
+        #if os(macOS)
         WindowGroup {
             rootView
         }
+        .windowResizability(.contentMinSize)
+        #else
+        WindowGroup {
+            rootView
+        }
+        #endif
     }
 
     @ViewBuilder private var rootView: some View {
@@ -57,6 +64,9 @@ struct MAformacApp: App {
                 forceReduceMotion: DebugLaunchArguments.forceReduceMotion,
                 visualSwapEnabled: DebugLaunchArguments.visualSwapEnabled
             )
+            #if os(macOS)
+            .frame(minWidth: T3MacWindowContract.minWidth, minHeight: T3MacWindowContract.minHeight)
+            #endif
         #else
         ContentView(
             store: vehicleStore,
@@ -64,6 +74,9 @@ struct MAformacApp: App {
             speech: speech,
             visualSwapEnabled: T7DVisualSwapFeature.isEnabled()
         )
+            #if os(macOS)
+            .frame(minWidth: T3MacWindowContract.minWidth, minHeight: T3MacWindowContract.minHeight)
+            #endif
         #endif
     }
 }
