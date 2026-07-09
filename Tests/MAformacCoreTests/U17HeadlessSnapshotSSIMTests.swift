@@ -5,7 +5,7 @@ import XCTest
 
 @MainActor
 final class U17HeadlessSnapshotSSIMTests: XCTestCase {
-    private let size = CGSize(width: 192, height: 112)
+    private let size = CGSize(width: 320, height: 180)
     private let thresholdEnvKey = "D1H_U17_SSIM_THRESHOLD"
     private let regenerateEnvKey = "D1H_U17_REGENERATE_BASELINES"
     private let badSampleEnvKey = "D1H_U17_FORCE_BAD_SAMPLE"
@@ -120,19 +120,17 @@ private struct U17HeadlessStateCard: View {
     var body: some View {
         ZStack {
             Color(rgb: TokenThemeID.deepSpace.surface)
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color(rgb: renderedToken.effectiveBackground(on: .deepSpace)))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color(rgb: renderedToken.effectiveBorder(on: .deepSpace)), lineWidth: accessibility.increaseContrast ? 7 : 5)
-                }
-                .padding(12)
-            stateBands
+            HStack(spacing: 10) {
+                heroCard
+                    .frame(width: 112)
+                compactMatrix
+            }
+            .padding(10)
             if forceBadSample {
                 Rectangle()
                     .fill(Color.white)
-                    .frame(width: 76, height: 48)
-                    .offset(x: 34, y: -10)
+                    .frame(width: 112, height: 78)
+                    .offset(x: 72, y: -24)
             }
         }
     }
@@ -141,15 +139,94 @@ private struct U17HeadlessStateCard: View {
         accessibility.reduceTransparency || accessibility.reduceMotion ? token.reducedVariant(on: .deepSpace) : token
     }
 
-    private var stateBands: some View {
+    private var heroCard: some View {
         let index = DemoVisualState.allCases.firstIndex(of: state) ?? 0
-        return VStack(spacing: 8) {
+        return RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .fill(Color(rgb: renderedToken.effectiveBackground(on: .deepSpace)))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color(rgb: renderedToken.effectiveBorder(on: .deepSpace)), lineWidth: accessibility.increaseContrast ? 7 : 5)
+            }
+            .overlay(alignment: .topLeading) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        stateDot(token: renderedToken, size: 18)
+                        Text("AC")
+                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .foregroundStyle(Color(rgb: TokenThemeID.deepSpace.inkPrimary))
+                        Spacer(minLength: 0)
+                    }
+                    Text("\(26 + index)C")
+                        .font(.system(size: 30, weight: .heavy, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(Color(rgb: TokenThemeID.deepSpace.inkPrimary))
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(rgb: rowColor(row: 1, stateIndex: index)))
+                        .frame(height: 8)
+                    Text(state.rawValue)
+                        .font(.system(size: 7, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color(rgb: TokenThemeID.deepSpace.inkDim))
+                        .lineLimit(1)
+                }
+                .padding(12)
+            }
+    }
+
+    private var compactMatrix: some View {
+        Grid(alignment: .topLeading, horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(0..<3, id: \.self) { row in
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(rgb: rowColor(row: row, stateIndex: index)))
-                    .frame(width: CGFloat(44 + index * 8 + row * 10), height: 8)
+                GridRow {
+                    ForEach(0..<3, id: \.self) { column in
+                        compactCard(index: row * 3 + column)
+                    }
+                }
             }
         }
+    }
+
+    private func compactCard(index: Int) -> some View {
+        let compactState = compactState(index: index)
+        let compactIndex = DemoVisualState.allCases.firstIndex(of: compactState) ?? 0
+        let baseToken = DesignTokenValues.token(for: compactState, theme: .deepSpace)
+        let compactToken = accessibility.reduceTransparency || accessibility.reduceMotion
+            ? baseToken.reducedVariant(on: .deepSpace)
+            : baseToken
+
+        return RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(Color(rgb: compactToken.effectiveBackground(on: .deepSpace)))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(Color(rgb: compactToken.effectiveBorder(on: .deepSpace)), lineWidth: accessibility.increaseContrast ? 3 : 2)
+            }
+            .overlay(alignment: .topLeading) {
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 4) {
+                        stateDot(token: compactToken, size: 8)
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(Color(rgb: TokenThemeID.deepSpace.inkPrimary))
+                            .frame(width: CGFloat(18 + compactIndex * 2), height: 4)
+                    }
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color(rgb: rowColor(row: 1, stateIndex: compactIndex)))
+                        .frame(width: CGFloat(34 + compactIndex * 3), height: 5)
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color(rgb: TokenThemeID.deepSpace.inkDim))
+                        .frame(width: CGFloat(22 + index * 2), height: 4)
+                }
+                .padding(7)
+            }
+            .frame(width: 58, height: 48)
+    }
+
+    private func compactState(index: Int) -> DemoVisualState {
+        let stateIndex = DemoVisualState.allCases.firstIndex(of: state) ?? 0
+        return DemoVisualState.allCases[(stateIndex + index) % DemoVisualState.allCases.count]
+    }
+
+    private func stateDot(token: SemanticStateToken, size: CGFloat) -> some View {
+        Circle()
+            .fill(Color(rgb: token.border))
+            .frame(width: size, height: size)
     }
 
     private func rowColor(row: Int, stateIndex: Int) -> TokenRGB {
