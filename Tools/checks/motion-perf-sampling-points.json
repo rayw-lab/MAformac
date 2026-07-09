@@ -1,0 +1,208 @@
+{
+  "schema": "maformac.motion_perf_sampling_points.v1",
+  "authority": "D0G-035_sampling_method_only",
+  "source_spec": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-08-daywork/macos-motion-perf-architecture.md#sampling",
+  "sampling_status": "method_harness_ready_not_perf_pass",
+  "budgets": [
+    {
+      "level": "fullShowcase",
+      "fps_target": 30,
+      "orb_particle_count": 72,
+      "stage_particle_count": 138,
+      "burst_particle_count": 250,
+      "context_capsule_mode": "animated",
+      "sampling_round": "pf1_fullShowcase"
+    },
+    {
+      "level": "balancedDemo",
+      "fps_target": 24,
+      "burst_fps_target": 30,
+      "orb_particle_count": 48,
+      "stage_particle_count": 64,
+      "burst_particle_count": 120,
+      "context_capsule_mode": "lowFPS",
+      "sampling_round": "pf1_balancedDemo"
+    },
+    {
+      "level": "trainSafeStatic",
+      "fps_target": 15,
+      "orb_particle_count": 24,
+      "stage_particle_count": 0,
+      "burst_particle_count": 0,
+      "context_capsule_mode": "staticImage",
+      "sampling_round": "pf1_trainSafeStatic"
+    }
+  ],
+  "sampling_points": [
+    {
+      "id": "card.waterfall.card_entrance",
+      "source_path": "App/Motion/CardWaterfall.swift",
+      "anchor": "CardWaterfallEntrance.animateIn",
+      "coverage": "entry_waterfall",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "card.waterfall.content_entrance",
+      "source_path": "App/Motion/CardWaterfall.swift",
+      "anchor": "CardContentEntrance.animateIn",
+      "coverage": "entry_waterfall",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "energy_line.canvas_line_trim",
+      "source_path": "App/Motion/EnergyLineOverlay.swift",
+      "anchor": "EnergyLineOverlay.fire trim",
+      "coverage": "energy_line",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "energy_line.orb_glow",
+      "source_path": "App/Motion/EnergyLineOverlay.swift",
+      "anchor": "EnergyLineOverlay.fire orbGlow",
+      "coverage": "energy_line",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "energy_line.card_pulse",
+      "source_path": "App/Motion/EnergyLineOverlay.swift",
+      "anchor": "EnergyLineOverlay.fire cardPulse",
+      "coverage": "energy_line",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "orb.timeline_body",
+      "source_path": "App/ContentView.swift",
+      "anchor": "DemoOrbView TimelineView",
+      "coverage": "orb",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "orb.pulse_scale",
+      "source_path": "App/ContentView.swift",
+      "anchor": "DemoOrbView pulse scale",
+      "coverage": "orb",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "orb.angular_highlight_rotation",
+      "source_path": "App/ContentView.swift",
+      "anchor": "DemoOrbView angular highlight rotation",
+      "coverage": "orb",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "orb.particle_field_l0_72",
+      "source_path": "App/ContentView.swift",
+      "anchor": "OrbParticleField particleCount=72",
+      "coverage": "orb_particles",
+      "budget_level": "fullShowcase",
+      "particle_count": 72,
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "orb.particle_field_l1_48",
+      "source_path": "App/ContentView.swift",
+      "anchor": "OrbParticleField particleCount=48",
+      "coverage": "orb_particles",
+      "budget_level": "balancedDemo",
+      "particle_count": 48,
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "orb.particle_field_l2_24",
+      "source_path": "App/ContentView.swift",
+      "anchor": "OrbParticleField particleCount=24",
+      "coverage": "orb_particles",
+      "budget_level": "trainSafeStatic",
+      "particle_count": 24,
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "stage_atmosphere.timeline_body",
+      "source_path": "App/ContentView.swift",
+      "anchor": "StageAtmosphereLayer TimelineView",
+      "coverage": "stage_atmosphere",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "stage_atmosphere.particle_field",
+      "source_path": "App/ContentView.swift",
+      "anchor": "StageAtmosphereLayer.particleCanvas",
+      "coverage": "stage_atmosphere",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "stage_atmosphere.edge_sheen_blur",
+      "source_path": "App/ContentView.swift",
+      "anchor": "StageAtmosphereLayer edge sheen blur",
+      "coverage": "stage_atmosphere",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "ambient_burst.phase_animator",
+      "source_path": "App/AmbientEdgeBurst.swift",
+      "anchor": "AmbientEdgeBurst PhaseAnimator",
+      "coverage": "ambient_burst",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "ambient_burst.timed_glow_30fps",
+      "source_path": "App/AmbientEdgeBurst.swift",
+      "anchor": "AmbientEdgeBurst timed glow",
+      "coverage": "ambient_burst",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "ambient_burst.particle_canvas_45fps",
+      "source_path": "App/AmbientEdgeBurst.swift",
+      "anchor": "AmbientEdgeBurstParticleCanvas",
+      "coverage": "ambient_burst",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "context_capsule.timeline_body",
+      "source_path": "App/ContextCapsule.swift",
+      "anchor": "ContextCapsuleView TimelineView",
+      "coverage": "context_capsule",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "context_capsule.vortex_layers",
+      "source_path": "App/ContextCapsule.swift",
+      "anchor": "ContextCapsuleView animated/lowFPS layers",
+      "coverage": "context_capsule",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "context_capsule.canvas_fallback_layers",
+      "source_path": "App/ContextCapsule.swift",
+      "anchor": "ContextCapsuleView staticImage fallback",
+      "coverage": "context_capsule",
+      "capture": "pending_idle_window"
+    },
+    {
+      "id": "mic_dock.waveform_canvas",
+      "source_path": "App/Motion/MicDockWaveform.swift",
+      "anchor": "MicDockWaveform Canvas",
+      "coverage": "mic_dock",
+      "capture": "pending_idle_window"
+    }
+  ],
+  "receipt_fields": [
+    "motion_budget_level",
+    "fps_target",
+    "orb_particle_count",
+    "stage_particle_count",
+    "burst_particle_count",
+    "context_capsule_mode",
+    "sampled_points",
+    "pending_idle_window_points",
+    "trace_path",
+    "proof_class"
+  ],
+  "non_claims": [
+    "not_perf_pass",
+    "not_operator_visual_pass",
+    "not_gui_trace_captured_by_headless_manifest"
+  ]
+}
