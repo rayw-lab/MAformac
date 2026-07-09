@@ -6,6 +6,7 @@ import SwiftUI
 struct ExpandedFamilyCard: View {
     let display: ExpandedFamilyDisplay
     let onDismiss: () -> Void
+    var forceReduceMotion = false
     var onMockTransition: (String, String) -> Void = { _, _ in }
 
     var body: some View {

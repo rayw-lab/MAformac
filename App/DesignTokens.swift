@@ -94,6 +94,21 @@ enum DesignTokens {
         }
     }
 
+    static func reduceTransparencyBackdropFill(for theme: PresentationTheme) -> Color {
+        let palette = palette(for: theme)
+        return palette.surface.opacity(theme == .ivory ? 0.96 : 0.94)
+    }
+
+    static func reduceTransparencyChromeFill(for theme: PresentationTheme) -> Color {
+        let palette = palette(for: theme)
+        return palette.surfaceElevated.opacity(theme == .ivory ? 0.98 : 0.96)
+    }
+
+    static func reduceTransparencyCardFill(for theme: PresentationTheme) -> Color {
+        let palette = palette(for: theme)
+        return palette.surfaceElevated
+    }
+
     // MARK: 底色 / 中性（tokens.md §1.1 深空层次）
     static let bgBase = Color(hex24: 0x121212)        // U11 + D2#2 软黑
     static let bgDeepest = Color(hex24: 0x05060C)
