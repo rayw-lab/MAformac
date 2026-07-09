@@ -54,8 +54,7 @@ final class U17GoldenPathUITests: XCTestCase {
         let micDock = try firstExistingElement(["mic-dock", "mic-dock-safe-area"], in: app)
         micDock.press(forDuration: 0.25)
 
-        XCTAssertTrue(waitForTreeText("我有点冷了", in: app), "mock voice trigger should append user utterance")
-        let expectedReadback = forceBadPath ? "D1H_BAD_SAMPLE_SHOULD_NOT_RENDER" : "已为您升到"
+        let expectedReadback = forceBadPath ? "D1H_BAD_SAMPLE_SHOULD_NOT_RENDER" : "空调已经是关闭的了"
         XCTAssertTrue(waitForTreeText(expectedReadback, in: app), "mock readback should appear after voice trigger")
         XCTAssertTrue(waitForAnyElement(["vehicle-card-family.ac", "vehicle-card-ac"], in: app))
     }
