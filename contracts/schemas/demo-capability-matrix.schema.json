@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DemoCapabilityMatrix",
+  "type": "object",
+  "required": ["schema_version", "source", "cells", "summary"],
+  "properties": {
+    "schema_version": {"const": "demo_capability_matrix_v1"},
+    "source": {"type": "object"},
+    "cells": {"type": "array", "minItems": 120, "maxItems": 120},
+    "summary": {"type": "object"}
+  },
+  "additionalProperties": false
+}

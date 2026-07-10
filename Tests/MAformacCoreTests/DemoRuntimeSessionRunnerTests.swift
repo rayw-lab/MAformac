@@ -67,6 +67,50 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
+    func testDefaultRunnerPreservesAllRouterFramesAtMultiFrameExecutionSeam() async throws {
+        let store = DemoVehicleStateStore()
+        let first = acPowerFrame(id: "cmd-first", traceID: "trace-multi")
+        let second = windowFrame(id: "cmd-second", traceID: "trace-multi", stateRevision: 0)
+        let traceLogger = InMemoryTraceLogger()
+        let runner = try DemoRuntimeSessionRunner.defaultRunner(
+            store: store,
+            traceLogger: traceLogger,
+            speech: RecordingSpeechSynthesisEngine(),
+            modelBackend: FixedMultiFrameBackend(frames: [first, second])
+        )
+
+        do {
+            _ = try await runner.run(text: "打开空调并打开车窗")
+            XCTFail("expected the multi-frame plan to stop at the B3b execution boundary")
+        } catch {
+            XCTAssertEqual(
+                error as? DemoRuntimeSessionRunnerError,
+                .multiFramePlanRequiresPartialExecution(frameIDs: ["cmd-first", "cmd-second"])
+            )
+        }
+
+        XCTAssertEqual(store.currentRevision, 0)
+        let guardEntry = try XCTUnwrap(
+            traceLogger.entries.first {
+                $0.stage == .guard && $0.message == "multi_frame_plan_rejected"
+            }
+        )
+        XCTAssertEqual(guardEntry.attributes.guardReason, "multi_frame_plan_requires_partial_execution")
+        XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
+        XCTAssertFalse(traceLogger.entries.contains { $0.stage == .execute })
+        XCTAssertFalse(traceLogger.entries.contains { $0.stage == .readback })
+    }
+
+    func testB3aDoesNotExtendTraceAttributeSchema() {
+        let labels = Set(Mirror(reflecting: TraceAttributes()).children.compactMap(\.label))
+
+        XCTAssertFalse(
+            labels.contains("stateMutation"),
+            "B3a must consume the existing trace schema; B2c owns trace schema extensions"
+        )
+    }
+
+    @MainActor
     func testTTSFailureDoesNotBlockVisualReadbackPresentation() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
@@ -141,13 +185,20 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let state = runner.currentDialogueState
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, "fast_path_no_match")
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue)
+        XCTAssertEqual(
+            payload.reconciliation.safeReason,
+            RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+        )
         XCTAssertEqual(state.focusEntity, "ac")
         XCTAssertEqual(state.lastReadback?.key, "ac.power")
         XCTAssertEqual(
             state.turns.map(\.text),
-            ["空调已打开", "顺便安排一个火箭座椅", "这个我先记下来，稍后帮您处理"]
+            ["空调已打开", "顺便安排一个火箭座椅", "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。"]
         )
+        let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("fast_path_no_match"))
+        XCTAssertFalse(encoded.contains("这个我先记下来，稍后帮您处理"))
     }
 
     @MainActor
@@ -306,4 +357,20 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
     }
+}
+
+private struct FixedMultiFrameBackend: LLMBackend {
+    let frames: [ToolCallFrame]
+
+    func load() async throws {}
+
+    func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] {
+        frames
+    }
+
+    func streamText(for prompt: String) -> AsyncThrowingStream<String, Error> {
+        AsyncThrowingStream { $0.finish() }
+    }
+
+    func cancel() {}
 }

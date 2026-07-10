@@ -37,7 +37,7 @@ final class W20ARuntimeProjectionTests: XCTestCase {
     }
 
     @MainActor
-    func testExcludedToolNameReturnsUnsupportedPayload() async throws {
+    func testExcludedToolNameReturnsTypedPresentationSafeFallbackPayload() async throws {
         let store = DemoVehicleStateStore()
         let speech = RecordingSpeechSynthesisEngine()
         let runner = try runner(
@@ -49,15 +49,22 @@ final class W20ARuntimeProjectionTests: XCTestCase {
         let payload = try await runner.run(text: "锁定空调")
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, "name_rejected")
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue)
         XCTAssertEqual(payload.reconciliation.status, .notApplicable)
+        XCTAssertEqual(
+            payload.reconciliation.safeReason,
+            RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue
+        )
         XCTAssertEqual(payload.readbacks, [])
-        XCTAssertEqual(speech.spokenTexts, ["这个我先记下来，稍后帮您处理"])
+        XCTAssertEqual(speech.spokenTexts, ["这项空调控制暂未接入演示版，我先不改车内状态。"])
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("name_rejected"))
+        XCTAssertFalse(encoded.contains("lock_ac"))
     }
 
     @MainActor
-    func testTraceRecordsSlotProjectedAndFiniteFailureReason() async throws {
+    func testTraceKeepsPrivateFiniteReasonWhilePayloadUsesTypedSafeReason() async throws {
         let projectedTrace = InMemoryTraceLogger()
         let projectedRunner = try runner(
             trace: projectedTrace,
@@ -79,10 +86,14 @@ final class W20ARuntimeProjectionTests: XCTestCase {
             completion: #"<tool_call>{"name":"lock_ac","arguments":{}}</tool_call>"#
         )
 
-        _ = try await failureRunner.run(text: "锁定空调")
+        let failurePayload = try await failureRunner.run(text: "锁定空调")
 
         let failureEntry = failureTrace.entries.first { $0.message == "unsupported_tool_plan" }
-        XCTAssertEqual(failureEntry?.attributes.finiteReason, "name_rejected")
+        XCTAssertEqual(failureEntry?.attributes.finiteReason, .nameRejected)
+        XCTAssertEqual(failurePayload.outcome.reason, FallbackSafeReasonKind.capabilityNotMounted.rawValue)
+        XCTAssertEqual(failurePayload.reconciliation.safeReason, FallbackSafeReasonKind.capabilityNotMounted.rawValue)
+        let encoded = String(decoding: try JSONEncoder().encode(failurePayload), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("name_rejected"))
     }
 
     @MainActor

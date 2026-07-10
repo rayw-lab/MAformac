@@ -1,0 +1,5 @@
+{
+  "operation": "set_reason_kind",
+  "matrix_id": 2,
+  "value": "free_form_customer_reason"
+}

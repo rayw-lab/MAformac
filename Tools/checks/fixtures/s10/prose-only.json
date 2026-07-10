@@ -1,0 +1,19 @@
+{
+  "schema_version": "s10_receipt.v1",
+  "receipt_id": "s10-fixture-prose-only",
+  "captured_at": "2026-07-10T01:03:00Z",
+  "proof_class": "local",
+  "evaluation_scope": {
+    "run_id": "s10-fixture-current",
+    "eval_set_id": "fixture-negative-v1",
+    "s10_stage": "s10_verdict"
+  },
+  "hedged": {"attempts": 10, "strikes": 9, "strike_rate": 0.9},
+  "can_question": {"attempts": 20, "strikes": 7, "strike_rate": 0.35},
+  "tier_decision": {
+    "tier": "expand_10_families_gt_70",
+    "mounted_expansion_allowed": true,
+    "planned_family_count": 10
+  },
+  "notes": "整体看可以扩，不需要结构化 joint 字段"
+}

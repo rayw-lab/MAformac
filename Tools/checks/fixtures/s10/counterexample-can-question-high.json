@@ -1,0 +1,19 @@
+{
+  "schema_version": "s10_receipt.v1",
+  "receipt_id": "s10-fixture-can-question-high",
+  "captured_at": "2026-07-10T01:01:00Z",
+  "proof_class": "local",
+  "evaluation_scope": {
+    "run_id": "s10-fixture-current",
+    "eval_set_id": "fixture-counterexamples-v1",
+    "s10_stage": "s10_verdict"
+  },
+  "hedged": {"attempts": 20, "strikes": 7, "strike_rate": 0.35},
+  "can_question": {"attempts": 10, "strikes": 9, "strike_rate": 0.9},
+  "joint_strike_rate": 0.35,
+  "tier_decision": {
+    "tier": "no_expand_lt_40",
+    "mounted_expansion_allowed": false,
+    "planned_family_count": 0
+  }
+}

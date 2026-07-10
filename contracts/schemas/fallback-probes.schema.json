@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DemoFallbackProbes",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "authority",
+    "family_enum",
+    "reason_kind_enum",
+    "fixture_path_by_reason",
+    "probes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "demo_fallback_probes_v1"
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "governance_change",
+        "cg",
+        "receipt_id"
+      ],
+      "properties": {
+        "governance_change": {
+          "const": "add-c1-demo-capability-governance"
+        },
+        "cg": {
+          "const": "CG-044"
+        },
+        "receipt_id": {
+          "const": "runtime-no-mutation-40-probes"
+        }
+      },
+      "additionalProperties": false
+    },
+    "family_enum": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "reason_kind_enum": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "fixture_path_by_reason": {
+      "type": "object"
+    },
+    "probes": {
+      "type": "array",
+      "minItems": 40,
+      "maxItems": 40,
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

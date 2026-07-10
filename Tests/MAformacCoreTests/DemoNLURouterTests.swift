@@ -2,7 +2,17 @@ import XCTest
 @testable import MAformacCore
 
 final class DemoNLURouterTests: XCTestCase {
-    func testRouterTakesFirstBackendFrame() async throws {
+    func testRouterPreservesAllBackendFramesInOrder() async throws {
+        let first = frame(id: "first", device: "ac_temperature")
+        let second = frame(id: "second", device: "window")
+        let router = DemoNLURouter(backend: FixedPlanBackend(frames: [first, second]))
+
+        let decoded = try await router.decodePlan(text: "调到26度并打开车窗")
+
+        XCTAssertEqual(decoded, [first, second])
+    }
+
+    func testSingleFrameCompatibilityDecodeTakesFirstBackendFrame() async throws {
         let first = frame(id: "first", device: "ac_temperature")
         let second = frame(id: "second", device: "window")
         let router = DemoNLURouter(backend: FixedPlanBackend(frames: [first, second]))

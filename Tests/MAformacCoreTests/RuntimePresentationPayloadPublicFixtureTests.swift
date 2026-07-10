@@ -27,6 +27,85 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         }
     }
 
+    func testB3bPartialExecutionResultMatchesCommittedV1BridgeFixture() throws {
+        let acceptedReadback = DemoActionReadback(
+            key: "ac.power",
+            actualValue: "on",
+            revision: 2,
+            spokenText: "ac opened",
+            scopeOrigin: .explicit
+        )
+        let executionResult = DemoRuntimePartialPlanResult(
+            traceID: "trace-partial-accept-refuse-1",
+            subactions: [
+                DemoRuntimePartialSubactionResult(
+                    frameID: "accepted-ac",
+                    disposition: .accepted,
+                    readbacks: [acceptedReadback],
+                    finiteReason: nil,
+                    observedToolCallCount: 1,
+                    observedReadbackCount: 1,
+                    stateMutation: true
+                ),
+                DemoRuntimePartialSubactionResult(
+                    frameID: "refused-window",
+                    disposition: .refused,
+                    readbacks: [],
+                    finiteReason: .unmountedToolName,
+                    observedToolCallCount: 0,
+                    observedReadbackCount: 0,
+                    stateMutation: false
+                )
+            ]
+        )
+        let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+            executionResult: executionResult,
+            acceptedCards: [
+                DemoVehicleStateCell(
+                    key: "ac.power",
+                    actualValue: "on",
+                    timestamp: Date(timeIntervalSince1970: 0),
+                    revision: 2,
+                    visualState: .satisfied
+                )
+            ],
+            refusedCardsBySubactionID: [
+                "refused-window": DemoVehicleStateCell(
+                    key: "window.position[主驾]",
+                    actualValue: "closed",
+                    timestamp: Date(timeIntervalSince1970: 0),
+                    revision: 0
+                )
+            ],
+            traceEnvelope: TraceEnvelope(validatedTraceID: executionResult.traceID, entries: []),
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
+        let payload = RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: "turn-partial-accept-refuse-1",
+            eventID: "event-partial-accept-refuse-1",
+            reconciliation: PresentationReconciliation(
+                status: .verified,
+                readbackKey: "ac.power",
+                safeReason: "partial_readback_verified"
+            )
+        )
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+
+        let fixtureObject = try Self.loadJSONObject(
+            Self.fixturesDirectory.appendingPathComponent("partial_accept_refuse_public_payload.v1.json")
+        )
+        let generatedObject = try Self.publicJSONObject(from: payload, encoder: encoder)
+
+        XCTAssertEqual(fixtureObject as NSDictionary, generatedObject as NSDictionary)
+        XCTAssertEqual(Set(generatedObject.keys), Self.publicTopLevelFields)
+        let encoded = String(decoding: try encoder.encode(payload), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("finiteReason"))
+        XCTAssertFalse(encoded.contains("unmounted_tool_name"))
+        XCTAssertTrue(encoded.contains("capability_not_mounted"))
+    }
+
     func testPublicFixtureManifestCoversExpectedFixturesWithSha256s() throws {
         let manifest = try Self.loadManifest()
         let schema = try Self.loadSharedSchema()
@@ -239,7 +318,7 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
             caseID: "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V1",
             fixtureClass: "bridge_contract_fixture",
             result: "partial_accept_partial_refuse",
-            familyCoverage: ["ac.power", "door.lock", "partial_accept_partial_refuse"]
+            familyCoverage: ["ac.power", "window.position", "partial_accept_partial_refuse"]
         ),
         RuntimeFixtureCase.windowPosition.fixtureName: ManifestExpectation(
             caseID: "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V1",

@@ -1,6 +1,12 @@
 name: Verify
 
 "on":
+  workflow_dispatch:
+    inputs:
+      change_ids:
+        description: "Optional comma-separated OpenSpec change ids"
+        required: false
+        default: ""
   pull_request:
   push:
     branches:
@@ -33,31 +39,13 @@ jobs:
           git diff --check "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" -- . ':(exclude)docs/evidence-frozen'
 
       - name: Write head-bound CI receipt
+        env:
+          VERIFY_CI_CHANGE_IDS: ${{ inputs.change_ids || '' }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number || '' }}
         run: |
-          dirty_worktree=false
-          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
-            dirty_worktree=true
-          fi
-          cat > "$RUNNER_TEMP/verify-ci-receipt.json" <<JSON
-          {
-            "receipt_id": "verify-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}",
-            "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "change_id": "define-demo-default-scope",
-            "proof_class": "ci_source_free",
-            "event_name": "${GITHUB_EVENT_NAME}",
-            "head_commit": "${GITHUB_SHA}",
-            "dirty_worktree": ${dirty_worktree},
-            "commands": [
-              "make verify-ci",
-              "git diff --check (pull_request only; skipped on push)"
-            ],
-            "claim_boundaries": [
-              "source-free CI proof only",
-              "local make verify-all receipt remains required for raw snapshot bound proof",
-              "no_training_no_c6_acceptance_no_golden_no_voice_no_uiue_merge"
-            ]
-          }
-          JSON
+          python3 Tools/checks/write_verify_ci_receipt.py \
+            --output "$RUNNER_TEMP/verify-ci-receipt.json" \
+            --change-ids "$VERIFY_CI_CHANGE_IDS"
           shasum -a 256 "$RUNNER_TEMP/verify-ci-receipt.json"
 
       - name: Upload CI receipt

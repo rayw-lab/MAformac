@@ -44,7 +44,7 @@ public struct DemoInteractionEvent: Codable, Equatable, Sendable {
     }
 }
 
-public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Sendable {
+public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
     case acceptedToolCall = "accepted_tool_call"
     case clarifyMissingSlot = "clarify_missing_slot"
     case refusalNoAvailableTool = "refusal_no_available_tool"
@@ -182,6 +182,48 @@ private enum PresentationPayloadSanitizer {
     static func redactedOptional(_ value: String?, maxLength: Int = 160) -> String? {
         value.map { redacted($0, maxLength: maxLength) }
     }
+
+    static func publicReason(_ value: String?, maxLength: Int = 160) -> String? {
+        guard let value else { return nil }
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: normalized) {
+            return projection.safeReasonKind.rawValue
+        }
+        if let safeReasonKind = RuntimePresentationSafeReasonKind(rawValue: normalized) {
+            return safeReasonKind.rawValue
+        }
+        return redacted(normalized, maxLength: maxLength)
+    }
+
+    static func publicPayloadReason(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: normalized) {
+            return projection.safeReasonKind.rawValue
+        }
+        if let safeReasonKind = RuntimePresentationSafeReasonKind(rawValue: normalized) {
+            return safeReasonKind.rawValue
+        }
+        if publicPayloadReasonPassthrough.contains(normalized) {
+            return normalized
+        }
+        return RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+    }
+
+    private static let publicPayloadReasonPassthrough: Set<String> = [
+        "backgrounding",
+        "cancelled",
+        "c2_readback_verified",
+        "guard_denied",
+        "interrupted",
+        "missing_required_scope",
+        "partial_accept_refuse",
+        "partial_readback_verified",
+        "readback_verified",
+        "runtime_error",
+        "timeout",
+        "user_requested",
+    ]
 }
 
 public struct TraceEnvelope: Codable, Equatable, Sendable {
@@ -454,7 +496,7 @@ public struct PresentationReconciliation: Codable, Equatable, Sendable {
         self.status = status
         self.readbackKey = readbackKey.map { PresentationPayloadSanitizer.redacted($0) }
         self.mismatchClass = mismatchClass
-        self.safeReason = PresentationPayloadSanitizer.redactedOptional(safeReason)
+        self.safeReason = PresentationPayloadSanitizer.publicReason(safeReason)
     }
 }
 
@@ -472,6 +514,22 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
     public var reconciliation: PresentationReconciliation
     public var traceEnvelope: TraceEnvelope?
     public var timestamp: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion
+        case traceID
+        case turnID
+        case eventID
+        case isTerminal
+        case outcome
+        case proofClass
+        case cards
+        case cardSemantics
+        case readbacks
+        case reconciliation
+        case traceEnvelope
+        case timestamp
+    }
 
     public init(
         schemaVersion: RuntimePresentationPayloadSchema = .v1,
@@ -498,7 +556,7 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         self.cards = cards.map(RuntimePresentationPayload.presentationSafe)
         self.cardSemantics = cardSemantics?.map(RuntimePresentationPayload.presentationSafe)
         self.readbacks = readbacks.map(RuntimePresentationPayload.presentationSafe)
-        self.reconciliation = reconciliation
+        self.reconciliation = RuntimePresentationPayload.presentationSafe(reconciliation)
         self.traceEnvelope = traceEnvelope?.presentationSafe()
         self.timestamp = timestamp
     }
@@ -525,13 +583,69 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         )
     }
 
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            schemaVersion: try container.decode(RuntimePresentationPayloadSchema.self, forKey: .schemaVersion),
+            traceID: try container.decode(String.self, forKey: .traceID),
+            turnID: try container.decode(String.self, forKey: .turnID),
+            eventID: try container.decodeIfPresent(String.self, forKey: .eventID),
+            isTerminal: try container.decode(Bool.self, forKey: .isTerminal),
+            outcome: try container.decode(DemoRuntimeOutcome.self, forKey: .outcome),
+            proofClass: try container.decode(PresentationProofClass.self, forKey: .proofClass),
+            cards: try container.decode([DemoVehicleStateCell].self, forKey: .cards),
+            cardSemantics: try container.decodeIfPresent([PresentationCardSemantics].self, forKey: .cardSemantics),
+            readbacks: try container.decode([DemoActionReadback].self, forKey: .readbacks),
+            reconciliation: try container.decode(PresentationReconciliation.self, forKey: .reconciliation),
+            traceEnvelope: try container.decodeIfPresent(TraceEnvelope.self, forKey: .traceEnvelope),
+            timestamp: try container.decode(Date.self, forKey: .timestamp)
+        )
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        let safe = RuntimePresentationPayload(
+            schemaVersion: schemaVersion,
+            traceID: traceID,
+            turnID: turnID,
+            eventID: eventID,
+            isTerminal: isTerminal,
+            outcome: outcome,
+            proofClass: proofClass,
+            cards: cards,
+            cardSemantics: cardSemantics,
+            readbacks: readbacks,
+            reconciliation: reconciliation,
+            traceEnvelope: traceEnvelope,
+            timestamp: timestamp
+        )
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(safe.schemaVersion, forKey: .schemaVersion)
+        try container.encode(safe.traceID, forKey: .traceID)
+        try container.encode(safe.turnID, forKey: .turnID)
+        try container.encodeIfPresent(safe.eventID, forKey: .eventID)
+        try container.encode(safe.isTerminal, forKey: .isTerminal)
+        try container.encode(safe.outcome, forKey: .outcome)
+        try container.encode(safe.proofClass, forKey: .proofClass)
+        try container.encode(safe.cards, forKey: .cards)
+        try container.encodeIfPresent(safe.cardSemantics, forKey: .cardSemantics)
+        try container.encode(safe.readbacks, forKey: .readbacks)
+        try container.encode(safe.reconciliation, forKey: .reconciliation)
+        try container.encodeIfPresent(safe.traceEnvelope, forKey: .traceEnvelope)
+        try container.encode(safe.timestamp, forKey: .timestamp)
+    }
+
     private static func presentationSafe(_ outcome: DemoRuntimeOutcome) -> DemoRuntimeOutcome {
-        DemoRuntimeOutcome(
-            result: outcome.result,
+        let projection = outcome.reason.flatMap {
+            RuntimePresentationReasonAuthority.projection(
+                forFiniteReason: $0.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        return DemoRuntimeOutcome(
+            result: projection?.result ?? outcome.result,
             behaviorClassSource: outcome.behaviorClassSource,
-            reason: PresentationPayloadSanitizer.redactedOptional(outcome.reason),
+            reason: projection?.safeReasonKind.rawValue ?? PresentationPayloadSanitizer.publicPayloadReason(outcome.reason),
             missingSlot: PresentationPayloadSanitizer.redactedOptional(outcome.missingSlot),
-            scopeFailureReason: PresentationPayloadSanitizer.redactedOptional(outcome.scopeFailureReason)
+            scopeFailureReason: PresentationPayloadSanitizer.publicPayloadReason(outcome.scopeFailureReason)
         )
     }
 
@@ -549,7 +663,7 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             cellKey: PresentationPayloadSanitizer.redacted(semantics.cellKey),
             role: semantics.role,
             scopeOrigin: semantics.scopeOrigin,
-            reason: PresentationPayloadSanitizer.redactedOptional(semantics.reason),
+            reason: PresentationPayloadSanitizer.publicPayloadReason(semantics.reason),
             isActive: semantics.isActive,
             siblingKeys: semantics.siblingKeys.map { PresentationPayloadSanitizer.redacted($0) }
         )
@@ -564,6 +678,15 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             scopeOrigin: readback.scopeOrigin
         )
     }
+
+    private static func presentationSafe(_ reconciliation: PresentationReconciliation) -> PresentationReconciliation {
+        PresentationReconciliation(
+            status: reconciliation.status,
+            readbackKey: reconciliation.readbackKey,
+            mismatchClass: reconciliation.mismatchClass,
+            safeReason: PresentationPayloadSanitizer.publicPayloadReason(reconciliation.safeReason)
+        )
+    }
 }
 
 public enum TerminalSnapshotStopReason: String, Codable, CaseIterable, Equatable, Sendable {
@@ -571,6 +694,17 @@ public enum TerminalSnapshotStopReason: String, Codable, CaseIterable, Equatable
     case interrupted
     case timeout
     case backgrounding
+}
+
+public enum RuntimePresentationPartialProjectionError: Error, Equatable, Sendable {
+    case invalidComposition
+    case acceptedSubactionMissingReadback(frameID: String)
+    case acceptedReadbackMissingCard(key: String)
+    case acceptedCardMissingReadback(key: String)
+    case refusedSubactionMissingCard(frameID: String)
+    case refusedSubactionMissingReason(frameID: String)
+    case unknownFiniteReason(frameID: String, reason: String)
+    case proofClassUpgrade(PresentationProofClass)
 }
 
 public enum RuntimePresentationTerminalSnapshotAdapter {
@@ -623,27 +757,113 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
     }
 
     public static func partialAcceptRefuse(
-        traceID: String,
-        acceptedReadbacks: [DemoActionReadback],
+        executionResult: DemoRuntimePartialPlanResult,
         acceptedCards: [DemoVehicleStateCell],
-        refusedCards: [DemoVehicleStateCell],
-        reason: String,
+        refusedCardsBySubactionID: [String: DemoVehicleStateCell],
         proofClass: PresentationProofClass = .localUnit,
         traceEnvelope: TraceEnvelope? = nil,
         timestamp: Date = Date()
-    ) -> PresentationSnapshot {
-        terminalSnapshot(
-            traceID: traceID,
+    ) throws -> PresentationSnapshot {
+        guard proofClass == .localUnit else {
+            throw RuntimePresentationPartialProjectionError.proofClassUpgrade(proofClass)
+        }
+        guard executionResult.hasAccepted, executionResult.hasRefused else {
+            throw RuntimePresentationPartialProjectionError.invalidComposition
+        }
+
+        let acceptedSubactions = executionResult.subactions.filter { $0.disposition == .accepted }
+        for subaction in acceptedSubactions where subaction.readbacks.isEmpty {
+            throw RuntimePresentationPartialProjectionError.acceptedSubactionMissingReadback(
+                frameID: subaction.frameID
+            )
+        }
+
+        let acceptedReadbacks = acceptedSubactions.flatMap(\.readbacks)
+        let acceptedCardsByKey = Dictionary(uniqueKeysWithValues: acceptedCards.map { ($0.key, $0) })
+        let acceptedReadbackKeys = Set(acceptedReadbacks.map(\.key))
+        for readback in acceptedReadbacks where acceptedCardsByKey[readback.key] == nil {
+            throw RuntimePresentationPartialProjectionError.acceptedReadbackMissingCard(key: readback.key)
+        }
+        for card in acceptedCards where !acceptedReadbackKeys.contains(card.key) {
+            throw RuntimePresentationPartialProjectionError.acceptedCardMissingReadback(key: card.key)
+        }
+
+        var refusedCards: [DemoVehicleStateCell] = []
+        var refusedReasonKinds: [RuntimePresentationSafeReasonKind] = []
+        for subaction in executionResult.subactions where subaction.disposition == .refused {
+            guard let card = refusedCardsBySubactionID[subaction.frameID] else {
+                throw RuntimePresentationPartialProjectionError.refusedSubactionMissingCard(
+                    frameID: subaction.frameID
+                )
+            }
+            guard let finiteReason = subaction.finiteReason else {
+                throw RuntimePresentationPartialProjectionError.refusedSubactionMissingReason(
+                    frameID: subaction.frameID
+                )
+            }
+            let reasonKind = RuntimePresentationSafeReasonKind(finiteReason: finiteReason)
+
+            var projectedCard = card
+            projectedCard.visualState = reasonKind == .safetyPolicy ? .unsafe : .blocked_with_alternative
+            refusedCards.append(projectedCard)
+            refusedReasonKinds.append(reasonKind)
+        }
+
+        let cards = PresentationCardOrdering.orderedForPresentation(acceptedCards + refusedCards)
+        let readbacksByKey = Dictionary(grouping: acceptedReadbacks, by: \.key)
+        let cardKeys = cards.map(\.key)
+        var unmatchedRefusedIndices = Array(refusedCards.indices)
+        let semantics = cards.map { card in
+            let siblingKeys = cardKeys.filter { $0 != card.key }
+            if let offset = unmatchedRefusedIndices.firstIndex(where: { refusedCards[$0] == card }) {
+                let refusedIndex = unmatchedRefusedIndices.remove(at: offset)
+                return PresentationCardSemantics(
+                    cellKey: card.key,
+                    role: .refused,
+                    reason: refusedReasonKinds[refusedIndex].rawValue,
+                    siblingKeys: siblingKeys
+                )
+            }
+
+            let readback = readbacksByKey[card.key]?.last
+            return PresentationCardSemantics(
+                cellKey: card.key,
+                role: .accepted,
+                scopeOrigin: readback?.scopeOrigin,
+                reason: "readback_verified",
+                isActive: true,
+                siblingKeys: siblingKeys
+            )
+        }
+
+        return terminalSnapshot(
+            traceID: executionResult.traceID,
             outcome: DemoRuntimeOutcome(
                 result: .partialAcceptPartialRefuse,
-                reason: normalizedReason(reason, fallback: "partial_accept_refuse")
+                reason: "partial_accept_refuse"
             ),
-            cards: acceptedCards + refusedCards,
+            cards: cards,
+            cardSemantics: semantics,
             readbacks: acceptedReadbacks,
             proofClass: proofClass,
             traceEnvelope: traceEnvelope,
             timestamp: timestamp
         )
+    }
+
+    static func canProjectPartialRefusalIdentity(
+        executionResult: DemoRuntimePartialPlanResult,
+        refusedCardsBySubactionID: [String: DemoVehicleStateCell]
+    ) -> Bool {
+        return executionResult.subactions
+            .filter { $0.disposition == .refused }
+            .allSatisfy { subaction in
+                guard subaction.finiteReason != nil,
+                      refusedCardsBySubactionID[subaction.frameID] != nil else {
+                    return false
+                }
+                return true
+            }
     }
 
     public static func terminalStop(
@@ -683,6 +903,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         traceID: String,
         outcome: DemoRuntimeOutcome,
         cards: [DemoVehicleStateCell],
+        cardSemantics: [PresentationCardSemantics]? = nil,
         readbacks: [DemoActionReadback],
         scopeOrigin: ScopeOrigin? = nil,
         proofClass: PresentationProofClass,
@@ -693,6 +914,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
             traceID: traceID,
             runtimeOutcome: outcome,
             cards: cards,
+            cardSemantics: cardSemantics,
             readbacks: readbacks,
             scopeOrigin: scopeOrigin,
             proofClass: proofClass,
@@ -709,7 +931,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         for token in unsafeReasonTokens.sorted(by: { $0.count > $1.count }) where safeReason.range(of: token, options: options) != nil {
             safeReason = safeReason.replacingOccurrences(of: token, with: "[redacted]", options: options)
         }
-        return String(safeReason.prefix(160))
+        return PresentationPayloadSanitizer.publicReason(String(safeReason.prefix(160))) ?? fallback
     }
 
     private static let unsafeReasonTokens = PresentationPayloadSanitizer.redactedTokens
@@ -719,11 +941,29 @@ private extension TraceAttributes {
     func presentationSafe(redactedTokens: [String], maxMessageLength: Int) -> TraceAttributes {
         var copy = self
         copy.stopReason = copy.stopReason.map {
-            TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+            if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: $0) {
+                return projection.safeReasonKind.rawValue
+            }
+            return TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
         }
-        copy.guardReason = copy.guardReason.map {
-            TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+        if let finiteReason = copy.finiteReason {
+            copy.guardReason = RuntimePresentationSafeReasonKind(finiteReason: finiteReason).rawValue
+            copy.finiteReason = nil
+        } else {
+            copy.guardReason = copy.guardReason.map {
+                if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: $0) {
+                    return projection.safeReasonKind.rawValue
+                }
+                if $0.range(
+                    of: #"^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$"#,
+                    options: .regularExpression
+                ) != nil {
+                    return RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+                }
+                return TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+            }
         }
+        copy.decodeFailureKind = nil
         return copy
     }
 

@@ -1,14 +1,19 @@
 import Foundation
 
+public enum DemoRuntimeSessionRunnerError: Error, Equatable {
+    case multiFramePlanRequiresPartialExecution(frameIDs: [String])
+}
+
 @MainActor
 public final class DemoRuntimeSessionRunner {
     public typealias FrameDecoder = (String) async throws -> ToolCallFrame
+    public typealias PlanDecoder = (String) async throws -> [ToolCallFrame]
 
     private let store: DemoVehicleStateStore
     private let pipeline: C3ExecutionPipeline
     private let traceLogger: any TraceLogger
     private let speech: any SpeechSynthesisEngine
-    private let frameDecoder: FrameDecoder
+    private let planDecoder: PlanDecoder
     private let alignsFrameStateRevisionToStore: Bool
     private let timestampProvider: () -> Date
     private var dialogueState: DialogueState
@@ -27,7 +32,27 @@ public final class DemoRuntimeSessionRunner {
         self.pipeline = pipeline
         self.traceLogger = traceLogger
         self.speech = speech
-        self.frameDecoder = frameDecoder
+        self.planDecoder = { text in [try await frameDecoder(text)] }
+        self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
+        self.dialogueState = dialogueState
+        self.timestampProvider = timestampProvider
+    }
+
+    public init(
+        store: DemoVehicleStateStore,
+        pipeline: C3ExecutionPipeline,
+        traceLogger: any TraceLogger,
+        speech: any SpeechSynthesisEngine,
+        planDecoder: @escaping PlanDecoder,
+        alignsFrameStateRevisionToStore: Bool = true,
+        dialogueState: DialogueState = DialogueState(),
+        timestampProvider: @escaping () -> Date = Date.init
+    ) {
+        self.store = store
+        self.pipeline = pipeline
+        self.traceLogger = traceLogger
+        self.speech = speech
+        self.planDecoder = planDecoder
         self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
         self.dialogueState = dialogueState
         self.timestampProvider = timestampProvider
@@ -46,20 +71,186 @@ public final class DemoRuntimeSessionRunner {
             pipeline: try bundle.makePipeline(),
             traceLogger: traceLogger,
             speech: speech,
-            frameDecoder: { text in try await router.decode(text: text) }
+            planDecoder: { text in try await router.decodePlan(text: text) }
         )
     }
 
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(text)
-        let frameResult: ToolCallFrame
+        let frameResults: [ToolCallFrame]
         do {
-            frameResult = try await frameDecoder(text)
+            frameResults = try await planDecoder(text)
         } catch let failure as DDomainToolPlanFailure {
-            return unsupportedPayload(finiteReason: failure.finiteReason)
+            return unsupportedPayload(
+                finiteReason: failure.finiteReason,
+                decodeFailureKind: failure.decodeFailureKind
+            )
         } catch FastPathIntentError.noMatch {
-            return unsupportedPayload(finiteReason: "fast_path_no_match")
+            return unsupportedPayload(finiteReason: .fastPathNoMatch)
+        }
+
+        guard let frameResult = frameResults.first else {
+            throw DemoNLURouterError.noToolPlanFrames
+        }
+        if frameResults.count > 1 {
+            guard frameResults.allSatisfy(DemoRuntimePartialPlan.isReviewed) else {
+                let traceID = frameResults.first?.traceID ?? UUID().uuidString
+                traceLogger.recordGuard(
+                    traceID: traceID,
+                    message: "multi_frame_plan_rejected",
+                    attributes: TraceAttributes(
+                        toolCallCount: 0,
+                        guardReason: "multi_frame_plan_requires_partial_execution"
+                    )
+                )
+                throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(
+                    frameIDs: frameResults.map(\.id)
+                )
+            }
+            let partialResult = try DemoRuntimePartialPlan().execute(
+                frames: frameResults,
+                store: store,
+                pipeline: pipeline,
+                traceLogger: traceLogger,
+                alignsFrameStateRevisionToStore: alignsFrameStateRevisionToStore
+            )
+
+            let acceptedReadbacks = partialResult.acceptedReadbacks
+            let acceptedCards = PresentationCardOrdering.orderedForPresentation(
+                acceptedReadbacks.compactMap { readback in store.cell(for: readback.key) }
+            )
+            let framesByID = Dictionary(uniqueKeysWithValues: frameResults.map { ($0.id, $0) })
+            let refusedCardsBySubactionID: [String: DemoVehicleStateCell] = Dictionary(
+                uniqueKeysWithValues: partialResult.subactions.compactMap { subaction in
+                    guard subaction.disposition == .refused,
+                          let frame = framesByID[subaction.frameID],
+                          let executionCellID = pipeline.allowlist.entry(device: frame.device)?.executionRangeCell
+                              ?? ToolContractStateApplier.deviceCellMap[frame.device] else {
+                        return nil
+                    }
+
+                    let definition = pipeline.stateCells.cell(id: executionCellID)
+                    let resolvedKey = definition.flatMap { definition in
+                        try? C2ScopeResolver.resolve(frame: frame, cell: definition).keys.first
+                    }
+                    let explicitlyScopedKey = C2ScopeResolver.requestedScope(from: frame).map {
+                        "\(executionCellID)[\($0)]"
+                    }
+                    let card = [resolvedKey, explicitlyScopedKey, executionCellID]
+                        .compactMap { $0 }
+                        .compactMap { store.cell(for: $0) }
+                        .first
+                        ?? store.cells.first { ScopedStateKey($0.key).base == executionCellID }
+                        ?? definition.map {
+                            DemoVehicleStateCell(
+                                key: resolvedKey ?? executionCellID,
+                                actualValue: $0.defaultValue ?? "unknown",
+                                availability: .unknown
+                            )
+                        }
+                    guard let card else {
+                        return nil
+                    }
+                    return (subaction.frameID, card)
+                }
+            )
+            let dialogText = acceptedReadbacks.map(\.spokenText).joined(separator: "；")
+            if !dialogText.isEmpty {
+                let speechResult = speech.speak(dialogText)
+                if !speechResult.didEnqueue {
+                    traceLogger.recordReadback(
+                        traceID: partialResult.traceID,
+                        message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
+                        attributes: TraceAttributes(readbackResult: .failed)
+                    )
+                }
+                dialogueState.recordAssistantText(dialogText)
+                dialogueState.recordReadbacks(acceptedReadbacks)
+            }
+
+            let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
+            if partialResult.hasAccepted && partialResult.hasRefused {
+                let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                    executionResult: partialResult,
+                    acceptedCards: acceptedCards,
+                    refusedCardsBySubactionID: refusedCardsBySubactionID,
+                    traceEnvelope: traceEnvelope,
+                    timestamp: timestampProvider()
+                )
+                return RuntimePresentationPayload(
+                    snapshot: snapshot,
+                    turnID: frameResult.id,
+                    eventID: "\(frameResult.id):runtime-presentation",
+                    reconciliation: PresentationReconciliation(
+                        status: .verified,
+                        readbackKey: acceptedReadbacks.last?.key,
+                        safeReason: "partial_readback_verified"
+                    )
+                )
+            }
+
+            if partialResult.hasAccepted {
+                let semantics = acceptedCards.map { cell in
+                    PresentationCardSemantics(
+                        cellKey: cell.key,
+                        role: .accepted,
+                        scopeOrigin: acceptedReadbacks.first { $0.key == cell.key }?.scopeOrigin,
+                        reason: "readback_verified",
+                        isActive: true
+                    )
+                }
+                let snapshot = PresentationSnapshot(
+                    traceID: partialResult.traceID,
+                    runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
+                    cards: acceptedCards,
+                    cardSemantics: semantics,
+                    dialogText: dialogText.isEmpty ? nil : dialogText,
+                    readbacks: acceptedReadbacks,
+                    scopeOrigin: acceptedReadbacks.compactMap(\.scopeOrigin).first,
+                    voiceState: dialogText.isEmpty ? .idle : .speak,
+                    orbState: dialogText.isEmpty ? .idle : .speak,
+                    proofClass: .localUnit,
+                    traceEnvelope: traceEnvelope,
+                    isTerminal: true,
+                    timestamp: timestampProvider()
+                )
+                return RuntimePresentationPayload(
+                    snapshot: snapshot,
+                    turnID: frameResult.id,
+                    eventID: "\(frameResult.id):runtime-presentation",
+                    reconciliation: PresentationReconciliation(
+                        status: .verified,
+                        readbackKey: acceptedReadbacks.last?.key,
+                        safeReason: "c2_readback_verified"
+                    )
+                )
+            }
+
+            let finiteReasons = partialResult.subactions.compactMap(\.finiteReason)
+            let sharedFiniteReason = Set(finiteReasons).count == 1 ? finiteReasons[0] : nil
+            let projection = sharedFiniteReason.map(RuntimePresentationReasonAuthority.projection(for:))
+            let refusalReason = projection?.safeReasonKind.rawValue
+                ?? RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+            let refusalResult = projection?.result ?? .refusalNoAvailableTool
+            let snapshot = PresentationSnapshot(
+                traceID: partialResult.traceID,
+                runtimeOutcome: DemoRuntimeOutcome(result: refusalResult, reason: refusalReason),
+                cards: store.presentationCells,
+                proofClass: .localUnit,
+                traceEnvelope: traceEnvelope,
+                isTerminal: true,
+                timestamp: timestampProvider()
+            )
+            return RuntimePresentationPayload(
+                snapshot: snapshot,
+                turnID: frameResult.id,
+                eventID: "\(frameResult.id):runtime-presentation",
+                reconciliation: PresentationReconciliation(
+                    status: .notApplicable,
+                    safeReason: refusalReason
+                )
+             )
         }
 
         var frame = frameResult
@@ -124,20 +315,25 @@ public final class DemoRuntimeSessionRunner {
         )
     }
 
-    private func unsupportedPayload(finiteReason: String) -> RuntimePresentationPayload {
+    private func unsupportedPayload(
+        finiteReason: RuntimeFiniteReason,
+        decodeFailureKind: DDomainDecodeFailureKind? = nil
+    ) -> RuntimePresentationPayload {
         let traceID = UUID().uuidString
         let turnID = "unsupported-\(traceID)"
-        let dialogText = "这个我先记下来，稍后帮您处理"
-        dialogueState.recordAssistantText(dialogText)
+        let userText = dialogueState.turns.last(where: { $0.role == .user })?.text
+        let context = FallbackContext.resolve(userText: userText, finiteReason: finiteReason)
+        dialogueState.recordAssistantText(context.dialogText)
         traceLogger.recordGuard(
             traceID: traceID,
             message: "unsupported_tool_plan",
             attributes: TraceAttributes(
                 guardReason: "unsupported_tool_plan",
-                finiteReason: finiteReason
+                finiteReason: finiteReason,
+                decodeFailureKind: decodeFailureKind
             )
         )
-        let speechResult = speech.speak(dialogText)
+        let speechResult = speech.speak(context.ttsText)
         if !speechResult.didEnqueue {
             traceLogger.recordReadback(
                 traceID: traceID,
@@ -145,21 +341,23 @@ public final class DemoRuntimeSessionRunner {
                 attributes: TraceAttributes(readbackResult: .failed)
             )
         }
-        let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: traceID)
         return RuntimePresentationPayload(
             traceID: traceID,
             turnID: turnID,
             eventID: "\(turnID):runtime-presentation",
             isTerminal: true,
-            outcome: DemoRuntimeOutcome(result: .refusalNoAvailableTool, reason: finiteReason),
+            outcome: DemoRuntimeOutcome(
+                result: context.runtimeResult,
+                reason: context.outcome.safeReasonKind.rawValue
+            ),
             proofClass: .localUnit,
             cards: store.presentationCells,
             readbacks: [],
             reconciliation: PresentationReconciliation(
                 status: .notApplicable,
-                safeReason: finiteReason
+                safeReason: context.outcome.safeReasonKind.rawValue
             ),
-            traceEnvelope: traceEnvelope,
+            traceEnvelope: nil,
             timestamp: timestampProvider()
         )
     }
