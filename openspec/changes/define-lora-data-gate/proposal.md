@@ -1,6 +1,10 @@
 status: `active_contract_carrier`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+v6_package_ids: [B1a,B1b,V8,O5]
+relation_type: upstream_data_gate
+not_owner_of: [B7,T02_corpus_freeze]
+v6_disposition: candidate_archive_after_controller_review
 
 ## Why
 

@@ -1,6 +1,9 @@
 status: `draft_deferred`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+status_action_now: keep_draft_deferred
+requires: explicit ballot + resource receipt + human/run authorization
+v6_package_ids: [B1a,B1b,B2,B3,B7,V8,O5]
 
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
 > 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，design.md 承载 Architecture Decisions，specs delta 占位待补，tasks 待细化。

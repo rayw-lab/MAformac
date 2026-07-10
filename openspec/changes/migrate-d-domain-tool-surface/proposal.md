@@ -1,6 +1,9 @@
 status: `draft_needs_human_propose`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+blocked_on: G1 v3 audit + G1 RATIFIED + human propose
+status_action_now: keep_draft
+v6_package_ids: [W6,B7,V1,O5]
 
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
 > 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。

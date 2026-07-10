@@ -1,6 +1,10 @@
 status: `active_contract_carrier`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+v6_package_ids: [W9,O5]
+relation_type: owns
+blocked_on: G3/T08 RATIFIED + Gate4 P0/P1=0
+proof_cap: local_static_contract_only
 
 ## Why
 
