@@ -38,10 +38,14 @@ BEHAVIOR_TEST_SOURCE = REPO_ROOT / "Tests/MAformacCoreTests/RuntimeFiniteReasonA
 BEHAVIOR_GATE_METHODS = (
     "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
     "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+    "testDDomainDiagnosticKindsFlowThroughProductionEmitter",
 )
 EXACT_FILTERS = tuple(
     f"RuntimeFiniteReasonAuthorityTests/{method}" for method in BEHAVIOR_GATE_METHODS
 )
+# Full typed authority suite (min-count mode) + one exact runner per behavior gate method.
+FULL_SUITE_FILTER = "--filter RuntimeFiniteReasonAuthorityTests --min-count 1"
+EXACT_RUNNER_INVOCATION_COUNT = len(BEHAVIOR_GATE_METHODS) + 1
 
 
 def missing_behavior_gate_declarations(source: str) -> list[str]:
@@ -80,7 +84,10 @@ def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
     assert RUNTIME_REASON_SUITE in runtime_reason_block, runtime_reason_block
     assert RUNTIME_REASON_CHECKER in runtime_reason_block, runtime_reason_block
     assert EXACT_RUNNER_SUITE in runtime_reason_block, runtime_reason_block
-    assert runtime_reason_block.count(EXACT_RUNNER) == 2, runtime_reason_block
+    assert (
+        runtime_reason_block.count(EXACT_RUNNER) == EXACT_RUNNER_INVOCATION_COUNT
+    ), runtime_reason_block
+    assert FULL_SUITE_FILTER in runtime_reason_block, runtime_reason_block
     for exact_filter in EXACT_FILTERS:
         assert f"--filter {exact_filter}" in runtime_reason_block, runtime_reason_block
 

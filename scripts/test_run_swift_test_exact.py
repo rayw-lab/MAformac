@@ -14,7 +14,12 @@ RUNNER = REPO_ROOT / "Tools/checks/run_swift_test_exact.py"
 
 
 class ExactSwiftTestRunnerTests(unittest.TestCase):
-    def run_fixture(self, stdout: str, returncode: int = 0) -> subprocess.CompletedProcess[str]:
+    def run_fixture(
+        self,
+        stdout: str,
+        returncode: int = 0,
+        extra_args: list[str] | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         with tempfile.TemporaryDirectory(prefix="swift-exact-runner-") as tmp:
             fake_swift = Path(tmp) / "fake-swift"
             fake_swift.write_text(
@@ -32,6 +37,7 @@ class ExactSwiftTestRunnerTests(unittest.TestCase):
                     str(fake_swift),
                     "--filter",
                     "RuntimeFiniteReasonAuthorityTests/testExactGate",
+                    *(extra_args or []),
                 ],
                 cwd=REPO_ROOT,
                 capture_output=True,
@@ -57,6 +63,36 @@ class ExactSwiftTestRunnerTests(unittest.TestCase):
         result = self.run_fixture("compiler failed", returncode=7)
         self.assertEqual(result.returncode, 7)
         self.assertIn("E_SWIFT_EXACT_TEST_COMMAND", result.stderr)
+
+    def test_skipped_test_fails_closed_even_when_swift_returns_zero(self) -> None:
+        result = self.run_fixture(
+            "Executed 1 test, with 1 test skipped and 0 failures (0 unexpected)"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_SWIFT_EXACT_TEST_SKIPPED", result.stderr)
+
+    def test_min_count_mode_accepts_full_suite(self) -> None:
+        result = self.run_fixture(
+            "Executed 7 tests, with 0 failures (0 unexpected)",
+            extra_args=["--min-count", "1"],
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_min_count_mode_fails_closed_on_zero_tests(self) -> None:
+        result = self.run_fixture(
+            "No matching test cases\nExecuted 0 tests, with 0 failures",
+            extra_args=["--min-count", "1"],
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_SWIFT_EXACT_TEST_ZERO", result.stderr)
+
+    def test_min_count_mode_fails_closed_on_skip(self) -> None:
+        result = self.run_fixture(
+            "Executed 7 tests, with 1 test skipped and 0 failures",
+            extra_args=["--min-count", "1"],
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_SWIFT_EXACT_TEST_SKIPPED", result.stderr)
 
 
 if __name__ == "__main__":

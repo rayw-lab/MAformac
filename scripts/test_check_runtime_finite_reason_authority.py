@@ -29,6 +29,7 @@ SURFACES = (
 BEHAVIOR_GATE_METHODS = (
     "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
     "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+    "testDDomainDiagnosticKindsFlowThroughProductionEmitter",
 )
 
 
@@ -94,10 +95,12 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         self.assertEqual(payload.get("behavior_gates"), [
             "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
             "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+            "RuntimeFiniteReasonAuthorityTests.testDDomainDiagnosticKindsFlowThroughProductionEmitter",
         ])
         self.assertEqual(payload.get("behavior_gate_presence"), {
             "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable": True,
             "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd": True,
+            "RuntimeFiniteReasonAuthorityTests.testDDomainDiagnosticKindsFlowThroughProductionEmitter": True,
         })
         self.assertEqual(len(payload.get("scan_coverage", [])), 9)
         self.assertNotIn(
@@ -140,6 +143,18 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         self.assert_behavior_gate_missing(
             BEHAVIOR_GATE_METHODS[1],
             "    // deleted trace behavior gate declaration(",
+        )
+
+    def test_renamed_production_emitter_behavior_gate_fails_closed(self) -> None:
+        self.assert_behavior_gate_missing(
+            BEHAVIOR_GATE_METHODS[2],
+            "    func helperDDomainDiagnosticKindsFlowThroughProductionEmitter(",
+        )
+
+    def test_deleted_production_emitter_behavior_gate_fails_closed(self) -> None:
+        self.assert_behavior_gate_missing(
+            BEHAVIOR_GATE_METHODS[2],
+            "    // deleted production emitter behavior gate declaration(",
         )
 
     def test_non_t0_literal_in_production_fails_closed(self) -> None:

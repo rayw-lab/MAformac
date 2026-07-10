@@ -344,6 +344,73 @@ final class RuntimeFiniteReasonAuthorityTests: XCTestCase {
         XCTAssertFalse(text.contains(DDomainDecodeFailureKind.nameRejected.rawValue), text)
         XCTAssertTrue(text.contains(RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue), text)
     }
+
+    // Production E2E: drive the real DemoRuntimeSessionRunner failure catch/emitter path for the
+    // four diagnostic kinds. Reads the raw trace from a retained InMemoryTraceLogger (not a hand-built
+    // TraceAttributes DTO), asserts the typed finiteReason + decodeFailureKind pair the production
+    // emitter wrote, then asserts presentation-safe erases both raw layers. Deleting the
+    // `decodeFailureKind: failure.decodeFailureKind` forwarding in DemoRuntimeSessionRunner makes this RED.
+    @MainActor
+    func testDDomainDiagnosticKindsFlowThroughProductionEmitter() async throws {
+        let cases: [(
+            userText: String,
+            failure: DDomainToolPlanFailure,
+            finiteReason: RuntimeFiniteReason,
+            rawFiniteReason: String,
+            decodeFailureKind: DDomainDecodeFailureKind,
+            rawDecodeFailureKind: String,
+            safeReason: RuntimePresentationSafeReasonKind
+        )] = [
+            ("解析失败输入", .parseFailed, .unsupportedToolPlan, "unsupported_tool_plan", .parseFailed, "parse_failed", .notAvailableInDemo),
+            ("打开一个未挂载工具", .nameRejected("secret_raw_tool_name"), .nameRejected, "name_rejected", .nameRejected, "name_rejected", .capabilityNotMounted),
+            ("无法归类的意图", .irUnclassified("secret_ir_detail"), .unsupportedToolPlan, "unsupported_tool_plan", .irUnclassified, "ir_unclassified", .notAvailableInDemo),
+            ("桥接失败的意图", .bridgeFailed("secret_bridge_detail"), .unsupportedToolPlan, "unsupported_tool_plan", .bridgeFailed, "bridge_failed", .notAvailableInDemo),
+        ]
+
+        XCTAssertEqual(cases.count, 4)
+        for expected in cases {
+            let logger = InMemoryTraceLogger()
+            let runner = try DemoRuntimeSessionRunner.defaultRunner(
+                store: DemoVehicleStateStore(),
+                traceLogger: logger,
+                speech: RecordingSpeechSynthesisEngine(),
+                modelBackend: RejectingBackend(failure: expected.failure)
+            )
+
+            _ = try await runner.run(text: expected.userText)
+
+            let guardEntry = try XCTUnwrap(
+                logger.entries.first { $0.stage == .guard && $0.message == "unsupported_tool_plan" },
+                "\(expected.rawDecodeFailureKind): missing production unsupported_tool_plan guard trace"
+            )
+            XCTAssertEqual(guardEntry.attributes.finiteReason, expected.finiteReason, expected.rawDecodeFailureKind)
+            XCTAssertEqual(
+                guardEntry.attributes.decodeFailureKind,
+                expected.decodeFailureKind,
+                expected.rawDecodeFailureKind
+            )
+
+            let rawData = try JSONEncoder().encode(guardEntry.attributes)
+            let rawObject = try XCTUnwrap(JSONSerialization.jsonObject(with: rawData) as? [String: Any])
+            XCTAssertEqual(rawObject["finiteReason"] as? String, expected.rawFiniteReason)
+            XCTAssertEqual(rawObject["decodeFailureKind"] as? String, expected.rawDecodeFailureKind)
+
+            let envelope = try XCTUnwrap(
+                TraceEnvelope(traceID: guardEntry.traceID, entries: [guardEntry])
+            )
+            let safeEnvelope = envelope.presentationSafe()
+            let safeAttributes = try XCTUnwrap(safeEnvelope.entries.first?.attributes)
+            let safeData = try JSONEncoder().encode(safeEnvelope)
+            let safeText = try XCTUnwrap(String(data: safeData, encoding: .utf8))
+
+            XCTAssertNil(safeAttributes.finiteReason, expected.rawDecodeFailureKind)
+            XCTAssertNil(safeAttributes.decodeFailureKind, expected.rawDecodeFailureKind)
+            XCTAssertEqual(safeAttributes.guardReason, expected.safeReason.rawValue, expected.rawDecodeFailureKind)
+            XCTAssertFalse(safeText.contains("\"finiteReason\""), safeText)
+            XCTAssertFalse(safeText.contains("\"decodeFailureKind\""), safeText)
+            XCTAssertFalse(safeText.contains(expected.rawDecodeFailureKind), safeText)
+        }
+    }
 }
 
 private struct ExpectedFallbackCell {

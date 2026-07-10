@@ -70,9 +70,13 @@ verify-c1-finite-reason-authority:
 	$(PYTHON_BOOTSTRAP) Tools/checks/check_runtime_finite_reason_authority.py \
 		--receipt .build/c1-run/receipts/c1/runtime-finite-reason-authority.json
 	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter RuntimeFiniteReasonAuthorityTests --min-count 1
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
 		--filter RuntimeFiniteReasonAuthorityTests/testFallbackResolutionMatchesHardcodedTenReasonScriptTable
 	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
 		--filter RuntimeFiniteReasonAuthorityTests/testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter RuntimeFiniteReasonAuthorityTests/testDDomainDiagnosticKindsFlowThroughProductionEmitter
 
 verify-c1-matrix: verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1
