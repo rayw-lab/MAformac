@@ -195,7 +195,17 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         }
 
         XCTAssertEqual(store.currentRevision, 0)
-        XCTAssertTrue(trace.entries.isEmpty)
+        let guardEntry = try XCTUnwrap(trace.entries.first)
+        XCTAssertEqual(trace.entries.count, 1)
+        XCTAssertEqual(guardEntry.stage, .guard)
+        XCTAssertEqual(guardEntry.message, "multi_frame_plan_rejected")
+        XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
+        XCTAssertEqual(
+            guardEntry.attributes.guardReason,
+            "multi_frame_plan_requires_partial_execution"
+        )
+        XCTAssertFalse(trace.entries.contains { $0.stage == .execute })
+        XCTAssertFalse(trace.entries.contains { $0.stage == .readback })
     }
 
     @MainActor

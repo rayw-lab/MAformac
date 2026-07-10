@@ -98,8 +98,7 @@ public final class DemoRuntimeSessionRunner {
                     message: "multi_frame_plan_rejected",
                     attributes: TraceAttributes(
                         toolCallCount: 0,
-                        guardReason: "multi_frame_plan_requires_partial_execution",
-                        stateMutation: false
+                        guardReason: "multi_frame_plan_requires_partial_execution"
                     )
                 )
                 throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(

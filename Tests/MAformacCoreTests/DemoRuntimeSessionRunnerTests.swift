@@ -97,7 +97,6 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         )
         XCTAssertEqual(guardEntry.attributes.guardReason, "multi_frame_plan_requires_partial_execution")
         XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
-        XCTAssertEqual(guardEntry.attributes.stateMutation, false)
         XCTAssertFalse(traceLogger.entries.contains { $0.stage == .execute })
         XCTAssertFalse(traceLogger.entries.contains { $0.stage == .readback })
     }
