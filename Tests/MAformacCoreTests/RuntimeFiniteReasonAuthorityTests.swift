@@ -351,7 +351,7 @@ final class RuntimeFiniteReasonAuthorityTests: XCTestCase {
     // emitter wrote, then asserts presentation-safe erases both raw layers. Deleting the
     // `decodeFailureKind: failure.decodeFailureKind` forwarding in DemoRuntimeSessionRunner makes this RED.
     @MainActor
-    func testDDomainDiagnosticKindsFlowThroughProductionEmitter() async throws {
+    func testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace() async throws {
         let cases: [(
             userText: String,
             failure: DDomainToolPlanFailure,

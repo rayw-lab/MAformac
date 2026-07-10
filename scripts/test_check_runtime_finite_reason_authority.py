@@ -29,7 +29,7 @@ SURFACES = (
 BEHAVIOR_GATE_METHODS = (
     "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
     "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
-    "testDDomainDiagnosticKindsFlowThroughProductionEmitter",
+    "testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace",
 )
 
 
@@ -95,12 +95,12 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         self.assertEqual(payload.get("behavior_gates"), [
             "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
             "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
-            "RuntimeFiniteReasonAuthorityTests.testDDomainDiagnosticKindsFlowThroughProductionEmitter",
+            "RuntimeFiniteReasonAuthorityTests.testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace",
         ])
         self.assertEqual(payload.get("behavior_gate_presence"), {
             "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable": True,
             "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd": True,
-            "RuntimeFiniteReasonAuthorityTests.testDDomainDiagnosticKindsFlowThroughProductionEmitter": True,
+            "RuntimeFiniteReasonAuthorityTests.testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace": True,
         })
         self.assertEqual(len(payload.get("scan_coverage", [])), 9)
         self.assertNotIn(
@@ -148,7 +148,7 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
     def test_renamed_production_emitter_behavior_gate_fails_closed(self) -> None:
         self.assert_behavior_gate_missing(
             BEHAVIOR_GATE_METHODS[2],
-            "    func helperDDomainDiagnosticKindsFlowThroughProductionEmitter(",
+            "    func helperDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace(",
         )
 
     def test_deleted_production_emitter_behavior_gate_fails_closed(self) -> None:

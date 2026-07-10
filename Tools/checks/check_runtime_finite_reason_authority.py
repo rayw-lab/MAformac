@@ -86,8 +86,8 @@ BEHAVIOR_GATE_METHODS = {
         "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
     "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd":
         "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
-    "RuntimeFiniteReasonAuthorityTests.testDDomainDiagnosticKindsFlowThroughProductionEmitter":
-        "testDDomainDiagnosticKindsFlowThroughProductionEmitter",
+    "RuntimeFiniteReasonAuthorityTests.testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace":
+        "testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace",
 }
 BEHAVIOR_GATES = list(BEHAVIOR_GATE_METHODS)
 

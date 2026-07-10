@@ -38,7 +38,7 @@ BEHAVIOR_TEST_SOURCE = REPO_ROOT / "Tests/MAformacCoreTests/RuntimeFiniteReasonA
 BEHAVIOR_GATE_METHODS = (
     "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
     "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
-    "testDDomainDiagnosticKindsFlowThroughProductionEmitter",
+    "testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace",
 )
 EXACT_FILTERS = tuple(
     f"RuntimeFiniteReasonAuthorityTests/{method}" for method in BEHAVIOR_GATE_METHODS

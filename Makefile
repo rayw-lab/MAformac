@@ -76,7 +76,7 @@ verify-c1-finite-reason-authority:
 	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
 		--filter RuntimeFiniteReasonAuthorityTests/testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd
 	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
-		--filter RuntimeFiniteReasonAuthorityTests/testDDomainDiagnosticKindsFlowThroughProductionEmitter
+		--filter RuntimeFiniteReasonAuthorityTests/testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace
 
 verify-c1-matrix: verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1
