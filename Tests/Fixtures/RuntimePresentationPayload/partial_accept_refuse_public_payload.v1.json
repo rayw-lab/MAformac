@@ -1,27 +1,34 @@
 {
   "cardSemantics": [
     {
-      "cellKey": "ac.power",
-      "isActive": true,
-      "reason": "user_requested",
-      "role": "accepted",
-      "scopeOrigin": "explicit",
+      "cellKey": "window.position[主驾]",
+      "isActive": false,
+      "reason": "capability_not_mounted",
+      "role": "refused",
       "siblingKeys": [
-        "door.lock"
+        "ac.power"
       ]
     },
     {
-      "cellKey": "door.lock",
-      "isActive": false,
-      "reason": "safety_policy_refusal",
-      "role": "refused",
+      "cellKey": "ac.power",
+      "isActive": true,
+      "reason": "readback_verified",
+      "role": "accepted",
       "scopeOrigin": "explicit",
       "siblingKeys": [
-        "ac.power"
+        "window.position[主驾]"
       ]
     }
   ],
   "cards": [
+    {
+      "actualValue": "closed",
+      "availability": "available",
+      "key": "window.position[主驾]",
+      "revision": 0,
+      "source": "mock",
+      "visualState": "blocked_with_alternative"
+    },
     {
       "actualValue": "on",
       "availability": "available",
@@ -29,14 +36,6 @@
       "revision": 2,
       "source": "mock",
       "visualState": "satisfied"
-    },
-    {
-      "actualValue": "locked",
-      "availability": "available",
-      "key": "door.lock",
-      "revision": 3,
-      "source": "mock",
-      "visualState": "unsafe"
     }
   ],
   "eventID": "event-partial-accept-refuse-1",
