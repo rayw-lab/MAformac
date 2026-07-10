@@ -24,11 +24,11 @@ public struct FallbackContext: Codable, Equatable, Sendable {
         family: FallbackScriptFamily?,
         reasonKind: FallbackGovernanceReason
     ) -> FallbackContext {
-        if let family,
-           let entry = FallbackScriptCatalog.entries.first(where: {
-               $0.family == family && $0.reasonKind == reasonKind
-           }) {
-            return FallbackContext(entry: entry)
+        if let family {
+            let cellID = "fallback.\(family.rawValue).\(reasonKind.rawValue).zh-CN"
+            if let entry = FallbackScriptCatalog.entries.first(where: { $0.cellID == cellID }) {
+                return FallbackContext(entry: entry, reasonKind: reasonKind)
+            }
         }
         return FallbackContext.noRepresentative(reasonKind: reasonKind)
     }
@@ -51,9 +51,9 @@ public struct FallbackContext: Codable, Equatable, Sendable {
         }
     }
 
-    private init(entry: FallbackScriptCatalogEntry) {
+    private init(entry: FallbackScriptCatalogEntry, reasonKind: FallbackGovernanceReason) {
         family = entry.family
-        reasonKind = entry.reasonKind
+        self.reasonKind = reasonKind
         outcome = FallbackOutcomeSummary(
             resultKind: entry.resultKind,
             safeReasonKind: entry.safeReasonKind
