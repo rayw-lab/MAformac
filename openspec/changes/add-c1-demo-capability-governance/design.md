@@ -55,6 +55,8 @@ Fallback coverage uses four closed governance classes:
 - `fast_path_no_match_fallback`
 - `unknown_no_representative_entry`
 
+Internal `finiteReason` is a closed nine-value enum. Its only members are `safety_or_policy_refusal`, `clarify_missing_slot`, `unmounted_tool_name`, `name_rejected`, `fast_path_no_match`, `unsupported_tool_plan`, `no_representative_tool`, `runtime_execution_error`, and `already_state_noop`. No free string, implicit alias or implementation-only addition is permitted; a membership change requires a new decision/change and simultaneous projection update. `partial_accept_partial_refuse` is a bridge result wrapper, not a `finiteReason` member.
+
 The normative projection is:
 
 | Condition | `primary_class` / fallback class | internal `finiteReason` | contract `fallback_reason` | bridge-owned safe `reasonKind` | bridge-owned result |
