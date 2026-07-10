@@ -79,6 +79,7 @@ verify-register:
 	PYTHONPATH=scripts python3 scripts/test_register_classifier_golden.py
 
 verify-mounted-catalog-no-delta: .venv/.deps.stamp
+	$(PYTHON) -m unittest scripts/test_check_mounted_catalog_no_delta.py
 	$(PYTHON) scripts/check_mounted_catalog_no_delta.py
 
 verify-c5-phase1-gates: .venv/.deps.stamp

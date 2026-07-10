@@ -9,10 +9,11 @@ baseline:
   description: "C2 frozen baseline: mounted catalog 1→N forbidden, only adjust_ac_temperature_to_number allowed"
 
 rollback_guard:
-  fallback_mounted_tool_names:
-    - "adjust_ac_temperature_to_number"
-  can_demo_fallback: true
-  fallback_description: "Rollback to safe C1 baseline if C2 delta detected"
+  affected_can_demo_after_rollback: false
+  preserve_artifacts:
+    - "fallback_catalog"
+    - "fallback_probes"
+  evidence_contract: "Pass --rollback-state JSON with before/after mounted names, affected cell before/after canDemo values, and before/after fallback artifact paths"
 
 enforcement:
   check_script: "scripts/check_mounted_catalog_no_delta.py"
