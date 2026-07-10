@@ -17,6 +17,16 @@ CHANGE_ID = "add-c1-demo-capability-governance"
 CHANGE_RELATIVE = Path("openspec/changes") / CHANGE_ID
 RATIFIED_RELATIVE = Path("docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md")
 CHECKER = REPO_ROOT / "Tools/checks/check_c1_ownership_map.py"
+RUNTIME_SURFACES = (
+    Path("Core/LLM/DDomainToolPlanFailure.swift"),
+    Path("Core/Execution/DemoRuntimeSessionRunner.swift"),
+    Path("Core/Execution/DemoRuntimePartialPlan.swift"),
+    Path("Core/Execution/FallbackContext.swift"),
+    Path("Core/Trace/TraceLogger.swift"),
+    Path("Core/Presentation/RuntimePresentationReasonAuthority.generated.swift"),
+    Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
+    Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
+)
 
 
 class C1OwnershipMapCheckerTests(unittest.TestCase):
@@ -28,6 +38,10 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
         self.ratified.parent.mkdir(parents=True)
         shutil.copytree(REPO_ROOT / CHANGE_RELATIVE, self.change)
         shutil.copy2(REPO_ROOT / RATIFIED_RELATIVE, self.ratified)
+        for relative in RUNTIME_SURFACES:
+            destination = self.root / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(REPO_ROOT / relative, destination)
 
     def tearDown(self) -> None:
         self.temp.cleanup()
@@ -78,6 +92,17 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
         self.assertEqual(receipt["duplicate_owners"], [])
         self.assertEqual(receipt["forbidden_parallel_ssot"], [])
         self.assertEqual(receipt["finite_reason_unknown"], [])
+        self.assertEqual(receipt["runtime_finite_reason_violations"], [])
+
+    @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
+    def test_runtime_non_t0_literal_fails_ownership_gate(self) -> None:
+        runner = self.root / "Core/Execution/DemoRuntimeSessionRunner.swift"
+        runner.write_text(
+            runner.read_text(encoding="utf-8")
+            + '\nprivate let finiteReason = "ownership_non_t0_reason"\n',
+            encoding="utf-8",
+        )
+        self.assert_failure("E_RUNTIME_FINITE_REASON_OUTSIDE_T0")
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
     def test_missing_owner_fails_closed(self) -> None:
@@ -179,7 +204,7 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
         self.assert_failure("semantic_gaps")
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
-    def test_registry_projection_accepts_new_closed_finite_reason_without_checker_shadow(self) -> None:
+    def test_registry_projection_rejects_eleventh_finite_reason_in_locked_fix_scope(self) -> None:
         payload = self.load_map()
         payload["finiteReason_enum"].append("future_registered_reason")
         payload["finiteReason_projections"].append(
@@ -202,11 +227,7 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-        result = self.run_checker()
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        receipt = json.loads(result.stdout)
-        self.assertEqual(receipt["finite_reason_unknown"], [])
-        self.assertEqual(receipt["finite_reason_projection_errors"], [])
+        self.assert_failure("E_T0_LOCKED_SET_CHANGED")
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
     def test_free_string_finite_reason_fails_closed(self) -> None:

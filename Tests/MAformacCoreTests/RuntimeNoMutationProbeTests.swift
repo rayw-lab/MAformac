@@ -85,7 +85,7 @@ final class RuntimeNoMutationProbeTests: XCTestCase {
                 context: context,
                 trace: trace,
                 speech: speech,
-                finiteReason: "fast_path_no_match"
+                finiteReason: .fastPathNoMatch
             )
         case "injected_tool_plan_stub":
             let runner = try DemoRuntimeSessionRunner.defaultRunner(
@@ -101,23 +101,28 @@ final class RuntimeNoMutationProbeTests: XCTestCase {
                 context: context,
                 trace: trace,
                 speech: speech,
-                finiteReason: "name_rejected"
+                finiteReason: .nameRejected
             )
         case "matrix_no_representative_stub":
-            let runner = try DemoRuntimeSessionRunner.defaultRunner(
-                store: store,
-                traceLogger: trace,
-                speech: speech,
-                modelBackend: ThrowingProbeBackend(failure: .parseFailed)
+            let traceID = "probe-no-representative-\(probe.probeID)"
+            trace.recordGuard(
+                traceID: traceID,
+                message: "fallback_probe_no_representative_tool",
+                attributes: TraceAttributes(
+                    toolCallCount: 0,
+                    guardReason: RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue,
+                    finiteReason: .noRepresentativeTool
+                )
             )
-            let payload = try await runner.run(text: probe.probeUtterance)
-            return observation(
-                runner: runner,
-                payload: payload,
-                context: context,
-                trace: trace,
-                speech: speech,
-                finiteReason: "parse_failed"
+            _ = speech.speak(context.ttsText)
+            return ProbeObservation(
+                traceID: traceID,
+                finiteReason: .noRepresentativeTool,
+                resultKind: context.outcome.resultKind.rawValue,
+                safeReasonKind: context.outcome.safeReasonKind.rawValue,
+                badgeLabel: context.badgeLabel,
+                dialogText: context.dialogText,
+                ttsText: try XCTUnwrap(speech.spokenTexts.last, probe.probeID)
             )
         case "guard_or_clarify_stub":
             let traceID = "probe-guard-\(probe.probeID)"
@@ -127,13 +132,13 @@ final class RuntimeNoMutationProbeTests: XCTestCase {
                 attributes: TraceAttributes(
                     toolCallCount: 0,
                     guardReason: "fallback_probe_guard_denied",
-                    finiteReason: "guard_denied"
+                    finiteReason: .safetyOrPolicyRefusal
                 )
             )
             _ = speech.speak(context.ttsText)
             return ProbeObservation(
                 traceID: traceID,
-                finiteReason: "guard_denied",
+                finiteReason: .safetyOrPolicyRefusal,
                 resultKind: context.outcome.resultKind.rawValue,
                 safeReasonKind: context.outcome.safeReasonKind.rawValue,
                 badgeLabel: context.badgeLabel,
@@ -153,7 +158,7 @@ final class RuntimeNoMutationProbeTests: XCTestCase {
         context: FallbackContext,
         trace: InMemoryTraceLogger,
         speech: RecordingSpeechSynthesisEngine,
-        finiteReason: String
+        finiteReason: RuntimeFiniteReason
     ) -> ProbeObservation {
         ProbeObservation(
             traceID: payload.traceID,
@@ -259,7 +264,7 @@ private struct ExpectedUIReadback: Decodable {
 
 private struct ProbeObservation {
     let traceID: String
-    let finiteReason: String
+    let finiteReason: RuntimeFiniteReason
     let resultKind: String
     let safeReasonKind: String
     let badgeLabel: String
@@ -272,7 +277,7 @@ private struct ObservedProbeCase: Codable {
     let family: String
     let reasonKind: String
     let traceID: String
-    let finiteReason: String
+    let finiteReason: RuntimeFiniteReason
     let stateBeforeSHA256: String
     let stateAfterSHA256: String
     let stateMutation: Bool

@@ -74,10 +74,16 @@ def generate_reason_authority_swift(registry: dict[str, Any], registry_sha: str)
         f"// T0 registry SHA-256: {registry_sha}",
         "",
     ]
+    lines.extend(enum_source("RuntimeFiniteReason", registry["finiteReason_enum"], "public"))
+    lines.append("")
     reason_enum = enum_source("RuntimePresentationSafeReasonKind", registry["reasonKind_enum"], "public")
     lines.extend(reason_enum[:-1])
     lines.extend(
         [
+            "",
+            "    public init(finiteReason: RuntimeFiniteReason) {",
+            "        self = RuntimePresentationReasonAuthority.projection(for: finiteReason).safeReasonKind",
+            "    }",
             "",
             "    public init?(finiteReason: String) {",
             "        guard let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: finiteReason) else {",
@@ -93,22 +99,16 @@ def generate_reason_authority_swift(registry: dict[str, Any], registry_sha: str)
             "}",
             "",
             "public enum RuntimePresentationReasonAuthority {",
-            "    public static let finiteReasons: [String] = [",
-        ]
-    )
-    for finite_reason in registry["finiteReason_enum"]:
-        lines.append(f"        {swift_string(finite_reason)},")
-    lines.extend(
-        [
-            "    ]",
+            "    public static let finiteReasons: [RuntimeFiniteReason] = RuntimeFiniteReason.allCases",
+            "    public static let finiteReasonRawValues: [String] = finiteReasons.map(\\.rawValue)",
             "",
-            "    private static let projections: [String: RuntimePresentationReasonProjection] = [",
+            "    private static let projections: [RuntimeFiniteReason: RuntimePresentationReasonProjection] = [",
         ]
     )
     for projection in registry["finiteReason_projections"]:
         lines.extend(
             [
-                f"        {swift_string(projection['finiteReason'])}: RuntimePresentationReasonProjection(",
+                f"        .{swift_case(projection['finiteReason'])}: RuntimePresentationReasonProjection(",
                 f"            safeReasonKind: .{swift_case(projection['reasonKind'])},",
                 f"            result: .{swift_case(projection['bridge_result'])}",
                 "        ),",
@@ -118,8 +118,28 @@ def generate_reason_authority_swift(registry: dict[str, Any], registry_sha: str)
         [
             "    ]",
             "",
+            "    private static let fallbackBuckets: [RuntimeFiniteReason: FallbackGovernanceReason] = [",
+        ]
+    )
+    for bucket in registry["fallback_catalog_buckets"]:
+        for finite_reason in bucket["finite_reasons"]:
+            lines.append(
+                f"        .{swift_case(finite_reason)}: .{swift_case(bucket['reason_kind'])},"
+            )
+    lines.extend(
+        [
+            "    ]",
+            "",
+            "    public static func projection(for finiteReason: RuntimeFiniteReason) -> RuntimePresentationReasonProjection {",
+            "        projections[finiteReason]!",
+            "    }",
+            "",
             "    public static func projection(forFiniteReason finiteReason: String) -> RuntimePresentationReasonProjection? {",
-            "        projections[finiteReason]",
+            "        RuntimeFiniteReason(rawValue: finiteReason).map(projection(for:))",
+            "    }",
+            "",
+            "    static func fallbackBucket(for finiteReason: RuntimeFiniteReason) -> FallbackGovernanceReason? {",
+            "        fallbackBuckets[finiteReason]",
             "    }",
             "}",
             "",
@@ -211,10 +231,9 @@ def generate_swift(source: dict[str, Any], source_sha: str, registry: dict[str, 
             "    static func entry(for family: FallbackScriptFamily, governanceReason: FallbackGovernanceReason) -> FallbackScriptCatalogEntry? {",
             "        entries.first { $0.family == family && governanceReasons[$0.cellID] == governanceReason }",
             "    }",
-            "}",
-            "",
         ]
     )
+    lines.extend(["}", ""])
     return "\n".join(lines)
 
 

@@ -45,10 +45,10 @@ EXPECTED_FIXTURES = {
     "unknown_no_representative_entry": "matrix_no_representative_stub",
 }
 EXPECTED_FINITE_REASONS = {
-    "safety_or_clarify_reject": "guard_denied",
+    "safety_or_clarify_reject": "safety_or_policy_refusal",
     "unmounted_name_rejected": "name_rejected",
     "fast_path_no_match_fallback": "fast_path_no_match",
-    "unknown_no_representative_entry": "parse_failed",
+    "unknown_no_representative_entry": "no_representative_tool",
 }
 PROBE_ID_RE = re.compile(
     r"^probe\.fallback\.([A-Za-z][A-Za-z0-9]*)\."

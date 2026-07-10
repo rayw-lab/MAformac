@@ -82,9 +82,12 @@ public final class DemoRuntimeSessionRunner {
         do {
             frameResults = try await planDecoder(text)
         } catch let failure as DDomainToolPlanFailure {
-            return unsupportedPayload(finiteReason: failure.finiteReason)
+            return unsupportedPayload(
+                finiteReason: failure.finiteReason,
+                decodeFailureKind: failure.decodeFailureKind
+            )
         } catch FastPathIntentError.noMatch {
-            return unsupportedPayload(finiteReason: "fast_path_no_match")
+            return unsupportedPayload(finiteReason: .fastPathNoMatch)
         }
 
         guard let frameResult = frameResults.first else {
@@ -225,16 +228,11 @@ public final class DemoRuntimeSessionRunner {
             }
 
             let finiteReasons = partialResult.subactions.compactMap(\.finiteReason)
-            let refusalReason = Set(finiteReasons).count == 1 ? finiteReasons[0] : "partial_refusal"
-            let refusalResult: DemoRuntimeResult
-            switch refusalReason {
-            case "clarify_missing_slot":
-                refusalResult = .clarifyMissingSlot
-            case "safety_or_policy_refusal":
-                refusalResult = .refusalSafetyOrPolicy
-            default:
-                refusalResult = .refusalNoAvailableTool
-            }
+            let sharedFiniteReason = Set(finiteReasons).count == 1 ? finiteReasons[0] : nil
+            let projection = sharedFiniteReason.map(RuntimePresentationReasonAuthority.projection(for:))
+            let refusalReason = projection?.safeReasonKind.rawValue
+                ?? RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+            let refusalResult = projection?.result ?? .refusalNoAvailableTool
             let snapshot = PresentationSnapshot(
                 traceID: partialResult.traceID,
                 runtimeOutcome: DemoRuntimeOutcome(result: refusalResult, reason: refusalReason),
@@ -317,7 +315,10 @@ public final class DemoRuntimeSessionRunner {
         )
     }
 
-    private func unsupportedPayload(finiteReason: String) -> RuntimePresentationPayload {
+    private func unsupportedPayload(
+        finiteReason: RuntimeFiniteReason,
+        decodeFailureKind: DDomainDecodeFailureKind? = nil
+    ) -> RuntimePresentationPayload {
         let traceID = UUID().uuidString
         let turnID = "unsupported-\(traceID)"
         let userText = dialogueState.turns.last(where: { $0.role == .user })?.text
@@ -328,7 +329,8 @@ public final class DemoRuntimeSessionRunner {
             message: "unsupported_tool_plan",
             attributes: TraceAttributes(
                 guardReason: "unsupported_tool_plan",
-                finiteReason: finiteReason
+                finiteReason: finiteReason,
+                decodeFailureKind: decodeFailureKind
             )
         )
         let speechResult = speech.speak(context.ttsText)

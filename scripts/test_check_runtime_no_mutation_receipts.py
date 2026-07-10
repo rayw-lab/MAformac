@@ -50,10 +50,10 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
     def valid_receipt(self) -> dict:
         cases = []
         finite_reason_by_reason = {
-            "safety_or_clarify_reject": "guard_denied",
+            "safety_or_clarify_reject": "safety_or_policy_refusal",
             "unmounted_name_rejected": "name_rejected",
             "fast_path_no_match_fallback": "fast_path_no_match",
-            "unknown_no_representative_entry": "parse_failed",
+            "unknown_no_representative_entry": "no_representative_tool",
         }
         for probe in self.generated["probes"]:
             cases.append(

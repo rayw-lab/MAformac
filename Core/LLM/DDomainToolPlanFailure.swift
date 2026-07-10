@@ -4,16 +4,36 @@ public enum DDomainToolPlanFailure: Error, Equatable, Sendable {
     case irUnclassified(String)
     case bridgeFailed(String)
 
-    public var finiteReason: String {
+    public var finiteReason: RuntimeFiniteReason {
         switch self {
         case .parseFailed:
-            return "parse_failed"
+            return .unsupportedToolPlan
         case .nameRejected:
-            return "name_rejected"
+            return .nameRejected
         case .irUnclassified:
-            return "ir_unclassified"
+            return .unsupportedToolPlan
         case .bridgeFailed:
-            return "bridge_failed"
+            return .unsupportedToolPlan
         }
     }
+
+    public var decodeFailureKind: DDomainDecodeFailureKind {
+        switch self {
+        case .parseFailed:
+            return .parseFailed
+        case .nameRejected:
+            return .nameRejected
+        case .irUnclassified:
+            return .irUnclassified
+        case .bridgeFailed:
+            return .bridgeFailed
+        }
+    }
+}
+
+public enum DDomainDecodeFailureKind: String, Codable, CaseIterable, Equatable, Sendable {
+    case parseFailed = "parse_failed"
+    case nameRejected = "name_rejected"
+    case irUnclassified = "ir_unclassified"
+    case bridgeFailed = "bridge_failed"
 }

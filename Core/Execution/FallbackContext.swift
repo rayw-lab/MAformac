@@ -33,10 +33,30 @@ public struct FallbackContext: Codable, Equatable, Sendable {
         return FallbackContext.noRepresentative(reasonKind: reasonKind)
     }
 
-    static func resolve(userText: String?, finiteReason: String) -> FallbackContext {
-        resolve(
-            family: family(in: userText),
-            reasonKind: governanceReason(for: finiteReason)
+    static func resolve(userText: String?, finiteReason: RuntimeFiniteReason) -> FallbackContext {
+        let resolvedFamily = family(in: userText)
+        let projection = RuntimePresentationReasonAuthority.projection(for: finiteReason)
+        let governanceReason = RuntimePresentationReasonAuthority.fallbackBucket(for: finiteReason)
+        if let resolvedFamily,
+           let governanceReason,
+           let entry = FallbackScriptCatalog.entry(
+               for: resolvedFamily,
+               governanceReason: governanceReason
+           ),
+           entry.safeReasonKind == projection.safeReasonKind,
+           entry.resultKind == projection.result {
+            return FallbackContext(entry: entry)
+        }
+        if let governanceReason {
+            let fallback = FallbackContext.noRepresentative(reasonKind: governanceReason)
+            if fallback.outcome.safeReasonKind == projection.safeReasonKind,
+               fallback.outcome.resultKind == projection.result {
+                return fallback
+            }
+        }
+        return FallbackContext.noRepresentative(
+            family: resolvedFamily,
+            projection: projection
         )
     }
 
@@ -110,17 +130,42 @@ public struct FallbackContext: Codable, Equatable, Sendable {
         )
     }
 
-    private static func governanceReason(for finiteReason: String) -> FallbackGovernanceReason {
-        switch finiteReason {
-        case "name_rejected":
-            return .unmountedNameRejected
-        case "fast_path_no_match":
-            return .fastPathNoMatchFallback
-        case "guard_denied", "safety_rejected", "clarify_required":
-            return .safetyOrClarifyReject
-        default:
-            return .unknownNoRepresentativeEntry
+    private static func noRepresentative(
+        family: FallbackScriptFamily?,
+        projection: RuntimePresentationReasonProjection
+    ) -> FallbackContext {
+        let dialogText: String
+        let badgeLabel: String
+        switch projection.safeReasonKind {
+        case .safetyPolicy:
+            dialogText = "当前状态下不能执行这项操作，车辆状态保持不变。"
+            badgeLabel = "安全限制"
+        case .clarificationRequired:
+            dialogText = "还需要确认具体信息，当前状态保持不变。"
+            badgeLabel = "需确认"
+        case .capabilityNotMounted:
+            dialogText = "这项能力暂未接入演示版，我先保持当前状态。"
+            badgeLabel = "暂未接入"
+        case .notAvailableInDemo:
+            dialogText = "这项能力不在本轮演示范围，我先保持原样。"
+            badgeLabel = "不在范围"
+        case .runtimeUnavailable:
+            dialogText = "当前运行状态不可用，请稍后重试。"
+            badgeLabel = "暂不可用"
+        case .alreadyDone:
+            dialogText = "当前已经是目标状态，无需重复操作。"
+            badgeLabel = "已完成"
         }
+        return FallbackContext(
+            family: family,
+            outcome: FallbackOutcomeSummary(
+                resultKind: projection.result,
+                safeReasonKind: projection.safeReasonKind
+            ),
+            dialogText: dialogText,
+            ttsText: dialogText,
+            badgeLabel: badgeLabel
+        )
     }
 
     private static func family(in userText: String?) -> FallbackScriptFamily? {

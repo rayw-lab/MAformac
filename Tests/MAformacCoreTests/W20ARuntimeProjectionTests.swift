@@ -89,7 +89,7 @@ final class W20ARuntimeProjectionTests: XCTestCase {
         let failurePayload = try await failureRunner.run(text: "锁定空调")
 
         let failureEntry = failureTrace.entries.first { $0.message == "unsupported_tool_plan" }
-        XCTAssertEqual(failureEntry?.attributes.finiteReason, "name_rejected")
+        XCTAssertEqual(failureEntry?.attributes.finiteReason, .nameRejected)
         XCTAssertEqual(failurePayload.outcome.reason, FallbackSafeReasonKind.capabilityNotMounted.rawValue)
         XCTAssertEqual(failurePayload.reconciliation.safeReason, FallbackSafeReasonKind.capabilityNotMounted.rawValue)
         let encoded = String(decoding: try JSONEncoder().encode(failurePayload), as: UTF8.self)

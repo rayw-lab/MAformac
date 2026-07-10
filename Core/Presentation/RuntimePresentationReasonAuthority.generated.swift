@@ -2,6 +2,19 @@
 // Semantic source: openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml
 // T0 registry SHA-256: cf7b887246486f35305e7effd0a13892864e5ebb04220ac6e7d2946786137775
 
+public enum RuntimeFiniteReason: String, CaseIterable, Codable, Hashable, Sendable {
+    case safetyOrPolicyRefusal = "safety_or_policy_refusal"
+    case clarifyMissingSlot = "clarify_missing_slot"
+    case unmountedToolName = "unmounted_tool_name"
+    case nameRejected = "name_rejected"
+    case fastPathNoMatch = "fast_path_no_match"
+    case unsupportedToolPlan = "unsupported_tool_plan"
+    case noRepresentativeTool = "no_representative_tool"
+    case runtimeExecutionError = "runtime_execution_error"
+    case staleStateRevision = "stale_state_revision"
+    case alreadyStateNoop = "already_state_noop"
+}
+
 public enum RuntimePresentationSafeReasonKind: String, CaseIterable, Codable, Hashable, Sendable {
     case safetyPolicy = "safety_policy"
     case clarificationRequired = "clarification_required"
@@ -9,6 +22,10 @@ public enum RuntimePresentationSafeReasonKind: String, CaseIterable, Codable, Ha
     case notAvailableInDemo = "not_available_in_demo"
     case runtimeUnavailable = "runtime_unavailable"
     case alreadyDone = "already_done"
+
+    public init(finiteReason: RuntimeFiniteReason) {
+        self = RuntimePresentationReasonAuthority.projection(for: finiteReason).safeReasonKind
+    }
 
     public init?(finiteReason: String) {
         guard let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: finiteReason) else {
@@ -24,63 +41,71 @@ public struct RuntimePresentationReasonProjection: Equatable, Sendable {
 }
 
 public enum RuntimePresentationReasonAuthority {
-    public static let finiteReasons: [String] = [
-        "safety_or_policy_refusal",
-        "clarify_missing_slot",
-        "unmounted_tool_name",
-        "name_rejected",
-        "fast_path_no_match",
-        "unsupported_tool_plan",
-        "no_representative_tool",
-        "runtime_execution_error",
-        "stale_state_revision",
-        "already_state_noop",
-    ]
+    public static let finiteReasons: [RuntimeFiniteReason] = RuntimeFiniteReason.allCases
+    public static let finiteReasonRawValues: [String] = finiteReasons.map(\.rawValue)
 
-    private static let projections: [String: RuntimePresentationReasonProjection] = [
-        "safety_or_policy_refusal": RuntimePresentationReasonProjection(
+    private static let projections: [RuntimeFiniteReason: RuntimePresentationReasonProjection] = [
+        .safetyOrPolicyRefusal: RuntimePresentationReasonProjection(
             safeReasonKind: .safetyPolicy,
             result: .refusalSafetyOrPolicy
         ),
-        "clarify_missing_slot": RuntimePresentationReasonProjection(
+        .clarifyMissingSlot: RuntimePresentationReasonProjection(
             safeReasonKind: .clarificationRequired,
             result: .clarifyMissingSlot
         ),
-        "unmounted_tool_name": RuntimePresentationReasonProjection(
+        .unmountedToolName: RuntimePresentationReasonProjection(
             safeReasonKind: .capabilityNotMounted,
             result: .refusalNoAvailableTool
         ),
-        "name_rejected": RuntimePresentationReasonProjection(
+        .nameRejected: RuntimePresentationReasonProjection(
             safeReasonKind: .capabilityNotMounted,
             result: .refusalNoAvailableTool
         ),
-        "fast_path_no_match": RuntimePresentationReasonProjection(
+        .fastPathNoMatch: RuntimePresentationReasonProjection(
             safeReasonKind: .notAvailableInDemo,
             result: .refusalNoAvailableTool
         ),
-        "unsupported_tool_plan": RuntimePresentationReasonProjection(
+        .unsupportedToolPlan: RuntimePresentationReasonProjection(
             safeReasonKind: .notAvailableInDemo,
             result: .refusalNoAvailableTool
         ),
-        "no_representative_tool": RuntimePresentationReasonProjection(
+        .noRepresentativeTool: RuntimePresentationReasonProjection(
             safeReasonKind: .notAvailableInDemo,
             result: .refusalNoAvailableTool
         ),
-        "runtime_execution_error": RuntimePresentationReasonProjection(
+        .runtimeExecutionError: RuntimePresentationReasonProjection(
             safeReasonKind: .runtimeUnavailable,
             result: .runtimeError
         ),
-        "stale_state_revision": RuntimePresentationReasonProjection(
+        .staleStateRevision: RuntimePresentationReasonProjection(
             safeReasonKind: .runtimeUnavailable,
             result: .runtimeError
         ),
-        "already_state_noop": RuntimePresentationReasonProjection(
+        .alreadyStateNoop: RuntimePresentationReasonProjection(
             safeReasonKind: .alreadyDone,
             result: .alreadyStateNoop
         ),
     ]
 
+    private static let fallbackBuckets: [RuntimeFiniteReason: FallbackGovernanceReason] = [
+        .safetyOrPolicyRefusal: .safetyOrClarifyReject,
+        .clarifyMissingSlot: .safetyOrClarifyReject,
+        .unmountedToolName: .unmountedNameRejected,
+        .nameRejected: .unmountedNameRejected,
+        .fastPathNoMatch: .fastPathNoMatchFallback,
+        .unsupportedToolPlan: .fastPathNoMatchFallback,
+        .noRepresentativeTool: .unknownNoRepresentativeEntry,
+    ]
+
+    public static func projection(for finiteReason: RuntimeFiniteReason) -> RuntimePresentationReasonProjection {
+        projections[finiteReason]!
+    }
+
     public static func projection(forFiniteReason finiteReason: String) -> RuntimePresentationReasonProjection? {
-        projections[finiteReason]
+        RuntimeFiniteReason(rawValue: finiteReason).map(projection(for:))
+    }
+
+    static func fallbackBucket(for finiteReason: RuntimeFiniteReason) -> FallbackGovernanceReason? {
+        fallbackBuckets[finiteReason]
     }
 }

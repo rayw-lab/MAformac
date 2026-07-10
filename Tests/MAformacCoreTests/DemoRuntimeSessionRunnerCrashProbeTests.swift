@@ -32,7 +32,7 @@ final class DemoRuntimeSessionRunnerCrashProbeTests: XCTestCase {
 
             let failureEntry = trace.entries.first { $0.message == "unsupported_tool_plan" }
             XCTAssertEqual(failureEntry?.attributes.guardReason, "unsupported_tool_plan")
-            XCTAssertEqual(failureEntry?.attributes.finiteReason, "fast_path_no_match")
+            XCTAssertEqual(failureEntry?.attributes.finiteReason, .fastPathNoMatch)
             let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
             XCTAssertFalse(encoded.contains("fast_path_no_match"))
             XCTAssertFalse(encoded.contains("这个我先记下来，稍后帮您处理"))

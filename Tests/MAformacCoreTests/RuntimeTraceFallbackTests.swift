@@ -24,7 +24,7 @@ final class RuntimeTraceFallbackTests: XCTestCase {
                     disposition: .refused,
                     family: "window",
                     reasonKind: "capability_not_mounted",
-                    finiteReason: "unmounted_tool_name",
+                    finiteReason: .unmountedToolName,
                     observedToolCallCount: 0,
                     stateMutation: false,
                     speechText: "当前演示暂不支持车窗控制",
@@ -52,37 +52,13 @@ final class RuntimeTraceFallbackTests: XCTestCase {
     }
 
     func testFallbackReceiptRejectsUnknownFiniteReason() {
-        let writer = InternalTraceReceiptWriter()
-
-        XCTAssertThrowsError(
-            try writer.record(
-                traceID: "trace-unknown-reason",
-                subactions: [
-                    InternalTraceSubactionFact(
-                        subactionID: "refused-ac",
-                        disposition: .refused,
-                        family: "ac",
-                        reasonKind: "not_available_in_demo",
-                        finiteReason: "invented_reason",
-                        observedToolCallCount: 0,
-                        stateMutation: false,
-                        speechText: "当前演示暂不支持该操作",
-                        readbackKeys: []
-                    )
-                ]
-            )
-        ) { error in
-            XCTAssertEqual(
-                error as? InternalTraceReceiptError,
-                .unknownFiniteReason(subactionID: "refused-ac", rawValue: "invented_reason")
-            )
-        }
+        XCTAssertNil(RuntimeFiniteReason(rawValue: "invented_reason"))
     }
 
     func testStaleStateRevisionReceiptUsesGeneratedFiniteReasonAuthority() throws {
         XCTAssertEqual(
             Set(InternalTraceFiniteReason.allCases.map(\.rawValue)),
-            Set(RuntimePresentationReasonAuthority.finiteReasons)
+            Set(RuntimePresentationReasonAuthority.finiteReasonRawValues)
         )
 
         let writer = InternalTraceReceiptWriter()
@@ -94,7 +70,7 @@ final class RuntimeTraceFallbackTests: XCTestCase {
                     disposition: .refused,
                     family: "ac",
                     reasonKind: "runtime_unavailable",
-                    finiteReason: "stale_state_revision",
+                    finiteReason: .staleStateRevision,
                     observedToolCallCount: 0,
                     stateMutation: false,
                     speechText: "状态已变化，请重试",
@@ -120,7 +96,7 @@ final class RuntimeTraceFallbackTests: XCTestCase {
                         disposition: .refused,
                         family: "car_door",
                         reasonKind: "safety_policy",
-                        finiteReason: "safety_or_policy_refusal",
+                        finiteReason: .safetyOrPolicyRefusal,
                         observedToolCallCount: 1,
                         stateMutation: true,
                         speechText: "当前状态下不能执行开门操作",

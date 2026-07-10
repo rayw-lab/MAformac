@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MAKEFILE = REPO_ROOT / "Makefile"
 CHECKER_PATHS = (
     Path("Tools/checks/check_c1_ownership_map.py"),
+    Path("Tools/checks/check_runtime_finite_reason_authority.py"),
     Path("Tools/checks/check_fallback_scripts.py"),
     Path("scripts/check_s10_receipt.py"),
 )
@@ -20,6 +21,9 @@ MISSING_MARKER = "ERROR_MISSING_C1_CHECKER"
 OWNERSHIP_TARGET = "verify-c1-ownership"
 OWNERSHIP_SUITE = "scripts/test_check_c1_ownership_map.py"
 OWNERSHIP_CHECKER = "Tools/checks/check_c1_ownership_map.py"
+RUNTIME_REASON_TARGET = "verify-c1-finite-reason-authority"
+RUNTIME_REASON_SUITE = "scripts/test_check_runtime_finite_reason_authority.py"
+RUNTIME_REASON_CHECKER = "Tools/checks/check_runtime_finite_reason_authority.py"
 
 
 def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
@@ -29,6 +33,8 @@ def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
     verify_ci_line = next(line for line in makefile_lines if line.startswith("verify-ci:"))
     assert OWNERSHIP_TARGET in verify_line, verify_line
     assert OWNERSHIP_TARGET in verify_ci_line, verify_ci_line
+    assert RUNTIME_REASON_TARGET in verify_line, verify_line
+    assert RUNTIME_REASON_TARGET in verify_ci_line, verify_ci_line
     assert "verify-c1-checker-files" in verify_ci_line, verify_ci_line
 
     ownership_start = makefile_text.index(f"{OWNERSHIP_TARGET}:")
@@ -38,6 +44,15 @@ def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
     ]
     assert OWNERSHIP_SUITE in ownership_block, ownership_block
     assert OWNERSHIP_CHECKER in ownership_block, ownership_block
+
+    runtime_reason_start = makefile_text.index(f"{RUNTIME_REASON_TARGET}:")
+    runtime_reason_end = makefile_text.find("\n\n", runtime_reason_start)
+    runtime_reason_block = makefile_text[
+        runtime_reason_start : runtime_reason_end if runtime_reason_end >= 0 else None
+    ]
+    assert RUNTIME_REASON_SUITE in runtime_reason_block, runtime_reason_block
+    assert RUNTIME_REASON_CHECKER in runtime_reason_block, runtime_reason_block
+    assert "RuntimeFiniteReasonAuthorityTests" in runtime_reason_block, runtime_reason_block
 
     for missing_relative in CHECKER_PATHS:
         with tempfile.TemporaryDirectory(prefix="verify-ci-checkers-") as tmp:

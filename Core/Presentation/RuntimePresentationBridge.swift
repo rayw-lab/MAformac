@@ -801,12 +801,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
                     frameID: subaction.frameID
                 )
             }
-            guard let reasonKind = RuntimePresentationSafeReasonKind(finiteReason: finiteReason) else {
-                throw RuntimePresentationPartialProjectionError.unknownFiniteReason(
-                    frameID: subaction.frameID,
-                    reason: finiteReason
-                )
-            }
+            let reasonKind = RuntimePresentationSafeReasonKind(finiteReason: finiteReason)
 
             var projectedCard = card
             projectedCard.visualState = reasonKind == .safetyPolicy ? .unsafe : .blocked_with_alternative
@@ -863,8 +858,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         return executionResult.subactions
             .filter { $0.disposition == .refused }
             .allSatisfy { subaction in
-                guard let finiteReason = subaction.finiteReason,
-                      RuntimePresentationSafeReasonKind(finiteReason: finiteReason) != nil,
+                guard subaction.finiteReason != nil,
                       refusedCardsBySubactionID[subaction.frameID] != nil else {
                     return false
                 }
@@ -953,17 +947,23 @@ private extension TraceAttributes {
             return TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
         }
         if let finiteReason = copy.finiteReason {
-            copy.guardReason = RuntimePresentationSafeReasonKind(finiteReason: finiteReason)?.rawValue
-                ?? RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+            copy.guardReason = RuntimePresentationSafeReasonKind(finiteReason: finiteReason).rawValue
             copy.finiteReason = nil
         } else {
             copy.guardReason = copy.guardReason.map {
                 if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: $0) {
                     return projection.safeReasonKind.rawValue
                 }
+                if $0.range(
+                    of: #"^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$"#,
+                    options: .regularExpression
+                ) != nil {
+                    return RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+                }
                 return TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
             }
         }
+        copy.decodeFailureKind = nil
         return copy
     }
 

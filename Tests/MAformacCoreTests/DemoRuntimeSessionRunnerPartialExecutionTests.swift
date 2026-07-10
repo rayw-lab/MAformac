@@ -55,7 +55,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(partialEntries[0].attributes.toolCallCount, 1)
         XCTAssertNil(partialEntries[0].attributes.finiteReason)
         XCTAssertEqual(partialEntries[1].attributes.toolCallCount, 0)
-        XCTAssertEqual(partialEntries[1].attributes.finiteReason, "unmounted_tool_name")
+        XCTAssertEqual(partialEntries[1].attributes.finiteReason, .unmountedToolName)
 
         let fixture = try partialFixtureJSONObject()
         let fixtureOutcome = try XCTUnwrap(fixture["outcome"] as? [String: Any])
@@ -93,7 +93,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             trace.entries.first { $0.message == "partial_subaction:refused-door:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(refusedEntry.attributes.toolCallCount, 0)
-        XCTAssertEqual(refusedEntry.attributes.finiteReason, "safety_or_policy_refusal")
+        XCTAssertEqual(refusedEntry.attributes.finiteReason, .safetyOrPolicyRefusal)
     }
 
     @MainActor
@@ -211,7 +211,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             trace.entries.first { $0.message == "partial_subaction:stale-ac-off:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(staleEntry.attributes.toolCallCount, 0)
-        XCTAssertEqual(staleEntry.attributes.finiteReason, "stale_state_revision")
+        XCTAssertEqual(staleEntry.attributes.finiteReason, .staleStateRevision)
     }
 
     @MainActor
@@ -240,7 +240,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             trace.entries.first { $0.message == "partial_subaction:unknown-action:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(unknownEntry.attributes.toolCallCount, 0)
-        XCTAssertEqual(unknownEntry.attributes.finiteReason, "unsupported_tool_plan")
+        XCTAssertEqual(unknownEntry.attributes.finiteReason, .unsupportedToolPlan)
     }
 
     @MainActor
@@ -267,7 +267,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             trace.entries.first { $0.message == "partial_subaction:bad-color:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(refusedEntry.attributes.toolCallCount, 0)
-        XCTAssertEqual(refusedEntry.attributes.finiteReason, "unsupported_tool_plan")
+        XCTAssertEqual(refusedEntry.attributes.finiteReason, .unsupportedToolPlan)
     }
 
     @MainActor
@@ -302,7 +302,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
                     frameID: refused.id,
                     disposition: .refused,
                     readbacks: [],
-                    finiteReason: "unmounted_tool_name",
+                    finiteReason: .unmountedToolName,
                     observedToolCallCount: 0,
                     observedReadbackCount: 0,
                     stateMutation: false

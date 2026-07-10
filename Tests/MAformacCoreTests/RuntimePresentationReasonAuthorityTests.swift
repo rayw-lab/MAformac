@@ -6,7 +6,7 @@ final class RuntimePresentationReasonAuthorityTests: XCTestCase {
     func testGeneratedReasonAuthorityMatchesEveryT0Projection() throws {
         let registry = try Self.loadRegistry()
 
-        XCTAssertEqual(Set(RuntimePresentationReasonAuthority.finiteReasons), Set(registry.finiteReasonEnum))
+        XCTAssertEqual(Set(RuntimePresentationReasonAuthority.finiteReasonRawValues), Set(registry.finiteReasonEnum))
         XCTAssertEqual(
             Set(RuntimePresentationSafeReasonKind.allCases.map(\.rawValue)),
             Set(registry.reasonKindEnum)
@@ -37,7 +37,7 @@ final class RuntimePresentationReasonAuthorityTests: XCTestCase {
                             message: "typed refusal",
                             attributes: TraceAttributes(
                                 guardReason: expected.finiteReason,
-                                finiteReason: expected.finiteReason
+                                finiteReason: try XCTUnwrap(RuntimeFiniteReason(rawValue: expected.finiteReason))
                             ),
                             timestamp: Date(timeIntervalSince1970: 1_800_001_000)
                         )
@@ -109,7 +109,7 @@ final class RuntimePresentationReasonAuthorityTests: XCTestCase {
                         message: "typed refusal",
                         attributes: TraceAttributes(
                             guardReason: rawFiniteReason,
-                            finiteReason: rawFiniteReason
+                            finiteReason: nil
                         ),
                         timestamp: Date(timeIntervalSince1970: 1_800_001_100)
                     )

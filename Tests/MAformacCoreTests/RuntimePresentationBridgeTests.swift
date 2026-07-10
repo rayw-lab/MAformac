@@ -148,7 +148,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                         frameID: "refused-door",
                         disposition: .refused,
                         readbacks: [],
-                        finiteReason: "safety_or_policy_refusal",
+                        finiteReason: .safetyOrPolicyRefusal,
                         observedToolCallCount: 0,
                         observedReadbackCount: 0,
                         stateMutation: false
@@ -200,7 +200,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     frameID: "refused-window",
                     disposition: .refused,
                     readbacks: [],
-                    finiteReason: "unmounted_tool_name",
+                    finiteReason: .unmountedToolName,
                     observedToolCallCount: 0,
                     observedReadbackCount: 0,
                     stateMutation: false
@@ -235,7 +235,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                             toolCallCount: 0,
                             guardReason: "unmounted_tool_name",
                             readbackResult: .notApplicable,
-                            finiteReason: "unmounted_tool_name"
+                            finiteReason: .unmountedToolName
                         )
                     )
                 ]
@@ -296,7 +296,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
                 executionResult: Self.partialExecutionResult(
                     acceptedReadbacks: [],
-                    refusedFiniteReason: "unmounted_tool_name"
+                    refusedFiniteReason: .unmountedToolName
                 ),
                 acceptedCards: [acceptedCard],
                 refusedCardsBySubactionID: refusedCards
@@ -312,7 +312,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
                 executionResult: Self.partialExecutionResult(
                     acceptedReadbacks: [Self.acceptedReadback],
-                    refusedFiniteReason: "unmounted_tool_name"
+                    refusedFiniteReason: .unmountedToolName
                 ),
                 acceptedCards: [
                     acceptedCard,
@@ -331,27 +331,13 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             )
         }
 
-        XCTAssertThrowsError(
-            try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
-                executionResult: Self.partialExecutionResult(
-                    acceptedReadbacks: [Self.acceptedReadback],
-                    refusedFiniteReason: "unmounted_name_rejected"
-                ),
-                acceptedCards: [acceptedCard],
-                refusedCardsBySubactionID: refusedCards
-            )
-        ) { error in
-            XCTAssertEqual(
-                error as? RuntimePresentationPartialProjectionError,
-                .unknownFiniteReason(frameID: "refused-window", reason: "unmounted_name_rejected")
-            )
-        }
+        XCTAssertNil(RuntimeFiniteReason(rawValue: "unmounted_name_rejected"))
 
         XCTAssertThrowsError(
             try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
                 executionResult: Self.partialExecutionResult(
                     acceptedReadbacks: [Self.acceptedReadback],
-                    refusedFiniteReason: "unmounted_tool_name"
+                    refusedFiniteReason: .unmountedToolName
                 ),
                 acceptedCards: [acceptedCard],
                 refusedCardsBySubactionID: refusedCards,
@@ -742,7 +728,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
 
     private static func partialExecutionResult(
         acceptedReadbacks: [DemoActionReadback],
-        refusedFiniteReason: String
+        refusedFiniteReason: RuntimeFiniteReason
     ) -> DemoRuntimePartialPlanResult {
         DemoRuntimePartialPlanResult(
             traceID: "trace-partial-mutation",

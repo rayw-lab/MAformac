@@ -51,7 +51,7 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
                     frameID: "refused-window",
                     disposition: .refused,
                     readbacks: [],
-                    finiteReason: "unmounted_tool_name",
+                    finiteReason: .unmountedToolName,
                     observedToolCallCount: 0,
                     observedReadbackCount: 0,
                     stateMutation: false

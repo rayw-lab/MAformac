@@ -11,6 +11,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from check_runtime_finite_reason_authority import check as check_runtime_finite_reason_authority
+
 
 CHANGE_ID = "add-c1-demo-capability-governance"
 LEGACY_CHANGE_ID = "define-c1-demo-capability-and-fallback-contract"
@@ -300,8 +302,9 @@ def check(change: Path, repo_root: Path) -> dict[str, Any]:
         if result not in bridge_text:
             projection_errors.append(f"bridge spec missing result token {result}")
 
+    runtime_finite_reason_authority = check_runtime_finite_reason_authority(repo_root)
     receipt = {
-        "schema_version": "c1_ownership_checker_receipt.v1",
+        "schema_version": "c1_ownership_checker_receipt.v2",
         "status": "PASS",
         "change_id": CHANGE_ID,
         "change_path": str(change),
@@ -324,6 +327,8 @@ def check(change: Path, repo_root: Path) -> dict[str, Any]:
         "finite_reason_missing": finite_reason_missing,
         "finite_reason_duplicates": finite_reason_duplicates,
         "finite_reason_projection_errors": sorted_unique(projection_errors),
+        "runtime_finite_reason_authority": runtime_finite_reason_authority,
+        "runtime_finite_reason_violations": runtime_finite_reason_authority["violations"],
         "errors": errors,
     }
     failing_fields = (
@@ -343,6 +348,7 @@ def check(change: Path, repo_root: Path) -> dict[str, Any]:
         "finite_reason_missing",
         "finite_reason_duplicates",
         "finite_reason_projection_errors",
+        "runtime_finite_reason_violations",
         "errors",
     )
     if any(receipt[field] for field in failing_fields):

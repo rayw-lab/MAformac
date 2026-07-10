@@ -36,7 +36,8 @@ public struct TraceAttributes: Codable, Equatable, Sendable {
     public var repairUsed: Bool?
     public var guardReason: String?
     public var readbackResult: TraceReadbackResult?
-    public var finiteReason: String?
+    public var finiteReason: RuntimeFiniteReason?
+    public var decodeFailureKind: DDomainDecodeFailureKind?
     public var rawPayloadHash: String?
     public var slotProjected: Bool?
 
@@ -47,7 +48,8 @@ public struct TraceAttributes: Codable, Equatable, Sendable {
         repairUsed: Bool? = nil,
         guardReason: String? = nil,
         readbackResult: TraceReadbackResult? = nil,
-        finiteReason: String? = nil,
+        finiteReason: RuntimeFiniteReason? = nil,
+        decodeFailureKind: DDomainDecodeFailureKind? = nil,
         rawPayloadHash: String? = nil,
         slotProjected: Bool? = nil
     ) {
@@ -58,6 +60,7 @@ public struct TraceAttributes: Codable, Equatable, Sendable {
         self.guardReason = guardReason
         self.readbackResult = readbackResult
         self.finiteReason = finiteReason
+        self.decodeFailureKind = decodeFailureKind
         self.rawPayloadHash = rawPayloadHash
         self.slotProjected = slotProjected
     }
@@ -212,37 +215,7 @@ public final class InMemoryTraceLogger: TraceLogger, @unchecked Sendable {
 /// This type is intentionally internal: raw finite reasons are retained in C3
 /// receipts for diagnostics, but are not part of the runtime-presentation bridge
 /// payload contract.
-struct InternalTraceFiniteReason: RawRepresentable, Codable, CaseIterable, Equatable, Sendable {
-    let rawValue: String
-
-    init?(rawValue: String) {
-        guard RuntimePresentationReasonAuthority.projection(forFiniteReason: rawValue) != nil else {
-            return nil
-        }
-        self.rawValue = rawValue
-    }
-
-    static var allCases: [InternalTraceFiniteReason] {
-        RuntimePresentationReasonAuthority.finiteReasons.compactMap(InternalTraceFiniteReason.init(rawValue:))
-    }
-
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let rawValue = try container.decode(String.self)
-        guard let finiteReason = Self(rawValue: rawValue) else {
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "Unknown T0 finiteReason: \(rawValue)"
-            )
-        }
-        self = finiteReason
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(rawValue)
-    }
-}
+typealias InternalTraceFiniteReason = RuntimeFiniteReason
 
 enum InternalTraceSubactionDisposition: String, Codable, Equatable, Sendable {
     case accepted
@@ -257,7 +230,7 @@ struct InternalTraceSubactionFact: Equatable, Sendable {
     let disposition: InternalTraceSubactionDisposition
     let family: String
     let reasonKind: String
-    let finiteReason: String?
+    let finiteReason: RuntimeFiniteReason?
     let observedToolCallCount: Int
     let stateMutation: Bool
     let speechText: String
@@ -268,7 +241,7 @@ struct InternalTraceSubactionFact: Equatable, Sendable {
         disposition: InternalTraceSubactionDisposition,
         family: String,
         reasonKind: String,
-        finiteReason: String?,
+        finiteReason: RuntimeFiniteReason?,
         observedToolCallCount: Int,
         stateMutation: Bool,
         speechText: String,
@@ -331,7 +304,6 @@ struct InternalTraceReceipt: Codable, Equatable, Sendable {
 }
 
 enum InternalTraceReceiptError: Error, Equatable, Sendable {
-    case unknownFiniteReason(subactionID: String, rawValue: String)
     case refusedSubactionMissingFiniteReason(subactionID: String)
     case acceptedSubactionHasFiniteReason(subactionID: String, rawValue: String)
     case refusedSubactionHasObservedEffects(
@@ -361,7 +333,7 @@ final class InternalTraceReceiptWriter {
     private func makeReceiptSubaction(
         from fact: InternalTraceSubactionFact
     ) throws -> InternalTraceReceiptSubaction {
-        let finiteReason = try parseFiniteReason(from: fact)
+        let finiteReason = fact.finiteReason
 
         switch fact.disposition {
         case .accepted:
@@ -397,20 +369,5 @@ final class InternalTraceReceiptWriter {
             speechText: fact.speechText,
             readbackKeys: fact.readbackKeys
         )
-    }
-
-    private func parseFiniteReason(
-        from fact: InternalTraceSubactionFact
-    ) throws -> InternalTraceFiniteReason? {
-        guard let rawValue = fact.finiteReason else {
-            return nil
-        }
-        guard let finiteReason = InternalTraceFiniteReason(rawValue: rawValue) else {
-            throw InternalTraceReceiptError.unknownFiniteReason(
-                subactionID: fact.subactionID,
-                rawValue: rawValue
-            )
-        }
-        return finiteReason
     }
 }

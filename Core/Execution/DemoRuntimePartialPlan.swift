@@ -14,7 +14,7 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
     public var frameID: String
     public var disposition: DemoRuntimePartialSubactionDisposition
     public var readbacks: [DemoActionReadback]
-    public var finiteReason: String?
+    public var finiteReason: RuntimeFiniteReason?
     public var observedToolCallCount: Int
     public var observedReadbackCount: Int
     public var stateMutation: Bool
@@ -23,7 +23,7 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
         frameID: String,
         disposition: DemoRuntimePartialSubactionDisposition,
         readbacks: [DemoActionReadback],
-        finiteReason: String?,
+        finiteReason: RuntimeFiniteReason?,
         observedToolCallCount: Int,
         observedReadbackCount: Int,
         stateMutation: Bool
@@ -127,7 +127,7 @@ public struct DemoRuntimePartialPlan: Sendable {
                     try refusedSubaction(
                         frame: frame,
                         before: before,
-                        finiteReason: "safety_or_policy_refusal",
+                        finiteReason: .safetyOrPolicyRefusal,
                         store: store,
                         traceID: traceID,
                         traceLogger: traceLogger
@@ -138,7 +138,7 @@ public struct DemoRuntimePartialPlan: Sendable {
                     try refusedSubaction(
                         frame: frame,
                         before: before,
-                        finiteReason: "stale_state_revision",
+                        finiteReason: .staleStateRevision,
                         store: store,
                         traceID: traceID,
                         traceLogger: traceLogger
@@ -149,19 +149,19 @@ public struct DemoRuntimePartialPlan: Sendable {
                     try refusedSubaction(
                         frame: frame,
                         before: before,
-                        finiteReason: "unsupported_tool_plan",
+                        finiteReason: .unsupportedToolPlan,
                         store: store,
                         traceID: traceID,
                         traceLogger: traceLogger
                     )
                 )
             } catch let ToolExecutionError.schemaInvalid(reason) {
-                let finiteReason: String
+                let finiteReason: RuntimeFiniteReason
                 switch reason {
                 case .missingField:
-                    finiteReason = "clarify_missing_slot"
+                    finiteReason = .clarifyMissingSlot
                 default:
-                    finiteReason = "unsupported_tool_plan"
+                    finiteReason = .unsupportedToolPlan
                 }
                 subactions.append(
                     try refusedSubaction(
@@ -179,12 +179,12 @@ public struct DemoRuntimePartialPlan: Sendable {
         return DemoRuntimePartialPlanResult(traceID: traceID, subactions: subactions)
     }
 
-    private func preflightFiniteReason(for frame: ToolCallFrame) -> String? {
+    private func preflightFiniteReason(for frame: ToolCallFrame) -> RuntimeFiniteReason? {
         guard frame.candidateSource != .fastPath else {
             return nil
         }
         guard DDomainMountedToolCatalog.mountedToolNames.contains(frame.toolName) else {
-            return "unmounted_tool_name"
+            return .unmountedToolName
         }
         return nil
     }
@@ -193,7 +193,7 @@ public struct DemoRuntimePartialPlan: Sendable {
     private func refusedSubaction(
         frame: ToolCallFrame,
         before: [String],
-        finiteReason: String,
+        finiteReason: RuntimeFiniteReason,
         store: DemoVehicleStateStore,
         traceID: String,
         traceLogger: any TraceLogger
@@ -228,7 +228,7 @@ public struct DemoRuntimePartialPlan: Sendable {
         let message = "partial_subaction:\(item.frameID):\(item.disposition.rawValue):tool_call_count=\(item.observedToolCallCount):readback_count=\(item.observedReadbackCount):state_mutation=\(item.stateMutation)"
         let attributes = TraceAttributes(
             toolCallCount: item.observedToolCallCount,
-            guardReason: item.finiteReason,
+            guardReason: item.finiteReason?.rawValue,
             readbackResult: item.disposition == .accepted ? .verified : .notApplicable,
             finiteReason: item.finiteReason
         )

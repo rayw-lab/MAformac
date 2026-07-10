@@ -252,7 +252,10 @@ def observe_follow_up_facts(
         fast_path_ready = "throw FastPathIntentError.noMatch(text)" in fast_path_text
         runtime_ready = (
             "catch FastPathIntentError.noMatch" in runtime_text
-            and 'finiteReason: "fast_path_no_match"' in runtime_text
+            and (
+                'finiteReason: "fast_path_no_match"' in runtime_text
+                or "finiteReason: .fastPathNoMatch" in runtime_text
+            )
         )
         details["query_result"]["fast_path_no_match_guard"] = fast_path_ready
         details["query_result"]["runtime_no_match_bucket"] = runtime_ready
