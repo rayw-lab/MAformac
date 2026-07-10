@@ -41,14 +41,7 @@ public struct FallbackContext: Codable, Equatable, Sendable {
     }
 
     public var runtimeResult: DemoRuntimeResult {
-        switch outcome.resultKind {
-        case .refusalSafetyOrPolicy:
-            return .refusalSafetyOrPolicy
-        case .clarifyMissingSlot:
-            return .clarifyMissingSlot
-        case .refusalNoAvailableTool:
-            return .refusalNoAvailableTool
-        }
+        outcome.resultKind
     }
 
     private init(entry: FallbackScriptCatalogEntry) {

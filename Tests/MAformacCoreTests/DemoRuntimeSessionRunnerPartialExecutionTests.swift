@@ -138,7 +138,10 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         let payload = try await runner.run(text: "打开两个未挂载车窗")
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, "unmounted_tool_name")
+        XCTAssertEqual(
+            payload.outcome.reason,
+            RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue
+        )
         XCTAssertNotEqual(payload.outcome.result, .partialAcceptPartialRefuse)
         XCTAssertEqual(payload.reconciliation.status, .notApplicable)
         XCTAssertTrue(payload.readbacks.isEmpty)

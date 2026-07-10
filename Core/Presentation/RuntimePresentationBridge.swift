@@ -44,7 +44,7 @@ public struct DemoInteractionEvent: Codable, Equatable, Sendable {
     }
 }
 
-public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Sendable {
+public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
     case acceptedToolCall = "accepted_tool_call"
     case clarifyMissingSlot = "clarify_missing_slot"
     case refusalNoAvailableTool = "refusal_no_available_tool"
@@ -181,6 +181,18 @@ private enum PresentationPayloadSanitizer {
 
     static func redactedOptional(_ value: String?, maxLength: Int = 160) -> String? {
         value.map { redacted($0, maxLength: maxLength) }
+    }
+
+    static func publicReason(_ value: String?, maxLength: Int = 160) -> String? {
+        guard let value else { return nil }
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: normalized) {
+            return projection.safeReasonKind.rawValue
+        }
+        if let safeReasonKind = RuntimePresentationSafeReasonKind(rawValue: normalized) {
+            return safeReasonKind.rawValue
+        }
+        return redacted(normalized, maxLength: maxLength)
     }
 }
 
@@ -454,7 +466,7 @@ public struct PresentationReconciliation: Codable, Equatable, Sendable {
         self.status = status
         self.readbackKey = readbackKey.map { PresentationPayloadSanitizer.redacted($0) }
         self.mismatchClass = mismatchClass
-        self.safeReason = PresentationPayloadSanitizer.redactedOptional(safeReason)
+        self.safeReason = PresentationPayloadSanitizer.publicReason(safeReason)
     }
 }
 
@@ -472,6 +484,22 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
     public var reconciliation: PresentationReconciliation
     public var traceEnvelope: TraceEnvelope?
     public var timestamp: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion
+        case traceID
+        case turnID
+        case eventID
+        case isTerminal
+        case outcome
+        case proofClass
+        case cards
+        case cardSemantics
+        case readbacks
+        case reconciliation
+        case traceEnvelope
+        case timestamp
+    }
 
     public init(
         schemaVersion: RuntimePresentationPayloadSchema = .v1,
@@ -498,7 +526,7 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         self.cards = cards.map(RuntimePresentationPayload.presentationSafe)
         self.cardSemantics = cardSemantics?.map(RuntimePresentationPayload.presentationSafe)
         self.readbacks = readbacks.map(RuntimePresentationPayload.presentationSafe)
-        self.reconciliation = reconciliation
+        self.reconciliation = RuntimePresentationPayload.presentationSafe(reconciliation)
         self.traceEnvelope = traceEnvelope?.presentationSafe()
         self.timestamp = timestamp
     }
@@ -525,13 +553,69 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         )
     }
 
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            schemaVersion: try container.decode(RuntimePresentationPayloadSchema.self, forKey: .schemaVersion),
+            traceID: try container.decode(String.self, forKey: .traceID),
+            turnID: try container.decode(String.self, forKey: .turnID),
+            eventID: try container.decodeIfPresent(String.self, forKey: .eventID),
+            isTerminal: try container.decode(Bool.self, forKey: .isTerminal),
+            outcome: try container.decode(DemoRuntimeOutcome.self, forKey: .outcome),
+            proofClass: try container.decode(PresentationProofClass.self, forKey: .proofClass),
+            cards: try container.decode([DemoVehicleStateCell].self, forKey: .cards),
+            cardSemantics: try container.decodeIfPresent([PresentationCardSemantics].self, forKey: .cardSemantics),
+            readbacks: try container.decode([DemoActionReadback].self, forKey: .readbacks),
+            reconciliation: try container.decode(PresentationReconciliation.self, forKey: .reconciliation),
+            traceEnvelope: try container.decodeIfPresent(TraceEnvelope.self, forKey: .traceEnvelope),
+            timestamp: try container.decode(Date.self, forKey: .timestamp)
+        )
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        let safe = RuntimePresentationPayload(
+            schemaVersion: schemaVersion,
+            traceID: traceID,
+            turnID: turnID,
+            eventID: eventID,
+            isTerminal: isTerminal,
+            outcome: outcome,
+            proofClass: proofClass,
+            cards: cards,
+            cardSemantics: cardSemantics,
+            readbacks: readbacks,
+            reconciliation: reconciliation,
+            traceEnvelope: traceEnvelope,
+            timestamp: timestamp
+        )
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(safe.schemaVersion, forKey: .schemaVersion)
+        try container.encode(safe.traceID, forKey: .traceID)
+        try container.encode(safe.turnID, forKey: .turnID)
+        try container.encodeIfPresent(safe.eventID, forKey: .eventID)
+        try container.encode(safe.isTerminal, forKey: .isTerminal)
+        try container.encode(safe.outcome, forKey: .outcome)
+        try container.encode(safe.proofClass, forKey: .proofClass)
+        try container.encode(safe.cards, forKey: .cards)
+        try container.encodeIfPresent(safe.cardSemantics, forKey: .cardSemantics)
+        try container.encode(safe.readbacks, forKey: .readbacks)
+        try container.encode(safe.reconciliation, forKey: .reconciliation)
+        try container.encodeIfPresent(safe.traceEnvelope, forKey: .traceEnvelope)
+        try container.encode(safe.timestamp, forKey: .timestamp)
+    }
+
     private static func presentationSafe(_ outcome: DemoRuntimeOutcome) -> DemoRuntimeOutcome {
-        DemoRuntimeOutcome(
-            result: outcome.result,
+        let projection = outcome.reason.flatMap {
+            RuntimePresentationReasonAuthority.projection(
+                forFiniteReason: $0.trimmingCharacters(in: .whitespacesAndNewlines)
+            )
+        }
+        return DemoRuntimeOutcome(
+            result: projection?.result ?? outcome.result,
             behaviorClassSource: outcome.behaviorClassSource,
-            reason: PresentationPayloadSanitizer.redactedOptional(outcome.reason),
+            reason: projection?.safeReasonKind.rawValue ?? PresentationPayloadSanitizer.publicReason(outcome.reason),
             missingSlot: PresentationPayloadSanitizer.redactedOptional(outcome.missingSlot),
-            scopeFailureReason: PresentationPayloadSanitizer.redactedOptional(outcome.scopeFailureReason)
+            scopeFailureReason: PresentationPayloadSanitizer.publicReason(outcome.scopeFailureReason)
         )
     }
 
@@ -549,7 +633,7 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             cellKey: PresentationPayloadSanitizer.redacted(semantics.cellKey),
             role: semantics.role,
             scopeOrigin: semantics.scopeOrigin,
-            reason: PresentationPayloadSanitizer.redactedOptional(semantics.reason),
+            reason: PresentationPayloadSanitizer.publicReason(semantics.reason),
             isActive: semantics.isActive,
             siblingKeys: semantics.siblingKeys.map { PresentationPayloadSanitizer.redacted($0) }
         )
@@ -564,6 +648,15 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             scopeOrigin: readback.scopeOrigin
         )
     }
+
+    private static func presentationSafe(_ reconciliation: PresentationReconciliation) -> PresentationReconciliation {
+        PresentationReconciliation(
+            status: reconciliation.status,
+            readbackKey: reconciliation.readbackKey,
+            mismatchClass: reconciliation.mismatchClass,
+            safeReason: reconciliation.safeReason
+        )
+    }
 }
 
 public enum TerminalSnapshotStopReason: String, Codable, CaseIterable, Equatable, Sendable {
@@ -571,34 +664,6 @@ public enum TerminalSnapshotStopReason: String, Codable, CaseIterable, Equatable
     case interrupted
     case timeout
     case backgrounding
-}
-
-private enum RuntimePresentationSafeReasonKind: String {
-    case safetyPolicy = "safety_policy"
-    case clarificationRequired = "clarification_required"
-    case capabilityNotMounted = "capability_not_mounted"
-    case notAvailableInDemo = "not_available_in_demo"
-    case runtimeUnavailable = "runtime_unavailable"
-    case alreadyDone = "already_done"
-
-    init?(finiteReason: String) {
-        switch finiteReason {
-        case "safety_or_policy_refusal":
-            self = .safetyPolicy
-        case "clarify_missing_slot":
-            self = .clarificationRequired
-        case "unmounted_tool_name", "name_rejected":
-            self = .capabilityNotMounted
-        case "fast_path_no_match", "unsupported_tool_plan", "no_representative_tool":
-            self = .notAvailableInDemo
-        case "runtime_execution_error":
-            self = .runtimeUnavailable
-        case "already_state_noop":
-            self = .alreadyDone
-        default:
-            return nil
-        }
-    }
 }
 
 public enum RuntimePresentationPartialProjectionError: Error, Equatable, Sendable {
@@ -865,7 +930,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         for token in unsafeReasonTokens.sorted(by: { $0.count > $1.count }) where safeReason.range(of: token, options: options) != nil {
             safeReason = safeReason.replacingOccurrences(of: token, with: "[redacted]", options: options)
         }
-        return String(safeReason.prefix(160))
+        return PresentationPayloadSanitizer.publicReason(String(safeReason.prefix(160))) ?? fallback
     }
 
     private static let unsafeReasonTokens = PresentationPayloadSanitizer.redactedTokens
@@ -875,14 +940,21 @@ private extension TraceAttributes {
     func presentationSafe(redactedTokens: [String], maxMessageLength: Int) -> TraceAttributes {
         var copy = self
         copy.stopReason = copy.stopReason.map {
-            TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+            if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: $0) {
+                return projection.safeReasonKind.rawValue
+            }
+            return TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
         }
         if let finiteReason = copy.finiteReason {
             copy.guardReason = RuntimePresentationSafeReasonKind(finiteReason: finiteReason)?.rawValue
+                ?? RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
             copy.finiteReason = nil
         } else {
             copy.guardReason = copy.guardReason.map {
-                TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+                if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: $0) {
+                    return projection.safeReasonKind.rawValue
+                }
+                return TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
             }
         }
         return copy
