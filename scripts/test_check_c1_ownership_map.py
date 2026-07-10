@@ -179,6 +179,36 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
         self.assert_failure("semantic_gaps")
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
+    def test_registry_projection_accepts_new_closed_finite_reason_without_checker_shadow(self) -> None:
+        payload = self.load_map()
+        payload["finiteReason_enum"].append("future_registered_reason")
+        payload["finiteReason_projections"].append(
+            {
+                "finiteReason": "future_registered_reason",
+                "fallback_reason": "runtime_error_typed",
+                "reasonKind": "runtime_unavailable",
+                "bridge_result": "runtime_error",
+            }
+        )
+        self.write_map(payload)
+
+        spec = self.change / "specs/demo-capability-governance/spec.md"
+        spec.write_text(
+            spec.read_text(encoding="utf-8").replace(
+                "or `already_state_noop`",
+                "`future_registered_reason`, or `already_state_noop`",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        receipt = json.loads(result.stdout)
+        self.assertEqual(receipt["finite_reason_unknown"], [])
+        self.assertEqual(receipt["finite_reason_projection_errors"], [])
+
+    @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
     def test_free_string_finite_reason_fails_closed(self) -> None:
         payload = self.load_map()
         payload["finiteReason_enum"].append("made_up_reason")

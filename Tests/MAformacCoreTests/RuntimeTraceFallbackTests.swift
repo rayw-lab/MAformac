@@ -39,7 +39,7 @@ final class RuntimeTraceFallbackTests: XCTestCase {
         XCTAssertTrue(receipt.subactions[0].stateMutation)
         XCTAssertEqual(receipt.subactions[0].observedToolCallCount, 1)
         XCTAssertNil(receipt.subactions[0].finiteReason)
-        XCTAssertEqual(receipt.subactions[1].finiteReason, .unmountedToolName)
+        XCTAssertEqual(receipt.subactions[1].finiteReason?.rawValue, "unmounted_tool_name")
         XCTAssertFalse(receipt.subactions[1].stateMutation)
         XCTAssertEqual(receipt.subactions[1].speechText, "当前演示暂不支持车窗控制")
         XCTAssertEqual(writer.receipts, [receipt])
@@ -77,6 +77,35 @@ final class RuntimeTraceFallbackTests: XCTestCase {
                 .unknownFiniteReason(subactionID: "refused-ac", rawValue: "invented_reason")
             )
         }
+    }
+
+    func testStaleStateRevisionReceiptUsesGeneratedFiniteReasonAuthority() throws {
+        XCTAssertEqual(
+            Set(InternalTraceFiniteReason.allCases.map(\.rawValue)),
+            Set(RuntimePresentationReasonAuthority.finiteReasons)
+        )
+
+        let writer = InternalTraceReceiptWriter()
+        let receipt = try writer.record(
+            traceID: "trace-stale-state-revision",
+            subactions: [
+                InternalTraceSubactionFact(
+                    subactionID: "refused-stale-ac",
+                    disposition: .refused,
+                    family: "ac",
+                    reasonKind: "runtime_unavailable",
+                    finiteReason: "stale_state_revision",
+                    observedToolCallCount: 0,
+                    stateMutation: false,
+                    speechText: "状态已变化，请重试",
+                    readbackKeys: []
+                )
+            ]
+        )
+
+        XCTAssertEqual(receipt.subactions[0].finiteReason?.rawValue, "stale_state_revision")
+        let encoded = try JSONEncoder().encode(receipt)
+        XCTAssertTrue(String(decoding: encoded, as: UTF8.self).contains("stale_state_revision"))
     }
 
     func testRefusedReceiptFailsWhenActualStateMutationOrToolCallExists() {

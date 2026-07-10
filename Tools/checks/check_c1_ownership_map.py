@@ -33,17 +33,6 @@ EXPECTED_OWNERS = {
     "payload_schema_cards_and_readback_rendering": "runtime-presentation-bridge",
     "presentation_safe_trace_and_proof_cap": "runtime-presentation-bridge",
 }
-FINITE_REASON_ENUM = {
-    "safety_or_policy_refusal",
-    "clarify_missing_slot",
-    "unmounted_tool_name",
-    "name_rejected",
-    "fast_path_no_match",
-    "unsupported_tool_plan",
-    "no_representative_tool",
-    "runtime_execution_error",
-    "already_state_noop",
-}
 SAFE_REASON_KINDS = {
     "safety_policy",
     "clarification_required",
@@ -267,8 +256,8 @@ def check(change: Path, repo_root: Path) -> dict[str, Any]:
         errors.append("finiteReason_enum must be a list of strings")
         finite_enum = []
     finite_set = set(finite_enum)
-    finite_reason_unknown = sorted(finite_set - FINITE_REASON_ENUM)
-    finite_reason_missing = sorted(FINITE_REASON_ENUM - finite_set)
+    if not finite_set:
+        errors.append("finiteReason_enum must not be empty")
     finite_reason_duplicates = sorted(item for item, count in Counter(finite_enum).items() if count > 1)
 
     projections = ownership_map.get("finiteReason_projections")
@@ -292,12 +281,19 @@ def check(change: Path, repo_root: Path) -> dict[str, Any]:
             projection_errors.append(f"{finite_reason}: invalid reasonKind")
         if projection.get("bridge_result") not in BRIDGE_RESULTS:
             projection_errors.append(f"{finite_reason}: invalid bridge_result")
-    for finite_reason in FINITE_REASON_ENUM:
+    for finite_reason in finite_set:
         if len(projection_by_reason.get(finite_reason, [])) != 1:
             projection_errors.append(f"{finite_reason}: expected exactly one projection")
-    for finite_reason in sorted(set(projection_by_reason) - FINITE_REASON_ENUM):
+    finite_reason_missing = sorted(set(projection_by_reason) - finite_set)
+    for finite_reason in finite_reason_missing:
         projection_errors.append(f"{finite_reason}: projection is not in finiteReason enum")
-    for token in FINITE_REASON_ENUM | FALLBACK_REASONS | SAFE_REASON_KINDS:
+    finite_reason_unknown = sorted(
+        finite_reason
+        for finite_reason in finite_set
+        if len(projection_by_reason.get(finite_reason, [])) != 1
+        or finite_reason not in governance_text
+    )
+    for token in finite_set | FALLBACK_REASONS | SAFE_REASON_KINDS:
         if token not in governance_text:
             projection_errors.append(f"governance spec missing projection token {token}")
     for result in BRIDGE_RESULTS:
