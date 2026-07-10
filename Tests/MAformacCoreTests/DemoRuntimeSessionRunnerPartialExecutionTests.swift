@@ -25,6 +25,20 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
         XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "0")
 
+        XCTAssertEqual(payload.cards.map(\.key), ["window.position[主驾]", "ac.power"])
+        XCTAssertEqual(payload.cards.map(\.visualState), [.blocked_with_alternative, .satisfied])
+        let refusedSemantics = try XCTUnwrap(
+            payload.cardSemantics?.first { $0.cellKey == "window.position[主驾]" }
+        )
+        XCTAssertEqual(refusedSemantics.role, .refused)
+        XCTAssertEqual(refusedSemantics.reason, "capability_not_mounted")
+        XCTAssertEqual(refusedSemantics.siblingKeys, ["ac.power"])
+
+        let encodedPayload = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+        XCTAssertFalse(encodedPayload.contains("unmounted_tool_name"))
+        XCTAssertFalse(encodedPayload.contains("finiteReason"))
+        XCTAssertTrue(encodedPayload.contains("capability_not_mounted"))
+
         let executionEntries = trace.entries.filter { $0.stage == .execute }
         let readbackEntries = trace.entries.filter { $0.stage == .readback }
         XCTAssertEqual(executionEntries.count, 1)
