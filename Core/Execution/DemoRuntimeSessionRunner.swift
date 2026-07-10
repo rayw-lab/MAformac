@@ -1,14 +1,19 @@
 import Foundation
 
+public enum DemoRuntimeSessionRunnerError: Error, Equatable {
+    case multiFramePlanRequiresPartialExecution(frameIDs: [String])
+}
+
 @MainActor
 public final class DemoRuntimeSessionRunner {
     public typealias FrameDecoder = (String) async throws -> ToolCallFrame
+    public typealias PlanDecoder = (String) async throws -> [ToolCallFrame]
 
     private let store: DemoVehicleStateStore
     private let pipeline: C3ExecutionPipeline
     private let traceLogger: any TraceLogger
     private let speech: any SpeechSynthesisEngine
-    private let frameDecoder: FrameDecoder
+    private let planDecoder: PlanDecoder
     private let alignsFrameStateRevisionToStore: Bool
     private let timestampProvider: () -> Date
     private var dialogueState: DialogueState
@@ -27,7 +32,27 @@ public final class DemoRuntimeSessionRunner {
         self.pipeline = pipeline
         self.traceLogger = traceLogger
         self.speech = speech
-        self.frameDecoder = frameDecoder
+        self.planDecoder = { text in [try await frameDecoder(text)] }
+        self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
+        self.dialogueState = dialogueState
+        self.timestampProvider = timestampProvider
+    }
+
+    public init(
+        store: DemoVehicleStateStore,
+        pipeline: C3ExecutionPipeline,
+        traceLogger: any TraceLogger,
+        speech: any SpeechSynthesisEngine,
+        planDecoder: @escaping PlanDecoder,
+        alignsFrameStateRevisionToStore: Bool = true,
+        dialogueState: DialogueState = DialogueState(),
+        timestampProvider: @escaping () -> Date = Date.init
+    ) {
+        self.store = store
+        self.pipeline = pipeline
+        self.traceLogger = traceLogger
+        self.speech = speech
+        self.planDecoder = planDecoder
         self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
         self.dialogueState = dialogueState
         self.timestampProvider = timestampProvider
@@ -46,20 +71,29 @@ public final class DemoRuntimeSessionRunner {
             pipeline: try bundle.makePipeline(),
             traceLogger: traceLogger,
             speech: speech,
-            frameDecoder: { text in try await router.decode(text: text) }
+            planDecoder: { text in try await router.decodePlan(text: text) }
         )
     }
 
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(text)
-        let frameResult: ToolCallFrame
+        let frameResults: [ToolCallFrame]
         do {
-            frameResult = try await frameDecoder(text)
+            frameResults = try await planDecoder(text)
         } catch let failure as DDomainToolPlanFailure {
             return unsupportedPayload(finiteReason: failure.finiteReason)
         } catch FastPathIntentError.noMatch {
             return unsupportedPayload(finiteReason: "fast_path_no_match")
+        }
+
+        guard let frameResult = frameResults.first else {
+            throw DemoNLURouterError.noToolPlanFrames
+        }
+        guard frameResults.count == 1 else {
+            throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(
+                frameIDs: frameResults.map(\.id)
+            )
         }
 
         var frame = frameResult
