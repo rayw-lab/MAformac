@@ -24,6 +24,7 @@ RUNTIME_SURFACES = (
     Path("Core/Execution/FallbackContext.swift"),
     Path("Core/Trace/TraceLogger.swift"),
     Path("Core/Presentation/RuntimePresentationReasonAuthority.generated.swift"),
+    Path("Core/Presentation/RuntimePresentationBridge.swift"),
     Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
     Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
 )
@@ -103,6 +104,11 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.assert_failure("E_RUNTIME_FINITE_REASON_OUTSIDE_T0")
+
+    @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
+    def test_missing_runtime_presentation_bridge_consumer_fails_ownership_gate(self) -> None:
+        (self.root / "Core/Presentation/RuntimePresentationBridge.swift").unlink()
+        self.assert_failure("E_REQUIRED_SURFACE_MISSING")
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
     def test_missing_owner_fails_closed(self) -> None:

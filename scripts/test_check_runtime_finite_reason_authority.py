@@ -20,6 +20,7 @@ SURFACES = (
     Path("Core/Execution/FallbackContext.swift"),
     Path("Core/Trace/TraceLogger.swift"),
     Path("Core/Presentation/RuntimePresentationReasonAuthority.generated.swift"),
+    Path("Core/Presentation/RuntimePresentationBridge.swift"),
     Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
     Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
     Path("openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml"),
@@ -89,6 +90,18 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_RUNTIME_FINITE_REASON_OUTSIDE_T0", self.violation_codes(payload))
 
+    def test_w1_n1_multiline_non_t0_literal_in_production_fails_closed(self) -> None:
+        path = self.repo / "Core/Execution/DemoRuntimeSessionRunner.swift"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + '\nprivate let finiteReason =\n    "w1_non_t0_reason"\n',
+            encoding="utf-8",
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_RUNTIME_FINITE_REASON_OUTSIDE_T0", self.violation_codes(payload))
+
     def test_fallback_shadow_switch_fails_closed(self) -> None:
         path = self.repo / "Core/Execution/FallbackContext.swift"
         path.write_text(
@@ -100,6 +113,82 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         result, payload = self.run_checker()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_FALLBACK_SHADOW_REASON_SWITCH", self.violation_codes(payload))
+
+    def test_w1_n2_shadow_helper_with_parenthesized_switch_fails_closed(self) -> None:
+        self.replace(
+            "Core/Execution/FallbackContext.swift",
+            "RuntimePresentationReasonAuthority.fallbackBucket(for: finiteReason)",
+            "shadowBucket(for: finiteReason)",
+        )
+        self.replace(
+            "Core/Execution/FallbackContext.swift",
+            "    public var runtimeResult: DemoRuntimeResult {",
+            "    private static func shadowBucket(for finiteReason: RuntimeFiniteReason) -> FallbackGovernanceReason? {\n"
+            "        switch (finiteReason) {\n"
+            "        default:\n"
+            "            return RuntimePresentationReasonAuthority.fallbackBucket(for: finiteReason)\n"
+            "        }\n"
+            "    }\n\n"
+            "    public var runtimeResult: DemoRuntimeResult {",
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_FALLBACK_SHADOW_REASON_SWITCH", self.violation_codes(payload))
+
+    def test_fallback_shadow_switch_through_local_alias_fails_closed(self) -> None:
+        path = self.repo / "Core/Execution/FallbackContext.swift"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\nprivate func remapForTest(_ finiteReason: RuntimeFiniteReason) {\n"
+            + "    let localReason = finiteReason\n"
+            + "    switch (localReason) { default: break }\n"
+            + "}\n",
+            encoding="utf-8",
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_FALLBACK_SHADOW_REASON_SWITCH", self.violation_codes(payload))
+
+    def test_fallback_local_governance_return_helper_fails_closed(self) -> None:
+        path = self.repo / "Core/Execution/FallbackContext.swift"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\nprivate func localBucket(for reason: RuntimeFiniteReason) -> FallbackGovernanceReason? {\n"
+            + "    RuntimePresentationReasonAuthority.fallbackBucket(for: reason)\n"
+            + "}\n",
+            encoding="utf-8",
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_FALLBACK_SHADOW_REASON_SWITCH", self.violation_codes(payload))
+
+    def test_commented_shadow_and_non_t0_literal_do_not_fail(self) -> None:
+        runner = self.repo / "Core/Execution/DemoRuntimeSessionRunner.swift"
+        runner.write_text(
+            runner.read_text(encoding="utf-8")
+            + '\n// private let finiteReason = "w1_non_t0_reason"\n',
+            encoding="utf-8",
+        )
+        fallback = self.repo / "Core/Execution/FallbackContext.swift"
+        fallback.write_text(
+            fallback.read_text(encoding="utf-8")
+            + "\n/* switch (finiteReason) { default: break } */\n",
+            encoding="utf-8",
+        )
+        result, payload = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(payload.get("status"), "PASS")
+        self.assertEqual(payload.get("violations"), [])
+
+    def test_missing_runtime_presentation_bridge_consumer_fails_closed(self) -> None:
+        (self.repo / "Core/Presentation/RuntimePresentationBridge.swift").unlink()
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_REQUIRED_SURFACE_MISSING", self.violation_codes(payload))
 
     def test_probe_expected_non_t0_reason_fails_closed(self) -> None:
         self.replace(
