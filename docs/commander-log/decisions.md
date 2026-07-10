@@ -1200,3 +1200,13 @@
 - **约束**：Task 0 OpenSpec change 须写 ownership map + 对 bridge 的引用（MODIFIED tool-execution + existing bridge），不重造 presentation。
 - **解锁**：计划 v3 的 `BLOCKED_PENDING_LEIGE` 解除 → 产计划 v4（B 锁定，可执行）。
 - **前置不变**：C1 编码基点=dirty-tree 收编包落地后 commit；push/PR 仍待磊哥键。**Non-claims**：不扩 mounted 1→N；不签 C5/C6。
+
+## D-135：dirty-tree 收编包落地——2 commit 全绿，C1 编码基点确立（2026-07-10）
+
+- **收编执行**（磊哥授权本地 commit 范围）：按 w1 integration-package-v2 落 2 commit：
+  - `35b4fb2b` test: C1 回归补测 + exposure fail-closed 门接线（补测 5 Swift+2 Python，Makefile verify-ci 增挂 verify-register + make test 增挂 exposure，gate_strength_delta=增强）。
+  - `cbd7d9b5` docs(c1): D-133/D-134 决议级联 + C1 grill RATIFIED SSOT。
+- **收编门三件套（clean tree 亲跑）**：make verify-all=**736 tests/0 failures/6 skipped**；xcodebuild MAformacMac=**BUILD SUCCEEDED**；python exposure=ok。
+- **诚实残留**：`?? Tools/checks/check-codex-hooks-health.sh`（蜂群副产诊断工具，非 C1，排除待独立 housekeeping 包，主树非全 clean 如实记）。
+- **C1 编码基点确立**：HEAD=`cbd7d9b5`（ahead origin 81 未 push），C1 实施计划 v4 EXECUTABLE 的 base-sha 前置满足。**push/PR 仍待磊哥键。**
+- **计划 v4**（w5 5.6-sol，sha d52a6aae）：D-134 B 物化=新 demo-capability-governance capability + MODIFIED tool-execution + MODIFIED runtime-presentation-bridge（禁平行 presentation SSOT），Task0=EXECUTABLE，全 DAG 补 worktree/TDD/GitNexus/三件套/CI/anchor/CG-080。**Non-claims**：不扩 mounted 1→N；不签 C5/C6；实现从 Phase0 receipt 门起。
