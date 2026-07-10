@@ -68,7 +68,7 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | V8 | closure verdict join（五门 receipt 机械汇签，same-subject join） | GAP | 制度物=O4 schema；join key（repo_head/build/model/contract/corpus/scorer）任一不同或缺失=BLOCKED（审计 P1-04） |
 
 ### 进度 verdict（可复算口径；本表为**最后一次手写账**，O2 checker 落地后由机械生成接管）
-- 计数源=本节三表逐行（训练 8 + 接线 13 + 验收 8 = **29**）：**DONE = 0/29**；READY_NOW = 1（W1）；READY_AFTER_HUMAN_KEY = 1（B1a）；READY_AFTER_PREDECESSORS = 4（B2/W2/W3/W4）；PLAN = 7（B1b/B3/B4/B5/B6/V6p/V7）；GAP = **16**（B7/W5a-d/W6-W10/V1-V5/V8）。合计 0+1+1+4+7+16=29 ✓。
+- 计数源=本节三表逐行（训练 8 + 接线 13 + 验收 8 = **29**；2026-07-11 D-143/144/145 翻转后过渡性重算，O2 checker 落地后接管）：**DONE = 1/29（W1）**；RUNNING = 1（W2 containment 半）；READY_AFTER_HUMAN_KEY = 1（B1a）；READY_AFTER_PREDECESSORS = 3（B2/W3/W4）；RATIFIED_PENDING_PLAN = 5（W5a-d/W6）；PARTIALLY_RATIFIED = 2（V1/B7）；PLAN = 7（B1b 补丁已 merge 留 launcher 侧/B3/B4/B5/B6/V6p/V7）；GAP = **9**（W7-W10/V2-V5/V8）。合计 1+1+1+3+5+2+7+9=29 ✓。
 - **hard closure 分母 = 28**（29 − V5 accounting；W10 计 hard 但只含 TTS 门收敛面，stretch ASR 不进硬门）。
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
