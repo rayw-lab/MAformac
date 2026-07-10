@@ -6,7 +6,6 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -22,14 +21,6 @@ FALLBACK_PATH = REPO_ROOT / "contracts" / "fallback-scripts.yaml"
 GENERATED_PATH = REPO_ROOT / "generated" / "demo-fallback-probes.catalog.json"
 MANIFEST_PATH = REPO_ROOT / "Tests" / "Fixtures" / "RuntimeFallbackReceipts" / "manifest.json"
 A1_CHECKER_PATH = REPO_ROOT / "Tools" / "checks" / "check_capability_matrix.py"
-A1_MANIFEST = Path(
-    os.environ.get(
-        "A1_MATRIX_MANIFEST",
-        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-10-ma12/tmp/capability-matrix-v3-manifest.jsonl",
-    )
-)
-
-
 def load_checker():
     spec = importlib.util.spec_from_file_location("check_runtime_no_mutation_receipts", CHECKER_PATH)
     if spec is None or spec.loader is None:
@@ -183,8 +174,6 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(A1_CHECKER_PATH),
                     "materialize",
-                    "--manifest",
-                    str(A1_MANIFEST),
                     "--probe-receipt",
                     str(receipt_path),
                     "--output",
@@ -223,8 +212,6 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(A1_CHECKER_PATH),
                     "materialize",
-                    "--manifest",
-                    str(A1_MANIFEST),
                     "--probe-receipt",
                     str(receipt_path),
                     "--output",
@@ -241,8 +228,6 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(A1_CHECKER_PATH),
                     "check",
-                    "--manifest",
-                    str(A1_MANIFEST),
                     "--probe-receipt",
                     str(receipt_path),
                     "--matrix",

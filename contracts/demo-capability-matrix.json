@@ -7438,7 +7438,7 @@
   "source": {
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "5c8faa54c7b28efa4daf9dc1bf7262481b65b72d43bb5ea6aac9e0ad0d2ffba6",
-    "probe_pack_sha256": "bb4e3d98e9a552788bc1b946f80a78dc10a94da0da1d7492390f867625fc27ca",
+    "probe_pack_sha256": "3ae98df5b712216d951a0bb45335697311ed4820193ad58c5fcf3c5f4a862190",
     "t0_design_sha256": "3d56b731800a4006262d408264d777f2789f495131e1e6074f457129d44b84be"
   },
   "summary": {

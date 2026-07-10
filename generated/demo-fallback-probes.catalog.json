@@ -1,7 +1,7 @@
 {
   "schemaVersion": "demo_fallback_probes_catalog_v1",
-  "sourceSHA256": "bb4e3d98e9a552788bc1b946f80a78dc10a94da0da1d7492390f867625fc27ca",
-  "fallbackSourceSHA256": "b244e7026d8dcefbbaa1148b92c6ed3dc53f4fd7b04a2e7426a56c721e1acba4",
+  "sourceSHA256": "3ae98df5b712216d951a0bb45335697311ed4820193ad58c5fcf3c5f4a862190",
+  "fallbackSourceSHA256": "537a4493ddd0ea85a708735699c3b65af15108cdf395b1e357af529fba869b79",
   "receiptID": "runtime-no-mutation-40-probes",
   "probes": [
     {
@@ -11,7 +11,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "空调执行高风险动作",
-      "fallbackCellID": "fallback.ac.01.zh-CN",
+      "fallbackCellID": "fallback.ac.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -36,7 +36,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "空调执行未挂载动作",
-      "fallbackCellID": "fallback.ac.02.zh-CN",
+      "fallbackCellID": "fallback.ac.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -61,7 +61,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把空调调一下",
-      "fallbackCellID": "fallback.ac.03.zh-CN",
+      "fallbackCellID": "fallback.ac.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -86,7 +86,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "空调切到银河模式",
-      "fallbackCellID": "fallback.ac.04.zh-CN",
+      "fallbackCellID": "fallback.ac.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -111,7 +111,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "座椅执行高风险动作",
-      "fallbackCellID": "fallback.seat.05.zh-CN",
+      "fallbackCellID": "fallback.seat.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -136,7 +136,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "座椅执行未挂载动作",
-      "fallbackCellID": "fallback.seat.06.zh-CN",
+      "fallbackCellID": "fallback.seat.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -161,7 +161,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把座椅调一下",
-      "fallbackCellID": "fallback.seat.07.zh-CN",
+      "fallbackCellID": "fallback.seat.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -186,7 +186,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "座椅切到银河模式",
-      "fallbackCellID": "fallback.seat.08.zh-CN",
+      "fallbackCellID": "fallback.seat.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -211,7 +211,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "车窗执行高风险动作",
-      "fallbackCellID": "fallback.window.09.zh-CN",
+      "fallbackCellID": "fallback.window.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -236,7 +236,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "车窗执行未挂载动作",
-      "fallbackCellID": "fallback.window.10.zh-CN",
+      "fallbackCellID": "fallback.window.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -261,7 +261,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把车窗调一下",
-      "fallbackCellID": "fallback.window.11.zh-CN",
+      "fallbackCellID": "fallback.window.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -286,7 +286,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "车窗切到银河模式",
-      "fallbackCellID": "fallback.window.12.zh-CN",
+      "fallbackCellID": "fallback.window.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -311,7 +311,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "车门执行高风险动作",
-      "fallbackCellID": "fallback.door.13.zh-CN",
+      "fallbackCellID": "fallback.door.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -336,7 +336,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "车门执行未挂载动作",
-      "fallbackCellID": "fallback.door.14.zh-CN",
+      "fallbackCellID": "fallback.door.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -361,7 +361,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把车门调一下",
-      "fallbackCellID": "fallback.door.15.zh-CN",
+      "fallbackCellID": "fallback.door.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -386,7 +386,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "车门切到银河模式",
-      "fallbackCellID": "fallback.door.16.zh-CN",
+      "fallbackCellID": "fallback.door.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -411,7 +411,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "氛围灯执行高风险动作",
-      "fallbackCellID": "fallback.ambient.17.zh-CN",
+      "fallbackCellID": "fallback.ambient.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -436,7 +436,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "氛围灯执行未挂载动作",
-      "fallbackCellID": "fallback.ambient.18.zh-CN",
+      "fallbackCellID": "fallback.ambient.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -461,7 +461,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把氛围灯调一下",
-      "fallbackCellID": "fallback.ambient.19.zh-CN",
+      "fallbackCellID": "fallback.ambient.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -486,7 +486,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "氛围灯切到银河模式",
-      "fallbackCellID": "fallback.ambient.20.zh-CN",
+      "fallbackCellID": "fallback.ambient.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -511,7 +511,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "屏幕执行高风险动作",
-      "fallbackCellID": "fallback.screen.21.zh-CN",
+      "fallbackCellID": "fallback.screen.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -536,7 +536,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "屏幕执行未挂载动作",
-      "fallbackCellID": "fallback.screen.22.zh-CN",
+      "fallbackCellID": "fallback.screen.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -561,7 +561,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把屏幕调一下",
-      "fallbackCellID": "fallback.screen.23.zh-CN",
+      "fallbackCellID": "fallback.screen.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -586,7 +586,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "屏幕切到银河模式",
-      "fallbackCellID": "fallback.screen.24.zh-CN",
+      "fallbackCellID": "fallback.screen.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -611,7 +611,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "音量执行高风险动作",
-      "fallbackCellID": "fallback.volume.25.zh-CN",
+      "fallbackCellID": "fallback.volume.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -636,7 +636,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "音量执行未挂载动作",
-      "fallbackCellID": "fallback.volume.26.zh-CN",
+      "fallbackCellID": "fallback.volume.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -661,7 +661,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把音量调一下",
-      "fallbackCellID": "fallback.volume.27.zh-CN",
+      "fallbackCellID": "fallback.volume.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -686,7 +686,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "音量切到银河模式",
-      "fallbackCellID": "fallback.volume.28.zh-CN",
+      "fallbackCellID": "fallback.volume.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -711,7 +711,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "雨刮执行高风险动作",
-      "fallbackCellID": "fallback.wiper.29.zh-CN",
+      "fallbackCellID": "fallback.wiper.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -736,7 +736,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "雨刮执行未挂载动作",
-      "fallbackCellID": "fallback.wiper.30.zh-CN",
+      "fallbackCellID": "fallback.wiper.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -761,7 +761,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把雨刮调一下",
-      "fallbackCellID": "fallback.wiper.31.zh-CN",
+      "fallbackCellID": "fallback.wiper.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -786,7 +786,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "雨刮切到银河模式",
-      "fallbackCellID": "fallback.wiper.32.zh-CN",
+      "fallbackCellID": "fallback.wiper.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -811,7 +811,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "遮阳帘执行高风险动作",
-      "fallbackCellID": "fallback.sunroofShade.33.zh-CN",
+      "fallbackCellID": "fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -836,7 +836,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "遮阳帘执行未挂载动作",
-      "fallbackCellID": "fallback.sunroofShade.34.zh-CN",
+      "fallbackCellID": "fallback.sunroofShade.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -861,7 +861,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把遮阳帘调一下",
-      "fallbackCellID": "fallback.sunroofShade.35.zh-CN",
+      "fallbackCellID": "fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -886,7 +886,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "遮阳帘切到银河模式",
-      "fallbackCellID": "fallback.sunroofShade.36.zh-CN",
+      "fallbackCellID": "fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -911,7 +911,7 @@
       "locale": "zh-CN",
       "fixturePath": "guard_or_clarify_stub",
       "probeUtterance": "香氛执行高风险动作",
-      "fallbackCellID": "fallback.fragrance.37.zh-CN",
+      "fallbackCellID": "fallback.fragrance.safety_or_clarify_reject.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -936,7 +936,7 @@
       "locale": "zh-CN",
       "fixturePath": "injected_tool_plan_stub",
       "probeUtterance": "香氛执行未挂载动作",
-      "fallbackCellID": "fallback.fragrance.38.zh-CN",
+      "fallbackCellID": "fallback.fragrance.unmounted_name_rejected.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -961,7 +961,7 @@
       "locale": "zh-CN",
       "fixturePath": "default_text_runner",
       "probeUtterance": "能不能把香氛调一下",
-      "fallbackCellID": "fallback.fragrance.39.zh-CN",
+      "fallbackCellID": "fallback.fragrance.fast_path_no_match_fallback.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],
@@ -986,7 +986,7 @@
       "locale": "zh-CN",
       "fixturePath": "matrix_no_representative_stub",
       "probeUtterance": "香氛切到银河模式",
-      "fallbackCellID": "fallback.fragrance.40.zh-CN",
+      "fallbackCellID": "fallback.fragrance.unknown_no_representative_entry.zh-CN",
       "expectedStateDelta": {
         "kind": "none",
         "mutated_cells": [],

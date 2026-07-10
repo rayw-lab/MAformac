@@ -96,7 +96,9 @@ def _fallback_projection(fallback: dict[str, Any]) -> dict[str, dict[str, Any]]:
         family = cell.get("family")
         reason = cell.get("reason_kind")
         locale = cell.get("locale")
-        public_id = f"fallback.{family}.{index:02d}.{locale}"
+        public_id = cell.get("cell_id")
+        if not isinstance(public_id, str) or not public_id:
+            raise ValueError(f"fallback cell {index} must carry canonical cell_id")
         projection[public_id] = {
             "family": family,
             "reasonKind": reason,

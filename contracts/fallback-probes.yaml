@@ -44,7 +44,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ac.01.zh-CN"
+          "fallback_cell_id": "fallback.ac.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ac.safety_or_clarify_reject.zh-CN",
@@ -73,7 +73,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ac.02.zh-CN"
+          "fallback_cell_id": "fallback.ac.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ac.unmounted_name_rejected.zh-CN",
@@ -102,7 +102,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ac.03.zh-CN"
+          "fallback_cell_id": "fallback.ac.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ac.fast_path_no_match_fallback.zh-CN",
@@ -131,7 +131,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ac.04.zh-CN"
+          "fallback_cell_id": "fallback.ac.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ac.unknown_no_representative_entry.zh-CN",
@@ -160,7 +160,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.seat.05.zh-CN"
+          "fallback_cell_id": "fallback.seat.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.seat.safety_or_clarify_reject.zh-CN",
@@ -189,7 +189,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.seat.06.zh-CN"
+          "fallback_cell_id": "fallback.seat.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.seat.unmounted_name_rejected.zh-CN",
@@ -218,7 +218,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.seat.07.zh-CN"
+          "fallback_cell_id": "fallback.seat.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.seat.fast_path_no_match_fallback.zh-CN",
@@ -247,7 +247,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.seat.08.zh-CN"
+          "fallback_cell_id": "fallback.seat.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.seat.unknown_no_representative_entry.zh-CN",
@@ -276,7 +276,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.window.09.zh-CN"
+          "fallback_cell_id": "fallback.window.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.window.safety_or_clarify_reject.zh-CN",
@@ -305,7 +305,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.window.10.zh-CN"
+          "fallback_cell_id": "fallback.window.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.window.unmounted_name_rejected.zh-CN",
@@ -334,7 +334,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.window.11.zh-CN"
+          "fallback_cell_id": "fallback.window.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.window.fast_path_no_match_fallback.zh-CN",
@@ -363,7 +363,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.window.12.zh-CN"
+          "fallback_cell_id": "fallback.window.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.window.unknown_no_representative_entry.zh-CN",
@@ -392,7 +392,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.door.13.zh-CN"
+          "fallback_cell_id": "fallback.door.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.door.safety_or_clarify_reject.zh-CN",
@@ -421,7 +421,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.door.14.zh-CN"
+          "fallback_cell_id": "fallback.door.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.door.unmounted_name_rejected.zh-CN",
@@ -450,7 +450,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.door.15.zh-CN"
+          "fallback_cell_id": "fallback.door.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.door.fast_path_no_match_fallback.zh-CN",
@@ -479,7 +479,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.door.16.zh-CN"
+          "fallback_cell_id": "fallback.door.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.door.unknown_no_representative_entry.zh-CN",
@@ -508,7 +508,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ambient.17.zh-CN"
+          "fallback_cell_id": "fallback.ambient.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.safety_or_clarify_reject.zh-CN",
@@ -537,7 +537,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ambient.18.zh-CN"
+          "fallback_cell_id": "fallback.ambient.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.unmounted_name_rejected.zh-CN",
@@ -566,7 +566,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ambient.19.zh-CN"
+          "fallback_cell_id": "fallback.ambient.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.fast_path_no_match_fallback.zh-CN",
@@ -595,7 +595,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.ambient.20.zh-CN"
+          "fallback_cell_id": "fallback.ambient.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.unknown_no_representative_entry.zh-CN",
@@ -624,7 +624,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.screen.21.zh-CN"
+          "fallback_cell_id": "fallback.screen.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.screen.safety_or_clarify_reject.zh-CN",
@@ -653,7 +653,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.screen.22.zh-CN"
+          "fallback_cell_id": "fallback.screen.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.screen.unmounted_name_rejected.zh-CN",
@@ -682,7 +682,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.screen.23.zh-CN"
+          "fallback_cell_id": "fallback.screen.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.screen.fast_path_no_match_fallback.zh-CN",
@@ -711,7 +711,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.screen.24.zh-CN"
+          "fallback_cell_id": "fallback.screen.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.screen.unknown_no_representative_entry.zh-CN",
@@ -740,7 +740,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.volume.25.zh-CN"
+          "fallback_cell_id": "fallback.volume.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.volume.safety_or_clarify_reject.zh-CN",
@@ -769,7 +769,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.volume.26.zh-CN"
+          "fallback_cell_id": "fallback.volume.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.volume.unmounted_name_rejected.zh-CN",
@@ -798,7 +798,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.volume.27.zh-CN"
+          "fallback_cell_id": "fallback.volume.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.volume.fast_path_no_match_fallback.zh-CN",
@@ -827,7 +827,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.volume.28.zh-CN"
+          "fallback_cell_id": "fallback.volume.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.volume.unknown_no_representative_entry.zh-CN",
@@ -856,7 +856,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.wiper.29.zh-CN"
+          "fallback_cell_id": "fallback.wiper.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.safety_or_clarify_reject.zh-CN",
@@ -885,7 +885,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.wiper.30.zh-CN"
+          "fallback_cell_id": "fallback.wiper.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.unmounted_name_rejected.zh-CN",
@@ -914,7 +914,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.wiper.31.zh-CN"
+          "fallback_cell_id": "fallback.wiper.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.fast_path_no_match_fallback.zh-CN",
@@ -943,7 +943,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.wiper.32.zh-CN"
+          "fallback_cell_id": "fallback.wiper.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.unknown_no_representative_entry.zh-CN",
@@ -972,7 +972,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.sunroofShade.33.zh-CN"
+          "fallback_cell_id": "fallback.sunroofShade.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
@@ -1001,7 +1001,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.sunroofShade.34.zh-CN"
+          "fallback_cell_id": "fallback.sunroofShade.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.unmounted_name_rejected.zh-CN",
@@ -1030,7 +1030,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.sunroofShade.35.zh-CN"
+          "fallback_cell_id": "fallback.sunroofShade.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
@@ -1059,7 +1059,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.sunroofShade.36.zh-CN"
+          "fallback_cell_id": "fallback.sunroofShade.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
@@ -1088,7 +1088,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.fragrance.37.zh-CN"
+          "fallback_cell_id": "fallback.fragrance.safety_or_clarify_reject.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.safety_or_clarify_reject.zh-CN",
@@ -1117,7 +1117,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.fragrance.38.zh-CN"
+          "fallback_cell_id": "fallback.fragrance.unmounted_name_rejected.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.unmounted_name_rejected.zh-CN",
@@ -1146,7 +1146,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.fragrance.39.zh-CN"
+          "fallback_cell_id": "fallback.fragrance.fast_path_no_match_fallback.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.fast_path_no_match_fallback.zh-CN",
@@ -1175,7 +1175,7 @@
           "full_state_hash": "unchanged"
         },
         "expected_ui_readback": {
-          "fallback_cell_id": "fallback.fragrance.40.zh-CN"
+          "fallback_cell_id": "fallback.fragrance.unknown_no_representative_entry.zh-CN"
         },
         "assertion_source": [
           "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.unknown_no_representative_entry.zh-CN",
