@@ -185,8 +185,11 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let state = runner.currentDialogueState
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, FallbackSafeReasonKind.notAvailableInDemo.rawValue)
-        XCTAssertEqual(payload.reconciliation.safeReason, FallbackSafeReasonKind.notAvailableInDemo.rawValue)
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue)
+        XCTAssertEqual(
+            payload.reconciliation.safeReason,
+            RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+        )
         XCTAssertEqual(state.focusEntity, "ac")
         XCTAssertEqual(state.lastReadback?.key, "ac.power")
         XCTAssertEqual(

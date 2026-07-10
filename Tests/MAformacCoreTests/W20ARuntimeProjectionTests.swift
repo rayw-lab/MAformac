@@ -49,9 +49,12 @@ final class W20ARuntimeProjectionTests: XCTestCase {
         let payload = try await runner.run(text: "锁定空调")
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, FallbackSafeReasonKind.capabilityNotMounted.rawValue)
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue)
         XCTAssertEqual(payload.reconciliation.status, .notApplicable)
-        XCTAssertEqual(payload.reconciliation.safeReason, FallbackSafeReasonKind.capabilityNotMounted.rawValue)
+        XCTAssertEqual(
+            payload.reconciliation.safeReason,
+            RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue
+        )
         XCTAssertEqual(payload.readbacks, [])
         XCTAssertEqual(speech.spokenTexts, ["这项空调控制暂未接入演示版，我先不改车内状态。"])
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
