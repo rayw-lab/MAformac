@@ -387,3 +387,60 @@ hermes glm 5h quota 中途打满，RT2 对抗审 died mid-task 目标 report 未
 
 ## M.60 真文件假内容比假路径更危险：cite-verify 必核值不只核行存在（2026-07-09 H6 mock 表审计）
 H6 弹药表引用的文件与行族全真，内容被写歪：`demo-scenarios.yaml:60` 只有 4 条 utterance 却把自造的「空调关一下」标成原文；MP-03 Turn1 无 `expected_readback_zh` 字段却把「车窗已打开」说成 yaml 口语化原文——finder 编造经典型（真锚假值），浅层 cite 核「行存在」必漏。修法：file:line cite 读实际值；YAML 数组逐元素比对；字段不存在显式写「无该字段」；contract original / local paraphrase / local dialog copy / structured readback 四类分栏禁混标。claim-vs-reality「value-in-source」在弹药表层的实证。锚 `reports/H6-AUDIT-RT2-PLAN.md:18-19,58-63`。
+
+
+```markdown
+## M.61 自指 oracle：行为期望不得对照 authority.projection（2026-07-10 ma13 AMENDMENT-1）
+若 unit/行为测试的期望取自与被测对象同源的 `authority.projection` / generated map，则影子映射只要「自称一致」即**双绿**（checker 与测试同时假绿）。ma13 round2 修住 exact regex 后，nested-closure 仍改 `FallbackContext.resolve` 行为而 authority checker PASS。修法：期望表**硬编码字面**（AMENDMENT-1）；禁 `resolve == authority.projection` 对照。锚：`runs/2026-07-10-ma13/specs/SPEC-p01-fix-acceptance.md` AMENDMENT-1；`runs/2026-07-10-ma13/reports/REAUDIT-round2-by-w1.md`（nested-closure / 自指段）。
+
+## M.62 行为门 > 语法门：regex/AST 军备竞赛停损（2026-07-10 ma13）
+对图灵完备语言，用堆 regex 或上 SwiftSyntax 追 production 负例的**语义完备**不可达，边际成本爆炸。主防线=可观察行为门（固定输入→硬编码期望）；静态 checker 只吃已知 pattern+具名 fixture，并标 `known_pattern_lexical_layer, not semantically complete`。AMENDMENT-1 明确不做 AST 重工程。修法：行为改变必须打红行为门；lexical residual 不阻塞 PASS 签署。锚：同 SPEC AMENDMENT-1 条 1–3；`REAUDIT-round2-by-w1.md`；`FIX-round2-receipt.md`（全门绿 vs 仍 RC）。
+
+## M.63 INTERFACE-LOCK：跨计划 ABI 双侧独立审后拍单点契约（2026-07-10 ma13）
+两计划各自自洽仍可在接缝 hard-stop（manifest 路径、digest 符号、basis casing、双 receipt schema）。修法：独立 auditor 互审 → commander 拍 `INTERFACE-LOCK` 为最高 authority，冲突改计划。ma13 锁 **1–9**（LOCK8 probe catalog owner=v5c；LOCK9 run-identity/launch ABI owner=v5b——v5d 双盲审 w1+grok 独立收敛「缺件」后补拍，owner 段由 v5b-v2.1 amendment 交付）。锚：`runs/2026-07-10-ma13/specs/INTERFACE-LOCK-int-v5.md:15`；`AUDIT-plan-v5a-by-w1.md` / `AUDIT-plan-v5c-by-w3.md` / `AUDIT-plan-v5d-by-w1.md` / `AUDIT-plan-v5d-by-grok.md`；后续 v5a-v3.1 / v5b-v2.1 / v5c-v3.1 recheck EXACT。
+
+## M.64 计划层交叉审在编码前拦 ABI 病（验证经济学）（2026-07-10 ma13）
+零业务代码阶段 plan↔plan 对抗审+recheck，比编码后改 ABI 便宜一个数量级。ma13 在 PR#42 未 merge、int-v5 未编码前，计划层收到 `EXECUTABLE_AFTER_*` / `PLAN_LAYER_CLOSED`；失败写在 recheck 非 runtime。修法：多计划并行时强制交叉审链，**计划 EXECUTABLE ≠ 编码开工**。锚：`PLAN-int-v5*`–`AUDIT`–`RECHECK` 链；`runs/2026-07-10-ma13/STATUS-BOARD.md` Non-claims（编码未开工）。
+
+## M.65 gate 覆盖面也是 basis：只核 registry 自洽=假绿（2026-07-10 延续 ownership 冰山）
+「门绿了」≠ 属性成立。checker 扫描面窄于 claim（只 ownership-map 自洽、不扫 production emitter）时，**门本身是假绿 basis**。PR42 原 P1-1；后扩 runtime authority 扫描仍被 flow 绕过 → 回指 M.61/M.62。修法：claim 面 ⊆ scan 面；扩扫后仍须行为门兜底。锚：`reports/PR42-ADVERSARIAL-REVIEW.md` ownership 段；round2 reaudit indexed/nested 假绿。
+
+## M.66 无主输入必显式 ownership：probe catalog → LOCK 第 8 条（2026-07-10 ma13）
+跨计划消费的物理文件若无 owner，preflight「存在性」会在三边 defer 中假绿或硬挡。`contracts/runtime-action-readback-probes.json` 曾无主 → RECHECK-v5c NEW-P0 → LOCK8：owner=int-v5c；v5a/v5b 不产不读内容；v5a 仅 `probe_catalog_sha256` 注入槽。修法：跨计划 artifact 必有唯一 owner 与读写权限表。锚：`INTERFACE-LOCK-int-v5.md` LOCK8；`RECHECK-plan-v5c-v2-by-w3.md` NEW-P0-01；v5a-v3.1 §1.0。
+
+## M.67 producer 全门绿 ≠ 可签 PASS：adversarial reaudit 必留新 mutation（2026-07-10 ma13 round2）
+producer G1–G7/N1–N8/verify-all 全绿只证明**已知 suite 内**可达；独立 auditor fresh 仍可用合法 Swift 造下一层绕过。纪律=producer≠auditor；Ready 前必有 adversarial reaudit（新 mutation，非复述 producer 用例）。修法：签署 `PASS_FOR_PR42_P01_SCOPE` / Ready 前 fan-in 独立 reaudit；producer receipt 永不升格为终局 PASS。锚：`FIX-round2-receipt.md`；`REAUDIT-round2-by-w1.md`；round3/round4 链延续同纪律。
+
+## M.68 秘书升格：实质复核可做、Ready/merge 空格不可代填（2026-07-10 ma13）
+秘书从只更 board 升到 recheck / D-13x filled 时，价值在 **cite-verify + 空格纪律**；完成任务必须 **run-dir REPORT + 回写 commander**，文件>pane prose。禁止代签 `PASS_FOR_PR42_P01_SCOPE` / Ready / MERGED；plan `EXECUTABLE_AFTER_*` ≠ 编码 DONE。修法：终审三格（verdict / Ready / merge）秘书只留空或填「在途」；升格仅 commander。锚：`DRAFT-d139-filled.md` / `DRAFT-d140-*.md` 空格纪律；`REPORT-sec-triple-to-commander.md`；`RECHECK-plan-v5b-v2-by-grok.md`。
+
+## M.69 OpenAI 内容策略误拦防御性 QA 审计（2026-07-10 ma13）
+对抗审计位构造**自有仓库**门控负例（合法 Swift mutation / 绕过探针）时，若 prompt 像「攻击/利用/入侵」叙事，平台内容策略可把 turn 误判为 **cybersecurity 违禁** 直接拒答——不是业务代码失败，是**审计工单被策略层掐断**。实证：ma13 round3 w1（sol xhigh）造负例变体触发 OpenAI 策略误拦（pane 显示 "This content can't be shown" + Trusted Access 链接，turn 被拒终止）。修法：① 派单与续写框定 **「自有仓库防御性回归 QA / fail-closed 门控验证 / 验证自己写的负例 fixture，非外部攻击」** 措辞，避免 bypass/adversarial attack 语汇；② 被拒后**声明已完成部分并复用**（新 thread 只补剩余 mutation），禁止重跑全量丢半成品；③ 关键审计预置同厂商备用席或本地 mutation worktree 不依赖云策略放行。锚：`runs/2026-07-10-ma13/COMMANDER-NOTES-ma13.md`（run dir 根，坑+救法一手）；`docs/commander-log/decisions.md:1279`（D-139 段坑点行）；`runs/2026-07-10-ma13/reports/DRAFT-handoff-ma13-v2.md:35`；姊妹：`M.59` 异源 quota / `M.67` producer≠auditor。
+
+## M.70 多模型档位 × 角色搭配：审计席不降档（2026-07-10 ma13）
+同轮修复链上，producer 产出「全门绿、diff 面干净」的实现后，高档位审计席仍能在合法 mutation 下挖出**下层绕过**——「绿」与「可签」不在同一档要求；审计席用过低档位会漏 P1 新绕过（与 M.67 同构）。本日 observed（一手）：修复位 r1–r4 = codex sol（high/xhigh）、r5 = Opus medium，每轮全门绿后 w1 高档 fresh 复审仍连续挖出新 P1（r1 regex 绕过→r2 两条合法 Swift 绕过→r3 行为变仍绿→r4 skip/子集/DTO 三漏）；grok 4.5 在 round4 盲审快且判据利落（`PASS_FOR_ROUND4_REPAIR_SCOPE`，P0=0/P1=0，明确不代签终局 PASS）。「修复位可用较低档降本」为**建议（prescriptive，本日无低档修复实证）**，采纳与否按项目额度另拍。修法：派单矩阵写清 **role×tier**（auditor 不降本；producer 降档属可选策略非本日实证）；fan-in 前禁止用 producer 档位自评替代 auditor；盲审与终审可同档但必须不同 session/席位。锚：`FIX-round4-receipt.md`（producer 全绿）× `AUDIT-round4-by-grok.md`（盲审不签终局）× `REAUDIT-round2-by-w1.md` / `REAUDIT-round4-by-w1.md`（绿后仍 RC）；档位一手 = `decisions.md` D-138~139 阵容记录 + `FIX-round5-receipt.md`（opus3 席）。
+
+## M.71 门 wire 进 verify ≠ 门在执行层有牙：skip 洗绿 / 只跑子集 / 测 DTO 不测生产链（2026-07-10 ma13 PR#42 round4→5）
+一个门「文件存在 + 已挂进 make verify/verify-ci」不等于它在**执行层**真有牙——round4 w1 fresh 复审在门全绿的 PR 上又抓三处执行完整性漏洞：① exact runner 只核 rc+executed 不核 skipped，整条行为门 `XCTSkip` 仍 rc0 假绿；② `verify-c1-finite-reason-authority` 只 exact-run 两条命名方法，不跑完整 typed suite，同 suite 内 mapping/decoder/trace 硬断言被 XCTFail 也不红；③ 四 diagnostic「E2E」手工拼 `TraceAttributes` DTO 而非驱动 `DemoRuntimeSessionRunner` 生产 emitter，删生产转发仍全绿。三者共性=门的**执行完整性**（可否被 skip / 是否跑全集 / 是否打到生产链）是独立于 M.65 扫描面、M.57 消费 target、M.61/M.62 语义完备的**第四审计轴**。修法：门验收必自问「这门能被 skip 洗绿吗？跑的是子集还是全集？测的是 DTO 还是生产路径？」——每条都配一次亲手 mutation（skip 注入 / 非命名方法 XCTFail / 删生产转发）确认稳定 RED，再签有牙。锚：`REAUDIT-round4-by-w1.md §3/§5`（三 P1 定义）；`FIX-round5-receipt.md §2`（三 mutation 亲手复放均 RED）；`Tools/checks/run_swift_test_exact.py`（skip fail-closed + `--min-count` 模式）。
+```
+
+---
+
+## 相对 v1（`DRAFT-lessons-M61-70-patch.md`）的改动摘要
+
+| 条 | 改动 | 依据 |
+|----|------|------|
+| M.63 | 「锁 1–8」→「锁 **1–9**」+ LOCK9 owner=v5b 说明 + 锚补 v5d 双盲审两件与 `:15` 行号 | opus3 P2-1 |
+| M.64 | 锚「STATUS-BOARD」→ `runs/2026-07-10-ma13/STATUS-BOARD.md` | opus3 P2-3 |
+| **M.69** | 删「run-dir 无 receipt / 只运营观察」错误表述；锚改三处一手（COMMANDER-NOTES-ma13.md + decisions.md:1279 + handoff-v2:35）；实证段补 pane 现象与救法措辞（抄 COMMANDER-NOTES 原文口径） | opus3 **P1-1** |
+| **M.70** | 标题「修复可低档、审计要高档」→「审计席不降档」；本日 observed 改一手真值（r1–r4 sol high/xhigh、r5 Opus medium，无低档修复）；「修复可低档」降为明标 prescriptive 建议；锚补 REAUDIT-round4 + 档位一手源 | opus3 P2-2 |
+| **M.71** | 新增（opus3 §4 建议稿原文采纳，仅锚点路径统一） | opus3 §4 |
+| checklist | 条 4 重写（原条含 P1-1 同款错误声称）；新增条 5（M.71 并入由 commander 拍） | 级联一致性 |
+| 其余（M.61/62/65/66/67/68） | 一字未动（opus3 cite-verify 全 PASS） | opus3 §2 |
+
+---
+
+*end DRAFT-lessons-M61-71-patch-v2 · ma13 %2 opus2（修）· 审计依据 AUDIT-lessons-patch-by-opus3.md*
+
+## M.72 长审计链的焦点漂移：每轮聚焦上轮修复面，未触面积累逃逸（2026-07-10 ma13 终极审）
+PR #42 六轮修复-审计全部聚焦 finiteReason 面（每轮审上轮修复），matrix canonical checker 六轮无人碰——merge 前终极对抗审计（全量换面反猎：gaming/负例牙口/红线三孙 lens）才抓到它 fail-open（tracked≠fresh+六种篡改 rc0），round 7 补修。修法：同 PR 多轮审计链收口前必须一次【全量换面终审】（审焦点=前轮修复聚焦区之外的全部面），审计焦点跟着修复走=结构性盲区。锚 ULTIMATE-ADVERSARIAL-AUDIT.md + REAUDIT-round7.md（ALL_SCOPE_PASS）。

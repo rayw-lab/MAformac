@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-10（D-138 补记：BALLOT-ma13 RATIFIED + branch protection 上线 + 修复轮/计划轨开工）
-last_verified_head: 07bb7758（opt/streamline-macos-20260707，ahead origin 3；head_truth_rule 以 live git 为准）
+updated: 2026-07-11 凌晨（D-141：PR #42 MERGED f5ef6270 + GAP-HUNT 12 主题 + V6 基线待开笔）
+last_verified_head: d9ccfb3d（opt/streamline-macos-20260707，与 origin 同步；head_truth_rule 以 live git 为准）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "PR #42 Ready/merge 或 D-139 修复轮收口落决策 或 int-v5 编码开工 或 S8 点火 或 ma13 关张"
+expires_when: "V6 基线 RATIFIED 或 int-v5a 编码开工 或 S8 点火"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,7 +14,15 @@ expires_when: "PR #42 Ready/merge 或 D-139 修复轮收口落决策 或 int-v5 
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-10：**C1 int-v4 Draft PR #42 + ma13 修复轮/计划轨推进中**；BALLOT 已 RATIFIED）
+## 当前阶段（2026-07-11 凌晨：**🎉 PR #42 MERGED（f5ef6270）——C1 治理修复合入主线；GAP-HUNT 12 主题出稿，V6 基线待 commander 开笔**）
+
+🔴 **本节 supersede 下方全部旧态段**。推进事实源 = decisions **D-133~D-141** + run dir `runs/2026-07-10-ma13/`（GAP-HUNT-closure-themes=V6 素材 SSOT + int-v5 四派单合同 + S8 READY 实证 + M-DEMO 实施包）+ handoff `2026-07-10-ma13-closeout`。
+- **PR #42 MERGED**：七轮修复-审计链（AMENDMENT-1 行为门收敛）+ merge 前终极对抗审计（matrix checker fail-open P0 round7 修复 ALL_SCOPE_PASS）→ 磊哥授权 merge。合入=治理层真金（诚实矩阵 canDemo=0/120 + fail-closed 门族 + typed authority）；**仍 NOT demo-ready**。
+- **GAP-HUNT 12 主题（P0=10/P1=2）**：T04 客户 ingress/runtime 接线=硬门中的硬门（App 无文本输入+runner 零接线）；C6 三层错位/C4 路由无 active spec/operator-pass 无 ceremony/force-state 双 registry/session 恢复/DialogueState 只记账/S6 定义漂移/PF1 无门/Line A 分母。真实闭环进度 ~50%。
+- **就绪待键**：S8 点火（READY_TO_IGNITE 实证）；int-v5a-d 编码（四合同 ready）；V6 基线（commander 亲笔，素材齐）。
+- **Non-claims**：canDemo=0/120；int-v5 编码未开工；S8 未点火；无 operator-pass/V-PASS/C6 acceptance。
+
+## 【历史】2026-07-10：C1 int-v4 Draft PR #42 + ma13 修复轮/计划轨推进中（被 2026-07-11 段 supersede）
 
 🔴 **本节 supersede 下方全部旧态段**（含同日「暂停待磊哥拍 BALLOT」稿）。推进事实源 = decisions **D-133~D-138（含 D-138 补记）** + run dir `~/Projects/agent-tmux-stack-research/runs/2026-07-10-ma12/`（C1 14 切片 + int-v4 链）与 `runs/2026-07-10-ma13/`（PR 审 + BALLOT + 修复轮 + int-v5 计划；STATUS-BOARD 为蜂群态）+ handoff `2026-07-10-ma12-c1-full-auto-dev-day.md` / `2026-07-10-ma13-first-wave-pause.md`（pause 态已被 D-138 补记 supersede，handoff 文件名可历史保留）。
 
