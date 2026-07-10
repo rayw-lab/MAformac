@@ -7,7 +7,6 @@
       "family": "ac",
       "familyLabel": "空调",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "请先确认温区或目标温度，我先保持空调状态不变。"
@@ -19,7 +18,6 @@
       "family": "ac",
       "familyLabel": "空调",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "这项空调控制暂未接入演示版，我先不改车内状态。"
@@ -31,7 +29,6 @@
       "family": "ac",
       "familyLabel": "空调",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个空调说法还没稳稳接住，您可以说空调调到26度。"
@@ -43,7 +40,6 @@
       "family": "ac",
       "familyLabel": "空调",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类空调能力不在本轮演示范围，我先保持原样。"
@@ -55,7 +51,6 @@
       "family": "seat",
       "familyLabel": "座椅",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "座椅动作需要确认位置，我先保持座椅不动。"
@@ -67,7 +62,6 @@
       "family": "seat",
       "familyLabel": "座椅",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "座椅控制暂未接入演示版，我先不移动座椅。"
@@ -79,7 +73,6 @@
       "family": "seat",
       "familyLabel": "座椅",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。"
@@ -91,7 +84,6 @@
       "family": "seat",
       "familyLabel": "座椅",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类座椅能力不在本轮演示范围，我先保持原样。"
@@ -103,7 +95,6 @@
       "family": "window",
       "familyLabel": "车窗",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "车窗动作需要确认位置和开度，我先保持车窗不变。"
@@ -115,7 +106,6 @@
       "family": "window",
       "familyLabel": "车窗",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "车窗控制暂未接入演示版，我先不动车窗。"
@@ -127,7 +117,6 @@
       "family": "window",
       "familyLabel": "车窗",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个车窗说法还没稳稳接住，您可以说主驾车窗打开一半。"
@@ -139,7 +128,6 @@
       "family": "window",
       "familyLabel": "车窗",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类车窗能力不在本轮演示范围，我先保持原样。"
@@ -151,7 +139,6 @@
       "family": "door",
       "familyLabel": "车门",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "refusal_safety_or_policy",
       "safeReasonKind": "safety_policy",
       "ttsText": "行驶中为了安全不能开门；停稳后请再说一次，我先保持车门不变。"
@@ -163,7 +150,6 @@
       "family": "door",
       "familyLabel": "车门",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "车门控制暂未接入演示版，我先不动车门。"
@@ -175,7 +161,6 @@
       "family": "door",
       "familyLabel": "车门",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个车门说法还没稳稳接住，我先保持车门状态不变。"
@@ -187,7 +172,6 @@
       "family": "door",
       "familyLabel": "车门",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类车门能力不在本轮演示范围，我先保持原样。"
@@ -199,7 +183,6 @@
       "family": "ambient",
       "familyLabel": "氛围灯",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "氛围灯效果需要确认颜色或亮度，我先保持灯光不变。"
@@ -211,7 +194,6 @@
       "family": "ambient",
       "familyLabel": "氛围灯",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "氛围灯控制暂未接入演示版，我先不改灯光。"
@@ -223,7 +205,6 @@
       "family": "ambient",
       "familyLabel": "氛围灯",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个氛围灯说法还没稳稳接住，您可以说氛围灯调亮一点。"
@@ -235,7 +216,6 @@
       "family": "ambient",
       "familyLabel": "氛围灯",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类氛围灯能力不在本轮演示范围，我先保持原样。"
@@ -247,7 +227,6 @@
       "family": "screen",
       "familyLabel": "屏幕",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "屏幕设置需要确认目标屏幕，我先保持显示不变。"
@@ -259,7 +238,6 @@
       "family": "screen",
       "familyLabel": "屏幕",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "屏幕控制暂未接入演示版，我先不改屏幕设置。"
@@ -271,7 +249,6 @@
       "family": "screen",
       "familyLabel": "屏幕",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个屏幕说法还没稳稳接住，您可以说中控屏亮度调高。"
@@ -283,7 +260,6 @@
       "family": "screen",
       "familyLabel": "屏幕",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类屏幕能力不在本轮演示范围，我先保持原样。"
@@ -295,7 +271,6 @@
       "family": "volume",
       "familyLabel": "音量",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "音量变化需要确认方向，我先保持当前音量。"
@@ -307,7 +282,6 @@
       "family": "volume",
       "familyLabel": "音量",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "音量控制暂未接入演示版，我先不改音量。"
@@ -319,7 +293,6 @@
       "family": "volume",
       "familyLabel": "音量",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个音量说法还没稳稳接住，您可以说音量调低一点。"
@@ -331,7 +304,6 @@
       "family": "volume",
       "familyLabel": "音量",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类音量能力不在本轮演示范围，我先保持原样。"
@@ -343,7 +315,6 @@
       "family": "wiper",
       "familyLabel": "雨刮",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "雨刮动作需要确认模式或速度，我先保持雨刮不变。"
@@ -355,7 +326,6 @@
       "family": "wiper",
       "familyLabel": "雨刮",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "雨刮控制暂未接入演示版，我先不动雨刮。"
@@ -367,7 +337,6 @@
       "family": "wiper",
       "familyLabel": "雨刮",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个雨刮说法还没稳稳接住，您可以说打开雨刮。"
@@ -379,7 +348,6 @@
       "family": "wiper",
       "familyLabel": "雨刮",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类雨刮能力不在本轮演示范围，我先保持原样。"
@@ -391,7 +359,6 @@
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "天窗遮阳需要确认部件和开度，我先保持当前位置。"
@@ -403,7 +370,6 @@
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "天窗遮阳控制暂未接入演示版，我先不动车顶部件。"
@@ -415,7 +381,6 @@
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个天窗遮阳说法还没稳稳接住，您可以说打开天窗遮阳帘。"
@@ -427,7 +392,6 @@
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类车顶部件不在本轮演示范围，我先保持原样。"
@@ -439,7 +403,6 @@
       "family": "fragrance",
       "familyLabel": "香氛",
       "locale": "zh-CN",
-      "reasonKind": "safety_or_clarify_reject",
       "resultKind": "clarify_missing_slot",
       "safeReasonKind": "clarification_required",
       "ttsText": "香氛设置需要确认模式或浓度，我先保持当前香氛。"
@@ -451,7 +414,6 @@
       "family": "fragrance",
       "familyLabel": "香氛",
       "locale": "zh-CN",
-      "reasonKind": "unmounted_name_rejected",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "capability_not_mounted",
       "ttsText": "香氛控制暂未接入演示版，我先不改香氛设置。"
@@ -463,7 +425,6 @@
       "family": "fragrance",
       "familyLabel": "香氛",
       "locale": "zh-CN",
-      "reasonKind": "fast_path_no_match_fallback",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这个香氛说法还没稳稳接住，您可以说打开香氛。"
@@ -475,7 +436,6 @@
       "family": "fragrance",
       "familyLabel": "香氛",
       "locale": "zh-CN",
-      "reasonKind": "unknown_no_representative_entry",
       "resultKind": "refusal_no_available_tool",
       "safeReasonKind": "not_available_in_demo",
       "ttsText": "这类香氛能力不在本轮演示范围，我先保持原样。"
