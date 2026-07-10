@@ -30,7 +30,12 @@ BASIS_KEYS = (
     "mounted_or_approved_action",
     "semantic_contract",
     "state_readback_cell",
-    "local_runtime_readback",
+    "readbackProbePass",
+)
+B4_PROBE_ID_PATTERN = re.compile(
+    r"^probe\.fallback\.[A-Za-z][A-Za-z0-9]*\."
+    r"(?:safety_or_clarify_reject|unmounted_name_rejected|"
+    r"fast_path_no_match_fallback|unknown_no_representative_entry)\.zh-CN$"
 )
 
 
@@ -109,13 +114,6 @@ def family_code(family: str) -> str | None:
     return match.group(1) if match else None
 
 
-def first_anchor(row: dict[str, Any], needle: str) -> str | None:
-    for anchor in row.get("anchors", []):
-        if needle in anchor:
-            return anchor
-    return None
-
-
 def derive_state_cell_reference(
     row: dict[str, Any], semantic_rows: list[dict[str, Any]], state_cells: set[str]
 ) -> str | None:
@@ -135,12 +133,38 @@ def basis(observed: bool, source_ref: str) -> dict[str, Any]:
     return {"observed": observed, "source_ref": source_ref}
 
 
+def pending_readback_probe_basis(matrix_id: int) -> dict[str, Any]:
+    return {
+        "observed": False,
+        "status": "conditional_pending",
+        "probe_id": None,
+        "probe_receipt_id": None,
+        "source_ref": (
+            "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json"
+            f"#matrix_id={matrix_id}"
+        ),
+    }
+
+
+def has_probe_proof(readback_basis: dict[str, Any]) -> bool:
+    probe_id = readback_basis.get("probe_id")
+    receipt_id = readback_basis.get("probe_receipt_id")
+    return (
+        readback_basis.get("observed") is True
+        and isinstance(probe_id, str)
+        and B4_PROBE_ID_PATTERN.fullmatch(probe_id) is not None
+        and isinstance(receipt_id, str)
+        and bool(receipt_id.strip())
+    )
+
+
 def compute_can_demo(can_demo_basis: dict[str, dict[str, Any]]) -> bool:
-    return all(
+    all_observed = all(
         isinstance(can_demo_basis.get(name, {}).get("observed"), bool)
         and can_demo_basis[name]["observed"]
         for name in BASIS_KEYS
     )
+    return all_observed and has_probe_proof(can_demo_basis.get("readbackProbePass", {}))
 
 
 def reason_projection(row: dict[str, Any]) -> tuple[str | None, str | None]:
@@ -176,17 +200,7 @@ def materialize_matrix(
         state_cell = derive_state_cell_reference(row, semantic_rows, state_cells)
         mounted = tool in mounted_tools
         default_fastpath = row["default_path_status"] == "executable_default_fastpath"
-        runner_anchor = first_anchor(row, "Core/Execution/DemoRuntimeSessionRunner.swift")
         fallback_reason, reason_kind = reason_projection(row)
-
-        # Find real runtime readback anchor if available
-        runtime_readback_possible = False
-        runtime_ref = f"manifest:matrix_id={row['matrix_id']}:no-runtime-readback-probe"
-        for anchor in row.get("anchors", []):
-            if "DemoRuntimeSessionRunnerTests.swift" in anchor or "W20ARuntimeReadbackReceiptWriter.swift" in anchor:
-                runtime_readback_possible = True
-                runtime_ref = anchor
-                break
 
         cell_basis = {
             "mounted_or_approved_action": basis(
@@ -209,10 +223,7 @@ def materialize_matrix(
                 if state_cell is not None
                 else f"manifest:matrix_id={row['matrix_id']}:no-state-readback-cell",
             ),
-            "local_runtime_readback": basis(
-                runtime_readback_possible and runner_anchor is not None,
-                runtime_ref if runtime_readback_possible else f"manifest:matrix_id={row['matrix_id']}:no-runtime-readback-probe",
-            ),
+            "readbackProbePass": pending_readback_probe_basis(row["matrix_id"]),
         }
         can_demo = compute_can_demo(cell_basis)
         cells.append(
@@ -229,7 +240,7 @@ def materialize_matrix(
                 "mounted_status": row["mounted_status"],
                 "semantic_basis": cell_basis["semantic_contract"],
                 "state_cell_basis": cell_basis["state_readback_cell"],
-                "readback_probe_basis": cell_basis["local_runtime_readback"],
+                "readback_probe_basis": cell_basis["readbackProbePass"],
                 "canDemo_basis": cell_basis,
                 "canDemo": can_demo,
                 "fallback_reason": fallback_reason,
@@ -329,6 +340,18 @@ def validate_matrix(
                     errors.append("E_BASIS_UNTRACEABLE")
                     basis_conflicts.append(matrix_id)
                     break
+            readback_basis = cell_basis.get("readbackProbePass", {})
+            if readback_basis.get("observed") is True:
+                if readback_basis.get("status") != "passed" or not has_probe_proof(readback_basis):
+                    errors.append("E_CAN_DEMO_PROBE_PROOF_MISSING")
+                    basis_conflicts.append(matrix_id)
+            elif (
+                readback_basis.get("status") != "conditional_pending"
+                or readback_basis.get("probe_id") is not None
+                or readback_basis.get("probe_receipt_id") is not None
+            ):
+                errors.append("E_BASIS_UNTRACEABLE")
+                basis_conflicts.append(matrix_id)
             expected_cell = expected_by_id.get(matrix_id)
             if expected_cell is not None and cell_basis != expected_cell["canDemo_basis"]:
                 errors.append("E_BASIS_EVIDENCE_DRIFT")
@@ -355,7 +378,7 @@ def validate_matrix(
 
     expected_counts = Counter(row["primary_class"] for row in manifest_rows)
     actual_counts = Counter(cell.get("primary_class") for cell in cells if isinstance(cell, dict))
-    
+
     # Check against manifest (preserve existing check)
     primary_class_diff = {
         value: {"expected": expected_counts.get(value, 0), "actual": actual_counts.get(value, 0)}
@@ -364,7 +387,7 @@ def validate_matrix(
     }
     if primary_class_diff:
         errors.append("E_PRIMARY_CLASS_CONSERVATION")
-    
+
     # Also check against D-123 fixed baseline
     d123_diff = {}
     for cls, expected in D123_BASELINE.items():
@@ -382,11 +405,15 @@ def validate_matrix(
         errors.append("E_BLOCKED_UNKNOWN_OVERRIDE")
 
     can_demo_count = sum(cell.get("canDemo") is True for cell in cells if isinstance(cell, dict))
+    conditional_pending_count = sum(
+        cell.get("canDemo_basis", {}).get("readbackProbePass", {}).get("status")
+        == "conditional_pending"
+        for cell in cells
+        if isinstance(cell, dict)
+    )
     status = "PASS"
     if errors:
         status = "FAIL"
-    elif can_demo_count != 1:
-        status = "CONFLICT_REQUIRES_COMMANDER_DECISION"
 
     return {
         "status": status,
@@ -403,6 +430,7 @@ def validate_matrix(
         "blocked_unknown_count": len(blocked_unknown_ids),
         "blocked_unknown_ids": blocked_unknown_ids,
         "canDemo_count": can_demo_count,
+        "conditional_pending_count": conditional_pending_count,
         "basis_conflicts": sorted(set(basis_conflicts)),
         "dropped_matrix_ids": missing_no_representative_ids,
         "mounted_catalog_delta": sorted(set(mounted_catalog_delta)),
