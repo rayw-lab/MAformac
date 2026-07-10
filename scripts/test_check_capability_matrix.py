@@ -6,7 +6,6 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -17,6 +16,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CHECKER_PATH = REPO_ROOT / "Tools" / "checks" / "check_capability_matrix.py"
+CANONICAL_MANIFEST = REPO_ROOT / "contracts" / "demo-capability-matrix-manifest.jsonl"
 T0_DESIGN = (
     REPO_ROOT
     / "openspec"
@@ -24,12 +24,7 @@ T0_DESIGN = (
     / "add-c1-demo-capability-governance"
     / "design.md"
 )
-MANIFEST = Path(
-    os.environ.get(
-        "A1_MATRIX_MANIFEST",
-        "/Users/wanglei/workspace/MAformac-ma12-wt/a1-matrix/contracts/capability-matrix-v3-manifest.jsonl",
-    )
-)
+MANIFEST = CANONICAL_MANIFEST
 SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
 STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
@@ -43,9 +38,27 @@ def load_json(path: Path) -> dict:
 class CapabilityMatrixCheckerTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        for path in (T0_DESIGN, MANIFEST, SEMANTIC_CONTRACT, STATE_CELLS, MOUNTED_CATALOG):
+        for path in (T0_DESIGN, SEMANTIC_CONTRACT, STATE_CELLS, MOUNTED_CATALOG):
             if not path.exists():
                 raise AssertionError(f"required A1 source is missing: {path}")
+
+    def test_canonical_manifest_is_repository_owned(self) -> None:
+        self.assertTrue(
+            CANONICAL_MANIFEST.is_file(),
+            "A1 materializer must have a committed manifest under contracts/",
+        )
+        self.assertEqual(CANONICAL_MANIFEST.parent, REPO_ROOT / "contracts")
+
+    def test_default_materializer_reads_canonical_manifest(self) -> None:
+        checker = self.checker()
+        matrix = checker.materialize_matrix(
+            t0_design_path=T0_DESIGN,
+            semantic_contract_path=SEMANTIC_CONTRACT,
+            state_cells_path=STATE_CELLS,
+            mounted_catalog_path=MOUNTED_CATALOG,
+        )
+        self.assertEqual(len(matrix["cells"]), 120)
+        self.assertEqual(matrix["source"]["manifest_sha256"], "5c8faa54c7b28efa4daf9dc1bf7262481b65b72d43bb5ea6aac9e0ad0d2ffba6")
 
     def checker(self):
         if not CHECKER_PATH.exists():
@@ -252,8 +265,6 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(CHECKER_PATH),
                     "materialize",
-                    "--manifest",
-                    str(MANIFEST),
                     "--t0-design",
                     str(T0_DESIGN),
                     "--output",
@@ -269,8 +280,6 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(CHECKER_PATH),
                     "check",
-                    "--manifest",
-                    str(MANIFEST),
                     "--t0-design",
                     str(T0_DESIGN),
                     "--matrix",
