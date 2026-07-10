@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "demo_runtime_bundle_selection_v1",
+  "generatorContract": "demo_runtime_contract_bundle_generator_v1",
+  "semanticRows": [
+    {
+      "contractRowID": "c1_airControl_000006",
+      "sourceRowHash": "9201f4417f15980da8aa993abb3a98431efc4dc1ac3e726fd57aa432b1a54021",
+      "canonicalSemanticID": "sem_5de05fdd3626ba1a",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "default_fast_path_ac_power_on"
+    },
+    {
+      "contractRowID": "c1_airControl_000164",
+      "sourceRowHash": "bbfe0f19c0a07dfe5c572e79d6c08463d6905dd743d2c0f01a324213dbe91c4c",
+      "canonicalSemanticID": "sem_bfe50f98f19b9faa",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "default_model_ac_temperature_unscoped"
+    }
+  ],
+  "projections": {"stateCells": "full_canonical_file", "riskPolicy": "full_canonical_file", "allowlist": "full_canonical_file"}
+}

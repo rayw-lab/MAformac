@@ -123,12 +123,20 @@ final class RuntimeActionReadbackProbeTests: XCTestCase {
     private func writeReceipt(catalog: ActionProbeCatalog, cases: [ObservedActionProbeCase]) throws {
         let catalogURL = repoRoot.appendingPathComponent("contracts/runtime-action-readback-probes.json")
         let receipt = RuntimeActionReadbackReceipt(
-            schemaVersion: "runtime_action_readback_receipt_v1",
+            schemaVersion: "runtime_action_readback_receipt_v2",
             receiptID: catalog.receiptID,
             probePackSHA256: try C6Hash.fileHash(url: catalogURL),
             proofClass: "local_unit",
             caseCount: cases.count,
-            cases: cases
+            cases: cases,
+            runID: ProcessInfo.processInfo.environment["C1_WITNESS_RUN_ID"] ?? "local:swift-test",
+            sourceHeadSHA: ProcessInfo.processInfo.environment["C1_WITNESS_SOURCE_HEAD_SHA"] ?? "0000000000000000000000000000000000000000",
+            testedCheckoutSHA: ProcessInfo.processInfo.environment["C1_WITNESS_TESTED_CHECKOUT_SHA"] ?? "0000000000000000000000000000000000000000",
+            nonce: ProcessInfo.processInfo.environment["C1_WITNESS_NONCE"] ?? "00000000000000000000000000000000",
+            buildIdentity: "swift-test",
+            modelIdentity: "FastPathDemoToolPlanBackend",
+            runtimeContractBundleDigest: DemoRuntimeContractBundleCatalog.runtimeContractBundleDigest,
+            probeCatalogSHA256: ProcessInfo.processInfo.environment["C1_WITNESS_PROBE_CATALOG_SHA256"]
         )
         let runDirectory = ProcessInfo.processInfo.environment["C1_RUN_DIR"].map {
             URL(fileURLWithPath: $0, isDirectory: true)
@@ -226,4 +234,37 @@ private struct RuntimeActionReadbackReceipt: Codable {
     let proofClass: String
     let caseCount: Int
     let cases: [ObservedActionProbeCase]
+    let runID: String
+    let sourceHeadSHA: String
+    let testedCheckoutSHA: String
+    let nonce: String
+    let buildIdentity: String
+    let modelIdentity: String
+    let runtimeContractBundleDigest: String
+    let probeCatalogSHA256: String?
+
+    enum CodingKeys: String, CodingKey {
+        case schemaVersion, receiptID, probePackSHA256, proofClass, caseCount, cases
+        case runID, sourceHeadSHA, testedCheckoutSHA, nonce, buildIdentity, modelIdentity
+        case runtimeContractBundleDigest
+        case probeCatalogSHA256 = "probe_catalog_sha256"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(schemaVersion, forKey: .schemaVersion)
+        try container.encode(receiptID, forKey: .receiptID)
+        try container.encode(probePackSHA256, forKey: .probePackSHA256)
+        try container.encode(proofClass, forKey: .proofClass)
+        try container.encode(caseCount, forKey: .caseCount)
+        try container.encode(cases, forKey: .cases)
+        try container.encode(runID, forKey: .runID)
+        try container.encode(sourceHeadSHA, forKey: .sourceHeadSHA)
+        try container.encode(testedCheckoutSHA, forKey: .testedCheckoutSHA)
+        try container.encode(nonce, forKey: .nonce)
+        try container.encode(buildIdentity, forKey: .buildIdentity)
+        try container.encode(modelIdentity, forKey: .modelIdentity)
+        try container.encode(runtimeContractBundleDigest, forKey: .runtimeContractBundleDigest)
+        try container.encode(probeCatalogSHA256, forKey: .probeCatalogSHA256)
+    }
 }

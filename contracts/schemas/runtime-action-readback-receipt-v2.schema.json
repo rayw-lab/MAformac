@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Runtime action readback receipt v2",
+  "type": "object",
+  "required": ["schemaVersion", "receiptID", "proofClass", "caseCount", "cases", "runID", "sourceHeadSHA", "testedCheckoutSHA", "nonce", "buildIdentity", "modelIdentity", "runtimeContractBundleDigest", "probe_catalog_sha256"],
+  "properties": {
+    "schemaVersion": {"const": "runtime_action_readback_receipt_v2"},
+    "receiptID": {"type": "string"}, "probePackSHA256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "proofClass": {"type": "string"}, "caseCount": {"const": 3},
+    "runID": {"type": "string"}, "sourceHeadSHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "testedCheckoutSHA": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "nonce": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+    "buildIdentity": {"type": "string", "minLength": 1}, "modelIdentity": {"type": "string", "minLength": 1},
+    "runtimeContractBundleDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "probe_catalog_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "cases": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

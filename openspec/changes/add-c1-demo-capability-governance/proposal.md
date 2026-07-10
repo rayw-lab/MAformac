@@ -41,3 +41,8 @@ D-123 已将 120 格 `DemoCapabilityMatrix` 内容口径签为能力面真值，
 - 后续实现将新增或修改 `contracts/` matrix/fallback/probe sources、generated catalogs、checker、Swift execution/bridge seams、fixtures、tests、Makefile 与 source-free CI gates。
 - `DemoRuntimeSessionRunner.run`、trace schema 与 bridge payload types 是潜在 HIGH/CRITICAL surface；实现前必须逐 symbol GitNexus impact，提交前必须 `detect_changes`。
 - 本 change 只定义行为与执行任务；当前提交不改变 runtime、mounted catalog、UIUE 或 proof status。
+## int-v5a V6 boundary
+
+Commit B adds the generated runtime-contract bundle and the single
+`runtime_action_readback_receipt_v2` freshness contract. Frontstage, witness, and
+final customer-readiness claims remain owned by v5b/v5c and are not materialized here.

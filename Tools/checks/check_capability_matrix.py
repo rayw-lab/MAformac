@@ -29,6 +29,7 @@ DEFAULT_STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 DEFAULT_MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
 DEFAULT_SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
 DEFAULT_ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
+DEFAULT_RUNTIME_BUNDLE_MANIFEST = REPO_ROOT / "generated" / "demo-runtime-contract-bundle.manifest.json"
 
 BASIS_KEYS = (
     "mounted_or_approved_action",
@@ -232,6 +233,7 @@ def evaluate_action_probe_receipt(
     receipt_path: Path,
     catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
     authority_root: Path = REPO_ROOT,
+    runtime_bundle_manifest_path: Path = DEFAULT_RUNTIME_BUNDLE_MANIFEST,
 ) -> dict[str, Any]:
     authority_root = authority_root.resolve()
     resolved_receipt_path = receipt_path.resolve()
@@ -263,7 +265,7 @@ def evaluate_action_probe_receipt(
     ):
         raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_PROBE_CATALOG_INVALID")
     if (
-        receipt.get("schemaVersion") != "runtime_action_readback_receipt_v1"
+        receipt.get("schemaVersion") not in {"runtime_action_readback_receipt_v1", "runtime_action_readback_receipt_v2"}
         or receipt.get("receiptID") != catalog["receiptID"]
         or receipt.get("proofClass") != "local_unit"
         or receipt.get("probePackSHA256") != sha256_file(catalog_path)
@@ -271,6 +273,13 @@ def evaluate_action_probe_receipt(
         or receipt.get("caseCount") != len(receipt["cases"])
     ):
         raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_IDENTITY_INVALID")
+    if receipt.get("schemaVersion") == "runtime_action_readback_receipt_v2":
+        try:
+            manifest = json.loads(runtime_bundle_manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE") from error
+        if receipt.get("runtimeContractBundleDigest") != manifest.get("runtime_contract_bundle_digest"):
+            raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE")
 
     probes_by_id: dict[str, dict[str, Any]] = {}
     probes_by_matrix_id: dict[int, dict[str, Any]] = {}

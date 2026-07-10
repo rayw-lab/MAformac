@@ -277,3 +277,14 @@ The system SHALL operate without network dependency for this demo path. Vehicle 
 - **WHEN** outcome status is produced
 - **THEN** the system SHALL NOT report the action as completed
 - **AND** it SHALL preserve the applicable typed non-success outcome.
+### Requirement: Generated runtime bundle freshness
+
+The implementation MUST derive the default runtime contract bundle from the canonical
+selection manifest and expose one runtime bundle digest. The v2 action receipt MUST
+carry that digest and MUST reject a stale digest; `probe_catalog_sha256` MAY be null
+before v5c and MUST remain an injected consumer field.
+
+#### Scenario: stale action receipt
+
+- **WHEN** a v2 action receipt carries a digest different from the generated bundle manifest
+- **THEN** the matrix freshness gate rejects the receipt and no action proof is promoted

@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -121,9 +121,16 @@ verify-c1-probes: .venv/.deps.stamp
 # Action/readback honesty gate is intentionally separate from CG-044 fallback probes.
 # A failed action probe is a truthful observation and keeps actionDemoProven=false; it must
 # never be replaced by a no-mutation fallback receipt.
-verify-c1-action-probes:
+verify-runtime-bundle: .venv/.deps.stamp
+	$(PYTHON) -m unittest -v scripts/test_generate_demo_runtime_contract_bundle.py scripts/test_int_v5a_v5c_preflight_contract.py
+	$(PYTHON) Tools/generate_demo_runtime_contract_bundle.py
+	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/demo-runtime-contract-bundle-manifest.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path("generated/demo-runtime-contract-bundle.manifest.json").read_text()))'
+	test ! -e generated/demo-runtime-contract-bundle.receipt.json
+
+verify-c1-action-probes: verify-runtime-bundle
 	C1_RUN_DIR="$(CURDIR)/.build/c1-run" swift test --filter RuntimeActionReadbackProbeTests
 	test -f .build/c1-run/receipts/c1/runtime-action-readback-probes.json
+	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/runtime-action-readback-receipt-v2.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path(".build/c1-run/receipts/c1/runtime-action-readback-probes.json").read_text()))'
 
 verify-c1-s10:
 	@if [ ! -f scripts/check_s10_receipt.py ]; then \

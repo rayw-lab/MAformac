@@ -117,3 +117,9 @@ Rollback is slice-based: revert governance source, execution delta implementatio
 ## Open Questions
 
 None for T0. D-123, D-133 and D-134 close the authority, enum and CG-080 decisions needed to start downstream slices. Any request to change enum membership, payload version or mounted scope requires a new decision/change rather than an implementation-time exception.
+## V6 int-v5a Commit B bundle freshness
+
+The canonical runtime bundle is selected by exact composite identity and emitted as
+`generated/demo-runtime-contract-bundle.manifest.json` plus the generated Swift catalog.
+The manifest digest is the sole freshness subject consumed by the v2 action receipt;
+v5a does not own or materialize the v5c probe catalog.

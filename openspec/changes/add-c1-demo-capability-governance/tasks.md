@@ -53,3 +53,9 @@
 - [ ] 8.3 Integrate slice commits in dependency order and run `openspec validate --all --strict`, targeted tests, `swift test`, `make verify-all`, the MAformacMac Xcode build, `make verify-ci`, `git diff --check`, and GitNexus `detect_changes`. **Superpowers: verification-before-completion.**
 - [ ] 8.4 Have an independent auditor rerun authority, 38/38 coverage, partial execution+bridge, 40 probes, mounted no-delta, CI and final gates; only P0/P1=0 may close this change. **Superpowers: requesting-code-review + verification-before-completion.**
 - [ ] 8.5 Keep closeout proof classes separate and retain non-claims: no mounted 1→N, S9/S10 execution, C5/C6 acceptance, candidate, mobile, true-device, live API, operator-pass or V-PASS. **Superpowers: verification-before-completion.**
+## int-v5a Commit B tasks
+
+- Generate the exact-composite runtime bundle manifest and Swift catalog.
+- Switch the default runner to the generated catalog; retain no inline production payload.
+- Emit and validate the single v2 action receipt with bundle digest and nullable v5c catalog digest.
+- Keep v5b/v5c frontstage, witness, and readiness carriers read-only.
