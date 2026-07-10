@@ -44,6 +44,7 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
                     readbacks: [acceptedReadback],
                     finiteReason: nil,
                     observedToolCallCount: 1,
+                    observedReadbackCount: 1,
                     stateMutation: true
                 ),
                 DemoRuntimePartialSubactionResult(
@@ -52,6 +53,7 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
                     readbacks: [],
                     finiteReason: "unmounted_tool_name",
                     observedToolCallCount: 0,
+                    observedReadbackCount: 0,
                     stateMutation: false
                 )
             ]

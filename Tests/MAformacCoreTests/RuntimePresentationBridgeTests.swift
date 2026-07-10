@@ -168,6 +168,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     readbacks: [acceptedReadback],
                     finiteReason: nil,
                     observedToolCallCount: 1,
+                    observedReadbackCount: 1,
                     stateMutation: true
                 ),
                 DemoRuntimePartialSubactionResult(
@@ -176,6 +177,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     readbacks: [],
                     finiteReason: "unmounted_tool_name",
                     observedToolCallCount: 0,
+                    observedReadbackCount: 0,
                     stateMutation: false
                 )
             ]
@@ -726,6 +728,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     readbacks: acceptedReadbacks,
                     finiteReason: nil,
                     observedToolCallCount: acceptedReadbacks.count,
+                    observedReadbackCount: acceptedReadbacks.count,
                     stateMutation: !acceptedReadbacks.isEmpty
                 ),
                 DemoRuntimePartialSubactionResult(
@@ -734,6 +737,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     readbacks: [],
                     finiteReason: refusedFiniteReason,
                     observedToolCallCount: 0,
+                    observedReadbackCount: 0,
                     stateMutation: false
                 )
             ]
