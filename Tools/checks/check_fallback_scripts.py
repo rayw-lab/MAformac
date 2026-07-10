@@ -306,6 +306,8 @@ def validate(
     repo_root: Path,
     generated_json: Path | None = None,
     generated_swift: Path | None = None,
+    generated_reason_authority: Path | None = None,
+    bridge_source: Path | None = None,
     t0_registry: Path | None = None,
 ) -> dict[str, Any]:
     errors: list[str] = []
@@ -528,6 +530,8 @@ def validate(
     source_digest = sha256(source) if source.exists() else None
     generated_json_digest = None
     generated_swift_digest = None
+    reason_authority_digest = None
+    bridge_source_digest = None
     if generated_json is not None:
         try:
             generated_payload = json.loads(generated_json.read_text(encoding="utf-8"))
@@ -548,8 +552,37 @@ def validate(
                 errors.append("generated_swift_source_sha_mismatch")
             if any(raw_field in generated_swift_text for raw_field in RAW_PUBLIC_FIELDS):
                 errors.append("generated_swift_raw_field_exposure")
+            if "enum FallbackSafeReasonKind" in generated_swift_text or "enum FallbackResultKind" in generated_swift_text:
+                errors.append("parallel_generated_fallback_reason_authority")
+            if "typealias FallbackSafeReasonKind = RuntimePresentationSafeReasonKind" not in generated_swift_text:
+                errors.append("generated_swift_reason_authority_alias_missing")
+            if "typealias FallbackResultKind = DemoRuntimeResult" not in generated_swift_text:
+                errors.append("generated_swift_result_authority_alias_missing")
         except Exception as exc:
             errors.append(f"generated_swift_read_error:{exc}")
+    if generated_reason_authority is not None:
+        try:
+            reason_authority_text = generated_reason_authority.read_text(encoding="utf-8")
+            reason_authority_digest = sha256(generated_reason_authority)
+            if registry_sha not in reason_authority_text:
+                errors.append("generated_reason_authority_registry_sha_mismatch")
+            if reason_authority_text.count("public enum RuntimePresentationSafeReasonKind") != 1:
+                errors.append("generated_reason_authority_declaration_count")
+            if "public enum RuntimePresentationReasonAuthority" not in reason_authority_text:
+                errors.append("generated_reason_authority_projection_missing")
+        except Exception as exc:
+            errors.append(f"generated_reason_authority_read_error:{exc}")
+    if bridge_source is not None:
+        try:
+            bridge_source_text = bridge_source.read_text(encoding="utf-8")
+            bridge_source_digest = sha256(bridge_source)
+            if (
+                "private enum RuntimePresentationSafeReasonKind" in bridge_source_text
+                or "init?(finiteReason: String)" in bridge_source_text
+            ):
+                errors.append("parallel_bridge_reason_authority")
+        except Exception as exc:
+            errors.append(f"bridge_source_read_error:{exc}")
 
     return {
         "status": "PASS" if not errors else "FAIL",
@@ -561,6 +594,10 @@ def validate(
         "t0_registry_sha256": registry_sha,
         "generated_json_sha256": generated_json_digest,
         "generated_swift_sha256": generated_swift_digest,
+        "reason_authority_path": display_path(generated_reason_authority, repo_root) if generated_reason_authority else None,
+        "reason_authority_sha256": reason_authority_digest,
+        "bridge_source_path": display_path(bridge_source, repo_root) if bridge_source else None,
+        "bridge_source_sha256": bridge_source_digest,
         "family_count": len(set(family for family, _ in pairs)),
         "reason_count": len(set(reason for _, reason in pairs)),
         "cell_count": len(cells),
@@ -594,6 +631,8 @@ def main() -> int:
     parser.add_argument("--receipt", type=Path, required=True)
     parser.add_argument("--generated-json", type=Path)
     parser.add_argument("--generated-swift", type=Path)
+    parser.add_argument("--generated-reason-authority", type=Path)
+    parser.add_argument("--bridge-source", type=Path)
     parser.add_argument("--t0-registry", type=Path)
     args = parser.parse_args()
     repo_root = Path(__file__).resolve().parents[2]
@@ -603,6 +642,8 @@ def main() -> int:
         repo_root,
         args.generated_json.resolve() if args.generated_json else None,
         args.generated_swift.resolve() if args.generated_swift else None,
+        args.generated_reason_authority.resolve() if args.generated_reason_authority else None,
+        args.bridge_source.resolve() if args.bridge_source else None,
         args.t0_registry.resolve() if args.t0_registry else None,
     )
     args.receipt.parent.mkdir(parents=True, exist_ok=True)

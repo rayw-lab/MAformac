@@ -22,26 +22,16 @@ internal enum FallbackGovernanceReason: String, CaseIterable, Hashable, Sendable
     case unknownNoRepresentativeEntry = "unknown_no_representative_entry"
 }
 
-public enum FallbackSafeReasonKind: String, CaseIterable, Codable, Hashable, Sendable {
-    case safetyPolicy = "safety_policy"
-    case clarificationRequired = "clarification_required"
-    case capabilityNotMounted = "capability_not_mounted"
-    case notAvailableInDemo = "not_available_in_demo"
-}
-
-public enum FallbackResultKind: String, CaseIterable, Codable, Hashable, Sendable {
-    case refusalSafetyOrPolicy = "refusal_safety_or_policy"
-    case clarifyMissingSlot = "clarify_missing_slot"
-    case refusalNoAvailableTool = "refusal_no_available_tool"
-}
+public typealias FallbackSafeReasonKind = RuntimePresentationSafeReasonKind
+public typealias FallbackResultKind = DemoRuntimeResult
 
 public struct FallbackScriptCatalogEntry: Codable, Equatable, Hashable, Sendable {
     public let cellID: String
     public let locale: String
     public let family: FallbackScriptFamily
     public let familyLabel: String
-    public let resultKind: FallbackResultKind
-    public let safeReasonKind: FallbackSafeReasonKind
+    public let resultKind: DemoRuntimeResult
+    public let safeReasonKind: RuntimePresentationSafeReasonKind
     public let dialogText: String
     public let ttsText: String
     public let badgeLabel: String
