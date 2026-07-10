@@ -12,13 +12,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=1:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=1:tool-not-mounted=open_ac"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=1",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -41,7 +44,10 @@
       "primary_class": "default_executable",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=1:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=1",
+        "status": "conditional_pending"
       },
       "reasonKind": null,
       "register": "直述",
@@ -70,13 +76,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=2:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=2:tool-not-mounted=open_ac"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=2",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -97,7 +106,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=2:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=2",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -126,13 +138,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=3:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=3:tool-not-mounted=open_ac"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=3",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -153,7 +168,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=3:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=3",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -182,15 +200,18 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "Tests/MAformacCoreTests/W20ARuntimeProjectionTests.swift:29-38"
       ],
-      "canDemo": true,
+      "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": true,
-          "source_ref": "Core/Execution/W20ARuntimeReadbackReceiptWriter.swift:35-43"
-        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=4",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -210,8 +231,11 @@
       "mounted_status": "mounted",
       "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
-        "observed": true,
-        "source_ref": "Core/Execution/W20ARuntimeReadbackReceiptWriter.swift:35-43"
+        "observed": false,
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=4",
+        "status": "conditional_pending"
       },
       "reasonKind": null,
       "register": "直述",
@@ -239,15 +263,18 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "capability-matrix-v2.md:50-52"
       ],
-      "canDemo": true,
+      "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": true,
-          "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
-        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=5",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -267,8 +294,11 @@
       "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": true,
-        "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
+        "observed": false,
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=5",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -296,15 +326,18 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "capability-matrix-v2.md:50-52"
       ],
-      "canDemo": true,
+      "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": true,
-          "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
-        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=6",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -324,8 +357,11 @@
       "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": true,
-        "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
+        "observed": false,
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=6",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -352,13 +388,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=7:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=7:tool-not-mounted=-"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=7",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": false,
@@ -379,7 +418,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=7:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=7",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
@@ -406,13 +448,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=8:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=8:tool-not-mounted=-"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=8",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": false,
@@ -433,7 +478,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=8:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=8",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -460,13 +508,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=9:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=9:tool-not-mounted=-"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=9",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": false,
@@ -487,7 +538,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=9:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=9",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -516,13 +570,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=10:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=10:tool-not-mounted=adjust_ac_temperature_to_exp"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=10",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -543,7 +600,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=10:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=10",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -572,13 +632,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=11:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=11:tool-not-mounted=adjust_ac_temperature_to_exp"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=11",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -599,7 +662,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=11:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=11",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -628,13 +694,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=12:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=12:tool-not-mounted=adjust_ac_temperature_to_exp"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=12",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -655,7 +724,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=12:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=12",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -684,13 +756,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=13:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=13:tool-not-mounted=open_seat_heat"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=13",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -711,7 +786,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=13:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=13",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -740,13 +818,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=14:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=14:tool-not-mounted=open_seat_heat"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=14",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -767,7 +848,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=14:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=14",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -796,13 +880,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=15:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=15:tool-not-mounted=open_seat_heat"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=15",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -823,7 +910,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=15:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=15",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -852,13 +942,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=16:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=16:tool-not-mounted=adjust_seat_heat_temperature_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=16",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -879,7 +972,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=16:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=16",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -908,13 +1004,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=17:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=17:tool-not-mounted=adjust_seat_heat_temperature_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=17",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -935,7 +1034,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=17:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=17",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -964,13 +1066,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=18:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=18:tool-not-mounted=adjust_seat_heat_temperature_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=18",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -991,7 +1096,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=18:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=18",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1020,13 +1128,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=19:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=19:tool-not-mounted=adjust_seat_position_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=19",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1047,7 +1158,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=19:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=19",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1076,13 +1190,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=20:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=20:tool-not-mounted=adjust_seat_position_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=20",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1103,7 +1220,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=20:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=20",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1132,13 +1252,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=21:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=21:tool-not-mounted=adjust_seat_position_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=21",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1159,7 +1282,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=21:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=21",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1188,13 +1314,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=22:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=22:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=22",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1215,7 +1344,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=22:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=22",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1244,13 +1376,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=23:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=23:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=23",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1271,7 +1406,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=23:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=23",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1300,13 +1438,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=24:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=24:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=24",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1327,7 +1468,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=24:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=24",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1356,13 +1500,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=25:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=25:tool-not-mounted=close_window"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=25",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1383,7 +1530,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=25:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=25",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1412,13 +1562,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=26:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=26:tool-not-mounted=close_window"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=26",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1439,7 +1592,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=26:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=26",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1468,13 +1624,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=27:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=27:tool-not-mounted=close_window"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=27",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1495,7 +1654,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=27:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=27",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1524,13 +1686,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=28:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=28:tool-not-mounted=open_window_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=28",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1551,7 +1716,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=28:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=28",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1580,13 +1748,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=29:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=29:tool-not-mounted=open_window_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=29",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1607,7 +1778,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=29:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=29",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1636,13 +1810,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=30:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=30:tool-not-mounted=open_window_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=30",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1663,7 +1840,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=30:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=30",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1692,13 +1872,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=31:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=31:tool-not-mounted=open_window_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=31",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1719,7 +1902,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=31:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=31",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1748,13 +1934,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=32:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=32:tool-not-mounted=open_window_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=32",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1775,7 +1964,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=32:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=32",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1804,13 +1996,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=33:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=33:tool-not-mounted=open_window_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=33",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1831,7 +2026,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=33:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=33",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1860,13 +2058,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=34:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=34:tool-not-mounted=open_window_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=34",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1887,7 +2088,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=34:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=34",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1916,13 +2120,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=35:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=35:tool-not-mounted=open_window_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=35",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1943,7 +2150,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=35:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=35",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1972,13 +2182,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=36:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=36:tool-not-mounted=open_window_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=36",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -1999,7 +2212,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=36:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=36",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2028,13 +2244,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=37:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=37:tool-not-mounted=open_screen"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=37",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2055,7 +2274,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=37:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=37",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2084,13 +2306,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=38:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=38:tool-not-mounted=open_screen"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=38",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2111,7 +2336,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=38:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=38",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2140,13 +2368,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=39:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=39:tool-not-mounted=open_screen"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=39",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2167,7 +2398,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=39:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=39",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2196,13 +2430,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=40:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=40:tool-not-mounted=adjust_screen_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=40",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2223,7 +2460,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=40:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=40",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2252,13 +2492,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=41:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=41:tool-not-mounted=adjust_screen_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=41",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2279,7 +2522,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=41:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=41",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2308,13 +2554,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=42:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=42:tool-not-mounted=adjust_screen_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=42",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2335,7 +2584,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=42:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=42",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2364,13 +2616,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=43:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=43:tool-not-mounted=adjust_screen_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=43",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2391,7 +2646,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=43:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=43",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2420,13 +2678,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=44:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=44:tool-not-mounted=adjust_screen_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=44",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2447,7 +2708,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=44:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=44",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2476,13 +2740,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=45:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=45:tool-not-mounted=adjust_screen_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=45",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2503,7 +2770,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=45:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=45",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2532,13 +2802,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=46:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=46:tool-not-mounted=adjust_screen_brightness_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=46",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2559,7 +2832,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=46:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=46",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2588,13 +2864,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=47:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=47:tool-not-mounted=adjust_screen_brightness_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=47",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2615,7 +2894,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=47:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=47",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2644,13 +2926,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=48:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=48:tool-not-mounted=adjust_screen_brightness_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=48",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2671,7 +2956,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=48:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=48",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2700,13 +2988,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=49:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=49:tool-not-mounted=open_atmosphere_lamp"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=49",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2727,7 +3018,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=49:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=49",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2756,13 +3050,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=50:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=50:tool-not-mounted=open_atmosphere_lamp"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=50",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2783,7 +3080,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=50:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=50",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2812,13 +3112,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=51:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=51:tool-not-mounted=open_atmosphere_lamp"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=51",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2839,7 +3142,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=51:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=51",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2868,13 +3174,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=52:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=52:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=52",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2895,7 +3204,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=52:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=52",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2924,13 +3236,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=53:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=53:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=53",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -2951,7 +3266,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=53:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=53",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2980,13 +3298,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=54:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=54:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=54",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3007,7 +3328,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=54:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=54",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3036,13 +3360,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=55:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=55:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=55",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3063,7 +3390,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=55:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=55",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3092,13 +3422,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=56:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=56:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=56",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3119,7 +3452,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=56:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=56",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3148,13 +3484,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=57:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=57:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=57",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3175,7 +3514,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=57:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=57",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3204,13 +3546,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=58:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=58:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=58",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3231,7 +3576,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=58:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=58",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3260,13 +3608,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=59:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=59:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=59",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3287,7 +3638,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=59:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=59",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3316,13 +3670,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=60:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=60:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=60",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3343,7 +3700,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=60:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=60",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3372,13 +3732,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=61:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=61:tool-not-mounted=open_car_door"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=61",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3399,7 +3762,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=61:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=61",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3428,13 +3794,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=62:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=62:tool-not-mounted=open_car_door"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=62",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3455,7 +3824,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=62:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=62",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3484,13 +3856,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=63:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=63:tool-not-mounted=open_car_door"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=63",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3511,7 +3886,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=63:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=63",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3540,13 +3918,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=64:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=64:tool-not-mounted=set_door_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=64",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3567,7 +3948,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=64:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=64",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3596,13 +3980,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=65:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=65:tool-not-mounted=set_door_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=65",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3623,7 +4010,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=65:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=65",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3652,13 +4042,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=66:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=66:tool-not-mounted=set_door_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=66",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3679,7 +4072,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=66:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=66",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3708,13 +4104,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=67:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=67:tool-not-mounted=open_door_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=67",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3735,7 +4134,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=67:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=67",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3764,13 +4166,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=68:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=68:tool-not-mounted=open_door_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=68",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3791,7 +4196,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=68:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=68",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3820,13 +4228,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=69:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=69:tool-not-mounted=open_door_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=69",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3847,7 +4258,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=69:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=69",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3876,13 +4290,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=70:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=70:tool-not-mounted=open_door_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=70",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3903,7 +4320,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=70:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=70",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3932,13 +4352,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=71:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=71:tool-not-mounted=open_door_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=71",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -3959,7 +4382,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=71:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=71",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3988,13 +4414,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=72:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=72:tool-not-mounted=open_door_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=72",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4015,7 +4444,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=72:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=72",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4044,13 +4476,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=73:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=73:tool-not-mounted=volume_mute"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=73",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4071,7 +4506,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=73:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=73",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4100,13 +4538,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=74:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=74:tool-not-mounted=volume_mute"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=74",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4127,7 +4568,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=74:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=74",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4156,13 +4600,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=75:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=75:tool-not-mounted=volume_mute"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=75",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4183,7 +4630,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=75:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=75",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4212,13 +4662,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=76:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=76:tool-not-mounted=adjust_volume_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=76",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4239,7 +4692,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=76:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=76",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4268,13 +4724,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=77:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=77:tool-not-mounted=adjust_volume_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=77",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4295,7 +4754,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=77:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=77",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4324,13 +4786,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=78:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=78:tool-not-mounted=adjust_volume_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=78",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4351,7 +4816,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=78:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=78",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4380,13 +4848,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=79:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=79:tool-not-mounted=adjust_volume_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=79",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4407,7 +4878,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=79:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=79",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4436,13 +4910,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=80:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=80:tool-not-mounted=adjust_volume_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=80",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4463,7 +4940,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=80:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=80",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4492,13 +4972,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=81:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=81:tool-not-mounted=adjust_volume_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=81",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4519,7 +5002,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=81:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=81",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4548,13 +5034,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=82:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=82:tool-not-mounted=adjust_volume_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=82",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4575,7 +5064,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=82:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=82",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4604,13 +5096,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=83:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=83:tool-not-mounted=adjust_volume_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=83",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4631,7 +5126,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=83:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=83",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4660,13 +5158,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=84:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=84:tool-not-mounted=adjust_volume_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=84",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4687,7 +5188,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=84:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=84",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4716,13 +5220,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=85:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=85:tool-not-mounted=open_wiper"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=85",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4743,7 +5250,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=85:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=85",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4772,13 +5282,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=86:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=86:tool-not-mounted=open_wiper"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=86",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4799,7 +5312,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=86:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=86",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4828,13 +5344,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=87:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=87:tool-not-mounted=open_wiper"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=87",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4855,7 +5374,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=87:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=87",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4884,13 +5406,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=88:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=88:tool-not-mounted=adjust_wiper_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=88",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4911,7 +5436,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=88:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=88",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4940,13 +5468,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=89:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=89:tool-not-mounted=adjust_wiper_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=89",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -4967,7 +5498,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=89:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=89",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4996,13 +5530,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=90:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=90:tool-not-mounted=adjust_wiper_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=90",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5023,7 +5560,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=90:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=90",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5052,13 +5592,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=91:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=91:tool-not-mounted=adjust_wiper_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=91",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5079,7 +5622,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=91:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=91",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5108,13 +5654,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=92:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=92:tool-not-mounted=adjust_wiper_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=92",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5135,7 +5684,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=92:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=92",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5164,13 +5716,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=93:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=93:tool-not-mounted=adjust_wiper_speed_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=93",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5191,7 +5746,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=93:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=93",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5220,13 +5778,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=94:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=94:tool-not-mounted=adjust_wiper_speed_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=94",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5247,7 +5808,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=94:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=94",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5276,13 +5840,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=95:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=95:tool-not-mounted=adjust_wiper_speed_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=95",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5303,7 +5870,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=95:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=95",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5332,13 +5902,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=96:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=96:tool-not-mounted=adjust_wiper_speed_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=96",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5359,7 +5932,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=96:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=96",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5388,13 +5964,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=97:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=97:tool-not-mounted=open_sunroof"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=97",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5415,7 +5994,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=97:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=97",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5444,13 +6026,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=98:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=98:tool-not-mounted=open_sunroof"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=98",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5471,7 +6056,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=98:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=98",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5500,13 +6088,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=99:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=99:tool-not-mounted=open_sunroof"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=99",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5527,7 +6118,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=99:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=99",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5556,13 +6150,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=100:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=100:tool-not-mounted=open_sunroof_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=100",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5583,7 +6180,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=100:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=100",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5612,13 +6212,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=101:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=101:tool-not-mounted=open_sunroof_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=101",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5639,7 +6242,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=101:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=101",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5668,13 +6274,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=102:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=102:tool-not-mounted=open_sunroof_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=102",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5695,7 +6304,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=102:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=102",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5724,13 +6336,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=103:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=103:tool-not-mounted=open_sunroof_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=103",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5751,7 +6366,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=103:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=103",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5780,13 +6398,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=104:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=104:tool-not-mounted=open_sunroof_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=104",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5807,7 +6428,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=104:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=104",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5836,13 +6460,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=105:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=105:tool-not-mounted=open_sunroof_by_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=105",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5863,7 +6490,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=105:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=105",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5892,13 +6522,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=106:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=106:tool-not-mounted=open_sunroof_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=106",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5919,7 +6552,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=106:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=106",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5948,13 +6584,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=107:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=107:tool-not-mounted=open_sunroof_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=107",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -5975,7 +6614,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=107:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=107",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6004,13 +6646,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=108:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=108:tool-not-mounted=open_sunroof_little"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=108",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6031,7 +6676,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=108:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=108",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6060,13 +6708,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=109:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=109:tool-not-mounted=open_fragrance"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=109",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6087,7 +6738,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=109:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=109",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6116,13 +6770,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=110:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=110:tool-not-mounted=open_fragrance"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=110",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6143,7 +6800,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=110:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=110",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6172,13 +6832,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=111:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=111:tool-not-mounted=open_fragrance"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=111",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6199,7 +6862,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=111:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=111",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6228,13 +6894,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=112:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=112:tool-not-mounted=adjust_fragrance_intensity_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=112",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6255,7 +6924,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=112:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=112",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6284,13 +6956,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=113:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=113:tool-not-mounted=adjust_fragrance_intensity_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=113",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6311,7 +6986,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=113:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=113",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6340,13 +7018,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=114:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=114:tool-not-mounted=adjust_fragrance_intensity_to_number"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=114",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6367,7 +7048,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=114:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=114",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6394,13 +7078,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=115:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=115:tool-not-mounted=-"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=115",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": false,
@@ -6421,7 +7108,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=115:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=115",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
@@ -6448,13 +7138,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=116:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=116:tool-not-mounted=-"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=116",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": false,
@@ -6475,7 +7168,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=116:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=116",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6502,13 +7198,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=117:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=117:tool-not-mounted=-"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=117",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": false,
@@ -6529,7 +7228,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=117:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=117",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6558,13 +7260,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=118:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=118:tool-not-mounted=adjust_fragrance_intensity_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=118",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6585,7 +7290,10 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=118:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=118",
+        "status": "conditional_pending"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6614,13 +7322,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=119:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=119:tool-not-mounted=adjust_fragrance_intensity_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=119",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6641,7 +7352,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=119:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=119",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6670,13 +7384,16 @@
       ],
       "canDemo": false,
       "canDemo_basis": {
-        "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=120:no-runtime-readback-probe"
-        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=120:tool-not-mounted=adjust_fragrance_intensity_to_gear"
+        },
+        "readbackProbePass": {
+          "observed": false,
+          "probe_id": null,
+          "probe_receipt_id": null,
+          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=120",
+          "status": "conditional_pending"
         },
         "semantic_contract": {
           "observed": true,
@@ -6697,7 +7414,10 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=120:no-runtime-readback-probe"
+        "probe_id": null,
+        "probe_receipt_id": null,
+        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=120",
+        "status": "conditional_pending"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
