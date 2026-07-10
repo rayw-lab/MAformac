@@ -391,11 +391,19 @@ def build_reports(
 
 
 def assert_durable_output(path: Path) -> None:
+    """Reject known ephemeral locations; callers should pass the run receipt path.
+
+    The checker intentionally does not infer RUN_DIR, so the CLI contract is
+    documented here: production callers persist under ``$RUN/receipts/c1``.
+    """
     if path == Path("/tmp") or Path("/tmp") in path.parents:
         raise ValueError(f"refusing ephemeral /tmp receipt path: {path}")
 
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
+    # A missing base matrix is represented as null in the receipt when the
+    # historical base predates that contract; consumers must inspect the
+    # accompanying base/head provenance before treating it as an attestation.
     assert_durable_output(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
