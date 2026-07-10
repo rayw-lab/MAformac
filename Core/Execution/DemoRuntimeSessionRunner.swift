@@ -90,9 +90,57 @@ public final class DemoRuntimeSessionRunner {
         guard let frameResult = frameResults.first else {
             throw DemoNLURouterError.noToolPlanFrames
         }
-        guard frameResults.count == 1 else {
-            throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(
-                frameIDs: frameResults.map(\.id)
+        if frameResults.count > 1 {
+            guard frameResults.allSatisfy(DemoRuntimePartialPlan.isReviewed) else {
+                throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(
+                    frameIDs: frameResults.map(\.id)
+                )
+            }
+            let partialResult = try DemoRuntimePartialPlan().execute(
+                frames: frameResults,
+                store: store,
+                pipeline: pipeline,
+                traceLogger: traceLogger,
+                alignsFrameStateRevisionToStore: alignsFrameStateRevisionToStore
+            )
+
+            let acceptedReadbacks = partialResult.acceptedReadbacks
+            let acceptedCards = PresentationCardOrdering.orderedForPresentation(
+                acceptedReadbacks.compactMap { readback in store.cell(for: readback.key) }
+            )
+            let dialogText = acceptedReadbacks.map(\.spokenText).joined(separator: "；")
+            if !dialogText.isEmpty {
+                let speechResult = speech.speak(dialogText)
+                if !speechResult.didEnqueue {
+                    traceLogger.recordReadback(
+                        traceID: partialResult.traceID,
+                        message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
+                        attributes: TraceAttributes(readbackResult: .failed)
+                    )
+                }
+                dialogueState.recordAssistantText(dialogText)
+                dialogueState.recordReadbacks(acceptedReadbacks)
+            }
+
+            let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
+            let snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                traceID: partialResult.traceID,
+                acceptedReadbacks: acceptedReadbacks,
+                acceptedCards: acceptedCards,
+                refusedCards: [],
+                reason: "partial_accept_refuse",
+                traceEnvelope: traceEnvelope,
+                timestamp: timestampProvider()
+            )
+            return RuntimePresentationPayload(
+                snapshot: snapshot,
+                turnID: frameResult.id,
+                eventID: "\(frameResult.id):runtime-presentation",
+                reconciliation: PresentationReconciliation(
+                    status: .verified,
+                    readbackKey: acceptedReadbacks.last?.key,
+                    safeReason: "partial_readback_verified"
+                )
             )
         }
 
