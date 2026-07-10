@@ -2,7 +2,7 @@
   "entries": [
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.ac.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.ac.01.zh-CN",
       "dialogText": "请先确认温区或目标温度，我先保持空调状态不变。",
       "family": "ac",
       "familyLabel": "空调",
@@ -13,7 +13,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.ac.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.ac.02.zh-CN",
       "dialogText": "这项空调控制暂未接入演示版，我先不改车内状态。",
       "family": "ac",
       "familyLabel": "空调",
@@ -24,7 +24,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.ac.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.ac.03.zh-CN",
       "dialogText": "这个空调说法还没稳稳接住，您可以说空调调到26度。",
       "family": "ac",
       "familyLabel": "空调",
@@ -35,7 +35,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.ac.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.ac.04.zh-CN",
       "dialogText": "这类空调能力不在本轮演示范围，我先保持原样。",
       "family": "ac",
       "familyLabel": "空调",
@@ -46,7 +46,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.seat.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.seat.05.zh-CN",
       "dialogText": "座椅动作需要确认位置，我先保持座椅不动。",
       "family": "seat",
       "familyLabel": "座椅",
@@ -57,7 +57,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.seat.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.seat.06.zh-CN",
       "dialogText": "座椅控制暂未接入演示版，我先不移动座椅。",
       "family": "seat",
       "familyLabel": "座椅",
@@ -68,7 +68,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.seat.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.seat.07.zh-CN",
       "dialogText": "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。",
       "family": "seat",
       "familyLabel": "座椅",
@@ -79,7 +79,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.seat.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.seat.08.zh-CN",
       "dialogText": "这类座椅能力不在本轮演示范围，我先保持原样。",
       "family": "seat",
       "familyLabel": "座椅",
@@ -90,7 +90,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.window.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.window.09.zh-CN",
       "dialogText": "车窗动作需要确认位置和开度，我先保持车窗不变。",
       "family": "window",
       "familyLabel": "车窗",
@@ -101,7 +101,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.window.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.window.10.zh-CN",
       "dialogText": "车窗控制暂未接入演示版，我先不动车窗。",
       "family": "window",
       "familyLabel": "车窗",
@@ -112,7 +112,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.window.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.window.11.zh-CN",
       "dialogText": "这个车窗说法还没稳稳接住，您可以说主驾车窗打开一半。",
       "family": "window",
       "familyLabel": "车窗",
@@ -123,7 +123,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.window.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.window.12.zh-CN",
       "dialogText": "这类车窗能力不在本轮演示范围，我先保持原样。",
       "family": "window",
       "familyLabel": "车窗",
@@ -134,7 +134,7 @@
     },
     {
       "badgeLabel": "安全拦截",
-      "cellID": "fallback.door.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.door.13.zh-CN",
       "dialogText": "行驶中为了安全不能开门；停稳后请再说一次，我先保持车门不变。",
       "family": "door",
       "familyLabel": "车门",
@@ -145,7 +145,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.door.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.door.14.zh-CN",
       "dialogText": "车门控制暂未接入演示版，我先不动车门。",
       "family": "door",
       "familyLabel": "车门",
@@ -156,7 +156,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.door.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.door.15.zh-CN",
       "dialogText": "这个车门说法还没稳稳接住，我先保持车门状态不变。",
       "family": "door",
       "familyLabel": "车门",
@@ -167,7 +167,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.door.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.door.16.zh-CN",
       "dialogText": "这类车门能力不在本轮演示范围，我先保持原样。",
       "family": "door",
       "familyLabel": "车门",
@@ -178,7 +178,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.ambient.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.ambient.17.zh-CN",
       "dialogText": "氛围灯效果需要确认颜色或亮度，我先保持灯光不变。",
       "family": "ambient",
       "familyLabel": "氛围灯",
@@ -189,7 +189,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.ambient.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.ambient.18.zh-CN",
       "dialogText": "氛围灯控制暂未接入演示版，我先不改灯光。",
       "family": "ambient",
       "familyLabel": "氛围灯",
@@ -200,7 +200,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.ambient.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.ambient.19.zh-CN",
       "dialogText": "这个氛围灯说法还没稳稳接住，您可以说氛围灯调亮一点。",
       "family": "ambient",
       "familyLabel": "氛围灯",
@@ -211,7 +211,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.ambient.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.ambient.20.zh-CN",
       "dialogText": "这类氛围灯能力不在本轮演示范围，我先保持原样。",
       "family": "ambient",
       "familyLabel": "氛围灯",
@@ -222,7 +222,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.screen.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.screen.21.zh-CN",
       "dialogText": "屏幕设置需要确认目标屏幕，我先保持显示不变。",
       "family": "screen",
       "familyLabel": "屏幕",
@@ -233,7 +233,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.screen.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.screen.22.zh-CN",
       "dialogText": "屏幕控制暂未接入演示版，我先不改屏幕设置。",
       "family": "screen",
       "familyLabel": "屏幕",
@@ -244,7 +244,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.screen.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.screen.23.zh-CN",
       "dialogText": "这个屏幕说法还没稳稳接住，您可以说中控屏亮度调高。",
       "family": "screen",
       "familyLabel": "屏幕",
@@ -255,7 +255,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.screen.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.screen.24.zh-CN",
       "dialogText": "这类屏幕能力不在本轮演示范围，我先保持原样。",
       "family": "screen",
       "familyLabel": "屏幕",
@@ -266,7 +266,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.volume.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.volume.25.zh-CN",
       "dialogText": "音量变化需要确认方向，我先保持当前音量。",
       "family": "volume",
       "familyLabel": "音量",
@@ -277,7 +277,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.volume.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.volume.26.zh-CN",
       "dialogText": "音量控制暂未接入演示版，我先不改音量。",
       "family": "volume",
       "familyLabel": "音量",
@@ -288,7 +288,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.volume.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.volume.27.zh-CN",
       "dialogText": "这个音量说法还没稳稳接住，您可以说音量调低一点。",
       "family": "volume",
       "familyLabel": "音量",
@@ -299,7 +299,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.volume.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.volume.28.zh-CN",
       "dialogText": "这类音量能力不在本轮演示范围，我先保持原样。",
       "family": "volume",
       "familyLabel": "音量",
@@ -310,7 +310,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.wiper.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.wiper.29.zh-CN",
       "dialogText": "雨刮动作需要确认模式或速度，我先保持雨刮不变。",
       "family": "wiper",
       "familyLabel": "雨刮",
@@ -321,7 +321,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.wiper.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.wiper.30.zh-CN",
       "dialogText": "雨刮控制暂未接入演示版，我先不动雨刮。",
       "family": "wiper",
       "familyLabel": "雨刮",
@@ -332,7 +332,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.wiper.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.wiper.31.zh-CN",
       "dialogText": "这个雨刮说法还没稳稳接住，您可以说打开雨刮。",
       "family": "wiper",
       "familyLabel": "雨刮",
@@ -343,7 +343,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.wiper.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.wiper.32.zh-CN",
       "dialogText": "这类雨刮能力不在本轮演示范围，我先保持原样。",
       "family": "wiper",
       "familyLabel": "雨刮",
@@ -354,7 +354,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.sunroofShade.33.zh-CN",
       "dialogText": "天窗遮阳需要确认部件和开度，我先保持当前位置。",
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
@@ -365,7 +365,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.sunroofShade.34.zh-CN",
       "dialogText": "天窗遮阳控制暂未接入演示版，我先不动车顶部件。",
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
@@ -376,7 +376,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.sunroofShade.35.zh-CN",
       "dialogText": "这个天窗遮阳说法还没稳稳接住，您可以说打开天窗遮阳帘。",
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
@@ -387,7 +387,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.sunroofShade.36.zh-CN",
       "dialogText": "这类车顶部件不在本轮演示范围，我先保持原样。",
       "family": "sunroofShade",
       "familyLabel": "天窗遮阳",
@@ -398,7 +398,7 @@
     },
     {
       "badgeLabel": "需确认",
-      "cellID": "fallback.fragrance.safety_or_clarify_reject.zh-CN",
+      "cellID": "fallback.fragrance.37.zh-CN",
       "dialogText": "香氛设置需要确认模式或浓度，我先保持当前香氛。",
       "family": "fragrance",
       "familyLabel": "香氛",
@@ -409,7 +409,7 @@
     },
     {
       "badgeLabel": "暂未接入",
-      "cellID": "fallback.fragrance.unmounted_name_rejected.zh-CN",
+      "cellID": "fallback.fragrance.38.zh-CN",
       "dialogText": "香氛控制暂未接入演示版，我先不改香氛设置。",
       "family": "fragrance",
       "familyLabel": "香氛",
@@ -420,7 +420,7 @@
     },
     {
       "badgeLabel": "换个说法",
-      "cellID": "fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+      "cellID": "fallback.fragrance.39.zh-CN",
       "dialogText": "这个香氛说法还没稳稳接住，您可以说打开香氛。",
       "family": "fragrance",
       "familyLabel": "香氛",
@@ -431,7 +431,7 @@
     },
     {
       "badgeLabel": "不在范围",
-      "cellID": "fallback.fragrance.unknown_no_representative_entry.zh-CN",
+      "cellID": "fallback.fragrance.40.zh-CN",
       "dialogText": "这类香氛能力不在本轮演示范围，我先保持原样。",
       "family": "fragrance",
       "familyLabel": "香氛",

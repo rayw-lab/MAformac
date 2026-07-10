@@ -44,17 +44,24 @@ def swift_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
-def enum_source(name: str, values: list[str], cases: dict[str, str]) -> list[str]:
-    lines = [f"public enum {name}: String, CaseIterable, Codable, Hashable, Sendable {{"]
+def enum_source(name: str, values: list[str], cases: dict[str, str], visibility: str = "public", codable: bool = True) -> list[str]:
+    protocols = "CaseIterable, Codable, Hashable, Sendable" if codable else "CaseIterable, Hashable, Sendable"
+    lines = [f"{visibility} enum {name}: String, {protocols} {{"]
     lines.extend(f"    case {cases[value]} = {swift_string(value)}" for value in values)
     lines.append("}")
     return lines
 
 
+def public_cell_id(source: dict, cell: dict) -> str:
+    # Stable public identifier deliberately excludes governance vocabulary.
+    index = source["cells"].index(cell) + 1
+    return f"fallback.{cell['family']}.{index:02d}.{cell['locale']}"
+
+
 def public_entry(source: dict, cell: dict) -> dict:
     family = cell["family"]
     return {
-        "cellID": cell["cell_id"],
+        "cellID": public_cell_id(source, cell),
         "locale": cell["locale"],
         "family": family,
         "familyLabel": source["families"][family]["familyLabel"],
@@ -72,13 +79,13 @@ def generate_swift(source: dict, source_sha: str) -> str:
         f"// Source SHA-256: {source_sha}",
         "",
     ]
-    lines.extend(enum_source("FallbackScriptFamily", source["family_enum"], FAMILY_CASES))
+    lines.extend(enum_source("FallbackScriptFamily", source["family_enum"], FAMILY_CASES, "public"))
     lines.append("")
-    lines.extend(enum_source("FallbackGovernanceReason", source["governance_reason_enum"], REASON_CASES))
+    lines.extend(enum_source("FallbackGovernanceReason", source["governance_reason_enum"], REASON_CASES, "internal", False))
     lines.append("")
-    lines.extend(enum_source("FallbackSafeReasonKind", source["safe_reason_kind_enum"], SAFE_CASES))
+    lines.extend(enum_source("FallbackSafeReasonKind", source["safe_reason_kind_enum"], SAFE_CASES, "public"))
     lines.append("")
-    lines.extend(enum_source("FallbackResultKind", source["result_kind_enum"], RESULT_CASES))
+    lines.extend(enum_source("FallbackResultKind", source["result_kind_enum"], RESULT_CASES, "public"))
     lines.extend(
         [
             "",
@@ -121,7 +128,7 @@ def generate_swift(source: dict, source_sha: str) -> str:
         lines.extend(
             [
                 "        FallbackScriptCatalogEntry(",
-                f"            cellID: {swift_string(cell['cell_id'])},",
+                f"            cellID: {swift_string(public_cell_id(source, cell))},",
                 f"            locale: {swift_string(cell['locale'])},",
                 f"            family: .{FAMILY_CASES[family]},",
                 f"            familyLabel: {swift_string(source['families'][family]['familyLabel'])},",
@@ -133,7 +140,23 @@ def generate_swift(source: dict, source_sha: str) -> str:
                 "        ),",
             ]
         )
-    lines.extend(["    ]", "}", ""])
+    lines.extend(["    ]", "", "    private static let governanceReasons: [String: FallbackGovernanceReason] = ["])
+    for cell in source["cells"]:
+        lines.append(f"        {swift_string(public_cell_id(source, cell))}: .{REASON_CASES[cell['reason_kind']]},")
+    lines.extend([
+        "    ]",
+        "",
+        "    /// Internal lookup for Core consumers; governance reason never enters the Codable entry.",
+        "    static func governanceReason(for entry: FallbackScriptCatalogEntry) -> FallbackGovernanceReason? {",
+        "        governanceReasons[entry.cellID]",
+        "    }",
+        "",
+        "    static func entry(for family: FallbackScriptFamily, governanceReason: FallbackGovernanceReason) -> FallbackScriptCatalogEntry? {",
+        "        entries.first { $0.family == family && governanceReasons[$0.cellID] == governanceReason }",
+        "    }",
+        "}",
+        "",
+    ])
     return "\n".join(lines)
 
 
