@@ -119,15 +119,18 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
         self.assertIn("unresolved_basis_refs", receipt["errors"])
         self.assertEqual(receipt["unresolved_basis_refs"][0]["cell_id"], "fallback.ac.safety_or_clarify_reject.zh-CN")
 
-    def test_all_door_cells_pin_risk_and_speed_authorities(self) -> None:
-        payload = json.loads(SOURCE.read_text(encoding="utf-8"))
-        door_cells = [cell for cell in payload["cells"] if cell["family"] == "door"]
-        self.assertEqual(len(door_cells), 4)
-        for cell in door_cells:
-            refs = {(ref["path"], ref["contains"]) for ref in cell["basis_refs"]}
-            self.assertIn(("Core/Contracts/DDomainMountedToolCatalog.swift", "mountedToolNames:"), refs)
-            self.assertIn(("contracts/state-cells.yaml", "- id: door.car_door"), refs)
-            self.assertIn(("contracts/state-cells.yaml", "- id: vehicle.speed"), refs)
+    def test_door_safety_cell_resolves_risk_and_speed_authorities_structurally(self) -> None:
+        result, receipt = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        resolution = next(
+            entry
+            for entry in receipt["basis_resolutions"]
+            if entry["cell_id"] == "fallback.door.safety_or_clarify_reject.zh-CN"
+        )
+        self.assertEqual(resolution["authority"], "risk_and_state_policy")
+        self.assertTrue(resolution["query_result"]["risk_rule"])
+        self.assertTrue(resolution["query_result"]["door_state"])
+        self.assertTrue(resolution["query_result"]["speed_state"])
 
     def test_t0_reason_projection_cannot_be_remapped_to_another_safe_enum(self) -> None:
         def mutate(payload: dict) -> None:
@@ -153,8 +156,8 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
 
     def test_source_has_no_parallel_t0_enum_or_projection_copy(self) -> None:
         payload = json.loads(SOURCE.read_text(encoding="utf-8"))
-        self.assertIn("basis_scope_note", payload)
         for field in (
+            "governance_reason_enum",
             "safe_reason_kind_enum",
             "result_kind_enum",
             "internal_reason_mappings",

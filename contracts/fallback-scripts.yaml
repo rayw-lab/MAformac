@@ -1,5 +1,4 @@
 {
-  "basis_scope_note": "basis=SSOT contract string presence proof; runtime reason fact-resolver is a C1 follow-up, not a blocker.",
   "schema_version": "demo_fallback_scripts.v1",
   "authority": {
     "t0_change": "add-c1-demo-capability-governance",

@@ -1,0 +1,17 @@
+{
+  "schema_version": "slice_receipt.v1",
+  "slice": "B1-fallback",
+  "base": "1c318e33ccdfe597d3062bb70f5d017b93a8c8c9",
+  "head": "ffd4a9946e43586c35d8c0ff48fe7399a968d10e",
+  "commit": "ffd4a9946e43586c35d8c0ff48fe7399a968d10e",
+  "commands": [
+    {
+      "argv": ["python3", "-m", "pytest", "-q", "scripts/test_check_fallback_scripts.py"],
+      "rc": 0,
+      "stdout_sha256": "7453e7462af6730279aff2f6a860dffad2d8048220c7b5daf507333113fee312"
+    }
+  ],
+  "touched_paths": ["contracts/fallback-scripts.yaml", "generated/demo-fallback-scripts.catalog.json", "Core/Contracts/FallbackScriptCatalog.generated.swift", "scripts/test_check_fallback_scripts.py"],
+  "detect_changes": "not-run (documentation-only receipt update)",
+  "residual_risk": "Runtime fact-resolver remains a C1 follow-up; basis scope is SSOT string existence proof."
+}
