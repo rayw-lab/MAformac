@@ -11,12 +11,16 @@ public struct DemoNLURouter: Sendable {
         self.backend = backend
     }
 
-    public func decode(text: String) async throws -> ToolCallFrame {
+    public func decodePlan(text: String) async throws -> [ToolCallFrame] {
         let frames = try await backend.generateToolPlan(for: ToolPlanRequest(text: text))
-        guard let first = frames.first else {
+        guard !frames.isEmpty else {
             throw DemoNLURouterError.noToolPlanFrames
         }
-        return first
+        return frames
+    }
+
+    public func decode(text: String) async throws -> ToolCallFrame {
+        try await decodePlan(text: text)[0]
     }
 }
 
