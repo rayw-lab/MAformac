@@ -188,7 +188,7 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
             self.assertEqual(materialize.returncode, 0, materialize.stderr)
             matrix = load_json(matrix_path)
             self.assertEqual(
-                [cell["matrix_id"] for cell in matrix["cells"] if cell["canDemo"]],
+                [cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]],
                 [],
             )
             self.assertEqual(
@@ -197,7 +197,7 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
             )
             self.assertEqual(
                 sum(
-                    cell["canDemo_basis"]["readbackProbePass"]["status"] == "passed"
+                    cell["actionDemoProven_basis"]["readbackProbePass"]["status"] == "passed"
                     for cell in matrix["cells"]
                 ),
                 0,
@@ -242,7 +242,7 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
             )
             self.assertEqual(checked.returncode, 0, checked.stderr)
             report = load_json(check_receipt_path)
-            self.assertEqual(report["canDemo_count"], 0)
+            self.assertEqual(report["actionDemoProven_count"], 0)
             self.assertEqual(report["conditional_pending_count"], 120)
 
 

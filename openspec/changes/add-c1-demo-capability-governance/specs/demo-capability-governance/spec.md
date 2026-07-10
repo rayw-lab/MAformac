@@ -2,19 +2,19 @@
 
 ### Requirement: DemoCapabilityMatrix SHALL preserve auditable 120-cell truth
 
-The system SHALL maintain exactly 120 stable capability cells. Each cell SHALL carry machine-readable identity, family, value shape, register, representative semantic action or explicit no-representative marker, mounted status, `primary_class`, default and conditional path status, entrypoint aliases, `canDemo`, same-cell `canDemo` basis, fallback classification, customer-safe reason reference and evidence anchors.
+The system SHALL maintain exactly 120 stable capability cells. Each cell SHALL carry machine-readable identity, family, value shape, register, representative semantic action or explicit no-representative marker, mounted status, `primary_class`, default and conditional path status, entrypoint aliases, `actionDemoProven`, same-cell `actionDemoProven` basis, fallback classification, customer-safe reason reference and evidence anchors.
 
 Coverage: CG-002, CG-004, CG-005, CG-007, CG-008, CG-009, CG-014, CG-015, CG-019, CG-063, CG-065.
 
 `primary_class` SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, `default_executable`, or `conditional_ddomain_executable`. It SHALL explain classification and SHALL NOT by itself prove default runtime execution.
 
-`canDemo=true` SHALL require mounted or explicitly approved action evidence, semantic-contract evidence, state/readback-cell evidence, and local runtime emission, execution and readback proof for the same cell. Matrix data SHALL be derived from mounted authority and SHALL NOT add a mounted action. FastPath aliases and conditional injected proof SHALL NOT independently promote `canDemo`.
+`actionDemoProven=true` SHALL require mounted or explicitly approved action evidence, semantic-contract evidence, state/readback-cell evidence, and local runtime emission, execution and readback proof for the same cell. Matrix data SHALL be derived from mounted authority and SHALL NOT add a mounted action. FastPath aliases and conditional injected proof SHALL NOT independently promote `actionDemoProven`.
 
 #### Scenario: Missing basis blocks eligibility
 
-- **GIVEN** a cell lacks any required same-cell `canDemo` basis
+- **GIVEN** a cell lacks any required same-cell `actionDemoProven` basis
 - **WHEN** matrix eligibility is computed
-- **THEN** `canDemo` SHALL be false
+- **THEN** `actionDemoProven` SHALL be false
 - **AND** validation SHALL report the missing basis instead of applying a prose or alias exception.
 
 #### Scenario: Semantic but unmounted cell remains visible
@@ -37,7 +37,7 @@ Coverage: CG-002, CG-004, CG-005, CG-007, CG-008, CG-009, CG-014, CG-015, CG-019
 - **GIVEN** a cell can be exercised only through an injected or conditional lane
 - **WHEN** default demo eligibility is computed
 - **THEN** the conditional evidence SHALL be recorded separately
-- **AND** the cell SHALL NOT become default `canDemo=true` until all four default evidence classes pass.
+- **AND** the cell SHALL NOT become default `actionDemoProven=true` until all four default evidence classes pass.
 
 #### Scenario: Fallback is not reported as rejection success
 
@@ -204,32 +204,32 @@ Coverage: CG-044, CG-076.
 
 ### Requirement: Expansion governance SHALL preserve prelay and mounted red lines
 
-The system SHALL allow matrix, fallback and probe prelay without authorizing mounted expansion. Expansion eligibility SHALL use `joint_strike_rate = min(hedged_strike_rate, can_question_strike_rate)` and the ratified tiers. A missing joint rate, failed fallback-quality gate, missing matrix row, missing readback/golden evidence or missing owner key SHALL block new mounted actions and new `canDemo=true` cells.
+The system SHALL allow matrix, fallback and probe prelay without authorizing mounted expansion. Expansion eligibility SHALL use `joint_strike_rate = min(hedged_strike_rate, can_question_strike_rate)` and the ratified tiers. A missing joint rate, failed fallback-quality gate, missing matrix row, missing readback/golden evidence or missing owner key SHALL block new mounted actions and new `actionDemoProven=true` cells.
 
 Coverage: CG-045, CG-048, CG-049, CG-050, CG-053, CG-054, CG-055, CG-057, CG-058, CG-060, CG-080.
 
-Expansion above the highest tier SHALL mean at most one primary cell per agreed family, not all semantic actions or all matrix cells. A mounted delta SHALL have a same-batch or already-planned matrix row with green checker evidence. Each newly mounted family SHALL add its primary golden case. Rollback SHALL revert mounted delta, downgrade affected `canDemo`, and preserve fallback coverage.
+Expansion above the highest tier SHALL mean at most one primary cell per agreed family, not all semantic actions or all matrix cells. A mounted delta SHALL have a same-batch or already-planned matrix row with green checker evidence. Each newly mounted family SHALL add its primary golden case. Rollback SHALL revert mounted delta, downgrade affected `actionDemoProven`, and preserve fallback coverage.
 
 #### Scenario: Low joint rate permits prelay only
 
 - **GIVEN** either component rate causes joint rate to remain below the expansion threshold
 - **WHEN** governance evaluates prepared matrix, fallback and probe artifacts
 - **THEN** those artifacts MAY remain prelay
-- **AND** no mounted action or `canDemo=true` cell SHALL be added.
+- **AND** no mounted action or `actionDemoProven=true` cell SHALL be added.
 
 #### Scenario: CG-048 asymmetric joint-rate fixture blocks expansion
 
 - **GIVEN** `hedged_strike_rate=0.90` and `can_question_strike_rate=0.35`
 - **WHEN** expansion eligibility computes the ratified formula
 - **THEN** `joint_strike_rate=0.35`
-- **AND** governance SHALL NOT authorize expansion, a mounted action, or a new `canDemo=true` cell.
+- **AND** governance SHALL NOT authorize expansion, a mounted action, or a new `actionDemoProven=true` cell.
 
 #### Scenario: CG-049 converse asymmetric joint-rate fixture blocks expansion
 
 - **GIVEN** `hedged_strike_rate=0.35` and `can_question_strike_rate=0.90`
 - **WHEN** expansion eligibility computes the ratified formula
 - **THEN** `joint_strike_rate=0.35`
-- **AND** governance SHALL NOT authorize expansion, a mounted action, or a new `canDemo=true` cell.
+- **AND** governance SHALL NOT authorize expansion, a mounted action, or a new `actionDemoProven=true` cell.
 
 #### Scenario: Missing joint rate blocks expansion
 
@@ -250,7 +250,7 @@ Expansion above the highest tier SHALL mean at most one primary cell per agreed 
 - **GIVEN** a newly authorized mounted family later fails golden or readback validation
 - **WHEN** rollback executes
 - **THEN** its mounted delta SHALL be reverted
-- **AND** affected matrix `canDemo` SHALL be downgraded
+- **AND** affected matrix `actionDemoProven` SHALL be downgraded
 - **AND** its fallback catalog and probes SHALL remain available.
 
 #### Scenario: C1 cannot authorize mounted one-to-many expansion

@@ -82,6 +82,10 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             mounted_catalog_path=MOUNTED_CATALOG,
         )
 
+    def v2_matrix(self) -> dict:
+        _, matrix = self.materialize()
+        return matrix
+
     def validate(self, checker: object, matrix: dict) -> dict:
         return checker.validate_matrix(
             matrix=matrix,
@@ -186,7 +190,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
 
         if operation == "remove_basis":
             assert target is not None
-            del target["canDemo_basis"][fixture["basis"]]
+            del target["actionDemoProven_basis"][fixture["basis"]]
         elif operation == "set_primary_class":
             assert target is not None
             target["primary_class"] = fixture["value"]
@@ -195,9 +199,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             duplicate = copy.deepcopy(target)
             duplicate["matrix_id"] = fixture["duplicate_of"]
             cells.append(duplicate)
-        elif operation == "set_candemo":
+        elif operation == "set_action_demo_proven":
             assert target is not None
-            target["canDemo"] = fixture["value"]
+            target["actionDemoProven"] = fixture["value"]
         elif operation == "set_reason_kind":
             assert target is not None
             target["reasonKind"] = fixture["value"]
@@ -231,12 +235,12 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             "readbackProbePass",
         }
         for cell in matrix["cells"]:
-            self.assertEqual(set(cell["canDemo_basis"]), required_basis)
+            self.assertEqual(set(cell["actionDemoProven_basis"]), required_basis)
             self.assertTrue(cell["anchors"])
-            for basis in cell["canDemo_basis"].values():
+            for basis in cell["actionDemoProven_basis"].values():
                 self.assertIsInstance(basis["observed"], bool)
                 self.assertTrue(basis["source_ref"])
-            probe_basis = cell["canDemo_basis"]["readbackProbePass"]
+            probe_basis = cell["actionDemoProven_basis"]["readbackProbePass"]
             self.assertFalse(probe_basis["observed"])
             self.assertEqual(probe_basis["status"], "conditional_pending")
             self.assertIsNone(probe_basis["probe_id"])
@@ -261,7 +265,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(report["blocked_unknown_count"], 0)
         self.assertNotIn("E_T0_ENUM_UNKNOWN", report["errors"])
 
-    def test_candemo_is_logical_and_of_four_same_cell_action_bases(self) -> None:
+    def test_action_demo_proven_is_logical_and_of_four_same_cell_action_bases(self) -> None:
         checker, _ = self.materialize()
         all_true = {
             "mounted_or_approved_action": {"observed": True},
@@ -274,13 +278,13 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 "receipt_sha256": "c" * 64,
             },
         }
-        self.assertTrue(checker.compute_can_demo(all_true))
+        self.assertTrue(checker.compute_action_demo_proven(all_true))
         for key in all_true:
             trial = copy.deepcopy(all_true)
             trial[key]["observed"] = False
-            self.assertFalse(checker.compute_can_demo(trial), key)
+            self.assertFalse(checker.compute_action_demo_proven(trial), key)
 
-    def test_candemo_true_requires_probe_id_and_receipt_id(self) -> None:
+    def test_action_demo_proven_true_requires_probe_id_and_receipt_id(self) -> None:
         checker, _ = self.materialize()
         basis = {
             "mounted_or_approved_action": {"observed": True},
@@ -296,7 +300,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         for missing_field in ("probe_id", "probe_receipt_id"):
             trial = copy.deepcopy(basis)
             trial["readbackProbePass"][missing_field] = None
-            self.assertFalse(checker.compute_can_demo(trial), missing_field)
+            self.assertFalse(checker.compute_action_demo_proven(trial), missing_field)
 
     def test_fallback_probe_id_is_rejected_for_action_readback(self) -> None:
         checker, _ = self.materialize()
@@ -310,13 +314,13 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 "probe_receipt_id": "runtime-no-mutation-40-probes",
             },
         }
-        self.assertFalse(checker.compute_can_demo(basis))
+        self.assertFalse(checker.compute_action_demo_proven(basis))
 
     def test_action_receipt_path_must_exist_inside_authority_root(self) -> None:
         checker, _ = self.materialize()
         receipt = self.valid_action_receipt(checker)
         missing = REPO_ROOT / ".build" / "missing-action-receipt.json"
-        with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_RECEIPT_MISSING"):
+        with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_RECEIPT_MISSING"):
             checker.evaluate_action_probe_receipt(
                 receipt=receipt,
                 receipt_path=missing,
@@ -327,7 +331,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="outside-action-authority-") as tmp:
             outside = Path(tmp) / "receipt.json"
             outside.write_text(json.dumps(receipt), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_RECEIPT_OUTSIDE_AUTHORITY"):
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_RECEIPT_OUTSIDE_AUTHORITY"):
                 checker.evaluate_action_probe_receipt(
                     receipt=receipt,
                     receipt_path=outside,
@@ -342,7 +346,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="action-receipt-") as tmp:
             receipt_path = Path(tmp) / "receipt.json"
             receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_PROBE_REUSED"):
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_PROBE_REUSED"):
                 checker.evaluate_action_probe_receipt(
                     receipt=receipt,
                     receipt_path=receipt_path,
@@ -363,7 +367,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
             receipt["probePackSHA256"] = checker.sha256_file(catalog_path)
             receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_PROBE_REUSED"):
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_PROBE_REUSED"):
                 checker.evaluate_action_probe_receipt(
                     receipt=receipt,
                     receipt_path=receipt_path,
@@ -392,7 +396,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
                     receipt["probePackSHA256"] = checker.sha256_file(catalog_path)
                     receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-                    with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_PROBE_CELL_MISMATCH"):
+                    with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH"):
                         checker.evaluate_action_probe_receipt(
                             receipt=receipt,
                             receipt_path=receipt_path,
@@ -457,15 +461,15 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 action_probe_catalog_path=ACTION_PROBE_CATALOG,
             )
         self.assertEqual(
-            [cell["matrix_id"] for cell in matrix["cells"] if cell["canDemo"]],
+            [cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]],
             [4, 5, 6],
         )
-        self.assertIn("E_CAN_DEMO_DEFAULT_PATH_CONTRADICTION", report["errors"])
+        self.assertIn("E_ACTION_DEMO_PROVEN_DEFAULT_PATH_CONTRADICTION", report["errors"])
 
     def test_live_matrix_has_zero_probe_gated_demo_cells(self) -> None:
         checker, matrix = self.materialize()
         report = self.validate(checker, matrix)
-        self.assertEqual(report["canDemo_count"], 0)
+        self.assertEqual(report["actionDemoProven_count"], 0)
         self.assertEqual(report["conditional_pending_count"], 120)
         self.assertEqual(report["status"], "PASS")
 
@@ -528,6 +532,34 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         matrix.pop("source")
         self.assertIn("E_MATRIX_SCHEMA_INVALID", self.validate(checker, matrix)["errors"])
 
+    def test_v2_rejects_legacy_action_key(self) -> None:
+        matrix = self.v2_matrix()
+        self.assertEqual(load_json(FIXTURES / "legacy-action-key.json")["key"], "canDemo")
+        matrix["cells"][0]["canDemo"] = False
+        errors = self.checker().validate_matrix_schema(matrix=matrix, schema_path=SCHEMA)
+        self.assertTrue(any(error["path"] == "cells/0" for error in errors), errors)
+
+    def test_v2_requires_action_demo_proven_basis(self) -> None:
+        matrix = self.v2_matrix()
+        del matrix["cells"][0]["actionDemoProven_basis"]
+        errors = self.checker().validate_matrix_schema(matrix=matrix, schema_path=SCHEMA)
+        self.assertTrue(any("actionDemoProven_basis" in error["message"] for error in errors), errors)
+
+    def test_v2_rejects_unknown_cell_key(self) -> None:
+        matrix = self.v2_matrix()
+        matrix["cells"][0]["unexpectedProof"] = True
+        errors = self.checker().validate_matrix_schema(matrix=matrix, schema_path=SCHEMA)
+        self.assertTrue(any("Additional properties" in error["message"] for error in errors), errors)
+
+    def test_weakened_schema_contract_fails_even_for_valid_matrix(self) -> None:
+        schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+        schema["properties"]["cells"]["items"].pop("required")
+        with tempfile.TemporaryDirectory() as temp:
+            weakened = Path(temp) / "schema.json"
+            weakened.write_text(json.dumps(schema), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_MATRIX_SCHEMA_CONTRACT_INVALID"):
+                self.checker().validate_matrix_schema(matrix=self.v2_matrix(), schema_path=weakened)
+
     def test_diff_target_requires_matrix_and_swift_canonical_regeneration(self) -> None:
         makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
         self.assertIn("diff: verify-c1-matrix-canonical", makefile)
@@ -548,9 +580,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         checker, matrix = self.mutate_with_fixture("duplicate-id.json")
         self.assertIn("E_DUPLICATE_MATRIX_ID", self.validate(checker, matrix)["errors"])
 
-    def test_fastpath_only_candemo_green_is_rejected(self) -> None:
-        checker, matrix = self.mutate_with_fixture("fastpath-only-candemo.json")
-        self.assertIn("E_CAN_DEMO_MANUAL_OVERRIDE", self.validate(checker, matrix)["errors"])
+    def test_fastpath_only_action_demo_proven_green_is_rejected(self) -> None:
+        checker, matrix = self.mutate_with_fixture("fastpath-only-action-demo-proven.json")
+        self.assertIn("E_ACTION_DEMO_PROVEN_MANUAL_OVERRIDE", self.validate(checker, matrix)["errors"])
 
     def test_free_string_reason_kind_is_rejected(self) -> None:
         checker, matrix = self.mutate_with_fixture("free-string-reason.json")
@@ -600,7 +632,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             self.assertEqual(checked.returncode, 0, checked.stderr)
             report = load_json(receipt)
             self.assertEqual(report["status"], "PASS")
-            self.assertEqual(report["canDemo_count"], 0)
+            self.assertEqual(report["actionDemoProven_count"], 0)
             self.assertEqual(report["conditional_pending_count"], 120)
 
 

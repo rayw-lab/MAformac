@@ -1,17 +1,8 @@
 {
   "cells": [
     {
-      "anchors": [
-        "capability-matrix-v2.md:47",
-        "capability-matrix-draft.md:36",
-        "Core/Contracts/DDomainIRMap.generated.swift:326",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-24",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:214-231"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=1:tool-not-mounted=open_ac"
@@ -32,6 +23,15 @@
           "source_ref": "contracts/state-cells.yaml#ac.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:47",
+        "capability-matrix-draft.md:36",
+        "Core/Contracts/DDomainIRMap.generated.swift:326",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-24",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:214-231"
+      ],
       "default_path_status": "executable_default_fastpath",
       "entrypointAliases": [
         "打开空调"
@@ -64,18 +64,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:48",
-        "capability-matrix-draft.md:37",
-        "Core/Contracts/DDomainIRMap.generated.swift:326",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=2:tool-not-mounted=open_ac"
@@ -96,6 +86,16 @@
           "source_ref": "contracts/state-cells.yaml#ac.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:48",
+        "capability-matrix-draft.md:37",
+        "Core/Contracts/DDomainIRMap.generated.swift:326",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -126,18 +126,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:49",
-        "capability-matrix-draft.md:38",
-        "Core/Contracts/DDomainIRMap.generated.swift:326",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=3:tool-not-mounted=open_ac"
@@ -158,6 +148,16 @@
           "source_ref": "contracts/state-cells.yaml#ac.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:49",
+        "capability-matrix-draft.md:38",
+        "Core/Contracts/DDomainIRMap.generated.swift:326",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -188,20 +188,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:50",
-        "capability-matrix-draft.md:39",
-        "Core/Contracts/DDomainIRMap.generated.swift:10",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142",
-        "Core/Execution/W20ARuntimeReadbackReceiptWriter.swift:35-43",
-        "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
-        "Tests/MAformacCoreTests/W20ARuntimeProjectionTests.swift:29-38"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -222,6 +210,18 @@
           "source_ref": "contracts/state-cells.yaml#ac.temp_setpoint"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:50",
+        "capability-matrix-draft.md:39",
+        "Core/Contracts/DDomainIRMap.generated.swift:10",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142",
+        "Core/Execution/W20ARuntimeReadbackReceiptWriter.swift:35-43",
+        "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
+        "Tests/MAformacCoreTests/W20ARuntimeProjectionTests.swift:29-38"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": null,
@@ -252,19 +252,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:51",
-        "capability-matrix-draft.md:40",
-        "Core/Contracts/DDomainIRMap.generated.swift:10",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142",
-        "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
-        "capability-matrix-v2.md:50-52"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -285,6 +274,17 @@
           "source_ref": "contracts/state-cells.yaml#ac.temp_setpoint"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:51",
+        "capability-matrix-draft.md:40",
+        "Core/Contracts/DDomainIRMap.generated.swift:10",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142",
+        "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
+        "capability-matrix-v2.md:50-52"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -315,19 +315,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:52",
-        "capability-matrix-draft.md:41",
-        "Core/Contracts/DDomainIRMap.generated.swift:10",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142",
-        "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
-        "capability-matrix-v2.md:50-52"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -348,6 +337,17 @@
           "source_ref": "contracts/state-cells.yaml#ac.temp_setpoint"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:52",
+        "capability-matrix-draft.md:41",
+        "Core/Contracts/DDomainIRMap.generated.swift:10",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142",
+        "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
+        "capability-matrix-v2.md:50-52"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -378,16 +378,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:53",
-        "capability-matrix-draft.md:42",
-        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=7:tool-not-mounted=-"
@@ -408,6 +400,14 @@
           "source_ref": "manifest:matrix_id=7:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:53",
+        "capability-matrix-draft.md:42",
+        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "no_representative_tool__default_fallback",
@@ -438,16 +438,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:54",
-        "capability-matrix-draft.md:43",
-        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=8:tool-not-mounted=-"
@@ -468,6 +460,14 @@
           "source_ref": "manifest:matrix_id=8:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:54",
+        "capability-matrix-draft.md:43",
+        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "no_representative_tool__default_fallback",
@@ -498,16 +498,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:55",
-        "capability-matrix-draft.md:44",
-        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=9:tool-not-mounted=-"
@@ -528,6 +520,14 @@
           "source_ref": "manifest:matrix_id=9:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:55",
+        "capability-matrix-draft.md:44",
+        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "no_representative_tool__default_fallback",
@@ -558,18 +558,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:56",
-        "capability-matrix-draft.md:45",
-        "Core/Contracts/DDomainIRMap.generated.swift:7",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=10:tool-not-mounted=adjust_ac_temperature_to_exp"
@@ -590,6 +580,16 @@
           "source_ref": "contracts/state-cells.yaml#ac.temp_setpoint"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:56",
+        "capability-matrix-draft.md:45",
+        "Core/Contracts/DDomainIRMap.generated.swift:7",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -620,18 +620,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:57",
-        "capability-matrix-draft.md:46",
-        "Core/Contracts/DDomainIRMap.generated.swift:7",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=11:tool-not-mounted=adjust_ac_temperature_to_exp"
@@ -652,6 +642,16 @@
           "source_ref": "contracts/state-cells.yaml#ac.temp_setpoint"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:57",
+        "capability-matrix-draft.md:46",
+        "Core/Contracts/DDomainIRMap.generated.swift:7",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -682,18 +682,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:58",
-        "capability-matrix-draft.md:47",
-        "Core/Contracts/DDomainIRMap.generated.swift:7",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=12:tool-not-mounted=adjust_ac_temperature_to_exp"
@@ -714,6 +704,16 @@
           "source_ref": "contracts/state-cells.yaml#ac.temp_setpoint"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:58",
+        "capability-matrix-draft.md:47",
+        "Core/Contracts/DDomainIRMap.generated.swift:7",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -744,18 +744,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:59",
-        "capability-matrix-draft.md:48",
-        "Core/Contracts/DDomainIRMap.generated.swift:391",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=13:tool-not-mounted=open_seat_heat"
@@ -776,6 +766,16 @@
           "source_ref": "manifest:matrix_id=13:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:59",
+        "capability-matrix-draft.md:48",
+        "Core/Contracts/DDomainIRMap.generated.swift:391",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -806,18 +806,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:60",
-        "capability-matrix-draft.md:49",
-        "Core/Contracts/DDomainIRMap.generated.swift:391",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=14:tool-not-mounted=open_seat_heat"
@@ -838,6 +828,16 @@
           "source_ref": "manifest:matrix_id=14:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:60",
+        "capability-matrix-draft.md:49",
+        "Core/Contracts/DDomainIRMap.generated.swift:391",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -868,18 +868,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:61",
-        "capability-matrix-draft.md:50",
-        "Core/Contracts/DDomainIRMap.generated.swift:391",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=15:tool-not-mounted=open_seat_heat"
@@ -900,6 +890,16 @@
           "source_ref": "manifest:matrix_id=15:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:61",
+        "capability-matrix-draft.md:50",
+        "Core/Contracts/DDomainIRMap.generated.swift:391",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -930,18 +930,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:62",
-        "capability-matrix-draft.md:51",
-        "Core/Contracts/DDomainIRMap.generated.swift:95",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=16:tool-not-mounted=adjust_seat_heat_temperature_to_number"
@@ -962,6 +952,16 @@
           "source_ref": "manifest:matrix_id=16:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:62",
+        "capability-matrix-draft.md:51",
+        "Core/Contracts/DDomainIRMap.generated.swift:95",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -992,18 +992,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:63",
-        "capability-matrix-draft.md:52",
-        "Core/Contracts/DDomainIRMap.generated.swift:95",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=17:tool-not-mounted=adjust_seat_heat_temperature_to_number"
@@ -1024,6 +1014,16 @@
           "source_ref": "manifest:matrix_id=17:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:63",
+        "capability-matrix-draft.md:52",
+        "Core/Contracts/DDomainIRMap.generated.swift:95",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1054,18 +1054,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:64",
-        "capability-matrix-draft.md:53",
-        "Core/Contracts/DDomainIRMap.generated.swift:95",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=18:tool-not-mounted=adjust_seat_heat_temperature_to_number"
@@ -1086,6 +1076,16 @@
           "source_ref": "manifest:matrix_id=18:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:64",
+        "capability-matrix-draft.md:53",
+        "Core/Contracts/DDomainIRMap.generated.swift:95",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1116,18 +1116,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:65",
-        "capability-matrix-draft.md:54",
-        "Core/Contracts/DDomainIRMap.generated.swift:114",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=19:tool-not-mounted=adjust_seat_position_to_number"
@@ -1148,6 +1138,16 @@
           "source_ref": "manifest:matrix_id=19:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:65",
+        "capability-matrix-draft.md:54",
+        "Core/Contracts/DDomainIRMap.generated.swift:114",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -1178,18 +1178,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:66",
-        "capability-matrix-draft.md:55",
-        "Core/Contracts/DDomainIRMap.generated.swift:114",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=20:tool-not-mounted=adjust_seat_position_to_number"
@@ -1210,6 +1200,16 @@
           "source_ref": "manifest:matrix_id=20:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:66",
+        "capability-matrix-draft.md:55",
+        "Core/Contracts/DDomainIRMap.generated.swift:114",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1240,18 +1240,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:67",
-        "capability-matrix-draft.md:56",
-        "Core/Contracts/DDomainIRMap.generated.swift:114",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=21:tool-not-mounted=adjust_seat_position_to_number"
@@ -1272,6 +1262,16 @@
           "source_ref": "manifest:matrix_id=21:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:67",
+        "capability-matrix-draft.md:56",
+        "Core/Contracts/DDomainIRMap.generated.swift:114",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1302,18 +1302,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:68",
-        "capability-matrix-draft.md:57",
-        "Core/Contracts/DDomainIRMap.generated.swift:92",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=22:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
@@ -1334,6 +1324,16 @@
           "source_ref": "manifest:matrix_id=22:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:68",
+        "capability-matrix-draft.md:57",
+        "Core/Contracts/DDomainIRMap.generated.swift:92",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -1364,18 +1364,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:69",
-        "capability-matrix-draft.md:58",
-        "Core/Contracts/DDomainIRMap.generated.swift:92",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=23:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
@@ -1396,6 +1386,16 @@
           "source_ref": "manifest:matrix_id=23:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:69",
+        "capability-matrix-draft.md:58",
+        "Core/Contracts/DDomainIRMap.generated.swift:92",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1426,18 +1426,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:70",
-        "capability-matrix-draft.md:59",
-        "Core/Contracts/DDomainIRMap.generated.swift:92",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=24:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
@@ -1458,6 +1448,16 @@
           "source_ref": "manifest:matrix_id=24:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:70",
+        "capability-matrix-draft.md:59",
+        "Core/Contracts/DDomainIRMap.generated.swift:92",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1488,18 +1488,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:71",
-        "capability-matrix-draft.md:60",
-        "Core/Contracts/DDomainIRMap.generated.swift:250",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=25:tool-not-mounted=close_window"
@@ -1520,6 +1510,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:71",
+        "capability-matrix-draft.md:60",
+        "Core/Contracts/DDomainIRMap.generated.swift:250",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -1550,18 +1550,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:72",
-        "capability-matrix-draft.md:61",
-        "Core/Contracts/DDomainIRMap.generated.swift:250",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=26:tool-not-mounted=close_window"
@@ -1582,6 +1572,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:72",
+        "capability-matrix-draft.md:61",
+        "Core/Contracts/DDomainIRMap.generated.swift:250",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1612,18 +1612,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:73",
-        "capability-matrix-draft.md:62",
-        "Core/Contracts/DDomainIRMap.generated.swift:250",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=27:tool-not-mounted=close_window"
@@ -1644,6 +1634,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:73",
+        "capability-matrix-draft.md:62",
+        "Core/Contracts/DDomainIRMap.generated.swift:250",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1674,18 +1674,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:74",
-        "capability-matrix-draft.md:63",
-        "Core/Contracts/DDomainIRMap.generated.swift:426",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=28:tool-not-mounted=open_window_by_number"
@@ -1706,6 +1696,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:74",
+        "capability-matrix-draft.md:63",
+        "Core/Contracts/DDomainIRMap.generated.swift:426",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -1736,18 +1736,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:75",
-        "capability-matrix-draft.md:64",
-        "Core/Contracts/DDomainIRMap.generated.swift:426",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=29:tool-not-mounted=open_window_by_number"
@@ -1768,6 +1758,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:75",
+        "capability-matrix-draft.md:64",
+        "Core/Contracts/DDomainIRMap.generated.swift:426",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1798,18 +1798,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:76",
-        "capability-matrix-draft.md:65",
-        "Core/Contracts/DDomainIRMap.generated.swift:426",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=30:tool-not-mounted=open_window_by_number"
@@ -1830,6 +1820,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:76",
+        "capability-matrix-draft.md:65",
+        "Core/Contracts/DDomainIRMap.generated.swift:426",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1860,18 +1860,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:77",
-        "capability-matrix-draft.md:66",
-        "Core/Contracts/DDomainIRMap.generated.swift:426",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=31:tool-not-mounted=open_window_by_number"
@@ -1892,6 +1882,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:77",
+        "capability-matrix-draft.md:66",
+        "Core/Contracts/DDomainIRMap.generated.swift:426",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -1922,18 +1922,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:78",
-        "capability-matrix-draft.md:67",
-        "Core/Contracts/DDomainIRMap.generated.swift:426",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=32:tool-not-mounted=open_window_by_number"
@@ -1954,6 +1944,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:78",
+        "capability-matrix-draft.md:67",
+        "Core/Contracts/DDomainIRMap.generated.swift:426",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -1984,18 +1984,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:79",
-        "capability-matrix-draft.md:68",
-        "Core/Contracts/DDomainIRMap.generated.swift:426",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=33:tool-not-mounted=open_window_by_number"
@@ -2016,6 +2006,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:79",
+        "capability-matrix-draft.md:68",
+        "Core/Contracts/DDomainIRMap.generated.swift:426",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2046,18 +2046,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:80",
-        "capability-matrix-draft.md:69",
-        "Core/Contracts/DDomainIRMap.generated.swift:428",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=34:tool-not-mounted=open_window_little"
@@ -2078,6 +2068,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:80",
+        "capability-matrix-draft.md:69",
+        "Core/Contracts/DDomainIRMap.generated.swift:428",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -2108,18 +2108,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:81",
-        "capability-matrix-draft.md:70",
-        "Core/Contracts/DDomainIRMap.generated.swift:428",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=35:tool-not-mounted=open_window_little"
@@ -2140,6 +2130,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:81",
+        "capability-matrix-draft.md:70",
+        "Core/Contracts/DDomainIRMap.generated.swift:428",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2170,18 +2170,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:82",
-        "capability-matrix-draft.md:71",
-        "Core/Contracts/DDomainIRMap.generated.swift:428",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=36:tool-not-mounted=open_window_little"
@@ -2202,6 +2192,16 @@
           "source_ref": "contracts/state-cells.yaml#window.position"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:82",
+        "capability-matrix-draft.md:71",
+        "Core/Contracts/DDomainIRMap.generated.swift:428",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2232,18 +2232,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:83",
-        "capability-matrix-draft.md:72",
-        "Core/Contracts/DDomainIRMap.generated.swift:379",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=37:tool-not-mounted=open_screen"
@@ -2264,6 +2254,16 @@
           "source_ref": "manifest:matrix_id=37:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:83",
+        "capability-matrix-draft.md:72",
+        "Core/Contracts/DDomainIRMap.generated.swift:379",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -2294,18 +2294,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:84",
-        "capability-matrix-draft.md:73",
-        "Core/Contracts/DDomainIRMap.generated.swift:379",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=38:tool-not-mounted=open_screen"
@@ -2326,6 +2316,16 @@
           "source_ref": "manifest:matrix_id=38:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:84",
+        "capability-matrix-draft.md:73",
+        "Core/Contracts/DDomainIRMap.generated.swift:379",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2356,18 +2356,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:85",
-        "capability-matrix-draft.md:74",
-        "Core/Contracts/DDomainIRMap.generated.swift:379",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=39:tool-not-mounted=open_screen"
@@ -2388,6 +2378,16 @@
           "source_ref": "manifest:matrix_id=39:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:85",
+        "capability-matrix-draft.md:74",
+        "Core/Contracts/DDomainIRMap.generated.swift:379",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2418,18 +2418,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:86",
-        "capability-matrix-draft.md:75",
-        "Core/Contracts/DDomainIRMap.generated.swift:73",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=40:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2450,6 +2440,16 @@
           "source_ref": "manifest:matrix_id=40:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:86",
+        "capability-matrix-draft.md:75",
+        "Core/Contracts/DDomainIRMap.generated.swift:73",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -2480,18 +2480,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:87",
-        "capability-matrix-draft.md:76",
-        "Core/Contracts/DDomainIRMap.generated.swift:73",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=41:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2512,6 +2502,16 @@
           "source_ref": "manifest:matrix_id=41:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:87",
+        "capability-matrix-draft.md:76",
+        "Core/Contracts/DDomainIRMap.generated.swift:73",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2542,18 +2542,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:88",
-        "capability-matrix-draft.md:77",
-        "Core/Contracts/DDomainIRMap.generated.swift:73",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=42:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2574,6 +2564,16 @@
           "source_ref": "manifest:matrix_id=42:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:88",
+        "capability-matrix-draft.md:77",
+        "Core/Contracts/DDomainIRMap.generated.swift:73",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2604,18 +2604,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:89",
-        "capability-matrix-draft.md:78",
-        "Core/Contracts/DDomainIRMap.generated.swift:73",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=43:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2636,6 +2626,16 @@
           "source_ref": "manifest:matrix_id=43:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:89",
+        "capability-matrix-draft.md:78",
+        "Core/Contracts/DDomainIRMap.generated.swift:73",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -2666,18 +2666,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:90",
-        "capability-matrix-draft.md:79",
-        "Core/Contracts/DDomainIRMap.generated.swift:73",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=44:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2698,6 +2688,16 @@
           "source_ref": "manifest:matrix_id=44:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:90",
+        "capability-matrix-draft.md:79",
+        "Core/Contracts/DDomainIRMap.generated.swift:73",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2728,18 +2728,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:91",
-        "capability-matrix-draft.md:80",
-        "Core/Contracts/DDomainIRMap.generated.swift:73",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=45:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2760,6 +2750,16 @@
           "source_ref": "manifest:matrix_id=45:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:91",
+        "capability-matrix-draft.md:80",
+        "Core/Contracts/DDomainIRMap.generated.swift:73",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2790,18 +2790,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:92",
-        "capability-matrix-draft.md:81",
-        "Core/Contracts/DDomainIRMap.generated.swift:70",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=46:tool-not-mounted=adjust_screen_brightness_to_gear"
@@ -2822,6 +2812,16 @@
           "source_ref": "manifest:matrix_id=46:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:92",
+        "capability-matrix-draft.md:81",
+        "Core/Contracts/DDomainIRMap.generated.swift:70",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -2852,18 +2852,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:93",
-        "capability-matrix-draft.md:82",
-        "Core/Contracts/DDomainIRMap.generated.swift:70",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=47:tool-not-mounted=adjust_screen_brightness_to_gear"
@@ -2884,6 +2874,16 @@
           "source_ref": "manifest:matrix_id=47:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:93",
+        "capability-matrix-draft.md:82",
+        "Core/Contracts/DDomainIRMap.generated.swift:70",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2914,18 +2914,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:94",
-        "capability-matrix-draft.md:83",
-        "Core/Contracts/DDomainIRMap.generated.swift:70",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=48:tool-not-mounted=adjust_screen_brightness_to_gear"
@@ -2946,6 +2936,16 @@
           "source_ref": "manifest:matrix_id=48:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:94",
+        "capability-matrix-draft.md:83",
+        "Core/Contracts/DDomainIRMap.generated.swift:70",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -2976,18 +2976,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:95",
-        "capability-matrix-draft.md:84",
-        "Core/Contracts/DDomainIRMap.generated.swift:332",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=49:tool-not-mounted=open_atmosphere_lamp"
@@ -3008,6 +2998,16 @@
           "source_ref": "manifest:matrix_id=49:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:95",
+        "capability-matrix-draft.md:84",
+        "Core/Contracts/DDomainIRMap.generated.swift:332",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -3038,18 +3038,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:96",
-        "capability-matrix-draft.md:85",
-        "Core/Contracts/DDomainIRMap.generated.swift:332",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=50:tool-not-mounted=open_atmosphere_lamp"
@@ -3070,6 +3060,16 @@
           "source_ref": "manifest:matrix_id=50:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:96",
+        "capability-matrix-draft.md:85",
+        "Core/Contracts/DDomainIRMap.generated.swift:332",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3100,18 +3100,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:97",
-        "capability-matrix-draft.md:86",
-        "Core/Contracts/DDomainIRMap.generated.swift:332",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=51:tool-not-mounted=open_atmosphere_lamp"
@@ -3132,6 +3122,16 @@
           "source_ref": "manifest:matrix_id=51:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:97",
+        "capability-matrix-draft.md:86",
+        "Core/Contracts/DDomainIRMap.generated.swift:332",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3162,18 +3162,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:98",
-        "capability-matrix-draft.md:87",
-        "Core/Contracts/DDomainIRMap.generated.swift:22",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=52:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3194,6 +3184,16 @@
           "source_ref": "manifest:matrix_id=52:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:98",
+        "capability-matrix-draft.md:87",
+        "Core/Contracts/DDomainIRMap.generated.swift:22",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -3224,18 +3224,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:99",
-        "capability-matrix-draft.md:88",
-        "Core/Contracts/DDomainIRMap.generated.swift:22",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=53:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3256,6 +3246,16 @@
           "source_ref": "manifest:matrix_id=53:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:99",
+        "capability-matrix-draft.md:88",
+        "Core/Contracts/DDomainIRMap.generated.swift:22",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3286,18 +3286,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:100",
-        "capability-matrix-draft.md:89",
-        "Core/Contracts/DDomainIRMap.generated.swift:22",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=54:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3318,6 +3308,16 @@
           "source_ref": "manifest:matrix_id=54:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:100",
+        "capability-matrix-draft.md:89",
+        "Core/Contracts/DDomainIRMap.generated.swift:22",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3348,18 +3348,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:101",
-        "capability-matrix-draft.md:90",
-        "Core/Contracts/DDomainIRMap.generated.swift:22",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=55:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3380,6 +3370,16 @@
           "source_ref": "manifest:matrix_id=55:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:101",
+        "capability-matrix-draft.md:90",
+        "Core/Contracts/DDomainIRMap.generated.swift:22",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -3410,18 +3410,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:102",
-        "capability-matrix-draft.md:91",
-        "Core/Contracts/DDomainIRMap.generated.swift:22",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=56:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3442,6 +3432,16 @@
           "source_ref": "manifest:matrix_id=56:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:102",
+        "capability-matrix-draft.md:91",
+        "Core/Contracts/DDomainIRMap.generated.swift:22",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3472,18 +3472,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:103",
-        "capability-matrix-draft.md:92",
-        "Core/Contracts/DDomainIRMap.generated.swift:22",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=57:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3504,6 +3494,16 @@
           "source_ref": "manifest:matrix_id=57:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:103",
+        "capability-matrix-draft.md:92",
+        "Core/Contracts/DDomainIRMap.generated.swift:22",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3534,18 +3534,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:104",
-        "capability-matrix-draft.md:93",
-        "Core/Contracts/DDomainIRMap.generated.swift:19",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=58:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
@@ -3566,6 +3556,16 @@
           "source_ref": "manifest:matrix_id=58:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:104",
+        "capability-matrix-draft.md:93",
+        "Core/Contracts/DDomainIRMap.generated.swift:19",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -3596,18 +3596,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:105",
-        "capability-matrix-draft.md:94",
-        "Core/Contracts/DDomainIRMap.generated.swift:19",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=59:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
@@ -3628,6 +3618,16 @@
           "source_ref": "manifest:matrix_id=59:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:105",
+        "capability-matrix-draft.md:94",
+        "Core/Contracts/DDomainIRMap.generated.swift:19",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3658,18 +3658,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:106",
-        "capability-matrix-draft.md:95",
-        "Core/Contracts/DDomainIRMap.generated.swift:19",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=60:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
@@ -3690,6 +3680,16 @@
           "source_ref": "manifest:matrix_id=60:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:106",
+        "capability-matrix-draft.md:95",
+        "Core/Contracts/DDomainIRMap.generated.swift:19",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3720,18 +3720,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:107",
-        "capability-matrix-draft.md:96",
-        "Core/Contracts/DDomainIRMap.generated.swift:341",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=61:tool-not-mounted=open_car_door"
@@ -3752,6 +3742,16 @@
           "source_ref": "manifest:matrix_id=61:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:107",
+        "capability-matrix-draft.md:96",
+        "Core/Contracts/DDomainIRMap.generated.swift:341",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -3782,18 +3782,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:108",
-        "capability-matrix-draft.md:97",
-        "Core/Contracts/DDomainIRMap.generated.swift:341",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=62:tool-not-mounted=open_car_door"
@@ -3814,6 +3804,16 @@
           "source_ref": "manifest:matrix_id=62:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:108",
+        "capability-matrix-draft.md:97",
+        "Core/Contracts/DDomainIRMap.generated.swift:341",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3844,18 +3844,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:109",
-        "capability-matrix-draft.md:98",
-        "Core/Contracts/DDomainIRMap.generated.swift:341",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=63:tool-not-mounted=open_car_door"
@@ -3876,6 +3866,16 @@
           "source_ref": "manifest:matrix_id=63:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:109",
+        "capability-matrix-draft.md:98",
+        "Core/Contracts/DDomainIRMap.generated.swift:341",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -3906,18 +3906,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:110",
-        "capability-matrix-draft.md:99",
-        "Core/Contracts/DDomainIRMap.generated.swift:514",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=64:tool-not-mounted=set_door_speed_to_number"
@@ -3938,6 +3928,16 @@
           "source_ref": "manifest:matrix_id=64:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:110",
+        "capability-matrix-draft.md:99",
+        "Core/Contracts/DDomainIRMap.generated.swift:514",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -3968,18 +3968,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:111",
-        "capability-matrix-draft.md:100",
-        "Core/Contracts/DDomainIRMap.generated.swift:514",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=65:tool-not-mounted=set_door_speed_to_number"
@@ -4000,6 +3990,16 @@
           "source_ref": "manifest:matrix_id=65:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:111",
+        "capability-matrix-draft.md:100",
+        "Core/Contracts/DDomainIRMap.generated.swift:514",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4030,18 +4030,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:112",
-        "capability-matrix-draft.md:101",
-        "Core/Contracts/DDomainIRMap.generated.swift:514",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=66:tool-not-mounted=set_door_speed_to_number"
@@ -4062,6 +4052,16 @@
           "source_ref": "manifest:matrix_id=66:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:112",
+        "capability-matrix-draft.md:101",
+        "Core/Contracts/DDomainIRMap.generated.swift:514",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4092,18 +4092,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:113",
-        "capability-matrix-draft.md:102",
-        "Core/Contracts/DDomainIRMap.generated.swift:353",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=67:tool-not-mounted=open_door_by_number"
@@ -4124,6 +4114,16 @@
           "source_ref": "manifest:matrix_id=67:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:113",
+        "capability-matrix-draft.md:102",
+        "Core/Contracts/DDomainIRMap.generated.swift:353",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -4154,18 +4154,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:114",
-        "capability-matrix-draft.md:103",
-        "Core/Contracts/DDomainIRMap.generated.swift:353",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=68:tool-not-mounted=open_door_by_number"
@@ -4186,6 +4176,16 @@
           "source_ref": "manifest:matrix_id=68:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:114",
+        "capability-matrix-draft.md:103",
+        "Core/Contracts/DDomainIRMap.generated.swift:353",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4216,18 +4216,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:115",
-        "capability-matrix-draft.md:104",
-        "Core/Contracts/DDomainIRMap.generated.swift:353",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=69:tool-not-mounted=open_door_by_number"
@@ -4248,6 +4238,16 @@
           "source_ref": "manifest:matrix_id=69:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:115",
+        "capability-matrix-draft.md:104",
+        "Core/Contracts/DDomainIRMap.generated.swift:353",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4278,18 +4278,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:116",
-        "capability-matrix-draft.md:105",
-        "Core/Contracts/DDomainIRMap.generated.swift:354",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=70:tool-not-mounted=open_door_little"
@@ -4310,6 +4300,16 @@
           "source_ref": "manifest:matrix_id=70:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:116",
+        "capability-matrix-draft.md:105",
+        "Core/Contracts/DDomainIRMap.generated.swift:354",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -4340,18 +4340,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:117",
-        "capability-matrix-draft.md:106",
-        "Core/Contracts/DDomainIRMap.generated.swift:354",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=71:tool-not-mounted=open_door_little"
@@ -4372,6 +4362,16 @@
           "source_ref": "manifest:matrix_id=71:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:117",
+        "capability-matrix-draft.md:106",
+        "Core/Contracts/DDomainIRMap.generated.swift:354",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4402,18 +4402,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:118",
-        "capability-matrix-draft.md:107",
-        "Core/Contracts/DDomainIRMap.generated.swift:354",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=72:tool-not-mounted=open_door_little"
@@ -4434,6 +4424,16 @@
           "source_ref": "manifest:matrix_id=72:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:118",
+        "capability-matrix-draft.md:107",
+        "Core/Contracts/DDomainIRMap.generated.swift:354",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4464,18 +4464,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:119",
-        "capability-matrix-draft.md:108",
-        "Core/Contracts/DDomainIRMap.generated.swift:566",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=73:tool-not-mounted=volume_mute"
@@ -4496,6 +4486,16 @@
           "source_ref": "manifest:matrix_id=73:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:119",
+        "capability-matrix-draft.md:108",
+        "Core/Contracts/DDomainIRMap.generated.swift:566",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -4526,18 +4526,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:120",
-        "capability-matrix-draft.md:109",
-        "Core/Contracts/DDomainIRMap.generated.swift:566",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=74:tool-not-mounted=volume_mute"
@@ -4558,6 +4548,16 @@
           "source_ref": "manifest:matrix_id=74:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:120",
+        "capability-matrix-draft.md:109",
+        "Core/Contracts/DDomainIRMap.generated.swift:566",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4588,18 +4588,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:121",
-        "capability-matrix-draft.md:110",
-        "Core/Contracts/DDomainIRMap.generated.swift:566",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=75:tool-not-mounted=volume_mute"
@@ -4620,6 +4610,16 @@
           "source_ref": "manifest:matrix_id=75:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:121",
+        "capability-matrix-draft.md:110",
+        "Core/Contracts/DDomainIRMap.generated.swift:566",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4650,18 +4650,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:122",
-        "capability-matrix-draft.md:111",
-        "Core/Contracts/DDomainIRMap.generated.swift:133",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=76:tool-not-mounted=adjust_volume_to_number"
@@ -4682,6 +4672,16 @@
           "source_ref": "manifest:matrix_id=76:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:122",
+        "capability-matrix-draft.md:111",
+        "Core/Contracts/DDomainIRMap.generated.swift:133",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -4712,18 +4712,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:123",
-        "capability-matrix-draft.md:112",
-        "Core/Contracts/DDomainIRMap.generated.swift:133",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=77:tool-not-mounted=adjust_volume_to_number"
@@ -4744,6 +4734,16 @@
           "source_ref": "manifest:matrix_id=77:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:123",
+        "capability-matrix-draft.md:112",
+        "Core/Contracts/DDomainIRMap.generated.swift:133",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4774,18 +4774,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:124",
-        "capability-matrix-draft.md:113",
-        "Core/Contracts/DDomainIRMap.generated.swift:133",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=78:tool-not-mounted=adjust_volume_to_number"
@@ -4806,6 +4796,16 @@
           "source_ref": "manifest:matrix_id=78:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:124",
+        "capability-matrix-draft.md:113",
+        "Core/Contracts/DDomainIRMap.generated.swift:133",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4836,18 +4836,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:125",
-        "capability-matrix-draft.md:114",
-        "Core/Contracts/DDomainIRMap.generated.swift:133",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=79:tool-not-mounted=adjust_volume_to_number"
@@ -4868,6 +4858,16 @@
           "source_ref": "manifest:matrix_id=79:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:125",
+        "capability-matrix-draft.md:114",
+        "Core/Contracts/DDomainIRMap.generated.swift:133",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -4898,18 +4898,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:126",
-        "capability-matrix-draft.md:115",
-        "Core/Contracts/DDomainIRMap.generated.swift:133",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=80:tool-not-mounted=adjust_volume_to_number"
@@ -4930,6 +4920,16 @@
           "source_ref": "manifest:matrix_id=80:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:126",
+        "capability-matrix-draft.md:115",
+        "Core/Contracts/DDomainIRMap.generated.swift:133",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -4960,18 +4960,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:127",
-        "capability-matrix-draft.md:116",
-        "Core/Contracts/DDomainIRMap.generated.swift:133",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=81:tool-not-mounted=adjust_volume_to_number"
@@ -4992,6 +4982,16 @@
           "source_ref": "manifest:matrix_id=81:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:127",
+        "capability-matrix-draft.md:116",
+        "Core/Contracts/DDomainIRMap.generated.swift:133",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5022,18 +5022,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:128",
-        "capability-matrix-draft.md:117",
-        "Core/Contracts/DDomainIRMap.generated.swift:130",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=82:tool-not-mounted=adjust_volume_to_gear"
@@ -5054,6 +5044,16 @@
           "source_ref": "manifest:matrix_id=82:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:128",
+        "capability-matrix-draft.md:117",
+        "Core/Contracts/DDomainIRMap.generated.swift:130",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -5084,18 +5084,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:129",
-        "capability-matrix-draft.md:118",
-        "Core/Contracts/DDomainIRMap.generated.swift:130",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=83:tool-not-mounted=adjust_volume_to_gear"
@@ -5116,6 +5106,16 @@
           "source_ref": "manifest:matrix_id=83:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:129",
+        "capability-matrix-draft.md:118",
+        "Core/Contracts/DDomainIRMap.generated.swift:130",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5146,18 +5146,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:130",
-        "capability-matrix-draft.md:119",
-        "Core/Contracts/DDomainIRMap.generated.swift:130",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=84:tool-not-mounted=adjust_volume_to_gear"
@@ -5178,6 +5168,16 @@
           "source_ref": "manifest:matrix_id=84:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:130",
+        "capability-matrix-draft.md:119",
+        "Core/Contracts/DDomainIRMap.generated.swift:130",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5208,18 +5208,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:131",
-        "capability-matrix-draft.md:120",
-        "Core/Contracts/DDomainIRMap.generated.swift:433",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=85:tool-not-mounted=open_wiper"
@@ -5240,6 +5230,16 @@
           "source_ref": "contracts/state-cells.yaml#wiper.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:131",
+        "capability-matrix-draft.md:120",
+        "Core/Contracts/DDomainIRMap.generated.swift:433",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -5270,18 +5270,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:132",
-        "capability-matrix-draft.md:121",
-        "Core/Contracts/DDomainIRMap.generated.swift:433",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=86:tool-not-mounted=open_wiper"
@@ -5302,6 +5292,16 @@
           "source_ref": "contracts/state-cells.yaml#wiper.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:132",
+        "capability-matrix-draft.md:121",
+        "Core/Contracts/DDomainIRMap.generated.swift:433",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5332,18 +5332,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:133",
-        "capability-matrix-draft.md:122",
-        "Core/Contracts/DDomainIRMap.generated.swift:433",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=87:tool-not-mounted=open_wiper"
@@ -5364,6 +5354,16 @@
           "source_ref": "contracts/state-cells.yaml#wiper.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:133",
+        "capability-matrix-draft.md:122",
+        "Core/Contracts/DDomainIRMap.generated.swift:433",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5394,18 +5394,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:134",
-        "capability-matrix-draft.md:123",
-        "Core/Contracts/DDomainIRMap.generated.swift:141",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=88:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5426,6 +5416,16 @@
           "source_ref": "manifest:matrix_id=88:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:134",
+        "capability-matrix-draft.md:123",
+        "Core/Contracts/DDomainIRMap.generated.swift:141",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -5456,18 +5456,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:135",
-        "capability-matrix-draft.md:124",
-        "Core/Contracts/DDomainIRMap.generated.swift:141",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=89:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5488,6 +5478,16 @@
           "source_ref": "manifest:matrix_id=89:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:135",
+        "capability-matrix-draft.md:124",
+        "Core/Contracts/DDomainIRMap.generated.swift:141",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5518,18 +5518,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:136",
-        "capability-matrix-draft.md:125",
-        "Core/Contracts/DDomainIRMap.generated.swift:141",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=90:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5550,6 +5540,16 @@
           "source_ref": "manifest:matrix_id=90:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:136",
+        "capability-matrix-draft.md:125",
+        "Core/Contracts/DDomainIRMap.generated.swift:141",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5580,18 +5580,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:137",
-        "capability-matrix-draft.md:126",
-        "Core/Contracts/DDomainIRMap.generated.swift:141",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=91:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5612,6 +5602,16 @@
           "source_ref": "manifest:matrix_id=91:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:137",
+        "capability-matrix-draft.md:126",
+        "Core/Contracts/DDomainIRMap.generated.swift:141",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -5642,18 +5642,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:138",
-        "capability-matrix-draft.md:127",
-        "Core/Contracts/DDomainIRMap.generated.swift:141",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=92:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5674,6 +5664,16 @@
           "source_ref": "manifest:matrix_id=92:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:138",
+        "capability-matrix-draft.md:127",
+        "Core/Contracts/DDomainIRMap.generated.swift:141",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5704,18 +5704,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:139",
-        "capability-matrix-draft.md:128",
-        "Core/Contracts/DDomainIRMap.generated.swift:141",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=93:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5736,6 +5726,16 @@
           "source_ref": "manifest:matrix_id=93:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:139",
+        "capability-matrix-draft.md:128",
+        "Core/Contracts/DDomainIRMap.generated.swift:141",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5766,18 +5766,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:140",
-        "capability-matrix-draft.md:129",
-        "Core/Contracts/DDomainIRMap.generated.swift:138",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=94:tool-not-mounted=adjust_wiper_speed_to_gear"
@@ -5798,6 +5788,16 @@
           "source_ref": "manifest:matrix_id=94:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:140",
+        "capability-matrix-draft.md:129",
+        "Core/Contracts/DDomainIRMap.generated.swift:138",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -5828,18 +5828,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:141",
-        "capability-matrix-draft.md:130",
-        "Core/Contracts/DDomainIRMap.generated.swift:138",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=95:tool-not-mounted=adjust_wiper_speed_to_gear"
@@ -5860,6 +5850,16 @@
           "source_ref": "manifest:matrix_id=95:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:141",
+        "capability-matrix-draft.md:130",
+        "Core/Contracts/DDomainIRMap.generated.swift:138",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5890,18 +5890,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:142",
-        "capability-matrix-draft.md:131",
-        "Core/Contracts/DDomainIRMap.generated.swift:138",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=96:tool-not-mounted=adjust_wiper_speed_to_gear"
@@ -5922,6 +5912,16 @@
           "source_ref": "manifest:matrix_id=96:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:142",
+        "capability-matrix-draft.md:131",
+        "Core/Contracts/DDomainIRMap.generated.swift:138",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -5952,18 +5952,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:143",
-        "capability-matrix-draft.md:132",
-        "Core/Contracts/DDomainIRMap.generated.swift:400",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=97:tool-not-mounted=open_sunroof"
@@ -5984,6 +5974,16 @@
           "source_ref": "manifest:matrix_id=97:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:143",
+        "capability-matrix-draft.md:132",
+        "Core/Contracts/DDomainIRMap.generated.swift:400",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -6014,18 +6014,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:144",
-        "capability-matrix-draft.md:133",
-        "Core/Contracts/DDomainIRMap.generated.swift:400",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=98:tool-not-mounted=open_sunroof"
@@ -6046,6 +6036,16 @@
           "source_ref": "manifest:matrix_id=98:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:144",
+        "capability-matrix-draft.md:133",
+        "Core/Contracts/DDomainIRMap.generated.swift:400",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6076,18 +6076,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:145",
-        "capability-matrix-draft.md:134",
-        "Core/Contracts/DDomainIRMap.generated.swift:400",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=99:tool-not-mounted=open_sunroof"
@@ -6108,6 +6098,16 @@
           "source_ref": "manifest:matrix_id=99:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:145",
+        "capability-matrix-draft.md:134",
+        "Core/Contracts/DDomainIRMap.generated.swift:400",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6138,18 +6138,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:146",
-        "capability-matrix-draft.md:135",
-        "Core/Contracts/DDomainIRMap.generated.swift:405",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=100:tool-not-mounted=open_sunroof_to_number"
@@ -6170,6 +6160,16 @@
           "source_ref": "manifest:matrix_id=100:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:146",
+        "capability-matrix-draft.md:135",
+        "Core/Contracts/DDomainIRMap.generated.swift:405",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -6200,18 +6200,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:147",
-        "capability-matrix-draft.md:136",
-        "Core/Contracts/DDomainIRMap.generated.swift:405",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=101:tool-not-mounted=open_sunroof_to_number"
@@ -6232,6 +6222,16 @@
           "source_ref": "manifest:matrix_id=101:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:147",
+        "capability-matrix-draft.md:136",
+        "Core/Contracts/DDomainIRMap.generated.swift:405",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6262,18 +6262,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:148",
-        "capability-matrix-draft.md:137",
-        "Core/Contracts/DDomainIRMap.generated.swift:405",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=102:tool-not-mounted=open_sunroof_to_number"
@@ -6294,6 +6284,16 @@
           "source_ref": "manifest:matrix_id=102:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:148",
+        "capability-matrix-draft.md:137",
+        "Core/Contracts/DDomainIRMap.generated.swift:405",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6324,18 +6324,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:149",
-        "capability-matrix-draft.md:138",
-        "Core/Contracts/DDomainIRMap.generated.swift:402",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=103:tool-not-mounted=open_sunroof_by_number"
@@ -6356,6 +6346,16 @@
           "source_ref": "manifest:matrix_id=103:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:149",
+        "capability-matrix-draft.md:138",
+        "Core/Contracts/DDomainIRMap.generated.swift:402",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -6386,18 +6386,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:150",
-        "capability-matrix-draft.md:139",
-        "Core/Contracts/DDomainIRMap.generated.swift:402",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=104:tool-not-mounted=open_sunroof_by_number"
@@ -6418,6 +6408,16 @@
           "source_ref": "manifest:matrix_id=104:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:150",
+        "capability-matrix-draft.md:139",
+        "Core/Contracts/DDomainIRMap.generated.swift:402",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6448,18 +6448,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:151",
-        "capability-matrix-draft.md:140",
-        "Core/Contracts/DDomainIRMap.generated.swift:402",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=105:tool-not-mounted=open_sunroof_by_number"
@@ -6480,6 +6470,16 @@
           "source_ref": "manifest:matrix_id=105:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:151",
+        "capability-matrix-draft.md:140",
+        "Core/Contracts/DDomainIRMap.generated.swift:402",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6510,18 +6510,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:152",
-        "capability-matrix-draft.md:141",
-        "Core/Contracts/DDomainIRMap.generated.swift:404",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=106:tool-not-mounted=open_sunroof_little"
@@ -6542,6 +6532,16 @@
           "source_ref": "manifest:matrix_id=106:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:152",
+        "capability-matrix-draft.md:141",
+        "Core/Contracts/DDomainIRMap.generated.swift:404",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -6572,18 +6572,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:153",
-        "capability-matrix-draft.md:142",
-        "Core/Contracts/DDomainIRMap.generated.swift:404",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=107:tool-not-mounted=open_sunroof_little"
@@ -6604,6 +6594,16 @@
           "source_ref": "manifest:matrix_id=107:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:153",
+        "capability-matrix-draft.md:142",
+        "Core/Contracts/DDomainIRMap.generated.swift:404",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6634,18 +6634,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:154",
-        "capability-matrix-draft.md:143",
-        "Core/Contracts/DDomainIRMap.generated.swift:404",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=108:tool-not-mounted=open_sunroof_little"
@@ -6666,6 +6656,16 @@
           "source_ref": "manifest:matrix_id=108:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:154",
+        "capability-matrix-draft.md:143",
+        "Core/Contracts/DDomainIRMap.generated.swift:404",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6696,18 +6696,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:155",
-        "capability-matrix-draft.md:144",
-        "Core/Contracts/DDomainIRMap.generated.swift:357",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=109:tool-not-mounted=open_fragrance"
@@ -6728,6 +6718,16 @@
           "source_ref": "contracts/state-cells.yaml#fragrance.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:155",
+        "capability-matrix-draft.md:144",
+        "Core/Contracts/DDomainIRMap.generated.swift:357",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -6758,18 +6758,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:156",
-        "capability-matrix-draft.md:145",
-        "Core/Contracts/DDomainIRMap.generated.swift:357",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=110:tool-not-mounted=open_fragrance"
@@ -6790,6 +6780,16 @@
           "source_ref": "contracts/state-cells.yaml#fragrance.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:156",
+        "capability-matrix-draft.md:145",
+        "Core/Contracts/DDomainIRMap.generated.swift:357",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6820,18 +6820,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:157",
-        "capability-matrix-draft.md:146",
-        "Core/Contracts/DDomainIRMap.generated.swift:357",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=111:tool-not-mounted=open_fragrance"
@@ -6852,6 +6842,16 @@
           "source_ref": "contracts/state-cells.yaml#fragrance.power"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:157",
+        "capability-matrix-draft.md:146",
+        "Core/Contracts/DDomainIRMap.generated.swift:357",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -6882,18 +6882,8 @@
       "value_shape": "STATE"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:158",
-        "capability-matrix-draft.md:147",
-        "Core/Contracts/DDomainIRMap.generated.swift:57",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=112:tool-not-mounted=adjust_fragrance_intensity_to_number"
@@ -6914,6 +6904,16 @@
           "source_ref": "manifest:matrix_id=112:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:158",
+        "capability-matrix-draft.md:147",
+        "Core/Contracts/DDomainIRMap.generated.swift:57",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -6944,18 +6944,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:159",
-        "capability-matrix-draft.md:148",
-        "Core/Contracts/DDomainIRMap.generated.swift:57",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=113:tool-not-mounted=adjust_fragrance_intensity_to_number"
@@ -6976,6 +6966,16 @@
           "source_ref": "manifest:matrix_id=113:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:159",
+        "capability-matrix-draft.md:148",
+        "Core/Contracts/DDomainIRMap.generated.swift:57",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -7006,18 +7006,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:160",
-        "capability-matrix-draft.md:149",
-        "Core/Contracts/DDomainIRMap.generated.swift:57",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=114:tool-not-mounted=adjust_fragrance_intensity_to_number"
@@ -7038,6 +7028,16 @@
           "source_ref": "manifest:matrix_id=114:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:160",
+        "capability-matrix-draft.md:149",
+        "Core/Contracts/DDomainIRMap.generated.swift:57",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -7068,16 +7068,8 @@
       "value_shape": "SPOT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:161",
-        "capability-matrix-draft.md:150",
-        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=115:tool-not-mounted=-"
@@ -7098,6 +7090,14 @@
           "source_ref": "manifest:matrix_id=115:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:161",
+        "capability-matrix-draft.md:150",
+        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "no_representative_tool__default_fallback",
@@ -7128,16 +7128,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:162",
-        "capability-matrix-draft.md:151",
-        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=116:tool-not-mounted=-"
@@ -7158,6 +7150,14 @@
           "source_ref": "manifest:matrix_id=116:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:162",
+        "capability-matrix-draft.md:151",
+        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "no_representative_tool__default_fallback",
@@ -7188,16 +7188,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:163",
-        "capability-matrix-draft.md:152",
-        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=117:tool-not-mounted=-"
@@ -7218,6 +7210,14 @@
           "source_ref": "manifest:matrix_id=117:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:163",
+        "capability-matrix-draft.md:152",
+        "Core/Contracts/DDomainIRMap.generated.swift:3-568",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "no_representative_tool__default_fallback",
@@ -7248,18 +7248,8 @@
       "value_shape": "PERCENT"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:164",
-        "capability-matrix-draft.md:153",
-        "Core/Contracts/DDomainIRMap.generated.swift:54",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=118:tool-not-mounted=adjust_fragrance_intensity_to_gear"
@@ -7280,6 +7270,16 @@
           "source_ref": "manifest:matrix_id=118:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:164",
+        "capability-matrix-draft.md:153",
+        "Core/Contracts/DDomainIRMap.generated.swift:54",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unmounted_name_rejected",
@@ -7310,18 +7310,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:165",
-        "capability-matrix-draft.md:154",
-        "Core/Contracts/DDomainIRMap.generated.swift:54",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=119:tool-not-mounted=adjust_fragrance_intensity_to_gear"
@@ -7342,6 +7332,16 @@
           "source_ref": "manifest:matrix_id=119:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:165",
+        "capability-matrix-draft.md:154",
+        "Core/Contracts/DDomainIRMap.generated.swift:54",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -7372,18 +7372,8 @@
       "value_shape": "EXP"
     },
     {
-      "anchors": [
-        "capability-matrix-v2.md:166",
-        "capability-matrix-draft.md:155",
-        "Core/Contracts/DDomainIRMap.generated.swift:54",
-        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
-        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
-        "Core/Intent/FastPathIntentEngine.swift:12-13",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
-        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
-      ],
-      "canDemo": false,
-      "canDemo_basis": {
+      "actionDemoProven": false,
+      "actionDemoProven_basis": {
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=120:tool-not-mounted=adjust_fragrance_intensity_to_gear"
@@ -7404,6 +7394,16 @@
           "source_ref": "manifest:matrix_id=120:no-state-readback-cell"
         }
       },
+      "anchors": [
+        "capability-matrix-v2.md:166",
+        "capability-matrix-draft.md:155",
+        "Core/Contracts/DDomainIRMap.generated.swift:54",
+        "Core/Contracts/DDomainMountedToolCatalog.swift:12-14",
+        "Core/LLM/DDomainToolPlanBackend.swift:29-30",
+        "Core/Intent/FastPathIntentEngine.swift:12-13",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:53-58",
+        "Core/Execution/DemoRuntimeSessionRunner.swift:114-142"
+      ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
@@ -7434,12 +7434,12 @@
       "value_shape": "EXP"
     }
   ],
-  "schema_version": "demo_capability_matrix_v1",
+  "schema_version": "demo_capability_matrix_v2",
   "source": {
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "5c8faa54c7b28efa4daf9dc1bf7262481b65b72d43bb5ea6aac9e0ad0d2ffba6",
     "probe_pack_sha256": "f54bb4b5968dd31f290993dce8ac82a8022f66d7eb6eb2357a407149f1157f8f",
-    "t0_design_sha256": "6a00a6ea27c8856b08a3b721bf946b1cb267c5b985880399b38a39b29131d93f"
+    "t0_design_sha256": "0f976870a304285dce09ba9eefa5f86233014a17c349bce3f46e41a39bb0a83b"
   },
   "summary": {
     "blocked_unknown": 0,

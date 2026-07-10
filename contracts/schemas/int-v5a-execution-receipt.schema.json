@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "int-v5a execution receipt",
+  "type": "object",
+  "required": ["schema_version", "phase", "implementation_base_sha", "head_sha", "touched_paths", "reviewed_no_change_paths", "commands", "runtime_bundle", "proof_class"],
+  "properties": {
+    "schema_version": {"const": "int_v5a_execution_receipt_v1"},
+    "phase": {"enum": ["preflight", "rename", "bundle", "final"]},
+    "implementation_base_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "touched_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "reviewed_no_change_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "must_change_paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "rc", "result"],
+        "properties": {
+          "command": {"type": "string"},
+          "rc": {"type": "integer"},
+          "result": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "runtime_bundle": {
+      "type": "object",
+      "required": ["status", "runtime_contract_bundle_digest"],
+      "properties": {
+        "status": {"enum": ["not_yet_available", "available"]},
+        "runtime_contract_bundle_digest": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "proof_class": {"type": "string"},
+    "baseline_prerequisite_status": {"type": "string"},
+    "baseline_restoration_evidence": {"type": "string"},
+    "baseline_contingency_owner": {"type": "string"},
+    "baseline_commands_passed": {"type": "array", "items": {"type": "string"}},
+    "gate_strength_delta": {"type": "array", "items": {"type": "object"}},
+    "code_mapping": {"type": "object"},
+    "negative_evidence": {"type": "array", "items": {"type": "string"}},
+    "residual_risks": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

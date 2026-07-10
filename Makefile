@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -49,7 +49,7 @@ verify-ci: verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-se
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.
 verify-c1-checker-files:
 	@status=0; \
-	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/run_swift_test_exact.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py; do \
+	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/check_action_demo_proven_legacy_tokens.py Tools/checks/check_int_v5a_execution_receipt.py Tools/checks/run_swift_test_exact.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py; do \
 		if [ ! -f "$$checker" ]; then \
 			echo "ERROR_MISSING_C1_CHECKER $$checker" >&2; \
 			status=1; \
@@ -119,7 +119,7 @@ verify-c1-probes: .venv/.deps.stamp
 		--output .build/c1-run/receipts/c1/runtime-no-mutation-check.json
 
 # Action/readback honesty gate is intentionally separate from CG-044 fallback probes.
-# A failed action probe is a truthful observation and keeps canDemo=false; it must
+# A failed action probe is a truthful observation and keeps actionDemoProven=false; it must
 # never be replaced by a no-mutation fallback receipt.
 verify-c1-action-probes:
 	C1_RUN_DIR="$(CURDIR)/.build/c1-run" swift test --filter RuntimeActionReadbackProbeTests
@@ -173,6 +173,21 @@ verify-register:
 verify-mounted-catalog-no-delta: .venv/.deps.stamp
 	$(PYTHON) -m unittest scripts/test_check_mounted_catalog_no_delta.py
 	$(PYTHON) scripts/check_mounted_catalog_no_delta.py
+
+verify-action-demo-proven-rename: .venv/.deps.stamp verify-c1-finite-reason-authority verify-mounted-catalog-no-delta
+	mkdir -p .build/c1-run/receipts/c1 .build/c1-run/canonical
+	$(PYTHON) -m unittest -v scripts/test_check_capability_matrix.py
+	$(PYTHON) Tools/checks/check_capability_matrix.py check \
+		--matrix contracts/demo-capability-matrix.json \
+		--receipt .build/c1-run/receipts/c1/capability-matrix-rename.json
+	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
+		--input contracts/demo-capability-matrix.json \
+		--output .build/c1-run/canonical/DemoCapabilityMatrix.rename.swift
+	cmp -s Core/Contracts/DemoCapabilityMatrix.generated.swift .build/c1-run/canonical/DemoCapabilityMatrix.rename.swift
+	$(PYTHON) -m unittest -v scripts/test_check_action_demo_proven_legacy_tokens.py
+	$(PYTHON) Tools/checks/check_action_demo_proven_legacy_tokens.py \
+		--allowlist contracts/action-demo-proven-legacy-token-allowlist.json
+	$(PYTHON) -m unittest -v scripts/test_check_int_v5a_execution_receipt.py
 
 verify-c5-phase1-gates: .venv/.deps.stamp
 	$(PYTHON) scripts/test_query_zero_tolerance.py

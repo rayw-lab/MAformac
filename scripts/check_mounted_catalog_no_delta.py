@@ -100,10 +100,10 @@ def load_baseline(path: Path) -> dict[str, Any]:
             f"declared={declared_sha!r} computed={computed_sha}",
         )
 
-    if rollback_guard.get("affected_can_demo_after_rollback") is not False:
+    if rollback_guard.get("affected_action_demo_proven_after_rollback") is not False:
         raise GuardInputError(
-            "rollback_policy_can_demo_invalid",
-            "rollback_guard.affected_can_demo_after_rollback must be false",
+            "rollback_policy_action_demo_proven_invalid",
+            "rollback_guard.affected_action_demo_proven_after_rollback must be false",
         )
     required_artifacts = rollback_guard.get("preserve_artifacts")
     expected_artifacts = {"fallback_catalog", "fallback_probes"}
@@ -116,7 +116,7 @@ def load_baseline(path: Path) -> dict[str, Any]:
     return {
         "mounted_tool_names": names,
         "catalog_sha": declared_sha,
-        "affected_can_demo_after_rollback": False,
+        "affected_action_demo_proven_after_rollback": False,
         "preserve_artifacts": sorted(expected_artifacts),
     }
 
@@ -196,16 +196,16 @@ def check_rollback(
 
     affected_cells = rollback_state.get("affected_cells")
     affected_cells = affected_cells if isinstance(affected_cells, list) else []
-    can_demo_downgraded = bool(affected_cells) and all(
+    action_demo_proven_downgraded = bool(affected_cells) and all(
         isinstance(cell, dict)
         and isinstance(cell.get("cell_id"), str)
         and bool(cell.get("cell_id"))
-        and cell.get("before_canDemo") is True
-        and cell.get("after_canDemo") is False
+        and cell.get("before_action_demo_proven") is True
+        and cell.get("after_action_demo_proven") is False
         for cell in affected_cells
     )
-    if not can_demo_downgraded:
-        violations.append("rollback_can_demo_not_downgraded")
+    if not action_demo_proven_downgraded:
+        violations.append("rollback_action_demo_proven_not_downgraded")
 
     artifact_evidence: dict[str, Any] = {}
     for artifact_key in ("catalog", "probes"):
@@ -225,7 +225,7 @@ def check_rollback(
         "before_mounted_tool_names": sorted(before_names),
         "mounted_restored": mounted_restored,
         "restored_mounted_tool_names": sorted(restored_names),
-        "affected_can_demo_downgraded": can_demo_downgraded,
+        "affected_action_demo_proven_downgraded": action_demo_proven_downgraded,
         "affected_cell_count": len(affected_cells),
         "fallback_artifact_evidence": artifact_evidence,
     }

@@ -3,7 +3,7 @@ import XCTest
 @testable import MAformacCore
 
 final class DemoCapabilityMatrixGeneratedTests: XCTestCase {
-    func testGeneratedCatalogPreservesAll120SourceCellsAndCanDemoTruth() throws {
+    func testGeneratedCatalogPreservesAll120SourceCellsAndActionDemoProvenTruth() throws {
         let source = try loadSourceMatrix()
 
         XCTAssertEqual(source.cells.count, 120)
@@ -18,7 +18,7 @@ final class DemoCapabilityMatrixGeneratedTests: XCTestCase {
         )
         for sourceCell in source.cells {
             let generated = try XCTUnwrap(generatedByID[sourceCell.matrixID])
-            XCTAssertEqual(generated.canDemo, sourceCell.canDemo, "matrix_id=\(sourceCell.matrixID)")
+            XCTAssertEqual(generated.actionDemoProven, sourceCell.actionDemoProven, "matrix_id=\(sourceCell.matrixID)")
             XCTAssertEqual(
                 generated.entrypointAliases,
                 sourceCell.entrypointAliases,
@@ -53,29 +53,29 @@ final class DemoCapabilityMatrixGeneratedTests: XCTestCase {
         )
     }
 
-    func testFastPathAliasCannotPromoteCanDemoBeyondSourceTruth() throws {
+    func testFastPathAliasCannotPromoteActionDemoProvenBeyondSourceTruth() throws {
         let source = try loadSourceMatrix()
         let sourceFastPath = source.cells.filter { !$0.entrypointAliases.isEmpty }
         let generatedFastPath = DemoCapabilityMatrixCatalog.cells.filter { !$0.entrypointAliases.isEmpty }
 
         XCTAssertFalse(sourceFastPath.isEmpty)
         XCTAssertEqual(generatedFastPath.map(\.matrixID), sourceFastPath.map(\.matrixID))
-        XCTAssertEqual(generatedFastPath.map(\.canDemo), sourceFastPath.map(\.canDemo))
+        XCTAssertEqual(generatedFastPath.map(\.actionDemoProven), sourceFastPath.map(\.actionDemoProven))
         XCTAssertTrue(
             zip(generatedFastPath, sourceFastPath).allSatisfy { generated, sourceCell in
-                generated.canDemo == sourceCell.canDemo
+                generated.actionDemoProven == sourceCell.actionDemoProven
             }
         )
     }
 
-    func testGeneratorPassesThroughValidSourceCanDemoTrue() throws {
+    func testGeneratorPassesThroughValidSourceActionDemoProvenTrue() throws {
         let sourceURL = repoRoot.appendingPathComponent("contracts/demo-capability-matrix.json")
         var root = try XCTUnwrap(
             JSONSerialization.jsonObject(with: Data(contentsOf: sourceURL)) as? [String: Any]
         )
         var cells = try XCTUnwrap(root["cells"] as? [[String: Any]])
         var first = cells[0]
-        var basis = try XCTUnwrap(first["canDemo_basis"] as? [String: Any])
+        var basis = try XCTUnwrap(first["actionDemoProven_basis"] as? [String: Any])
         for key in ["mounted_or_approved_action", "semantic_contract", "state_readback_cell"] {
             var item = try XCTUnwrap(basis[key] as? [String: Any])
             item["observed"] = true
@@ -87,8 +87,8 @@ final class DemoCapabilityMatrixGeneratedTests: XCTestCase {
         readback["probe_id"] = "probe.action.matrix.1.zh-CN"
         readback["probe_receipt_id"] = "runtime-action-readback-probes"
         basis["readbackProbePass"] = readback
-        first["canDemo_basis"] = basis
-        first["canDemo"] = true
+        first["actionDemoProven_basis"] = basis
+        first["actionDemoProven"] = true
         cells[0] = first
         root["cells"] = cells
 
@@ -110,7 +110,7 @@ final class DemoCapabilityMatrixGeneratedTests: XCTestCase {
         let firstCell = try XCTUnwrap(generated.range(of: "matrixID: 1,"))
         let suffix = generated[firstCell.lowerBound...]
         let nextCell = try XCTUnwrap(suffix.range(of: "matrixID: 2,"))
-        XCTAssertTrue(suffix[..<nextCell.lowerBound].contains("canDemo: true"))
+        XCTAssertTrue(suffix[..<nextCell.lowerBound].contains("actionDemoProven: true"))
     }
 
     func testGeneratorIsByteIdenticalAcrossRunsAndMatchesTrackedOutput() throws {
@@ -183,12 +183,12 @@ private struct SourceCell: Decodable {
     var matrixID: Int
     var primaryClass: String
     var entrypointAliases: [String]
-    var canDemo: Bool
+    var actionDemoProven: Bool
 
     private enum CodingKeys: String, CodingKey {
         case matrixID = "matrix_id"
         case primaryClass = "primary_class"
         case entrypointAliases
-        case canDemo
+        case actionDemoProven
     }
 }

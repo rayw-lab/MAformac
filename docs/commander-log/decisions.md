@@ -1,5 +1,7 @@
 # COMMANDER DECISIONS — MAformac 指挥官决策日志（append-only, ADR 风格）
 
+> **V6 mapping banner（2026-07-11）**：本文是 append-only 历史档，旧键原文保持不变；当前语义映射为 `canDemo` → `actionDemoProven`，live authority 以 V6 active carriers 为准。
+
 > 规则（github-first 搜证的 decision-log best practice）：每重大决策**立即写**（definition of done，不等压缩）；**supersede 不删**（保历史）；**rejected 选项 = hard constraint**（别再提被否的）。格式 = ADR 四问（what / why / alternatives / consequences）。
 
 ---

@@ -1,6 +1,6 @@
 ## Context
 
-D-123 ratified the 120-cell `DemoCapabilityMatrix` content truth and left its repository carrier/checker to C1 (`docs/commander-log/decisions.md:1112-1116`). D-133 ratified all 38 C1 P0 decisions, including matrix source/derivation, four-source `canDemo`, fallback catalog, CG-036, probes, prelay and CG-080 (`docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md:14-18,24-61`). D-134 selected B: add independent C1 governance, modify `tool-execution` for execution facts, and reuse the existing `runtime-presentation-bridge` for presentation; a same-meaning presentation SSOT is forbidden (`docs/commander-log/decisions.md:1196-1201`).
+D-123 ratified the 120-cell `DemoCapabilityMatrix` content truth and left its repository carrier/checker to C1 (`docs/commander-log/decisions.md:1112-1116`). D-133 ratified all 38 C1 P0 decisions, including matrix source/derivation, four-source `actionDemoProven`, fallback catalog, CG-036, probes, prelay and CG-080 (`docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md:14-18,24-61`). D-134 selected B: add independent C1 governance, modify `tool-execution` for execution facts, and reuse the existing `runtime-presentation-bridge` for presentation; a same-meaning presentation SSOT is forbidden (`docs/commander-log/decisions.md:1196-1201`).
 
 The existing bridge is already concrete authority, not a placeholder. It declares the mainline Runtime → Presentation mapping and forbids a second same-meaning bridge SSOT (`openspec/changes/define-runtime-presentation-bridge/specs/runtime-presentation-bridge/spec.md:3-19`); owns the result vocabulary (`:39-69`), presentation snapshot/readback/safe trace (`:71-151`) and main-owned payload/schema (`:164-223`). The archived `tool-execution` spec still rejects every multi-tool turn (`openspec/specs/tool-execution/spec.md:18-35`), so CG-036 cannot be closed by presentation fixtures alone.
 
@@ -28,15 +28,15 @@ The runtime remains fully offline and mock-only: text → intent → reviewed To
 
 | Concern | Sole owner | Other surfaces may | Forbidden |
 |---|---|---|---|
-| 120-cell matrix, `primary_class`, `canDemo` basis, fallback taxonomy/catalog, probe policy, S10/mounted/rollback gates | `demo-capability-governance` | execution/bridge consume classifications and policy decisions | governance cannot define public payload fields, schema versions, readback rendering or safe trace envelopes |
+| 120-cell matrix, `primary_class`, `actionDemoProven` basis, fallback taxonomy/catalog, probe policy, S10/mounted/rollback gates | `demo-capability-governance` | execution/bridge consume classifications and policy decisions | governance cannot define public payload fields, schema versions, readback rendering or safe trace envelopes |
 | bounded multi-intent gates, accepted/refused identity, state mutation, observed tool calls, accepted readback, internal finite reasons and execution receipt | `tool-execution` | governance requires coverage; bridge consumes facts | execution cannot define customer copy or public payload schema |
 | result vocabulary, partial composite projection, customer-safe `reasonKind`, payload version, cards/readbacks, proof cap and presentation-safe trace | `runtime-presentation-bridge` | governance/execution reference existing bridge semantics | governance/execution/UIUE cannot invent same-meaning fields or a second presentation SSOT |
 
 Alternative A—placing all C1 behavior in the bridge—was rejected by D-134 because matrix eligibility and expansion policy are not presentation semantics. Alternative “new C1 payload capability” was rejected because it duplicates the bridge’s existing authority.
 
-### AD-002 — `canDemo` is computed from same-cell evidence and never opens mounted catalog
+### AD-002 — `actionDemoProven` is computed from same-cell evidence and never opens mounted catalog
 
-`canDemo=true` requires mounted/explicitly approved action, semantic contract, state/readback cell and local runtime emission+execution+readback proof for the same cell. FastPath is only `entrypointAlias`; conditional injected proof is a separate lane. The matrix is derived from mounted/semantic/state/proof sources and cannot write back to mounted authority.
+`actionDemoProven=true` requires mounted/explicitly approved action, semantic contract, state/readback cell and local runtime emission+execution+readback proof for the same cell. FastPath is only `entrypointAlias`; conditional injected proof is a separate lane. The matrix is derived from mounted/semantic/state/proof sources and cannot write back to mounted authority.
 
 ### AD-003 — Enum projection is closed before coding
 
@@ -99,7 +99,7 @@ The union is the exact 38-item D-133 set; CG-021 and the 39-item P1/D0G batch re
 
 - **Parallel SSOT reappears through copied payload language** → Specs modify the existing bridge requirement names and design records a sole-owner map; any `runtime-presentation-payload` capability is a hard failure. Evidence: existing bridge explicitly forbids a second same-meaning SSOT at `:14-19`.
 - **CG-036 fixtures go green while runtime still drops frames** → Tasks require router/runtime producer tests before bridge fixture acceptance; execution and bridge audits remain separate. Evidence: archived execution contract currently rejects all multi-tool output at `openspec/specs/tool-execution/spec.md:18-24`.
-- **FastPath/prose manually promotes `canDemo`** → Matrix checker recomputes same-cell four-source basis and emits conflict instead of exceptions. Evidence: D-133 CG-004/007/014/065.
+- **FastPath/prose manually promotes `actionDemoProven`** → Matrix checker recomputes same-cell four-source basis and emits conflict instead of exceptions. Evidence: D-133 CG-004/007/014/065.
 - **Internal finite reasons leak to users** → Only bridge-owned `reasonKind`/copy crosses the public boundary; negative fixture tests reject raw `finiteReason`. Evidence: bridge safe payload/redaction requirements at `:164-223`.
 - **Prelay is misreported as mounted expansion** → CG-045/054/080 are explicit stop lines and mounted delta must remain zero in C1.
 
