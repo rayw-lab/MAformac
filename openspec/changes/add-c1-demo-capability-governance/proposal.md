@@ -22,7 +22,7 @@ D-123 已将 120 格 `DemoCapabilityMatrix` 内容口径签为能力面真值，
 - `openspec validate add-c1-demo-capability-governance --strict` 与 `openspec validate --all --strict` 均通过。
 - D-133 的 38 个 CG 均由明确 requirement、scenario、architecture decision 或 test-first task 承接，coverage 为 38/38，无遗漏、无伪重开。
 - `demo-capability-governance`、`tool-execution`、`runtime-presentation-bridge` 三个 owner 边界清楚；CG-036 同时具有 execution delta 与 bridge projection delta。
-- enum 只允许已锁的 `primary_class`、governance fallback classification、customer-safe `reasonKind` 映射；未知/free-string 值 fail closed。
+- enum 只允许已锁的 `primary_class`、governance fallback classification、internal `finiteReason`、`fallback_reason` 与 customer-safe `reasonKind` 映射；未知/free-string 值 fail closed。
 - matrix/fallback/probe 可预铺，但任何新增 mounted 或 `canDemo=true` 都在 CG-080 下保持未授权。
 
 ## Capabilities
