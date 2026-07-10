@@ -20,9 +20,9 @@ final class DemoRuntimeSessionRunnerCrashProbeTests: XCTestCase {
             let payload = try await runner.run(text: sample)
 
             XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-            XCTAssertEqual(payload.outcome.reason, "fast_path_no_match")
+            XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue)
             XCTAssertEqual(payload.reconciliation.status, .notApplicable)
-            XCTAssertEqual(payload.reconciliation.safeReason, "fast_path_no_match")
+            XCTAssertEqual(payload.reconciliation.safeReason, RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue)
             XCTAssertEqual(payload.readbacks, [])
             XCTAssertEqual(speech.spokenTexts, ["这个我先记下来，稍后帮您处理"])
             XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")

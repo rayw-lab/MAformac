@@ -49,7 +49,7 @@ final class W20ARuntimeProjectionTests: XCTestCase {
         let payload = try await runner.run(text: "锁定空调")
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, "name_rejected")
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.capabilityNotMounted.rawValue)
         XCTAssertEqual(payload.reconciliation.status, .notApplicable)
         XCTAssertEqual(payload.readbacks, [])
         XCTAssertEqual(speech.spokenTexts, ["这个我先记下来，稍后帮您处理"])

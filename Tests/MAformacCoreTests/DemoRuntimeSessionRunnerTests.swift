@@ -141,7 +141,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let state = runner.currentDialogueState
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, "fast_path_no_match")
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue)
         XCTAssertEqual(state.focusEntity, "ac")
         XCTAssertEqual(state.lastReadback?.key, "ac.power")
         XCTAssertEqual(
