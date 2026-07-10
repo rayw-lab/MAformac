@@ -9,6 +9,7 @@ Residual blind spots accepted by SPEC AMENDMENT-1:
 - qualified or typealiased String declarations can evade the typed-field regex;
 - arbitrary Swift dataflow and scope resolution remain out of scope;
 - multiline string code examples may conservatively false-positive.
+- the fixed nine-surface allowlist does not auto-discover future producers or consumers.
 """
 
 from __future__ import annotations
@@ -32,6 +33,7 @@ GENERATED_AUTHORITY_SURFACE = Path("Core/Presentation/RuntimePresentationReasonA
 PRESENTATION_BRIDGE_SURFACE = Path("Core/Presentation/RuntimePresentationBridge.swift")
 SWIFT_PROBE_SURFACE = Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift")
 PROBE_CHECKER_SURFACE = Path("Tools/checks/check_runtime_no_mutation_receipts.py")
+BEHAVIOR_GATE_SURFACE = Path("Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift")
 SURFACES = (
     DDOMAIN_SURFACE,
     RUNNER_SURFACE,
@@ -77,11 +79,15 @@ RESIDUAL_BLIND_SPOTS = [
     "qualified_or_typealiased_string_types",
     "arbitrary_swift_dataflow_and_scope_resolution",
     "multiline_string_code_examples_may_false_positive",
+    "fixed_nine_surface_allowlist_does_not_auto_discover_future_producers_or_consumers",
 ]
-BEHAVIOR_GATES = [
-    "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
-    "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
-]
+BEHAVIOR_GATE_METHODS = {
+    "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable":
+        "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
+    "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd":
+        "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+}
+BEHAVIOR_GATES = list(BEHAVIOR_GATE_METHODS)
 
 
 def violation(code: str, path: Path, detail: str, line: int | None = None) -> dict[str, Any]:
@@ -432,6 +438,21 @@ def fallback_shadow_switches(text: str) -> list[tuple[int, str]]:
 def check(repo_root: Path) -> dict[str, Any]:
     violations: list[dict[str, Any]] = []
     texts = {relative: read_text(repo_root, relative, violations) for relative in SURFACES}
+    behavior_gate_text = read_text(repo_root, BEHAVIOR_GATE_SURFACE, violations)
+    behavior_gate_code = mask_swift_strings(mask_swift_comments(behavior_gate_text))
+    behavior_gate_presence: dict[str, bool] = {}
+    for gate, method in BEHAVIOR_GATE_METHODS.items():
+        declaration = re.compile(rf"(?m)^[ \t]*func[ \t]+{re.escape(method)}[ \t]*\(")
+        count = len(declaration.findall(behavior_gate_code))
+        behavior_gate_presence[gate] = count == 1
+        if count != 1:
+            violations.append(
+                violation(
+                    "E_REQUIRED_BEHAVIOR_GATE_MISSING",
+                    BEHAVIOR_GATE_SURFACE,
+                    f"expected exactly one func {method}( declaration, found {count}",
+                )
+            )
     registry_text = read_text(repo_root, REGISTRY, violations)
     try:
         registry = json.loads(registry_text)
@@ -573,6 +594,7 @@ def check(repo_root: Path) -> dict[str, Any]:
         "semantic_completeness": SEMANTIC_COMPLETENESS,
         "residual_blind_spots": RESIDUAL_BLIND_SPOTS,
         "behavior_gates": BEHAVIOR_GATES,
+        "behavior_gate_presence": behavior_gate_presence,
         "t0_count": len(t0_values),
         "t0_values": t0_values,
         "production_mappings": production_mappings,

@@ -26,6 +26,7 @@ RUNTIME_SURFACES = (
     Path("Core/Presentation/RuntimePresentationReasonAuthority.generated.swift"),
     Path("Core/Presentation/RuntimePresentationBridge.swift"),
     Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
+    Path("Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift"),
     Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
 )
 

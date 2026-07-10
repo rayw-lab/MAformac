@@ -49,7 +49,7 @@ verify-ci: verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-se
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.
 verify-c1-checker-files:
 	@status=0; \
-	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py; do \
+	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/run_swift_test_exact.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py; do \
 		if [ ! -f "$$checker" ]; then \
 			echo "ERROR_MISSING_C1_CHECKER $$checker" >&2; \
 			status=1; \
@@ -66,9 +66,13 @@ verify-c1-ownership:
 verify-c1-finite-reason-authority:
 	mkdir -p .build/c1-run/receipts/c1
 	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_check_runtime_finite_reason_authority.py
+	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_run_swift_test_exact.py
 	$(PYTHON_BOOTSTRAP) Tools/checks/check_runtime_finite_reason_authority.py \
 		--receipt .build/c1-run/receipts/c1/runtime-finite-reason-authority.json
-	swift test --filter RuntimeFiniteReasonAuthorityTests
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter RuntimeFiniteReasonAuthorityTests/testFallbackResolutionMatchesHardcodedTenReasonScriptTable
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter RuntimeFiniteReasonAuthorityTests/testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd
 
 verify-c1-matrix: verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1

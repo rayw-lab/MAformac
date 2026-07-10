@@ -23,7 +23,12 @@ SURFACES = (
     Path("Core/Presentation/RuntimePresentationBridge.swift"),
     Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
     Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
+    Path("Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift"),
     Path("openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml"),
+)
+BEHAVIOR_GATE_METHODS = (
+    "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
+    "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
 )
 
 
@@ -84,13 +89,58 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
             "qualified_or_typealiased_string_types",
             "arbitrary_swift_dataflow_and_scope_resolution",
             "multiline_string_code_examples_may_false_positive",
+            "fixed_nine_surface_allowlist_does_not_auto_discover_future_producers_or_consumers",
         ])
         self.assertEqual(payload.get("behavior_gates"), [
             "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
             "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
         ])
+        self.assertEqual(payload.get("behavior_gate_presence"), {
+            "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable": True,
+            "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd": True,
+        })
+        self.assertEqual(len(payload.get("scan_coverage", [])), 9)
+        self.assertNotIn(
+            "Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift",
+            payload.get("scan_coverage", []),
+        )
         self.assertEqual(payload.get("t0_count"), 10)
         self.assertEqual(payload.get("violations"), [])
+
+    def assert_behavior_gate_missing(self, method: str, replacement: str) -> None:
+        self.replace(
+            "Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift",
+            f"    func {method}(",
+            replacement,
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_REQUIRED_BEHAVIOR_GATE_MISSING", self.violation_codes(payload))
+
+    def test_renamed_fallback_behavior_gate_fails_closed(self) -> None:
+        self.assert_behavior_gate_missing(
+            BEHAVIOR_GATE_METHODS[0],
+            "    func helperFallbackResolutionMatchesHardcodedTenReasonScriptTable(",
+        )
+
+    def test_deleted_fallback_behavior_gate_fails_closed(self) -> None:
+        self.assert_behavior_gate_missing(
+            BEHAVIOR_GATE_METHODS[0],
+            "    // deleted fallback behavior gate declaration(",
+        )
+
+    def test_renamed_trace_behavior_gate_fails_closed(self) -> None:
+        self.assert_behavior_gate_missing(
+            BEHAVIOR_GATE_METHODS[1],
+            "    func helperTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd(",
+        )
+
+    def test_deleted_trace_behavior_gate_fails_closed(self) -> None:
+        self.assert_behavior_gate_missing(
+            BEHAVIOR_GATE_METHODS[1],
+            "    // deleted trace behavior gate declaration(",
+        )
 
     def test_non_t0_literal_in_production_fails_closed(self) -> None:
         path = self.repo / "Core/Execution/DemoRuntimeSessionRunner.swift"

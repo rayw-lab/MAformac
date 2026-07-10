@@ -6,14 +6,22 @@ from __future__ import annotations
 import subprocess
 import sys
 import tempfile
+import re
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+from Tools.checks.check_runtime_finite_reason_authority import (  # noqa: E402
+    mask_swift_comments,
+    mask_swift_strings,
+)
+
 MAKEFILE = REPO_ROOT / "Makefile"
 CHECKER_PATHS = (
     Path("Tools/checks/check_c1_ownership_map.py"),
     Path("Tools/checks/check_runtime_finite_reason_authority.py"),
+    Path("Tools/checks/run_swift_test_exact.py"),
     Path("Tools/checks/check_fallback_scripts.py"),
     Path("scripts/check_s10_receipt.py"),
 )
@@ -24,6 +32,25 @@ OWNERSHIP_CHECKER = "Tools/checks/check_c1_ownership_map.py"
 RUNTIME_REASON_TARGET = "verify-c1-finite-reason-authority"
 RUNTIME_REASON_SUITE = "scripts/test_check_runtime_finite_reason_authority.py"
 RUNTIME_REASON_CHECKER = "Tools/checks/check_runtime_finite_reason_authority.py"
+EXACT_RUNNER = "Tools/checks/run_swift_test_exact.py"
+EXACT_RUNNER_SUITE = "scripts/test_run_swift_test_exact.py"
+BEHAVIOR_TEST_SOURCE = REPO_ROOT / "Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift"
+BEHAVIOR_GATE_METHODS = (
+    "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
+    "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+)
+EXACT_FILTERS = tuple(
+    f"RuntimeFiniteReasonAuthorityTests/{method}" for method in BEHAVIOR_GATE_METHODS
+)
+
+
+def missing_behavior_gate_declarations(source: str) -> list[str]:
+    source = mask_swift_strings(mask_swift_comments(source))
+    return [
+        method
+        for method in BEHAVIOR_GATE_METHODS
+        if re.search(rf"(?m)^[ \t]*func[ \t]+{re.escape(method)}[ \t]*\(", source) is None
+    ]
 
 
 def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
@@ -52,7 +79,36 @@ def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
     ]
     assert RUNTIME_REASON_SUITE in runtime_reason_block, runtime_reason_block
     assert RUNTIME_REASON_CHECKER in runtime_reason_block, runtime_reason_block
-    assert "RuntimeFiniteReasonAuthorityTests" in runtime_reason_block, runtime_reason_block
+    assert EXACT_RUNNER_SUITE in runtime_reason_block, runtime_reason_block
+    assert runtime_reason_block.count(EXACT_RUNNER) == 2, runtime_reason_block
+    for exact_filter in EXACT_FILTERS:
+        assert f"--filter {exact_filter}" in runtime_reason_block, runtime_reason_block
+
+    behavior_source = BEHAVIOR_TEST_SOURCE.read_text(encoding="utf-8")
+    assert missing_behavior_gate_declarations(behavior_source) == []
+    for method in BEHAVIOR_GATE_METHODS:
+        renamed = behavior_source.replace(
+            f"    func {method}(",
+            f"    func helper{method}(",
+            1,
+        )
+        deleted = behavior_source.replace(
+            f"    func {method}(",
+            "    // deleted behavior gate declaration(",
+            1,
+        )
+        block_commented = behavior_source.replace(
+            f"    func {method}(",
+            f"    /*\n    func {method}(\n    */",
+            1,
+        )
+        assert method in missing_behavior_gate_declarations(renamed), method
+        assert method in missing_behavior_gate_declarations(deleted), method
+        assert method in missing_behavior_gate_declarations(block_commented), method
+
+    exact_runner_text = (REPO_ROOT / EXACT_RUNNER).read_text(encoding="utf-8")
+    assert "E_SWIFT_EXACT_TEST_ZERO" in exact_runner_text
+    assert "E_SWIFT_EXACT_TEST_COUNT" in exact_runner_text
 
     for missing_relative in CHECKER_PATHS:
         with tempfile.TemporaryDirectory(prefix="verify-ci-checkers-") as tmp:
