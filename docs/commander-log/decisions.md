@@ -1240,3 +1240,18 @@
 - 3 Codex 终审 P0 修复+commander 亲核(🔴 亲手弄红 ownership→verify-ci rc2,fail-open 治好非信报告)→int-v4=790b6c7b,全门 PASS,canDemo=0/120 三向一致(真 action 探针),ancestry 21/21。
 - Draft PR #42(c1/int-v4-governance-repair→opt/streamline)=governance-repair candidate,🔴 NOT demo-ready(三厂商终审一致:governanceTruthful=true/customerDemoReady=false)。GPT Pro 深层 findings(App admission/witness 模型/gate-of-gates/可靠性)作 int-v5+ 开放项,PR body 诚实列。
 - 脏区清:20 ma12 worktree 移除。ma13 接 PR review + int-v5+。
+
+## D-138：ma13 第一波——PR #42 fresh 对抗审 REQUEST_CHANGES + int-v5 四路预研收稿 + BALLOT 待拍（2026-07-10）
+
+- **蜂群**：ma13 = 4 codex sol high + hermes 秘书（%0 commander/%5 秘书/右列 %1 w1、%3 w2、%2 w3、%4 w4）。run dir `~/Projects/agent-tmux-stack-research/runs/2026-07-10-ma13/`。
+- 🔴 **w1 fresh 对抗审 int-v4（790b6c7b）= REQUEST_CHANGES，int-v4 仍 NOT Ready**：
+  - **P0-1（commander 亲手 comm 复现坐实）**：PR body「finiteReason authority 闭合 T0 单源 10 项」被生产代码反证——`DDomainToolPlanFailure` 仍发 `parse_failed/ir_unclassified/bridge_failed` 三个 T0 外值（`Core/LLM/DDomainToolPlanFailure.swift:7-17`）；`FallbackContext.swift:113-123` 手写 switch 消费 T0 外别名 `guard_denied/safety_rejected/clarify_required`（T0 真值是 `safety_or_policy_refusal/clarify_missing_slot`，字面值都不同）+ default 吞错；B4 probe 把 T0 外值固化为期望。
+  - **P1-1**：ownership gate false-negative——checker 只核 registry/spec 自洽（`check_c1_ownership_map.py:252-301`），不扫生产 emitter/consumer → 生产违反 T0 时 checker 仍 PASS。ma12「亲核被 gate 覆盖缺口骗」的再深一层：**gate wire 进 verify ≠ gate 覆盖面够，覆盖面也是 basis**。
+  - P2-1：D-137 supersede 在 base 非 PR head，body 归因需改「base-side prerequisite」（w1 与 w3 独立收敛 = 铁证）。
+  - 其余 body 声称全 MATCH：canDemo=0 真 / partial typed bridge 真实装 / escape hatch 真删 / 删门+软化负例全 rc2 / 83 文件无 scope 越界 / CG-080 守住。另发现 make verify-all fresh 环境 rc2（source-snapshot xlsx 路径已迁移，pre-existing 非 PR 归因，入 backlog）。
+  - 修复口径 commander 已锁（w1 验收门 SPEC `specs/SPEC-p01-fix-acceptance.md`）：parse/ir/bridge→映射既有 `unsupported_tool_plan` + `decodeFailureKind` 分离诊断，**不扩 T0 闭集**；ownership checker 扩扫生产面 + 负例。
+- **int-v5 四路预研收稿（全 DESIGN_DRAFT，cite commander 抽核坐实）**：w2 admission ⭐C（App façade+runner policy，deny-first 不依赖 S8）+ 可靠性两阶段；w3 P0-5 加重实证（inline bundle 自造契约不存在 row ID + risk policy 削空 door_open_while_moving + allowlist 削空）+ 正名 ⭐直接 bool `actionDemoProven`（拒 demoStatus 枚举：action/fallback 正交轴）；w4 witness envelope ⭐int-v5 先行（等 S8=正证落可拼接旧 receipt）+ 🔴 live API 实况 repo=PUBLIC 且 main/opt-streamline **零 branch protection、rulesets 空**+ 单人仓 CODEOWNERS 诚实评估（开 required review 锁死 owner 自己 PR）。
+- **双向互审（producer≠auditor）**：w3 审 w2 抓 2 真 P0（multi-frame 绕过推荐插点 + frontstage receipt 未绑 bundle digest）；w2 审 w3 抓「schema gate 纸门」（checker --schema 只查存在不校验）——方向全接受，实施细节吸收进执行序。
+- **BALLOT-ma13-final.md 待磊哥拍**：主 3 题（Q-1 路线 ⭐B 治理修复合入+demo 另立 line / Q-12 Solo Baseline protection ⭐立即上 / Q-13 结构缺口 ⭐记 residual）+ 细节 10 题全 ⭐。
+- **秘书验证**：hermes 一稿 3 处编造（HEAD 参照系错/D-134、D-137 描述凭印象/worker 态 stale）被审出打回，二稿全合格——「hermes 产出无例外必审」再实证。
+- **磊哥令**：全员回稿后暂停一小时不派单（16:35 起计时）。**Non-claims**：int-v4 未 Ready/未 merge；canDemo=0/120 不变；修复轮未开工；int-v5a/b/c 未开工；无 operator-pass/V-PASS。

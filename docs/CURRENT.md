@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-09深夜（D-132 全日收口）
-last_verified_head: a9b94c23（opt/streamline-macos-20260707，ahead 77 未 push；全量 731/0(6 skip)+verify-all rc0+BUILD SUCCEEDED；head_truth_rule 以 live git 为准）
+updated: 2026-07-10（D-138 ma13 第一波收稿+暂停）
+last_verified_head: 4779b8eb（opt/streamline-macos-20260707，ahead origin 1；head_truth_rule 以 live git 为准）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "S8 r3 点火 或 idle 窗采集实跑 或 D1 左栏专场开工"
+expires_when: "BALLOT-ma13 磊哥拍板 或 P0-1 修复轮开工 或 PR #42 状态变更 或 S8 点火"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,9 +14,19 @@ expires_when: "S8 r3 点火 或 idle 窗采集实跑 或 D1 左栏专场开工"
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-09深夜：**D-132 全日收口——14 收编 656→731/0，Line D 一天全链上树**）
+## 当前阶段（2026-07-10：**C1 int-v4 Draft PR #42 + ma13 第一波收稿，暂停待磊哥拍 BALLOT**）
 
-🔴 **本节 supersede 下方全部旧态段**。推进事实源 = roadmap v5 + decisions **D-114~D-132** + run dir `runs/2026-07-09-ma10-uiue-runtime/`（findings-ledger-ma10 + REPORTS-INDEX + reports/）+ handoff `2026-07-09-ma11-closeout-line-d-wave.md`。
+🔴 **本节 supersede 下方全部旧态段**。推进事实源 = decisions **D-133~D-138** + run dir `~/Projects/agent-tmux-stack-research/runs/2026-07-10-ma12/`（C1 14 切片 + int-v4 链）与 `runs/2026-07-10-ma13/`（PR 审 + int-v5 预研 + BALLOT）+ handoff `2026-07-10-ma12-c1-full-auto-dev-day.md` / `2026-07-10-ma13-first-wave-pause.md`。
+
+- **C1 int-v4 = Draft PR #42**（`c1/int-v4-governance-repair`→opt/streamline，governance-repair candidate，🔴 NOT demo-ready，三厂商终审一致 governanceTruthful=true/customerDemoReady=false）；🔴 **canDemo 诚实真值 = 0/120（D-137 supersede 旧 1/120）**，真执行能力=S8。
+- **ma13 w1 fresh 对抗审 = REQUEST_CHANGES**（D-138）：P0-1 finiteReason 生产分叉（commander 亲核坐实）+ P1-1 ownership gate 不扫生产面。int-v4 转 Ready 前置 = 修复轮（验收门 SPEC 已锁映射口径）+ w1 复审。
+- **int-v5 四路预研 + 双向互审完成**：admission ⭐C（deny-first 不依赖 S8）/ P0-5 加重实证（inline bundle 自造 row ID + risk 削空）/ ⑥正名 ⭐`actionDemoProven` / witness ⭐int-v5 先行 / 🔴 repo 实况零 branch protection。
+- **待磊哥**：`runs/2026-07-10-ma13/reports/BALLOT-ma13-final.md`（主 3 题 + 细节 10 题全 ⭐）→ 拍后执行序：修复轮→w1 复审→Ready→merge（键）→int-v5a/b/c；S8 点火键仍在途。
+- **Non-claims**：PR #42 未 Ready/未 merge；修复轮未开工；无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行；CG-080 禁 mounted 1→N 不变。
+
+## 【历史】2026-07-09深夜：D-132 全日收口——14 收编 656→731/0，Line D 一天全链上树（被 2026-07-10 段 supersede）
+
+推进事实源 = roadmap v5 + decisions **D-114~D-132** + run dir `runs/2026-07-09-ma10-uiue-runtime/`（findings-ledger-ma10 + REPORTS-INDEX + reports/）+ handoff `2026-07-09-ma11-closeout-line-d-wave.md`。
 - 终态：14 次收编全部三件门绿（swift test 731/0[6 skip]+verify-all+xcodebuild——门 suite 本日制度化为三件套）；两 demo 炸点修死；idle 采集 dry-run 包 ready（未实跑）；D1 左栏规格 v2 经审待磊哥⭐；三事故（主树切分支/自审自产/忘 commit×2）全当场闭环入账。
 - 待磊哥键：idle 窗一键采集 → M-DEMO 5 题 ballot → D1 左栏专场令 → S8 点火 → push 授权（ahead 77）。C1 P0 38 题已由 D-133 全按 ⭐B RATIFIED；后续为消减矩阵→实施计划→对抗审→编码，CG-080 仍禁止 mounted 1→N（等 S10+A1+磊哥键）。
 - Non-claims：无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行；idle 采集未实跑；cross-vendor 异源审缺口待 hermes 额度回补。
