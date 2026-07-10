@@ -1235,3 +1235,8 @@
 - **历史保留**：D-133/D-123 原文不改（doc-cascade 历史档纪律），本 D-137 作现行权威；checker 禁止旧决议重新生成 1/2。
 - **级联**：grill-ratified doc 加 banner 指 D-137（canDemo=0，default_executable=1 是分类非证明）；后续生成器/矩阵 SSOT 以 0/120 为真值。
 - **Non-claims**：canDemo=0 是诚实失败非 demo 成功（GPT Pro：governanceTruthful=true / customerDemoReady=false）；真执行=后续（LoRA/constrained decoding/deterministic fast-path，GPT Pro 纠「LoRA 非唯一解」）。
+
+### D-137 补记：int-v4 治理修复候选 + Draft PR #42（2026-07-10 收尾）
+- 3 Codex 终审 P0 修复+commander 亲核(🔴 亲手弄红 ownership→verify-ci rc2,fail-open 治好非信报告)→int-v4=790b6c7b,全门 PASS,canDemo=0/120 三向一致(真 action 探针),ancestry 21/21。
+- Draft PR #42(c1/int-v4-governance-repair→opt/streamline)=governance-repair candidate,🔴 NOT demo-ready(三厂商终审一致:governanceTruthful=true/customerDemoReady=false)。GPT Pro 深层 findings(App admission/witness 模型/gate-of-gates/可靠性)作 int-v5+ 开放项,PR body 诚实列。
+- 脏区清:20 ma12 worktree 移除。ma13 接 PR review + int-v5+。
