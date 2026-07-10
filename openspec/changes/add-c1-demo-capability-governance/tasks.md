@@ -1,8 +1,8 @@
 ## 1. Carrier and ownership gates
 
-- [ ] 1.1 In a dedicated clean worktree, validate this change with `openspec validate add-c1-demo-capability-governance --strict` and `openspec validate --all --strict`; record the exact base SHA and command outputs. **Superpowers: verification-before-completion.**
-- [ ] 1.2 Add a mechanical ownership audit that fails if governance owns presentation fields, execution owns customer copy, the bridge owns matrix eligibility, either MODIFIED delta is absent, or any `runtime-presentation-payload` capability appears. Write failing fixtures first, then the checker. **Superpowers: test-driven-development.**
-- [ ] 1.3 Add a 38-ID coverage assertion for `CG-002,004,005,007,008,009,014,015,019,022,023,024,025,026,027,028,036,038,039,041,044,045,048,049,050,053,054,055,057,058,059,060,063,065,068,074,076,080`; fail on missing, duplicate or extra P1/D0G IDs. **Superpowers: test-driven-development.**
+- [x] 1.1 In a dedicated clean worktree, validate this change with `openspec validate add-c1-demo-capability-governance --strict` and `openspec validate --all --strict`; record the exact base SHA and command outputs. **Superpowers: verification-before-completion.**
+- [x] 1.2 Add a mechanical ownership audit that fails if governance owns presentation fields, execution owns customer copy, the bridge owns matrix eligibility, either MODIFIED delta is absent, or any `runtime-presentation-payload` capability appears. Write failing fixtures first, then the checker. **Superpowers: test-driven-development.**
+- [x] 1.3 Add a 38-ID coverage assertion for `CG-002,004,005,007,008,009,014,015,019,022,023,024,025,026,027,028,036,038,039,041,044,045,048,049,050,053,054,055,057,058,059,060,063,065,068,074,076,080`; fail on missing, duplicate or extra P1/D0G IDs. **Superpowers: test-driven-development.**
 - [ ] 1.4 Before each implementation slice, create an isolated worktree from the recorded implementation base, list owned/no-touch paths, and keep all commits limited to that slice; never use `git add .`. **Superpowers: using-git-worktrees.**
 
 ## 2. Matrix source, schema and checker

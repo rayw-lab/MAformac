@@ -73,3 +73,17 @@
 - **THEN** canonical after-state SHALL 等于 before-state
 - **AND** observed tool-call count SHALL 为零
 - **AND** receipt SHALL NOT 声称 public presentation 字段或成功 readback。
+
+### Requirement: Classified ToolExecutionError SHALL preserve typed non-runtime outcomes
+
+When C3 exposes a classifiable `ToolExecutionError`, execution SHALL classify it as typed fallback, clarify or safety using the closed internal `finiteReason` contract before bridge projection. A classifiable error SHALL preserve its accepted/refused identity and no-write fact where refused; it SHALL NOT crash, disappear, or be collapsed into generic `runtime_error`. Only a genuinely unclassifiable adapter/runtime throw remains the bridge-owned terminal runtime-error path.
+
+Coverage: CG-074.
+
+#### Scenario: C3 ToolExecutionError remains typed before bridge projection
+
+- **GIVEN** C3 reports a `ToolExecutionError` classified as fallback, clarify, or safety
+- **WHEN** execution records the refused subaction
+- **THEN** it SHALL retain the matching closed `finiteReason` and execution trace fact
+- **AND** it SHALL emit no mutation or tool call for the refused subaction
+- **AND** it SHALL NOT be collapsed into generic `runtime_error` before the existing bridge projects its safe result.

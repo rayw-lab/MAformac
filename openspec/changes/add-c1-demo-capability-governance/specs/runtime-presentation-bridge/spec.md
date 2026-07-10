@@ -105,6 +105,14 @@ The system SHALL expose a presentation snapshot that contains trace identity, ca
 - **AND** the snapshot SHALL be terminal for the turn
 - **AND** it SHALL carry trace identity, finite proof class, and a safe machine-readable reason instead of failing silently.
 
+#### Scenario: Classified ToolExecutionError keeps its typed safe projection
+
+- **GIVEN** `tool-execution` supplies a classifiable `ToolExecutionError` fact as typed fallback, clarify, or safety
+- **WHEN** the existing bridge emits the terminal snapshot
+- **THEN** safety SHALL project to `refusal_safety_or_policy`, clarify SHALL project to `clarify_missing_slot`, and fallback SHALL project to `refusal_no_available_tool`
+- **AND** the bridge SHALL NOT collapse that classified fact into generic `runtime_error`
+- **AND** a genuinely unclassifiable adapter/runtime throw remains governed by the thrown-failure scenario above.
+
 #### Scenario: Partial accept/refuse terminates with composite presentation state
 
 - **GIVEN** a turn has at least one accepted effect and at least one refused effect
