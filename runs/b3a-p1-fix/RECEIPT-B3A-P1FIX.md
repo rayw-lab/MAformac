@@ -1,7 +1,7 @@
 # B3a P1 Fix Receipt
 - branch: c1/b3a-ingress
 - base_commit: eeed2734bdf2ff2e00e808cdce65200e9f94f507
-- head_commit: (see commit created for this receipt update)
+- head_commit: d882891136b53c16ce4e08083726028018ee1fde (receipt update commit)
 - changed_files:
   - Core/Execution/DemoRuntimeSessionRunner.swift
   - Core/Trace/TraceLogger.swift
