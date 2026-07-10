@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-11（D-142 V6 RATIFIED；baseline_activation=PENDING_CASCADE；int-v5a 编码开工未合入；S8 磊哥令不着急）
-last_verified_head: ef5761b3cedd39033998f7425f0b4413ff10935b（live git 亲跑；head_truth_rule 以 live git 为准）
+updated: 2026-07-11（D-142~D-145；V6 RATIFIED、G1 全闭、G2/G4/G5 部分裁决、W1 DONE；本轮 live 核验）
+last_verified_head: 94dcc334e767cf82d7b57a795ec61c7d818cce3c（live git 亲跑；head_truth_rule 以 live git 为准）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "G1 BALLOT RATIFIED 或 int-v5a 收编 或 S8 点火"
+expires_when: "32 题呈拍 disposition、v5b ABI-proof 窗结果、S8 点火状态、或 G3/O 控制面任一状态翻转时刷新"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,13 +14,25 @@ expires_when: "G1 BALLOT RATIFIED 或 int-v5a 收编 或 S8 点火"
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-11：**V6 RATIFIED（D-142）——三链+O 控制面基线生效（PENDING_CASCADE）；int-v5a 编码开工；G1/G2 BALLOT 备料中；S8 磊哥令不着急**）
+## 当前阶段（2026-07-11：**D-142~D-145 后态——V6 RATIFIED/PENDING_CASCADE；G1 全闭；G2/G4/G5 部分裁决；W1 DONE；32 题待磊哥呈拍**）
 
-🔴 **本节 supersede 下方旧态段**。推进事实源=`docs/roadmap-2026-07-11-v6-closure-baseline.md` v6.1 + `docs/commander-log/decisions.md` D-142 + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/`；`active_baseline_v6` 指针已切到该 v6 文件，但 activation 仍 `PENDING_CASCADE`；本文件仍是 router-only，不替代 V6、decisions、OpenSpec 或 run-dir receipts。
-- **V6 状态**：`decision_status=RATIFIED`；`baseline_activation=PENDING_CASCADE`；三链是 owner/view，O 是 orchestration/governance control plane，typed 工作包表是调度真相，未因 RATIFY 自动翻 `ACTIVE`（D-142；v6.1:23,120-127,139-147）。
-- **执行态**：int-v5a 已开工编码但尚未合入；G1/G2 BALLOT 仍备料/待磊哥拍，G3-G5 按波次排队；当前只消费 run-dir 物料，不把弹药、INDEX 或审计 receipt写成 RATIFIED（本轮任务书 `SPEC-CASCADE-EXEC.md:9-13`；run-dir `reports/BALLOT-INDEX-v6.md`）。
-- **S8**：磊哥 2026-07-11「S8不着急」，点火键挂起；不得写成 running/completed（D-142；v6.1:129-137）。
-- **Non-claims**：`canDemo=0/120`；S8 未点火；int-v5a 已开工但未合入；无 operator-pass/V-PASS/C6 acceptance/candidate signed；`baseline_activation` 未 `ACTIVE`。
+🔴 **本节 supersede 下方所有历史态段（含紧随其后的旧「V6 RATIFIED（D-142）」段）**。推进事实源=`docs/commander-log/decisions.md` D-142~D-145 + `docs/roadmap-2026-07-11-v6-closure-baseline.md` §一 + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/`；本文件仍是 router-only，不替代 decisions、roadmap、OpenSpec 或 run-dir receipts。
+
+- **V6 / W1**：V6 `decision_status=RATIFIED`、`baseline_activation=PENDING_CASCADE`；W1 int-v5a=`DONE`（merge `ba2c3636`），B1b receipt-chain 已 merge `a3160c88`，过渡性进度为 `DONE=1/29`、hard closure 分母仍 28（D-145 `docs/commander-log/decisions.md:1325-1330`；V6 §一 `docs/roadmap-2026-07-11-v6-closure-baseline.md:44,70-74`；双账 `runs/2026-07-11-ma14/reports/BALLOT-INDEX-v6.md:153-163`）。
+- **波次裁决**：D-143 的 G1=56 atoms 全闭（41 auto + 5已拍B + 10 carry）；D-144 的 G2=`PARTIALLY_RATIFIED`（50 auto + 3 counted C1 已拍，12 parent + `G2-038-C1` 仍未拍，S10 硬边未解除）；D-145 仅完成 G4/G5 白名单代拍，19 个 escalate 仍待呈（D-143~D-145 `docs/commander-log/decisions.md:1311-1330`；双账 `runs/2026-07-11-ma14/reports/BALLOT-INDEX-v6.md:157-171`）。
+- **32 题呈拍池**：G4/G5=19（14+5）+ `G2-038-C1` 重制版=1 + G2 parent authority=12；`G2-038-C1` 的⭐B是七 device family，且不继承 parent、不得自动票（晨报 `runs/2026-07-11-ma14/reports/DRAFT-morning-brief-ma14.md:14-22`；BALLOT `reports/BALLOT-INDEX-v6.md:165-170`）。
+- **三把窗口键**：① v5b ABI-proof 系统授权窗口：containment 已就绪，customer façade/default composition 仍等 T03+T04 cut；② S8 点火：仍未点火，开窗前须 fresh preflight/host/进程/磁盘检查；③ `20+12` 呈拍：全按⭐后才可能解除 G2 的 T01/T02→S10 签署硬边（晨报 `runs/2026-07-11-ma14/reports/DRAFT-morning-brief-ma14.md:24-28`）。
+- **在飞四单**：%5=G1 消减矩阵+T04/T03 实施计划 v1（W5c 继续守 T03+T09）；%2=G3 v3 修复链；%3=O1/O2 控制面实装；%1=三方数字一致性 sweep（晨报 `runs/2026-07-11-ma14/reports/DRAFT-morning-brief-ma14.md:30-35`）。
+- **Non-claims**：G2 非全闭、G4/G5 非全闭、S10 未签；S8 未点火/未训练；无 runtime、operator-pass、C6 acceptance、candidate、mobile、true-device、live_api 或 V-PASS；`baseline_activation` 未 `ACTIVE`（D-145 `docs/commander-log/decisions.md:1327-1330`；晨报 `runs/2026-07-11-ma14/reports/DRAFT-morning-brief-ma14.md:37-41`）。
+
+
+## 【历史】当前阶段（2026-07-11：**V6 RATIFIED（D-142）——三链+O 控制面基线生效（PENDING_CASCADE）；int-v5a 编码开工；G1/G2 BALLOT 备料中；S8 磊哥令不着急**；已被 D-143~D-145 后态 supersede）
+
+🔴 **本节为 D-142 当时快照，不得作为当前路由或状态来源**。当时 `active_baseline_v6` 指针已切到 v6，但 G1/G2/G4/G5 后续裁决、W1 收编、B1b merge、FINAL-V41 与 32 题呈拍池尚未发生；以本文件顶部当前阶段和 D-143~D-145 为准。
+- **V6 状态（历史）**：`decision_status=RATIFIED`；`baseline_activation=PENDING_CASCADE`；三链是 owner/view，O 是 orchestration/governance control plane，typed 工作包表是调度真相，未因 RATIFY 自动翻 `ACTIVE`（D-142；v6.1:23,120-127,139-147）。
+- **执行态（历史）**：int-v5a 已开工编码但尚未合入；G1/G2 BALLOT 仍备料/待磊哥拍，G3-G5 按波次排队；当前只消费 run-dir 物料，不把弹药、INDEX 或审计 receipt写成 RATIFIED（本轮任务书 `SPEC-CASCADE-EXEC.md:9-13`；run-dir `reports/BALLOT-INDEX-v6.md`）。
+- **S8（历史）**：磊哥 2026-07-11「S8不着急」，点火键挂起；不得写成 running/completed（D-142；v6.1:129-137）。
+- **Non-claims（历史）**：`canDemo=0/120`；S8 未点火；int-v5a 已开工但未合入；无 operator-pass/V-PASS/C6 acceptance/candidate signed；`baseline_activation` 未 `ACTIVE`。
 
 ## 【历史】当前阶段（2026-07-11 凌晨：**🎉 PR #42 MERGED（f5ef6270）——C1 治理修复合入主线；GAP-HUNT 12 主题出稿，V6 基线待 commander 开笔**）
 
