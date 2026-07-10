@@ -91,6 +91,16 @@ public final class DemoRuntimeSessionRunner {
             throw DemoNLURouterError.noToolPlanFrames
         }
         guard frameResults.count == 1 else {
+            let traceID = frameResults.first?.traceID ?? UUID().uuidString
+            traceLogger.recordGuard(
+                traceID: traceID,
+                message: "multi_frame_plan_rejected",
+                attributes: TraceAttributes(
+                    toolCallCount: 0,
+                    guardReason: "multi_frame_plan_requires_partial_execution",
+                    stateMutation: false
+                )
+            )
             throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(
                 frameIDs: frameResults.map(\.id)
             )
