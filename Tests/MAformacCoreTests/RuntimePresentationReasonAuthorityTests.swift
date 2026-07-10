@@ -95,6 +95,84 @@ final class RuntimePresentationReasonAuthorityTests: XCTestCase {
         }
     }
 
+    func testPublicPayloadMapsUnknownFiniteReasonToGenericSafeReason() throws {
+        let rawFiniteReason = "made_up_internal_finite_reason"
+        let safeReason = RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+        let traceID = "trace-public-unknown-reason-boundary"
+        let trace = try XCTUnwrap(
+            TraceEnvelope(
+                traceID: traceID,
+                entries: [
+                    TraceEntry(
+                        stage: .guard,
+                        traceID: traceID,
+                        message: "typed refusal",
+                        attributes: TraceAttributes(
+                            guardReason: rawFiniteReason,
+                            finiteReason: rawFiniteReason
+                        ),
+                        timestamp: Date(timeIntervalSince1970: 1_800_001_100)
+                    )
+                ]
+            )
+        )
+        var payload = RuntimePresentationPayload(
+            traceID: traceID,
+            turnID: "turn-unknown-reason",
+            isTerminal: true,
+            outcome: DemoRuntimeOutcome(
+                result: .refusalNoAvailableTool,
+                reason: rawFiniteReason,
+                scopeFailureReason: rawFiniteReason
+            ),
+            proofClass: .localUnit,
+            cards: [],
+            cardSemantics: [
+                PresentationCardSemantics(
+                    cellKey: "fallback.unknown",
+                    role: .refused,
+                    reason: rawFiniteReason
+                )
+            ],
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: rawFiniteReason
+            ),
+            traceEnvelope: trace,
+            timestamp: Date(timeIntervalSince1970: 1_800_001_100)
+        )
+
+        // The custom encoder must re-apply the boundary after public-field mutation.
+        payload.outcome.reason = rawFiniteReason
+        payload.outcome.scopeFailureReason = rawFiniteReason
+        payload.cardSemantics?[0].reason = rawFiniteReason
+        payload.reconciliation.safeReason = rawFiniteReason
+        payload.traceEnvelope = trace
+
+        let data = try JSONEncoder().encode(payload)
+        let text = try XCTUnwrap(String(data: data, encoding: .utf8))
+        XCTAssertFalse(text.contains(rawFiniteReason), text)
+        XCTAssertFalse(text.contains("\"finiteReason\""), text)
+        XCTAssertTrue(text.contains(safeReason), text)
+
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let outcome = try XCTUnwrap(object["outcome"] as? [String: Any])
+        XCTAssertEqual(outcome["reason"] as? String, safeReason)
+        XCTAssertEqual(outcome["scopeFailureReason"] as? String, safeReason)
+
+        let semantics = try XCTUnwrap((object["cardSemantics"] as? [[String: Any]])?.first)
+        XCTAssertEqual(semantics["reason"] as? String, safeReason)
+
+        let reconciliation = try XCTUnwrap(object["reconciliation"] as? [String: Any])
+        XCTAssertEqual(reconciliation["safeReason"] as? String, safeReason)
+
+        let envelope = try XCTUnwrap(object["traceEnvelope"] as? [String: Any])
+        let entry = try XCTUnwrap((envelope["entries"] as? [[String: Any]])?.first)
+        let attributes = try XCTUnwrap(entry["attributes"] as? [String: Any])
+        XCTAssertNil(attributes["finiteReason"])
+        XCTAssertEqual(attributes["guardReason"] as? String, safeReason)
+    }
+
     private static func loadRegistry() throws -> Registry {
         let repoRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

@@ -194,6 +194,36 @@ private enum PresentationPayloadSanitizer {
         }
         return redacted(normalized, maxLength: maxLength)
     }
+
+    static func publicPayloadReason(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let projection = RuntimePresentationReasonAuthority.projection(forFiniteReason: normalized) {
+            return projection.safeReasonKind.rawValue
+        }
+        if let safeReasonKind = RuntimePresentationSafeReasonKind(rawValue: normalized) {
+            return safeReasonKind.rawValue
+        }
+        if publicPayloadReasonPassthrough.contains(normalized) {
+            return normalized
+        }
+        return RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+    }
+
+    private static let publicPayloadReasonPassthrough: Set<String> = [
+        "backgrounding",
+        "cancelled",
+        "c2_readback_verified",
+        "guard_denied",
+        "interrupted",
+        "missing_required_scope",
+        "partial_accept_refuse",
+        "partial_readback_verified",
+        "readback_verified",
+        "runtime_error",
+        "timeout",
+        "user_requested",
+    ]
 }
 
 public struct TraceEnvelope: Codable, Equatable, Sendable {
@@ -613,9 +643,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         return DemoRuntimeOutcome(
             result: projection?.result ?? outcome.result,
             behaviorClassSource: outcome.behaviorClassSource,
-            reason: projection?.safeReasonKind.rawValue ?? PresentationPayloadSanitizer.publicReason(outcome.reason),
+            reason: projection?.safeReasonKind.rawValue ?? PresentationPayloadSanitizer.publicPayloadReason(outcome.reason),
             missingSlot: PresentationPayloadSanitizer.redactedOptional(outcome.missingSlot),
-            scopeFailureReason: PresentationPayloadSanitizer.publicReason(outcome.scopeFailureReason)
+            scopeFailureReason: PresentationPayloadSanitizer.publicPayloadReason(outcome.scopeFailureReason)
         )
     }
 
@@ -633,7 +663,7 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             cellKey: PresentationPayloadSanitizer.redacted(semantics.cellKey),
             role: semantics.role,
             scopeOrigin: semantics.scopeOrigin,
-            reason: PresentationPayloadSanitizer.publicReason(semantics.reason),
+            reason: PresentationPayloadSanitizer.publicPayloadReason(semantics.reason),
             isActive: semantics.isActive,
             siblingKeys: semantics.siblingKeys.map { PresentationPayloadSanitizer.redacted($0) }
         )
@@ -654,7 +684,7 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             status: reconciliation.status,
             readbackKey: reconciliation.readbackKey,
             mismatchClass: reconciliation.mismatchClass,
-            safeReason: reconciliation.safeReason
+            safeReason: PresentationPayloadSanitizer.publicPayloadReason(reconciliation.safeReason)
         )
     }
 }
