@@ -77,6 +77,18 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         result, payload = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(payload.get("status"), "PASS")
+        self.assertEqual(payload.get("scope"), "known_pattern_lexical_layer")
+        self.assertEqual(payload.get("semantic_completeness"), "not_semantically_complete")
+        self.assertEqual(payload.get("residual_blind_spots"), [
+            "renamed_probe_constants",
+            "qualified_or_typealiased_string_types",
+            "arbitrary_swift_dataflow_and_scope_resolution",
+            "multiline_string_code_examples_may_false_positive",
+        ])
+        self.assertEqual(payload.get("behavior_gates"), [
+            "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
+            "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+        ])
         self.assertEqual(payload.get("t0_count"), 10)
         self.assertEqual(payload.get("violations"), [])
 
@@ -95,6 +107,19 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         path.write_text(
             path.read_text(encoding="utf-8")
             + '\nprivate let finiteReason =\n    "w1_non_t0_reason"\n',
+            encoding="utf-8",
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_RUNTIME_FINITE_REASON_OUTSIDE_T0", self.violation_codes(payload))
+
+    def test_w1_round2_indexed_literal_flow_fails_known_pattern_lexical_layer(self) -> None:
+        path = self.repo / "Core/Execution/DemoRuntimeSessionRunner.swift"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + '\nprivate let w1NonT0Reasons = ["w1_non_t0_reason"]\n'
+            + "private let finiteReason = w1NonT0Reasons[0]\n",
             encoding="utf-8",
         )
         result, payload = self.run_checker()
@@ -130,6 +155,24 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
             "        }\n"
             "    }\n\n"
             "    public var runtimeResult: DemoRuntimeResult {",
+        )
+        result, payload = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(payload.get("status"), "FAIL")
+        self.assertIn("E_FALLBACK_SHADOW_REASON_SWITCH", self.violation_codes(payload))
+
+    def test_w1_round2_nested_closure_shadow_fails_known_pattern_lexical_layer(self) -> None:
+        self.replace(
+            "Core/Execution/FallbackContext.swift",
+            "let governanceReason = RuntimePresentationReasonAuthority.fallbackBucket(for: finiteReason)",
+            "let governanceReason: FallbackGovernanceReason? = { reason in\n"
+            "            switch reason {\n"
+            "            case .nameRejected:\n"
+            "                return .fastPathNoMatchFallback\n"
+            "            default:\n"
+            "                return RuntimePresentationReasonAuthority.fallbackBucket(for: reason)\n"
+            "            }\n"
+            "        }(finiteReason)",
         )
         result, payload = self.run_checker()
         self.assertNotEqual(result.returncode, 0)

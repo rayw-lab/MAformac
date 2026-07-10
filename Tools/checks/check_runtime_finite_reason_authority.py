@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""Fail-close runtime finiteReason producers and consumers against the T0 registry."""
+"""Fail-close known lexical finiteReason patterns against the T0 registry.
+
+Scope: known_pattern_lexical_layer, not semantically complete. Semantic mapping
+drift is owned by hard-coded Swift behavior gates, not by this lexical scanner.
+
+Residual blind spots accepted by SPEC AMENDMENT-1:
+- renamed probe constants are not discovered structurally;
+- qualified or typealiased String declarations can evade the typed-field regex;
+- arbitrary Swift dataflow and scope resolution remain out of scope;
+- multiline string code examples may conservatively false-positive.
+"""
 
 from __future__ import annotations
 
@@ -60,6 +70,18 @@ LOCKED_DECODE_FAILURE_KINDS = (
     "bridge_failed",
 )
 DIAGNOSTIC_ONLY_KINDS = {"parse_failed", "ir_unclassified", "bridge_failed"}
+CHECKER_SCOPE = "known_pattern_lexical_layer"
+SEMANTIC_COMPLETENESS = "not_semantically_complete"
+RESIDUAL_BLIND_SPOTS = [
+    "renamed_probe_constants",
+    "qualified_or_typealiased_string_types",
+    "arbitrary_swift_dataflow_and_scope_resolution",
+    "multiline_string_code_examples_may_false_positive",
+]
+BEHAVIOR_GATES = [
+    "RuntimeFiniteReasonAuthorityTests.testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
+    "RuntimeFiniteReasonAuthorityTests.testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
+]
 
 
 def violation(code: str, path: Path, detail: str, line: int | None = None) -> dict[str, Any]:
@@ -232,7 +254,7 @@ def mask_swift_strings(text: str) -> str:
 
 
 def swift_finite_reason_literals(text: str) -> list[tuple[str, int]]:
-    """Find string literals flowing directly or through a local alias into finiteReason."""
+    """Find literals reaching finiteReason through the checker-known lexical patterns."""
     code = mask_swift_comments(text)
     findings: list[tuple[str, int]] = []
     direct_patterns = (
@@ -267,6 +289,24 @@ def swift_finite_reason_literals(text: str) -> list[tuple[str, int]]:
     ):
         aliases[match.group(1)] = match.group(2)
 
+    collection_bindings: dict[str, list[tuple[str, int]]] = {}
+    for match in re.finditer(
+        r'\b(?:let|var)\s+([A-Za-z_][A-Za-z0-9_]*)'
+        r'\s*(?::[^=\n]+)?=\s*\[(?P<body>[^\]]*)\]',
+        structural,
+        flags=re.DOTALL,
+    ):
+        original_body = code[match.start("body") : match.end("body")]
+        values = [
+            (
+                literal.group(1),
+                code.count("\n", 0, match.start("body") + literal.start()) + 1,
+            )
+            for literal in re.finditer(r'"([a-z][a-z0-9_]+)"', original_body)
+        ]
+        if values:
+            collection_bindings[match.group(1)] = values
+
     def resolve_literal(identifier: str) -> tuple[str, int] | None:
         seen: set[str] = set()
         while identifier not in seen:
@@ -279,6 +319,18 @@ def swift_finite_reason_literals(text: str) -> list[tuple[str, int]]:
             identifier = next_identifier
         return None
 
+    def resolve_collection(identifier: str) -> list[tuple[str, int]]:
+        seen: set[str] = set()
+        while identifier not in seen:
+            seen.add(identifier)
+            if identifier in collection_bindings:
+                return collection_bindings[identifier]
+            next_identifier = aliases.get(identifier)
+            if next_identifier is None:
+                return []
+            identifier = next_identifier
+        return []
+
     alias_sinks = (
         re.compile(r'\bfiniteReason\s*=\s*([A-Za-z_][A-Za-z0-9_]*)'),
         re.compile(r'\bfiniteReason\s*:\s*([A-Za-z_][A-Za-z0-9_]*)'),
@@ -290,11 +342,20 @@ def swift_finite_reason_literals(text: str) -> list[tuple[str, int]]:
                 literal, _ = resolved
                 findings.append((literal, structural.count("\n", 0, match.start()) + 1))
 
+    indexed_sinks = (
+        re.compile(r'\bfiniteReason\s*=\s*([A-Za-z_][A-Za-z0-9_]*)\s*\[[^\]]+\]'),
+        re.compile(r'\bfiniteReason\s*:\s*([A-Za-z_][A-Za-z0-9_]*)\s*\[[^\]]+\]'),
+    )
+    for pattern in indexed_sinks:
+        for match in pattern.finditer(structural):
+            for literal, _ in resolve_collection(match.group(1)):
+                findings.append((literal, structural.count("\n", 0, match.start()) + 1))
+
     return sorted(set(findings), key=lambda item: (item[1], item[0]))
 
 
 def fallback_shadow_switches(text: str) -> list[tuple[int, str]]:
-    """Find local finiteReason remapping without depending on helper spelling."""
+    """Find checker-known local finiteReason remapping patterns."""
     code = mask_swift_comments(text)
     structural = mask_swift_strings(code)
     findings: list[tuple[int, str]] = []
@@ -320,6 +381,25 @@ def fallback_shadow_switches(text: str) -> list[tuple[int, str]]:
                 return True
             subject = next_subject
         return False
+
+    for match in re.finditer(
+        r'\{\s*(?:\(\s*)?(?P<parameter>[A-Za-z_][A-Za-z0-9_]*)'
+        r'(?:\s*:\s*[^)]+)?(?:\s*\))?\s+in\b'
+        r'(?P<body>.*?)\}\s*\(\s*(?P<argument>[A-Za-z_][A-Za-z0-9_.]*)\s*\)',
+        structural,
+        flags=re.DOTALL,
+    ):
+        parameter = match.group("parameter")
+        if resolves_to_finite_reason(match.group("argument")) and re.search(
+            rf'\bswitch\s*(?:\(\s*)?{re.escape(parameter)}(?:\s*\))?\s*\{{',
+            match.group("body"),
+        ):
+            findings.append(
+                (
+                    structural.count("\n", 0, match.start()) + 1,
+                    f"invoked closure parameter {parameter} remaps {match.group('argument')}",
+                )
+            )
 
     for match in re.finditer(
         r'\bswitch\s*(?:\(\s*)?([A-Za-z_][A-Za-z0-9_.]*)(?:\s*\))?\s*\{',
@@ -489,6 +569,10 @@ def check(repo_root: Path) -> dict[str, Any]:
             deduplicated.append(item)
     return {
         "status": "PASS" if not deduplicated else "FAIL",
+        "scope": CHECKER_SCOPE,
+        "semantic_completeness": SEMANTIC_COMPLETENESS,
+        "residual_blind_spots": RESIDUAL_BLIND_SPOTS,
+        "behavior_gates": BEHAVIOR_GATES,
         "t0_count": len(t0_values),
         "t0_values": t0_values,
         "production_mappings": production_mappings,
