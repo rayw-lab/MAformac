@@ -10,15 +10,15 @@
         "Core/Intent/FastPathIntentEngine.swift:12-24",
         "Core/Execution/DemoRuntimeSessionRunner.swift:214-231"
       ],
-      "canDemo": true,
+      "canDemo": false,
       "canDemo_basis": {
         "local_runtime_readback": {
-          "observed": true,
-          "source_ref": "Core/Execution/DemoRuntimeSessionRunner.swift:214-231"
+          "observed": false,
+          "source_ref": "manifest:matrix_id=1:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
-          "observed": true,
-          "source_ref": "manifest:matrix_id=1:default_path_status=executable_default_fastpath"
+          "observed": false,
+          "source_ref": "manifest:matrix_id=1:tool-not-mounted=open_ac"
         },
         "semantic_contract": {
           "observed": true,
@@ -40,8 +40,8 @@
       "mounted_status": "unmounted",
       "primary_class": "default_executable",
       "readback_probe_basis": {
-        "observed": true,
-        "source_ref": "Core/Execution/DemoRuntimeSessionRunner.swift:214-231"
+        "observed": false,
+        "source_ref": "manifest:matrix_id=1:no-runtime-readback-probe"
       },
       "reasonKind": null,
       "register": "直述",
@@ -72,11 +72,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=2:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=2:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=2:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=2:tool-not-mounted=open_ac"
         },
         "semantic_contract": {
           "observed": true,
@@ -97,7 +97,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=2:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=2:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -128,11 +128,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=3:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=3:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=3:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=3:tool-not-mounted=open_ac"
         },
         "semantic_contract": {
           "observed": true,
@@ -153,7 +153,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=3:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=3:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -182,11 +182,11 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "Tests/MAformacCoreTests/W20ARuntimeProjectionTests.swift:29-38"
       ],
-      "canDemo": false,
+      "canDemo": true,
       "canDemo_basis": {
         "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=4:default_path_status=fast_path_no_match_fallback"
+          "observed": true,
+          "source_ref": "Core/Execution/W20ARuntimeReadbackReceiptWriter.swift:35-43"
         },
         "mounted_or_approved_action": {
           "observed": true,
@@ -210,8 +210,8 @@
       "mounted_status": "mounted",
       "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
-        "observed": false,
-        "source_ref": "manifest:matrix_id=4:default_path_status=fast_path_no_match_fallback"
+        "observed": true,
+        "source_ref": "Core/Execution/W20ARuntimeReadbackReceiptWriter.swift:35-43"
       },
       "reasonKind": null,
       "register": "直述",
@@ -239,11 +239,11 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "capability-matrix-v2.md:50-52"
       ],
-      "canDemo": false,
+      "canDemo": true,
       "canDemo_basis": {
         "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=5:default_path_status=fast_path_no_match_fallback"
+          "observed": true,
+          "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
         },
         "mounted_or_approved_action": {
           "observed": true,
@@ -267,8 +267,8 @@
       "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "source_ref": "manifest:matrix_id=5:default_path_status=fast_path_no_match_fallback"
+        "observed": true,
+        "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -296,11 +296,11 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "capability-matrix-v2.md:50-52"
       ],
-      "canDemo": false,
+      "canDemo": true,
       "canDemo_basis": {
         "local_runtime_readback": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=6:default_path_status=fast_path_no_match_fallback"
+          "observed": true,
+          "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
         },
         "mounted_or_approved_action": {
           "observed": true,
@@ -324,8 +324,8 @@
       "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "source_ref": "manifest:matrix_id=6:default_path_status=fast_path_no_match_fallback"
+        "observed": true,
+        "source_ref": "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -354,11 +354,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=7:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=7:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=7:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=7:tool-not-mounted=-"
         },
         "semantic_contract": {
           "observed": false,
@@ -379,7 +379,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=7:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=7:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
@@ -408,11 +408,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=8:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=8:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=8:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=8:tool-not-mounted=-"
         },
         "semantic_contract": {
           "observed": false,
@@ -433,7 +433,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=8:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=8:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -462,11 +462,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=9:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=9:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=9:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=9:tool-not-mounted=-"
         },
         "semantic_contract": {
           "observed": false,
@@ -487,7 +487,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=9:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=9:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -518,11 +518,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=10:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=10:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=10:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=10:tool-not-mounted=adjust_ac_temperature_to_exp"
         },
         "semantic_contract": {
           "observed": true,
@@ -543,7 +543,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=10:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=10:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -574,11 +574,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=11:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=11:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=11:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=11:tool-not-mounted=adjust_ac_temperature_to_exp"
         },
         "semantic_contract": {
           "observed": true,
@@ -599,7 +599,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=11:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=11:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -630,11 +630,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=12:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=12:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=12:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=12:tool-not-mounted=adjust_ac_temperature_to_exp"
         },
         "semantic_contract": {
           "observed": true,
@@ -655,7 +655,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=12:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=12:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -686,11 +686,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=13:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=13:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=13:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=13:tool-not-mounted=open_seat_heat"
         },
         "semantic_contract": {
           "observed": true,
@@ -711,7 +711,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=13:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=13:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -742,11 +742,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=14:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=14:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=14:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=14:tool-not-mounted=open_seat_heat"
         },
         "semantic_contract": {
           "observed": true,
@@ -767,7 +767,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=14:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=14:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -798,11 +798,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=15:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=15:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=15:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=15:tool-not-mounted=open_seat_heat"
         },
         "semantic_contract": {
           "observed": true,
@@ -823,7 +823,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=15:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=15:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -854,11 +854,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=16:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=16:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=16:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=16:tool-not-mounted=adjust_seat_heat_temperature_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -879,7 +879,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=16:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=16:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -910,11 +910,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=17:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=17:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=17:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=17:tool-not-mounted=adjust_seat_heat_temperature_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -935,7 +935,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=17:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=17:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -966,11 +966,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=18:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=18:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=18:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=18:tool-not-mounted=adjust_seat_heat_temperature_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -991,7 +991,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=18:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=18:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1022,11 +1022,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=19:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=19:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=19:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=19:tool-not-mounted=adjust_seat_position_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1047,7 +1047,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=19:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=19:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1078,11 +1078,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=20:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=20:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=20:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=20:tool-not-mounted=adjust_seat_position_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1103,7 +1103,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=20:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=20:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1134,11 +1134,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=21:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=21:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=21:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=21:tool-not-mounted=adjust_seat_position_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1159,7 +1159,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=21:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=21:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1190,11 +1190,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=22:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=22:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=22:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=22:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -1215,7 +1215,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=22:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=22:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1246,11 +1246,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=23:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=23:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=23:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=23:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -1271,7 +1271,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=23:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=23:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1302,11 +1302,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=24:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=24:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=24:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=24:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -1327,7 +1327,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=24:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=24:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1358,11 +1358,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=25:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=25:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=25:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=25:tool-not-mounted=close_window"
         },
         "semantic_contract": {
           "observed": true,
@@ -1383,7 +1383,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=25:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=25:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1414,11 +1414,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=26:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=26:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=26:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=26:tool-not-mounted=close_window"
         },
         "semantic_contract": {
           "observed": true,
@@ -1439,7 +1439,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=26:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=26:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1470,11 +1470,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=27:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=27:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=27:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=27:tool-not-mounted=close_window"
         },
         "semantic_contract": {
           "observed": true,
@@ -1495,7 +1495,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=27:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=27:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1526,11 +1526,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=28:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=28:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=28:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=28:tool-not-mounted=open_window_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1551,7 +1551,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=28:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=28:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1582,11 +1582,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=29:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=29:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=29:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=29:tool-not-mounted=open_window_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1607,7 +1607,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=29:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=29:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1638,11 +1638,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=30:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=30:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=30:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=30:tool-not-mounted=open_window_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1663,7 +1663,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=30:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=30:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1694,11 +1694,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=31:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=31:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=31:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=31:tool-not-mounted=open_window_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1719,7 +1719,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=31:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=31:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1750,11 +1750,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=32:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=32:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=32:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=32:tool-not-mounted=open_window_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1775,7 +1775,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=32:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=32:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1806,11 +1806,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=33:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=33:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=33:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=33:tool-not-mounted=open_window_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -1831,7 +1831,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=33:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=33:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1862,11 +1862,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=34:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=34:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=34:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=34:tool-not-mounted=open_window_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -1887,7 +1887,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=34:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=34:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1918,11 +1918,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=35:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=35:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=35:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=35:tool-not-mounted=open_window_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -1943,7 +1943,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=35:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=35:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1974,11 +1974,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=36:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=36:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=36:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=36:tool-not-mounted=open_window_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -1999,7 +1999,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=36:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=36:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2030,11 +2030,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=37:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=37:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=37:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=37:tool-not-mounted=open_screen"
         },
         "semantic_contract": {
           "observed": true,
@@ -2055,7 +2055,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=37:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=37:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2086,11 +2086,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=38:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=38:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=38:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=38:tool-not-mounted=open_screen"
         },
         "semantic_contract": {
           "observed": true,
@@ -2111,7 +2111,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=38:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=38:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2142,11 +2142,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=39:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=39:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=39:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=39:tool-not-mounted=open_screen"
         },
         "semantic_contract": {
           "observed": true,
@@ -2167,7 +2167,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=39:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=39:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2198,11 +2198,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=40:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=40:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=40:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=40:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2223,7 +2223,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=40:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=40:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2254,11 +2254,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=41:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=41:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=41:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=41:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2279,7 +2279,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=41:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=41:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2310,11 +2310,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=42:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=42:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=42:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=42:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2335,7 +2335,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=42:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=42:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2366,11 +2366,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=43:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=43:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=43:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=43:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2391,7 +2391,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=43:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=43:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2422,11 +2422,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=44:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=44:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=44:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=44:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2447,7 +2447,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=44:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=44:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2478,11 +2478,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=45:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=45:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=45:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=45:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2503,7 +2503,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=45:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=45:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2534,11 +2534,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=46:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=46:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=46:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=46:tool-not-mounted=adjust_screen_brightness_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -2559,7 +2559,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=46:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=46:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2590,11 +2590,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=47:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=47:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=47:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=47:tool-not-mounted=adjust_screen_brightness_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -2615,7 +2615,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=47:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=47:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2646,11 +2646,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=48:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=48:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=48:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=48:tool-not-mounted=adjust_screen_brightness_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -2671,7 +2671,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=48:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=48:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2702,11 +2702,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=49:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=49:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=49:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=49:tool-not-mounted=open_atmosphere_lamp"
         },
         "semantic_contract": {
           "observed": true,
@@ -2727,7 +2727,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=49:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=49:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2758,11 +2758,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=50:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=50:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=50:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=50:tool-not-mounted=open_atmosphere_lamp"
         },
         "semantic_contract": {
           "observed": true,
@@ -2783,7 +2783,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=50:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=50:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2814,11 +2814,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=51:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=51:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=51:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=51:tool-not-mounted=open_atmosphere_lamp"
         },
         "semantic_contract": {
           "observed": true,
@@ -2839,7 +2839,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=51:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=51:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2870,11 +2870,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=52:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=52:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=52:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=52:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2895,7 +2895,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=52:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=52:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2926,11 +2926,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=53:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=53:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=53:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=53:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -2951,7 +2951,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=53:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=53:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2982,11 +2982,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=54:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=54:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=54:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=54:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3007,7 +3007,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=54:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=54:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3038,11 +3038,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=55:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=55:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=55:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=55:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3063,7 +3063,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=55:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=55:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3094,11 +3094,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=56:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=56:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=56:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=56:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3119,7 +3119,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=56:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=56:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3150,11 +3150,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=57:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=57:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=57:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=57:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3175,7 +3175,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=57:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=57:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3206,11 +3206,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=58:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=58:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=58:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=58:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -3231,7 +3231,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=58:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=58:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3262,11 +3262,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=59:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=59:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=59:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=59:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -3287,7 +3287,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=59:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=59:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3318,11 +3318,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=60:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=60:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=60:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=60:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -3343,7 +3343,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=60:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=60:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3374,11 +3374,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=61:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=61:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=61:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=61:tool-not-mounted=open_car_door"
         },
         "semantic_contract": {
           "observed": true,
@@ -3399,7 +3399,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=61:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=61:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3430,11 +3430,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=62:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=62:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=62:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=62:tool-not-mounted=open_car_door"
         },
         "semantic_contract": {
           "observed": true,
@@ -3455,7 +3455,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=62:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=62:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3486,11 +3486,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=63:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=63:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=63:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=63:tool-not-mounted=open_car_door"
         },
         "semantic_contract": {
           "observed": true,
@@ -3511,7 +3511,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=63:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=63:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3542,11 +3542,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=64:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=64:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=64:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=64:tool-not-mounted=set_door_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3567,7 +3567,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=64:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=64:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3598,11 +3598,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=65:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=65:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=65:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=65:tool-not-mounted=set_door_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3623,7 +3623,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=65:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=65:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3654,11 +3654,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=66:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=66:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=66:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=66:tool-not-mounted=set_door_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3679,7 +3679,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=66:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=66:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3710,11 +3710,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=67:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=67:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=67:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=67:tool-not-mounted=open_door_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3735,7 +3735,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=67:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=67:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3766,11 +3766,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=68:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=68:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=68:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=68:tool-not-mounted=open_door_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3791,7 +3791,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=68:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=68:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3822,11 +3822,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=69:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=69:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=69:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=69:tool-not-mounted=open_door_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -3847,7 +3847,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=69:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=69:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3878,11 +3878,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=70:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=70:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=70:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=70:tool-not-mounted=open_door_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -3903,7 +3903,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=70:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=70:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3934,11 +3934,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=71:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=71:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=71:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=71:tool-not-mounted=open_door_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -3959,7 +3959,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=71:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=71:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3990,11 +3990,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=72:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=72:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=72:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=72:tool-not-mounted=open_door_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -4015,7 +4015,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=72:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=72:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4046,11 +4046,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=73:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=73:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=73:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=73:tool-not-mounted=volume_mute"
         },
         "semantic_contract": {
           "observed": true,
@@ -4071,7 +4071,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=73:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=73:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4102,11 +4102,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=74:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=74:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=74:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=74:tool-not-mounted=volume_mute"
         },
         "semantic_contract": {
           "observed": true,
@@ -4127,7 +4127,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=74:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=74:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4158,11 +4158,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=75:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=75:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=75:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=75:tool-not-mounted=volume_mute"
         },
         "semantic_contract": {
           "observed": true,
@@ -4183,7 +4183,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=75:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=75:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4214,11 +4214,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=76:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=76:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=76:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=76:tool-not-mounted=adjust_volume_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4239,7 +4239,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=76:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=76:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4270,11 +4270,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=77:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=77:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=77:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=77:tool-not-mounted=adjust_volume_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4295,7 +4295,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=77:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=77:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4326,11 +4326,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=78:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=78:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=78:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=78:tool-not-mounted=adjust_volume_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4351,7 +4351,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=78:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=78:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4382,11 +4382,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=79:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=79:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=79:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=79:tool-not-mounted=adjust_volume_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4407,7 +4407,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=79:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=79:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4438,11 +4438,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=80:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=80:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=80:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=80:tool-not-mounted=adjust_volume_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4463,7 +4463,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=80:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=80:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4494,11 +4494,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=81:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=81:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=81:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=81:tool-not-mounted=adjust_volume_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4519,7 +4519,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=81:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=81:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4550,11 +4550,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=82:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=82:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=82:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=82:tool-not-mounted=adjust_volume_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -4575,7 +4575,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=82:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=82:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4606,11 +4606,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=83:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=83:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=83:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=83:tool-not-mounted=adjust_volume_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -4631,7 +4631,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=83:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=83:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4662,11 +4662,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=84:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=84:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=84:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=84:tool-not-mounted=adjust_volume_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -4687,7 +4687,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=84:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=84:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4718,11 +4718,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=85:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=85:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=85:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=85:tool-not-mounted=open_wiper"
         },
         "semantic_contract": {
           "observed": true,
@@ -4743,7 +4743,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=85:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=85:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4774,11 +4774,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=86:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=86:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=86:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=86:tool-not-mounted=open_wiper"
         },
         "semantic_contract": {
           "observed": true,
@@ -4799,7 +4799,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=86:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=86:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4830,11 +4830,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=87:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=87:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=87:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=87:tool-not-mounted=open_wiper"
         },
         "semantic_contract": {
           "observed": true,
@@ -4855,7 +4855,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=87:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=87:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4886,11 +4886,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=88:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=88:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=88:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=88:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4911,7 +4911,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=88:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=88:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4942,11 +4942,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=89:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=89:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=89:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=89:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -4967,7 +4967,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=89:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=89:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4998,11 +4998,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=90:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=90:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=90:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=90:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5023,7 +5023,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=90:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=90:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5054,11 +5054,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=91:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=91:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=91:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=91:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5079,7 +5079,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=91:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=91:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5110,11 +5110,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=92:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=92:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=92:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=92:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5135,7 +5135,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=92:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=92:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5166,11 +5166,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=93:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=93:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=93:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=93:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5191,7 +5191,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=93:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=93:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5222,11 +5222,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=94:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=94:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=94:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=94:tool-not-mounted=adjust_wiper_speed_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -5247,7 +5247,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=94:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=94:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5278,11 +5278,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=95:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=95:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=95:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=95:tool-not-mounted=adjust_wiper_speed_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -5303,7 +5303,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=95:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=95:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5334,11 +5334,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=96:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=96:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=96:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=96:tool-not-mounted=adjust_wiper_speed_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -5359,7 +5359,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=96:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=96:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5390,11 +5390,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=97:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=97:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=97:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=97:tool-not-mounted=open_sunroof"
         },
         "semantic_contract": {
           "observed": true,
@@ -5415,7 +5415,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=97:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=97:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5446,11 +5446,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=98:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=98:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=98:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=98:tool-not-mounted=open_sunroof"
         },
         "semantic_contract": {
           "observed": true,
@@ -5471,7 +5471,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=98:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=98:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5502,11 +5502,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=99:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=99:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=99:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=99:tool-not-mounted=open_sunroof"
         },
         "semantic_contract": {
           "observed": true,
@@ -5527,7 +5527,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=99:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=99:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5558,11 +5558,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=100:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=100:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=100:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=100:tool-not-mounted=open_sunroof_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5583,7 +5583,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=100:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=100:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5614,11 +5614,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=101:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=101:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=101:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=101:tool-not-mounted=open_sunroof_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5639,7 +5639,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=101:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=101:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5670,11 +5670,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=102:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=102:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=102:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=102:tool-not-mounted=open_sunroof_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5695,7 +5695,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=102:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=102:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5726,11 +5726,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=103:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=103:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=103:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=103:tool-not-mounted=open_sunroof_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5751,7 +5751,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=103:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=103:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5782,11 +5782,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=104:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=104:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=104:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=104:tool-not-mounted=open_sunroof_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5807,7 +5807,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=104:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=104:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5838,11 +5838,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=105:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=105:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=105:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=105:tool-not-mounted=open_sunroof_by_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -5863,7 +5863,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=105:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=105:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5894,11 +5894,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=106:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=106:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=106:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=106:tool-not-mounted=open_sunroof_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -5919,7 +5919,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=106:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=106:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5950,11 +5950,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=107:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=107:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=107:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=107:tool-not-mounted=open_sunroof_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -5975,7 +5975,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=107:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=107:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6006,11 +6006,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=108:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=108:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=108:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=108:tool-not-mounted=open_sunroof_little"
         },
         "semantic_contract": {
           "observed": true,
@@ -6031,7 +6031,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=108:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=108:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6062,11 +6062,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=109:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=109:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=109:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=109:tool-not-mounted=open_fragrance"
         },
         "semantic_contract": {
           "observed": true,
@@ -6087,7 +6087,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=109:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=109:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6118,11 +6118,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=110:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=110:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=110:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=110:tool-not-mounted=open_fragrance"
         },
         "semantic_contract": {
           "observed": true,
@@ -6143,7 +6143,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=110:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=110:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6174,11 +6174,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=111:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=111:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=111:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=111:tool-not-mounted=open_fragrance"
         },
         "semantic_contract": {
           "observed": true,
@@ -6199,7 +6199,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=111:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=111:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6230,11 +6230,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=112:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=112:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=112:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=112:tool-not-mounted=adjust_fragrance_intensity_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -6255,7 +6255,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=112:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=112:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6286,11 +6286,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=113:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=113:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=113:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=113:tool-not-mounted=adjust_fragrance_intensity_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -6311,7 +6311,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=113:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=113:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6342,11 +6342,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=114:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=114:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=114:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=114:tool-not-mounted=adjust_fragrance_intensity_to_number"
         },
         "semantic_contract": {
           "observed": true,
@@ -6367,7 +6367,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=114:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=114:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6396,11 +6396,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=115:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=115:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=115:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=115:tool-not-mounted=-"
         },
         "semantic_contract": {
           "observed": false,
@@ -6421,7 +6421,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=115:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=115:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
@@ -6450,11 +6450,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=116:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=116:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=116:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=116:tool-not-mounted=-"
         },
         "semantic_contract": {
           "observed": false,
@@ -6475,7 +6475,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=116:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=116:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6504,11 +6504,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=117:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=117:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=117:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=117:tool-not-mounted=-"
         },
         "semantic_contract": {
           "observed": false,
@@ -6529,7 +6529,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=117:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=117:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6560,11 +6560,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=118:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=118:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=118:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=118:tool-not-mounted=adjust_fragrance_intensity_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -6585,7 +6585,7 @@
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=118:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=118:no-runtime-readback-probe"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6616,11 +6616,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=119:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=119:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=119:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=119:tool-not-mounted=adjust_fragrance_intensity_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -6641,7 +6641,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=119:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=119:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6672,11 +6672,11 @@
       "canDemo_basis": {
         "local_runtime_readback": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=120:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=120:no-runtime-readback-probe"
         },
         "mounted_or_approved_action": {
           "observed": false,
-          "source_ref": "manifest:matrix_id=120:default_path_status=fast_path_no_match_fallback"
+          "source_ref": "manifest:matrix_id=120:tool-not-mounted=adjust_fragrance_intensity_to_gear"
         },
         "semantic_contract": {
           "observed": true,
@@ -6697,7 +6697,7 @@
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
-        "source_ref": "manifest:matrix_id=120:default_path_status=fast_path_no_match_fallback"
+        "source_ref": "manifest:matrix_id=120:no-runtime-readback-probe"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
