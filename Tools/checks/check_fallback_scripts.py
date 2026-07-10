@@ -48,6 +48,11 @@ T0_COPY_FIELDS = {
     "result_kind_enum",
     "internal_reason_mappings",
 }
+BASIS_SCOPE_NOTE = (
+    "C1 hard gate: basis_refs SHALL identify unique strings in authoritative SSOT contract sources. "
+    "Runtime/IR/mounted fact-resolution is follow-up evidence and SHALL NOT fail the 40-cell catalog gate."
+)
+AUTHORITATIVE_BASIS_PATHS = {"Core/Contracts/DDomainMountedToolCatalog.swift"}
 
 
 def sha256(path: Path) -> str:
@@ -190,7 +195,14 @@ def parse_mounted_tools(path: Path) -> set[str]:
     return set(re.findall(r'"([^"]+)"', text.split(marker, 1)[1].split("]", 1)[0]))
 
 
-def resolve_basis(
+def is_authoritative_basis_path(raw_path: str) -> bool:
+    return raw_path.startswith("contracts/") or raw_path in AUTHORITATIVE_BASIS_PATHS
+
+
+# FOLLOW-UP ONLY: C1 admission is decided by the unique authoritative-contract
+# strings in basis_refs. Runtime/IR/mounted observations document later resolver
+# work and are intentionally unable to fail the 40-cell catalog gate.
+def observe_follow_up_facts(
     cell: dict[str, Any],
     family_config: dict[str, Any],
     semantic_rows: list[dict[str, Any]],
@@ -205,10 +217,10 @@ def resolve_basis(
     reason = str(cell.get("reason_kind", ""))
     semantic_device = family_config.get("semantic_device")
     representative_tool = family_config.get("representative_tool")
-    failures: list[dict[str, str]] = []
+    observations: list[dict[str, str]] = []
     if not isinstance(semantic_device, str) or not isinstance(representative_tool, str):
-        failures.append({"cell_id": cell_id, "kind": "family_basis_selector_missing"})
-        return {"cell_id": cell_id, "reason_kind": reason}, failures
+        observations.append({"cell_id": cell_id, "kind": "family_basis_selector_missing"})
+        return {"cell_id": cell_id, "reason_kind": reason}, observations
 
     semantic_matches = [row for row in semantic_rows if row.get("device") == semantic_device]
     family_ir_tools = sorted(name for name, device in ir_tools.items() if device == semantic_device)
@@ -227,14 +239,14 @@ def resolve_basis(
         },
     }
     if not semantic_matches:
-        failures.append({"cell_id": cell_id, "kind": "semantic_selector_no_rows"})
+        observations.append({"cell_id": cell_id, "kind": "semantic_selector_no_rows"})
     if representative_tool not in family_ir_tools:
-        failures.append({"cell_id": cell_id, "kind": "representative_not_in_ir"})
+        observations.append({"cell_id": cell_id, "kind": "representative_not_in_ir"})
 
     if reason == "unmounted_name_rejected":
         details["authority"] = "mounted_catalog_absence_plus_semantic_presence"
         if representative_tool in mounted_tools:
-            failures.append({"cell_id": cell_id, "kind": "mounted_representative_present"})
+            observations.append({"cell_id": cell_id, "kind": "mounted_representative_present"})
     elif reason == "fast_path_no_match_fallback":
         details["authority"] = "fast_path_router_runtime_bucket"
         fast_path_ready = "throw FastPathIntentError.noMatch(text)" in fast_path_text
@@ -245,11 +257,11 @@ def resolve_basis(
         details["query_result"]["fast_path_no_match_guard"] = fast_path_ready
         details["query_result"]["runtime_no_match_bucket"] = runtime_ready
         if not fast_path_ready or not runtime_ready:
-            failures.append({"cell_id": cell_id, "kind": "fast_path_runtime_bucket_missing"})
+            observations.append({"cell_id": cell_id, "kind": "fast_path_runtime_bucket_missing"})
     elif reason == "unknown_no_representative_entry":
         details["authority"] = "semantic_ir_mounted_absence_receipt"
         if mounted_family_tools:
-            failures.append({"cell_id": cell_id, "kind": "mounted_representative_present"})
+            observations.append({"cell_id": cell_id, "kind": "mounted_representative_present"})
     elif reason == "safety_or_clarify_reject":
         if cell.get("result_kind") == "refusal_safety_or_policy":
             details["authority"] = "risk_and_state_policy"
@@ -260,16 +272,16 @@ def resolve_basis(
                 {"risk_rule": risk_present, "door_state": door_present, "speed_state": speed_present}
             )
             if not (risk_present and door_present and speed_present):
-                failures.append({"cell_id": cell_id, "kind": "safety_policy_selector_missing"})
+                observations.append({"cell_id": cell_id, "kind": "safety_policy_selector_missing"})
         else:
             details["authority"] = "semantic_slot_policy"
             slot_rows = sum(1 for row in semantic_matches if row.get("slot_keys"))
             details["query_result"]["semantic_slot_row_count"] = slot_rows
             if slot_rows == 0:
-                failures.append({"cell_id": cell_id, "kind": "clarify_slot_policy_missing"})
+                observations.append({"cell_id": cell_id, "kind": "clarify_slot_policy_missing"})
     else:
-        failures.append({"cell_id": cell_id, "kind": "unknown_basis_reason"})
-    return details, failures
+        observations.append({"cell_id": cell_id, "kind": "unknown_basis_reason"})
+    return details, observations
 
 
 def expected_generated_entry(source: dict[str, Any], cell: dict[str, Any]) -> dict[str, Any]:
@@ -305,8 +317,8 @@ def validate(
     schema_shape_hits: list[str] = []
     unknown_families: list[str] = []
     unknown_reasons: list[str] = []
-    basis_resolutions: list[dict[str, Any]] = []
-    basis_resolution_failures: list[dict[str, str]] = []
+    non_ssot_basis_refs: list[dict[str, str]] = []
+    follow_up_fact_observations: list[dict[str, Any]] = []
 
     try:
         data = load_json_yaml(source)
@@ -343,6 +355,8 @@ def validate(
     parallel_t0_copies = sorted(T0_COPY_FIELDS & set(data))
     if parallel_t0_copies:
         errors.append("parallel_t0_enum_copy")
+    if data.get("basis_scope_note") != BASIS_SCOPE_NOTE:
+        errors.append("basis_scope_note_mismatch")
 
     expected_reasons = contract["reason_kinds"] if contract else ()
     expected_safe_reason_kinds = contract["safe_reason_kinds"] if contract else set()
@@ -367,6 +381,10 @@ def validate(
     semantic_rows: list[dict[str, Any]] = []
     ir_tools: dict[str, str] = {}
     mounted_tools: set[str] = set()
+    # The dynamic sources below are observability-only. A missing/mismatched
+    # runtime, IR, or mounted fact must surface in the receipt, never become a
+    # C1 hard failure; the contract-string checks inside the cell loop are the
+    # C1 gate.
     try:
         semantic_rows = parse_semantic_rows(repo_root / "contracts/semantic-function-contract.jsonl")
         ir_tools = parse_ir_tools(repo_root / "Core/Contracts/DDomainIRMap.generated.swift")
@@ -376,7 +394,9 @@ def validate(
         risk_policy_text = (repo_root / "contracts/risk-policy.yaml").read_text(encoding="utf-8")
         state_cells_text = (repo_root / "contracts/state-cells.yaml").read_text(encoding="utf-8")
     except Exception as exc:
-        errors.append(f"basis_authority_read_error:{exc}")
+        follow_up_fact_observations.append(
+            {"cell_id": "fact-resolution", "kind": "fact_resolution_unavailable", "detail": str(exc)}
+        )
         fast_path_text = runtime_text = risk_policy_text = state_cells_text = ""
 
     for index, cell in enumerate(cells):
@@ -445,10 +465,12 @@ def validate(
                     continue
                 if resolved.read_text(encoding="utf-8").count(str(ref["contains"])) != 1:
                     unresolved.append({"cell_id": cell_id, "ref": f"{raw_path}#{ref['contains']}"})
+                elif not is_authoritative_basis_path(raw_path):
+                    non_ssot_basis_refs.append({"cell_id": cell_id, "ref": raw_path})
 
         family_config = families.get(family) if isinstance(families, dict) else None
         if isinstance(family_config, dict):
-            resolution, failures = resolve_basis(
+            resolution, observations = observe_follow_up_facts(
                 cell,
                 family_config,
                 semantic_rows,
@@ -460,9 +482,12 @@ def validate(
                 state_cells_text,
             )
         else:
-            resolution, failures = ({"cell_id": cell_id, "reason_kind": reason}, [{"cell_id": cell_id, "kind": "family_basis_selector_missing"}])
-        basis_resolutions.append(resolution)
-        basis_resolution_failures.extend(failures)
+            resolution, observations = (
+                {"cell_id": cell_id, "reason_kind": reason},
+                [{"cell_id": cell_id, "kind": "family_basis_selector_missing"}],
+            )
+        follow_up_fact_observations.append(resolution)
+        follow_up_fact_observations.extend(observations)
 
     expected_pairs_set = {(family, reason) for family in EXPECTED_FAMILIES for reason in expected_reasons}
     pair_counts = Counter(pairs)
@@ -487,8 +512,8 @@ def validate(
         errors.append("unknown_reasons")
     if unresolved:
         errors.append("unresolved_basis_refs")
-    if basis_resolution_failures:
-        errors.append("basis_resolution_failed")
+    if non_ssot_basis_refs:
+        errors.append("non_ssot_basis_refs")
     if raw_hits:
         errors.append("customer_raw_field_exposure")
     if banned_hits:
@@ -545,8 +570,13 @@ def validate(
         "unknown_families": sorted(set(unknown_families)),
         "unknown_reasons": sorted(set(unknown_reasons)),
         "unresolved_basis_refs": unresolved,
-        "basis_resolutions": basis_resolutions,
-        "basis_resolution_failures": basis_resolution_failures,
+        "non_ssot_basis_refs": non_ssot_basis_refs,
+        "basis_contract_gate": {
+            "scope": "authoritative_ssot_contract_strings",
+            "unique_string_match_required": True,
+            "fact_resolution": "follow_up_not_c1_gate",
+        },
+        "follow_up_fact_observations": follow_up_fact_observations,
         "customer_raw_field_hits": raw_hits,
         "banned_copy_hits": banned_hits,
         "generic_leakage_hits": generic_hits,

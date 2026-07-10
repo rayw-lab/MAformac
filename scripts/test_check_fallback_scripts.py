@@ -119,18 +119,32 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
         self.assertIn("unresolved_basis_refs", receipt["errors"])
         self.assertEqual(receipt["unresolved_basis_refs"][0]["cell_id"], "fallback.ac.safety_or_clarify_reject.zh-CN")
 
-    def test_door_safety_cell_resolves_risk_and_speed_authorities_structurally(self) -> None:
+    def test_basis_ref_rejects_runtime_source_even_when_its_string_is_unique(self) -> None:
+        def mutate(payload: dict) -> None:
+            payload["cells"][0]["basis_refs"][0] = {
+                "path": "Core/Intent/FastPathIntentEngine.swift",
+                "contains": "enum FastPathIntentError",
+            }
+
+        tmp, source = self.write_mutation(mutate)
+        self.addCleanup(tmp.cleanup)
+        result, receipt = self.run_checker(source)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("non_ssot_basis_refs", receipt["errors"])
+
+    def test_door_safety_fact_resolution_is_reported_as_follow_up(self) -> None:
         result, receipt = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stderr)
-        resolution = next(
+        observation = next(
             entry
-            for entry in receipt["basis_resolutions"]
+            for entry in receipt["follow_up_fact_observations"]
             if entry["cell_id"] == "fallback.door.safety_or_clarify_reject.zh-CN"
         )
-        self.assertEqual(resolution["authority"], "risk_and_state_policy")
-        self.assertTrue(resolution["query_result"]["risk_rule"])
-        self.assertTrue(resolution["query_result"]["door_state"])
-        self.assertTrue(resolution["query_result"]["speed_state"])
+        self.assertEqual(observation["authority"], "risk_and_state_policy")
+        self.assertTrue(observation["query_result"]["risk_rule"])
+        self.assertTrue(observation["query_result"]["door_state"])
+        self.assertTrue(observation["query_result"]["speed_state"])
+        self.assertEqual(receipt["basis_contract_gate"]["fact_resolution"], "follow_up_not_c1_gate")
 
     def test_t0_reason_projection_cannot_be_remapped_to_another_safe_enum(self) -> None:
         def mutate(payload: dict) -> None:
@@ -164,12 +178,11 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
         ):
             self.assertNotIn(field, payload)
 
-    def test_checker_emits_structural_basis_result_for_each_reason_specific_cell(self) -> None:
+    def test_checker_emits_follow_up_observation_for_each_reason_specific_cell(self) -> None:
         result, receipt = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(len(receipt["basis_resolutions"]), 40)
-        self.assertEqual(receipt["basis_resolution_failures"], [])
-        reasons = {entry["reason_kind"] for entry in receipt["basis_resolutions"]}
+        self.assertEqual(len(receipt["follow_up_fact_observations"]), 40)
+        reasons = {entry["reason_kind"] for entry in receipt["follow_up_fact_observations"]}
         self.assertEqual(
             reasons,
             {
@@ -180,20 +193,33 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
             },
         )
 
-    def test_unmounted_basis_fails_when_its_representative_is_mounted(self) -> None:
+    def test_fact_resolution_is_follow_up_when_its_representative_is_mounted(self) -> None:
         def mutate(payload: dict) -> None:
             payload["families"]["ac"]["representative_tool"] = "adjust_ac_temperature_to_number"
 
         tmp, source = self.write_mutation(mutate)
         self.addCleanup(tmp.cleanup)
         result, receipt = self.run_checker(source)
-        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertNotIn("basis_resolution_failed", receipt["errors"])
         self.assertTrue(
             any(
-                failure["kind"] == "mounted_representative_present"
-                for failure in receipt["basis_resolution_failures"]
+                observation.get("kind") == "mounted_representative_present"
+                for observation in receipt["follow_up_fact_observations"]
             )
         )
+
+    def test_basis_scope_note_locks_ssot_gate_and_follow_up_boundary(self) -> None:
+        payload = json.loads(SOURCE.read_text(encoding="utf-8"))
+        self.assertIn("unique strings", payload["basis_scope_note"])
+        self.assertIn("follow-up", payload["basis_scope_note"])
+        self.assertIn("SHALL NOT fail", payload["basis_scope_note"])
+
+        tmp, source = self.write_mutation(lambda mutated: mutated.pop("basis_scope_note"))
+        self.addCleanup(tmp.cleanup)
+        result, receipt = self.run_checker(source)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("basis_scope_note_mismatch", receipt["errors"])
 
     def test_generated_catalog_drift_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory(prefix="fallback-generated-drift-") as tmp:

@@ -4,6 +4,7 @@
     "t0_change": "add-c1-demo-capability-governance",
     "t0_registry": "openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml"
   },
+  "basis_scope_note": "C1 hard gate: basis_refs SHALL identify unique strings in authoritative SSOT contract sources. Runtime/IR/mounted fact-resolution is follow-up evidence and SHALL NOT fail the 40-cell catalog gate.",
   "family_enum": [
     "ac",
     "seat",
