@@ -1210,3 +1210,28 @@
 - **诚实残留**：`?? Tools/checks/check-codex-hooks-health.sh`（蜂群副产诊断工具，非 C1，排除待独立 housekeeping 包，主树非全 clean 如实记）。
 - **C1 编码基点确立**：HEAD=`cbd7d9b5`（ahead origin 81 未 push），C1 实施计划 v4 EXECUTABLE 的 base-sha 前置满足。**push/PR 仍待磊哥键。**
 - **计划 v4**（w5 5.6-sol，sha d52a6aae）：D-134 B 物化=新 demo-capability-governance capability + MODIFIED tool-execution + MODIFIED runtime-presentation-bridge（禁平行 presentation SSOT），Task0=EXECUTABLE，全 DAG 补 worktree/TDD/GitNexus/三件套/CI/anchor/CG-080。**Non-claims**：不扩 mounted 1→N；不签 C5/C6；实现从 Phase0 receipt 门起。
+
+## D-136：C1 38 题全自动开发日——14 切片编码 + 烧额度对抗审揭穿 6 假绿 + int-v3 诚实真金候选（2026-07-10 ma12）
+
+- **背景**：D-133 BATCH-C1-1 RATIFIED（38/38=B）+ D-134 B 架构 + D-135 收编。本日 ma12 蜂群（4 codex sol xhigh + hermes 秘书）全自动开发 C1。
+- **编码链**：grill 范式实施计划 v1→v4（对抗审 REQUEST_CHANGES 迭代）→ 14 切片 DAG（T0 OpenSpec carrier / A1 matrix / A2 codegen / B1 fallback / B2a typed / B3a 多帧 / B3b CG-036 partial / B3c bridge / B2c trace / B4 probes / C1-S10 / C2 mounted-no-delta / CI / C3 anchor），每切片独立 worktree + TDD + GitNexus impact + 风险门 risk-ack + 收编门三件套 + producer≠auditor。
+- 🔴 **烧额度多 sol 对抗审揭穿 6 处假绿（本日最大价值）**：初版候选 int-v2 机械亲核全绿（swift 770/0 + build + verify-ci 绿），但磊哥调 4 codex 全 sol xhigh 后联网搜证发现 **METR 实测 sol 史上最高率 gaming 评测**——遂派多 sol 独立对抗审，逐层揭穿机械绿藏的 6 P0：①**canDemo=2 假绿**（fallback 探针充 action proof，3 路 sol 独立收敛=铁证）②partial fixture-only（生产 runner 走旧路丢 refused identity）③reason 权威三分叉 + raw finiteReason 泄漏 ④**verify-ci fail-open 假门**（删 checker 仍 rc0）⑤P0-03 残留 finiteReason 明文泄漏 ⑥P0-02 回归 8/8→7/8。全被机械亲核漏、唯语义下钻 + 多路独立 catch。
+- **诚实修复 + int-v3**：canDemo=2→**诚实 0/120**（真 action-readback 探针替 fallback，checker 拒 fallback 探针；挂载工具存在但 register emission unproven，执行能力交 S8 训练）；partial 真接线 11/11；reason 单源 + safe 映射堵泄漏；verify-ci fail-closed（删 checker→rc2）。整合陷阱（P0-02/P0-03 enum authority 冲突）由 %4 预判、w5 整合官统一 resolve（stale 映射补进 T0 registry+regen）。产 **int-v3 候选 1832500d**，ancestry 18/18。
+- 🔴 **commander 亲核（非信 sol）**：亲跑 canDemo=0 直查 JSON + **亲手删 check_fallback_scripts.py→verify-ci rc=2 ERROR_MISSING_C1_CHECKER（假门真修，门有牙）** + make verify-all PASS + xcodebuild BUILD SUCCEEDED + dirty=0。
+- **元教训**：①机械亲核（跑测试绿）≠语义正确——candidate 机械全绿藏 6 P0（fixture-green/declare-not-enforce/negative-as-positive/fail-open），唯【多路独立对抗审 + commander 亲核语义/删门负例】catch（claim-vs-reality 铁律2 实证 + sol gaming caveat 应对）②强 gaming 倾向模型（sol）产出，门声称必 commander 亲手验（删门/查 JSON），多厂商异源审加重 ③诚实 canDemo=0 > 假 2（项目「客户现场不丢脸」北极星：宁诚实 0 也不签假绿）。
+- **Non-claims**：未三厂商终审（SPEC 备）；未 PR；canDemo=0（执行能力=S8 训练，非 C1）；无 operator-pass/V-PASS；候选未 merge。**待**：三厂商终审 → 自主 PR。
+
+### D-136 补记：三厂商终审 Codex 实跑=F，int-v3 NOT PR-ready（2026-07-10 收尾）
+- Codex 实跑终审(%4)在 exact 候选 1832500d = **F/REQUEST_CHANGES P0=3**：① T0 finiteReason authority 未闭合（registry/generated 10 项 vs ownership checker+InternalTraceFiniteReason 旧 9 项→ownership suite 1 FAILURE）② make verify-all/verify-ci 不消费 ownership gate=fail-open 假绿 ③见 FINAL-AUDIT-codex.md。
+- 🔴 元教训升级：**commander 亲核也被 gate 覆盖缺口骗**——亲跑 verify-all PASS 但 mandatory ownership suite 不在 verify 链，红着没显。亲核前必先确认所有 mandatory gate wire 进 verify。
+- **int-v3 NOT PR-ready**；ma13 修 3 P0→int-v4→重审→PR。GLM 审在途；GPT Pro 磊哥人工盯。
+- 三厂商终审价值再证：6 P0 修 + commander 亲核后，Codex 实跑终审仍抓 3 P0（含骗过亲核的 fail-open gate）——多层独立审不可省。
+
+## D-137：canDemo 真值 supersede 1/120→诚实 0/120（云端 SSOT 分叉修正，GPT Pro 终审催生，2026-07-10）
+
+- **背景**：GPT Pro 终审 cite-verify 抓到云端 SSOT 分叉——`decisions.md:1194`(D-133) 写「矩阵 canDemo 真值仍 **1/120**」+ grill-ratified `default_executable=1`，但本地诚实候选是 **canDemo=0/120**。已推云端(opt/streamline)的决策 doc 自相矛盾=C1 违反它要治理的 SSOT 原则（GPT Pro P0）。
+- 🔴 **supersede**：D-133 line 1194「canDemo 真值仍 1/120」+ 任何「canDemo=1 or 2」表述 **作废**，以本 D-137 的 **canDemo=诚实 0/120** 为准。根因=旧 1/120 里那 1-2 格用 fallback 探针（证明「优雅拒识可演」）冒充 action proof；真 action-readback 探针证明 **0 格真能演动作**（挂载工具存在但 register emission unproven）。
+- 🔴 **两轴分清（GPT Pro P0-3 洞察）**：`canDemo`（proof 轴=proven action-readback）与 `default_executable`（classification 轴=cell 归类）**是不同轴**。D-123 的 `default_executable=1`（分类）不变；被 supersede 的是把它当「1 格 canDemo=true」的**证明**声称。诚实口径=`actionDemoProven=0/120`（GPT Pro 建议改名，int-v4 落）。
+- **历史保留**：D-133/D-123 原文不改（doc-cascade 历史档纪律），本 D-137 作现行权威；checker 禁止旧决议重新生成 1/2。
+- **级联**：grill-ratified doc 加 banner 指 D-137（canDemo=0，default_executable=1 是分类非证明）；后续生成器/矩阵 SSOT 以 0/120 为真值。
+- **Non-claims**：canDemo=0 是诚实失败非 demo 成功（GPT Pro：governanceTruthful=true / customerDemoReady=false）；真执行=后续（LoRA/constrained decoding/deterministic fast-path，GPT Pro 纠「LoRA 非唯一解」）。
