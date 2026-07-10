@@ -48,7 +48,7 @@ Coverage: CG-002, CG-004, CG-005, CG-007, CG-008, CG-009, CG-014, CG-015, CG-019
 
 ### Requirement: Governance enums and projections SHALL be closed
 
-The system SHALL reject unknown or free-string values for `primary_class`, fallback classification, `fallback_reason`, and customer-safe `reasonKind`. The governance fallback classification SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, or `unknown_no_representative_entry`.
+The system SHALL reject unknown or free-string values for `primary_class`, fallback classification, internal `finiteReason`, `fallback_reason`, and customer-safe `reasonKind`. The governance fallback classification SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, or `unknown_no_representative_entry`. Internal `finiteReason` SHALL be exactly one of `safety_or_policy_refusal`, `clarify_missing_slot`, `unmounted_tool_name`, `name_rejected`, `fast_path_no_match`, `unsupported_tool_plan`, `no_representative_tool`, `runtime_execution_error`, or `already_state_noop`; `partial_accept_partial_refuse` is a bridge result wrapper and SHALL NOT be admitted as `finiteReason`.
 
 Coverage: CG-005, CG-022, CG-023, CG-024, CG-025, CG-038, CG-039, CG-068, CG-074.
 
@@ -71,6 +71,13 @@ The governance mapping SHALL NOT define public payload field names or schema ver
 - **THEN** validation SHALL fail
 - **AND** the value SHALL NOT be converted to generic fallback, success or display copy.
 
+#### Scenario: Unknown finiteReason fails before projection
+
+- **GIVEN** execution supplies an internal `finiteReason` outside the exact closed membership
+- **WHEN** the governance projection is validated
+- **THEN** validation SHALL fail before fallback, safe `reasonKind`, or bridge result projection
+- **AND** the value SHALL NOT be accepted as an alias or converted to generic `runtime_error`.
+
 #### Scenario: Name rejection preserves mounted context
 
 - **GIVEN** a semantic action is attributable to a family
@@ -92,6 +99,20 @@ The governance mapping SHALL NOT define public payload field names or schema ver
 - **WHEN** a customer-visible reason is requested
 - **THEN** only the mapped safe `reasonKind` and family-safe copy SHALL be eligible for presentation
 - **AND** governance SHALL defer public field and redaction semantics to the bridge.
+
+### Requirement: Safety refusal SHALL remain an SSOT typed gap until runner closure
+
+Governance SHALL register safety refusal as an SSOT classification with internal `safety_or_policy_refusal`, `safety_policy_refused`, and safe `safety_policy`. Until the C3 runner emits and preserves that typed execution fact, this carrier SHALL label the runner integration boundary `typed_gap`; it SHALL NOT claim that the runner is already closed or substitute untyped refusal/success.
+
+Coverage: CG-024.
+
+#### Scenario: Safety refusal remains typed and non-claimed
+
+- **GIVEN** a safety or policy gate refuses a reviewed action
+- **WHEN** C1 evaluates the contract before the runner implementation slice
+- **THEN** the refusal SHALL remain an SSOT typed fact with the locked projection
+- **AND** the unimplemented runner boundary SHALL remain `typed_gap`
+- **AND** the carrier SHALL NOT claim runtime closure from this specification alone.
 
 ### Requirement: Fallback catalog SHALL have complete family-aware coverage
 
@@ -194,6 +215,20 @@ Expansion above the highest tier SHALL mean at most one primary cell per agreed 
 - **WHEN** governance evaluates prepared matrix, fallback and probe artifacts
 - **THEN** those artifacts MAY remain prelay
 - **AND** no mounted action or `canDemo=true` cell SHALL be added.
+
+#### Scenario: CG-048 asymmetric joint-rate fixture blocks expansion
+
+- **GIVEN** `hedged_strike_rate=0.90` and `can_question_strike_rate=0.35`
+- **WHEN** expansion eligibility computes the ratified formula
+- **THEN** `joint_strike_rate=0.35`
+- **AND** governance SHALL NOT authorize expansion, a mounted action, or a new `canDemo=true` cell.
+
+#### Scenario: CG-049 converse asymmetric joint-rate fixture blocks expansion
+
+- **GIVEN** `hedged_strike_rate=0.35` and `can_question_strike_rate=0.90`
+- **WHEN** expansion eligibility computes the ratified formula
+- **THEN** `joint_strike_rate=0.35`
+- **AND** governance SHALL NOT authorize expansion, a mounted action, or a new `canDemo=true` cell.
 
 #### Scenario: Missing joint rate blocks expansion
 
