@@ -35,7 +35,7 @@ GENERATED_SWIFT := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register diff test verify-contentview-wiring
+verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-mounted-catalog-no-delta diff test verify-contentview-wiring
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
@@ -77,6 +77,9 @@ verify-default-scope: .venv/.deps.stamp
 verify-register:
 	PYTHONPATH=scripts python3 scripts/test_register_classifier_lib.py
 	PYTHONPATH=scripts python3 scripts/test_register_classifier_golden.py
+
+verify-mounted-catalog-no-delta: .venv/.deps.stamp
+	$(PYTHON) scripts/check_mounted_catalog_no_delta.py
 
 verify-c5-phase1-gates: .venv/.deps.stamp
 	$(PYTHON) scripts/test_query_zero_tolerance.py
