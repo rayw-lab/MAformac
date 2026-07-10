@@ -573,6 +573,45 @@ public enum TerminalSnapshotStopReason: String, Codable, CaseIterable, Equatable
     case backgrounding
 }
 
+private enum RuntimePresentationSafeReasonKind: String {
+    case safetyPolicy = "safety_policy"
+    case clarificationRequired = "clarification_required"
+    case capabilityNotMounted = "capability_not_mounted"
+    case notAvailableInDemo = "not_available_in_demo"
+    case runtimeUnavailable = "runtime_unavailable"
+    case alreadyDone = "already_done"
+
+    init?(finiteReason: String) {
+        switch finiteReason {
+        case "safety_or_policy_refusal":
+            self = .safetyPolicy
+        case "clarify_missing_slot":
+            self = .clarificationRequired
+        case "unmounted_tool_name", "name_rejected":
+            self = .capabilityNotMounted
+        case "fast_path_no_match", "unsupported_tool_plan", "no_representative_tool":
+            self = .notAvailableInDemo
+        case "runtime_execution_error":
+            self = .runtimeUnavailable
+        case "already_state_noop":
+            self = .alreadyDone
+        default:
+            return nil
+        }
+    }
+}
+
+public enum RuntimePresentationPartialProjectionError: Error, Equatable, Sendable {
+    case invalidComposition
+    case acceptedSubactionMissingReadback(frameID: String)
+    case acceptedReadbackMissingCard(key: String)
+    case acceptedCardMissingReadback(key: String)
+    case refusedSubactionMissingCard(frameID: String)
+    case refusedSubactionMissingReason(frameID: String)
+    case unknownFiniteReason(frameID: String, reason: String)
+    case proofClassUpgrade(PresentationProofClass)
+}
+
 public enum RuntimePresentationTerminalSnapshotAdapter {
     public static func guardDenial(
         traceID: String,
@@ -646,6 +685,104 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         )
     }
 
+    public static func partialAcceptRefuse(
+        executionResult: DemoRuntimePartialPlanResult,
+        acceptedCards: [DemoVehicleStateCell],
+        refusedCardsBySubactionID: [String: DemoVehicleStateCell],
+        proofClass: PresentationProofClass = .localUnit,
+        traceEnvelope: TraceEnvelope? = nil,
+        timestamp: Date = Date()
+    ) throws -> PresentationSnapshot {
+        guard proofClass == .localUnit else {
+            throw RuntimePresentationPartialProjectionError.proofClassUpgrade(proofClass)
+        }
+        guard executionResult.hasAccepted, executionResult.hasRefused else {
+            throw RuntimePresentationPartialProjectionError.invalidComposition
+        }
+
+        let acceptedSubactions = executionResult.subactions.filter { $0.disposition == .accepted }
+        for subaction in acceptedSubactions where subaction.readbacks.isEmpty {
+            throw RuntimePresentationPartialProjectionError.acceptedSubactionMissingReadback(
+                frameID: subaction.frameID
+            )
+        }
+
+        let acceptedReadbacks = acceptedSubactions.flatMap(\.readbacks)
+        let acceptedCardsByKey = Dictionary(uniqueKeysWithValues: acceptedCards.map { ($0.key, $0) })
+        let acceptedReadbackKeys = Set(acceptedReadbacks.map(\.key))
+        for readback in acceptedReadbacks where acceptedCardsByKey[readback.key] == nil {
+            throw RuntimePresentationPartialProjectionError.acceptedReadbackMissingCard(key: readback.key)
+        }
+        for card in acceptedCards where !acceptedReadbackKeys.contains(card.key) {
+            throw RuntimePresentationPartialProjectionError.acceptedCardMissingReadback(key: card.key)
+        }
+
+        var refusedCards: [DemoVehicleStateCell] = []
+        var refusedReasonsByKey: [String: RuntimePresentationSafeReasonKind] = [:]
+        for subaction in executionResult.subactions where subaction.disposition == .refused {
+            guard let card = refusedCardsBySubactionID[subaction.frameID] else {
+                throw RuntimePresentationPartialProjectionError.refusedSubactionMissingCard(
+                    frameID: subaction.frameID
+                )
+            }
+            guard let finiteReason = subaction.finiteReason else {
+                throw RuntimePresentationPartialProjectionError.refusedSubactionMissingReason(
+                    frameID: subaction.frameID
+                )
+            }
+            guard let reasonKind = RuntimePresentationSafeReasonKind(finiteReason: finiteReason) else {
+                throw RuntimePresentationPartialProjectionError.unknownFiniteReason(
+                    frameID: subaction.frameID,
+                    reason: finiteReason
+                )
+            }
+
+            var projectedCard = card
+            projectedCard.visualState = reasonKind == .safetyPolicy ? .unsafe : .blocked_with_alternative
+            refusedCards.append(projectedCard)
+            refusedReasonsByKey[projectedCard.key] = reasonKind
+        }
+
+        let cards = PresentationCardOrdering.orderedForPresentation(acceptedCards + refusedCards)
+        let readbacksByKey = Dictionary(grouping: acceptedReadbacks, by: \.key)
+        let cardKeys = cards.map(\.key)
+        let semantics = cards.map { card in
+            let siblingKeys = cardKeys.filter { $0 != card.key }
+            if let reasonKind = refusedReasonsByKey[card.key] {
+                return PresentationCardSemantics(
+                    cellKey: card.key,
+                    role: .refused,
+                    reason: reasonKind.rawValue,
+                    siblingKeys: siblingKeys
+                )
+            }
+
+            let readback = readbacksByKey[card.key]?.last
+            return PresentationCardSemantics(
+                cellKey: card.key,
+                role: .accepted,
+                scopeOrigin: readback?.scopeOrigin,
+                reason: "readback_verified",
+                isActive: true,
+                siblingKeys: siblingKeys
+            )
+        }
+
+        return terminalSnapshot(
+            traceID: executionResult.traceID,
+            outcome: DemoRuntimeOutcome(
+                result: .partialAcceptPartialRefuse,
+                reason: "partial_accept_refuse"
+            ),
+            cards: cards,
+            cardSemantics: semantics,
+            readbacks: acceptedReadbacks,
+            proofClass: proofClass,
+            traceEnvelope: traceEnvelope,
+            timestamp: timestamp
+        )
+    }
+
     public static func terminalStop(
         traceID: String,
         stopReason: TerminalSnapshotStopReason,
@@ -683,6 +820,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         traceID: String,
         outcome: DemoRuntimeOutcome,
         cards: [DemoVehicleStateCell],
+        cardSemantics: [PresentationCardSemantics]? = nil,
         readbacks: [DemoActionReadback],
         scopeOrigin: ScopeOrigin? = nil,
         proofClass: PresentationProofClass,
@@ -693,6 +831,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
             traceID: traceID,
             runtimeOutcome: outcome,
             cards: cards,
+            cardSemantics: cardSemantics,
             readbacks: readbacks,
             scopeOrigin: scopeOrigin,
             proofClass: proofClass,
@@ -721,8 +860,13 @@ private extension TraceAttributes {
         copy.stopReason = copy.stopReason.map {
             TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
         }
-        copy.guardReason = copy.guardReason.map {
-            TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+        if let finiteReason = copy.finiteReason {
+            copy.guardReason = RuntimePresentationSafeReasonKind(finiteReason: finiteReason)?.rawValue
+            copy.finiteReason = nil
+        } else {
+            copy.guardReason = copy.guardReason.map {
+                TraceAttributes.redacted($0, redactedTokens: redactedTokens, maxMessageLength: maxMessageLength)
+            }
         }
         return copy
     }

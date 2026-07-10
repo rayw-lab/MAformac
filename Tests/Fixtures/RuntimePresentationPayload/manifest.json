@@ -102,10 +102,10 @@
       "result": "partial_accept_partial_refuse",
       "familyCoverage": [
         "ac.power",
-        "door.lock",
+        "window.position",
         "partial_accept_partial_refuse"
       ],
-      "sha256": "4e7de740715634a34c7d5c73ccd94f9161a62e85612b3066cac6dea9aa818649",
+      "sha256": "422ca788dd8f8a7cf708776ec8533c5bfcebe1c7775d557d6d76f023267c97c1",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v1.json",
       "consumerRepo": "MAformac-uiue",

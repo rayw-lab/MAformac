@@ -194,9 +194,9 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(mismatch.proofClass, .localMock)
 
         let partial = try XCTUnwrap(snapshots["partial_accept_refuse_public_payload.v1.json"])
-        XCTAssertEqual(partial.storeCells.map(\.key), ["ac.power", "door.lock"])
+        XCTAssertEqual(partial.storeCells.map(\.key), ["window.position[主驾]", "ac.power"])
         XCTAssertEqual(partial.activeCells[.ac], "ac.power")
-        XCTAssertEqual(partial.refusedCell, "door.lock")
+        XCTAssertEqual(partial.refusedCell, "window.position[主驾]")
         XCTAssertEqual(partial.dialogText, "ac opened")
         XCTAssertEqual(partial.resultKind, .partialAcceptPartialRefuse)
         XCTAssertEqual(partial.proofClass, .localMock)
@@ -408,7 +408,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
             caseID: "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V1",
             fixtureClass: "bridge_contract_fixture",
             result: "partial_accept_partial_refuse",
-            familyCoverage: ["ac.power", "door.lock", "partial_accept_partial_refuse"]
+            familyCoverage: ["ac.power", "window.position", "partial_accept_partial_refuse"]
         ),
         RuntimeFixtureName.windowPosition: ManifestExpectation(
             caseID: "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V1",
