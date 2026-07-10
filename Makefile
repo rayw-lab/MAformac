@@ -43,7 +43,7 @@ verify-all: verify swift-test
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope diff test swift-test verify-contentview-wiring
+verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register diff test swift-test verify-contentview-wiring
 
 swift-test:
 	swift test
@@ -98,6 +98,7 @@ test: .venv/.deps.stamp
 	$(PYTHON) scripts/test_label_authority_conflicts.py
 	$(PYTHON) scripts/test_c6_bench_cli.py
 	$(PYTHON) scripts/test_subset_manifest.py
+	$(PYTHON) scripts/test_train_eval_exposure.py
 
 verify-source: .venv/.deps.stamp
 	$(PYTHON) scripts/freeze_snapshot.py --check

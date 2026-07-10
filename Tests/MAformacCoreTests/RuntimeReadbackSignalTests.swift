@@ -145,6 +145,50 @@ final class RuntimeReadbackSignalTests: XCTestCase {
         XCTAssertTrue(queue.isIdle)
     }
 
+    func testRuntimeReadbackQueueCancelClearsInFlightAndPendingSteps() {
+        let snapshot = StagePresentationSnapshot(storeCells: [])
+        let steps = ["rb-1", "rb-2"].map { readbackID in
+            RuntimeReadbackEventStep(
+                event: .runtime(snapshot: snapshot, readbackID: readbackID),
+                speechText: T5ReadbackText(id: readbackID, text: readbackID)
+            )
+        }
+        var queue = RuntimeReadbackEventQueue()
+
+        XCTAssertEqual(queue.start(steps)?.event.readbackID, "rb-1")
+        XCTAssertEqual(queue.pendingCount, 1)
+
+        queue.cancel()
+
+        XCTAssertTrue(queue.isIdle)
+        XCTAssertNil(queue.inFlightReadbackID)
+        XCTAssertEqual(queue.pendingCount, 0)
+        XCTAssertNil(queue.completeInFlight())
+    }
+
+    func testRuntimeSequenceSynthesizesMockCellWhenReadbackKeyIsMissing() throws {
+        let readback = DemoActionReadback(
+            key: "window.position[主驾]",
+            actualValue: "45",
+            revision: 7,
+            spokenText: "主驾车窗已调到45%"
+        )
+        let steps = RuntimeReadbackEventSequence.steps(
+            snapshot: StagePresentationSnapshot(storeCells: [], readbacks: [readback]),
+            initialStoreCells: [],
+            priorReadbacks: [],
+            readbacks: [readback]
+        )
+
+        let cell = try XCTUnwrap(steps.first?.event.snapshot.storeCells.first)
+        XCTAssertEqual(cell.key, readback.key)
+        XCTAssertEqual(cell.actualValue, "45")
+        XCTAssertEqual(cell.desiredValue, "45")
+        XCTAssertEqual(cell.source, .mock)
+        XCTAssertEqual(cell.revision, 7)
+        XCTAssertEqual(steps.first?.event.snapshot.activeCells[.window], readback.key)
+    }
+
     private func cellValue(_ key: String, in snapshot: StagePresentationSnapshot) -> String? {
         snapshot.storeCells.first { $0.key == key }?.actualValue
     }

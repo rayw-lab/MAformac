@@ -28,6 +28,17 @@ final class DemoNLURouterTests: XCTestCase {
         XCTAssertEqual(decoded, backendFrame)
     }
 
+    func testRouterRejectsEmptyToolPlan() async {
+        let router = DemoNLURouter(backend: FixedPlanBackend(frames: []))
+
+        do {
+            _ = try await router.decode(text: "调到26度")
+            XCTFail("expected noToolPlanFrames")
+        } catch {
+            XCTAssertEqual(error as? DemoNLURouterError, .noToolPlanFrames)
+        }
+    }
+
     private func frame(
         id: String,
         toolName: String = "adjust_ac_temperature_to_number",

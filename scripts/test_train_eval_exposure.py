@@ -253,6 +253,50 @@ def main() -> int:
         if missing_arg_result.returncode != 65:
             failures.append(f"missing --trainpack expected rc=65, got {missing_arg_result.returncode}: {missing_arg_result.stderr}")
 
+        empty_train, empty_train_manifest, empty_train_holdout, empty_train_report = build_case(
+            root,
+            "empty-train",
+            [],
+            [eval_row("eval-empty-train-001", "空调能不能调到26度")],
+            [eval_row("holdout-empty-train-001", "可不可以把主驾车窗打开")],
+        )
+        empty_train_result = run_checker(
+            empty_train,
+            empty_train_manifest,
+            empty_train_holdout,
+            empty_train_report,
+        )
+        if empty_train_result.returncode != 65:
+            failures.append(f"empty train tokens expected rc=65, got {empty_train_result.returncode}: {empty_train_result.stderr}")
+        else:
+            payload = json.loads(empty_train_report.read_text(encoding="utf-8"))
+            if payload.get("status") != "ERROR":
+                failures.append(f"empty train status expected ERROR, got {payload.get('status')}")
+            if payload.get("coverage_errors") != ["zero_train_prompt_text_tokens"]:
+                failures.append(f"empty train coverage_errors mismatch: {payload.get('coverage_errors')}")
+
+        nonempty_train, empty_eval_manifest, empty_eval_holdout, empty_eval_report = build_case(
+            root,
+            "empty-eval",
+            [train_row("train-empty-eval-001", "把空调调到二十六度")],
+            [],
+            [],
+        )
+        empty_eval_result = run_checker(
+            nonempty_train,
+            empty_eval_manifest,
+            empty_eval_holdout,
+            empty_eval_report,
+        )
+        if empty_eval_result.returncode != 65:
+            failures.append(f"empty eval tokens expected rc=65, got {empty_eval_result.returncode}: {empty_eval_result.stderr}")
+        else:
+            payload = json.loads(empty_eval_report.read_text(encoding="utf-8"))
+            if payload.get("status") != "ERROR":
+                failures.append(f"empty eval status expected ERROR, got {payload.get('status')}")
+            if payload.get("coverage_errors") != ["zero_eval_prompt_text_tokens"]:
+                failures.append(f"empty eval coverage_errors mismatch: {payload.get('coverage_errors')}")
+
         if A3_FIXTURE_ROOT.exists():
             expected_a3_rc = {
                 "clean_control": 0,

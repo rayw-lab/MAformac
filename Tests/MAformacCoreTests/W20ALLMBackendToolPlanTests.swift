@@ -33,6 +33,23 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
         await assertNameRejected(toolCall("open_ac", [:]), expectedName: "open_ac")
     }
 
+    func testMountedNameWithoutIRMappingFailsClosed() async {
+        let name = "adjust_ac_temperature_to_number"
+        let completion = #"<tool_call>{"name":"adjust_ac_temperature_to_number","arguments":{"temperature":"26"}}</tool_call>"#
+        let backend = DDomainToolPlanBackend(
+            mountedToolNames: [name],
+            irMap: [:],
+            completionProvider: { _ in completion }
+        )
+
+        do {
+            _ = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+            XCTFail("expected ir_unclassified")
+        } catch {
+            XCTAssertEqual(error as? DDomainToolPlanFailure, .irUnclassified(name))
+        }
+    }
+
     func testEXPAndLockACToolNamesAreRejected() async {
         await assertNameRejected(toolCall("raise_ac_temperature_by_exp", [:]), expectedName: "raise_ac_temperature_by_exp")
         await assertNameRejected(toolCall("lock_ac", [:]), expectedName: "lock_ac")
