@@ -1,5 +1,7 @@
 # ma13 第一波收稿 + 暂停点交接（2026-07-10 16:40）
 
+> 🔴 HISTORICAL：本 handoff 的『暂停待拍』态已被 D-138 补记 supersede（BALLOT RATIFIED + 修复轮开工），现行态见 docs/CURRENT.md + STATUS-BOARD。
+
 > 起手读链：本文 → decisions.md **D-138**（本波全账）→ run dir `~/Projects/agent-tmux-stack-research/runs/2026-07-10-ma13/`（9 份交付）→ ma12 交接 `2026-07-10-ma12-c1-full-auto-dev-day.md`。
 
 ## 完成了什么
