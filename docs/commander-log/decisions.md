@@ -1307,3 +1307,24 @@
 - **当前执行态**：int-v5a 已开工编码但尚未合入；G1/G2 INDEX 与后续各波 ballot 继续按 run-dir 物料推进，不能把 ballot pending 或 plan receipt 写成产品完成（本轮任务书 `SPEC-CASCADE-EXEC.md:9-13`；v6.1 当前 W1/W2 边界见 `docs/roadmap-2026-07-11-v6-closure-baseline.md:41-56`）。
 - **S8 键**：磊哥「S8不着急」，点火挂起；不得因 V6 RATIFY 把 S8 写成 running、completed 或自动授权（本轮任务书 `SPEC-CASCADE-EXEC.md:9`；v6.1 待磊哥键见 `docs/roadmap-2026-07-11-v6-closure-baseline.md:129-137`）。
 - **Non-claims**：`canDemo=0/120` 不变；S8 未点火；G1-G5 BALLOT 未拍；无 operator-pass、V-PASS、C6 acceptance、candidate signed 或 live/runtime proof。`RATIFIED` 只代表决策已拍，不代表 `baseline_activation=ACTIVE`（D-137 诚实边界 `/Users/wanglei/workspace/MAformac/docs/commander-log/decisions.md:1230-1237`；v6.1 proof boundary `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:149-155`）。
+
+## D-143：G1 波（T04+T03）RATIFIED——V6 首个 grill 波全闭（2026-07-11，commander 按磊哥授权代拍）
+
+- **授权链**：磊哥「G1同意 你自动化推进」+「其他全力推动」；代拍闸门=`FINAL-RECHECK-V41-addendum.md`（AUTOBALLOT_GO，w5 sol xhigh 两轮全局审+narrow recheck；G1 v4.1 sha `505f70ee…`）。
+- **账**：56 atoms 全闭=41 auto_ballot_safe（30 白名单+11 机械，按⭐代拍）+ 5 磊哥亲拍（G1-004/011/012/019/049 全 B，receipt=`runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-escalation-8.md`）+ 10 ALREADY_DECIDED_CARRY_FORWARD（不计分母）；excluded=0。
+- **载力锁定**（题义详见 GRILL-INDEX-G1.md v4.1）：T04 typed route result 消费/RouteTrace 最小合同/alias owner=C4 active spec/拒绝分类优先序 safety→nonsense→unsupported/TTS 失败 frontstage incomplete 分账/composite exactly-one（受界逐项审查多意图合法，承 CG-036）/T04b 机器级前置=T03+T09 contract cut/T04a ingress containment 可先行。
+- **级联**：V6 工作包 W5a/W5b/W5c/W5d/W6 = GAP→**RATIFIED_PENDING_PLAN**（W5c 仍持 T03+T09→T04b 硬边，T09 in G3 未拍）；下一环=G1 消减矩阵→T04/T03 实施计划→对抗审计划→编码。
+- **Non-claims**：RATIFIED=决策层收敛，非实现/验收；canDemo=actionDemoProven=0/120 不变。
+
+## D-144：G2 波（T01+T02）部分 RATIFIED——白名单+3 counted 已拍；12 parent authority 题上抛在途（2026-07-11，commander 代拍）
+
+- **账**：66 units=50 auto_ballot_safe 代拍 + 3 counted C1 磊哥已拍（G2-046/054/057-C1 全 B）+ 13 excluded（12 parent escalation/authority 待呈 + G2-038-C1 重制版已重呈磊哥待拍）。G2 v4.1 sha `8fdcb8dd…`。
+- 🔴 **S10 硬边未解除**：T01/T02 wave 未全闭（12+1 未拍）→「T01/T02 RATIFIED 先于 S10 签署」仍挡 S10；T02 corpus freeze→S9 硬边同在。12 parent 上抛批下轮呈磊哥。
+- **级联**：V1/B7 = GAP→**PARTIALLY_RATIFIED_PENDING_ESCALATIONS**。
+
+## D-145：G4/G5 白名单代拍 + 上抛批呈拍中（2026-07-11，commander 代拍）
+
+- **账**：G4 53=33 auto 代拍+6 noop+14 escalate（呈拍中，选项稿经 XAUDIT-G4-OPTIONS PASS_WITH_NOTE）；G5 29=13 auto+11 noop+5 escalate（呈拍中，A5 逐项磊哥点头谓词保留）。G4 v4.1 sha `073fdc02…`/G5 v4.1 sha（FINAL-V41 addendum 附录）。
+- **级联**：V3/V4/W10/V5 保持 GAP（各自 escalate 拍后翻转）；G3 波（T07-T10）v3 修复在途未入本拍。
+- **本日实装收编另账**：W1 int-v5a MERGED `ba2c3636`（V6 首个 DONE）+ B1b receipt 链 MERGED `a3160c88`；W2 containment 半在修（XAUDIT P1×2）。
+- **Non-claims**：G3 未拍；S8 未点火（磊哥「不着急」）；无 operator-pass/V-PASS；baseline_activation 仍 PENDING_CASCADE。
