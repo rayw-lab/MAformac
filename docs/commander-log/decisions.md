@@ -1185,3 +1185,18 @@
 - **秘书链**：SEC2→SEC2-AUDIT（抓 stale）→SEC3 收口包→SEC3-AUDIT（LAND_AFTER_STALE_PATCH）→commander 亲落带正（D1HR 审终值 P1=3/P2=5 非 pack 的 P1=2）。当天推进快过秘书两次=收口期秘书稿必须 capture_at 与落笔时点 diff。
 - **hermes 席位**：glm+doubao 双额度尽（11 单完整交付后倒下）；今晚全部审计=codex 互审（producer≠auditor 守住），**cross-vendor 异源缺口记账待回补**。
 - **在途/待磊哥键不变**：S8 点火/C1 ballot 38 题/M-DEMO ballot 5 题/D1 左栏专场令+⭐参数（规格 v2 已备经审）/idle 窗（采集包 dry-run ready 一键跑）。**Non-claims**：无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行；idle 采集未实跑。
+
+## D-133：BATCH-C1-1 全按星标 RATIFIED（38/38=B）+ ma12 开张 + C1 全自动开发链启动（磊哥 2026-07-10 拍）
+
+- **拍定**：磊哥「开始 C1 38 题全自动开发」= BATCH-C1-1（`runs/2026-07-08-daywork/BATCH-C1-1-ballot.md`，P0 38 题全 ⭐B）**全按星标 RATIFIED**。ballot 注记点名的 CG-036（partial 执行）/CG-045（fallback 质量门阻塞扩 mounted 但允许预铺）/CG-054（<40% 允许预铺）/CG-080（C1 不授权 mounted 1→N）按 ⭐B 生效。CG-021 已移出（ALREADY_DECIDED）。C1 P1 批（39 题，depends_on D0G）不在本拍。
+- **授权范围**：全自动范式链 = 消减矩阵级联 → grill 范式实施计划（inline CG+file:line）→ 对抗审计计划 → 编码（worktree+TDD+GitNexus impact/detect_changes+收编门三件套）→ 测试 CI/CD → 审计（producer≠auditor）→ 锚点对比。**红线不变**：CG-080=不扩 mounted 1→N（等 S10+磊哥键）；预铺（matrix/fallback/probes）在授权内。
+- **ma12 阵容**：全新 tmux server（ma11 已消失，旧 pane historical）。%0 commander 席位（左3/5）；%1/%3/%2/%4 = codex-w1..w4（右2/5四等分，gpt-5.6-sol high，专复杂任务）。新规四条（布局/worker乘法/5.5生图锚点/clone-design授权+GitNexus）已落 swarm-commander §22 + memory feedback-ma12-layout-worker-multiplier。
+- **Non-claims**：不扩 mounted；不签 C5/C6；S9/S10 未执行；矩阵 canDemo 真值仍 1/120。
+
+## D-134：C1 Task0 架构分叉拍定 = B（新建独立 C1 capability + presentation 复用现有 bridge，禁平行 SSOT）（磊哥 2026-07-10 拍）
+
+- **背景**：C1 实施计划 v2 二审（w5 5.6-sol）暴露 Task 0 契约层平行 SSOT 风险——新建 payload/partial/trace capability 会与现有 `define-runtime-presentation-bridge` authority 撞车。commander 未自拍，派 w5 深挖产 A/B 决策简报（`runs/2026-07-10-ma12/reports/task0-ssot-architecture-brief.md`）。
+- **拍定 B（磊哥亲拍）**：新建独立 C1 governance capability（管 matrix「能不能演」+ fallback enum + CG-036 partial + probe），**但 payload/partial/trace 的呈现层复用现有 runtime-presentation bridge，禁止建平行 presentation SSOT**。理由（一手源坐实）：现有代码三概念本就不同 authority——matrix=能不能演 / tool-execution=执行或拒绝发生了什么 / bridge=如何安全呈现；压成一个 bridge SSOT 降文件数但升语义冲突率。A 案（扩现有 bridge spec）边界糊，弃。
+- **约束**：Task 0 OpenSpec change 须写 ownership map + 对 bridge 的引用（MODIFIED tool-execution + existing bridge），不重造 presentation。
+- **解锁**：计划 v3 的 `BLOCKED_PENDING_LEIGE` 解除 → 产计划 v4（B 锁定，可执行）。
+- **前置不变**：C1 编码基点=dirty-tree 收编包落地后 commit；push/PR 仍待磊哥键。**Non-claims**：不扩 mounted 1→N；不签 C5/C6。

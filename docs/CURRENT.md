@@ -18,7 +18,7 @@ expires_when: "S8 r3 点火 或 idle 窗采集实跑 或 D1 左栏专场开工"
 
 🔴 **本节 supersede 下方全部旧态段**。推进事实源 = roadmap v5 + decisions **D-114~D-132** + run dir `runs/2026-07-09-ma10-uiue-runtime/`（findings-ledger-ma10 + REPORTS-INDEX + reports/）+ handoff `2026-07-09-ma11-closeout-line-d-wave.md`。
 - 终态：14 次收编全部三件门绿（swift test 731/0[6 skip]+verify-all+xcodebuild——门 suite 本日制度化为三件套）；两 demo 炸点修死；idle 采集 dry-run 包 ready（未实跑）；D1 左栏规格 v2 经审待磊哥⭐；三事故（主树切分支/自审自产/忘 commit×2）全当场闭环入账。
-- 待磊哥键：idle 窗一键采集 → C1 38 题 + M-DEMO 5 题 ballot → D1 左栏专场令 → S8 点火 → push 授权（ahead 77）。
+- 待磊哥键：idle 窗一键采集 → M-DEMO 5 题 ballot → D1 左栏专场令 → S8 点火 → push 授权（ahead 77）。C1 P0 38 题已由 D-133 全按 ⭐B RATIFIED；后续为消减矩阵→实施计划→对抗审→编码，CG-080 仍禁止 mounted 1→N（等 S10+A1+磊哥键）。
 - Non-claims：无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行；idle 采集未实跑；cross-vendor 异源审缺口待 hermes 额度回补。
 
 ## 【历史】2026-07-09夜：ma10 Wave 1 收编日——Line D 五席拉满，主干 656→690/0 三连收编
