@@ -71,9 +71,10 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let store = DemoVehicleStateStore()
         let first = acPowerFrame(id: "cmd-first", traceID: "trace-multi")
         let second = windowFrame(id: "cmd-second", traceID: "trace-multi", stateRevision: 0)
+        let traceLogger = InMemoryTraceLogger()
         let runner = try DemoRuntimeSessionRunner.defaultRunner(
             store: store,
-            traceLogger: InMemoryTraceLogger(),
+            traceLogger: traceLogger,
             speech: RecordingSpeechSynthesisEngine(),
             modelBackend: FixedMultiFrameBackend(frames: [first, second])
         )
@@ -89,6 +90,16 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         }
 
         XCTAssertEqual(store.currentRevision, 0)
+        let guardEntry = try XCTUnwrap(
+            traceLogger.entries.first {
+                $0.stage == .guard && $0.message == "multi_frame_plan_rejected"
+            }
+        )
+        XCTAssertEqual(guardEntry.attributes.guardReason, "multi_frame_plan_requires_partial_execution")
+        XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
+        XCTAssertEqual(guardEntry.attributes.stateMutation, false)
+        XCTAssertFalse(traceLogger.entries.contains { $0.stage == .execute })
+        XCTAssertFalse(traceLogger.entries.contains { $0.stage == .readback })
     }
 
     @MainActor
