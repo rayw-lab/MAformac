@@ -12,6 +12,6 @@
     }
   ],
   "touched_paths": ["contracts/fallback-scripts.yaml", "generated/demo-fallback-scripts.catalog.json", "Core/Contracts/FallbackScriptCatalog.generated.swift", "scripts/test_check_fallback_scripts.py"],
-  "detect_changes": "not-run (documentation-only receipt update)",
-  "residual_risk": "Runtime fact-resolver remains a C1 follow-up; basis scope is SSOT string existence proof."
+  "detect_changes": "GitNexus scope=all: changed_files=4, risk_level=low, changed_symbols=0 (index does not resolve this branch-local Python surface).",
+  "residual_risk": "P1 basis resolution is enforced locally for all 40 cells; an independent re-audit remains required before INT admission."
 }
