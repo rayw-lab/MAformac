@@ -1311,7 +1311,7 @@
 ## D-143：G1 波（T04+T03）RATIFIED——V6 首个 grill 波全闭（2026-07-11，commander 按磊哥授权代拍）
 
 - **授权链**：磊哥「G1同意 你自动化推进」+「其他全力推动」；代拍闸门=`FINAL-RECHECK-V41-addendum.md`（AUTOBALLOT_GO，w5 sol xhigh 两轮全局审+narrow recheck；G1 v4.1 sha `505f70ee…`）。
-- **账**：56 atoms 全闭=41 auto_ballot_safe（30 白名单+11 机械，按⭐代拍）+ 5 磊哥亲拍（G1-004/011/012/019/049 全 B，receipt=`runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-escalation-8.md`）+ 10 ALREADY_DECIDED_CARRY_FORWARD（不计分母）；excluded=0。
+- **账**：56 atoms 全闭=41 auto_ballot_safe（30 白名单+11 机械，按⭐代拍）+ 5 磊哥亲拍（G1-004/011/012/019/049 全 B，receipt=`runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-escalation-8.md`）+ 10 ALREADY_DECIDED_CARRY_FORWARD（🔴措辞纠偏 per CONSISTENCY-SWEEP-postD145：不计【新投票分母】，纳入 56-unit 守恒与 safe_noop 集）；excluded=0。
 - **载力锁定**（题义详见 GRILL-INDEX-G1.md v4.1）：T04 typed route result 消费/RouteTrace 最小合同/alias owner=C4 active spec/拒绝分类优先序 safety→nonsense→unsupported/TTS 失败 frontstage incomplete 分账/composite exactly-one（受界逐项审查多意图合法，承 CG-036）/T04b 机器级前置=T03+T09 contract cut/T04a ingress containment 可先行。
 - **级联**：V6 工作包 W5a/W5b/W5c/W5d/W6 = GAP→**RATIFIED_PENDING_PLAN**（W5c 仍持 T03+T09→T04b 硬边，T09 in G3 未拍）；下一环=G1 消减矩阵→T04/T03 实施计划→对抗审计划→编码。
 - **Non-claims**：RATIFIED=决策层收敛，非实现/验收；canDemo=actionDemoProven=0/120 不变。
