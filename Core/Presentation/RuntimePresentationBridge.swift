@@ -783,6 +783,23 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         )
     }
 
+    static func canProjectPartialRefusalIdentity(
+        executionResult: DemoRuntimePartialPlanResult,
+        refusedCardsBySubactionID: [String: DemoVehicleStateCell]
+    ) -> Bool {
+        let acceptedReadbackKeys = Set(executionResult.acceptedReadbacks.map(\.key))
+        return executionResult.subactions
+            .filter { $0.disposition == .refused }
+            .allSatisfy { subaction in
+                guard let finiteReason = subaction.finiteReason,
+                      RuntimePresentationSafeReasonKind(finiteReason: finiteReason) != nil,
+                      let refusedCard = refusedCardsBySubactionID[subaction.frameID] else {
+                    return false
+                }
+                return !acceptedReadbackKeys.contains(refusedCard.key)
+            }
+    }
+
     public static func terminalStop(
         traceID: String,
         stopReason: TerminalSnapshotStopReason,

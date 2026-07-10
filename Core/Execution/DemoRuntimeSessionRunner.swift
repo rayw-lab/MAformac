@@ -117,6 +117,41 @@ public final class DemoRuntimeSessionRunner {
             let acceptedCards = PresentationCardOrdering.orderedForPresentation(
                 acceptedReadbacks.compactMap { readback in store.cell(for: readback.key) }
             )
+            let framesByID = Dictionary(uniqueKeysWithValues: frameResults.map { ($0.id, $0) })
+            let refusedCardsBySubactionID: [String: DemoVehicleStateCell] = Dictionary(
+                uniqueKeysWithValues: partialResult.subactions.compactMap { subaction in
+                    guard subaction.disposition == .refused,
+                          let frame = framesByID[subaction.frameID],
+                          let executionCellID = pipeline.allowlist.entry(device: frame.device)?.executionRangeCell
+                              ?? ToolContractStateApplier.deviceCellMap[frame.device] else {
+                        return nil
+                    }
+
+                    let definition = pipeline.stateCells.cell(id: executionCellID)
+                    let resolvedKey = definition.flatMap { definition in
+                        try? C2ScopeResolver.resolve(frame: frame, cell: definition).keys.first
+                    }
+                    let explicitlyScopedKey = C2ScopeResolver.requestedScope(from: frame).map {
+                        "\(executionCellID)[\($0)]"
+                    }
+                    let card = [resolvedKey, explicitlyScopedKey, executionCellID]
+                        .compactMap { $0 }
+                        .compactMap { store.cell(for: $0) }
+                        .first
+                        ?? store.cells.first { ScopedStateKey($0.key).base == executionCellID }
+                        ?? definition.map {
+                            DemoVehicleStateCell(
+                                key: resolvedKey ?? executionCellID,
+                                actualValue: $0.defaultValue ?? "unknown",
+                                availability: .unknown
+                            )
+                        }
+                    guard let card else {
+                        return nil
+                    }
+                    return (subaction.frameID, card)
+                }
+            )
             let dialogText = acceptedReadbacks.map(\.spokenText).joined(separator: "；")
             if !dialogText.isEmpty {
                 let speechResult = speech.speak(dialogText)
@@ -133,15 +168,31 @@ public final class DemoRuntimeSessionRunner {
 
             let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
             if partialResult.hasAccepted && partialResult.hasRefused {
-                let snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
-                    traceID: partialResult.traceID,
-                    acceptedReadbacks: acceptedReadbacks,
-                    acceptedCards: acceptedCards,
-                    refusedCards: [],
-                    reason: "partial_accept_refuse",
-                    traceEnvelope: traceEnvelope,
-                    timestamp: timestampProvider()
-                )
+                let canProjectTypedRefusalIdentity =
+                    RuntimePresentationTerminalSnapshotAdapter.canProjectPartialRefusalIdentity(
+                        executionResult: partialResult,
+                        refusedCardsBySubactionID: refusedCardsBySubactionID
+                    )
+                let snapshot: PresentationSnapshot
+                if canProjectTypedRefusalIdentity {
+                    snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                        executionResult: partialResult,
+                        acceptedCards: acceptedCards,
+                        refusedCardsBySubactionID: refusedCardsBySubactionID,
+                        traceEnvelope: traceEnvelope,
+                        timestamp: timestampProvider()
+                    )
+                } else {
+                    snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                        traceID: partialResult.traceID,
+                        acceptedReadbacks: acceptedReadbacks,
+                        acceptedCards: acceptedCards,
+                        refusedCards: [],
+                        reason: "partial_accept_refuse",
+                        traceEnvelope: traceEnvelope,
+                        timestamp: timestampProvider()
+                    )
+                }
                 return RuntimePresentationPayload(
                     snapshot: snapshot,
                     turnID: frameResult.id,
