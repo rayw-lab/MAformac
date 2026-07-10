@@ -204,3 +204,193 @@ public final class InMemoryTraceLogger: TraceLogger, @unchecked Sendable {
         ))
     }
 }
+
+// MARK: - C3 internal fallback receipt
+
+/// The only finite reasons accepted by the C1 governance contract (T0).
+///
+/// This type is intentionally internal: raw finite reasons are retained in C3
+/// receipts for diagnostics, but are not part of the runtime-presentation bridge
+/// payload contract.
+enum InternalTraceFiniteReason: String, Codable, CaseIterable, Equatable, Sendable {
+    case safetyOrPolicyRefusal = "safety_or_policy_refusal"
+    case clarifyMissingSlot = "clarify_missing_slot"
+    case unmountedToolName = "unmounted_tool_name"
+    case nameRejected = "name_rejected"
+    case fastPathNoMatch = "fast_path_no_match"
+    case unsupportedToolPlan = "unsupported_tool_plan"
+    case noRepresentativeTool = "no_representative_tool"
+    case runtimeExecutionError = "runtime_execution_error"
+    case alreadyStateNoop = "already_state_noop"
+}
+
+enum InternalTraceSubactionDisposition: String, Codable, Equatable, Sendable {
+    case accepted
+    case refused
+}
+
+/// A C3 subaction observation before it is persisted as an internal receipt.
+/// `stateMutation` is supplied from the observed subaction fact; the writer
+/// deliberately does not infer or overwrite it.
+struct InternalTraceSubactionFact: Equatable, Sendable {
+    let subactionID: String
+    let disposition: InternalTraceSubactionDisposition
+    let family: String
+    let reasonKind: String
+    let finiteReason: String?
+    let observedToolCallCount: Int
+    let stateMutation: Bool
+    let speechText: String
+    let readbackKeys: [String]
+
+    init(
+        subactionID: String,
+        disposition: InternalTraceSubactionDisposition,
+        family: String,
+        reasonKind: String,
+        finiteReason: String?,
+        observedToolCallCount: Int,
+        stateMutation: Bool,
+        speechText: String,
+        readbackKeys: [String]
+    ) {
+        self.subactionID = subactionID
+        self.disposition = disposition
+        self.family = family
+        self.reasonKind = reasonKind
+        self.finiteReason = finiteReason
+        self.observedToolCallCount = observedToolCallCount
+        self.stateMutation = stateMutation
+        self.speechText = speechText
+        self.readbackKeys = readbackKeys
+    }
+}
+
+struct InternalTraceReceiptSubaction: Codable, Equatable, Sendable {
+    let subactionID: String
+    let disposition: InternalTraceSubactionDisposition
+    let family: String
+    let reasonKind: String
+    let finiteReason: InternalTraceFiniteReason?
+    let observedToolCallCount: Int
+    let stateMutation: Bool
+    let speechText: String
+    let readbackKeys: [String]
+
+    private enum CodingKeys: String, CodingKey {
+        case subactionID = "subaction_id"
+        case disposition
+        case family
+        case reasonKind = "reason_kind"
+        case finiteReason = "finite_reason"
+        case observedToolCallCount = "observed_tool_call_count"
+        case stateMutation = "state_mutation"
+        case speechText = "speech_text"
+        case readbackKeys = "readback_keys"
+    }
+}
+
+struct InternalTraceReceipt: Codable, Equatable, Sendable {
+    static let schemaVersion = "c3_internal_trace_receipt.v1"
+
+    let schemaVersion: String
+    let traceID: String
+    let subactions: [InternalTraceReceiptSubaction]
+
+    init(traceID: String, subactions: [InternalTraceReceiptSubaction]) {
+        self.schemaVersion = Self.schemaVersion
+        self.traceID = traceID
+        self.subactions = subactions
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion = "schema_version"
+        case traceID = "trace_id"
+        case subactions
+    }
+}
+
+enum InternalTraceReceiptError: Error, Equatable, Sendable {
+    case unknownFiniteReason(subactionID: String, rawValue: String)
+    case refusedSubactionMissingFiniteReason(subactionID: String)
+    case acceptedSubactionHasFiniteReason(subactionID: String, rawValue: String)
+    case refusedSubactionHasObservedEffects(
+        subactionID: String,
+        observedToolCallCount: Int,
+        stateMutation: Bool
+    )
+}
+
+/// Persists C3 fallback and partial facts without widening the public bridge.
+final class InternalTraceReceiptWriter {
+    private(set) var receipts: [InternalTraceReceipt] = []
+
+    @discardableResult
+    func record(
+        traceID: String,
+        subactions: [InternalTraceSubactionFact]
+    ) throws -> InternalTraceReceipt {
+        let receipt = try InternalTraceReceipt(
+            traceID: traceID,
+            subactions: subactions.map(makeReceiptSubaction)
+        )
+        receipts.append(receipt)
+        return receipt
+    }
+
+    private func makeReceiptSubaction(
+        from fact: InternalTraceSubactionFact
+    ) throws -> InternalTraceReceiptSubaction {
+        let finiteReason = try parseFiniteReason(from: fact)
+
+        switch fact.disposition {
+        case .accepted:
+            if let finiteReason {
+                throw InternalTraceReceiptError.acceptedSubactionHasFiniteReason(
+                    subactionID: fact.subactionID,
+                    rawValue: finiteReason.rawValue
+                )
+            }
+        case .refused:
+            guard finiteReason != nil else {
+                throw InternalTraceReceiptError.refusedSubactionMissingFiniteReason(
+                    subactionID: fact.subactionID
+                )
+            }
+            if fact.observedToolCallCount != 0 || fact.stateMutation {
+                throw InternalTraceReceiptError.refusedSubactionHasObservedEffects(
+                    subactionID: fact.subactionID,
+                    observedToolCallCount: fact.observedToolCallCount,
+                    stateMutation: fact.stateMutation
+                )
+            }
+        }
+
+        return InternalTraceReceiptSubaction(
+            subactionID: fact.subactionID,
+            disposition: fact.disposition,
+            family: fact.family,
+            reasonKind: fact.reasonKind,
+            finiteReason: finiteReason,
+            observedToolCallCount: fact.observedToolCallCount,
+            stateMutation: fact.stateMutation,
+            speechText: fact.speechText,
+            readbackKeys: fact.readbackKeys
+        )
+    }
+
+    private func parseFiniteReason(
+        from fact: InternalTraceSubactionFact
+    ) throws -> InternalTraceFiniteReason? {
+        guard let rawValue = fact.finiteReason else {
+            return nil
+        }
+        guard let finiteReason = InternalTraceFiniteReason(rawValue: rawValue) else {
+            throw InternalTraceReceiptError.unknownFiniteReason(
+                subactionID: fact.subactionID,
+                rawValue: rawValue
+            )
+        }
+        return finiteReason
+    }
+}
