@@ -9,7 +9,6 @@ final class DemoRuntimeSessionRunnerFallbackTests: XCTestCase {
         )
 
         XCTAssertEqual(context.family, .door)
-        XCTAssertEqual(context.reasonKind, .safetyOrClarifyReject)
         XCTAssertEqual(context.outcome.resultKind, .refusalSafetyOrPolicy)
         XCTAssertEqual(context.outcome.safeReasonKind, .safetyPolicy)
         XCTAssertEqual(context.runtimeResult, .refusalSafetyOrPolicy)
@@ -18,6 +17,8 @@ final class DemoRuntimeSessionRunnerFallbackTests: XCTestCase {
         XCTAssertEqual(context.badgeLabel, "安全拦截")
         let encoded = String(decoding: try JSONEncoder().encode(context), as: UTF8.self)
         XCTAssertFalse(encoded.contains("finiteReason"))
+        XCTAssertFalse(encoded.contains("reasonKind"))
+        XCTAssertFalse(encoded.contains("safety_or_clarify_reject"))
         XCTAssertFalse(encoded.contains("model"))
         XCTAssertFalse(encoded.contains("ledger"))
     }
@@ -29,7 +30,6 @@ final class DemoRuntimeSessionRunnerFallbackTests: XCTestCase {
         )
 
         XCTAssertNil(context.family)
-        XCTAssertEqual(context.reasonKind, .unknownNoRepresentativeEntry)
         XCTAssertEqual(context.outcome.resultKind, .refusalNoAvailableTool)
         XCTAssertEqual(context.outcome.safeReasonKind, .notAvailableInDemo)
         XCTAssertEqual(context.runtimeResult, .refusalNoAvailableTool)
@@ -38,6 +38,8 @@ final class DemoRuntimeSessionRunnerFallbackTests: XCTestCase {
         XCTAssertEqual(context.badgeLabel, "不在范围")
         let encoded = String(decoding: try JSONEncoder().encode(context), as: UTF8.self)
         XCTAssertFalse(encoded.contains("finiteReason"))
+        XCTAssertFalse(encoded.contains("reasonKind"))
+        XCTAssertFalse(encoded.contains("unknown_no_representative_entry"))
         XCTAssertFalse(encoded.contains("raw"))
     }
 }

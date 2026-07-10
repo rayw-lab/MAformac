@@ -14,26 +14,26 @@ public struct FallbackOutcomeSummary: Codable, Equatable, Sendable {
 /// Raw model output, raw tool names, ledger state, and finite runtime reasons do not belong here.
 public struct FallbackContext: Codable, Equatable, Sendable {
     public let family: FallbackScriptFamily?
-    public let reasonKind: FallbackGovernanceReason
     public let outcome: FallbackOutcomeSummary
     public let dialogText: String
     public let ttsText: String
     public let badgeLabel: String
 
-    public static func resolve(
+    static func resolve(
         family: FallbackScriptFamily?,
         reasonKind: FallbackGovernanceReason
     ) -> FallbackContext {
         if let family,
-           let entry = FallbackScriptCatalog.entries.first(where: {
-               $0.family == family && $0.reasonKind == reasonKind
-           }) {
+           let entry = FallbackScriptCatalog.entry(
+               for: family,
+               governanceReason: reasonKind
+           ) {
             return FallbackContext(entry: entry)
         }
         return FallbackContext.noRepresentative(reasonKind: reasonKind)
     }
 
-    public static func resolve(userText: String?, finiteReason: String) -> FallbackContext {
+    static func resolve(userText: String?, finiteReason: String) -> FallbackContext {
         resolve(
             family: family(in: userText),
             reasonKind: governanceReason(for: finiteReason)
@@ -53,7 +53,6 @@ public struct FallbackContext: Codable, Equatable, Sendable {
 
     private init(entry: FallbackScriptCatalogEntry) {
         family = entry.family
-        reasonKind = entry.reasonKind
         outcome = FallbackOutcomeSummary(
             resultKind: entry.resultKind,
             safeReasonKind: entry.safeReasonKind
@@ -65,14 +64,12 @@ public struct FallbackContext: Codable, Equatable, Sendable {
 
     private init(
         family: FallbackScriptFamily?,
-        reasonKind: FallbackGovernanceReason,
         outcome: FallbackOutcomeSummary,
         dialogText: String,
         ttsText: String,
         badgeLabel: String
     ) {
         self.family = family
-        self.reasonKind = reasonKind
         self.outcome = outcome
         self.dialogText = dialogText
         self.ttsText = ttsText
@@ -110,7 +107,6 @@ public struct FallbackContext: Codable, Equatable, Sendable {
 
         return FallbackContext(
             family: nil,
-            reasonKind: reasonKind,
             outcome: FallbackOutcomeSummary(
                 resultKind: resultKind,
                 safeReasonKind: safeReasonKind
