@@ -591,7 +591,7 @@ private enum RuntimePresentationSafeReasonKind: String {
             self = .capabilityNotMounted
         case "fast_path_no_match", "unsupported_tool_plan", "no_representative_tool":
             self = .notAvailableInDemo
-        case "runtime_execution_error":
+        case "runtime_execution_error", "stale_state_revision":
             self = .runtimeUnavailable
         case "already_state_noop":
             self = .alreadyDone
