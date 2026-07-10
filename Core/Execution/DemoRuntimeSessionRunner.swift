@@ -127,8 +127,9 @@ public final class DemoRuntimeSessionRunner {
     private func unsupportedPayload(finiteReason: String) -> RuntimePresentationPayload {
         let traceID = UUID().uuidString
         let turnID = "unsupported-\(traceID)"
-        let dialogText = "这个我先记下来，稍后帮您处理"
-        dialogueState.recordAssistantText(dialogText)
+        let userText = dialogueState.turns.last(where: { $0.role == .user })?.text
+        let context = FallbackContext.resolve(userText: userText, finiteReason: finiteReason)
+        dialogueState.recordAssistantText(context.dialogText)
         traceLogger.recordGuard(
             traceID: traceID,
             message: "unsupported_tool_plan",
@@ -137,7 +138,7 @@ public final class DemoRuntimeSessionRunner {
                 finiteReason: finiteReason
             )
         )
-        let speechResult = speech.speak(dialogText)
+        let speechResult = speech.speak(context.ttsText)
         if !speechResult.didEnqueue {
             traceLogger.recordReadback(
                 traceID: traceID,
@@ -145,21 +146,23 @@ public final class DemoRuntimeSessionRunner {
                 attributes: TraceAttributes(readbackResult: .failed)
             )
         }
-        let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: traceID)
         return RuntimePresentationPayload(
             traceID: traceID,
             turnID: turnID,
             eventID: "\(turnID):runtime-presentation",
             isTerminal: true,
-            outcome: DemoRuntimeOutcome(result: .refusalNoAvailableTool, reason: finiteReason),
+            outcome: DemoRuntimeOutcome(
+                result: context.runtimeResult,
+                reason: context.outcome.safeReasonKind.rawValue
+            ),
             proofClass: .localUnit,
             cards: store.presentationCells,
             readbacks: [],
             reconciliation: PresentationReconciliation(
                 status: .notApplicable,
-                safeReason: finiteReason
+                safeReason: context.outcome.safeReasonKind.rawValue
             ),
-            traceEnvelope: traceEnvelope,
+            traceEnvelope: nil,
             timestamp: timestampProvider()
         )
     }

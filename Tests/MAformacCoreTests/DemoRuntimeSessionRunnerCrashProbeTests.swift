@@ -3,8 +3,11 @@ import XCTest
 
 final class DemoRuntimeSessionRunnerCrashProbeTests: XCTestCase {
     @MainActor
-    func testFastPathNoMatchFallsBackToUnsupportedPayloadForNonFastPathText() async throws {
-        let samples = ["随便说一句", "帮我放首歌"]
+    func testFastPathNoMatchProducesTypedPresentationSafeFallback() async throws {
+        let samples = [
+            (text: "随便说一句", speech: "这个说法还没稳稳接住，请换个车控说法再试。"),
+            (text: "帮我放首歌", speech: "这个音量说法还没稳稳接住，您可以说音量调低一点。"),
+        ]
 
         for sample in samples {
             let store = DemoVehicleStateStore()
@@ -17,19 +20,22 @@ final class DemoRuntimeSessionRunnerCrashProbeTests: XCTestCase {
                 speech: speech
             )
 
-            let payload = try await runner.run(text: sample)
+            let payload = try await runner.run(text: sample.text)
 
             XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-            XCTAssertEqual(payload.outcome.reason, "fast_path_no_match")
+            XCTAssertEqual(payload.outcome.reason, FallbackSafeReasonKind.notAvailableInDemo.rawValue)
             XCTAssertEqual(payload.reconciliation.status, .notApplicable)
-            XCTAssertEqual(payload.reconciliation.safeReason, "fast_path_no_match")
+            XCTAssertEqual(payload.reconciliation.safeReason, FallbackSafeReasonKind.notAvailableInDemo.rawValue)
             XCTAssertEqual(payload.readbacks, [])
-            XCTAssertEqual(speech.spokenTexts, ["这个我先记下来，稍后帮您处理"])
+            XCTAssertEqual(speech.spokenTexts, [sample.speech])
             XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
 
             let failureEntry = trace.entries.first { $0.message == "unsupported_tool_plan" }
             XCTAssertEqual(failureEntry?.attributes.guardReason, "unsupported_tool_plan")
             XCTAssertEqual(failureEntry?.attributes.finiteReason, "fast_path_no_match")
+            let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+            XCTAssertFalse(encoded.contains("fast_path_no_match"))
+            XCTAssertFalse(encoded.contains("这个我先记下来，稍后帮您处理"))
         }
     }
 
