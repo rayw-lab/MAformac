@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import subprocess
@@ -21,6 +22,9 @@ FALLBACK_PATH = REPO_ROOT / "contracts" / "fallback-scripts.yaml"
 GENERATED_PATH = REPO_ROOT / "generated" / "demo-fallback-probes.catalog.json"
 MANIFEST_PATH = REPO_ROOT / "Tests" / "Fixtures" / "RuntimeFallbackReceipts" / "manifest.json"
 A1_CHECKER_PATH = REPO_ROOT / "Tools" / "checks" / "check_capability_matrix.py"
+ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
+
+
 def load_checker():
     spec = importlib.util.spec_from_file_location("check_runtime_no_mutation_receipts", CHECKER_PATH)
     if spec is None or spec.loader is None:
@@ -159,7 +163,7 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
         self.assertEqual(manifest["caseCount"], 40)
         self.assertEqual(manifest["proofClass"], "local_unit")
 
-    def test_matrix_refresh_promotes_only_fallback_cells_with_all_four_bases(self) -> None:
+    def test_no_mutation_receipt_never_promotes_action_can_demo(self) -> None:
         with tempfile.TemporaryDirectory(prefix="b4-matrix-refresh-") as tmp:
             tmp_path = Path(tmp)
             receipt_path = tmp_path / "runtime-receipt.json"
@@ -174,8 +178,6 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(A1_CHECKER_PATH),
                     "materialize",
-                    "--probe-receipt",
-                    str(receipt_path),
                     "--output",
                     str(matrix_path),
                 ],
@@ -187,15 +189,18 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
             matrix = load_json(matrix_path)
             self.assertEqual(
                 [cell["matrix_id"] for cell in matrix["cells"] if cell["canDemo"]],
-                [5, 6],
+                [],
             )
-            self.assertEqual(matrix["source"]["probe_pack_sha256"], self.generated["sourceSHA256"])
+            self.assertEqual(
+                matrix["source"]["probe_pack_sha256"],
+                hashlib.sha256(ACTION_PROBE_CATALOG.read_bytes()).hexdigest(),
+            )
             self.assertEqual(
                 sum(
                     cell["canDemo_basis"]["readbackProbePass"]["status"] == "passed"
                     for cell in matrix["cells"]
                 ),
-                118,
+                0,
             )
             rerun_receipt = self.valid_receipt()
             for case in rerun_receipt["cases"]:
@@ -212,8 +217,6 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(A1_CHECKER_PATH),
                     "materialize",
-                    "--probe-receipt",
-                    str(receipt_path),
                     "--output",
                     str(rerun_matrix_path),
                 ],
@@ -228,8 +231,6 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
                     sys.executable,
                     str(A1_CHECKER_PATH),
                     "check",
-                    "--probe-receipt",
-                    str(receipt_path),
                     "--matrix",
                     str(matrix_path),
                     "--receipt",
@@ -241,8 +242,8 @@ class RuntimeNoMutationReceiptCheckerTests(unittest.TestCase):
             )
             self.assertEqual(checked.returncode, 0, checked.stderr)
             report = load_json(check_receipt_path)
-            self.assertEqual(report["canDemo_count"], 2)
-            self.assertEqual(report["conditional_pending_count"], 2)
+            self.assertEqual(report["canDemo_count"], 0)
+            self.assertEqual(report["conditional_pending_count"], 120)
 
 
 if __name__ == "__main__":

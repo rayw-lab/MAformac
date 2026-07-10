@@ -28,6 +28,7 @@ MANIFEST = CANONICAL_MANIFEST
 SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
 STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
+ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
 FIXTURES = REPO_ROOT / "Tools" / "checks" / "fixtures" / "demo_capability_matrix"
 
 
@@ -88,6 +89,63 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             state_cells_path=STATE_CELLS,
             mounted_catalog_path=MOUNTED_CATALOG,
         )
+
+    def valid_action_receipt(self, checker: object) -> dict:
+        catalog = load_json(ACTION_PROBE_CATALOG)
+        cases = []
+        for probe in catalog["probes"]:
+            target = probe["expectedStateDelta"]
+            readback = probe["expectedReadback"]
+            cases.append(
+                {
+                    "probeID": probe["probeID"],
+                    "matrixID": probe["matrixID"],
+                    "register": probe["register"],
+                    "utterance": probe["utterance"],
+                    "representativeTool": probe["representativeTool"],
+                    "pathKind": "default_runtime",
+                    "injectionUsed": False,
+                    "traceID": f"trace-matrix-{probe['matrixID']}",
+                    "stageTraceIDs": {
+                        "decode": [f"trace-matrix-{probe['matrixID']}"],
+                        "execute": [f"trace-matrix-{probe['matrixID']}"],
+                        "readback": [f"trace-matrix-{probe['matrixID']}"],
+                    },
+                    "observedToolCallCount": 1,
+                    "emittedToolNames": [probe["representativeTool"]],
+                    "stateBeforeSHA256": "a" * 64,
+                    "stateAfterSHA256": "b" * 64,
+                    "stateMutation": True,
+                    "stateDeltas": [
+                        {
+                            "key": target["key"],
+                            "beforeValue": target["beforeValue"],
+                            "afterValue": target["afterValue"],
+                        }
+                    ],
+                    "confirmedState": {
+                        "key": target["key"],
+                        "actualValue": target["afterValue"],
+                    },
+                    "resultKind": "accepted_tool_call",
+                    "reconciliationStatus": "verified",
+                    "readbacks": [
+                        {
+                            "key": readback["key"],
+                            "actualValue": readback["actualValue"],
+                            "spokenText": "主驾空调已调到26度",
+                        }
+                    ],
+                }
+            )
+        return {
+            "schemaVersion": "runtime_action_readback_receipt_v1",
+            "receiptID": catalog["receiptID"],
+            "probePackSHA256": checker.sha256_file(ACTION_PROBE_CATALOG),
+            "proofClass": "local_unit",
+            "caseCount": len(cases),
+            "cases": cases,
+        }
 
     def mutate_with_fixture(self, fixture_name: str) -> tuple[object, dict]:
         checker, matrix = self.materialize()
@@ -174,7 +232,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(report["blocked_unknown_count"], 0)
         self.assertNotIn("E_T0_ENUM_UNKNOWN", report["errors"])
 
-    def test_candemo_is_logical_and_of_four_same_cell_bases(self) -> None:
+    def test_candemo_is_logical_and_of_four_same_cell_action_bases(self) -> None:
         checker, _ = self.materialize()
         all_true = {
             "mounted_or_approved_action": {"observed": True},
@@ -182,8 +240,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             "state_readback_cell": {"observed": True},
             "readbackProbePass": {
                 "observed": True,
-                "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
-                "probe_receipt_id": "runtime-no-mutation-40-probes",
+                "probe_id": "probe.action.matrix.4.zh-CN",
+                "probe_receipt_id": "runtime-action-readback-probes",
+                "receipt_sha256": "c" * 64,
             },
         }
         self.assertTrue(checker.compute_can_demo(all_true))
@@ -200,8 +259,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             "state_readback_cell": {"observed": True},
             "readbackProbePass": {
                 "observed": True,
-                "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
-                "probe_receipt_id": "runtime-no-mutation-40-probes",
+                "probe_id": "probe.action.matrix.4.zh-CN",
+                "probe_receipt_id": "runtime-action-readback-probes",
+                "receipt_sha256": "c" * 64,
             },
         }
         for missing_field in ("probe_id", "probe_receipt_id"):
@@ -209,7 +269,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             trial["readbackProbePass"][missing_field] = None
             self.assertFalse(checker.compute_can_demo(trial), missing_field)
 
-    def test_non_b4_probe_id_is_rejected(self) -> None:
+    def test_fallback_probe_id_is_rejected_for_action_readback(self) -> None:
         checker, _ = self.materialize()
         basis = {
             "mounted_or_approved_action": {"observed": True},
@@ -217,11 +277,132 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             "state_readback_cell": {"observed": True},
             "readbackProbePass": {
                 "observed": True,
-                "probe_id": "matrix.ac.temperature.zh-CN",
+                "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
                 "probe_receipt_id": "runtime-no-mutation-40-probes",
             },
         }
         self.assertFalse(checker.compute_can_demo(basis))
+
+    def test_action_receipt_path_must_exist_inside_authority_root(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_action_receipt(checker)
+        missing = REPO_ROOT / ".build" / "missing-action-receipt.json"
+        with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_RECEIPT_MISSING"):
+            checker.evaluate_action_probe_receipt(
+                receipt=receipt,
+                receipt_path=missing,
+                catalog_path=ACTION_PROBE_CATALOG,
+                authority_root=REPO_ROOT,
+            )
+
+        with tempfile.TemporaryDirectory(prefix="outside-action-authority-") as tmp:
+            outside = Path(tmp) / "receipt.json"
+            outside.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_RECEIPT_OUTSIDE_AUTHORITY"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt,
+                    receipt_path=outside,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_action_receipt_requires_independent_probe_per_cell(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_action_receipt(checker)
+        receipt["cases"][1]["probeID"] = receipt["cases"][0]["probeID"]
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="action-receipt-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_PROBE_REUSED"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_action_probe_catalog_requires_unique_utterance_and_fingerprint(self) -> None:
+        checker, _ = self.materialize()
+        catalog = load_json(ACTION_PROBE_CATALOG)
+        receipt = self.valid_action_receipt(checker)
+        catalog["probes"][1]["utterance"] = catalog["probes"][0]["utterance"]
+        receipt["cases"][1]["utterance"] = receipt["cases"][0]["utterance"]
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="action-catalog-") as tmp:
+            tmp_path = Path(tmp)
+            catalog_path = tmp_path / "catalog.json"
+            receipt_path = tmp_path / "receipt.json"
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            receipt["probePackSHA256"] = checker.sha256_file(catalog_path)
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_PROBE_REUSED"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt,
+                    receipt_path=receipt_path,
+                    catalog_path=catalog_path,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_action_receipt_fails_closed_on_conditional_or_incomplete_truth(self) -> None:
+        checker, _ = self.materialize()
+        mutations = {
+            "conditional": lambda case: case.update(injectionUsed=True),
+            "no_tool_call": lambda case: case.update(observedToolCallCount=0),
+            "no_state_delta": lambda case: case.update(
+                stateMutation=False,
+                stateAfterSHA256=case["stateBeforeSHA256"],
+                stateDeltas=[],
+            ),
+            "readback_mismatch": lambda case: case["readbacks"][0].update(actualValue="25"),
+            "trace_break": lambda case: case["stageTraceIDs"]["readback"].__setitem__(0, "other-trace"),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                receipt = self.valid_action_receipt(checker)
+                mutate(receipt["cases"][0])
+                with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="action-receipt-") as tmp:
+                    receipt_path = Path(tmp) / "receipt.json"
+                    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+                    evaluation = checker.evaluate_action_probe_receipt(
+                        receipt=receipt,
+                        receipt_path=receipt_path,
+                        catalog_path=ACTION_PROBE_CATALOG,
+                        authority_root=REPO_ROOT,
+                    )
+                self.assertNotIn(4, evaluation["passing_by_matrix_id"], label)
+                self.assertIn(4, evaluation["failures_by_matrix_id"], label)
+
+    def test_action_pass_cannot_hide_fallback_classification(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_action_receipt(checker)
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="action-receipt-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=receipt,
+                action_probe_receipt_path=receipt_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+            )
+            report = checker.validate_matrix(
+                matrix=matrix,
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=receipt,
+                action_probe_receipt_path=receipt_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+            )
+        self.assertEqual(
+            [cell["matrix_id"] for cell in matrix["cells"] if cell["canDemo"]],
+            [4, 5, 6],
+        )
+        self.assertIn("E_CAN_DEMO_DEFAULT_PATH_CONTRADICTION", report["errors"])
 
     def test_live_matrix_has_zero_probe_gated_demo_cells(self) -> None:
         checker, matrix = self.materialize()

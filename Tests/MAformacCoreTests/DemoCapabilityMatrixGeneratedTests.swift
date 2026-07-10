@@ -84,8 +84,8 @@ final class DemoCapabilityMatrixGeneratedTests: XCTestCase {
         var readback = try XCTUnwrap(basis["readbackProbePass"] as? [String: Any])
         readback["observed"] = true
         readback["status"] = "passed"
-        readback["probe_id"] = "probe.fallback.ac.fast_path_no_match_fallback.zh-CN"
-        readback["probe_receipt_id"] = "receipt:test"
+        readback["probe_id"] = "probe.action.matrix.1.zh-CN"
+        readback["probe_receipt_id"] = "runtime-action-readback-probes"
         basis["readbackProbePass"] = readback
         first["canDemo_basis"] = basis
         first["canDemo"] = true

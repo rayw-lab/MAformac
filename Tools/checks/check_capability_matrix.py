@@ -26,6 +26,7 @@ DEFAULT_SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contrac
 DEFAULT_STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 DEFAULT_MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
 DEFAULT_SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
+DEFAULT_ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
 
 BASIS_KEYS = (
     "mounted_or_approved_action",
@@ -33,11 +34,8 @@ BASIS_KEYS = (
     "state_readback_cell",
     "readbackProbePass",
 )
-B4_PROBE_ID_PATTERN = re.compile(
-    r"^probe\.fallback\.[A-Za-z][A-Za-z0-9]*\."
-    r"(?:safety_or_clarify_reject|unmounted_name_rejected|"
-    r"fast_path_no_match_fallback|unknown_no_representative_entry)\.zh-CN$"
-)
+ACTION_PROBE_ID_PATTERN = re.compile(r"^probe\.action\.matrix\.(\d+)\.zh-CN$")
+FALLBACK_PROBE_ID_PATTERN = re.compile(r"^probe\.fallback\.")
 
 
 def sha256_file(path: Path) -> str:
@@ -153,82 +151,222 @@ def pending_readback_probe_basis(matrix_id: int) -> dict[str, Any]:
         "status": "conditional_pending",
         "probe_id": None,
         "probe_receipt_id": None,
-        "source_ref": (
-            "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json"
-            f"#matrix_id={matrix_id}"
-        ),
+        "source_ref": f"manifest:matrix_id={matrix_id}:action-readback-proof-pending",
     }
 
 
-def passed_probe_pairs(receipt: dict[str, Any]) -> dict[tuple[str, str], dict[str, str]]:
-    if receipt.get("schemaVersion") != "runtime_no_mutation_receipt_v1":
-        raise ValueError("B4 probe receipt schema mismatch")
-    receipt_id = receipt.get("receiptID")
-    cases = receipt.get("cases")
-    if receipt_id != "runtime-no-mutation-40-probes" or not isinstance(cases, list):
-        raise ValueError("B4 probe receipt identity mismatch")
+def _action_probe_pass_failures(case: dict[str, Any], probe: dict[str, Any]) -> list[str]:
+    expected_delta = probe["expectedStateDelta"]
+    expected_readback = probe["expectedReadback"]
+    trace_id = case.get("traceID")
+    stage_trace_ids = case.get("stageTraceIDs")
+    state_deltas = case.get("stateDeltas")
+    readbacks = case.get("readbacks")
+    allowed_delta_keys = {expected_delta["key"], "ac.power"}
+    failures: list[str] = []
 
-    pairs: dict[tuple[str, str], dict[str, str]] = {}
-    for case in cases:
-        if not isinstance(case, dict):
-            raise ValueError("B4 probe receipt case must be an object")
-        probe_id = case.get("probeID")
-        family = case.get("family")
-        reason = case.get("reasonKind")
-        trace_id = case.get("traceID")
+    if case.get("pathKind") != "default_runtime" or case.get("injectionUsed") is not False:
+        failures.append("E_ACTION_PROBE_CONDITIONAL_ONLY")
+    if case.get("observedToolCallCount") != 1:
+        failures.append("E_ACTION_PROBE_NO_SINGLE_TOOL_CALL")
+    if case.get("emittedToolNames") != [probe["representativeTool"]]:
+        failures.append("E_ACTION_PROBE_TOOL_MISMATCH")
+    if (
+        case.get("stateMutation") is not True
+        or case.get("stateBeforeSHA256") == case.get("stateAfterSHA256")
+        or not isinstance(state_deltas, list)
+    ):
+        failures.append("E_ACTION_PROBE_NO_STATE_DELTA")
+    else:
+        target_delta = any(
+            isinstance(delta, dict)
+            and delta.get("key") == expected_delta["key"]
+            and delta.get("beforeValue") == expected_delta["beforeValue"]
+            and delta.get("afterValue") == expected_delta["afterValue"]
+            for delta in state_deltas
+        )
+        delta_keys = {
+            delta.get("key") for delta in state_deltas if isinstance(delta, dict)
+        }
+        if not target_delta or not delta_keys.issubset(allowed_delta_keys):
+            failures.append("E_ACTION_PROBE_STATE_DELTA_MISMATCH")
+    confirmed = case.get("confirmedState")
+    if not isinstance(confirmed, dict) or (
+        confirmed.get("key") != expected_delta["key"]
+        or confirmed.get("actualValue") != expected_delta["afterValue"]
+    ):
+        failures.append("E_ACTION_PROBE_STATE_NOT_CONFIRMED")
+    if case.get("resultKind") != "accepted_tool_call":
+        failures.append("E_ACTION_PROBE_RESULT_NOT_ACCEPTED")
+    if case.get("reconciliationStatus") != "verified":
+        failures.append("E_ACTION_PROBE_RECONCILIATION_NOT_VERIFIED")
+    if not isinstance(readbacks, list) or not any(
+        isinstance(readback, dict)
+        and readback.get("key") == expected_readback["key"]
+        and readback.get("actualValue") == expected_readback["actualValue"]
+        and isinstance(readback.get("spokenText"), str)
+        and bool(readback["spokenText"].strip())
+        for readback in readbacks
+    ):
+        failures.append("E_ACTION_PROBE_READBACK_MISMATCH")
+    if not isinstance(trace_id, str) or not trace_id.strip() or not isinstance(stage_trace_ids, dict):
+        failures.append("E_ACTION_PROBE_TRACE_DISCONNECTED")
+    else:
+        for stage in ("decode", "execute", "readback"):
+            trace_ids = stage_trace_ids.get(stage)
+            if (
+                not isinstance(trace_ids, list)
+                or not trace_ids
+                or any(item != trace_id for item in trace_ids)
+            ):
+                failures.append("E_ACTION_PROBE_TRACE_DISCONNECTED")
+                break
+    return sorted(set(failures))
+
+
+def evaluate_action_probe_receipt(
+    *,
+    receipt: dict[str, Any],
+    receipt_path: Path,
+    catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
+    authority_root: Path = REPO_ROOT,
+) -> dict[str, Any]:
+    authority_root = authority_root.resolve()
+    resolved_receipt_path = receipt_path.resolve()
+    resolved_catalog_path = catalog_path.resolve()
+    try:
+        resolved_catalog_path.relative_to(authority_root)
+    except ValueError as error:
+        raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_OUTSIDE_AUTHORITY") from error
+    if not resolved_catalog_path.is_file():
+        raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_MISSING")
+    try:
+        resolved_receipt_path.relative_to(authority_root)
+    except ValueError as error:
+        raise ValueError("E_CAN_DEMO_RECEIPT_OUTSIDE_AUTHORITY") from error
+    if not resolved_receipt_path.is_file():
+        raise ValueError("E_CAN_DEMO_RECEIPT_MISSING")
+    try:
+        receipt_on_disk = json.loads(resolved_receipt_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("E_CAN_DEMO_RECEIPT_INVALID_JSON") from error
+    if receipt_on_disk != receipt:
+        raise ValueError("E_CAN_DEMO_RECEIPT_CONTENT_MISMATCH")
+
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    if (
+        catalog.get("schemaVersion") != "runtime_action_readback_probe_catalog_v1"
+        or catalog.get("receiptID") != "runtime-action-readback-probes"
+        or not isinstance(catalog.get("probes"), list)
+    ):
+        raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_INVALID")
+    if (
+        receipt.get("schemaVersion") != "runtime_action_readback_receipt_v1"
+        or receipt.get("receiptID") != catalog["receiptID"]
+        or receipt.get("proofClass") != "local_unit"
+        or receipt.get("probePackSHA256") != sha256_file(catalog_path)
+        or not isinstance(receipt.get("cases"), list)
+        or receipt.get("caseCount") != len(receipt["cases"])
+    ):
+        raise ValueError("E_CAN_DEMO_ACTION_RECEIPT_IDENTITY_INVALID")
+
+    probes_by_id: dict[str, dict[str, Any]] = {}
+    probes_by_matrix_id: dict[int, dict[str, Any]] = {}
+    probe_utterances: set[str] = set()
+    probe_fingerprints: set[str] = set()
+    for probe in catalog["probes"]:
+        probe_id = probe.get("probeID") if isinstance(probe, dict) else None
+        matrix_id = probe.get("matrixID") if isinstance(probe, dict) else None
+        match = ACTION_PROBE_ID_PATTERN.fullmatch(probe_id or "")
         if (
             not isinstance(probe_id, str)
-            or B4_PROBE_ID_PATTERN.fullmatch(probe_id) is None
-            or not isinstance(family, str)
-            or not isinstance(reason, str)
-            or not isinstance(trace_id, str)
-            or not trace_id.strip()
+            or match is None
+            or not isinstance(matrix_id, int)
+            or int(match.group(1)) != matrix_id
+            or probe_id in probes_by_id
+            or matrix_id in probes_by_matrix_id
         ):
-            raise ValueError("B4 probe receipt identity is incomplete")
+            raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_INVALID")
+        utterance = probe.get("utterance")
+        fingerprint = json.dumps(
+            {
+                "register": probe.get("register"),
+                "utterance": utterance,
+                "representativeTool": probe.get("representativeTool"),
+                "expectedStateDelta": probe.get("expectedStateDelta"),
+                "expectedReadback": probe.get("expectedReadback"),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+        )
         if (
-            case.get("stateBeforeSHA256") != case.get("stateAfterSHA256")
-            or case.get("stateMutation") is not False
-            or case.get("observedToolCallCount") != 0
-            or not case.get("dialogText")
-            or not case.get("ttsText")
+            not isinstance(utterance, str)
+            or not utterance.strip()
+            or utterance in probe_utterances
+            or fingerprint in probe_fingerprints
         ):
-            raise ValueError(f"B4 probe receipt is not a passing no-mutation fact: {probe_id}")
-        pair = (family, reason)
-        if pair in pairs:
-            raise ValueError(f"duplicate B4 probe pair: {family}/{reason}")
-        probe_pack_sha = receipt.get("probePackSHA256")
-        if not isinstance(probe_pack_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", probe_pack_sha):
-            raise ValueError("B4 probe pack sha is missing")
-        pairs[pair] = {
-            "probe_id": probe_id,
-            "receipt_id": receipt_id,
-            "probe_pack_sha256": probe_pack_sha,
+            raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+        probes_by_id[probe_id] = probe
+        probes_by_matrix_id[matrix_id] = probe
+        probe_utterances.add(utterance)
+        probe_fingerprints.add(fingerprint)
+
+    cases_by_id: dict[str, dict[str, Any]] = {}
+    cases_by_matrix_id: dict[int, dict[str, Any]] = {}
+    trace_ids: set[str] = set()
+    for case in receipt["cases"]:
+        if not isinstance(case, dict):
+            raise ValueError("E_CAN_DEMO_ACTION_RECEIPT_CASE_INVALID")
+        probe_id = case.get("probeID")
+        matrix_id = case.get("matrixID")
+        trace_id = case.get("traceID")
+        if probe_id in cases_by_id or matrix_id in cases_by_matrix_id:
+            raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+        if isinstance(trace_id, str) and trace_id in trace_ids:
+            raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+        probe = probes_by_id.get(probe_id)
+        if probe is None or matrix_id != probe.get("matrixID"):
+            raise ValueError("E_CAN_DEMO_PROBE_CELL_MISMATCH")
+        for key in ("register", "utterance", "representativeTool"):
+            if case.get(key) != probe.get(key):
+                raise ValueError("E_CAN_DEMO_PROBE_CELL_MISMATCH")
+        cases_by_id[probe_id] = case
+        cases_by_matrix_id[matrix_id] = case
+        if isinstance(trace_id, str):
+            trace_ids.add(trace_id)
+
+    if set(cases_by_id) != set(probes_by_id):
+        raise ValueError("E_CAN_DEMO_ACTION_RECEIPT_COVERAGE_MISMATCH")
+
+    receipt_sha256 = sha256_file(resolved_receipt_path)
+    receipt_source = resolved_receipt_path.relative_to(authority_root).as_posix()
+    passing: dict[int, dict[str, str]] = {}
+    failures: dict[int, list[str]] = {}
+    for matrix_id, probe in probes_by_matrix_id.items():
+        case = cases_by_matrix_id[matrix_id]
+        case_failures = _action_probe_pass_failures(case, probe)
+        if case_failures:
+            failures[matrix_id] = case_failures
+            continue
+        passing[matrix_id] = {
+            "probe_id": probe["probeID"],
+            "receipt_id": receipt["receiptID"],
+            "receipt_sha256": receipt_sha256,
+            "source_ref": f"{receipt_source}#probe_id={probe['probeID']}",
         }
-    if len(pairs) != 40:
-        raise ValueError(f"B4 probe receipt must cover 40 pairs, got {len(pairs)}")
-    return pairs
-
-
-def probe_reason_for_row(row: dict[str, Any]) -> str | None:
-    if row["mounted_status"] == "no_representative_tool":
-        return "unknown_no_representative_entry"
-    primary = row["primary_class"]
-    if primary == "unmounted_name_rejected":
-        return "unmounted_name_rejected"
-    if primary == "fast_path_no_match_fallback":
-        return "fast_path_no_match_fallback"
-    if primary == "safety_or_clarify_reject":
-        return "safety_or_clarify_reject"
-    return None
+    return {
+        "passing_by_matrix_id": passing,
+        "failures_by_matrix_id": failures,
+        "receipt_sha256": receipt_sha256,
+        "receipt_source": receipt_source,
+    }
 
 
 def readback_probe_basis(
     row: dict[str, Any],
-    probe_pairs: dict[tuple[str, str], dict[str, str]],
+    action_proofs: dict[int, dict[str, str]],
 ) -> dict[str, Any]:
-    family = family_code(row["family"])
-    reason = probe_reason_for_row(row)
-    proof = probe_pairs.get((family, reason)) if family and reason else None
+    proof = action_proofs.get(row["matrix_id"])
     if proof is None:
         return pending_readback_probe_basis(row["matrix_id"])
     return {
@@ -236,10 +374,8 @@ def readback_probe_basis(
         "status": "passed",
         "probe_id": proof["probe_id"],
         "probe_receipt_id": proof["receipt_id"],
-        "source_ref": (
-            "receipts/c1/runtime-no-mutation-40-probes.json"
-            f"#probe_id={proof['probe_id']}"
-        ),
+        "receipt_sha256": proof["receipt_sha256"],
+        "source_ref": proof["source_ref"],
     }
 
 
@@ -249,9 +385,11 @@ def has_probe_proof(readback_basis: dict[str, Any]) -> bool:
     return (
         readback_basis.get("observed") is True
         and isinstance(probe_id, str)
-        and B4_PROBE_ID_PATTERN.fullmatch(probe_id) is not None
+        and ACTION_PROBE_ID_PATTERN.fullmatch(probe_id) is not None
         and isinstance(receipt_id, str)
-        and bool(receipt_id.strip())
+        and receipt_id == "runtime-action-readback-probes"
+        and isinstance(readback_basis.get("receipt_sha256"), str)
+        and re.fullmatch(r"[0-9a-f]{64}", readback_basis["receipt_sha256"]) is not None
     )
 
 
@@ -283,7 +421,9 @@ def materialize_matrix(
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
     state_cells_path: Path = DEFAULT_STATE_CELLS,
     mounted_catalog_path: Path = DEFAULT_MOUNTED_CATALOG,
-    probe_receipt: dict[str, Any] | None = None,
+    action_probe_receipt: dict[str, Any] | None = None,
+    action_probe_receipt_path: Path | None = None,
+    action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
 ) -> dict[str, Any]:
     manifest_path = canonical_manifest_path(manifest_path)
     enums = parse_t0_enums(t0_design_path)
@@ -291,7 +431,18 @@ def materialize_matrix(
     semantic_by_intent = parse_semantic_contract(semantic_contract_path)
     state_cells = parse_state_cells(state_cells_path)
     mounted_tools = parse_mounted_tools(mounted_catalog_path)
-    probe_pairs = passed_probe_pairs(probe_receipt) if probe_receipt is not None else {}
+    action_evaluation = None
+    if action_probe_receipt is not None:
+        if action_probe_receipt_path is None:
+            raise ValueError("E_CAN_DEMO_RECEIPT_MISSING")
+        action_evaluation = evaluate_action_probe_receipt(
+            receipt=action_probe_receipt,
+            receipt_path=action_probe_receipt_path,
+            catalog_path=action_probe_catalog_path,
+        )
+    action_proofs = (
+        action_evaluation["passing_by_matrix_id"] if action_evaluation is not None else {}
+    )
 
     cells: list[dict[str, Any]] = []
     for row in manifest_rows:
@@ -323,7 +474,7 @@ def materialize_matrix(
                 if state_cell is not None
                 else f"manifest:matrix_id={row['matrix_id']}:no-state-readback-cell",
             ),
-            "readbackProbePass": readback_probe_basis(row, probe_pairs),
+            "readbackProbePass": readback_probe_basis(row, action_proofs),
         }
         can_demo = compute_can_demo(cell_basis)
         cells.append(
@@ -356,11 +507,7 @@ def materialize_matrix(
             "manifest_sha256": sha256_file(manifest_path),
             "t0_design_sha256": sha256_file(t0_design_path),
             "enum_contract": "T0:add-c1-demo-capability-governance",
-            "probe_pack_sha256": (
-                next(iter(probe_pairs.values()))["probe_pack_sha256"]
-                if probe_pairs
-                else None
-            ),
+            "probe_pack_sha256": sha256_file(action_probe_catalog_path),
         },
         "cells": cells,
         "summary": {
@@ -384,7 +531,9 @@ def validate_matrix(
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
     state_cells_path: Path = DEFAULT_STATE_CELLS,
     mounted_catalog_path: Path = DEFAULT_MOUNTED_CATALOG,
-    probe_receipt: dict[str, Any] | None = None,
+    action_probe_receipt: dict[str, Any] | None = None,
+    action_probe_receipt_path: Path | None = None,
+    action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
 ) -> dict[str, Any]:
     manifest_path = canonical_manifest_path(manifest_path)
     expected = materialize_matrix(
@@ -393,8 +542,17 @@ def validate_matrix(
         semantic_contract_path=semantic_contract_path,
         state_cells_path=state_cells_path,
         mounted_catalog_path=mounted_catalog_path,
-        probe_receipt=probe_receipt,
+        action_probe_receipt=action_probe_receipt,
+        action_probe_receipt_path=action_probe_receipt_path,
+        action_probe_catalog_path=action_probe_catalog_path,
     )
+    action_evaluation = None
+    if action_probe_receipt is not None and action_probe_receipt_path is not None:
+        action_evaluation = evaluate_action_probe_receipt(
+            receipt=action_probe_receipt,
+            receipt_path=action_probe_receipt_path,
+            catalog_path=action_probe_catalog_path,
+        )
     enums = parse_t0_enums(t0_design_path)
     manifest_rows = read_jsonl(manifest_path)
     mounted_tools = parse_mounted_tools(mounted_catalog_path)
@@ -418,6 +576,7 @@ def validate_matrix(
 
     mounted_catalog_delta: list[int] = []
     blocked_unknown_ids: list[int] = []
+    seen_action_probe_ids: set[str] = set()
     for cell in cells:
         if not isinstance(cell, dict):
             errors.append("E_CELL_NOT_OBJECT")
@@ -450,6 +609,15 @@ def validate_matrix(
                     break
             readback_basis = cell_basis.get("readbackProbePass", {})
             if readback_basis.get("observed") is True:
+                probe_id = readback_basis.get("probe_id")
+                if isinstance(probe_id, str) and FALLBACK_PROBE_ID_PATTERN.match(probe_id):
+                    errors.append("E_CAN_DEMO_FALLBACK_PROBE_FORBIDDEN")
+                    basis_conflicts.append(matrix_id)
+                if probe_id in seen_action_probe_ids:
+                    errors.append("E_CAN_DEMO_PROBE_REUSED")
+                    basis_conflicts.append(matrix_id)
+                elif isinstance(probe_id, str):
+                    seen_action_probe_ids.add(probe_id)
                 if readback_basis.get("status") != "passed" or not has_probe_proof(readback_basis):
                     errors.append("E_CAN_DEMO_PROBE_PROOF_MISSING")
                     basis_conflicts.append(matrix_id)
@@ -467,6 +635,13 @@ def validate_matrix(
             computed = compute_can_demo(cell_basis)
             if cell.get("canDemo") is not computed:
                 errors.append("E_CAN_DEMO_MANUAL_OVERRIDE")
+            if computed and (
+                cell.get("primary_class")
+                in {"fast_path_no_match_fallback", "conditional_ddomain_executable"}
+                or cell.get("default_path_status") == "fast_path_no_match_fallback"
+            ):
+                errors.append("E_CAN_DEMO_DEFAULT_PATH_CONTRADICTION")
+                basis_conflicts.append(matrix_id)
 
         expected_status = _expected_mounted_status(cell.get("representative_tool", "-"), mounted_tools)
         if cell.get("mounted_status") != expected_status:
@@ -543,6 +718,12 @@ def validate_matrix(
         "dropped_matrix_ids": missing_no_representative_ids,
         "mounted_catalog_delta": sorted(set(mounted_catalog_delta)),
         "t0_enum_receipt_sha": sha256_file(t0_design_path),
+        "action_probe_failures": (
+            action_evaluation["failures_by_matrix_id"] if action_evaluation is not None else {}
+        ),
+        "action_probe_receipt_sha256": (
+            action_evaluation["receipt_sha256"] if action_evaluation is not None else None
+        ),
     }
 
 
@@ -560,7 +741,10 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--semantic-contract", type=Path, default=DEFAULT_SEMANTIC_CONTRACT)
         subparser.add_argument("--state-cells", type=Path, default=DEFAULT_STATE_CELLS)
         subparser.add_argument("--mounted-catalog", type=Path, default=DEFAULT_MOUNTED_CATALOG)
-        subparser.add_argument("--probe-receipt", type=Path)
+        subparser.add_argument(
+            "--action-probe-catalog", type=Path, default=DEFAULT_ACTION_PROBE_CATALOG
+        )
+        subparser.add_argument("--action-probe-receipt", type=Path)
     subcommands.choices["materialize"].add_argument("--output", required=True, type=Path)
     subcommands.choices["check"].add_argument("--matrix", required=True, type=Path)
     subcommands.choices["check"].add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
@@ -570,14 +754,20 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    probe_receipt = json.loads(args.probe_receipt.read_text(encoding="utf-8")) if args.probe_receipt else None
+    action_probe_receipt = (
+        json.loads(args.action_probe_receipt.read_text(encoding="utf-8"))
+        if args.action_probe_receipt
+        else None
+    )
     if args.command == "materialize":
         matrix = materialize_matrix(
             t0_design_path=args.t0_design,
             semantic_contract_path=args.semantic_contract,
             state_cells_path=args.state_cells,
             mounted_catalog_path=args.mounted_catalog,
-            probe_receipt=probe_receipt,
+            action_probe_receipt=action_probe_receipt,
+            action_probe_receipt_path=args.action_probe_receipt,
+            action_probe_catalog_path=args.action_probe_catalog,
         )
         write_json(args.output, matrix)
         return 0
@@ -592,7 +782,9 @@ def main(argv: list[str] | None = None) -> int:
         semantic_contract_path=args.semantic_contract,
         state_cells_path=args.state_cells,
         mounted_catalog_path=args.mounted_catalog,
-        probe_receipt=probe_receipt,
+        action_probe_receipt=action_probe_receipt,
+        action_probe_receipt_path=args.action_probe_receipt,
+        action_probe_catalog_path=args.action_probe_catalog,
     )
     write_json(args.receipt, report)
     if report["status"] != "PASS":
