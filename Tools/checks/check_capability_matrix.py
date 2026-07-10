@@ -12,6 +12,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from jsonschema import Draft202012Validator, SchemaError
+
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_T0_DESIGN = (
@@ -532,9 +534,20 @@ def _expected_mounted_status(tool: str, mounted_tools: set[str]) -> str:
     return "mounted" if tool in mounted_tools else "unmounted"
 
 
+def validate_matrix_schema(*, matrix: Any, schema_path: Path) -> list[str]:
+    """Return fail-closed envelope errors from the committed Draft 2020-12 schema."""
+    try:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema)
+    except (OSError, json.JSONDecodeError, SchemaError):
+        return ["E_MATRIX_SCHEMA_INVALID"]
+    return ["E_MATRIX_SCHEMA_INVALID"] if list(validator.iter_errors(matrix)) else []
+
+
 def validate_matrix(
     *,
     matrix: dict[str, Any],
+    schema_path: Path = DEFAULT_SCHEMA,
     manifest_path: Path | None = None,
     t0_design_path: Path = DEFAULT_T0_DESIGN,
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
@@ -544,6 +557,14 @@ def validate_matrix(
     action_probe_receipt_path: Path | None = None,
     action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
 ) -> dict[str, Any]:
+    errors = validate_matrix_schema(matrix=matrix, schema_path=schema_path)
+    if not isinstance(matrix, dict):
+        return {
+            "status": "FAIL",
+            "errors": sorted(set(errors + ["E_MATRIX_SCHEMA_INVALID"])),
+            "row_count": 0,
+        }
+
     manifest_path = canonical_manifest_path(manifest_path)
     expected = materialize_matrix(
         manifest_path=manifest_path,
@@ -566,7 +587,6 @@ def validate_matrix(
     manifest_rows = read_jsonl(manifest_path)
     mounted_tools = parse_mounted_tools(mounted_catalog_path)
     cells = matrix.get("cells", [])
-    errors: list[str] = []
     basis_conflicts: list[int] = []
 
     ids = [cell.get("matrix_id") for cell in cells if isinstance(cell, dict)]
@@ -574,6 +594,10 @@ def validate_matrix(
         errors.append("E_DUPLICATE_MATRIX_ID")
 
     expected_by_id = {cell["matrix_id"]: cell for cell in expected["cells"]}
+    if set(ids) != set(expected_by_id):
+        errors.append("E_MATRIX_ID_SET_MISMATCH")
+    if matrix != expected:
+        errors.append("E_MATRIX_CANONICAL_DRIFT")
     actual_by_id = {cell.get("matrix_id"): cell for cell in cells if isinstance(cell, dict)}
     missing_no_representative_ids = [
         row["matrix_id"]
@@ -784,9 +808,14 @@ def main(argv: list[str] | None = None) -> int:
     if not args.schema.exists():
         print(f"missing schema: {args.schema}", file=sys.stderr)
         return 2
-    matrix = json.loads(args.matrix.read_text(encoding="utf-8"))
+    try:
+        matrix = json.loads(args.matrix.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"E_MATRIX_INVALID_JSON: {error}", file=sys.stderr)
+        return 2
     report = validate_matrix(
         matrix=matrix,
+        schema_path=args.schema,
         t0_design_path=args.t0_design,
         semantic_contract_path=args.semantic_contract,
         state_cells_path=args.state_cells,

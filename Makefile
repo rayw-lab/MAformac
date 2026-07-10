@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -80,11 +80,23 @@ verify-c1-finite-reason-authority:
 
 verify-c1-matrix: verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1
-	$(PYTHON_BOOTSTRAP) -m unittest scripts/test_check_capability_matrix.py
-	$(PYTHON_BOOTSTRAP) Tools/checks/check_capability_matrix.py check \
+	$(PYTHON) -m unittest scripts/test_check_capability_matrix.py
+	$(PYTHON) Tools/checks/check_capability_matrix.py check \
 		--action-probe-receipt .build/c1-run/receipts/c1/runtime-action-readback-probes.json \
 		--matrix contracts/demo-capability-matrix.json \
 		--receipt .build/c1-run/receipts/c1/capability-matrix.json
+
+# Fail closed on the full authority -> matrix -> Swift projection chain.  The
+# temporary artifacts ensure a dirty tracked file cannot self-certify.
+verify-c1-matrix-canonical: .venv/.deps.stamp
+	mkdir -p .build/c1-run/canonical
+	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
+		--output .build/c1-run/canonical/demo-capability-matrix.json
+	cmp -s contracts/demo-capability-matrix.json .build/c1-run/canonical/demo-capability-matrix.json
+	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
+		--input .build/c1-run/canonical/demo-capability-matrix.json \
+		--output .build/c1-run/canonical/DemoCapabilityMatrix.generated.swift
+	cmp -s Core/Contracts/DemoCapabilityMatrix.generated.swift .build/c1-run/canonical/DemoCapabilityMatrix.generated.swift
 
 verify-c1-fallback:
 	@if [ ! -f Tools/checks/check_fallback_scripts.py ]; then \
@@ -100,7 +112,7 @@ verify-c1-fallback:
 	fi
 
 verify-c1-probes: .venv/.deps.stamp
-	$(PYTHON_BOOTSTRAP) -m unittest scripts/test_check_runtime_no_mutation_receipts.py
+	$(PYTHON) -m unittest scripts/test_check_runtime_no_mutation_receipts.py
 	C1_RUN_DIR="$(CURDIR)/.build/c1-run" swift test --filter RuntimeNoMutationProbeTests
 	$(PYTHON_BOOTSTRAP) Tools/checks/check_runtime_no_mutation_receipts.py check \
 		--receipt .build/c1-run/receipts/c1/runtime-no-mutation-40-probes.json \
@@ -205,7 +217,7 @@ verify-refs: .venv/.deps.stamp
 # 手写契约(非生成), 纳入 diff 防未提交漂移; 不进 regen。risk-policy/demo-scenarios 2026-06-20 补入(审计:别让 reviewed 候选伪装闭合)
 HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml contracts/subset-grouping.yaml
 
-diff:
+diff: verify-c1-matrix-canonical
 	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(GENERATED_DOMAIN) $(GENERATED_SWIFT) $(HANDWRITTEN_CONTRACTS) scripts Makefile
 
 clean-venv:

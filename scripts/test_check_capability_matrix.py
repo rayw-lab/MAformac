@@ -29,6 +29,8 @@ SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
 STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
 ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
+MATRIX = REPO_ROOT / "contracts" / "demo-capability-matrix.json"
+SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
 FIXTURES = REPO_ROOT / "Tools" / "checks" / "fixtures" / "demo_capability_matrix"
 
 
@@ -83,12 +85,39 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def validate(self, checker: object, matrix: dict) -> dict:
         return checker.validate_matrix(
             matrix=matrix,
+            schema_path=SCHEMA,
             manifest_path=MANIFEST,
             t0_design_path=T0_DESIGN,
             semantic_contract_path=SEMANTIC_CONTRACT,
             state_cells_path=STATE_CELLS,
             mounted_catalog_path=MOUNTED_CATALOG,
         )
+
+    def assert_cli_rejects(self, matrix: dict, expected_errors: set[str]) -> None:
+        with tempfile.TemporaryDirectory(prefix="a1-matrix-negative-") as tmp:
+            tmp_path = Path(tmp)
+            matrix_path = tmp_path / "matrix.json"
+            receipt_path = tmp_path / "receipt.json"
+            matrix_path.write_text(json.dumps(matrix, ensure_ascii=False), encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(CHECKER_PATH),
+                    "check",
+                    "--matrix",
+                    str(matrix_path),
+                    "--schema",
+                    str(SCHEMA),
+                    "--receipt",
+                    str(receipt_path),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(receipt_path.is_file(), result.stderr)
+            self.assertTrue(expected_errors.issubset(set(load_json(receipt_path)["errors"])))
 
     def valid_action_receipt(self, checker: object) -> dict:
         catalog = load_json(ACTION_PROBE_CATALOG)
@@ -439,6 +468,73 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(report["canDemo_count"], 0)
         self.assertEqual(report["conditional_pending_count"], 120)
         self.assertEqual(report["status"], "PASS")
+
+    def test_tracked_matrix_is_byte_identical_to_fresh_materialization(self) -> None:
+        checker, expected = self.materialize()
+        self.assertEqual(load_json(MATRIX), expected)
+
+    def test_cli_rejects_named_canonical_envelope_mutations(self) -> None:
+        baseline = load_json(MATRIX)
+        cases = {
+            "stale_source_provenance": (
+                lambda matrix: matrix["source"].__setitem__("t0_design_sha256", "0" * 64),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "missing_source": (
+                lambda matrix: matrix.pop("source"),
+                {"E_MATRIX_SCHEMA_INVALID", "E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "wrong_schema_version": (
+                lambda matrix: matrix.__setitem__("schema_version", "bogus_v999"),
+                {"E_MATRIX_SCHEMA_INVALID", "E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "tampered_family": (
+                lambda matrix: matrix["cells"][0].__setitem__("family", "tampered-family"),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "tampered_value_shape": (
+                lambda matrix: matrix["cells"][0].__setitem__("value_shape", "tampered-shape"),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "tampered_register": (
+                lambda matrix: matrix["cells"][0].__setitem__("register", "tampered-register"),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "tampered_injected_path_status": (
+                lambda matrix: matrix["cells"][0].__setitem__("injected_path_status", "tampered-status"),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "tampered_source_hash": (
+                lambda matrix: matrix["cells"][0].__setitem__("source_hash", "0" * 64),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "tampered_anchors": (
+                lambda matrix: matrix["cells"][0].__setitem__("anchors", ["tampered-anchor"]),
+                {"E_MATRIX_CANONICAL_DRIFT"},
+            ),
+            "matrix_id_999": (
+                lambda matrix: matrix["cells"][0].__setitem__("matrix_id", 999),
+                {"E_MATRIX_ID_SET_MISMATCH", "E_MATRIX_CANONICAL_DRIFT"},
+            ),
+        }
+        for name, (mutate, expected_errors) in cases.items():
+            with self.subTest(name=name):
+                mutated = copy.deepcopy(baseline)
+                mutate(mutated)
+                self.assert_cli_rejects(mutated, expected_errors)
+
+    def test_matrix_schema_is_actually_executed(self) -> None:
+        checker, matrix = self.materialize()
+        matrix.pop("source")
+        self.assertIn("E_MATRIX_SCHEMA_INVALID", self.validate(checker, matrix)["errors"])
+
+    def test_diff_target_requires_matrix_and_swift_canonical_regeneration(self) -> None:
+        makefile = (REPO_ROOT / "Makefile").read_text(encoding="utf-8")
+        self.assertIn("diff: verify-c1-matrix-canonical", makefile)
+        self.assertIn("check_capability_matrix.py materialize", makefile)
+        self.assertIn("cmp -s contracts/demo-capability-matrix.json", makefile)
+        self.assertIn("generate_demo_capability_matrix_swift.py", makefile)
+        self.assertIn("cmp -s Core/Contracts/DemoCapabilityMatrix.generated.swift", makefile)
 
     def test_missing_basis_is_rejected(self) -> None:
         checker, matrix = self.mutate_with_fixture("missing-basis.json")
