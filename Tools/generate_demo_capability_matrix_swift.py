@@ -57,7 +57,7 @@ def require_string(value: Any, path: str) -> str:
 
 def validate_basis(cell: dict[str, Any]) -> None:
     matrix_id = cell["matrix_id"]
-    basis = cell.get("canDemo_basis")
+    basis = cell.get("actionDemoProven_basis")
     required = {
         "mounted_or_approved_action",
         "semantic_contract",
@@ -65,7 +65,7 @@ def validate_basis(cell: dict[str, Any]) -> None:
         "readbackProbePass",
     }
     if not isinstance(basis, dict) or set(basis) != required:
-        raise ValueError(f"matrix_id={matrix_id} has invalid canDemo_basis keys")
+        raise ValueError(f"matrix_id={matrix_id} has invalid actionDemoProven_basis keys")
 
     for key in ("mounted_or_approved_action", "semantic_contract", "state_readback_cell"):
         item = basis[key]
@@ -92,8 +92,8 @@ def validate_basis(cell: dict[str, Any]) -> None:
 
 
 def validate_source(root: Any) -> list[dict[str, Any]]:
-    if not isinstance(root, dict) or root.get("schema_version") != "demo_capability_matrix_v1":
-        raise ValueError("input must be demo_capability_matrix_v1")
+    if not isinstance(root, dict) or root.get("schema_version") != "demo_capability_matrix_v2":
+        raise ValueError("input must be demo_capability_matrix_v2")
     cells = root.get("cells")
     if not isinstance(cells, list) or len(cells) != 120:
         raise ValueError("matrix must contain exactly 120 cells")
@@ -127,7 +127,7 @@ def validate_source(root: Any) -> list[dict[str, Any]]:
         swift_string_array(cell.get("entrypointAliases"))
         swift_string_array(cell.get("anchors"))
         validate_basis(cell)
-        require_bool(cell.get("canDemo"), f"matrix_id={matrix_id}.canDemo")
+        require_bool(cell.get("actionDemoProven"), f"matrix_id={matrix_id}.actionDemoProven")
     return cells
 
 
@@ -151,7 +151,7 @@ def render_readback_basis(value: dict[str, Any]) -> str:
 
 
 def render_cell(cell: dict[str, Any]) -> str:
-    basis = cell["canDemo_basis"]
+    basis = cell["actionDemoProven_basis"]
     representative_tool = None if cell["representative_tool"] == "-" else cell["representative_tool"]
     return "\n".join(
         [
@@ -166,7 +166,7 @@ def render_cell(cell: dict[str, Any]) -> str:
             f"            injectedPathStatus: {swift_string(cell['injected_path_status'])},",
             f"            entrypointAliases: {swift_string_array(cell['entrypointAliases'])},",
             f"            mountedStatus: {swift_string(cell['mounted_status'])},",
-            "            canDemoBasis: DemoCapabilityCanDemoBasis(",
+            "            actionDemoProvenBasis: DemoCapabilityActionDemoProvenBasis(",
             "                mountedOrApprovedAction: "
             + render_evidence_basis(basis["mounted_or_approved_action"])
             + ",",
@@ -179,7 +179,7 @@ def render_cell(cell: dict[str, Any]) -> str:
             "                readbackProbePass: "
             + render_readback_basis(basis["readbackProbePass"]),
             "            ),",
-            f"            canDemo: {str(cell['canDemo']).lower()},",
+            f"            actionDemoProven: {str(cell['actionDemoProven']).lower()},",
             f"            fallbackReason: {swift_optional_string(cell.get('fallback_reason'))},",
             f"            reasonKind: {swift_optional_string(cell.get('reasonKind'))},",
             f"            sourceHash: {swift_string(cell['source_hash'])},",
@@ -216,7 +216,7 @@ public struct DemoCapabilityReadbackProbeBasis: Codable, Equatable, Hashable, Se
     public let sourceRef: String
 }}
 
-public struct DemoCapabilityCanDemoBasis: Codable, Equatable, Hashable, Sendable {{
+public struct DemoCapabilityActionDemoProvenBasis: Codable, Equatable, Hashable, Sendable {{
     public let mountedOrApprovedAction: DemoCapabilityEvidenceBasis
     public let semanticContract: DemoCapabilityEvidenceBasis
     public let stateReadbackCell: DemoCapabilityEvidenceBasis
@@ -234,8 +234,8 @@ public struct DemoCapabilityMatrixCell: Codable, Equatable, Hashable, Sendable {
     public let injectedPathStatus: String
     public let entrypointAliases: [String]
     public let mountedStatus: String
-    public let canDemoBasis: DemoCapabilityCanDemoBasis
-    public let canDemo: Bool
+    public let actionDemoProvenBasis: DemoCapabilityActionDemoProvenBasis
+    public let actionDemoProven: Bool
     public let fallbackReason: String?
     public let reasonKind: String?
     public let sourceHash: String
@@ -243,9 +243,9 @@ public struct DemoCapabilityMatrixCell: Codable, Equatable, Hashable, Sendable {
 }}
 
 /// Read-only projection of contracts/demo-capability-matrix.json.
-/// This catalog never adds mounted tools or promotes canDemo independently of the source matrix.
+/// This catalog never adds mounted tools or promotes actionDemoProven independently of the source matrix.
 public enum DemoCapabilityMatrixCatalog {{
-    public static let schemaVersion = "demo_capability_matrix_v1"
+    public static let schemaVersion = "demo_capability_matrix_v2"
     public static let sourceSHA256 = "{source_sha256}"
     public static let cells: [DemoCapabilityMatrixCell] = [
 {rendered_cells}

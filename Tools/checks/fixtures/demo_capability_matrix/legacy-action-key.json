@@ -1,0 +1,6 @@
+{
+  "matrix_id": 1,
+  "operation": "inject_legacy_action_key",
+  "key": "canDemo",
+  "value": true
+}

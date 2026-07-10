@@ -7,6 +7,8 @@ source_ballot: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-08
 proof_class: decision_record
 ---
 
+> **V6 mapping banner（2026-07-11）**：本历史 grill 中的 `canDemo` 等价映射为当前 `actionDemoProven`；不改写以下已 ratify 原文。
+
 # C1 能力面 Grill 决议（D-133，38/38=⭐B）
 
 ## 范围与口径

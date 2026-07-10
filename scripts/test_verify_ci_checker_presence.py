@@ -23,6 +23,8 @@ CHECKER_PATHS = (
     Path("Tools/checks/check_runtime_finite_reason_authority.py"),
     Path("Tools/checks/run_swift_test_exact.py"),
     Path("Tools/checks/check_fallback_scripts.py"),
+    Path("Tools/checks/check_action_demo_proven_legacy_tokens.py"),
+    Path("Tools/checks/check_int_v5a_execution_receipt.py"),
     Path("scripts/check_s10_receipt.py"),
 )
 MISSING_MARKER = "ERROR_MISSING_C1_CHECKER"

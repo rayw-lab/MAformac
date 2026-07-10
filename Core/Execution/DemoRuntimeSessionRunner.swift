@@ -434,32 +434,7 @@ public struct DemoRuntimeContractBundle: Sendable {
         )
     }
 
-    public static let singleCommandDemoDefault = DemoRuntimeContractBundle(
-        semanticJSONL: """
-        {"contract_row_id":"runtime_app_ac_power_on","device":"ac","action_primitive":"power_on","slot":"device","slot_keys":[],"clarify_tag":"explicit","risk":"","exec_tier":"L1","execution_range_ref":"ac.power","value":{"ref":"","direct":"","offset":"on","type":"STATE"}}
-        {"contract_row_id":"runtime_app_ac_temperature_adjust_to_number","device":"ac_temperature","action_primitive":"adjust_to_number","slot":"temperature","slot_keys":[],"clarify_tag":"explicit","risk":"","exec_tier":"L1","execution_range_ref":"ac.temp_setpoint","value":{"ref":"","direct":"","offset":"","type":""}}
-        """,
-        stateCellsYAML: """
-        cells:
-          - id: ac.power
-            type: enum
-            values: [off, on]
-            default: off
-            readback_zh: 空调{已关闭|已打开}
-          - id: ac.temp_setpoint
-            type: int
-            unit: celsius
-            scope: [主驾, 副驾, 左后, 右后, 全车]
-            default_scope: 主驾
-            execution_range: {min: 18, max: 32, step: 1}
-            default: 24
-            readback_zh: "{温区}空调温度{值}度"
-        """,
-        riskPolicyYAML: """
-        forbidden:
-        """,
-        allowlistYAML: """
-        allowlist:
-        """
-    )
+    public static var singleCommandDemoDefault: DemoRuntimeContractBundle {
+        DemoRuntimeContractBundleCatalog.generatedDefault
+    }
 }

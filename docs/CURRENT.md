@@ -25,22 +25,22 @@ expires_when: "G1 BALLOT RATIFIED 或 int-v5a 收编 或 S8 点火"
 ## 【历史】当前阶段（2026-07-11 凌晨：**🎉 PR #42 MERGED（f5ef6270）——C1 治理修复合入主线；GAP-HUNT 12 主题出稿，V6 基线待 commander 开笔**）
 
 🔴 **本节 supersede 下方全部旧态段**。推进事实源 = decisions **D-133~D-141** + run dir `runs/2026-07-10-ma13/`（GAP-HUNT-closure-themes=V6 素材 SSOT + int-v5 四派单合同 + S8 READY 实证 + M-DEMO 实施包）+ handoff `2026-07-10-ma13-closeout`。
-- **PR #42 MERGED**：七轮修复-审计链（AMENDMENT-1 行为门收敛）+ merge 前终极对抗审计（matrix checker fail-open P0 round7 修复 ALL_SCOPE_PASS）→ 磊哥授权 merge。合入=治理层真金（诚实矩阵 canDemo=0/120 + fail-closed 门族 + typed authority）；**仍 NOT demo-ready**。
+- **PR #42 MERGED**：七轮修复-审计链（AMENDMENT-1 行为门收敛）+ merge 前终极对抗审计（matrix checker fail-open P0 round7 修复 ALL_SCOPE_PASS）→ 磊哥授权 merge。合入=治理层真金（诚实矩阵 actionDemoProven=0/120 + fail-closed 门族 + typed authority）；**仍 NOT demo-ready**。
 - **GAP-HUNT 12 主题（P0=10/P1=2）**：T04 客户 ingress/runtime 接线=硬门中的硬门（App 无文本输入+runner 零接线）；C6 三层错位/C4 路由无 active spec/operator-pass 无 ceremony/force-state 双 registry/session 恢复/DialogueState 只记账/S6 定义漂移/PF1 无门/Line A 分母。真实闭环进度 ~50%。
 - **就绪待键**：S8 点火（READY_TO_IGNITE 实证）；int-v5a-d 编码（四合同 ready）；V6 基线（commander 亲笔，素材齐）。
-- **Non-claims**：canDemo=0/120；int-v5 编码未开工；S8 未点火；无 operator-pass/V-PASS/C6 acceptance。
+- **Non-claims**：actionDemoProven=0/120；int-v5 编码未开工；S8 未点火；无 operator-pass/V-PASS/C6 acceptance。
 
 ## 【历史】2026-07-10：C1 int-v4 Draft PR #42 + ma13 修复轮/计划轨推进中（被 2026-07-11 段 supersede）
 
 🔴 **本节 supersede 下方全部旧态段**（含同日「暂停待磊哥拍 BALLOT」稿）。推进事实源 = decisions **D-133~D-138（含 D-138 补记）** + run dir `~/Projects/agent-tmux-stack-research/runs/2026-07-10-ma12/`（C1 14 切片 + int-v4 链）与 `runs/2026-07-10-ma13/`（PR 审 + BALLOT + 修复轮 + int-v5 计划；STATUS-BOARD 为蜂群态）+ handoff `2026-07-10-ma12-c1-full-auto-dev-day.md` / `2026-07-10-ma13-first-wave-pause.md`（pause 态已被 D-138 补记 supersede，handoff 文件名可历史保留）。
 
-- **C1 int-v4 = Draft PR #42**（`c1/int-v4-governance-repair`→opt/streamline，governance-repair candidate，🔴 NOT demo-ready；三厂商终审一致 governanceTruthful=true/customerDemoReady=false）；🔴 **canDemo 诚实真值 = 0/120（D-137 supersede 旧 1/120）**，真执行能力=S8。
+- **C1 int-v4 = Draft PR #42**（`c1/int-v4-governance-repair`→opt/streamline，governance-repair candidate，🔴 NOT demo-ready；三厂商终审一致 governanceTruthful=true/customerDemoReady=false）；🔴 **actionDemoProven 诚实真值 = 0/120（D-137 supersede 旧 1/120）**，真执行能力=S8。
 - **ma13 已越过 BALLOT 暂停点（D-138 补记）**：磊哥 **Q-1 + 细节 10 题全按星标**——路线 **B**=治理修复先合入 + demo 另立 int-v5 line；admission C 案 / mock rehearsal 隔离 / 非循环五件套 / typed sidecar / 可靠性两阶段 / p95 fast / memory baseline / int-v5a 一 PR 两 commit / `actionDemoProven` / witness int-v5 先行；**Q-12=B** branch protection 立即上（已执行）；**Q-13=⭐A** 单人仓+residual，不加 reviewer、不建外部 App。
 - **branch protection 双分支已上线（D-138 补记）**：`opt/streamline-macos-20260707` + `main` = required check `verify`(strict) + 禁 force-push/deletion + `required_conversation_resolution`；commander 裁决 delta：`enforce_admins=false` + 不设 require-PR（保留 docs 直推日常流）；residual=admin 可绕 verify/可拆门；诚实等级=`GATE_BASELINE_HAS_TEETH`（非 `SAME_PR_UNSOFTENABLE`）。（D-138 正文预研「零 protection」仅作历史；现态以补记为准。）
 - **修复轮已开工未合入（D-138 补记 + STATUS-BOARD）**：w2(%3) 领 **SPEC-fix-p01-p11**（P0-1 四点 + P1-1 扩扫 + probe 期望值级联；映射口径 **LOCKED 不扩 T0**）；修完 push PR 分支 → w1 按验收门复审。D-138 正文 w1 **REQUEST_CHANGES**（P0-1 finiteReason 生产分叉 + P1-1 ownership 不扫生产面）仍为修复对象；int-v4 转 Ready 前置 = 修复轮收口 + w1 复审 clean。
 - **int-v5 计划轨并行（编码未开工）**：w3 吸收互审 5P1 产 int-v5a 实施计划 v2；w4 细化 witness 实施计划 + CODEOWNERS advisory 草案。**计划 ≠ 编码开工**。
 - **下一动作（非 BALLOT）**：修复轮 push → w1 复审 → Ready → merge（磊哥键，路线 B）→ int-v5a/b/c 编码序；S8 点火键仍在途。
-- **Non-claims（D-138 正文 + 补记 supersede 后口径）**：PR #42 / int-v4 **未 Ready / 未 merge**；**canDemo=0/120 不变**；**修复轮已开工未合入**；**int-v5 编码未开工**（仅 w3/w4 实施计划轨 in-progress）；**无 operator-pass / V-PASS**；另沿用：无 C6 / candidate signed；S9/S10 未执行；CG-080 禁 mounted 1→N 不变。
+- **Non-claims（D-138 正文 + 补记 supersede 后口径）**：PR #42 / int-v4 **未 Ready / 未 merge**；**actionDemoProven=0/120 不变**；**修复轮已开工未合入**；**int-v5 编码未开工**（仅 w3/w4 实施计划轨 in-progress）；**无 operator-pass / V-PASS**；另沿用：无 C6 / candidate signed；S9/S10 未执行；CG-080 禁 mounted 1→N 不变。
 
 ## 【历史】2026-07-09深夜：D-132 全日收口——14 收编 656→731/0，Line D 一天全链上树（被 2026-07-10 段 supersede）
 

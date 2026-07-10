@@ -42,8 +42,8 @@ class MountedCatalogRollbackGuardTests(unittest.TestCase):
             "affected_cells": [
                 {
                     "cell_id": "window.position",
-                    "before_canDemo": True,
-                    "after_canDemo": False,
+                    "before_action_demo_proven": True,
+                    "after_action_demo_proven": False,
                 },
             ],
             "fallback_artifacts": {
@@ -68,7 +68,7 @@ class MountedCatalogRollbackGuardTests(unittest.TestCase):
                 "catalog_sha": catalog_sha(names),
             },
             "rollback_guard": {
-                "affected_can_demo_after_rollback": False,
+                "affected_action_demo_proven_after_rollback": False,
                 "preserve_artifacts": ["fallback_catalog", "fallback_probes"],
             },
         }
@@ -124,9 +124,9 @@ class MountedCatalogRollbackGuardTests(unittest.TestCase):
         self.rollback_state["mounted_tool_names_after"] = [BASELINE_TOOL, "open_window"]
         self.assert_guard_failure("rollback_mounted_not_restored")
 
-    def test_rollback_fails_when_affected_can_demo_is_not_downgraded(self) -> None:
-        self.rollback_state["affected_cells"][0]["after_canDemo"] = True
-        self.assert_guard_failure("rollback_can_demo_not_downgraded")
+    def test_rollback_fails_when_affected_action_demo_proven_is_not_downgraded(self) -> None:
+        self.rollback_state["affected_cells"][0]["after_action_demo_proven"] = True
+        self.assert_guard_failure("rollback_action_demo_proven_not_downgraded")
 
     def test_rollback_fails_when_fallback_probes_are_deleted(self) -> None:
         (self.root / "probes-after.json").unlink()

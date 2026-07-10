@@ -1,0 +1,29 @@
+{
+  "schema_version": "action_demo_proven_legacy_allowlist_v1",
+  "entries": [
+    {
+      "path": "Tools/checks/fixtures/demo_capability_matrix/legacy-action-key.json",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "negative_fixture"
+    },
+    {
+      "path": "scripts/test_check_capability_matrix.py",
+      "token_regex": "canDemo",
+      "max_matches": 2,
+      "purpose": "negative_fixture_builder"
+    },
+    {
+      "path": "docs/commander-log/decisions.md",
+      "token_regex": "canDemo",
+      "max_matches": 22,
+      "purpose": "historical_mapping"
+    },
+    {
+      "path": "docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md",
+      "token_regex": "canDemo",
+      "max_matches": 8,
+      "purpose": "historical_mapping"
+    }
+  ]
+}

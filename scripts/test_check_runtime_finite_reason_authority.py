@@ -338,23 +338,33 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_DECODE_FAILURE_KIND_AS_FINITE_REASON", self.violation_codes(payload))
 
-    def test_t0_membership_change_fails_locked_set_gate(self) -> None:
+    def assert_locked_set_mutation_fails(self, mutate) -> None:
         registry_path = self.repo / "openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml"
         payload = json.loads(registry_path.read_text(encoding="utf-8"))
-        payload["finiteReason_enum"].append("future_registered_reason")
-        payload["finiteReason_projections"].append(
-            {
-                "finiteReason": "future_registered_reason",
-                "fallback_reason": "unsupported_no_available_tool",
-                "reasonKind": "not_available_in_demo",
-                "bridge_result": "refusal_no_available_tool",
-            }
-        )
+        mutate(payload["finiteReason_enum"])
         registry_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
         result, receipt = self.run_checker()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("E_T0_LOCKED_SET_CHANGED", self.violation_codes(receipt))
+        self.assertTrue(
+            self.violation_codes(receipt)
+            & {
+                "E_T0_PROJECTION_DRIFT",
+                "E_GENERATED_RUNTIME_REASON_DRIFT",
+                "E_T0_LOCKED_SET_CHANGED",
+            },
+            receipt,
+        )
+
+    def test_t0_add_eleventh_member_fails_locked_set_gate(self) -> None:
+        self.assert_locked_set_mutation_fails(lambda values: values.append("v5a_forbidden_eleventh"))
+
+    def test_t0_delete_member_fails_locked_set_gate(self) -> None:
+        self.assert_locked_set_mutation_fails(lambda values: values.pop())
+
+    def test_t0_rename_member_fails_locked_set_gate(self) -> None:
+        self.assert_locked_set_mutation_fails(
+            lambda values: values.__setitem__(0, "v5a_forbidden_rename")
+        )
 
 
 if __name__ == "__main__":

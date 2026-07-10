@@ -7,8 +7,8 @@
 
 ## 2. Matrix source, schema and checker
 
-- [ ] 2.1 Write failing checker fixtures for missing same-cell basis, unknown `primary_class`, duplicate identity, FastPath-only `canDemo=true`, dropped no-representative cell and free-string reason; then add `contracts/demo-capability-matrix.json`, its schema and checker. **Superpowers: test-driven-development.**
-- [ ] 2.2 Make the checker preserve exactly 120 cells, recompute the ratified class counts and derive `canDemo` only from mounted/semantic/state-cell/local-runtime-readback evidence; emit a conflict receipt instead of a hand-edited green exception. **Superpowers: test-driven-development.**
+- [ ] 2.1 Write failing checker fixtures for missing same-cell basis, unknown `primary_class`, duplicate identity, FastPath-only `actionDemoProven=true`, dropped no-representative cell and free-string reason; then add `contracts/demo-capability-matrix.json`, its schema and checker. **Superpowers: test-driven-development.**
+- [ ] 2.2 Make the checker preserve exactly 120 cells, recompute the ratified class counts and derive `actionDemoProven` only from mounted/semantic/state-cell/local-runtime-readback evidence; emit a conflict receipt instead of a hand-edited green exception. **Superpowers: test-driven-development.**
 - [ ] 2.3 Write failing deterministic-generation tests before adding the Swift matrix catalog; assert 120 cells, source digest, closed enums, conditional-lane separation and byte-identical regeneration. **Superpowers: test-driven-development.**
 - [ ] 2.4 Run task-specific tests, GitNexus `detect_changes` against the slice base, and commit only matrix-owned files with a receipt containing base/head SHA, touched paths, commands and proof class. **Superpowers: verification-before-completion.**
 
@@ -43,7 +43,7 @@
 ## 7. S10 prelay, mounted no-delta and rollback guards
 
 - [ ] 7.1 Write failing S10 checker fixtures for missing joint rate, stale run identity, prose-only rate and wrong min formula; then enforce `joint=min(hedged,can_question)` without claiming S10 ran. **Superpowers: test-driven-development.**
-- [ ] 7.2 Write failing mounted-policy fixtures for growth without matrix evidence, `canDemo` growth without S10/owner gates, missing golden/readback and rollback that drops fallback; then implement the guard. **Superpowers: test-driven-development.**
+- [ ] 7.2 Write failing mounted-policy fixtures for growth without matrix evidence, `actionDemoProven` growth without S10/owner gates, missing golden/readback and rollback that drops fallback; then implement the guard. **Superpowers: test-driven-development.**
 - [ ] 7.3 Compare mounted authority at implementation base and head and require zero delta for C1; keep matrix/fallback/probe prelay allowed and record CG-080 non-claims. **Superpowers: verification-before-completion.**
 
 ## 8. CI, anchor comparison and closeout
@@ -53,3 +53,9 @@
 - [ ] 8.3 Integrate slice commits in dependency order and run `openspec validate --all --strict`, targeted tests, `swift test`, `make verify-all`, the MAformacMac Xcode build, `make verify-ci`, `git diff --check`, and GitNexus `detect_changes`. **Superpowers: verification-before-completion.**
 - [ ] 8.4 Have an independent auditor rerun authority, 38/38 coverage, partial execution+bridge, 40 probes, mounted no-delta, CI and final gates; only P0/P1=0 may close this change. **Superpowers: requesting-code-review + verification-before-completion.**
 - [ ] 8.5 Keep closeout proof classes separate and retain non-claims: no mounted 1→N, S9/S10 execution, C5/C6 acceptance, candidate, mobile, true-device, live API, operator-pass or V-PASS. **Superpowers: verification-before-completion.**
+## int-v5a Commit B tasks
+
+- Generate the exact-composite runtime bundle manifest and Swift catalog.
+- Switch the default runner to the generated catalog; retain no inline production payload.
+- Emit and validate the single v2 action receipt with bundle digest and nullable v5c catalog digest.
+- Keep v5b/v5c frontstage, witness, and readiness carriers read-only.

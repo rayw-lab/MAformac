@@ -29,6 +29,7 @@ DEFAULT_STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 DEFAULT_MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
 DEFAULT_SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
 DEFAULT_ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
+DEFAULT_RUNTIME_BUNDLE_MANIFEST = REPO_ROOT / "generated" / "demo-runtime-contract-bundle.manifest.json"
 
 BASIS_KEYS = (
     "mounted_or_approved_action",
@@ -232,6 +233,7 @@ def evaluate_action_probe_receipt(
     receipt_path: Path,
     catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
     authority_root: Path = REPO_ROOT,
+    runtime_bundle_manifest_path: Path = DEFAULT_RUNTIME_BUNDLE_MANIFEST,
 ) -> dict[str, Any]:
     authority_root = authority_root.resolve()
     resolved_receipt_path = receipt_path.resolve()
@@ -239,21 +241,21 @@ def evaluate_action_probe_receipt(
     try:
         resolved_catalog_path.relative_to(authority_root)
     except ValueError as error:
-        raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_OUTSIDE_AUTHORITY") from error
+        raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_PROBE_CATALOG_OUTSIDE_AUTHORITY") from error
     if not resolved_catalog_path.is_file():
-        raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_MISSING")
+        raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_PROBE_CATALOG_MISSING")
     try:
         resolved_receipt_path.relative_to(authority_root)
     except ValueError as error:
-        raise ValueError("E_CAN_DEMO_RECEIPT_OUTSIDE_AUTHORITY") from error
+        raise ValueError("E_ACTION_DEMO_PROVEN_RECEIPT_OUTSIDE_AUTHORITY") from error
     if not resolved_receipt_path.is_file():
-        raise ValueError("E_CAN_DEMO_RECEIPT_MISSING")
+        raise ValueError("E_ACTION_DEMO_PROVEN_RECEIPT_MISSING")
     try:
         receipt_on_disk = json.loads(resolved_receipt_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
-        raise ValueError("E_CAN_DEMO_RECEIPT_INVALID_JSON") from error
+        raise ValueError("E_ACTION_DEMO_PROVEN_RECEIPT_INVALID_JSON") from error
     if receipt_on_disk != receipt:
-        raise ValueError("E_CAN_DEMO_RECEIPT_CONTENT_MISMATCH")
+        raise ValueError("E_ACTION_DEMO_PROVEN_RECEIPT_CONTENT_MISMATCH")
 
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     if (
@@ -261,16 +263,23 @@ def evaluate_action_probe_receipt(
         or catalog.get("receiptID") != "runtime-action-readback-probes"
         or not isinstance(catalog.get("probes"), list)
     ):
-        raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_INVALID")
+        raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_PROBE_CATALOG_INVALID")
     if (
-        receipt.get("schemaVersion") != "runtime_action_readback_receipt_v1"
+        receipt.get("schemaVersion") not in {"runtime_action_readback_receipt_v1", "runtime_action_readback_receipt_v2"}
         or receipt.get("receiptID") != catalog["receiptID"]
         or receipt.get("proofClass") != "local_unit"
         or receipt.get("probePackSHA256") != sha256_file(catalog_path)
         or not isinstance(receipt.get("cases"), list)
         or receipt.get("caseCount") != len(receipt["cases"])
     ):
-        raise ValueError("E_CAN_DEMO_ACTION_RECEIPT_IDENTITY_INVALID")
+        raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_IDENTITY_INVALID")
+    if receipt.get("schemaVersion") == "runtime_action_readback_receipt_v2":
+        try:
+            manifest = json.loads(runtime_bundle_manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE") from error
+        if receipt.get("runtimeContractBundleDigest") != manifest.get("runtime_contract_bundle_digest"):
+            raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE")
 
     probes_by_id: dict[str, dict[str, Any]] = {}
     probes_by_matrix_id: dict[int, dict[str, Any]] = {}
@@ -291,7 +300,7 @@ def evaluate_action_probe_receipt(
             or probe_id in probes_by_id
             or matrix_id in probes_by_matrix_id
         ):
-            raise ValueError("E_CAN_DEMO_ACTION_PROBE_CATALOG_INVALID")
+            raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_PROBE_CATALOG_INVALID")
         utterance = probe.get("utterance")
         fingerprint = json.dumps(
             {
@@ -310,13 +319,13 @@ def evaluate_action_probe_receipt(
             or utterance in probe_utterances
             or fingerprint in probe_fingerprints
         ):
-            raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+            raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_REUSED")
         canonical_row = canonical_rows_by_matrix_id.get(matrix_id)
         if canonical_row is None or (
             probe.get("register") != canonical_row.get("register")
             or probe.get("representativeTool") != canonical_row.get("representative_tool")
         ):
-            raise ValueError("E_CAN_DEMO_PROBE_CELL_MISMATCH")
+            raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
         probes_by_id[probe_id] = probe
         probes_by_matrix_id[matrix_id] = probe
         probe_utterances.add(utterance)
@@ -327,27 +336,27 @@ def evaluate_action_probe_receipt(
     trace_ids: set[str] = set()
     for case in receipt["cases"]:
         if not isinstance(case, dict):
-            raise ValueError("E_CAN_DEMO_ACTION_RECEIPT_CASE_INVALID")
+            raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_CASE_INVALID")
         probe_id = case.get("probeID")
         matrix_id = case.get("matrixID")
         trace_id = case.get("traceID")
         if probe_id in cases_by_id or matrix_id in cases_by_matrix_id:
-            raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+            raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_REUSED")
         if isinstance(trace_id, str) and trace_id in trace_ids:
-            raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+            raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_REUSED")
         probe = probes_by_id.get(probe_id)
         if probe is None or matrix_id != probe.get("matrixID"):
-            raise ValueError("E_CAN_DEMO_PROBE_CELL_MISMATCH")
+            raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
         for key in ("register", "utterance", "representativeTool"):
             if case.get(key) != probe.get(key):
-                raise ValueError("E_CAN_DEMO_PROBE_CELL_MISMATCH")
+                raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
         cases_by_id[probe_id] = case
         cases_by_matrix_id[matrix_id] = case
         if isinstance(trace_id, str):
             trace_ids.add(trace_id)
 
     if set(cases_by_id) != set(probes_by_id):
-        raise ValueError("E_CAN_DEMO_ACTION_RECEIPT_COVERAGE_MISMATCH")
+        raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_COVERAGE_MISMATCH")
 
     receipt_sha256 = sha256_file(resolved_receipt_path)
     receipt_source = resolved_receipt_path.relative_to(authority_root).as_posix()
@@ -404,13 +413,13 @@ def has_probe_proof(readback_basis: dict[str, Any]) -> bool:
     )
 
 
-def compute_can_demo(can_demo_basis: dict[str, dict[str, Any]]) -> bool:
+def compute_action_demo_proven(action_demo_proven_basis: dict[str, dict[str, Any]]) -> bool:
     all_observed = all(
-        isinstance(can_demo_basis.get(name, {}).get("observed"), bool)
-        and can_demo_basis[name]["observed"]
+        isinstance(action_demo_proven_basis.get(name, {}).get("observed"), bool)
+        and action_demo_proven_basis[name]["observed"]
         for name in BASIS_KEYS
     )
-    return all_observed and has_probe_proof(can_demo_basis.get("readbackProbePass", {}))
+    return all_observed and has_probe_proof(action_demo_proven_basis.get("readbackProbePass", {}))
 
 
 def reason_projection(row: dict[str, Any]) -> tuple[str | None, str | None]:
@@ -445,7 +454,7 @@ def materialize_matrix(
     action_evaluation = None
     if action_probe_receipt is not None:
         if action_probe_receipt_path is None:
-            raise ValueError("E_CAN_DEMO_RECEIPT_MISSING")
+            raise ValueError("E_ACTION_DEMO_PROVEN_RECEIPT_MISSING")
         action_evaluation = evaluate_action_probe_receipt(
             receipt=action_probe_receipt,
             receipt_path=action_probe_receipt_path,
@@ -487,7 +496,7 @@ def materialize_matrix(
             ),
             "readbackProbePass": readback_probe_basis(row, action_proofs),
         }
-        can_demo = compute_can_demo(cell_basis)
+        action_demo_proven = compute_action_demo_proven(cell_basis)
         cells.append(
             {
                 "matrix_id": row["matrix_id"],
@@ -503,8 +512,8 @@ def materialize_matrix(
                 "semantic_basis": cell_basis["semantic_contract"],
                 "state_cell_basis": cell_basis["state_readback_cell"],
                 "readback_probe_basis": cell_basis["readbackProbePass"],
-                "canDemo_basis": cell_basis,
-                "canDemo": can_demo,
+                "actionDemoProven_basis": cell_basis,
+                "actionDemoProven": action_demo_proven,
                 "fallback_reason": fallback_reason,
                 "reasonKind": reason_kind,
                 "source_hash": row["source_hash"],
@@ -513,7 +522,7 @@ def materialize_matrix(
         )
 
     return {
-        "schema_version": "demo_capability_matrix_v1",
+        "schema_version": "demo_capability_matrix_v2",
         "source": {
             "manifest_sha256": sha256_file(manifest_path),
             "t0_design_sha256": sha256_file(t0_design_path),
@@ -534,14 +543,35 @@ def _expected_mounted_status(tool: str, mounted_tools: set[str]) -> str:
     return "mounted" if tool in mounted_tools else "unmounted"
 
 
-def validate_matrix_schema(*, matrix: Any, schema_path: Path) -> list[str]:
-    """Return fail-closed envelope errors from the committed Draft 2020-12 schema."""
+def validate_required_matrix_v2_schema_contract(schema: dict[str, Any]) -> None:
+    """Reject a syntactically valid schema that weakens the locked cell contract."""
+    try:
+        cell_schema = schema["properties"]["cells"]["items"]
+        required = set(cell_schema["required"])
+    except (KeyError, TypeError):
+        raise ValueError("E_MATRIX_SCHEMA_CONTRACT_INVALID") from None
+    locked = {"actionDemoProven", "actionDemoProven_basis"}
+    if (
+        schema.get("properties", {}).get("schema_version", {}).get("const")
+        != "demo_capability_matrix_v2"
+        or not locked.issubset(required)
+        or cell_schema.get("additionalProperties") is not False
+    ):
+        raise ValueError("E_MATRIX_SCHEMA_CONTRACT_INVALID")
+
+
+def validate_matrix_schema(*, matrix: Any, schema_path: Path) -> list[dict[str, str]]:
+    """Return precise Draft 2020-12 violations after checking the schema strength."""
     try:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        validator = Draft202012Validator(schema)
-    except (OSError, json.JSONDecodeError, SchemaError):
-        return ["E_MATRIX_SCHEMA_INVALID"]
-    return ["E_MATRIX_SCHEMA_INVALID"] if list(validator.iter_errors(matrix)) else []
+        Draft202012Validator.check_schema(schema)
+    except (OSError, json.JSONDecodeError, SchemaError) as error:
+        raise ValueError("E_MATRIX_SCHEMA_CONTRACT_INVALID") from error
+    validate_required_matrix_v2_schema_contract(schema)
+    return [
+        {"path": "/".join(map(str, error.absolute_path)), "message": error.message}
+        for error in sorted(Draft202012Validator(schema).iter_errors(matrix), key=str)
+    ]
 
 
 def validate_matrix(
@@ -557,7 +587,10 @@ def validate_matrix(
     action_probe_receipt_path: Path | None = None,
     action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
 ) -> dict[str, Any]:
-    errors = validate_matrix_schema(matrix=matrix, schema_path=schema_path)
+    schema_errors = validate_matrix_schema(matrix=matrix, schema_path=schema_path)
+    errors = (
+        ["E_MATRIX_SCHEMA_INVALID", "E_MATRIX_SCHEMA_VALIDATION"] if schema_errors else []
+    )
     if not isinstance(matrix, dict):
         return {
             "status": "FAIL",
@@ -625,7 +658,7 @@ def validate_matrix(
         if fallback_reason is not None and fallback_reason not in enums["fallback_reason"]:
             errors.append("E_T0_FALLBACK_REASON_UNKNOWN")
 
-        cell_basis = cell.get("canDemo_basis")
+        cell_basis = cell.get("actionDemoProven_basis")
         if not isinstance(cell_basis, dict) or set(cell_basis) != set(BASIS_KEYS):
             errors.append("E_BASIS_UNTRACEABLE")
             basis_conflicts.append(matrix_id)
@@ -644,15 +677,15 @@ def validate_matrix(
             if readback_basis.get("observed") is True:
                 probe_id = readback_basis.get("probe_id")
                 if isinstance(probe_id, str) and FALLBACK_PROBE_ID_PATTERN.match(probe_id):
-                    errors.append("E_CAN_DEMO_FALLBACK_PROBE_FORBIDDEN")
+                    errors.append("E_ACTION_DEMO_PROVEN_FALLBACK_PROBE_FORBIDDEN")
                     basis_conflicts.append(matrix_id)
                 if probe_id in seen_action_probe_ids:
-                    errors.append("E_CAN_DEMO_PROBE_REUSED")
+                    errors.append("E_ACTION_DEMO_PROVEN_PROBE_REUSED")
                     basis_conflicts.append(matrix_id)
                 elif isinstance(probe_id, str):
                     seen_action_probe_ids.add(probe_id)
                 if readback_basis.get("status") != "passed" or not has_probe_proof(readback_basis):
-                    errors.append("E_CAN_DEMO_PROBE_PROOF_MISSING")
+                    errors.append("E_ACTION_DEMO_PROVEN_PROBE_PROOF_MISSING")
                     basis_conflicts.append(matrix_id)
             elif (
                 readback_basis.get("status") != "conditional_pending"
@@ -662,18 +695,18 @@ def validate_matrix(
                 errors.append("E_BASIS_UNTRACEABLE")
                 basis_conflicts.append(matrix_id)
             expected_cell = expected_by_id.get(matrix_id)
-            if expected_cell is not None and cell_basis != expected_cell["canDemo_basis"]:
+            if expected_cell is not None and cell_basis != expected_cell["actionDemoProven_basis"]:
                 errors.append("E_BASIS_EVIDENCE_DRIFT")
                 basis_conflicts.append(matrix_id)
-            computed = compute_can_demo(cell_basis)
-            if cell.get("canDemo") is not computed:
-                errors.append("E_CAN_DEMO_MANUAL_OVERRIDE")
+            computed = compute_action_demo_proven(cell_basis)
+            if cell.get("actionDemoProven") is not computed:
+                errors.append("E_ACTION_DEMO_PROVEN_MANUAL_OVERRIDE")
             if computed and (
                 cell.get("primary_class")
                 in {"fast_path_no_match_fallback", "conditional_ddomain_executable"}
                 or cell.get("default_path_status") == "fast_path_no_match_fallback"
             ):
-                errors.append("E_CAN_DEMO_DEFAULT_PATH_CONTRADICTION")
+                errors.append("E_ACTION_DEMO_PROVEN_DEFAULT_PATH_CONTRADICTION")
                 basis_conflicts.append(matrix_id)
 
         expected_status = _expected_mounted_status(cell.get("representative_tool", "-"), mounted_tools)
@@ -720,9 +753,9 @@ def validate_matrix(
     if declared_unknown != len(blocked_unknown_ids):
         errors.append("E_BLOCKED_UNKNOWN_OVERRIDE")
 
-    can_demo_count = sum(cell.get("canDemo") is True for cell in cells if isinstance(cell, dict))
+    action_demo_proven_count = sum(cell.get("actionDemoProven") is True for cell in cells if isinstance(cell, dict))
     conditional_pending_count = sum(
-        cell.get("canDemo_basis", {}).get("readbackProbePass", {}).get("status")
+        cell.get("actionDemoProven_basis", {}).get("readbackProbePass", {}).get("status")
         == "conditional_pending"
         for cell in cells
         if isinstance(cell, dict)
@@ -745,7 +778,7 @@ def validate_matrix(
         },
         "blocked_unknown_count": len(blocked_unknown_ids),
         "blocked_unknown_ids": blocked_unknown_ids,
-        "canDemo_count": can_demo_count,
+        "actionDemoProven_count": action_demo_proven_count,
         "conditional_pending_count": conditional_pending_count,
         "basis_conflicts": sorted(set(basis_conflicts)),
         "dropped_matrix_ids": missing_no_representative_ids,
