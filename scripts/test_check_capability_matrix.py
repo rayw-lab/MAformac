@@ -342,6 +342,35 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     authority_root=REPO_ROOT,
                 )
 
+    def test_action_probe_catalog_must_match_canonical_cell_register_and_tool(self) -> None:
+        checker, _ = self.materialize()
+        mutations = {
+            "register": ("register", "直述"),
+            "representative_tool": ("representativeTool", "open_ac"),
+        }
+        for label, (field, value) in mutations.items():
+            with self.subTest(label=label):
+                catalog = load_json(ACTION_PROBE_CATALOG)
+                receipt = self.valid_action_receipt(checker)
+                catalog["probes"][1][field] = value
+                receipt["cases"][1][field] = value
+                with tempfile.TemporaryDirectory(
+                    dir=REPO_ROOT / ".build", prefix="action-cell-binding-"
+                ) as tmp:
+                    tmp_path = Path(tmp)
+                    catalog_path = tmp_path / "catalog.json"
+                    receipt_path = tmp_path / "receipt.json"
+                    catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+                    receipt["probePackSHA256"] = checker.sha256_file(catalog_path)
+                    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "E_CAN_DEMO_PROBE_CELL_MISMATCH"):
+                        checker.evaluate_action_probe_receipt(
+                            receipt=receipt,
+                            receipt_path=receipt_path,
+                            catalog_path=catalog_path,
+                            authority_root=REPO_ROOT,
+                        )
+
     def test_action_receipt_fails_closed_on_conditional_or_incomplete_truth(self) -> None:
         checker, _ = self.materialize()
         mutations = {

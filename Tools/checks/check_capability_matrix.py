@@ -274,6 +274,9 @@ def evaluate_action_probe_receipt(
     probes_by_matrix_id: dict[int, dict[str, Any]] = {}
     probe_utterances: set[str] = set()
     probe_fingerprints: set[str] = set()
+    canonical_rows_by_matrix_id = {
+        row["matrix_id"]: row for row in read_jsonl(canonical_manifest_path())
+    }
     for probe in catalog["probes"]:
         probe_id = probe.get("probeID") if isinstance(probe, dict) else None
         matrix_id = probe.get("matrixID") if isinstance(probe, dict) else None
@@ -306,6 +309,12 @@ def evaluate_action_probe_receipt(
             or fingerprint in probe_fingerprints
         ):
             raise ValueError("E_CAN_DEMO_PROBE_REUSED")
+        canonical_row = canonical_rows_by_matrix_id.get(matrix_id)
+        if canonical_row is None or (
+            probe.get("register") != canonical_row.get("register")
+            or probe.get("representativeTool") != canonical_row.get("representative_tool")
+        ):
+            raise ValueError("E_CAN_DEMO_PROBE_CELL_MISMATCH")
         probes_by_id[probe_id] = probe
         probes_by_matrix_id[matrix_id] = probe
         probe_utterances.add(utterance)
