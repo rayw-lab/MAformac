@@ -30,26 +30,26 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
 | B1a | S8 1800 训练执行（legacy 点火 authority） | **READY_AFTER_HUMAN_KEY** | preflight `READY_TO_IGNITE` rc0（s8-preflight-check.sh 实测）——待磊哥窗口令 |
-| B1b | S8 G1 closure receipt 链（nonce/prelaunch inventory/completion seal） | PLAN | `runs/2026-07-10-ma13/reports/S8-IGNITION-READINESS-REFRESH.md:4` 总态 PARTIAL：launcher 缺 G1 字段，兼容补丁**草稿在未实施**（审计 P0-02）。⭐点火前落此小补丁，否则 9-11h 产物无法被 B6/V8 诚实消费 |
+| B1b | S8 G1 closure receipt 链（nonce/prelaunch inventory/completion seal） | 实装 MERGED a3160c88（launcher run-dir 侧接线留点火窗） | `runs/2026-07-10-ma13/reports/S8-IGNITION-READINESS-REFRESH.md:4` 总态 PARTIAL：launcher 缺 G1 字段，兼容补丁**草稿在未实施**（审计 P0-02）。⭐点火前落此小补丁，否则 9-11h 产物无法被 B6/V8 诚实消费 |
 | B2 | S9 三臂 eval | READY_AFTER_S8 | holdout FROZEN 61 行四桶 33/9/10/9，sha256 `77853cae…`（D-127 `docs/commander-log/decisions.md:1146`）；🔴 新前置=B7 的 T02 digest/exposure freeze 先于 S9（审计 P1-02） |
 | B3 | S9b + S10 verdict | PLAN | 模板+四类分流 D-114 预拍；🔴 前置=T01/T02 RATIFIED（§二） |
 | B4 | S11 renderer ack | PLAN | v5 §一 序 |
 | B5 | C2 扩挂载（三档表零临场） | PLAN | gate=S10 verdict |
 | B6 | 翻绿 promotion transaction（去重后独占部分） | PLAN | greening v3-DRAFT 的 G1-G8 与 B1/B2/W1-W3/V8 重叠（审计 P1-01）——B6 只保留 promotion 独占事务，G8 join 归 V8 |
-| B7 | T02 corpus/regen/denominator 收敛 | GAP | Wave G2；含 release corpus freeze（前移到 S9 前） |
+| B7 | T02 corpus/regen/denominator 收敛 | PARTIALLY_RATIFIED（D-144；freeze→S9 硬边不变） | Wave G2；含 release corpus freeze（前移到 S9 前） |
 
 ### 接线链（13 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
-| W1 | int-v5a：matrix rename（canDemo→actionDemoProven）+ canonical contract bundle/default runner（App diff-free） | **READY_NOW** | `SPEC-v5a-implementation-dispatch.md`（两 commit 结构；Task9 App admission diff-free）——唯一当前可开工实施包（审计 P0-04 owner 修正） |
+| W1 | int-v5a：matrix rename（canDemo→actionDemoProven）+ canonical contract bundle/default runner（App diff-free） | **DONE**（merge ba2c3636，D-145） | 审计链=XAUDIT→修复→RECHECK 全 FIXED+commander 三件套亲跑 784/6/0 |
 | W2 | int-v5b：deny-first frontstage admission + customer MicDock→façade + frontstage receipt + run-identity ABI | READY_AFTER_V5A | `SPEC-v5b:4-8` status=READY_FOR_POST_V5A_DISPATCH；🔴 其中 **customer façade/default composition 部分另需 T03/T04 interface cut RATIFIED**（审计 P1-03——防 customer code 再跑在 authority 前）；不依赖 T04 的 deny-first containment 部分可随 v5a 后先行 |
 | W3 | int-v5c：witness + probe catalog | READY_AFTER_V5A_V5B | `SPEC-v5c:4-8`（要 v5b authenticated receipt） |
 | W4 | int-v5d：reliability（p95≤800ms/20-turn/300s soak） | READY_AFTER_V5ABC | `SPEC-v5d:4-8` READY_AFTER_EXACT_PREDECESSORS |
-| W5a | T04a ingress façade（text 输入/统一 ingress 语义/校验） | GAP | Wave G1；T04 弹药 Q1-Q4 |
-| W5b | local model artifact/load readiness（MLX/Qwen 供给+预热） | GAP | Wave G1；仓内无 MLX runtime 依赖（GAP-HUNT T04 段）；artifact identity 与 T06 咬合 |
-| W5c | T04b production composition root（唯一装配点/default backend） | GAP | Wave G1 grill + 🔴 前置=T03+T09 contract cut（审计 P1-02：production composition 只能消费 route/lifecycle 边界） |
-| W5d | decode policy（multi-call fail-closed/metadata-aware parser） | GAP | Wave G1；exactly-one authority=`openspec/specs/tool-execution/spec.md:18-24` |
-| W6 | T03 C4 路由 active spec + L1-L5 本体 | GAP | Wave G1 |
+| W5a | T04a ingress façade（text 输入/统一 ingress 语义/校验） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；T04 弹药 Q1-Q4 |
+| W5b | local model artifact/load readiness（MLX/Qwen 供给+预热） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；仓内无 MLX runtime 依赖（GAP-HUNT T04 段）；artifact identity 与 T06 咬合 |
+| W5c | T04b production composition root（唯一装配点/default backend） | RATIFIED_PENDING_PLAN（D-143；硬边 T03✅+T09⏳ 未齐禁实装） | Wave G1 grill + 🔴 前置=T03+T09 contract cut（审计 P1-02：production composition 只能消费 route/lifecycle 边界） |
+| W5d | decode policy（multi-call fail-closed/metadata-aware parser） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；exactly-one authority=`openspec/specs/tool-execution/spec.md:18-24` |
+| W6 | T03 C4 路由 active spec + L1-L5 本体 | RATIFIED_PENDING_PLAN（D-143） | Wave G1 |
 | W7 | T10 DialogueState 消费语义 | GAP | Wave G3 |
 | W8 | T09 session lifecycle/cancel/recovery | GAP | Wave G3 |
 | W9 | T08 force-state 单一 authority | GAP | Wave G3 |
@@ -58,7 +58,7 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 ### 验收链（8 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
-| V1 | T01 C6 量尺 authority 归并/阈值/promotion | GAP | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
+| V1 | T01 C6 量尺 authority 归并/阈值/promotion | PARTIALLY_RATIFIED（D-144；12 parent 上抛在途） | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
 | V2 | T07 operator-pass ceremony（T07a ceremony contract / T07b final operator run） | GAP | Wave G3；🔴 T07b 前置=T06 artifact/build identity（审计 P1-02） |
 | V3 | T11 性能门归属（PF1 + int-v5d receipt 进 closure verdict） | GAP | Wave G4 |
 | V4 | T06 S6 Mac 打包边界（audience/artifact/签名公证 in-out） | GAP | Wave G4；U43 internal-only 已锁 |
