@@ -34,8 +34,8 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(
             partialEntries.map(\.message),
             [
-                "partial_subaction:accepted-ac:accepted:state_mutation=true",
-                "partial_subaction:refused-window:refused:state_mutation=false",
+                "partial_subaction:accepted-ac:accepted:tool_call_count=1:readback_count=1:state_mutation=true",
+                "partial_subaction:refused-window:refused:tool_call_count=0:readback_count=0:state_mutation=false",
             ]
         )
         XCTAssertEqual(partialEntries[0].attributes.toolCallCount, 1)
@@ -76,10 +76,86 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(trace.entries.filter { $0.stage == .readback }.count, 1)
 
         let refusedEntry = try XCTUnwrap(
-            trace.entries.first { $0.message == "partial_subaction:refused-door:refused:state_mutation=false" }
+            trace.entries.first { $0.message == "partial_subaction:refused-door:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(refusedEntry.attributes.toolCallCount, 0)
         XCTAssertEqual(refusedEntry.attributes.finiteReason, "safety_or_policy_refusal")
+    }
+
+    @MainActor
+    func testTwoAcceptedReviewedFramesProduceAcceptedOutcomeRatherThanPartialRefusal() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let power = acPowerFrame(id: "accepted-power", traceID: "trace-all-accepted")
+        let temperature = acTemperatureFrame(id: "accepted-temperature", traceID: "trace-all-accepted")
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline(),
+            traceLogger: trace,
+            speech: RecordingSpeechSynthesisEngine(),
+            planDecoder: { _ in [power, temperature] }
+        )
+
+        let payload = try await runner.run(text: "打开空调并调到26度")
+
+        XCTAssertEqual(payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(payload.outcome.reason, "readback_verified")
+        XCTAssertNotEqual(payload.outcome.result, .partialAcceptPartialRefuse)
+        XCTAssertEqual(payload.reconciliation.status, .verified)
+        XCTAssertEqual(payload.readbacks.map(\.key), ["ac.power", "ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+    }
+
+    @MainActor
+    func testTwoRefusedReviewedFramesProduceRefusalWithoutVerifiedReconciliation() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let first = unmountedWindowFrame(id: "refused-window-one", traceID: "trace-all-refused")
+        let second = unmountedWindowFrame(id: "refused-window-two", traceID: "trace-all-refused")
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: trace,
+            speech: RecordingSpeechSynthesisEngine(),
+            planDecoder: { _ in [first, second] }
+        )
+
+        let payload = try await runner.run(text: "打开两个未挂载车窗")
+
+        XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
+        XCTAssertEqual(payload.outcome.reason, "unmounted_tool_name")
+        XCTAssertNotEqual(payload.outcome.result, .partialAcceptPartialRefuse)
+        XCTAssertEqual(payload.reconciliation.status, .notApplicable)
+        XCTAssertTrue(payload.readbacks.isEmpty)
+        XCTAssertEqual(store.currentRevision, 0)
+        XCTAssertEqual(trace.entries.filter { $0.stage == .execute }.count, 0)
+    }
+
+    @MainActor
+    func testAcceptedFrameWithMultipleReadbacksCountsOneToolCallAndRecordsReadbackCount() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let temperature = acTemperatureFrame(id: "accepted-temperature", traceID: "trace-multi-readback")
+        let refused = unmountedWindowFrame(id: "refused-window", traceID: "trace-multi-readback")
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline(),
+            traceLogger: trace,
+            speech: RecordingSpeechSynthesisEngine(),
+            planDecoder: { _ in [temperature, refused] }
+        )
+
+        let payload = try await runner.run(text: "空调调到26度并打开车窗")
+
+        XCTAssertEqual(payload.outcome.result, .partialAcceptPartialRefuse)
+        XCTAssertEqual(payload.readbacks.map(\.key), ["ac.power", "ac.temp_setpoint[主驾]"])
+        let acceptedEntry = try XCTUnwrap(
+            trace.entries.first {
+                $0.message == "partial_subaction:accepted-temperature:accepted:tool_call_count=1:readback_count=2:state_mutation=true"
+            }
+        )
+        XCTAssertEqual(acceptedEntry.attributes.toolCallCount, 1)
     }
 
     @MainActor
@@ -107,7 +183,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(trace.entries.filter { $0.stage == .readback }.count, 1)
 
         let staleEntry = try XCTUnwrap(
-            trace.entries.first { $0.message == "partial_subaction:stale-ac-off:refused:state_mutation=false" }
+            trace.entries.first { $0.message == "partial_subaction:stale-ac-off:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(staleEntry.attributes.toolCallCount, 0)
         XCTAssertEqual(staleEntry.attributes.finiteReason, "stale_state_revision")
@@ -136,7 +212,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(trace.entries.filter { $0.stage == .readback }.count, 1)
 
         let unknownEntry = try XCTUnwrap(
-            trace.entries.first { $0.message == "partial_subaction:unknown-action:refused:state_mutation=false" }
+            trace.entries.first { $0.message == "partial_subaction:unknown-action:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(unknownEntry.attributes.toolCallCount, 0)
         XCTAssertEqual(unknownEntry.attributes.finiteReason, "unsupported_tool_plan")
@@ -163,7 +239,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "ambient.color")?.actualValue, "白")
 
         let refusedEntry = try XCTUnwrap(
-            trace.entries.first { $0.message == "partial_subaction:bad-color:refused:state_mutation=false" }
+            trace.entries.first { $0.message == "partial_subaction:bad-color:refused:tool_call_count=0:readback_count=0:state_mutation=false" }
         )
         XCTAssertEqual(refusedEntry.attributes.toolCallCount, 0)
         XCTAssertEqual(refusedEntry.attributes.finiteReason, "unsupported_tool_plan")
@@ -262,6 +338,21 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             device: "ac",
             actionPrimitive: "power_on",
             value: ContractValue(offset: "on", type: "STATE"),
+            stateRevision: 0,
+            candidateSource: .fastPath
+        )
+    }
+
+    private func acTemperatureFrame(id: String, traceID: String) -> ToolCallFrame {
+        ToolCallFrame(
+            id: id,
+            traceID: traceID,
+            agentID: "vehicle-control",
+            capabilityID: "vehicle.ac.temperature",
+            toolName: "adjust_ac_temperature_to_number",
+            device: "ac_temperature",
+            actionPrimitive: "adjust_to_number",
+            value: ContractValue(direct: "26", type: "SPOT"),
             stateRevision: 0,
             candidateSource: .fastPath
         )
