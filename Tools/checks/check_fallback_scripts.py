@@ -107,12 +107,12 @@ def duplicate_values(values: list[str]) -> list[str]:
 
 def expected_generated_entry(source: dict[str, Any], cell: dict[str, Any]) -> dict[str, Any]:
     family = cell["family"]
+    index = source["cells"].index(cell) + 1
     return {
-        "cellID": cell["cell_id"],
+        "cellID": f"fallback.{family}.{index:02d}.{cell['locale']}",
         "locale": cell["locale"],
         "family": family,
         "familyLabel": source["families"][family]["familyLabel"],
-        "reasonKind": cell["reason_kind"],
         "resultKind": cell["result_kind"],
         "safeReasonKind": cell["safeReasonKind"],
         "dialogText": cell["dialogText"],
