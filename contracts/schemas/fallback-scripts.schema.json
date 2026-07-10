@@ -7,6 +7,7 @@
   "required": [
     "schema_version",
     "authority",
+    "basis_scope_note",
     "family_enum",
     "customer_surface_policy",
     "families",
@@ -14,6 +15,9 @@
   ],
   "properties": {
     "schema_version": {"const": "demo_fallback_scripts.v1"},
+    "basis_scope_note": {
+      "const": "C1 hard gate: basis_refs SHALL identify unique strings in authoritative SSOT contract sources. Runtime/IR/mounted fact-resolution is follow-up evidence and SHALL NOT fail the 40-cell catalog gate."
+    },
     "authority": {
       "type": "object",
       "additionalProperties": false,
