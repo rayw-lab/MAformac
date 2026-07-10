@@ -1,0 +1,19 @@
+{
+  "schema_version": "s10_receipt.v1",
+  "receipt_id": "s10-fixture-stale-run",
+  "captured_at": "2026-07-10T01:04:00Z",
+  "proof_class": "local",
+  "evaluation_scope": {
+    "run_id": "s10-fixture-stale",
+    "eval_set_id": "fixture-negative-v1",
+    "s10_stage": "s10_verdict"
+  },
+  "hedged": {"attempts": 20, "strikes": 12, "strike_rate": 0.6},
+  "can_question": {"attempts": 20, "strikes": 13, "strike_rate": 0.65},
+  "joint_strike_rate": 0.6,
+  "tier_decision": {
+    "tier": "expand_3_families_40_to_70",
+    "mounted_expansion_allowed": true,
+    "planned_family_count": 3
+  }
+}

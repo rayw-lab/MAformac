@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://maformac.local/schemas/s10-receipt.schema.json",
+  "title": "MAformac S10 structured receipt",
+  "description": "Fixture-consumable S10 receipt contract. Passing this schema/checker does not prove S10 executed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "captured_at",
+    "proof_class",
+    "evaluation_scope",
+    "hedged",
+    "can_question",
+    "joint_strike_rate",
+    "tier_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "s10_receipt.v1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "proof_class": {
+      "type": "string",
+      "enum": ["local", "unit", "integration", "runtime", "desktop_operator_equivalent"]
+    },
+    "evaluation_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "eval_set_id", "s10_stage"],
+      "properties": {
+        "run_id": {"type": "string", "minLength": 1},
+        "eval_set_id": {"type": "string", "minLength": 1},
+        "s10_stage": {"const": "s10_verdict"}
+      }
+    },
+    "hedged": {"$ref": "#/$defs/strike_arm"},
+    "can_question": {"$ref": "#/$defs/strike_arm"},
+    "joint_strike_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Must equal min(hedged.strike_rate, can_question.strike_rate)."
+    },
+    "tier_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier", "mounted_expansion_allowed", "planned_family_count"],
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": [
+            "no_expand_lt_40",
+            "expand_3_families_40_to_70",
+            "expand_10_families_gt_70"
+          ]
+        },
+        "mounted_expansion_allowed": {"type": "boolean"},
+        "planned_family_count": {"type": "integer", "enum": [0, 3, 10]}
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional prose only; never substitutes for joint_strike_rate."
+    }
+  },
+  "$defs": {
+    "strike_arm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attempts", "strikes", "strike_rate"],
+      "properties": {
+        "attempts": {"type": "integer", "minimum": 1},
+        "strikes": {"type": "integer", "minimum": 0},
+        "strike_rate": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    }
+  }
+}
