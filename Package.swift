@@ -13,7 +13,8 @@ let package = Package(
         .executable(name: "C5DataGateCLI", targets: ["C5DataGateCLI"]),
         .executable(name: "C5TrainingCLI", targets: ["C5TrainingCLI"]),
         .executable(name: "C6BenchCLI", targets: ["C6BenchCLI"]),
-        .executable(name: "Gate7DryRunCLI", targets: ["Gate7DryRunCLI"])
+        .executable(name: "Gate7DryRunCLI", targets: ["Gate7DryRunCLI"]),
+        .executable(name: "FrontstageRouteGateCLI", targets: ["FrontstageRouteGateCLI"])
     ],
     targets: [
         .target(
@@ -75,6 +76,11 @@ let package = Package(
             name: "Gate7DryRunCLI",
             dependencies: ["MAformacCore"],
             path: "Tools/Gate7DryRunCLI"
+        ),
+        .executableTarget(
+            name: "FrontstageRouteGateCLI",
+            dependencies: ["MAformacCore"],
+            path: "Tools/FrontstageRouteGateCLI"
         )
     ]
 )
