@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -35,7 +35,7 @@ GENERATED_SWIFT := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-mounted-catalog-no-delta diff test verify-contentview-wiring
+verify: .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta diff test verify-contentview-wiring
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
@@ -43,7 +43,43 @@ verify-all: verify swift-test
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register diff test swift-test verify-contentview-wiring
+verify-ci: .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-ci-receipt diff test swift-test verify-contentview-wiring
+
+verify-c1-matrix: verify-c1-probes
+	mkdir -p .build/c1-run/receipts/c1
+	$(PYTHON_BOOTSTRAP) Tools/checks/check_capability_matrix.py check \
+		--probe-receipt .build/c1-run/receipts/c1/runtime-no-mutation-40-probes.json \
+		--matrix contracts/demo-capability-matrix.json \
+		--receipt .build/c1-run/receipts/c1/capability-matrix.json
+
+verify-c1-fallback:
+	@if [ ! -f Tools/checks/check_fallback_scripts.py ]; then \
+		echo "SKIP_PENDING_SLICE verify-c1-fallback"; \
+	else \
+		mkdir -p /tmp/maformac-c1-checks; \
+		$(PYTHON_BOOTSTRAP) Tools/checks/check_fallback_scripts.py \
+			--source contracts/fallback-scripts.yaml \
+			--schema contracts/schemas/fallback-scripts.schema.json \
+			--generated-json generated/demo-fallback-scripts.catalog.json \
+			--receipt /tmp/maformac-c1-checks/fallback-scripts.json; \
+	fi
+
+verify-c1-probes: .venv/.deps.stamp
+	$(PYTHON_BOOTSTRAP) -m unittest scripts/test_check_runtime_no_mutation_receipts.py
+	C1_RUN_DIR="$(CURDIR)/.build/c1-run" swift test --filter RuntimeNoMutationProbeTests
+	$(PYTHON_BOOTSTRAP) Tools/checks/check_runtime_no_mutation_receipts.py check \
+		--receipt .build/c1-run/receipts/c1/runtime-no-mutation-40-probes.json \
+		--output .build/c1-run/receipts/c1/runtime-no-mutation-check.json
+
+verify-c1-s10:
+	@if [ ! -f scripts/check_s10_receipt.py ]; then \
+		echo "SKIP_PENDING_SLICE verify-c1-s10"; \
+	else \
+		$(PYTHON_BOOTSTRAP) scripts/test_check_s10_receipt.py; \
+	fi
+
+verify-ci-receipt:
+	$(PYTHON_BOOTSTRAP) scripts/test_write_verify_ci_receipt.py
 
 swift-test:
 	swift test
