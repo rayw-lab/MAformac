@@ -16,6 +16,7 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
     public var readbacks: [DemoActionReadback]
     public var finiteReason: String?
     public var observedToolCallCount: Int
+    public var observedReadbackCount: Int
     public var stateMutation: Bool
 
     public init(
@@ -24,6 +25,7 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
         readbacks: [DemoActionReadback],
         finiteReason: String?,
         observedToolCallCount: Int,
+        observedReadbackCount: Int,
         stateMutation: Bool
     ) {
         self.frameID = frameID
@@ -31,6 +33,7 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
         self.readbacks = readbacks
         self.finiteReason = finiteReason
         self.observedToolCallCount = observedToolCallCount
+        self.observedReadbackCount = observedReadbackCount
         self.stateMutation = stateMutation
     }
 }
@@ -113,7 +116,8 @@ public struct DemoRuntimePartialPlan: Sendable {
                     disposition: .accepted,
                     readbacks: result.readbacks,
                     finiteReason: nil,
-                    observedToolCallCount: result.readbacks.count,
+                    observedToolCallCount: 1,
+                    observedReadbackCount: result.readbacks.count,
                     stateMutation: before != after
                 )
                 record(item, traceID: traceID, traceLogger: traceLogger)
@@ -204,6 +208,7 @@ public struct DemoRuntimePartialPlan: Sendable {
             readbacks: [],
             finiteReason: finiteReason,
             observedToolCallCount: 0,
+            observedReadbackCount: 0,
             stateMutation: false
         )
         record(item, traceID: traceID, traceLogger: traceLogger)
@@ -220,7 +225,7 @@ public struct DemoRuntimePartialPlan: Sendable {
         traceID: String,
         traceLogger: any TraceLogger
     ) {
-        let message = "partial_subaction:\(item.frameID):\(item.disposition.rawValue):state_mutation=\(item.stateMutation)"
+        let message = "partial_subaction:\(item.frameID):\(item.disposition.rawValue):tool_call_count=\(item.observedToolCallCount):readback_count=\(item.observedReadbackCount):state_mutation=\(item.stateMutation)"
         let attributes = TraceAttributes(
             toolCallCount: item.observedToolCallCount,
             guardReason: item.finiteReason,

@@ -123,13 +123,83 @@ public final class DemoRuntimeSessionRunner {
             }
 
             let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
-            let snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+            if partialResult.hasAccepted && partialResult.hasRefused {
+                let snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                    traceID: partialResult.traceID,
+                    acceptedReadbacks: acceptedReadbacks,
+                    acceptedCards: acceptedCards,
+                    refusedCards: [],
+                    reason: "partial_accept_refuse",
+                    traceEnvelope: traceEnvelope,
+                    timestamp: timestampProvider()
+                )
+                return RuntimePresentationPayload(
+                    snapshot: snapshot,
+                    turnID: frameResult.id,
+                    eventID: "\(frameResult.id):runtime-presentation",
+                    reconciliation: PresentationReconciliation(
+                        status: .verified,
+                        readbackKey: acceptedReadbacks.last?.key,
+                        safeReason: "partial_readback_verified"
+                    )
+                )
+            }
+
+            if partialResult.hasAccepted {
+                let semantics = acceptedCards.map { cell in
+                    PresentationCardSemantics(
+                        cellKey: cell.key,
+                        role: .accepted,
+                        scopeOrigin: acceptedReadbacks.first { $0.key == cell.key }?.scopeOrigin,
+                        reason: "readback_verified",
+                        isActive: true
+                    )
+                }
+                let snapshot = PresentationSnapshot(
+                    traceID: partialResult.traceID,
+                    runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
+                    cards: acceptedCards,
+                    cardSemantics: semantics,
+                    dialogText: dialogText.isEmpty ? nil : dialogText,
+                    readbacks: acceptedReadbacks,
+                    scopeOrigin: acceptedReadbacks.compactMap(\.scopeOrigin).first,
+                    voiceState: dialogText.isEmpty ? .idle : .speak,
+                    orbState: dialogText.isEmpty ? .idle : .speak,
+                    proofClass: .localUnit,
+                    traceEnvelope: traceEnvelope,
+                    isTerminal: true,
+                    timestamp: timestampProvider()
+                )
+                return RuntimePresentationPayload(
+                    snapshot: snapshot,
+                    turnID: frameResult.id,
+                    eventID: "\(frameResult.id):runtime-presentation",
+                    reconciliation: PresentationReconciliation(
+                        status: .verified,
+                        readbackKey: acceptedReadbacks.last?.key,
+                        safeReason: "c2_readback_verified"
+                    )
+                )
+            }
+
+            let finiteReasons = partialResult.subactions.compactMap(\.finiteReason)
+            let refusalReason = Set(finiteReasons).count == 1 ? finiteReasons[0] : "partial_refusal"
+            let refusalResult: DemoRuntimeResult
+            switch refusalReason {
+            case "clarify_missing_slot":
+                refusalResult = .clarifyMissingSlot
+            case "safety_or_policy_refusal":
+                refusalResult = .refusalSafetyOrPolicy
+            default:
+                refusalResult = .refusalNoAvailableTool
+            }
+            let snapshot = PresentationSnapshot(
                 traceID: partialResult.traceID,
-                acceptedReadbacks: acceptedReadbacks,
-                acceptedCards: acceptedCards,
-                refusedCards: [],
-                reason: "partial_accept_refuse",
+                runtimeOutcome: DemoRuntimeOutcome(result: refusalResult, reason: refusalReason),
+                cards: store.presentationCells,
+                proofClass: .localUnit,
                 traceEnvelope: traceEnvelope,
+                isTerminal: true,
                 timestamp: timestampProvider()
             )
             return RuntimePresentationPayload(
@@ -137,9 +207,8 @@ public final class DemoRuntimeSessionRunner {
                 turnID: frameResult.id,
                 eventID: "\(frameResult.id):runtime-presentation",
                 reconciliation: PresentationReconciliation(
-                    status: .verified,
-                    readbackKey: acceptedReadbacks.last?.key,
-                    safeReason: "partial_readback_verified"
+                    status: .notApplicable,
+                    safeReason: refusalReason
                 )
             )
         }
