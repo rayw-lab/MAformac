@@ -1,0 +1,1491 @@
+{
+  "schema_version": "demo_fallback_scripts.v1",
+  "authority": {
+    "t0_commit": "15f1d60908795fc3859fa5a9239d731678f1339d",
+    "t0_change": "add-c1-demo-capability-governance",
+    "t0_spec": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md"
+  },
+  "family_enum": [
+    "ac",
+    "seat",
+    "window",
+    "door",
+    "ambient",
+    "screen",
+    "volume",
+    "wiper",
+    "sunroofShade",
+    "fragrance"
+  ],
+  "governance_reason_enum": [
+    "safety_or_clarify_reject",
+    "unmounted_name_rejected",
+    "fast_path_no_match_fallback",
+    "unknown_no_representative_entry"
+  ],
+  "safe_reason_kind_enum": [
+    "safety_policy",
+    "clarification_required",
+    "capability_not_mounted",
+    "not_available_in_demo"
+  ],
+  "result_kind_enum": [
+    "refusal_safety_or_policy",
+    "clarify_missing_slot",
+    "refusal_no_available_tool"
+  ],
+  "internal_reason_mappings": {
+    "safety_or_policy_refusal": "safety_policy_refused",
+    "clarify_missing_slot": "clarify_missing_slot",
+    "unmounted_tool_name": "unmounted_name_rejected",
+    "name_rejected": "unmounted_name_rejected",
+    "fast_path_no_match": "unsupported_no_available_tool",
+    "unsupported_tool_plan": "unsupported_no_available_tool",
+    "no_representative_tool": "no_representative_tool__default_fallback"
+  },
+  "customer_surface_policy": {
+    "allowed_fields": [
+      "familyLabel",
+      "safeReasonKind",
+      "resultKind",
+      "dialogText",
+      "ttsText",
+      "badgeLabel"
+    ],
+    "forbidden_fields": [
+      "finiteReason",
+      "rawFiniteReason",
+      "internalReason",
+      "basis_refs",
+      "probe_id"
+    ],
+    "banned_phrases": [
+      "这个我先记下来，稍后帮您处理",
+      "稍后处理",
+      "FastPath",
+      "DDomain",
+      "mounted",
+      "SSOT",
+      "matrix",
+      "我再执行",
+      "之后执行",
+      "稍后执行",
+      "自动执行",
+      "自动处理",
+      "已排队",
+      "等条件满足后执行"
+    ]
+  },
+  "families": {
+    "ac": {
+      "familyLabel": "空调",
+      "aliases": [
+        "air_conditioner"
+      ],
+      "suggestedDemoUtterance": "空调调到26度"
+    },
+    "seat": {
+      "familyLabel": "座椅",
+      "aliases": [],
+      "suggestedDemoUtterance": "主驾座椅加热打开"
+    },
+    "window": {
+      "familyLabel": "车窗",
+      "aliases": [],
+      "suggestedDemoUtterance": "主驾车窗打开一半"
+    },
+    "door": {
+      "familyLabel": "车门",
+      "aliases": [],
+      "suggestedDemoUtterance": "停稳后打开主驾车门"
+    },
+    "ambient": {
+      "familyLabel": "氛围灯",
+      "aliases": [
+        "ambient_light"
+      ],
+      "suggestedDemoUtterance": "氛围灯调亮一点"
+    },
+    "screen": {
+      "familyLabel": "屏幕",
+      "aliases": [],
+      "suggestedDemoUtterance": "中控屏亮度调高"
+    },
+    "volume": {
+      "familyLabel": "音量",
+      "aliases": [],
+      "suggestedDemoUtterance": "音量调低一点"
+    },
+    "wiper": {
+      "familyLabel": "雨刮",
+      "aliases": [],
+      "suggestedDemoUtterance": "打开雨刮"
+    },
+    "sunroofShade": {
+      "familyLabel": "天窗遮阳",
+      "aliases": [
+        "sunroof_shade"
+      ],
+      "suggestedDemoUtterance": "打开天窗遮阳帘"
+    },
+    "fragrance": {
+      "familyLabel": "香氛",
+      "aliases": [],
+      "suggestedDemoUtterance": "打开香氛"
+    }
+  },
+  "cells": [
+    {
+      "cell_id": "fallback.ac.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "ac",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "请先确认温区或目标温度，我先保持空调状态不变。",
+      "ttsText": "请先确认温区或目标温度，我先保持空调状态不变。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ac.power"
+        }
+      ],
+      "probe_id": "probe.fallback.ac.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.ac.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ac.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "ac",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "这项空调控制暂未接入演示版，我先不改车内状态。",
+      "ttsText": "这项空调控制暂未接入演示版，我先不改车内状态。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ac.power"
+        }
+      ],
+      "probe_id": "probe.fallback.ac.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.ac.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ac.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "ac",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个空调说法还没稳稳接住，您可以说空调调到26度。",
+      "ttsText": "这个空调说法还没稳稳接住，您可以说空调调到26度。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ac.power"
+        }
+      ],
+      "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.ac.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ac.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "ac",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类空调能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类空调能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ac.power"
+        }
+      ],
+      "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.ac.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.seat.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "seat",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "座椅动作需要确认位置，我先保持座椅不动。",
+      "ttsText": "座椅动作需要确认位置，我先保持座椅不动。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: seat.heat_level"
+        }
+      ],
+      "probe_id": "probe.fallback.seat.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.seat.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.seat.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "seat",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "座椅控制暂未接入演示版，我先不移动座椅。",
+      "ttsText": "座椅控制暂未接入演示版，我先不移动座椅。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: seat.heat_level"
+        }
+      ],
+      "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.seat.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.seat.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "seat",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。",
+      "ttsText": "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: seat.heat_level"
+        }
+      ],
+      "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.seat.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.seat.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "seat",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类座椅能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类座椅能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: seat.heat_level"
+        }
+      ],
+      "probe_id": "probe.fallback.seat.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.seat.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.window.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "window",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "车窗动作需要确认位置和开度，我先保持车窗不变。",
+      "ttsText": "车窗动作需要确认位置和开度，我先保持车窗不变。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: window.position"
+        }
+      ],
+      "probe_id": "probe.fallback.window.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.window.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.window.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "window",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "车窗控制暂未接入演示版，我先不动车窗。",
+      "ttsText": "车窗控制暂未接入演示版，我先不动车窗。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: window.position"
+        }
+      ],
+      "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.window.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.window.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "window",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个车窗说法还没稳稳接住，您可以说主驾车窗打开一半。",
+      "ttsText": "这个车窗说法还没稳稳接住，您可以说主驾车窗打开一半。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: window.position"
+        }
+      ],
+      "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.window.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.window.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "window",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类车窗能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类车窗能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: window.position"
+        }
+      ],
+      "probe_id": "probe.fallback.window.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.window.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.door.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "door",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "refusal_safety_or_policy",
+      "safeReasonKind": "safety_policy",
+      "dialogText": "行驶中为了安全不能开门；停稳后请再说一次，我先保持车门不变。",
+      "ttsText": "行驶中为了安全不能开门；停稳后请再说一次，我先保持车门不变。",
+      "badgeLabel": "安全拦截",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: door.car_door"
+        },
+        {
+          "path": "contracts/risk-policy.yaml",
+          "contains": "- rule_id: door_open_while_moving"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: vehicle.speed"
+        }
+      ],
+      "probe_id": "probe.fallback.door.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.door.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.door.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "door",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "车门控制暂未接入演示版，我先不动车门。",
+      "ttsText": "车门控制暂未接入演示版，我先不动车门。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: door.car_door"
+        },
+        {
+          "path": "contracts/risk-policy.yaml",
+          "contains": "- rule_id: door_open_while_moving"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: vehicle.speed"
+        }
+      ],
+      "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.door.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.door.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "door",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个车门说法还没稳稳接住，我先保持车门状态不变。",
+      "ttsText": "这个车门说法还没稳稳接住，我先保持车门状态不变。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: door.car_door"
+        },
+        {
+          "path": "contracts/risk-policy.yaml",
+          "contains": "- rule_id: door_open_while_moving"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: vehicle.speed"
+        }
+      ],
+      "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.door.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.door.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "door",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类车门能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类车门能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: door.car_door"
+        },
+        {
+          "path": "contracts/risk-policy.yaml",
+          "contains": "- rule_id: door_open_while_moving"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: vehicle.speed"
+        }
+      ],
+      "probe_id": "probe.fallback.door.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.door.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ambient.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "ambient",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "氛围灯效果需要确认颜色或亮度，我先保持灯光不变。",
+      "ttsText": "氛围灯效果需要确认颜色或亮度，我先保持灯光不变。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ambient.color"
+        }
+      ],
+      "probe_id": "probe.fallback.ambient.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.ambient.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ambient.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "ambient",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "氛围灯控制暂未接入演示版，我先不改灯光。",
+      "ttsText": "氛围灯控制暂未接入演示版，我先不改灯光。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ambient.color"
+        }
+      ],
+      "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.ambient.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ambient.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "ambient",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个氛围灯说法还没稳稳接住，您可以说氛围灯调亮一点。",
+      "ttsText": "这个氛围灯说法还没稳稳接住，您可以说氛围灯调亮一点。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ambient.color"
+        }
+      ],
+      "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.ambient.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.ambient.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "ambient",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类氛围灯能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类氛围灯能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: ambient.color"
+        }
+      ],
+      "probe_id": "probe.fallback.ambient.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.ambient.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.screen.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "screen",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "屏幕设置需要确认目标屏幕，我先保持显示不变。",
+      "ttsText": "屏幕设置需要确认目标屏幕，我先保持显示不变。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: screen.brightness"
+        }
+      ],
+      "probe_id": "probe.fallback.screen.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.screen.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.screen.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "screen",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "屏幕控制暂未接入演示版，我先不改屏幕设置。",
+      "ttsText": "屏幕控制暂未接入演示版，我先不改屏幕设置。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: screen.brightness"
+        }
+      ],
+      "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.screen.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.screen.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "screen",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个屏幕说法还没稳稳接住，您可以说中控屏亮度调高。",
+      "ttsText": "这个屏幕说法还没稳稳接住，您可以说中控屏亮度调高。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: screen.brightness"
+        }
+      ],
+      "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.screen.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.screen.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "screen",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类屏幕能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类屏幕能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: screen.brightness"
+        }
+      ],
+      "probe_id": "probe.fallback.screen.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.screen.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.volume.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "volume",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "音量变化需要确认方向，我先保持当前音量。",
+      "ttsText": "音量变化需要确认方向，我先保持当前音量。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: volume.level"
+        }
+      ],
+      "probe_id": "probe.fallback.volume.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.volume.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.volume.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "volume",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "音量控制暂未接入演示版，我先不改音量。",
+      "ttsText": "音量控制暂未接入演示版，我先不改音量。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: volume.level"
+        }
+      ],
+      "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.volume.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.volume.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "volume",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个音量说法还没稳稳接住，您可以说音量调低一点。",
+      "ttsText": "这个音量说法还没稳稳接住，您可以说音量调低一点。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: volume.level"
+        }
+      ],
+      "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.volume.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.volume.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "volume",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类音量能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类音量能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: volume.level"
+        }
+      ],
+      "probe_id": "probe.fallback.volume.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.volume.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.wiper.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "wiper",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "雨刮动作需要确认模式或速度，我先保持雨刮不变。",
+      "ttsText": "雨刮动作需要确认模式或速度，我先保持雨刮不变。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: wiper.power"
+        }
+      ],
+      "probe_id": "probe.fallback.wiper.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.wiper.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.wiper.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "wiper",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "雨刮控制暂未接入演示版，我先不动雨刮。",
+      "ttsText": "雨刮控制暂未接入演示版，我先不动雨刮。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: wiper.power"
+        }
+      ],
+      "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.wiper.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.wiper.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "wiper",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个雨刮说法还没稳稳接住，您可以说打开雨刮。",
+      "ttsText": "这个雨刮说法还没稳稳接住，您可以说打开雨刮。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: wiper.power"
+        }
+      ],
+      "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.wiper.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.wiper.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "wiper",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类雨刮能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类雨刮能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: wiper.power"
+        }
+      ],
+      "probe_id": "probe.fallback.wiper.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.wiper.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "sunroofShade",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "天窗遮阳需要确认部件和开度，我先保持当前位置。",
+      "ttsText": "天窗遮阳需要确认部件和开度，我先保持当前位置。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: sunshade.position"
+        }
+      ],
+      "probe_id": "probe.fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.sunroofShade.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "sunroofShade",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "天窗遮阳控制暂未接入演示版，我先不动车顶部件。",
+      "ttsText": "天窗遮阳控制暂未接入演示版，我先不动车顶部件。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: sunshade.position"
+        }
+      ],
+      "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.sunroofShade.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "sunroofShade",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个天窗遮阳说法还没稳稳接住，您可以说打开天窗遮阳帘。",
+      "ttsText": "这个天窗遮阳说法还没稳稳接住，您可以说打开天窗遮阳帘。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: sunshade.position"
+        }
+      ],
+      "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.sunroofShade.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "sunroofShade",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类车顶部件不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类车顶部件不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: sunshade.position"
+        }
+      ],
+      "probe_id": "probe.fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.sunroofShade.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.fragrance.safety_or_clarify_reject.zh-CN",
+      "locale": "zh-CN",
+      "family": "fragrance",
+      "reason_kind": "safety_or_clarify_reject",
+      "result_kind": "clarify_missing_slot",
+      "safeReasonKind": "clarification_required",
+      "dialogText": "香氛设置需要确认模式或浓度，我先保持当前香氛。",
+      "ttsText": "香氛设置需要确认模式或浓度，我先保持当前香氛。",
+      "badgeLabel": "需确认",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: fragrance.power"
+        }
+      ],
+      "probe_id": "probe.fallback.fragrance.safety_or_clarify_reject.zh-CN",
+      "diagnostic_path": "scripts.fragrance.safety_or_clarify_reject",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.fragrance.unmounted_name_rejected.zh-CN",
+      "locale": "zh-CN",
+      "family": "fragrance",
+      "reason_kind": "unmounted_name_rejected",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "capability_not_mounted",
+      "dialogText": "香氛控制暂未接入演示版，我先不改香氛设置。",
+      "ttsText": "香氛控制暂未接入演示版，我先不改香氛设置。",
+      "badgeLabel": "暂未接入",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: fragrance.power"
+        }
+      ],
+      "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+      "diagnostic_path": "scripts.fragrance.unmounted_name_rejected",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+      "locale": "zh-CN",
+      "family": "fragrance",
+      "reason_kind": "fast_path_no_match_fallback",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这个香氛说法还没稳稳接住，您可以说打开香氛。",
+      "ttsText": "这个香氛说法还没稳稳接住，您可以说打开香氛。",
+      "badgeLabel": "换个说法",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: fragrance.power"
+        }
+      ],
+      "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+      "diagnostic_path": "scripts.fragrance.fast_path_no_match_fallback",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    },
+    {
+      "cell_id": "fallback.fragrance.unknown_no_representative_entry.zh-CN",
+      "locale": "zh-CN",
+      "family": "fragrance",
+      "reason_kind": "unknown_no_representative_entry",
+      "result_kind": "refusal_no_available_tool",
+      "safeReasonKind": "not_available_in_demo",
+      "dialogText": "这类香氛能力不在本轮演示范围，我先保持原样。",
+      "ttsText": "这类香氛能力不在本轮演示范围，我先保持原样。",
+      "badgeLabel": "不在范围",
+      "basis_refs": [
+        {
+          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
+          "contains": "The governance fallback classification SHALL be one of"
+        },
+        {
+          "path": "contracts/state-cells.yaml",
+          "contains": "- id: fragrance.power"
+        }
+      ],
+      "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+      "diagnostic_path": "scripts.fragrance.unknown_no_representative_entry",
+      "state_mutation_expected": "none",
+      "no_tool_call_expected": true,
+      "customer_surface_fields": [
+        "familyLabel",
+        "safeReasonKind",
+        "resultKind",
+        "dialogText",
+        "ttsText",
+        "badgeLabel"
+      ]
+    }
+  ]
+}
