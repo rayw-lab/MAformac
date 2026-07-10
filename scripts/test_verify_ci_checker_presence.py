@@ -12,19 +12,32 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAKEFILE = REPO_ROOT / "Makefile"
 CHECKER_PATHS = (
+    Path("Tools/checks/check_c1_ownership_map.py"),
     Path("Tools/checks/check_fallback_scripts.py"),
     Path("scripts/check_s10_receipt.py"),
 )
 MISSING_MARKER = "ERROR_MISSING_C1_CHECKER"
+OWNERSHIP_TARGET = "verify-c1-ownership"
+OWNERSHIP_SUITE = "scripts/test_check_c1_ownership_map.py"
+OWNERSHIP_CHECKER = "Tools/checks/check_c1_ownership_map.py"
 
 
 def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
-    verify_ci_line = next(
-        line
-        for line in MAKEFILE.read_text(encoding="utf-8").splitlines()
-        if line.startswith("verify-ci:")
-    )
+    makefile_text = MAKEFILE.read_text(encoding="utf-8")
+    makefile_lines = makefile_text.splitlines()
+    verify_line = next(line for line in makefile_lines if line.startswith("verify:"))
+    verify_ci_line = next(line for line in makefile_lines if line.startswith("verify-ci:"))
+    assert OWNERSHIP_TARGET in verify_line, verify_line
+    assert OWNERSHIP_TARGET in verify_ci_line, verify_ci_line
     assert "verify-c1-checker-files" in verify_ci_line, verify_ci_line
+
+    ownership_start = makefile_text.index(f"{OWNERSHIP_TARGET}:")
+    ownership_end = makefile_text.find("\n\n", ownership_start)
+    ownership_block = makefile_text[
+        ownership_start : ownership_end if ownership_end >= 0 else None
+    ]
+    assert OWNERSHIP_SUITE in ownership_block, ownership_block
+    assert OWNERSHIP_CHECKER in ownership_block, ownership_block
 
     for missing_relative in CHECKER_PATHS:
         with tempfile.TemporaryDirectory(prefix="verify-ci-checkers-") as tmp:
