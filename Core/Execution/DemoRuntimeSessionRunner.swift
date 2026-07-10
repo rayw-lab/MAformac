@@ -168,31 +168,13 @@ public final class DemoRuntimeSessionRunner {
 
             let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
             if partialResult.hasAccepted && partialResult.hasRefused {
-                let canProjectTypedRefusalIdentity =
-                    RuntimePresentationTerminalSnapshotAdapter.canProjectPartialRefusalIdentity(
-                        executionResult: partialResult,
-                        refusedCardsBySubactionID: refusedCardsBySubactionID
-                    )
-                let snapshot: PresentationSnapshot
-                if canProjectTypedRefusalIdentity {
-                    snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
-                        executionResult: partialResult,
-                        acceptedCards: acceptedCards,
-                        refusedCardsBySubactionID: refusedCardsBySubactionID,
-                        traceEnvelope: traceEnvelope,
-                        timestamp: timestampProvider()
-                    )
-                } else {
-                    snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
-                        traceID: partialResult.traceID,
-                        acceptedReadbacks: acceptedReadbacks,
-                        acceptedCards: acceptedCards,
-                        refusedCards: [],
-                        reason: "partial_accept_refuse",
-                        traceEnvelope: traceEnvelope,
-                        timestamp: timestampProvider()
-                    )
-                }
+                let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                    executionResult: partialResult,
+                    acceptedCards: acceptedCards,
+                    refusedCardsBySubactionID: refusedCardsBySubactionID,
+                    traceEnvelope: traceEnvelope,
+                    timestamp: timestampProvider()
+                )
                 return RuntimePresentationPayload(
                     snapshot: snapshot,
                     turnID: frameResult.id,
