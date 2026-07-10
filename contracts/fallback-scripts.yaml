@@ -1,9 +1,9 @@
 {
+  "basis_scope_note": "basis=SSOT contract string presence proof; runtime reason fact-resolver is a C1 follow-up, not a blocker.",
   "schema_version": "demo_fallback_scripts.v1",
   "authority": {
-    "t0_commit": "15f1d60908795fc3859fa5a9239d731678f1339d",
     "t0_change": "add-c1-demo-capability-governance",
-    "t0_spec": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md"
+    "t0_registry": "openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml"
   },
   "family_enum": [
     "ac",
@@ -17,32 +17,6 @@
     "sunroofShade",
     "fragrance"
   ],
-  "governance_reason_enum": [
-    "safety_or_clarify_reject",
-    "unmounted_name_rejected",
-    "fast_path_no_match_fallback",
-    "unknown_no_representative_entry"
-  ],
-  "safe_reason_kind_enum": [
-    "safety_policy",
-    "clarification_required",
-    "capability_not_mounted",
-    "not_available_in_demo"
-  ],
-  "result_kind_enum": [
-    "refusal_safety_or_policy",
-    "clarify_missing_slot",
-    "refusal_no_available_tool"
-  ],
-  "internal_reason_mappings": {
-    "safety_or_policy_refusal": "safety_policy_refused",
-    "clarify_missing_slot": "clarify_missing_slot",
-    "unmounted_tool_name": "unmounted_name_rejected",
-    "name_rejected": "unmounted_name_rejected",
-    "fast_path_no_match": "unsupported_no_available_tool",
-    "unsupported_tool_plan": "unsupported_no_available_tool",
-    "no_representative_tool": "no_representative_tool__default_fallback"
-  },
   "customer_surface_policy": {
     "allowed_fields": [
       "familyLabel",
@@ -79,6 +53,8 @@
   "families": {
     "ac": {
       "familyLabel": "空调",
+      "semantic_device": "ac",
+      "representative_tool": "close_ac",
       "aliases": [
         "air_conditioner"
       ],
@@ -86,21 +62,29 @@
     },
     "seat": {
       "familyLabel": "座椅",
+      "semantic_device": "seat_heat",
+      "representative_tool": "close_seat_heat",
       "aliases": [],
       "suggestedDemoUtterance": "主驾座椅加热打开"
     },
     "window": {
       "familyLabel": "车窗",
+      "semantic_device": "window",
+      "representative_tool": "close_window",
       "aliases": [],
       "suggestedDemoUtterance": "主驾车窗打开一半"
     },
     "door": {
       "familyLabel": "车门",
+      "semantic_device": "car_door",
+      "representative_tool": "close_car_door",
       "aliases": [],
       "suggestedDemoUtterance": "停稳后打开主驾车门"
     },
     "ambient": {
       "familyLabel": "氛围灯",
+      "semantic_device": "atmosphere_lamp_color",
+      "representative_tool": "switch_atmosphere_lamp_color",
       "aliases": [
         "ambient_light"
       ],
@@ -108,21 +92,29 @@
     },
     "screen": {
       "familyLabel": "屏幕",
+      "semantic_device": "screen_brightness",
+      "representative_tool": "adjust_screen_brightness_to_gear",
       "aliases": [],
       "suggestedDemoUtterance": "中控屏亮度调高"
     },
     "volume": {
       "familyLabel": "音量",
+      "semantic_device": "volume",
+      "representative_tool": "adjust_volume_to_gear",
       "aliases": [],
       "suggestedDemoUtterance": "音量调低一点"
     },
     "wiper": {
       "familyLabel": "雨刮",
+      "semantic_device": "wiper",
+      "representative_tool": "close_wiper",
       "aliases": [],
       "suggestedDemoUtterance": "打开雨刮"
     },
     "sunroofShade": {
       "familyLabel": "天窗遮阳",
+      "semantic_device": "sunshade",
+      "representative_tool": "close_sunshade",
       "aliases": [
         "sunroof_shade"
       ],
@@ -130,6 +122,8 @@
     },
     "fragrance": {
       "familyLabel": "香氛",
+      "semantic_device": "fragrance",
+      "representative_tool": "close_fragrance",
       "aliases": [],
       "suggestedDemoUtterance": "打开香氛"
     }
@@ -147,8 +141,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -180,8 +174,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -213,8 +207,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -246,8 +240,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -279,8 +273,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -312,8 +306,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -345,8 +339,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -378,8 +372,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -411,8 +405,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -444,8 +438,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -477,8 +471,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -510,8 +504,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -543,16 +537,16 @@
       "badgeLabel": "安全拦截",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
           "contains": "- id: door.car_door"
         },
         {
-          "path": "contracts/risk-policy.yaml",
-          "contains": "- rule_id: door_open_while_moving"
+          "path": "Core/Contracts/DDomainMountedToolCatalog.swift",
+          "contains": "mountedToolNames:"
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -584,16 +578,16 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
           "contains": "- id: door.car_door"
         },
         {
-          "path": "contracts/risk-policy.yaml",
-          "contains": "- rule_id: door_open_while_moving"
+          "path": "Core/Contracts/DDomainMountedToolCatalog.swift",
+          "contains": "mountedToolNames:"
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -625,16 +619,16 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
           "contains": "- id: door.car_door"
         },
         {
-          "path": "contracts/risk-policy.yaml",
-          "contains": "- rule_id: door_open_while_moving"
+          "path": "Core/Contracts/DDomainMountedToolCatalog.swift",
+          "contains": "mountedToolNames:"
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -666,16 +660,16 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
           "contains": "- id: door.car_door"
         },
         {
-          "path": "contracts/risk-policy.yaml",
-          "contains": "- rule_id: door_open_while_moving"
+          "path": "Core/Contracts/DDomainMountedToolCatalog.swift",
+          "contains": "mountedToolNames:"
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -707,8 +701,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -740,8 +734,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -773,8 +767,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -806,8 +800,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -839,8 +833,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -872,8 +866,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -905,8 +899,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -938,8 +932,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -971,8 +965,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1004,8 +998,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1037,8 +1031,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1070,8 +1064,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1103,8 +1097,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1136,8 +1130,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1169,8 +1163,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1202,8 +1196,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1235,8 +1229,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1268,8 +1262,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1301,8 +1295,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1334,8 +1328,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1367,8 +1361,8 @@
       "badgeLabel": "需确认",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1400,8 +1394,8 @@
       "badgeLabel": "暂未接入",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1433,8 +1427,8 @@
       "badgeLabel": "换个说法",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",
@@ -1466,8 +1460,8 @@
       "badgeLabel": "不在范围",
       "basis_refs": [
         {
-          "path": "openspec/changes/add-c1-demo-capability-governance/specs/demo-capability-governance/spec.md",
-          "contains": "The governance fallback classification SHALL be one of"
+          "path": "contracts/semantic-function-contract.jsonl",
+          "contains": "\"contract_row_id\":\"c1_airControl_000002\""
         },
         {
           "path": "contracts/state-cells.yaml",

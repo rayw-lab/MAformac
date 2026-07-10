@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate deterministic audit JSON and Swift lookup views from fallback-scripts.yaml."""
+"""Generate deterministic fallback catalog views from source plus the T0 registry."""
 
 from __future__ import annotations
 
@@ -7,58 +7,61 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-
-
-FAMILY_CASES = {
-    "ac": "ac",
-    "seat": "seat",
-    "window": "window",
-    "door": "door",
-    "ambient": "ambient",
-    "screen": "screen",
-    "volume": "volume",
-    "wiper": "wiper",
-    "sunroofShade": "sunroofShade",
-    "fragrance": "fragrance",
-}
-REASON_CASES = {
-    "safety_or_clarify_reject": "safetyOrClarifyReject",
-    "unmounted_name_rejected": "unmountedNameRejected",
-    "fast_path_no_match_fallback": "fastPathNoMatchFallback",
-    "unknown_no_representative_entry": "unknownNoRepresentativeEntry",
-}
-SAFE_CASES = {
-    "safety_policy": "safetyPolicy",
-    "clarification_required": "clarificationRequired",
-    "capability_not_mounted": "capabilityNotMounted",
-    "not_available_in_demo": "notAvailableInDemo",
-}
-RESULT_CASES = {
-    "refusal_safety_or_policy": "refusalSafetyOrPolicy",
-    "clarify_missing_slot": "clarifyMissingSlot",
-    "refusal_no_available_tool": "refusalNoAvailableTool",
-}
+from typing import Any
 
 
 def swift_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
-def enum_source(name: str, values: list[str], cases: dict[str, str], visibility: str = "public", codable: bool = True) -> list[str]:
+def swift_case(value: str) -> str:
+    pieces = value.replace("-", "_").split("_")
+    return pieces[0] + "".join(piece[:1].upper() + piece[1:] for piece in pieces[1:])
+
+
+def enum_source(name: str, values: list[str], visibility: str = "public", codable: bool = True) -> list[str]:
     protocols = "CaseIterable, Codable, Hashable, Sendable" if codable else "CaseIterable, Hashable, Sendable"
     lines = [f"{visibility} enum {name}: String, {protocols} {{"]
-    lines.extend(f"    case {cases[value]} = {swift_string(value)}" for value in values)
+    lines.extend(f"    case {swift_case(value)} = {swift_string(value)}" for value in values)
     lines.append("}")
     return lines
 
 
-def public_cell_id(source: dict, cell: dict) -> str:
+def ordered_projection_values(registry: dict[str, Any], field: str, bucket_reasons: set[str]) -> list[str]:
+    bucket_by_reason = {item["reason_kind"]: item["finite_reasons"] for item in registry["fallback_catalog_buckets"]}
+    selected_finite = {finite for reason in bucket_reasons for finite in bucket_by_reason[reason]}
+    projection_by_finite = {item["finiteReason"]: item for item in registry["finiteReason_projections"]}
+    values = {projection_by_finite[finite][field] for finite in selected_finite}
+    enum_key = "reasonKind_enum" if field == "reasonKind" else "bridge_result_enum"
+    return [value for value in registry[enum_key] if value in values]
+
+
+def load_registry(source: dict[str, Any], repo_root: Path, override: Path | None) -> tuple[dict[str, Any], Path]:
+    authority = source.get("authority", {})
+    if not isinstance(authority, dict) or authority.get("t0_change") != "add-c1-demo-capability-governance":
+        raise ValueError("fallback source must pin the add-c1-demo-capability-governance authority")
+    registry_reference = authority.get("t0_registry")
+    if override is None:
+        if not isinstance(registry_reference, str):
+            raise ValueError("fallback source must name t0_registry")
+        path = (repo_root / registry_reference).resolve()
+    else:
+        path = override.resolve()
+    registry = json.loads(path.read_text(encoding="utf-8"))
+    if registry.get("change_id") != "add-c1-demo-capability-governance":
+        raise ValueError("T0 registry change id mismatch")
+    if not isinstance(registry.get("fallback_catalog_buckets"), list):
+        raise ValueError("T0 registry lacks fallback catalog buckets")
+    return registry, path
+
+
+def public_cell_id(source: dict[str, Any], cell: dict[str, Any]) -> str:
     # Stable public identifier deliberately excludes governance vocabulary.
     index = source["cells"].index(cell) + 1
     return f"fallback.{cell['family']}.{index:02d}.{cell['locale']}"
 
 
-def public_entry(source: dict, cell: dict) -> dict:
+def public_entry(source: dict[str, Any], cell: dict[str, Any]) -> dict[str, Any]:
     family = cell["family"]
     return {
         "cellID": public_cell_id(source, cell),
@@ -73,19 +76,23 @@ def public_entry(source: dict, cell: dict) -> dict:
     }
 
 
-def generate_swift(source: dict, source_sha: str) -> str:
+def generate_swift(source: dict[str, Any], source_sha: str, registry: dict[str, Any], registry_sha: str) -> str:
+    governance_reasons = [item["reason_kind"] for item in registry["fallback_catalog_buckets"]]
+    safe_reason_kinds = ordered_projection_values(registry, "reasonKind", set(governance_reasons))
+    result_kinds = ordered_projection_values(registry, "bridge_result", set(governance_reasons))
     lines = [
         "// Generated by Tools/generate_fallback_script_catalog_swift.py. Do not edit.",
         f"// Source SHA-256: {source_sha}",
+        f"// T0 registry SHA-256: {registry_sha}",
         "",
     ]
-    lines.extend(enum_source("FallbackScriptFamily", source["family_enum"], FAMILY_CASES, "public"))
+    lines.extend(enum_source("FallbackScriptFamily", source["family_enum"], "public"))
     lines.append("")
-    lines.extend(enum_source("FallbackGovernanceReason", source["governance_reason_enum"], REASON_CASES, "internal", False))
+    lines.extend(enum_source("FallbackGovernanceReason", governance_reasons, "internal", False))
     lines.append("")
-    lines.extend(enum_source("FallbackSafeReasonKind", source["safe_reason_kind_enum"], SAFE_CASES, "public"))
+    lines.extend(enum_source("FallbackSafeReasonKind", safe_reason_kinds, "public"))
     lines.append("")
-    lines.extend(enum_source("FallbackResultKind", source["result_kind_enum"], RESULT_CASES, "public"))
+    lines.extend(enum_source("FallbackResultKind", result_kinds, "public"))
     lines.extend(
         [
             "",
@@ -111,7 +118,7 @@ def generate_swift(source: dict, source_sha: str) -> str:
         aliases.append((family, family))
         aliases.extend((alias, family) for alias in source["families"][family].get("aliases", []))
     for alias, family in sorted(aliases):
-        lines.append(f"        {swift_string(alias)}: .{FAMILY_CASES[family]},")
+        lines.append(f"        {swift_string(alias)}: .{swift_case(family)},")
     lines.extend(
         [
             "    ]",
@@ -130,10 +137,10 @@ def generate_swift(source: dict, source_sha: str) -> str:
                 "        FallbackScriptCatalogEntry(",
                 f"            cellID: {swift_string(public_cell_id(source, cell))},",
                 f"            locale: {swift_string(cell['locale'])},",
-                f"            family: .{FAMILY_CASES[family]},",
+                f"            family: .{swift_case(family)},",
                 f"            familyLabel: {swift_string(source['families'][family]['familyLabel'])},",
-                f"            resultKind: .{RESULT_CASES[cell['result_kind']]},",
-                f"            safeReasonKind: .{SAFE_CASES[cell['safeReasonKind']]},",
+                f"            resultKind: .{swift_case(cell['result_kind'])},",
+                f"            safeReasonKind: .{swift_case(cell['safeReasonKind'])},",
                 f"            dialogText: {swift_string(cell['dialogText'])},",
                 f"            ttsText: {swift_string(cell['ttsText'])},",
                 f"            badgeLabel: {swift_string(cell['badgeLabel'])}",
@@ -142,21 +149,23 @@ def generate_swift(source: dict, source_sha: str) -> str:
         )
     lines.extend(["    ]", "", "    private static let governanceReasons: [String: FallbackGovernanceReason] = ["])
     for cell in source["cells"]:
-        lines.append(f"        {swift_string(public_cell_id(source, cell))}: .{REASON_CASES[cell['reason_kind']]},")
-    lines.extend([
-        "    ]",
-        "",
-        "    /// Internal lookup for Core consumers; governance reason never enters the Codable entry.",
-        "    static func governanceReason(for entry: FallbackScriptCatalogEntry) -> FallbackGovernanceReason? {",
-        "        governanceReasons[entry.cellID]",
-        "    }",
-        "",
-        "    static func entry(for family: FallbackScriptFamily, governanceReason: FallbackGovernanceReason) -> FallbackScriptCatalogEntry? {",
-        "        entries.first { $0.family == family && governanceReasons[$0.cellID] == governanceReason }",
-        "    }",
-        "}",
-        "",
-    ])
+        lines.append(f"        {swift_string(public_cell_id(source, cell))}: .{swift_case(cell['reason_kind'])},")
+    lines.extend(
+        [
+            "    ]",
+            "",
+            "    /// Internal lookup for Core consumers; governance reason never enters the Codable entry.",
+            "    static func governanceReason(for entry: FallbackScriptCatalogEntry) -> FallbackGovernanceReason? {",
+            "        governanceReasons[entry.cellID]",
+            "    }",
+            "",
+            "    static func entry(for family: FallbackScriptFamily, governanceReason: FallbackGovernanceReason) -> FallbackScriptCatalogEntry? {",
+            "        entries.first { $0.family == family && governanceReasons[$0.cellID] == governanceReason }",
+            "    }",
+            "}",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -165,14 +174,19 @@ def main() -> int:
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--json-output", type=Path, required=True)
     parser.add_argument("--swift-output", type=Path, required=True)
+    parser.add_argument("--t0-registry", type=Path)
     args = parser.parse_args()
 
+    repo_root = Path(__file__).resolve().parents[1]
     source_bytes = args.source.read_bytes()
     source = json.loads(source_bytes)
+    registry, registry_path = load_registry(source, repo_root, args.t0_registry)
     source_sha = hashlib.sha256(source_bytes).hexdigest()
+    registry_sha = hashlib.sha256(registry_path.read_bytes()).hexdigest()
     catalog = {
         "schemaVersion": "demo_fallback_script_catalog.v1",
         "sourceSHA256": source_sha,
+        "t0RegistrySHA256": registry_sha,
         "entries": [public_entry(source, cell) for cell in source["cells"]],
     }
     args.json_output.parent.mkdir(parents=True, exist_ok=True)
@@ -181,7 +195,7 @@ def main() -> int:
         json.dumps(catalog, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    args.swift_output.write_text(generate_swift(source, source_sha), encoding="utf-8")
+    args.swift_output.write_text(generate_swift(source, source_sha, registry, registry_sha), encoding="utf-8")
     return 0
 
 

@@ -18,6 +18,7 @@ SCHEMA = REPO_ROOT / "contracts" / "schemas" / "fallback-scripts.schema.json"
 GENERATED_JSON = REPO_ROOT / "generated" / "demo-fallback-scripts.catalog.json"
 GENERATED_SWIFT = REPO_ROOT / "Core" / "Contracts" / "FallbackScriptCatalog.generated.swift"
 GENERATOR = REPO_ROOT / "Tools" / "generate_fallback_script_catalog_swift.py"
+T0_REGISTRY = REPO_ROOT / "openspec" / "changes" / "add-c1-demo-capability-governance" / "ownership-map.yaml"
 
 
 class FallbackScriptsCheckerTests(unittest.TestCase):
@@ -26,6 +27,7 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
         source: Path = SOURCE,
         generated_json: Path | None = None,
         generated_swift: Path | None = None,
+        t0_registry: Path | None = None,
     ) -> tuple[subprocess.CompletedProcess[str], dict]:
         with tempfile.TemporaryDirectory(prefix="fallback-checker-test-") as tmp:
             receipt = Path(tmp) / "receipt.json"
@@ -39,6 +41,8 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
                     "--receipt",
                     str(receipt),
                 ]
+            if t0_registry is not None:
+                command.extend(["--t0-registry", str(t0_registry)])
             if generated_json is not None:
                 command.extend(["--generated-json", str(generated_json)])
             if generated_swift is not None:
@@ -121,7 +125,7 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
         self.assertEqual(len(door_cells), 4)
         for cell in door_cells:
             refs = {(ref["path"], ref["contains"]) for ref in cell["basis_refs"]}
-            self.assertIn(("contracts/risk-policy.yaml", "- rule_id: door_open_while_moving"), refs)
+            self.assertIn(("Core/Contracts/DDomainMountedToolCatalog.swift", "mountedToolNames:"), refs)
             self.assertIn(("contracts/state-cells.yaml", "- id: door.car_door"), refs)
             self.assertIn(("contracts/state-cells.yaml", "- id: vehicle.speed"), refs)
 
@@ -137,14 +141,56 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
         self.assertIn("t0_projection_mismatch", receipt["errors"])
 
     def test_t0_internal_reason_mapping_is_closed(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="fallback-registry-mutation-") as tmp:
+            registry = Path(tmp) / "ownership-map.yaml"
+            payload = json.loads(T0_REGISTRY.read_text(encoding="utf-8"))
+            projection = next(item for item in payload["finiteReason_projections"] if item["finiteReason"] == "name_rejected")
+            projection["fallback_reason"] = "friendly_free_string"
+            registry.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            result, receipt = self.run_checker(t0_registry=registry)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("t0_registry_projection_errors", receipt["errors"])
+
+    def test_source_has_no_parallel_t0_enum_or_projection_copy(self) -> None:
+        payload = json.loads(SOURCE.read_text(encoding="utf-8"))
+        self.assertIn("basis_scope_note", payload)
+        for field in (
+            "safe_reason_kind_enum",
+            "result_kind_enum",
+            "internal_reason_mappings",
+        ):
+            self.assertNotIn(field, payload)
+
+    def test_checker_emits_structural_basis_result_for_each_reason_specific_cell(self) -> None:
+        result, receipt = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(receipt["basis_resolutions"]), 40)
+        self.assertEqual(receipt["basis_resolution_failures"], [])
+        reasons = {entry["reason_kind"] for entry in receipt["basis_resolutions"]}
+        self.assertEqual(
+            reasons,
+            {
+                "safety_or_clarify_reject",
+                "unmounted_name_rejected",
+                "fast_path_no_match_fallback",
+                "unknown_no_representative_entry",
+            },
+        )
+
+    def test_unmounted_basis_fails_when_its_representative_is_mounted(self) -> None:
         def mutate(payload: dict) -> None:
-            payload["internal_reason_mappings"]["name_rejected"] = "friendly_free_string"
+            payload["families"]["ac"]["representative_tool"] = "adjust_ac_temperature_to_number"
 
         tmp, source = self.write_mutation(mutate)
         self.addCleanup(tmp.cleanup)
         result, receipt = self.run_checker(source)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("t0_internal_reason_mapping_mismatch", receipt["errors"])
+        self.assertTrue(
+            any(
+                failure["kind"] == "mounted_representative_present"
+                for failure in receipt["basis_resolution_failures"]
+            )
+        )
 
     def test_generated_catalog_drift_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory(prefix="fallback-generated-drift-") as tmp:
