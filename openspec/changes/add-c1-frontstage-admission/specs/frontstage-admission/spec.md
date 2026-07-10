@@ -21,7 +21,7 @@ Customer MicDock submissions SHALL enter a stable typed `FrontstageVoiceSession`
 
 ### Requirement: Frontstage containment receipt SHALL bind the current turn to a five-key run identity
 
-The receipt is one latest-turn JSON object, not a ledger. In foreign emit mode it SHALL require `C1_FRONTSTAGE_RECEIPT_EMIT=1`, `C1_FRONTSTAGE_RUN_ID`, `C1_FRONTSTAGE_RUN_NONCE`, `C1_RUN_DIR`, and `C1_FRONTSTAGE_SOURCE_HEAD_SHA`. A missing or invalid foreign value SHALL write zero bytes and SHALL NOT fall back. A valid foreign write SHALL use only `$C1_RUN_DIR/receipts/c1/frontstage-route-receipt.v1.json`, write atomically, and include run/session/turn/event/sequence identity plus typed denial/no-write facts.
+The receipt is one latest-turn JSON object, not a ledger. In foreign emit mode it SHALL require `C1_FRONTSTAGE_RECEIPT_EMIT=1`, `C1_FRONTSTAGE_RUN_ID`, `C1_FRONTSTAGE_RUN_NONCE`, `C1_RUN_DIR`, and `C1_FRONTSTAGE_SOURCE_HEAD_SHA`. A missing or invalid foreign value SHALL write zero bytes and SHALL NOT fall back. A valid foreign write SHALL use only `$C1_RUN_DIR/receipts/c1/frontstage-route-receipt.v1.json`, write atomically, and include run/session/turn/event/sequence identity plus typed denial/no-write facts. It SHALL copy `C1_FRONTSTAGE_SOURCE_HEAD_SHA` into both `source_head_sha` and `tested_checkout_sha`, and bind `matrix_source_sha256` to the SHA-256 of the checked matrix source; the owner checker SHALL reject either binding when it differs from its expected input.
 
 #### Scenario: Foreign ABI input is incomplete
 
@@ -37,3 +37,5 @@ The receipt is one latest-turn JSON object, not a ledger. In foreign emit mode i
 - **WHEN** each turn completes
 - **THEN** the receipt path SHALL contain only the latest turn
 - **AND** the session/run/nonce SHALL stay stable while sequence advances from 1 to 2.
+- **AND** each turn SHALL retain equal `source_head_sha` and `tested_checkout_sha` values from the supplied source head.
+- **AND** each turn SHALL carry the same matrix source digest that the owner checker recomputes from the matrix input.

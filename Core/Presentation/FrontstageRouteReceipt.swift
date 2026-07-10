@@ -133,11 +133,13 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
     public let runID: String
     public let runNonce: String
     public let sourceHeadSHA: String?
+    public let testedCheckoutSHA: String?
     public let sessionID: String
     public let turnID: String
     public let eventID: String
     public let sequence: Int
     public let matrixID: Int?
+    public let matrixSourceSHA256: String
     public let runtimeContractBundleDigest: String
     public let appExecutableSHA256: String
     public let proofClass: String
@@ -150,11 +152,13 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
         case runID = "run_id"
         case runNonce = "run_nonce"
         case sourceHeadSHA = "source_head_sha"
+        case testedCheckoutSHA = "tested_checkout_sha"
         case sessionID = "session_id"
         case turnID = "turn_id"
         case eventID = "event_id"
         case sequence
         case matrixID = "matrix_id"
+        case matrixSourceSHA256 = "matrix_source_sha256"
         case runtimeContractBundleDigest = "runtime_contract_bundle_digest"
         case appExecutableSHA256 = "app_executable_sha256"
         case proofClass = "proof_class"
@@ -169,11 +173,13 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
         try container.encode(runID, forKey: .runID)
         try container.encode(runNonce, forKey: .runNonce)
         try container.encode(sourceHeadSHA, forKey: .sourceHeadSHA)
+        try container.encode(testedCheckoutSHA, forKey: .testedCheckoutSHA)
         try container.encode(sessionID, forKey: .sessionID)
         try container.encode(turnID, forKey: .turnID)
         try container.encode(eventID, forKey: .eventID)
         try container.encode(sequence, forKey: .sequence)
         try container.encode(matrixID, forKey: .matrixID)
+        try container.encode(matrixSourceSHA256, forKey: .matrixSourceSHA256)
         try container.encode(runtimeContractBundleDigest, forKey: .runtimeContractBundleDigest)
         try container.encode(appExecutableSHA256, forKey: .appExecutableSHA256)
         try container.encode(proofClass, forKey: .proofClass)
@@ -191,11 +197,13 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
             runID: configuration.runID,
             runNonce: configuration.runNonce,
             sourceHeadSHA: configuration.sourceHeadSHA,
+            testedCheckoutSHA: configuration.sourceHeadSHA,
             sessionID: turn.sessionID,
             turnID: turn.turnID,
             eventID: turn.eventID,
             sequence: turn.sequence,
             matrixID: nil,
+            matrixSourceSHA256: DemoCapabilityMatrixCatalog.sourceSHA256,
             runtimeContractBundleDigest: DemoRuntimeContractBundleCatalog.runtimeContractBundleDigest,
             appExecutableSHA256: try executableSHA256(),
             proofClass: "frontstage_route_local_integration",

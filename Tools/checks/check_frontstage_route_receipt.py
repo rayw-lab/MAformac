@@ -50,17 +50,25 @@ def main() -> int:
     report = validate(receipt, args.schema)
     if receipt.get("source_head_sha") != args.expected_head:
         report["errors"].append("E_HEAD")
+    if receipt.get("tested_checkout_sha") != args.expected_head:
+        report["errors"].append("E_TESTED_CHECKOUT")
     if receipt.get("run_id") != args.expected_run_id:
         report["errors"].append("E_RUN_ID")
     if receipt.get("run_nonce") != args.expected_run_nonce:
         report["errors"].append("E_EXPECTED_NONCE")
+    if not args.matrix.is_file() or not args.app_executable.is_file():
+        report["errors"].append("E_REQUIRED_INPUT")
+        report["errors"] = sorted(set(report["errors"]))
+        report["status"] = "FAIL"
+        print(json.dumps(report, ensure_ascii=False, sort_keys=True))
+        return 1
+    if receipt.get("matrix_source_sha256") != sha256_file(args.matrix):
+        report["errors"].append("E_MATRIX_DIGEST")
     manifest = json.loads(args.runtime_bundle_manifest.read_text(encoding="utf-8"))
     if receipt.get("runtime_contract_bundle_digest") != manifest.get("runtime_contract_bundle_digest"):
         report["errors"].append("E_BUNDLE_DIGEST")
     if receipt.get("app_executable_sha256") != sha256_file(args.app_executable):
         report["errors"].append("E_APP_EXECUTABLE_SHA")
-    if not args.matrix.exists() or not args.app_executable.is_file():
-        report["errors"].append("E_REQUIRED_INPUT")
     report["errors"] = sorted(set(report["errors"]))
     report["status"] = "PASS" if not report["errors"] else "FAIL"
     print(json.dumps(report, ensure_ascii=False, sort_keys=True))
