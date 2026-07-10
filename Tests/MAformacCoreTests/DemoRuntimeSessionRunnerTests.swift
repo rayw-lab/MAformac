@@ -141,13 +141,17 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let state = runner.currentDialogueState
 
         XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
-        XCTAssertEqual(payload.outcome.reason, "fast_path_no_match")
+        XCTAssertEqual(payload.outcome.reason, FallbackSafeReasonKind.notAvailableInDemo.rawValue)
+        XCTAssertEqual(payload.reconciliation.safeReason, FallbackSafeReasonKind.notAvailableInDemo.rawValue)
         XCTAssertEqual(state.focusEntity, "ac")
         XCTAssertEqual(state.lastReadback?.key, "ac.power")
         XCTAssertEqual(
             state.turns.map(\.text),
-            ["空调已打开", "顺便安排一个火箭座椅", "这个我先记下来，稍后帮您处理"]
+            ["空调已打开", "顺便安排一个火箭座椅", "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。"]
         )
+        let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("fast_path_no_match"))
+        XCTAssertFalse(encoded.contains("这个我先记下来，稍后帮您处理"))
     }
 
     @MainActor
