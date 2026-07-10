@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/fallback-scripts.schema.json",
+  "title": "C1 fallback scripts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "authority",
+    "family_enum",
+    "governance_reason_enum",
+    "safe_reason_kind_enum",
+    "result_kind_enum",
+    "internal_reason_mappings",
+    "customer_surface_policy",
+    "families",
+    "cells"
+  ],
+  "properties": {
+    "schema_version": {"const": "demo_fallback_scripts.v1"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["t0_commit", "t0_change", "t0_spec"],
+      "properties": {
+        "t0_commit": {"const": "15f1d60908795fc3859fa5a9239d731678f1339d"},
+        "t0_change": {"const": "add-c1-demo-capability-governance"},
+        "t0_spec": {"type": "string"}
+      }
+    },
+    "family_enum": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true},
+    "governance_reason_enum": {"type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true},
+    "safe_reason_kind_enum": {"type": "array", "uniqueItems": true},
+    "result_kind_enum": {"type": "array", "uniqueItems": true},
+    "internal_reason_mappings": {"type": "object"},
+    "customer_surface_policy": {"type": "object"},
+    "families": {"type": "object", "minProperties": 10, "maxProperties": 10},
+    "cells": {
+      "type": "array",
+      "minItems": 40,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cell_id",
+          "locale",
+          "family",
+          "reason_kind",
+          "result_kind",
+          "safeReasonKind",
+          "dialogText",
+          "ttsText",
+          "badgeLabel",
+          "basis_refs",
+          "probe_id",
+          "diagnostic_path",
+          "state_mutation_expected",
+          "no_tool_call_expected",
+          "customer_surface_fields"
+        ],
+        "properties": {
+          "cell_id": {"type": "string"},
+          "locale": {"const": "zh-CN"},
+          "family": {"type": "string"},
+          "reason_kind": {"type": "string"},
+          "result_kind": {"type": "string"},
+          "safeReasonKind": {"type": "string"},
+          "dialogText": {"type": "string", "minLength": 1},
+          "ttsText": {"type": "string", "minLength": 1},
+          "badgeLabel": {"type": "string", "minLength": 1},
+          "basis_refs": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "contains"],
+              "properties": {
+                "path": {"type": "string"},
+                "contains": {"type": "string", "minLength": 1}
+              }
+            }
+          },
+          "probe_id": {"type": "string"},
+          "diagnostic_path": {"type": "string"},
+          "state_mutation_expected": {"const": "none"},
+          "no_tool_call_expected": {"const": true},
+          "customer_surface_fields": {"type": "array", "uniqueItems": true}
+        }
+      }
+    }
+  }
+}
