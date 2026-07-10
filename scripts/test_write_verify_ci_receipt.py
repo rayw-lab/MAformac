@@ -90,12 +90,17 @@ def test_makefile_wires_only_source_free_c1_gates_into_ci() -> None:
     text = MAKEFILE.read_text(encoding="utf-8")
     verify_line = next(line for line in text.splitlines() if line.startswith("verify:"))
     verify_ci_line = next(line for line in text.splitlines() if line.startswith("verify-ci:"))
-    for target in ("verify-c1-matrix", "verify-c1-fallback", "verify-c1-s10"):
+    source_free_targets = (
+        "verify-c1-matrix",
+        "verify-c1-fallback",
+        "verify-c1-probes",
+        "verify-c1-s10",
+        "verify-mounted-catalog-no-delta",
+    )
+    for target in source_free_targets:
         assert f"{target}:" in text
         assert target in verify_line
-    assert "verify-c1-matrix" not in verify_ci_line
-    assert "verify-c1-fallback" in verify_ci_line
-    assert "verify-c1-s10" in verify_ci_line
+        assert target in verify_ci_line
     assert "A1_MATRIX_MANIFEST" not in verify_ci_line
 
 
