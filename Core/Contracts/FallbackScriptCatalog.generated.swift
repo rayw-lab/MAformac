@@ -14,7 +14,7 @@ public enum FallbackScriptFamily: String, CaseIterable, Codable, Hashable, Senda
     case fragrance = "fragrance"
 }
 
-public enum FallbackGovernanceReason: String, CaseIterable, Codable, Hashable, Sendable {
+internal enum FallbackGovernanceReason: String, CaseIterable, Hashable, Sendable {
     case safetyOrClarifyReject = "safety_or_clarify_reject"
     case unmountedNameRejected = "unmounted_name_rejected"
     case fastPathNoMatchFallback = "fast_path_no_match_fallback"
@@ -70,7 +70,7 @@ public enum FallbackScriptCatalog {
 
     public static let entries: [FallbackScriptCatalogEntry] = [
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ac.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.ac.01.zh-CN",
             locale: "zh-CN",
             family: .ac,
             familyLabel: "空调",
@@ -81,7 +81,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ac.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.ac.02.zh-CN",
             locale: "zh-CN",
             family: .ac,
             familyLabel: "空调",
@@ -92,7 +92,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ac.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.ac.03.zh-CN",
             locale: "zh-CN",
             family: .ac,
             familyLabel: "空调",
@@ -103,7 +103,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ac.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.ac.04.zh-CN",
             locale: "zh-CN",
             family: .ac,
             familyLabel: "空调",
@@ -114,7 +114,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.seat.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.seat.05.zh-CN",
             locale: "zh-CN",
             family: .seat,
             familyLabel: "座椅",
@@ -125,7 +125,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.seat.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.seat.06.zh-CN",
             locale: "zh-CN",
             family: .seat,
             familyLabel: "座椅",
@@ -136,7 +136,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.seat.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.seat.07.zh-CN",
             locale: "zh-CN",
             family: .seat,
             familyLabel: "座椅",
@@ -147,7 +147,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.seat.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.seat.08.zh-CN",
             locale: "zh-CN",
             family: .seat,
             familyLabel: "座椅",
@@ -158,7 +158,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.window.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.window.09.zh-CN",
             locale: "zh-CN",
             family: .window,
             familyLabel: "车窗",
@@ -169,7 +169,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.window.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.window.10.zh-CN",
             locale: "zh-CN",
             family: .window,
             familyLabel: "车窗",
@@ -180,7 +180,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.window.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.window.11.zh-CN",
             locale: "zh-CN",
             family: .window,
             familyLabel: "车窗",
@@ -191,7 +191,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.window.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.window.12.zh-CN",
             locale: "zh-CN",
             family: .window,
             familyLabel: "车窗",
@@ -202,7 +202,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.door.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.door.13.zh-CN",
             locale: "zh-CN",
             family: .door,
             familyLabel: "车门",
@@ -213,7 +213,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "安全拦截"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.door.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.door.14.zh-CN",
             locale: "zh-CN",
             family: .door,
             familyLabel: "车门",
@@ -224,7 +224,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.door.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.door.15.zh-CN",
             locale: "zh-CN",
             family: .door,
             familyLabel: "车门",
@@ -235,7 +235,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.door.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.door.16.zh-CN",
             locale: "zh-CN",
             family: .door,
             familyLabel: "车门",
@@ -246,7 +246,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ambient.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.ambient.17.zh-CN",
             locale: "zh-CN",
             family: .ambient,
             familyLabel: "氛围灯",
@@ -257,7 +257,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ambient.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.ambient.18.zh-CN",
             locale: "zh-CN",
             family: .ambient,
             familyLabel: "氛围灯",
@@ -268,7 +268,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ambient.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.ambient.19.zh-CN",
             locale: "zh-CN",
             family: .ambient,
             familyLabel: "氛围灯",
@@ -279,7 +279,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.ambient.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.ambient.20.zh-CN",
             locale: "zh-CN",
             family: .ambient,
             familyLabel: "氛围灯",
@@ -290,7 +290,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.screen.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.screen.21.zh-CN",
             locale: "zh-CN",
             family: .screen,
             familyLabel: "屏幕",
@@ -301,7 +301,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.screen.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.screen.22.zh-CN",
             locale: "zh-CN",
             family: .screen,
             familyLabel: "屏幕",
@@ -312,7 +312,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.screen.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.screen.23.zh-CN",
             locale: "zh-CN",
             family: .screen,
             familyLabel: "屏幕",
@@ -323,7 +323,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.screen.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.screen.24.zh-CN",
             locale: "zh-CN",
             family: .screen,
             familyLabel: "屏幕",
@@ -334,7 +334,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.volume.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.volume.25.zh-CN",
             locale: "zh-CN",
             family: .volume,
             familyLabel: "音量",
@@ -345,7 +345,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.volume.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.volume.26.zh-CN",
             locale: "zh-CN",
             family: .volume,
             familyLabel: "音量",
@@ -356,7 +356,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.volume.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.volume.27.zh-CN",
             locale: "zh-CN",
             family: .volume,
             familyLabel: "音量",
@@ -367,7 +367,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.volume.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.volume.28.zh-CN",
             locale: "zh-CN",
             family: .volume,
             familyLabel: "音量",
@@ -378,7 +378,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.wiper.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.wiper.29.zh-CN",
             locale: "zh-CN",
             family: .wiper,
             familyLabel: "雨刮",
@@ -389,7 +389,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.wiper.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.wiper.30.zh-CN",
             locale: "zh-CN",
             family: .wiper,
             familyLabel: "雨刮",
@@ -400,7 +400,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.wiper.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.wiper.31.zh-CN",
             locale: "zh-CN",
             family: .wiper,
             familyLabel: "雨刮",
@@ -411,7 +411,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.wiper.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.wiper.32.zh-CN",
             locale: "zh-CN",
             family: .wiper,
             familyLabel: "雨刮",
@@ -422,7 +422,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.sunroofShade.33.zh-CN",
             locale: "zh-CN",
             family: .sunroofShade,
             familyLabel: "天窗遮阳",
@@ -433,7 +433,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.sunroofShade.34.zh-CN",
             locale: "zh-CN",
             family: .sunroofShade,
             familyLabel: "天窗遮阳",
@@ -444,7 +444,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.sunroofShade.35.zh-CN",
             locale: "zh-CN",
             family: .sunroofShade,
             familyLabel: "天窗遮阳",
@@ -455,7 +455,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.sunroofShade.36.zh-CN",
             locale: "zh-CN",
             family: .sunroofShade,
             familyLabel: "天窗遮阳",
@@ -466,7 +466,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.fragrance.safety_or_clarify_reject.zh-CN",
+            cellID: "fallback.fragrance.37.zh-CN",
             locale: "zh-CN",
             family: .fragrance,
             familyLabel: "香氛",
@@ -477,7 +477,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "需确认"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.fragrance.unmounted_name_rejected.zh-CN",
+            cellID: "fallback.fragrance.38.zh-CN",
             locale: "zh-CN",
             family: .fragrance,
             familyLabel: "香氛",
@@ -488,7 +488,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "暂未接入"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+            cellID: "fallback.fragrance.39.zh-CN",
             locale: "zh-CN",
             family: .fragrance,
             familyLabel: "香氛",
@@ -499,7 +499,7 @@ public enum FallbackScriptCatalog {
             badgeLabel: "换个说法"
         ),
         FallbackScriptCatalogEntry(
-            cellID: "fallback.fragrance.unknown_no_representative_entry.zh-CN",
+            cellID: "fallback.fragrance.40.zh-CN",
             locale: "zh-CN",
             family: .fragrance,
             familyLabel: "香氛",
@@ -510,4 +510,56 @@ public enum FallbackScriptCatalog {
             badgeLabel: "不在范围"
         ),
     ]
+
+    private static let governanceReasons: [String: FallbackGovernanceReason] = [
+        "fallback.ac.01.zh-CN": .safetyOrClarifyReject,
+        "fallback.ac.02.zh-CN": .unmountedNameRejected,
+        "fallback.ac.03.zh-CN": .fastPathNoMatchFallback,
+        "fallback.ac.04.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.seat.05.zh-CN": .safetyOrClarifyReject,
+        "fallback.seat.06.zh-CN": .unmountedNameRejected,
+        "fallback.seat.07.zh-CN": .fastPathNoMatchFallback,
+        "fallback.seat.08.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.window.09.zh-CN": .safetyOrClarifyReject,
+        "fallback.window.10.zh-CN": .unmountedNameRejected,
+        "fallback.window.11.zh-CN": .fastPathNoMatchFallback,
+        "fallback.window.12.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.door.13.zh-CN": .safetyOrClarifyReject,
+        "fallback.door.14.zh-CN": .unmountedNameRejected,
+        "fallback.door.15.zh-CN": .fastPathNoMatchFallback,
+        "fallback.door.16.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.ambient.17.zh-CN": .safetyOrClarifyReject,
+        "fallback.ambient.18.zh-CN": .unmountedNameRejected,
+        "fallback.ambient.19.zh-CN": .fastPathNoMatchFallback,
+        "fallback.ambient.20.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.screen.21.zh-CN": .safetyOrClarifyReject,
+        "fallback.screen.22.zh-CN": .unmountedNameRejected,
+        "fallback.screen.23.zh-CN": .fastPathNoMatchFallback,
+        "fallback.screen.24.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.volume.25.zh-CN": .safetyOrClarifyReject,
+        "fallback.volume.26.zh-CN": .unmountedNameRejected,
+        "fallback.volume.27.zh-CN": .fastPathNoMatchFallback,
+        "fallback.volume.28.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.wiper.29.zh-CN": .safetyOrClarifyReject,
+        "fallback.wiper.30.zh-CN": .unmountedNameRejected,
+        "fallback.wiper.31.zh-CN": .fastPathNoMatchFallback,
+        "fallback.wiper.32.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.sunroofShade.33.zh-CN": .safetyOrClarifyReject,
+        "fallback.sunroofShade.34.zh-CN": .unmountedNameRejected,
+        "fallback.sunroofShade.35.zh-CN": .fastPathNoMatchFallback,
+        "fallback.sunroofShade.36.zh-CN": .unknownNoRepresentativeEntry,
+        "fallback.fragrance.37.zh-CN": .safetyOrClarifyReject,
+        "fallback.fragrance.38.zh-CN": .unmountedNameRejected,
+        "fallback.fragrance.39.zh-CN": .fastPathNoMatchFallback,
+        "fallback.fragrance.40.zh-CN": .unknownNoRepresentativeEntry,
+    ]
+
+    /// Internal lookup for Core consumers; governance reason never enters the Codable entry.
+    static func governanceReason(for entry: FallbackScriptCatalogEntry) -> FallbackGovernanceReason? {
+        governanceReasons[entry.cellID]
+    }
+
+    static func entry(for family: FallbackScriptFamily, governanceReason: FallbackGovernanceReason) -> FallbackScriptCatalogEntry? {
+        entries.first { $0.family == family && governanceReasons[$0.cellID] == governanceReason }
+    }
 }

@@ -5,8 +5,12 @@ final class FallbackScriptCatalogTests: XCTestCase {
     func testGeneratedCatalogCoversExactTenByFourPairs() {
         XCTAssertEqual(FallbackScriptCatalog.entries.count, 40)
         XCTAssertEqual(Set(FallbackScriptCatalog.entries.map(\.family)).count, 10)
-        XCTAssertEqual(Set(FallbackScriptCatalog.entries.map(\.reasonKind)).count, 4)
-        XCTAssertEqual(Set(FallbackScriptCatalog.entries.map { "\($0.family.rawValue)|\($0.reasonKind.rawValue)" }).count, 40)
+        let keys = FallbackScriptCatalog.entries.compactMap { entry in
+            FallbackScriptCatalog.governanceReason(for: entry)
+                .map { "\(entry.family.rawValue)|\($0.rawValue)" }
+        }
+        XCTAssertEqual(Set(keys).count, 40)
+        XCTAssertEqual(keys.count, 40)
     }
 
     func testFamilyAliasesNormalizeThroughGeneratedCatalog() {
@@ -14,6 +18,16 @@ final class FallbackScriptCatalogTests: XCTestCase {
         XCTAssertEqual(FallbackScriptCatalog.normalizeFamily("ambient_light"), .ambient)
         XCTAssertEqual(FallbackScriptCatalog.normalizeFamily("sunroof_shade"), .sunroofShade)
         XCTAssertNil(FallbackScriptCatalog.normalizeFamily("unknown_family"))
+    }
+
+    func testCoreLookupKeepsGovernanceReasonInternalToSafeEntry() throws {
+        let entry = FallbackScriptCatalog.entry(
+            for: .ac,
+            governanceReason: .unmountedNameRejected
+        )
+        XCTAssertEqual(entry?.safeReasonKind, .capabilityNotMounted)
+        XCTAssertFalse((entry?.cellID ?? "").contains("unmounted_name_rejected"))
+        XCTAssertEqual(FallbackScriptCatalog.governanceReason(for: try XCTUnwrap(entry)), .unmountedNameRejected)
     }
 
     func testEncodedCatalogContainsOnlySafeReasonProjection() throws {
