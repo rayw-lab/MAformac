@@ -1,7 +1,7 @@
 {
   "schemaVersion": "demo_fallback_probes_catalog_v1",
   "sourceSHA256": "3ae98df5b712216d951a0bb45335697311ed4820193ad58c5fcf3c5f4a862190",
-  "fallbackSourceSHA256": "537a4493ddd0ea85a708735699c3b65af15108cdf395b1e357af529fba869b79",
+  "fallbackSourceSHA256": "306144f6ba9edeedc171820c1248bf0e0f95947f79cc61841181bbdf335d893c",
   "receiptID": "runtime-no-mutation-40-probes",
   "probes": [
     {
