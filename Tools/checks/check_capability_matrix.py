@@ -21,6 +21,7 @@ DEFAULT_T0_DESIGN = (
     / "add-c1-demo-capability-governance"
     / "design.md"
 )
+DEFAULT_MANIFEST = REPO_ROOT / "contracts" / "demo-capability-matrix-manifest.jsonl"
 DEFAULT_SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
 DEFAULT_STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 DEFAULT_MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
@@ -41,6 +42,19 @@ B4_PROBE_ID_PATTERN = re.compile(
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def canonical_manifest_path(manifest_path: Path | None = None) -> Path:
+    canonical = DEFAULT_MANIFEST.resolve()
+    selected = (manifest_path or DEFAULT_MANIFEST).resolve()
+    if selected != canonical:
+        raise ValueError(
+            "A1 manifest must be the committed repository source: "
+            f"{canonical} (external/run-dir paths are not supported)"
+        )
+    if not canonical.is_file():
+        raise ValueError(f"missing canonical A1 manifest: {canonical}")
+    return canonical
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -181,12 +195,13 @@ def reason_projection(row: dict[str, Any]) -> tuple[str | None, str | None]:
 
 def materialize_matrix(
     *,
-    manifest_path: Path,
+    manifest_path: Path | None = None,
     t0_design_path: Path = DEFAULT_T0_DESIGN,
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
     state_cells_path: Path = DEFAULT_STATE_CELLS,
     mounted_catalog_path: Path = DEFAULT_MOUNTED_CATALOG,
 ) -> dict[str, Any]:
+    manifest_path = canonical_manifest_path(manifest_path)
     enums = parse_t0_enums(t0_design_path)
     manifest_rows = read_jsonl(manifest_path)
     semantic_by_intent = parse_semantic_contract(semantic_contract_path)
@@ -274,12 +289,13 @@ def _expected_mounted_status(tool: str, mounted_tools: set[str]) -> str:
 def validate_matrix(
     *,
     matrix: dict[str, Any],
-    manifest_path: Path,
+    manifest_path: Path | None = None,
     t0_design_path: Path = DEFAULT_T0_DESIGN,
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
     state_cells_path: Path = DEFAULT_STATE_CELLS,
     mounted_catalog_path: Path = DEFAULT_MOUNTED_CATALOG,
 ) -> dict[str, Any]:
+    manifest_path = canonical_manifest_path(manifest_path)
     expected = materialize_matrix(
         manifest_path=manifest_path,
         t0_design_path=t0_design_path,
@@ -448,7 +464,6 @@ def build_parser() -> argparse.ArgumentParser:
     subcommands = parser.add_subparsers(dest="command", required=True)
     for command in ("materialize", "check"):
         subparser = subcommands.add_parser(command)
-        subparser.add_argument("--manifest", required=True, type=Path)
         subparser.add_argument("--t0-design", type=Path, default=DEFAULT_T0_DESIGN)
         subparser.add_argument("--semantic-contract", type=Path, default=DEFAULT_SEMANTIC_CONTRACT)
         subparser.add_argument("--state-cells", type=Path, default=DEFAULT_STATE_CELLS)
@@ -464,7 +479,6 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "materialize":
         matrix = materialize_matrix(
-            manifest_path=args.manifest,
             t0_design_path=args.t0_design,
             semantic_contract_path=args.semantic_contract,
             state_cells_path=args.state_cells,
@@ -479,7 +493,6 @@ def main(argv: list[str] | None = None) -> int:
     matrix = json.loads(args.matrix.read_text(encoding="utf-8"))
     report = validate_matrix(
         matrix=matrix,
-        manifest_path=args.manifest,
         t0_design_path=args.t0_design,
         semantic_contract_path=args.semantic_contract,
         state_cells_path=args.state_cells,
