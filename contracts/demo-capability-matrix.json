@@ -81,11 +81,11 @@
           "source_ref": "manifest:matrix_id=2:tool-not-mounted=open_ac"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=2",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -105,11 +105,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=2",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -143,11 +143,11 @@
           "source_ref": "manifest:matrix_id=3:tool-not-mounted=open_ac"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=3",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -167,11 +167,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=3",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -263,18 +263,18 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "capability-matrix-v2.md:50-52"
       ],
-      "canDemo": false,
+      "canDemo": true,
       "canDemo_basis": {
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=5",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -294,11 +294,11 @@
       "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=5",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -326,18 +326,18 @@
         "Tests/MAformacCoreTests/DemoRuntimeSessionRunnerTests.swift:48-66",
         "capability-matrix-v2.md:50-52"
       ],
-      "canDemo": false,
+      "canDemo": true,
       "canDemo_basis": {
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=6",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -357,11 +357,11 @@
       "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=6",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -393,11 +393,11 @@
           "source_ref": "manifest:matrix_id=7:tool-not-mounted=-"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=7",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": false,
@@ -417,11 +417,11 @@
       "mounted_status": "no_representative_tool",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=7",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
@@ -453,11 +453,11 @@
           "source_ref": "manifest:matrix_id=8:tool-not-mounted=-"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=8",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": false,
@@ -477,11 +477,11 @@
       "mounted_status": "no_representative_tool",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=8",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -513,11 +513,11 @@
           "source_ref": "manifest:matrix_id=9:tool-not-mounted=-"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=9",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": false,
@@ -537,11 +537,11 @@
       "mounted_status": "no_representative_tool",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=9",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -575,11 +575,11 @@
           "source_ref": "manifest:matrix_id=10:tool-not-mounted=adjust_ac_temperature_to_exp"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=10",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -599,11 +599,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=10",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -637,11 +637,11 @@
           "source_ref": "manifest:matrix_id=11:tool-not-mounted=adjust_ac_temperature_to_exp"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=11",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -661,11 +661,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=11",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -699,11 +699,11 @@
           "source_ref": "manifest:matrix_id=12:tool-not-mounted=adjust_ac_temperature_to_exp"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=12",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -723,11 +723,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=12",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -761,11 +761,11 @@
           "source_ref": "manifest:matrix_id=13:tool-not-mounted=open_seat_heat"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=13",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -785,11 +785,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=13",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -823,11 +823,11 @@
           "source_ref": "manifest:matrix_id=14:tool-not-mounted=open_seat_heat"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=14",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -847,11 +847,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=14",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -885,11 +885,11 @@
           "source_ref": "manifest:matrix_id=15:tool-not-mounted=open_seat_heat"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=15",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -909,11 +909,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=15",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -947,11 +947,11 @@
           "source_ref": "manifest:matrix_id=16:tool-not-mounted=adjust_seat_heat_temperature_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=16",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -971,11 +971,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=16",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1009,11 +1009,11 @@
           "source_ref": "manifest:matrix_id=17:tool-not-mounted=adjust_seat_heat_temperature_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=17",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1033,11 +1033,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=17",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1071,11 +1071,11 @@
           "source_ref": "manifest:matrix_id=18:tool-not-mounted=adjust_seat_heat_temperature_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=18",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1095,11 +1095,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=18",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1133,11 +1133,11 @@
           "source_ref": "manifest:matrix_id=19:tool-not-mounted=adjust_seat_position_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=19",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1157,11 +1157,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=19",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1195,11 +1195,11 @@
           "source_ref": "manifest:matrix_id=20:tool-not-mounted=adjust_seat_position_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=20",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1219,11 +1219,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=20",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1257,11 +1257,11 @@
           "source_ref": "manifest:matrix_id=21:tool-not-mounted=adjust_seat_position_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=21",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1281,11 +1281,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=21",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1319,11 +1319,11 @@
           "source_ref": "manifest:matrix_id=22:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=22",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1343,11 +1343,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=22",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1381,11 +1381,11 @@
           "source_ref": "manifest:matrix_id=23:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=23",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1405,11 +1405,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=23",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1443,11 +1443,11 @@
           "source_ref": "manifest:matrix_id=24:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=24",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1467,11 +1467,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=24",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1505,11 +1505,11 @@
           "source_ref": "manifest:matrix_id=25:tool-not-mounted=close_window"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=25",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1529,11 +1529,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=25",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1567,11 +1567,11 @@
           "source_ref": "manifest:matrix_id=26:tool-not-mounted=close_window"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=26",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1591,11 +1591,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=26",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1629,11 +1629,11 @@
           "source_ref": "manifest:matrix_id=27:tool-not-mounted=close_window"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=27",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1653,11 +1653,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=27",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1691,11 +1691,11 @@
           "source_ref": "manifest:matrix_id=28:tool-not-mounted=open_window_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=28",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1715,11 +1715,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=28",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1753,11 +1753,11 @@
           "source_ref": "manifest:matrix_id=29:tool-not-mounted=open_window_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=29",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1777,11 +1777,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=29",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -1815,11 +1815,11 @@
           "source_ref": "manifest:matrix_id=30:tool-not-mounted=open_window_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=30",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1839,11 +1839,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=30",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -1877,11 +1877,11 @@
           "source_ref": "manifest:matrix_id=31:tool-not-mounted=open_window_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=31",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1901,11 +1901,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=31",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -1939,11 +1939,11 @@
           "source_ref": "manifest:matrix_id=32:tool-not-mounted=open_window_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=32",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -1963,11 +1963,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=32",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2001,11 +2001,11 @@
           "source_ref": "manifest:matrix_id=33:tool-not-mounted=open_window_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=33",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2025,11 +2025,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=33",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2063,11 +2063,11 @@
           "source_ref": "manifest:matrix_id=34:tool-not-mounted=open_window_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=34",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2087,11 +2087,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=34",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2125,11 +2125,11 @@
           "source_ref": "manifest:matrix_id=35:tool-not-mounted=open_window_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=35",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2149,11 +2149,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=35",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2187,11 +2187,11 @@
           "source_ref": "manifest:matrix_id=36:tool-not-mounted=open_window_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=36",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2211,11 +2211,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=36",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2249,11 +2249,11 @@
           "source_ref": "manifest:matrix_id=37:tool-not-mounted=open_screen"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=37",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2273,11 +2273,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=37",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2311,11 +2311,11 @@
           "source_ref": "manifest:matrix_id=38:tool-not-mounted=open_screen"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=38",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2335,11 +2335,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=38",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2373,11 +2373,11 @@
           "source_ref": "manifest:matrix_id=39:tool-not-mounted=open_screen"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=39",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2397,11 +2397,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=39",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2435,11 +2435,11 @@
           "source_ref": "manifest:matrix_id=40:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=40",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2459,11 +2459,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=40",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2497,11 +2497,11 @@
           "source_ref": "manifest:matrix_id=41:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=41",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2521,11 +2521,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=41",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2559,11 +2559,11 @@
           "source_ref": "manifest:matrix_id=42:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=42",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2583,11 +2583,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=42",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2621,11 +2621,11 @@
           "source_ref": "manifest:matrix_id=43:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=43",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2645,11 +2645,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=43",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2683,11 +2683,11 @@
           "source_ref": "manifest:matrix_id=44:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=44",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2707,11 +2707,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=44",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2745,11 +2745,11 @@
           "source_ref": "manifest:matrix_id=45:tool-not-mounted=adjust_screen_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=45",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2769,11 +2769,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=45",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2807,11 +2807,11 @@
           "source_ref": "manifest:matrix_id=46:tool-not-mounted=adjust_screen_brightness_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=46",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2831,11 +2831,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=46",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -2869,11 +2869,11 @@
           "source_ref": "manifest:matrix_id=47:tool-not-mounted=adjust_screen_brightness_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=47",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2893,11 +2893,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=47",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -2931,11 +2931,11 @@
           "source_ref": "manifest:matrix_id=48:tool-not-mounted=adjust_screen_brightness_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=48",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -2955,11 +2955,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=48",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -2993,11 +2993,11 @@
           "source_ref": "manifest:matrix_id=49:tool-not-mounted=open_atmosphere_lamp"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=49",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3017,11 +3017,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=49",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3055,11 +3055,11 @@
           "source_ref": "manifest:matrix_id=50:tool-not-mounted=open_atmosphere_lamp"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=50",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3079,11 +3079,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=50",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3117,11 +3117,11 @@
           "source_ref": "manifest:matrix_id=51:tool-not-mounted=open_atmosphere_lamp"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=51",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3141,11 +3141,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=51",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3179,11 +3179,11 @@
           "source_ref": "manifest:matrix_id=52:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=52",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3203,11 +3203,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=52",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3241,11 +3241,11 @@
           "source_ref": "manifest:matrix_id=53:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=53",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3265,11 +3265,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=53",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3303,11 +3303,11 @@
           "source_ref": "manifest:matrix_id=54:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=54",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3327,11 +3327,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=54",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3365,11 +3365,11 @@
           "source_ref": "manifest:matrix_id=55:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=55",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3389,11 +3389,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=55",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3427,11 +3427,11 @@
           "source_ref": "manifest:matrix_id=56:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=56",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3451,11 +3451,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=56",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3489,11 +3489,11 @@
           "source_ref": "manifest:matrix_id=57:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=57",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3513,11 +3513,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=57",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3551,11 +3551,11 @@
           "source_ref": "manifest:matrix_id=58:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=58",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3575,11 +3575,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=58",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3613,11 +3613,11 @@
           "source_ref": "manifest:matrix_id=59:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=59",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3637,11 +3637,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=59",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3675,11 +3675,11 @@
           "source_ref": "manifest:matrix_id=60:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=60",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3699,11 +3699,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=60",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3737,11 +3737,11 @@
           "source_ref": "manifest:matrix_id=61:tool-not-mounted=open_car_door"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=61",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3761,11 +3761,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=61",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3799,11 +3799,11 @@
           "source_ref": "manifest:matrix_id=62:tool-not-mounted=open_car_door"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=62",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3823,11 +3823,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=62",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -3861,11 +3861,11 @@
           "source_ref": "manifest:matrix_id=63:tool-not-mounted=open_car_door"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=63",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3885,11 +3885,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=63",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -3923,11 +3923,11 @@
           "source_ref": "manifest:matrix_id=64:tool-not-mounted=set_door_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=64",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -3947,11 +3947,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=64",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -3985,11 +3985,11 @@
           "source_ref": "manifest:matrix_id=65:tool-not-mounted=set_door_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=65",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4009,11 +4009,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=65",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4047,11 +4047,11 @@
           "source_ref": "manifest:matrix_id=66:tool-not-mounted=set_door_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=66",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4071,11 +4071,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=66",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4109,11 +4109,11 @@
           "source_ref": "manifest:matrix_id=67:tool-not-mounted=open_door_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=67",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4133,11 +4133,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=67",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4171,11 +4171,11 @@
           "source_ref": "manifest:matrix_id=68:tool-not-mounted=open_door_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=68",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4195,11 +4195,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=68",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4233,11 +4233,11 @@
           "source_ref": "manifest:matrix_id=69:tool-not-mounted=open_door_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=69",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4257,11 +4257,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=69",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4295,11 +4295,11 @@
           "source_ref": "manifest:matrix_id=70:tool-not-mounted=open_door_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=70",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4319,11 +4319,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=70",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4357,11 +4357,11 @@
           "source_ref": "manifest:matrix_id=71:tool-not-mounted=open_door_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=71",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4381,11 +4381,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=71",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4419,11 +4419,11 @@
           "source_ref": "manifest:matrix_id=72:tool-not-mounted=open_door_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=72",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4443,11 +4443,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=72",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4481,11 +4481,11 @@
           "source_ref": "manifest:matrix_id=73:tool-not-mounted=volume_mute"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=73",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4505,11 +4505,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=73",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4543,11 +4543,11 @@
           "source_ref": "manifest:matrix_id=74:tool-not-mounted=volume_mute"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=74",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4567,11 +4567,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=74",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4605,11 +4605,11 @@
           "source_ref": "manifest:matrix_id=75:tool-not-mounted=volume_mute"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=75",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4629,11 +4629,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=75",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4667,11 +4667,11 @@
           "source_ref": "manifest:matrix_id=76:tool-not-mounted=adjust_volume_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=76",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4691,11 +4691,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=76",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4729,11 +4729,11 @@
           "source_ref": "manifest:matrix_id=77:tool-not-mounted=adjust_volume_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=77",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4753,11 +4753,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=77",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4791,11 +4791,11 @@
           "source_ref": "manifest:matrix_id=78:tool-not-mounted=adjust_volume_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=78",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4815,11 +4815,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=78",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -4853,11 +4853,11 @@
           "source_ref": "manifest:matrix_id=79:tool-not-mounted=adjust_volume_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=79",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4877,11 +4877,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=79",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -4915,11 +4915,11 @@
           "source_ref": "manifest:matrix_id=80:tool-not-mounted=adjust_volume_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=80",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -4939,11 +4939,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=80",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -4977,11 +4977,11 @@
           "source_ref": "manifest:matrix_id=81:tool-not-mounted=adjust_volume_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=81",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5001,11 +5001,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=81",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5039,11 +5039,11 @@
           "source_ref": "manifest:matrix_id=82:tool-not-mounted=adjust_volume_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=82",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5063,11 +5063,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=82",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5101,11 +5101,11 @@
           "source_ref": "manifest:matrix_id=83:tool-not-mounted=adjust_volume_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=83",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5125,11 +5125,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=83",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5163,11 +5163,11 @@
           "source_ref": "manifest:matrix_id=84:tool-not-mounted=adjust_volume_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=84",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5187,11 +5187,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=84",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5225,11 +5225,11 @@
           "source_ref": "manifest:matrix_id=85:tool-not-mounted=open_wiper"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=85",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5249,11 +5249,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=85",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5287,11 +5287,11 @@
           "source_ref": "manifest:matrix_id=86:tool-not-mounted=open_wiper"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=86",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5311,11 +5311,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=86",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5349,11 +5349,11 @@
           "source_ref": "manifest:matrix_id=87:tool-not-mounted=open_wiper"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=87",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5373,11 +5373,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=87",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5411,11 +5411,11 @@
           "source_ref": "manifest:matrix_id=88:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=88",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5435,11 +5435,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=88",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5473,11 +5473,11 @@
           "source_ref": "manifest:matrix_id=89:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=89",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5497,11 +5497,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=89",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5535,11 +5535,11 @@
           "source_ref": "manifest:matrix_id=90:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=90",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5559,11 +5559,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=90",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5597,11 +5597,11 @@
           "source_ref": "manifest:matrix_id=91:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=91",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5621,11 +5621,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=91",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5659,11 +5659,11 @@
           "source_ref": "manifest:matrix_id=92:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=92",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5683,11 +5683,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=92",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5721,11 +5721,11 @@
           "source_ref": "manifest:matrix_id=93:tool-not-mounted=adjust_wiper_speed_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=93",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5745,11 +5745,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=93",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5783,11 +5783,11 @@
           "source_ref": "manifest:matrix_id=94:tool-not-mounted=adjust_wiper_speed_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=94",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5807,11 +5807,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=94",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -5845,11 +5845,11 @@
           "source_ref": "manifest:matrix_id=95:tool-not-mounted=adjust_wiper_speed_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=95",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5869,11 +5869,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=95",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -5907,11 +5907,11 @@
           "source_ref": "manifest:matrix_id=96:tool-not-mounted=adjust_wiper_speed_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=96",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5931,11 +5931,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=96",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -5969,11 +5969,11 @@
           "source_ref": "manifest:matrix_id=97:tool-not-mounted=open_sunroof"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=97",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -5993,11 +5993,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=97",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6031,11 +6031,11 @@
           "source_ref": "manifest:matrix_id=98:tool-not-mounted=open_sunroof"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=98",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6055,11 +6055,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=98",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6093,11 +6093,11 @@
           "source_ref": "manifest:matrix_id=99:tool-not-mounted=open_sunroof"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=99",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6117,11 +6117,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=99",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6155,11 +6155,11 @@
           "source_ref": "manifest:matrix_id=100:tool-not-mounted=open_sunroof_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=100",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6179,11 +6179,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=100",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6217,11 +6217,11 @@
           "source_ref": "manifest:matrix_id=101:tool-not-mounted=open_sunroof_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=101",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6241,11 +6241,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=101",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6279,11 +6279,11 @@
           "source_ref": "manifest:matrix_id=102:tool-not-mounted=open_sunroof_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=102",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6303,11 +6303,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=102",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6341,11 +6341,11 @@
           "source_ref": "manifest:matrix_id=103:tool-not-mounted=open_sunroof_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=103",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6365,11 +6365,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=103",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6403,11 +6403,11 @@
           "source_ref": "manifest:matrix_id=104:tool-not-mounted=open_sunroof_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=104",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6427,11 +6427,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=104",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6465,11 +6465,11 @@
           "source_ref": "manifest:matrix_id=105:tool-not-mounted=open_sunroof_by_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=105",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6489,11 +6489,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=105",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6527,11 +6527,11 @@
           "source_ref": "manifest:matrix_id=106:tool-not-mounted=open_sunroof_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=106",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6551,11 +6551,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=106",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6589,11 +6589,11 @@
           "source_ref": "manifest:matrix_id=107:tool-not-mounted=open_sunroof_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=107",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6613,11 +6613,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=107",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6651,11 +6651,11 @@
           "source_ref": "manifest:matrix_id=108:tool-not-mounted=open_sunroof_little"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=108",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6675,11 +6675,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=108",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6713,11 +6713,11 @@
           "source_ref": "manifest:matrix_id=109:tool-not-mounted=open_fragrance"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=109",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6737,11 +6737,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=109",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6775,11 +6775,11 @@
           "source_ref": "manifest:matrix_id=110:tool-not-mounted=open_fragrance"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=110",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6799,11 +6799,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=110",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -6837,11 +6837,11 @@
           "source_ref": "manifest:matrix_id=111:tool-not-mounted=open_fragrance"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=111",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6861,11 +6861,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=111",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -6899,11 +6899,11 @@
           "source_ref": "manifest:matrix_id=112:tool-not-mounted=adjust_fragrance_intensity_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=112",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6923,11 +6923,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=112",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -6961,11 +6961,11 @@
           "source_ref": "manifest:matrix_id=113:tool-not-mounted=adjust_fragrance_intensity_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=113",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -6985,11 +6985,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=113",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -7023,11 +7023,11 @@
           "source_ref": "manifest:matrix_id=114:tool-not-mounted=adjust_fragrance_intensity_to_number"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=114",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -7047,11 +7047,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=114",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -7083,11 +7083,11 @@
           "source_ref": "manifest:matrix_id=115:tool-not-mounted=-"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=115",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": false,
@@ -7107,11 +7107,11 @@
       "mounted_status": "no_representative_tool",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=115",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
@@ -7143,11 +7143,11 @@
           "source_ref": "manifest:matrix_id=116:tool-not-mounted=-"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=116",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": false,
@@ -7167,11 +7167,11 @@
       "mounted_status": "no_representative_tool",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=116",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -7203,11 +7203,11 @@
           "source_ref": "manifest:matrix_id=117:tool-not-mounted=-"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=117",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": false,
@@ -7227,11 +7227,11 @@
       "mounted_status": "no_representative_tool",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=117",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -7265,11 +7265,11 @@
           "source_ref": "manifest:matrix_id=118:tool-not-mounted=adjust_fragrance_intensity_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=118",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -7289,11 +7289,11 @@
       "mounted_status": "unmounted",
       "primary_class": "unmounted_name_rejected",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=118",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
@@ -7327,11 +7327,11 @@
           "source_ref": "manifest:matrix_id=119:tool-not-mounted=adjust_fragrance_intensity_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=119",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -7351,11 +7351,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=119",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
@@ -7389,11 +7389,11 @@
           "source_ref": "manifest:matrix_id=120:tool-not-mounted=adjust_fragrance_intensity_to_gear"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=120",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "probe_receipt_id": "runtime-no-mutation-40-probes",
+          "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -7413,11 +7413,11 @@
       "mounted_status": "unmounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "B4:pending:receipts/c1/runtime-no-mutation-40-probes.json#matrix_id=120",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "probe_receipt_id": "runtime-no-mutation-40-probes",
+        "source_ref": "receipts/c1/runtime-no-mutation-40-probes.json#probe_id=probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "status": "passed"
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
@@ -7438,7 +7438,8 @@
   "source": {
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "5c8faa54c7b28efa4daf9dc1bf7262481b65b72d43bb5ea6aac9e0ad0d2ffba6",
-    "t0_design_sha256": "3cd8c48505d37dfc5d5cd27ead74bf29b11a9fed69a0a8657cc554de31df99f6"
+    "probe_pack_sha256": "bb4e3d98e9a552788bc1b946f80a78dc10a94da0da1d7492390f867625fc27ca",
+    "t0_design_sha256": "3d56b731800a4006262d408264d777f2789f495131e1e6074f457129d44b84be"
   },
   "summary": {
     "blocked_unknown": 0,

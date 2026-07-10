@@ -160,6 +160,89 @@ def pending_readback_probe_basis(matrix_id: int) -> dict[str, Any]:
     }
 
 
+def passed_probe_pairs(receipt: dict[str, Any]) -> dict[tuple[str, str], dict[str, str]]:
+    if receipt.get("schemaVersion") != "runtime_no_mutation_receipt_v1":
+        raise ValueError("B4 probe receipt schema mismatch")
+    receipt_id = receipt.get("receiptID")
+    cases = receipt.get("cases")
+    if receipt_id != "runtime-no-mutation-40-probes" or not isinstance(cases, list):
+        raise ValueError("B4 probe receipt identity mismatch")
+
+    pairs: dict[tuple[str, str], dict[str, str]] = {}
+    for case in cases:
+        if not isinstance(case, dict):
+            raise ValueError("B4 probe receipt case must be an object")
+        probe_id = case.get("probeID")
+        family = case.get("family")
+        reason = case.get("reasonKind")
+        trace_id = case.get("traceID")
+        if (
+            not isinstance(probe_id, str)
+            or B4_PROBE_ID_PATTERN.fullmatch(probe_id) is None
+            or not isinstance(family, str)
+            or not isinstance(reason, str)
+            or not isinstance(trace_id, str)
+            or not trace_id.strip()
+        ):
+            raise ValueError("B4 probe receipt identity is incomplete")
+        if (
+            case.get("stateBeforeSHA256") != case.get("stateAfterSHA256")
+            or case.get("stateMutation") is not False
+            or case.get("observedToolCallCount") != 0
+            or not case.get("dialogText")
+            or not case.get("ttsText")
+        ):
+            raise ValueError(f"B4 probe receipt is not a passing no-mutation fact: {probe_id}")
+        pair = (family, reason)
+        if pair in pairs:
+            raise ValueError(f"duplicate B4 probe pair: {family}/{reason}")
+        probe_pack_sha = receipt.get("probePackSHA256")
+        if not isinstance(probe_pack_sha, str) or not re.fullmatch(r"[0-9a-f]{64}", probe_pack_sha):
+            raise ValueError("B4 probe pack sha is missing")
+        pairs[pair] = {
+            "probe_id": probe_id,
+            "receipt_id": receipt_id,
+            "probe_pack_sha256": probe_pack_sha,
+        }
+    if len(pairs) != 40:
+        raise ValueError(f"B4 probe receipt must cover 40 pairs, got {len(pairs)}")
+    return pairs
+
+
+def probe_reason_for_row(row: dict[str, Any]) -> str | None:
+    if row["mounted_status"] == "no_representative_tool":
+        return "unknown_no_representative_entry"
+    primary = row["primary_class"]
+    if primary == "unmounted_name_rejected":
+        return "unmounted_name_rejected"
+    if primary == "fast_path_no_match_fallback":
+        return "fast_path_no_match_fallback"
+    if primary == "safety_or_clarify_reject":
+        return "safety_or_clarify_reject"
+    return None
+
+
+def readback_probe_basis(
+    row: dict[str, Any],
+    probe_pairs: dict[tuple[str, str], dict[str, str]],
+) -> dict[str, Any]:
+    family = family_code(row["family"])
+    reason = probe_reason_for_row(row)
+    proof = probe_pairs.get((family, reason)) if family and reason else None
+    if proof is None:
+        return pending_readback_probe_basis(row["matrix_id"])
+    return {
+        "observed": True,
+        "status": "passed",
+        "probe_id": proof["probe_id"],
+        "probe_receipt_id": proof["receipt_id"],
+        "source_ref": (
+            "receipts/c1/runtime-no-mutation-40-probes.json"
+            f"#probe_id={proof['probe_id']}"
+        ),
+    }
+
+
 def has_probe_proof(readback_basis: dict[str, Any]) -> bool:
     probe_id = readback_basis.get("probe_id")
     receipt_id = readback_basis.get("probe_receipt_id")
@@ -200,6 +283,7 @@ def materialize_matrix(
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
     state_cells_path: Path = DEFAULT_STATE_CELLS,
     mounted_catalog_path: Path = DEFAULT_MOUNTED_CATALOG,
+    probe_receipt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     manifest_path = canonical_manifest_path(manifest_path)
     enums = parse_t0_enums(t0_design_path)
@@ -207,6 +291,7 @@ def materialize_matrix(
     semantic_by_intent = parse_semantic_contract(semantic_contract_path)
     state_cells = parse_state_cells(state_cells_path)
     mounted_tools = parse_mounted_tools(mounted_catalog_path)
+    probe_pairs = passed_probe_pairs(probe_receipt) if probe_receipt is not None else {}
 
     cells: list[dict[str, Any]] = []
     for row in manifest_rows:
@@ -238,7 +323,7 @@ def materialize_matrix(
                 if state_cell is not None
                 else f"manifest:matrix_id={row['matrix_id']}:no-state-readback-cell",
             ),
-            "readbackProbePass": pending_readback_probe_basis(row["matrix_id"]),
+            "readbackProbePass": readback_probe_basis(row, probe_pairs),
         }
         can_demo = compute_can_demo(cell_basis)
         cells.append(
@@ -271,6 +356,11 @@ def materialize_matrix(
             "manifest_sha256": sha256_file(manifest_path),
             "t0_design_sha256": sha256_file(t0_design_path),
             "enum_contract": "T0:add-c1-demo-capability-governance",
+            "probe_pack_sha256": (
+                next(iter(probe_pairs.values()))["probe_pack_sha256"]
+                if probe_pairs
+                else None
+            ),
         },
         "cells": cells,
         "summary": {
@@ -294,6 +384,7 @@ def validate_matrix(
     semantic_contract_path: Path = DEFAULT_SEMANTIC_CONTRACT,
     state_cells_path: Path = DEFAULT_STATE_CELLS,
     mounted_catalog_path: Path = DEFAULT_MOUNTED_CATALOG,
+    probe_receipt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     manifest_path = canonical_manifest_path(manifest_path)
     expected = materialize_matrix(
@@ -302,6 +393,7 @@ def validate_matrix(
         semantic_contract_path=semantic_contract_path,
         state_cells_path=state_cells_path,
         mounted_catalog_path=mounted_catalog_path,
+        probe_receipt=probe_receipt,
     )
     enums = parse_t0_enums(t0_design_path)
     manifest_rows = read_jsonl(manifest_path)
@@ -468,6 +560,7 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--semantic-contract", type=Path, default=DEFAULT_SEMANTIC_CONTRACT)
         subparser.add_argument("--state-cells", type=Path, default=DEFAULT_STATE_CELLS)
         subparser.add_argument("--mounted-catalog", type=Path, default=DEFAULT_MOUNTED_CATALOG)
+        subparser.add_argument("--probe-receipt", type=Path)
     subcommands.choices["materialize"].add_argument("--output", required=True, type=Path)
     subcommands.choices["check"].add_argument("--matrix", required=True, type=Path)
     subcommands.choices["check"].add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
@@ -477,12 +570,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    probe_receipt = json.loads(args.probe_receipt.read_text(encoding="utf-8")) if args.probe_receipt else None
     if args.command == "materialize":
         matrix = materialize_matrix(
             t0_design_path=args.t0_design,
             semantic_contract_path=args.semantic_contract,
             state_cells_path=args.state_cells,
             mounted_catalog_path=args.mounted_catalog,
+            probe_receipt=probe_receipt,
         )
         write_json(args.output, matrix)
         return 0
@@ -497,6 +592,7 @@ def main(argv: list[str] | None = None) -> int:
         semantic_contract_path=args.semantic_contract,
         state_cells_path=args.state_cells,
         mounted_catalog_path=args.mounted_catalog,
+        probe_receipt=probe_receipt,
     )
     write_json(args.receipt, report)
     if report["status"] != "PASS":

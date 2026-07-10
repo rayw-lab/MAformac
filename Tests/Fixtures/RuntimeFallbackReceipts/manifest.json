@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "runtime_fallback_receipt_manifest_v1",
+  "receiptID": "runtime-no-mutation-40-probes",
+  "receiptPath": "$RUN/receipts/c1/runtime-no-mutation-40-probes.json",
+  "caseCount": 40,
+  "proofClass": "local_unit",
+  "sourcePath": "contracts/fallback-probes.yaml",
+  "generatedCatalogPath": "generated/demo-fallback-probes.catalog.json",
+  "assertionSource": "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift",
+  "nonClaims": [
+    "not_mobile",
+    "not_true_device",
+    "not_live_api",
+    "not_v_pass"
+  ]
+}
