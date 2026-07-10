@@ -783,7 +783,7 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         }
 
         var refusedCards: [DemoVehicleStateCell] = []
-        var refusedReasonsByKey: [String: RuntimePresentationSafeReasonKind] = [:]
+        var refusedReasonKinds: [RuntimePresentationSafeReasonKind] = []
         for subaction in executionResult.subactions where subaction.disposition == .refused {
             guard let card = refusedCardsBySubactionID[subaction.frameID] else {
                 throw RuntimePresentationPartialProjectionError.refusedSubactionMissingCard(
@@ -805,19 +805,21 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
             var projectedCard = card
             projectedCard.visualState = reasonKind == .safetyPolicy ? .unsafe : .blocked_with_alternative
             refusedCards.append(projectedCard)
-            refusedReasonsByKey[projectedCard.key] = reasonKind
+            refusedReasonKinds.append(reasonKind)
         }
 
         let cards = PresentationCardOrdering.orderedForPresentation(acceptedCards + refusedCards)
         let readbacksByKey = Dictionary(grouping: acceptedReadbacks, by: \.key)
         let cardKeys = cards.map(\.key)
+        var unmatchedRefusedIndices = Array(refusedCards.indices)
         let semantics = cards.map { card in
             let siblingKeys = cardKeys.filter { $0 != card.key }
-            if let reasonKind = refusedReasonsByKey[card.key] {
+            if let offset = unmatchedRefusedIndices.firstIndex(where: { refusedCards[$0] == card }) {
+                let refusedIndex = unmatchedRefusedIndices.remove(at: offset)
                 return PresentationCardSemantics(
                     cellKey: card.key,
                     role: .refused,
-                    reason: reasonKind.rawValue,
+                    reason: refusedReasonKinds[refusedIndex].rawValue,
                     siblingKeys: siblingKeys
                 )
             }
@@ -852,16 +854,15 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         executionResult: DemoRuntimePartialPlanResult,
         refusedCardsBySubactionID: [String: DemoVehicleStateCell]
     ) -> Bool {
-        let acceptedReadbackKeys = Set(executionResult.acceptedReadbacks.map(\.key))
         return executionResult.subactions
             .filter { $0.disposition == .refused }
             .allSatisfy { subaction in
                 guard let finiteReason = subaction.finiteReason,
                       RuntimePresentationSafeReasonKind(finiteReason: finiteReason) != nil,
-                      let refusedCard = refusedCardsBySubactionID[subaction.frameID] else {
+                      refusedCardsBySubactionID[subaction.frameID] != nil else {
                     return false
                 }
-                return !acceptedReadbackKeys.contains(refusedCard.key)
+                return true
             }
     }
 

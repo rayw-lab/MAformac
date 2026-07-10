@@ -48,7 +48,7 @@ Coverage: CG-002, CG-004, CG-005, CG-007, CG-008, CG-009, CG-014, CG-015, CG-019
 
 ### Requirement: Governance enums and projections SHALL be closed
 
-The system SHALL reject unknown or free-string values for `primary_class`, fallback classification, internal `finiteReason`, `fallback_reason`, and customer-safe `reasonKind`. The governance fallback classification SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, or `unknown_no_representative_entry`. Internal `finiteReason` SHALL be exactly one of `safety_or_policy_refusal`, `clarify_missing_slot`, `unmounted_tool_name`, `name_rejected`, `fast_path_no_match`, `unsupported_tool_plan`, `no_representative_tool`, `runtime_execution_error`, or `already_state_noop`; `partial_accept_partial_refuse` is a bridge result wrapper and SHALL NOT be admitted as `finiteReason`.
+The system SHALL reject unknown or free-string values for `primary_class`, fallback classification, internal `finiteReason`, `fallback_reason`, and customer-safe `reasonKind`. The governance fallback classification SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, or `unknown_no_representative_entry`. Internal `finiteReason` SHALL be exactly one of `safety_or_policy_refusal`, `clarify_missing_slot`, `unmounted_tool_name`, `name_rejected`, `fast_path_no_match`, `unsupported_tool_plan`, `no_representative_tool`, `runtime_execution_error`, `stale_state_revision`, or `already_state_noop`; `partial_accept_partial_refuse` is a bridge result wrapper and SHALL NOT be admitted as `finiteReason`.
 
 Coverage: CG-005, CG-022, CG-023, CG-024, CG-025, CG-038, CG-039, CG-068, CG-074.
 
@@ -60,6 +60,7 @@ The mapping SHALL preserve these meanings:
 - FastPath miss or unsupported plan: internal `fast_path_no_match` or `unsupported_tool_plan` → `unsupported_no_available_tool` → safe `not_available_in_demo`;
 - no representative action: internal `no_representative_tool` → `no_representative_tool__default_fallback` → safe `not_available_in_demo`;
 - typed runtime execution error: internal `runtime_execution_error` → `runtime_error_typed` → safe `runtime_unavailable`;
+- stale-state gate refusal: internal `stale_state_revision` → `runtime_error_typed` → safe `runtime_unavailable`;
 - already-satisfied state: internal `already_state_noop` → `already_state_noop` → safe `already_done`.
 
 The governance mapping SHALL NOT define public payload field names or schema versions. Public results and encoded projection remain bridge-owned.

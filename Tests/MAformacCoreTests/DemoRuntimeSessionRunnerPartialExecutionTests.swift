@@ -196,6 +196,14 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(payload.readbacks.map(\.key), ["ac.power"])
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
         XCTAssertEqual(store.cell(for: "ac.power")?.revision, 1)
+        let staleSemantics = try XCTUnwrap(
+            payload.cardSemantics?.first { $0.reason == "runtime_unavailable" }
+        )
+        XCTAssertEqual(staleSemantics.cellKey, "ac.power")
+        XCTAssertEqual(staleSemantics.role, .refused)
+        let encodedPayload = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+        XCTAssertFalse(encodedPayload.contains("stale_state_revision"))
+        XCTAssertFalse(encodedPayload.contains("finiteReason"))
         XCTAssertEqual(trace.entries.filter { $0.stage == .execute }.count, 1)
         XCTAssertEqual(trace.entries.filter { $0.stage == .readback }.count, 1)
 

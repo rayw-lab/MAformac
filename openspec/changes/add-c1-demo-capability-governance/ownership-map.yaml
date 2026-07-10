@@ -38,6 +38,7 @@
     "unsupported_tool_plan",
     "no_representative_tool",
     "runtime_execution_error",
+    "stale_state_revision",
     "already_state_noop"
   ],
   "fallback_reason_enum": [
@@ -73,6 +74,7 @@
     {"finiteReason": "unsupported_tool_plan", "fallback_reason": "unsupported_no_available_tool", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
     {"finiteReason": "no_representative_tool", "fallback_reason": "no_representative_tool__default_fallback", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
     {"finiteReason": "runtime_execution_error", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
+    {"finiteReason": "stale_state_revision", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
     {"finiteReason": "already_state_noop", "fallback_reason": "already_state_noop", "reasonKind": "already_done", "bridge_result": "already_state_noop"}
   ],
   "fallback_catalog_buckets": [
