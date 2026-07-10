@@ -1261,3 +1261,12 @@
 - **branch protection 已执行 + readback 验证**：`opt/streamline-macos-20260707` + `main` 双分支 = required check `verify`(strict) + 禁 force-push/deletion + required_conversation_resolution。🔴 **commander 裁决 delta**（对 w4 §5.1 原案）：`enforce_admins=false` + 不设 require-PR——保留磊哥/commander docs 直推日常流（原案会把未跑 CI 的 docs commit 直推全拒）；residual 如实记：admin 直推可绕 verify、admin 可拆门（w4 已列为威胁模型外）。诚实等级=GATE_BASELINE_HAS_TEETH（分层再降半档），非 SAME_PR_UNSOFTENABLE。
 - **修复轮开工**：w2(%3) 领 SPEC-fix-p01-p11（P0-1 四点+P1-1 扩扫+probe 期望值级联，映射口径 LOCKED 不扩 T0），修完 push PR 分支→w1 按验收门复审。
 - **并行**：w3 吸收互审 5P1 产 int-v5a 实施计划 v2；w4 细化 witness 实施计划+CODEOWNERS advisory 草案。
+
+## D-139：BATCH-C1-2 消减（39→A19/B11/C-拍）+ ballot-next 24 题全按星标 RATIFIED（磊哥授权 commander 逐题亲核代拍，2026-07-10 ma13）
+
+- **消减**：C1 P1 批 39 题（BATCH-C1-2，2026-07-08 备好）经 grok 消减矩阵分诊 = A 已决 19（cite 逐条，commander 抽核 Q18→D-114/CG-055→D-133 过关）/ B 新事实改写 11（正名/0-120/int-v5 吸收，A′ 正名版默认生效）/ C 真待拍并入 ballot。源 `runs/2026-07-10-ma13/reports/BATCH-C1-2-reduction.md`。
+- **ballot-next 24 题 RATIFIED**（`DRAFT-ballot-next.md`，磊哥「全带推荐的如果你都认可就按星标」授权，commander 逐题过全文后代拍）：
+  - **L1-L8（Line C 扩面/翻绿）全 ⭐B**：L1 第一刀=PROOF_FLIP matrix4（零新工具）/ L2 单格证明栈绿即升、批次 1→N 绑 S10（证明轴≠扩面轴）/ L3 matrix5-6 靠 S9/S10 或 runtime emission receipt（CG-015）/ L4 第一新工具=open_ac / L5 第二刀=window / L6 joint<40% 仍允许 PROOF_FLIP（CG-054 字面不违反）/ L7 三档表零临场 / L8 probe-witness 并行、改 baseline 串行。
+  - **C1-C11（P1 工程纪律）**：C5=⭐A（joint=0.70 仍中档，>0.70 才 10 族）其余 ⭐B：register 变更走 proposal→schema bump→regen / checker 五类分级 / family unknown=emergency+leakage 计数 / joint=0.40 进中档 / FastPath 优先+同 presentation schema 禁双 mutation / 冲突 trace 记录 / literal 仅直述 L1 / stale=runtime error 不进兜底 KPI / 3 族序=空调→车窗→座椅 / C3 红不挡 S10-PROOF_FLIP 挡 1→N-closeout。
+  - **M-Q01~05（M-DEMO golden run）全 ⭐B**：must_pass=已挂载/已 cell、10 族走 fallback 轨 / 四层断言 deny 轨 mutation=false / 对外四字段+对内 refs / 跑全+failure_class / golden⊥U17⊥frontstage 三轨正交。
+- **Non-claims**：本票不授权 mounted 1→N；不 Ready PR#42（round 3 终审在途）；不签 canDemo>0；不开工 int-v5 编码；S8 状态不变。
