@@ -179,14 +179,21 @@ def materialize_matrix(
         runner_anchor = first_anchor(row, "Core/Execution/DemoRuntimeSessionRunner.swift")
         fallback_reason, reason_kind = reason_projection(row)
 
+        # Find real runtime readback anchor if available
+        runtime_readback_possible = False
+        runtime_ref = f"manifest:matrix_id={row['matrix_id']}:no-runtime-readback-probe"
+        for anchor in row.get("anchors", []):
+            if "DemoRuntimeSessionRunnerTests.swift" in anchor or "W20ARuntimeReadbackReceiptWriter.swift" in anchor:
+                runtime_readback_possible = True
+                runtime_ref = anchor
+                break
+
         cell_basis = {
             "mounted_or_approved_action": basis(
-                mounted or default_fastpath,
-                (
-                    "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
-                    if mounted
-                    else f"manifest:matrix_id={row['matrix_id']}:default_path_status={row['default_path_status']}"
-                ),
+                mounted,
+                "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
+                if mounted
+                else f"manifest:matrix_id={row['matrix_id']}:tool-not-mounted={tool}",
             ),
             "semantic_contract": basis(
                 bool(semantic_rows),
@@ -203,10 +210,8 @@ def materialize_matrix(
                 else f"manifest:matrix_id={row['matrix_id']}:no-state-readback-cell",
             ),
             "local_runtime_readback": basis(
-                default_fastpath and runner_anchor is not None,
-                runner_anchor
-                if default_fastpath and runner_anchor is not None
-                else f"manifest:matrix_id={row['matrix_id']}:default_path_status={row['default_path_status']}",
+                runtime_readback_possible and runner_anchor is not None,
+                runtime_ref if runtime_readback_possible else f"manifest:matrix_id={row['matrix_id']}:no-runtime-readback-probe",
             ),
         }
         can_demo = compute_can_demo(cell_basis)
@@ -339,8 +344,19 @@ def validate_matrix(
     if blocked_unknown_ids:
         errors.append("E_T0_ENUM_UNKNOWN")
 
+    # D-123 fixed baselines: primary class counts
+    D123_BASELINE = {
+        "safety_or_clarify_reject": 0,
+        "unmounted_name_rejected": 36,
+        "fast_path_no_match_fallback": 82,
+        "default_executable": 1,
+        "conditional_ddomain_executable": 1,
+    }
+
     expected_counts = Counter(row["primary_class"] for row in manifest_rows)
     actual_counts = Counter(cell.get("primary_class") for cell in cells if isinstance(cell, dict))
+    
+    # Check against manifest (preserve existing check)
     primary_class_diff = {
         value: {"expected": expected_counts.get(value, 0), "actual": actual_counts.get(value, 0)}
         for value in sorted(set(expected_counts) | set(actual_counts))
@@ -348,6 +364,15 @@ def validate_matrix(
     }
     if primary_class_diff:
         errors.append("E_PRIMARY_CLASS_CONSERVATION")
+    
+    # Also check against D-123 fixed baseline
+    d123_diff = {}
+    for cls, expected in D123_BASELINE.items():
+        actual = actual_counts.get(cls, 0)
+        if actual != expected:
+            d123_diff[cls] = {"expected": expected, "actual": actual}
+    if d123_diff:
+        errors.append("E_PRIMARY_CLASS_D123_BASELINE_MISMATCH")
 
     if mounted_catalog_delta:
         errors.append("E_MOUNTED_CATALOG_DELTA")
