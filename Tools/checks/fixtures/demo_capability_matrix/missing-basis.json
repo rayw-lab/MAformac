@@ -1,0 +1,5 @@
+{
+  "operation": "remove_basis",
+  "matrix_id": 1,
+  "basis": "semantic_contract"
+}
