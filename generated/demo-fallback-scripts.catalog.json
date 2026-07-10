@@ -442,5 +442,6 @@
     }
   ],
   "schemaVersion": "demo_fallback_script_catalog.v1",
-  "sourceSHA256": "b22ead6468d79f81f8fb04a8199917de89a279972a1618d76e055efe48fd8b0b"
+  "sourceSHA256": "3c1324e5af5925f774eeb8f55cf13ad598537a2b554db0d9bab48c04bf6338a3",
+  "t0RegistrySHA256": "e42c288796ac1e40763854486c96658cf7f76bc585f3f0cfd84f773e1c59e160"
 }

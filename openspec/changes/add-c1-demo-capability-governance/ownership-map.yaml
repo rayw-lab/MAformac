@@ -40,6 +40,30 @@
     "runtime_execution_error",
     "already_state_noop"
   ],
+  "fallback_reason_enum": [
+    "safety_policy_refused",
+    "clarify_missing_slot",
+    "unmounted_name_rejected",
+    "unsupported_no_available_tool",
+    "no_representative_tool__default_fallback",
+    "runtime_error_typed",
+    "already_state_noop"
+  ],
+  "reasonKind_enum": [
+    "safety_policy",
+    "clarification_required",
+    "capability_not_mounted",
+    "not_available_in_demo",
+    "runtime_unavailable",
+    "already_done"
+  ],
+  "bridge_result_enum": [
+    "refusal_safety_or_policy",
+    "clarify_missing_slot",
+    "refusal_no_available_tool",
+    "runtime_error",
+    "already_state_noop"
+  ],
   "finiteReason_projections": [
     {"finiteReason": "safety_or_policy_refusal", "fallback_reason": "safety_policy_refused", "reasonKind": "safety_policy", "bridge_result": "refusal_safety_or_policy"},
     {"finiteReason": "clarify_missing_slot", "fallback_reason": "clarify_missing_slot", "reasonKind": "clarification_required", "bridge_result": "clarify_missing_slot"},
@@ -50,6 +74,12 @@
     {"finiteReason": "no_representative_tool", "fallback_reason": "no_representative_tool__default_fallback", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
     {"finiteReason": "runtime_execution_error", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
     {"finiteReason": "already_state_noop", "fallback_reason": "already_state_noop", "reasonKind": "already_done", "bridge_result": "already_state_noop"}
+  ],
+  "fallback_catalog_buckets": [
+    {"reason_kind": "safety_or_clarify_reject", "finite_reasons": ["safety_or_policy_refusal", "clarify_missing_slot"]},
+    {"reason_kind": "unmounted_name_rejected", "finite_reasons": ["unmounted_tool_name", "name_rejected"]},
+    {"reason_kind": "fast_path_no_match_fallback", "finite_reasons": ["fast_path_no_match", "unsupported_tool_plan"]},
+    {"reason_kind": "unknown_no_representative_entry", "finite_reasons": ["no_representative_tool"]}
   ],
   "semantic_assertions": [
     {

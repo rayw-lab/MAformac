@@ -8,10 +8,6 @@
     "schema_version",
     "authority",
     "family_enum",
-    "governance_reason_enum",
-    "safe_reason_kind_enum",
-    "result_kind_enum",
-    "internal_reason_mappings",
     "customer_surface_policy",
     "families",
     "cells"
@@ -21,18 +17,13 @@
     "authority": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["t0_commit", "t0_change", "t0_spec"],
+      "required": ["t0_change", "t0_registry"],
       "properties": {
-        "t0_commit": {"const": "15f1d60908795fc3859fa5a9239d731678f1339d"},
         "t0_change": {"const": "add-c1-demo-capability-governance"},
-        "t0_spec": {"type": "string"}
+        "t0_registry": {"type": "string", "minLength": 1}
       }
     },
     "family_enum": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true},
-    "governance_reason_enum": {"type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true},
-    "safe_reason_kind_enum": {"type": "array", "uniqueItems": true},
-    "result_kind_enum": {"type": "array", "uniqueItems": true},
-    "internal_reason_mappings": {"type": "object"},
     "customer_surface_policy": {"type": "object"},
     "families": {"type": "object", "minProperties": 10, "maxProperties": 10},
     "cells": {
