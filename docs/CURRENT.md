@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-11 凌晨（D-141：PR #42 MERGED f5ef6270 + GAP-HUNT 12 主题 + V6 基线待开笔）
-last_verified_head: d9ccfb3d（opt/streamline-macos-20260707，与 origin 同步；head_truth_rule 以 live git 为准）
+updated: 2026-07-11（D-142 V6 RATIFIED；baseline_activation=PENDING_CASCADE；int-v5a 编码开工未合入；S8 磊哥令不着急）
+last_verified_head: ef5761b3cedd39033998f7425f0b4413ff10935b（live git 亲跑；head_truth_rule 以 live git 为准）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "V6 基线 RATIFIED 或 int-v5a 编码开工 或 S8 点火"
+expires_when: "G1 BALLOT RATIFIED 或 int-v5a 收编 或 S8 点火"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,7 +14,15 @@ expires_when: "V6 基线 RATIFIED 或 int-v5a 编码开工 或 S8 点火"
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-11 凌晨：**🎉 PR #42 MERGED（f5ef6270）——C1 治理修复合入主线；GAP-HUNT 12 主题出稿，V6 基线待 commander 开笔**）
+## 当前阶段（2026-07-11：**V6 RATIFIED（D-142）——三链+O 控制面基线生效（PENDING_CASCADE）；int-v5a 编码开工；G1/G2 BALLOT 备料中；S8 磊哥令不着急**）
+
+🔴 **本节 supersede 下方旧态段**。推进事实源=`docs/roadmap-2026-07-11-v6-closure-baseline.md` v6.1 + `docs/commander-log/decisions.md` D-142 + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/`；`active_baseline_v6` 指针已切到该 v6 文件，但 activation 仍 `PENDING_CASCADE`；本文件仍是 router-only，不替代 V6、decisions、OpenSpec 或 run-dir receipts。
+- **V6 状态**：`decision_status=RATIFIED`；`baseline_activation=PENDING_CASCADE`；三链是 owner/view，O 是 orchestration/governance control plane，typed 工作包表是调度真相，未因 RATIFY 自动翻 `ACTIVE`（D-142；v6.1:23,120-127,139-147）。
+- **执行态**：int-v5a 已开工编码但尚未合入；G1/G2 BALLOT 仍备料/待磊哥拍，G3-G5 按波次排队；当前只消费 run-dir 物料，不把弹药、INDEX 或审计 receipt写成 RATIFIED（本轮任务书 `SPEC-CASCADE-EXEC.md:9-13`；run-dir `reports/BALLOT-INDEX-v6.md`）。
+- **S8**：磊哥 2026-07-11「S8不着急」，点火键挂起；不得写成 running/completed（D-142；v6.1:129-137）。
+- **Non-claims**：`canDemo=0/120`；S8 未点火；int-v5a 已开工但未合入；无 operator-pass/V-PASS/C6 acceptance/candidate signed；`baseline_activation` 未 `ACTIVE`。
+
+## 【历史】当前阶段（2026-07-11 凌晨：**🎉 PR #42 MERGED（f5ef6270）——C1 治理修复合入主线；GAP-HUNT 12 主题出稿，V6 基线待 commander 开笔**）
 
 🔴 **本节 supersede 下方全部旧态段**。推进事实源 = decisions **D-133~D-141** + run dir `runs/2026-07-10-ma13/`（GAP-HUNT-closure-themes=V6 素材 SSOT + int-v5 四派单合同 + S8 READY 实证 + M-DEMO 实施包）+ handoff `2026-07-10-ma13-closeout`。
 - **PR #42 MERGED**：七轮修复-审计链（AMENDMENT-1 行为门收敛）+ merge 前终极对抗审计（matrix checker fail-open P0 round7 修复 ALL_SCOPE_PASS）→ 磊哥授权 merge。合入=治理层真金（诚实矩阵 canDemo=0/120 + fail-closed 门族 + typed authority）；**仍 NOT demo-ready**。

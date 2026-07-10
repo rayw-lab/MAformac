@@ -1,6 +1,7 @@
 ---
 authority: baseline_roadmap（基线文档组成员；与 CLAUDE.md/OpenSpec specs/grill SSOT 冲突时让位并须回写）
 status: active_baseline_v5（2026-07-10 D-133 增量：Line C 矩阵 v3 内容与 C1 P0 38/38 ⭐B 已 RATIFIED；120=10族×4 value_shape×3 register，主分类账 unmounted=36 / fastpath=82 / default=1 / conditional=1，safety=0；实现仍走消减矩阵→计划→对抗审→编码，CG-080 禁 mounted 1→N。其余 v5 增量与 v4.1 骨架不动）
+superseded_by: docs/roadmap-2026-07-11-v6-closure-baseline.md（D-142，2026-07-11 RATIFIED；本文件转 historical——Line B 执行细账与五门定义作为一手档继续被 v6 引用）
 author: claude-commander (Fable5, 磊哥拍板「亲自编写」2026-07-07 傍晚；v4 增量 2026-07-08 晨；v5 增量 2026-07-08 午后磊哥拍 A + 令对抗审计)
 basis: opt/streamline-macos-20260707 @ bdd40892 + w20a run dir（S7c recert D-120 + S8 r1/r2 receipts）+ daywork run dir（矩阵 v3/preflight v2/S9 预备件，2026-07-08）+ UIUE 方法论包 `docs/research/2026-07-08-macos-uiue-methodology/`
 supersedes: 本文件是三线融合调度层；任务①②③各自的 run-dir 计划（SYNTHESIS-v2 / IMPL-PLAN-v3 / task3 弹药）保持有效

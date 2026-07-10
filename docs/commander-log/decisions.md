@@ -1287,3 +1287,21 @@
 - **阵容终态**：codex 22:33 重置后五席（sol high/sol xhigh/terra×2/luna max）+hermes 秘书（%4）；上半夜 4-grok 时代产出（四合同前身/收口草稿族）经 opus 补审全过。
 - **merge 语义（body v4 固化）**：governanceTruthful=true 合入=治理层真金（诚实矩阵 0/120+fail-closed 门族+typed authority）；**仍 NOT demo-ready**（customerDemoReady=false 直到 int-v5+S8 正证）；无 operator-pass/V-PASS/C6。
 - **接续**：int-v5a 编码可开工（合同 ready）；S8 点火键在途；V6 基线待 GAP-HUNT 出稿后 commander 亲笔。
+
+## D-142：V6 基线 RATIFY——三链 + O 控制面基线进入级联（2026-07-11，磊哥拍）
+
+- **决策 lineage**：v6.0 基线经 `AUDIT-V6-by-w5.md` 全局对抗审为 `REQUEST_CHANGES`（P0=6 / P1=8 / P2=1；审计头与计数见 `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/AUDIT-V6-by-w5.md:3-15`），六个 P0 经 commander 亲核复放坐实并吸收到 v6.1（审计复盘见同文件 `:296-300`；v6.1 frontmatter 与审计吸收记录见 `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:1-7,15`）。v6.1 RATIFY 前 source SHA=`63d8d9bbea60903885b64f6ac2677c014de28819aa5101066c90f882eb3fbe01`。
+- **磊哥 ballot**：2026-07-11，原话为「V6 RATIFY agree」「S8不着急」「其他全力推动」「按 grill 范式项目管理编排」「grill 拆解细/corner case 要思考」（本轮执行任务书 `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/specs/SPEC-CASCADE-EXEC.md:3,9`）。
+- **V6-N1**：三链视图 + typed 工作包为调度 SSOT（三链/五门均非第二 SSOT）。
+- **V6-N2**：29 包 closure 分母 + hard 分母 28 + 三轴状态制 + 手写账仅此一次。
+- **V6-N3**：三条硬边：T02 freeze→S9；T03+T09→T04b；T06→T07b（原有 T01/T02→S10 保持）。
+- **V6-N4**：wave 制 grill 日程 G1-G5 与每波级联义务。
+- **V6-N5**：V8 closure verdict same-subject join（禁 prose join）。
+- **V6-N6**：O 控制面 O1-O6 制度物 +「计数由 checker 生成禁手写」原则。
+- **V6-N7**：int-v5 序修正：v5a 先行；v5b customer façade/default composition 等 T03/T04 interface cut。
+
+  上述 V6-N1~N7 为 v6.1 §七逐条落条，原文锚为 `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:139-147`。
+- **状态**：`decision_status=RATIFIED`；`baseline_activation=PENDING_CASCADE`。C-08 active OpenSpec carrier disposition=`residual`，按 carrier 分批核对/执行；O1/O2 与 C-02~C-10 cascade receipt 未齐前，不翻 `ACTIVE`（级联义务与 stopline 见 `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/DESIGN-v6-cascade-inventory.md:54-85`）。
+- **当前执行态**：int-v5a 已开工编码但尚未合入；G1/G2 INDEX 与后续各波 ballot 继续按 run-dir 物料推进，不能把 ballot pending 或 plan receipt 写成产品完成（本轮任务书 `SPEC-CASCADE-EXEC.md:9-13`；v6.1 当前 W1/W2 边界见 `docs/roadmap-2026-07-11-v6-closure-baseline.md:41-56`）。
+- **S8 键**：磊哥「S8不着急」，点火挂起；不得因 V6 RATIFY 把 S8 写成 running、completed 或自动授权（本轮任务书 `SPEC-CASCADE-EXEC.md:9`；v6.1 待磊哥键见 `docs/roadmap-2026-07-11-v6-closure-baseline.md:129-137`）。
+- **Non-claims**：`canDemo=0/120` 不变；S8 未点火；G1-G5 BALLOT 未拍；无 operator-pass、V-PASS、C6 acceptance、candidate signed 或 live/runtime proof。`RATIFIED` 只代表决策已拍，不代表 `baseline_activation=ACTIVE`（D-137 诚实边界 `/Users/wanglei/workspace/MAformac/docs/commander-log/decisions.md:1230-1237`；v6.1 proof boundary `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:149-155`）。
