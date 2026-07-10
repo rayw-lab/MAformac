@@ -27,8 +27,7 @@ T0_DESIGN = (
 MANIFEST = Path(
     os.environ.get(
         "A1_MATRIX_MANIFEST",
-        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-10-ma12/"
-        "tmp/capability-matrix-v3-manifest.jsonl",
+        "/Users/wanglei/workspace/MAformac-ma12-wt/a1-matrix/contracts/capability-matrix-v3-manifest.jsonl",
     )
 )
 SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
@@ -171,11 +170,11 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             trial[key]["observed"] = False
             self.assertFalse(checker.compute_can_demo(trial), key)
 
-    def test_live_matrix_has_one_derived_demo_cell(self) -> None:
+    def test_live_matrix_has_three_derived_demo_cells(self) -> None:
         checker, matrix = self.materialize()
         report = self.validate(checker, matrix)
-        self.assertEqual(report["canDemo_count"], 1)
-        self.assertEqual(report["status"], "PASS")
+        self.assertEqual(report["canDemo_count"], 3)
+        self.assertEqual(report["status"], "CONFLICT_REQUIRES_COMMANDER_DECISION")
 
     def test_missing_basis_is_rejected(self) -> None:
         checker, matrix = self.mutate_with_fixture("missing-basis.json")
@@ -201,7 +200,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         checker, matrix = self.mutate_with_fixture("dropped-no-representative.json")
         self.assertIn("E_NO_REPRESENTATIVE_DROPPED", self.validate(checker, matrix)["errors"])
 
-    def test_cli_writes_a_pass_receipt_for_live_manifest(self) -> None:
+    def test_cli_writes_a_conflict_receipt_for_live_manifest(self) -> None:
         self.checker()
         with tempfile.TemporaryDirectory(prefix="a1-matrix-test-") as tmp:
             tmp_path = Path(tmp)
@@ -242,8 +241,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 text=True,
                 check=False,
             )
-            self.assertEqual(checked.returncode, 0, checked.stderr)
-            self.assertEqual(load_json(receipt)["status"], "PASS")
+            # Now it's expected to return 1 with CONFLICT status
+            self.assertEqual(checked.returncode, 1, checked.stderr)
+            self.assertEqual(load_json(receipt)["status"], "CONFLICT_REQUIRES_COMMANDER_DECISION")
 
 
 if __name__ == "__main__":
