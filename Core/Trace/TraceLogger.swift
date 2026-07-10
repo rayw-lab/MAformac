@@ -212,16 +212,36 @@ public final class InMemoryTraceLogger: TraceLogger, @unchecked Sendable {
 /// This type is intentionally internal: raw finite reasons are retained in C3
 /// receipts for diagnostics, but are not part of the runtime-presentation bridge
 /// payload contract.
-enum InternalTraceFiniteReason: String, Codable, CaseIterable, Equatable, Sendable {
-    case safetyOrPolicyRefusal = "safety_or_policy_refusal"
-    case clarifyMissingSlot = "clarify_missing_slot"
-    case unmountedToolName = "unmounted_tool_name"
-    case nameRejected = "name_rejected"
-    case fastPathNoMatch = "fast_path_no_match"
-    case unsupportedToolPlan = "unsupported_tool_plan"
-    case noRepresentativeTool = "no_representative_tool"
-    case runtimeExecutionError = "runtime_execution_error"
-    case alreadyStateNoop = "already_state_noop"
+struct InternalTraceFiniteReason: RawRepresentable, Codable, CaseIterable, Equatable, Sendable {
+    let rawValue: String
+
+    init?(rawValue: String) {
+        guard RuntimePresentationReasonAuthority.projection(forFiniteReason: rawValue) != nil else {
+            return nil
+        }
+        self.rawValue = rawValue
+    }
+
+    static var allCases: [InternalTraceFiniteReason] {
+        RuntimePresentationReasonAuthority.finiteReasons.compactMap(InternalTraceFiniteReason.init(rawValue:))
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        guard let finiteReason = Self(rawValue: rawValue) else {
+            throw DecodingError.dataCorruptedError(
+                in: container,
+                debugDescription: "Unknown T0 finiteReason: \(rawValue)"
+            )
+        }
+        self = finiteReason
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
 }
 
 enum InternalTraceSubactionDisposition: String, Codable, Equatable, Sendable {
