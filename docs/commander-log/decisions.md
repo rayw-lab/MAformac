@@ -1279,3 +1279,11 @@
 - **阵容三迁**：codex 4 席 sol→额度紧磊哥令停派（跑完不断）→grok 4 席拉满（免费试用）→grok 额度尽全停→**Opus 3 席（%2/%3/%4）+codex %1 终审位（10% 余量刀刃）+%5 Opus manual 磊哥手边**。坑：OpenAI 内容策略误拦防御性 QA 审计（sol 造负例变体被判 cybersecurity，turn 拒；救法=框定「自有仓库防御性回归 QA」重派+已完成部分复用——待沉淀 gpt56 rule）。
 - **收口物料就绪**：completeness 审计（opus2，P0/P1/P2 分级钉死收口路径）+PR body v3 预制（占位）+D-140 即本条+收口四件草稿 v4（grok 产 opus4 抽核无 drift）。
 - **Non-claims**：round5 未终审；PR #42 仍 Draft/未 Ready/未 merge；canDemo=0/120 不变；int-v5 编码未开工；S8 未点火；翻绿链 v2 仅 DRAFT。**暂停点=磊哥合盖出门，round5 push 后全场静默待令。**
+
+## D-141：PR #42 MERGED——七轮修复-审计链+终极对抗审计全链收官 + 通宵波全账（2026-07-10 深夜，磊哥授权 merge）
+
+- **终章链**：round6=6e2bf2a4（identifier 契约收口）→ w1 终审 **PASS_FOR_PR42_P01_SCOPE**（0/0/0）→ 🔴 merge 前终极对抗审计（%5 sol xhigh 三孙 lens）=**DO_NOT_MERGE P0=1**：matrix canonical checker fail-open（tracked≠fresh materialize+六种篡改 rc0——七轮唯一逃逸到 matrix 面的假绿，commander 亲核 cmp 不一致坐实）→ round7=e360213c（fresh canonical checker+schema/ID/full-equality fail-closed+diff 接 regen）→ w1 终验 **ALL_SCOPE_PASS**（六配方稳定 red/回归面 fresh PASS/783/7/0/BUILD SUCCEEDED/matrix 语义真值零变动）→ Ready 序（update-branch 1b68bc3a+required verify 4m1s 绿+body v4 七轮链 Ready 语义上线）→ **磊哥授权 merge：`f5ef62705b3e` MERGED @23:57**。
+- **通宵波全账**（22:33 五 codex 齐发）：S8 点火链实测 READY_TO_IGNITE rc0（只待磊哥窗口令；G1 receipt 兼容补丁草稿备）/ int-v5 四派单合同全家福（specs/SPEC-v5{a,b,c,d}-implementation-dispatch.md，merge 后流水开工）/ M-DEMO golden-run 实施预备包（16 rows SOURCE_LITERAL_PASS+checker 设计+ingress plan）/ 翻绿链路 v3-DRAFT（P0×2 修净：content-digest 链去自指+capsule projection 强制）/ gap 盘点在途（GAP-HUNT 待出→V6 基线素材）。
+- **阵容终态**：codex 22:33 重置后五席（sol high/sol xhigh/terra×2/luna max）+hermes 秘书（%4）；上半夜 4-grok 时代产出（四合同前身/收口草稿族）经 opus 补审全过。
+- **merge 语义（body v4 固化）**：governanceTruthful=true 合入=治理层真金（诚实矩阵 0/120+fail-closed 门族+typed authority）；**仍 NOT demo-ready**（customerDemoReady=false 直到 int-v5+S8 正证）；无 operator-pass/V-PASS/C6。
+- **接续**：int-v5a 编码可开工（合同 ready）；S8 点火键在途；V6 基线待 GAP-HUNT 出稿后 commander 亲笔。
