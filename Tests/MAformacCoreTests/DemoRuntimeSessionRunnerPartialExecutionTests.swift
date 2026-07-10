@@ -271,6 +271,73 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
     }
 
     @MainActor
+    func testAcceptedAndReviewedRefusalWithoutCardFailsClosedInsteadOfEmittingEmptyRefusedCards() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let accepted = acPowerFrame(id: "accepted-ac", traceID: "trace-missing-refused-card")
+        let refused = reviewedUnmappableRefusalFrame(
+            id: "refused-without-card",
+            traceID: "trace-missing-refused-card"
+        )
+        let expectedExecutionResult = DemoRuntimePartialPlanResult(
+            traceID: "trace-missing-refused-card",
+            subactions: [
+                DemoRuntimePartialSubactionResult(
+                    frameID: accepted.id,
+                    disposition: .accepted,
+                    readbacks: [
+                        DemoActionReadback(
+                            key: "ac.power",
+                            actualValue: "on",
+                            revision: 1,
+                            spokenText: "空调已打开"
+                        )
+                    ],
+                    finiteReason: nil,
+                    observedToolCallCount: 1,
+                    observedReadbackCount: 1,
+                    stateMutation: true
+                ),
+                DemoRuntimePartialSubactionResult(
+                    frameID: refused.id,
+                    disposition: .refused,
+                    readbacks: [],
+                    finiteReason: "unmounted_tool_name",
+                    observedToolCallCount: 0,
+                    observedReadbackCount: 0,
+                    stateMutation: false
+                )
+            ]
+        )
+        XCTAssertTrue(DemoRuntimePartialPlan.isReviewed(refused))
+        XCTAssertFalse(
+            RuntimePresentationTerminalSnapshotAdapter.canProjectPartialRefusalIdentity(
+                executionResult: expectedExecutionResult,
+                refusedCardsBySubactionID: [:]
+            )
+        )
+
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: trace,
+            speech: RecordingSpeechSynthesisEngine(),
+            planDecoder: { _ in [accepted, refused] }
+        )
+
+        do {
+            _ = try await runner.run(text: "打开空调并执行无法投影的拒绝动作")
+            XCTFail("expected missing refused card to fail closed instead of emitting an empty refused list")
+        } catch {
+            XCTAssertEqual(
+                error as? RuntimePresentationPartialProjectionError,
+                .refusedSubactionMissingCard(frameID: "refused-without-card")
+            )
+        }
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+    }
+
+    @MainActor
     func testUnreviewedExtraActionRejectsWholePlanBeforeAnyMutation() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
@@ -463,6 +530,21 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             value: ContractValue(ref: "ZERO", direct: "+", offset: "粉", type: "SPOT"),
             stateRevision: 0,
             candidateSource: .fastPath
+        )
+    }
+
+    private func reviewedUnmappableRefusalFrame(id: String, traceID: String) -> ToolCallFrame {
+        ToolCallFrame(
+            id: id,
+            traceID: traceID,
+            agentID: "vehicle-control",
+            capabilityID: "vehicle.unmappable",
+            toolName: "adjust_seat_backrest_to_number",
+            device: "missing_card_device",
+            actionPrimitive: "adjust_to_number",
+            value: ContractValue(direct: "26", type: "SPOT"),
+            stateRevision: 0,
+            candidateSource: .upstreamToolCall
         )
     }
 

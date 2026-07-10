@@ -757,30 +757,6 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
     }
 
     public static func partialAcceptRefuse(
-        traceID: String,
-        acceptedReadbacks: [DemoActionReadback],
-        acceptedCards: [DemoVehicleStateCell],
-        refusedCards: [DemoVehicleStateCell],
-        reason: String,
-        proofClass: PresentationProofClass = .localUnit,
-        traceEnvelope: TraceEnvelope? = nil,
-        timestamp: Date = Date()
-    ) -> PresentationSnapshot {
-        terminalSnapshot(
-            traceID: traceID,
-            outcome: DemoRuntimeOutcome(
-                result: .partialAcceptPartialRefuse,
-                reason: normalizedReason(reason, fallback: "partial_accept_refuse")
-            ),
-            cards: acceptedCards + refusedCards,
-            readbacks: acceptedReadbacks,
-            proofClass: proofClass,
-            traceEnvelope: traceEnvelope,
-            timestamp: timestamp
-        )
-    }
-
-    public static func partialAcceptRefuse(
         executionResult: DemoRuntimePartialPlanResult,
         acceptedCards: [DemoVehicleStateCell],
         refusedCardsBySubactionID: [String: DemoVehicleStateCell],

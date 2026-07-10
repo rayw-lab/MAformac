@@ -123,7 +123,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(snapshot.proofClass, .localUnit)
     }
 
-    func testPartialAcceptRefuseCarriesMixedCardsAndCompositeReadback() {
+    func testPartialAcceptRefuseCarriesMixedCardsAndCompositeReadback() throws {
         let acceptedReadback = DemoActionReadback(
             key: "window.driver",
             actualValue: "closed",
@@ -131,16 +131,41 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             spokenText: "主驾车窗已关闭",
             scopeOrigin: .explicit
         )
-        let snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
-            traceID: "trace-partial",
-            acceptedReadbacks: [acceptedReadback],
+        let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+            executionResult: DemoRuntimePartialPlanResult(
+                traceID: "trace-partial",
+                subactions: [
+                    DemoRuntimePartialSubactionResult(
+                        frameID: "accepted-window",
+                        disposition: .accepted,
+                        readbacks: [acceptedReadback],
+                        finiteReason: nil,
+                        observedToolCallCount: 1,
+                        observedReadbackCount: 1,
+                        stateMutation: true
+                    ),
+                    DemoRuntimePartialSubactionResult(
+                        frameID: "refused-door",
+                        disposition: .refused,
+                        readbacks: [],
+                        finiteReason: "safety_or_policy_refusal",
+                        observedToolCallCount: 0,
+                        observedReadbackCount: 0,
+                        stateMutation: false
+                    )
+                ]
+            ),
             acceptedCards: [
                 DemoVehicleStateCell(key: "window.driver", actualValue: "closed", revision: 2, visualState: .satisfied)
             ],
-            refusedCards: [
-                DemoVehicleStateCell(key: "door.lock", actualValue: "locked", revision: 1, visualState: .unsafe)
-            ],
-            reason: "partial_accept_refuse"
+            refusedCardsBySubactionID: [
+                "refused-door": DemoVehicleStateCell(
+                    key: "door.lock",
+                    actualValue: "locked",
+                    revision: 1,
+                    visualState: .unsafe
+                )
+            ]
         )
 
         XCTAssertTrue(snapshot.isTerminal)
@@ -148,7 +173,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(snapshot.runtimeOutcome.result, .partialAcceptPartialRefuse)
         XCTAssertEqual(snapshot.runtimeOutcome.reason, "partial_accept_refuse")
         XCTAssertEqual(snapshot.readbacks, [acceptedReadback])
-        XCTAssertEqual(snapshot.cards.map(\.visualState), [.satisfied, .unsafe])
+        XCTAssertEqual(Set(snapshot.cards.map(\.visualState)), [.satisfied, .unsafe])
     }
 
     func testPartialExecutionResultProjectsThroughExistingV1FieldsWithSafeRefusedReason() throws {
