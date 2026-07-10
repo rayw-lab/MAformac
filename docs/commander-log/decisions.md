@@ -1255,3 +1255,9 @@
 - **BALLOT-ma13-final.md 待磊哥拍**：主 3 题（Q-1 路线 ⭐B 治理修复合入+demo 另立 line / Q-12 Solo Baseline protection ⭐立即上 / Q-13 结构缺口 ⭐记 residual）+ 细节 10 题全 ⭐。
 - **秘书验证**：hermes 一稿 3 处编造（HEAD 参照系错/D-134、D-137 描述凭印象/worker 态 stale）被审出打回，二稿全合格——「hermes 产出无例外必审」再实证。
 - **磊哥令**：全员回稿后暂停一小时不派单（16:35 起计时）。**Non-claims**：int-v4 未 Ready/未 merge；canDemo=0/120 不变；修复轮未开工；int-v5a/b/c 未开工；无 operator-pass/V-PASS。
+
+### D-138 补记：BALLOT-ma13 RATIFIED + branch protection 上线 + 修复轮开工（磊哥 2026-07-10 拍）
+- **磊哥拍**：Q-1 + 细节 10 题**全按星标**（路线 B=治理修复先合入+demo 另立 line；admission C 案/mock rehearsal 隔离/非循环五件套/typed sidecar/可靠性两阶段/p95 fast/memory baseline/int-v5a 一 PR 两 commit/actionDemoProven/witness int-v5 先行）；Q-12=B（branch protection 立即上，授权 commander 执行）；Q-13=授权按 ⭐A（单人仓+residual，不加 reviewer 不建外部 App）。
+- **branch protection 已执行 + readback 验证**：`opt/streamline-macos-20260707` + `main` 双分支 = required check `verify`(strict) + 禁 force-push/deletion + required_conversation_resolution。🔴 **commander 裁决 delta**（对 w4 §5.1 原案）：`enforce_admins=false` + 不设 require-PR——保留磊哥/commander docs 直推日常流（原案会把未跑 CI 的 docs commit 直推全拒）；residual 如实记：admin 直推可绕 verify、admin 可拆门（w4 已列为威胁模型外）。诚实等级=GATE_BASELINE_HAS_TEETH（分层再降半档），非 SAME_PR_UNSOFTENABLE。
+- **修复轮开工**：w2(%3) 领 SPEC-fix-p01-p11（P0-1 四点+P1-1 扩扫+probe 期望值级联，映射口径 LOCKED 不扩 T0），修完 push PR 分支→w1 按验收门复审。
+- **并行**：w3 吸收互审 5P1 产 int-v5a 实施计划 v2；w4 细化 witness 实施计划+CODEOWNERS advisory 草案。
