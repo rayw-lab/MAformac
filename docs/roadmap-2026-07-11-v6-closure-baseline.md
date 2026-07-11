@@ -53,7 +53,7 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | W5d | decode policy（multi-call fail-closed/metadata-aware parser） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；exactly-one authority=`openspec/specs/tool-execution/spec.md:18-24` |
 | W6 | T03 C4 路由 active spec + L1-L5 本体 | RATIFIED_PENDING_PLAN（D-143） | Wave G1 |
 | W7 | T10 DialogueState 消费语义 | RATIFIED_PENDING_PLAN（D-150；exact-nine 5 个 design atoms 仅解锁 draft expansion） | Wave G3 |
-| W8 | T09 session lifecycle/cancel/recovery | RATIFIED_PENDING_PLAN（D-150；W5c/T04b 前置硬边不变） | Wave G3 |
+| W8 | T09 session lifecycle/cancel/recovery | RATIFIED_PENDING_PLAN（D-150/D-152；W8/T09 是 W5c/T04b 的前置；W8 自身不依赖 W5c DONE） | Wave G3 |
 | W9 | T08 force-state 单一 authority | RATIFIED_PENDING_PLAN（D-150；force-state authority 切换尚未执行） | Wave G3 |
 | W10 | T05 语音分层：**hard=TTS 门收敛**（stretch ASR 面不进 hard 分母） | RATIFIED_PENDING_PLAN（D-147） | Wave G4；D14 选型不重拍 |
 
@@ -75,13 +75,13 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
 
-<!-- O1:GENERATED:START registry_sha256=fda0bb478b775b96f6ed5e19aeda53f070679251680c07e6ed4fd4b2b378aaa4 checker_sha256=9a0580e0580a806eec24df4d9d3dfa7cc63824cce260ee2caee0dfac004de5ab -->
+<!-- O1:GENERATED:START registry_sha256=9e0959414158454a28d52331b6f0612852fd158c423a1f773b6340c4232f4703 checker_sha256=9a0580e0580a806eec24df4d9d3dfa7cc63824cce260ee2caee0dfac004de5ab -->
 | O1 checker field | derived value |
 |---|---:|
 | packages | 29 |
 | hard leaf denominator | 28 |
 | execution | done=4; ready=0; blocked=4; planned=20; gap=1; running=0; paused=0 |
-| count token | `O1COUNTv1{registry=fda0bb478b775b96f6ed5e19aeda53f070679251680c07e6ed4fd4b2b378aaa4;packages=29;hard=28;done=4;ready=0;blocked=4;planned=20;gap=1;running=0;paused=0}` |
+| count token | `O1COUNTv1{registry=9e0959414158454a28d52331b6f0612852fd158c423a1f773b6340c4232f4703;packages=29;hard=28;done=4;ready=0;blocked=4;planned=20;gap=1;running=0;paused=0}` |
 
 | package | decision_state | execution_state | proof_state |
 |---|---|---|---|
