@@ -2,27 +2,31 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-11（post-D-150：G1-G5 五波 decision layer closed；W7/W8/W9/V2 ratified/planned；G1-T1 P1-01、rebuild-C6、A4-0b 与 v5b ABI 各沿独立 stopline 推进）
-last_verified_head: 2bbc515819507aa1bb6443d221153b2e6efa3036（本轮编辑基线 live HEAD=upstream；D-150 已 push；closure=25/25、verify-ci=794/6/0；rebuild-C6 四文件为 commander-owned dirty）
+updated: 2026-07-11（post-D-152/helper：wave-2 17/17+GOV-001=C canonical；done4/29；G1-T1/rebuild-c6/A4-0b/B1b/classfix/helper 已分层收编；lessons M.78-M.85 与 ma15 swarm-run 随 docs 批次落正典）
+last_verified_head: cae485ebe46a0bc4fbedafb30d7d92de06943a3c（docs批次起点 HEAD=upstream；helper merge已push，helper实现receipt记closure=53/53+make verify rc0；本docs commit与后继helper reanchor/double-gate结果见DOCS-BATCH receipt）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "G1-T1 P1-01 复审/收编、rebuild-C6 human propose/commit、A4-0b 收编、v5b ABI-proof 窗、S8 点火、exact-nine 5/2/2 proof cap 或 baseline activation 任一翻转时刷新"
+expires_when: "wave-2 carrier/apply/coding/merge/proof、v5b formal ABI、S8点火、baseline activation、O1计数或docs批次后继重锚/push任一翻转时刷新"
 ---
 
 # CURRENT — MAformac 当前路由牌
 
-> 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
+> 本文件是交通牌不是事实源。与 `CLAUDE.md`、OpenSpec、`docs/commander-log/decisions.md`、registry、签字证据或 live repo 冲突时，本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-11：**post-D-150——G1-G5 五波 DECISION_LAYER_CLOSED；四包 ratified/planned；独立实现、人审与 proof stopline 继续**）
+## 当前阶段（2026-07-11：**post-D-152/helper——wave-2 17/17 RATIFIED + GOV-001=C；O1 done4/29；实现与 proof 另键**）
 
-🔴 **本节 supersede 下方所有历史态段（含紧随其后的旧 D-142 与 D-142~D-148 段）**。推进事实源=`docs/commander-log/decisions.md` D-142~D-150 + `docs/roadmap-2026-07-11-v6-closure-baseline.md` §一 generated table + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/reports/`；本文件仍是 router-only，不替代 decisions、roadmap、OpenSpec 或 run-dir receipts。
+🔴 **本节 supersede 下方所有历史态段，包括旧 post-D-150 活段。** 推进事实源=`docs/commander-log/decisions.md` D-150~D-152 + `contracts/closure-work-packages.v1.yaml` + `docs/roadmap-2026-07-11-v6-closure-baseline.md` generated table + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/` receipts；本文件只做路由。
 
-- **D-150 / 五波 decision 层**：D-150 已落并 push 于 `2bbc5158`；G1-G5 只可表述为 `DECISION_LAYER_CLOSED / FULLY_ACCOUNTED 93/93`，不得写 `FULLY_RATIFIED`。G3 exact-nine 的 proof cap 仍是 **5 design atoms / 2 implementation clarifications / 2 runtime escalation prerequisites**，decision 闭合不等于实现或 proof 闭合。
-- **O1 / 四包 post-D-150 态**：W7/W8/W9/V2 均为 `decision_state=ratified`、`execution_state=planned`、`proof_state=none`；O1 canonical execution=`done=1 / blocked=4 / planned=23 / gap=1`。V6 `baseline_activation=PENDING_CASCADE`，未翻 `ACTIVE`。
-- **G1-T1 收尾**：最新独立复审仅剩 **P1-01** 收尾在途；该项未收编前不得把 G1-T1 升格为完成。
-- **独立在途键**：rebuild-C6 四个 OpenSpec 修订文件仍为未提交写回，待磊哥确认后由 commander 统一 commit；A4-0b 在途；v5b Mandatory Release two-turn ABI proof 等磊哥返回可见 macOS 授权窗；S8 不点火。各 lane 不互相替代，T02 freeze→S9、T09→W5c、T06→T07b 等硬边继续生效。
-- **Non-claims**：`DECISION_LAYER_CLOSED` 不是 93 项逐项 ratified，更不是 implementation/proof closure；无 operator-pass、C6 acceptance、candidate、mobile、true-device、live_api 或 V-PASS；S8/S9/S10 未执行，`baseline_activation` 未 `ACTIVE`。
+- **D-152 / wave-2**：A/B=`dcac3f42→fbc4574b` 已push；终账=`17/17 counted RATIFIED + GOV-001=C companion`。17=`14按⭐ + SEQ-001=A + M16-010a=A + 010b=B`，GOV不进17分母。INDEX v3.1 sha=`253a40e2…`，KEYS七批live sha=`7c29fa46…`；010a仅stress profile，010b仅真实process `proof_runtime` recipe，均不等于proof satisfied/W8 DONE。carrier/spec-design、`/opsx:apply`、coding、merge、package transition/state flip全部另键。
+- **O1 / closure**：live generated=`packages29 / hard28 / done4 / blocked4 / planned20 / gap1`；done exact=`B1b,W1,W5a,W5d`。B1b flip=`83d470af`已push，只闭`s8.g1_receipt_chain` local/t_pass；B1a仍blocked，S8未点火。
+- **已收编供给**：G1-T1 merge=`dd5d4f77`+reanchor=`997ec76d`；rebuild-c6七⭐ carrier human-reviewed accepted=`fd12695b`，但未`/opsx:apply`；A4-0b merge=`5687932c`后经`e33135bf→09330817→2550560c` probe/presence/wiring/reanchor链收编，只证明App target dev-source membership hygiene，A4-1/SwiftPM/runtime改善未做。
+- **v5b ABI 三层态**：L1授权层=`RESOLVED`；L2五键/env harness=`FIXED_ON_CONTAIN_BRANCH@a9b55252`，L3写域=`FIXED_ON_CONTAIN_BRANCH_NOT_INTEGRATED@59dc8822`，二者均只在`c1/int-v5b-contain-20260711`，**不在mainline `cae485eb`**。formal exact ABI proof仍以正式receipt为准；readiness、waiver、local/unit/build与recipe均不等于desktop/operator proof。
+- **治理冰山 / classfix / helper**：global rule=`roster-sync-on-set-expansion`。classfix patch+reanchor=`c8ad0563→c96c6785`已push，fresh closure=`52/52`、verify-ci=`814/6/0`；reanchor helper实现=`a86f5025`、merge=`cae485eb`已push，helper receipt记closure=`53/53`+`make verify rc0`。helper是canonical投影同步器，不替代commit-stability、双门或人审。
+- **十连push尾账（post-`4d2e24e9`红门基座）**：`2bbc5158→a62b4b4c→997ec76d→fd12695b→4da372f8→2550560c→83d470af→fbc4574b→c96c6785→cae485eb`；D-152/classfix/helper均已在upstream。该里程碑账不把中间merge/authority commit重复计数。
+- **文档级联**：TRACKING已对齐v3.1与KEYS七批；本批把lessons M.78-M.85与ma15 swarm-run落repo正典，M.85按独立审把裸`&`复发计数改为四次。canonical MEMORY与D-151 historical边注仍须另批处理，不得用旧MEMORY顶段覆盖本节。
+- **下一动作**：①本docs commit后用`reanchor_closure_registry.py`做第二消费并fresh跑closure+verify-ci，磊哥逐字核后才push；②wave-2 carrier/apply/coding/merge/proof按另键推进；③v5b formal按operator纪律；④S8继续不点火。
+- **Non-claims**：`actionDemoProven=0/120`；`baseline_activation=PENDING_CASCADE`；S8未点火；B1a未DONE；wave-2无carrier/apply/coding/merge/proof；v5b formal ABI未闭；rebuild-c6未apply；A4-1未做。本docs批次与后继reanchor在磊哥review前均不push；无operator-pass、V-PASS、C6 acceptance、candidate signed、mobile、true_device或live_api proof。
 
 
 ## 【历史】当前阶段（2026-07-11：**V6 RATIFIED（D-142）——三链+O 控制面基线生效（PENDING_CASCADE）；int-v5a 编码开工；G1/G2 BALLOT 备料中；S8 磊哥令不着急**；已被 D-143~D-145 后态 supersede）
