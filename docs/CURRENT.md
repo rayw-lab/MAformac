@@ -2,11 +2,11 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-11（D-147/D-148 后态；32 题全拍、O1/O2 committed fresh-green@8ac39cdd、G1-T1 修复与 G3 末波呈拍在途）
-last_verified_head: 8ac39cddaa507e85ad04cdbfff3b5ddf643d8c90（live git + upstream equality；本轮编辑前 clean snapshot 的 closure=25/25，当前文档改动按磊哥令保持 uncommitted；head_truth_rule 以 live git 为准）
+updated: 2026-07-11（post-D-150：G1-G5 五波 decision layer closed；W7/W8/W9/V2 ratified/planned；G1-T1 P1-01、rebuild-C6、A4-0b 与 v5b ABI 各沿独立 stopline 推进）
+last_verified_head: 2bbc515819507aa1bb6443d221153b2e6efa3036（本轮编辑基线 live HEAD=upstream；D-150 已 push；closure=25/25、verify-ci=794/6/0；rebuild-C6 四文件为 commander-owned dirty）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "G3 七题 disposition / exact-SHA 终确认、G1-T1 fresh recheck/收编、v5b ABI-proof 窗、rebuild-C6 propose、S8 点火或 O1 generated 状态任一翻转时刷新"
+expires_when: "G1-T1 P1-01 复审/收编、rebuild-C6 human propose/commit、A4-0b 收编、v5b ABI-proof 窗、S8 点火、exact-nine 5/2/2 proof cap 或 baseline activation 任一翻转时刷新"
 ---
 
 # CURRENT — MAformac 当前路由牌
@@ -14,16 +14,15 @@ expires_when: "G3 七题 disposition / exact-SHA 终确认、G1-T1 fresh recheck
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-11：**D-147/D-148 后态——32 题全拍；O1/O2 committed fresh-green@8ac39cdd；G1-T1 修复在途；G3 v4.2 待终确认 + 七题呈拍中**）
+## 当前阶段（2026-07-11：**post-D-150——G1-G5 五波 DECISION_LAYER_CLOSED；四包 ratified/planned；独立实现、人审与 proof stopline 继续**）
 
-🔴 **本节 supersede 下方所有历史态段（含紧随其后的旧 D-142 与 D-142~D-145 段）**。推进事实源=`docs/commander-log/decisions.md` D-142~D-148 + `docs/roadmap-2026-07-11-v6-closure-baseline.md` §一 generated table + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/`；本文件仍是 router-only，不替代 decisions、roadmap、OpenSpec 或 run-dir receipts。
+🔴 **本节 supersede 下方所有历史态段（含紧随其后的旧 D-142 与 D-142~D-148 段）**。推进事实源=`docs/commander-log/decisions.md` D-142~D-150 + `docs/roadmap-2026-07-11-v6-closure-baseline.md` §一 generated table + `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/reports/`；本文件仍是 router-only，不替代 decisions、roadmap、OpenSpec 或 run-dir receipts。
 
-- **V6 / O1 / 已收编面**：V6 `decision_status=RATIFIED`、`baseline_activation=PENDING_CASCADE`；O1/O2 已 merge `207ac515`，红门 incident 经 clean commit `8ac39cdd` 恢复 committed fresh-green，`make verify-closure-work-packages`=`25 passed / rc0`。本轮两份 authority 文档按磊哥令保持未提交，current dirty-tree checker 因 subject freshness 返回 `E_STALE_BASIS`，须在磊哥核稿并完成后续收编后 fresh 复跑，不得把 clean-baseline green 外推为 dirty-tree green。W1 int-v5a=`DONE`（`ba2c3636`）；W2 containment 已以 ABI waiver 半收编（`95f2d5d5`，waiver≠proof）；B1b receipt-chain 已收编（`a3160c88`）（D-146/D-148 `docs/commander-log/decisions.md:1342-1353`；fresh closeout `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/CLOSEOUT-CROSSFACE-AUDIT-by-w5.md:17,62-72,78-86`）。
-- **32 题 / G2-G4-G5**：D-147 将 G2 parent 12 + `G2-038-C1` 1 + G4 14 + G5 5 共 **32/32** 全按⭐ RATIFIED；因此 G2=`66/66`、G4=`53/53`、G5=`29/29`，T01/T02 的 S10 拍板前置已满足，但 T02 freeze→S9 执行序硬边仍在（`docs/commander-log/decisions.md:1332-1340`；`/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md:1-25`）。
-- **G1-T1 修复在途**：第一 tranche producer receipt 为 `PARTIAL_LOCAL_PASS`；独立审为 `REQUEST_CHANGES`（P0×2/P1×2）：bounded-reviewed 双调用撞 active exactly-one，risk-ack symbol closure 不成立。P0-1/length direct negative 已修，expanded ACK 与后续 commit/recheck 在途；fresh recheck 前不得收编（`/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/XAUDIT-G1-CODE-T1-by-w3.md:17-28,131-144`；`/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/G1T1-FIX-ACK-DIFF.md:1-24`）。
-- **G3 v4.2 / 七题呈拍**：v4.2 目标单行修与 `70/7/9/7` 守恒已通过，source SHA=`90f1815824ea38443e5be87b153d4aa34b0b62dbedf5df0d45970ca6ae280e34`；因其终核时 O1 仍红，整体 verdict 保持 `AUTOBALLOT_NO_GO`，当前需在 `8ac39cdd` fresh-green basis 上再做 exact-SHA 终确认。七个独立 escalate=`006/010/011/027/028/029/090` 已制成呈拍页，未拍前 70 项不得自动票（`/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/FINAL-RECHECK-G3V42-by-w5.md:17-28,30-50`；`/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/G3-ESCALATION-ONEPAGER.md:1-16,88-94`）。
-- **仍在外部/人审键**：v5b Mandatory Release two-turn ABI proof 仍等可见 macOS 授权窗；rebuild-C6 仅完成 propose 预备、尚未执行 human-reviewed propose/apply；S8 仍未点火（ABI `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/V5B-ABI-PROOF-OPERATOR-GUIDE.md:3-7,30-76`；rebuild-C6 `openspec/changes/rebuild-c6-four-layer-bench/proposal.md:1-30`；D-147 non-claims `docs/commander-log/decisions.md:1337-1340`）。
-- **Non-claims**：O1 fresh-green 是 governance/local integration proof，不是产品 runtime；G1-T1 未收编，G3 七题未拍，S8/S9/S10 未执行；无 operator-pass、C6 acceptance、candidate、mobile、true-device、live_api 或 V-PASS；`baseline_activation` 未 `ACTIVE`。
+- **D-150 / 五波 decision 层**：D-150 已落并 push 于 `2bbc5158`；G1-G5 只可表述为 `DECISION_LAYER_CLOSED / FULLY_ACCOUNTED 93/93`，不得写 `FULLY_RATIFIED`。G3 exact-nine 的 proof cap 仍是 **5 design atoms / 2 implementation clarifications / 2 runtime escalation prerequisites**，decision 闭合不等于实现或 proof 闭合。
+- **O1 / 四包 post-D-150 态**：W7/W8/W9/V2 均为 `decision_state=ratified`、`execution_state=planned`、`proof_state=none`；O1 canonical execution=`done=1 / blocked=4 / planned=23 / gap=1`。V6 `baseline_activation=PENDING_CASCADE`，未翻 `ACTIVE`。
+- **G1-T1 收尾**：最新独立复审仅剩 **P1-01** 收尾在途；该项未收编前不得把 G1-T1 升格为完成。
+- **独立在途键**：rebuild-C6 四个 OpenSpec 修订文件仍为未提交写回，待磊哥确认后由 commander 统一 commit；A4-0b 在途；v5b Mandatory Release two-turn ABI proof 等磊哥返回可见 macOS 授权窗；S8 不点火。各 lane 不互相替代，T02 freeze→S9、T09→W5c、T06→T07b 等硬边继续生效。
+- **Non-claims**：`DECISION_LAYER_CLOSED` 不是 93 项逐项 ratified，更不是 implementation/proof closure；无 operator-pass、C6 acceptance、candidate、mobile、true-device、live_api 或 V-PASS；S8/S9/S10 未执行，`baseline_activation` 未 `ACTIVE`。
 
 
 ## 【历史】当前阶段（2026-07-11：**V6 RATIFIED（D-142）——三链+O 控制面基线生效（PENDING_CASCADE）；int-v5a 编码开工；G1/G2 BALLOT 备料中；S8 磊哥令不着急**；已被 D-143~D-145 后态 supersede）

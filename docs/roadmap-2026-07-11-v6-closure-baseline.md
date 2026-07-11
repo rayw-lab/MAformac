@@ -52,16 +52,16 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | W5c | T04b production composition root（唯一装配点/default backend） | RATIFIED_PENDING_PLAN（D-143；硬边 T03✅+T09⏳ 未齐禁实装） | Wave G1 grill + 🔴 前置=T03+T09 contract cut（审计 P1-02：production composition 只能消费 route/lifecycle 边界） |
 | W5d | decode policy（multi-call fail-closed/metadata-aware parser） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；exactly-one authority=`openspec/specs/tool-execution/spec.md:18-24` |
 | W6 | T03 C4 路由 active spec + L1-L5 本体 | RATIFIED_PENDING_PLAN（D-143） | Wave G1 |
-| W7 | T10 DialogueState 消费语义 | GAP | Wave G3 |
-| W8 | T09 session lifecycle/cancel/recovery | GAP | Wave G3 |
-| W9 | T08 force-state 单一 authority | GAP | Wave G3 |
+| W7 | T10 DialogueState 消费语义 | RATIFIED_PENDING_PLAN（D-150；exact-nine 5 个 design atoms 仅解锁 draft expansion） | Wave G3 |
+| W8 | T09 session lifecycle/cancel/recovery | RATIFIED_PENDING_PLAN（D-150；W5c/T04b 前置硬边不变） | Wave G3 |
+| W9 | T08 force-state 单一 authority | RATIFIED_PENDING_PLAN（D-150；force-state authority 切换尚未执行） | Wave G3 |
 | W10 | T05 语音分层：**hard=TTS 门收敛**（stretch ASR 面不进 hard 分母） | RATIFIED_PENDING_PLAN（D-147） | Wave G4；D14 选型不重拍 |
 
 ### 验收链（8 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
 | V1 | T01 C6 量尺 authority 归并/阈值/promotion | RATIFIED_PENDING_PLAN（D-147 全闭；S10 拍板面硬边解除） | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
-| V2 | T07 operator-pass ceremony（T07a ceremony contract / T07b final operator run） | GAP（G3 波，T07 题未拍——G4G5 拍的不含 T07） | Wave G3；🔴 T07b 前置=T06 artifact/build identity（审计 P1-02） |
+| V2 | T07 operator-pass ceremony（T07a ceremony contract / T07b final operator run） | RATIFIED_PENDING_PLAN（D-150；T07a/T07b 执行尚未开始） | Wave G3；🔴 T07b 前置=T06 artifact/build identity（审计 P1-02） |
 | V3 | T11 性能门归属（PF1 + int-v5d receipt 进 closure verdict） | RATIFIED_PENDING_PLAN（D-147） | Wave G4 |
 | V4 | T06 S6 Mac 打包边界（audience/artifact/签名公证 in-out） | RATIFIED_PENDING_PLAN（D-147） | Wave G4；U43 internal-only 已锁 |
 | V5 | T12 Line A 分母 accounting（**不进 hard 分母**） | RATIFIED_PENDING_PLAN（D-147；A5 各项仍逐项磊哥点头） | Wave G5 |
@@ -70,18 +70,18 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | V8 | closure verdict join（五门 receipt 机械汇签，same-subject join） | GAP | 制度物=O4 schema；join key（repo_head/build/model/contract/corpus/scorer）任一不同或缺失=BLOCKED（审计 P1-04） |
 
 ### 进度 verdict（可复算口径；本表为**最后一次手写账**，O2 checker 落地后由机械生成接管）
-- canonical 计数只认下方 checker 接管的 `O1:GENERATED` table：**done=1**（generated execution row `:83`；count token `:84`）/ **blocked=4**（`:83-84`）/ **planned=19**（`:83-84`）/ **gap=5**（`:83-84`）/ **ready=0 / running=0 / paused=0**（`:83-84`）。接管源为 `contracts/closure-work-packages.v1.yaml` 经 `scripts/check_closure_work_packages.py` 生成并由 `make verify-closure-work-packages` 校验的 marker block（registry/checker identity `:78`，29-package rows `:86-117`）；三张历史业务说明表只作 reason/provenance，不再手写 canonical execution 计数。
+- canonical 计数只认下方 checker 接管的 `O1:GENERATED` table：**done=1**（generated execution row `:83`；count token `:84`）/ **blocked=4**（`:83-84`）/ **planned=23**（`:83-84`）/ **gap=1**（`:83-84`）/ **ready=0 / running=0 / paused=0**（`:83-84`）。接管源为 `contracts/closure-work-packages.v1.yaml` 经 `scripts/check_closure_work_packages.py` 生成并由 `make verify-closure-work-packages` 校验的 marker block（registry/checker identity `:78`，29-package rows `:86-117`）；三张历史业务说明表已同步 D-150 后业务态，但 canonical execution 计数仍只认 marker。
 - **hard closure 分母 = 28**（29 − V5 accounting；W10 计 hard 但只含 TTS 门收敛面，stretch ASR 不进硬门）。
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
 
-<!-- O1:GENERATED:START registry_sha256=1184f4549955fa44181fb96aa62e47fd95f81ac696014c350395b7f2eaa37037 checker_sha256=9a0580e0580a806eec24df4d9d3dfa7cc63824cce260ee2caee0dfac004de5ab -->
+<!-- O1:GENERATED:START registry_sha256=cb747eb67274f1ff76f8dd9fee425a79bd61878df9edd76307b5e112c2834c62 checker_sha256=9a0580e0580a806eec24df4d9d3dfa7cc63824cce260ee2caee0dfac004de5ab -->
 | O1 checker field | derived value |
 |---|---:|
 | packages | 29 |
 | hard leaf denominator | 28 |
 | execution | done=1; ready=0; blocked=4; planned=23; gap=1; running=0; paused=0 |
-| count token | `O1COUNTv1{registry=1184f4549955fa44181fb96aa62e47fd95f81ac696014c350395b7f2eaa37037;packages=29;hard=28;done=1;ready=0;blocked=4;planned=23;gap=1;running=0;paused=0}` |
+| count token | `O1COUNTv1{registry=cb747eb67274f1ff76f8dd9fee425a79bd61878df9edd76307b5e112c2834c62;packages=29;hard=28;done=1;ready=0;blocked=4;planned=23;gap=1;running=0;paused=0}` |
 
 | package | decision_state | execution_state | proof_state |
 |---|---|---|---|
