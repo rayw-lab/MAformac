@@ -1360,3 +1360,14 @@
 - **ma15 交接**：handoff=`docs/handoffs/2026-07-11-ma14-closeout.md`（含蜂群布局规格+拉满教义+哨兵复用指引——磊哥令写入）。
 - **Non-claims**：G3 未拍；G1-T1 未收编；ACTIVE 未翻；S8 未点火；actionDemoProven=0/120；无 operator-pass/V-PASS。
 - **ERRATA（术语规范化，2026-07-11 ma15）**：D-149 的动作证明轴统一使用 canonical `actionDemoProven`；只修术语，不改变 0/120 数值、状态或结论。
+
+## D-150：G3 wave RATIFIED——七题磊哥亲拍 + 70 白名单代拍 + exact-nine 重账；T07-T10 契约级联启动（2026-07-11 午后，磊哥拍 + commander 按授权代拍）
+
+- **ballot 原话（verbatim）**：磊哥「G3 七题（090⭐C）拍板」「我同意」（ma15 commander 会话）。commander 按 onepager ⭐ 零自由发挥：G3-006/010/011/027/028/029=B、G3-090=C。receipt=`runs/2026-07-11-ma15/reports/RATIFICATION-RECEIPT-g3-seven.md`。counted 新票=7；G3-027/028 的 axis-separation 为 non-counted carry-forward（D-147 已拍）不重复计票。
+- **source 锚**：G3 INDEX v4.2 sha256=`90f1815824ea38443e5be87b153d4aa34b0b62dbedf5df0d45970ca6ae280e34`；exact-SHA 终确认（fresh-green basis `4d2e24e9`，closure 25/25 + verify-ci 794/6/0 双绿）=`runs/2026-07-11-ma15/reports/FINAL-CONFIRM-G3V42-freshgreen-by-w1.md`。
+- **70 代拍已执行**：exact 70 auto_ballot_safe 全部按各自⭐通过；commander 签 receipt=`runs/2026-07-11-ma15/reports/RATIFICATION-RECEIPT-g3-70-autoballot.md`（exact ID 清单 incorporate by reference=`G3-FOUR-ACCOUNTS-EXACT-by-w3.md` sha256=`c6cbcae1368825ffba702feca94f626a05989ab7747c8f68ca206080694fff7b`）。授权链=磊哥 ma15 起手令（七题拍后代拍 70）。
+- **四账 closure**：`70 auto（已代拍）/ 7 noop / 9 excluded（重账见下）/ 7 escalate（磊哥亲拍）= 93`，pairwise-disjoint、union=G3-001..093，python 复算 rc0 → **G3 波（T07-T10）decision 层全闭；G1-G5 五波全部收官**。
+- **exact-nine 重账（commander disposition，采纳 w3 草案）**：G3-090=C 只解除 `g3_090_ratification_pending` 决策前置。5 个 design atoms（077/078/081/082/083）UNBLOCK_TO_DRAFT_EXPANSION（各带 NEW_CORNER_REQUIRED，展开时必须落）；2 个（084/091）可起草 test plan 但 **proof 面保持 excluded**；2 个（092/093）REMAIN_EXCLUDED 等具名前置 proof（091 及 082-084 字段合同）。诚实措辞=`five design atoms recheckable; four proof atoms remain excluded pending named predecessors`；禁写「9 项随 090 自动 RATIFIED」。草案锚=`runs/2026-07-11-ma15/reports/G3-EXACT-NINE-RECOUNT-DRAFT-by-w3.md`。
+- **V6 工作包翻转**：W7（T10 DialogueState 消费语义）/ W8（T09 session lifecycle）/ W9（T08 force-state 单一 authority）/ V2（T07 operator-pass ceremony）decision_state gap→**ratified**（authority_refs=D-150），execution_state gap→**planned**（O3 sequence1 gap→planned receipt 按 live checker 语义 escrow 于 run-dir，registry 侧 planned 态 transition_receipts=[]；转 ready 时补 sequence2 后挂完整 chain）。硬边保持：V2/T07b 仍等 T06 artifact/build identity；W8/T09 仍是 W5c/T04b 前置；T02 freeze→S9 不变。
+- **同批 canonical 义务**：本 D 条 append 改变 decisions.md authority SHA → 与 registry canonical digest/render 重锚为同一 cascade transaction（A/B 两 commit，无中间 push，双门全绿后 commander 亲核收编）。
+- **Non-claims**：RATIFIED=决策层；不声称实现完成/OpenSpec applied/T06/T07b/T04b 完成/operator-pass/V-PASS/C6 acceptance/candidate/`actionDemoProven>0`；`baseline_activation` 仍 `PENDING_CASCADE`（ACTIVE 翻转差项另见 ma15 ACTIVE-FLIP-GAP-LIST）；S8 未点火。
