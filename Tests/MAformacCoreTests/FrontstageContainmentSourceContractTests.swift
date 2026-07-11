@@ -17,6 +17,10 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.session"))
         XCTAssertTrue(submission.contains("FrontstageRouteReceiptWriter.writeCurrent"))
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.isCurrentTurn"))
+        XCTAssertTrue(submission.contains("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED"))
+        XCTAssertTrue(submission.contains("FRONTSTAGE_ROUTE_RECEIPT_WRITE_FAILED"))
+        XCTAssertFalse(submission.contains("try? FrontstageRouteReceiptConfiguration.environment"))
+        XCTAssertFalse(submission.contains("_ = try? FrontstageRouteReceiptWriter.writeCurrent"))
         XCTAssertFalse(submission.contains("MockVoicePresetPlanner"))
         XCTAssertFalse(submission.contains("applyMockVoiceColdIntent"))
     }

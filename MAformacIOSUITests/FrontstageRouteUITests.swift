@@ -12,32 +12,15 @@ final class FrontstageRouteUITests: XCTestCase {
     @MainActor
     func testReleaseCustomerTwoTurnRunIdentityContract() throws {
         #if os(macOS)
-        let suppliedEnvironment = ProcessInfo.processInfo.environment
-        let ownsRunDirectory = suppliedEnvironment["C1_RUN_DIR"] == nil
-        let runDirectory = suppliedEnvironment["C1_RUN_DIR"].map { URL(fileURLWithPath: $0) }
-            ?? FileManager.default.temporaryDirectory
-                .appendingPathComponent("frontstage-ui-\(UUID().uuidString)", isDirectory: true)
-        if ownsRunDirectory {
-            defer { try? FileManager.default.removeItem(at: runDirectory) }
-        }
-
-        let runID = suppliedEnvironment["C1_FRONTSTAGE_RUN_ID"] ?? "frontstage-ui-run"
-        let nonce = suppliedEnvironment["C1_FRONTSTAGE_RUN_NONCE"] ?? "0123456789abcdef0123456789abcdef"
-        let sourceHead: String
-        if let suppliedSourceHead = suppliedEnvironment["C1_FRONTSTAGE_SOURCE_HEAD_SHA"] {
-            sourceHead = suppliedSourceHead
-        } else {
-            sourceHead = try gitHead()
-        }
-        let receiptEmit = suppliedEnvironment["C1_FRONTSTAGE_RECEIPT_EMIT"] ?? "1"
+        let configuration = try FrontstageRouteUITestRunConfiguration(
+            formalEnvironment: ProcessInfo.processInfo.environment
+        )
+        let runDirectory = configuration.runDirectory
+        let runID = configuration.runID
+        let nonce = configuration.runNonce
+        let sourceHead = configuration.sourceHeadSHA
         let app = XCUIApplication()
-        app.launchEnvironment = [
-            "C1_FRONTSTAGE_RECEIPT_EMIT": receiptEmit,
-            "C1_FRONTSTAGE_RUN_ID": runID,
-            "C1_FRONTSTAGE_RUN_NONCE": nonce,
-            "C1_RUN_DIR": runDirectory.path,
-            "C1_FRONTSTAGE_SOURCE_HEAD_SHA": sourceHead
-        ]
+        app.launchEnvironment = configuration.appLaunchEnvironment
         app.launch()
         defer { app.terminate() }
 
@@ -155,19 +138,6 @@ final class FrontstageRouteUITests: XCTestCase {
         let executable = bundleURL.appendingPathComponent("Contents/MacOS/MAformacMac")
         XCTAssertTrue(FileManager.default.isExecutableFile(atPath: executable.path))
         return executable
-    }
-
-    private func gitHead() throws -> String {
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/git")
-        process.arguments = ["rev-parse", "HEAD"]
-        process.currentDirectoryURL = repositoryRoot()
-        let output = Pipe()
-        process.standardOutput = output
-        try process.run()
-        process.waitUntilExit()
-        return String(decoding: output.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func repositoryRoot() -> URL {

@@ -130,7 +130,7 @@ verify-runtime-bundle: .venv/.deps.stamp
 # int-v5b containment half: local standalone deny route only. It is deliberately
 # not wired into verify-ci until the T03/T04 production interface cut is ratified.
 verify-frontstage-route: .venv/.deps.stamp
-	$(PYTHON) -m unittest -v scripts/test_check_frontstage_route_receipt.py scripts/test_run_frontstage_route_gate.py
+	$(PYTHON) -m unittest -v scripts/test_check_frontstage_route_receipt.py scripts/test_run_frontstage_route_gate.py scripts/test_frontstage_ui_harness.py
 	PYTHON_BIN="$(PYTHON)" ./scripts/run_frontstage_route_gate.sh
 
 verify-c1-action-probes: verify-runtime-bundle
