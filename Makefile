@@ -38,7 +38,7 @@ GENERATED_SWIFT := \
 verify: verify-c1-checker-files .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages diff test verify-contentview-wiring
 
 verify-a4-target-exclusions:
-	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_check_a4_app_target_exclusions.py
+	$(PYTHON_BOOTSTRAP) scripts/test_check_a4_app_target_exclusions.py
 	$(PYTHON_BOOTSTRAP) scripts/check_a4_app_target_exclusions.py
 
 verify-closure-work-packages: .venv/.deps.stamp
@@ -62,7 +62,6 @@ verify-ci: verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-se
 # Source-free C1 checkers are hard CI dependencies. Missing files must stop verify-ci
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.
 verify-c1-checker-files:
-	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_check_a4_app_target_exclusions.py
 	@status=0; \
 	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/check_action_demo_proven_legacy_tokens.py Tools/checks/check_int_v5a_execution_receipt.py Tools/checks/run_swift_test_exact.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py scripts/check_closure_work_packages.py scripts/check_a4_app_target_exclusions.py scripts/test_check_a4_app_target_exclusions.py contracts/closure-work-packages.v1.yaml contracts/schemas/closure-work-packages.v1.schema.json contracts/schemas/closure-status-transition-receipt.v1.schema.json contracts/schemas/closure-package-exit-envelope.v1.schema.json contracts/schemas/closure-gate-receipt.v1.schema.json contracts/closure-execution-window.v1.yaml Tests/test_closure_work_packages.py; do \
 		if [ ! -f "$$checker" ]; then \
@@ -71,6 +70,7 @@ verify-c1-checker-files:
 		fi; \
 	done; \
 	exit $$status
+	$(PYTHON_BOOTSTRAP) scripts/test_check_a4_app_target_exclusions.py
 
 verify-c1-ownership:
 	mkdir -p .build/c1-run/receipts/c1

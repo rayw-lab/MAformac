@@ -27,6 +27,8 @@ CHECKER_PATHS = (
     Path("Tools/checks/check_int_v5a_execution_receipt.py"),
     Path("scripts/check_s10_receipt.py"),
     Path("scripts/check_closure_work_packages.py"),
+    Path("scripts/check_a4_app_target_exclusions.py"),
+    Path("scripts/test_check_a4_app_target_exclusions.py"),
     Path("contracts/closure-work-packages.v1.yaml"),
     Path("contracts/schemas/closure-work-packages.v1.schema.json"),
     Path("contracts/schemas/closure-status-transition-receipt.v1.schema.json"),
