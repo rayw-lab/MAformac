@@ -6,6 +6,7 @@ import json
 import hashlib
 import importlib.util
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -107,6 +108,64 @@ def read_receipt(tmp_path: Path) -> dict[str, object]:
     return json.loads((tmp_path / "closure-registry-check.v1.json").read_text(encoding="utf-8"))
 
 
+def committed_registry_probe(tmp_path: Path, *, include_product_change: bool) -> tuple[subprocess.CompletedProcess[str], dict[str, object]]:
+    clone = tmp_path / "postcommit"
+    subprocess.run(
+        ["git", "clone", "--quiet", "--no-hardlinks", str(REPO), str(clone)],
+        check=True,
+    )
+    subprocess.run(["git", "config", "user.name", "O1O2 pytest"], cwd=clone, check=True)
+    subprocess.run(["git", "config", "user.email", "o1o2-pytest@example.invalid"], cwd=clone, check=True)
+    basis_head = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=clone, text=True, capture_output=True, check=True
+    ).stdout.strip()
+    registry_path = clone / "contracts" / "closure-work-packages.v1.yaml"
+    registry_text = registry_path.read_text(encoding="utf-8")
+    registry_text, replacement_count = re.subn(
+        r"(?m)^(  repo_head:) [0-9a-f]{40}$",
+        rf"\1 {basis_head}",
+        registry_text,
+        count=2,
+    )
+    assert replacement_count == 2
+    registry_path.write_text(registry_text, encoding="utf-8")
+    shutil.copy2(CHECKER, clone / "scripts" / "check_closure_work_packages.py")
+    subprocess.run(
+        ["git", "add", "contracts/closure-work-packages.v1.yaml", "scripts/check_closure_work_packages.py"],
+        cwd=clone,
+        check=True,
+    )
+    subprocess.run(["git", "commit", "--quiet", "-m", "test: registry-only refresh"], cwd=clone, check=True)
+    if include_product_change:
+        product_path = clone / "Core" / "State" / "DialogueState.swift"
+        product_path.write_text(product_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        subprocess.run(["git", "add", "Core/State/DialogueState.swift"], cwd=clone, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "test: product drift"], cwd=clone, check=True)
+    subject_head = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=clone, text=True, capture_output=True, check=True
+    ).stdout.strip()
+    receipt_path = clone / ".build" / "closure-registry-check.v1.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(clone / "scripts" / "check_closure_work_packages.py"),
+            "check",
+            "--registry", str(registry_path),
+            "--schema", str(clone / "contracts" / "schemas" / "closure-work-packages.v1.schema.json"),
+            "--roadmap", str(clone / "docs" / "roadmap-2026-07-11-v6-closure-baseline.md"),
+            "--o6-policy", str(RESOURCE_POLICY),
+            "--subject-head", subject_head,
+            "--receipt", str(receipt_path),
+        ],
+        cwd=clone,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    return result, receipt
+
+
 def test_current_29_package_registry_passes(tmp_path: Path) -> None:
     result = run_checker(tmp_path)
 
@@ -145,6 +204,21 @@ def test_parent_basis_behind_checked_subject_is_stale(tmp_path: Path) -> None:
 
     assert result.returncode == 70, result.stderr
     assert "E_STALE_BASIS" in read_receipt(tmp_path)["errors"]
+
+
+def test_registry_only_commit_after_basis_remains_fresh(tmp_path: Path) -> None:
+    result, receipt = committed_registry_probe(tmp_path, include_product_change=False)
+
+    assert result.returncode == 0, receipt
+    assert receipt["status"] == "PASS"
+    assert "E_STALE_BASIS" not in receipt["errors"]
+
+
+def test_product_change_after_basis_is_stale(tmp_path: Path) -> None:
+    result, receipt = committed_registry_probe(tmp_path, include_product_change=True)
+
+    assert result.returncode != 0
+    assert "E_STALE_BASIS" in receipt["errors"]
 
 
 def test_arbitrary_existing_file_cannot_satisfy_w1_transition_chain(tmp_path: Path) -> None:
