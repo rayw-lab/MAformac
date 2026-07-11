@@ -1358,4 +1358,5 @@
 - **封板**：`4dfa2609` push（O1 canonical 重锚收尾链 fe029bdc→89efda16→89873433→4dfa2609）；closure 25/25 + verify-ci 794/6/0 commander 无管道亲跑。换面终审（M.72 范式）三 P1 全修（孤儿门 wiring+假绿哨/CURRENT/roadmap 计数接管 O1 generated 1/4/19/5）。
 - **终收五单**：G1T1-FIX（双 P0 修净 813/6/0，待 fresh 复审收编）/T08 归并设计/V6p 计划/CURRENT-roadmap 同步/rename 门修。G3 七题+rebuild-c6 propose 包+A4 方案=磊哥堆。
 - **ma15 交接**：handoff=`docs/handoffs/2026-07-11-ma14-closeout.md`（含蜂群布局规格+拉满教义+哨兵复用指引——磊哥令写入）。
-- **Non-claims**：G3 未拍；G1-T1 未收编；ACTIVE 未翻；S8 未点火；canDemo=0/120；无 operator-pass/V-PASS。
+- **Non-claims**：G3 未拍；G1-T1 未收编；ACTIVE 未翻；S8 未点火；actionDemoProven=0/120；无 operator-pass/V-PASS。
+- **ERRATA（术语规范化，2026-07-11 ma15）**：D-149 的动作证明轴统一使用 canonical `actionDemoProven`；只修术语，不改变 0/120 数值、状态或结论。
