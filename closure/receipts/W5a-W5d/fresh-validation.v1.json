@@ -1,0 +1,55 @@
+{
+  "schema_version": "w5a_w5d_fresh_validation_v1",
+  "status": "PASS",
+  "subject_head": "997ec76d56a2bbe22418ce2e9645f080d9e800f1",
+  "delivery_merge": "dd5d4f7768b667174e5b6a6fc5ee4549c617acc5",
+  "captured_at": "2026-07-11T06:53:32Z",
+  "proof_class": [
+    "local",
+    "unit",
+    "integration",
+    "static",
+    "app_build"
+  ],
+  "checks": [
+    {
+      "command": "python3 scripts/test_check_t04a_customer_ingress.py",
+      "rc": 0,
+      "result": "2 tests passed"
+    },
+    {
+      "command": "python3 scripts/test_check_customer_route_avoids_legacy_decode.py",
+      "rc": 0,
+      "result": "3 tests passed"
+    },
+    {
+      "command": "swift test --filter FrontstageCustomerIngressTests",
+      "rc": 0,
+      "result": "2 tests, 0 failures"
+    },
+    {
+      "command": "swift test --filter DDomainCompletionEnvelopeTests/testBoundedReviewedProductionChainExecutesMountedAndRejectsUnmountedPerItem",
+      "rc": 0,
+      "result": "1 test, 0 failures"
+    },
+    {
+      "command": "make verify-ci",
+      "rc": 0,
+      "elapsed_seconds": 174,
+      "result": "814 tests, 6 skipped, 0 failures; closure checker 25 passed"
+    },
+    {
+      "command": "xcodebuild -project MAformac.xcodeproj -scheme MAformacMac -configuration Debug -destination platform=macOS -derivedDataPath $PWD/.build/closure/w5a-w5d-stage1-derived build",
+      "rc": 0,
+      "elapsed_seconds": 20,
+      "result": "BUILD SUCCEEDED"
+    }
+  ],
+  "non_claims": [
+    "not_runtime_operator_pass",
+    "not_mobile_or_true_device",
+    "not_live_api",
+    "not_c6_acceptance",
+    "not_v_pass"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": "decode_policy_v1",
+  "package_id": "W5d",
+  "status": "DONE",
+  "verdict": "T_PASS",
+  "deliverable_key": "t04.decode_policy",
+  "subject_schema_id": "decode_policy_subject_v1",
+  "subject_head": "997ec76d56a2bbe22418ce2e9645f080d9e800f1",
+  "delivery_merge": "dd5d4f7768b667174e5b6a6fc5ee4549c617acc5",
+  "fresh_validation": {
+    "path": "closure/receipts/W5a-W5d/fresh-validation.v1.json",
+    "sha256": "6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f",
+    "status": "PASS"
+  },
+  "independent_reaudit": {
+    "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/reports/FINAL-REAUDIT3-G1T1-by-w3.md",
+    "sha256": "bb0fea2e4d618bda00c93efccca39cbe86db840aab4d64a729459c1c1da6af2c",
+    "verdict": "APPROVE_FOR_MERGE"
+  },
+  "scope": {
+    "implemented": [
+      "strict completion envelope rejects missing malformed truncated or extra-text output",
+      "exactly-one policy accepts one and rejects zero or multiple calls",
+      "bounded-reviewed policy accepts only within its explicit maximum",
+      "production-shaped bounded-reviewed chain preserves per-item accepted and refused outcomes",
+      "unmounted action cannot mutate state and carries a finite refusal reason"
+    ]
+  },
+  "proof_class": [
+    "local",
+    "unit",
+    "integration",
+    "static",
+    "app_build"
+  ],
+  "claim": "integration_contract_or_implementation",
+  "non_claims": [
+    "T04b production composition is not done",
+    "W6 and W8 are not done",
+    "not operator pass or V-PASS"
+  ]
+}
