@@ -64,3 +64,17 @@ Unchecked future tasks are not apply authorization. This draft does not authoriz
 - [ ] 5.3 Do not import raw cockpit/customer text, PII, secrets, or "internal only" source material into bench cases.
 - [ ] 5.4 Do not claim UIUE is merged or R-L17 is closed without live git/PR/state proof and the required human-owner evidence.
 - [ ] 5.5 Apply-layer changes are limited to the §3.9a-d bounded upstream producer subtask. Any change beyond applied-write fact shape, such as new apply policy, soft errors, plan/validate/apply split, C6-private scorer logic, or `ScopedStateKey` struct promotion, requires a new accepted carrier or a new explicit grill decision.
+
+## 6. Ratified Amendment Writeback Tasks (Still Pending Human Proposal Acceptance)
+
+- [ ] 6.1 Preserve this existing carrier as the only route; assert lifecycle=`draft_needs_human_propose`; add a human proposal-acceptance stop gate before any `/opsx:apply` request.
+- [ ] 6.2 TDD exact hard-layer thresholds: golden 100%, demo_fuzz integer `5*pass >= 4*eligible`, unsupported 100%, safety 100%; add empty/missing/red layer negatives and reject `direct_no_call`.
+- [ ] 6.3 Materialize demo-fuzz family-v2 selector for exact `tags.contract_device` seven-family roster; fresh-hash selector/corpus/family-manifest/result-set/receipt; add N1 denominator-zero, N2 missing-run, N3 positive-denominator/zero-pass extinction negatives.
+- [ ] 6.4 Add N4 stale-digest, N5 roster mismatch, and N6 cross-layer/family-selection negatives; confirm no per-family 80% threshold is introduced.
+- [ ] 6.5 Emit and schema-check all seven Plan-P fields: `model_hard_pass_basis`, `model_hard_failed`, `readback_applicable`, `readback_match`, `readback_hard_failed`, `readback_excluded_from_model_hard_pass`, `renderer_contract_digest`; missing field is red and renderer mismatch does not alter model numerator.
+- [ ] 6.6 Implement typed same-subject comparison join with exactly three seeds `[17,29,43]`, `3/3`, and spread `max-min <= 1pp`; test missing, duplicate, unequal, and manual-override attempts as blocking.
+- [ ] 6.7 Represent construction/candidate/authorization/execution/acceptance as five independent transitions; test missing owner/predicate/receipt, runner signing attempt, and `required_judge_lanes=[]`.
+- [ ] 6.8 Enforce release `must_not_train` ACL and five exposure levels; deliberate-red training/checkpoint-selection/prompt-tuning/S9-repair contamination must block candidate/verdict.
+- [ ] 6.9 Shadow the current 57-case snapshot plus N1-N6 and named deliberate-red fixtures before activation; write an activation receipt only after all required shadow evidence passes.
+- [ ] 6.10 Keep old runner/fixtures `legacy_observation_only` before activation. Test rollback stops new promotion and never restores old acceptance authority.
+- [ ] 6.11 Re-run `openspec validate rebuild-c6-four-layer-bench --strict`, show exact carrier diff to the human reviewer, and keep proposal unaccepted until the reviewer explicitly confirms the written text.
