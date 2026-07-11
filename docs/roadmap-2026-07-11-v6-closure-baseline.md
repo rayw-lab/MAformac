@@ -75,13 +75,13 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
 
-<!-- O1:GENERATED:START registry_sha256=6582d45bcee1e2acd6ee0875db5395289d1e44c031f32746aab38c55549212a6 checker_sha256=9a0580e0580a806eec24df4d9d3dfa7cc63824cce260ee2caee0dfac004de5ab -->
+<!-- O1:GENERATED:START registry_sha256=1184f4549955fa44181fb96aa62e47fd95f81ac696014c350395b7f2eaa37037 checker_sha256=9a0580e0580a806eec24df4d9d3dfa7cc63824cce260ee2caee0dfac004de5ab -->
 | O1 checker field | derived value |
 |---|---:|
 | packages | 29 |
 | hard leaf denominator | 28 |
-| execution | done=1; ready=0; blocked=4; planned=19; gap=5; running=0; paused=0 |
-| count token | `O1COUNTv1{registry=6582d45bcee1e2acd6ee0875db5395289d1e44c031f32746aab38c55549212a6;packages=29;hard=28;done=1;ready=0;blocked=4;planned=19;gap=5;running=0;paused=0}` |
+| execution | done=1; ready=0; blocked=4; planned=23; gap=1; running=0; paused=0 |
+| count token | `O1COUNTv1{registry=1184f4549955fa44181fb96aa62e47fd95f81ac696014c350395b7f2eaa37037;packages=29;hard=28;done=1;ready=0;blocked=4;planned=23;gap=1;running=0;paused=0}` |
 
 | package | decision_state | execution_state | proof_state |
 |---|---|---|---|
@@ -102,12 +102,12 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | W5c | ratified | planned | none |
 | W5d | ratified | planned | none |
 | W6 | ratified | planned | none |
-| W7 | draft | gap | none |
-| W8 | draft | gap | none |
-| W9 | draft | gap | none |
+| W7 | ratified | planned | none |
+| W8 | ratified | planned | none |
+| W9 | ratified | planned | none |
 | W10 | ratified | planned | none |
 | V1 | ratified | planned | none |
-| V2 | draft | gap | none |
+| V2 | ratified | planned | none |
 | V3 | ratified | planned | none |
 | V4 | ratified | planned | none |
 | V5 | ratified | planned | none |

@@ -4,18 +4,18 @@ artifact_kind: closure_work_packages_registry
 authority:
   state: ratified
   source_path: docs/commander-log/decisions.md
-  source_sha256: 5c79f9edafe566d17b0d705afc3f1e10364d0bd449eca5767e493c74027058d9
+  source_sha256: 00241a4b434644760fe1995c0682072f1f95939b049dd44cbf93db3d8bd3567f
   bootstrap_ratification_receipt: null
 basis:
-  repo_head: 0c287a0dac4a777b64f8b68319c9c045c3b0ac58
-  captured_at: '2026-07-11T13:47:38+08:00'
+  repo_head: 9aeabd2fb847f7d2e4f271f7d3c52059366600c5
+  captured_at: '2026-07-11T14:17:20+08:00'
   roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   roadmap_sha256: d8f2a932b5659a0cc940c839b140b4f6eaae405da77c0802e907dffaf314d291
 source_snapshot:
   manifest_id: v6_1_source_snapshot_d142_cascade
   source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   source_sha256: d8f2a932b5659a0cc940c839b140b4f6eaae405da77c0802e907dffaf314d291
-  repo_head: 0c287a0dac4a777b64f8b68319c9c045c3b0ac58
+  repo_head: 9aeabd2fb847f7d2e4f271f7d3c52059366600c5
   package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
   hard_edges:
     - {from: B7, to: B2}
@@ -359,8 +359,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: W7, count_in_hard_denominator: true, deliverable_keys: [dialogue_state.semantic_consumption]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W7, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t10_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-150, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [dialogue_state_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t10.ratified, require_status: satisfied}]
@@ -375,8 +375,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: W8, count_in_hard_denominator: true, deliverable_keys: [session.lifecycle_recovery]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W8, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t09_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-150, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [session_lifecycle_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t09.ratified, require_status: satisfied}]
@@ -391,8 +391,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: W9, count_in_hard_denominator: true, deliverable_keys: [force_state.single_authority]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W9, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t08_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-150, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [force_state_authority_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t08.ratified, require_status: satisfied}]
@@ -439,8 +439,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: V2, count_in_hard_denominator: true, deliverable_keys: [operator.final_ceremony]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V2, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t07_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-150, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [operator_ceremony_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: [{package_id: V3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V4, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V6p, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V7, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W8, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W10, require_decision: ratified, require_execution: done, require_receipt: true}]
     external_gates: [{fact_id: t07.ratified, require_status: satisfied}]
