@@ -1,0 +1,33 @@
+## ADDED Requirements
+
+### Requirement: Customer frontstage SHALL use one typed ingress facade
+
+Visible text, future ASR transcripts, and shortcuts SHALL enter one facade. Identity SHALL be assigned before exactly-once validation.
+
+#### Scenario: Visible text is submitted
+
+- **GIVEN** the customer frontstage is visible
+- **WHEN** valid text is submitted
+- **THEN** it SHALL receive stable session, turn, and event identity
+- **AND** validation SHALL run exactly once.
+
+### Requirement: Invalid or unavailable ingress SHALL be side-effect free
+
+Nil transcript, blank text, oversized input, unavailable ASR, and stale identity SHALL return typed rejection with zero mutation and zero readback.
+
+#### Scenario: MicDock has no ASR provider
+
+- **GIVEN** no ASR provider is installed
+- **WHEN** MicDock submits
+- **THEN** the result SHALL be typed unavailable
+- **AND** no state mutation or readback SHALL occur.
+
+### Requirement: T04a SHALL not extend runtime or receipt ownership
+
+T04a SHALL consume the existing presentation bridge and int-v5b receipt without changing receipt/schema/checker/launch ABI or binding a production runner/backend/default composition.
+
+#### Scenario: T04a closes locally
+
+- **WHEN** ingress and correlation tests pass
+- **THEN** the maximum claim SHALL be local/unit/integration construction
+- **AND** T04b, runtime/operator/action-success, and V-PASS SHALL remain unclaimed.
