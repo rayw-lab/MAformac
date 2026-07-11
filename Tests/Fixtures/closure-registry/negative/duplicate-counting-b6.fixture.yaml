@@ -1,0 +1,15 @@
+fixture_contract: closure_registry_negative_fixture_v1
+id: duplicate-counting-b6
+patches:
+  - target: registry
+    op: replace
+    path: /packages/by-id/B6/counting/count_key
+    value: W1
+  - target: registry
+    op: replace
+    path: /packages/by-id/B6/exit_receipt/artifact/path
+    value: closure/receipts/W1.v1.json
+expect:
+  rc: 66
+  status: BLOCKED
+  errors_include: [E_COUNTING, E_RECEIPT_ALIAS]

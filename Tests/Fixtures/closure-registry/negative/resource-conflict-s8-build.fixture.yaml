@@ -1,0 +1,23 @@
+fixture_contract: closure_registry_negative_fixture_v1
+id: resource-conflict-s8-build
+patches:
+  - target: registry
+    op: replace
+    path: /packages/by-id/B1a/execution_state/declared
+    value: running
+  - target: registry
+    op: replace
+    path: /packages/by-id/W1/execution_state/declared
+    value: running
+  - target: leases
+    op: add_valid_lease
+    package_id: B1a
+    claim_id: o6_claim_s8_gpu
+  - target: leases
+    op: add_valid_lease
+    package_id: W1
+    claim_id: o6_claim_full_build
+expect:
+  rc: 67
+  status: BLOCKED
+  errors_exact: [E_RESOURCE_CONFLICT]
