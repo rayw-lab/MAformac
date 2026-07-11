@@ -444,3 +444,18 @@ producer G1–G7/N1–N8/verify-all 全绿只证明**已知 suite 内**可达；
 
 ## M.72 长审计链的焦点漂移：每轮聚焦上轮修复面，未触面积累逃逸（2026-07-10 ma13 终极审）
 PR #42 六轮修复-审计全部聚焦 finiteReason 面（每轮审上轮修复），matrix canonical checker 六轮无人碰——merge 前终极对抗审计（全量换面反猎：gaming/负例牙口/红线三孙 lens）才抓到它 fail-open（tracked≠fresh+六种篡改 rc0），round 7 补修。修法：同 PR 多轮审计链收口前必须一次【全量换面终审】（审焦点=前轮修复聚焦区之外的全部面），审计焦点跟着修复走=结构性盲区。锚 ULTIMATE-ADVERSARIAL-AUDIT.md + REAUDIT-round7.md（ALL_SCOPE_PASS）。
+
+## M.73 四层自造门会逐级洗绿：producer≠auditor 必须贯穿状态、账本、checker 与计划（2026-07-11 ma14）
+V6 初稿把 prepared/after-predecessor 压成 READY 并手写 7/25；INDEX 又可用自报总数、漏 tag 与无 disposition corner 洗账；纸 schema 若不核 typed owner/same-subject，计划再错接 owner，四层可把同一病链逐级包装成绿。修法：状态由 typed DAG+fresh predecessor receipt 生成；INDEX 由独立 auditor 从 ID/binding/互斥集复算；checker 核 owner/schema/digest/HEAD/proof cap；计划只消费已签 authority。锚 `runs/2026-07-11-ma14/reports/AUDIT-V6-by-w5.md:22-45,213-268` + `XAUDIT-INDEX-G1-G2-by-w5.md:15-25,102-131`。
+
+## M.74 AUTOBALLOT 三闸：先拦互斥契约，再修版本，最后只放 exact safe set（2026-07-11 ma14）
+自动代拍不是“一审通过整表放行”。ma14 先以 RECHECK 拦 mandatory corner/owner/分账冲突，v4 主体守恒仍因四项残差判 NO_GO，窄修后 v4.1 才放 `137 auto_ballot_safe`，同时保留 `35 safe_noop` 与 `32 excluded_unsafe` 互斥全覆盖。修法：`RECHECK_CONTRACT → REVISION_vN → FINAL_EXACT_SET_GO`；未知/重复 ID、SHA 漂移、计数不守恒或 excluded 混入均 fail-closed。锚 `FINAL-RECHECK-V4-by-w5.md:12-21,164-170` + `FINAL-RECHECK-V41-addendum.md:12-43,240-248`。
+
+## M.75 先分清 denominator 轴与诊断轴：G2-038 roster 类别错误（2026-07-11 ma14）
+demo_fuzz core-family roster 应按 `tags.contract_device` 的七个 device family 冻结；五类 `VehicleToolBehaviorClass` 是正交行为诊断轴，不能充当 family denominator。混轴会让 aggregate/histogram 掩盖某设备族 denominator=0 或 extinction。修法：receipt 固定 family_key、exact roster、selector、same-manifest/corpus、per-family denominator/pass；任一缺失/空集/zero-pass 即 BLOCKED。锚 `runs/2026-07-11-ma14/reports/G2-038-C1-REVISED.md:9-29`。
+
+## M.76 checklist 记录历史，不证明 current frontstage：carrier 要能表达“曾完成、现失效、重开残余”（2026-07-11 ma14）
+runtime-adapter 17.1/17.2 在 `15216238` 曾真实实现，UI 重写后 live App 已无 text input/runner reachability，MicDock 仍 mock/deny-only；旧 checkbox 不能支撑 archive，粗暴抹除又会丢 lineage。修法：写 `historical_implemented_at + current_frontstage_superseded + new_current_residual`，验收核 App ingress/唯一 composition/customer-path receipt，不用 Core fixture 替代 frontstage。锚 `runs/2026-07-11-ma14/reports/DRAFT-rtadapter-task-reconciliation.md:12-16,48-70,116-126` + `openspec/changes/define-runtime-adapter-execution/tasks.md:145-150`。
+
+## M.77 REPORT 驱动不等于监控：静默完工要独立 sentinel 唤醒（2026-07-11 ma14）
+REPORT 是完成凭证，不是事件源；文件落盘、ack 与 pane Working→idle 都可能不唤醒 commander，ma14 连续出现静默完工漏检后才补 sentinel v1。修法：独立监控 reports 新文件、busy→idle、持续全闲与 heartbeat；触发后仍走 file/header/content/readback/independent-audit 收稿。哨兵只负责唤醒，不替代内容审计或 SMUX receipt。锚 `runs/2026-07-11-ma14/scripts/swarm-sentinel.sh:1-46` + `specs/SPEC-SEC-ma14.md:7-9`。
