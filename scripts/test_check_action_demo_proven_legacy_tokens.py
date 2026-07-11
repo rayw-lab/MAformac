@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -33,6 +34,8 @@ class ActionDemoProvenLegacyTokenTests(unittest.TestCase):
             source = REPO_ROOT / entry["path"]
             self.write(entry["path"], source.read_text(encoding="utf-8"))
         self.write("contracts/allowlist.json", json.dumps(payload))
+        subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
+        subprocess.run(["git", "add", "."], cwd=self.root, check=True)
         self.checker = load_checker()
 
     def tearDown(self) -> None:
@@ -45,8 +48,21 @@ class ActionDemoProvenLegacyTokenTests(unittest.TestCase):
 
     def test_unallowlisted_production_token_fails(self) -> None:
         self.write("Core/Execution/Bad.swift", f"let {LEGACY_TOKEN} = true\n")
+        subprocess.run(["git", "add", "Core/Execution/Bad.swift"], cwd=self.root, check=True)
         report = self.checker.check_legacy_tokens(self.root, self.allowlist)
         self.assertIn("E_LEGACY_TOKEN_OUTSIDE_ALLOWLIST", report["errors"])
+
+    def test_ignored_runtime_noise_is_outside_the_scan_domain(self) -> None:
+        self.write(".gitignore", ".omx/\n")
+        subprocess.run(["git", "add", ".gitignore"], cwd=self.root, check=True)
+        self.write(".omx/logs/turns.jsonl", f'{{"historical": "{LEGACY_TOKEN}"}}\n')
+
+        candidates = {
+            path.relative_to(self.root).as_posix()
+            for path in self.checker.candidate_paths(self.root)
+        }
+
+        self.assertNotIn(".omx/logs/turns.jsonl", candidates)
 
     def test_allowlist_match_budget_exceeded_fails(self) -> None:
         self.write(

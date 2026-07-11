@@ -11,7 +11,7 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 # V6 基线：从「治理真金」到「客户路径真接通」（2026-07-11，v6.1）
 
 > **北极星（不变）**：客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑（CLAUDE.md §1）。
-> **V6 的一句话**：PR #42 合入的是治理层真金（诚实矩阵 canDemo=0/120，D-137 `docs/commander-log/decisions.md:1230-1237` + fail-closed 门族 + typed authority），**不是 demo**；下一阶段 = 把「治理正确的空壳」接成「客户真能摸的路径」，并让每个「能演」声称都有量尺 authority 和 ceremony 背书。
+> **V6 的一句话**：PR #42 合入的是治理层真金（诚实矩阵 actionDemoProven=0/120，D-137 `docs/commander-log/decisions.md:1230-1237` + fail-closed 门族 + typed authority），**不是 demo**；下一阶段 = 把「治理正确的空壳」接成「客户真能摸的路径」，并让每个「能演」声称都有量尺 authority 和 ceremony 背书。
 > **v6.1 对 v6.0 的修正核**（审计裁决全收）：v6.0 把「合同 ready」压成「READY 可立即执行」= 用自己要消灭的机制造新假绿。v6.1 拆三轴状态（decision/execution/proof），工作包重切 25→29，硬前置补三条逆边，门命令改绑实存 make target，并新立 O 控制面承载制度物。
 
 ## 〇、V6 对 v5 的三个修正（为什么开笔）
@@ -150,7 +150,7 @@ closure = 五门全绿 + operator-pass ceremony 执行
 全功能闭环 = 五门全绿 + operator-pass ceremony。每门绑**实存**验收命令/receipt，禁 prose：
 
 1. **模型门**：S10 verdict receipt + `make verify-c5-phase1-gates` rc0 + qa safety receipt——量尺引用必须指向 T01 归并后的 active C6 authority。
-2. **能力面门**：`make verify-c1-matrix` + `make verify-c1-matrix-canonical`（`Makefile:81-99` 实存 target；v6.0 所引 `scripts/check_capability_matrix.py` 不存在——审计 P0-05 修正，实际 checker 在 `Tools/checks/` 由 make 链消费）+ canDemo 翻绿只认 action-readback 证明（D-137 两轴）。
+2. **能力面门**：`make verify-c1-matrix` + `make verify-c1-matrix-canonical`（`Makefile:81-99` 实存 target；v6.0 所引 `scripts/check_capability_matrix.py` 不存在——审计 P0-05 修正，实际 checker 在 `Tools/checks/` 由 make 链消费）+ actionDemoProven 翻绿只认 action-readback 证明（D-137 两轴）。
 3. **架构门**：`make verify-all` rc0 + `make verify-register` rc0 + swift test 全量 0 failures + T12 分诊后的 A 面账。
 4. **演示门**：golden-run 脚本 exit 0（V6p 实装后转可记态）+ A2 evidence validator（V7）+ operator-pass ceremony receipt（T07 拍后）。
 5. **诚实门**：强词 grep 0 命中 + candidate unsigned 直到证据齐 + 进度声称只认 §一 细账口径。
@@ -191,7 +191,7 @@ closure = 五门全绿 + operator-pass ceremony 执行
 
 ## 八、Non-claims
 
-- canDemo=actionDemoProven=**0/120** 不变；S8 未点火（磊哥 2026-07-11「不着急」挂起）；S9/S9b/S10/S11 未执行；int-v5a 已开工编码**未合入**、v5b-d 未开工；M-DEMO golden run 未实装（PREPARED_DRAFT）；无 operator-pass / desktop_operator_equivalent / V-PASS / C6 acceptance / candidate signed。
+- actionDemoProven=**0/120** 不变；S8 未点火（磊哥 2026-07-11「不着急」挂起）；S9/S9b/S10/S11 未执行；int-v5a 已开工编码**未合入**、v5b-d 未开工；M-DEMO golden run 未实装（PREPARED_DRAFT）；无 operator-pass / desktop_operator_equivalent / V-PASS / C6 acceptance / candidate signed。
 - GAP 态 16 包在对应 wave RATIFIED 前无实施授权；CG-080 禁 mounted 1→N 不变。
 - 本文件**不推翻**任何已拍决策；其**新增**治理裁决见 §七 清单（已随 D-142 RATIFIED 落条）。
 - v5 已挂 supersede banner 转 historical（D-142）；本文件 `baseline_activation=PENDING_CASCADE`，ACTIVE 前 C-08/O1/O2 义务未齐；GAP-HUNT proof boundary 继承。

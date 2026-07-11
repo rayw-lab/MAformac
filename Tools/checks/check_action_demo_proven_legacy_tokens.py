@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -23,9 +24,16 @@ LEGACY_TOKEN = "can" + "Demo"
 
 
 def candidate_paths(repo_root: Path) -> list[Path]:
+    tracked = subprocess.run(
+        ["git", "-C", str(repo_root), "ls-files", "-z"],
+        check=True,
+        capture_output=True,
+    ).stdout.split(b"\0")
     return sorted(
         path
-        for path in repo_root.rglob("*")
+        for raw in tracked
+        if raw
+        for path in [repo_root / raw.decode("utf-8")]
         if path.is_file()
         and not any(path.relative_to(repo_root).as_posix().startswith(prefix) for prefix in IGNORED_PREFIXES)
         and path.relative_to(repo_root).as_posix() not in IGNORED_PATHS

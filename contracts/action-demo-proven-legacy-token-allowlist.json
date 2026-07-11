@@ -16,7 +16,7 @@
     {
       "path": "docs/commander-log/decisions.md",
       "token_regex": "canDemo",
-      "max_matches": 22,
+      "max_matches": 26,
       "purpose": "historical_mapping"
     },
     {
@@ -24,6 +24,18 @@
       "token_regex": "canDemo",
       "max_matches": 8,
       "purpose": "historical_mapping"
+    },
+    {
+      "path": "closure/registry/native/W1-int-v5a-recheck.md",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "historical_verification_receipt"
+    },
+    {
+      "path": "docs/roadmap-2026-07-11-v6-closure-baseline.md",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "rename_migration_mapping"
     }
   ]
 }

@@ -42,6 +42,9 @@ OWNERSHIP_CHECKER = "Tools/checks/check_c1_ownership_map.py"
 RUNTIME_REASON_TARGET = "verify-c1-finite-reason-authority"
 RUNTIME_REASON_SUITE = "scripts/test_check_runtime_finite_reason_authority.py"
 RUNTIME_REASON_CHECKER = "Tools/checks/check_runtime_finite_reason_authority.py"
+ACTION_DEMO_RENAME_TARGET = "verify-action-demo-proven-rename"
+ACTION_DEMO_RENAME_SUITE = "scripts/test_check_action_demo_proven_legacy_tokens.py"
+ACTION_DEMO_RENAME_CHECKER = "Tools/checks/check_action_demo_proven_legacy_tokens.py"
 EXACT_RUNNER = "Tools/checks/run_swift_test_exact.py"
 EXACT_RUNNER_SUITE = "scripts/test_run_swift_test_exact.py"
 BEHAVIOR_TEST_SOURCE = REPO_ROOT / "Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift"
@@ -76,6 +79,8 @@ def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
     assert OWNERSHIP_TARGET in verify_ci_line, verify_ci_line
     assert RUNTIME_REASON_TARGET in verify_line, verify_line
     assert RUNTIME_REASON_TARGET in verify_ci_line, verify_ci_line
+    assert ACTION_DEMO_RENAME_TARGET in verify_line, verify_line
+    assert ACTION_DEMO_RENAME_TARGET in verify_ci_line, verify_ci_line
     assert "verify-c1-checker-files" in verify_ci_line, verify_ci_line
 
     ownership_start = makefile_text.index(f"{OWNERSHIP_TARGET}:")
@@ -100,6 +105,14 @@ def test_verify_ci_fails_when_a_checker_is_deleted() -> None:
     assert FULL_SUITE_FILTER in runtime_reason_block, runtime_reason_block
     for exact_filter in EXACT_FILTERS:
         assert f"--filter {exact_filter}" in runtime_reason_block, runtime_reason_block
+
+    action_demo_start = makefile_text.index(f"{ACTION_DEMO_RENAME_TARGET}:")
+    action_demo_end = makefile_text.find("\n\n", action_demo_start)
+    action_demo_block = makefile_text[
+        action_demo_start : action_demo_end if action_demo_end >= 0 else None
+    ]
+    assert ACTION_DEMO_RENAME_SUITE in action_demo_block, action_demo_block
+    assert ACTION_DEMO_RENAME_CHECKER in action_demo_block, action_demo_block
 
     behavior_source = BEHAVIOR_TEST_SOURCE.read_text(encoding="utf-8")
     assert missing_behavior_gate_declarations(behavior_source) == []
