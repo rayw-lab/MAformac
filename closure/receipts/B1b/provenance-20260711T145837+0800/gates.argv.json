@@ -1,0 +1,18 @@
+{
+  "bash_n": [
+    "/bin/bash",
+    "-n",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-flight/launch_s8.sh"
+  ],
+  "shellcheck": [
+    "/opt/homebrew/bin/shellcheck",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-flight/launch_s8.sh"
+  ],
+  "unit": [
+    "python3",
+    "-m",
+    "unittest",
+    "-v",
+    "scripts/test_s8_g1_receipt.py"
+  ]
+}
