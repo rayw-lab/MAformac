@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -126,6 +126,12 @@ verify-runtime-bundle: .venv/.deps.stamp
 	$(PYTHON) Tools/generate_demo_runtime_contract_bundle.py
 	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/demo-runtime-contract-bundle-manifest.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path("generated/demo-runtime-contract-bundle.manifest.json").read_text()))'
 	test ! -e generated/demo-runtime-contract-bundle.receipt.json
+
+# int-v5b containment half: local standalone deny route only. It is deliberately
+# not wired into verify-ci until the T03/T04 production interface cut is ratified.
+verify-frontstage-route: .venv/.deps.stamp
+	$(PYTHON) -m unittest -v scripts/test_check_frontstage_route_receipt.py scripts/test_run_frontstage_route_gate.py
+	PYTHON_BIN="$(PYTHON)" ./scripts/run_frontstage_route_gate.sh
 
 verify-c1-action-probes: verify-runtime-bundle
 	C1_RUN_DIR="$(CURDIR)/.build/c1-run" swift test --filter RuntimeActionReadbackProbeTests

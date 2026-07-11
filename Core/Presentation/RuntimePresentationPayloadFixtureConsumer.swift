@@ -105,8 +105,8 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         let dialogText = localReadbacks.map(\.spokenText).filter { !$0.isEmpty }.joined(separator: "；")
         let resolvedDialogText = dialogText.isEmpty ? (outcome.reason ?? resultPresentation.dialogText) : dialogText
 
-        return StagePresentationSnapshot(
-            traceId: traceID,
+        return FrontstageRuntimePresentationAdapter.fixtureSnapshot(
+            traceID: traceID,
             storeCells: localCards,
             activeCells: activeCells,
             refusedCell: refusedCell,

@@ -44,6 +44,7 @@ struct ContentView: View {
     @State private var energyLineTriggerToken = 0
     @State private var mockVoiceScriptIndex = 0
     @State private var mockVoiceResponseTask: Task<Void, Never>?
+    @State private var frontstageRuntimeComposition = FrontstageRuntimeComposition()
     @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
@@ -244,7 +245,7 @@ struct ContentView: View {
             DialogueStream(messages: messages, theme: theme, forceReduceMotion: forceReduceMotion)
                 .frame(minHeight: 240, maxHeight: 330)
             Spacer(minLength: 28)
-            MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: applyMockVoiceColdIntent)
+            MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                 .frame(maxWidth: .infinity, minHeight: 76, maxHeight: 80)
                 .padding(.bottom, 10)
         }
@@ -333,7 +334,7 @@ struct ContentView: View {
         let split = usesMacSplit(size: size)
         if !split {
             HStack {
-                MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: applyMockVoiceColdIntent)
+                MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                     .frame(maxWidth: min(780, size.width - 70), minHeight: 70, maxHeight: 74)
             }
             .padding(.horizontal, horizontalPadding(for: size))
@@ -443,6 +444,31 @@ struct ContentView: View {
         if let burstColor {
             triggerAmbientBurst(colorName: burstColor)
         }
+    }
+
+    private func submitCustomerMicDock() {
+        mockVoiceResponseTask?.cancel()
+        runtimeReadbackQueue.cancel()
+        let turn = frontstageRuntimeComposition.session.submitContainment(utterance: "客户语音指令")
+        frontstageRuntimeComposition.markCurrent(turn)
+        guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+        let receiptConfiguration = try? FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)
+        if let receiptConfiguration {
+            _ = try? FrontstageRouteReceiptWriter.writeCurrent(
+                turn,
+                configuration: receiptConfiguration,
+                isCurrent: { frontstageRuntimeComposition.isCurrentTurn(turn) }
+            )
+        }
+
+        let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
+        snapshot = update.snapshot
+        messages.append(contentsOf: update.dialogueTurns.map { turn in
+            DialogueMessage(
+                role: turn.role == .user ? .user : .assistant,
+                text: turn.text
+            )
+        })
     }
 
     private func applyMockVoiceColdIntent() {
