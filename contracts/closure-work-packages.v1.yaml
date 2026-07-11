@@ -7,15 +7,15 @@ authority:
   source_sha256: 3b118682497e6c42a4d016e13dd81de57b791af273c68e26b21bbe70b59a2e08
   bootstrap_ratification_receipt: null
 basis:
-  repo_head: 5687932cef64eb1f6406d8cc9a6097e10aab0bb7
-  captured_at: '2026-07-11T15:38:39+08:00'
+  repo_head: 09330817b2c7288b441497ba1f697b56b2908e54
+  captured_at: '2026-07-11T16:12:49+08:00'
   roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   roadmap_sha256: a7f90f27a46cf81d90924fbf499e853300ee85f010e6ae4f90fff8c5f01fc483
 source_snapshot:
   manifest_id: v6_1_source_snapshot_d142_cascade
   source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   source_sha256: a7f90f27a46cf81d90924fbf499e853300ee85f010e6ae4f90fff8c5f01fc483
-  repo_head: 5687932cef64eb1f6406d8cc9a6097e10aab0bb7
+  repo_head: 09330817b2c7288b441497ba1f697b56b2908e54
   package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
   hard_edges:
     - {from: B7, to: B2}
