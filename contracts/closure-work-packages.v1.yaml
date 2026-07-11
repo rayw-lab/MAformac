@@ -7,15 +7,15 @@ authority:
   source_sha256: 3b118682497e6c42a4d016e13dd81de57b791af273c68e26b21bbe70b59a2e08
   bootstrap_ratification_receipt: null
 basis:
-  repo_head: 09330817b2c7288b441497ba1f697b56b2908e54
-  captured_at: '2026-07-11T16:12:49+08:00'
+  repo_head: d973b730ae8f8e6002d8678de2353e453206ca0f
+  captured_at: '2026-07-11T16:30:03+08:00'
   roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   roadmap_sha256: a7f90f27a46cf81d90924fbf499e853300ee85f010e6ae4f90fff8c5f01fc483
 source_snapshot:
   manifest_id: v6_1_source_snapshot_d142_cascade
   source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   source_sha256: a7f90f27a46cf81d90924fbf499e853300ee85f010e6ae4f90fff8c5f01fc483
-  repo_head: 09330817b2c7288b441497ba1f697b56b2908e54
+  repo_head: d973b730ae8f8e6002d8678de2353e453206ca0f
   package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
   hard_edges:
     - {from: B7, to: B2}
@@ -104,12 +104,12 @@ packages:
     closure_required: true
     counting: {role: leaf, count_key: B1b, count_in_hard_denominator: true, deliverable_keys: [s8.g1_receipt_chain]}
     decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-145, required_state: ratified}]}
-    execution_state: {declared: planned, stage: implementation, readiness_mode: after_predecessors, reason_codes: [launcher_patch_pending], transition_receipts: []}
-    proof_state: {declared: none, evidence: [], verdict: none}
+    execution_state: {declared: done, stage: closeout, readiness_mode: now, reason_codes: [materialization_merge_d973b730], transition_receipts: [{root: repo, path: closure/receipts/B1b/transitions/B1b.0001.gap-to-planned.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/B1b/transitions/B1b.0002.planned-to-ready.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/B1b/transitions/B1b.0003.ready-to-running.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/B1b/transitions/B1b.0004.running-to-done.json, availability: existing, sha256: null}]}
+    proof_state: {declared: satisfied, evidence: [{class: local, artifact: {root: repo, path: closure/receipts/B1b/native-closeout.v1.json, availability: existing, sha256: 3c9da252d04fec69b17b3a35ac221dc1f7bdb7dd28f92188840af5a8973abf41}, claim: local_receipt_chain}], verdict: t_pass}
     prerequisites: []
     external_gates: [{fact_id: v6.ratified, require_status: satisfied}]
-    exit_receipt: {artifact: {root: build, path: closure/receipts/B1b.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: s8_g1_receipt_v1, owner_package_id: B1b, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: s8_g1_subject_v1}
-    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-s8-g1-receipt-source], timeout_seconds: 600, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-s8-g1-receipt-chain], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}}
+    exit_receipt: {artifact: {root: repo, path: closure/receipts/B1b.v1.json, availability: existing, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: s8_g1_receipt_v1, native_artifact: {root: repo, path: closure/receipts/B1b/native-closeout.v1.json, availability: existing, sha256: 3c9da252d04fec69b17b3a35ac221dc1f7bdb7dd28f92188840af5a8973abf41}, owner_package_id: B1b, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: s8_g1_subject_v1}
+    check_command: {entry: {availability: existing, cwd: repo, argv: [python3, -B, Tools/S8ReceiptChain/s8_g1_receipt.py, validate-start, --receipt, closure/receipts/B1b/postmerge-dryrun-launch-basis.v1.json], timeout_seconds: 600, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: existing, cwd: repo, argv: [python3, -B, -m, unittest, -v, scripts/test_s8_g1_receipt.py], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}}
     proof_profile_id: proof_local_receipt
     resource_claim_refs: [o6_claim_s8_run_dir]
   - id: B2

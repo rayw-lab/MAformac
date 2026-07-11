@@ -1,0 +1,43 @@
+{
+  "schema_version": "closure_package_exit_envelope_v1",
+  "registry_schema_major": "closure_work_packages_v1",
+  "registry_digest": "fda0bb478b775b96f6ed5e19aeda53f070679251680c07e6ed4fd4b2b378aaa4",
+  "package_id": "B1b",
+  "package_revision": 1,
+  "native_receipt_schema_id": "s8_g1_receipt_v1",
+  "native_receipt": {
+    "root": "repo",
+    "path": "closure/receipts/B1b/native-closeout.v1.json",
+    "sha256": "3c9da252d04fec69b17b3a35ac221dc1f7bdb7dd28f92188840af5a8973abf41"
+  },
+  "native_receipt_digest": "3c9da252d04fec69b17b3a35ac221dc1f7bdb7dd28f92188840af5a8973abf41",
+  "status": "DONE",
+  "subject_schema_id": "s8_g1_subject_v1",
+  "subject": [
+    {
+      "key": "implementation_merge",
+      "value_type": "git_sha",
+      "value": "a3160c88ff2cde29a4bf3e319330ee6d463fbc4f"
+    },
+    {
+      "key": "materialization_merge",
+      "value_type": "git_sha",
+      "value": "d973b730ae8f8e6002d8678de2353e453206ca0f"
+    },
+    {
+      "key": "postmerge_dryrun_evidence_sha256",
+      "value_type": "sha256",
+      "value": "b9835543a3915c6e5ab81511fdb6e888d400fad090ab8f29645f7bd5accb7294"
+    },
+    {
+      "key": "native_receipt_sha256",
+      "value_type": "sha256",
+      "value": "3c9da252d04fec69b17b3a35ac221dc1f7bdb7dd28f92188840af5a8973abf41"
+    },
+    {
+      "key": "external_launcher_raw_matches",
+      "value_type": "integer",
+      "value": 14
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "B1b",
+  "package_revision": 1,
+  "sequence": 3,
+  "from_state": "ready",
+  "to_state": "running",
+  "trigger_decision": "B1b Stage1 captured the accepted post-merge dry-run and raw provenance",
+  "evidence": {"root": "repo", "path": "closure/receipts/B1b/postmerge-dryrun-evidence.v1.json", "sha256": "b9835543a3915c6e5ab81511fdb6e888d400fad090ab8f29645f7bd5accb7294"},
+  "repo_head": "fef626e49950e8dc50fd7f3e5ec339cf6917be1f",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

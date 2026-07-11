@@ -40,6 +40,15 @@
     "argv_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.argv.json",
     "env_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.env.json"
   },
+  "external_launcher_provenance_replay": {
+    "scope": "external_launcher_raw_set_only",
+    "matched_artifacts": 14,
+    "expected_artifacts": 14,
+    "digest_mismatches": 0,
+    "repo_only_supplementary_gate_artifacts": 13,
+    "manifest_files_compared": false,
+    "claim": "external launcher raw set 14/14 matches the repo copy; the repo manifest additionally contains 13 supplementary gate raw artifacts"
+  },
   "unit_gate": {
     "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v scripts/test_s8_g1_receipt.py",
     "rc": 0,
