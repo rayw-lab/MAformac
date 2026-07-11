@@ -16,14 +16,6 @@ public struct ToolContractCompiler: Sendable {
         self.dDomainCatalog = dDomainCatalog
     }
 
-    public init(seeds: [C5SemanticSeed], dDomainCatalog: [DDomainToolEntry] = []) {
-        self.devices = Self.unique(seeds.map(\.device))
-        self.actionPrimitives = Self.unique(seeds.map(\.actionPrimitive))
-        self.valueTypes = Self.unique(seeds.map { $0.value.type })
-        self.slotKeys = Self.unique(seeds.flatMap(\.slotKeys))
-        self.dDomainCatalog = dDomainCatalog
-    }
-
     // D-domain 具名工具目录加载(generated/ 被 Package.swift exclude, 走 repoRoot 文件加载, 仿 C6 :1381)。
     public static func loadDDomainCatalog(repoRoot: URL) throws -> [DDomainToolEntry] {
         let url = repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")
