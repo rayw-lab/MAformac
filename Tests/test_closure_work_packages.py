@@ -153,7 +153,7 @@ def committed_registry_probe(tmp_path: Path, *, include_product_change: bool) ->
             "--registry", str(registry_path),
             "--schema", str(clone / "contracts" / "schemas" / "closure-work-packages.v1.schema.json"),
             "--roadmap", str(clone / "docs" / "roadmap-2026-07-11-v6-closure-baseline.md"),
-            "--o6-policy", str(RESOURCE_POLICY),
+            "--o6-policy", str(clone / "contracts" / "closure-execution-window.v1.yaml"),
             "--subject-head", subject_head,
             "--receipt", str(receipt_path),
         ],
