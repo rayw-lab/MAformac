@@ -1338,3 +1338,17 @@
 - **rebuild-c6**：WAIT_G2_V3_RATIFICATION 解除，carrier disposition 推进授权。
 - **级联**：V6 §一——B7/V1/V3/V4/V5/W10 → RATIFIED_PENDING_PLAN；W2 → containment MERGED+剩余面可派；V2（T07）仍 GAP（G3 波未拍）。
 - **Non-claims**：S8 未点火；A5 各项未逐项点头；ABI proof 未补证；G3 波未拍；canDemo=0/120；无 operator-pass/V-PASS。
+
+## D-146（补录，时序在 D-147 前后交叠）：ma14 后半场制度物收口——O1/O2 环境分裂全链 + C-08 全清 + W2 waiver 半收编 + G1 编码开工 + sentinel 上线（2026-07-11）
+
+- 全文基于秘书 DRAFT-d146-filled（commander 审后落）：O1/O2 实装→审→修→复审→环境分裂两层（R19 自引用悖论→commander 裁决祖先+白名单规则；allowed_roots 绝对路径→净 clone 9 败被 commander 亲核抓出→relocatable 修复 23/23）→merge `207ac515`。**元教训：worktree 绿≠relocatable，环境与路径属于验证 basis**（详 lessons 候补）。
+- C-08 disposition inventory 全清（十项 metadata `426063ac` + HOLD2 `8ea185d9` + rebuild-c6 `cb282ba4`）；rebuild-c6 保持 draft_needs_human_propose，下一步=opsx propose 人审。
+- W2/v5b waiver 半收编 `95f2d5d5`（LEIGE-WAIVER-V5B-ABI-1，waiver≠proof）；G1 编码开工（risk-ack 三签：三 CRITICAL+ContentView+ReceiptWriter.run，影响面⊆ack 集纪律）；sentinel v1 三信号上线（磊哥抓漏检后）。
+- proof boundary：无 operator-pass/C6 acceptance/candidate/V-PASS；S8-S10 未执行。
+
+## D-148：主线红门 incident 与修复 + 32 题深审终态（2026-07-11 上午）
+
+- 🔴 **incident 如实**：O 链 merge `207ac515` 后主线 closure 门红（7F/16P，根因=merge 上下文 registry rebind 缺失），且 **commander push 先于读门结果**（顺序失误）+ 监控脚本 rc 被管道尾吞（假 0）。修复=`6b2ee8b9`+`f5bccfa0` fix-forward（registry rebind + R19 freshness anchor，未放宽 R19），commander 无管道亲跑双门 rc0（closure 23/23 + verify-ci 794/6/0）后 push。两教训：**push 前必读门结果**；**rc 取值禁管道尾**（zsh $pipestatus）。
+- **32 题深审终态**（磊哥令「你审查后按照星标」）：commander 逐题对照 authority 复核，32/32 维持 RATIFIED_AS_STARRED 零修正（receipt 补记=RATIFICATION-RECEIPT-pool32.md）。
+- 其他：GitNexus analyze 重复注入块修复 `6987a37b`；G3 v4.1 出（70/7/9/7，exact-SHA 终核在途）；A4 target split 方案稿备（App 零引用 9228 行编译面账，待磊哥过目）；C6-family/T09 设计对抗审 P0 修复在途。
+- Non-claims：G3 未拍；ABI proof 未补证；S8 未点火；canDemo=0/120；无 operator-pass/V-PASS。
