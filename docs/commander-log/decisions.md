@@ -1352,3 +1352,10 @@
 - **32 题深审终态**（磊哥令「你审查后按照星标」）：commander 逐题对照 authority 复核，32/32 维持 RATIFIED_AS_STARRED 零修正（receipt 补记=RATIFICATION-RECEIPT-pool32.md）。
 - 其他：GitNexus analyze 重复注入块修复 `6987a37b`；G3 v4.1 出（70/7/9/7，exact-SHA 终核在途）；A4 target split 方案稿备（App 零引用 9228 行编译面账，待磊哥过目）；C6-family/T09 设计对抗审 P0 修复在途。
 - Non-claims：G3 未拍；ABI proof 未补证；S8 未点火；canDemo=0/120；无 operator-pass/V-PASS。
+
+## D-149：ma14 收官——主线全绿封板 + 五单终收 + ma15 交接（2026-07-11 午）
+
+- **封板**：`4dfa2609` push（O1 canonical 重锚收尾链 fe029bdc→89efda16→89873433→4dfa2609）；closure 25/25 + verify-ci 794/6/0 commander 无管道亲跑。换面终审（M.72 范式）三 P1 全修（孤儿门 wiring+假绿哨/CURRENT/roadmap 计数接管 O1 generated 1/4/19/5）。
+- **终收五单**：G1T1-FIX（双 P0 修净 813/6/0，待 fresh 复审收编）/T08 归并设计/V6p 计划/CURRENT-roadmap 同步/rename 门修。G3 七题+rebuild-c6 propose 包+A4 方案=磊哥堆。
+- **ma15 交接**：handoff=`docs/handoffs/2026-07-11-ma14-closeout.md`（含蜂群布局规格+拉满教义+哨兵复用指引——磊哥令写入）。
+- **Non-claims**：G3 未拍；G1-T1 未收编；ACTIVE 未翻；S8 未点火；canDemo=0/120；无 operator-pass/V-PASS。
