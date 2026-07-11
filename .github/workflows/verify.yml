@@ -12,6 +12,7 @@ name: Verify
     branches:
       - main
       - "codex/**"
+      - opt/streamline-macos-20260707
 
 jobs:
   verify:
