@@ -107,6 +107,66 @@ class FrontstageRouteUIABIFinalizerTests(unittest.TestCase):
             self.assertEqual(json.loads((copies / "turn-0001.json").read_text())["sequence"], 1)
             self.assertEqual(json.loads((copies / "turn-0002.json").read_text())["sequence"], 2)
 
+    def test_rewritten_xcresult_attachment_names_map_one_receipt_per_sequence(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="frontstage-ui-finalize-") as temp:
+            fixture = self.make_fixture(Path(temp))
+            manifest_path = Path(fixture["export_directory"]) / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest[0]["attachments"][0]["suggestedHumanReadableName"] = (
+                "frontstage-route-turn-0001_0_12345678-1234-1234-1234-123456789abc.json"
+            )
+            manifest[0]["attachments"][1]["suggestedHumanReadableName"] = (
+                "frontstage-route-turn-0002_0_abcdefab-cdef-cdef-cdef-abcdefabcdef.json"
+            )
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            report = self.finalizer.finalize_exported_attachments(**fixture)
+
+            self.assertEqual(report["status"], "PASS")
+            copies = Path(temp) / "owner/copies"
+            self.assertEqual(json.loads((copies / "turn-0001.json").read_text())["sequence"], 1)
+            self.assertEqual(json.loads((copies / "turn-0002.json").read_text())["sequence"], 2)
+
+    def test_attachment_name_boundary_rejects_evil_suffix_without_owner_copies(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="frontstage-ui-finalize-") as temp:
+            fixture = self.make_fixture(Path(temp))
+            manifest_path = Path(fixture["export_directory"]) / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest[0]["attachments"][0]["suggestedHumanReadableName"] = (
+                "frontstage-route-turn-0001evil.json"
+            )
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(self.finalizer.FinalizeError, "E_ATTACHMENT_SET"):
+                self.finalizer.finalize_exported_attachments(**fixture)
+            self.assertFalse((Path(temp) / "owner/copies").exists())
+
+    def test_exact_plus_rewritten_duplicate_for_one_sequence_fails_attachment_set(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="frontstage-ui-finalize-") as temp:
+            fixture = self.make_fixture(Path(temp))
+            export_directory = Path(fixture["export_directory"])
+            duplicate_name = "random-1-duplicate.json"
+            (export_directory / duplicate_name).write_text(
+                (export_directory / "random-1.json").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            manifest_path = export_directory / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest[0]["attachments"].append(
+                {
+                    "exportedFileName": duplicate_name,
+                    "suggestedHumanReadableName": (
+                        "frontstage-route-turn-0001_0_12345678-1234-1234-1234-123456789abc.json"
+                    ),
+                    "isAssociatedWithFailure": False,
+                }
+            )
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            with self.assertRaisesRegex(self.finalizer.FinalizeError, "E_ATTACHMENT_SET"):
+                self.finalizer.finalize_exported_attachments(**fixture)
+            self.assertFalse((Path(temp) / "owner/copies").exists())
+
     def test_missing_or_duplicate_named_attachment_fails_closed_without_owner_copies(self) -> None:
         with tempfile.TemporaryDirectory(prefix="frontstage-ui-finalize-") as temp:
             fixture = self.make_fixture(Path(temp))
