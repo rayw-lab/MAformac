@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CHECKER = ROOT / "scripts/check_a4_app_target_exclusions.py"
 PROJECT = ROOT / "MAformac.xcodeproj/project.pbxproj"
+MAKEFILE = ROOT / "Makefile"
 
 
 def run(project: Path = PROJECT) -> subprocess.CompletedProcess[str]:
@@ -24,6 +25,23 @@ def run(project: Path = PROJECT) -> subprocess.CompletedProcess[str]:
 
 
 class A4TargetExclusionCheckerTests(unittest.TestCase):
+    def test_verify_entrypoints_consume_a4_checker(self) -> None:
+        prerequisites: dict[str, set[str]] = {}
+        for line in MAKEFILE.read_text().splitlines():
+            if not line or line[0].isspace() or ":" not in line:
+                continue
+            target, dependency_text = line.split(":", 1)
+            if target in {"verify", "verify-ci"}:
+                prerequisites[target] = set(dependency_text.split())
+
+        self.assertEqual(set(prerequisites), {"verify", "verify-ci"})
+        for target in ("verify", "verify-ci"):
+            self.assertIn(
+                "verify-a4-target-exclusions",
+                prerequisites[target],
+                f"{target} must directly consume verify-a4-target-exclusions",
+            )
+
     def test_current_project_is_exact(self) -> None:
         result = run()
         self.assertEqual(result.returncode, 0, result.stderr)
