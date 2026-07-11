@@ -126,7 +126,8 @@ def committed_registry_probe(
     registry_path = clone / "contracts" / "closure-work-packages.v1.yaml"
     shutil.copy2(REGISTRY, registry_path)
     shutil.copy2(ROADMAP, clone / ROADMAP.relative_to(REPO))
-    shutil.copy2(REPO / "closure" / "receipts" / "W1.v1.json", clone / "closure" / "receipts" / "W1.v1.json")
+    for receipt_path in sorted((REPO / "closure" / "receipts").glob("*.v1.json")):
+        shutil.copy2(receipt_path, clone / "closure" / "receipts" / receipt_path.name)
     registry_text = registry_path.read_text(encoding="utf-8")
     registry_text, replacement_count = re.subn(
         r"(?m)^(  repo_head:) [0-9a-f]{40}$",
@@ -142,7 +143,7 @@ def committed_registry_probe(
             "git",
             "add",
             "contracts/closure-work-packages.v1.yaml",
-            "closure/receipts/W1.v1.json",
+            "closure/receipts",
             "docs/roadmap-2026-07-11-v6-closure-baseline.md",
             "scripts/check_closure_work_packages.py",
         ],

@@ -1,7 +1,7 @@
 {
   "schema_version": "closure_package_exit_envelope_v1",
   "registry_schema_major": "closure_work_packages_v1",
-  "registry_digest": "45f03fda99421b80ea5cc0245bb9b0c7a36a079f0be27e92cd6ef2f43da2eae2",
+  "registry_digest": "52150a9fd4a1830291850e4dd01d4a780d5656faa1f0286a13fd56d87002726e",
   "package_id": "W5d",
   "package_revision": 1,
   "native_receipt_schema_id": "decode_policy_v1",
@@ -14,9 +14,25 @@
   "status": "DONE",
   "subject_schema_id": "decode_policy_subject_v1",
   "subject": [
-    {"key": "subject_head", "value_type": "git_sha", "value": "997ec76d56a2bbe22418ce2e9645f080d9e800f1"},
-    {"key": "delivery_merge", "value_type": "git_sha", "value": "dd5d4f7768b667174e5b6a6fc5ee4549c617acc5"},
-    {"key": "fresh_validation_sha256", "value_type": "sha256", "value": "6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f"},
-    {"key": "native_receipt_sha256", "value_type": "sha256", "value": "633b150f5e3b88f03804c0edaa95a1378325b048b54142224d745f54fae971fb"}
+    {
+      "key": "subject_head",
+      "value_type": "git_sha",
+      "value": "997ec76d56a2bbe22418ce2e9645f080d9e800f1"
+    },
+    {
+      "key": "delivery_merge",
+      "value_type": "git_sha",
+      "value": "dd5d4f7768b667174e5b6a6fc5ee4549c617acc5"
+    },
+    {
+      "key": "fresh_validation_sha256",
+      "value_type": "sha256",
+      "value": "6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f"
+    },
+    {
+      "key": "native_receipt_sha256",
+      "value_type": "sha256",
+      "value": "633b150f5e3b88f03804c0edaa95a1378325b048b54142224d745f54fae971fb"
+    }
   ]
 }
