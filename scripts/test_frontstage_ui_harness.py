@@ -9,6 +9,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONFIGURATION_SOURCE = REPO_ROOT / "MAformacIOSUITests/FrontstageRouteUITestRunConfiguration.swift"
+UI_TEST_SOURCE = REPO_ROOT / "MAformacIOSUITests/FrontstageRouteUITests.swift"
 PROBE_SOURCE = REPO_ROOT / "scripts/frontstage_route_ui_harness_probe.swift"
 OPERATOR_GUIDE = REPO_ROOT / "docs/grill-checklist/v5b-abi-proof-operator-guide.md"
 ABI_KEYS = (
@@ -100,6 +101,19 @@ class FrontstageUIHarnessTests(unittest.TestCase):
             self.assertIn(f"TEST_RUNNER_{key}", source)
         self.assertIn("TEST_RUNNER_<VAR>", source)
         self.assertIn("prefix stripped", source)
+        self.assertIn("Tools/checks/finalize_frontstage_route_ui_abi.py", source)
+        self.assertIn("xcresult attachment", source)
+
+    def test_ui_runner_preserves_receipts_as_xcresult_attachments_without_owner_writes(self) -> None:
+        source = UI_TEST_SOURCE.read_text(encoding="utf-8")
+        self.assertIn("XCTAttachment(data:", source)
+        self.assertIn("attachment.lifetime = .keepAlways", source)
+        self.assertIn("preserveReceipt(from: receiptURL, sequence: 1)", source)
+        self.assertIn("preserveReceipt(from: receiptURL, sequence: 2)", source)
+        self.assertNotIn("createDirectory(at: copiesDirectory", source)
+        self.assertNotIn("copyReceipt(from:", source)
+        self.assertNotIn("Process()", source)
+        self.assertNotIn(".venv/bin/python", source)
 
 
 if __name__ == "__main__":
