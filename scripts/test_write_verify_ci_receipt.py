@@ -111,6 +111,23 @@ def test_workflow_uses_writer_without_hardcoded_singular_change_id() -> None:
     assert "VERIFY_CI_CHANGE_IDS" in text
 
 
+def test_workflow_checkout_fetches_full_history_before_verify_ci() -> None:
+    text = WORKFLOW.read_text(encoding="utf-8")
+    checkout_step = """\
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+"""
+    verify_command = "        run: make verify-ci"
+    assert checkout_step in text, (
+        "verify workflow checkout must set actions/checkout fetch-depth: 0"
+    )
+    assert text.index(checkout_step) < text.index(verify_command), (
+        "full-history checkout must precede make verify-ci"
+    )
+
+
 def main() -> int:
     tests = [
         test_empty_change_ids_are_truthful,
@@ -118,6 +135,7 @@ def main() -> int:
         test_required_head_bound_fields_are_present,
         test_makefile_wires_only_source_free_c1_gates_into_ci,
         test_workflow_uses_writer_without_hardcoded_singular_change_id,
+        test_workflow_checkout_fetches_full_history_before_verify_ci,
     ]
     failures: list[str] = []
     for test in tests:
