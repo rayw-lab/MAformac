@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -48,7 +49,15 @@ def _attachment_paths(export_directory: Path) -> dict[int, Path]:
             if not isinstance(attachment, dict):
                 raise FinalizeError("E_ATTACHMENT_MANIFEST")
             for sequence, expected_name in ATTACHMENT_NAMES.items():
-                if attachment.get("suggestedHumanReadableName") != expected_name:
+                # Xcode 26.x xcresulttool 会把 suggestedHumanReadableName 改写成
+                # `<name>_0_<UUID>.json` 导出形态；按【词干前缀 + 边界】匹配，
+                # 每个 sequence 仍必须恰好命中一条（下方 len!=1 检查不放宽）。
+                readable = attachment.get("suggestedHumanReadableName")
+                stem = expected_name.removesuffix(".json")
+                if not isinstance(readable, str) or not (
+                    readable == expected_name
+                    or re.fullmatch(re.escape(stem) + r"[_.].*", readable)
+                ):
                     continue
                 exported_name = attachment.get("exportedFileName")
                 if not isinstance(exported_name, str) or Path(exported_name).name != exported_name:
