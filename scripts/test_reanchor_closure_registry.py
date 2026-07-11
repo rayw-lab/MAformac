@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import json
 import re
@@ -116,6 +117,31 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
             self.assertEqual(payload["registry_digest"], digest)
         self.assertEqual(summary["envelope_paths"], envelope_paths)
         self.assertEqual(summary["envelope_count"], len(done))
+
+    def test_both_authority_refresh_flags_update_the_actual_digest(self) -> None:
+        for flag in ("--refresh-authority", "--refresh-authority-sha"):
+            with self.subTest(flag=flag):
+                clone = self.make_clone()
+                registry_path = clone / REGISTRY_REL
+                registry_before = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+                authority_path = clone / registry_before["authority"]["source_path"]
+                authority_path.write_text(
+                    authority_path.read_text(encoding="utf-8") + "\n<!-- authority refresh regression -->\n",
+                    encoding="utf-8",
+                )
+                expected_digest = hashlib.sha256(authority_path.read_bytes()).hexdigest()
+
+                result = self.run_helper(
+                    clone,
+                    flag,
+                    "--no-precheck",
+                    "--no-postcheck",
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                summary = json.loads(result.stdout)
+                registry_after = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+                self.assertEqual(summary["authority_sha256"], expected_digest)
+                self.assertEqual(registry_after["authority"]["source_sha256"], expected_digest)
 
     def test_dry_run_is_byte_identical(self) -> None:
         clone = self.make_clone()

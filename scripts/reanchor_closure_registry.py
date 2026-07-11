@@ -469,7 +469,13 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--schema", default="contracts/schemas/closure-work-packages.v1.schema.json")
     result.add_argument("--o6-policy", default="contracts/closure-execution-window.v1.yaml")
     result.add_argument("--check-receipt", default=".build/closure/reanchor-helper-check.v1.json")
-    result.add_argument("--refresh-authority-sha", action="store_true")
+    result.add_argument(
+        "--refresh-authority",
+        "--refresh-authority-sha",
+        dest="refresh_authority_sha",
+        action="store_true",
+        help="refresh authority.source_sha256 (legacy alias: --refresh-authority-sha)",
+    )
     result.add_argument("--prose-already-applied", action="store_true")
     result.add_argument("--dry-run", action="store_true")
     result.add_argument("--no-precheck", action="store_true")
