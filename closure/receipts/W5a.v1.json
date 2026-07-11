@@ -1,0 +1,22 @@
+{
+  "schema_version": "closure_package_exit_envelope_v1",
+  "registry_schema_major": "closure_work_packages_v1",
+  "registry_digest": "45f03fda99421b80ea5cc0245bb9b0c7a36a079f0be27e92cd6ef2f43da2eae2",
+  "package_id": "W5a",
+  "package_revision": 1,
+  "native_receipt_schema_id": "t04_ingress_v1",
+  "native_receipt": {
+    "root": "repo",
+    "path": "closure/receipts/W5a/native-closeout.v1.json",
+    "sha256": "629bed27af52a4cedf35bab1e49dc8097100e729b2b4cde598bf41d52038ec5c"
+  },
+  "native_receipt_digest": "629bed27af52a4cedf35bab1e49dc8097100e729b2b4cde598bf41d52038ec5c",
+  "status": "DONE",
+  "subject_schema_id": "ingress_subject_v1",
+  "subject": [
+    {"key": "subject_head", "value_type": "git_sha", "value": "997ec76d56a2bbe22418ce2e9645f080d9e800f1"},
+    {"key": "delivery_merge", "value_type": "git_sha", "value": "dd5d4f7768b667174e5b6a6fc5ee4549c617acc5"},
+    {"key": "fresh_validation_sha256", "value_type": "sha256", "value": "6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f"},
+    {"key": "native_receipt_sha256", "value_type": "sha256", "value": "629bed27af52a4cedf35bab1e49dc8097100e729b2b4cde598bf41d52038ec5c"}
+  ]
+}

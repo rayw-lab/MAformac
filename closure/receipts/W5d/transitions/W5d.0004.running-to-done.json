@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W5d",
+  "package_revision": 1,
+  "sequence": 4,
+  "from_state": "running",
+  "to_state": "done",
+  "trigger_decision": "D-151 authorized W5d stage2 DONE after Stage1 fresh closeout",
+  "evidence": {"root": "repo", "path": "closure/receipts/W5a-W5d/fresh-validation.v1.json", "sha256": "6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f"},
+  "repo_head": "a850f4baacb8eeaf0f95f43317d91cb6a104edfa",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

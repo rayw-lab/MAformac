@@ -1,7 +1,7 @@
 {
   "schema_version": "closure_package_exit_envelope_v1",
   "registry_schema_major": "closure_work_packages_v1",
-  "registry_digest": "aebfb5e8c5b23e44b716fbeb4572cb56e248f3bda1e11192deea375d2bad7cc2",
+  "registry_digest": "45f03fda99421b80ea5cc0245bb9b0c7a36a079f0be27e92cd6ef2f43da2eae2",
   "package_id": "W1",
   "package_revision": 1,
   "native_receipt_schema_id": "int_v5a_recheck_report_v1",

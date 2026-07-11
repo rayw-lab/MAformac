@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W5a",
+  "package_revision": 1,
+  "sequence": 1,
+  "from_state": "gap",
+  "to_state": "planned",
+  "trigger_decision": "D-143 ratified W5a and created its implementation-plan state",
+  "evidence": {"root": "repo", "path": "docs/commander-log/decisions.md", "sha256": "ed7104bafd6a309bd52bd3fc9e80d6b085852f99ea62ef7bf21b42578fdf49f7"},
+  "repo_head": "30cc57d46e9d8537a1969208aae5d070ba54fb15",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

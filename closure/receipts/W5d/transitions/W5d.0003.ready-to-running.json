@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W5d",
+  "package_revision": 1,
+  "sequence": 3,
+  "from_state": "ready",
+  "to_state": "running",
+  "trigger_decision": "G1-T1 implementation round entered production-shaped repair",
+  "evidence": {"root": "repo", "path": "Core/LLM/DDomainToolPlanBackend.swift", "sha256": "7a6e8f83f34ba6c7c5e0fd273b9d04b77280e2c0fa4b60c42902d94f96247d5d"},
+  "repo_head": "0d5e5f8121ea4291dced05cb32f3b3a2960f5add",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

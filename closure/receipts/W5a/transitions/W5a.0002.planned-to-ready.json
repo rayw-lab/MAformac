@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W5a",
+  "package_revision": 1,
+  "sequence": 2,
+  "from_state": "planned",
+  "to_state": "ready",
+  "trigger_decision": "W5a tranche aligned to the accepted T04a authority carrier",
+  "evidence": {"root": "repo", "path": "openspec/changes/add-t04a-customer-ingress/proposal.md", "sha256": "e8ebfdc599b02a62957375345b7de857a933ba284075c596ccfbede0e1f03d3b"},
+  "repo_head": "24b562b05ac388d3bd771c4d368d1a35ad3087ae",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

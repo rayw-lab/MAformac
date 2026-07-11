@@ -4,10 +4,10 @@ artifact_kind: closure_work_packages_registry
 authority:
   state: ratified
   source_path: docs/commander-log/decisions.md
-  source_sha256: 00241a4b434644760fe1995c0682072f1f95939b049dd44cbf93db3d8bd3567f
+  source_sha256: 3b118682497e6c42a4d016e13dd81de57b791af273c68e26b21bbe70b59a2e08
   bootstrap_ratification_receipt: null
 basis:
-  repo_head: dd5d4f7768b667174e5b6a6fc5ee4549c617acc5
+  repo_head: a850f4baacb8eeaf0f95f43317d91cb6a104edfa
   captured_at: '2026-07-11T14:45:05+08:00'
   roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   roadmap_sha256: a7f90f27a46cf81d90924fbf499e853300ee85f010e6ae4f90fff8c5f01fc483
@@ -15,7 +15,7 @@ source_snapshot:
   manifest_id: v6_1_source_snapshot_d142_cascade
   source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   source_sha256: a7f90f27a46cf81d90924fbf499e853300ee85f010e6ae4f90fff8c5f01fc483
-  repo_head: dd5d4f7768b667174e5b6a6fc5ee4549c617acc5
+  repo_head: a850f4baacb8eeaf0f95f43317d91cb6a104edfa
   package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
   hard_edges:
     - {from: B7, to: B2}
@@ -280,12 +280,12 @@ packages:
     closure_required: true
     counting: {role: leaf, count_key: W5a, count_in_hard_denominator: true, deliverable_keys: [t04.ingress_facade]}
     decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
-    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t04_plan_pending], transition_receipts: []}
-    proof_state: {declared: none, evidence: [], verdict: none}
+    execution_state: {declared: done, stage: closeout, readiness_mode: now, reason_codes: [merge_dd5d4f77], transition_receipts: [{root: repo, path: closure/receipts/W5a/transitions/W5a.0001.gap-to-planned.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/W5a/transitions/W5a.0002.planned-to-ready.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/W5a/transitions/W5a.0003.ready-to-running.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/W5a/transitions/W5a.0004.running-to-done.json, availability: existing, sha256: null}]}
+    proof_state: {declared: satisfied, evidence: [{class: integration, artifact: {root: repo, path: closure/receipts/W5a-W5d/fresh-validation.v1.json, availability: existing, sha256: 6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f}, claim: integration_contract_or_implementation}], verdict: t_pass}
     prerequisites: []
     external_gates: [{fact_id: t04.ratified, require_status: satisfied}]
-    exit_receipt: {artifact: {root: build, path: closure/receipts/W5a.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: t04_ingress_v1, owner_package_id: W5a, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: ingress_subject_v1}
-    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-customer-ingress-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-customer-ingress], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    exit_receipt: {artifact: {root: repo, path: closure/receipts/W5a.v1.json, availability: existing, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: t04_ingress_v1, native_artifact: {root: repo, path: closure/receipts/W5a/native-closeout.v1.json, availability: existing, sha256: 629bed27af52a4cedf35bab1e49dc8097100e729b2b4cde598bf41d52038ec5c}, owner_package_id: W5a, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: ingress_subject_v1}
+    check_command: {entry: {availability: existing, cwd: repo, argv: [python3, scripts/test_check_t04a_customer_ingress.py], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: existing, cwd: repo, argv: [swift, test, --filter, FrontstageCustomerIngressTests], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
     proof_profile_id: proof_integration
     resource_claim_refs: [o6_claim_full_build]
   - id: W5b
@@ -328,12 +328,12 @@ packages:
     closure_required: true
     counting: {role: leaf, count_key: W5d, count_in_hard_denominator: true, deliverable_keys: [t04.decode_policy]}
     decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
-    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t04_plan_pending], transition_receipts: []}
-    proof_state: {declared: none, evidence: [], verdict: none}
+    execution_state: {declared: done, stage: closeout, readiness_mode: now, reason_codes: [merge_dd5d4f77], transition_receipts: [{root: repo, path: closure/receipts/W5d/transitions/W5d.0001.gap-to-planned.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/W5d/transitions/W5d.0002.planned-to-ready.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/W5d/transitions/W5d.0003.ready-to-running.json, availability: existing, sha256: null}, {root: repo, path: closure/receipts/W5d/transitions/W5d.0004.running-to-done.json, availability: existing, sha256: null}]}
+    proof_state: {declared: satisfied, evidence: [{class: integration, artifact: {root: repo, path: closure/receipts/W5a-W5d/fresh-validation.v1.json, availability: existing, sha256: 6e8b433b784a0375a22091cc2b5b7b18a9d68cbd707daab40b6305090488c88f}, claim: integration_contract_or_implementation}], verdict: t_pass}
     prerequisites: []
     external_gates: [{fact_id: t04.ratified, require_status: satisfied}]
-    exit_receipt: {artifact: {root: build, path: closure/receipts/W5d.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: decode_policy_v1, owner_package_id: W5d, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: decode_policy_subject_v1}
-    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-decode-policy-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-exactly-one-decode-policy], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    exit_receipt: {artifact: {root: repo, path: closure/receipts/W5d.v1.json, availability: existing, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: decode_policy_v1, native_artifact: {root: repo, path: closure/receipts/W5d/native-closeout.v1.json, availability: existing, sha256: 633b150f5e3b88f03804c0edaa95a1378325b048b54142224d745f54fae971fb}, owner_package_id: W5d, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: decode_policy_subject_v1}
+    check_command: {entry: {availability: existing, cwd: repo, argv: [python3, scripts/test_check_customer_route_avoids_legacy_decode.py], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: existing, cwd: repo, argv: [swift, test, --filter, DDomainCompletionEnvelopeTests/testBoundedReviewedProductionChainExecutesMountedAndRejectsUnmountedPerItem], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
     proof_profile_id: proof_integration
     resource_claim_refs: [o6_claim_full_build]
   - id: W6
