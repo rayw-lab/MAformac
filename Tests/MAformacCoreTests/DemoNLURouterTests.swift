@@ -12,15 +12,17 @@ final class DemoNLURouterTests: XCTestCase {
         XCTAssertEqual(decoded, [first, second])
     }
 
-    func testSingleFrameCompatibilityDecodeTakesFirstBackendFrame() async throws {
+    func testSingleFrameDecodeRejectsUncheckedMultiFramePlan() async throws {
         let first = frame(id: "first", device: "ac_temperature")
         let second = frame(id: "second", device: "window")
         let router = DemoNLURouter(backend: FixedPlanBackend(frames: [first, second]))
 
-        let decoded = try await router.decode(text: "调到26度")
-
-        XCTAssertEqual(decoded.id, "first")
-        XCTAssertEqual(decoded.device, "ac_temperature")
+        do {
+            _ = try await router.decode(text: "调到26度")
+            XCTFail("expected explicit single-frame cardinality rejection")
+        } catch {
+            XCTAssertEqual(error as? DemoNLURouterError, .expectedSingleToolPlanFrame(actual: 2))
+        }
     }
 
     func testRouterDoesNotDecodeOrNormalize() async throws {

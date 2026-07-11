@@ -107,7 +107,15 @@ final class W20ARuntimeProjectionTests: XCTestCase {
             store: store,
             traceLogger: trace,
             speech: speech,
-            modelBackend: DDomainToolPlanBackend(completionProvider: { _ in completion })
+            modelBackend: DDomainToolPlanBackend(completionEnvelopeProvider: { _ in
+                DDomainCompletionEnvelope(
+                    content: completion,
+                    finishReason: "tool_calls",
+                    stopReason: "end_turn",
+                    toolCallCount: 1,
+                    source: "w20a_projection_test"
+                )
+            })
         )
     }
 
