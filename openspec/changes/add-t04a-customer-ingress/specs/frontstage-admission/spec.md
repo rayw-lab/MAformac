@@ -46,6 +46,6 @@ T04a SHALL consume the existing presentation bridge and int-v5b receipt without 
 
 #### Scenario: T04a closes locally
 
-- **WHEN** ingress and correlation tests pass
+- **WHEN** current-tranche ingress and side-effect-free rejection tests pass
 - **THEN** the maximum claim SHALL be local/unit/integration construction
 - **AND** T04b, runtime/operator/action-success, and V-PASS SHALL remain unclaimed.
