@@ -1,10 +1,15 @@
 {
   "schema_version": "closure_package_exit_envelope_v1",
   "registry_schema_major": "closure_work_packages_v1",
-  "registry_digest": "81ade16892999da13e8389d1aed10bae7ab52bd06aac3b1f7692274ddc9e5d61",
+  "registry_digest": "ca931cdcb4441b076e48c5715f9cbdd34ed925d4bf391a412dee7b8202e21f9b",
   "package_id": "W1",
   "package_revision": 1,
   "native_receipt_schema_id": "int_v5a_recheck_report_v1",
+  "native_receipt": {
+    "root": "repo",
+    "path": "closure/registry/native/W1-int-v5a-recheck.md",
+    "sha256": "551e2036b27303c22a3a8def11bea814db0c34a16d431b29f7e4018d1bc34cd7"
+  },
   "native_receipt_digest": "551e2036b27303c22a3a8def11bea814db0c34a16d431b29f7e4018d1bc34cd7",
   "status": "DONE",
   "subject_schema_id": "int_v5a_subject_v1",

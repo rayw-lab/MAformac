@@ -26,25 +26,27 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 
 **分母定义**：closure = 五门全绿（§四）+ operator-pass ceremony 实际执行。每包绑验收物；**状态三轴** = decision_state（draft/ratified）× execution_state（READY_NOW / READY_AFTER_<前置> / PLAN / GAP / BLOCKED）× proof_state（none→local→…→operator，禁越级）。表内「状态」列 = execution_state 精确词，**禁把 `READY_AFTER_*` 截短成 READY**（审计 P0-01）。
 
+> historical source view; superseded by O1 generated table。下列三张手写表保留业务说明与来源锚，但其状态值已校准为 O1 canonical execution state；机械消费只认本节末 `O1:GENERATED` 的 29 行表。
+
 ### 训练链（8 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
-| B1a | S8 1800 训练执行（legacy 点火 authority） | **READY_AFTER_HUMAN_KEY** | preflight `READY_TO_IGNITE` rc0（s8-preflight-check.sh 实测）——待磊哥窗口令 |
-| B1b | S8 G1 closure receipt 链（nonce/prelaunch inventory/completion seal） | 实装 MERGED a3160c88（launcher run-dir 侧接线留点火窗） | `runs/2026-07-10-ma13/reports/S8-IGNITION-READINESS-REFRESH.md:4` 总态 PARTIAL：launcher 缺 G1 字段，兼容补丁**草稿在未实施**（审计 P0-02）。⭐点火前落此小补丁，否则 9-11h 产物无法被 B6/V8 诚实消费 |
-| B2 | S9 三臂 eval | READY_AFTER_S8 | holdout FROZEN 61 行四桶 33/9/10/9，sha256 `77853cae…`（D-127 `docs/commander-log/decisions.md:1146`）；🔴 新前置=B7 的 T02 digest/exposure freeze 先于 S9（审计 P1-02） |
+| B1a | S8 1800 训练执行（legacy 点火 authority） | **BLOCKED**（B1b DONE + human key 未齐） | preflight `READY_TO_IGNITE` rc0（s8-preflight-check.sh 实测）——待磊哥窗口令 |
+| B1b | S8 G1 closure receipt 链（nonce/prelaunch inventory/completion seal） | **PLANNED**（代码已 merge，不等于 closure package DONE） | `runs/2026-07-10-ma13/reports/S8-IGNITION-READINESS-REFRESH.md:4` 总态 PARTIAL：launcher 点火窗接线未执行。⭐点火前完成，否则 9-11h 产物无法被 B6/V8 诚实消费 |
+| B2 | S9 三臂 eval | **BLOCKED**（S8 + B7/T02 freeze 未齐） | holdout FROZEN 61 行四桶 33/9/10/9，sha256 `77853cae…`（D-127 `docs/commander-log/decisions.md:1146`）；🔴 新前置=B7 的 T02 digest/exposure freeze 先于 S9（审计 P1-02） |
 | B3 | S9b + S10 verdict | PLAN | 模板+四类分流 D-114 预拍；🔴 前置=T01/T02 RATIFIED（§二） |
 | B4 | S11 renderer ack | PLAN | v5 §一 序 |
 | B5 | C2 扩挂载（三档表零临场） | PLAN | gate=S10 verdict |
 | B6 | 翻绿 promotion transaction（去重后独占部分） | PLAN | greening v3-DRAFT 的 G1-G8 与 B1/B2/W1-W3/V8 重叠（审计 P1-01）——B6 只保留 promotion 独占事务，G8 join 归 V8 |
-| B7 | T02 corpus/regen/denominator 收敛 | PARTIALLY_RATIFIED（D-144；freeze→S9 硬边不变） | Wave G2；含 release corpus freeze（前移到 S9 前） |
+| B7 | T02 corpus/regen/denominator 收敛 | **BLOCKED**（decision partial；freeze→S9 硬边不变） | Wave G2；含 release corpus freeze（前移到 S9 前） |
 
 ### 接线链（13 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
 | W1 | int-v5a：matrix rename（canDemo→actionDemoProven）+ canonical contract bundle/default runner（App diff-free） | **DONE**（merge ba2c3636，D-145） | 审计链=XAUDIT→修复→RECHECK 全 FIXED+commander 三件套亲跑 784/6/0 |
-| W2 | int-v5b：deny-first frontstage admission + customer MicDock→façade + frontstage receipt + run-identity ABI | READY_AFTER_V5A | `SPEC-v5b:4-8` status=READY_FOR_POST_V5A_DISPATCH；🔴 其中 **customer façade/default composition 部分另需 T03/T04 interface cut RATIFIED**（审计 P1-03——防 customer code 再跑在 authority 前）；不依赖 T04 的 deny-first containment 部分可随 v5a 后先行 |
-| W3 | int-v5c：witness + probe catalog | READY_AFTER_V5A_V5B | `SPEC-v5c:4-8`（要 v5b authenticated receipt） |
-| W4 | int-v5d：reliability（p95≤800ms/20-turn/300s soak） | READY_AFTER_V5ABC | `SPEC-v5d:4-8` READY_AFTER_EXACT_PREDECESSORS |
+| W2 | int-v5b：deny-first frontstage admission + customer MicDock→façade + frontstage receipt + run-identity ABI | **BLOCKED**（containment 已有独立进展；固定 29 包整包仍等 T03/T04 cut） | `SPEC-v5b:4-8` status=READY_FOR_POST_V5A_DISPATCH；🔴 customer façade/default composition 仍需 T03/T04 interface cut RATIFIED |
+| W3 | int-v5c：witness + probe catalog | **BLOCKED**（W1/W2 DONE receipts 未齐） | `SPEC-v5c:4-8`（要 v5b authenticated receipt） |
+| W4 | int-v5d：reliability（p95≤800ms/20-turn/300s soak） | **BLOCKED**（W1/W2/W3 DONE receipts 未齐） | `SPEC-v5d:4-8` READY_AFTER_EXACT_PREDECESSORS |
 | W5a | T04a ingress façade（text 输入/统一 ingress 语义/校验） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；T04 弹药 Q1-Q4 |
 | W5b | local model artifact/load readiness（MLX/Qwen 供给+预热） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；仓内无 MLX runtime 依赖（GAP-HUNT T04 段）；artifact identity 与 T06 咬合 |
 | W5c | T04b production composition root（唯一装配点/default backend） | RATIFIED_PENDING_PLAN（D-143；硬边 T03✅+T09⏳ 未齐禁实装） | Wave G1 grill + 🔴 前置=T03+T09 contract cut（审计 P1-02：production composition 只能消费 route/lifecycle 边界） |
@@ -58,7 +60,7 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 ### 验收链（8 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
-| V1 | T01 C6 量尺 authority 归并/阈值/promotion | PARTIALLY_RATIFIED（D-144；12 parent 上抛在途） | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
+| V1 | T01 C6 量尺 authority 归并/阈值/promotion | **BLOCKED**（decision partial；12 parent 上抛在途） | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
 | V2 | T07 operator-pass ceremony（T07a ceremony contract / T07b final operator run） | GAP | Wave G3；🔴 T07b 前置=T06 artifact/build identity（审计 P1-02） |
 | V3 | T11 性能门归属（PF1 + int-v5d receipt 进 closure verdict） | GAP | Wave G4 |
 | V4 | T06 S6 Mac 打包边界（audience/artifact/签名公证 in-out） | GAP | Wave G4；U43 internal-only 已锁 |
@@ -68,18 +70,50 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | V8 | closure verdict join（五门 receipt 机械汇签，same-subject join） | GAP | 制度物=O4 schema；join key（repo_head/build/model/contract/corpus/scorer）任一不同或缺失=BLOCKED（审计 P1-04） |
 
 ### 进度 verdict（可复算口径；本表为**最后一次手写账**，O2 checker 落地后由机械生成接管）
-- 计数源=本节三表逐行（训练 8 + 接线 13 + 验收 8 = **29**；2026-07-11 D-143/144/145 翻转后过渡性重算，O2 checker 落地后接管）：**DONE = 1/29（W1）**；RUNNING = 1（W2 containment 半）；READY_AFTER_HUMAN_KEY = 1（B1a）；READY_AFTER_PREDECESSORS = 3（B2/W3/W4）；RATIFIED_PENDING_PLAN = 5（W5a-d/W6）；PARTIALLY_RATIFIED = 2（V1/B7）；PLAN = 7（B1b 补丁已 merge 留 launcher 侧/B3/B4/B5/B6/V6p/V7）；GAP = **9**（W7-W10/V2-V5/V8）。合计 1+1+1+3+5+2+7+9=29 ✓。
+- canonical 计数只认下方 O1 generated table：**done=1 / blocked=7 / planned=12 / gap=9 / ready=running=paused=0**；三表中的代码 merge、partial ratification 与 containment 子进展仅作 reason/provenance，不再占用 execution_state 枚举。
 - **hard closure 分母 = 28**（29 − V5 accounting；W10 计 hard 但只含 TTS 门收敛面，stretch ASR 不进硬门）。
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
 
-<!-- O1:GENERATED:START registry_sha256=81ade16892999da13e8389d1aed10bae7ab52bd06aac3b1f7692274ddc9e5d61 checker_sha256=fbea005a32d9734b4bc61b4880e081fabcf596182623b99f55410906f68214ba -->
+<!-- O1:GENERATED:START registry_sha256=ca931cdcb4441b076e48c5715f9cbdd34ed925d4bf391a412dee7b8202e21f9b checker_sha256=382aa10bfdad2697cb60c10eafda7c3c5d9cad8ef0f6d55bdac3fb6522895b84 -->
 | O1 checker field | derived value |
 |---|---:|
 | packages | 29 |
 | hard leaf denominator | 28 |
 | execution | done=1; ready=0; blocked=7; planned=12; gap=9; running=0; paused=0 |
-| count token | `O1COUNTv1{registry=81ade16892999da13e8389d1aed10bae7ab52bd06aac3b1f7692274ddc9e5d61;packages=29;hard=28;done=1;ready=0;blocked=7;planned=12;gap=9;running=0;paused=0}` |
+| count token | `O1COUNTv1{registry=ca931cdcb4441b076e48c5715f9cbdd34ed925d4bf391a412dee7b8202e21f9b;packages=29;hard=28;done=1;ready=0;blocked=7;planned=12;gap=9;running=0;paused=0}` |
+
+| package | decision_state | execution_state | proof_state |
+|---|---|---|---|
+| B1a | ratified | blocked | partial |
+| B1b | ratified | planned | none |
+| B2 | ratified | blocked | partial |
+| B3 | draft | planned | none |
+| B4 | draft | planned | none |
+| B5 | draft | planned | none |
+| B6 | draft | planned | none |
+| B7 | draft | blocked | none |
+| W1 | ratified | done | satisfied |
+| W2 | ratified | blocked | partial |
+| W3 | ratified | blocked | none |
+| W4 | ratified | blocked | none |
+| W5a | ratified | planned | none |
+| W5b | ratified | planned | none |
+| W5c | ratified | planned | none |
+| W5d | ratified | planned | none |
+| W6 | ratified | planned | none |
+| W7 | draft | gap | none |
+| W8 | draft | gap | none |
+| W9 | draft | gap | none |
+| W10 | draft | gap | none |
+| V1 | draft | blocked | none |
+| V2 | draft | gap | none |
+| V3 | draft | gap | none |
+| V4 | draft | gap | none |
+| V5 | draft | gap | none |
+| V6p | draft | planned | partial |
+| V7 | draft | planned | none |
+| V8 | draft | gap | none |
 <!-- O1:GENERATED:END -->
 
 ## 二、三链重排（谁供给谁 + 硬前置；本节是视图，真相=§一 表）

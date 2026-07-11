@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/schemas/closure-package-exit-envelope.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_schema_major", "registry_digest", "package_id", "package_revision", "native_receipt_schema_id", "native_receipt", "native_receipt_digest", "status", "subject_schema_id", "subject"],
+  "properties": {
+    "schema_version": {"const": "closure_package_exit_envelope_v1"},
+    "registry_schema_major": {"const": "closure_work_packages_v1"},
+    "registry_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "package_id": {"type": "string", "pattern": "^[A-Z][A-Za-z0-9]{0,15}$"},
+    "package_revision": {"type": "integer", "minimum": 1},
+    "native_receipt_schema_id": {"type": "string", "minLength": 1},
+    "native_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["root", "path", "sha256"],
+      "properties": {
+        "root": {"enum": ["repo", "run_dir", "runs_archive", "build"]},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "native_receipt_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"const": "DONE"},
+    "subject_schema_id": {"type": "string", "minLength": 1},
+    "subject": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "value_type", "value"],
+        "properties": {
+          "key": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+          "value_type": {"enum": ["git_sha", "sha256", "string", "integer", "boolean"]},
+          "value": {}
+        }
+      }
+    }
+  }
+}

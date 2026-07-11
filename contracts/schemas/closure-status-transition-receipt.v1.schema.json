@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/schemas/closure-status-transition-receipt.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "package_id", "package_revision", "sequence", "from_state", "to_state", "trigger_decision", "evidence", "repo_head", "command_rc", "reviewer"],
+  "properties": {
+    "schema_version": {"const": "closure_status_transition_receipt_v1"},
+    "package_id": {"type": "string", "pattern": "^[A-Z][A-Za-z0-9]{0,15}$"},
+    "package_revision": {"type": "integer", "minimum": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "from_state": {"enum": ["gap", "planned", "blocked", "ready", "running", "paused", "done", "failed"]},
+    "to_state": {"enum": ["gap", "planned", "blocked", "ready", "running", "paused", "done", "failed"]},
+    "trigger_decision": {"type": "string", "minLength": 1},
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["root", "path", "sha256"],
+      "properties": {
+        "root": {"enum": ["repo", "run_dir", "runs_archive", "build"]},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "repo_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "command_rc": {"type": "integer", "minimum": 0},
+    "reviewer": {"type": "string", "minLength": 1}
+  }
+}

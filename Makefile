@@ -41,8 +41,10 @@ verify-closure-work-packages: .venv/.deps.stamp
 	$(PYTHON) -m pytest -q Tests/test_closure_work_packages.py
 	$(PYTHON) scripts/check_closure_work_packages.py check \
 		--registry contracts/closure-work-packages.v1.yaml \
+		--schema contracts/schemas/closure-work-packages.v1.schema.json \
 		--roadmap docs/roadmap-2026-07-11-v6-closure-baseline.md \
 		--o6-policy contracts/closure-execution-window.v1.yaml \
+		--subject-head "$$(git rev-parse HEAD)" \
 		--receipt .build/closure/closure-registry-check.v1.json
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
@@ -51,13 +53,13 @@ verify-all: verify swift-test
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-ci-receipt diff test swift-test verify-contentview-wiring
+verify-ci: verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-closure-work-packages verify-ci-receipt diff test swift-test verify-contentview-wiring
 
 # Source-free C1 checkers are hard CI dependencies. Missing files must stop verify-ci
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.
 verify-c1-checker-files:
 	@status=0; \
-	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/check_action_demo_proven_legacy_tokens.py Tools/checks/check_int_v5a_execution_receipt.py Tools/checks/run_swift_test_exact.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py; do \
+	for checker in Tools/checks/check_c1_ownership_map.py Tools/checks/check_runtime_finite_reason_authority.py Tools/checks/check_action_demo_proven_legacy_tokens.py Tools/checks/check_int_v5a_execution_receipt.py Tools/checks/run_swift_test_exact.py Tools/checks/check_fallback_scripts.py scripts/check_s10_receipt.py scripts/check_closure_work_packages.py contracts/closure-work-packages.v1.yaml contracts/schemas/closure-work-packages.v1.schema.json contracts/schemas/closure-status-transition-receipt.v1.schema.json contracts/schemas/closure-package-exit-envelope.v1.schema.json contracts/schemas/closure-gate-receipt.v1.schema.json contracts/closure-execution-window.v1.yaml Tests/test_closure_work_packages.py; do \
 		if [ ! -f "$$checker" ]; then \
 			echo "ERROR_MISSING_C1_CHECKER $$checker" >&2; \
 			status=1; \

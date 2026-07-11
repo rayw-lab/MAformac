@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from jsonschema import Draft202012Validator, FormatChecker
 
 
 SCHEMA_VERSION = "closure_work_packages_v1"
@@ -44,6 +45,16 @@ MARKER_RE = re.compile(
 )
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 GIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+TRANSITION_SCHEMA_PATH = ROOT / "contracts" / "schemas" / "closure-status-transition-receipt.v1.schema.json"
+EXIT_ENVELOPE_SCHEMA_PATH = ROOT / "contracts" / "schemas" / "closure-package-exit-envelope.v1.schema.json"
+GATE_RECEIPT_SCHEMA_PATH = ROOT / "contracts" / "schemas" / "closure-gate-receipt.v1.schema.json"
+ALLOWED_TRANSITIONS = {
+    ("gap", "planned"), ("gap", "blocked"),
+    ("planned", "ready"), ("blocked", "ready"),
+    ("ready", "running"),
+    ("running", "paused"), ("running", "done"), ("running", "failed"),
+    ("paused", "ready"), ("paused", "running"), ("paused", "failed"),
+}
 
 
 class DuplicateKeyError(ValueError):
@@ -87,6 +98,62 @@ def registry_digest(registry: dict[str, Any]) -> str:
 
 def checker_digest() -> str:
     return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+
+def file_digest(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def git_blob_digest(repo_head: str, relative_path: str) -> str:
+    if not GIT_SHA_RE.fullmatch(repo_head) or relative_path.startswith("/") or ".." in Path(relative_path).parts:
+        raise CheckFailure("E_TRANSITION", "invalid git evidence subject")
+    result = subprocess.run(
+        ["git", "show", f"{repo_head}:{relative_path}"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise CheckFailure("E_TRANSITION", "transition evidence is absent at declared repo head")
+    return hashlib.sha256(result.stdout).hexdigest()
+
+
+def is_ancestor(ancestor: str, descendant: str) -> bool:
+    return subprocess.run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    ).returncode == 0
+
+
+def typed_value_is_valid(value_type: Any, value: Any) -> bool:
+    if value_type == "git_sha":
+        return isinstance(value, str) and bool(GIT_SHA_RE.fullmatch(value))
+    if value_type == "sha256":
+        return isinstance(value, str) and bool(SHA256_RE.fullmatch(value))
+    if value_type == "string":
+        return isinstance(value, str)
+    if value_type == "integer":
+        return isinstance(value, int) and not isinstance(value, bool)
+    if value_type == "boolean":
+        return isinstance(value, bool)
+    return False
+
+
+def load_json(path: Path, code: str) -> dict[str, Any]:
+    try:
+        value = json.loads(read_utf8(path))
+    except (OSError, json.JSONDecodeError, CheckFailure) as exc:
+        raise CheckFailure(code, f"invalid JSON artifact: {path}") from exc
+    if not isinstance(value, dict):
+        raise CheckFailure(code, f"JSON artifact must be an object: {path}")
+    return value
+
+
+def schema_errors(instance: Any, schema: dict[str, Any]) -> list[str]:
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    return [error.message for error in validator.iter_errors(instance)]
 
 
 def read_utf8(path: Path) -> str:
@@ -175,7 +242,10 @@ def source_basis_text(roadmap_text: str) -> str:
     # The generated block is inserted after the source paragraph's blank line.
     # Removing the whole match (rather than replacing it with another newline)
     # restores the pre-generated source byte stream for R19.
-    return MARKER_RE.sub("", roadmap_text)
+    without_generated = MARKER_RE.sub("", roadmap_text)
+    # R18 exclusively owns count-token placement.  Excluding standalone tokens
+    # from the R19 source digest keeps one mutation mapped to one exact error.
+    return re.sub(r"(?:^|\n)O1COUNTv1\{[^\r\n]*\}\n?", "\n", without_generated)
 
 
 def derive_counts(packages: list[dict[str, Any]]) -> dict[str, int]:
@@ -215,6 +285,11 @@ def render_generated_block(registry: dict[str, Any]) -> str:
     digest = registry_digest(registry)
     counts = derive_counts(registry["packages"])
     token = count_token(digest, counts)
+    rows = [
+        f"| {package['id']} | {package['decision_state']['declared']} | "
+        f"{package['execution_state']['declared']} | {package['proof_state']['declared']} |"
+        for package in registry["packages"]
+    ]
     return "\n".join(
         [
             f"<!-- O1:GENERATED:START registry_sha256={digest} checker_sha256={checker_digest()} -->",
@@ -224,6 +299,10 @@ def render_generated_block(registry: dict[str, Any]) -> str:
             f"| hard leaf denominator | {counts['hard_leaf_denominator']} |",
             f"| execution | done={counts['done']}; ready={counts['ready']}; blocked={counts['blocked']}; planned={counts['planned']}; gap={counts['gap']}; running={counts['running']}; paused={counts['paused']} |",
             f"| count token | `{token}` |",
+            "",
+            "| package | decision_state | execution_state | proof_state |",
+            "|---|---|---|---|",
+            *rows,
             "<!-- O1:GENERATED:END -->",
         ]
     )
@@ -248,31 +327,17 @@ V8_SUBJECT_KEYS = {
     "architecture_gate_receipt_sha256", "demo_gate_receipt_sha256", "honesty_gate_receipt_sha256",
     "operator_ceremony_receipt_sha256",
 }
+V8_SHARED_SUBJECT_KEYS = {
+    "repo_head", "build_identity", "base_model_sha256", "adapter_sha256", "tokenizer_sha256",
+    "contract_bundle_sha256", "matrix_sha256", "corpus_sha256", "scorer_sha256", "checker_bundle_sha256",
+}
 
 
-def validate_shape(registry: dict[str, Any]) -> list[str]:
-    errors: list[str] = []
-    if not isinstance(registry, dict) or set(registry) != REQUIRED_TOP_LEVEL:
+def validate_shape(registry: dict[str, Any], schema: dict[str, Any]) -> list[str]:
+    if schema_errors(registry, schema):
         return ["E_SCHEMA"]
-    if registry.get("schema_version") != SCHEMA_VERSION:
-        errors.append("E_SCHEMA")
-    if registry.get("artifact_kind") != "closure_work_packages_registry":
-        errors.append("E_SCHEMA")
-    if not isinstance(registry.get("packages"), list):
-        errors.append("E_SCHEMA")
-        return errors
+    errors: list[str] = []
     for package in registry["packages"]:
-        if not isinstance(package, dict) or set(package) != REQUIRED_PACKAGE:
-            errors.append("E_SCHEMA")
-            continue
-        if package["execution_state"].get("declared") not in ALLOWED_EXECUTION:
-            errors.append("E_SCHEMA")
-        if package["decision_state"].get("declared") not in {"draft", "ratified", "retired"}:
-            errors.append("E_SCHEMA")
-        if package["proof_state"].get("declared") not in {"none", "partial", "satisfied", "blocked"}:
-            errors.append("E_SCHEMA")
-        if package["exit_receipt"].get("envelope_schema_id") != ENVELOPE_VERSION:
-            errors.append("E_SCHEMA")
         for command in package["check_command"].values():
             if not command_is_safe(command):
                 errors.append("E_COMMAND_UNSAFE")
@@ -292,10 +357,14 @@ def apply_fixture(
         target = patch["target"]
         if target == "registry":
             match = re.fullmatch(r"/packages/by-id/([^/]+)/(.*)", patch["path"])
-            if not match or match.group(1) not in by_id:
+            if match and match.group(1) in by_id:
+                node: Any = by_id[match.group(1)]
+                parts = match.group(2).split("/")
+            elif re.fullmatch(r"/(basis|source_snapshot)/[A-Za-z0-9_]+", patch["path"]):
+                parts = patch["path"].removeprefix("/").split("/")
+                node = result
+            else:
                 raise CheckFailure("E_SCHEMA", f"unsupported registry patch: {patch}")
-            node: Any = by_id[match.group(1)]
-            parts = match.group(2).split("/")
             for part in parts[:-1]:
                 node = node[part]
             node[parts[-1]] = patch["value"]
@@ -331,33 +400,79 @@ def validate_resource_policy(policy: dict[str, Any]) -> tuple[dict[str, set[str]
     return claims, pairs
 
 
+def native_receipt_value(path: Path, pointer: str) -> Any:
+    if path.suffix == ".json":
+        value: Any = load_json(path, "E_DONE_RECEIPT")
+    else:
+        raw = read_utf8(path)
+        match = re.search(r"~~~yaml\s*\n(.*?)\n~~~", raw, re.DOTALL)
+        if not match:
+            raise CheckFailure("E_DONE_RECEIPT", f"native receipt has no YAML metadata: {path}")
+        value = yaml.safe_load(match.group(1))
+    for part in pointer.removeprefix("/").split("/"):
+        if not isinstance(value, dict) or part not in value:
+            raise CheckFailure("E_DONE_RECEIPT", f"native success pointer not found: {pointer}")
+        value = value[part]
+    return value
+
+
 def load_done_receipts(
     registry: dict[str, Any], packages: dict[str, dict[str, Any]], fixture_mode: bool
 ) -> tuple[dict[str, dict[str, Any]], list[str]]:
     receipts: dict[str, dict[str, Any]] = {}
     errors: list[str] = []
     digest = registry_digest(registry)
+    envelope_schema = load_json(EXIT_ENVELOPE_SCHEMA_PATH, "E_SCHEMA")
     for package in packages.values():
         if package["execution_state"]["declared"] != "done":
             continue
         try:
             path = artifact_path(registry, package["exit_receipt"]["artifact"])
-            payload = json.loads(read_utf8(path))
-        except (CheckFailure, OSError, json.JSONDecodeError):
+            payload = load_json(path, "E_DONE_RECEIPT")
+        except (CheckFailure, OSError):
             errors.append("E_DONE_RECEIPT")
             continue
         if fixture_mode:
             payload["registry_digest"] = digest
-        if (
-            payload.get("schema_version") != ENVELOPE_VERSION
-            or payload.get("registry_schema_major") != SCHEMA_VERSION
+        if schema_errors(payload, envelope_schema):
+            errors.append("E_DONE_RECEIPT")
+            continue
+        revision_mismatch = (
+            payload.get("registry_schema_major") != SCHEMA_VERSION
             or payload.get("registry_digest") != digest
             or payload.get("package_id") != package["id"]
             or payload.get("package_revision") != package["revision"]
+        )
+        if revision_mismatch:
+            errors.append("E_RECEIPT_REVISION")
+            continue
+        if (
+            payload.get("schema_version") != ENVELOPE_VERSION
             or payload.get("native_receipt_schema_id") != package["exit_receipt"]["native_schema_id"]
             or payload.get("status") != "DONE"
             or payload.get("subject_schema_id") != package["exit_receipt"]["subject_schema_id"]
             or not SHA256_RE.fullmatch(str(payload.get("native_receipt_digest", "")))
+        ):
+            errors.append("E_DONE_RECEIPT")
+            continue
+        native_ref = package["exit_receipt"].get("native_artifact")
+        if not isinstance(native_ref, dict) or payload.get("native_receipt") != {
+            "root": native_ref.get("root"), "path": native_ref.get("path"), "sha256": native_ref.get("sha256")
+        }:
+            errors.append("E_DONE_RECEIPT")
+            continue
+        try:
+            native_path = artifact_path(registry, native_ref)
+            native_digest = file_digest(native_path)
+            success_value = native_receipt_value(native_path, package["exit_receipt"]["success_pointer"])
+        except (CheckFailure, OSError):
+            errors.append("E_DONE_RECEIPT")
+            continue
+        if (
+            native_ref.get("availability") != "existing"
+            or native_ref.get("sha256") != native_digest
+            or payload.get("native_receipt_digest") != native_digest
+            or success_value not in package["exit_receipt"]["success_values"]
         ):
             errors.append("E_DONE_RECEIPT")
             continue
@@ -368,12 +483,7 @@ def load_done_receipts(
             if key in subject_keys or not isinstance(key, str):
                 valid_subject = False
             subject_keys.add(key)
-            if value_type == "git_sha":
-                valid_subject = valid_subject and isinstance(value, str) and bool(GIT_SHA_RE.fullmatch(value))
-            elif value_type == "sha256":
-                valid_subject = valid_subject and isinstance(value, str) and bool(SHA256_RE.fullmatch(value))
-            elif value_type not in {"string", "integer", "boolean"}:
-                valid_subject = False
+            valid_subject = valid_subject and typed_value_is_valid(value_type, value)
         if not valid_subject:
             errors.append("E_DONE_RECEIPT")
             continue
@@ -381,11 +491,141 @@ def load_done_receipts(
     return receipts, errors
 
 
+def validate_transition_chain(registry: dict[str, Any], package: dict[str, Any]) -> list[str]:
+    state = package["execution_state"]["declared"]
+    refs = package["execution_state"]["transition_receipts"]
+    if state not in {"ready", "running", "paused", "done", "failed"}:
+        return [] if not refs else ["E_TRANSITION"]
+    if not refs:
+        return ["E_TRANSITION"]
+    schema = load_json(TRANSITION_SCHEMA_PATH, "E_SCHEMA")
+    receipts: list[dict[str, Any]] = []
+    for ref in refs:
+        try:
+            path = artifact_path(registry, ref)
+            payload = load_json(path, "E_TRANSITION")
+        except CheckFailure:
+            return ["E_TRANSITION"]
+        if schema_errors(payload, schema):
+            return ["E_TRANSITION"]
+        evidence = payload["evidence"]
+        evidence_ref = {"root": evidence["root"], "path": evidence["path"], "availability": "existing", "sha256": evidence["sha256"]}
+        try:
+            evidence_path = artifact_path(registry, evidence_ref)
+            head_ok = is_ancestor(payload["repo_head"], registry["basis"]["repo_head"])
+            if evidence["root"] == "repo":
+                evidence_ok = evidence_path.is_file() and git_blob_digest(
+                    payload["repo_head"], evidence["path"]
+                ) == evidence["sha256"]
+            else:
+                evidence_ok = evidence_path.is_file() and file_digest(evidence_path) == evidence["sha256"]
+        except (CheckFailure, OSError):
+            evidence_ok = head_ok = False
+        if (
+            payload["package_id"] != package["id"]
+            or payload["package_revision"] != package["revision"]
+            or not evidence_ok
+            or not head_ok
+            or payload["command_rc"] != 0
+        ):
+            return ["E_TRANSITION"]
+        receipts.append(payload)
+    receipts.sort(key=lambda item: item["sequence"])
+    if [item["sequence"] for item in receipts] != list(range(1, len(receipts) + 1)):
+        return ["E_TRANSITION"]
+    if receipts[0]["from_state"] != "gap" or receipts[-1]["to_state"] != state:
+        return ["E_TRANSITION"]
+    final_head = receipts[-1]["repo_head"]
+    if any(not is_ancestor(receipt["repo_head"], final_head) for receipt in receipts[:-1]):
+        return ["E_TRANSITION"]
+    for index, receipt in enumerate(receipts):
+        if (receipt["from_state"], receipt["to_state"]) not in ALLOWED_TRANSITIONS:
+            return ["E_TRANSITION"]
+        if index:
+            previous = receipts[index - 1]
+            if previous["to_state"] != receipt["from_state"]:
+                return ["E_TRANSITION"]
+    return []
+
+
+def typed_subject_map(payload: dict[str, Any]) -> dict[str, tuple[str, Any]]:
+    result: dict[str, tuple[str, Any]] = {}
+    for item in payload.get("subject", []):
+        key = item.get("key")
+        if not isinstance(key, str) or key in result:
+            raise CheckFailure("E_SUBJECT_JOIN", "duplicate or invalid typed subject key")
+        value_type, value = item.get("value_type"), item.get("value")
+        if not typed_value_is_valid(value_type, value):
+            raise CheckFailure("E_SUBJECT_JOIN", "typed subject value does not match value_type")
+        result[key] = (value_type, value)
+    return result
+
+
+def validate_v8_same_subject(inputs: list[tuple[str, Path]]) -> list[str]:
+    expected_gate_ids = {"model", "capability", "architecture", "demo", "honesty", "operator"}
+    if len(inputs) != 6 or {gate_id for gate_id, _ in inputs} != expected_gate_ids:
+        return ["E_SUBJECT_JOIN"]
+    schema = load_json(GATE_RECEIPT_SCHEMA_PATH, "E_SCHEMA")
+    reference: dict[str, tuple[str, Any]] | None = None
+    for gate_id, path in inputs:
+        try:
+            payload = load_json(path, "E_SUBJECT_JOIN")
+            if schema_errors(payload, schema) or payload.get("gate_id") != gate_id or payload.get("status") != "PASS":
+                return ["E_SUBJECT_JOIN"]
+            subject = typed_subject_map(payload)
+        except (CheckFailure, OSError):
+            return ["E_SUBJECT_JOIN"]
+        if set(subject) != V8_SHARED_SUBJECT_KEYS:
+            return ["E_SUBJECT_JOIN"]
+        if reference is None:
+            reference = subject
+        elif subject != reference:
+            return ["E_SUBJECT_JOIN"]
+    return []
+
+
+def validate_v8_join(
+    registry: dict[str, Any], package: dict[str, Any], v8_receipt: dict[str, Any]
+) -> list[str]:
+    join_inputs = package["exit_receipt"].get("join_inputs", [])
+    inputs: list[tuple[str, Path]] = []
+    digest_keys: dict[str, str] = {}
+    for item in join_inputs:
+        artifact = item.get("artifact", {})
+        if artifact.get("availability") != "existing":
+            return ["E_SUBJECT_JOIN"]
+        try:
+            path = artifact_path(registry, artifact)
+        except CheckFailure:
+            return ["E_SUBJECT_JOIN"]
+        inputs.append((item.get("gate_id"), path))
+        digest_keys[item.get("digest_subject_key")] = file_digest(path) if path.is_file() else ""
+    errors = validate_v8_same_subject(inputs)
+    if errors:
+        return errors
+    try:
+        v8_subject = typed_subject_map(v8_receipt)
+        first_gate = load_json(inputs[0][1], "E_SUBJECT_JOIN")
+        shared_subject = typed_subject_map(first_gate)
+    except (CheckFailure, OSError):
+        return ["E_SUBJECT_JOIN"]
+    if set(v8_subject) != V8_SUBJECT_KEYS:
+        return ["E_SUBJECT_JOIN"]
+    for key, value in shared_subject.items():
+        if v8_subject.get(key) != value:
+            return ["E_SUBJECT_JOIN"]
+    for key, digest in digest_keys.items():
+        if v8_subject.get(key) != ("sha256", digest):
+            return ["E_SUBJECT_JOIN"]
+    return []
+
+
 def validate_registry(
-    registry: dict[str, Any], roadmap_text: str, policy: dict[str, Any], policy_path: Path,
+    registry: dict[str, Any], schema: dict[str, Any], schema_path: Path, roadmap_text: str,
+    policy: dict[str, Any], policy_path: Path, subject_head: str,
     fixture_mode: bool, leases: list[dict[str, Any]]
 ) -> tuple[list[str], dict[str, Any]]:
-    errors = validate_shape(registry)
+    errors = validate_shape(registry, schema)
     packages_list = registry.get("packages", [])
     if errors:
         return sorted(set(errors)), {}
@@ -423,6 +663,7 @@ def validate_registry(
     source_sha = sha256_text(source_basis_text(roadmap_text))
     if (
         basis["repo_head"] != snapshot["repo_head"]
+        or basis["repo_head"] != subject_head
         or basis["roadmap_sha256"] != snapshot["source_sha256"]
         or basis["roadmap_sha256"] != source_sha
         or basis["roadmap_path"] != snapshot["source_path"]
@@ -567,17 +808,7 @@ def validate_registry(
             external_ok = all(facts.get(gate["fact_id"], {}).get("status") == "satisfied" for gate in package["external_gates"])
             if not prereq_ok or not external_ok or not command_available(package["check_command"]["entry"]):
                 errors.append("E_READY_PREREQUISITE")
-        if state in {"ready", "running", "paused", "done"}:
-            transitions = package["execution_state"]["transition_receipts"]
-            if not transitions:
-                errors.append("E_TRANSITION")
-            for transition in transitions:
-                try:
-                    transition_path = artifact_path(registry, transition)
-                    if transition["availability"] == "existing" and not transition_path.is_file():
-                        errors.append("E_TRANSITION")
-                except CheckFailure:
-                    errors.append("E_TRANSITION")
+        errors.extend(validate_transition_chain(registry, package))
         profile = profiles.get(package["proof_profile_id"])
         if profile is None:
             errors.append("E_PROOF_PROMOTION")
@@ -593,9 +824,7 @@ def validate_registry(
             if not run_command(package["check_command"]["exit"]):
                 errors.append("E_DONE_RECEIPT")
     if packages["V8"]["execution_state"]["declared"] == "done":
-        v8_subject = {entry["key"] for entry in receipts.get("V8", {}).get("subject", [])}
-        if v8_subject != V8_SUBJECT_KEYS:
-            errors.append("E_SUBJECT_JOIN")
+        errors.extend(validate_v8_join(registry, packages["V8"], receipts.get("V8", {})))
     counts = derive_counts(packages_list)
     if counts["hard_leaf_denominator"] != 28:
         errors.append("E_COUNTING")
@@ -613,9 +842,9 @@ def validate_registry(
         "registry_digest": registry_digest(registry),
         "source_snapshot_sha256": snapshot["source_sha256"],
         "o6_resource_policy_sha256": sha256_text(canonical_json(policy)),
-        "schema_sha256": sha256_text("closure_work_packages_v1_manual_schema"),
+        "schema_sha256": file_digest(schema_path),
         "checker_sha256": checker_digest(),
-        "repo_head": basis["repo_head"],
+        "repo_head": subject_head,
         "resource_holds": [package_id for package_id, _ in running_resources],
     }
     if resource_errors:
@@ -672,6 +901,10 @@ def command_check(args: argparse.Namespace) -> int:
     receipt_path = Path(args.receipt)
     try:
         registry = load_yaml(registry_path)
+        schema_path = Path(args.schema)
+        schema = load_json(schema_path, "E_SCHEMA")
+        if not GIT_SHA_RE.fullmatch(args.subject_head):
+            raise CheckFailure("E_STALE_BASIS", "checked subject head must be a 40-character lowercase git SHA")
         roadmap_text = read_utf8(roadmap_path)
         policy_path = Path(args.o6_policy)
         policy = load_yaml(policy_path)
@@ -684,7 +917,10 @@ def command_check(args: argparse.Namespace) -> int:
                 roadmap_text = MARKER_RE.sub("\n" + generated + "\n", roadmap_text)
             else:
                 roadmap_text = roadmap_text.rstrip("\n") + "\n\n" + generated + "\n"
-        errors, metadata = validate_registry(registry, roadmap_text, policy, policy_path, fixture_mode, leases)
+        errors, metadata = validate_registry(
+            registry, schema, schema_path, roadmap_text, policy, policy_path,
+            args.subject_head, fixture_mode, leases
+        )
     except CheckFailure as exc:
         errors, metadata = [exc.code], {}
     write_receipt(receipt_path, errors, metadata)
@@ -696,9 +932,11 @@ def parser() -> argparse.ArgumentParser:
     subcommands = result.add_subparsers(dest="command", required=True)
     check = subcommands.add_parser("check")
     check.add_argument("--registry", required=True)
+    check.add_argument("--schema", required=True)
     check.add_argument("--roadmap", required=True)
     check.add_argument("--o6-policy", required=True)
     check.add_argument("--receipt", required=True)
+    check.add_argument("--subject-head", required=True)
     check.add_argument("--fixture")
     render = subcommands.add_parser("render")
     render.add_argument("--registry", required=True)

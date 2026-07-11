@@ -26,6 +26,14 @@ CHECKER_PATHS = (
     Path("Tools/checks/check_action_demo_proven_legacy_tokens.py"),
     Path("Tools/checks/check_int_v5a_execution_receipt.py"),
     Path("scripts/check_s10_receipt.py"),
+    Path("scripts/check_closure_work_packages.py"),
+    Path("contracts/closure-work-packages.v1.yaml"),
+    Path("contracts/schemas/closure-work-packages.v1.schema.json"),
+    Path("contracts/schemas/closure-status-transition-receipt.v1.schema.json"),
+    Path("contracts/schemas/closure-package-exit-envelope.v1.schema.json"),
+    Path("contracts/schemas/closure-gate-receipt.v1.schema.json"),
+    Path("contracts/closure-execution-window.v1.yaml"),
+    Path("Tests/test_closure_work_packages.py"),
 )
 MISSING_MARKER = "ERROR_MISSING_C1_CHECKER"
 OWNERSHIP_TARGET = "verify-c1-ownership"

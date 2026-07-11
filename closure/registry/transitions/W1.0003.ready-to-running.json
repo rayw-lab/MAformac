@@ -1,0 +1,17 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W1",
+  "package_revision": 1,
+  "sequence": 3,
+  "from_state": "ready",
+  "to_state": "running",
+  "trigger_decision": "user-authorized SPEC-CASCADE-EXEC dispatched int-v5a",
+  "evidence": {
+    "root": "repo",
+    "path": "docs/commander-log/decisions.md",
+    "sha256": "222635a870f302cbbf828073d2066f8f5d2862a61816582890fdd3dd79892000"
+  },
+  "repo_head": "ed4aabc42a831d1838820eb89fdbeef3535797b2",
+  "command_rc": 0,
+  "reviewer": "commander"
+}
