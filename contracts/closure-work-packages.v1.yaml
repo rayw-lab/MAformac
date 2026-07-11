@@ -4,18 +4,18 @@ artifact_kind: closure_work_packages_registry
 authority:
   state: ratified
   source_path: docs/commander-log/decisions.md
-  source_sha256: c03cd52187f42dd8c18e28b7132f0a4a6ae2e13eed852c91c1cede9543273837
+  source_sha256: 8e30f72e2ba5d8cc7e563ce85838608af01e95d211b12b2d9b6276058b82b053
   bootstrap_ratification_receipt: null
 basis:
-  repo_head: 6b2ee8b941b5f50e9dc2c8f002b05866cad81ffe
-  captured_at: '2026-07-11T10:38:47+08:00'
+  repo_head: e02998c4c9701a9eaa3cb19a71532a0d791edea2
+  captured_at: '2026-07-11T11:02:18+08:00'
   roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   roadmap_sha256: 264e71d0392499e5dd52b8dff0583a7ec51bf17809d7feae79f588b020fd9c73
 source_snapshot:
   manifest_id: v6_1_source_snapshot_d142_cascade
   source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   source_sha256: 264e71d0392499e5dd52b8dff0583a7ec51bf17809d7feae79f588b020fd9c73
-  repo_head: 6b2ee8b941b5f50e9dc2c8f002b05866cad81ffe
+  repo_head: e02998c4c9701a9eaa3cb19a71532a0d791edea2
   package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
   hard_edges:
     - {from: B7, to: B2}
@@ -65,18 +65,18 @@ external_facts:
   - {id: v6.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
   - {id: t04.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
   - {id: human.s8_window, status: pending, evidence: null}
-  - {id: t01.ratified, status: pending, evidence: null}
-  - {id: t02.ratified, status: pending, evidence: null}
-  - {id: t03.ratified, status: pending, evidence: null}
-  - {id: t03_t04.interface_cut, status: pending, evidence: null}
-  - {id: t05.ratified, status: pending, evidence: null}
-  - {id: t06.ratified, status: pending, evidence: null}
+  - {id: t01.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t02.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t03.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t03_t04.interface_cut, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t05.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t06.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
   - {id: t07.ratified, status: pending, evidence: null}
   - {id: t08.ratified, status: pending, evidence: null}
   - {id: t09.ratified, status: pending, evidence: null}
   - {id: t10.ratified, status: pending, evidence: null}
-  - {id: t11.ratified, status: pending, evidence: null}
-  - {id: t12.ratified, status: pending, evidence: null}
+  - {id: t11.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t12.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
   - {id: default_scope.accepted, status: pending, evidence: null}
   - {id: o4.schema_available, status: pending, evidence: null}
 packages:
@@ -199,8 +199,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: B7, count_in_hard_denominator: true, deliverable_keys: [c6.corpus_lineage]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-144, required_state: ratified}]}
-    execution_state: {declared: blocked, stage: design, readiness_mode: after_predecessors, reason_codes: [t02_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-147, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t02_freeze_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t02.ratified, require_status: satisfied}]
@@ -232,7 +232,7 @@ packages:
     closure_required: true
     counting: {role: leaf, count_key: W2, count_in_hard_denominator: true, deliverable_keys: [int_v5b.closeout]}
     decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-142, required_state: ratified}]}
-    execution_state: {declared: blocked, stage: implementation, readiness_mode: after_predecessors, reason_codes: [t03_t04_cut_pending, fixed_29_package_scope], transition_receipts: []}
+    execution_state: {declared: planned, stage: implementation, readiness_mode: after_predecessors, reason_codes: [containment_merged_remaining_scope_pending, abi_proof_waiver_residual], transition_receipts: []}
     proof_state: {declared: partial, evidence: [], verdict: none}
     prerequisites: [{package_id: W1, require_decision: ratified, require_execution: done, require_receipt: true}]
     external_gates: [{fact_id: t03_t04.interface_cut, require_status: satisfied}]
@@ -407,8 +407,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: W10, count_in_hard_denominator: true, deliverable_keys: [tts.hard_runtime_gate]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W10, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t05_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-147, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [tts_gate_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: [{package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}]
     external_gates: [{fact_id: t05.ratified, require_status: satisfied}]
@@ -423,8 +423,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: V1, count_in_hard_denominator: true, deliverable_keys: [c6.active_authority]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-144, required_state: ratified}]}
-    execution_state: {declared: blocked, stage: design, readiness_mode: after_predecessors, reason_codes: [g2_parent_ballots_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-147, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [c6_authority_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t01.ratified, require_status: satisfied}]
@@ -455,8 +455,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: V3, count_in_hard_denominator: true, deliverable_keys: [performance.closure_gate]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V3, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t11_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-147, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [performance_gate_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: [{package_id: W4, require_decision: ratified, require_execution: done, require_receipt: true}]
     external_gates: [{fact_id: t11.ratified, require_status: satisfied}]
@@ -471,8 +471,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: leaf, count_key: V4, count_in_hard_denominator: true, deliverable_keys: [macos.package_identity]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V4, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t06_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-147, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [macos_package_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t06.ratified, require_status: satisfied}]
@@ -487,8 +487,8 @@ packages:
     scope_class: hard
     closure_required: true
     counting: {role: aggregate, count_key: V5, count_in_hard_denominator: false, deliverable_keys: [line_a.accounting_receipt]}
-    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V5, required_state: draft}]}
-    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t12_ratification_pending], transition_receipts: []}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-147, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [line_a_accounting_plan_pending], transition_receipts: []}
     proof_state: {declared: none, evidence: [], verdict: none}
     prerequisites: []
     external_gates: [{fact_id: t12.ratified, require_status: satisfied}]

@@ -108,7 +108,11 @@ def read_receipt(tmp_path: Path) -> dict[str, object]:
     return json.loads((tmp_path / "closure-registry-check.v1.json").read_text(encoding="utf-8"))
 
 
-def committed_registry_probe(tmp_path: Path, *, include_product_change: bool) -> tuple[subprocess.CompletedProcess[str], dict[str, object]]:
+def committed_registry_probe(
+    tmp_path: Path,
+    *,
+    post_basis_change: str | None = None,
+) -> tuple[subprocess.CompletedProcess[str], dict[str, object]]:
     clone = tmp_path / "postcommit"
     subprocess.run(
         ["git", "clone", "--quiet", "--no-hardlinks", str(REPO), str(clone)],
@@ -120,6 +124,9 @@ def committed_registry_probe(tmp_path: Path, *, include_product_change: bool) ->
         ["git", "rev-parse", "HEAD"], cwd=clone, text=True, capture_output=True, check=True
     ).stdout.strip()
     registry_path = clone / "contracts" / "closure-work-packages.v1.yaml"
+    shutil.copy2(REGISTRY, registry_path)
+    shutil.copy2(ROADMAP, clone / ROADMAP.relative_to(REPO))
+    shutil.copy2(REPO / "closure" / "receipts" / "W1.v1.json", clone / "closure" / "receipts" / "W1.v1.json")
     registry_text = registry_path.read_text(encoding="utf-8")
     registry_text, replacement_count = re.subn(
         r"(?m)^(  repo_head:) [0-9a-f]{40}$",
@@ -131,16 +138,47 @@ def committed_registry_probe(tmp_path: Path, *, include_product_change: bool) ->
     registry_path.write_text(registry_text, encoding="utf-8")
     shutil.copy2(CHECKER, clone / "scripts" / "check_closure_work_packages.py")
     subprocess.run(
-        ["git", "add", "contracts/closure-work-packages.v1.yaml", "scripts/check_closure_work_packages.py"],
+        [
+            "git",
+            "add",
+            "contracts/closure-work-packages.v1.yaml",
+            "closure/receipts/W1.v1.json",
+            "docs/roadmap-2026-07-11-v6-closure-baseline.md",
+            "scripts/check_closure_work_packages.py",
+        ],
         cwd=clone,
         check=True,
     )
     subprocess.run(["git", "commit", "--quiet", "-m", "test: registry-only refresh"], cwd=clone, check=True)
-    if include_product_change:
+    if post_basis_change == "docs":
+        docs_path = clone / "docs" / "r19-whitelist-probe.md"
+        docs_path.write_text("# R19 governance-only probe\n", encoding="utf-8")
+        subprocess.run(["git", "add", str(docs_path.relative_to(clone))], cwd=clone, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "test: docs-only drift"], cwd=clone, check=True)
+    elif post_basis_change == "roadmap_generated_table":
+        roadmap_path = clone / "docs" / "roadmap-2026-07-11-v6-closure-baseline.md"
+        roadmap_text = roadmap_path.read_text(encoding="utf-8")
+        roadmap_text, replacement_count = re.subn(
+            r"(?m)^\| packages \| 29 \|$",
+            "| packages | 30 |",
+            roadmap_text,
+            count=1,
+        )
+        assert replacement_count == 1
+        roadmap_path.write_text(roadmap_text, encoding="utf-8")
+        subprocess.run(["git", "add", str(roadmap_path.relative_to(clone))], cwd=clone, check=True)
+        subprocess.run(
+            ["git", "commit", "--quiet", "-m", "test: unsynchronized generated table"],
+            cwd=clone,
+            check=True,
+        )
+    elif post_basis_change == "core":
         product_path = clone / "Core" / "State" / "DialogueState.swift"
         product_path.write_text(product_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         subprocess.run(["git", "add", "Core/State/DialogueState.swift"], cwd=clone, check=True)
         subprocess.run(["git", "commit", "--quiet", "-m", "test: product drift"], cwd=clone, check=True)
+    elif post_basis_change is not None:
+        raise AssertionError(f"unsupported post-basis change: {post_basis_change}")
     subject_head = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=clone, text=True, capture_output=True, check=True
     ).stdout.strip()
@@ -207,18 +245,37 @@ def test_parent_basis_behind_checked_subject_is_stale(tmp_path: Path) -> None:
 
 
 def test_registry_only_commit_after_basis_remains_fresh(tmp_path: Path) -> None:
-    result, receipt = committed_registry_probe(tmp_path, include_product_change=False)
+    result, receipt = committed_registry_probe(tmp_path)
 
     assert result.returncode == 0, receipt
     assert receipt["status"] == "PASS"
     assert "E_STALE_BASIS" not in receipt["errors"]
 
 
-def test_product_change_after_basis_is_stale(tmp_path: Path) -> None:
-    result, receipt = committed_registry_probe(tmp_path, include_product_change=True)
+def test_docs_only_commit_after_basis_remains_fresh(tmp_path: Path) -> None:
+    result, receipt = committed_registry_probe(tmp_path, post_basis_change="docs")
+
+    assert result.returncode == 0, receipt
+    assert receipt["status"] == "PASS"
+    assert "E_STALE_BASIS" not in receipt["errors"]
+
+
+def test_core_change_after_basis_is_stale(tmp_path: Path) -> None:
+    result, receipt = committed_registry_probe(tmp_path, post_basis_change="core")
 
     assert result.returncode != 0
     assert "E_STALE_BASIS" in receipt["errors"]
+
+
+def test_unsynchronized_roadmap_generated_table_is_not_guarded_by_staleness(tmp_path: Path) -> None:
+    result, receipt = committed_registry_probe(
+        tmp_path,
+        post_basis_change="roadmap_generated_table",
+    )
+
+    assert result.returncode == 68, receipt
+    assert "E_GENERATED_BLOCK_DRIFT" in receipt["errors"]
+    assert "E_STALE_BASIS" not in receipt["errors"]
 
 
 def test_arbitrary_existing_file_cannot_satisfy_w1_transition_chain(tmp_path: Path) -> None:

@@ -132,13 +132,14 @@ def is_ancestor(ancestor: str, descendant: str) -> bool:
 
 STALE_BASIS_ALLOWED_PATHS = (
     re.compile(r"^contracts/closure-work-packages(?:\.[^/]+)?\.yaml$"),
-    re.compile(r"^closure/receipts/"),
+    re.compile(r"^closure/receipts/.*$"),
     re.compile(r"^contracts/schemas/closure-[^/]+\.schema\.json$"),
     re.compile(r"^Tests/test_closure_work_packages\.py$"),
-    re.compile(r"^Tests/Fixtures/closure-registry/"),
+    re.compile(r"^Tests/Fixtures/closure-registry/.*$"),
     re.compile(r"^scripts/check_closure_work_packages\.py$"),
     re.compile(r"^scripts/test_verify_ci_checker_presence\.py$"),
-    re.compile(r"^Makefile$"),
+    re.compile(r"^docs/.*$"),
+    re.compile(r"^openspec/changes/.*$"),
 )
 
 
