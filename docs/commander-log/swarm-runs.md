@@ -116,3 +116,16 @@
 - **纪律沉淀**: worker 回报纪律（REPORT/PROGRESS/BLOCKED 行）+ 3-worker 使用范式入 memory（磊哥点名满意）+ lessons K 段。
 - **收稿=文件+亲核**: 全部 receipt 关键声称经 commander gh/grep/亲跑抽核（562 三路复算 / self-test 复现 / 消费链测试亲读 / spot audit hash 对比）。
 - **UPDATE（2026-07-02 下午～深夜，G7+hermes 闭环段）**: G7A/B/C/D 四切片全合流（PR #17/#18/#19/#20，B1 手写表 BLOCKER 修复 contract 模式）→ hermes GLM-5.2 真异源终审 REQUEST_CHANGES（%44 助理执行位跑通；P1 policy 零校验 + P2×2 dead/no-op 字段；**二层 catch：XG7D 假验证被证伪**）→ 修复轮 PR #21/#22 MERGED（main=`a8fcd245`）+ #23 HIGH 返修中（S-210 第三层不可达，交换审第 8 咬）。**今日累计 11 支 PR 合流（#12-#22）+ 8 个真问题被审计体系咬住**。ops：%43 47min 卡死 kill 重启救援（宪法 §8 PROVEN）；假 hermes subagent 教训（宪法 §8）；外审执行位下沉 worker + 20min 上限 + 角色流转（D-021）。
+
+## run 2026-07-11-ma14（V6 RATIFY→五波 grill→W1/W2/O 控制面收编）
+- **阵容三态**：开场 `%0 commander + %1/%2/%3 主题 worker + %4 luna secretary + %5 sol xhigh auditor`；中场按 AMMO/INDEX/审计/int-v5/C-08/O1O2 滚动复用；后半场模型与角色继续漂移，收稿始终以 run-dir output file 为准，不以静态 roster 或 pane prose 为准。
+- **决策链**：V6 v6.0 被异源审抓 6P0/8P1/1P2→v6.1/D-142 RATIFIED；G1/G2/G4/G5 经 INDEX 对抗审、v4、FINAL-V41 exact-set 三闸→D-143~145；D-147 再将 pool32 全⭐，G2/G4/G5 决策波全闭，S10 的 T01/T02 拍板前置解除，T02 freeze→S9 仍保留。
+- **实现链**：W1 int-v5a merge `ba2c3636`；W2 containment 以 `LEIGE-WAIVER-V5B-ABI-1` 半收编 `95f2d5d5`（waiver≠proof）；G1 第一 tranche 开工，双 risk-ack 覆盖三 CRITICAL 核心符号并补签 ContentView，W5c/T09/default-runner 继续禁止越界。
+- **O1/O2 全链**：implementation→adversarial audit→fix→recheck 先抓 R19 self-HEAD 不可提交；`5a0d0289` 改 commit-stable 后，clean-clone 又以 `9 failed/14 passed` 抓出 `allowed_roots.repo` 绝对路径回指源 worktree；`cec60780/25ecadea` 改为 clone-relocatable 并达 23/23，最终 merge `207ac515`。
+- **C-08**：10 metadata + HOLD2 reconciliation + rebuild-C6 ratification wait resolution 均落；disposition inventory 全清。rebuild-C6 仍是 `draft_needs_human_propose`，只表示可进入人审 propose，不表示已 apply/C6 acceptance/baseline ACTIVE。
+- **G3**：v3 recheck 新抓 basis stale 与 promotion/proof/claim-cap 混轴；v4 已吸收，四集合=`70 auto + 9 noop + 9 excluded + 5 escalate = 93`，状态仍 `DRAFT_V4_PENDING_NARROW_RECHECK`。
+- **监控/收稿事故**：哨兵缺位造成静默完工漏检 3 波（operator-attested）；sentinel v1 改看 reports 新文件、pane busy→idle、持续全闲三信号。REPORT 只是凭证格式，不是唤醒机制；sentinel 只唤醒，内容仍须 commander readback+独立审。
+- **新 PROVEN 坑**：验证环境分裂会让 worktree 绿、clean clone 红；registry 内绝对 `allowed_roots` 会把 clone artifact 解析回源 worktree并注入错误 `E_RESOURCE_POLICY`；环境/路径都是验证 basis，必须 clone-relocatable。
+- **主要产出**：`runs/2026-07-11-ma14/` 的 V6/INDEX/FINAL-V41/pool32/C-08/O1O2/G1-plan+code/prestudy/sentinel/lessons receipts；repo decisions D-142~147；lessons M.73~77。
+- **proof boundary**：截至本段，S8/S9/S10 未执行，v5b ABI proof 未补，G3 未 ratify，rebuild-C6 未 propose/apply，无 operator-pass、C6 acceptance、candidate 或 V-PASS；baseline activation 仍须 fresh cascade receipt 判定。
+- **ops 纪律**：派单前 fresh 核 session/pane/output；read→message→read→Enter；收稿 file-first；长跑默认 sentinel；worktree PASS 必补 clean-clone/relocatable probe；HIGH/CRITICAL 必独立 risk-ack，影响面溢出重签。
