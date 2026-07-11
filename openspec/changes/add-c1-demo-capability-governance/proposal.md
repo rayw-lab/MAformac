@@ -1,3 +1,10 @@
+> status: `candidate_archive_after_controller_review`
+> execution_state: `implementation_merged_reconciliation_residuals_open`
+> reconciliation_note: 22 historical PR #42 implementation tasks are evidenced; seven evidence-chain residuals remain open and are not retroactively claimed as pre-edit proof.
+> archive_allowed: `false`
+> proof_cap: `local_static_reconciliation_only`
+> status_source: `runs/2026-07-11-ma14/reports/DRAFT-addc1-task-reconciliation.md:70-87`
+
 ## Why
 
 D-123 已将 120 格 `DemoCapabilityMatrix` 内容口径签为能力面真值，D-133 又将 C1 P0 的 38 项治理决策全部按 B 拍定；当前仍缺一个可严格校验、能约束后续 matrix、fallback、partial execution 与 probe 实现的 OpenSpec carrier。D-134 已进一步锁定三方 authority：C1 需要独立 capability-governance，但不得重造现有 Runtime → Presentation 的 payload、trace、readback 或 partial-result presentation SSOT。
