@@ -22,6 +22,7 @@ ROADMAP = REPO / "docs" / "roadmap-2026-07-11-v6-closure-baseline.md"
 RESOURCE_POLICY = REPO / "contracts" / "closure-execution-window.v1.yaml"
 SCHEMA = REPO / "contracts" / "schemas" / "closure-work-packages.v1.schema.json"
 NEGATIVE_DIR = REPO / "Tests" / "Fixtures" / "closure-registry" / "negative"
+REANCHOR_HELPER_TEST = REPO / "scripts" / "test_reanchor_closure_registry.py"
 
 
 def load_checker_module():
@@ -610,6 +611,18 @@ def test_verify_ci_consumes_o1o2_checker_and_presence_gate() -> None:
         "Tests/test_closure_work_packages.py",
     ]:
         assert required in presence.group("body")
+
+
+def test_reanchor_helper_regression_suite() -> None:
+    """The existing closure target owns the helper regression suite; no second Make roster."""
+    result = subprocess.run(
+        [sys.executable, str(REANCHOR_HELPER_TEST)],
+        cwd=REPO,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_generated_block_contains_all_canonical_package_rows() -> None:
