@@ -29,8 +29,12 @@ public struct DDomainToolPlanBackend: LLMBackend {
     public func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] {
         let envelope = try await completionEnvelopeProvider(request)
         let parsedCalls = try DDomainToolCallParser.parse(envelope, policy: cardinalityPolicy)
+        // A multi-call plan has already passed the explicit bounded cardinality policy.
+        // Preserve known IR frames so DemoRuntimePartialPlan can apply mount checks per item;
+        // single-call requests keep the existing pre-C3 fail-closed rejection.
+        let defersMountChecksToPerItemRuntime = parsedCalls.count > 1
         return try parsedCalls.flatMap { parsed in
-            guard mountedToolNames.contains(parsed.name) else {
+            guard mountedToolNames.contains(parsed.name) || defersMountChecksToPerItemRuntime else {
                 throw DDomainToolPlanFailure.nameRejected(parsed.name)
             }
             let call = C6ToolCall(name: parsed.name, arguments: parsed.arguments)

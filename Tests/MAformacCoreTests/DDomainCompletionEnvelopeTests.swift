@@ -69,6 +69,43 @@ final class DDomainCompletionEnvelopeTests: XCTestCase {
         )
     }
 
+    @MainActor
+    func testBoundedReviewedProductionChainExecutesMountedAndRejectsUnmountedPerItem() async throws {
+        let unmounted = #"<tool_call>{"name":"open_window","arguments":{}}</tool_call>"#
+        let backend = DDomainToolPlanBackend(
+            cardinalityPolicy: .boundedReviewed(maximum: 2),
+            completionEnvelopeProvider: { [call] _ in
+                DDomainCompletionEnvelope(
+                    content: call + unmounted,
+                    finishReason: "tool_calls",
+                    stopReason: "end_turn",
+                    toolCallCount: 2,
+                    source: "production-shaped-test"
+                )
+            }
+        )
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let runner = try DemoRuntimeSessionRunner.defaultRunner(
+            store: store,
+            traceLogger: trace,
+            speech: RecordingSpeechSynthesisEngine(),
+            modelBackend: backend
+        )
+
+        let payload = try await runner.run(text: "空调调到26度并打开车窗")
+
+        XCTAssertEqual(payload.outcome.result, .partialAcceptPartialRefuse)
+        XCTAssertTrue(payload.readbacks.contains { $0.key == "ac.temp_setpoint[主驾]" })
+        XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "0")
+        XCTAssertTrue(
+            trace.entries.contains {
+                $0.message.contains(":refused:") && $0.attributes.finiteReason == .unmountedToolName
+            }
+        )
+    }
+
     private func envelope(
         content: String,
         finishReason: String = "tool_calls",
