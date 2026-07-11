@@ -35,7 +35,7 @@ edge_basis:
     - {from: W9, to: V8, basis: audit_repair_v2, authority_refs: [{path: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/XAUDIT-O1O2-by-w2.md, locator: P0-1, required_state: draft}]}
 requires_checker: {contract_id: closure_registry_checker_v1, generated_block_required: true}
 allowed_roots:
-  repo: /Users/wanglei/workspace/MAformac-o1o2
+  repo: .
   run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14
   runs_archive: /Users/wanglei/Projects/agent-tmux-stack-research/runs
   build: .build
