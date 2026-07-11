@@ -93,7 +93,10 @@ def canonical_json(value: Any) -> str:
 
 
 def registry_digest(registry: dict[str, Any]) -> str:
-    return sha256_text(canonical_json(registry))
+    semantic_registry = copy.deepcopy(registry)
+    semantic_registry["basis"].pop("repo_head", None)
+    semantic_registry["source_snapshot"].pop("repo_head", None)
+    return sha256_text(canonical_json(semantic_registry))
 
 
 def checker_digest() -> str:
@@ -125,6 +128,34 @@ def is_ancestor(ancestor: str, descendant: str) -> bool:
         capture_output=True,
         check=False,
     ).returncode == 0
+
+
+STALE_BASIS_ALLOWED_PATHS = (
+    re.compile(r"^contracts/closure-work-packages(?:\.[^/]+)?\.yaml$"),
+    re.compile(r"^closure/receipts/"),
+    re.compile(r"^contracts/schemas/closure-[^/]+\.schema\.json$"),
+    re.compile(r"^Tests/test_closure_work_packages\.py$"),
+    re.compile(r"^Tests/Fixtures/closure-registry/"),
+    re.compile(r"^scripts/check_closure_work_packages\.py$"),
+    re.compile(r"^scripts/test_verify_ci_checker_presence\.py$"),
+    re.compile(r"^Makefile$"),
+)
+
+
+def basis_has_only_registry_changes(basis_head: str, subject_head: str) -> bool:
+    if not is_ancestor(basis_head, subject_head):
+        return False
+    result = subprocess.run(
+        ["git", "diff", "--name-only", f"{basis_head}..{subject_head}"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return False
+    changed_paths = [line for line in result.stdout.splitlines() if line]
+    return all(any(pattern.fullmatch(path) for pattern in STALE_BASIS_ALLOWED_PATHS) for path in changed_paths)
 
 
 def typed_value_is_valid(value_type: Any, value: Any) -> bool:
@@ -663,7 +694,7 @@ def validate_registry(
     source_sha = sha256_text(source_basis_text(roadmap_text))
     if (
         basis["repo_head"] != snapshot["repo_head"]
-        or basis["repo_head"] != subject_head
+        or not basis_has_only_registry_changes(basis["repo_head"], subject_head)
         or basis["roadmap_sha256"] != snapshot["source_sha256"]
         or basis["roadmap_sha256"] != source_sha
         or basis["roadmap_path"] != snapshot["source_path"]
