@@ -1,0 +1,13 @@
+{
+  "schema_version": "b1b_launcher_argv_capture_v1",
+  "cwd": "/Users/wanglei/workspace/MAformac-b1b-stage1",
+  "executable": "/usr/bin/env",
+  "env_clear": true,
+  "argv": [
+    "/bin/bash",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-flight/launch_s8.sh",
+    "--dry-run",
+    "--run-dir",
+    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-provenance-20260711T145837+0800"
+  ]
+}

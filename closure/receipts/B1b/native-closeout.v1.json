@@ -1,0 +1,79 @@
+{
+  "schema_version": "s8_g1_receipt_v1",
+  "artifact_kind": "closure_package_native_closeout_receipt",
+  "package_id": "B1b",
+  "package_revision": 1,
+  "deliverable": "s8.g1_receipt_chain",
+  "status": "DONE",
+  "verdict": "t_pass",
+  "class": "local",
+  "claim": "local_receipt_chain",
+  "implementation_merge": "a3160c88ff2cde29a4bf3e319330ee6d463fbc4f",
+  "materialization_basis_head": "2bbc515819507aa1bb6443d221153b2e6efa3036",
+  "merged_writer": {
+    "path": "Tools/S8ReceiptChain/s8_g1_receipt.py",
+    "sha256": "bab76b4f12105afe904987599b9a1323474574e808516c47c3369f7ebe2018da"
+  },
+  "operational_launcher": {
+    "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-flight/launch_s8.sh",
+    "sha256": "6f2216a3b181125aa4825dfcda98ae4f0d9110ff681158bf3862fc9f6705d041"
+  },
+  "post_merge_dry_run": {
+    "launch_basis_artifact": "closure/receipts/B1b/postmerge-dryrun-launch-basis.v1.json",
+    "launch_basis_sha256": "3e8dd8e114a554d0aef914abd6a361bdad7a8ae21a6c5d996313bb6030878827",
+    "evidence_artifact": "closure/receipts/B1b/postmerge-dryrun-evidence.v1.json",
+    "evidence_sha256": "b9835543a3915c6e5ab81511fdb6e888d400fad090ab8f29645f7bd5accb7294",
+    "rc": 0,
+    "status": "DRY_RUN_READY_NOT_LAUNCHED",
+    "validate_start_rc": 0,
+    "prelaunch_inventory_empty": true,
+    "resume_adapter_file": null,
+    "new_training_processes": 0,
+    "unexpected_training_sidecars": 0
+  },
+  "raw_provenance": {
+    "accepted_basis_head": "747e10ceeda9739a2a1863477f9aa6a2098eb8d8",
+    "manifest": "closure/receipts/B1b/provenance-20260711T145837+0800/evidence.manifest.json",
+    "manifest_sha256": "e7fbbd153b3cf4b4de0c8aa571c6b0cbe886b0b6c2ee56e948c204fa74c6cb3e",
+    "launcher_rc": 0,
+    "launcher_rc_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.rc",
+    "argv_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.argv.json",
+    "env_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.env.json"
+  },
+  "unit_gate": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v scripts/test_s8_g1_receipt.py",
+    "rc": 0,
+    "tests": 10,
+    "failures": 0,
+    "raw_rc_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/unit.rc",
+    "raw_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "stdout_sha256": "e6762ce08b2f7b43877fcc8ef02ecc3d21deae409e5b348e0ced855053bd93f8",
+    "stderr_sha256": "c492daaf19a6621ca4731f7f5749724001ec4238709c73f1ea9d7b0decac2812"
+  },
+  "launcher_static_gates": {
+    "bash_n_rc": 0,
+    "bash_n_raw_rc_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/bash-n.rc",
+    "bash_n_raw_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "bash_n_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bash_n_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "shellcheck_rc": 0,
+    "shellcheck_raw_rc_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/shellcheck.rc",
+    "shellcheck_raw_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "shellcheck_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "shellcheck_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "launch": false,
+  "training": false,
+  "live_g1_sealed": false,
+  "b1a_done": false,
+  "proof_class": "local_unit_dry_run_integration",
+  "non_claims": [
+    "not_s8_launch_authorization",
+    "not_training_started",
+    "not_training_completed",
+    "not_live_g1_sealed",
+    "not_b1a_done",
+    "not_operator_pass",
+    "not_v_pass"
+  ]
+}

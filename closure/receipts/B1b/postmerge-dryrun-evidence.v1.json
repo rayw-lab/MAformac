@@ -1,0 +1,98 @@
+{
+  "schema_version": "b1b_postmerge_dryrun_evidence_v1",
+  "artifact_kind": "b1b_postmerge_dryrun_evidence",
+  "captured_at": "2026-07-11T14:35:44+0800",
+  "subject_head": "2bbc515819507aa1bb6443d221153b2e6efa3036",
+  "implementation_merge": "a3160c88ff2cde29a4bf3e319330ee6d463fbc4f",
+  "implementation_merge_is_ancestor_rc": 0,
+  "launcher": {
+    "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-flight/launch_s8.sh",
+    "sha256": "6f2216a3b181125aa4825dfcda98ae4f0d9110ff681158bf3862fc9f6705d041",
+    "bash_n_rc": 0,
+    "shellcheck_rc": 0
+  },
+  "merged_writer": {
+    "path": "Tools/S8ReceiptChain/s8_g1_receipt.py",
+    "sha256": "bab76b4f12105afe904987599b9a1323474574e808516c47c3369f7ebe2018da",
+    "unit_command": [
+      "python3",
+      "-m",
+      "unittest",
+      "-v",
+      "scripts/test_s8_g1_receipt.py"
+    ],
+    "unit_rc": 0,
+    "unit_result": "10 tests / 0 failures"
+  },
+  "dry_run": {
+    "command_mode": "--dry-run",
+    "run_dir": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-postmerge-20260711T143544+0800",
+    "receipt_path": "closure/receipts/B1b/postmerge-dryrun-launch-basis.v1.json",
+    "receipt_sha256": "3e8dd8e114a554d0aef914abd6a361bdad7a8ae21a6c5d996313bb6030878827",
+    "rc": 0,
+    "stdout": [
+      "DRY_RUN_READY_NOT_LAUNCHED",
+      "launch_allowed_if_real=false"
+    ],
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validate_start_rc": 0,
+    "prelaunch_inventory_empty": true,
+    "resume_adapter_file": null,
+    "trainer_pid": "DRY_RUN_NOT_STARTED",
+    "launch": false,
+    "training": false,
+    "live_g1_sealed": false
+  },
+  "process_probe": {
+    "before_rc": 0,
+    "after_rc": 0,
+    "before_sha256": "e8a1ec06164d3cf778b4ab6730637b5bca3883ce89f68ca58a9eff656755fef3",
+    "after_sha256": "e8a1ec06164d3cf778b4ab6730637b5bca3883ce89f68ca58a9eff656755fef3",
+    "snapshots_identical": true,
+    "new_matching_processes": [],
+    "preexisting_matches": "two dummy-model --test processes from concurrent test gates; unchanged across dry-run"
+  },
+  "unexpected_training_sidecars": [],
+  "raw_provenance": {
+    "accepted_basis_head": "747e10ceeda9739a2a1863477f9aa6a2098eb8d8",
+    "directory": "closure/receipts/B1b/provenance-20260711T145837+0800",
+    "manifest": "closure/receipts/B1b/provenance-20260711T145837+0800/evidence.manifest.json",
+    "manifest_sha256": "e7fbbd153b3cf4b4de0c8aa571c6b0cbe886b0b6c2ee56e948c204fa74c6cb3e",
+    "launcher_rc_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.rc",
+    "launcher_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "argv_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.argv.json",
+    "argv_sha256": "2eafeffa3a47f963d8949fb45ab8e5c72499beaa540667ffd45685c9db7df01b",
+    "env_artifact": "closure/receipts/B1b/provenance-20260711T145837+0800/launcher.env.json",
+    "env_sha256": "f123021da7c4197eb29a9903dce22d5602a10afc48944f9878860d303baf10f8",
+    "stdout_sha256": "a57eace2e168fd0daaea8373b9345ae56f20d7c831384a69742c3bad4d7c30de",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "launch_basis_sha256": "a38434cd597cae5c238756cbfdafb61a259bdfc2dd313a1ce3b346f60e8020ca",
+    "supplementary_gates_captured_at": "2026-07-11T15:13:37+0800",
+    "supplementary_gate_execution_head": "f701e3d8fe8dbfd904be5f470726b7094c3d34f8",
+    "accepted_basis_source_same_rc": 0,
+    "gates_argv_sha256": "354466ec3efb03412c3c2eacaf459dc859362ed896c895af7ec56cd6b7f9fdff",
+    "gates_env_sha256": "b2ee0c9cdcc540a9ac01521bca02bf1357ebb14da1dc4b484c058ee58f1e0f8c",
+    "unit_rc": 0,
+    "unit_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "unit_stdout_sha256": "e6762ce08b2f7b43877fcc8ef02ecc3d21deae409e5b348e0ced855053bd93f8",
+    "unit_stderr_sha256": "c492daaf19a6621ca4731f7f5749724001ec4238709c73f1ea9d7b0decac2812",
+    "bash_n_rc": 0,
+    "bash_n_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "bash_n_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bash_n_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "shellcheck_rc": 0,
+    "shellcheck_rc_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "shellcheck_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "shellcheck_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "proof_class": "local_dry_run",
+  "non_claims": [
+    "not_s8_launch_authorization",
+    "not_training_started",
+    "not_training_completed",
+    "not_live_g1_sealed",
+    "not_b1a_done",
+    "not_operator_pass",
+    "not_v_pass"
+  ]
+}

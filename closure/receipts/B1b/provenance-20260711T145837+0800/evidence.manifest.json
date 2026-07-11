@@ -1,0 +1,153 @@
+{
+  "accepted_basis_head": "747e10ceeda9739a2a1863477f9aa6a2098eb8d8",
+  "external_inputs": [
+    {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-flight/launch_s8.sh",
+      "sha256": "6f2216a3b181125aa4825dfcda98ae4f0d9110ff681158bf3862fc9f6705d041"
+    },
+    {
+      "path": "Tools/S8ReceiptChain/s8_g1_receipt.py",
+      "sha256": "bab76b4f12105afe904987599b9a1323474574e808516c47c3369f7ebe2018da"
+    }
+  ],
+  "files": [
+    {
+      "bytes": 41,
+      "name": "subject.head",
+      "sha256": "12d53a9208f33d822fd0f7a922c0ca2f7f6ef5a411c383184048febbad91e88b"
+    },
+    {
+      "bytes": 503,
+      "name": "launcher.argv.json",
+      "sha256": "2eafeffa3a47f963d8949fb45ab8e5c72499beaa540667ffd45685c9db7df01b"
+    },
+    {
+      "bytes": 1967,
+      "name": "launcher.env.json",
+      "sha256": "f123021da7c4197eb29a9903dce22d5602a10afc48944f9878860d303baf10f8"
+    },
+    {
+      "bytes": 2,
+      "name": "launcher.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 216,
+      "name": "launcher.stdout",
+      "sha256": "a57eace2e168fd0daaea8373b9345ae56f20d7c831384a69742c3bad4d7c30de"
+    },
+    {
+      "bytes": 0,
+      "name": "launcher.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 4717,
+      "name": "s8-launch-basis-receipt.json",
+      "sha256": "a38434cd597cae5c238756cbfdafb61a259bdfc2dd313a1ce3b346f60e8020ca"
+    },
+    {
+      "bytes": 0,
+      "name": "process.before.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "name": "process.after.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 2,
+      "name": "process.same.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 2,
+      "name": "validate.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 26,
+      "name": "validate.stdout",
+      "sha256": "aec5a1dadc2eb2064d73539934b4a0ad5c754df15c98178845550169717a7327"
+    },
+    {
+      "bytes": 0,
+      "name": "validate.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 2,
+      "name": "unexpected-sidecars.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 41,
+      "name": "gates.subject.head",
+      "sha256": "0a632b6c0f9df39a6ef797d5da3b93454cff171c0c61c71aff367ba5f150971f"
+    },
+    {
+      "bytes": 2,
+      "name": "gates.accepted-basis-source.same.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 492,
+      "name": "gates.argv.json",
+      "sha256": "354466ec3efb03412c3c2eacaf459dc859362ed896c895af7ec56cd6b7f9fdff"
+    },
+    {
+      "bytes": 389,
+      "name": "gates.env.json",
+      "sha256": "b2ee0c9cdcc540a9ac01521bca02bf1357ebb14da1dc4b484c058ee58f1e0f8c"
+    },
+    {
+      "bytes": 2,
+      "name": "unit.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 131,
+      "name": "unit.stdout",
+      "sha256": "e6762ce08b2f7b43877fcc8ef02ecc3d21deae409e5b348e0ced855053bd93f8"
+    },
+    {
+      "bytes": 1236,
+      "name": "unit.stderr",
+      "sha256": "c492daaf19a6621ca4731f7f5749724001ec4238709c73f1ea9d7b0decac2812"
+    },
+    {
+      "bytes": 2,
+      "name": "bash-n.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 0,
+      "name": "bash-n.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "name": "bash-n.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 2,
+      "name": "shellcheck.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 0,
+      "name": "shellcheck.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "name": "shellcheck.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "run_dir": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-provenance-20260711T145837+0800",
+  "schema_version": "b1b_stage1_provenance_manifest_v1",
+  "supplementary_gate_execution_head": "f701e3d8fe8dbfd904be5f470726b7094c3d34f8"
+}
