@@ -39,7 +39,7 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
         let backend = DDomainToolPlanBackend(
             mountedToolNames: [name],
             irMap: [:],
-            completionProvider: { _ in completion }
+            completionEnvelopeProvider: { _ in completionEnvelope(completion) }
         )
 
         do {
@@ -59,7 +59,7 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
         let completion = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
         let backend = DDomainToolPlanBackend(
             mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
-            completionProvider: { _ in completion },
+            completionEnvelopeProvider: { _ in completionEnvelope(completion) },
             streamTextProvider: { _ in
                 XCTFail("streamText must not participate in W20A tool plan")
                 return AsyncThrowingStream<String, Error> { $0.finish() }
@@ -67,6 +67,35 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
         )
 
         _ = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+    }
+
+    func testBoundedReviewedTwoCallsProjectsBothInOrder() async throws {
+        let first = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
+        let second = toolCall("adjust_ac_temperature_to_number", ["temperature": "24"])
+        let backend = DDomainToolPlanBackend(
+            mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
+            cardinalityPolicy: .boundedReviewed(maximum: 2),
+            completionEnvelopeProvider: { _ in completionEnvelope(first + second, toolCallCount: 2) }
+        )
+
+        let frames = try await backend.generateToolPlan(for: ToolPlanRequest(text: "先调26度再调24度"))
+
+        XCTAssertEqual(frames.map(\.value.direct), ["26", "24"])
+    }
+
+    func testBackendRejectsCountMismatchBeforeProjection() async {
+        let completion = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
+        let backend = DDomainToolPlanBackend(
+            mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
+            completionEnvelopeProvider: { _ in completionEnvelope(completion, toolCallCount: 2) }
+        )
+
+        do {
+            _ = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+            XCTFail("expected count mismatch")
+        } catch {
+            XCTAssertEqual(error as? DDomainCompletionRejection, .toolCallCountMismatch(declared: 2, parsed: 1))
+        }
     }
 
     private func assertNameRejected(_ completion: String, expectedName: String) async {
@@ -82,7 +111,7 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
     private func backend(completion: String) -> DDomainToolPlanBackend {
         DDomainToolPlanBackend(
             mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
-            completionProvider: { _ in completion }
+            completionEnvelopeProvider: { _ in completionEnvelope(completion) }
         )
     }
 
@@ -93,4 +122,14 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
             .joined(separator: ",")
         return #"<tool_call>{"name":"\#(name)","arguments":{\#(args)}}</tool_call>"#
     }
+}
+
+private func completionEnvelope(_ content: String, toolCallCount: Int = 1) -> DDomainCompletionEnvelope {
+    DDomainCompletionEnvelope(
+        content: content,
+        finishReason: "tool_calls",
+        stopReason: "end_turn",
+        toolCallCount: toolCallCount,
+        source: "test_model"
+    )
 }

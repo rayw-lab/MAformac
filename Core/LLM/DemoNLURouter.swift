@@ -2,6 +2,7 @@ import Foundation
 
 public enum DemoNLURouterError: Error, Equatable {
     case noToolPlanFrames
+    case expectedSingleToolPlanFrame(actual: Int)
 }
 
 public struct DemoNLURouter: Sendable {
@@ -20,7 +21,11 @@ public struct DemoNLURouter: Sendable {
     }
 
     public func decode(text: String) async throws -> ToolCallFrame {
-        try await decodePlan(text: text)[0]
+        let frames = try await decodePlan(text: text)
+        guard frames.count == 1, let frame = frames.first else {
+            throw DemoNLURouterError.expectedSingleToolPlanFrame(actual: frames.count)
+        }
+        return frame
     }
 }
 

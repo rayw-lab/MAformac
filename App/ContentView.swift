@@ -45,6 +45,8 @@ struct ContentView: View {
     @State private var mockVoiceScriptIndex = 0
     @State private var mockVoiceResponseTask: Task<Void, Never>?
     @State private var frontstageRuntimeComposition = FrontstageRuntimeComposition()
+    @State private var customerIngressText = ""
+    @State private var customerIngressStatusText: String?
     @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
@@ -245,6 +247,7 @@ struct ContentView: View {
             DialogueStream(messages: messages, theme: theme, forceReduceMotion: forceReduceMotion)
                 .frame(minHeight: 240, maxHeight: 330)
             Spacer(minLength: 28)
+            customerIngressBar
             MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                 .frame(maxWidth: .infinity, minHeight: 76, maxHeight: 80)
                 .padding(.bottom, 10)
@@ -333,7 +336,8 @@ struct ContentView: View {
     private func bottomMicDock(size: CGSize) -> some View {
         let split = usesMacSplit(size: size)
         if !split {
-            HStack {
+            VStack(spacing: 8) {
+                customerIngressBar
                 MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                     .frame(maxWidth: min(780, size.width - 70), minHeight: 70, maxHeight: 74)
             }
@@ -341,7 +345,9 @@ struct ContentView: View {
             .padding(.bottom, 0)
             .offset(y: 24)
             .zIndex(7)
-            .accessibilityIdentifier("mic-dock-safe-area")
+            .background {
+                Color.clear.accessibilityIdentifier("mic-dock-safe-area")
+            }
         }
     }
 
@@ -447,9 +453,42 @@ struct ContentView: View {
     }
 
     private func submitCustomerMicDock() {
+        submitCustomerIngress(.init(source: .voiceTranscript, rawText: nil))
+    }
+
+    private var customerIngressBar: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                TextField("输入车控指令", text: $customerIngressText)
+                    .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("frontstage-customer-text-field")
+                    .onSubmit(submitCustomerText)
+                Button("发送", action: submitCustomerText)
+                    .accessibilityIdentifier("frontstage-customer-text-submit")
+            }
+            Text(customerIngressStatusText ?? "等待输入")
+                .font(.caption)
+                .accessibilityIdentifier("frontstage-customer-ingress-status")
+        }
+    }
+
+    private func submitCustomerText() {
+        let text = customerIngressText
+        customerIngressText = ""
+        submitCustomerIngress(.init(source: .text, rawText: text))
+    }
+
+    private func submitCustomerIngress(_ input: FrontstageIngressInput) {
         mockVoiceResponseTask?.cancel()
         runtimeReadbackQueue.cancel()
-        let turn = frontstageRuntimeComposition.session.submitContainment(utterance: "客户语音指令")
+        precondition(frontstageRuntimeComposition.customerIngress.sessionID == frontstageRuntimeComposition.session.sessionID)
+        let result = frontstageRuntimeComposition.customerIngress.submit(input)
+        guard case let .accepted(turn) = result else {
+            customerIngressStatusText = "语音输入当前不可用"
+            messages.append(DialogueMessage(role: .assistant, text: "语音输入当前不可用"))
+            return
+        }
+        customerIngressStatusText = turn.utterance
         frontstageRuntimeComposition.markCurrent(turn)
         guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
         let receiptConfiguration = try? FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)

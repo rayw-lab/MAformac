@@ -223,6 +223,7 @@ verify-generated: .venv/.deps.stamp verify-refs test
 
 # 合成脏行 fixture: 坐实 quarantine 逻辑生效(source-free, 不需 raw 快照)
 test: .venv/.deps.stamp
+	$(PYTHON) -m unittest -v scripts/test_check_customer_route_avoids_legacy_decode.py scripts/test_check_t04a_customer_ingress.py
 	$(PYTHON) scripts/test_quarantine.py
 	$(PYTHON) scripts/test_fc_flags.py
 	$(PYTHON) scripts/test_tool_name_sanitize.py

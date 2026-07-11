@@ -14,12 +14,29 @@ public final class FrontstageVoiceSession {
     }
 
     public func submitContainment(utterance: String) -> FrontstageVoiceTurn {
+        let request = issueIngressRequest(.init(source: .voiceTranscript, rawText: utterance))
+        return makeContainmentTurn(request: request, utterance: utterance)
+    }
+
+    public func issueIngressRequest(_ input: FrontstageIngressInput) -> FrontstageIngressRequest {
         latestSequence += 1
-        return FrontstageVoiceTurn(
+        return FrontstageIngressRequest(
+            source: input.source,
+            rawText: input.rawText,
             sessionID: sessionID,
             sequence: latestSequence,
             turnID: UUID().uuidString.lowercased(),
-            eventID: UUID().uuidString.lowercased(),
+            eventID: UUID().uuidString.lowercased()
+        )
+    }
+
+    public func makeContainmentTurn(request: FrontstageIngressRequest, utterance: String) -> FrontstageVoiceTurn {
+        precondition(request.sessionID == sessionID)
+        return FrontstageVoiceTurn(
+            sessionID: sessionID,
+            sequence: request.sequence,
+            turnID: request.turnID,
+            eventID: request.eventID,
             utterance: utterance.trimmingCharacters(in: .whitespacesAndNewlines),
             outcome: DemoRuntimeOutcome(
                 result: .refusalNoAvailableTool,
