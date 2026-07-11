@@ -1,7 +1,7 @@
 {
   "schema_version": "closure_package_exit_envelope_v1",
   "registry_schema_major": "closure_work_packages_v1",
-  "registry_digest": "d7e10e21f9230de3f3538d3675b059d1b5fded30bba475bf8ce04a075e7a0dc3",
+  "registry_digest": "9eada19a4d2b1ab9bd8919411904d0e2636067f5d7ad397686773a02c35e3203",
   "package_id": "W5d",
   "package_revision": 1,
   "native_receipt_schema_id": "decode_policy_v1",
