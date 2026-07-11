@@ -6,7 +6,9 @@ The facade assigns session/turn/event identity before invoking its validator exa
 
 ### Rejections are typed and side-effect free
 
-Nil transcript, blank, oversized, unavailable-ASR, stale, and correlation-mismatch inputs produce typed refusal, zero mutation, and zero readback.
+The implemented first-tranche facade produces typed, side-effect-free refusal for nil transcript, blank, oversized, unavailable-ASR, and injected validator rejection.
+
+Stale session/turn/event and correlation-mismatch typed rejection remain normative delta requirements but are **not implemented in this tranche**. They stay `BLOCKED_WAIT_W6_TYPES` until the W6 typed route-result/trace identities land; the receipt writer's current-turn guard is not a substitute for that ingress contract.
 
 ### Existing owners remain unchanged
 

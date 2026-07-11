@@ -17,6 +17,10 @@ final class DDomainCompletionEnvelopeTests: XCTestCase {
         assertRejected(envelope(content: call, finishReason: "mystery"), .unsupportedFinishReason("mystery"))
     }
 
+    func testLengthFinishReasonFailsClosedBeforeProjection() {
+        assertRejected(envelope(content: call, finishReason: "length"), .unsupportedFinishReason("length"))
+    }
+
     func testMissingStopReasonFailsClosed() {
         assertRejected(envelope(content: call, stopReason: ""), .missingStopReason)
     }
