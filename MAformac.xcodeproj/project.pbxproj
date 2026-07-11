@@ -19,6 +19,37 @@
 		E10000000000000000000001 /* MAformacMacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MAformacMacUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A4E000000000000000000001 /* A4-0 dev-source exclusions for MAformacMac */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Bench/C5DataGate.swift,
+				Bench/C6ContractBundleFingerprint.swift,
+				Bench/C6SubsetContext.swift,
+				Bench/C6VehicleToolBench.swift,
+				Generation/Gate7GeneratorPipeline.swift,
+				Training/C5LoRATraining.swift,
+				Training/C5TinyAblationHarness.swift,
+				"Training/ToolContractCompiler+Seeds.swift",
+			);
+			target = A50000000000000000000001 /* MAformacMac */;
+		};
+		A4E000000000000000000002 /* A4-0 dev-source exclusions for MAformacIOS */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Bench/C5DataGate.swift,
+				Bench/C6ContractBundleFingerprint.swift,
+				Bench/C6SubsetContext.swift,
+				Bench/C6VehicleToolBench.swift,
+				Generation/Gate7GeneratorPipeline.swift,
+				Training/C5LoRATraining.swift,
+				Training/C5TinyAblationHarness.swift,
+				"Training/ToolContractCompiler+Seeds.swift",
+			);
+			target = A50000000000000000000002 /* MAformacIOS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A20000000000000000000001 /* App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -27,6 +58,10 @@
 		};
 		A20000000000000000000002 /* Core */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A4E000000000000000000001 /* A4-0 dev-source exclusions for MAformacMac */,
+				A4E000000000000000000002 /* A4-0 dev-source exclusions for MAformacIOS */,
+			);
 			path = Core;
 			sourceTree = "<group>";
 		};
