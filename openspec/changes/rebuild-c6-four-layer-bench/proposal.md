@@ -2,6 +2,34 @@ status: `draft_needs_human_propose`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
 
+```yaml
+typed_status:
+  lifecycle_status: draft_needs_human_propose
+  c08_disposition: UNLOCKED_PENDING_OPSX_PROPOSE_HUMAN_REVIEW
+  previous_wait: WAIT_G2_V3_RATIFICATION
+  previous_wait_condition: resolved
+  wait_resolution:
+    decision: D-147
+    result: G2_wave_closed_66_of_66
+    ratification_receipt: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md
+    g2_038_c1:
+      disposition: RATIFIED_AS_STARRED_OPTION_B
+      family_key: tags.contract_device
+      exact_family_roster:
+        - ac_temperature
+        - window
+        - screen_brightness
+        - atmosphere_lamp_color
+        - atmosphere_lamp_brightness
+        - ac_windspeed
+        - car_door
+      representation_source: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/G2-038-C1-REVISED.md
+  next_status_recommendation: run_opsx_propose_and_obtain_human_review
+  status_action_this_change: keep_draft_needs_human_propose
+  propose_performed_this_change: false
+  implementation_authorized_this_change: false
+```
+
 > DRAFT SKELETON（2026-06-24 Q1-Q4 文档吸收版，待人审 propose）
 >
 > This change is an OpenSpec carrier for rebuilding C6 as the trusted yardstick before C5 retraining. It is documentation absorption only until propose acceptance and route gates are satisfied.
