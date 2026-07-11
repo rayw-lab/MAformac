@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/schemas/closure-gate-receipt.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "gate_id", "status", "subject"],
+  "properties": {
+    "schema_version": {"const": "closure_gate_receipt_v1"},
+    "gate_id": {"enum": ["model", "capability", "architecture", "demo", "honesty", "operator"]},
+    "status": {"const": "PASS"},
+    "subject": {
+      "type": "array", "minItems": 10, "maxItems": 10,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "value_type", "value"],
+        "properties": {
+          "key": {"type": "string"},
+          "value_type": {"enum": ["git_sha", "sha256", "string", "integer", "boolean"]},
+          "value": {}
+        },
+        "allOf": [
+          {"if": {"properties": {"value_type": {"const": "git_sha"}}}, "then": {"properties": {"value": {"type": "string", "pattern": "^[0-9a-f]{40}$"}}}},
+          {"if": {"properties": {"value_type": {"const": "sha256"}}}, "then": {"properties": {"value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}},
+          {"if": {"properties": {"value_type": {"const": "string"}}}, "then": {"properties": {"value": {"type": "string"}}}},
+          {"if": {"properties": {"value_type": {"const": "integer"}}}, "then": {"properties": {"value": {"type": "integer"}}}},
+          {"if": {"properties": {"value_type": {"const": "boolean"}}}, "then": {"properties": {"value": {"type": "boolean"}}}}
+        ]
+      }
+    }
+  }
+}

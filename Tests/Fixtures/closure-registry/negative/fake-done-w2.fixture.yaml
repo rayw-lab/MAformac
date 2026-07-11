@@ -1,0 +1,11 @@
+fixture_contract: closure_registry_negative_fixture_v1
+id: fake-done-w2
+patches:
+  - target: registry
+    op: replace
+    path: /packages/by-id/W2/execution_state/declared
+    value: done
+expect:
+  rc: 69
+  status: BLOCKED
+  errors_exact: [E_DONE_RECEIPT, E_PROOF_PROMOTION, E_TRANSITION]

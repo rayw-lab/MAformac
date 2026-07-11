@@ -1,0 +1,561 @@
+schema_version: closure_work_packages_v1
+registry_id: maformac.v6.closure.current
+artifact_kind: closure_work_packages_registry
+authority:
+  state: ratified
+  source_path: docs/commander-log/decisions.md
+  source_sha256: ed7104bafd6a309bd52bd3fc9e80d6b085852f99ea62ef7bf21b42578fdf49f7
+  bootstrap_ratification_receipt: null
+basis:
+  repo_head: cec6078028fe3c5a3168d1e619ab04e2766e8fd5
+  captured_at: '2026-07-11T07:45:00+08:00'
+  roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
+  roadmap_sha256: 251f20229123c7d72e60d8e85f6447efe987235118ea99ffe6b7a65fb8b6b483
+source_snapshot:
+  manifest_id: v6_1_source_snapshot_d142_cascade
+  source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
+  source_sha256: 251f20229123c7d72e60d8e85f6447efe987235118ea99ffe6b7a65fb8b6b483
+  repo_head: cec6078028fe3c5a3168d1e619ab04e2766e8fd5
+  package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
+  hard_edges:
+    - {from: B7, to: B2}
+    - {from: W6, to: W5c}
+    - {from: W8, to: W5c}
+    - {from: V4, to: V2}
+edge_basis:
+  default_basis: conservative_v2
+  default_authority_refs:
+    - {path: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/DESIGN-O1-O2-registry.md, locator: DRIFT-01..09, required_state: draft}
+  overrides:
+    - {from: B7, to: B2, basis: source_inherited, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V6-N3 T02 freeze to S9, required_state: ratified}]}
+    - {from: W6, to: W5c, basis: source_inherited, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V6-N3 T03 plus T09 to T04b, required_state: ratified}]}
+    - {from: W8, to: W5c, basis: source_inherited, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V6-N3 T03 plus T09 to T04b, required_state: ratified}]}
+    - {from: V4, to: V2, basis: source_inherited, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V6-N3 T06 to T07b, required_state: ratified}]}
+    - {from: W7, to: V8, basis: audit_repair_v2, authority_refs: [{path: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/XAUDIT-O1O2-by-w2.md, locator: P0-1, required_state: draft}]}
+    - {from: W9, to: V8, basis: audit_repair_v2, authority_refs: [{path: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/XAUDIT-O1O2-by-w2.md, locator: P0-1, required_state: draft}]}
+requires_checker: {contract_id: closure_registry_checker_v1, generated_block_required: true}
+allowed_roots:
+  repo: .
+  run_dir: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14
+  runs_archive: /Users/wanglei/Projects/agent-tmux-stack-research/runs
+  build: .build
+closure_roots: [V8]
+proof_profiles:
+  - {id: proof_local_contract, allowed_claims: [local_authority_acceptance, local_corpus_lineage, local_accounting], forbidden_claims: [operator_pass, c6_acceptance, v_pass], done_requires: {all_of: [local], any_of: []}}
+  - {id: proof_local_receipt, allowed_claims: [local_receipt_chain, local_training_completion], forbidden_claims: [operator_pass, c6_acceptance, v_pass], done_requires: {all_of: [local], any_of: []}}
+  - {id: proof_integration, allowed_claims: [integration_contract_or_implementation], forbidden_claims: [operator_pass, c6_acceptance, v_pass], done_requires: {all_of: [integration], any_of: []}}
+  - {id: proof_runtime, allowed_claims: [runtime_gate], forbidden_claims: [operator_pass, c6_acceptance, v_pass], done_requires: {all_of: [runtime], any_of: []}}
+  - {id: proof_desktop, allowed_claims: [desktop_operator_equivalent], forbidden_claims: [operator_pass, mobile, true_device, live_api, v_pass], done_requires: {all_of: [desktop_operator_equivalent], any_of: []}}
+  - {id: proof_operator, allowed_claims: [operator_pass], forbidden_claims: [mobile, true_device, live_api, product_v_pass], done_requires: {all_of: [operator_pass], any_of: []}}
+  - {id: proof_closure_join, allowed_claims: [operator_scoped_closure], forbidden_claims: [mobile, true_device, live_api, product_v_pass], done_requires: {all_of: [operator_pass], any_of: []}}
+o6_resource_policy_ref:
+  authority: O6
+  schema_id: closure_execution_window_v1
+  artifact: {root: repo, path: contracts/closure-execution-window.v1.yaml, availability: existing, sha256: null}
+  policy_sha256: null
+  lease_required_for_states: [running]
+receipt_envelope_contract:
+  schema_id: closure_package_exit_envelope_v1
+  registry_schema_major: closure_work_packages_v1
+  require_registry_digest: true
+  require_package_revision: true
+  require_typed_subject: true
+external_facts:
+  - {id: pr42.merged, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: v6.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: t04.ratified, status: satisfied, evidence: {root: repo, path: docs/commander-log/decisions.md, availability: existing, sha256: null}}
+  - {id: human.s8_window, status: pending, evidence: null}
+  - {id: t01.ratified, status: pending, evidence: null}
+  - {id: t02.ratified, status: pending, evidence: null}
+  - {id: t03.ratified, status: pending, evidence: null}
+  - {id: t03_t04.interface_cut, status: pending, evidence: null}
+  - {id: t05.ratified, status: pending, evidence: null}
+  - {id: t06.ratified, status: pending, evidence: null}
+  - {id: t07.ratified, status: pending, evidence: null}
+  - {id: t08.ratified, status: pending, evidence: null}
+  - {id: t09.ratified, status: pending, evidence: null}
+  - {id: t10.ratified, status: pending, evidence: null}
+  - {id: t11.ratified, status: pending, evidence: null}
+  - {id: t12.ratified, status: pending, evidence: null}
+  - {id: default_scope.accepted, status: pending, evidence: null}
+  - {id: o4.schema_available, status: pending, evidence: null}
+packages:
+  - id: B1a
+    source_id: B1a
+    revision: 1
+    kind: execution
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B1a, count_in_hard_denominator: true, deliverable_keys: [s8.model_adapter]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-141, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: preflight, readiness_mode: after_predecessors_and_human_key, reason_codes: [g1_receipt_chain_pending, human_window_pending], transition_receipts: []}
+    proof_state: {declared: partial, evidence: [], verdict: none}
+    prerequisites: [{package_id: B1b, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: human.s8_window, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B1a.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: s8_training_execution_v1, owner_package_id: B1a, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: s8_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-s8-preflight], timeout_seconds: 600, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-s8-training-completion], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_receipt
+    resource_claim_refs: [o6_claim_s8_gpu]
+  - id: B1b
+    source_id: B1b
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B1b, count_in_hard_denominator: true, deliverable_keys: [s8.g1_receipt_chain]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-145, required_state: ratified}]}
+    execution_state: {declared: planned, stage: implementation, readiness_mode: after_predecessors, reason_codes: [launcher_patch_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: v6.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B1b.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: s8_g1_receipt_v1, owner_package_id: B1b, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: s8_g1_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-s8-g1-receipt-source], timeout_seconds: 600, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-s8-g1-receipt-chain], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_receipt
+    resource_claim_refs: [o6_claim_s8_run_dir]
+  - id: B2
+    source_id: B2
+    revision: 1
+    kind: execution
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B2, count_in_hard_denominator: true, deliverable_keys: [s9.three_arm_receipt]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-127, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: preflight, readiness_mode: after_predecessors, reason_codes: [s8_pending, t02_freeze_pending], transition_receipts: []}
+    proof_state: {declared: partial, evidence: [], verdict: none}
+    prerequisites: [{package_id: B1a, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B1b, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B7, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B2.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: s9_three_arm_v1, owner_package_id: B2, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: s9_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-s9-preflight], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-s9-three-arm], timeout_seconds: 7200, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_receipt
+    resource_claim_refs: [o6_claim_gpu]
+  - id: B3
+    source_id: B3
+    revision: 1
+    kind: acceptance
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B3, count_in_hard_denominator: true, deliverable_keys: [s10.technical_verdict]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: B3, required_state: draft}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [s9_pending, t01_t02_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: B2, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B7, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V1, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B3.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: s10_verdict_v1, owner_package_id: B3, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: s10_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-s10-preflight], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-s10-verdict], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_receipt
+    resource_claim_refs: [o6_claim_gpu]
+  - id: B4
+    source_id: B4
+    revision: 1
+    kind: acceptance
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B4, count_in_hard_denominator: true, deliverable_keys: [renderer.ack_receipt]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: B4, required_state: draft}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [s10_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: B3, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B4.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: renderer_ack_v1, owner_package_id: B4, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: renderer_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-s11-renderer-source], timeout_seconds: 600, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-s11-renderer-ack], timeout_seconds: 1200, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: []
+  - id: B5
+    source_id: B5
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B5, count_in_hard_denominator: true, deliverable_keys: [c2.expansion_receipt]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: B5, required_state: draft}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [s10_renderer_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: B3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B4, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B5.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: c2_expansion_v1, owner_package_id: B5, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: c2_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-c2-expansion-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-c2-expansion], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: B6
+    source_id: B6
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B6, count_in_hard_denominator: true, deliverable_keys: [promotion.atomic_transaction]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: B6, required_state: draft}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [promotion_design_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: B3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B4, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W1, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W2, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W3, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: v6.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B6.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: promotion_transaction_v1, owner_package_id: B6, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: promotion_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-proof-flip-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-proof-flip-promotion], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: B7
+    source_id: B7
+    revision: 1
+    kind: authority
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: B7, count_in_hard_denominator: true, deliverable_keys: [c6.corpus_lineage]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-144, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: design, readiness_mode: after_predecessors, reason_codes: [t02_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t02.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/B7.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: corpus_lineage_v1, owner_package_id: B7, success_pointer: /status, success_values: [DONE], freshness_policy: immutable_digest, subject_schema_id: corpus_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-c6-corpus-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-c6-corpus-lineage], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_contract
+    resource_claim_refs: []
+  - id: W1
+    source_id: W1
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W1, count_in_hard_denominator: true, deliverable_keys: [int_v5a.closeout]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-145, required_state: ratified}]}
+    execution_state: {declared: done, stage: closeout, readiness_mode: now, reason_codes: [merge_ba2c3636], transition_receipts: [{root: repo, path: closure/registry/transitions/W1.0001.gap-to-planned.json, availability: existing, sha256: null}, {root: repo, path: closure/registry/transitions/W1.0002.planned-to-ready.json, availability: existing, sha256: null}, {root: repo, path: closure/registry/transitions/W1.0003.ready-to-running.json, availability: existing, sha256: null}, {root: repo, path: closure/registry/transitions/W1.0004.running-to-done.json, availability: existing, sha256: null}]}
+    proof_state: {declared: satisfied, evidence: [{class: integration, artifact: {root: repo, path: closure/registry/native/W1-int-v5a-recheck.md, availability: existing, sha256: 551e2036b27303c22a3a8def11bea814db0c34a16d431b29f7e4018d1bc34cd7}, claim: integration_contract_or_implementation}], verdict: t_pass}
+    prerequisites: []
+    external_gates: [{fact_id: pr42.merged, require_status: satisfied}]
+    exit_receipt: {artifact: {root: repo, path: closure/receipts/W1.v1.json, availability: existing, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: int_v5a_recheck_report_v1, native_artifact: {root: repo, path: closure/registry/native/W1-int-v5a-recheck.md, availability: existing, sha256: 551e2036b27303c22a3a8def11bea814db0c34a16d431b29f7e4018d1bc34cd7}, owner_package_id: W1, success_pointer: /status, success_values: [PASS], freshness_policy: immutable_digest, subject_schema_id: int_v5a_subject_v1}
+    check_command: {entry: {availability: existing, cwd: repo, argv: [git, rev-parse, --verify, HEAD], timeout_seconds: 60, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: existing, cwd: repo, argv: [git, rev-parse, --verify, ba2c3636], timeout_seconds: 60, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W2
+    source_id: W2
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W2, count_in_hard_denominator: true, deliverable_keys: [int_v5b.closeout]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-142, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: implementation, readiness_mode: after_predecessors, reason_codes: [t03_t04_cut_pending, fixed_29_package_scope], transition_receipts: []}
+    proof_state: {declared: partial, evidence: [], verdict: none}
+    prerequisites: [{package_id: W1, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: t03_t04.interface_cut, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W2.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: int_v5b_execution_v1, owner_package_id: W2, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: int_v5b_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-int-v5b-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-int-v5b], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W3
+    source_id: W3
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W3, count_in_hard_denominator: true, deliverable_keys: [int_v5c.closeout]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-142, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: preflight, readiness_mode: after_predecessors, reason_codes: [v5b_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: W1, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W2, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W3.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: int_v5c_execution_v1, owner_package_id: W3, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: int_v5c_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-int-v5c-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-int-v5c], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W4
+    source_id: W4
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W4, count_in_hard_denominator: true, deliverable_keys: [int_v5d.reliability_receipt]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-142, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: preflight, readiness_mode: after_predecessors, reason_codes: [v5abc_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: W1, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W2, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W3, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W4.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: int_v5d_reliability_v1, owner_package_id: W4, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: int_v5d_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-int-v5d-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-int-v5d], timeout_seconds: 7200, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_build_and_target]
+  - id: W5a
+    source_id: W5a
+    revision: 1
+    kind: authority
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W5a, count_in_hard_denominator: true, deliverable_keys: [t04.ingress_facade]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t04_plan_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t04.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W5a.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: t04_ingress_v1, owner_package_id: W5a, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: ingress_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-customer-ingress-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-customer-ingress], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W5b
+    source_id: W5b
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W5b, count_in_hard_denominator: true, deliverable_keys: [local_model.load_readiness]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [artifact_identity_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: V4, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: t04.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W5b.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: local_model_load_v1, owner_package_id: W5b, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: local_model_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-local-model-artifact], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-local-model-load], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_gpu_and_build]
+  - id: W5c
+    source_id: W5c
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W5c, count_in_hard_denominator: true, deliverable_keys: [t04.production_composition]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t03_t09_contract_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: B3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5a, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5b, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5d, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W6, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W8, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W5c.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: production_composition_v1, owner_package_id: W5c, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: production_composition_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-production-composition-source], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-production-composition], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_gpu_and_build]
+  - id: W5d
+    source_id: W5d
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W5d, count_in_hard_denominator: true, deliverable_keys: [t04.decode_policy]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t04_plan_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t04.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W5d.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: decode_policy_v1, owner_package_id: W5d, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: decode_policy_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-decode-policy-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-exactly-one-decode-policy], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W6
+    source_id: W6
+    revision: 1
+    kind: authority
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W6, count_in_hard_denominator: true, deliverable_keys: [c4.routing_contract]}
+    decision_state: {declared: ratified, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-143, required_state: ratified}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [t03_plan_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t03.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W6.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: c4_routing_v1, owner_package_id: W6, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: routing_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-c4-routing-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-c4-routing], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W7
+    source_id: W7
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W7, count_in_hard_denominator: true, deliverable_keys: [dialogue_state.semantic_consumption]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W7, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t10_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t10.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W7.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: dialogue_state_v1, owner_package_id: W7, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: dialogue_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-dialogue-state-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-dialogue-state-consumption], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_integration
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W8
+    source_id: W8
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W8, count_in_hard_denominator: true, deliverable_keys: [session.lifecycle_recovery]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W8, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t09_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t09.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W8.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: session_lifecycle_v1, owner_package_id: W8, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: session_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-session-lifecycle-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-session-lifecycle], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W9
+    source_id: W9
+    revision: 1
+    kind: authority
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W9, count_in_hard_denominator: true, deliverable_keys: [force_state.single_authority]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W9, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t08_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t08.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W9.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: force_state_authority_v1, owner_package_id: W9, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: force_state_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-force-state-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-force-state-authority], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_full_build]
+  - id: W10
+    source_id: W10
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: W10, count_in_hard_denominator: true, deliverable_keys: [tts.hard_runtime_gate]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: W10, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t05_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: t05.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/W10.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: tts_runtime_v1, owner_package_id: W10, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: tts_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, check-tts-preflight], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-tts-runtime], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_build_and_target]
+  - id: V1
+    source_id: V1
+    revision: 1
+    kind: authority
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V1, count_in_hard_denominator: true, deliverable_keys: [c6.active_authority]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/commander-log/decisions.md, locator: D-144, required_state: ratified}]}
+    execution_state: {declared: blocked, stage: design, readiness_mode: after_predecessors, reason_codes: [g2_parent_ballots_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t01.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V1.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: c6_active_authority_v1, owner_package_id: V1, success_pointer: /status, success_values: [DONE], freshness_policy: immutable_digest, subject_schema_id: c6_authority_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-c6-authority-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-c6-active-authority], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_contract
+    resource_claim_refs: []
+  - id: V2
+    source_id: V2
+    revision: 1
+    kind: acceptance
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V2, count_in_hard_denominator: true, deliverable_keys: [operator.final_ceremony]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V2, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t07_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: V3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V4, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V6p, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V7, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W8, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W10, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: t07.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V2.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: operator_ceremony_v1, owner_package_id: V2, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: operator_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-operator-ceremony-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-operator-ceremony], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_operator
+    resource_claim_refs: [o6_claim_target_mac]
+  - id: V3
+    source_id: V3
+    revision: 1
+    kind: acceptance
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V3, count_in_hard_denominator: true, deliverable_keys: [performance.closure_gate]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V3, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t11_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: W4, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: t11.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V3.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: performance_gate_v1, owner_package_id: V3, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: performance_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-runtime-performance-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-runtime-performance], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_target_mac]
+  - id: V4
+    source_id: V4
+    revision: 1
+    kind: authority
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V4, count_in_hard_denominator: true, deliverable_keys: [macos.package_identity]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V4, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t06_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t06.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V4.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: macos_package_v1, owner_package_id: V4, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: macos_package_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-macos-package-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-macos-package], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_desktop
+    resource_claim_refs: [o6_claim_build_and_target]
+  - id: V5
+    source_id: V5
+    revision: 1
+    kind: accounting
+    scope_class: hard
+    closure_required: true
+    counting: {role: aggregate, count_key: V5, count_in_hard_denominator: false, deliverable_keys: [line_a.accounting_receipt]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V5, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [t12_ratification_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: []
+    external_gates: [{fact_id: t12.ratified, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V5.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: line_a_accounting_v1, owner_package_id: V5, success_pointer: /status, success_values: [DONE], freshness_policy: same_repo_head, subject_schema_id: line_a_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-line-a-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-line-a-accounting], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_local_contract
+    resource_claim_refs: []
+  - id: V6p
+    source_id: V6p
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V6p, count_in_hard_denominator: true, deliverable_keys: [mdemo.golden_run]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V6p, required_state: draft}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [default_scope_pending], transition_receipts: []}
+    proof_state: {declared: partial, evidence: [], verdict: none}
+    prerequisites: [{package_id: B5, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: default_scope.accepted, require_status: satisfied}]
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V6p.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: mdemo_golden_v1, owner_package_id: V6p, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: mdemo_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-demo-golden-contract-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-demo-golden-contract], timeout_seconds: 3600, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_runtime
+    resource_claim_refs: [o6_claim_build_and_target]
+  - id: V7
+    source_id: V7
+    revision: 1
+    kind: implementation
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V7, count_in_hard_denominator: true, deliverable_keys: [macos.demo_evidence]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V7, required_state: draft}]}
+    execution_state: {declared: planned, stage: design, readiness_mode: after_predecessors, reason_codes: [validator_missing], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: V4, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: []
+    exit_receipt: {artifact: {root: build, path: closure/receipts/V7.v1.json, availability: planned, sha256: null}, envelope_schema_id: closure_package_exit_envelope_v1, native_schema_id: macos_evidence_v1, owner_package_id: V7, success_pointer: /status, success_values: [DONE], freshness_policy: same_subject, subject_schema_id: macos_evidence_subject_v1}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [python3, Tools/checks/check-macos-demo-evidence.py, --mode, source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-macos-demo-evidence], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_desktop
+    resource_claim_refs: [o6_claim_target_mac]
+  - id: V8
+    source_id: V8
+    revision: 1
+    kind: acceptance
+    scope_class: hard
+    closure_required: true
+    counting: {role: leaf, count_key: V8, count_in_hard_denominator: true, deliverable_keys: [closure.final_verdict]}
+    decision_state: {declared: draft, authority_refs: [{path: docs/roadmap-2026-07-11-v6-closure-baseline.md, locator: V8, required_state: draft}]}
+    execution_state: {declared: gap, stage: design, readiness_mode: after_predecessors, reason_codes: [o4_pending, closure_inputs_pending], transition_receipts: []}
+    proof_state: {declared: none, evidence: [], verdict: none}
+    prerequisites: [{package_id: B3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B5, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: B6, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V1, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V2, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V3, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V4, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V5, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V6p, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: V7, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W5c, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W7, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W9, require_decision: ratified, require_execution: done, require_receipt: true}, {package_id: W10, require_decision: ratified, require_execution: done, require_receipt: true}]
+    external_gates: [{fact_id: o4.schema_available, require_status: satisfied}]
+    exit_receipt:
+      artifact: {root: build, path: closure/receipts/V8.v1.json, availability: planned, sha256: null}
+      envelope_schema_id: closure_package_exit_envelope_v1
+      native_schema_id: closure_verdict_v1
+      owner_package_id: V8
+      success_pointer: /status
+      success_values: [DONE]
+      freshness_policy: same_subject
+      subject_schema_id: closure_subject_v1
+      join_inputs:
+        - {gate_id: model, digest_subject_key: model_gate_receipt_sha256, artifact: {root: build, path: closure/gates/model.v1.json, availability: planned, sha256: null}}
+        - {gate_id: capability, digest_subject_key: capability_gate_receipt_sha256, artifact: {root: build, path: closure/gates/capability.v1.json, availability: planned, sha256: null}}
+        - {gate_id: architecture, digest_subject_key: architecture_gate_receipt_sha256, artifact: {root: build, path: closure/gates/architecture.v1.json, availability: planned, sha256: null}}
+        - {gate_id: demo, digest_subject_key: demo_gate_receipt_sha256, artifact: {root: build, path: closure/gates/demo.v1.json, availability: planned, sha256: null}}
+        - {gate_id: honesty, digest_subject_key: honesty_gate_receipt_sha256, artifact: {root: build, path: closure/gates/honesty.v1.json, availability: planned, sha256: null}}
+        - {gate_id: operator, digest_subject_key: operator_ceremony_receipt_sha256, artifact: {root: build, path: closure/gates/operator.v1.json, availability: planned, sha256: null}}
+    check_command: {entry: {availability: planned, cwd: repo, argv: [make, verify-closure-verdict-source], timeout_seconds: 900, shell: false, env_names: [], success_exit_codes: [0]}, exit: {availability: planned, cwd: repo, argv: [make, verify-closure-verdict], timeout_seconds: 1800, shell: false, env_names: [], success_exit_codes: [0]}}
+    proof_profile_id: proof_closure_join
+    resource_claim_refs: []

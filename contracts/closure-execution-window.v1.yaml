@@ -1,0 +1,15 @@
+schema_version: closure_execution_window_v1
+authority: O6
+lease_required_for_states: [running]
+conflict_pairs:
+  - {left: full_build_exclusive, right: mac_gpu_exclusive}
+  - {left: full_build_exclusive, right: target_mac_operator_exclusive}
+  - {left: mac_gpu_exclusive, right: target_mac_operator_exclusive}
+claims:
+  - {id: o6_claim_s8_gpu, resources: [mac_gpu_exclusive, s8_run_dir_exclusive]}
+  - {id: o6_claim_s8_run_dir, resources: [s8_run_dir_exclusive]}
+  - {id: o6_claim_gpu, resources: [mac_gpu_exclusive]}
+  - {id: o6_claim_full_build, resources: [full_build_exclusive]}
+  - {id: o6_claim_target_mac, resources: [target_mac_operator_exclusive]}
+  - {id: o6_claim_gpu_and_build, resources: [mac_gpu_exclusive, full_build_exclusive]}
+  - {id: o6_claim_build_and_target, resources: [full_build_exclusive, target_mac_operator_exclusive]}

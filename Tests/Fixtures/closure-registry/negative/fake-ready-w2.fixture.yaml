@@ -1,0 +1,11 @@
+fixture_contract: closure_registry_negative_fixture_v1
+id: fake-ready-w2
+patches:
+  - target: registry
+    op: replace
+    path: /packages/by-id/W2/execution_state/declared
+    value: ready
+expect:
+  rc: 65
+  status: BLOCKED
+  errors_include: [E_READY_PREREQUISITE]

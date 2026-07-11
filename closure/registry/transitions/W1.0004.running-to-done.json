@@ -1,0 +1,17 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W1",
+  "package_revision": 1,
+  "sequence": 4,
+  "from_state": "running",
+  "to_state": "done",
+  "trigger_decision": "D-145 accepted merge ba2c3636 after independent recheck and three gates",
+  "evidence": {
+    "root": "repo",
+    "path": "docs/commander-log/decisions.md",
+    "sha256": "5d95778d56f20eb198fd302cfc2660261c73b719e51b369b07a74ec7529ea4d9"
+  },
+  "repo_head": "ba2c36360584bcca8260d57c2be4c9294f82f8a5",
+  "command_rc": 0,
+  "reviewer": "commander"
+}
