@@ -45,6 +45,11 @@ SURFACES = (
     SWIFT_PROBE_SURFACE,
     PROBE_CHECKER_SURFACE,
 )
+# Lexical scan coverage stays the fixed nine production/probe surfaces above
+# (residual: no auto-discovery). Fixture/tests must not invent a second roster:
+# always import these helpers instead of re-listing paths.
+RUNTIME_OWNERSHIP_FIXTURE_SURFACES = SURFACES + (BEHAVIOR_GATE_SURFACE,)
+CHECKER_SANDBOX_FIXTURE_SURFACES = RUNTIME_OWNERSHIP_FIXTURE_SURFACES + (REGISTRY,)
 RUNTIME_LITERAL_SURFACES = (
     DDOMAIN_SURFACE,
     RUNNER_SURFACE,

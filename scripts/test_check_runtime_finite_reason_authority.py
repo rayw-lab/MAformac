@@ -13,24 +13,21 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CHECKER = REPO_ROOT / "Tools/checks/check_runtime_finite_reason_authority.py"
-SURFACES = (
-    Path("Core/LLM/DDomainToolPlanFailure.swift"),
-    Path("Core/Execution/DemoRuntimeSessionRunner.swift"),
-    Path("Core/Execution/DemoRuntimePartialPlan.swift"),
-    Path("Core/Execution/FallbackContext.swift"),
-    Path("Core/Trace/TraceLogger.swift"),
-    Path("Core/Presentation/RuntimePresentationReasonAuthority.generated.swift"),
-    Path("Core/Presentation/RuntimePresentationBridge.swift"),
-    Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
-    Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
-    Path("Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift"),
-    Path("openspec/changes/add-c1-demo-capability-governance/ownership-map.yaml"),
-)
-BEHAVIOR_GATE_METHODS = (
-    "testFallbackResolutionMatchesHardcodedTenReasonScriptTable",
-    "testTraceRoundTripsHardcodedTenFiniteReasonsEndToEnd",
-    "testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace",
-)
+import importlib.util
+
+def _load_finite_reason_checker():
+    spec = importlib.util.spec_from_file_location(
+        "runtime_finite_reason_authority_checker", CHECKER
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+_FINITE_REASON_CHECKER = _load_finite_reason_checker()
+# SSOT: checker exports (no second path roster / no second behavior-gate roster).
+SURFACES = _FINITE_REASON_CHECKER.CHECKER_SANDBOX_FIXTURE_SURFACES
+BEHAVIOR_GATE_METHODS = tuple(_FINITE_REASON_CHECKER.BEHAVIOR_GATE_METHODS.values())
 
 
 class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):

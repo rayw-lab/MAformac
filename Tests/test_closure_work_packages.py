@@ -33,8 +33,47 @@ def load_checker_module():
     return module
 
 
+
 CHECKER_MODULE = load_checker_module()
 
+
+def load_registry() -> dict:
+    return yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+
+
+def expected_counts_from_registry(registry: dict | None = None) -> dict[str, int]:
+    """Independent oracle: len/sum over registry fields (do NOT call production derive_counts)."""
+    if registry is None:
+        registry = load_registry()
+    packages = registry["packages"]
+    hard_leaf = sum(
+        1
+        for package in packages
+        if package["closure_required"]
+        and package["scope_class"] == "hard"
+        and package["counting"]["role"] == "leaf"
+        and package["counting"]["count_in_hard_denominator"]
+    )
+    return {
+        "package_count": len(packages),
+        "hard_leaf_denominator": hard_leaf,
+    }
+
+
+def done_packages_with_transition_receipts(registry: dict | None = None) -> list[str]:
+    """Registry-derived set of done packages that carry transition_receipts (eligible sample set)."""
+    if registry is None:
+        registry = load_registry()
+    return [
+        package["id"]
+        for package in registry["packages"]
+        if package["execution_state"]["declared"] == "done"
+        and package["execution_state"].get("transition_receipts")
+    ]
+
+
+def package_by_id(registry: dict, package_id: str) -> dict:
+    return next(item for item in registry["packages"] if item["id"] == package_id)
 
 def current_head() -> str:
     return subprocess.run(
@@ -159,9 +198,10 @@ def committed_registry_probe(
     elif post_basis_change == "roadmap_generated_table":
         roadmap_path = clone / "docs" / "roadmap-2026-07-11-v6-closure-baseline.md"
         roadmap_text = roadmap_path.read_text(encoding="utf-8")
+        package_count = expected_counts_from_registry()["package_count"]
         roadmap_text, replacement_count = re.subn(
-            r"(?m)^\| packages \| 29 \|$",
-            "| packages | 30 |",
+            rf"(?m)^\| packages \| {package_count} \|$",
+            f"| packages | {package_count + 1} |",
             roadmap_text,
             count=1,
         )
@@ -205,15 +245,17 @@ def committed_registry_probe(
     return result, receipt
 
 
-def test_current_29_package_registry_passes(tmp_path: Path) -> None:
+def test_current_registry_passes_with_derived_counts(tmp_path: Path) -> None:
+    expected = expected_counts_from_registry()
+    package_count = expected["package_count"]
     result = run_checker(tmp_path)
 
     assert result.returncode == 0, result.stderr
     receipt = read_receipt(tmp_path)
     assert receipt["status"] == "PASS"
-    assert receipt["package_count"] == 29
-    assert receipt["hard_leaf_denominator"] == 28
-    assert receipt["root_reach"] == "29/29"
+    assert receipt["package_count"] == package_count
+    assert receipt["hard_leaf_denominator"] == expected["hard_leaf_denominator"]
+    assert receipt["root_reach"] == f"{package_count}/{package_count}"
     assert receipt["resource_pair_encoding"] == "unordered_canonical_single_row"
     assert receipt["lease_states"] == ["running"]
     assert receipt["repo_head"] == current_head()
@@ -279,12 +321,15 @@ def test_unsynchronized_roadmap_generated_table_is_not_guarded_by_staleness(tmp_
     assert "E_STALE_BASIS" not in receipt["errors"]
 
 
-def test_arbitrary_existing_file_cannot_satisfy_w1_transition_chain(tmp_path: Path) -> None:
+@pytest.mark.parametrize("package_id", done_packages_with_transition_receipts())
+def test_arbitrary_existing_file_cannot_satisfy_done_package_transition_chain(
+    tmp_path: Path, package_id: str
+) -> None:
     fixture = write_fixture(
         tmp_path,
         [{
             "target": "registry", "op": "replace",
-            "path": "/packages/by-id/W1/execution_state/transition_receipts",
+            "path": f"/packages/by-id/{package_id}/execution_state/transition_receipts",
             "value": [{"root": "repo", "path": "docs/commander-log/decisions.md", "availability": "existing", "sha256": None}],
         }],
     )
@@ -295,24 +340,28 @@ def test_arbitrary_existing_file_cannot_satisfy_w1_transition_chain(tmp_path: Pa
     assert "E_TRANSITION" in read_receipt(tmp_path)["errors"]
 
 
+@pytest.mark.parametrize("package_id", done_packages_with_transition_receipts())
 @pytest.mark.parametrize("mutation", ["wrong_package", "illegal_edge", "missing_intermediate"])
-def test_w1_transition_chain_rejects_invalid_hops(tmp_path: Path, mutation: str) -> None:
-    registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+def test_done_package_transition_chain_rejects_invalid_hops(
+    tmp_path: Path, package_id: str, mutation: str
+) -> None:
+    registry = load_registry()
     registry["allowed_roots"]["build"] = str(tmp_path)
-    package = next(item for item in registry["packages"] if item["id"] == "W1")
+    package = package_by_id(registry, package_id)
     source_paths = [
         REPO / reference["path"] for reference in package["execution_state"]["transition_receipts"]
     ]
     payloads = [json.loads(path.read_text(encoding="utf-8")) for path in source_paths]
     if mutation == "wrong_package":
-        payloads[1]["package_id"] = "W2"
+        # Use a package_id that is never the subject package.
+        payloads[1]["package_id"] = "W2" if package_id != "W2" else "W3"
     elif mutation == "illegal_edge":
         payloads[1]["to_state"] = "done"
     else:
         payloads.pop(1)
     refs = []
     for index, payload in enumerate(payloads, 1):
-        path = tmp_path / f"transition-{index}.json"
+        path = tmp_path / f"transition-{package_id}-{index}.json"
         path.write_text(json.dumps(payload), encoding="utf-8")
         refs.append({"root": "build", "path": path.name, "availability": "existing", "sha256": None})
     package["execution_state"]["transition_receipts"] = refs
@@ -320,13 +369,14 @@ def test_w1_transition_chain_rejects_invalid_hops(tmp_path: Path, mutation: str)
     assert CHECKER_MODULE.validate_transition_chain(registry, package) == ["E_TRANSITION"]
 
 
+@pytest.mark.parametrize("package_id", done_packages_with_transition_receipts())
 @pytest.mark.parametrize("mutation", ["unknown_head", "digest_not_at_head", "regressing_head"])
-def test_w1_transition_receipts_bind_evidence_to_declared_git_head(
-    tmp_path: Path, mutation: str
+def test_done_package_transition_receipts_bind_evidence_to_declared_git_head(
+    tmp_path: Path, package_id: str, mutation: str
 ) -> None:
-    registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+    registry = load_registry()
     registry["allowed_roots"]["build"] = str(tmp_path)
-    package = next(item for item in registry["packages"] if item["id"] == "W1")
+    package = package_by_id(registry, package_id)
     payloads = [
         json.loads((REPO / reference["path"]).read_text(encoding="utf-8"))
         for reference in package["execution_state"]["transition_receipts"]
@@ -344,7 +394,7 @@ def test_w1_transition_receipts_bind_evidence_to_declared_git_head(
         payloads[3]["evidence"]["sha256"] = "222635a870f302cbbf828073d2066f8f5d2862a61816582890fdd3dd79892000"
     refs = []
     for index, payload in enumerate(payloads, 1):
-        path = tmp_path / f"historical-transition-{index}.json"
+        path = tmp_path / f"historical-transition-{package_id}-{index}.json"
         path.write_text(json.dumps(payload), encoding="utf-8")
         refs.append({"root": "build", "path": path.name, "availability": "existing", "sha256": None})
     package["execution_state"]["transition_receipts"] = refs
@@ -352,12 +402,15 @@ def test_w1_transition_receipts_bind_evidence_to_declared_git_head(
     assert CHECKER_MODULE.validate_transition_chain(registry, package) == ["E_TRANSITION"]
 
 
-def test_wrong_native_receipt_digest_is_rejected(tmp_path: Path) -> None:
+@pytest.mark.parametrize("package_id", done_packages_with_transition_receipts())
+def test_wrong_native_receipt_digest_is_rejected_for_done_package(
+    tmp_path: Path, package_id: str
+) -> None:
     fixture = write_fixture(
         tmp_path,
         [{
             "target": "registry", "op": "replace",
-            "path": "/packages/by-id/W1/exit_receipt/native_artifact/sha256",
+            "path": f"/packages/by-id/{package_id}/exit_receipt/native_artifact/sha256",
             "value": "0" * 64,
         }],
     )
@@ -366,6 +419,72 @@ def test_wrong_native_receipt_digest_is_rejected(tmp_path: Path) -> None:
 
     assert result.returncode == 69, result.stderr
     assert "E_DONE_RECEIPT" in read_receipt(tmp_path)["errors"]
+
+
+def test_eligible_done_package_set_is_four_current() -> None:
+    """Set gate: current registry must expose the full 4/4 eligible done packages (not first-sample)."""
+    eligible = done_packages_with_transition_receipts()
+    assert eligible == ["B1b", "W1", "W5a", "W5d"], eligible
+
+
+def test_schema_accepts_thirty_packages_when_snapshot_matches(tmp_path: Path) -> None:
+    """Schema minItems=29 without maxItems: expand to 30 when package_ids stay in sync."""
+    import copy
+    import json as _json
+
+    registry = load_registry()
+    # Clone an existing package and rewrite identity fields so required keys stay valid.
+    template = copy.deepcopy(registry["packages"][0])
+    template["id"] = "Z30"
+    template["source_id"] = "Z30"
+    template["counting"] = {
+        "role": "leaf",
+        "count_key": "Z30",
+        "count_in_hard_denominator": False,
+        "deliverable_keys": ["classfix.expand30"],
+    }
+    # Keep required nested objects from the clone; force non-done path if exit_receipt present.
+    template["execution_state"] = copy.deepcopy(template["execution_state"])
+    template["execution_state"]["declared"] = template["execution_state"].get("declared", "gap")
+    registry["packages"].append(template)
+    registry["source_snapshot"]["package_ids"] = [package["id"] for package in registry["packages"]]
+    schema = _json.loads(SCHEMA.read_text(encoding="utf-8"))
+    packages_schema = schema["properties"]["packages"]
+    assert packages_schema.get("minItems") == 29
+    assert "maxItems" not in packages_schema
+    ids_schema = schema["$defs"]["source_snapshot"]["properties"]["package_ids"]
+    assert ids_schema.get("minItems") == 29
+    assert "maxItems" not in ids_schema
+    import jsonschema
+
+    jsonschema.validate(instance=registry, schema=schema)
+
+
+def test_schema_and_checker_reject_snapshot_package_set_drift(tmp_path: Path) -> None:
+    """packages/snapshot id set inequality still E_SOURCE_SET_DRIFT (class-fix must not weaken).
+
+    Keep cardinality legal for schema (minItems=29) but change the id set so checker
+    — not schema — owns the drift signal.
+    """
+    registry = load_registry()
+    ids = [package["id"] for package in registry["packages"]]
+    # same length, different set (drop first real id, add synthetic Z9)
+    drifted = ids[1:] + ["Z9"]
+    assert len(drifted) == len(ids)
+    assert set(drifted) != set(ids)
+    fixture = write_fixture(
+        tmp_path,
+        [{
+            "target": "registry",
+            "op": "replace",
+            "path": "/source_snapshot/package_ids",
+            "value": drifted,
+        }],
+    )
+    result = run_checker(tmp_path, "--fixture", str(fixture))
+    assert result.returncode != 0, result.stderr
+    errors = read_receipt(tmp_path)["errors"]
+    assert "E_SOURCE_SET_DRIFT" in errors, errors
 
 
 def test_v8_join_requires_six_real_receipts_with_equal_subject_values(tmp_path: Path) -> None:
@@ -493,11 +612,17 @@ def test_verify_ci_consumes_o1o2_checker_and_presence_gate() -> None:
         assert required in presence.group("body")
 
 
-def test_generated_block_contains_all_29_canonical_package_rows() -> None:
-    registry = yaml.safe_load(REGISTRY.read_text(encoding="utf-8"))
+def test_generated_block_contains_all_canonical_package_rows() -> None:
+    registry = load_registry()
+    expected_ids = [package["id"] for package in registry["packages"]]
     generated = CHECKER_MODULE.render_generated_block(registry)
 
-    rows = re.findall(r"^\| (B1a|B1b|B[2-7]|W(?:10|[1-9]|5[a-d])|V(?:6p|[1-8])) \|", generated, re.MULTILINE)
-    assert len(rows) == 29
-    assert len(set(rows)) == 29
+    # Rows are rendered in registry order; do not hardcode package-id shape rosters.
+    rows = re.findall(
+        r"^\| ([A-Za-z0-9_]+) \| (?:draft|ratified) \| ",
+        generated,
+        re.MULTILINE,
+    )
+    assert rows == expected_ids
+    assert len(set(rows)) == len(expected_ids)
     assert "historical source view; superseded by O1 generated table" in ROADMAP.read_text(encoding="utf-8")

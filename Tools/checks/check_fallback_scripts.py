@@ -12,18 +12,18 @@ from pathlib import Path
 from typing import Any
 
 
-EXPECTED_FAMILIES = (
-    "ac",
-    "seat",
-    "window",
-    "door",
-    "ambient",
-    "screen",
-    "volume",
-    "wiper",
-    "sunroofShade",
-    "fragrance",
-)
+def family_enum_from_source(data: dict[str, Any]) -> tuple[str, ...]:
+    """SSOT = contracts YAML `family_enum` (no second Python roster freeze)."""
+    raw = data.get("family_enum")
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("family_enum must be a non-empty list")
+    if any(not isinstance(item, str) or not item for item in raw):
+        raise ValueError("family_enum entries must be non-empty strings")
+    if len(raw) != len(set(raw)):
+        raise ValueError("family_enum must be unique")
+    return tuple(raw)
+
+
 REQUIRED_CELL_FIELDS = {
     "cell_id",
     "locale",
@@ -367,8 +367,11 @@ def validate(
     expected_safe_reason_kinds = contract["safe_reason_kinds"] if contract else set()
     expected_result_kinds = contract["result_kinds"] if contract else set()
     expected_pairs = contract["bucket_pairs"] if contract else {}
-    if tuple(data.get("family_enum", [])) != EXPECTED_FAMILIES:
+    try:
+        expected_families = family_enum_from_source(data)
+    except ValueError:
         errors.append("family_enum_mismatch")
+        expected_families = ()
 
     cells = data.get("cells", [])
     if not isinstance(cells, list):
@@ -421,7 +424,7 @@ def validate(
         cell_ids.append(cell_id)
         probe_ids.append(str(cell.get("probe_id", "")))
         diagnostic_paths.append(str(cell.get("diagnostic_path", "")))
-        if family not in EXPECTED_FAMILIES:
+        if family not in expected_families:
             unknown_families.append(family)
         if reason not in expected_reasons:
             unknown_reasons.append(reason)
@@ -494,7 +497,7 @@ def validate(
         follow_up_fact_observations.append(resolution)
         follow_up_fact_observations.extend(observations)
 
-    expected_pairs_set = {(family, reason) for family in EXPECTED_FAMILIES for reason in expected_reasons}
+    expected_pairs_set = {(family, reason) for family in expected_families for reason in expected_reasons}
     pair_counts = Counter(pairs)
     missing_pairs = [list(pair) for pair in sorted(expected_pairs_set - set(pair_counts))]
     duplicate_pairs = [list(pair) for pair, count in sorted(pair_counts.items()) if count > 1]
@@ -503,7 +506,7 @@ def validate(
         "probe_id": duplicate_values(probe_ids),
         "diagnostic_path": duplicate_values(diagnostic_paths),
     }
-    if len(cells) != len(EXPECTED_FAMILIES) * len(expected_reasons):
+    if expected_families and expected_reasons and len(cells) != len(expected_families) * len(expected_reasons):
         errors.append(f"cell_count_mismatch:{len(cells)}")
     if missing_pairs:
         errors.append("missing_family_reason_pairs")

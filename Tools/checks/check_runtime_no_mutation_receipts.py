@@ -20,18 +20,18 @@ DEFAULT_SCHEMA = REPO_ROOT / "contracts" / "schemas" / "fallback-probes.schema.j
 DEFAULT_FALLBACK = REPO_ROOT / "contracts" / "fallback-scripts.yaml"
 DEFAULT_GENERATED = REPO_ROOT / "generated" / "demo-fallback-probes.catalog.json"
 
-EXPECTED_FAMILIES = (
-    "ac",
-    "seat",
-    "window",
-    "door",
-    "ambient",
-    "screen",
-    "volume",
-    "wiper",
-    "sunroofShade",
-    "fragrance",
-)
+def family_enum_from_source(data: dict[str, Any]) -> tuple[str, ...]:
+    """SSOT = contracts YAML `family_enum` (no second Python roster freeze)."""
+    raw = data.get("family_enum")
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("family_enum must be a non-empty list")
+    if any(not isinstance(item, str) or not item for item in raw):
+        raise ValueError("family_enum entries must be non-empty strings")
+    if len(raw) != len(set(raw)):
+        raise ValueError("family_enum must be unique")
+    return tuple(raw)
+
+
 EXPECTED_REASONS = (
     "safety_or_clarify_reject",
     "unmounted_name_rejected",
@@ -170,8 +170,19 @@ def _validate_source(source: dict[str, Any], schema: dict[str, Any]) -> tuple[li
     authority = source.get("authority", {})
     if authority.get("receipt_id") != "runtime-no-mutation-40-probes":
         errors.append("receipt_id_mismatch")
-    if tuple(source.get("family_enum", [])) != EXPECTED_FAMILIES:
+    try:
+        expected_families = family_enum_from_source(source)
+    except ValueError:
         errors.append("family_enum_mismatch")
+        expected_families = ()
+    # Cross-source lock: probes family_enum must match fallback-scripts family_enum.
+    try:
+        fallback_payload = json.loads(DEFAULT_FALLBACK.read_text(encoding="utf-8"))
+        fallback_families = family_enum_from_source(fallback_payload)
+        if expected_families and fallback_families != expected_families:
+            errors.append("family_enum_cross_source_mismatch")
+    except Exception:
+        errors.append("family_enum_cross_source_unreadable")
     if tuple(source.get("reason_kind_enum", [])) != EXPECTED_REASONS:
         errors.append("reason_enum_mismatch")
     if source.get("fixture_path_by_reason") != EXPECTED_FIXTURES:
@@ -237,7 +248,7 @@ def _validate_source(source: dict[str, Any], schema: dict[str, Any]) -> tuple[li
         }:
             errors.append("runtime_assertion_contract_mismatch")
 
-    expected_pairs = {(family, reason) for family in EXPECTED_FAMILIES for reason in EXPECTED_REASONS}
+    expected_pairs = {(family, reason) for family in expected_families for reason in EXPECTED_REASONS}
     counts = Counter(pairs)
     missing_pairs = [list(pair) for pair in sorted(expected_pairs - set(counts))]
     duplicate_pairs = [list(pair) for pair, count in sorted(counts.items()) if count > 1]

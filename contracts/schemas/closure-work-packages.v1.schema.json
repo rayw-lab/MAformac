@@ -62,7 +62,7 @@
       }
     },
     "external_facts": {"type": "array", "items": {"$ref": "#/$defs/external_fact"}},
-    "packages": {"type": "array", "minItems": 29, "maxItems": 29, "items": {"$ref": "#/$defs/package"}}
+    "packages": {"type": "array", "minItems": 29, "items": {"$ref": "#/$defs/package"}}
   },
   "$defs": {
     "package_id": {"type": "string", "pattern": "^[A-Z][A-Za-z0-9]{0,15}$"},
@@ -99,7 +99,7 @@
         "manifest_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
         "source_path": {"$ref": "#/$defs/path"}, "source_sha256": {"$ref": "#/$defs/sha256"},
         "repo_head": {"$ref": "#/$defs/git_sha"},
-        "package_ids": {"type": "array", "minItems": 29, "maxItems": 29, "uniqueItems": true, "items": {"$ref": "#/$defs/package_id"}},
+        "package_ids": {"type": "array", "minItems": 29, "uniqueItems": true, "items": {"$ref": "#/$defs/package_id"}},
         "hard_edges": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/edge"}}
       }
     },

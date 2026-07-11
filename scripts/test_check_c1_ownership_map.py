@@ -17,18 +17,19 @@ CHANGE_ID = "add-c1-demo-capability-governance"
 CHANGE_RELATIVE = Path("openspec/changes") / CHANGE_ID
 RATIFIED_RELATIVE = Path("docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md")
 CHECKER = REPO_ROOT / "Tools/checks/check_c1_ownership_map.py"
-RUNTIME_SURFACES = (
-    Path("Core/LLM/DDomainToolPlanFailure.swift"),
-    Path("Core/Execution/DemoRuntimeSessionRunner.swift"),
-    Path("Core/Execution/DemoRuntimePartialPlan.swift"),
-    Path("Core/Execution/FallbackContext.swift"),
-    Path("Core/Trace/TraceLogger.swift"),
-    Path("Core/Presentation/RuntimePresentationReasonAuthority.generated.swift"),
-    Path("Core/Presentation/RuntimePresentationBridge.swift"),
-    Path("Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift"),
-    Path("Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift"),
-    Path("Tools/checks/check_runtime_no_mutation_receipts.py"),
-)
+import importlib.util
+
+def _runtime_ownership_fixture_surfaces():
+    finite_checker = REPO_ROOT / "Tools/checks/check_runtime_finite_reason_authority.py"
+    spec = importlib.util.spec_from_file_location(
+        "runtime_finite_reason_authority_checker", finite_checker
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.RUNTIME_OWNERSHIP_FIXTURE_SURFACES
+
+RUNTIME_SURFACES = _runtime_ownership_fixture_surfaces()
 
 
 class C1OwnershipMapCheckerTests(unittest.TestCase):

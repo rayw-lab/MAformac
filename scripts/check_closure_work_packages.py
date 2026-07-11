@@ -670,8 +670,9 @@ def validate_registry(
     snapshot_ids = snapshot["package_ids"]
     if len(snapshot_ids) != len(set(snapshot_ids)) or set(package_ids) != set(snapshot_ids):
         errors.append("E_SOURCE_SET_DRIFT")
-    if len(packages_list) != 29:
-        errors.append("E_SOURCE_SET_DRIFT")
+    # Package cardinality is free to expand with the registry YAML (schema minItems=29, no maxItems).
+    # Source-set integrity is solely package_ids == source_snapshot.package_ids
+    # (and uniqueness). Do not freeze len(packages) to a design-time literal.
     for package in packages_list:
         if package["source_id"] != package["id"]:
             errors.append("E_SOURCE_SET_DRIFT")
@@ -858,8 +859,9 @@ def validate_registry(
     if packages["V8"]["execution_state"]["declared"] == "done":
         errors.extend(validate_v8_join(registry, packages["V8"], receipts.get("V8", {})))
     counts = derive_counts(packages_list)
-    if counts["hard_leaf_denominator"] != 28:
-        errors.append("E_COUNTING")
+    # hard_leaf_denominator is derived from package counting fields; do not freeze
+    # it to a design-time literal (class-bug: single-era roster). Structural
+    # E_COUNTING still covers duplicate count_key / deliverable_keys above.
     generated = render_generated_block(registry)
     marker_matches = list(MARKER_RE.finditer(roadmap_text))
     if len(marker_matches) != 1 or marker_matches[0].group(0).strip() != generated.strip():
@@ -917,7 +919,12 @@ def write_receipt(path: Path, errors: list[str], metadata: dict[str, Any]) -> No
         "package_count": counts.get("package_count", 0),
         "hard_leaf_denominator": counts.get("hard_leaf_denominator", 0),
         "counts_by_execution": {key: counts.get(key, 0) for key in ALLOWED_EXECUTION},
-        "root_reach": "29/29" if not any(error in {"E_DAG", "E_SOURCE_SET_DRIFT"} for error in errors) else "blocked",
+        "root_reach": (
+            f"{counts.get('package_count', 0)}/{counts.get('package_count', 0)}"
+            if counts.get("package_count", 0)
+            and not any(error in {"E_DAG", "E_SOURCE_SET_DRIFT"} for error in errors)
+            else "blocked"
+        ),
         "resource_pair_encoding": "unordered_canonical_single_row",
         "lease_states": ["running"],
         "resource_holds": metadata.get("resource_holds", []),
