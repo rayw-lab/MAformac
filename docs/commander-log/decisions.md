@@ -1328,3 +1328,13 @@
 - **级联**：V3/V4/W10/V5 保持 GAP（各自 escalate 拍后翻转）；G3 波（T07-T10）v3 修复在途未入本拍。
 - **本日实装收编另账**：W1 int-v5a MERGED `ba2c3636`（V6 首个 DONE）+ B1b receipt 链 MERGED `a3160c88`；W2 containment 半在修（XAUDIT P1×2）。
 - **Non-claims**：G3 未拍；S8 未点火（磊哥「不着急」）；无 operator-pass/V-PASS；baseline_activation 仍 PENDING_CASCADE。
+
+## D-147：32 题池全按⭐ RATIFIED + v5b waiver 收编 + rebuild-c6 解锁——G2/G4/G5 波全闭（2026-07-11 上午，磊哥拍）
+
+- **磊哥原话**：「rebuild C6我同意的 我都授权 包括什么V5B」（承接呈拍池「一句清池」约定）。receipt=`runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md`。
+- **账**：G2 parent 12 + G2-038-C1 重制（⭐B=tags.contract_device 七 device family）+ G4 14 + G5 5 = 32 题全⭐ RATIFIED → **G2/G4/G5 波全闭**（G2=66/66、G4=53/53、G5=29/29）。
+- 🔴 **S10 拍板面硬边解除**：T01/T02 wave 全闭（T02 freeze→S9 执行序硬边保留）。
+- **v5b containment 半收编**：merge `c1/int-v5b-contain-20260711`（tip d4753d47）；`LEIGE-WAIVER-V5B-ABI-1`（Mandatory ABI proof 暂缓授权窗补证，waiver≠proof，residual 如实）；façade/composition 剩余面进可派窗口。**G1 编码波 start gate 的 base 条件满足。**
+- **rebuild-c6**：WAIT_G2_V3_RATIFICATION 解除，carrier disposition 推进授权。
+- **级联**：V6 §一——B7/V1/V3/V4/V5/W10 → RATIFIED_PENDING_PLAN；W2 → containment MERGED+剩余面可派；V2（T07）仍 GAP（G3 波未拍）。
+- **Non-claims**：S8 未点火；A5 各项未逐项点头；ABI proof 未补证；G3 波未拍；canDemo=0/120；无 operator-pass/V-PASS。

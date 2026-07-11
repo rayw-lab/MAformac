@@ -36,13 +36,13 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | B4 | S11 renderer ack | PLAN | v5 §一 序 |
 | B5 | C2 扩挂载（三档表零临场） | PLAN | gate=S10 verdict |
 | B6 | 翻绿 promotion transaction（去重后独占部分） | PLAN | greening v3-DRAFT 的 G1-G8 与 B1/B2/W1-W3/V8 重叠（审计 P1-01）——B6 只保留 promotion 独占事务，G8 join 归 V8 |
-| B7 | T02 corpus/regen/denominator 收敛 | PARTIALLY_RATIFIED（D-144；freeze→S9 硬边不变） | Wave G2；含 release corpus freeze（前移到 S9 前） |
+| B7 | T02 corpus/regen/denominator 收敛 | RATIFIED_PENDING_PLAN（D-147 全闭；freeze→S9 执行序硬边不变） | Wave G2；含 release corpus freeze（前移到 S9 前） |
 
 ### 接线链（13 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
 | W1 | int-v5a：matrix rename（canDemo→actionDemoProven）+ canonical contract bundle/default runner（App diff-free） | **DONE**（merge ba2c3636，D-145） | 审计链=XAUDIT→修复→RECHECK 全 FIXED+commander 三件套亲跑 784/6/0 |
-| W2 | int-v5b：deny-first frontstage admission + customer MicDock→façade + frontstage receipt + run-identity ABI | READY_AFTER_V5A | `SPEC-v5b:4-8` status=READY_FOR_POST_V5A_DISPATCH；🔴 其中 **customer façade/default composition 部分另需 T03/T04 interface cut RATIFIED**（审计 P1-03——防 customer code 再跑在 authority 前）；不依赖 T04 的 deny-first containment 部分可随 v5a 后先行 |
+| W2 | int-v5b：containment 半已收编（merge，LEIGE-WAIVER-V5B-ABI-1 残留=ABI proof 授权窗补证）；façade/composition 剩余面可派（T03/T04 已闭） | `SPEC-v5b:4-8` status=READY_FOR_POST_V5A_DISPATCH；🔴 其中 **customer façade/default composition 部分另需 T03/T04 interface cut RATIFIED**（审计 P1-03——防 customer code 再跑在 authority 前）；不依赖 T04 的 deny-first containment 部分可随 v5a 后先行 |
 | W3 | int-v5c：witness + probe catalog | READY_AFTER_V5A_V5B | `SPEC-v5c:4-8`（要 v5b authenticated receipt） |
 | W4 | int-v5d：reliability（p95≤800ms/20-turn/300s soak） | READY_AFTER_V5ABC | `SPEC-v5d:4-8` READY_AFTER_EXACT_PREDECESSORS |
 | W5a | T04a ingress façade（text 输入/统一 ingress 语义/校验） | RATIFIED_PENDING_PLAN（D-143） | Wave G1；T04 弹药 Q1-Q4 |
@@ -53,16 +53,16 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | W7 | T10 DialogueState 消费语义 | GAP | Wave G3 |
 | W8 | T09 session lifecycle/cancel/recovery | GAP | Wave G3 |
 | W9 | T08 force-state 单一 authority | GAP | Wave G3 |
-| W10 | T05 语音分层：**hard=TTS 门收敛**（stretch ASR 面不进 hard 分母） | GAP | Wave G4；D14 选型不重拍 |
+| W10 | T05 语音分层：**hard=TTS 门收敛**（stretch ASR 面不进 hard 分母） | RATIFIED_PENDING_PLAN（D-147） | Wave G4；D14 选型不重拍 |
 
 ### 验收链（8 包）
 | # | 包 | execution_state | 验收物锚 |
 |---|---|---|---|
-| V1 | T01 C6 量尺 authority 归并/阈值/promotion | PARTIALLY_RATIFIED（D-144；12 parent 上抛在途） | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
-| V2 | T07 operator-pass ceremony（T07a ceremony contract / T07b final operator run） | GAP | Wave G3；🔴 T07b 前置=T06 artifact/build identity（审计 P1-02） |
-| V3 | T11 性能门归属（PF1 + int-v5d receipt 进 closure verdict） | GAP | Wave G4 |
-| V4 | T06 S6 Mac 打包边界（audience/artifact/签名公证 in-out） | GAP | Wave G4；U43 internal-only 已锁 |
-| V5 | T12 Line A 分母 accounting（**不进 hard 分母**） | GAP | Wave G5 |
+| V1 | T01 C6 量尺 authority 归并/阈值/promotion | RATIFIED_PENDING_PLAN（D-147 全闭；S10 拍板面硬边解除） | Wave G2；🔴 S10 verdict 签署前必须 RATIFIED |
+| V2 | T07 operator-pass ceremony（T07a ceremony contract / T07b final operator run） | GAP（G3 波，T07 题未拍——G4G5 拍的不含 T07） | Wave G3；🔴 T07b 前置=T06 artifact/build identity（审计 P1-02） |
+| V3 | T11 性能门归属（PF1 + int-v5d receipt 进 closure verdict） | RATIFIED_PENDING_PLAN（D-147） | Wave G4 |
+| V4 | T06 S6 Mac 打包边界（audience/artifact/签名公证 in-out） | RATIFIED_PENDING_PLAN（D-147） | Wave G4；U43 internal-only 已锁 |
+| V5 | T12 Line A 分母 accounting（**不进 hard 分母**） | RATIFIED_PENDING_PLAN（D-147；A5 各项仍逐项磊哥点头） | Wave G5 |
 | V6p | M-DEMO golden run 实装 | PLAN | 预备包 `PARTIAL/PREPARED`：**16 scenario rows，其中 12 catalog-backed rows 过 source-literal 核验**；checker 未实现、`implementation_authorized=false`（`runs/2026-07-10-ma13/reports/MDEMO-golden-run-impl-pack.md:3-16` + `runs/2026-07-10-ma13/reports/golden-run.v1.yaml:3-8`；审计 P0-03 修正 v6.0 错值「16 rows PASS」） |
 | V7 | A2 evidence package（check-macos-demo-evidence.py + capture） | PLAN | 脚本尚不存在（GAP-HUNT T12 段坐实） |
 | V8 | closure verdict join（五门 receipt 机械汇签，same-subject join） | GAP | 制度物=O4 schema；join key（repo_head/build/model/contract/corpus/scorer）任一不同或缺失=BLOCKED（审计 P1-04） |
