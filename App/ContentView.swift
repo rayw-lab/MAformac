@@ -47,6 +47,7 @@ struct ContentView: View {
     @State private var frontstageRuntimeComposition = FrontstageRuntimeComposition()
     @State private var customerIngressText = ""
     @State private var customerIngressStatusText: String?
+    @State private var customerIngressProofText = "route=demo_slice;status=idle;runner=0;mutation=0;readbacks=0"
     @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
@@ -469,6 +470,11 @@ struct ContentView: View {
             Text(customerIngressStatusText ?? "等待输入")
                 .font(.caption)
                 .accessibilityIdentifier("frontstage-customer-ingress-status")
+            Text(customerIngressProofText)
+                .font(.system(size: 1))
+                .foregroundStyle(.clear)
+                .frame(height: 1)
+                .accessibilityIdentifier("frontstage-demo-slice-proof")
         }
     }
 
@@ -484,13 +490,137 @@ struct ContentView: View {
         precondition(frontstageRuntimeComposition.customerIngress.sessionID == frontstageRuntimeComposition.session.sessionID)
         let result = frontstageRuntimeComposition.customerIngress.submit(input)
         guard case let .accepted(turn) = result else {
-            customerIngressStatusText = "语音输入当前不可用"
-            messages.append(DialogueMessage(role: .assistant, text: "语音输入当前不可用"))
+            guard case let .rejected(rejected) = result else { return }
+            let message: String
+            switch rejected.reason {
+            case .unavailable:
+                message = "语音输入当前不可用"
+            case .blank:
+                message = "请输入车控指令"
+            case .oversize:
+                message = "指令过长，请简短输入"
+            case .rejectedByValidator:
+                message = "这条指令未通过输入校验"
+            }
+            customerIngressStatusText = message
+            customerIngressProofText = "route=demo_slice;status=ingress_rejected;runner=0;mutation=0;readbacks=0;reason=\(String(describing: rejected.reason))"
+            messages.append(DialogueMessage(role: .assistant, text: message))
             return
         }
         customerIngressStatusText = turn.utterance
         frontstageRuntimeComposition.markCurrent(turn)
         guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+        Task { @MainActor in
+            do {
+                let routeResult = try await frontstageRuntimeComposition.routeDemoSlice(
+                    turn,
+                    store: store,
+                    traceLogger: traceLogger,
+                    speech: speech
+                )
+                guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+                if let execution = routeResult.execution {
+                    applyDemoSliceExecution(execution, utterance: turn.utterance)
+                } else if let rejection = routeResult.rejection {
+                    writeContainmentReceipt(turn)
+                    applyDemoSliceRejection(rejection, turn: turn)
+                }
+            } catch {
+                guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+                customerIngressStatusText = "演示链路暂时不可用"
+                messages.append(DialogueMessage(role: .assistant, text: "演示链路暂时不可用"))
+                emitFrontstageRouteReceiptDiagnostic("DEMO_SLICE_ROUTE_FAILED")
+            }
+        }
+    }
+
+    private func applyDemoSliceExecution(_ execution: DemoSliceExecution, utterance: String) {
+        let payload = execution.payload
+        let dialogueText = payload.readbacks.map(\.spokenText).joined(separator: "；")
+        var activeCells = snapshot.activeCells
+        var scopeOrigins = snapshot.scopeOrigins
+        for readback in payload.readbacks {
+            let base = ScopedStateKey(readback.key).base
+            if let family = FamilyCardIDMapper.familyCardID(forBase: base) {
+                activeCells[family] = readback.key
+            }
+            if let scopeOrigin = readback.scopeOrigin {
+                scopeOrigins[readback.key] = scopeOrigin
+            }
+        }
+        let resultKind: DemoRuntimeResultKind
+        switch payload.outcome.result {
+        case .acceptedToolCall: resultKind = .acceptedToolCall
+        case .alreadyStateNoop: resultKind = .alreadyStateNoop
+        default: resultKind = .runtimeError
+        }
+        snapshot = StagePresentationSnapshot.from(
+            store: store,
+            activeCells: activeCells,
+            context: snapshot.context,
+            resultKind: resultKind,
+            traceId: payload.traceID,
+            scopeOrigins: scopeOrigins,
+            orbState: .speak,
+            voiceState: .speaking,
+            dialogText: dialogueText,
+            readbacks: snapshot.readbacks + payload.readbacks,
+            proofClass: .localMock
+        )
+        customerIngressStatusText = dialogueText
+        let readbackValues = payload.readbacks.map { "\($0.key)=\($0.actualValue)" }.joined(separator: ",")
+        customerIngressProofText = "route=demo_slice;status=executed;runner=\(execution.runnerCallCount);mutation=1;matrix_id=\(execution.admission.entry.matrixID);contract_row_id=\(execution.admission.entry.contractRowID);state_revision=\(store.currentRevision);readbacks=\(payload.readbacks.count);values=\(readbackValues)"
+        messages.append(DialogueMessage(role: .user, text: utterance))
+        messages.append(DialogueMessage(role: .assistant, text: dialogueText))
+    }
+
+    private func applyDemoSliceRejection(_ rejection: DemoSliceAdmissionRejection, turn: FrontstageVoiceTurn) {
+        let message: String
+        let resultKind: DemoRuntimeResultKind
+        switch rejection {
+        case .blank:
+            message = "请输入车控指令"
+            resultKind = .clarifyMissingSlot
+        case .valueOutOfRange:
+            message = "空调温度支持18到32度，请重新输入"
+            resultKind = .clarifyMissingSlot
+        case .clarifyMissingSlot:
+            message = "请告诉我空调要打开，还是调到多少度"
+            resultKind = .clarifyMissingSlot
+        case .notInCatalog:
+            let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
+            snapshot = update.snapshot
+            customerIngressStatusText = update.snapshot.dialogText
+            customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=not_in_catalog;state_revision=\(store.currentRevision)"
+            messages.append(contentsOf: update.dialogueTurns.map { dialogueTurn in
+                DialogueMessage(
+                    role: dialogueTurn.role == .user ? .user : .assistant,
+                    text: dialogueTurn.text
+                )
+            })
+            return
+        }
+        snapshot = StagePresentationSnapshot(
+            traceId: snapshot.traceId,
+            storeCells: snapshot.storeCells,
+            activeCells: snapshot.activeCells,
+            refusedCell: snapshot.refusedCell,
+            scopeOrigins: snapshot.scopeOrigins,
+            context: snapshot.context,
+            orbState: .think,
+            voiceState: .idle,
+            dialogText: message,
+            readbacks: snapshot.readbacks,
+            resultKind: resultKind,
+            proofClass: snapshot.proofClass
+        )
+        customerIngressStatusText = message
+        customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(String(describing: rejection));state_revision=\(store.currentRevision)"
+        messages.append(DialogueMessage(role: .user, text: turn.utterance))
+        messages.append(DialogueMessage(role: .assistant, text: message))
+    }
+
+    private func writeContainmentReceipt(_ turn: FrontstageVoiceTurn) {
         do {
             let receiptConfiguration = try FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)
             do {
@@ -505,15 +635,6 @@ struct ContentView: View {
         } catch {
             emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED")
         }
-
-        let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
-        snapshot = update.snapshot
-        messages.append(contentsOf: update.dialogueTurns.map { turn in
-            DialogueMessage(
-                role: turn.role == .user ? .user : .assistant,
-                text: turn.text
-            )
-        })
     }
 
     private func emitFrontstageRouteReceiptDiagnostic(_ code: String) {

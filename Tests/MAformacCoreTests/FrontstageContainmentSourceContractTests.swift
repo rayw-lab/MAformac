@@ -15,6 +15,8 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         XCTAssertFalse(source.contains("onMockVoiceSubmit: applyMockVoiceColdIntent"))
         let submission = try section(in: source, from: "private func submitCustomerMicDock", until: "private func applyMockVoiceColdIntent")
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.session"))
+        XCTAssertTrue(submission.contains("frontstageRuntimeComposition.routeDemoSlice"))
+        XCTAssertTrue(submission.contains("applyDemoSliceExecution"))
         XCTAssertTrue(submission.contains("FrontstageRouteReceiptWriter.writeCurrent"))
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.isCurrentTurn"))
         XCTAssertTrue(submission.contains("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED"))
@@ -25,13 +27,14 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         XCTAssertFalse(submission.contains("applyMockVoiceColdIntent"))
     }
 
-    func testContainmentCompositionDoesNotBindTheProductionRunner() throws {
+    func testCompositionBindsOnlyOneNarrowDemoSliceRouteAndKeepsMockPlannerOut() throws {
         let source = try String(contentsOf: repoRoot.appendingPathComponent("App/FrontstageRuntimeComposition.swift"), encoding: .utf8)
 
         XCTAssertTrue(source.contains("let session: FrontstageVoiceSession"))
-        XCTAssertFalse(source.contains("DemoRuntimeSessionRunner"))
+        XCTAssertTrue(source.contains("private var demoSliceRoute: DemoSliceRoute?"))
+        XCTAssertTrue(source.contains("func routeDemoSlice"))
+        XCTAssertEqual(occurrences(of: "DemoSliceRoute(", in: source), 1)
         XCTAssertFalse(source.contains("DemoRuntimePartialPlan"))
-        XCTAssertFalse(source.contains("ToolCallFrame"))
         XCTAssertFalse(source.contains("MockVoicePresetPlanner"))
     }
 
