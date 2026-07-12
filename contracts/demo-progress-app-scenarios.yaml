@@ -19,5 +19,50 @@
     "count_rule": "A_den = scenarios with count_in_denominator != false; L2_num = runtime_path_reachable true; L3_num = operator_pass true + evidence_complete",
     "note": "File body is JSON-in-.yaml for zero-deps parse (json.loads). PyYAML also accepts it."
   },
-  "scenarios": []
+  "scenarios": [
+    {
+      "id": "app-ac-power-on-zh",
+      "title": "客户文本打开空调",
+      "count_in_denominator": true,
+      "route_mode": "demo_slice",
+      "matrix_id": 1,
+      "contract_row_id": "c1_airControl_000006",
+      "layers": {
+        "runtime_path_reachable": true,
+        "operator_pass": false
+      },
+      "evidence": {
+        "operator": "codex-w4",
+        "basis_head": "0d5416df4fac1d7c846094ac8937cee3ebd54b76",
+        "proof_class": "desktop_operator_equivalent",
+        "receipt_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/live-proof.txt",
+        "receipt_sha256": "594a8ffd3e6da0d0e9ececea51f5e08c5103fab27e1e3d85a73c7afa6b66e32b",
+        "screenshot_paths": [
+          "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/P1-open-ac.png"
+        ]
+      }
+    },
+    {
+      "id": "app-ac-temp-22-zh",
+      "title": "客户文本把空调调到22度",
+      "count_in_denominator": true,
+      "route_mode": "demo_slice",
+      "matrix_id": 4,
+      "contract_row_id": "c1_airControl_000164",
+      "layers": {
+        "runtime_path_reachable": true,
+        "operator_pass": false
+      },
+      "evidence": {
+        "operator": "codex-w4",
+        "basis_head": "0d5416df4fac1d7c846094ac8937cee3ebd54b76",
+        "proof_class": "desktop_operator_equivalent",
+        "receipt_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/live-proof.txt",
+        "receipt_sha256": "594a8ffd3e6da0d0e9ececea51f5e08c5103fab27e1e3d85a73c7afa6b66e32b",
+        "screenshot_paths": [
+          "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/P2-temp-22.png"
+        ]
+      }
+    }
+  ]
 }
