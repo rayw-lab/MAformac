@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -263,6 +263,16 @@ HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.
 
 diff: verify-c1-matrix-canonical
 	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(GENERATED_DOMAIN) $(GENERATED_SWIFT) $(HANDWRITTEN_CONTRACTS) scripts Makefile
+
+# --- demo progress gauge (NON-GATING; user-goal oriented; w2 three-layer fields) ---
+# DO NOT add to verify / verify-ci dependency chains. Always observational exit 0.
+# Layers: actionDemoProven | runtime_path_reachable | operator_pass (ban single 「可演」).
+demo-progress:
+	@$(PYTHON_BOOTSTRAP) Tools/scripts/demo_progress_gauge.py \
+		--receipt .build/c1-run/receipts/c1/capability-matrix.json \
+		--matrix contracts/demo-capability-matrix.json \
+		--app-registry contracts/demo-progress-app-scenarios.yaml \
+		$(if $(REFRESH),--refresh,)
 
 clean-venv:
 	rm -rf .venv
