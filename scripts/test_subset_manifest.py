@@ -3,6 +3,7 @@
 
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -11,6 +12,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "gen_subset_manifest.py"
+MAKEFILE = ROOT / "Makefile"
+VERIFY_SUBSET_BUDGET_TARGET = "verify-subset-budget"
+VERIFY_SUBSET_BUDGET_CHECK_COMMAND = (
+    "HF_HUB_OFFLINE=1 $(PYTHON_TOKENIZER) scripts/gen_subset_manifest.py "
+    "--check --verify-budget --budget-cap 7200 --tokenizer-mode qwen"
+)
 sys.path.insert(0, str(ROOT / "scripts"))
 import gen_subset_manifest as manifest_generator
 
@@ -26,6 +33,91 @@ def run_cmd(args, cwd=ROOT, expect_ok=True):
 
 def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def make_target_block(makefile_text: str, target: str) -> tuple[str, list[str]]:
+    """Return a target header and its tab-prefixed recipe lines.
+
+    The target header intentionally permits prerequisites after the colon so
+    adding a prerequisite cannot make the recipe parser silently miss the
+    check command.
+    """
+    match = re.search(rf"^{re.escape(target)}:[^\n]*\n", makefile_text, re.MULTILINE)
+    if match is None:
+        return "", []
+
+    header = match.group(0).rstrip("\n")
+    recipe_lines = []
+    for line in makefile_text[match.end():].splitlines():
+        if line.startswith("\t"):
+            recipe_lines.append(line[1:])
+            continue
+        if not line:
+            continue
+        break
+    return header, recipe_lines
+
+
+def verify_generated_subset_wiring_errors(makefile_text: str) -> list[str]:
+    generated_header, _ = make_target_block(makefile_text, "verify-generated")
+    generated_prerequisites = generated_header.partition(":")[2].split()
+    _, subset_budget_recipe = make_target_block(makefile_text, VERIFY_SUBSET_BUDGET_TARGET)
+
+    errors = []
+    if VERIFY_SUBSET_BUDGET_TARGET not in generated_prerequisites:
+        errors.append("E_VERIFY_GENERATED_SUBSET_CHECK_EDGE")
+    if subset_budget_recipe != [VERIFY_SUBSET_BUDGET_CHECK_COMMAND]:
+        errors.append("E_VERIFY_SUBSET_BUDGET_CHECK_COMMAND")
+    return errors
+
+
+def test_verify_subset_budget_recipe_accepts_prerequisites():
+    makefile_text = MAKEFILE.read_text(encoding="utf-8")
+    mutated = makefile_text.replace(
+        "verify-subset-budget:\n",
+        "verify-subset-budget: .venv/.deps.stamp\n",
+        1,
+    )
+    header, recipe = make_target_block(mutated, VERIFY_SUBSET_BUDGET_TARGET)
+    assert header == "verify-subset-budget: .venv/.deps.stamp"
+    assert recipe == [VERIFY_SUBSET_BUDGET_CHECK_COMMAND]
+
+
+def test_verify_generated_wires_subset_budget_check():
+    errors = verify_generated_subset_wiring_errors(MAKEFILE.read_text(encoding="utf-8"))
+    assert errors == [], errors
+
+
+def test_verify_generated_wiring_passes_with_prerequisite():
+    makefile_text = MAKEFILE.read_text(encoding="utf-8")
+    mutated = makefile_text.replace(
+        "verify-generated: .venv/.deps.stamp verify-refs test\n",
+        "verify-generated: .venv/.deps.stamp verify-refs test verify-subset-budget\n",
+        1,
+    )
+    assert verify_generated_subset_wiring_errors(mutated) == []
+
+
+def test_verify_generated_subset_check_edge_deleted():
+    makefile_text = MAKEFILE.read_text(encoding="utf-8")
+    mutated = makefile_text.replace(
+        "verify-generated: .venv/.deps.stamp verify-refs test verify-subset-budget\n",
+        "verify-generated: .venv/.deps.stamp verify-refs test\n",
+        1,
+    )
+    errors = verify_generated_subset_wiring_errors(mutated)
+    assert errors == ["E_VERIFY_GENERATED_SUBSET_CHECK_EDGE"], errors
+
+
+def test_verify_subset_budget_check_deleted():
+    makefile_text = MAKEFILE.read_text(encoding="utf-8")
+    mutated = makefile_text.replace(
+        VERIFY_SUBSET_BUDGET_CHECK_COMMAND,
+        VERIFY_SUBSET_BUDGET_CHECK_COMMAND.replace("--check ", "", 1),
+        1,
+    )
+    errors = verify_generated_subset_wiring_errors(mutated)
+    assert errors == ["E_VERIFY_SUBSET_BUDGET_CHECK_COMMAND"], errors
 
 
 def test_real_catalog_single_group_coverage_and_digest_identity():
@@ -233,6 +325,11 @@ def write_grouping(path: Path, seat_groups: dict[str, list[str]], whole_domain_g
 
 def main() -> int:
     tests = [
+        test_verify_subset_budget_recipe_accepts_prerequisites,
+        test_verify_generated_wires_subset_budget_check,
+        test_verify_generated_wiring_passes_with_prerequisite,
+        test_verify_generated_subset_check_edge_deleted,
+        test_verify_subset_budget_check_deleted,
         test_real_catalog_single_group_coverage_and_digest_identity,
         test_fixture_digest_stable,
         test_budget_gate_fails_closed_for_over_cap_single_group,
