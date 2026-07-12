@@ -4,18 +4,18 @@ artifact_kind: closure_work_packages_registry
 authority:
   state: ratified
   source_path: docs/commander-log/decisions.md
-  source_sha256: 1b77d985baa65fdabaf4add29fe4bc898e1be2f4566936a3c834337d7b60974a
+  source_sha256: a44933a07d7626a3a20783b2d89a2abb6c40de08116b37495e96f933cb093d40
   bootstrap_ratification_receipt: null
 basis:
-  repo_head: 81c2b6ae01f0118fd2fb5170afb75262305f2044
-  captured_at: '2026-07-11T19:58:31+08:00'
+  repo_head: 0bff6d29d1e692de7ce637050e15c7d39597bfa3
+  captured_at: '2026-07-12T17:21:15+08:00'
   roadmap_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   roadmap_sha256: ef69acab30dc7d56c382a7277867915ebdf3105cda84dcb46db04753e293a697
 source_snapshot:
   manifest_id: v6_1_source_snapshot_d142_cascade
   source_path: docs/roadmap-2026-07-11-v6-closure-baseline.md
   source_sha256: ef69acab30dc7d56c382a7277867915ebdf3105cda84dcb46db04753e293a697
-  repo_head: 81c2b6ae01f0118fd2fb5170afb75262305f2044
+  repo_head: 0bff6d29d1e692de7ce637050e15c7d39597bfa3
   package_ids: [B1a, B1b, B2, B3, B4, B5, B6, B7, W1, W2, W3, W4, W5a, W5b, W5c, W5d, W6, W7, W8, W9, W10, V1, V2, V3, V4, V5, V6p, V7, V8]
   hard_edges:
     - {from: B7, to: B2}
