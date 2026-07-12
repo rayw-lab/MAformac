@@ -491,13 +491,19 @@ struct ContentView: View {
         customerIngressStatusText = turn.utterance
         frontstageRuntimeComposition.markCurrent(turn)
         guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
-        let receiptConfiguration = try? FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)
-        if let receiptConfiguration {
-            _ = try? FrontstageRouteReceiptWriter.writeCurrent(
-                turn,
-                configuration: receiptConfiguration,
-                isCurrent: { frontstageRuntimeComposition.isCurrentTurn(turn) }
-            )
+        do {
+            let receiptConfiguration = try FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)
+            do {
+                _ = try FrontstageRouteReceiptWriter.writeCurrent(
+                    turn,
+                    configuration: receiptConfiguration,
+                    isCurrent: { frontstageRuntimeComposition.isCurrentTurn(turn) }
+                )
+            } catch {
+                emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_WRITE_FAILED")
+            }
+        } catch {
+            emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED")
         }
 
         let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
@@ -508,6 +514,10 @@ struct ContentView: View {
                 text: turn.text
             )
         })
+    }
+
+    private func emitFrontstageRouteReceiptDiagnostic(_ code: String) {
+        FileHandle.standardError.write(Data("\(code)\n".utf8))
     }
 
     private func applyMockVoiceColdIntent() {
