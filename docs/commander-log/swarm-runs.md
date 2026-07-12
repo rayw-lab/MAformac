@@ -141,3 +141,14 @@
 - **导航与主要产出**：`runs/2026-07-11-ma15/`覆盖G3/D-150/D-151/D-152、TRACKING v3.1、G1/A4/B1b/W5a/W5d/rebuild/classfix、v5b iceberg、carrier三包、GOV设计、lessons/MEMORY/CURRENT/handoff草稿及配对审。`REPORTS-INDEX v4`冻结快照=`180 indexed rows`（FINAL91/DRAFT38/SUPERSEDED51，sha12 180/180，51条successor单跳可解析）；w5g复核=`PASS_WITH_P2`。该180是索引捕获分母，随后落的REMOTE-CI与INDEX复核receipt不倒灌旧快照，等下一次增量刷新。
 - **远端/证明边界**：c96/fbc/83d均有本地双门绿，但`opt/**`不在Verify push trigger内，三SHA远端required check实际是`NO_RUN`，不得写remote CI green或red。v5b formal ABI在本段仍以正式receipt为准，readiness/recipe/local build不替代operator proof；S8未点火，B1a未DONE，rebuild-c6未apply，A4-1未做，`actionDemoProven=0/120`，无operator-pass、V-PASS、C6 acceptance、candidate signed、mobile/true_device/live_api proof。
 - **ops纪律沉淀**：磊哥亲笔/commander预裁件也必须独立审再实证；新门先标`NEVER_GREEN`并逐层取证；跨厂商阵容每次变更重校busy marker；sentinel必须用宿主原生background handle而非裸`&`；所有回稿坚持`read→message→read→Enter`、file-first、live>dated report、局部绿不外推产品绿。
+
+## run 2026-07-12-ma17（PARK100 + 四键批 + carrier/APPLY + 隔离执行链 + docs cascade）
+
+- **决策链**：PARK v3 exact set 封口为 `100=42/43/15`；B1 九题全 A、AUTO 五题全 A；首批三键完成 V7 RATIFY、carrier writeback 与 A5 `G5-019=A/G5-020 plan`。批二磊哥「全部同意 拉满」绑定键4 APPLY、键5 CI recovery、键6 G5020 coding、键7 docs cascade；总 authority=`KEYS-RECEIPT-BATCH2-PLUS-K7` sha `858ea783…`。
+- **carrier/APPLY 主线链**：carrier=`b465514b→1ea47e48→8ce8adc9→a6125d02`；APPLY=`257696e4→33852f50→fadb096c→93232744`，OpenSpec strict 最终 `30/0`。W7 task8=`CODING_GATE_PENDING_RISK_ACK_AT_CODING_KEY`，W9 历史 Gate4 task 4.4 均诚实未勾。
+- **隔离实现链**：G5020 在 `c1/g5020-wiring-20260712` 形成 `36d81306060fdcb9638de8e6b43eab3f9e7dc4a3`（Makefile+test 两文件，本地门绿）；CI recovery 在 `codex/ma16-w2-verify-ci-full-history` 形成 governance B=`42408b7ea46e4adf993e2e0f4cca9324933aafdb`（B-tip+detached local commit-stable）。两链均未 merge mainline、未 push、未宣 remote green。
+- **键7级联**：successor receipt v2 sha=`7212a638…` 确认 Leige key；K7 amend 把 lessons M.86–M.89 纳入 A，A exact join=Git six+MEMORY sidecar one，B=helper exact six。执行基座=`93232744425fd824c2a51d26d347b2b9913c5d90`；最终 HEAD_A/HEAD_B、after SHA 与状态只读 `receipts/ma17-docs-cascade-v2.1/`，本段不预填。
+- **文档资产**：D-154 吸收 `D154-DRAFT-v3` + `D154-ADDENDUM`；SEQ receipt 补录 `fbc4574b` 已完成的一处极性 prose 清洗；handoff/CURRENT 按终态事实源现场写；lessons 追加 M.86–M.89；MEMORY 加 ma17 as-of。
+- **仍开放**：packet v6=`STILL_OPEN`，v7 需基于 docs cascade HEAD_B fresh re-pin；S8=`NOT_READY_TO_IGNITE`；V2 source gate planned，T07b/P8 blocked；`actionDemoProven=0/120`，`baseline_activation=PENDING_CASCADE`。
+- **事务纪律**：A/B 间与事务后禁 push；B 后双门由 commander 亲跑，w2 不宣绿；w3 再做 post-exec read-only audit。任何 source/hash/HEAD/dirty/lock/content/M.79/path/gate 漂移即 HOLD，不 reset/clean/force。
+- **proof boundary**：carrier/APPLY/doc commits、isolated local tests 与 commit-stable proof均不等于 operator-pass、V-PASS、C6 acceptance、candidate、mobile、true_device、live_api 或 production acceptance。
