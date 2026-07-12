@@ -51,10 +51,10 @@
 
 > This unchecked section is the only task group that represents the D-152 W9 delta. It is carrier/spec work only; implementation, apply, coding, merge, package transition, and gate materialization require separate keys.
 
-- [ ] 5.1 Reconcile the live five requirements and Gate1–4R checkbox history against M16-011/M16-012; preserve `KEEP`, `KEEP_WITH_NOTE`, `AMEND_TEXT`, and `HISTORICAL_CHECKBOX_ONLY` dispositions without claiming historical closure.
-- [ ] 5.2 Add the M16-011 one-physical-catalog contract with explicit `debug`/`demo` kind-and-namespace values, stable identity, owner/version fields, duplicate rejection, and no second authority.
-- [ ] 5.3 Add the M16-011 declared digest/canonicalization contract with complete-entry coverage, stable canonical output, and mismatch fail-closed behavior.
-- [ ] 5.4 Add the M16-011 exact versioned migration ledger contract; reject missing/duplicate/ambiguous/fuzzy mappings and forbid `4↔5` mapping.
-- [ ] 5.5 Amend M16-012 force-state ownership to boundary validator → Core applier → projection-only, including direct App/customer mutation and missing-provenance deletion negatives.
-- [ ] 5.6 Preserve W8 lifecycle/fence ownership and keep `verify-force-state-source` / `verify-force-state-authority` marked `PLANNED_GATE_NOT_YET_EXECUTABLE` until their surfaces materialize.
-- [ ] 5.7 Run W9 change strict validation and exact diff checks, then bind the four amended artifacts, pinned plan, key receipt, current HEAD, and unchanged shared-plan status in the W9 pair receipt.
+- [x] 5.1 Reconcile the live five requirements and Gate1–4R checkbox history against M16-011/M16-012; preserve `KEEP`, `KEEP_WITH_NOTE`, `AMEND_TEXT`, and `HISTORICAL_CHECKBOX_ONLY` dispositions without claiming historical closure.
+- [x] 5.2 Add the M16-011 one-physical-catalog contract with explicit `debug`/`demo` kind-and-namespace values, stable identity, owner/version fields, duplicate rejection, and no second authority.
+- [x] 5.3 Add the M16-011 declared digest/canonicalization contract with complete-entry coverage, stable canonical output, and mismatch fail-closed behavior.
+- [x] 5.4 Add the M16-011 exact versioned migration ledger contract; reject missing/duplicate/ambiguous/fuzzy mappings and forbid `4↔5` mapping.
+- [x] 5.5 Amend M16-012 force-state ownership to boundary validator → Core applier → projection-only, including direct App/customer mutation and missing-provenance deletion negatives.
+- [x] 5.6 Preserve W8 lifecycle/fence ownership and keep `verify-force-state-source` / `verify-force-state-authority` marked `PLANNED_GATE_NOT_YET_EXECUTABLE` until their surfaces materialize.
+- [x] 5.7 Run W9 change strict validation and exact diff checks, then bind the four amended artifacts, pinned plan, key receipt, current HEAD, and unchanged shared-plan status in the W9 pair receipt.
