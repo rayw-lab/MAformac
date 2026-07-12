@@ -75,13 +75,13 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
 
-<!-- O1:GENERATED:START registry_sha256=3b32680259ab38314997d2e8333c0e289f8f9a41163656dd116490ee9dd61ed1 checker_sha256=e51de6325a4eba636fc7b63975dbf17cd958ba2ba4fea7d701193e94c2f57ac8 -->
+<!-- O1:GENERATED:START registry_sha256=4e4d356788204fe928860c615662b1c3ec793b290b36d72c58a36c102018139e checker_sha256=e51de6325a4eba636fc7b63975dbf17cd958ba2ba4fea7d701193e94c2f57ac8 -->
 | O1 checker field | derived value |
 |---|---:|
 | packages | 29 |
 | hard leaf denominator | 28 |
 | execution | done=4; ready=0; blocked=4; planned=20; gap=1; running=0; paused=0 |
-| count token | `O1COUNTv1{registry=3b32680259ab38314997d2e8333c0e289f8f9a41163656dd116490ee9dd61ed1;packages=29;hard=28;done=4;ready=0;blocked=4;planned=20;gap=1;running=0;paused=0}` |
+| count token | `O1COUNTv1{registry=4e4d356788204fe928860c615662b1c3ec793b290b36d72c58a36c102018139e;packages=29;hard=28;done=4;ready=0;blocked=4;planned=20;gap=1;running=0;paused=0}` |
 
 | package | decision_state | execution_state | proof_state |
 |---|---|---|---|
