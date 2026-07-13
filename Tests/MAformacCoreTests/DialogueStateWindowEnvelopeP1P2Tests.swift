@@ -212,4 +212,92 @@ final class DialogueStateWindowEnvelopeP1P2Tests: XCTestCase {
         XCTAssertEqual(evicted.auditGroups.count, envelope.auditGroups.count)
         XCTAssertTrue(evicted.auditGroups.isEmpty)
     }
+
+    // MARK: - P2#1 fix: nested validity records are validated (fail-closed)
+
+    private func groupRef(_ ordinal: UInt32) -> DialogueSourceGroupRef {
+        DialogueSourceGroupRef(identity: makeIdentity(ordinal))
+    }
+
+    func testNestedFocusValidityUnsupportedVersionFailsClosed() throws {
+        let json = Data(#""w7.dialogue-state/vNext""#.utf8)
+        let unsupportedVersion = try JSONDecoder().decode(DialogueStateSchemaVersion.self, from: json)
+        let envelope = DialogueStateWindowEnvelope(
+            schemaVersion: .v1,
+            identity: makeIdentity(),
+            bound: DialogueWindowBound(maxActiveGroups: 5),
+            focusValidity: DialogueFieldValidityRecord(
+                reason: .derivedFromReadback,
+                sourceGroupRef: groupRef(1),
+                schemaVersion: unsupportedVersion
+            )
+        )
+        XCTAssertThrowsError(try envelope.validate()) { error in
+            guard case DialogueStateEnvelopeError.unsupportedSchemaVersion(let raw) = error else {
+                return XCTFail("expected nested .unsupportedSchemaVersion got \(error)")
+            }
+            XCTAssertEqual(raw, "w7.dialogue-state/vNext")
+        }
+    }
+
+    func testNestedReadbackValidityUnknownReasonFailsClosed() throws {
+        let json = Data(#"{"kind":"future_reason"}"#.utf8)
+        let unknownReason = try JSONDecoder().decode(DialogueFieldValidityReason.self, from: json)
+        let envelope = DialogueStateWindowEnvelope(
+            schemaVersion: .v1,
+            identity: makeIdentity(),
+            bound: DialogueWindowBound(maxActiveGroups: 5),
+            readbackValidity: DialogueFieldValidityRecord(
+                reason: unknownReason,
+                sourceGroupRef: groupRef(1),
+                schemaVersion: .v1
+            )
+        )
+        XCTAssertThrowsError(try envelope.validate()) { error in
+            guard case DialogueStateEnvelopeError.unknownValidityReason(let label) = error else {
+                return XCTFail("expected .unknownValidityReason got \(error)")
+            }
+            XCTAssertEqual(label, "readbackValidity")
+        }
+    }
+
+    func testNestedFocusValidityEnabledInjectionFailsClosed() {
+        // 类型 API 允许构造 disabled=false（decode 会被拦，但 Swift 侧仍可构造）
+        // → envelope validate 必须补上这一门 fail-closed。
+        let envelope = DialogueStateWindowEnvelope(
+            schemaVersion: .v1,
+            identity: makeIdentity(),
+            bound: DialogueWindowBound(maxActiveGroups: 5),
+            focusValidity: DialogueFieldValidityRecord(
+                reason: .derivedFromExplicitFocusInjection(disabled: false),
+                sourceGroupRef: groupRef(1),
+                schemaVersion: .v1
+            )
+        )
+        XCTAssertThrowsError(try envelope.validate()) { error in
+            guard case DialogueStateEnvelopeError.focusInjectionMustRemainDisabled(let label) = error else {
+                return XCTFail("expected .focusInjectionMustRemainDisabled got \(error)")
+            }
+            XCTAssertEqual(label, "focusValidity")
+        }
+    }
+
+    func testNestedValidityRecordsSupportedRoundTripValidates() throws {
+        let envelope = DialogueStateWindowEnvelope(
+            schemaVersion: .v1,
+            identity: makeIdentity(),
+            bound: DialogueWindowBound(maxActiveGroups: 5),
+            focusValidity: DialogueFieldValidityRecord(
+                reason: .derivedFromReadback,
+                sourceGroupRef: groupRef(1),
+                schemaVersion: .v1
+            ),
+            readbackValidity: DialogueFieldValidityRecord(
+                reason: .invalidated(dueTo: .terminalClear),
+                sourceGroupRef: groupRef(2),
+                schemaVersion: .v1
+            )
+        )
+        XCTAssertNoThrow(try envelope.validate())
+    }
 }

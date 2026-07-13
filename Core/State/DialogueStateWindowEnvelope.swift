@@ -197,7 +197,24 @@ public struct DialogueStateWindowEnvelope: Codable, Equatable, Sendable {
         if UInt(activeGroups.count) > bound.maxActiveGroups {
             throw DialogueStateEnvelopeError.retentionExceeded(current: UInt(activeGroups.count), bound: bound.maxActiveGroups)
         }
+        // nested validity records fail-closed（P2#1）：unknown reason / unsupported schema
+        // / injection enabled → 明确拒收，防 declare-vs-enforce（铁律 1）。
+        try Self.validateNested(focusValidity, label: "focusValidity")
+        try Self.validateNested(readbackValidity, label: "readbackValidity")
         return self
+    }
+
+    private static func validateNested(_ record: DialogueFieldValidityRecord?, label: String) throws {
+        guard let record else { return }
+        guard record.schemaVersion.isSupported else {
+            throw DialogueStateEnvelopeError.unsupportedSchemaVersion(rawValue: record.schemaVersion.rawValue)
+        }
+        guard record.reason.isKnown else {
+            throw DialogueStateEnvelopeError.unknownValidityReason(label: label)
+        }
+        if record.reason.isFocusInjectionAllowed {
+            throw DialogueStateEnvelopeError.focusInjectionMustRemainDisabled(label: label)
+        }
     }
 
     /// 显式驱逐最老一条 active 组，返回新 envelope（不进 auditGroups，
@@ -226,6 +243,8 @@ public enum DialogueStateEnvelopeError: Error, Equatable, Sendable {
     case terminalAuditInActiveWindow
     case nonTerminalGroupInAuditWindow(rawValue: String)
     case retentionExceeded(current: UInt, bound: UInt)
+    case unknownValidityReason(label: String)
+    case focusInjectionMustRemainDisabled(label: String)
 }
 
 // MARK: - Canonical encoding helper
