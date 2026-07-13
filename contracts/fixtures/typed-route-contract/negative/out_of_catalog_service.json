@@ -1,0 +1,30 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "service=media is outside the canonical D-domain catalog {airControl, carControl, cmd} (live jsonl service distribution: 178/2656/1156). SHALL 'Contract SHALL NOT introduce a second D-domain tool registry, service catalog, or fc_flags->exec_tier map' scenario 'Out-of-catalog service is rejected'.",
+    "expected_error": "unknown_enum"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-out-catalog-000001",
+    "trace_id": "trace-neg-out-catalog-000001",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "media",
+    "action_candidate": {
+      "intent": "play_song",
+      "service": "media",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "power_on",
+      "action_code": "activate_instant_device_or_function",
+      "device": "player",
+      "slot": "none",
+      "slot_keys": [],
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

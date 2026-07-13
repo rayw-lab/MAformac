@@ -1,0 +1,40 @@
+{
+  "_source": {
+    "contract_row_id": "c1_cmd_000002",
+    "jsonl_path": "contracts/semantic-function-contract.jsonl",
+    "captured_at": "2026-07-13",
+    "note": "action_candidate.{intent,service,device,action_primitive,action_code} verbatim from live jsonl row (grep-verified 2026-07-13, first cmd row). Third service coverage of the {airControl, carControl, cmd} catalog verified via live jsonl service distribution (airControl 178 / carControl 2656 / cmd 1156)."
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-cmd-000002",
+    "trace_id": "trace-cmd-000002",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "cmd",
+    "action_candidate": {
+      "intent": "open_bluetooth",
+      "service": "cmd",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "power_on",
+      "action_code": "activate_instant_device_or_function",
+      "device": "bluetooth",
+      "slot": "none",
+      "slot_keys": [],
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "trace_digest": "5c9341c96faaf6f7eb1eb139e156c5e69237b38a9837d4421f4ff71c1501d9c8",
+    "rejection_reason": null
+  },
+  "route_trace_load_bearing": {
+    "schema_version": "typed_route_contract.v1",
+    "turn_id": "turn-cmd-000002",
+    "trace_id": "trace-cmd-000002",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "redaction_policy_id": "redaction_policy.v1"
+  }
+}

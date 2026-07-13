@@ -1,0 +1,30 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "value.type=EXP with value.offset='WARM' violates SHALL 'value four-tuple SHALL use jsonl field names verbatim and a typed primitive enum' scenario 'EXP offset must use experiential enum'. Only {LITTLE, MORE, MAX, MIN, HIGH, HIGHER, MIDDLE, LOW, LOWER} are permitted experiential offsets (docs/baseline-semantic-protocol-2026-06-19.md:56).",
+    "expected_error": "unknown_enum"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-exp-offset-000001",
+    "trace_id": "trace-neg-exp-offset-000001",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": {
+      "intent": "raise_ac_temperature_by_exp",
+      "service": "airControl",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "increase_by_exp",
+      "action_code": "increase_value_little",
+      "device": "ac_temperature",
+      "slot": "none",
+      "slot_keys": [],
+      "value": {"ref": "CUR", "direct": "+", "offset": "WARM", "type": "EXP"}
+    },
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

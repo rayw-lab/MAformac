@@ -1,0 +1,30 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "outcome='candidatex' is outside the closed alphabet {candidate, clarify, reject, fallback}. SHALL 'Typed route/model contract SHALL use closed types with three independent axes' scenario 'Unknown enum fails closed'. The value 'candidatex' is a plausible typo that a permissive decoder would silently accept — the total validator MUST fail closed.",
+    "expected_error": "unknown_enum"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-unknown-outcome-000001",
+    "trace_id": "trace-neg-unknown-outcome-000001",
+    "exec_tier": "L2",
+    "outcome": "candidatex",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": {
+      "intent": "open_ac_set_interface",
+      "service": "airControl",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "power_on",
+      "action_code": "open_page",
+      "device": "ac_set_interface",
+      "slot": "none",
+      "slot_keys": [],
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

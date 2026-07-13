@@ -1,0 +1,20 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "schema_version='typed_route_contract.v2' does not match the const RouteSchemaVersion.current='typed_route_contract.v1'. SHALL 'schema_version (const `typed_route_contract.v1`)' in Route result minimum wire fields.",
+    "expected_error": "schema_version_mismatch"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v2",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-schema-drift-000001",
+    "trace_id": "trace-neg-schema-drift-000001",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": null,
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

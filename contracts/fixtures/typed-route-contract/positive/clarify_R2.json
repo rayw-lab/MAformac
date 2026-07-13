@@ -1,0 +1,28 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "note": "R2 clarify positive fixture. Illustrates SHALL 'outcome=clarify SHALL NOT carry rejection_reason (clarify is orthogonal to reject)' and design.md decision that runtime routing states ambiguous/rejected/passthrough (docs/srd-three-layer-intent-routing.md:52) express via outcome axis not by widening clarify_tag alphabet."
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-clarify-000001",
+    "trace_id": "trace-clarify-000001",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": null,
+    "trace_digest": "dc32266bf5f5c96879286a9bf9c7e37b173272469f8cb7aaaab1d07cde02bdaf",
+    "rejection_reason": null
+  },
+  "route_trace_load_bearing": {
+    "schema_version": "typed_route_contract.v1",
+    "turn_id": "turn-clarify-000001",
+    "trace_id": "trace-clarify-000001",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "implicit",
+    "redaction_policy_id": "redaction_policy.v1"
+  }
+}
