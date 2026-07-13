@@ -90,9 +90,36 @@ final class DialogueStatePairingP1P2Tests: XCTestCase {
         let disabled = DialogueFieldValidityReason.derivedFromExplicitFocusInjection(disabled: true)
         XCTAssertFalse(disabled.isFocusInjectionAllowed)
 
-        // 类型 API 上仍能构造 disabled=false，但语义上表示尝试授权——
-        // schema 层的下游门（envelope validate / focus owner isValid）会拒收。
+        // 类型 API 上仍能构造 disabled=false（Swift 编译层不可完全禁止）；
+        // 但 decode 层 + envelope validate + focus owner isValid 三处 fail-closed。
         let enabled = DialogueFieldValidityReason.derivedFromExplicitFocusInjection(disabled: false)
-        XCTAssertTrue(enabled.isFocusInjectionAllowed, "typed schema must expose the 'enabled=true' signal for callers to reject")
+        XCTAssertTrue(enabled.isFocusInjectionAllowed, "typed schema must expose the 'enabled=true' signal for downstream fail-closed")
+    }
+
+    // MARK: - P2#2 fix: decode of disabled=false fails closed
+
+    func testDecodingEnabledFocusInjectionFailsClosed() {
+        let json = Data(#"{"kind":"derived_from_explicit_focus_injection","disabled":false}"#.utf8)
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(DialogueFieldValidityReason.self, from: json)
+        ) { error in
+            guard case DecodingError.dataCorrupted(let ctx) = error else {
+                return XCTFail("expected DecodingError.dataCorrupted got \(error)")
+            }
+            XCTAssertTrue(ctx.debugDescription.contains("disabled=true"))
+        }
+    }
+
+    func testDecodingDisabledFocusInjectionSucceedsAndStaysDisabled() throws {
+        let json = Data(#"{"kind":"derived_from_explicit_focus_injection","disabled":true}"#.utf8)
+        let reason = try JSONDecoder().decode(DialogueFieldValidityReason.self, from: json)
+        XCTAssertFalse(reason.isFocusInjectionAllowed)
+    }
+
+    func testDecodingFocusInjectionAbsentDisabledDefaultsToDisabledTrue() throws {
+        // 缺 disabled 字段 → 默认 disabled=true（不冒充授权）
+        let json = Data(#"{"kind":"derived_from_explicit_focus_injection"}"#.utf8)
+        let reason = try JSONDecoder().decode(DialogueFieldValidityReason.self, from: json)
+        XCTAssertFalse(reason.isFocusInjectionAllowed)
     }
 }

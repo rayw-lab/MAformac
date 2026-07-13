@@ -85,8 +85,16 @@ public enum DialogueFieldValidityReason: Codable, Equatable, Sendable {
             self = .derivedFromReadback
         case "derived_from_explicit_focus_injection":
             let disabled = try container.decodeIfPresent(Bool.self, forKey: .disabled) ?? true
-            // typed schema 层强制 disabled = true（未授权 injection 不可 enable）
-            self = .derivedFromExplicitFocusInjection(disabled: disabled)
+            // typed schema 层 fail-closed 强制 disabled = true（未授权 injection SHALL NOT
+            // 被 enable；对齐 W7 spec R5 与 declare-vs-enforce 铁律 1）
+            guard disabled else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .disabled,
+                    in: container,
+                    debugDescription: "derived_from_explicit_focus_injection SHALL be disabled=true; enabled=true fails closed per W7 spec R5 (focus injection remains disabled until a separate authority is ratified)."
+                )
+            }
+            self = .derivedFromExplicitFocusInjection(disabled: true)
         case "invalidated":
             let cause = try container.decode(DialogueFieldValidityInvalidationCause.self, forKey: .cause)
             self = .invalidated(dueTo: cause)
