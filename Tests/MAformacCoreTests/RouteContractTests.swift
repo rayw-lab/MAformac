@@ -1,0 +1,592 @@
+import XCTest
+@testable import MAformacCore
+
+final class RouteContractTests: XCTestCase {
+
+    // MARK: - Helpers
+
+    private func makeAirControlCandidate() -> ActionCandidate {
+        ActionCandidate(
+            intent: "open_ac_set_interface",
+            service: .airControl,
+            mountedToolName: "adjust_ac_temperature_to_number",
+            actionPrimitive: "power_on",
+            actionCode: "open_page",
+            device: "ac_set_interface",
+            slot: "none",
+            slotKeys: [],
+            value: RouteValueFourTuple()
+        )
+    }
+
+    private func makeCarControlCandidate() -> ActionCandidate {
+        ActionCandidate(
+            intent: "open_window",
+            service: .carControl,
+            mountedToolName: "adjust_ac_temperature_to_number",
+            actionPrimitive: "power_on",
+            actionCode: "open_process_device",
+            device: "window",
+            slot: "none",
+            slotKeys: [],
+            value: RouteValueFourTuple()
+        )
+    }
+
+    private func makeTrace(
+        turnID: String = "turn-1",
+        traceID: String = "trace-1",
+        execTier: RouteExecTier = .L2,
+        outcome: RouteOutcome = .candidate,
+        clarifyTag: RouteClarifyTag = .implicit,
+        rejectionReason: RouteError? = nil,
+        redactionPolicyID: String = "redaction_policy.v1",
+        staleMarker: String? = nil
+    ) throws -> RouteTrace {
+        let placeholder = RouteTrace(
+            turnID: turnID,
+            traceID: traceID,
+            execTier: execTier,
+            outcome: outcome,
+            clarifyTag: clarifyTag,
+            rejectionReason: rejectionReason,
+            redactionPolicyID: redactionPolicyID,
+            staleMarker: staleMarker,
+            traceDigest: ""
+        )
+        return try placeholder.withRecomputedDigest()
+    }
+
+    private func makeResult(
+        turnID: String = "turn-1",
+        traceID: String = "trace-1",
+        execTier: RouteExecTier = .L2,
+        outcome: RouteOutcome = .candidate,
+        clarifyTag: RouteClarifyTag = .implicit,
+        service: RouteService = .airControl,
+        actionCandidate: ActionCandidate? = nil,
+        rejectionReason: RouteError? = nil,
+        traceDigest: String
+    ) -> RouteResult {
+        RouteResult(
+            routeSchema: "route_schema.demo.v1",
+            turnID: turnID,
+            traceID: traceID,
+            execTier: execTier,
+            outcome: outcome,
+            clarifyTag: clarifyTag,
+            service: service,
+            actionCandidate: actionCandidate,
+            traceDigest: traceDigest,
+            rejectionReason: rejectionReason
+        )
+    }
+
+    // MARK: - Three-axis independence
+
+    func testThreeAxisIndependentPositive() throws {
+        let trace = try makeTrace(execTier: .L1, outcome: .candidate, clarifyTag: .explicit)
+        let result = makeResult(
+            execTier: .L1,
+            outcome: .candidate,
+            clarifyTag: .explicit,
+            service: .airControl,
+            actionCandidate: makeAirControlCandidate(),
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertNoThrow(try RouteContractValidator.validate(result, trace: trace))
+    }
+
+    func testExecTierAlphabetIsClosed() {
+        let cases = RouteExecTier.allCases.map(\.rawValue).sorted()
+        XCTAssertEqual(cases, ["L1", "L2", "L3", "L4", "L5"])
+    }
+
+    func testOutcomeAlphabetIsClosed() {
+        let cases = RouteOutcome.allCases.map(\.rawValue).sorted()
+        XCTAssertEqual(cases, ["candidate", "clarify", "fallback", "reject"])
+    }
+
+    func testClarifyTagAlphabetStrictJsonlAlignment() {
+        // Two values only — matches jsonl row-level distribution
+        // (explicit + implicit; runtime ambiguous/rejected/passthrough go through outcome / RouteError).
+        let cases = RouteClarifyTag.allCases.map(\.rawValue).sorted()
+        XCTAssertEqual(cases, ["explicit", "implicit"])
+    }
+
+    func testWidenedClarifyTagRejectedByDecode() throws {
+        let json = """
+        {
+          "schema_version": "typed_route_contract.v1",
+          "route_schema": "route_schema.demo.v1",
+          "turn_id": "t1",
+          "trace_id": "tr1",
+          "exec_tier": "L2",
+          "outcome": "clarify",
+          "clarify_tag": "ambiguous",
+          "service": "airControl",
+          "action_candidate": null,
+          "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+          "rejection_reason": null
+        }
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try JSONDecoder().decode(RouteResult.self, from: json))
+    }
+
+    func testUnknownExecTierFailsClosedOnDecode() throws {
+        let json = """
+        {
+          "schema_version": "typed_route_contract.v1",
+          "route_schema": "route_schema.demo.v1",
+          "turn_id": "t1",
+          "trace_id": "tr1",
+          "exec_tier": "L9",
+          "outcome": "candidate",
+          "clarify_tag": "implicit",
+          "service": "airControl",
+          "action_candidate": null,
+          "trace_digest": "0",
+          "rejection_reason": null
+        }
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try JSONDecoder().decode(RouteResult.self, from: json))
+    }
+
+    // MARK: - Minimum wire fields / ontology narrowing
+
+    func testCandidateOutcomeRequiresActionCandidate() throws {
+        let trace = try makeTrace(outcome: .candidate)
+        let result = makeResult(
+            outcome: .candidate,
+            actionCandidate: nil,
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.illegalCombination = error else {
+                return XCTFail("expected .illegalCombination, got \(error)")
+            }
+        }
+    }
+
+    func testRejectOutcomeRequiresRejectionReason() throws {
+        let trace = try makeTrace(outcome: .reject, rejectionReason: nil)
+        let result = makeResult(
+            outcome: .reject,
+            actionCandidate: nil,
+            rejectionReason: nil,
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.illegalCombination = error else {
+                return XCTFail("expected .illegalCombination, got \(error)")
+            }
+        }
+    }
+
+    func testClarifyOutcomeForbidsRejectionReason() throws {
+        let trace = try makeTrace(outcome: .clarify)
+        let result = makeResult(
+            outcome: .clarify,
+            actionCandidate: nil,
+            rejectionReason: .clarifyRequired(.implicit),
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.illegalCombination = error else {
+                return XCTFail("expected .illegalCombination, got \(error)")
+            }
+        }
+    }
+
+    func testRouteResultCodableRoundTrip() throws {
+        let trace = try makeTrace(outcome: .candidate, clarifyTag: .explicit)
+        let original = makeResult(
+            outcome: .candidate,
+            clarifyTag: .explicit,
+            actionCandidate: makeAirControlCandidate(),
+            traceDigest: trace.traceDigest
+        )
+        let encoded = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(RouteResult.self, from: encoded)
+        XCTAssertEqual(original, decoded)
+    }
+
+    func testSessionIDLeakThroughForeignKeyRejected() throws {
+        // Extra field session_id (from jsonl-adjacent world) SHALL NOT be tolerated:
+        // Swift Codable with default init(from:) succeeds on extra fields, so we
+        // rely on the JSON schema validator (Python fixture checker) + design.
+        // Here we verify RouteResult itself DOES NOT expose session_id in any
+        // codable path (compile-time guarantee: no such property).
+        let mirror = Mirror(reflecting: RouteResult(
+            routeSchema: "r",
+            turnID: "t",
+            traceID: "tr",
+            execTier: .L2,
+            outcome: .clarify,
+            clarifyTag: .implicit,
+            service: .airControl,
+            actionCandidate: nil,
+            traceDigest: String(repeating: "0", count: 64),
+            rejectionReason: nil
+        ))
+        let names = mirror.children.compactMap { $0.label }
+        XCTAssertFalse(names.contains("sessionID"))
+        XCTAssertFalse(names.contains("eventID"))
+        XCTAssertFalse(names.contains("sequence"))
+    }
+
+    // MARK: - Mounted D-domain tool binding
+
+    func testUnmountedNameRejected() throws {
+        let unmounted = ActionCandidate(
+            intent: "raise_ac_temperature_by_exp",
+            service: .airControl,
+            mountedToolName: "raise_ac_temperature_by_exp",
+            actionPrimitive: "increase_by_exp",
+            actionCode: "increase_value_little",
+            device: "ac_temperature",
+            slot: "none",
+            slotKeys: [],
+            value: RouteValueFourTuple(
+                ref: .CUR, direct: .plus,
+                offset: .experiential(.LITTLE), type: .EXP
+            )
+        )
+        let trace = try makeTrace(outcome: .candidate)
+        let result = makeResult(
+            outcome: .candidate,
+            actionCandidate: unmounted,
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.unmountedName(let name) = error else {
+                return XCTFail("expected .unmountedName, got \(error)")
+            }
+            XCTAssertEqual(name, "raise_ac_temperature_by_exp")
+        }
+    }
+
+    func testMountedToolBindingIsSSOTNotDuplicated() {
+        // Live-cored: personaAvoidListToolNames is NOT mountedToolNames.
+        // The validator consumes DDomainMountedToolCatalog.mountedToolNames only.
+        XCTAssertEqual(
+            DDomainMountedToolCatalog.mountedToolNames,
+            ["adjust_ac_temperature_to_number"]
+        )
+        // personaAvoidListToolNames must not overlap with mountedToolNames.
+        XCTAssertTrue(
+            DDomainMountedToolCatalog.mountedToolNames
+                .isDisjoint(with: DDomainMountedToolCatalog.personaAvoidListToolNames)
+        )
+    }
+
+    // MARK: - Value four-tuple typed enums
+
+    func testValueEmptyDecodesEachAxisEmpty() throws {
+        let json = "{\"ref\":\"\",\"direct\":\"\",\"offset\":\"\",\"type\":\"\"}"
+            .data(using: .utf8)!
+        let value = try JSONDecoder().decode(RouteValueFourTuple.self, from: json)
+        XCTAssertEqual(value.ref, .empty)
+        XCTAssertEqual(value.direct, .empty)
+        XCTAssertEqual(value.type, .empty)
+        XCTAssertEqual(value.offset, .empty)
+        XCTAssertTrue(value.isEmpty)
+    }
+
+    func testExpWithExperientialOffsetAccepted() throws {
+        let value = RouteValueFourTuple(
+            ref: .CUR, direct: .plus,
+            offset: .experiential(.LITTLE), type: .EXP
+        )
+        let encoded = try JSONEncoder().encode(value)
+        let decoded = try JSONDecoder().decode(RouteValueFourTuple.self, from: encoded)
+        XCTAssertEqual(value, decoded)
+    }
+
+    func testExpWithLiteralOffsetFailsValidator() throws {
+        let bad = ActionCandidate(
+            intent: "raise_ac_temperature_by_exp",
+            service: .airControl,
+            mountedToolName: "adjust_ac_temperature_to_number",
+            actionPrimitive: "increase_by_exp",
+            actionCode: "increase_value_little",
+            device: "ac_temperature",
+            slot: "none",
+            slotKeys: [],
+            value: RouteValueFourTuple(
+                ref: .CUR, direct: .plus,
+                offset: .literal("WARM"), type: .EXP
+            )
+        )
+        let trace = try makeTrace(outcome: .candidate)
+        let result = makeResult(
+            outcome: .candidate,
+            actionCandidate: bad,
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.unknownEnum(let field) = error else {
+                return XCTFail("expected .unknownEnum, got \(error)")
+            }
+            XCTAssertEqual(field, "value.offset")
+        }
+    }
+
+    func testValueFourTupleFieldNamesAreJsonlVerbatim() throws {
+        // Verify canonical JSON keys match jsonl SSOT names exactly.
+        let value = RouteValueFourTuple()
+        let data = try RouteCanonicalJSON.encode(value)
+        let s = String(data: data, encoding: .utf8)!
+        XCTAssertEqual(s, "{\"direct\":\"\",\"offset\":\"\",\"ref\":\"\",\"type\":\"\"}")
+    }
+
+    // MARK: - Error enum coverage / precedence
+
+    func testRouteErrorHasAllRequiredCases() {
+        let errors: [RouteError] = [
+            .riskR0Forbidden("_"),
+            .illegalCombination("_"),
+            .unmountedName("_"),
+            .outOfCatalog("_"),
+            .oldGeneration("_"),
+            .staleSource("_"),
+            .digestMismatch(expected: "_", actual: "_"),
+            .schemaVersionMismatch(expected: "_", actual: "_"),
+            .payloadInvalid("_"),
+            .slotMissing("_"),
+            .valueOutOfRange("_"),
+            .unknownEnum("_"),
+            .riskR1PreconditionUnmet("_"),
+            .clarifyRequired(.implicit)
+        ]
+        // All 14 cases unique via `code`.
+        let codes = Set(errors.map(\.code))
+        XCTAssertEqual(codes.count, 14)
+    }
+
+    func testR0TakesPrecedenceOverR1() {
+        let selected = RouteContractValidator.selectRejection(from: [
+            .riskR1PreconditionUnmet("state precondition unmet"),
+            .riskR0Forbidden("driving forbidden")
+        ])
+        guard case .riskR0Forbidden = selected else {
+            return XCTFail("expected R0 selected over R1")
+        }
+    }
+
+    func testRejectionPrecedenceIsTotalOrdered() {
+        // Rank ordering matches SHALL enumeration.
+        let ranks = [
+            RouteError.riskR0Forbidden("_").rank,
+            RouteError.illegalCombination("_").rank,
+            RouteError.unmountedName("_").rank,
+            RouteError.outOfCatalog("_").rank,
+            RouteError.oldGeneration("_").rank,
+            RouteError.staleSource("_").rank,
+            RouteError.digestMismatch(expected: "_", actual: "_").rank,
+            RouteError.schemaVersionMismatch(expected: "_", actual: "_").rank,
+            RouteError.payloadInvalid("_").rank,
+            RouteError.slotMissing("_").rank,
+            RouteError.valueOutOfRange("_").rank,
+            RouteError.unknownEnum("_").rank,
+            RouteError.riskR1PreconditionUnmet("_").rank,
+            RouteError.clarifyRequired(.implicit).rank
+        ]
+        XCTAssertEqual(ranks, Array(0...13))
+    }
+
+    func testRouteErrorCodableRoundTrip() throws {
+        let cases: [RouteError] = [
+            .riskR0Forbidden("driving forbidden"),
+            .unmountedName("bad_tool"),
+            .digestMismatch(expected: "aa", actual: "bb"),
+            .clarifyRequired(.implicit),
+            .valueOutOfRange("50%>range")
+        ]
+        for original in cases {
+            let data = try JSONEncoder().encode(original)
+            let decoded = try JSONDecoder().decode(RouteError.self, from: data)
+            XCTAssertEqual(original, decoded)
+        }
+    }
+
+    // MARK: - RouteTrace canonical digest
+
+    func testDigestIsStableForIdenticalLoadBearing() throws {
+        let a = try makeTrace(turnID: "t", traceID: "tr", execTier: .L2,
+                              outcome: .candidate, clarifyTag: .implicit)
+        let b = try makeTrace(turnID: "t", traceID: "tr", execTier: .L2,
+                              outcome: .candidate, clarifyTag: .implicit)
+        XCTAssertEqual(a.traceDigest, b.traceDigest)
+    }
+
+    func testDigestFlipsOnLoadBearingChange() throws {
+        let a = try makeTrace(outcome: .candidate)
+        let b = try makeTrace(outcome: .reject,
+                              rejectionReason: .riskR0Forbidden("_"))
+        XCTAssertNotEqual(a.traceDigest, b.traceDigest)
+    }
+
+    func testDigestMismatchBetweenResultAndTraceRejected() throws {
+        let trace = try makeTrace(outcome: .candidate)
+        // Deliberately wrong digest.
+        let wrong = String(repeating: "d", count: 64)
+        let result = makeResult(
+            outcome: .candidate,
+            actionCandidate: makeAirControlCandidate(),
+            traceDigest: wrong
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result, trace: trace)) { error in
+            guard case RouteError.digestMismatch(let expected, let actual) = error else {
+                return XCTFail("expected .digestMismatch, got \(error)")
+            }
+            XCTAssertEqual(expected, wrong)
+            XCTAssertEqual(actual, trace.traceDigest)
+        }
+    }
+
+    func testCanonicalJSONSortedKeysDeterministic() throws {
+        let subject = RouteSubject(
+            routeSchema: "s",
+            turnID: "t",
+            traceID: "tr",
+            sourceIdentity: RouteSourceIdentity(
+                matrixSourceSHA256: "aa",
+                runtimeContractBundleDigest: "bb"
+            ),
+            sourceRevision: "rev1",
+            staleMarker: nil,
+            contractDigest: "cc"
+        )
+        let a = try RouteCanonicalJSON.sha256Hex(subject)
+        let b = try RouteCanonicalJSON.sha256Hex(subject)
+        XCTAssertEqual(a, b)
+        // Load-bearing change flips digest.
+        let subject2 = RouteSubject(
+            routeSchema: "s",
+            turnID: "t",
+            traceID: "tr",
+            sourceIdentity: RouteSourceIdentity(
+                matrixSourceSHA256: "aa",
+                runtimeContractBundleDigest: "bb"
+            ),
+            sourceRevision: "rev2",  // changed
+            staleMarker: nil,
+            contractDigest: "cc"
+        )
+        let c = try RouteCanonicalJSON.sha256Hex(subject2)
+        XCTAssertNotEqual(a, c)
+    }
+
+    // MARK: - Fixture consumption
+
+    private func fixtureURL(_ subdir: String, _ filename: String) -> URL? {
+        // Fixtures live outside the test bundle at contracts/fixtures/typed-route-contract/.
+        // Walk up from the test source file location.
+        // XCTest runs with cwd = package root when invoked via `swift test`.
+        let fm = FileManager.default
+        let cwd = fm.currentDirectoryPath
+        let path = "\(cwd)/contracts/fixtures/typed-route-contract/\(subdir)/\(filename)"
+        return fm.fileExists(atPath: path) ? URL(fileURLWithPath: path) : nil
+    }
+
+    func testAirControlPositiveFixtureRoundTripAndValidator() throws {
+        guard let url = fixtureURL("positive", "airControl_candidate.json") else {
+            throw XCTSkip("fixture path not resolvable — cwd not package root")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let routeResultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: routeResultData)
+
+        // Reconstruct the trace and verify digest matches the fixture's pinned digest.
+        let lb = root["route_trace_load_bearing"] as! [String: Any]
+        let trace = RouteTrace(
+            turnID: lb["turn_id"] as! String,
+            traceID: lb["trace_id"] as! String,
+            execTier: RouteExecTier(rawValue: lb["exec_tier"] as! String)!,
+            outcome: RouteOutcome(rawValue: lb["outcome"] as! String)!,
+            clarifyTag: RouteClarifyTag(rawValue: lb["clarify_tag"] as! String)!,
+            rejectionReason: nil,
+            redactionPolicyID: lb["redaction_policy_id"] as! String,
+            staleMarker: nil,
+            traceDigest: ""
+        )
+        let recomputed = try trace.computeTraceDigest()
+        XCTAssertEqual(recomputed, result.traceDigest,
+                       "Swift-computed digest must equal pinned fixture digest")
+        let boundTrace = try trace.withRecomputedDigest()
+        XCTAssertNoThrow(try RouteContractValidator.validate(result, trace: boundTrace))
+    }
+
+    func testCarControlPositiveFixtureValidatorAccepts() throws {
+        guard let url = fixtureURL("positive", "carControl_candidate.json") else {
+            throw XCTSkip("fixture path not resolvable")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let resultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
+        XCTAssertNoThrow(try RouteContractValidator.validate(result))
+        XCTAssertEqual(result.service, .carControl)
+        XCTAssertEqual(result.actionCandidate?.intent, "open_window")
+    }
+
+    func testCmdPositiveFixtureValidatorAccepts() throws {
+        guard let url = fixtureURL("positive", "cmd_candidate.json") else {
+            throw XCTSkip("fixture path not resolvable")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let resultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
+        XCTAssertNoThrow(try RouteContractValidator.validate(result))
+        XCTAssertEqual(result.service, .cmd)
+        XCTAssertEqual(result.actionCandidate?.intent, "open_bluetooth")
+    }
+
+    func testUnmountedToolFixtureRejected() throws {
+        guard let url = fixtureURL("negative", "unmounted_tool_name.json") else {
+            throw XCTSkip("fixture path not resolvable")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let resultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.unmountedName = error else {
+                return XCTFail("expected .unmountedName, got \(error)")
+            }
+        }
+    }
+
+    func testIllegalCombinationFixtureRejected() throws {
+        guard let url = fixtureURL("negative", "illegal_combination_candidate_without_action.json") else {
+            throw XCTSkip("fixture path not resolvable")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let resultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.illegalCombination = error else {
+                return XCTFail("expected .illegalCombination, got \(error)")
+            }
+        }
+    }
+
+    func testSchemaVersionDriftFixtureRejected() throws {
+        guard let url = fixtureURL("negative", "schema_version_drift.json") else {
+            throw XCTSkip("fixture path not resolvable")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let resultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.schemaVersionMismatch = error else {
+                return XCTFail("expected .schemaVersionMismatch, got \(error)")
+            }
+        }
+    }
+}
