@@ -4,6 +4,40 @@ public enum DemoRuntimeSessionRunnerError: Error, Equatable {
     case multiFramePlanRequiresPartialExecution(frameIDs: [String])
 }
 
+/// D1 wire producer contract: given the accepted `ToolCallFrame` of a turn,
+/// return a `RouteToDialogueCorrelation` binding W6 route identity
+/// (`RouteTurnIdentifier` / `RouteTraceIdentifier`) with W7 dialogue group
+/// identity (`DialogueSourceGroupRef`). Returning `nil` opts the turn out
+/// of typed-facts recording without failing the run.
+///
+/// The producer must fully construct a schema-supported correlation — the
+/// downstream reducer (`DialogueState.recordTypedFacts`) will fail-closed on
+/// unsupported schema versions, missing identity fields, or version mismatch.
+/// See `~/.claude/rules/claim-vs-reality-gap.md` 铁律 1 (enforce, not declare).
+public struct RuntimeSessionCorrelationProvider {
+    public let makeCorrelation: @MainActor (_ frame: ToolCallFrame, _ traceID: String) -> RouteToDialogueCorrelation?
+
+    public init(
+        _ makeCorrelation: @escaping @MainActor (_ frame: ToolCallFrame, _ traceID: String) -> RouteToDialogueCorrelation?
+    ) {
+        self.makeCorrelation = makeCorrelation
+    }
+}
+
+/// Fail-closed diagnostic when the D1 wire reducer refuses a typed-facts batch.
+/// Emitted via the trace logger's guard channel so operators can distinguish
+/// "silently no-op'd" (provider returned nil) from "reducer refused" (correlation
+/// was invalid at the schema/validator boundary).
+public struct DemoRuntimeTypedFactsRecordDiagnostic: Equatable, Sendable {
+    public let traceID: String
+    public let reason: String
+
+    public init(traceID: String, reason: String) {
+        self.traceID = traceID
+        self.reason = reason
+    }
+}
+
 @MainActor
 public final class DemoRuntimeSessionRunner {
     public typealias FrameDecoder = (String) async throws -> ToolCallFrame
@@ -17,6 +51,15 @@ public final class DemoRuntimeSessionRunner {
     private let alignsFrameStateRevisionToStore: Bool
     private let timestampProvider: () -> Date
     private var dialogueState: DialogueState
+    private let correlationProvider: RuntimeSessionCorrelationProvider?
+
+    /// Last typed-facts reducer outcome for the most recent completed turn.
+    /// Nil when the current runner has no correlation provider or the turn
+    /// produced no readback (readback-less refusal path). Test surface only.
+    public private(set) var lastTypedFactsRecordResult: DialogueTypedFactsRecordResult?
+    /// Last typed-facts refusal diagnostic (reducer said `.deniedContextInvalid`).
+    /// Nil when the most recent typed-facts attempt was accepted or absent.
+    public private(set) var lastTypedFactsRefusal: DemoRuntimeTypedFactsRecordDiagnostic?
 
     public init(
         store: DemoVehicleStateStore,
@@ -26,7 +69,8 @@ public final class DemoRuntimeSessionRunner {
         frameDecoder: @escaping FrameDecoder = { try FastPathIntentEngine().decode($0) },
         alignsFrameStateRevisionToStore: Bool = true,
         dialogueState: DialogueState = DialogueState(),
-        timestampProvider: @escaping () -> Date = Date.init
+        timestampProvider: @escaping () -> Date = Date.init,
+        correlationProvider: RuntimeSessionCorrelationProvider? = nil
     ) {
         self.store = store
         self.pipeline = pipeline
@@ -36,6 +80,7 @@ public final class DemoRuntimeSessionRunner {
         self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
         self.dialogueState = dialogueState
         self.timestampProvider = timestampProvider
+        self.correlationProvider = correlationProvider
     }
 
     public init(
@@ -46,7 +91,8 @@ public final class DemoRuntimeSessionRunner {
         planDecoder: @escaping PlanDecoder,
         alignsFrameStateRevisionToStore: Bool = true,
         dialogueState: DialogueState = DialogueState(),
-        timestampProvider: @escaping () -> Date = Date.init
+        timestampProvider: @escaping () -> Date = Date.init,
+        correlationProvider: RuntimeSessionCorrelationProvider? = nil
     ) {
         self.store = store
         self.pipeline = pipeline
@@ -56,6 +102,7 @@ public final class DemoRuntimeSessionRunner {
         self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
         self.dialogueState = dialogueState
         self.timestampProvider = timestampProvider
+        self.correlationProvider = correlationProvider
     }
 
     public static func defaultRunner(
@@ -167,6 +214,7 @@ public final class DemoRuntimeSessionRunner {
                 }
                 dialogueState.recordAssistantText(dialogText)
                 dialogueState.recordReadbacks(acceptedReadbacks)
+                consumeTypedFactsIfWired(frame: frameResult, traceID: partialResult.traceID)
             }
 
             let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
@@ -284,6 +332,7 @@ public final class DemoRuntimeSessionRunner {
             }
             dialogueState.recordAssistantText(dialogText)
             dialogueState.recordReadbacks(result.readbacks)
+            consumeTypedFactsIfWired(frame: frame, traceID: result.traceID)
         }
 
         let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: result.traceID)
@@ -364,6 +413,48 @@ public final class DemoRuntimeSessionRunner {
 
     public var currentDialogueState: DialogueState {
         dialogueState
+    }
+
+    /// D1 wire consumer. Called after `recordReadbacks` on both the partial-plan
+    /// and single-frame paths. Fail-closed producer + reducer boundary:
+    ///   - no provider  -> no-op, state hash unchanged (default runner path)
+    ///   - provider returns nil                 -> tracked as "no correlation this turn",
+    ///                                             typedFactsWindow unchanged
+    ///   - provider returns invalid correlation -> reducer refuses, guard emitted
+    ///                                             on the trace channel, window unchanged
+    ///   - provider returns valid correlation   -> reducer appends, window bounded
+    /// See `~/.claude/rules/claim-vs-reality-gap.md` 铁律 2 — deliberate negatives
+    /// present downstream to prove the wire is not just "recorded a field".
+    private func consumeTypedFactsIfWired(frame: ToolCallFrame, traceID: String) {
+        guard let provider = correlationProvider else {
+            lastTypedFactsRecordResult = nil
+            lastTypedFactsRefusal = nil
+            return
+        }
+        guard let correlation = provider.makeCorrelation(frame, traceID) else {
+            lastTypedFactsRecordResult = .accepted(count: 0)
+            lastTypedFactsRefusal = nil
+            return
+        }
+        let result = dialogueState.recordTypedFacts([correlation])
+        lastTypedFactsRecordResult = result
+        switch result {
+        case .accepted:
+            lastTypedFactsRefusal = nil
+        case .deniedContextInvalid(let reason):
+            let diagnostic = DemoRuntimeTypedFactsRecordDiagnostic(
+                traceID: traceID,
+                reason: reason
+            )
+            lastTypedFactsRefusal = diagnostic
+            traceLogger.recordGuard(
+                traceID: traceID,
+                message: "typed_facts_refused",
+                attributes: TraceAttributes(
+                    guardReason: "typed_facts_refused:\(reason)"
+                )
+            )
+        }
     }
 
     private func recordProjectionTraceIfNeeded(for frame: ToolCallFrame) {
