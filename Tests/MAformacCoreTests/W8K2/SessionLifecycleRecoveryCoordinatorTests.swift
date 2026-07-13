@@ -175,6 +175,44 @@ final class SessionLifecycleRecoveryCoordinatorTests: XCTestCase {
         XCTAssertEqual(sc, 1)
     }
 
+    // (j) P0 regression guard (grok-4.5-high + grok-composer K2 audit, CONFIRMED
+    //     FALSE_GREEN_RECOVERY): cancelAll fan-out alone, with the child NEVER acking
+    //     terminal/unsupported and NEVER being fenced, MUST NOT satisfy the fence-join
+    //     condition. Prior to the fix, `.cancelled` was treated as settled inside
+    //     `fenceJoinOutcome()`, so a bare cancelAll with zero real child acknowledgement
+    //     falsely produced `.allAcked` and let `requestRecovery` grant recovery over an
+    //     unsettled child. This test drives exactly that sequence through the public
+    //     coordinator surface and asserts recovery is denied, generation is NOT rotated,
+    //     and the fence-join outcome itself reads `.pending` (not `.allAcked`).
+    func test_recoveryRejectedWhenFenceNotAllAcked() async {
+        let c = makeCoordinator()
+        await driveToTerminal(c)
+        _ = await c.recordStableCheckpoint(SessionLifecycleK2Fixtures.F06.stableCheckpoint(), authority: SessionLifecycleK2Fixtures.F06.owner)
+        _ = await c.registerChild(childID: SessionLifecycleK2Fixtures.childA, authority: SessionLifecycleK2Fixtures.F06.owner)
+        let cancelResult = await c.cancelAllChildren(authority: SessionLifecycleK2Fixtures.F06.owner)
+        guard case .applied = cancelResult else {
+            XCTFail("Expected cancelAll .applied; got \(cancelResult)")
+            return
+        }
+        // childA is now `.cancelled` — cancellation intent written, but the child
+        // never acked terminal/unsupported and was never fenced. Fence-join MUST
+        // fail-closed to `.pending`, not report `.allAcked`.
+        let fence = await c.fenceJoinOutcome()
+        XCTAssertEqual(fence, .pending, "cancelled-without-ack must not be treated as settled")
+        let out = await c.requestRecovery(
+            newGeneration: SessionLifecycleK2Fixtures.F06.newGeneration,
+            newSessionID: SessionLifecycleK2Fixtures.F06.newSessionID,
+            authority: SessionLifecycleK2Fixtures.F06.owner
+        )
+        XCTAssertEqual(out, .deniedChildJoinIncomplete, "recovery must be denied when a cancelled child never acked")
+        // Generation MUST remain unchanged — recovery must not have been silently granted.
+        let k2gen = await c.generation()
+        XCTAssertEqual(k2gen, SessionLifecycleK2Fixtures.F06.initialGeneration)
+        // K1 remains terminal, untouched by the denied recovery attempt.
+        let k1 = await c.snapshot()
+        XCTAssertEqual(k1.state, .terminal)
+    }
+
     // (i) fixture truth-table row count matches expected structure (independent oracle).
     func test_i_recovery_truth_table_row_cardinality() {
         // The recovery outcome enum has 7 cases: granted + 6 denials.

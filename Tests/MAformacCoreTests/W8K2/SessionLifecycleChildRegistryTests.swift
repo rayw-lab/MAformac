@@ -127,25 +127,30 @@ final class SessionLifecycleChildRegistryTests: XCTestCase {
         XCTAssertEqual(snap[0].disposition, .pending)
     }
 
-    // (h) fenceJoinOutcome returns .pending when any child remains pending
-    //     (mixed one .terminal + one .pending).
+    // (h) fenceJoinOutcome returns .pending when any child remains pending, AND
+    //     (P0 FIX regression guard, grok-4.5-high + grok-composer K2 audit,
+    //     CONFIRMED FALSE_GREEN_RECOVERY) when any child is only `.cancelled`
+    //     (cancellation intent written, no ack, no fence) — cancelled-without-ack
+    //     MUST NOT be reported as `.allAcked`. Prior to the fix this test asserted
+    //     the opposite (`.allAcked`) and thereby encoded the bug as expected
+    //     behavior; that assertion is now inverted to `.pending`.
     func test_h_fenceJoin_pending_when_any_child_pending() async {
         let r = makeRegistry()
         _ = await r.register(childID: SessionLifecycleK2Fixtures.childA, authority: SessionLifecycleK2Fixtures.F04.owner)
         _ = await r.register(childID: SessionLifecycleK2Fixtures.childB, authority: SessionLifecycleK2Fixtures.F04.owner)
         _ = await r.cancelAll(authority: SessionLifecycleK2Fixtures.F04.owner)
         let _ = await r.ackTerminal(childID: SessionLifecycleK2Fixtures.childA, disposition: .terminal, authority: SessionLifecycleK2Fixtures.F04.owner)
-        // childB was cancelled and did not ack — fence-join must not report allAcked or timedOutFenced.
+        // childB was cancelled and did NOT ack — fence-join MUST fail-closed to
+        // .pending (cancellation intent alone is not settlement; see spec
+        // "Child disposition and cancellation fence": "the parent cannot claim
+        // all children settled before acknowledgement or timeout plus fence").
         let fence = await r.fenceJoinOutcome()
-        // childB is .cancelled (post cancelAll), not .pending; fenceJoin sees no .pending → .allAcked
-        // per current logic. Adjust: to test .pending path deterministically we need at least one .pending.
-        // Register a third child that stays pending to prove .pending fail-closed.
+        XCTAssertEqual(fence, .pending, "cancelled-without-ack must fail-closed to .pending, not .allAcked")
+        // Register a third child that stays .pending — independently proves the
+        // plain-.pending fail-closed path still holds after the fix.
         _ = await r.register(childID: SessionLifecycleK2Fixtures.childC, authority: SessionLifecycleK2Fixtures.F04.owner)
         let fence2 = await r.fenceJoinOutcome()
         XCTAssertEqual(fence2, .pending, "fence-join must fail-closed when any child is .pending")
-        // Sanity: the intermediate fence outcome before childC registration was NOT .pending
-        // (childA terminal, childB cancelled), consistent with .allAcked semantics.
-        XCTAssertEqual(fence, .allAcked)
     }
 
     // (i) Closed-set cardinality matches the K2 extension (5 members including pending).

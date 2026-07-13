@@ -334,8 +334,19 @@ public actor SessionLifecycleChildRegistry {
     /// Compute fence-join outcome from current records.
     /// Exhaustive on `SessionChildDisposition`:
     /// - Any `.pending` → `.pending`
-    /// - All settled and at least one `.timedOutFenced` → `.timedOutFenced`
-    /// - All settled without any `.timedOutFenced` → `.allAcked`
+    /// - Any `.cancelled` (cancellation intent written but child has NOT yet
+    ///   acknowledged terminal/unsupported, and has NOT been fenced) → `.pending`.
+    ///   P0 FIX (grok-4.5-high + grok-composer K2 audit, CONFIRMED FALSE_GREEN_RECOVERY):
+    ///   `.cancelled` alone is a parent-side intent write, not a settlement. Spec
+    ///   (session-lifecycle/spec.md "Child disposition and cancellation fence")
+    ///   requires "the parent cannot claim all children settled before acknowledgement
+    ///   or timeout plus fence" — treating bare `.cancelled` as settled let cancelAll
+    ///   fan-out alone (with zero child acks) satisfy `.allAcked` and falsely unblock
+    ///   `SessionLifecycleRecoveryCoordinator.requestRecovery`'s fence-join condition.
+    /// - All settled (`.terminal` / `.unsupported`) and at least one `.timedOutFenced`
+    ///   → `.timedOutFenced`
+    /// - All settled (`.terminal` / `.unsupported`) without any `.timedOutFenced`
+    ///   → `.allAcked`
     /// Empty registry → `.allAcked` (vacuously true; no pending children).
     public func fenceJoinOutcome() -> SessionFenceJoinOutcome {
         var sawTimedOut = false
@@ -343,9 +354,13 @@ public actor SessionLifecycleChildRegistry {
             switch record.disposition {
             case .pending:
                 return .pending
+            case .cancelled:
+                // Cancellation intent only; child has not acked terminal/unsupported
+                // nor been fenced. MUST NOT be treated as settled (see fix note above).
+                return .pending
             case .timedOutFenced:
                 sawTimedOut = true
-            case .cancelled, .terminal, .unsupported:
+            case .terminal, .unsupported:
                 continue
             }
         }
