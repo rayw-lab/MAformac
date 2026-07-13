@@ -1,23 +1,24 @@
 ## Implementation
 
-- [ ] 1. Add `Core/Contracts/RouteValuePrimitive.swift` — typed enums for `ref/direct/offset/type` per `docs/baseline-semantic-protocol-2026-06-19.md:53-57` §2②.
-- [ ] 2. Add `Core/Contracts/RouteError.swift` — closed error enum covering R0-R3 per `CLAUDE.md:109`.
-- [ ] 3. Add `Core/Contracts/RouteContract.swift` — closed axis enums (`RouteExecTier`, `RouteOutcome`, `RouteClarifyTag`, `RouteService`) + `RouteSourceIdentity` + `RouteSubject` + canonical JSON encoding helpers.
-- [ ] 4. Add `Core/Contracts/RouteResult.swift` — `ActionCandidate` + `RouteTrace` + `RouteResult` + `RouteContractValidator` (total validator, precedence-ordered rejection).
-- [ ] 5. Add `contracts/schemas/typed-route-contract.v1.schema.json` — JSON schema for `RouteResult` canonical wire form.
-- [ ] 6. Add `contracts/fixtures/typed-route-contract/` positive fixtures (≥3, one per service; each with `_source.contract_row_id` from a real `contracts/semantic-function-contract.jsonl` row) + negative fixtures (unknown-enum × 3 axes, illegal-combination, unmounted tool, out-of-catalog service, stale source, digest mismatch, session_id leak, EXP-non-experiential-offset).
-- [ ] 7. Add `Tests/MAformacCoreTests/RouteContractTests.swift` — Codable round-trip, three-axis independence, mounted tool binding, canonical digest, rejection precedence, error enum coverage.
-- [ ] 8. Add `Tests/python/contracts/test_route_fixtures.py` — JSON schema validation, fixture ↔ jsonl `contract_row_id` cross-check, positive rc0 / negative rc≠0.
-- [ ] 9. Run producer gates (see §Validation).
-- [ ] 10. Commit in semantic-complete slices (Swift core → schema+fixtures → tests → openspec).
+- [x] 1. Add `Core/Contracts/RouteValuePrimitive.swift` — typed enums for `ref/direct/offset/type` per `docs/baseline-semantic-protocol-2026-06-19.md:53-57` §2②.
+- [x] 2. Add `Core/Contracts/RouteError.swift` — closed error enum covering R0-R3 per `CLAUDE.md:109`.
+- [x] 3. Add `Core/Contracts/RouteContract.swift` — closed axis enums (`RouteExecTier`, `RouteOutcome`, `RouteClarifyTag`, `RouteService`) + `RouteSourceIdentity` + `RouteSubject` + canonical JSON encoding helpers.
+- [x] 4. Add `Core/Contracts/RouteResult.swift` — `ActionCandidate` + `RouteTrace` + `RouteResult` + `RouteContractValidator` (total validator, precedence-ordered rejection).
+- [x] 5. Add `contracts/schemas/typed-route-contract.v1.schema.json` — JSON schema for `RouteResult` canonical wire form.
+- [x] 6. Add `contracts/fixtures/typed-route-contract/` positive fixtures (5, incl. 3 service-covering airControl/carControl/cmd from real jsonl rows plus reject_R0 and clarify_R2) + negative fixtures (11 covering unknown-enum × 3 axes, illegal-combination, unmounted tool, out-of-catalog service, EXP-non-experiential-offset, session_id leak, schema_version drift, reject-missing-reason, digest mismatch, widened_clarify_tag).
+- [x] 7. Add `Tests/MAformacCoreTests/RouteContractTests.swift` — Codable round-trip, three-axis independence, mounted tool binding, canonical digest, rejection precedence, error enum coverage. 31 tests / 31 PASS.
+- [x] 8. Add `Tests/python/contracts/test_route_fixtures.py` — JSON schema validation, fixture ↔ jsonl `contract_row_id` cross-check, positive rc0 / negative rc≠0. 25 tests / 25 PASS.
+- [x] 9. Run producer gates (see §Validation).
+- [x] 10. Commit in semantic-complete slices (openspec carrier → Swift core → schema → fixtures → tests).
 
 ## Validation
 
-- [ ] `openspec validate add-w6-typed-route-contract --strict` rc0.
-- [ ] `swift test --filter RouteContractTests` rc0.
-- [ ] `python3 -m unittest -v Tests/python/contracts/test_route_fixtures.py` rc0 (or `python3 -m pytest Tests/python/contracts/test_route_fixtures.py -q` rc0 depending on runner availability).
-- [ ] `git status --short` clean of untracked garbage in owned paths (allowed paths only).
-- [ ] Owned-paths audit: `git diff --stat` shows only the paths listed in the SHALL "SHALL NOT modify" filter's complement.
+- [x] `openspec validate add-w6-typed-route-contract --strict` rc0.
+- [x] `openspec validate --all --strict` — 31/31 passed.
+- [x] `swift test --filter RouteContractTests` rc0 — 31 tests, 0 failures, 0.009s.
+- [x] `python3 -m pytest Tests/python/contracts/test_route_fixtures.py -q` rc0 — 25 passed in 0.34s.
+- [x] `git status --short` clean.
+- [x] Owned-paths audit: `git diff --name-only 2140fb14..HEAD` — 23 files, all within SHALL allowlist.
 
 ## Explicitly deferred (NOT in this change)
 
