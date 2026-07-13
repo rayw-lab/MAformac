@@ -91,19 +91,42 @@ public struct DialogueFocusOwnerWindow: Codable, Equatable, Sendable {
         self.schemaVersion = schemaVersion
     }
 
-    /// 纯函数：给定当前仍 active 的 owner window ref 集合，判定 focus 是否仍有效。
+    /// 纯函数：给定当前仍 active 的 owner window 组集合，判定 focus 是否仍有效。
     ///
-    /// - unpaired supersession 组不能作为 owner（R5 "Unpaired groups SHALL NOT renew focus"）。
-    /// - `activeUntil == .revoked(...)` 一律失效。
-    /// - schema version unsupported → 失效（fail-closed）。
-    public func isValid(givenActiveWindows activeOwnerRefs: Set<DialogueSourceGroupRef>) -> Bool {
+    /// R5 三层 enforce（**typed schema 层 fail-closed，不 declare 交给 caller**）：
+    /// 1. schema version unsupported / activeUntil unknown / focusValidityReason unknown
+    ///    / injection reason 声明 enabled → 直接 invalid。
+    /// 2. `activeUntil == .revoked(...)` → invalid。
+    /// 3. owner window 必须存在于 activeGroups 内 **且 disposition == `.paired`**：
+    ///    - 不存在 → invalid（已 evict）。
+    ///    - 存在但 disposition ≠ `.paired`（含 unpaired* / legacyUnpaired / contextInvalid /
+    ///      terminalAuditOnly / unknown）→ invalid（R5 "Unpaired groups SHALL NOT renew focus"）。
+    public func isValid(givenActiveGroups activeGroups: [DialogueGroupRecord]) -> Bool {
         guard schemaVersion.isSupported else { return false }
         guard activeUntil.isKnown else { return false }
         if case .revoked = activeUntil { return false }
         if !focusValidityReason.isKnown { return false }
         // focus injection 必须在 disabled=true 状态（未授权 → 静态 invalid）
         if focusValidityReason.isFocusInjectionAllowed { return false }
-        return activeOwnerRefs.contains(ownerWindowRef)
+        // 显式 lookup owner group by ref。存在性 + disposition 双门。
+        for record in activeGroups {
+            let ref = DialogueSourceGroupRef(identity: record.identity)
+            guard ref == ownerWindowRef else { continue }
+            switch record.completeness.disposition {
+            case .paired:
+                return true
+            case .unpairedUserOnly,
+                 .unpairedAssistantCancelled,
+                 .unpairedConsecutiveUserSupersession,
+                 .legacyUnpairedAmbiguous,
+                 .contextInvalid,
+                 .terminalAuditOnly,
+                 .unknown:
+                // R5 enforce: unpaired（及其它非 paired disposition）SHALL NOT renew focus.
+                return false
+            }
+        }
+        return false
     }
 }
 

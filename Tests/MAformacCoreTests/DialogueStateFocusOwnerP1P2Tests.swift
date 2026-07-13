@@ -6,6 +6,33 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
         DialogueSourceGroupRef(sessionRef: "sess-A", generationRef: "gen-1", groupOrdinal: ordinal)
     }
 
+    private func identity(_ ordinal: UInt32) -> DialogueGroupIdentity {
+        DialogueGroupIdentity(sessionRef: "sess-A", generationRef: "gen-1", groupOrdinal: ordinal)
+    }
+
+    private func pairedRecord(_ ordinal: UInt32) -> DialogueGroupRecord {
+        DialogueGroupRecord(
+            identity: identity(ordinal),
+            completeness: DialogueGroupCompleteness(
+                disposition: .paired,
+                reason: .pairedComplete
+            ),
+            userText: "u\(ordinal)",
+            assistantText: "a\(ordinal)"
+        )
+    }
+
+    private func unpairedRecord(_ ordinal: UInt32, disposition: DialogueGroupDisposition) -> DialogueGroupRecord {
+        DialogueGroupRecord(
+            identity: identity(ordinal),
+            completeness: DialogueGroupCompleteness(
+                disposition: disposition,
+                reason: .userOnlyPending
+            ),
+            userText: "u\(ordinal)"
+        )
+    }
+
     // MARK: - Round-trip
 
     func testFocusOwnerWindowRoundTrips() throws {
@@ -33,12 +60,97 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .untilOwnerWindowEvicted,
             schemaVersion: .v1
         )
-        // owner group 仍 active → 有效
-        XCTAssertTrue(window.isValid(givenActiveWindows: [groupRef(1)]))
+        // owner group 仍 active 且 paired → 有效
+        XCTAssertTrue(window.isValid(givenActiveGroups: [pairedRecord(1)]))
         // owner group 已被 evict → 无效
-        XCTAssertFalse(window.isValid(givenActiveWindows: [groupRef(2), groupRef(3)]))
+        XCTAssertFalse(window.isValid(givenActiveGroups: [pairedRecord(2), pairedRecord(3)]))
         // 空集 → 无效
-        XCTAssertFalse(window.isValid(givenActiveWindows: []))
+        XCTAssertFalse(window.isValid(givenActiveGroups: []))
+    }
+
+    // MARK: - R5 enforce: unpaired ordinal cannot be focus owner (P1 blocker)
+
+    func testUnpairedOwnerCannotBeFocusOwner_userOnly() {
+        let window = DialogueFocusOwnerWindow(
+            ownerWindowRef: groupRef(1),
+            focusValidityReason: .derivedFromReadback,
+            activeUntil: .untilOwnerWindowEvicted,
+            schemaVersion: .v1
+        )
+        // ordinal=1 匹配 owner，但 disposition=.unpairedUserOnly → 必须拒收（R5 enforce）。
+        XCTAssertFalse(
+            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedUserOnly)]),
+            "R5: unpaired group SHALL NOT renew focus (was declare-only in prior isValid)"
+        )
+    }
+
+    func testUnpairedOwnerCannotBeFocusOwner_consecutiveUserSupersession() {
+        let window = DialogueFocusOwnerWindow(
+            ownerWindowRef: groupRef(1),
+            focusValidityReason: .derivedFromReadback,
+            activeUntil: .untilOwnerWindowEvicted,
+            schemaVersion: .v1
+        )
+        XCTAssertFalse(
+            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedConsecutiveUserSupersession)])
+        )
+    }
+
+    func testUnpairedOwnerCannotBeFocusOwner_assistantCancelled() {
+        let window = DialogueFocusOwnerWindow(
+            ownerWindowRef: groupRef(1),
+            focusValidityReason: .derivedFromReadback,
+            activeUntil: .untilOwnerWindowEvicted,
+            schemaVersion: .v1
+        )
+        XCTAssertFalse(
+            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedAssistantCancelled)])
+        )
+    }
+
+    func testUnpairedOwnerCannotBeFocusOwner_contextInvalid() {
+        let window = DialogueFocusOwnerWindow(
+            ownerWindowRef: groupRef(1),
+            focusValidityReason: .derivedFromReadback,
+            activeUntil: .untilOwnerWindowEvicted,
+            schemaVersion: .v1
+        )
+        XCTAssertFalse(
+            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .contextInvalid)])
+        )
+    }
+
+    func testUnknownDispositionOwnerFailsClosed() throws {
+        let json = Data(#""future_disposition""#.utf8)
+        let unknownDisposition = try JSONDecoder().decode(DialogueGroupDisposition.self, from: json)
+        let record = DialogueGroupRecord(
+            identity: identity(1),
+            completeness: DialogueGroupCompleteness(disposition: unknownDisposition, reason: .contextInvalid),
+            userText: "u1"
+        )
+        let window = DialogueFocusOwnerWindow(
+            ownerWindowRef: groupRef(1),
+            focusValidityReason: .derivedFromReadback,
+            activeUntil: .untilOwnerWindowEvicted,
+            schemaVersion: .v1
+        )
+        XCTAssertFalse(window.isValid(givenActiveGroups: [record]))
+    }
+
+    func testPairedOwnerAmongMixedGroupsIsValid() {
+        let window = DialogueFocusOwnerWindow(
+            ownerWindowRef: groupRef(2),
+            focusValidityReason: .derivedFromReadback,
+            activeUntil: .untilOwnerWindowEvicted,
+            schemaVersion: .v1
+        )
+        // ordinal=2 是 paired，ordinal=1/3 是 unpaired → 只 owner 那条决定结果。
+        let groups: [DialogueGroupRecord] = [
+            unpairedRecord(1, disposition: .unpairedUserOnly),
+            pairedRecord(2),
+            unpairedRecord(3, disposition: .unpairedConsecutiveUserSupersession)
+        ]
+        XCTAssertTrue(window.isValid(givenActiveGroups: groups))
     }
 
     // MARK: - R5 scenario: force visual state cannot create focus
@@ -91,7 +203,7 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .untilOwnerWindowEvicted,
             schemaVersion: unsupported
         )
-        XCTAssertFalse(window.isValid(givenActiveWindows: [groupRef(1)]))
+        XCTAssertFalse(window.isValid(givenActiveGroups: [pairedRecord(1)]))
     }
 
     // MARK: - Fail-closed: enabled=true injection reason
@@ -103,7 +215,7 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .untilOwnerWindowEvicted,
             schemaVersion: .v1
         )
-        XCTAssertFalse(window.isValid(givenActiveWindows: [groupRef(1)]))
+        XCTAssertFalse(window.isValid(givenActiveGroups: [pairedRecord(1)]))
     }
 
     // MARK: - Fail-closed: revoked activation
@@ -115,7 +227,7 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .revoked(reason: .unauthorisedInjection),
             schemaVersion: .v1
         )
-        XCTAssertFalse(window.isValid(givenActiveWindows: [groupRef(1)]))
+        XCTAssertFalse(window.isValid(givenActiveGroups: [pairedRecord(1)]))
     }
 
     // MARK: - Unknown activation bound
@@ -131,6 +243,6 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: bound,
             schemaVersion: .v1
         )
-        XCTAssertFalse(window.isValid(givenActiveWindows: [groupRef(1)]))
+        XCTAssertFalse(window.isValid(givenActiveGroups: [pairedRecord(1)]))
     }
 }
