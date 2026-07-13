@@ -61,6 +61,16 @@ struct ContentView: View {
             requested: requestedMotionBudget
         )
     }
+    /// D2 W9 force-state cutover — the sole App-layer path to write to `store`.
+    /// Constructed per access (value type) so every write site is bound to the
+    /// canonical `DemoCapabilityMatrixCatalog.sourceSHA256` at call time; a
+    /// codegen refresh flips the digest and any stale caller fails closed at
+    /// the applier gate instead of writing against an unknown baseline. See
+    /// `Core/State/DemoVehicleStateApplier.swift` and CLAUDE.md §9 canonical
+    /// digest consumption clause.
+    private var stateApplier: DemoVehicleStateApplier {
+        DemoVehicleStateApplier(store: store)
+    }
 
     init(
         store: DemoVehicleStateStore,
@@ -420,7 +430,10 @@ struct ContentView: View {
                 visualState: .normal
             ))
         }
-        store.replaceCells(cells)
+        // D2 cutover: route through DemoVehicleStateApplier (Authority = .appMockTransition)
+        // instead of touching store.replaceCells directly. Fail-closed on digest/enum mismatch
+        // means the store stays untouched if the canonical baseline drifts.
+        try? stateApplier.apply(cells: cells, authority: .appMockTransition)
         let readback = store.applyMockTransition(
             DemoMockTransition(key: key, desiredValue: desiredValue, source: .user)
         )
@@ -691,7 +704,8 @@ struct ContentView: View {
     private func commitMockVoicePlan(_ plan: MockVoicePresetPlan) {
         let initialStoreCells = snapshot.storeCells
         let priorReadbacks = snapshot.readbacks
-        store.replaceCells(plan.cells)
+        // D2 cutover: Authority = .appMockVoicePlan; direct store.replaceCells removed.
+        try? stateApplier.apply(cells: plan.cells, authority: .appMockVoicePlan)
         var scopeOrigins = snapshot.scopeOrigins
         for (key, origin) in plan.scopeOrigins {
             scopeOrigins[key] = origin
@@ -753,7 +767,8 @@ struct ContentView: View {
                 visualState: .normal
             ))
         }
-        store.replaceCells(cells)
+        // D2 cutover: Authority = .appLegacyMockVoiceColdIntent.
+        try? stateApplier.apply(cells: cells, authority: .appLegacyMockVoiceColdIntent)
         let readback = store.applyMockTransition(
             DemoMockTransition(key: key, desiredValue: targetValue, source: .mock)
         )
@@ -880,7 +895,8 @@ struct ContentView: View {
         dialogText: String
     ) {
         runtimeReadbackQueue.cancel()
-        store.replaceCells(cells)
+        // D2 cutover: Authority = .appForceStateSnapshot (force-state 控制台 / debug snapshot).
+        try? stateApplier.apply(cells: cells, authority: .appForceStateSnapshot)
         withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
             snapshot = StagePresentationSnapshot.from(
                 store: store,
