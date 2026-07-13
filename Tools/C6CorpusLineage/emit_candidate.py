@@ -18,6 +18,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "Tools"))
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
 from C6CorpusLineage import (  # noqa: E402
     EXPECTED_ASSEMBLED_COUNT,
     assemble,
@@ -26,9 +27,25 @@ from C6CorpusLineage import (  # noqa: E402
     packaging_row_text,
     shipping_count_errors,
 )
+from check_closure_work_packages import (  # noqa: E402
+    load_yaml,
+    registry_digest,
+)
 
 CANDIDATE_DIR = REPO_ROOT / "closure/candidates/B7"
 ASSEMBLED_REL = "closure/candidates/B7/c6-corpus-lineage.assembled.jsonl"
+# Authoritative O1 registry; digest rule = scripts/check_closure_work_packages.registry_digest
+# (canonical JSON after stripping basis.repo_head + source_snapshot.repo_head).
+REGISTRY_PATH = REPO_ROOT / "contracts" / "closure-work-packages.v1.yaml"
+
+
+def live_semantic_registry_digest() -> str:
+    """Compute the live semantic closure-registry digest (identity axis).
+
+    Reuses the authoritative digest definition from the O1 checker — do not
+    invent a second hash of decisions.md or any other non-registry artifact.
+    """
+    return registry_digest(load_yaml(REGISTRY_PATH))
 
 
 def main() -> int:
@@ -64,10 +81,12 @@ def main() -> int:
     )
 
     # 3) closure exit envelope — self-marked NON-canonical / NON-DONE
+    # registry_digest is the live semantic O1 registry identity, not a
+    # hard-coded decisions.md (or other prose) digest.
     envelope = {
         "schema_version": "closure_package_exit_envelope_v1",
         "registry_schema_major": "closure_work_packages_v1",
-        "registry_digest": "39d8ee006983b3d06bbe45e7986753b228da0c7fcc5ccdb05e5b31b5c22e36ce",
+        "registry_digest": live_semantic_registry_digest(),
         "package_id": "B7",
         "package_revision": 1,
         "native_receipt_schema_id": "corpus_lineage_v1",

@@ -353,6 +353,35 @@ def test_no_invented_manual_rows_in_shipping():
     assert invented == [], f"invented manual rows present: {invented}"
 
 
+def test_envelope_registry_digest_matches_live_semantic_registry():
+    """Identity axis: envelope.registry_digest == live O1 semantic registry digest.
+
+    Recomputes via the authoritative rule in check_closure_work_packages
+    (canonical JSON after removing basis.repo_head + source_snapshot.repo_head)
+    and asserts the on-disk B7 exit envelope binds that live digest — not a
+    hard-coded digest of decisions.md or any other non-registry artifact.
+    """
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    from check_closure_work_packages import load_yaml, registry_digest  # noqa: E402
+
+    registry_path = REPO_ROOT / "contracts" / "closure-work-packages.v1.yaml"
+    live = registry_digest(load_yaml(registry_path))
+    assert isinstance(live, str) and len(live) == 64
+
+    envelope_path = (
+        REPO_ROOT / "closure" / "candidates" / "B7" / "c6-corpus-lineage.envelope.json"
+    )
+    envelope = json.loads(envelope_path.read_text(encoding="utf-8"))
+    assert envelope["registry_digest"] == live, (
+        f"envelope.registry_digest={envelope['registry_digest']!r} "
+        f"!= live semantic registry digest={live!r}"
+    )
+    # Explicit anti-regression: the prior wrong decisions.md digest must not reappear.
+    assert envelope["registry_digest"] != (
+        "39d8ee006983b3d06bbe45e7986753b228da0c7fcc5ccdb05e5b31b5c22e36ce"
+    )
+
+
 def main():
     tests = [
         v
