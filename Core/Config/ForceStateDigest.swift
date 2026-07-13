@@ -21,12 +21,17 @@ public enum ForceStateCanonicalizationVersion: String, Codable, CaseIterable, Eq
 }
 
 public struct ForceStateDigestMetadata: Codable, Equatable, Sendable {
-    public let algorithm: ForceStateDigestAlgorithm
+    /// Raw algorithm identifier string.  The typed `ForceStateDigestAlgorithm`
+    /// enum is used for canonical output; this field accepts any string so that
+    /// `validate(metadata:against:)` can reject unknown algorithms at runtime
+    /// (the typed enum's exhaustive `CaseIterable` makes the guard unreachable
+    /// when the field itself is typed).
+    public let algorithm: String
     public let canonicalizationVersion: ForceStateCanonicalizationVersion
     public let digestHex: String
 
     public init(
-        algorithm: ForceStateDigestAlgorithm,
+        algorithm: String,
         canonicalizationVersion: ForceStateCanonicalizationVersion,
         digestHex: String
     ) {
@@ -58,7 +63,7 @@ public enum ForceStateDigest {
         )
         let digestHex = hash(algorithm: algorithm, payload: payload)
         return ForceStateDigestMetadata(
-            algorithm: algorithm,
+            algorithm: algorithm.rawValue,
             canonicalizationVersion: canonicalizationVersion,
             digestHex: digestHex
         )
@@ -78,15 +83,15 @@ public enum ForceStateDigest {
         // version. However, decoders may pass raw values captured elsewhere;
         // the guards below are the code-level fail-closed backstop mandated
         // by the M16-011 SHALL and its "unknown algorithm" Scenario.
-        guard ForceStateDigestAlgorithm.allCases.contains(metadata.algorithm) else {
-            throw ForceStateDigestError.unknownAlgorithm(metadata.algorithm.rawValue)
+        guard let algorithm = ForceStateDigestAlgorithm(rawValue: metadata.algorithm) else {
+            throw ForceStateDigestError.unknownAlgorithm(metadata.algorithm)
         }
         guard ForceStateCanonicalizationVersion.allCases.contains(metadata.canonicalizationVersion) else {
             throw ForceStateDigestError.unknownCanonicalizationVersion(metadata.canonicalizationVersion.rawValue)
         }
         let recomputed = canonicalDigest(
             of: catalog,
-            algorithm: metadata.algorithm,
+            algorithm: algorithm,
             canonicalizationVersion: metadata.canonicalizationVersion
         )
         guard recomputed.digestHex == metadata.digestHex else {

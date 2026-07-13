@@ -35,7 +35,7 @@ final class ForceStateDigestTests: XCTestCase {
 
         XCTAssertEqual(firstDigest.digestHex, secondDigest.digestHex)
         XCTAssertEqual(firstDigest.digestHex, thirdDigest.digestHex)
-        XCTAssertEqual(firstDigest.algorithm, .sha256V1)
+        XCTAssertEqual(firstDigest.algorithm, "sha256-v1")
         XCTAssertEqual(firstDigest.canonicalizationVersion, .v1)
         XCTAssertFalse(firstDigest.digestHex.isEmpty)
     }
@@ -131,7 +131,7 @@ final class ForceStateDigestTests: XCTestCase {
     func testMismatchedDigestFailsClosedWithoutSilentRepair() throws {
         let catalog = try ForceStateCatalog.load(entries: [makeEntry(stableIdentity: "force.a")])
         let poisoned = ForceStateDigestMetadata(
-            algorithm: .sha256V1,
+            algorithm: "sha256-v1",
             canonicalizationVersion: .v1,
             digestHex: String(repeating: "0", count: 64)
         )
@@ -151,5 +151,19 @@ final class ForceStateDigestTests: XCTestCase {
         ])
         let metadata = ForceStateDigest.canonicalDigest(of: catalog)
         XCTAssertNoThrow(try ForceStateDigest.validate(metadata: metadata, against: catalog))
+    }
+
+    // MARK: - P1-F3: unknown algorithm via raw String input
+
+    func testUnknownAlgorithm_stringInput_rejected() throws {
+        let catalog = try ForceStateCatalog.load(entries: [makeEntry(stableIdentity: "force.a")])
+        let unknown = ForceStateDigestMetadata(
+            algorithm: "sha256-v2",
+            canonicalizationVersion: .v1,
+            digestHex: String(repeating: "a", count: 64)
+        )
+        XCTAssertThrowsError(try ForceStateDigest.validate(metadata: unknown, against: catalog)) { error in
+            XCTAssertEqual(error as? ForceStateDigestError, .unknownAlgorithm("sha256-v2"))
+        }
     }
 }
