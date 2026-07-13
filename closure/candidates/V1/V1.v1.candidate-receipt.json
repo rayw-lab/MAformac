@@ -1,16 +1,16 @@
 {
   "schema_version": "closure_package_exit_envelope_v1",
   "registry_schema_major": "closure_work_packages_v1",
-  "registry_digest": "dcf4ea12ba67164e2b5ff48395404e64782a3cfc022b4ec7cd522b59e9b53809",
+  "registry_digest": "5813877179eeda967c6aec5e6501861885ec0406a7f4439b7ca99e46ffb5accb",
   "package_id": "V1",
   "package_revision": 1,
   "native_receipt_schema_id": "c6_active_authority_v1",
   "native_receipt": {
     "root": "repo",
     "path": "contracts/c6-active-authority/authority.v1.candidate.json",
-    "sha256": "e7cfbd9ba1b224e2faef8228c099562eb088a9a36fa28ac694775bb7129812d7"
+    "sha256": "86b130c19c1e86a4a75ce7a6b5dd6de037370916726b3d6da700c61b9c65fcda"
   },
-  "native_receipt_digest": "e7cfbd9ba1b224e2faef8228c099562eb088a9a36fa28ac694775bb7129812d7",
+  "native_receipt_digest": "86b130c19c1e86a4a75ce7a6b5dd6de037370916726b3d6da700c61b9c65fcda",
   "status": "CANDIDATE",
   "claims": {
     "status_label": "CANDIDATE",

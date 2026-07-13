@@ -8,7 +8,7 @@
     {
       "path": "docs/commander-log/decisions.md",
       "locator": "D-147",
-      "sha256": "39d8ee006983b3d06bbe45e7986753b228da0c7fcc5ccdb05e5b31b5c22e36ce"
+      "sha256": "694b6c3ce7807130deed2b3580444de153d8f5b87af6851c3bf2263ef35aa1d5"
     },
     {
       "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md",
@@ -32,7 +32,7 @@
       "role": "ratification_decision",
       "path": "docs/commander-log/decisions.md",
       "locator": "D-147",
-      "sha256": "39d8ee006983b3d06bbe45e7986753b228da0c7fcc5ccdb05e5b31b5c22e36ce",
+      "sha256": "694b6c3ce7807130deed2b3580444de153d8f5b87af6851c3bf2263ef35aa1d5",
       "subject_bindings": [
         "ratification_decision"
       ]
@@ -52,7 +52,7 @@
       "role": "registry_package_entry",
       "path": "contracts/closure-work-packages.v1.yaml",
       "locator": "V1",
-      "sha256": "1390612824ab08555fa7d9f07c1da2fb33f8f51975d4ea9103f4cd81158b3566",
+      "sha256": "7298faf444a9f1f4309319f1084a6bbd14e56c25513cd82e6e43fc225003826a",
       "subject_bindings": [
         "authority_id"
       ]
