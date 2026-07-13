@@ -61,15 +61,29 @@ struct ContentView: View {
             requested: requestedMotionBudget
         )
     }
+    /// D2 W9 force-state cutover — observable failure ack channel. Populated
+    /// whenever `stateApplier.apply(...)` throws (digest / primary-class /
+    /// authority gate refusal). Direct answer to grok-4.5 short review P1-2:
+    /// before this channel existed, `try? apply` silently swallowed the
+    /// applier's fail-closed signal. See CLOSEOUT.md v2 §"P1 Fix Section".
+    @State private var stateApplierFailureLog: [DemoVehicleStateApplierFailureRecord] = []
     /// D2 W9 force-state cutover — the sole App-layer path to write to `store`.
     /// Constructed per access (value type) so every write site is bound to the
     /// canonical `DemoCapabilityMatrixCatalog.sourceSHA256` at call time; a
     /// codegen refresh flips the digest and any stale caller fails closed at
-    /// the applier gate instead of writing against an unknown baseline. See
+    /// the applier gate instead of writing against an unknown baseline. Passes
+    /// a failureReceiver so refusals populate `stateApplierFailureLog` in
+    /// addition to throwing — observers can distinguish "never attempted"
+    /// (log stays empty) from "gate refused" (log gains a record). See
     /// `Core/State/DemoVehicleStateApplier.swift` and CLAUDE.md §9 canonical
     /// digest consumption clause.
     private var stateApplier: DemoVehicleStateApplier {
-        DemoVehicleStateApplier(store: store)
+        DemoVehicleStateApplier(
+            store: store,
+            failureReceiver: { record in
+                self.stateApplierFailureLog.append(record)
+            }
+        )
     }
 
     init(
@@ -430,10 +444,26 @@ struct ContentView: View {
                 visualState: .normal
             ))
         }
-        // D2 cutover: route through DemoVehicleStateApplier (Authority = .appMockTransition)
-        // instead of touching store.replaceCells directly. Fail-closed on digest/enum mismatch
-        // means the store stays untouched if the canonical baseline drifts.
-        try? stateApplier.apply(cells: cells, authority: .appMockTransition)
+        // D2 cutover (grok-4.5 short review P1-1 + P1-2): route through
+        // DemoVehicleStateApplier instead of touching store.replaceCells
+        // directly. If the applier gate refuses (digest / primary-class /
+        // authority mismatch), we MUST NOT continue into store.applyMockTransition
+        // — writing a mock mutation against a baseline the applier just refused
+        // to establish is exactly the fail-closed violation this cutover was
+        // added to prevent (~/.claude/rules/claim-vs-reality-gap.md 铁律 1
+        // "enforce not declare"). Explicit do-catch (no more try?): failures
+        // populate stateApplierFailureLog via failureReceiver, and this call
+        // site returns early instead of falling back into the pre-cutover mock
+        // apply path.
+        do {
+            _ = try stateApplier.apply(cells: cells, authority: .appMockTransition)
+        } catch {
+            // Applier gate refused; failureReceiver already recorded the
+            // structured failure. Do not proceed to mutate store on an unknown
+            // baseline. Return so no readback / snapshot advance / burst
+            // triggers off a gate refusal.
+            return
+        }
         let readback = store.applyMockTransition(
             DemoMockTransition(key: key, desiredValue: desiredValue, source: .user)
         )
@@ -704,8 +734,20 @@ struct ContentView: View {
     private func commitMockVoicePlan(_ plan: MockVoicePresetPlan) {
         let initialStoreCells = snapshot.storeCells
         let priorReadbacks = snapshot.readbacks
-        // D2 cutover: Authority = .appMockVoicePlan; direct store.replaceCells removed.
-        try? stateApplier.apply(cells: plan.cells, authority: .appMockVoicePlan)
+        // D2 cutover (grok-4.5 short review P1-2): direct store.replaceCells
+        // removed. Applier gate refusal populates stateApplierFailureLog so the
+        // signal is observable, unlike the earlier try? that silently ate the
+        // error. This call site does not have a follow-on mock-apply step
+        // (the write is atomic with plan.cells), so on refusal we still emit
+        // the snapshot advance below because it derives from `store` which
+        // stays on the pre-attempt baseline — not a fallback to a raw
+        // replaceCells, just a snapshot render of the current store state.
+        do {
+            _ = try stateApplier.apply(cells: plan.cells, authority: .appMockVoicePlan)
+        } catch {
+            // Applier gate refused; snapshot advance below still renders the
+            // pre-refusal store state (a truthful render, not a fallback write).
+        }
         var scopeOrigins = snapshot.scopeOrigins
         for (key, origin) in plan.scopeOrigins {
             scopeOrigins[key] = origin
@@ -767,8 +809,15 @@ struct ContentView: View {
                 visualState: .normal
             ))
         }
-        // D2 cutover: Authority = .appLegacyMockVoiceColdIntent.
-        try? stateApplier.apply(cells: cells, authority: .appLegacyMockVoiceColdIntent)
+        // D2 cutover (grok-4.5 short review P1-1 + P1-2): mirrors the
+        // applyMockTransition fix. Applier gate refusal MUST NOT be followed
+        // by a mock apply on an unknown baseline. On refusal we return early;
+        // failureReceiver already recorded the reason tag.
+        do {
+            _ = try stateApplier.apply(cells: cells, authority: .appLegacyMockVoiceColdIntent)
+        } catch {
+            return
+        }
         let readback = store.applyMockTransition(
             DemoMockTransition(key: key, desiredValue: targetValue, source: .mock)
         )
@@ -895,8 +944,16 @@ struct ContentView: View {
         dialogText: String
     ) {
         runtimeReadbackQueue.cancel()
-        // D2 cutover: Authority = .appForceStateSnapshot (force-state 控制台 / debug snapshot).
-        try? stateApplier.apply(cells: cells, authority: .appForceStateSnapshot)
+        // D2 cutover (grok-4.5 short review P1-2): force-state 控制台 / debug
+        // snapshot path. Applier refusal populates stateApplierFailureLog and
+        // this call site continues to render the snapshot from the pre-attempt
+        // store state (truthful render, not a raw replaceCells fallback).
+        do {
+            _ = try stateApplier.apply(cells: cells, authority: .appForceStateSnapshot)
+        } catch {
+            // Applier gate refused; failureReceiver already recorded the
+            // structured failure. Snapshot below renders the pre-refusal store.
+        }
         withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
             snapshot = StagePresentationSnapshot.from(
                 store: store,

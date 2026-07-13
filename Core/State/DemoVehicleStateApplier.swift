@@ -79,6 +79,37 @@ public struct DemoVehicleStateApplierTerminalAck: Equatable, Sendable {
     }
 }
 
+/// Structured failure ack emitted whenever a gate refuses a write. Complements
+/// the success `TerminalAck` so observers can distinguish silence (no attempt)
+/// from refusal (attempted but gated off). Direct answer to grok-4.5 short
+/// review P1-2 — before this type existed, `try?` at the caller silently ate
+/// the applier's fail-closed signal, leaving observers unable to see the gate
+/// fire. See CLOSEOUT.md v2 §"P1 Fix Section".
+public struct DemoVehicleStateApplierFailureRecord: Equatable, Sendable {
+    public let authority: DemoVehicleStateAuthority
+    public let reasonTag: String
+    public let cellCount: Int
+    public let expectedDigest: String
+    public let actualDigest: String
+    public let timestamp: Date
+
+    public init(
+        authority: DemoVehicleStateAuthority,
+        reasonTag: String,
+        cellCount: Int,
+        expectedDigest: String,
+        actualDigest: String,
+        timestamp: Date
+    ) {
+        self.authority = authority
+        self.reasonTag = reasonTag
+        self.cellCount = cellCount
+        self.expectedDigest = expectedDigest
+        self.actualDigest = actualDigest
+        self.timestamp = timestamp
+    }
+}
+
 /// Single-owner applier for App/UI direct-write force-state paths. Constructed
 /// once by the App layer (typically inside `ContentView`) and threaded through
 /// every write site.
@@ -106,6 +137,7 @@ public struct DemoVehicleStateApplier {
     private let expectedDigest: String
     private let expectedPrimaryClasses: [DemoCapabilityPrimaryClass]
     private let ackReceiver: @MainActor (DemoVehicleStateApplierTerminalAck) -> Void
+    private let failureReceiver: @MainActor (DemoVehicleStateApplierFailureRecord) -> Void
     private let clock: @Sendable () -> Date
 
     public init(
@@ -113,12 +145,14 @@ public struct DemoVehicleStateApplier {
         expectedDigest: String = DemoVehicleStateApplier.canonicalDigest,
         expectedPrimaryClasses: [DemoCapabilityPrimaryClass] = DemoVehicleStateApplier.canonicalPrimaryClasses,
         ackReceiver: @escaping @MainActor (DemoVehicleStateApplierTerminalAck) -> Void = { _ in },
+        failureReceiver: @escaping @MainActor (DemoVehicleStateApplierFailureRecord) -> Void = { _ in },
         clock: @escaping @Sendable () -> Date = Date.init
     ) {
         self.store = store
         self.expectedDigest = expectedDigest
         self.expectedPrimaryClasses = expectedPrimaryClasses
         self.ackReceiver = ackReceiver
+        self.failureReceiver = failureReceiver
         self.clock = clock
     }
 
@@ -135,6 +169,19 @@ public struct DemoVehicleStateApplier {
         // the write land against an unknown canonical baseline.
         let canonical = Self.canonicalDigest
         guard expectedDigest == canonical else {
+            // Emit failure record *before* throwing so observers that use
+            // failureReceiver do not depend on the caller's do-catch shape.
+            // Direct answer to grok-4.5 short review P1-2 — silence after
+            // gate throw is a fixture-green surface; the receiver channel
+            // makes the gate observable regardless of caller handling.
+            failureReceiver(DemoVehicleStateApplierFailureRecord(
+                authority: authority,
+                reasonTag: "digest_mismatch",
+                cellCount: cells.count,
+                expectedDigest: canonical,
+                actualDigest: expectedDigest,
+                timestamp: clock()
+            ))
             throw DemoVehicleStateApplierError.digestMismatch(
                 expected: canonical,
                 actual: expectedDigest
@@ -147,6 +194,14 @@ public struct DemoVehicleStateApplier {
         // that construct their own out-of-order list.
         let canonicalPrimaryClasses = Self.canonicalPrimaryClasses
         guard expectedPrimaryClasses == canonicalPrimaryClasses else {
+            failureReceiver(DemoVehicleStateApplierFailureRecord(
+                authority: authority,
+                reasonTag: "primary_class_catalog_mismatch",
+                cellCount: cells.count,
+                expectedDigest: canonical,
+                actualDigest: expectedDigest,
+                timestamp: clock()
+            ))
             throw DemoVehicleStateApplierError.primaryClassCatalogMismatch(
                 expected: canonicalPrimaryClasses,
                 actual: expectedPrimaryClasses

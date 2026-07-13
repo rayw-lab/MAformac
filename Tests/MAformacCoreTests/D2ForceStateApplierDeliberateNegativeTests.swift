@@ -259,6 +259,133 @@ final class D2ForceStateApplierDeliberateNegativeTests: XCTestCase {
                      "refused apply must NOT write vehicle.speed = anti-fixture-green invariant")
     }
 
+    // MARK: - P1 Fix Section (grok-4.5 short review ACCEPT_WITH_FOLLOWUP_TICKETS)
+    //
+    // P1-2 evidence — `failureReceiver` fires exactly when the gate throws.
+    // These tests exist because grok-4.5 flagged that `try? apply(...)` at the
+    // call site silently swallows the applier's fail-closed signal. The
+    // failure ack channel restores observability so an operator (or a
+    // downstream harness test) can distinguish "gate never fired" from "gate
+    // fired and refused". See CLOSEOUT.md v2 §"P1 Fix Section".
+
+    @MainActor
+    func testP1Fix_FailureReceiverInvokedOnDigestMismatch() {
+        let store = makeStore(seed: [makeCell(key: "ac.power", value: "on", revision: 3)])
+        var failures: [DemoVehicleStateApplierFailureRecord] = []
+        var acks: [DemoVehicleStateApplierTerminalAck] = []
+        let applier = DemoVehicleStateApplier(
+            store: store,
+            expectedDigest: "deadbeef-not-canonical",
+            ackReceiver: { acks.append($0) },
+            failureReceiver: { failures.append($0) }
+        )
+
+        XCTAssertThrowsError(try applier.apply(
+            cells: [makeCell(key: "ac.power", value: "off")],
+            authority: .appMockTransition
+        ))
+
+        // Structural failure record present exactly once, with the correct
+        // reason tag, expected canonical digest, and the caller's stale one.
+        XCTAssertEqual(failures.count, 1)
+        XCTAssertEqual(failures.first?.authority, .appMockTransition)
+        XCTAssertEqual(failures.first?.reasonTag, "digest_mismatch")
+        XCTAssertEqual(failures.first?.expectedDigest, DemoCapabilityMatrixCatalog.sourceSHA256)
+        XCTAssertEqual(failures.first?.actualDigest, "deadbeef-not-canonical")
+        XCTAssertEqual(failures.first?.cellCount, 1)
+        // No ack on a refused write (would be fixture-green).
+        XCTAssertTrue(acks.isEmpty)
+        // Store still holds the seed value — no fallback / partial apply.
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(store.cell(for: "ac.power")?.revision, 3)
+    }
+
+    @MainActor
+    func testP1Fix_FailureReceiverInvokedOnPrimaryClassMismatch() {
+        let store = makeStore()
+        var failures: [DemoVehicleStateApplierFailureRecord] = []
+        let applier = DemoVehicleStateApplier(
+            store: store,
+            expectedPrimaryClasses: [.defaultExecutable],
+            failureReceiver: { failures.append($0) }
+        )
+
+        XCTAssertThrowsError(try applier.apply(
+            cells: [makeCell(key: "ac.power", value: "off")],
+            authority: .appForceStateSnapshot
+        ))
+
+        XCTAssertEqual(failures.count, 1)
+        XCTAssertEqual(failures.first?.reasonTag, "primary_class_catalog_mismatch")
+        XCTAssertEqual(failures.first?.authority, .appForceStateSnapshot)
+        // The store must remain empty — no fallback write.
+        XCTAssertEqual(store.cells.count, 0)
+    }
+
+    @MainActor
+    func testP1Fix_FailureReceiverIsNotInvokedOnSuccessfulApply() throws {
+        let store = makeStore()
+        var failures: [DemoVehicleStateApplierFailureRecord] = []
+        var acks: [DemoVehicleStateApplierTerminalAck] = []
+        let applier = DemoVehicleStateApplier(
+            store: store,
+            ackReceiver: { acks.append($0) },
+            failureReceiver: { failures.append($0) }
+        )
+
+        _ = try applier.apply(
+            cells: [makeCell(key: "ac.power", value: "on")],
+            authority: .appMockVoicePlan
+        )
+
+        // Success emits exactly one ack, zero failure records — proves the
+        // channels are disjoint (no silent double-fire).
+        XCTAssertEqual(acks.count, 1)
+        XCTAssertEqual(failures.count, 0)
+    }
+
+    // P1-1 evidence — the applier's throw path leaves the store byte-identical
+    // to the pre-attempt state. Combined with the App/ContentView.swift do-catch
+    // fix (which `return`s from the call site on refusal instead of continuing
+    // into store.applyMockTransition), this proves the fail-closed guarantee
+    // is real: no mock apply lands against an unknown baseline.
+    @MainActor
+    func testP1Fix_StoreByteIdenticalAfterGateRefusalConfirmsNoFallback() {
+        let seed = [
+            makeCell(key: "ac.power", value: "on", revision: 7),
+            makeCell(key: "window.position[主驾]", value: "60", revision: 4),
+            makeCell(key: "seat.heat", value: "2", revision: 1)
+        ]
+        let store = makeStore(seed: seed)
+        var failures: [DemoVehicleStateApplierFailureRecord] = []
+        let applier = DemoVehicleStateApplier(
+            store: store,
+            expectedDigest: "not-the-canonical-digest",
+            failureReceiver: { failures.append($0) }
+        )
+
+        // Attempt a write that would touch multiple keys.
+        XCTAssertThrowsError(try applier.apply(
+            cells: [
+                makeCell(key: "ac.power", value: "off"),
+                makeCell(key: "window.position[主驾]", value: "0"),
+                makeCell(key: "seat.heat", value: "0")
+            ],
+            authority: .appMockTransition
+        ))
+
+        // Byte-identical to the seed (values + revisions preserved).
+        for cell in seed {
+            let actual = store.cell(for: cell.key)
+            XCTAssertEqual(actual?.actualValue, cell.actualValue,
+                           "gate refusal must leave \(cell.key) byte-identical")
+            XCTAssertEqual(actual?.revision, cell.revision,
+                           "gate refusal must not bump revision for \(cell.key)")
+        }
+        // Failure receiver captured exactly the one refused attempt.
+        XCTAssertEqual(failures.count, 1)
+    }
+
     // MARK: - Helpers
 
     private func repoRelativeSource(_ relativePath: String) throws -> String {
