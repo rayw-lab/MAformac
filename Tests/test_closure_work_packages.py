@@ -601,6 +601,8 @@ def test_verify_ci_consumes_o1o2_checker_and_presence_gate() -> None:
     verify_ci = re.search(r"^verify-ci:\s*(.*)$", makefile, re.MULTILINE)
     assert verify_ci is not None
     assert "verify-closure-work-packages" in verify_ci.group(1)
+    assert "verify-closure-work-packages-local-fast" not in verify_ci.group(1)
+    assert re.search(r"^verify-closure-work-packages-local-fast:", makefile, re.MULTILINE)
     presence = re.search(r"^verify-c1-checker-files:\n(?P<body>(?:\t.*\n)+)", makefile, re.MULTILINE)
     assert presence is not None
     for required in [

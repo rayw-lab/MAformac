@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -50,6 +50,29 @@ verify-closure-work-packages: .venv/.deps.stamp
 		--o6-policy contracts/closure-execution-window.v1.yaml \
 		--subject-head "$$(git rev-parse HEAD)" \
 		--receipt .build/closure/closure-registry-check.v1.json
+
+verify-closure-work-packages-static: .venv/.deps.stamp
+	$(PYTHON) -m pytest -q Tests/test_closure_work_packages.py $$($(PYTHON) scripts/closure_path_classifier.py pytest-deselect)
+	$(PYTHON) scripts/check_closure_work_packages.py check \
+		--registry contracts/closure-work-packages.v1.yaml \
+		--schema contracts/schemas/closure-work-packages.v1.schema.json \
+		--roadmap docs/roadmap-2026-07-11-v6-closure-baseline.md \
+		--o6-policy contracts/closure-execution-window.v1.yaml \
+		--subject-head "$$(git rev-parse HEAD)" \
+		--receipt .build/closure/closure-registry-check.v1.json
+
+verify-closure-work-packages-local-fast: .venv/.deps.stamp
+	@base="$${CLOSURE_BASE:-HEAD}"; subject="$${CLOSURE_SUBJECT:-HEAD}"; \
+	result=$$($(PYTHON) scripts/closure_path_classifier.py tier \
+		--repo . --base "$$base" --subject "$$subject" --show-reason); \
+	tier=$$(printf '%s' "$$result" | cut -f1); \
+	echo "closure-local-fast $$result"; \
+	case "$$tier" in \
+		ordinary_docs) git diff --check "$$base" "$$subject" && git diff --check HEAD && $(MAKE) verify-cross-section ;; \
+		closure_authority) $(MAKE) verify-closure-work-packages ;; \
+		full) $(MAKE) verify-ci ;; \
+		*) echo "unknown classifier tier=$$tier" >&2; exit 2 ;; \
+	esac
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
 # verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
