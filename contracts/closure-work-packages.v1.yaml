@@ -1,3 +1,10 @@
+# Registry note (FT1 = B1 fast-tier non-package infrastructure classifier split, D-156):
+# This closure-work-packages.v1 registry is the SSOT for closure gate work packages.
+# Fast-tier classifier (scripts/closure_path_classifier.py) is registry-adjacent
+# infrastructure — NOT a package row here. It splits verify-closure-work-packages
+# into fast (unit + static) vs slow (full subprocess) tiers via pytest-deselect,
+# and it lives under STALE_BASIS_ALLOWED_PATHS + verify-c1-checker-files roster.
+# See docs/commander-log/decisions.md#D-156 and openspec/changes/add-b1-fast-tier-closure-checker-split.
 schema_version: closure_work_packages_v1
 registry_id: maformac.v6.closure.current
 artifact_kind: closure_work_packages_registry

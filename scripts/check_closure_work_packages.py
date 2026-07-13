@@ -137,6 +137,8 @@ STALE_BASIS_ALLOWED_PATHS = (
     re.compile(r"^Tests/test_closure_work_packages\.py$"),
     re.compile(r"^Tests/Fixtures/closure-registry/.*$"),
     re.compile(r"^scripts/check_closure_work_packages\.py$"),
+    re.compile(r"^scripts/closure_path_classifier\.py$"),
+    re.compile(r"^scripts/test_closure_path_classifier\.py$"),
     re.compile(r"^scripts/reanchor_closure_registry\.py$"),
     re.compile(r"^scripts/test_reanchor_closure_registry\.py$"),
     re.compile(r"^scripts/test_verify_ci_checker_presence\.py$"),
