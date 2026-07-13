@@ -36,15 +36,20 @@ public actor SessionLifecycleChildRegistry {
     private var currentGeneration: SessionGeneration
     private var records: [SessionChildID: SessionChildRegistration]
     private var staleLateCallbackCount: UInt
-    // Deadlines per child (registered at cancelAll time; fence at markFenced).
+    // Per-child fence deadline (in monotonic nanoseconds from `clock`).
+    // Populated at register; enforced by `sweepFenceTimeouts()` which reads `clock.nowNanoseconds()`
+    // and transitions expired pending/cancelled children to `.timedOutFenced` (P1-1 fix: clock + deadline
+    // are actively consumed, no dead field). Owner authority is required to sweep.
     private var fenceDeadlineNsPerChild: [SessionChildID: UInt64]
     private let clock: SessionK2Clock
+    private let defaultFenceDeadlineNs: UInt64
 
     public init(
         ownerAuthority: SessionOwnerAuthority,
         parentSessionID: SessionID,
         generation: SessionGeneration,
-        clock: SessionK2Clock = SessionSystemK2Clock()
+        clock: SessionK2Clock = SessionSystemK2Clock(),
+        defaultFenceDeadlineNs: UInt64 = 5_000_000_000  // 5 seconds monotonic default
     ) {
         self.ownerAuthority = ownerAuthority
         self.parentSessionID = parentSessionID
@@ -53,6 +58,7 @@ public actor SessionLifecycleChildRegistry {
         self.staleLateCallbackCount = 0
         self.fenceDeadlineNsPerChild = [:]
         self.clock = clock
+        self.defaultFenceDeadlineNs = defaultFenceDeadlineNs
     }
 
     // MARK: - Registration
@@ -74,6 +80,10 @@ public actor SessionLifecycleChildRegistry {
             disposition: .pending,
             generation: currentGeneration
         )
+        // P1-1: enforce per-child fence deadline (clock + deadline actively consumed).
+        // Deadline = registration time + defaultFenceDeadlineNs; sweepFenceTimeouts() reads clock.
+        let registeredAtNs = clock.nowNanoseconds()
+        fenceDeadlineNsPerChild[childID] = registeredAtNs &+ defaultFenceDeadlineNs
         return .applied
     }
 
@@ -213,6 +223,48 @@ public actor SessionLifecycleChildRegistry {
         case .terminal, .unsupported, .timedOutFenced:
             return .rejected(.childAlreadySettled)
         }
+    }
+
+    // MARK: - Fence timeout sweep (P1-1: enforce clock + deadline)
+    //
+    // Sweep the registry for pending/cancelled children whose per-child fence deadline
+    // has elapsed against `clock.nowNanoseconds()`. Expired children transition to
+    // `.timedOutFenced`; already-settled children are left alone. Returns the set of
+    // children that were transitioned in this sweep call.
+    //
+    // Called explicitly by the owner (see SessionLifecycleRecoveryCoordinator);
+    // enforces that `clock` and `fenceDeadlineNsPerChild` are consumed (not dead fields).
+
+    /// Sweep fence timeouts against the K2 clock; transition expired pending/cancelled
+    /// children to `.timedOutFenced` and return the children so transitioned.
+    /// Rejects (returns empty transitioned set) on non-owner authority; does NOT alter records.
+    public func sweepFenceTimeouts(
+        authority: SessionOwnerAuthority
+    ) -> [SessionChildID] {
+        guard authority == ownerAuthority else {
+            return []
+        }
+        let nowNs = clock.nowNanoseconds()
+        var transitioned: [SessionChildID] = []
+        // Deterministic order by rawValue for stable receipt.
+        let sortedChildren = records.keys.sorted { $0.rawValue < $1.rawValue }
+        for childID in sortedChildren {
+            guard let existing = records[childID] else { continue }
+            switch existing.disposition {
+            case .pending, .cancelled:
+                if let deadline = fenceDeadlineNsPerChild[childID], nowNs >= deadline {
+                    records[childID] = SessionChildRegistration(
+                        childID: childID,
+                        disposition: .timedOutFenced,
+                        generation: existing.generation
+                    )
+                    transitioned.append(childID)
+                }
+            case .terminal, .unsupported, .timedOutFenced:
+                continue
+            }
+        }
+        return transitioned
     }
 
     // MARK: - Stale-late callback observation (never applies; increments counter)

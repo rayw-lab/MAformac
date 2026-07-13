@@ -100,6 +100,53 @@ final class SessionLifecycleGenerationFenceTests: XCTestCase {
         // The two live in separate namespaces on the recovery coordinator; not equal by type.
     }
 
+    // (g) P1-2 fix: non-owner authority sending an old-generation event MUST NOT
+    //     pollute oldGenerationStaleCount. Non-owner is rejected by K1 with
+    //     .wrongAuthority; K2 stale counter stays at 0 (authority precedes counting).
+    func test_g_non_owner_old_generation_does_not_pollute_stale_count() async {
+        let c = SessionLifecycleRecoveryCoordinator(
+            ownerAuthority: SessionLifecycleK2Fixtures.F07.owner,
+            sessionID: SessionLifecycleK2Fixtures.F07.parentSession,
+            generation: SessionLifecycleK2Fixtures.F07.currentGeneration,
+            clock: SessionK2FakeClock(startNanoseconds: 0)
+        )
+        // Non-owner authority + old-generation event.
+        let result = await c.apply(
+            SessionLifecycleK2Fixtures.F07.oldGenerationTerminalEvent(),
+            authority: SessionLifecycleK2Fixtures.ownerB
+        )
+        // K1 rejects on wrongAuthority; K2 stale counter untouched.
+        XCTAssertEqual(result.status, .rejected(.wrongAuthority))
+        let sc = await c.oldGenerationStaleCallbackCount()
+        XCTAssertEqual(sc, 0, "non-owner old-generation events must not pollute stale count")
+        // Owner + old-gen then increments to 1, proving the counter is functional.
+        _ = await c.apply(
+            SessionLifecycleK2Fixtures.F07.oldGenerationTerminalEvent(),
+            authority: SessionLifecycleK2Fixtures.F07.owner
+        )
+        let sc2 = await c.oldGenerationStaleCallbackCount()
+        XCTAssertEqual(sc2, 1)
+    }
+
+    // (h) P1-2 fix: non-owner authority sending an old-generation event as part of
+    //     a batch MUST NOT pollute oldGenerationStaleCount either.
+    func test_h_non_owner_old_generation_batch_does_not_pollute_stale_count() async {
+        let c = SessionLifecycleRecoveryCoordinator(
+            ownerAuthority: SessionLifecycleK2Fixtures.F07.owner,
+            sessionID: SessionLifecycleK2Fixtures.F07.parentSession,
+            generation: SessionLifecycleK2Fixtures.F07.currentGeneration,
+            clock: SessionK2FakeClock(startNanoseconds: 0)
+        )
+        let batch: [SessionLifecycleEvent] = [
+            SessionLifecycleK2Fixtures.F07.oldGenerationStartEvent(),
+            SessionLifecycleK2Fixtures.F07.oldGenerationTerminalEvent()
+        ]
+        let result = await c.apply(batch: batch, authority: SessionLifecycleK2Fixtures.ownerB)
+        XCTAssertEqual(result.status, .rejected(.wrongAuthority))
+        let sc = await c.oldGenerationStaleCallbackCount()
+        XCTAssertEqual(sc, 0, "non-owner batch with old-gen events must not pollute stale count")
+    }
+
     // MARK: - SHA-256 helper (CommonCrypto)
 
     private static func sha256HexOf(_ text: String) -> String {

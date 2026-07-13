@@ -154,4 +154,70 @@ final class SessionLifecycleChildRegistryTests: XCTestCase {
         XCTAssertEqual(SessionLifecycleK2Fixtures.F04.expectedClosedSetCount, 5)
         XCTAssertEqual(SessionLifecycleK2Fixtures.F04.expectedSettledSetCountFromDefineT09, 4)
     }
+
+    // (j) P1-1 fix: sweepFenceTimeouts enforces clock + per-child deadline.
+    //     Advance FakeClock past the deadline → expired pending/cancelled children
+    //     transition to .timedOutFenced; a fresh (not-yet-expired) child is untouched.
+    func test_j_sweep_fence_timeouts_transitions_expired_children() async {
+        let clock = SessionK2FakeClock(startNanoseconds: 0)
+        // Deadline = 1_000 ns for deterministic sweep test.
+        let r = SessionLifecycleChildRegistry(
+            ownerAuthority: SessionLifecycleK2Fixtures.F04.owner,
+            parentSessionID: SessionLifecycleK2Fixtures.F04.parentSession,
+            generation: SessionLifecycleK2Fixtures.F04.generation,
+            clock: clock,
+            defaultFenceDeadlineNs: 1_000
+        )
+        _ = await r.register(childID: SessionLifecycleK2Fixtures.childA, authority: SessionLifecycleK2Fixtures.F04.owner)
+        // Advance clock so child A's deadline (t=1000) has elapsed.
+        clock.advance(by: 1_500)
+        // Register child B AFTER advancing; B's deadline = 1_500 + 1_000 = 2_500.
+        _ = await r.register(childID: SessionLifecycleK2Fixtures.childB, authority: SessionLifecycleK2Fixtures.F04.owner)
+        // Sweep at t=1_500 → A expired (1_500 >= 1_000); B not yet expired (1_500 < 2_500).
+        let transitioned = await r.sweepFenceTimeouts(authority: SessionLifecycleK2Fixtures.F04.owner)
+        XCTAssertEqual(transitioned, [SessionLifecycleK2Fixtures.childA])
+        let snap = await r.snapshot()
+        XCTAssertEqual(snap.count, 2)
+        // Snapshot is sorted by rawValue; childA first (rawValue "child.a"), then childB.
+        XCTAssertEqual(snap[0].childID, SessionLifecycleK2Fixtures.childA)
+        XCTAssertEqual(snap[0].disposition, .timedOutFenced)
+        XCTAssertEqual(snap[1].childID, SessionLifecycleK2Fixtures.childB)
+        XCTAssertEqual(snap[1].disposition, .pending)
+    }
+
+    // (k) P1-1 fix: sweep with no elapsed deadline returns empty and does not mutate.
+    func test_k_sweep_without_elapsed_deadline_returns_empty() async {
+        let clock = SessionK2FakeClock(startNanoseconds: 0)
+        let r = SessionLifecycleChildRegistry(
+            ownerAuthority: SessionLifecycleK2Fixtures.F04.owner,
+            parentSessionID: SessionLifecycleK2Fixtures.F04.parentSession,
+            generation: SessionLifecycleK2Fixtures.F04.generation,
+            clock: clock,
+            defaultFenceDeadlineNs: 1_000
+        )
+        _ = await r.register(childID: SessionLifecycleK2Fixtures.childA, authority: SessionLifecycleK2Fixtures.F04.owner)
+        // Clock not advanced; deadline (t=1_000) not elapsed at t=0.
+        let transitioned = await r.sweepFenceTimeouts(authority: SessionLifecycleK2Fixtures.F04.owner)
+        XCTAssertEqual(transitioned, [])
+        let snap = await r.snapshot()
+        XCTAssertEqual(snap[0].disposition, .pending)
+    }
+
+    // (l) P1-1 fix: non-owner authority cannot sweep; empty result + no mutation.
+    func test_l_non_owner_sweep_rejected_no_mutation() async {
+        let clock = SessionK2FakeClock(startNanoseconds: 0)
+        let r = SessionLifecycleChildRegistry(
+            ownerAuthority: SessionLifecycleK2Fixtures.F04.owner,
+            parentSessionID: SessionLifecycleK2Fixtures.F04.parentSession,
+            generation: SessionLifecycleK2Fixtures.F04.generation,
+            clock: clock,
+            defaultFenceDeadlineNs: 1_000
+        )
+        _ = await r.register(childID: SessionLifecycleK2Fixtures.childA, authority: SessionLifecycleK2Fixtures.F04.owner)
+        clock.advance(by: 2_000)
+        let transitioned = await r.sweepFenceTimeouts(authority: SessionLifecycleK2Fixtures.ownerB)
+        XCTAssertEqual(transitioned, [])
+        let snap = await r.snapshot()
+        XCTAssertEqual(snap[0].disposition, .pending, "non-owner sweep must not mutate disposition")
+    }
 }

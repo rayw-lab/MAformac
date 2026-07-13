@@ -31,7 +31,8 @@ public actor SessionLifecycleRecoveryCoordinator {
         ownerAuthority: SessionOwnerAuthority,
         sessionID: SessionID,
         generation: SessionGeneration,
-        clock: SessionK2Clock = SessionSystemK2Clock()
+        clock: SessionK2Clock = SessionSystemK2Clock(),
+        defaultFenceDeadlineNs: UInt64 = 5_000_000_000
     ) {
         self.ownerAuthority = ownerAuthority
         self.parentSessionID = sessionID
@@ -44,7 +45,8 @@ public actor SessionLifecycleRecoveryCoordinator {
             ownerAuthority: ownerAuthority,
             parentSessionID: sessionID,
             generation: generation,
-            clock: clock
+            clock: clock,
+            defaultFenceDeadlineNs: defaultFenceDeadlineNs
         )
         self.stableCheckpoint = nil
         self.pendingPlan = nil
@@ -61,11 +63,23 @@ public actor SessionLifecycleRecoveryCoordinator {
 
     /// Delegate a single parent-lifecycle event to K1 apply under owner authority.
     /// Old-generation events are rejected at the K2 boundary before touching K1.
+    ///
+    /// P1-2 fix: authority is verified BEFORE the old-generation guard so that non-owner
+    /// callers cannot pollute `oldGenerationStaleCount`. Non-owner calls pass through to
+    /// K1 which will reject them with `.wrongAuthority`; the K2 stale counter is untouched
+    /// (verification-economics: authorization precedes counting).
     public func apply(
         _ event: SessionLifecycleEvent,
         authority: SessionOwnerAuthority
     ) -> SessionLifecycleApplyResult {
-        // K2 boundary: old-generation guard first.
+        // Authority gate BEFORE stale-count guard (P1-2).
+        guard authority == ownerAuthority else {
+            // Non-owner path: forward to K1 which will reject with .wrongAuthority;
+            // K2 stale counter MUST NOT increment on non-owner calls, so bypass the
+            // old-generation guard entirely for non-owner authority.
+            return k1Coordinator.apply(event, authority: authority)
+        }
+        // K2 boundary: old-generation guard (owner authority path only).
         if let ev = eventGeneration(event), ev.value < currentGeneration.value {
             oldGenerationStaleCount = oldGenerationStaleCount &+ 1
             return SessionLifecycleApplyResult(
@@ -79,10 +93,17 @@ public actor SessionLifecycleRecoveryCoordinator {
 
     /// Delegate a compound batch to K1 apply under owner authority.
     /// Old-generation events anywhere in the batch reject the whole batch.
+    ///
+    /// P1-2 fix: authority is verified BEFORE the old-generation guard so that non-owner
+    /// callers cannot pollute `oldGenerationStaleCount` (see the single-event apply above).
     public func apply(
         batch: [SessionLifecycleEvent],
         authority: SessionOwnerAuthority
     ) -> SessionLifecycleApplyResult {
+        // Authority gate BEFORE stale-count guard (P1-2).
+        guard authority == ownerAuthority else {
+            return k1Coordinator.apply(batch: batch, authority: authority)
+        }
         for event in batch {
             if let ev = eventGeneration(event), ev.value < currentGeneration.value {
                 oldGenerationStaleCount = oldGenerationStaleCount &+ 1
@@ -146,6 +167,14 @@ public actor SessionLifecycleRecoveryCoordinator {
 
     public func fenceJoinOutcome() async -> SessionFenceJoinOutcome {
         await childRegistry.fenceJoinOutcome()
+    }
+
+    /// Sweep fence timeouts against the K2 clock (P1-1 enforce path).
+    /// Non-owner authority returns an empty transitioned set and does not mutate records.
+    public func sweepChildFenceTimeouts(
+        authority: SessionOwnerAuthority
+    ) async -> [SessionChildID] {
+        await childRegistry.sweepFenceTimeouts(authority: authority)
     }
 
     public func childStaleLateCallbacks() async -> UInt {
