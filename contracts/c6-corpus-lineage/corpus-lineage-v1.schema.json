@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/schemas/corpus-lineage-v1.schema.json",
+  "title": "corpus_lineage_v1",
+  "description": "B7 T02 corpus lineage native receipt. Local-only candidate under proof_local_contract; NOT canonical, NOT B7 DONE, NOT C6 acceptance. Shipping = 45 generated + 12 manual_trap = 57.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_kind",
+    "is_canonical",
+    "is_b7_done",
+    "assembled",
+    "sources",
+    "row_conservation",
+    "id_conservation",
+    "hashes",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": {"const": "corpus_lineage_v1"},
+    "candidate_kind": {"const": "local_durable_candidate"},
+    "is_canonical": {"const": false},
+    "is_b7_done": {"const": false},
+    "assembled": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "row_count", "sha256", "ordered_case_ids", "compat_sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "row_count": {"type": "integer", "const": 57},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ordered_case_ids": {
+          "type": "array",
+          "minItems": 57,
+          "maxItems": 57,
+          "items": {"type": "string"}
+        },
+        "compat_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "generated_row_count": {"type": "integer", "const": 45},
+        "manual_trap_row_count": {"type": "integer", "const": 12},
+        "expected_generated": {"type": "integer", "const": 45},
+        "expected_manual_trap": {"type": "integer", "const": 12},
+        "expected_assembled": {"type": "integer", "const": 57},
+        "tracked_path": {"type": "string"},
+        "tracked_content_sha256": {"type": "string"},
+        "assembled_content_sha256": {"type": "string"},
+        "content_equality": {"type": "string"},
+        "note": {"type": "string"}
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_kind", "path", "row_count", "sha256", "canonical_json_present"],
+        "properties": {
+          "source_kind": {"enum": ["generated", "manual_trap"]},
+          "path": {"type": "string", "minLength": 1},
+          "row_count": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "canonical_json_present": {"type": "boolean"}
+        }
+      }
+    },
+    "row_conservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sum_source_rows", "assembled_rows", "consistent"],
+      "properties": {
+        "sum_source_rows": {"type": "integer", "const": 57},
+        "assembled_rows": {"type": "integer", "const": 57},
+        "consistent": {"type": "boolean"}
+      }
+    },
+    "id_conservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["union_source_ids", "assembled_ids", "consistent"],
+      "properties": {
+        "union_source_ids": {"type": "integer", "const": 57},
+        "assembled_ids": {"type": "integer", "const": 57},
+        "consistent": {"type": "boolean"}
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unordered_id_set_sha256", "recomputable"],
+      "properties": {
+        "unordered_id_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ordered_id_list_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "recomputable": {"type": "boolean"}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proof_class", "forbidden_claims", "coverage_note"],
+      "properties": {
+        "proof_class": {"const": "local_corpus_lineage"},
+        "forbidden_claims": {
+          "type": "array",
+          "items": {"enum": ["canonical", "b7_done", "c6_acceptance", "t02_freeze_authorized", "opsx_apply", "s9_authorization", "candidate_signed"]}
+        },
+        "coverage_note": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

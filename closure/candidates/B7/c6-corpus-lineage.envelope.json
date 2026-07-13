@@ -1,0 +1,63 @@
+{
+  "native_receipt": {
+    "path": "closure/candidates/B7/c6-corpus-lineage.receipt.json",
+    "root": "build",
+    "sha256": "161a3447e1550191589eeb6a43d0dd2071aab4e5923e810fd64b4d93bfba66ea"
+  },
+  "native_receipt_digest": "161a3447e1550191589eeb6a43d0dd2071aab4e5923e810fd64b4d93bfba66ea",
+  "native_receipt_schema_id": "corpus_lineage_v1",
+  "package_id": "B7",
+  "package_revision": 1,
+  "registry_digest": "39d8ee006983b3d06bbe45e7986753b228da0c7fcc5ccdb05e5b31b5c22e36ce",
+  "registry_schema_major": "closure_work_packages_v1",
+  "schema_version": "closure_package_exit_envelope_v1",
+  "status": "CANDIDATE_LOCAL_ONLY",
+  "subject": [
+    {
+      "key": "assembled_sha256",
+      "value": "6952a7e8f9526242d9b948538653f82603351aa24b6910050e59c9c39778a3a7",
+      "value_type": "sha256"
+    },
+    {
+      "key": "compat_sha256",
+      "value": "47806412a9b168595e732bf116a293a5582cf566d0fb63173d48343bd11fecfa",
+      "value_type": "sha256"
+    },
+    {
+      "key": "unordered_id_set_sha256",
+      "value": "e40555682fb2a5ef65d6737a8aa0c39f69bd702de23d5b98266e2f397c566f76",
+      "value_type": "sha256"
+    },
+    {
+      "key": "source_digests",
+      "value": "{\"generated\": \"037337b2a054c2eca9b6c3b10fd7c8dc7bd36a34b96ee9cc3d3c7050f0fc2062\", \"manual_trap\": \"26d891b14ed0ff6dce0d83243540abfe80850a67bec99732d460bd6ad3a5721c\"}",
+      "value_type": "string"
+    },
+    {
+      "key": "source_row_counts",
+      "value": "{\"generated\": 45, \"manual_trap\": 12}",
+      "value_type": "string"
+    },
+    {
+      "key": "lineage_recomputable",
+      "value": true,
+      "value_type": "boolean"
+    },
+    {
+      "key": "is_canonical",
+      "value": false,
+      "value_type": "boolean"
+    },
+    {
+      "key": "is_b7_done",
+      "value": false,
+      "value_type": "boolean"
+    },
+    {
+      "key": "carrier",
+      "value": "openspec/changes/add-b7-corpus-lineage-candidate",
+      "value_type": "string"
+    }
+  ],
+  "subject_schema_id": "corpus_subject_v1"
+}

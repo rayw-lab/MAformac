@@ -1,0 +1,61 @@
+{
+  "manifest_version": "c6-corpus-lineage-v1",
+  "authority": "local_durable_candidate_only",
+  "note": "B7 T02 corpus-lineage durable local candidate. Shipping = 45 generated + 12 manual_trap = 57 exact tracked ids. NOT canonical, NOT B7 DONE, NOT C6 acceptance, NOT T02 freeze authorization, NOT /opsx:apply. See carrier openspec/changes/add-b7-corpus-lineage-candidate.",
+  "shipping_counts": {
+    "generated": 45,
+    "manual_trap": 12,
+    "assembled": 57,
+    "tracked_path": "contracts/c6-bench-cases.jsonl",
+    "exact_id_set": "assembled case_id set MUST equal tracked 57 unique ids; NO invented C6-MANUAL-* rows"
+  },
+  "sources": [
+    {
+      "source_kind": "generated",
+      "path": "Tools/C6CorpusLineage/sources/c6-bench-cases.generated.jsonl",
+      "row_count": 45,
+      "identity": "exact 45 non-C6-TRAP-* rows from tracked contracts/c6-bench-cases.jsonl with source_kind=generated (identity-preserving content copy)",
+      "must_not_train_overlap": "inherits contracts/c6-bench-cases.jsonl must_not_train flags"
+    },
+    {
+      "source_kind": "manual_trap",
+      "path": "Tools/C6CorpusLineage/sources/c6-bench-cases.manual-trap.jsonl",
+      "row_count": 12,
+      "identity": "exact 12 existing C6-TRAP-* rows from tracked contracts/c6-bench-cases.jsonl with source_kind=manual_trap + stable lineage metadata (source_record_id/provenance/rationale/external_layer/authored_at=unknown/captured_at). Valid shipping source, NOT quarantine."
+    }
+  ],
+  "mutations": {
+    "path": "Tools/C6CorpusLineage/mutations/deliberate-red.jsonl",
+    "identity": "deliberate-red mutation fixture (cross-source duplicate id / missing case_id / bad state cell). Independent of source denominator; never counted in shipping 45/12/57.",
+    "checker_flag": "--with-mutations (alias --with-trap)"
+  },
+  "assembler": {
+    "lossless": true,
+    "stable_sort_key": "case_id",
+    "stable_serialization": "json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(',',':'))",
+    "row_id_conservation": "assembled row_count MUST equal sum of source row_counts; assembled case_id set MUST equal union of source case_id sets",
+    "content_equality": "after strip_lineage_metadata, assembled content fingerprint equals tracked content fingerprint (parse+sort+canonical). Packaging byte equality is NOT claimed.",
+    "fail_closed": [
+      "duplicate case_id (within or across sources)",
+      "missing case_id",
+      "missing required field / invalid behavior_class",
+      "cross-source id collision between generated and manual_trap",
+      "shipping count drift from exact 45/12/57",
+      "assembled ID set != tracked 57",
+      "invented C6-MANUAL-* rows",
+      "quarantine: rows with trap_note or source_kind==trap are isolated, never silently merged"
+    ]
+  },
+  "recomputable_hashes": [
+    "per-source sha256 over content-canonical JSON of its rows (lineage metadata stripped)",
+    "assembled sha256 over packaging JSON of assembled rows (lineage metadata retained)",
+    "compat_sha256 over assembled rows with lineage metadata stripped (content/canonical equality vs tracked fingerprint)",
+    "unordered_id_set_sha256 over sorted set of all case_ids",
+    "ordered_id_list_sha256 over case_ids in materialization order"
+  ],
+  "proof_claims": {
+    "allowed": ["local_corpus_lineage", "local_authority_acceptance", "local_accounting"],
+    "forbidden": ["canonical", "b7_done", "c6_acceptance", "t02_freeze_authorized", "opsx_apply", "s9_authorization", "candidate_signed"]
+  },
+  "verification_scope_limit": "dedicated Python + unit + schema + OpenSpec strict only. NO full Swift build, NO GUI, NO S8."
+}

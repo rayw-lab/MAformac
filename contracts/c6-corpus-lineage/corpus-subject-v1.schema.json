@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/schemas/corpus-subject-v1.schema.json",
+  "title": "corpus_subject_v1",
+  "description": "B7 subject schema for the closure envelope subject[] array. Identity = assembled corpus bytes + source digests + immutable source row counts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["assembled_sha256", "source_digests", "source_row_counts", "lineage_recomputable"],
+  "properties": {
+    "assembled_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_digests": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "source_row_counts": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "lineage_recomputable": {"type": "boolean"}
+  }
+}

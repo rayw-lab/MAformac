@@ -1,0 +1,127 @@
+{
+  "assembled": {
+    "compat_sha256": "47806412a9b168595e732bf116a293a5582cf566d0fb63173d48343bd11fecfa",
+    "ordered_case_ids": [
+      "C6-COV-001",
+      "C6-COV-002",
+      "C6-COV-003",
+      "C6-COV-004",
+      "C6-COV-005",
+      "C6-COV-006",
+      "C6-COV-007",
+      "C6-MP-001",
+      "C6-MP-002",
+      "C6-MP-003",
+      "C6-MP-004",
+      "C6-MP-005",
+      "C6-MP-006",
+      "C6-MP-007",
+      "C6-MP-008",
+      "C6-MP-009",
+      "C6-MP-010",
+      "C6-MP-011",
+      "C6-MP-012",
+      "C6-MP-013",
+      "C6-MP-014",
+      "C6-MP-015",
+      "C6-MP-016",
+      "C6-MP-017",
+      "C6-MP-018",
+      "C6-MP-019",
+      "C6-MP-020",
+      "C6-MP-021",
+      "C6-MP-022",
+      "C6-MP-023",
+      "C6-MP-024",
+      "C6-MP-025",
+      "C6-MP-026",
+      "C6-MP-027",
+      "C6-MP-028",
+      "C6-MP-029",
+      "C6-MP-030",
+      "C6-NEG-001",
+      "C6-NEG-002",
+      "C6-NEG-003",
+      "C6-NEG-004",
+      "C6-NEG-005",
+      "C6-NEG-006",
+      "C6-NEG-007",
+      "C6-NEG-008",
+      "C6-TRAP-AMB-001",
+      "C6-TRAP-AMB-002",
+      "C6-TRAP-ASR-001",
+      "C6-TRAP-ASR-002",
+      "C6-TRAP-CORR-001",
+      "C6-TRAP-CORR-002",
+      "C6-TRAP-LURE-001",
+      "C6-TRAP-LURE-002",
+      "C6-TRAP-NEG-001",
+      "C6-TRAP-NEG-002",
+      "C6-TRAP-SAFE-001",
+      "C6-TRAP-SAFE-002"
+    ],
+    "path": "closure/candidates/B7/c6-corpus-lineage.assembled.jsonl",
+    "row_count": 57,
+    "sha256": "6952a7e8f9526242d9b948538653f82603351aa24b6910050e59c9c39778a3a7"
+  },
+  "candidate_kind": "local_durable_candidate",
+  "claims": {
+    "coverage_note": "B7 T02 corpus lineage durable local candidate only. Shipping = 45 generated + 12 manual_trap = 57 exact tracked ids. Mutation fixtures are independent of the source denominator. NOT canonical, NOT B7 DONE, NOT C6 acceptance, NOT T02 freeze authorization, NOT /opsx:apply.",
+    "forbidden_claims": [
+      "canonical",
+      "b7_done",
+      "c6_acceptance",
+      "t02_freeze_authorized",
+      "opsx_apply",
+      "s9_authorization",
+      "candidate_signed"
+    ],
+    "proof_class": "local_corpus_lineage"
+  },
+  "hashes": {
+    "ordered_id_list_sha256": "e40555682fb2a5ef65d6737a8aa0c39f69bd702de23d5b98266e2f397c566f76",
+    "recomputable": true,
+    "unordered_id_set_sha256": "e40555682fb2a5ef65d6737a8aa0c39f69bd702de23d5b98266e2f397c566f76"
+  },
+  "id_conservation": {
+    "assembled_ids": 57,
+    "consistent": true,
+    "union_source_ids": 57
+  },
+  "is_b7_done": false,
+  "is_canonical": false,
+  "lineage": {
+    "assembled_content_sha256": "47806412a9b168595e732bf116a293a5582cf566d0fb63173d48343bd11fecfa",
+    "content_equality": "assembled after strip_lineage_metadata equals tracked content fingerprint (parse+sort+canonical). Packaging byte equality is NOT claimed.",
+    "expected_assembled": 57,
+    "expected_generated": 45,
+    "expected_manual_trap": 12,
+    "generated_row_count": 45,
+    "manual_trap_row_count": 12,
+    "note": "generated = exact 45 non-TRAP tracked rows; manual_trap = exact 12 existing C6-TRAP-* tracked rows; no invented C6-MANUAL-* rows; mutation fixtures are not part of the source denominator.",
+    "tracked_content_sha256": "47806412a9b168595e732bf116a293a5582cf566d0fb63173d48343bd11fecfa",
+    "tracked_path": "contracts/c6-bench-cases.jsonl"
+  },
+  "row_conservation": {
+    "assembled_rows": 57,
+    "consistent": true,
+    "sum_source_rows": 57
+  },
+  "schema_version": "corpus_lineage_v1",
+  "sources": [
+    {
+      "canonical_json_present": true,
+      "path": "Tools/C6CorpusLineage/sources/c6-bench-cases.generated.jsonl",
+      "row_count": 45,
+      "sha256": "037337b2a054c2eca9b6c3b10fd7c8dc7bd36a34b96ee9cc3d3c7050f0fc2062",
+      "source_kind": "generated"
+    },
+    {
+      "canonical_json_present": true,
+      "path": "Tools/C6CorpusLineage/sources/c6-bench-cases.manual-trap.jsonl",
+      "row_count": 12,
+      "sha256": "26d891b14ed0ff6dce0d83243540abfe80850a67bec99732d460bd6ad3a5721c",
+      "source_kind": "manual_trap"
+    }
+  ]
+}
