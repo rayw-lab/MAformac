@@ -25,13 +25,17 @@ NEGATIVE_DIR = REPO / "Tests" / "Fixtures" / "closure-registry" / "negative"
 REANCHOR_HELPER_TEST = REPO / "scripts" / "test_reanchor_closure_registry.py"
 
 
-def load_checker_module():
-    spec = importlib.util.spec_from_file_location("closure_checker", CHECKER)
+def _load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def load_checker_module():
+    return _load_module(CHECKER, "closure_checker")
 
 
 
@@ -152,6 +156,7 @@ def committed_registry_probe(
     tmp_path: Path,
     *,
     post_basis_change: str | None = None,
+    candidate_drift: str | None = None,
 ) -> tuple[subprocess.CompletedProcess[str], dict[str, object]]:
     clone = tmp_path / "postcommit"
     subprocess.run(
@@ -178,6 +183,24 @@ def committed_registry_probe(
     assert replacement_count == 2
     registry_path.write_text(registry_text, encoding="utf-8")
     shutil.copy2(CHECKER, clone / "scripts" / "check_closure_work_packages.py")
+    # Load the (possibly modified) checker from the clone and regenerate the
+    # roadmap's derived generated block under it, so the block's embedded
+    # checker_sha256 matches the checker that runs the check.  The generated
+    # block is derived output, not a hand-authored artifact, so refreshing it
+    # together with the registry keeps the probe honest for any checker edit
+    # without weakening E_STALE_BASIS coverage.  The roadmap_generated_table
+    # negative test still corrupts the block AFTER this refresh, so it remains
+    # out of sync and still trips E_GENERATED_BLOCK_DRIFT.
+    clone_checker = _load_module(clone / "scripts" / "check_closure_work_packages.py", "closure_checker_clone")
+    clone_registry = yaml.safe_load((clone / "contracts" / "closure-work-packages.v1.yaml").read_text(encoding="utf-8"))
+    roadmap_path = clone / ROADMAP.relative_to(REPO)
+    roadmap_text = roadmap_path.read_text(encoding="utf-8")
+    generated = clone_checker.render_generated_block(clone_registry)
+    if clone_checker.MARKER_RE.search(roadmap_text):
+        roadmap_text = clone_checker.MARKER_RE.sub("\n" + generated + "\n", roadmap_text)
+    else:
+        roadmap_text = roadmap_text.rstrip("\n") + "\n\n" + generated + "\n"
+    roadmap_path.write_text(roadmap_text, encoding="utf-8")
     subprocess.run(
         [
             "git",
@@ -219,8 +242,54 @@ def committed_registry_probe(
         product_path.write_text(product_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         subprocess.run(["git", "add", "Core/State/DialogueState.swift"], cwd=clone, check=True)
         subprocess.run(["git", "commit", "--quiet", "-m", "test: product drift"], cwd=clone, check=True)
+    elif candidate_drift == "b7_assembled":
+        # Adjacent B7 file in the SAME directory, NOT whitelisted (only the
+        # .envelope.json identity file is). Must remain E_STALE_BASIS.
+        candidate_path = clone / "closure" / "candidates" / "B7" / "c6-corpus-lineage.assembled.jsonl"
+        candidate_path.write_text(candidate_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        subprocess.run(["git", "add", "closure/candidates/B7/c6-corpus-lineage.assembled.jsonl"], cwd=clone, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "test: b7 adjacent assembled drift"], cwd=clone, check=True)
+    elif candidate_drift == "b7_receipt":
+        candidate_path = clone / "closure" / "candidates" / "B7" / "c6-corpus-lineage.receipt.json"
+        candidate_path.write_text(candidate_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        subprocess.run(["git", "add", "closure/candidates/B7/c6-corpus-lineage.receipt.json"], cwd=clone, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "test: b7 adjacent receipt drift"], cwd=clone, check=True)
+    elif candidate_drift == "c6_authority_schema":
+        candidate_path = clone / "contracts" / "c6-active-authority" / "authority-schema.v1.json"
+        candidate_path.write_text(candidate_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        subprocess.run(["git", "add", "contracts/c6-active-authority/authority-schema.v1.json"], cwd=clone, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "test: c6 authority adjacent schema drift"], cwd=clone, check=True)
+    elif candidate_drift == "all_three_allowlisted":
+        # Positive fan-in shape: the reanchor necessarily cascades the new
+        # semantic registry digest into exactly these three derived candidate
+        # identity files. Modify all three in one post-basis commit so the
+        # basis..subject diff is covered entirely by the allowlist and the
+        # checker PASSes without E_STALE_BASIS.
+        for rel, name in [
+            ("closure/candidates/B7", "c6-corpus-lineage.envelope.json"),
+            ("closure/candidates/V1", "V1.v1.candidate-receipt.json"),
+            ("contracts/c6-active-authority", "authority.v1.candidate.json"),
+        ]:
+            candidate_path = clone / rel / name
+            candidate_path.write_text(candidate_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+            subprocess.run(["git", "add", f"{rel}/{name}"], cwd=clone, check=True)
+        subprocess.run(
+            ["git", "commit", "--quiet", "-m", "test: all three whitelisted candidate identity files"],
+            cwd=clone,
+            check=True,
+        )
+    elif candidate_drift == "v1_adjacent":
+        # Adjacent V1 candidate directory path, NOT the whitelisted
+        # V1.v1.candidate-receipt.json. Created in the clone only (ephemeral,
+        # never touches the real worktree); must remain E_STALE_BASIS.
+        candidate_path = clone / "closure" / "candidates" / "V1" / "V1.v1.candidate-lineage.json"
+        candidate_path.write_text('{"note": "adjacent non-whitelisted V1 candidate file"}\n', encoding="utf-8")
+        subprocess.run(["git", "add", "closure/candidates/V1/V1.v1.candidate-lineage.json"], cwd=clone, check=True)
+        subprocess.run(["git", "commit", "--quiet", "-m", "test: v1 adjacent non-whitelisted drift"], cwd=clone, check=True)
     elif post_basis_change is not None:
         raise AssertionError(f"unsupported post-basis change: {post_basis_change}")
+    elif candidate_drift is not None:
+        raise AssertionError(f"unsupported candidate drift: {candidate_drift}")
     subject_head = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=clone, text=True, capture_output=True, check=True
     ).stdout.strip()
@@ -306,6 +375,52 @@ def test_docs_only_commit_after_basis_remains_fresh(tmp_path: Path) -> None:
 
 def test_core_change_after_basis_is_stale(tmp_path: Path) -> None:
     result, receipt = committed_registry_probe(tmp_path, post_basis_change="core")
+
+    assert result.returncode != 0
+    assert "E_STALE_BASIS" in receipt["errors"]
+
+
+def test_closure_candidate_identity_allowlist_admits_all_three_exact_paths(tmp_path: Path) -> None:
+    """The fan-in reanchor cascades the new semantic registry digest into exactly
+    three derived candidate identity files; the stale-basis policy must admit them
+    so `make verify` converges without re-whitelisting anything broader.
+
+    Seeds the clone with the current HEAD's candidate files, applies the
+    registry/roadmap/receipts refresh commit (basis), then makes a post-basis
+    commit that modifies all three whitelisted files. The basis..subject diff is
+    therefore covered entirely by the three allowlist entries, proving the
+    policy PASSES without E_STALE_BASIS — i.e. the allowlist entries are actually
+    exercised, not merely present.
+    """
+    result, receipt = committed_registry_probe(tmp_path, candidate_drift="all_three_allowlisted")
+
+    assert result.returncode == 0, receipt
+    assert receipt["status"] == "PASS"
+    assert "E_STALE_BASIS" not in receipt["errors"]
+
+
+@pytest.mark.parametrize(
+    "drift",
+    [
+        # Same B7 directory, adjacent (assembled) — NOT the whitelisted .envelope.json.
+        "b7_assembled",
+        # Same B7 directory, adjacent (receipt) — NOT the whitelisted .envelope.json.
+        "b7_receipt",
+        # Same V1 candidate directory, adjacent non-whitelisted file — NOT the
+        # whitelisted V1.v1.candidate-receipt.json.
+        "v1_adjacent",
+        # Same c6-active-authority directory, adjacent schema — NOT the whitelisted
+        # authority.v1.candidate.json.
+        "c6_authority_schema",
+    ],
+)
+def test_closure_candidate_adjacent_paths_remain_stale(tmp_path: Path, drift: str) -> None:
+    """A close adjacent path in each candidate area must still trip E_STALE_BASIS.
+
+    This proves the allowlist is exact (anchored file paths), not directory- or
+    glob-wide, and that B7 assembled/receipt and c6 authority schemas stay fail-closed.
+    """
+    result, receipt = committed_registry_probe(tmp_path, candidate_drift=drift)
 
     assert result.returncode != 0
     assert "E_STALE_BASIS" in receipt["errors"]

@@ -144,6 +144,15 @@ STALE_BASIS_ALLOWED_PATHS = (
     re.compile(r"^scripts/test_verify_ci_checker_presence\.py$"),
     re.compile(r"^docs/.*$"),
     re.compile(r"^openspec/changes/.*$"),
+    # Fan-in closure candidate identity allowlist (closure registry reanchor cascade).
+    # Exact anchored file paths only — the reanchor necessarily cascades the new
+    # semantic registry digest into exactly these three derived candidate identity
+    # files, so they must be admitted by the stale-basis policy without widening the
+    # allowlist to directories, globs, B7 assembled/receipt, V1 schemas, generic
+    # contracts, Tools, or S8.
+    re.compile(r"^closure/candidates/B7/c6-corpus-lineage\.envelope\.json$"),
+    re.compile(r"^closure/candidates/V1/V1\.v1\.candidate-receipt\.json$"),
+    re.compile(r"^contracts/c6-active-authority/authority\.v1\.candidate\.json$"),
 )
 
 
