@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "typed-route-contract.v1",
+  "title": "W6 Typed Route/Model Contract v1",
+  "description": "Canonical wire form of RouteResult. Session/event/sequence deliberately absent (belong to T04a/W5a pending-correlation record). See openspec/changes/add-w6-typed-route-contract/specs/typed-route-contract/spec.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "route_schema",
+    "turn_id",
+    "trace_id",
+    "exec_tier",
+    "outcome",
+    "clarify_tag",
+    "service",
+    "action_candidate",
+    "trace_digest",
+    "rejection_reason"
+  ],
+  "properties": {
+    "schema_version": {"const": "typed_route_contract.v1"},
+    "route_schema": {"type": "string", "minLength": 1},
+    "turn_id": {"type": "string", "minLength": 1},
+    "trace_id": {"type": "string", "minLength": 1},
+    "exec_tier": {"enum": ["L1", "L2", "L3", "L4", "L5"]},
+    "outcome": {"enum": ["candidate", "clarify", "reject", "fallback"]},
+    "clarify_tag": {"enum": ["explicit", "implicit"]},
+    "service": {"enum": ["airControl", "carControl", "cmd"]},
+    "action_candidate": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/ActionCandidate"}
+      ]
+    },
+    "trace_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "rejection_reason": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/RouteError"}
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "description": "session/event/sequence SHALL NOT appear (W5a ontology, not RouteResult).",
+      "not": {
+        "anyOf": [
+          {"required": ["session_id"]},
+          {"required": ["event_id"]},
+          {"required": ["sequence"]}
+        ]
+      }
+    },
+    {
+      "description": "outcome=candidate SHALL carry action_candidate AND SHALL NOT carry rejection_reason.",
+      "if": {"properties": {"outcome": {"const": "candidate"}}},
+      "then": {
+        "properties": {
+          "action_candidate": {"$ref": "#/$defs/ActionCandidate"},
+          "rejection_reason": {"type": "null"}
+        }
+      }
+    },
+    {
+      "description": "outcome=reject SHALL carry rejection_reason AND SHALL NOT carry action_candidate.",
+      "if": {"properties": {"outcome": {"const": "reject"}}},
+      "then": {
+        "properties": {
+          "action_candidate": {"type": "null"},
+          "rejection_reason": {"$ref": "#/$defs/RouteError"}
+        }
+      }
+    },
+    {
+      "description": "outcome=clarify SHALL NOT carry rejection_reason (clarify is orthogonal to reject).",
+      "if": {"properties": {"outcome": {"const": "clarify"}}},
+      "then": {
+        "properties": {"rejection_reason": {"type": "null"}}
+      }
+    },
+    {
+      "description": "outcome=fallback SHALL NOT carry rejection_reason (fallback is not a reject).",
+      "if": {"properties": {"outcome": {"const": "fallback"}}},
+      "then": {
+        "properties": {"rejection_reason": {"type": "null"}}
+      }
+    }
+  ],
+  "$defs": {
+    "ActionCandidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intent",
+        "service",
+        "mounted_tool_name",
+        "action_primitive",
+        "action_code",
+        "device",
+        "slot",
+        "slot_keys",
+        "value"
+      ],
+      "properties": {
+        "intent": {"type": "string", "minLength": 1},
+        "service": {"enum": ["airControl", "carControl", "cmd"]},
+        "mounted_tool_name": {"type": "string", "minLength": 1},
+        "action_primitive": {"type": "string", "minLength": 1},
+        "action_code": {"type": "string", "minLength": 1},
+        "device": {"type": "string", "minLength": 1},
+        "slot": {"type": "string"},
+        "slot_keys": {"type": "array", "items": {"type": "string"}},
+        "value": {"$ref": "#/$defs/ValueFourTuple"}
+      }
+    },
+    "ValueFourTuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "direct", "offset", "type"],
+      "properties": {
+        "ref": {"enum": ["", "CUR", "ZERO", "MAX"]},
+        "direct": {"enum": ["", "+", "-"]},
+        "offset": {"type": "string"},
+        "type": {"enum": ["", "SPOT", "PERCENT", "EXP"]}
+      },
+      "allOf": [
+        {
+          "description": "When type=EXP, offset SHALL be an experiential enum value.",
+          "if": {"properties": {"type": {"const": "EXP"}}},
+          "then": {
+            "properties": {
+              "offset": {
+                "enum": ["LITTLE", "MORE", "MAX", "MIN", "HIGH", "HIGHER", "MIDDLE", "LOW", "LOWER"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "RouteError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "enum": [
+            "risk_r0_forbidden",
+            "illegal_combination",
+            "unmounted_name",
+            "out_of_catalog",
+            "old_generation",
+            "stale_source",
+            "digest_mismatch",
+            "schema_version_mismatch",
+            "payload_invalid",
+            "slot_missing",
+            "value_out_of_range",
+            "unknown_enum",
+            "risk_r1_precondition_unmet",
+            "clarify_required"
+          ]
+        },
+        "detail": {"type": "string"},
+        "expected": {"type": "string"},
+        "actual": {"type": "string"},
+        "clarify_tag": {"enum": ["explicit", "implicit"]}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"code": {"enum": ["digest_mismatch", "schema_version_mismatch"]}}
+          },
+          "then": {"required": ["expected", "actual"]}
+        },
+        {
+          "if": {"properties": {"code": {"const": "clarify_required"}}},
+          "then": {"required": ["clarify_tag"]}
+        },
+        {
+          "if": {
+            "properties": {
+              "code": {
+                "enum": [
+                  "risk_r0_forbidden",
+                  "illegal_combination",
+                  "unmounted_name",
+                  "out_of_catalog",
+                  "old_generation",
+                  "stale_source",
+                  "payload_invalid",
+                  "slot_missing",
+                  "value_out_of_range",
+                  "unknown_enum",
+                  "risk_r1_precondition_unmet"
+                ]
+              }
+            }
+          },
+          "then": {"required": ["detail"]}
+        }
+      ]
+    }
+  }
+}
