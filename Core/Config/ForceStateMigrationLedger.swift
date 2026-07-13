@@ -133,17 +133,42 @@ public struct ForceStateMigrationLedger: Equatable, Sendable {
 
     // MARK: - Forbidden 4↔5 detection
 
-    private static func isForbidden4to5(source: String, target: String) -> Bool {
-        let forbiddenPairs: Set<Pair> = [
-            Pair(a: "4", b: "5"),
-            Pair(a: "5", b: "4")
-        ]
-        return forbiddenPairs.contains(Pair(a: source, b: target))
+    /// Patterns that match a stable identity referring to catalog version "4".
+    /// Each pattern is a regular expression; if the source matches any
+    /// `fourPatterns` AND the target matches any `fivePatterns` (or vice
+    /// versa), the mapping is unconditionally refused.
+    private static let fourPatterns: [String] = [
+        "^4$",
+        "\\bv4\\b",
+        "\\bcatalog-4\\b",
+        "\\b4\\.0\\b",
+        "\\bfour\\b",
+    ]
+
+    /// Patterns that match a stable identity referring to catalog version "5".
+    private static let fivePatterns: [String] = [
+        "^5$",
+        "\\bv5\\b",
+        "\\bcatalog-5\\b",
+        "\\b5\\.0\\b",
+        "\\bfive\\b",
+    ]
+
+    private static func matchesAnyPattern(_ s: String, patterns: [String]) -> Bool {
+        for pattern in patterns {
+            if s.range(of: pattern, options: .regularExpression) != nil {
+                return true
+            }
+        }
+        return false
     }
 
-    private struct Pair: Hashable {
-        let a: String
-        let b: String
+    private static func isForbidden4to5(source: String, target: String) -> Bool {
+        let sourceIsFour = matchesAnyPattern(source, patterns: fourPatterns)
+        let sourceIsFive = matchesAnyPattern(source, patterns: fivePatterns)
+        let targetIsFour = matchesAnyPattern(target, patterns: fourPatterns)
+        let targetIsFive = matchesAnyPattern(target, patterns: fivePatterns)
+        return (sourceIsFour && targetIsFive) || (sourceIsFive && targetIsFour)
     }
 }
 

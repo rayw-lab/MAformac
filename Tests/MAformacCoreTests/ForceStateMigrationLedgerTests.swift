@@ -152,4 +152,64 @@ final class ForceStateMigrationLedgerTests: XCTestCase {
         XCTAssertEqual(try ledger.resolve(source: "src.a", direction: .forward), forward)
         XCTAssertEqual(try ledger.resolve(source: "src.a", direction: .reverse), reverse)
     }
+
+    // MARK: - P1-F5: forbidden 4↔5 variant patterns
+
+    func testForbidden4to5VariantV4IsRejected() {
+        XCTAssertThrowsError(
+            try ForceStateMigrationLedger.load(rows: [makeRow(source: "v4", target: "v5", direction: .forward)])
+        ) { error in
+            XCTAssertEqual(
+                error as? ForceStateMigrationError,
+                .forbidden4to5Mapping(source: "v4", target: "v5", direction: .forward)
+            )
+        }
+    }
+
+    func testForbidden4to5VariantCatalog4IsRejected() {
+        XCTAssertThrowsError(
+            try ForceStateMigrationLedger.load(rows: [makeRow(source: "catalog-4", target: "catalog-5", direction: .forward)])
+        ) { error in
+            XCTAssertEqual(
+                error as? ForceStateMigrationError,
+                .forbidden4to5Mapping(source: "catalog-4", target: "catalog-5", direction: .forward)
+            )
+        }
+    }
+
+    func testForbidden4to5VariantFourpointohIsRejected() {
+        XCTAssertThrowsError(
+            try ForceStateMigrationLedger.load(rows: [makeRow(source: "4.0", target: "5.0", direction: .forward)])
+        ) { error in
+            XCTAssertEqual(
+                error as? ForceStateMigrationError,
+                .forbidden4to5Mapping(source: "4.0", target: "5.0", direction: .forward)
+            )
+        }
+    }
+
+    func testForbidden4to5VariantFourFiveWordsIsRejected() {
+        XCTAssertThrowsError(
+            try ForceStateMigrationLedger.load(rows: [makeRow(source: "four", target: "five", direction: .forward)])
+        ) { error in
+            XCTAssertEqual(
+                error as? ForceStateMigrationError,
+                .forbidden4to5Mapping(source: "four", target: "five", direction: .forward)
+            )
+        }
+    }
+
+    func testForbidden4to5DoesNotCatchUnrelatedIdentities() throws {
+        // Identities that happen to contain "4" or "5" as substrings of a
+        // larger word should NOT be caught.
+        let row = makeRow(source: "sensor-24", target: "sensor-25", direction: .forward)
+        XCTAssertNoThrow(try ForceStateMigrationLedger.load(rows: [row]))
+    }
+
+    func testForbidden4to5DoesNotCatchSingleDigitInWord() throws {
+        // "v34" contains "4" but not as a standalone word boundary; "v56"
+        // contains "5" similarly.
+        let row = makeRow(source: "v34", target: "v56", direction: .forward)
+        XCTAssertNoThrow(try ForceStateMigrationLedger.load(rows: [row]))
+    }
 }
