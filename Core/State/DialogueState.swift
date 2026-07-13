@@ -39,6 +39,21 @@ public struct DialogueState: Codable, Equatable, Sendable {
     /// W7 P2 typed correlation window (D1 wire consumer target). Empty until
     /// `recordTypedFacts` accepts a batch. Kept parallel to `turns` — recording
     /// typed facts never mutates the legacy dialogue turns/readback path.
+    ///
+    /// 🔴 D1 wire is **opt-in**, not always-on production surface (grok-4.5
+    /// D1/D2 short review P1-3 non-claim). The producer contract is:
+    /// `DemoRuntimeSessionRunner.correlationProvider` is optional and defaults
+    /// to `nil`; when `nil`, `consumeTypedFactsIfWired` early-exits and this
+    /// window stays empty across every turn. D1's goal was to prove the
+    /// typed-facts consumption contract (reducer API + fail-closed atomicity +
+    /// runner call-site wire on both partial and normal paths) and to back it
+    /// with deliberate-negative evidence — NOT to promise that every
+    /// production runner records typed facts. Wiring a real correlation
+    /// provider at the App composition layer is a follow-on RISK-ACK-W7 slice.
+    /// Any downstream text that reads "typedFactsWindow always populated in
+    /// production" is a false-green surface unless it also names the composed
+    /// provider. See CLOSEOUT.md v2 §"P1 Fix Section" for the non-claim
+    /// boundary the D1 wire dispatch operated under.
     public private(set) var typedFactsWindow: [RouteToDialogueCorrelation]
     public var maxTurns: Int
     /// Retention cap for `typedFactsWindow`. Mirrors `maxTurns` semantics: the
