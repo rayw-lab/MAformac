@@ -40,6 +40,7 @@ final class RouteContractTests: XCTestCase {
         outcome: RouteOutcome = .candidate,
         clarifyTag: RouteClarifyTag = .implicit,
         rejectionReason: RouteError? = nil,
+        actionCandidateSummary: ActionCandidateSummary? = nil,
         redactionPolicyID: String = "redaction_policy.v1",
         staleMarker: String? = nil
     ) throws -> RouteTrace {
@@ -50,11 +51,34 @@ final class RouteContractTests: XCTestCase {
             outcome: outcome,
             clarifyTag: clarifyTag,
             rejectionReason: rejectionReason,
+            actionCandidateSummary: actionCandidateSummary,
             redactionPolicyID: redactionPolicyID,
             staleMarker: staleMarker,
             traceDigest: ""
         )
         return try placeholder.withRecomputedDigest()
+    }
+
+    /// Convenience — build a trace whose actionCandidateSummary mirrors a
+    /// given candidate so validate(_:trace:) can verify the joint digest.
+    private func makeTraceMirroring(
+        _ candidate: ActionCandidate?,
+        turnID: String = "turn-1",
+        traceID: String = "trace-1",
+        execTier: RouteExecTier = .L2,
+        outcome: RouteOutcome = .candidate,
+        clarifyTag: RouteClarifyTag = .implicit,
+        rejectionReason: RouteError? = nil
+    ) throws -> RouteTrace {
+        try makeTrace(
+            turnID: turnID,
+            traceID: traceID,
+            execTier: execTier,
+            outcome: outcome,
+            clarifyTag: clarifyTag,
+            rejectionReason: rejectionReason,
+            actionCandidateSummary: candidate?.summary
+        )
     }
 
     private func makeResult(
@@ -85,13 +109,15 @@ final class RouteContractTests: XCTestCase {
     // MARK: - Three-axis independence
 
     func testThreeAxisIndependentPositive() throws {
-        let trace = try makeTrace(execTier: .L1, outcome: .candidate, clarifyTag: .explicit)
+        let candidate = makeAirControlCandidate()
+        let trace = try makeTraceMirroring(candidate,
+            execTier: .L1, outcome: .candidate, clarifyTag: .explicit)
         let result = makeResult(
             execTier: .L1,
             outcome: .candidate,
             clarifyTag: .explicit,
             service: .airControl,
-            actionCandidate: makeAirControlCandidate(),
+            actionCandidate: candidate,
             traceDigest: trace.traceDigest
         )
         XCTAssertNoThrow(try RouteContractValidator.validate(result, trace: trace))
@@ -365,7 +391,11 @@ final class RouteContractTests: XCTestCase {
         let errors: [RouteError] = [
             .riskR0Forbidden("_"),
             .illegalCombination("_"),
+            .forbiddenKey("_"),
             .unmountedName("_"),
+            .crossDomainMountedTool(
+                tool: "_", boundService: .airControl, candidateService: .carControl
+            ),
             .outOfCatalog("_"),
             .oldGeneration("_"),
             .staleSource("_"),
@@ -378,9 +408,9 @@ final class RouteContractTests: XCTestCase {
             .riskR1PreconditionUnmet("_"),
             .clarifyRequired(.implicit)
         ]
-        // All 14 cases unique via `code`.
+        // 16 cases unique via `code` — extended in grok-4.5 review P1 fix.
         let codes = Set(errors.map(\.code))
-        XCTAssertEqual(codes.count, 14)
+        XCTAssertEqual(codes.count, 16)
     }
 
     func testR0TakesPrecedenceOverR1() {
@@ -395,10 +425,16 @@ final class RouteContractTests: XCTestCase {
 
     func testRejectionPrecedenceIsTotalOrdered() {
         // Rank ordering matches SHALL enumeration.
+        // Extended to 16 cases in the grok-4.5 review P1 fix commit
+        // (added .forbiddenKey at rank 2, .crossDomainMountedTool at rank 4).
         let ranks = [
             RouteError.riskR0Forbidden("_").rank,
             RouteError.illegalCombination("_").rank,
+            RouteError.forbiddenKey("_").rank,
             RouteError.unmountedName("_").rank,
+            RouteError.crossDomainMountedTool(
+                tool: "_", boundService: .airControl, candidateService: .carControl
+            ).rank,
             RouteError.outOfCatalog("_").rank,
             RouteError.oldGeneration("_").rank,
             RouteError.staleSource("_").rank,
@@ -411,7 +447,7 @@ final class RouteContractTests: XCTestCase {
             RouteError.riskR1PreconditionUnmet("_").rank,
             RouteError.clarifyRequired(.implicit).rank
         ]
-        XCTAssertEqual(ranks, Array(0...13))
+        XCTAssertEqual(ranks, Array(0...15))
     }
 
     func testRouteErrorCodableRoundTrip() throws {
@@ -447,12 +483,15 @@ final class RouteContractTests: XCTestCase {
     }
 
     func testDigestMismatchBetweenResultAndTraceRejected() throws {
-        let trace = try makeTrace(outcome: .candidate)
-        // Deliberately wrong digest.
+        // Candidate summary MUST match to get past the summary sync check
+        // (which now runs before the digest check for a more specific error).
+        let candidate = makeAirControlCandidate()
+        let trace = try makeTraceMirroring(candidate, outcome: .candidate)
+        // Deliberately wrong digest, matching summary.
         let wrong = String(repeating: "d", count: 64)
         let result = makeResult(
             outcome: .candidate,
-            actionCandidate: makeAirControlCandidate(),
+            actionCandidate: candidate,
             traceDigest: wrong
         )
         XCTAssertThrowsError(try RouteContractValidator.validate(result, trace: trace)) { error in
@@ -519,7 +558,14 @@ final class RouteContractTests: XCTestCase {
         let result = try JSONDecoder().decode(RouteResult.self, from: routeResultData)
 
         // Reconstruct the trace and verify digest matches the fixture's pinned digest.
+        // Load-bearing now includes action_candidate_summary (grok-4.5 review P1-B2 fix).
         let lb = root["route_trace_load_bearing"] as! [String: Any]
+        let summaryDict = lb["action_candidate_summary"] as? [String: Any]
+        var summary: ActionCandidateSummary? = nil
+        if let summaryDict {
+            let sumData = try JSONSerialization.data(withJSONObject: summaryDict)
+            summary = try JSONDecoder().decode(ActionCandidateSummary.self, from: sumData)
+        }
         let trace = RouteTrace(
             turnID: lb["turn_id"] as! String,
             traceID: lb["trace_id"] as! String,
@@ -527,6 +573,7 @@ final class RouteContractTests: XCTestCase {
             outcome: RouteOutcome(rawValue: lb["outcome"] as! String)!,
             clarifyTag: RouteClarifyTag(rawValue: lb["clarify_tag"] as! String)!,
             rejectionReason: nil,
+            actionCandidateSummary: summary,
             redactionPolicyID: lb["redaction_policy_id"] as! String,
             staleMarker: nil,
             traceDigest: ""
@@ -619,6 +666,208 @@ final class RouteContractTests: XCTestCase {
             guard case RouteError.schemaVersionMismatch = error else {
                 return XCTFail("expected .schemaVersionMismatch, got \(error)")
             }
+        }
+    }
+
+    // MARK: - grok-4.5 xAI review P1 fixes — new tests
+
+    /// P1-A2: kinship gate — service must match tool's jsonl-verified binding.
+    func testCrossDomainMountedToolRejected() throws {
+        // Construct a candidate with a mounted tool from airControl but
+        // service=carControl. Existence check passes (tool IS mounted);
+        // kinship gate must catch the cross-service violation.
+        let badCandidate = ActionCandidate(
+            intent: "adjust_ac_temperature_to_number",
+            service: .carControl,  // wrong — tool binds to airControl per jsonl
+            mountedToolName: "adjust_ac_temperature_to_number",
+            actionPrimitive: "adjust_to_number",
+            actionCode: "adjust_value_to_specific_value",
+            device: "ac_temperature",
+            slot: "adjustment_mode+temperature",
+            slotKeys: ["adjustment_mode", "temperature"],
+            value: RouteValueFourTuple()
+        )
+        let result = makeResult(
+            outcome: .candidate,
+            service: .carControl,  // must match candidate.service to pass the earlier check
+            actionCandidate: badCandidate,
+            traceDigest: String(repeating: "0", count: 64)
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.crossDomainMountedTool(let tool, let bound, let cand) = error else {
+                return XCTFail("expected .crossDomainMountedTool, got \(error)")
+            }
+            XCTAssertEqual(tool, "adjust_ac_temperature_to_number")
+            XCTAssertEqual(bound, .airControl)
+            XCTAssertEqual(cand, .carControl)
+        }
+    }
+
+    func testCrossServiceMountBindingFixtureRejected() throws {
+        guard let url = fixtureURL("negative", "cross_service_mount_binding.json") else {
+            throw XCTSkip("fixture path not resolvable")
+        }
+        let data = try Data(contentsOf: url)
+        let root = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        let resultData = try JSONSerialization.data(withJSONObject: root["route_result"]!)
+        let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
+        XCTAssertThrowsError(try RouteContractValidator.validate(result)) { error in
+            guard case RouteError.crossDomainMountedTool = error else {
+                return XCTFail("expected .crossDomainMountedTool, got \(error)")
+            }
+        }
+    }
+
+    /// P1-A2 invariant — every mounted tool has a service binding in the map.
+    /// Guards against catalog expansion without updating the projection.
+    func testMountedToolServiceMapCoversCatalog() {
+        for tool in DDomainMountedToolCatalog.mountedToolNames {
+            XCTAssertNotNil(
+                MountedToolServiceMap.service(for: tool),
+                "MountedToolServiceMap missing binding for mounted tool '\(tool)'. When catalog expands, update Core/Contracts/RouteContract.swift MountedToolServiceMap.bindings with the jsonl-verified service."
+            )
+        }
+    }
+
+    /// P1-B6: forbidden-key inspection at decode time.
+    func testForbiddenKeySessionIdCaughtByDecodeGuard() {
+        let json = """
+        {
+          "schema_version": "typed_route_contract.v1",
+          "route_schema": "route_schema.demo.v1",
+          "turn_id": "t1",
+          "trace_id": "tr1",
+          "exec_tier": "L2",
+          "outcome": "clarify",
+          "clarify_tag": "implicit",
+          "service": "airControl",
+          "action_candidate": null,
+          "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+          "rejection_reason": null,
+          "session_id": "leaked-session-000001"
+        }
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try RouteResult.decodeRejectingForbiddenKeys(from: json)) { error in
+            guard case RouteError.forbiddenKey(let field) = error else {
+                return XCTFail("expected .forbiddenKey, got \(error)")
+            }
+            XCTAssertTrue(field.contains("session_id"), "expected session_id in \(field)")
+        }
+    }
+
+    func testForbiddenKeyEventIdCaughtByDecodeGuard() {
+        let json = """
+        {"schema_version":"typed_route_contract.v1","route_schema":"r","turn_id":"t","trace_id":"tr","exec_tier":"L2","outcome":"clarify","clarify_tag":"implicit","service":"airControl","action_candidate":null,"trace_digest":"0","rejection_reason":null,"event_id":"leak"}
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try RouteResult.decodeRejectingForbiddenKeys(from: json)) { error in
+            guard case RouteError.forbiddenKey = error else {
+                return XCTFail("expected .forbiddenKey, got \(error)")
+            }
+        }
+    }
+
+    func testForbiddenKeyRawPromptCaughtOnTrace() {
+        let json = """
+        {"schema_version":"typed_route_contract.v1","turn_id":"t","trace_id":"tr","exec_tier":"L2","outcome":"clarify","clarify_tag":"implicit","rejection_reason":null,"action_candidate_summary":null,"redaction_policy_id":"redaction_policy.v1","stale_marker":null,"trace_digest":"0","raw_prompt":"customer said hello"}
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try RouteTrace.decodeRejectingForbiddenKeys(from: json)) { error in
+            guard case RouteError.forbiddenKey(let field) = error else {
+                return XCTFail("expected .forbiddenKey, got \(error)")
+            }
+            XCTAssertTrue(field.contains("raw_prompt"))
+        }
+    }
+
+    func testForbiddenKeyPassthroughForRouteSubject() {
+        // RouteSubject also gets guarded — session_id must not appear.
+        let json = """
+        {"schema_version":"typed_route_contract.v1","route_schema":"r","turn_id":"t","trace_id":"tr","source_identity":{"matrix_source_sha256":"aa","runtime_contract_bundle_digest":"bb"},"source_revision":"rev1","stale_marker":null,"contract_digest":"cc","session_id":"leak"}
+        """.data(using: .utf8)!
+        XCTAssertThrowsError(try RouteSubject.decodeRejectingForbiddenKeys(from: json)) { error in
+            guard case RouteError.forbiddenKey = error else {
+                return XCTFail("expected .forbiddenKey, got \(error)")
+            }
+        }
+    }
+
+    /// P1-B2: trace_digest covers action_candidate payload — tampering flips digest.
+    func testTraceDigestCoversMountedToolNameTampering() throws {
+        let candidate = makeAirControlCandidate()
+        let goodTrace = try makeTraceMirroring(candidate, outcome: .candidate)
+
+        // Same result outcome-axis facts, but candidate mounted_tool_name
+        // "tampered" — well, we can only tamper with an in-catalog tool, so
+        // simulate by swapping to another summary. Use a fresh candidate
+        // whose value four-tuple differs.
+        let tamperedCandidate = ActionCandidate(
+            intent: candidate.intent,
+            service: candidate.service,
+            mountedToolName: candidate.mountedToolName,
+            actionPrimitive: candidate.actionPrimitive,
+            actionCode: "adjust_position_value_to_specific_value", // tampered
+            device: candidate.device,
+            slot: candidate.slot,
+            slotKeys: candidate.slotKeys,
+            value: candidate.value
+        )
+        let tamperedTrace = try makeTraceMirroring(tamperedCandidate, outcome: .candidate)
+
+        XCTAssertNotEqual(
+            goodTrace.traceDigest, tamperedTrace.traceDigest,
+            "trace_digest MUST flip when action_candidate.action_code is tampered"
+        )
+    }
+
+    func testTraceDigestCoversValueFourTupleTampering() throws {
+        let clean = makeAirControlCandidate()
+        let tampered = ActionCandidate(
+            intent: clean.intent,
+            service: clean.service,
+            mountedToolName: clean.mountedToolName,
+            actionPrimitive: clean.actionPrimitive,
+            actionCode: clean.actionCode,
+            device: clean.device,
+            slot: clean.slot,
+            slotKeys: clean.slotKeys,
+            value: RouteValueFourTuple(ref: .CUR, direct: .plus, offset: .literal("5"), type: .SPOT)
+        )
+        let a = try makeTraceMirroring(clean, outcome: .candidate)
+        let b = try makeTraceMirroring(tampered, outcome: .candidate)
+        XCTAssertNotEqual(a.traceDigest, b.traceDigest,
+                          "trace_digest MUST flip when value four-tuple is tampered")
+    }
+
+    func testCandidateSummaryMismatchTrappedBeforeDigest() throws {
+        let candidateA = makeAirControlCandidate()
+        let candidateB = makeCarControlCandidate()  // different summary
+
+        // Trace mirrors A, result carries B — summary mismatch fires.
+        let trace = try makeTraceMirroring(candidateA, outcome: .candidate)
+        let result = makeResult(
+            outcome: .candidate,
+            service: .airControl,
+            actionCandidate: ActionCandidate(
+                intent: "adjust_ac_temperature_to_number",
+                service: .airControl,
+                // Take mounted name from A (in-catalog) but summary fields from B.
+                mountedToolName: candidateA.mountedToolName,
+                actionPrimitive: "power_on",  // different from A's adjust_to_number
+                actionCode: candidateB.actionCode,
+                device: candidateA.device,
+                slot: candidateA.slot,
+                slotKeys: candidateA.slotKeys,
+                value: candidateA.value
+            ),
+            traceDigest: trace.traceDigest
+        )
+        XCTAssertThrowsError(try RouteContractValidator.validate(result, trace: trace)) { error in
+            guard case RouteError.illegalCombination(let msg) = error else {
+                return XCTFail("expected .illegalCombination, got \(error)")
+            }
+            XCTAssertTrue(
+                msg.contains("action_candidate.summary") || msg.contains("candidate_summary"),
+                "expected mismatch reason to mention summary; got: \(msg)"
+            )
         }
     }
 }

@@ -118,6 +118,67 @@ public struct RouteSubject: Codable, Equatable, Sendable {
         case staleMarker = "stale_marker"
         case contractDigest = "contract_digest"
     }
+
+    /// Forbidden-key inspection at decode time — grok-4.5 review P1-B6 (2026-07-13).
+    public static func decodeRejectingForbiddenKeys(from data: Data) throws -> RouteSubject {
+        try RouteWireGuard.rejectForbiddenKeys(in: data, contextPath: "route_subject")
+        return try JSONDecoder().decode(RouteSubject.self, from: data)
+    }
+}
+
+// MARK: - MountedToolServiceMap
+//
+// Kinship gate for grok-4.5 xAI review P1-A2 (2026-07-13).
+//
+// The catalog `Core/Contracts/DDomainMountedToolCatalog.swift:12-14`
+// `mountedToolNames` gives *existence* only. To enforce the paradigm rule
+// (`docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md:13`,
+// "intent == 工具名") a candidate that names a mounted tool MUST also
+// belong to the D-domain service that tool binds to per jsonl. This map
+// records that binding.
+//
+// Live-verified via jsonl grep on 2026-07-13:
+//   grep '"intent":"adjust_ac_temperature_to_number"' \
+//     contracts/semantic-function-contract.jsonl
+// returns rows c1_airControl_000164, _000165, _000166 (all service=airControl).
+//
+// Currently the map has ONE entry (the sole mounted tool). When the catalog
+// expands, add the corresponding jsonl-verified service binding here.
+//
+// This is NOT a second registry — the *set of mounted names* still comes from
+// DDomainMountedToolCatalog.mountedToolNames. This map is a peer projection
+// that the validator consumes, and a compile-time invariant test ensures the
+// projection covers every mounted tool name (see RouteContractTests).
+public enum MountedToolServiceMap {
+    public static let bindings: [String: RouteService] = [
+        "adjust_ac_temperature_to_number": .airControl
+    ]
+
+    /// Nil when the tool is not mounted at all (validator emits `.unmountedName`).
+    /// Non-nil when the tool is mounted; the value is the jsonl-verified service.
+    public static func service(for toolName: String) -> RouteService? {
+        bindings[toolName]
+    }
+}
+
+// MARK: - RouteForbiddenKeys
+//
+// Ontology-narrowing enforcement for grok-4.5 xAI review P1-B6 (2026-07-13).
+//
+// Swift `JSONDecoder` silently drops unknown keys by default, so the SHALL
+// "Session identity leaks are forbidden" needs explicit key inspection at
+// decode time. Route* structs consult this set in their custom `init(from:)`.
+//
+// session_id / event_id / sequence belong to T04a / W5a pending-correlation
+// record (see `openspec/changes/add-t04a-customer-ingress/design.md:7-11`),
+// NOT to the RouteResult ontology.
+//
+// raw_prompt / raw_response are redaction violations for RouteTrace
+// (see SHALL "RouteTrace refuses raw prompt embedding").
+public enum RouteForbiddenKeys {
+    public static let ontology: Set<String> = ["session_id", "event_id", "sequence"]
+    public static let redaction: Set<String> = ["raw_prompt", "raw_response"]
+    public static let all: Set<String> = ontology.union(redaction)
 }
 
 // MARK: - RouteCanonicalJSON

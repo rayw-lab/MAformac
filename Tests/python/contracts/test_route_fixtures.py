@@ -264,6 +264,37 @@ class NegativeFixtureSchemaOrSemantic(unittest.TestCase):
         # But documents expected_error:
         self.assertEqual(payload["_source"]["expected_error"], "unmounted_name")
 
+    def test_cross_service_mount_binding_is_schema_valid_semantic_only(self):
+        # grok-4.5 xAI review P1-A2 fixture (2026-07-13). service=carControl
+        # but mounted_tool_name=adjust_ac_temperature_to_number (bound to
+        # airControl per MountedToolServiceMap). JSON schema can't cross-check
+        # this because the mounted<->service binding lives in Swift; the Swift
+        # validator handles rejection with .crossDomainMountedTool.
+        payload = json.loads((NEGATIVE_DIR / "cross_service_mount_binding.json").read_text())
+        jsonschema.validate(instance=payload["route_result"], schema=self.schema)
+        self.assertEqual(payload["_source"]["expected_error"], "cross_domain_mounted_tool")
+        # Assert the top-level service disagrees with the tool's known binding.
+        self.assertEqual(payload["route_result"]["service"], "carControl")
+        self.assertEqual(
+            payload["route_result"]["action_candidate"]["mounted_tool_name"],
+            "adjust_ac_temperature_to_number",
+        )
+
+
+class ParadigmBindingCheck(unittest.TestCase):
+    """P1-A1 fix: candidate positive fixtures MUST satisfy the D-domain
+    paradigm at `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md:13`
+    intent == 工具名 (intent must equal mounted_tool_name for candidate outcomes)."""
+
+    def test_air_control_intent_equals_mounted_tool_name(self):
+        payload = json.loads((POSITIVE_DIR / "airControl_candidate.json").read_text())
+        ac = payload["route_result"]["action_candidate"]
+        self.assertIsNotNone(ac, "airControl fixture must have action_candidate")
+        self.assertEqual(
+            ac["intent"], ac["mounted_tool_name"],
+            "SHALL 'intent == 工具名' paradigm violated — this was grok-4.5 review P1-A1.",
+        )
+
 
 class CanonicalDigestParityWithSwift(unittest.TestCase):
     """Verify Python's canonical JSON (sort_keys + separators) reproduces

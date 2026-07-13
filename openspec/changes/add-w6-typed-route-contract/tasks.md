@@ -11,14 +11,21 @@
 - [x] 9. Run producer gates (see §Validation).
 - [x] 10. Commit in semantic-complete slices (openspec carrier → Swift core → schema → fixtures → tests).
 
+## grok-4.5 xAI review P1 fix pass (2026-07-13)
+
+- [x] 11. P1-A1: Replace `airControl_candidate.json` positive fixture with real jsonl row `c1_airControl_000164` where `intent==mounted_tool_name=adjust_ac_temperature_to_number` (grep-verified). Recompute trace_digest.
+- [x] 12. P1-A2: Add `MountedToolServiceMap` peer projection + `RouteError.crossDomainMountedTool` case + validator kinship gate + `cross_service_mount_binding.json` negative fixture.
+- [x] 13. P1-B6: Add `RouteError.forbiddenKey` case + `RouteWireGuard.rejectForbiddenKeys` + `decodeRejectingForbiddenKeys(from:)` on `RouteResult`/`RouteSubject`/`RouteTrace`/`ActionCandidate` + 4 forbidden-key Swift tests.
+- [x] 14. P1-B2: Add `ActionCandidateSummary` + extend `RouteTrace.LoadBearing` to include summary + candidate-summary sync check in joint validator + tampering-detection Swift tests + digest-parity verification for extended load-bearing.
+
 ## Validation
 
 - [x] `openspec validate add-w6-typed-route-contract --strict` rc0.
 - [x] `openspec validate --all --strict` — 31/31 passed.
-- [x] `swift test --filter RouteContractTests` rc0 — 31 tests, 0 failures, 0.009s.
-- [x] `python3 -m pytest Tests/python/contracts/test_route_fixtures.py -q` rc0 — 25 passed in 0.34s.
+- [x] `swift test --filter RouteContractTests` rc0 — 42 tests, 0 failures (was 32; +10 for P1 fixes).
+- [x] `python3 -m unittest -v Tests.python.contracts.test_route_fixtures` rc0 — 27 tests, 0 failures (was 25; +2 for P1 fixes).
 - [x] `git status --short` clean.
-- [x] Owned-paths audit: `git diff --name-only 2140fb14..HEAD` — 23 files, all within SHALL allowlist.
+- [x] Owned-paths audit: no forbidden paths touched (Makefile / closure checker / generated Swift / App / parked change tree).
 
 ## Explicitly deferred (NOT in this change)
 

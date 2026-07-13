@@ -55,6 +55,86 @@ public struct ActionCandidate: Codable, Equatable, Sendable {
         case slotKeys = "slot_keys"
         case value
     }
+
+    /// Digest-safe summary of the candidate — the subset that trace_digest
+    /// covers so tampering with a load-bearing candidate field (mounted tool,
+    /// action_primitive, action_code, value, or service) flips the digest.
+    /// grok-4.5 xAI review P1-B2 (2026-07-13): trace_digest previously only
+    /// covered outcome axis, letting candidate tampering pass through the
+    /// joint validator. Summary now included in RouteTrace.LoadBearing.
+    public var summary: ActionCandidateSummary {
+        ActionCandidateSummary(
+            mountedToolName: mountedToolName,
+            service: service,
+            actionPrimitive: actionPrimitive,
+            actionCode: actionCode,
+            value: value
+        )
+    }
+
+    /// Forbidden-key inspection at decode time — grok-4.5 review P1-B6.
+    /// JSONDecoder default silently drops unknown keys; we defend the
+    /// ontology narrowing with an explicit key set check.
+    public static func decodeRejectingForbiddenKeys(from data: Data) throws -> ActionCandidate {
+        try RouteWireGuard.rejectForbiddenKeys(in: data, contextPath: "action_candidate")
+        return try JSONDecoder().decode(ActionCandidate.self, from: data)
+    }
+}
+
+// MARK: - ActionCandidateSummary
+//
+// The candidate subset that trace_digest covers. Includes exactly the
+// load-bearing candidate fields per grok-4.5 review P1-B2 fix
+// (mounted_tool_name / service / action_primitive / action_code / value).
+// `intent / device / slot / slot_keys` are NOT in the summary because they
+// are derivable from mounted_tool_name via jsonl (intent==mounted_tool_name
+// under the paradigm) and downstream doesn't act on them structurally.
+public struct ActionCandidateSummary: Codable, Equatable, Sendable {
+    public let mountedToolName: String
+    public let service: RouteService
+    public let actionPrimitive: String
+    public let actionCode: String
+    public let value: RouteValueFourTuple
+
+    public init(
+        mountedToolName: String,
+        service: RouteService,
+        actionPrimitive: String,
+        actionCode: String,
+        value: RouteValueFourTuple
+    ) {
+        self.mountedToolName = mountedToolName
+        self.service = service
+        self.actionPrimitive = actionPrimitive
+        self.actionCode = actionCode
+        self.value = value
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case mountedToolName = "mounted_tool_name"
+        case service
+        case actionPrimitive = "action_primitive"
+        case actionCode = "action_code"
+        case value
+    }
+}
+
+// MARK: - RouteWireGuard
+//
+// Forbidden-key inspection at decode time. grok-4.5 review P1-B6.
+public enum RouteWireGuard {
+    /// Parse raw JSON and reject if any RouteForbiddenKeys.all key appears
+    /// at the top-level object. Throws RouteError.forbiddenKey.
+    public static func rejectForbiddenKeys(in data: Data, contextPath: String) throws {
+        guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return  // Not a top-level object, nothing to guard
+        }
+        let keys = Set(object.keys)
+        let violations = keys.intersection(RouteForbiddenKeys.all)
+        if let first = violations.sorted().first {
+            throw RouteError.forbiddenKey("\(contextPath).\(first)")
+        }
+    }
 }
 
 // MARK: - RouteTrace
@@ -72,6 +152,10 @@ public struct RouteTrace: Codable, Equatable, Sendable {
     public let outcome: RouteOutcome
     public let clarifyTag: RouteClarifyTag
     public let rejectionReason: RouteError?
+    /// grok-4.5 review P1-B2 fix — trace_digest now covers candidate payload.
+    /// nil when the RouteResult has no action_candidate (outcome=clarify/reject/fallback
+    /// path); Some(...) when outcome=candidate carries a load-bearing tool binding.
+    public let actionCandidateSummary: ActionCandidateSummary?
     public let redactionPolicyID: String
     public let staleMarker: String?
     public let traceDigest: String
@@ -84,6 +168,7 @@ public struct RouteTrace: Codable, Equatable, Sendable {
         outcome: RouteOutcome,
         clarifyTag: RouteClarifyTag,
         rejectionReason: RouteError?,
+        actionCandidateSummary: ActionCandidateSummary? = nil,
         redactionPolicyID: String,
         staleMarker: String?,
         traceDigest: String
@@ -95,6 +180,7 @@ public struct RouteTrace: Codable, Equatable, Sendable {
         self.outcome = outcome
         self.clarifyTag = clarifyTag
         self.rejectionReason = rejectionReason
+        self.actionCandidateSummary = actionCandidateSummary
         self.redactionPolicyID = redactionPolicyID
         self.staleMarker = staleMarker
         self.traceDigest = traceDigest
@@ -108,6 +194,7 @@ public struct RouteTrace: Codable, Equatable, Sendable {
         case outcome
         case clarifyTag = "clarify_tag"
         case rejectionReason = "rejection_reason"
+        case actionCandidateSummary = "action_candidate_summary"
         case redactionPolicyID = "redaction_policy_id"
         case staleMarker = "stale_marker"
         case traceDigest = "trace_digest"
@@ -117,8 +204,11 @@ public struct RouteTrace: Codable, Equatable, Sendable {
     /// digest field itself (self-reference would loop) and any non-load-bearing
     /// metadata that MAY drift without changing decision semantics.
     ///
-    /// Load-bearing: schema_version, turn_id, trace_id, exec_tier, outcome,
-    /// clarify_tag, rejection_reason, redaction_policy_id, stale_marker.
+    /// Load-bearing:
+    ///   - schema_version, turn_id, trace_id, exec_tier, outcome, clarify_tag,
+    ///     rejection_reason, redaction_policy_id, stale_marker (outcome axis).
+    ///   - action_candidate_summary (grok-4.5 review P1-B2 fix, 2026-07-13):
+    ///     mounted_tool_name / service / action_primitive / action_code / value.
     public struct LoadBearing: Codable, Equatable, Sendable {
         public let schemaVersion: String
         public let turnID: String
@@ -127,6 +217,7 @@ public struct RouteTrace: Codable, Equatable, Sendable {
         public let outcome: RouteOutcome
         public let clarifyTag: RouteClarifyTag
         public let rejectionReason: RouteError?
+        public let actionCandidateSummary: ActionCandidateSummary?
         public let redactionPolicyID: String
         public let staleMarker: String?
 
@@ -138,6 +229,7 @@ public struct RouteTrace: Codable, Equatable, Sendable {
             case outcome
             case clarifyTag = "clarify_tag"
             case rejectionReason = "rejection_reason"
+            case actionCandidateSummary = "action_candidate_summary"
             case redactionPolicyID = "redaction_policy_id"
             case staleMarker = "stale_marker"
         }
@@ -152,6 +244,7 @@ public struct RouteTrace: Codable, Equatable, Sendable {
             outcome: outcome,
             clarifyTag: clarifyTag,
             rejectionReason: rejectionReason,
+            actionCandidateSummary: actionCandidateSummary,
             redactionPolicyID: redactionPolicyID,
             staleMarker: staleMarker
         )
@@ -176,10 +269,17 @@ public struct RouteTrace: Codable, Equatable, Sendable {
             outcome: outcome,
             clarifyTag: clarifyTag,
             rejectionReason: rejectionReason,
+            actionCandidateSummary: actionCandidateSummary,
             redactionPolicyID: redactionPolicyID,
             staleMarker: staleMarker,
             traceDigest: digest
         )
+    }
+
+    /// Forbidden-key inspection at decode time — grok-4.5 review P1-B6 (2026-07-13).
+    public static func decodeRejectingForbiddenKeys(from data: Data) throws -> RouteTrace {
+        try RouteWireGuard.rejectForbiddenKeys(in: data, contextPath: "route_trace")
+        return try JSONDecoder().decode(RouteTrace.self, from: data)
     }
 }
 
@@ -244,6 +344,51 @@ public struct RouteResult: Codable, Equatable, Sendable {
         case traceDigest = "trace_digest"
         case rejectionReason = "rejection_reason"
     }
+
+    /// Custom Codable init — grok-4.5 review P1-B6 (2026-07-13).
+    /// The synthesized init silently drops unknown keys (session_id / event_id /
+    /// sequence / raw_prompt / raw_response), letting SHALL "session identity
+    /// leaks are forbidden" be violated at runtime while tests read Mirror
+    /// output. We use DecodingError.userInfo to carry the raw JSON bytes so
+    /// the forbidden-key set can be inspected. When called from
+    /// `decodeRejectingForbiddenKeys`, the guard runs on raw bytes BEFORE decode.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: RouteResult.CodingKeys.self)
+        self.schemaVersion = try c.decode(String.self, forKey: .schemaVersion)
+        self.routeSchema = try c.decode(String.self, forKey: .routeSchema)
+        self.turnID = try c.decode(String.self, forKey: .turnID)
+        self.traceID = try c.decode(String.self, forKey: .traceID)
+        self.execTier = try c.decode(RouteExecTier.self, forKey: .execTier)
+        self.outcome = try c.decode(RouteOutcome.self, forKey: .outcome)
+        self.clarifyTag = try c.decode(RouteClarifyTag.self, forKey: .clarifyTag)
+        self.service = try c.decode(RouteService.self, forKey: .service)
+        self.actionCandidate = try c.decodeIfPresent(ActionCandidate.self, forKey: .actionCandidate)
+        self.traceDigest = try c.decode(String.self, forKey: .traceDigest)
+        self.rejectionReason = try c.decodeIfPresent(RouteError.self, forKey: .rejectionReason)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: RouteResult.CodingKeys.self)
+        try c.encode(schemaVersion, forKey: .schemaVersion)
+        try c.encode(routeSchema, forKey: .routeSchema)
+        try c.encode(turnID, forKey: .turnID)
+        try c.encode(traceID, forKey: .traceID)
+        try c.encode(execTier, forKey: .execTier)
+        try c.encode(outcome, forKey: .outcome)
+        try c.encode(clarifyTag, forKey: .clarifyTag)
+        try c.encode(service, forKey: .service)
+        try c.encodeIfPresent(actionCandidate, forKey: .actionCandidate)
+        try c.encode(traceDigest, forKey: .traceDigest)
+        try c.encodeIfPresent(rejectionReason, forKey: .rejectionReason)
+    }
+
+    /// Forbidden-key inspection at decode time — grok-4.5 review P1-B6.
+    /// This is the recommended entry point for consumers that receive JSON
+    /// from an untrusted source (W5a follow-up, T04a activation, etc.).
+    public static func decodeRejectingForbiddenKeys(from data: Data) throws -> RouteResult {
+        try RouteWireGuard.rejectForbiddenKeys(in: data, contextPath: "route_result")
+        return try JSONDecoder().decode(RouteResult.self, from: data)
+    }
 }
 
 // MARK: - RouteContractValidator
@@ -302,6 +447,17 @@ public enum RouteContractValidator {
         if result.clarifyTag != trace.clarifyTag {
             throw RouteError.illegalCombination(
                 "RouteResult.clarify_tag \(result.clarifyTag.rawValue) != RouteTrace.clarify_tag \(trace.clarifyTag.rawValue)"
+            )
+        }
+
+        // Candidate-summary sync between result and trace — grok-4.5 review
+        // P1-B2 fix (2026-07-13). trace_digest now covers action_candidate,
+        // so a mismatch in candidate summaries surfaces as illegal combination
+        // BEFORE the digest check, giving a more specific error.
+        let resultSummary = result.actionCandidate?.summary
+        if resultSummary != trace.actionCandidateSummary {
+            throw RouteError.illegalCombination(
+                "RouteResult.action_candidate.summary != RouteTrace.action_candidate_summary"
             )
         }
 
@@ -396,6 +552,19 @@ public enum RouteContractValidator {
         // Mounted tool name SSOT — consume DDomainMountedToolCatalog, no parallel set.
         if !DDomainMountedToolCatalog.mountedToolNames.contains(candidate.mountedToolName) {
             throw RouteError.unmountedName(candidate.mountedToolName)
+        }
+
+        // Kinship gate — grok-4.5 xAI review P1-A2 (2026-07-13).
+        // Mounted tool binds to a specific service per jsonl; candidate's
+        // service must equal that binding. Guards against
+        // service=carControl + mounted_tool=airControl-tool illegal combos.
+        if let boundService = MountedToolServiceMap.service(for: candidate.mountedToolName),
+           boundService != candidate.service {
+            throw RouteError.crossDomainMountedTool(
+                tool: candidate.mountedToolName,
+                boundService: boundService,
+                candidateService: candidate.service
+            )
         }
 
         // EXP-typed offset SHALL be an experiential enum (not literal).

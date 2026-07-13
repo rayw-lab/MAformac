@@ -215,6 +215,87 @@ Negative fixtures SHALL cover, at minimum: unknown enum on each of the three axe
 - **THEN** the checker SHALL fail closed with a jsonl-mismatch error
 - **AND** the writer SHALL NOT commit that fixture as a positive case.
 
+### Requirement: Candidate positive fixtures SHALL satisfy the D-domain paradigm intent==mounted_tool_name
+
+A positive fixture with `outcome=candidate` and a non-null `action_candidate` SHALL satisfy `action_candidate.intent == action_candidate.mounted_tool_name`, mirroring the D-domain named-tool paradigm at `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md:13` ("intent == 工具名"). A fixture that uses a mounted tool name whose jsonl service binding does not match its own service SHALL be rejected either at fixture-check time or by the validator.
+
+grok-4.5 xAI review (2026-07-13) P1-A1 exposed the semantic false binding where a previous airControl positive fixture used `intent=open_ac_set_interface` (from `c1_airControl_000002`) with `mounted_tool_name=adjust_ac_temperature_to_number` — the "metadata true, surface binding false" 0/34 variant. Real jsonl rows where `intent==adjust_ac_temperature_to_number` include `c1_airControl_000164` / `_000165` / `_000166` (grep-verified 2026-07-13, all `service=airControl`).
+
+#### Scenario: Positive candidate fixture's intent equals its mounted tool
+
+- **GIVEN** a positive fixture with `outcome=candidate` and a non-null `action_candidate`
+- **WHEN** a fixture checker inspects it
+- **THEN** `action_candidate.intent` SHALL equal `action_candidate.mounted_tool_name`
+- **AND** the row referenced by `_source.contract_row_id` in `contracts/semantic-function-contract.jsonl` SHALL also satisfy `intent == mounted_tool_name` for that row.
+
+### Requirement: The validator SHALL enforce mounted-tool kinship (service must match jsonl binding)
+
+A mounted tool name binds to a specific D-domain service per jsonl. The validator SHALL reject an `ActionCandidate` whose `service` disagrees with the jsonl-verified binding of its `mounted_tool_name`. This gate is orthogonal to `.unmountedName` — the tool exists in `Core/Contracts/DDomainMountedToolCatalog.swift:12-14` mountedToolNames, but its cross-service binding is illegal.
+
+The kinship table (`MountedToolServiceMap.bindings` in `Core/Contracts/RouteContract.swift`) SHALL be a peer projection of the catalog, verified by an invariant test that every mounted tool has a service binding. The map SHALL NOT be a second SSOT — its keys are consumed from the catalog and its values are the jsonl-verified services.
+
+grok-4.5 xAI review (2026-07-13) P1-A2 exposed this gap: existence-only checks let `service=carControl + mounted_tool_name=adjust_ac_temperature_to_number` (bound to airControl per jsonl) pass silently.
+
+#### Scenario: Cross-service mounted-tool binding is rejected
+
+- **GIVEN** an `ActionCandidate` where `mounted_tool_name` is in `mountedToolNames` but its jsonl service binding differs from `candidate.service`
+- **WHEN** the validator runs
+- **THEN** it SHALL fail with `RouteError.crossDomainMountedTool(tool:, boundService:, candidateService:)`
+- **AND** the error SHALL carry the concrete tool name, the bound service, and the offending candidate service.
+
+#### Scenario: Every mounted tool has a service binding
+
+- **GIVEN** the set `DDomainMountedToolCatalog.mountedToolNames`
+- **WHEN** the invariant test runs `MountedToolServiceMap.service(for:)` on every name
+- **THEN** every lookup SHALL return a non-nil `RouteService`
+- **AND** catalog expansion without corresponding map update SHALL surface as a test failure.
+
+### Requirement: Forbidden ontology keys SHALL be rejected at decode time
+
+The Swift wire decoders for `RouteResult`, `RouteSubject`, `RouteTrace`, and `ActionCandidate` SHALL, when invoked via their `decodeRejectingForbiddenKeys(from:)` entry, inspect the raw JSON object and reject any occurrence of forbidden keys with `RouteError.forbiddenKey(...)`.
+
+Forbidden ontology keys SHALL be `session_id`, `event_id`, `sequence` (belong to T04a/W5a pending-correlation record per `openspec/changes/add-t04a-customer-ingress/design.md:7-11`, not to this ontology). Forbidden redaction keys SHALL be `raw_prompt`, `raw_response` (redaction-safe carrier SHALL NOT carry raw customer utterance).
+
+The default `JSONDecoder.decode` silently drops unknown keys; the SHALL "Session identity leaks are forbidden" therefore requires explicit key inspection at decode time via the guarded entry point. grok-4.5 xAI review (2026-07-13) P1-B6 exposed this: prior tests only asserted the Swift struct had no such property (`Mirror` inspection), which does not catch the wire violation.
+
+#### Scenario: session_id key on the wire is caught by the decode guard
+
+- **GIVEN** a JSON payload with a top-level `session_id` key
+- **WHEN** `RouteResult.decodeRejectingForbiddenKeys(from:)` is called
+- **THEN** decoding SHALL fail with `RouteError.forbiddenKey("route_result.session_id")`
+- **AND** the default `JSONDecoder().decode(RouteResult.self, from:)` SHALL NOT be the recommended entry point for untrusted input.
+
+#### Scenario: raw_prompt on RouteTrace is caught
+
+- **GIVEN** a JSON payload for `RouteTrace` with a `raw_prompt` field
+- **WHEN** `RouteTrace.decodeRejectingForbiddenKeys(from:)` is called
+- **THEN** decoding SHALL fail with `RouteError.forbiddenKey("route_trace.raw_prompt")`.
+
+### Requirement: trace_digest SHALL cover the action_candidate payload
+
+`trace_digest` SHALL be computed over a load-bearing set that includes, when present, an `ActionCandidateSummary` with `mounted_tool_name`, `service`, `action_primitive`, `action_code`, and `value` (the four-tuple). Any tampering with these fields SHALL flip the digest; the joint validator SHALL emit `RouteError.digestMismatch` when the pinned `trace_digest` disagrees with the recomputed one, and SHALL emit `RouteError.illegalCombination` when the trace's `action_candidate_summary` does not equal the result's `action_candidate.summary` (a more specific failure that fires before the digest check).
+
+grok-4.5 xAI review (2026-07-13) P1-B2 exposed the prior gap: the digest covered only outcome-axis facts (`exec_tier`, `outcome`, `clarify_tag`, `rejection_reason`), leaving candidate tampering to pass through the joint validator. `intent`, `device`, `slot`, and `slot_keys` are NOT in the summary because they are derivable via the paradigm binding (intent==mounted_tool_name and the jsonl row identity).
+
+#### Scenario: Tampering with mounted tool name in the candidate flips the digest
+
+- **GIVEN** two `RouteTrace` values identical except that the second's `actionCandidateSummary.mountedToolName` differs
+- **WHEN** their `computeTraceDigest()` values are computed
+- **THEN** the two digests SHALL differ.
+
+#### Scenario: Tampering with value four-tuple in the candidate flips the digest
+
+- **GIVEN** two `RouteTrace` values identical except that the second's `actionCandidateSummary.value` differs (e.g. `ref` changes from `""` to `"CUR"`)
+- **WHEN** their digests are computed
+- **THEN** the two digests SHALL differ.
+
+#### Scenario: Candidate summary mismatch between result and trace fires before digest check
+
+- **GIVEN** a `RouteResult` whose `action_candidate.summary` differs from its accompanying `RouteTrace.actionCandidateSummary`, and whose `trace_digest` (by construction) does not equal the recomputed digest either
+- **WHEN** the joint validator runs
+- **THEN** it SHALL emit `RouteError.illegalCombination("RouteResult.action_candidate.summary != RouteTrace.action_candidate_summary")` first (more specific)
+- **AND** SHALL NOT emit `RouteError.digestMismatch` on the same call.
+
 ### Requirement: The change SHALL NOT touch B1b, App composition, Makefile, or generated files
 
 This change SHALL restrict its write-set to a fixed allowlist of new files under `Core/Contracts/`, `contracts/schemas/`, `contracts/fixtures/typed-route-contract/`, `Tests/MAformacCoreTests/`, `Tests/python/contracts/`, and `openspec/changes/add-w6-typed-route-contract/`; and SHALL NOT modify Makefile, closure-shared checkers, generated Swift files, App composition, runner/store seams, or the parked intent-routing change tree.

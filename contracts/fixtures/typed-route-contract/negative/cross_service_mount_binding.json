@@ -1,0 +1,30 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "Kinship violation — grok-4.5 xAI review P1-A2 (2026-07-13). service=carControl but mounted_tool_name=adjust_ac_temperature_to_number binds to service=airControl per MountedToolServiceMap (live-verified via grep of contracts/semantic-function-contract.jsonl for intent==adjust_ac_temperature_to_number — all 3 hits are service=airControl). The existence check RouteError.unmountedName does NOT catch this because the tool is in mountedToolNames; the kinship gate catches it and raises RouteError.crossDomainMountedTool.",
+    "expected_error": "cross_domain_mounted_tool"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-cross-service-000001",
+    "trace_id": "trace-neg-cross-service-000001",
+    "exec_tier": "L1",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "carControl",
+    "action_candidate": {
+      "intent": "adjust_ac_temperature_to_number",
+      "service": "carControl",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "adjust_to_number",
+      "action_code": "adjust_value_to_specific_value",
+      "device": "ac_temperature",
+      "slot": "adjustment_mode+temperature",
+      "slot_keys": ["adjustment_mode", "temperature"],
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

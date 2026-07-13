@@ -18,9 +18,20 @@ public enum RouteError: Error, Equatable, Sendable {
     // D-domain named tool surface violation — tool name not in
     // Core/Contracts/DDomainMountedToolCatalog.swift:12-14 mountedToolNames.
     case unmountedName(String)
+    // Kinship violation — mounted_tool_name binds to service X per jsonl,
+    // but ActionCandidate.service is Y. Guards against
+    // `docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md:13`
+    // "intent == 工具名" paradigm violation via cross-service binding.
+    // grok-4.5 xAI review P1-A2 (2026-07-13).
+    case crossDomainMountedTool(tool: String, boundService: RouteService, candidateService: RouteService)
     // Service outside the canonical catalog {airControl, carControl, cmd}
     // (verified via jsonl service distribution + docs/baseline-semantic-protocol-2026-06-19.md:16).
     case outOfCatalog(String)
+    // Forbidden key present in wire payload (session_id / event_id / sequence /
+    // raw_prompt / raw_response). grok-4.5 xAI review P1-B6 (2026-07-13):
+    // Swift JSONDecoder default silently drops unknown keys, so ontology-
+    // narrowing must be enforced via explicit key inspection at decode time.
+    case forbiddenKey(String)
     // Session-generation mismatch (W8 lifecycle downstream).
     case oldGeneration(String)
     // Source revision / stale-marker.
@@ -44,22 +55,27 @@ public enum RouteError: Error, Equatable, Sendable {
 
     /// Total ordering used by the validator to select a single reject reason.
     /// Lower = higher precedence. Matches the SHALL enumeration order.
+    /// Precedence extended for grok-4.5 review P1 additions:
+    /// forbiddenKey comes right after illegalCombination (both wire-shape),
+    /// crossDomainMountedTool right after unmountedName (both mounted-tool binding).
     public var rank: Int {
         switch self {
         case .riskR0Forbidden: return 0
         case .illegalCombination: return 1
-        case .unmountedName: return 2
-        case .outOfCatalog: return 3
-        case .oldGeneration: return 4
-        case .staleSource: return 5
-        case .digestMismatch: return 6
-        case .schemaVersionMismatch: return 7
-        case .payloadInvalid: return 8
-        case .slotMissing: return 9
-        case .valueOutOfRange: return 10
-        case .unknownEnum: return 11
-        case .riskR1PreconditionUnmet: return 12
-        case .clarifyRequired: return 13
+        case .forbiddenKey: return 2
+        case .unmountedName: return 3
+        case .crossDomainMountedTool: return 4
+        case .outOfCatalog: return 5
+        case .oldGeneration: return 6
+        case .staleSource: return 7
+        case .digestMismatch: return 8
+        case .schemaVersionMismatch: return 9
+        case .payloadInvalid: return 10
+        case .slotMissing: return 11
+        case .valueOutOfRange: return 12
+        case .unknownEnum: return 13
+        case .riskR1PreconditionUnmet: return 14
+        case .clarifyRequired: return 15
         }
     }
 
@@ -68,7 +84,9 @@ public enum RouteError: Error, Equatable, Sendable {
         switch self {
         case .riskR0Forbidden: return "risk_r0_forbidden"
         case .illegalCombination: return "illegal_combination"
+        case .forbiddenKey: return "forbidden_key"
         case .unmountedName: return "unmounted_name"
+        case .crossDomainMountedTool: return "cross_domain_mounted_tool"
         case .outOfCatalog: return "out_of_catalog"
         case .oldGeneration: return "old_generation"
         case .staleSource: return "stale_source"
@@ -96,6 +114,9 @@ extension RouteError: Codable {
         case expected
         case actual
         case clarify_tag
+        case tool
+        case bound_service
+        case candidate_service
     }
 
     public init(from decoder: Decoder) throws {
@@ -106,8 +127,16 @@ extension RouteError: Codable {
             self = .riskR0Forbidden(try c.decode(String.self, forKey: .detail))
         case "illegal_combination":
             self = .illegalCombination(try c.decode(String.self, forKey: .detail))
+        case "forbidden_key":
+            self = .forbiddenKey(try c.decode(String.self, forKey: .detail))
         case "unmounted_name":
             self = .unmountedName(try c.decode(String.self, forKey: .detail))
+        case "cross_domain_mounted_tool":
+            self = .crossDomainMountedTool(
+                tool: try c.decode(String.self, forKey: .tool),
+                boundService: try c.decode(RouteService.self, forKey: .bound_service),
+                candidateService: try c.decode(RouteService.self, forKey: .candidate_service)
+            )
         case "out_of_catalog":
             self = .outOfCatalog(try c.decode(String.self, forKey: .detail))
         case "old_generation":
@@ -150,6 +179,7 @@ extension RouteError: Codable {
         switch self {
         case .riskR0Forbidden(let d),
              .illegalCombination(let d),
+             .forbiddenKey(let d),
              .unmountedName(let d),
              .outOfCatalog(let d),
              .oldGeneration(let d),
@@ -160,6 +190,10 @@ extension RouteError: Codable {
              .unknownEnum(let d),
              .riskR1PreconditionUnmet(let d):
             try c.encode(d, forKey: .detail)
+        case .crossDomainMountedTool(let tool, let bound, let candidate):
+            try c.encode(tool, forKey: .tool)
+            try c.encode(bound, forKey: .bound_service)
+            try c.encode(candidate, forKey: .candidate_service)
         case .digestMismatch(let expected, let actual),
              .schemaVersionMismatch(let expected, let actual):
             try c.encode(expected, forKey: .expected)
