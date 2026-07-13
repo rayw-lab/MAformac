@@ -1,4 +1,7 @@
 import XCTest
+#if os(macOS)
+import AppKit
+#endif
 
 final class FrontstageCustomerIngressUITests: XCTestCase {
     @MainActor
@@ -101,7 +104,7 @@ final class FrontstageCustomerIngressUITests: XCTestCase {
 
         let proof = app.staticTexts["frontstage-demo-slice-proof"]
         if proof.exists {
-            let attachment = XCTAttachment(string: proof.label)
+            let attachment = XCTAttachment(string: textContent(of: proof))
             attachment.name = "\(caseName)-proof.txt"
             attachment.lifetime = .keepAlways
             add(attachment)
@@ -117,7 +120,19 @@ final class FrontstageCustomerIngressUITests: XCTestCase {
         let field = app.textFields["frontstage-customer-text-field"]
         XCTAssertTrue(field.waitForExistence(timeout: 12))
         field.tap()
+#if os(macOS)
+        let pasteboard = NSPasteboard.general
+        let previousPasteboardString = pasteboard.string(forType: .string)
+        pasteboard.clearContents()
+        pasteboard.setString(text, forType: .string)
+        field.typeKey("v", modifierFlags: .command)
+        pasteboard.clearContents()
+        if let previousPasteboardString {
+            pasteboard.setString(previousPasteboardString, forType: .string)
+        }
+#else
         field.typeText(text)
+#endif
         let submit = app.buttons["frontstage-customer-text-submit"]
         XCTAssertTrue(submit.exists)
         submit.tap()
@@ -127,7 +142,7 @@ final class FrontstageCustomerIngressUITests: XCTestCase {
     private func assertStatus(contains text: String, in app: XCUIApplication) {
         let status = app.staticTexts["frontstage-customer-ingress-status"]
         XCTAssertTrue(status.waitForExistence(timeout: 5))
-        XCTAssertTrue(waitForLabel(containing: text, on: status, timeout: 8), "status=\(status.label)")
+        XCTAssertTrue(waitForText(containing: text, on: status, timeout: 8), "status=\(textContent(of: status))")
     }
 
     @MainActor
@@ -135,15 +150,22 @@ final class FrontstageCustomerIngressUITests: XCTestCase {
         let proof = app.staticTexts["frontstage-demo-slice-proof"]
         XCTAssertTrue(proof.waitForExistence(timeout: 5))
         for fragment in fragments {
-            XCTAssertTrue(waitForLabel(containing: fragment, on: proof, timeout: 8), "fragment=\(fragment), proof=\(proof.label)")
+            XCTAssertTrue(waitForText(containing: fragment, on: proof, timeout: 8), "fragment=\(fragment), proof=\(textContent(of: proof))")
         }
     }
 
-    private func waitForLabel(containing text: String, on element: XCUIElement, timeout: TimeInterval) -> Bool {
-        let predicate = NSPredicate(format: "label CONTAINS %@", text)
+    private func waitForText(containing text: String, on element: XCUIElement, timeout: TimeInterval) -> Bool {
+        let predicate = NSPredicate(format: "label CONTAINS %@ OR value CONTAINS %@", text, text)
         return XCTWaiter.wait(
             for: [XCTNSPredicateExpectation(predicate: predicate, object: element)],
             timeout: timeout
         ) == .completed
+    }
+
+    private func textContent(of element: XCUIElement) -> String {
+        if !element.label.isEmpty {
+            return element.label
+        }
+        return element.value as? String ?? ""
     }
 }
