@@ -1,5 +1,4 @@
 import Foundation
-import CryptoKit
 
 // MARK: - RouteExecTier
 //
@@ -124,10 +123,12 @@ public struct RouteSubject: Codable, Equatable, Sendable {
 // MARK: - RouteCanonicalJSON
 //
 // Deterministic canonical JSON encoding used for digest computation.
-// Sorted keys, no whitespace, ISO-8601 dates disabled. Anchored to the
-// existing SHA-256 usage pattern in `Core/Contracts/DDomainMountedToolCatalog.swift:22-26`
-// (`C6CanonicalJSON.encode(...)` + `C6Hash.sha256Hex(...)`). We provide a
-// standalone helper here to avoid mutating that catalog file.
+// Sorted keys, no whitespace, ISO-8601 dates. The bytes → hex hash step
+// delegates to `C6Hash.sha256Hex(_ data: Data)` at
+// `Core/Support/C6Hash.swift:5` so there is no parallel SHA-256 hex
+// implementation in the repo (SHALL "Contract SHALL NOT introduce a second
+// D-domain tool registry, service catalog, or fc_flags→exec_tier map" —
+// its intent, no-second-SSOT, applies to hash helpers too).
 public enum RouteCanonicalJSON {
     public static func encode<T: Encodable>(_ value: T) throws -> Data {
         let encoder = JSONEncoder()
@@ -136,9 +137,9 @@ public enum RouteCanonicalJSON {
         return try encoder.encode(value)
     }
 
+    /// Delegate to the existing C6Hash helper — no second sha256Hex impl.
     public static func sha256Hex<T: Encodable>(_ value: T) throws -> String {
         let data = try encode(value)
-        let digest = SHA256.hash(data: data)
-        return digest.compactMap { String(format: "%02x", $0) }.joined()
+        return C6Hash.sha256Hex(data)
     }
 }

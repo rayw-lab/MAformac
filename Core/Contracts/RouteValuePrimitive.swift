@@ -106,6 +106,13 @@ public enum RouteValueOffset: Codable, Equatable, Sendable {
 // Typed carrier of the jsonl `value{ref,direct,offset,type}` four-tuple.
 // Field names are verbatim jsonl keys (`ref`, `direct`, `offset`, `type`) — no
 // near-synonyms per SHALL "value four-tuple SHALL use jsonl field names verbatim".
+//
+// Codable is custom (not synthesized) so `init(from:)` can enforce the
+// cross-field SHALL Scenario: `type=EXP` REQUIRES `offset` to be an
+// experiential enum value. Defense in depth: RouteContractValidator also
+// enforces this at validation time, but decode-time enforcement means even
+// direct `JSONDecoder().decode(...)` catches it — no silent `.literal("WARM")`
+// under `type=EXP` (belt + suspenders vs. fixture-green trap).
 public struct RouteValueFourTuple: Codable, Equatable, Sendable {
     public var ref: RouteValueRef
     public var direct: RouteValueDirect
@@ -122,6 +129,48 @@ public struct RouteValueFourTuple: Codable, Equatable, Sendable {
         self.direct = direct
         self.offset = offset
         self.type = type
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case ref, direct, offset, type
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let ref = try c.decode(RouteValueRef.self, forKey: .ref)
+        let direct = try c.decode(RouteValueDirect.self, forKey: .direct)
+        let offset = try c.decode(RouteValueOffset.self, forKey: .offset)
+        let type = try c.decode(RouteValueType.self, forKey: .type)
+
+        // Cross-field SHALL: when type=EXP, offset MUST be experiential.
+        // Fires before the value struct is exposed to any caller — validator
+        // still checks again to defend against direct construction bypass.
+        if type == .EXP {
+            switch offset {
+            case .experiential:
+                break
+            case .empty, .literal:
+                throw DecodingError.dataCorrupted(
+                    DecodingError.Context(
+                        codingPath: c.codingPath + [CodingKeys.offset],
+                        debugDescription: "value.offset must be an experiential enum when value.type=EXP; got \(offset.rawString)"
+                    )
+                )
+            }
+        }
+
+        self.ref = ref
+        self.direct = direct
+        self.offset = offset
+        self.type = type
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(ref, forKey: .ref)
+        try c.encode(direct, forKey: .direct)
+        try c.encode(offset, forKey: .offset)
+        try c.encode(type, forKey: .type)
     }
 
     /// True when every axis is empty — matches jsonl rows that carry

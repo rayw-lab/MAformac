@@ -3,7 +3,16 @@
     "contract_row_id": "c1_carControl_000002",
     "jsonl_path": "contracts/semantic-function-contract.jsonl",
     "captured_at": "2026-07-13",
-    "note": "action_candidate.{intent,service,device,action_primitive,action_code} verbatim from live jsonl row (grep-verified 2026-07-13, first carControl row). mounted_tool_name is the only member of Core/Contracts/DDomainMountedToolCatalog.mountedToolNames; using it in this cross-service positive fixture demonstrates that the D-domain named-tool binding is a service-independent SSOT (SHALL 'action_candidate SHALL bind to a mounted D-domain tool name')."
+    "note": "Positive fixture proving the R2 clarify path per CLAUDE.md:101 real-capability disclosure (only one D-domain tool is currently mounted; the rest of the ir_map is un-mounted per task3 teardown 2026-07-07 statement on that line). Live-cored 2026-07-13: Core/Contracts/DDomainMountedToolCatalog.swift:12-14 mountedToolNames = {'adjust_ac_temperature_to_number'} (airControl only). A carControl candidate has no directly-mounted tool at this checkpoint, so the correct route is outcome=clarify (docs/srd-three-layer-intent-routing.md:52 clarifyTag=implicit route), NOT a candidate that binds to airControl's tool. jsonl_binding records the original intent/service/device/action_primitive/action_code so a fixture checker still cross-checks against a real jsonl row.",
+    "jsonl_binding": {
+      "intent": "open_window",
+      "service": "carControl",
+      "device": "window",
+      "action_primitive": "power_on",
+      "action_code": "open_process_device",
+      "clarify_tag": "implicit",
+      "exec_tier": "L1"
+    }
   },
   "route_result": {
     "schema_version": "typed_route_contract.v1",
@@ -11,21 +20,11 @@
     "turn_id": "turn-carControl-000002",
     "trace_id": "trace-carControl-000002",
     "exec_tier": "L1",
-    "outcome": "candidate",
+    "outcome": "clarify",
     "clarify_tag": "implicit",
     "service": "carControl",
-    "action_candidate": {
-      "intent": "open_window",
-      "service": "carControl",
-      "mounted_tool_name": "adjust_ac_temperature_to_number",
-      "action_primitive": "power_on",
-      "action_code": "open_process_device",
-      "device": "window",
-      "slot": "none",
-      "slot_keys": [],
-      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
-    },
-    "trace_digest": "f6e0f782bfa728f4c953a4f1b7bcbcf9c8b12775e93d90af1e337cdd5eefb9bb",
+    "action_candidate": null,
+    "trace_digest": "4b1cb52f3f3b7e38769f6b446af3f6a4bca5d3051bb9d867d48fd36cc08a5068",
     "rejection_reason": null
   },
   "route_trace_load_bearing": {
@@ -33,7 +32,7 @@
     "turn_id": "turn-carControl-000002",
     "trace_id": "trace-carControl-000002",
     "exec_tier": "L1",
-    "outcome": "candidate",
+    "outcome": "clarify",
     "clarify_tag": "implicit",
     "redaction_policy_id": "redaction_policy.v1"
   }

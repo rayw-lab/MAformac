@@ -293,6 +293,25 @@ final class RouteContractTests: XCTestCase {
         XCTAssertTrue(value.isEmpty)
     }
 
+    /// Bug 2 fix — decoder-level cross-field defense (belt + suspenders).
+    /// Without the RouteValueFourTuple.init(from:) cross-field check, a payload
+    /// with type=EXP + offset='WARM' would silently decode to
+    /// .literal("WARM") and only the validator would catch it later.
+    /// After the fix, the decoder itself throws.
+    func testExpWithLiteralOffsetFailsAtDecoder() {
+        let json = "{\"ref\":\"CUR\",\"direct\":\"+\",\"offset\":\"WARM\",\"type\":\"EXP\"}"
+            .data(using: .utf8)!
+        XCTAssertThrowsError(try JSONDecoder().decode(RouteValueFourTuple.self, from: json)) { error in
+            guard case DecodingError.dataCorrupted(let ctx) = error else {
+                return XCTFail("expected DecodingError.dataCorrupted, got \(error)")
+            }
+            XCTAssertTrue(
+                ctx.debugDescription.contains("experiential"),
+                "expected debug description to mention 'experiential', got: \(ctx.debugDescription)"
+            )
+        }
+    }
+
     func testExpWithExperientialOffsetAccepted() throws {
         let value = RouteValueFourTuple(
             ref: .CUR, direct: .plus,
@@ -520,6 +539,10 @@ final class RouteContractTests: XCTestCase {
     }
 
     func testCarControlPositiveFixtureValidatorAccepts() throws {
+        // carControl currently has no mounted D-domain tool
+        // (mountedToolNames = {'adjust_ac_temperature_to_number'} airControl only),
+        // so the positive route is outcome=clarify with action_candidate=null.
+        // jsonl binding intent is preserved in _source.jsonl_binding.
         guard let url = fixtureURL("positive", "carControl_candidate.json") else {
             throw XCTSkip("fixture path not resolvable")
         }
@@ -529,10 +552,15 @@ final class RouteContractTests: XCTestCase {
         let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
         XCTAssertNoThrow(try RouteContractValidator.validate(result))
         XCTAssertEqual(result.service, .carControl)
-        XCTAssertEqual(result.actionCandidate?.intent, "open_window")
+        XCTAssertEqual(result.outcome, .clarify)
+        XCTAssertNil(result.actionCandidate)
+        let source = root["_source"] as! [String: Any]
+        let binding = source["jsonl_binding"] as! [String: Any]
+        XCTAssertEqual(binding["intent"] as? String, "open_window")
     }
 
     func testCmdPositiveFixtureValidatorAccepts() throws {
+        // cmd same situation as carControl (see comment above).
         guard let url = fixtureURL("positive", "cmd_candidate.json") else {
             throw XCTSkip("fixture path not resolvable")
         }
@@ -542,7 +570,11 @@ final class RouteContractTests: XCTestCase {
         let result = try JSONDecoder().decode(RouteResult.self, from: resultData)
         XCTAssertNoThrow(try RouteContractValidator.validate(result))
         XCTAssertEqual(result.service, .cmd)
-        XCTAssertEqual(result.actionCandidate?.intent, "open_bluetooth")
+        XCTAssertEqual(result.outcome, .clarify)
+        XCTAssertNil(result.actionCandidate)
+        let source = root["_source"] as! [String: Any]
+        let binding = source["jsonl_binding"] as! [String: Any]
+        XCTAssertEqual(binding["intent"] as? String, "open_bluetooth")
     }
 
     func testUnmountedToolFixtureRejected() throws {
