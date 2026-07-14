@@ -1,4 +1,3 @@
-++ b/MEMORY.md
 # MEMORY — MAformac
 
 > memory sidecar only. This file is not OpenSpec SSOT, not a decision ledger, not a receipt, and not product/runtime proof. 与 live repo、OpenSpec、`docs/commander-log/decisions.md` 或 run-dir receipts 冲突时，本文件让位。

@@ -1422,7 +1422,6 @@
 - **键7 docs cascade**：执行基座固定为 clean mainline `93232744425fd824c2a51d26d347b2b9913c5d90`。Commit A 负责本 D-154、CURRENT、swarm-runs、SEQ receipt、ma17 handoff、M.86–M.89，加 MEMORY sidecar；Commit B 仅由 helper 重锚 canonical 六路径。A/B 间与事务后禁 push；最终状态只从 `runs/2026-07-12-ma17/receipts/ma17-docs-cascade-v2.1/` 的执行 receipt 与 live Git读取，不从本条预填 HEAD_B。
 - **仍开放**：merge packet v6=`STILL_OPEN`；S8=`NOT_READY_TO_IGNITE`，未取 lease、未点火；V2 source gate=`PLANNED_GATE_NOT_YET_EXECUTABLE`，T07b/P8=`PHASED_BLOCKED_UNTIL_REAL_T06`；`actionDemoProven=0/120`，`baseline_activation=PENDING_CASCADE`。
 - **Non-claims**：本条不授权 push、PR、四支 merge、package flip、S8、operator-pass、V-PASS、C6 acceptance、candidate、mobile/true-device/live API。所有 commit 均按其 receipt 的 local proof ceiling 解读；未 push。
-++ b/docs/commander-log/decisions.md
 
 ## D-155：ma18 V8→push→B1→W-P1→postmerge 三键全键账（2026-07-12 深夜，磊哥拍 + commander 裁决）
 
@@ -1439,7 +1438,6 @@
   | `POSTMERGE-KEY1-PUSH@70a2884e` | push disposable `refs/heads/ma18/w6-v9-integration` | 「三键均批，7个拉满，带孙」 | `DONE` | `postmerge-keys/KEY1-push.out` rc0 + exact readback |
   | `POSTMERGE-KEY2-REMOTE-RERUN` | workflow dispatch @ integration ref | 同三键 batch | `GREEN_EXACT_SHA` | run `29197406884`，headSha=`70a2884e...`、event=`workflow_dispatch`、top-level/job=`success`; `KEY2-final-assert.json` sha=`f1e64404...` |
   | `POSTMERGE-KEY3-PROMOTE` | ff-only `70a2884e...` → opt ref | 同三键 batch | `RATIFIED_EXECUTED_PROMOTED` | mainline/opt=`70a2884e797bb3a35fc6ba912a6f7fa8fd027d87`（KEY3 promote 落点）；随后 gauge ff-merge 进 mainline，现 mainline/opt=`684746c7d80fd035b5408829ea7be16e770da1c8`；sentinel `PROMOTED`(from=371f25fb→to=70a2884e)；live git HEAD/@{u} 一致；KEY2 前置已绿，commander 按已批 exact contract 已串行执行 |
-+
 - **三键执行全链落账（postmerge-keys/ 全链 receipt）**：键1 `KEY1-push.out` rc0 + `KEY1-readback.out` exact=`70a2884e...`（disposable ref `ma18/w6-v9-integration`）；键2 `KEY2-dispatch.out`（首 dispatch 网络 EOF→有界重试 2/3 成功）+ `KEY2-watch.log`（WATCH rc=0，run `29197406884` verify 11m34s `✓ Complete job`）+ `KEY2-final-assert.json`（`{conclusion:success, headSha:70a2884e, event:workflow_dispatch, verify_job:[success]}`）；键3 `KEY3-precheck.out`（pre: local=remote=371f25fb clean）+ `KEY3-ffonly.out`（Fast-forward `371f25fb..70a2884e`，21 files +932/-130）+ `KEY3-push.out`（首发 `Recv failure: Operation timed out`→attempt 2 success `371f25fb..70a2884e`）+ `KEY3-readback.out`（post: local=remote=`70a2884e`）；`POSTMERGE-3KEYS-EXEC-RECEIPT.md` 三键均 GREEN、网络瞬断×2 有界重试闭合。
 - **remote 三绿（派单口径）**：① **integration ref**=`70a2884e...`（`ma18/w6-v9-integration`，KEY1 readback exact + KEY2 headSha 同 commit）；② **opt 自动 run `29198128727`**=`success`（`OPT-AUTORUN-watch.log` 捕获 `{"conclusion":"success","headSha":"70a2884e...","verify":["success"]}`，opt ref 推后自动触发 verify 同 commit 已绿）；③ **首绿 `29197406884`**=KEY2 run verify_job success（53 面新门链 remote 历史首绿）。三绿 headSha 均=`70a2884e...`，与 mainline promote 后态一致。
 - **键数勘误（M.95 已立）**：派单口述「今晚 11 键」为 commander 历史口误；STANDING-AUTH 经 w6 质询勘误实账=**14 键 / 5 RATIFY receipt**：`V8(1)+KEY-PUSH@371f25fb(1)+B1(2: G18-01A/G18-02A)+W-P1 merge批(7)+postmerge(3)`；辅助件（AUTO-BATCH G18-345×3、RISK-ACK×2、SKILL-RULING）不计键。本表逐键 verbatim 按 receipt 枚举，不以口数凑账。

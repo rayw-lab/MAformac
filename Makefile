@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -35,7 +35,11 @@ GENERATED_SWIFT := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: verify-c1-checker-files .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live diff test verify-contentview-wiring
+verify: verify-governance-hygiene verify-c1-checker-files .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live diff test verify-contentview-wiring
+
+verify-governance-hygiene:
+	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_check_governance_hygiene.py
+	$(PYTHON_BOOTSTRAP) scripts/check_governance_hygiene.py
 
 verify-a4-target-exclusions:
 	$(PYTHON_BOOTSTRAP) scripts/test_check_a4_app_target_exclusions.py
@@ -90,7 +94,7 @@ verify-all: verify swift-test
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring
+verify-ci: verify-governance-hygiene verify-c1-checker-files .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring
 
 # Source-free C1 checkers are hard CI dependencies. Missing files must stop verify-ci
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.

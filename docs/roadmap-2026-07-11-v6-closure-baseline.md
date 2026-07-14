@@ -69,8 +69,8 @@ retire_trigger: macOS app 全功能闭环达成，或磊哥重定路线
 | V7 | A2 evidence package（check-macos-demo-evidence.py + capture） | PLAN | 脚本尚不存在（GAP-HUNT T12 段坐实） |
 | V8 | closure verdict join（五门 receipt 机械汇签，same-subject join） | GAP | 制度物=O4 schema；join key（repo_head/build/model/contract/corpus/scorer）任一不同或缺失=BLOCKED（审计 P1-04） |
 
-### 进度 verdict（可复算口径；本表为**最后一次手写账**，O2 checker 落地后由机械生成接管）
-- canonical 计数只认下方 checker 接管的 `O1:GENERATED` table：**done=1**（generated execution row `:83`；count token `:84`）/ **blocked=4**（`:83-84`）/ **planned=23**（`:83-84`）/ **gap=1**（`:83-84`）/ **ready=0 / running=0 / paused=0**（`:83-84`）。接管源为 `contracts/closure-work-packages.v1.yaml` 经 `scripts/check_closure_work_packages.py` 生成并由 `make verify-closure-work-packages` 校验的 marker block（registry/checker identity `:78`，29-package rows `:86-117`）；三张历史业务说明表已同步 D-150 后业务态，但 canonical execution 计数仍只认 marker。
+### 进度 verdict（可复算口径）
+- canonical 状态和计数只读下方 `O1:GENERATED` marker block；本手写段不复制数字。生成源为 `contracts/closure-work-packages.v1.yaml`，由 `scripts/check_closure_work_packages.py` 物化并经 `make verify-closure-work-packages` 校验。上方业务说明表仅供历史语境，不参与机械消费。
 - **hard closure 分母 = 28**（29 − V5 accounting；W10 计 hard 但只含 TTS 门收敛面，stretch ASR 不进硬门）。
 - **地基（不进闭环分母，是已交付资产）**：治理层（PR #42 MERGED）/ Line D 呈现层（swift test 783/7/0，D-141 `docs/commander-log/decisions.md:1285`——dated local 证据，非 operator-pass）/ 训练准备 / 计划层 / branch protection / A1+A3 ancestry。
 - **叙事口径校准**：本账是「remaining closure backlog 状态」，不是「总工程完成度」；「~50%」粗账仅口头参照。分母变更（增删/重切包）须走本文件修订 + D 条 + O3 transition receipt，禁静默换分母。
