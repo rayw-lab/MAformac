@@ -1,0 +1,2 @@
+{"utterance":"打开天窗","expected_disposition":"reject","proof_class":"fixture_local"}
+{"utterance":"我想听音乐","expected_disposition":"clarify","proof_class":"fixture_local"}

@@ -1,0 +1,8 @@
+{
+  "threshold_basis": "provisional_package_local",
+  "basis_citation": "Tests/Fixtures/product-operator-reliability/provisional-receipt.json",
+  "metric_id": "turn_latency_ms",
+  "provisional_p95_ms": null,
+  "soak_status": "resource_deferred",
+  "non_claims": ["not_w4_done", "not_v1_ratified"]
+}

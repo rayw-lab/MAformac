@@ -1,0 +1,72 @@
+{
+  "synthetic": true,
+  "proof_class": "local",
+  "satisfies_t07b_prerequisite": false,
+  "envelope": {
+    "schemaVersion": "t07a_v1",
+    "subject": {
+      "repoSHA": "aae8a8acc48edde889b121ece24215676c134b9a",
+      "dirtyVerdict": false
+    },
+    "environment": {
+      "machine": "macOS",
+      "osVersion": "14.5",
+      "target": "arm64",
+      "scenarioVersion": "v1",
+      "contractVersion": "v1"
+    },
+    "attempt": {
+      "attemptID": "syn-001",
+      "launchMode": "xcode_run",
+      "artifact": {
+        "repoSHA": "aae8a8acc48edde889b121ece24215676c134b9a",
+        "dirtyVerdict": false,
+        "buildScheme": "MAformacCore",
+        "bundleVersion": "1.0",
+        "bundleHash": "abc123"
+      },
+      "environment": {
+        "machine": "macOS",
+        "osVersion": "14.5",
+        "target": "arm64",
+        "scenarioVersion": "v1",
+        "contractVersion": "v1"
+      },
+      "timestamp": 1800000000,
+      "disposition": "passed",
+      "reason": null
+    },
+    "axes": {
+      "decision": {
+        "predicateVersion": "v1",
+        "isCurrent": true,
+        "pass": true,
+        "reason": null,
+        "claimCap": "local_schema_join_only"
+      },
+      "execution": {
+        "predicateVersion": "v1",
+        "isCurrent": true,
+        "pass": true,
+        "reason": null,
+        "claimCap": "local_schema_join_only"
+      },
+      "proof": {
+        "predicateVersion": "v1",
+        "isCurrent": true,
+        "pass": true,
+        "reason": null,
+        "claimCap": "local_schema_join_only"
+      }
+    },
+    "expiry": {
+      "isExpired": false,
+      "expiredReason": null,
+      "retestRequired": false
+    },
+    "evidence": {
+      "evidenceIDs": ["syn-evidence-001"],
+      "proofClass": "local"
+    }
+  }
+}
