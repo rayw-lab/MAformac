@@ -157,7 +157,7 @@ Canonical JSON（`sort_keys=True, separators=(",", ":")`）。同一 repo 状态
 
 ```bash
 # 单元测试
-python3 -B scripts/test_export_c6_active_authority_ratification_packet.py
+python3 -B scripts/test_check_c6_active_authority_ratification_packet.py
 
 # 回归：V1 candidate checker
 python3 -B scripts/check_c6_active_authority_candidate.py \

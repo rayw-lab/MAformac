@@ -100,7 +100,7 @@ Packet 只接受以下顶层字段（`ALLOWED_TOP_LEVEL_KEYS`）：
 
 ```bash
 # 单元测试
-python3 -B scripts/test_export_c6_corpus_freeze_packet.py
+python3 -B scripts/test_check_c6_corpus_freeze_packet.py
 
 # 回归：B7 candidate checker
 python3 -B scripts/check_c6_corpus_lineage_candidate.py

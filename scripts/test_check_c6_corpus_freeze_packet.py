@@ -16,7 +16,7 @@ Required negative gates (must be RED / fail-closed):
  10. --check byte-drift    -> coherent live source mutation without packet update fails
  11. schema extra/missing  -> stdlib (or jsonschema) enforces additionalProperties/required
 
-Run: python3 -B scripts/test_export_c6_corpus_freeze_packet.py
+Run: python3 -B scripts/test_check_c6_corpus_freeze_packet.py
 """
 from __future__ import annotations
 

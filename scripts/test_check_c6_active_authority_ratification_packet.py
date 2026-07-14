@@ -17,7 +17,7 @@ Required negative gates (must be RED / fail-closed):
  11. --check byte-drift -> coherent subject+digest mutation fails check
  12. schema extra/missing -> stdlib (or jsonschema) enforces additionalProperties/required
 
-Run: python3 -B scripts/test_export_c6_active_authority_ratification_packet.py
+Run: python3 -B scripts/test_check_c6_active_authority_ratification_packet.py
 """
 from __future__ import annotations
 

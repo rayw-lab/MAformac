@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "contracts/c6-corpus-lineage/freeze-packet.v1.schema.json",
   "title": "C6 Corpus Lineage B7 T02 Freeze Packet (candidate-only, mechanical consumption envelope)",
-  "description": "Machine-consumable freeze packet derived from the live B7 corpus-lineage candidate. It mechanically binds the 57-row / 45+12 shipping corpus, assembled/compat/id-set digests, the D-127 frozen holdout pin sha, the must_not_train/exposure ACL, and D-147 ratification refs. It is CANDIDATE_PACKET_ONLY: is_canonical=false, is_b7_done=false, requires_operator_ceremony=true. It does NOT elevate B7 to DONE/canonical. The schema is a structural contract; the authoritative fail-closed invariants live in the exporter + test_export_c6_corpus_freeze_packet.py. README prose is not a substitute for the schema or the checker.",
+  "description": "Machine-consumable freeze packet derived from the live B7 corpus-lineage candidate. It mechanically binds the 57-row / 45+12 shipping corpus, assembled/compat/id-set digests, the D-127 frozen holdout pin sha, the must_not_train/exposure ACL, and D-147 ratification refs. It is CANDIDATE_PACKET_ONLY: is_canonical=false, is_b7_done=false, requires_operator_ceremony=true. It does NOT elevate B7 to DONE/canonical. The schema is a structural contract; the authoritative fail-closed invariants live in the exporter + test_check_c6_corpus_freeze_packet.py. README prose is not a substitute for the schema or the checker.",
   "type": "object",
   "additionalProperties": false,
   "required": [

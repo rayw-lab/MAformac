@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "contracts/c6-active-authority/ratification-packet.v1.schema.json",
   "title": "C6 Active Authority V1 Ratification Packet (candidate-only, mechanical consumption envelope)",
-  "description": "Machine-consumable ratification packet derived from the live V1 active-authority candidate. It mechanically binds the authority candidate digest, the four_layer_thresholds, and the decision/receipt refs. It is CANDIDATE_PACKET_ONLY: observed_status=CANDIDATE, target_status=RATIFIED, requires_operator_ceremony=true, is_v1_done=false. It does NOT forge operator/time/signature, does NOT elevate V1 to RATIFIED/canonical. The authoritative fail-closed invariants live in the exporter + test_export_c6_active_authority_ratification_packet.py. README prose is not a substitute for the schema or the checker.",
+  "description": "Machine-consumable ratification packet derived from the live V1 active-authority candidate. It mechanically binds the authority candidate digest, the four_layer_thresholds, and the decision/receipt refs. It is CANDIDATE_PACKET_ONLY: observed_status=CANDIDATE, target_status=RATIFIED, requires_operator_ceremony=true, is_v1_done=false. It does NOT forge operator/time/signature, does NOT elevate V1 to RATIFIED/canonical. The authoritative fail-closed invariants live in the exporter + test_check_c6_active_authority_ratification_packet.py. README prose is not a substitute for the schema or the checker.",
   "type": "object",
   "additionalProperties": false,
   "required": [
