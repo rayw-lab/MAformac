@@ -3,10 +3,10 @@
 ```text
 mode: dependency_DAG
 authority: design.md AD-1..AD-10
-revision: 2026-07-14-checklist-reconcile-r3
+revision: 2026-07-14-checklist-reconcile-r4
 lane_status: PARTIAL
-apply_head: 0d59f0bd
-apply_commits: a4bf8aa4,669ce366,0d59f0bd
+apply_head: 1b04fa16
+apply_commits: a4bf8aa4,669ce366,0d59f0bd,1b04fa16
 wave0: OpenSpec only (this change tree) — no Swift until independent review CLEAR + apply key
 proof: unit | source_contract | build | runtime_local | runtime_local_preflight | fixture_local | operator(forbidden)
 stop_on: writeset_exceeded | no_touch_hit | claim_cap_violation | missing_negative | banned_placeholder
@@ -445,7 +445,7 @@ swift test --filter ProductOperatorT07aLedgerConsumerTests
 ## 全局 validation（apply 收口，仍 local）
 
 ```text
-swift test --filter ProductOperator          # 99/99 green @ HEAD 0d59f0bd (2026-07-14)
+swift test --filter ProductOperator          # 99/99 green @ HEAD 1b04fa16 (2026-07-14)
 swift test --filter D1TypedFactsWireDeliberateNegativeTests  # 10/10 green
 swift test --filter ForceStateDigestTests    # 11/11 green
 scripts/run_v9_product_operator_tts_preflight.sh  # PASS runtime_local_preflight exit=0
@@ -454,10 +454,11 @@ openspec validate --all --strict             # 40/40 pass
 git diff --check                             # pass (tasks.md only in this reconcile)
 # detect_changes / git diff ⊆ allowed_writeset_future_apply
 # 禁止: Makefile / no_touch / Core/ForceState/** / DialogueStateEffectBoundary MODIFY / Force catalog App claim
+# P0 scope remediation @ 1b04fa16: unauthorized `Core/Ceremony/ProductOperatorFixture.swift` net-removed; fixture load/validate support relocated into `Tests/MAformacCoreTests/ProductOperatorGoldenContractTests.swift` (allowed GoldenContract test path)
 ```
 
 **Closeout 允许 claim（证据齐时）：**
-`LOCAL_COMPOSITION_WIRED` + `FIXTURE_LOCAL_PASS` + `SOURCE_CONTRACT_PASS` + `BRIDGE_UNIT_PASS` + `FORCE_DIGEST_GATE_UNIT_PASS` + `TTS_PREFLIGHT_PASS` — **all evidenced @ HEAD 0d59f0bd; ceiling remains PARTIAL**
+`LOCAL_COMPOSITION_WIRED` + `FIXTURE_LOCAL_PASS` + `SOURCE_CONTRACT_PASS` + `BRIDGE_UNIT_PASS` + `FORCE_DIGEST_GATE_UNIT_PASS` + `TTS_PREFLIGHT_PASS` — **all evidenced @ HEAD 1b04fa16; ceiling remains PARTIAL**
 
 **允许 lane 收口：** **PARTIAL**（product lifecycle App wiring deferred + force catalog App consumption deferred + customer-shaped runtime / p95 / soak resource_deferred）
 
