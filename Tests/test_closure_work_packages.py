@@ -259,22 +259,23 @@ def committed_registry_probe(
         candidate_path.write_text(candidate_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
         subprocess.run(["git", "add", "contracts/c6-active-authority/authority-schema.v1.json"], cwd=clone, check=True)
         subprocess.run(["git", "commit", "--quiet", "-m", "test: c6 authority adjacent schema drift"], cwd=clone, check=True)
-    elif candidate_drift == "all_three_allowlisted":
+    elif candidate_drift == "all_four_allowlisted":
         # Positive fan-in shape: the reanchor necessarily cascades the new
-        # semantic registry digest into exactly these three derived candidate
-        # identity files. Modify all three in one post-basis commit so the
+        # semantic registry digest / file SHA into exactly these four derived candidate
+        # identity files. Modify all four in one post-basis commit so the
         # basis..subject diff is covered entirely by the allowlist and the
         # checker PASSes without E_STALE_BASIS.
         for rel, name in [
             ("closure/candidates/B7", "c6-corpus-lineage.envelope.json"),
             ("closure/candidates/V1", "V1.v1.candidate-receipt.json"),
+            ("closure/candidates/V1", "V1.v1.ratification-packet.candidate.json"),
             ("contracts/c6-active-authority", "authority.v1.candidate.json"),
         ]:
             candidate_path = clone / rel / name
             candidate_path.write_text(candidate_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
             subprocess.run(["git", "add", f"{rel}/{name}"], cwd=clone, check=True)
         subprocess.run(
-            ["git", "commit", "--quiet", "-m", "test: all three whitelisted candidate identity files"],
+            ["git", "commit", "--quiet", "-m", "test: all four whitelisted candidate identity files"],
             cwd=clone,
             check=True,
         )
@@ -380,19 +381,19 @@ def test_core_change_after_basis_is_stale(tmp_path: Path) -> None:
     assert "E_STALE_BASIS" in receipt["errors"]
 
 
-def test_closure_candidate_identity_allowlist_admits_all_three_exact_paths(tmp_path: Path) -> None:
+def test_closure_candidate_identity_allowlist_admits_all_four_exact_paths(tmp_path: Path) -> None:
     """The fan-in reanchor cascades the new semantic registry digest into exactly
-    three derived candidate identity files; the stale-basis policy must admit them
+    four derived candidate identity files; the stale-basis policy must admit them
     so `make verify` converges without re-whitelisting anything broader.
 
     Seeds the clone with the current HEAD's candidate files, applies the
     registry/roadmap/receipts refresh commit (basis), then makes a post-basis
-    commit that modifies all three whitelisted files. The basis..subject diff is
-    therefore covered entirely by the three allowlist entries, proving the
+    commit that modifies all four whitelisted files. The basis..subject diff is
+    therefore covered entirely by the four allowlist entries, proving the
     policy PASSES without E_STALE_BASIS — i.e. the allowlist entries are actually
     exercised, not merely present.
     """
-    result, receipt = committed_registry_probe(tmp_path, candidate_drift="all_three_allowlisted")
+    result, receipt = committed_registry_probe(tmp_path, candidate_drift="all_four_allowlisted")
 
     assert result.returncode == 0, receipt
     assert receipt["status"] == "PASS"

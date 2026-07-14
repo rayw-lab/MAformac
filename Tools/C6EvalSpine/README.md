@@ -1,6 +1,6 @@
 # C6EvalSpine — S9→S9b→S10→S11 harness
 
-**proof_class**: `local_unit_integration_fixture`  
+**proof_class**: `local_unit_integration_fixture`
 **status target**: `DONE_LOCAL_EVAL_SPINE_READY_FOR_S8_FANIN`
 
 ## What this is

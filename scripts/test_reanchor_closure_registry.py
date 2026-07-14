@@ -13,6 +13,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
 import yaml
 
@@ -24,6 +26,12 @@ REGISTRY_REL = Path("contracts/closure-work-packages.v1.yaml")
 ROADMAP_REL = Path("docs/roadmap-2026-07-11-v6-closure-baseline.md")
 SCHEMA_REL = Path("contracts/schemas/closure-work-packages.v1.schema.json")
 POLICY_REL = Path("contracts/closure-execution-window.v1.yaml")
+CANDIDATE_IDENTITY_RELS = (
+    Path("closure/candidates/B7/c6-corpus-lineage.envelope.json"),
+    Path("contracts/c6-active-authority/authority.v1.candidate.json"),
+    Path("closure/candidates/V1/V1.v1.candidate-receipt.json"),
+    Path("closure/candidates/V1/V1.v1.ratification-packet.candidate.json"),
+)
 MARKER_PATTERN = re.compile(
     r"\n<!-- O1:GENERATED:START registry_sha256=[0-9a-f]{64} checker_sha256=[0-9a-f]{64} -->"
     r"\n.*?\n<!-- O1:GENERATED:END -->\n?",
@@ -42,7 +50,10 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
         )
         # Keep the clone's committed checker+marker pair intact so the helper's
         # default pre-check is exercised from an actually green baseline.
-        for relative in (HELPER_REL,):
+        for relative in (
+            HELPER_REL,
+            Path("Tools/C6ActiveAuthority/export_ratification_packet.py"),
+        ):
             source = REPO / relative
             if source.exists():
                 shutil.copy2(source, clone / relative)
@@ -88,6 +99,7 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
         for package in registry["packages"]:
             if package["execution_state"]["declared"] == "done":
                 paths.append(clone / package["exit_receipt"]["artifact"]["path"])
+        paths.extend(clone / relative for relative in CANDIDATE_IDENTITY_RELS)
         return paths
 
     def test_real_run_updates_all_done_envelopes_and_self_checks(self) -> None:
@@ -117,6 +129,40 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
             self.assertEqual(payload["registry_digest"], digest)
         self.assertEqual(summary["envelope_paths"], envelope_paths)
         self.assertEqual(summary["envelope_count"], len(done))
+        self.assertEqual(
+            summary["candidate_identity_paths"],
+            [str(path) for path in CANDIDATE_IDENTITY_RELS],
+        )
+
+        b7 = json.loads((clone / CANDIDATE_IDENTITY_RELS[0]).read_text(encoding="utf-8"))
+        authority_path = clone / CANDIDATE_IDENTITY_RELS[1]
+        authority = json.loads(authority_path.read_text(encoding="utf-8"))
+        receipt = json.loads((clone / CANDIDATE_IDENTITY_RELS[2]).read_text(encoding="utf-8"))
+        packet = json.loads((clone / CANDIDATE_IDENTITY_RELS[3]).read_text(encoding="utf-8"))
+        registry_sha = hashlib.sha256((clone / REGISTRY_REL).read_bytes()).hexdigest()
+        authority_sha = hashlib.sha256(authority_path.read_bytes()).hexdigest()
+        registry_member = next(
+            member
+            for member in authority["source_members"]
+            if member["member_id"] == "closure_work_packages_v1"
+        )
+        packet_member = next(
+            member
+            for member in packet["source_members_binding"]["members"]
+            if member["member_id"] == "closure_work_packages_v1"
+        )
+        self.assertEqual(b7["registry_digest"], digest)
+        self.assertEqual(receipt["registry_digest"], digest)
+        self.assertEqual(registry_member["sha256"], registry_sha)
+        self.assertEqual(packet_member["sha256"], registry_sha)
+        self.assertEqual(receipt["native_receipt"]["sha256"], authority_sha)
+        self.assertEqual(receipt["native_receipt_digest"], authority_sha)
+        receipt_authority_digest = next(
+            item["value"]
+            for item in receipt["subject"]
+            if item["key"] == "authority_digest"
+        )
+        self.assertEqual(receipt_authority_digest, authority["digest"]["sha256"])
 
     def test_both_authority_refresh_flags_update_the_actual_digest(self) -> None:
         for flag in ("--refresh-authority", "--refresh-authority-sha"):
@@ -166,6 +212,62 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_DONE_ENVELOPE_MISSING", result.stderr)
         self.assertEqual(before, {path: path.read_bytes() for path in before})
+
+    def test_unrelated_v1_source_drift_refuses_without_writes(self) -> None:
+        clone = self.make_clone()
+        before = {path: path.read_bytes() for path in self.canonical_paths(clone)}
+        unrelated = clone / "openspec/changes/rebuild-c6-four-layer-bench/proposal.md"
+        unrelated.write_text(
+            unrelated.read_text(encoding="utf-8") + "\n<!-- unrelated drift -->\n",
+            encoding="utf-8",
+        )
+        result = self.run_helper(clone, "--no-precheck", "--no-postcheck")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unrelated V1 source member is stale", result.stderr)
+        self.assertEqual(before, {path: path.read_bytes() for path in before})
+
+    def test_postcheck_receipt_failure_rolls_back_every_identity_path(self) -> None:
+        clone = self.make_clone()
+        before = {path: path.read_bytes() for path in self.canonical_paths(clone)}
+        result = self.run_helper(
+            clone,
+            "--check-receipt",
+            "/dev/null/reanchor-helper-check.v1.json",
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_CHECKER_RECEIPT", result.stderr)
+        self.assertEqual(before, {path: path.read_bytes() for path in before})
+
+    def test_mid_replace_failure_rolls_back_all_replaced_paths(self) -> None:
+        scripts = str(REPO / "scripts")
+        sys.path.insert(0, scripts)
+        self.addCleanup(sys.path.remove, scripts)
+        helper = importlib.import_module("reanchor_closure_registry")
+        root = Path(tempfile.mkdtemp(prefix="reanchor-mid-replace-"))
+        self.addCleanup(shutil.rmtree, root, ignore_errors=True)
+        paths = [root / "one.json", root / "two.json", root / "three.json"]
+        for index, path in enumerate(paths):
+            path.write_bytes(f"old-{index}".encode())
+        originals = {path: path.read_bytes() for path in paths}
+        plan = SimpleNamespace(
+            changes={path: f"new-{index}".encode() for index, path in enumerate(paths)},
+            original_bytes=originals,
+        )
+        real_replace = helper.os.replace
+        calls = 0
+
+        def fail_second_once(source, destination):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise OSError("injected second replace failure")
+            return real_replace(source, destination)
+
+        with mock.patch.object(helper.os, "replace", side_effect=fail_second_once):
+            with self.assertRaises(helper.ReanchorError) as raised:
+                helper.apply_transaction(plan)
+        self.assertEqual(raised.exception.code, "E_TRANSACTION")
+        self.assertEqual(originals, {path: path.read_bytes() for path in paths})
 
     def test_marker_count_must_be_exactly_one_without_partial_writes(self) -> None:
         for mode in ("zero", "two"):

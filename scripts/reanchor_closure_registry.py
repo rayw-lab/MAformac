@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import os
 import stat
@@ -43,6 +44,16 @@ from check_closure_work_packages import (
 ROOT = Path(__file__).resolve().parents[1]
 if ROOT != CHECKER_ROOT:
     raise RuntimeError("reanchor helper and closure checker must share one repository root")
+sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "Tools"))
+import check_c6_active_authority_candidate as active_authority_checker  # noqa: E402
+from C6ActiveAuthority import export_ratification_packet  # noqa: E402
+
+
+B7_ENVELOPE = ROOT / "closure/candidates/B7/c6-corpus-lineage.envelope.json"
+V1_AUTHORITY = ROOT / "contracts/c6-active-authority/authority.v1.candidate.json"
+V1_RECEIPT = ROOT / "closure/candidates/V1/V1.v1.candidate-receipt.json"
+V1_PACKET = ROOT / "closure/candidates/V1/V1.v1.ratification-packet.candidate.json"
 
 
 @dataclass
@@ -59,6 +70,7 @@ class ReanchorPlan:
     registry_path: Path
     roadmap_path: Path
     envelope_paths: tuple[Path, ...]
+    candidate_identity_paths: tuple[Path, ...]
     old_registry_digest: str
     new_registry_digest: str
     captured_at: str
@@ -67,6 +79,115 @@ class ReanchorPlan:
     marker_changed: bool
     authority_sha256: str | None
     roadmap_sha256: str
+
+
+def json_bytes(
+    payload: dict[str, Any],
+    *,
+    canonical: bool = False,
+    trailing_newline: bool = True,
+) -> bytes:
+    if canonical:
+        return json.dumps(
+            payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+        ).encode("utf-8")
+    suffix = "\n" if trailing_newline else ""
+    return (json.dumps(payload, ensure_ascii=False, indent=2) + suffix).encode("utf-8")
+
+
+def sha256_bytes(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
+
+
+def refresh_candidate_identities(
+    *,
+    changes: dict[Path, bytes],
+    registry_path: Path,
+    new_registry_digest: str,
+    refresh_authority_source: str | None,
+) -> tuple[Path, ...]:
+    """Recompute the full B7/V1 candidate chain against staged registry bytes."""
+    required = (B7_ENVELOPE, V1_AUTHORITY, V1_RECEIPT, V1_PACKET)
+    for path in required:
+        if not path.is_file():
+            raise ReanchorError("E_CANDIDATE_IDENTITY", f"missing candidate identity artifact: {path}")
+
+    registry_file_sha = sha256_bytes(changes[registry_path])
+
+    b7 = load_envelope_payload(B7_ENVELOPE)
+    b7["registry_digest"] = new_registry_digest
+    changes[B7_ENVELOPE] = json_bytes(
+        b7,
+        trailing_newline=B7_ENVELOPE.read_bytes().endswith(b"\n"),
+    )
+
+    authority = load_envelope_payload(V1_AUTHORITY)
+    source_members = authority.get("source_members", [])
+    registry_members = [
+        member for member in source_members if member.get("member_id") == "closure_work_packages_v1"
+    ]
+    if len(registry_members) != 1:
+        raise ReanchorError(
+            "E_CANDIDATE_IDENTITY",
+            "V1 authority must contain exactly one closure_work_packages_v1 source member",
+        )
+    for member in source_members:
+        path = member.get("path")
+        if not isinstance(path, str):
+            raise ReanchorError("E_CANDIDATE_IDENTITY", "V1 source member path must be a string")
+        live_sha = file_digest(active_authority_checker.resolve_member_path(path))
+        if member.get("member_id") == "closure_work_packages_v1":
+            member["sha256"] = registry_file_sha
+        elif refresh_authority_source is not None and path == refresh_authority_source:
+            member["sha256"] = live_sha
+        elif member.get("sha256") != live_sha:
+            raise ReanchorError(
+                "E_CANDIDATE_IDENTITY",
+                f"unrelated V1 source member is stale and cannot be absorbed: {path}",
+            )
+    for ref in authority.get("ratification_refs", []):
+        path = ref.get("path")
+        if not isinstance(path, str):
+            raise ReanchorError("E_CANDIDATE_IDENTITY", "V1 ratification ref path must be a string")
+        live_sha = file_digest(active_authority_checker.resolve_member_path(path))
+        if refresh_authority_source is not None and path == refresh_authority_source:
+            ref["sha256"] = live_sha
+        elif ref.get("sha256") != live_sha:
+            raise ReanchorError(
+                "E_CANDIDATE_IDENTITY",
+                f"unrelated V1 ratification ref is stale and cannot be absorbed: {path}",
+            )
+    authority["digest"]["sha256"] = active_authority_checker.compute_digest(authority)
+    authority_bytes = json_bytes(authority)
+    changes[V1_AUTHORITY] = authority_bytes
+    authority_sha = sha256_bytes(authority_bytes)
+
+    receipt = load_envelope_payload(V1_RECEIPT)
+    receipt["registry_digest"] = new_registry_digest
+    receipt["native_receipt"]["sha256"] = authority_sha
+    receipt["native_receipt_digest"] = authority_sha
+    authority_subject = [
+        item for item in receipt.get("subject", []) if item.get("key") == "authority_digest"
+    ]
+    if len(authority_subject) != 1:
+        raise ReanchorError(
+            "E_CANDIDATE_IDENTITY",
+            "V1 receipt must contain exactly one authority_digest subject binding",
+        )
+    authority_subject[0]["value"] = authority["digest"]["sha256"]
+    changes[V1_RECEIPT] = json_bytes(receipt)
+
+    packet, packet_errors = export_ratification_packet.build_packet(
+        authority,
+        source_sha_overrides={"contracts/closure-work-packages.v1.yaml": registry_file_sha},
+    )
+    if packet_errors:
+        raise ReanchorError(
+            "E_CANDIDATE_IDENTITY",
+            f"V1 ratification packet rebuild refused: {packet_errors}",
+        )
+    changes[V1_PACKET] = export_ratification_packet.canonical_bytes(packet)
+    return required
 
 
 def resolve_path(value: str) -> Path:
@@ -295,6 +416,16 @@ def build_plan(args: argparse.Namespace, bind_head: str) -> ReanchorPlan:
     if sha256_text(source_basis_text(rendered_roadmap)) != roadmap_sha256:
         raise ReanchorError("E_ROADMAP_DIGEST", "render changed the roadmap source basis")
     changes[roadmap_path] = rendered_roadmap.encode("utf-8")
+    candidate_identity_paths = refresh_candidate_identities(
+        changes=changes,
+        registry_path=registry_path,
+        new_registry_digest=new_digest,
+        refresh_authority_source=(
+            mutated.get("authority", {}).get("source_path")
+            if args.refresh_authority_sha
+            else None
+        ),
+    )
 
     original_bytes = {path: path.read_bytes() for path in changes}
     if len(changes) != len(set(changes)):
@@ -303,6 +434,7 @@ def build_plan(args: argparse.Namespace, bind_head: str) -> ReanchorPlan:
         registry_path=registry_path,
         roadmap_path=roadmap_path,
         envelope_paths=tuple(envelope_paths),
+        candidate_identity_paths=candidate_identity_paths,
         old_registry_digest=old_digest,
         new_registry_digest=new_digest,
         captured_at=captured_at,
@@ -383,6 +515,37 @@ def verify_applied_plan(plan: ReanchorPlan) -> None:
         payload = load_envelope_payload(path)
         if payload.get("registry_digest") != plan.new_registry_digest:
             raise ReanchorError("E_POST_ASSERT", f"envelope digest differs after write: {path}")
+    b7 = load_envelope_payload(B7_ENVELOPE)
+    if b7.get("registry_digest") != plan.new_registry_digest:
+        raise ReanchorError("E_POST_ASSERT", "B7 candidate registry digest differs after write")
+    authority = load_envelope_payload(V1_AUTHORITY)
+    authority_errors: list[str] = []
+    active_authority_checker.check_digest(authority, authority_errors)
+    active_authority_checker.check_source_members(authority, authority_errors)
+    if authority_errors:
+        raise ReanchorError("E_POST_ASSERT", f"V1 authority differs after write: {authority_errors}")
+    receipt = load_envelope_payload(V1_RECEIPT)
+    if receipt.get("registry_digest") != plan.new_registry_digest:
+        raise ReanchorError("E_POST_ASSERT", "V1 candidate receipt registry digest differs after write")
+    authority_sha = file_digest(V1_AUTHORITY)
+    if (
+        receipt.get("native_receipt", {}).get("sha256") != authority_sha
+        or receipt.get("native_receipt_digest") != authority_sha
+    ):
+        raise ReanchorError("E_POST_ASSERT", "V1 candidate receipt native binding differs after write")
+    receipt_authority_digest = [
+        item.get("value")
+        for item in receipt.get("subject", [])
+        if item.get("key") == "authority_digest"
+    ]
+    if receipt_authority_digest != [authority.get("digest", {}).get("sha256")]:
+        raise ReanchorError("E_POST_ASSERT", "V1 receipt authority subject binding differs after write")
+    packet, packet_errors = export_ratification_packet.build_packet()
+    if packet_errors or export_ratification_packet.canonical_bytes(packet) != V1_PACKET.read_bytes():
+        raise ReanchorError(
+            "E_POST_ASSERT",
+            f"V1 ratification packet differs after write: {packet_errors}",
+        )
     roadmap_text = read_utf8(plan.roadmap_path)
     matches = list(MARKER_RE.finditer(roadmap_text))
     if len(matches) != 1 or matches[0].group(0).strip() != render_generated_block(registry).strip():
@@ -450,6 +613,9 @@ def summary(
         "authority_sha256": plan.authority_sha256,
         "envelope_count": len(plan.envelope_paths),
         "envelope_paths": [str(path.relative_to(ROOT)) for path in plan.envelope_paths],
+        "candidate_identity_paths": [
+            str(path.relative_to(ROOT)) for path in plan.candidate_identity_paths
+        ],
         "marker_replacement_count": 1,
         "marker_changed": plan.marker_changed,
         "precheck": precheck,

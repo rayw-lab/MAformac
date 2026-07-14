@@ -2,11 +2,10 @@
 status: active_router_only_not_ssot
 artifact_kind: current_route_board
 authority: router_only_not_contract
-updated: 2026-07-12（ma17 四键批：carrier+APPLY 主线串行完成；G5020/CI recovery 隔离本地完成未合主线；键7 docs cascade A/B 执行中）
-updated: 2026-07-13（ma18 KEY-DOCS 本地级联 v3：V8/push/B1/W-P1 已落；postmerge KEY1 DONE、KEY2 exact-SHA GREEN、KEY3 已执行 promote（mainline=70a2884e, sentinel PROMOTED），随后 gauge ff-merge 进 mainline，现 HEAD=684746c7）
+updated: 2026-07-14（V9 fan-in P1 identity repair：技术收口由 PARTIAL 修复至 DONE；产品残余不翻格）
 branch: opt/streamline-macos-20260707
 head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-transaction_state_source: runs/2026-07-12-ma17/receipts/ma17-docs-cascade-v2.1/CLOSEOUT.txt
+transaction_state_source: docs/handoffs/2026-07-14-v9-fanin-identity-repair.md
 head_truth_rule: "Run git rev-parse HEAD, git rev-parse @{u}, git status --short, git ls-remote, and gh run view 29197406884 before using this router; live repo/receipts win."
 ---
 
@@ -15,7 +14,16 @@ head_truth_rule: "Run git rev-parse HEAD, git rev-parse @{u}, git status --short
 > 本文件是交通牌不是事实源。与 `CLAUDE.md`、OpenSpec、`docs/commander-log/decisions.md`、registry、签字证据或 live repo 冲突时，本文件让位并须更新。
 > 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
 
-## 当前阶段（2026-07-13 深夜：**ma18 KEY-DOCS 本地级联 v3；integration 70a2884e remote verify GREEN；KEY3 已执行 promote（mainline=70a2884e, sentinel PROMOTED），随后 gauge ff-merge 进 mainline，现 HEAD=684746c7；KEY-DOCS 文档级联待落**）
+## 当前阶段（2026-07-14：**V9 A/fan-in 技术 DONE；identity cascade 与聚合门已闭环，产品线 non-claims 保持**）
+
+🔴 **本节 supersede 下方全部历史态段。** 本段 authority=`router_only_not_contract`；唯一修复依据=`/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-14-v9-global-strict-audit/GLOBAL-STRICT-AUDIT.md`（SHA-256 `a81953162e304f3515454ff141b25a7b36cbe1267c4cfb1e7f5d04ecd38db98a`）+ live Git/remote readback + 本轮 closeout；本文件只负责冷启动路由。
+
+- **live subject**：branch=`opt/streamline-macos-20260707`；修复起点=`a3eaca03174f3266a2d52645648cadcfe5da8bb8`。最终 HEAD/upstream/remote 必须以 `git rev-parse HEAD`、`git rev-parse @{u}`、`git ls-remote` 与最新 handoff 为准，不从本文猜 SHA。
+- **PARTIAL → DONE 的精确变化**：canonical reanchor 现在把 registry semantic digest、registry file SHA、B7 envelope、V1 authority `source_members`、V1 native candidate receipt 与 ratification-packet `source_members_binding` 纳入同一事务；five authority-eval suites 与 B7/V1 direct checker 已接入 `make verify-all` / `make verify-ci`，消除 targeted-red / aggregate-green 假绿。这里的 DONE 仅指 A/fan-in 技术 identity/gate 收口。
+- **合法下一步**：从本轮 closeout 读取 exact HEAD、验证与 residual；后续若推进，另开 S8 或 B lane 产品 residual，不复用本轮技术 DONE 冒充产品 DONE。
+- **Non-claims**：S8 未完成；真实三臂评分未执行；B7 freeze ceremony、V1 ratification ceremony 未执行；无 operator/V-PASS、C6 acceptance、candidate signed、mobile、true_device 或 live_api proof；B lane lifecycle/restart/recovery、W9 App consumption 与 customer-shaped runtime 仍 deferred。
+
+## 【历史】当前阶段（2026-07-13 深夜：**ma18 KEY-DOCS 本地级联 v3；integration 70a2884e remote verify GREEN；KEY3 已执行 promote（mainline=70a2884e, sentinel PROMOTED），随后 gauge ff-merge 进 mainline，现 HEAD=684746c7；KEY-DOCS 文档级联待落**）
 
 🔴 **本节 supersede 下方全部历史态段。** 本段 authority=`router_only_not_contract`；事实源=`docs/commander-log/decisions.md` D-154 + D-155候选 + `runs/2026-07-12-ma18/` receipts/reports + live Git/GitHub readback；本文件只做 router，不冒充 SSOT。
 

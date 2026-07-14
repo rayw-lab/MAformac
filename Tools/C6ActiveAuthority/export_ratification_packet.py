@@ -151,7 +151,11 @@ def _external_allowlist_resolved() -> Path:
     return Path(EXTERNAL_REF_ALLOWLIST_DECLARED).resolve()
 
 
-def _resolve_ref_strict(ref: dict) -> tuple[dict | None, str | None]:
+def _resolve_ref_strict(
+    ref: dict,
+    *,
+    sha_overrides: dict[str, str] | None = None,
+) -> tuple[dict | None, str | None]:
     """Fail-closed ref resolver. Never emits all-zero sha as valid evidence.
 
     Repo-relative refs must remain inside REPO_ROOT after symlink resolution.
@@ -187,7 +191,8 @@ def _resolve_ref_strict(ref: dict) -> tuple[dict | None, str | None]:
             return None, f"missing ref path: {path_str}"
         if not resolved.is_file():
             return None, f"ref path is not a file: {path_str}"
-        sha = _sha256(resolved)
+        overrides = sha_overrides or {}
+        sha = overrides[path_str] if path_str in overrides else _sha256(resolved)
     except OSError as exc:
         return None, f"unreadable ref path {path_str}: {exc}"
     if sha == ZERO_SHA:
@@ -264,7 +269,11 @@ def _exact_ref_list_errors(
     return errs
 
 
-def _validate_and_bind_source_members(doc: dict) -> tuple[dict | None, list[str]]:
+def _validate_and_bind_source_members(
+    doc: dict,
+    *,
+    sha_overrides: dict[str, str] | None = None,
+) -> tuple[dict | None, list[str]]:
     """Exact source_members validation + packet-level binding (not legacy digest).
 
     Validates declared members against auth_checker.EXPECTED_SOURCE_MEMBERS and live
@@ -339,7 +348,8 @@ def _validate_and_bind_source_members(doc: dict) -> tuple[dict | None, list[str]
         elif isinstance(path, str) and path:
             # Path containment: absolute only allowlisted pool32; relative under repo.
             resolved_ref, path_err = _resolve_ref_strict(
-                {"path": path, "locator": locator if isinstance(locator, str) else mid}
+                {"path": path, "locator": locator if isinstance(locator, str) else mid},
+                sha_overrides=sha_overrides,
             )
             if path_err or resolved_ref is None:
                 errors.append(f"{label}: path fail-closed: {path_err}")
@@ -402,10 +412,14 @@ def _load_candidate() -> dict:
     return json.loads(CANDIDATE_PATH.read_text(encoding="utf-8"))
 
 
-def build_packet() -> tuple[dict, list[str]]:
+def build_packet(
+    candidate: dict | None = None,
+    *,
+    source_sha_overrides: dict[str, str] | None = None,
+) -> tuple[dict, list[str]]:
     """Return (packet, drift_errors). Drift_errors non-empty => refuse to write."""
     errors: list[str] = []
-    doc = _load_candidate()
+    doc = candidate if candidate is not None else _load_candidate()
 
     # Exact-check source candidate status / members / decision refs.
     source_status = doc.get("status")
@@ -415,7 +429,10 @@ def build_packet() -> tuple[dict, list[str]]:
         )
 
     # Exact source_members bind (packet-level; NOT part of legacy authority digest).
-    source_members_binding, sm_errs = _validate_and_bind_source_members(doc)
+    source_members_binding, sm_errs = _validate_and_bind_source_members(
+        doc,
+        sha_overrides=source_sha_overrides,
+    )
     errors.extend(sm_errs)
 
     authority_id = doc.get("authority_id")
