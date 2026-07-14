@@ -7,12 +7,33 @@ from .modes import Mode, normalize_mode
 from .thresholds import evaluate_layer_gate, load_thresholds_from_v1
 
 
+def _normalize_gate_slot(
+    name: str,
+    slot: dict[str, Any] | None,
+    *,
+    default_status: str = "NOT_RUN",
+) -> dict[str, Any]:
+    if not isinstance(slot, dict):
+        slot = {}
+    status = str(slot.get("status") or default_status)
+    out: dict[str, Any] = {
+        "status": status,
+        "receipt_path": slot.get("receipt_path"),
+    }
+    if name == "c5_phase1":
+        out["command"] = slot.get("command") or "make verify-c5-phase1-gates"
+        out["rc"] = slot.get("rc")
+    return out
+
+
 def build_s10_verdict(
     s9b: dict[str, Any],
     *,
     authority_path: Any = None,
     embedded_thresholds: dict[str, Any] | None = None,
     force_status: str | None = None,
+    qa_safety: dict[str, Any] | None = None,
+    c5_phase1: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     errors: list[dict[str, str]] = []
     mode = normalize_mode(s9b.get("mode") or "fixture")
@@ -36,9 +57,23 @@ def build_s10_verdict(
         pass_count = int(layer.get("pass") or 0)
         layers_out[layer_name] = evaluate_layer_gate(layer_name, thresholds, pass_count, eligible)
 
-    # Authority gate for real
+    qa_slot = _normalize_gate_slot("qa_safety", qa_safety)
+    c5_slot = _normalize_gate_slot("c5_phase1", c5_phase1)
+
+    # REAL: never honor force_status; always evaluate every gate first.
+    force_rejected = False
+    if force_status is not None and mode == Mode.REAL:
+        force_rejected = True
+        errors.append(
+            {
+                "code": "E_FORCE_STATUS_REJECTED",
+                "detail": f"force_status={force_status!r} rejected under mode=real",
+            }
+        )
+
     status = "PASS"
-    if force_status:
+    if force_status is not None and mode != Mode.REAL and not force_rejected:
+        # Fixture/dry_run harness-only override (never used for real DONE claims).
         status = force_status
     elif mode == Mode.REAL:
         if observed_status != "RATIFIED":
@@ -49,19 +84,57 @@ def build_s10_verdict(
                     "detail": f"observed_status={observed_status}",
                 }
             )
-        # Real scores required
+        # Real scores required: synthetic eligible must not count as real.
         per_arm = s9b.get("per_arm") if isinstance(s9b.get("per_arm"), dict) else {}
         new_arm = per_arm.get("new") if isinstance(per_arm.get("new"), dict) else {}
-        if int(new_arm.get("eligible") or 0) == 0:
+        real_new = int(new_arm.get("real_model") or 0)
+        synthetic_new = int(new_arm.get("synthetic") or 0)
+        eligible_new = int(new_arm.get("eligible") or 0)
+        if synthetic_new > 0:
+            status = "BLOCKED_MISSING_REAL_SCORES"
+            errors.append(
+                {
+                    "code": "E_SYNTHETIC_SCORE_IN_REAL",
+                    "detail": "S10 real rejects synthetic arm scores as real eligible",
+                }
+            )
+        if real_new == 0 or eligible_new == 0:
             status = "BLOCKED_MISSING_REAL_SCORES"
             errors.append(
                 {
                     "code": "E_NO_REAL_SCORES",
-                    "detail": "new arm has no real scores",
+                    "detail": "new arm has no real_model scores",
+                }
+            )
+        # QA safety gate (explicit input; default NOT_RUN)
+        if qa_slot.get("status") != "PASS":
+            if status == "PASS":
+                status = "FAIL"
+            errors.append(
+                {
+                    "code": "E_QA_SAFETY_FAIL",
+                    "detail": f"qa_safety.status={qa_slot.get('status')!r} (real requires PASS)",
+                }
+            )
+        # C5 phase1 gate (status=PASS and rc=0)
+        c5_ok = c5_slot.get("status") == "PASS" and c5_slot.get("rc") == 0
+        if not c5_ok:
+            if status == "PASS":
+                status = "FAIL"
+            errors.append(
+                {
+                    "code": "E_C5_PHASE1_FAIL",
+                    "detail": (
+                        f"c5_phase1.status={c5_slot.get('status')!r} "
+                        f"rc={c5_slot.get('rc')!r} (real requires PASS+rc=0)"
+                    ),
                 }
             )
         if s9b.get("status") in {"FAIL", "INCOMPARABLE"}:
             status = "INCOMPARABLE" if s9b.get("status") == "INCOMPARABLE" else "FAIL"
+        # force rejection already recorded; ensure non-PASS if only force error somehow
+        if force_rejected and status == "PASS":
+            status = "FAIL"
     else:
         # fixture/dry_run: may PASS harness-wise even if V1 is CANDIDATE
         if any(e.get("code") == "E_THRESHOLD_REINVENT" for e in errors):
@@ -76,7 +149,7 @@ def build_s10_verdict(
         else:
             status = "PASS"
 
-    # Hard package-done claims always false
+    # Hard package-done claims always false. Fixture may leave QA/C5 NOT_RUN.
     claims = {
         "package_b3_done": False,
         "c6_acceptance": False,
@@ -106,12 +179,8 @@ def build_s10_verdict(
             "thresholds_ref": "subject.four_layer_thresholds",
         },
         "layers": layers_out,
-        "qa_safety": {"status": "NOT_RUN", "receipt_path": None},
-        "c5_phase1": {
-            "status": "NOT_RUN",
-            "command": "make verify-c5-phase1-gates",
-            "rc": None,
-        },
+        "qa_safety": qa_slot,
+        "c5_phase1": c5_slot,
         "joint_strike": joint_strike,
         "d114_failure_class": None,
         "claims": claims,
@@ -134,6 +203,8 @@ def build_s10_verdict(
                 "authority": verdict["authority"],
                 "layers": verdict["layers"],
                 "claims": verdict["claims"],
+                "qa_safety": verdict["qa_safety"],
+                "c5_phase1": verdict["c5_phase1"],
             }
         )
     )

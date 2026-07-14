@@ -284,11 +284,17 @@ def test_full_synthetic_replay() -> None:
         "V-PASS",
     ):
         _assert(banned not in blob, f"banned claim leaked: {banned}")
-    _assert(set(result.residual) >= {
+    residual_set = set(result.residual)
+    _assert(residual_set == {
         "missing_s8_adapter",
-        "missing_t01_t02_ratification",
         "no_real_three_arm_scores",
     }, result.residual)
+    _assert("missing_t01_t02_ratification" not in residual_set, residual_set)
+    pending = result.authority_materialization_pending
+    _assert(isinstance(pending, dict) and pending.get("not_residual_enum") is True, pending)
+    items = pending.get("items") or {}
+    _assert("b7_freeze_execution" in items, items)
+    _assert("v1_candidate_to_ratified_ceremony" in items, items)
     _assert(s9["mode"] == "fixture", s9["mode"])
     _assert(s9b["status"] == "PASS", s9b)
     print("PASS test_full_synthetic_replay")
@@ -370,6 +376,275 @@ def test_b7_v1_regression() -> None:
     print("PASS test_b7_v1_regression")
 
 
+def _real_subject_ready(run_id: str) -> dict:
+    return build_subject(
+        mode=Mode.REAL,
+        run_id=run_id,
+        b7_is_done=True,
+        v1_status="RATIFIED",
+    )
+
+
+def _present_synthetic_arms() -> dict:
+    """P0-A deliberate-red surface: adapters present but score_class=synthetic."""
+    arms = default_fixture_arms(new_absent=False)
+    for arm_id in ("base", "old", "new"):
+        arms[arm_id]["adapter_status"] = "present"
+        arms[arm_id]["score_class"] = "synthetic"
+        arms[arm_id]["artifact"] = {
+            "kind": f"synthetic_{arm_id}",
+            "sha256": "a" * 64,
+        }
+    return arms
+
+
+def test_real_synthetic_bypass_red() -> None:
+    """P0-A: REAL + B7 done + V1 RATIFIED + present adapters + synthetic scores must red."""
+    subject = _real_subject_ready("real-synth-bypass")
+    arms = _present_synthetic_arms()
+    manifest = build_s9_manifest(
+        mode=Mode.REAL,
+        run_id="real-synth-bypass",
+        subject=subject,
+        arms=arms,
+        case_limit=2,
+    )
+    # Force b7 done flag on manifest too
+    manifest["b7"]["is_b7_done"] = True
+    manifest["v1"]["status"] = "RATIFIED"
+    receipt = run_s9(manifest)
+    codes = {e["code"] for e in receipt["errors"]}
+    _assert("E_SYNTHETIC_SCORE_IN_REAL" in codes, codes)
+    _assert(receipt["status"] != "PASS", receipt["status"])
+    _assert(receipt["sealed"] is False, "synthetic real must not seal")
+    _assert(receipt["errors"], "must have errors")
+
+    # S9b must also reject synthetic under REAL
+    # Build a fake s9 with synthetic results to prove aggregate gate.
+    row = {"holdout_family": "primary_can_question", "row_id": "c1"}
+    synth_results = [
+        synthetic_arm_result(
+            run_id="real-synth-bypass",
+            arm_id=arm_id,
+            case_id="c1",
+            row=row,
+            subject=subject,
+            score_class="synthetic",
+        )
+        for arm_id in ("base", "old", "new")
+    ]
+    s9_for_agg = {
+        "run_id": "real-synth-bypass",
+        "mode": "real",
+        "subject": subject,
+        "results": synth_results,
+        "status": "PASS",
+    }
+    agg = aggregate_s9b(s9_for_agg)
+    agg_codes = {e["code"] for e in agg["errors"]}
+    _assert("E_SYNTHETIC_SCORE_IN_REAL" in agg_codes, agg_codes)
+    _assert(agg["status"] != "PASS", agg["status"])
+    # synthetic must not count as real eligible
+    for arm_id in ("base", "old", "new"):
+        _assert(agg["per_arm"][arm_id]["eligible"] == 0, agg["per_arm"][arm_id])
+        _assert(agg["per_arm"][arm_id]["synthetic"] == 1, agg["per_arm"][arm_id])
+
+    # S10 REAL must not treat synthetic eligible as real scores
+    s9b_synth = {
+        "run_id": "real-synth-bypass",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "layers": {
+            "golden": {"eligible": 2, "pass": 2},
+            "demo_fuzz": {"eligible": 0, "pass": 0},
+            "unsupported": {"eligible": 0, "pass": 0},
+            "safety": {"eligible": 0, "pass": 0},
+        },
+        "per_arm": {
+            "new": {"eligible": 2, "pass": 2, "synthetic": 2, "real_model": 0},
+            "base": {"eligible": 2, "pass": 2, "synthetic": 2, "real_model": 0},
+            "old": {"eligible": 2, "pass": 2, "synthetic": 2, "real_model": 0},
+        },
+    }
+    s10 = build_s10_verdict(
+        s9b_synth,
+        qa_safety={"status": "PASS"},
+        c5_phase1={"status": "PASS", "rc": 0},
+    )
+    s10_codes = {e["code"] for e in s10["errors"]}
+    _assert(
+        "E_SYNTHETIC_SCORE_IN_REAL" in s10_codes or "E_NO_REAL_SCORES" in s10_codes,
+        s10_codes,
+    )
+    _assert(s10["status"] != "PASS", s10["status"])
+    print("PASS test_real_synthetic_bypass_red")
+
+
+def test_force_status_bypass_red() -> None:
+    """P0-B: force_status must not skip REAL V1/real-score gates."""
+    subject = _real_subject_ready("force-bypass")
+    # Deliberately incomplete real s9b (no real scores, V1 RATIFIED on subject)
+    s9b = {
+        "run_id": "force-bypass",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "layers": {
+            "golden": {"eligible": 0, "pass": 0},
+            "demo_fuzz": {"eligible": 0, "pass": 0},
+            "unsupported": {"eligible": 0, "pass": 0},
+            "safety": {"eligible": 0, "pass": 0},
+        },
+        "per_arm": {
+            "new": {"eligible": 0, "pass": 0, "synthetic": 0, "real_model": 0},
+        },
+    }
+    verdict = build_s10_verdict(
+        s9b,
+        force_status="PASS",
+        qa_safety={"status": "PASS"},
+        c5_phase1={"status": "PASS", "rc": 0},
+    )
+    codes = {e["code"] for e in verdict["errors"]}
+    _assert("E_FORCE_STATUS_REJECTED" in codes, codes)
+    _assert("E_NO_REAL_SCORES" in codes, codes)
+    _assert(verdict["status"] != "PASS", verdict["status"])
+    print("PASS test_force_status_bypass_red")
+
+
+def test_qa_c5_not_run_bypass_red() -> None:
+    """P1-C: REAL cannot PASS with qa_safety/c5_phase1 NOT_RUN."""
+    subject = _real_subject_ready("qa-c5-bypass")
+    s9b = {
+        "run_id": "qa-c5-bypass",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "layers": {
+            "golden": {"eligible": 2, "pass": 2},
+            "demo_fuzz": {"eligible": 0, "pass": 0},
+            "unsupported": {"eligible": 0, "pass": 0},
+            "safety": {"eligible": 0, "pass": 0},
+        },
+        "per_arm": {
+            "new": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+            "base": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+            "old": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+        },
+    }
+    # Default / explicit NOT_RUN
+    verdict = build_s10_verdict(s9b)
+    codes = {e["code"] for e in verdict["errors"]}
+    _assert("E_QA_SAFETY_FAIL" in codes, codes)
+    _assert("E_C5_PHASE1_FAIL" in codes, codes)
+    _assert(verdict["status"] != "PASS", verdict["status"])
+    _assert(verdict["qa_safety"]["status"] == "NOT_RUN", verdict["qa_safety"])
+    _assert(verdict["c5_phase1"]["status"] == "NOT_RUN", verdict["c5_phase1"])
+    _assert(verdict["claims"]["s10_real_done"] is False, verdict["claims"])
+
+    # Explicit NOT_RUN inputs
+    verdict2 = build_s10_verdict(
+        s9b,
+        qa_safety={"status": "NOT_RUN"},
+        c5_phase1={"status": "NOT_RUN", "rc": None},
+    )
+    codes2 = {e["code"] for e in verdict2["errors"]}
+    _assert("E_QA_SAFETY_FAIL" in codes2, codes2)
+    _assert("E_C5_PHASE1_FAIL" in codes2, codes2)
+    _assert(verdict2["status"] != "PASS", verdict2["status"])
+
+    # Fixture may leave NOT_RUN without claiming real DONE
+    fix_s9b = dict(s9b)
+    fix_s9b["mode"] = "fixture"
+    fix_s9b["subject"] = build_subject(mode=Mode.FIXTURE, run_id="qa-c5-fixture")
+    fix_verdict = build_s10_verdict(fix_s9b)
+    _assert(fix_verdict["qa_safety"]["status"] == "NOT_RUN", fix_verdict["qa_safety"])
+    _assert(fix_verdict["claims"]["s10_real_done"] is False, fix_verdict["claims"])
+    print("PASS test_qa_c5_not_run_bypass_red")
+
+
+def test_residual_truth_no_t01_t02() -> None:
+    """P1-D: residual must not report missing_t01_t02_ratification."""
+    result = run_fixture_replay(case_limit=4, skip_exposure=True)
+    _assert("missing_t01_t02_ratification" not in result.residual, result.residual)
+    _assert(set(result.residual) <= {"missing_s8_adapter", "no_real_three_arm_scores", "none"}, result.residual)
+    pending = result.authority_materialization_pending
+    _assert(pending.get("not_residual_enum") is True, pending)
+    _assert("b7_freeze_execution" in (pending.get("items") or {}), pending)
+    print("PASS test_residual_truth_no_t01_t02")
+
+
+def test_stage_s9b_auto_prereq() -> None:
+    """P1-E: --stage s9b fixture auto-runs S9 prereq."""
+    result = run_stage("s9b", mode=Mode.FIXTURE, case_limit=3, skip_exposure=True)
+    _assert(result.ok, f"s9b stage failed: {result.errors}")
+    _assert("s9" in result.stages, list(result.stages))
+    _assert("s9b" in result.stages, list(result.stages))
+    _assert(result.stages["s9b"]["status"] == "PASS", result.stages["s9b"])
+    print("PASS test_stage_s9b_auto_prereq")
+
+
+def test_stage_s10_auto_prereq() -> None:
+    """P1-E: --stage s10 fixture auto-runs S9→S9b prereq."""
+    result = run_stage("s10", mode=Mode.FIXTURE, case_limit=3, skip_exposure=True)
+    _assert(result.ok, f"s10 stage failed: {result.errors}")
+    _assert("s9" in result.stages and "s9b" in result.stages and "s10" in result.stages, list(result.stages))
+    print("PASS test_stage_s10_auto_prereq")
+
+
+def test_stage_s11_auto_prereq() -> None:
+    """P1-E: --stage s11 fixture auto-runs S9→S9b→S10 prereq."""
+    result = run_stage("s11", mode=Mode.FIXTURE, case_limit=3, skip_exposure=True)
+    _assert(result.ok, f"s11 stage failed: {result.errors}")
+    for key in ("s9", "s9b", "s10", "s11"):
+        _assert(key in result.stages, list(result.stages))
+    print("PASS test_stage_s11_auto_prereq")
+
+
+def test_cli_stage_s9b_s10_s11() -> None:
+    """P1-E CLI: stage s9b/s10/s11 fixture must rc0 with auto-prereq."""
+    for stage in ("s9b", "s10", "s11"):
+        proc = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                str(CHECKER),
+                "--stage",
+                stage,
+                "--mode",
+                "fixture",
+                "--case-limit",
+                "3",
+                "--skip-exposure",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        _assert(
+            proc.returncode == 0,
+            f"stage {stage} rc={proc.returncode}\n{proc.stdout}\n{proc.stderr}",
+        )
+        payload = json.loads(proc.stdout)
+        _assert(payload["ok"] is True, payload.get("errors"))
+        _assert("missing_t01_t02_ratification" not in (payload.get("residual") or []), payload.get("residual"))
+    print("PASS test_cli_stage_s9b_s10_s11")
+
+
+def test_full_61_case_fixture_replay() -> None:
+    """Full 61-case fixture replay must stay green."""
+    result = run_fixture_replay(case_limit=None, skip_exposure=False)
+    _assert(result.ok, f"61-case fixture replay failed: {result.errors}")
+    _assert(
+        result.status == "DONE_LOCAL_EVAL_SPINE_READY_FOR_S8_FANIN",
+        result.status,
+    )
+    s9 = result.stages["s9"]
+    _assert(s9["result_count"] >= 61, s9["result_count"])  # at least 61 rows × arms with new absent
+    print("PASS test_full_61_case_fixture_replay")
+
+
 def main() -> int:
     tests = [
         test_holdout_pin,
@@ -386,6 +661,16 @@ def main() -> int:
         test_cli_fixture_replay,
         test_cli_real_mode_blocked,
         test_b7_v1_regression,
+        # Gate hardening regressions (P0/P1)
+        test_real_synthetic_bypass_red,
+        test_force_status_bypass_red,
+        test_qa_c5_not_run_bypass_red,
+        test_residual_truth_no_t01_t02,
+        test_stage_s9b_auto_prereq,
+        test_stage_s10_auto_prereq,
+        test_stage_s11_auto_prereq,
+        test_cli_stage_s9b_s10_s11,
+        test_full_61_case_fixture_replay,
     ]
     failed = 0
     for fn in tests:

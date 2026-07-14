@@ -49,6 +49,16 @@ def validate_readback(readback: dict[str, Any] | None) -> list[dict[str, str]]:
     return errors
 
 
+def _artifact_digest_valid(arm: dict[str, Any]) -> bool:
+    artifact = arm.get("artifact")
+    if not isinstance(artifact, dict):
+        return False
+    digest = artifact.get("sha256")
+    if not isinstance(digest, str) or len(digest) != 64:
+        return False
+    return all(ch in "0123456789abcdef" for ch in digest.lower())
+
+
 def validate_arm_descriptor(
     arm_id: str,
     arm: dict[str, Any],
@@ -86,13 +96,49 @@ def validate_arm_descriptor(
                 "detail": f"mode={mode.value} forbids score_class=real_model on arm {arm_id}",
             }
         )
-    if mode == Mode.REAL and arm_id == "new" and status == "absent":
-        errors.append(
-            {
-                "code": "E_MODE_REAL_WITHOUT_NEW_ADAPTER",
-                "detail": "mode=real requires arms.new.adapter_status=present",
-            }
-        )
+    if mode == Mode.REAL:
+        # REAL: every required arm must be present + real_model + valid artifact digest.
+        if status != "present":
+            code = (
+                "E_MODE_REAL_WITHOUT_NEW_ADAPTER"
+                if arm_id == "new"
+                else "E_NO_REAL_SCORES"
+            )
+            errors.append(
+                {
+                    "code": code,
+                    "detail": (
+                        f"mode=real requires arms.{arm_id}.adapter_status=present "
+                        f"(got {status!r})"
+                    ),
+                }
+            )
+        if score_class == "synthetic":
+            errors.append(
+                {
+                    "code": "E_SYNTHETIC_SCORE_IN_REAL",
+                    "detail": f"mode=real forbids score_class=synthetic on arm {arm_id}",
+                }
+            )
+        elif score_class == "absent":
+            code = (
+                "E_MODE_REAL_WITHOUT_NEW_ADAPTER"
+                if arm_id == "new"
+                else "E_NO_REAL_SCORES"
+            )
+            errors.append(
+                {
+                    "code": code,
+                    "detail": f"mode=real forbids score_class=absent on arm {arm_id}",
+                }
+            )
+        elif score_class == "real_model" and not _artifact_digest_valid(arm):
+            errors.append(
+                {
+                    "code": "E_REAL_ARTIFACT_DIGEST",
+                    "detail": f"mode=real requires arms.{arm_id}.artifact.sha256 (64 hex)",
+                }
+            )
     return errors
 
 
@@ -325,13 +371,42 @@ def run_s9(
                         "detail": f"unknown behavior_class_observed={behavior!r}",
                     }
                 )
-            if item.get("score_class") == "real_model" and mode != Mode.REAL:
+            item_score = item.get("score_class")
+            if item_score == "real_model" and mode != Mode.REAL:
                 errors.append(
                     {
                         "code": "E_FORGED_REAL_SCORE",
                         "detail": f"forged real score in mode={mode.value}",
                     }
                 )
+            if mode == Mode.REAL and item_score == "synthetic":
+                errors.append(
+                    {
+                        "code": "E_SYNTHETIC_SCORE_IN_REAL",
+                        "detail": (
+                            f"injected synthetic score forbidden in real mode: "
+                            f"{item.get('case_id')}/{item.get('arm_id')}"
+                        ),
+                    }
+                )
+            if mode == Mode.REAL and item_score == "absent":
+                errors.append(
+                    {
+                        "code": "E_NO_REAL_SCORES",
+                        "detail": (
+                            f"injected absent score forbidden in real mode: "
+                            f"{item.get('case_id')}/{item.get('arm_id')}"
+                        ),
+                    }
+                )
+    elif mode == Mode.REAL and not errors:
+        # REAL cannot invent real_model scores from synthetic fixture path.
+        errors.append(
+            {
+                "code": "E_NO_REAL_SCORES",
+                "detail": "mode=real requires injected real_model arm results; no auto-synthetic",
+            }
+        )
     elif not errors:
         case_limit = manifest.get("case_limit")
         rows = holdout_info.get("rows") or []
@@ -393,7 +468,14 @@ def run_s9(
 
     status = "PASS" if not errors else "FAIL"
     if mode == Mode.REAL and any(
-        e.get("code") in {"E_MODE_REAL_WITHOUT_NEW_ADAPTER", "E_B7_NOT_FROZEN", "E_NO_REAL_SCORES"}
+        e.get("code")
+        in {
+            "E_MODE_REAL_WITHOUT_NEW_ADAPTER",
+            "E_B7_NOT_FROZEN",
+            "E_NO_REAL_SCORES",
+            "E_SYNTHETIC_SCORE_IN_REAL",
+            "E_REAL_ARTIFACT_DIGEST",
+        }
         for e in errors
     ):
         status = "BLOCKED"

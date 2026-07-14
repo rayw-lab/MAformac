@@ -73,7 +73,7 @@ def aggregate_s9b(
     if require_all_arms:
         for arm_id in sorted(required_arms - present_arms):
             errors.append({"code": "E_MISSING_ARM", "detail": f"missing arm results: {arm_id}"})
-        # For real, absent score_class is also missing real scores
+        # For real, absent/synthetic score_class is not real join material
         for arm_id, rows in by_arm.items():
             if any(r.get("score_class") == "absent" for r in rows):
                 errors.append(
@@ -82,6 +82,29 @@ def aggregate_s9b(
                         "detail": f"arm {arm_id} has absent score_class under real join",
                     }
                 )
+            if any(r.get("score_class") == "synthetic" for r in rows):
+                errors.append(
+                    {
+                        "code": "E_SYNTHETIC_SCORE_IN_REAL",
+                        "detail": f"arm {arm_id} has synthetic score_class under real join",
+                    }
+                )
+            if any(r.get("score_class") not in {"real_model", "absent", "synthetic"} for r in rows):
+                errors.append(
+                    {
+                        "code": "E_SCHEMA",
+                        "detail": f"arm {arm_id} has invalid score_class under real join",
+                    }
+                )
+            # real join requires real_model only (absent already flagged above)
+            if rows and all(r.get("score_class") != "real_model" for r in rows):
+                if not any(r.get("score_class") == "synthetic" for r in rows):
+                    errors.append(
+                        {
+                            "code": "E_NO_REAL_SCORES",
+                            "detail": f"arm {arm_id} has no real_model scores under real join",
+                        }
+                    )
 
     # Join completeness across arms that produced non-absent rows
     active_arms = [
@@ -112,7 +135,13 @@ def aggregate_s9b(
 
     per_arm: dict[str, Any] = {}
     for arm_id, rows in by_arm.items():
-        eligible = [r for r in rows if r.get("score_class") != "absent"]
+        # REAL eligible counts only real_model; fixture/dry_run counts non-absent.
+        if mode == Mode.REAL:
+            eligible = [r for r in rows if r.get("score_class") == "real_model"]
+            synthetic_count = sum(1 for r in rows if r.get("score_class") == "synthetic")
+        else:
+            eligible = [r for r in rows if r.get("score_class") != "absent"]
+            synthetic_count = sum(1 for r in rows if r.get("score_class") == "synthetic")
         passes = [r for r in eligible if r.get("model_hard_pass") is True]
         families = Counter(str(r.get("holdout_family") or "unknown") for r in eligible)
         behaviors = Counter(str(r.get("behavior_class_observed") or "unknown") for r in eligible)
@@ -120,6 +149,8 @@ def aggregate_s9b(
             "eligible": len(eligible),
             "pass": len(passes),
             "absent": sum(1 for r in rows if r.get("score_class") == "absent"),
+            "synthetic": synthetic_count,
+            "real_model": sum(1 for r in rows if r.get("score_class") == "real_model"),
             "pass_rate": (len(passes) / len(eligible)) if eligible else None,
             "families": dict(families),
             "behaviors": dict(behaviors),
@@ -138,7 +169,11 @@ def aggregate_s9b(
     preferred_arm = "new" if "new" in active_arms else (active_arms[0] if active_arms else None)
     if preferred_arm:
         for row in by_arm[preferred_arm]:
-            if row.get("score_class") == "absent":
+            # REAL: only real_model contributes layer eligible; synthetic must not inflate.
+            if mode == Mode.REAL:
+                if row.get("score_class") != "real_model":
+                    continue
+            elif row.get("score_class") == "absent":
                 continue
             family = str(row.get("holdout_family") or "")
             if family.startswith("negative"):

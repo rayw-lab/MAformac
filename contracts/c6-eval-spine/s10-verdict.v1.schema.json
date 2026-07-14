@@ -21,7 +21,8 @@
         "FAIL",
         "BLOCKED_AUTHORITY",
         "BLOCKED_MISSING_REAL_SCORES",
-        "INCOMPARABLE"
+        "INCOMPARABLE",
+        "BLOCKED"
       ]
     },
     "mode": { "type": "string", "enum": ["fixture", "dry_run", "real"] },

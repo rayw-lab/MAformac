@@ -84,6 +84,26 @@
     "E_NO_REAL_SCORES": {
       "stage": "s10",
       "description": "real mode without real_model scores"
+    },
+    "E_SYNTHETIC_SCORE_IN_REAL": {
+      "stage": "s9",
+      "description": "mode=real forbids score_class=synthetic on any required arm"
+    },
+    "E_FORCE_STATUS_REJECTED": {
+      "stage": "s10",
+      "description": "force_status override is rejected under mode=real; all gates still run"
+    },
+    "E_QA_SAFETY_FAIL": {
+      "stage": "s10",
+      "description": "mode=real requires qa_safety.status=PASS"
+    },
+    "E_C5_PHASE1_FAIL": {
+      "stage": "s10",
+      "description": "mode=real requires c5_phase1.status=PASS and rc=0"
+    },
+    "E_REAL_ARTIFACT_DIGEST": {
+      "stage": "s9",
+      "description": "mode=real requires present arm artifact.sha256 digest (64 hex)"
     }
   }
 }

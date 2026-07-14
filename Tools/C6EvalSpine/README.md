@@ -45,8 +45,20 @@ Thresholds are loaded from:
 
 Any embedded second set → `E_THRESHOLD_REINVENT`.
 
-## Residual (always honest)
+## Residual (always honest; dispatch enum only)
+
+Machine residual enum (exact, still true for local harness):
 
 - `missing_s8_adapter`
-- `missing_t01_t02_ratification`
 - `no_real_three_arm_scores`
+
+**Not residual:** `missing_t01_t02_ratification` — D-147 already satisfied t01/t02 **decision** ratification.
+
+## Authority materialization pending (not residual enum)
+
+Separate structure `authority_materialization_pending` tracks execution/artifact work still open:
+
+- B7 freeze execution / canonical receipt
+- V1 CANDIDATE→RATIFIED artifact / operator ceremony
+
+This is **not** a residual enum member and **does not** claim decision-layer t01/t02 missing.
