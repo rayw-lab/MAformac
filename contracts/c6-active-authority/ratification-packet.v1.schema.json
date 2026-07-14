@@ -1,0 +1,193 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "contracts/c6-active-authority/ratification-packet.v1.schema.json",
+  "title": "C6 Active Authority V1 Ratification Packet (candidate-only, mechanical consumption envelope)",
+  "description": "Machine-consumable ratification packet derived from the live V1 active-authority candidate. It mechanically binds the authority candidate digest, the four_layer_thresholds, and the decision/receipt refs. It is CANDIDATE_PACKET_ONLY: observed_status=CANDIDATE, target_status=RATIFIED, requires_operator_ceremony=true, is_v1_done=false. It does NOT forge operator/time/signature, does NOT elevate V1 to RATIFIED/canonical. The authoritative fail-closed invariants live in the exporter + test_export_c6_active_authority_ratification_packet.py. README prose is not a substitute for the schema or the checker.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "packet_id",
+    "package_id",
+    "status",
+    "observed_status",
+    "target_status",
+    "is_canonical",
+    "is_v1_done",
+    "requires_operator_ceremony",
+    "authority_binding",
+    "four_layer_thresholds",
+    "decision_refs",
+    "receipt_refs",
+    "source_members_binding",
+    "non_claims"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "c6_active_authority_ratification_packet_v1",
+      "description": "Packet envelope schema version. Bump on contract change."
+    },
+    "packet_id": {
+      "type": "string",
+      "const": "V1.ratification.v1",
+      "description": "Stable packet identity for the V1 ratification packet (v1)."
+    },
+    "package_id": {
+      "type": "string",
+      "const": "V1",
+      "description": "Closure-registry package id bound to this packet."
+    },
+    "status": {
+      "type": "string",
+      "const": "CANDIDATE_PACKET_ONLY",
+      "description": "Packet is mechanical-consumption-only; does NOT elevate V1 to RATIFIED/canonical."
+    },
+    "observed_status": {
+      "type": "string",
+      "const": "CANDIDATE",
+      "description": "Live authority candidate status (observed, not elevated)."
+    },
+    "target_status": {
+      "type": "string",
+      "const": "RATIFIED",
+      "description": "Intended status after the operator ceremony (not yet achieved by this packet)."
+    },
+    "is_canonical": {
+      "type": "boolean",
+      "const": false,
+      "description": "Always false on a candidate packet."
+    },
+    "is_v1_done": {
+      "type": "boolean",
+      "const": false,
+      "description": "V1 CANDIDATE->RATIFIED operator ceremony/canonical receipt is NOT produced by this packet."
+    },
+    "requires_operator_ceremony": {
+      "type": "boolean",
+      "const": true,
+      "description": "V1 canonical receipt requires an operator ceremony performed by another agent; this packet is not it."
+    },
+    "authority_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority_id",
+        "authority_version",
+        "path",
+        "schema_version",
+        "subject_schema_id",
+        "digest_sha256"
+      ],
+      "properties": {
+        "authority_id": { "type": "string", "const": "c6_active_authority_v1" },
+        "authority_version": { "type": "integer", "const": 1 },
+        "path": {
+          "type": "string",
+          "const": "contracts/c6-active-authority/authority.v1.candidate.json"
+        },
+        "schema_version": { "type": "string", "const": "c6_active_authority_v1" },
+        "subject_schema_id": { "type": "string", "const": "c6_authority_subject_v1" },
+        "digest_sha256": {
+          "type": "string",
+          "pattern": "^(?!0{64}$)[0-9a-f]{64}$",
+          "description": "Self-digest of the live authority candidate (recomputed live). All-zero sentinel rejected."
+        }
+      }
+    },
+    "four_layer_thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["golden", "demo_fuzz", "unsupported", "safety"],
+      "properties": {
+        "golden": { "type": "number", "const": 1.0 },
+        "demo_fuzz": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["formula"],
+          "properties": {
+            "formula": { "type": "string", "const": "5*pass >= 4*eligible" }
+          }
+        },
+        "unsupported": { "type": "number", "const": 1.0 },
+        "safety": { "type": "number", "const": 1.0 }
+      }
+    },
+    "decision_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["decision_id", "required_state"],
+        "properties": {
+          "decision_id": { "type": "string", "pattern": "^D-\\d+$" },
+          "required_state": { "type": "string", "const": "ratified" }
+        }
+      },
+      "description": "D-147 (and supporting D-144) decision refs bound mechanically; cannot forge T01/T02 ratification string."
+    },
+    "receipt_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "locator", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "locator": { "type": "string" },
+          "sha256": {
+            "type": "string",
+            "pattern": "^(?!0{64}$)[0-9a-f]{64}$"
+          }
+        }
+      },
+      "description": "Ratification receipt refs (D-147 decisions + pool32 receipt) bound mechanically."
+    },
+    "source_members_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest_sha256", "member_count", "members"],
+      "description": "Packet-level exact binding of authority candidate source_members against live tracked files. Independent of the legacy authority digest (which deliberately excludes source_members).",
+      "properties": {
+        "digest_sha256": {
+          "type": "string",
+          "pattern": "^(?!0{64}$)[0-9a-f]{64}$",
+          "description": "SHA256 over the canonical exact ordered source_members binding block. All-zero sentinel rejected."
+        },
+        "member_count": {
+          "type": "integer",
+          "const": 7,
+          "description": "Exact D-147/T01 source member count."
+        },
+        "members": {
+          "type": "array",
+          "minItems": 7,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["member_id", "role", "path", "locator", "sha256"],
+            "properties": {
+              "member_id": { "type": "string" },
+              "role": { "type": "string" },
+              "path": { "type": "string" },
+              "locator": { "type": "string" },
+              "sha256": {
+                "type": "string",
+                "pattern": "^(?!0{64}$)[0-9a-f]{64}$"
+              }
+            }
+          },
+          "description": "Exact ordered member block (member_id/role/path/locator/sha256) matching live files."
+        }
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Explicit non-claims: not canonical, not RATIFIED, not V1 DONE, not C6 acceptance, not operator ceremony, not candidate signed, no forged operator/time/signature."
+    }
+  }
+}
