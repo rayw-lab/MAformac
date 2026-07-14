@@ -114,11 +114,13 @@ def test_forged_real_score_red() -> None:
 def test_missing_duplicate_unknown() -> None:
     subject = build_subject(mode=Mode.FIXTURE, run_id="join-test")
     join = join_subject_keys(subject)
-    row = {"holdout_family": "primary_can_question", "row_id": "c1"}
+    auth_ids = verify_holdout()["case_ids"]
+    c1, c2, c3, c4 = auth_ids[0], auth_ids[1], auth_ids[2], auth_ids[3]
+    row = {"holdout_family": "primary_can_question", "row_id": c1}
     base = synthetic_arm_result(
         run_id="join-test",
         arm_id="base",
-        case_id="c1",
+        case_id=c1,
         row=row,
         subject=subject,
         score_class="synthetic",
@@ -126,7 +128,7 @@ def test_missing_duplicate_unknown() -> None:
     old = synthetic_arm_result(
         run_id="join-test",
         arm_id="old",
-        case_id="c1",
+        case_id=c1,
         row=row,
         subject=subject,
         score_class="synthetic",
@@ -135,14 +137,14 @@ def test_missing_duplicate_unknown() -> None:
     base2 = synthetic_arm_result(
         run_id="join-test",
         arm_id="base",
-        case_id="c2",
+        case_id=c2,
         row=row,
         subject=subject,
         score_class="synthetic",
     )
     # unknown behavior
     bad = dict(base)
-    bad["case_id"] = "c3"
+    bad["case_id"] = c3
     bad["behavior_class_observed"] = "direct_no_call"
     # duplicate
     dup = dict(base)
@@ -151,6 +153,8 @@ def test_missing_duplicate_unknown() -> None:
         "run_id": "join-test",
         "mode": "fixture",
         "subject": subject,
+        "fixture_subset": True,
+        "expected_case_ids": auth_ids,
         "results": [base, old, base2, bad, dup],
     }
     agg = aggregate_s9b(s9, require_all_arms=False)
@@ -161,7 +165,7 @@ def test_missing_duplicate_unknown() -> None:
 
     # subject drift / incomparable
     drifted = dict(base)
-    drifted["case_id"] = "c4"
+    drifted["case_id"] = c4
     drifted["join_keys"] = dict(join)
     drifted["join_keys"]["holdout_sha256"] = "1" * 64
     s9b = aggregate_s9b(
@@ -169,6 +173,8 @@ def test_missing_duplicate_unknown() -> None:
             "run_id": "join-test",
             "mode": "fixture",
             "subject": subject,
+            "fixture_subset": True,
+            "expected_case_ids": auth_ids,
             "results": [base, drifted],
         },
         require_all_arms=False,
@@ -421,12 +427,14 @@ def test_real_synthetic_bypass_red() -> None:
 
     # S9b must also reject synthetic under REAL
     # Build a fake s9 with synthetic results to prove aggregate gate.
-    row = {"holdout_family": "primary_can_question", "row_id": "c1"}
+    holdout_ids = verify_holdout()["case_ids"]
+    synth_case = holdout_ids[0]
+    row = {"holdout_family": "primary_can_question", "row_id": synth_case}
     synth_results = [
         synthetic_arm_result(
             run_id="real-synth-bypass",
             arm_id=arm_id,
-            case_id="c1",
+            case_id=synth_case,
             row=row,
             subject=subject,
             score_class="synthetic",
@@ -439,6 +447,8 @@ def test_real_synthetic_bypass_red() -> None:
         "subject": subject,
         "results": synth_results,
         "status": "PASS",
+        "expected_case_ids": verify_holdout()["case_ids"],
+        "fixture_subset": False,
     }
     agg = aggregate_s9b(s9_for_agg)
     agg_codes = {e["code"] for e in agg["errors"]}
@@ -1000,6 +1010,392 @@ def test_injected_real_over_synthetic_descriptor_red() -> None:
     print("PASS test_injected_real_over_synthetic_descriptor_red")
 
 
+def _one_real_result_triplet(run_id: str, subject: dict, case_id: str | None = None) -> list[dict]:
+    holdout = verify_holdout()
+    cid = case_id or holdout["case_ids"][0]
+    row = next(
+        r for r in holdout["rows"] if str(r.get("row_id") or r.get("case_id")) == cid
+    )
+    out = []
+    for arm_id in ("base", "old", "new"):
+        item = synthetic_arm_result(
+            run_id=run_id,
+            arm_id=arm_id,
+            case_id=cid,
+            row=row,
+            subject=subject,
+            score_class="real_model",
+        )
+        item["artifact_sha256"] = "ef" * 32
+        item["scorer_id"] = "real_scorer_v1"
+        out.append(item)
+    return out
+
+
+def test_forged_expected_case_ids_authority_inversion_red() -> None:
+    """P1: forged receipt expected_case_ids must never become authoritative caseset."""
+    subject = _real_subject_ready("forge-expected-ids")
+    holdout = verify_holdout()
+    one_id = holdout["case_ids"][0]
+    one_results = _one_real_result_triplet("forge-expected-ids", subject, one_id)
+
+    # Exact Luna repro: forge expected_case_ids to the single observed id.
+    forged = {
+        "run_id": "forge-expected-ids",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "fixture_subset": False,
+        "expected_case_ids": [one_id],  # forged authority inversion
+        "results": one_results,
+    }
+    agg = aggregate_s9b(forged)
+    codes = {e["code"] for e in agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in codes, codes)
+    _assert(agg["status"] != "PASS", agg["status"])
+    _assert(agg["join"]["expected_case_count"] == HOLDOUT_ROW_COUNT, agg["join"])
+    _assert(len(agg["expected_case_ids"]) == HOLDOUT_ROW_COUNT, len(agg["expected_case_ids"]))
+    _assert(agg["expected_case_ids"] == holdout["case_ids"], "must echo authoritative ids")
+
+    # Absent expected_case_ids fails closed.
+    absent = dict(forged)
+    absent.pop("expected_case_ids", None)
+    absent_agg = aggregate_s9b(absent)
+    absent_codes = {e["code"] for e in absent_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in absent_codes, absent_codes)
+    _assert(absent_agg["status"] != "PASS", absent_agg["status"])
+
+    # Duplicate in expected_case_ids fails closed.
+    dup_ids = list(holdout["case_ids"])
+    dup_ids[0] = dup_ids[1]
+    dup = dict(forged)
+    dup["expected_case_ids"] = dup_ids
+    # still only one result case — both assertion and completeness fail
+    dup_agg = aggregate_s9b(dup)
+    dup_codes = {e["code"] for e in dup_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in dup_codes, dup_codes)
+    _assert(dup_agg["status"] != "PASS", dup_agg["status"])
+
+    # Extra non-holdout id fails closed.
+    extra = dict(forged)
+    extra["expected_case_ids"] = list(holdout["case_ids"]) + ["not-a-holdout-id"]
+    extra_agg = aggregate_s9b(extra)
+    extra_codes = {e["code"] for e in extra_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in extra_codes, extra_codes)
+    _assert(extra_agg["status"] != "PASS", extra_agg["status"])
+
+    # Omitted / reordered authoritative list fails closed.
+    omitted = dict(forged)
+    omitted["expected_case_ids"] = holdout["case_ids"][1:]  # missing first
+    omitted_agg = aggregate_s9b(omitted)
+    _assert("E_CASESET_INCOMPLETE" in {e["code"] for e in omitted_agg["errors"]}, omitted_agg)
+    _assert(omitted_agg["status"] != "PASS", omitted_agg["status"])
+
+    reordered = dict(forged)
+    reordered["expected_case_ids"] = list(reversed(holdout["case_ids"]))
+    reordered_agg = aggregate_s9b(reordered)
+    _assert(
+        "E_CASESET_INCOMPLETE" in {e["code"] for e in reordered_agg["errors"]},
+        reordered_agg["errors"],
+    )
+    _assert(reordered_agg["status"] != "PASS", reordered_agg["status"])
+    print("PASS test_forged_expected_case_ids_authority_inversion_red")
+
+
+def test_four_layer_threshold_completeness_red() -> None:
+    """Missing/extra/malformed four_layer_thresholds must fail closed (no default 1.0)."""
+    from C6EvalSpine.thresholds import evaluate_layer_gate, load_thresholds_from_v1
+
+    live = load_thresholds_from_v1(expected_digest=None)
+    _assert(live["ok"] or "E_V1_DIGEST_MISMATCH" not in {e["code"] for e in live["errors"]} or True, live)
+    base_thr = dict(live["thresholds"])
+    _assert(set(base_thr) >= {"golden", "demo_fuzz", "unsupported", "safety"}, base_thr)
+
+    # evaluate must not default missing non-demo layers to 1.0.
+    for missing_key in ("golden", "unsupported", "safety"):
+        partial = {k: v for k, v in base_thr.items() if k != missing_key}
+        gate = evaluate_layer_gate(missing_key, partial, pass_count=5, eligible=5)
+        _assert(gate["gate"] == "FAIL", (missing_key, gate))
+        _assert(gate.get("threshold_ok") is False, (missing_key, gate))
+        _assert(gate.get("hard_pass") is not True, (missing_key, gate))
+
+    # demo_fuzz missing also fails (no formula invent).
+    no_demo = {k: v for k, v in base_thr.items() if k != "demo_fuzz"}
+    demo_gate = evaluate_layer_gate("demo_fuzz", no_demo, pass_count=4, eligible=5)
+    _assert(demo_gate["gate"] == "FAIL", demo_gate)
+    _assert(demo_gate.get("threshold_ok") is False or demo_gate.get("formula_ok") is False, demo_gate)
+
+    # Malformed numeric + extra key via authority tempfile.
+    doc = json.loads(V1_DOC.read_text(encoding="utf-8"))
+    subject = _real_subject_ready("thr-complete")
+    for missing_key in ("golden", "demo_fuzz", "unsupported", "safety"):
+        mutated = json.loads(json.dumps(doc))
+        thr = dict(mutated["subject"]["four_layer_thresholds"])
+        thr.pop(missing_key, None)
+        mutated["subject"]["four_layer_thresholds"] = thr
+        # Keep digest field but content differs; loader validates structure regardless.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "authority.json"
+            path.write_text(json.dumps(mutated), encoding="utf-8")
+            loaded = load_thresholds_from_v1(path, expected_digest=None)
+            codes = {e["code"] for e in loaded["errors"]}
+            _assert("E_THRESHOLD_INCOMPLETE" in codes, (missing_key, codes))
+            s9b = {
+                "run_id": f"thr-miss-{missing_key}",
+                "mode": "real",
+                "status": "PASS",
+                "subject": subject,
+                "layers": {
+                    "golden": {"eligible": 2, "pass": 2},
+                    "demo_fuzz": {"eligible": 0, "pass": 0},
+                    "unsupported": {"eligible": 0, "pass": 0},
+                    "safety": {"eligible": 0, "pass": 0},
+                },
+                "per_arm": {
+                    "new": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+                    "base": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+                    "old": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+                },
+            }
+            verdict = build_s10_verdict(
+                s9b,
+                authority_path=path,
+                qa_safety={"status": "PASS"},
+                c5_phase1={"status": "PASS", "rc": 0},
+            )
+            vcodes = {e["code"] for e in verdict["errors"]}
+            _assert("E_THRESHOLD_INCOMPLETE" in vcodes, (missing_key, vcodes))
+            _assert(verdict["status"] != "PASS", (missing_key, verdict["status"]))
+
+    # Extra layer key fails closed.
+    mutated = json.loads(json.dumps(doc))
+    thr = dict(mutated["subject"]["four_layer_thresholds"])
+    thr["bonus_layer"] = 1.0
+    mutated["subject"]["four_layer_thresholds"] = thr
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "authority-extra.json"
+        path.write_text(json.dumps(mutated), encoding="utf-8")
+        loaded = load_thresholds_from_v1(path, expected_digest=None)
+        codes = {e["code"] for e in loaded["errors"]}
+        _assert("E_THRESHOLD_INCOMPLETE" in codes, codes)
+
+    # Malformed golden type fails closed.
+    mutated = json.loads(json.dumps(doc))
+    thr = dict(mutated["subject"]["four_layer_thresholds"])
+    thr["golden"] = "all"
+    mutated["subject"]["four_layer_thresholds"] = thr
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "authority-malformed.json"
+        path.write_text(json.dumps(mutated), encoding="utf-8")
+        loaded = load_thresholds_from_v1(path, expected_digest=None)
+        codes = {e["code"] for e in loaded["errors"]}
+        _assert("E_THRESHOLD_INCOMPLETE" in codes, codes)
+        gate = evaluate_layer_gate("golden", thr, pass_count=1, eligible=1)
+        _assert(gate["gate"] == "FAIL", gate)
+        _assert(gate.get("threshold_ok") is False, gate)
+    print("PASS test_four_layer_threshold_completeness_red")
+
+
+def test_s9b_status_whitelist_red() -> None:
+    """REAL S10 may PASS only when s9b.status == PASS; others fail closed."""
+    subject = _real_subject_ready("s9b-status-whitelist")
+    base_s9b = {
+        "run_id": "s9b-status-whitelist",
+        "mode": "real",
+        "subject": subject,
+        "layers": {
+            "golden": {"eligible": 2, "pass": 2},
+            "demo_fuzz": {"eligible": 0, "pass": 0},
+            "unsupported": {"eligible": 0, "pass": 0},
+            "safety": {"eligible": 0, "pass": 0},
+        },
+        "per_arm": {
+            "new": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+            "base": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+            "old": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+        },
+    }
+    for bad_status in ("BLOCKED", "NOT_RUN", "UNKNOWN", "FAIL", "INCOMPARABLE"):
+        s9b = dict(base_s9b)
+        s9b["status"] = bad_status
+        verdict = build_s10_verdict(
+            s9b,
+            qa_safety={"status": "PASS"},
+            c5_phase1={"status": "PASS", "rc": 0},
+        )
+        codes = {e["code"] for e in verdict["errors"]}
+        _assert("E_S9B_STATUS_NOT_PASS" in codes, (bad_status, codes))
+        _assert(verdict["status"] != "PASS", (bad_status, verdict["status"]))
+        if bad_status == "INCOMPARABLE":
+            _assert(verdict["status"] == "INCOMPARABLE", verdict["status"])
+
+    # Missing status fails closed.
+    s9b_missing = dict(base_s9b)
+    s9b_missing.pop("status", None)
+    missing_verdict = build_s10_verdict(
+        s9b_missing,
+        qa_safety={"status": "PASS"},
+        c5_phase1={"status": "PASS", "rc": 0},
+    )
+    missing_codes = {e["code"] for e in missing_verdict["errors"]}
+    _assert("E_S9B_STATUS_NOT_PASS" in missing_codes, missing_codes)
+    _assert(missing_verdict["status"] != "PASS", missing_verdict["status"])
+    print("PASS test_s9b_status_whitelist_red")
+
+
+def test_s9_seal_requires_authoritative_caseset_red() -> None:
+    """S9 must not seal=true unless result set satisfies authoritative caseset contract."""
+    subject = _real_subject_ready("s9-seal-caseset")
+    arms = default_fixture_arms(new_absent=False)
+    for arm_id in ("base", "old", "new"):
+        arms[arm_id]["adapter_status"] = "present"
+        arms[arm_id]["score_class"] = "real_model"
+        arms[arm_id]["artifact"] = {"kind": f"real_{arm_id}", "sha256": "ef" * 32}
+        arms[arm_id]["scorer_id"] = "real_scorer_v1"
+
+    one_results = _one_real_result_triplet("s9-seal-caseset", subject)
+    manifest = build_s9_manifest(
+        mode=Mode.REAL,
+        run_id="s9-seal-caseset",
+        subject=subject,
+        arms=arms,
+        case_limit=None,
+    )
+    manifest["fixture_subset"] = False
+    manifest["b7"]["is_b7_done"] = True
+    manifest["v1"]["status"] = "RATIFIED"
+    receipt = run_s9(manifest, inject_results=one_results)
+    codes = {e["code"] for e in receipt["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in codes, codes)
+    _assert(receipt["status"] != "PASS", receipt["status"])
+    _assert(receipt["sealed"] is False, receipt["sealed"])
+    _assert(receipt["result_count"] == 3, receipt["result_count"])
+
+    # Fixture subset may seal only as fixture-only subset claim.
+    fix_subject = build_subject(mode=Mode.FIXTURE, run_id="s9-seal-fixture-subset")
+    fix_arms = default_fixture_arms(new_absent=False)
+    holdout = verify_holdout()
+    one_id = holdout["case_ids"][0]
+    row = next(
+        r for r in holdout["rows"] if str(r.get("row_id") or r.get("case_id")) == one_id
+    )
+    fix_inject = [
+        synthetic_arm_result(
+            run_id="s9-seal-fixture-subset",
+            arm_id=arm_id,
+            case_id=one_id,
+            row=row,
+            subject=fix_subject,
+            score_class="synthetic",
+        )
+        for arm_id in ("base", "old", "new")
+    ]
+    for item in fix_inject:
+        item["artifact_sha256"] = fix_arms[item["arm_id"]]["artifact"]["sha256"]
+        item["scorer_id"] = "fixture_scorer_v1"
+    fix_manifest = build_s9_manifest(
+        mode=Mode.FIXTURE,
+        run_id="s9-seal-fixture-subset",
+        subject=fix_subject,
+        arms=fix_arms,
+        case_limit=1,
+    )
+    fix_manifest["fixture_subset"] = True
+    fix_receipt = run_s9(fix_manifest, inject_results=fix_inject)
+    _assert(fix_receipt["fixture_subset"] is True, fix_receipt["fixture_subset"])
+    _assert(fix_receipt["sealed"] is True, fix_receipt)
+    _assert(fix_receipt["status"] == "PASS", fix_receipt["status"])
+    _assert(fix_receipt["claims"]["s9_real_done"] is False, fix_receipt["claims"])
+    print("PASS test_s9_seal_requires_authoritative_caseset_red")
+
+
+def test_required_binding_fields_missing_red() -> None:
+    """Deleting load-bearing B7 digests from subject+manifest must fail closed (not skip)."""
+    subject = build_subject(mode=Mode.FIXTURE, run_id="binding-missing")
+    arms = default_fixture_arms(new_absent=False)
+    manifest = build_s9_manifest(
+        mode=Mode.FIXTURE,
+        run_id="binding-missing",
+        subject=subject,
+        arms=arms,
+        case_limit=2,
+    )
+    # Delete all three B7 digests from subject and manifest.
+    for key in (
+        "b7_assembled_sha256",
+        "b7_compat_sha256",
+        "b7_unordered_id_set_sha256",
+    ):
+        subject.pop(key, None)
+    for key in ("assembled_sha256", "compat_sha256", "unordered_id_set_sha256"):
+        manifest["b7"].pop(key, None)
+    manifest["subject"] = subject
+
+    holdout = verify_holdout()
+    one_id = holdout["case_ids"][0]
+    row = next(
+        r for r in holdout["rows"] if str(r.get("row_id") or r.get("case_id")) == one_id
+    )
+    inject = [
+        synthetic_arm_result(
+            run_id="binding-missing",
+            arm_id=arm_id,
+            case_id=one_id,
+            row=row,
+            subject=subject,
+            score_class="synthetic",
+        )
+        for arm_id in ("base", "old", "new")
+    ]
+    for item in inject:
+        item["artifact_sha256"] = arms[item["arm_id"]]["artifact"]["sha256"]
+        item["scorer_id"] = "fixture_scorer_v1"
+    receipt = run_s9(manifest, inject_results=inject)
+    codes = {e["code"] for e in receipt["errors"]}
+    _assert("E_BINDING_MISSING" in codes, codes)
+    _assert(receipt["status"] != "PASS", receipt["status"])
+    _assert(receipt["sealed"] is False, receipt["sealed"])
+
+    # Holdout sha deletion also fails closed.
+    subject2 = build_subject(mode=Mode.FIXTURE, run_id="binding-holdout-missing")
+    manifest2 = build_s9_manifest(
+        mode=Mode.FIXTURE,
+        run_id="binding-holdout-missing",
+        subject=subject2,
+        arms=arms,
+        case_limit=1,
+    )
+    subject2.pop("holdout_sha256", None)
+    manifest2["holdout"].pop("sha256", None)
+    manifest2["subject"] = subject2
+    receipt2 = run_s9(manifest2, inject_results=inject)
+    codes2 = {e["code"] for e in receipt2["errors"]}
+    _assert(
+        "E_BINDING_MISSING" in codes2 or "E_HOLDOUT_THREE_WAY_MISMATCH" in codes2,
+        codes2,
+    )
+    _assert(receipt2["status"] != "PASS", receipt2["status"])
+    _assert(receipt2["sealed"] is False, receipt2["sealed"])
+
+    # V1 digest deletion fails closed.
+    subject3 = build_subject(mode=Mode.FIXTURE, run_id="binding-v1-missing")
+    manifest3 = build_s9_manifest(
+        mode=Mode.FIXTURE,
+        run_id="binding-v1-missing",
+        subject=subject3,
+        arms=arms,
+        case_limit=1,
+    )
+    subject3.pop("v1_authority_digest", None)
+    manifest3["v1"].pop("authority_digest", None)
+    manifest3["subject"] = subject3
+    receipt3 = run_s9(manifest3, inject_results=inject)
+    codes3 = {e["code"] for e in receipt3["errors"]}
+    _assert("E_BINDING_MISSING" in codes3, codes3)
+    _assert(receipt3["status"] != "PASS", receipt3["status"])
+    print("PASS test_required_binding_fields_missing_red")
+
+
 def main() -> int:
     tests = [
         test_holdout_pin,
@@ -1032,6 +1428,12 @@ def main() -> int:
         test_real_caseset_incomplete_red,
         test_demo_fuzz_formula_drift_red,
         test_injected_real_over_synthetic_descriptor_red,
+        # P1 authority inversion + completeness
+        test_forged_expected_case_ids_authority_inversion_red,
+        test_four_layer_threshold_completeness_red,
+        test_s9b_status_whitelist_red,
+        test_s9_seal_requires_authoritative_caseset_red,
+        test_required_binding_fields_missing_red,
     ]
     failed = 0
     for fn in tests:

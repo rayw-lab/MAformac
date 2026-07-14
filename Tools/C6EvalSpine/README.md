@@ -43,9 +43,9 @@ Thresholds are loaded from:
 
 `contracts/c6-active-authority/authority.v1.candidate.json` → `subject.four_layer_thresholds`
 
-Any embedded second set → `E_THRESHOLD_REINVENT`.
-
-`demo_fuzz` formula is bound to the canonical `5*pass >= 4*eligible` only (`E_V1_FORMULA_DRIFT` otherwise; e.g. `4*pass >= 3*eligible` is rejected).
+- Exactly the four keys `golden` / `demo_fuzz` / `unsupported` / `safety` are required (`E_THRESHOLD_INCOMPLETE` on missing/extra/malformed). **Never** synthesize a default threshold for an absent layer.
+- Any embedded second set → `E_THRESHOLD_REINVENT`.
+- `demo_fuzz` formula is bound to the canonical `5*pass >= 4*eligible` only (`E_V1_FORMULA_DRIFT` otherwise; e.g. `4*pass >= 3*eligible` is rejected).
 
 ## Fail-closed bindings (REAL)
 
@@ -53,7 +53,10 @@ Any embedded second set → `E_THRESHOLD_REINVENT`.
 |---|---|---|
 | V1 digest | REAL mismatch cannot PASS/seal S9–S10 | `E_V1_DIGEST_MISMATCH` |
 | Holdout three-way | pin == subject == loaded artifact (sha + row_count) | `E_HOLDOUT_THREE_WAY_MISMATCH` |
-| Case set | REAL requires exact 61-id set per arm; empty always fails; fixture subset only if `fixture_subset=true` | `E_CASESET_INCOMPLETE` |
+| Case set | Authoritative IDs **always** from `verify_holdout()` / D-127 pin; receipt `expected_case_ids` is assertion-only (absent/dup/extra/missing/reorder ≠ auth → fail). REAL requires exact 61-id set per arm; empty always fails; fixture subset only if `fixture_subset=true` and ids ⊆ auth set; REAL never subsets | `E_CASESET_INCOMPLETE` |
+| S9 seal | `sealed=true` only when the result set itself satisfies the authoritative caseset contract; fixture subsets seal fixture-only claims only | `E_CASESET_INCOMPLETE` |
+| Required bindings | Subject/manifest B7 digests, holdout sha/row_count, V1 digest/status, repo/mode/contract/scorer must be present and pin-matched before evaluation (missing ≠ skip) | `E_BINDING_MISSING` / `E_B7_DIGEST_MISMATCH` |
+| S9b status whitelist | REAL S10 may PASS only when `s9b.status == "PASS"`; `BLOCKED`/`NOT_RUN`/`UNKNOWN`/missing/other fail closed | `E_S9B_STATUS_NOT_PASS` |
 | Result provenance | `real_model` results must bind arm descriptor score_class/status + artifact sha + scorer + mode | `E_RESULT_PROVENANCE_MISMATCH` |
 
 ## Residual (always honest; dispatch enum only)

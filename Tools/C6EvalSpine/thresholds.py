@@ -12,6 +12,9 @@ from .constants import (
 )
 from .identity import file_sha256
 
+REQUIRED_FOUR_LAYER_KEYS = ("golden", "demo_fuzz", "unsupported", "safety")
+NUMERIC_LAYER_KEYS = frozenset({"golden", "unsupported", "safety"})
+
 
 def load_authority(path: Path | None = None) -> dict[str, Any]:
     authority_path = path or V1_AUTHORITY_PATH
@@ -32,6 +35,83 @@ def is_canonical_demo_fuzz_formula(formula: str | None) -> bool:
     return normalize_formula(formula) == normalize_formula(CANONICAL_DEMO_FUZZ_FORMULA)
 
 
+def validate_four_layer_thresholds(thresholds: Any) -> list[dict[str, str]]:
+    """Require exact four keys with correct type/range/canonical demo formula.
+
+    Never synthesize defaults for absent authority layers.
+    """
+    errors: list[dict[str, str]] = []
+    if not isinstance(thresholds, dict):
+        return [
+            {
+                "code": "E_THRESHOLD_INCOMPLETE",
+                "detail": "subject.four_layer_thresholds missing or not object",
+            }
+        ]
+
+    present = set(thresholds.keys())
+    required = set(REQUIRED_FOUR_LAYER_KEYS)
+    missing = sorted(required - present)
+    extra = sorted(present - required)
+    if missing or extra:
+        errors.append(
+            {
+                "code": "E_THRESHOLD_INCOMPLETE",
+                "detail": (
+                    "four_layer_thresholds must contain exactly "
+                    f"{list(REQUIRED_FOUR_LAYER_KEYS)}; "
+                    f"missing={missing} extra={extra}"
+                ),
+            }
+        )
+
+    for key in NUMERIC_LAYER_KEYS:
+        if key not in thresholds:
+            continue
+        spec = thresholds.get(key)
+        if not isinstance(spec, (int, float)) or isinstance(spec, bool):
+            errors.append(
+                {
+                    "code": "E_THRESHOLD_INCOMPLETE",
+                    "detail": f"layer {key} must be numeric threshold in [0,1], got {spec!r}",
+                }
+            )
+            continue
+        value = float(spec)
+        if value < 0.0 or value > 1.0:
+            errors.append(
+                {
+                    "code": "E_THRESHOLD_INCOMPLETE",
+                    "detail": f"layer {key} threshold out of range [0,1]: {value}",
+                }
+            )
+
+    if "demo_fuzz" in thresholds:
+        demo_spec = thresholds.get("demo_fuzz")
+        if not isinstance(demo_spec, dict):
+            errors.append(
+                {
+                    "code": "E_THRESHOLD_INCOMPLETE",
+                    "detail": f"demo_fuzz must be object with formula, got {type(demo_spec).__name__}",
+                }
+            )
+        else:
+            demo_formula = demo_spec.get("formula")
+            if not is_canonical_demo_fuzz_formula(
+                demo_formula if isinstance(demo_formula, str) else None
+            ):
+                errors.append(
+                    {
+                        "code": "E_V1_FORMULA_DRIFT",
+                        "detail": (
+                            f"demo_fuzz.formula must be {CANONICAL_DEMO_FUZZ_FORMULA!r}; "
+                            f"got {demo_formula!r}"
+                        ),
+                    }
+                )
+    return errors
+
+
 def load_thresholds_from_v1(
     authority_path: Path | None = None,
     *,
@@ -42,6 +122,7 @@ def load_thresholds_from_v1(
 
     If allow_embedded_thresholds is provided and differs from V1, raise
     E_THRESHOLD_REINVENT via returned errors structure.
+    Missing/extra/malformed layer specs fail closed; never default absent layers.
     """
     path = authority_path or V1_AUTHORITY_PATH
     doc = load_authority(path)
@@ -67,29 +148,13 @@ def load_thresholds_from_v1(
     if not isinstance(thresholds, dict):
         errors.append(
             {
-                "code": "E_SCHEMA",
+                "code": "E_THRESHOLD_INCOMPLETE",
                 "detail": "subject.four_layer_thresholds missing or not object",
             }
         )
         thresholds = {}
-
-    # Bind demo_fuzz formula: only canonical form accepted.
-    demo_spec = thresholds.get("demo_fuzz") if isinstance(thresholds, dict) else None
-    demo_formula = None
-    if isinstance(demo_spec, dict):
-        demo_formula = demo_spec.get("formula")
-    if thresholds and not is_canonical_demo_fuzz_formula(
-        demo_formula if isinstance(demo_formula, str) else None
-    ):
-        errors.append(
-            {
-                "code": "E_V1_FORMULA_DRIFT",
-                "detail": (
-                    f"demo_fuzz.formula must be {CANONICAL_DEMO_FUZZ_FORMULA!r}; "
-                    f"got {demo_formula!r}"
-                ),
-            }
-        )
+    else:
+        errors.extend(validate_four_layer_thresholds(thresholds))
 
     if allow_embedded_thresholds is not None:
         if allow_embedded_thresholds != thresholds:
@@ -115,7 +180,7 @@ def load_thresholds_from_v1(
 
 
 def evaluate_layer_gate(layer_name: str, thresholds: dict[str, Any], pass_count: int, eligible: int) -> dict[str, Any]:
-    """Apply V1 four-layer thresholds. No reinvented constants."""
+    """Apply V1 four-layer thresholds. No reinvented constants or missing defaults."""
     if eligible < 0 or pass_count < 0 or pass_count > eligible:
         return {
             "layer": layer_name,
@@ -124,8 +189,21 @@ def evaluate_layer_gate(layer_name: str, thresholds: dict[str, Any], pass_count:
             "gate": "FAIL",
             "reason": "invalid_counts",
             "formula_ok": None,
+            "threshold_ok": False,
         }
     if eligible == 0:
+        # Still require the layer spec to exist; zero-denom does not invent thresholds.
+        if not isinstance(thresholds, dict) or layer_name not in thresholds:
+            return {
+                "layer": layer_name,
+                "eligible": 0,
+                "pass": 0,
+                "gate": "FAIL",
+                "reason": "missing_threshold",
+                "hard_pass": False,
+                "formula_ok": None,
+                "threshold_ok": False,
+            }
         return {
             "layer": layer_name,
             "eligible": 0,
@@ -133,7 +211,20 @@ def evaluate_layer_gate(layer_name: str, thresholds: dict[str, Any], pass_count:
             "gate": "UNKNOWN",
             "reason": "denominator_zero",
             "hard_pass": None,
-            "formula_ok": None,
+            "formula_ok": None if layer_name != "demo_fuzz" else True,
+            "threshold_ok": True,
+        }
+
+    if not isinstance(thresholds, dict) or layer_name not in thresholds:
+        return {
+            "layer": layer_name,
+            "eligible": eligible,
+            "pass": pass_count,
+            "gate": "FAIL",
+            "hard_pass": False,
+            "reason": "missing_threshold",
+            "formula_ok": False if layer_name == "demo_fuzz" else None,
+            "threshold_ok": False,
         }
 
     spec = thresholds.get(layer_name)
@@ -151,6 +242,7 @@ def evaluate_layer_gate(layer_name: str, thresholds: dict[str, Any], pass_count:
                 "pass": pass_count,
                 "formula": formula,
                 "formula_ok": False,
+                "threshold_ok": False,
                 "canonical_formula": CANONICAL_DEMO_FUZZ_FORMULA,
                 "gate": "FAIL",
                 "hard_pass": False,
@@ -164,11 +256,36 @@ def evaluate_layer_gate(layer_name: str, thresholds: dict[str, Any], pass_count:
             "pass": pass_count,
             "formula": CANONICAL_DEMO_FUZZ_FORMULA,
             "formula_ok": True,
+            "threshold_ok": True,
             "gate": "PASS" if ok else "FAIL",
             "hard_pass": ok,
         }
 
-    threshold = float(spec) if isinstance(spec, (int, float)) else 1.0
+    if not isinstance(spec, (int, float)) or isinstance(spec, bool):
+        return {
+            "layer": layer_name,
+            "eligible": eligible,
+            "pass": pass_count,
+            "gate": "FAIL",
+            "hard_pass": False,
+            "reason": "malformed_threshold",
+            "threshold": spec,
+            "threshold_ok": False,
+            "formula_ok": None,
+        }
+    threshold = float(spec)
+    if threshold < 0.0 or threshold > 1.0:
+        return {
+            "layer": layer_name,
+            "eligible": eligible,
+            "pass": pass_count,
+            "gate": "FAIL",
+            "hard_pass": False,
+            "reason": "threshold_out_of_range",
+            "threshold": threshold,
+            "threshold_ok": False,
+            "formula_ok": None,
+        }
     rate = pass_count / eligible
     ok = rate + 1e-12 >= threshold
     return {
@@ -179,5 +296,6 @@ def evaluate_layer_gate(layer_name: str, thresholds: dict[str, Any], pass_count:
         "rate": rate,
         "gate": "PASS" if ok else "FAIL",
         "hard_pass": ok,
+        "threshold_ok": True,
         "formula_ok": None,
     }

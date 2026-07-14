@@ -20,7 +20,198 @@ from .holdout_pin import verify_holdout
 from .identity import build_subject, join_subject_keys, sha256_text, subject_digest
 from .modes import Mode, normalize_mode
 from .resume import check_resume_subject, load_partials, write_partial
+from .s9b_aggregate import check_caseset_completeness
 from .thresholds import load_thresholds_from_v1
+
+# Load-bearing subject + binding fields required before evaluation/seal.
+REQUIRED_SUBJECT_FIELDS = (
+    "repo_head",
+    "holdout_sha256",
+    "holdout_row_count",
+    "b7_assembled_sha256",
+    "b7_compat_sha256",
+    "b7_unordered_id_set_sha256",
+    "v1_authority_digest",
+    "v1_status",
+    "contract_bundle_digest",
+    "parser_id",
+    "mode",
+)
+
+REQUIRED_B7_MANIFEST_FIELDS = (
+    ("assembled_sha256", B7_ASSEMBLED_SHA256, "b7_assembled_sha256"),
+    ("compat_sha256", B7_COMPAT_SHA256, "b7_compat_sha256"),
+    ("unordered_id_set_sha256", B7_UNORDERED_ID_SET_SHA256, "b7_unordered_id_set_sha256"),
+)
+
+
+def validate_required_bindings(
+    subject: dict[str, Any],
+    manifest: dict[str, Any],
+    *,
+    mode: Mode,
+) -> list[dict[str, str]]:
+    """Fail closed when load-bearing subject/manifest binding fields are missing or wrong.
+
+    Comparisons must not skip absent values: missing digests are errors, not no-ops.
+    """
+    errors: list[dict[str, str]] = []
+    subj = subject if isinstance(subject, dict) else {}
+    b7 = manifest.get("b7") if isinstance(manifest.get("b7"), dict) else {}
+    holdout = manifest.get("holdout") if isinstance(manifest.get("holdout"), dict) else {}
+    v1 = manifest.get("v1") if isinstance(manifest.get("v1"), dict) else {}
+
+    for field in REQUIRED_SUBJECT_FIELDS:
+        if field not in subj or subj.get(field) is None or subj.get(field) == "":
+            errors.append(
+                {
+                    "code": "E_BINDING_MISSING",
+                    "detail": f"subject.{field} missing; required before S9 evaluation",
+                }
+            )
+
+    # Exact value checks for pinned digests/counts when present.
+    if subj.get("holdout_sha256") is not None and subj.get("holdout_sha256") != HOLDOUT_SHA256:
+        errors.append(
+            {
+                "code": "E_HOLDOUT_SHA_MISMATCH",
+                "detail": (
+                    f"subject.holdout_sha256={subj.get('holdout_sha256')!r} "
+                    f"!= pin {HOLDOUT_SHA256}"
+                ),
+            }
+        )
+    if (
+        subj.get("holdout_row_count") is not None
+        and subj.get("holdout_row_count") != HOLDOUT_ROW_COUNT
+    ):
+        errors.append(
+            {
+                "code": "E_HOLDOUT_ROW_COUNT_MISMATCH",
+                "detail": (
+                    f"subject.holdout_row_count={subj.get('holdout_row_count')!r} "
+                    f"!= pin {HOLDOUT_ROW_COUNT}"
+                ),
+            }
+        )
+
+    expected_subject_b7 = {
+        "b7_assembled_sha256": B7_ASSEMBLED_SHA256,
+        "b7_compat_sha256": B7_COMPAT_SHA256,
+        "b7_unordered_id_set_sha256": B7_UNORDERED_ID_SET_SHA256,
+    }
+    for field, expected in expected_subject_b7.items():
+        value = subj.get(field)
+        if value is None or value == "":
+            # already reported as missing above
+            continue
+        if value != expected:
+            errors.append(
+                {
+                    "code": "E_B7_DIGEST_MISMATCH",
+                    "detail": f"subject.{field} mismatch vs B7 candidate pin",
+                }
+            )
+
+    for manifest_key, expected, subject_alias in REQUIRED_B7_MANIFEST_FIELDS:
+        value = b7.get(manifest_key)
+        if value is None or value == "":
+            errors.append(
+                {
+                    "code": "E_BINDING_MISSING",
+                    "detail": (
+                        f"manifest.b7.{manifest_key} missing "
+                        f"(subject alias {subject_alias}); required before S9 evaluation"
+                    ),
+                }
+            )
+        elif value != expected:
+            errors.append(
+                {
+                    "code": "E_B7_DIGEST_MISMATCH",
+                    "detail": f"manifest.b7.{manifest_key} mismatch vs B7 candidate pin",
+                }
+            )
+
+    # Holdout + V1 manifest pins must also be present (not only compared when set).
+    if holdout.get("sha256") is None or holdout.get("sha256") == "":
+        errors.append(
+            {
+                "code": "E_BINDING_MISSING",
+                "detail": "manifest.holdout.sha256 missing; required before S9 evaluation",
+            }
+        )
+    elif holdout.get("sha256") != HOLDOUT_SHA256:
+        errors.append(
+            {
+                "code": "E_HOLDOUT_SHA_MISMATCH",
+                "detail": "manifest.holdout.sha256 mismatch vs D-127 pin",
+            }
+        )
+    if holdout.get("row_count") is None:
+        errors.append(
+            {
+                "code": "E_BINDING_MISSING",
+                "detail": "manifest.holdout.row_count missing; required before S9 evaluation",
+            }
+        )
+    elif holdout.get("row_count") != HOLDOUT_ROW_COUNT:
+        errors.append(
+            {
+                "code": "E_HOLDOUT_ROW_COUNT_MISMATCH",
+                "detail": "manifest.holdout.row_count mismatch vs D-127 pin",
+            }
+        )
+
+    if v1.get("authority_digest") is None or v1.get("authority_digest") == "":
+        errors.append(
+            {
+                "code": "E_BINDING_MISSING",
+                "detail": "manifest.v1.authority_digest missing; required before S9 evaluation",
+            }
+        )
+    if v1.get("status") is None or v1.get("status") == "":
+        errors.append(
+            {
+                "code": "E_BINDING_MISSING",
+                "detail": "manifest.v1.status missing; required before S9 evaluation",
+            }
+        )
+
+    if subj.get("mode") is not None and subj.get("mode") != mode.value:
+        errors.append(
+            {
+                "code": "E_SCHEMA",
+                "detail": (
+                    f"subject.mode={subj.get('mode')!r} does not match run mode={mode.value}"
+                ),
+            }
+        )
+
+    if not isinstance(subj.get("repo_head"), str) or not str(subj.get("repo_head") or "").strip():
+        if not any(
+            e.get("detail", "").startswith("subject.repo_head") for e in errors
+        ):
+            errors.append(
+                {
+                    "code": "E_BINDING_MISSING",
+                    "detail": "subject.repo_head missing or empty",
+                }
+            )
+
+    # Scorer identity: REAL arms must declare scorer_id; fixture uses fixture scorer.
+    arms = manifest.get("arms") if isinstance(manifest.get("arms"), dict) else {}
+    if mode == Mode.REAL:
+        for arm_id in ("base", "old", "new"):
+            arm = arms.get(arm_id) if isinstance(arms.get(arm_id), dict) else {}
+            if not arm.get("scorer_id"):
+                errors.append(
+                    {
+                        "code": "E_BINDING_MISSING",
+                        "detail": f"arms.{arm_id}.scorer_id missing under mode=real",
+                    }
+                )
+    return errors
 
 
 def verify_holdout_three_way(
@@ -430,6 +621,9 @@ def run_s9(
     if not holdout_info["ok"]:
         errors.extend(holdout_info["errors"])
 
+    # Required subject/manifest bindings before evaluation (missing != skip).
+    errors.extend(validate_required_bindings(subject, manifest, mode=mode))
+
     # Three-way: manifest pin == subject declaration == loaded artifact.
     # Hard fail always (forged subject with correct file must not green).
     errors.extend(
@@ -449,43 +643,23 @@ def run_s9(
     v1_errors = [
         e
         for e in (thr.get("errors") or [])
-        if e.get("code") in {"E_V1_DIGEST_MISMATCH", "E_V1_FORMULA_DRIFT", "E_SCHEMA"}
+        if e.get("code")
+        in {
+            "E_V1_DIGEST_MISMATCH",
+            "E_V1_FORMULA_DRIFT",
+            "E_SCHEMA",
+            "E_THRESHOLD_INCOMPLETE",
+        }
     ]
     if mode == Mode.REAL:
         errors.extend(v1_errors)
     else:
-        # Fixture/dry_run: digest soft unless other hard V1 errors (formula).
+        # Fixture/dry_run: digest soft unless other hard V1 errors (formula/completeness).
         for e in v1_errors:
             if e.get("code") != "E_V1_DIGEST_MISMATCH":
                 errors.append(e)
 
-    # B7 pin (static expected digests)
     b7 = manifest.get("b7") if isinstance(manifest.get("b7"), dict) else {}
-    if b7.get("assembled_sha256") and b7.get("assembled_sha256") != B7_ASSEMBLED_SHA256:
-        errors.append(
-            {
-                "code": "E_B7_DIGEST_MISMATCH",
-                "detail": "assembled_sha256 mismatch vs B7 candidate pin",
-            }
-        )
-    if b7.get("compat_sha256") and b7.get("compat_sha256") != B7_COMPAT_SHA256:
-        errors.append(
-            {
-                "code": "E_B7_DIGEST_MISMATCH",
-                "detail": "compat_sha256 mismatch vs B7 candidate pin",
-            }
-        )
-    if (
-        b7.get("unordered_id_set_sha256")
-        and b7.get("unordered_id_set_sha256") != B7_UNORDERED_ID_SET_SHA256
-    ):
-        errors.append(
-            {
-                "code": "E_B7_DIGEST_MISMATCH",
-                "detail": "unordered_id_set_sha256 mismatch vs B7 candidate pin",
-            }
-        )
-
     if mode == Mode.REAL and not bool(b7.get("is_b7_done") or subject.get("b7_is_done")):
         errors.append(
             {
@@ -662,8 +836,31 @@ def run_s9(
                 }
             )
 
+    # Authoritative caseset contract on the result set itself before any seal/PASS.
+    # REAL requires full holdout; fixture_subset may only seal clearly fixture-only subsets.
+    case_ids_by_arm: dict[str, list[str]] = {"base": [], "old": [], "new": []}
+    for item in results:
+        if not isinstance(item, dict):
+            continue
+        arm_id = str(item.get("arm_id") or "")
+        case_id = str(item.get("case_id") or "")
+        if arm_id in case_ids_by_arm and case_id:
+            case_ids_by_arm[arm_id].append(case_id)
+    active_arms = [arm_id for arm_id, ids in case_ids_by_arm.items() if ids]
+    errors.extend(
+        check_caseset_completeness(
+            mode=mode,
+            fixture_subset=fixture_subset,
+            authoritative_case_ids=expected_case_ids,
+            case_ids_by_arm=case_ids_by_arm,
+            active_arms=active_arms,
+            results=results,
+        )
+    )
+
     sealed = False
     if not errors and results:
+        # Only seal when the result set itself satisfies the authoritative caseset contract.
         sealed = True
         if isinstance(manifest.get("resume"), dict):
             manifest["resume"]["sealed"] = True
@@ -685,6 +882,8 @@ def run_s9(
             "E_RESULT_PROVENANCE_MISMATCH",
             "E_CASESET_INCOMPLETE",
             "E_V1_FORMULA_DRIFT",
+            "E_BINDING_MISSING",
+            "E_THRESHOLD_INCOMPLETE",
         }
         for e in errors
     ):
@@ -713,6 +912,7 @@ def run_s9(
         "result_count": len(results),
         "sealed": sealed,
         "fixture_subset": fixture_subset,
+        # Always the authoritative holdout IDs (not a trusted input override).
         "expected_case_ids": expected_case_ids,
         "errors": errors,
         "claims": {

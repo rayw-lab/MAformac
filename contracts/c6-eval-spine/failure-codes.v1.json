@@ -111,7 +111,7 @@
     },
     "E_CASESET_INCOMPLETE": {
       "stage": "s9b",
-      "description": "case set empty, truncated, duplicated, or not the authoritative 61-id set required for mode"
+      "description": "case set empty, truncated, duplicated, or not the authoritative 61-id set required for mode; receipt expected_case_ids is assertion-only vs D-127 holdout"
     },
     "E_V1_FORMULA_DRIFT": {
       "stage": "s10",
@@ -120,6 +120,18 @@
     "E_RESULT_PROVENANCE_MISMATCH": {
       "stage": "s9",
       "description": "arm result score_class/artifact/scorer/mode does not bind to manifest arm descriptor"
+    },
+    "E_THRESHOLD_INCOMPLETE": {
+      "stage": "s10",
+      "description": "V1 four_layer_thresholds missing/extra/malformed; never synthesize defaults for absent layers"
+    },
+    "E_S9B_STATUS_NOT_PASS": {
+      "stage": "s10",
+      "description": "REAL S10 requires s9b.status==PASS; BLOCKED/NOT_RUN/UNKNOWN/missing/other fail closed"
+    },
+    "E_BINDING_MISSING": {
+      "stage": "s9",
+      "description": "required subject/manifest binding field missing before evaluation (B7 digests, holdout, V1, mode, scorer)"
     }
   }
 }

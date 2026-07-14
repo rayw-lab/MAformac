@@ -71,7 +71,7 @@ def build_s10_verdict(
             }
         )
 
-    # Layer formula binding errors from evaluate_layer_gate.
+    # Layer formula / threshold binding errors from evaluate_layer_gate.
     for layer_name, layer_out in layers_out.items():
         if layer_out.get("formula_ok") is False:
             errors.append(
@@ -80,6 +80,16 @@ def build_s10_verdict(
                     "detail": (
                         f"layer {layer_name} formula_ok=false "
                         f"formula={layer_out.get('formula')!r}"
+                    ),
+                }
+            )
+        if layer_out.get("threshold_ok") is False and layer_out.get("formula_ok") is not False:
+            errors.append(
+                {
+                    "code": "E_THRESHOLD_INCOMPLETE",
+                    "detail": (
+                        f"layer {layer_name} threshold_ok=false "
+                        f"reason={layer_out.get('reason')!r}"
                     ),
                 }
             )
@@ -93,6 +103,9 @@ def build_s10_verdict(
         if any(e.get("code") == "E_V1_DIGEST_MISMATCH" for e in errors):
             status = "BLOCKED_AUTHORITY"
         if any(e.get("code") == "E_V1_FORMULA_DRIFT" for e in errors):
+            if status == "PASS":
+                status = "FAIL"
+        if any(e.get("code") == "E_THRESHOLD_INCOMPLETE" for e in errors):
             if status == "PASS":
                 status = "FAIL"
         if observed_status != "RATIFIED":
@@ -149,8 +162,21 @@ def build_s10_verdict(
                     ),
                 }
             )
-        if s9b.get("status") in {"FAIL", "INCOMPARABLE"}:
-            status = "INCOMPARABLE" if s9b.get("status") == "INCOMPARABLE" else "FAIL"
+        # S9b status whitelist: only PASS may yield S10 PASS. Any other/unknown/missing fails closed.
+        s9b_status = s9b.get("status")
+        if s9b_status != "PASS":
+            errors.append(
+                {
+                    "code": "E_S9B_STATUS_NOT_PASS",
+                    "detail": (
+                        f"s9b.status={s9b_status!r}; REAL S10 requires s9b.status=='PASS'"
+                    ),
+                }
+            )
+            if s9b_status == "INCOMPARABLE":
+                status = "INCOMPARABLE"
+            elif status == "PASS":
+                status = "FAIL"
         # force rejection already recorded; ensure non-PASS if only force error somehow
         if force_rejected and status == "PASS":
             status = "FAIL"
@@ -160,7 +186,12 @@ def build_s10_verdict(
     else:
         # fixture/dry_run: may PASS harness-wise even if V1 is CANDIDATE
         soft_codes = {"E_V1_DIGEST_MISMATCH"}
-        if any(e.get("code") in {"E_THRESHOLD_REINVENT", "E_V1_FORMULA_DRIFT"} for e in errors):
+        hard_threshold_codes = {
+            "E_THRESHOLD_REINVENT",
+            "E_V1_FORMULA_DRIFT",
+            "E_THRESHOLD_INCOMPLETE",
+        }
+        if any(e.get("code") in hard_threshold_codes for e in errors):
             status = "FAIL"
         elif s9b.get("status") in {"FAIL", "INCOMPARABLE"}:
             status = str(s9b.get("status"))
