@@ -21,6 +21,18 @@ NEVER_EXEMPT = {
     "training_data_from_restricted_sources",
 }
 ALLOWED_CARRIERS = {"docs/research/**", "referencerepo/reports/**"}
+ALLOWED_EXCEPTION_STATUSES = {"active", "retired"}
+EXPECTED_EXCEPTION_IDS = {"D-049-NARROW-PUBLIC-RESEARCH-202607"}
+ALLOWED_SUBJECTS = {
+    "non_identifying_vehicle_or_platform_codes",
+    "vendor_or_product_names_from_public_sources",
+}
+REQUIRED_CONDITIONS = {
+    "source_is_public_or_separately_approved_for_public_citation",
+    "use_is_minimal_and_research_only",
+    "not_training_data",
+    "not_customer_facing_demo_copy",
+}
 PATCH_RESIDUE_FILES = (
     "MEMORY.md",
     "docs/lessons-learned.md",
@@ -86,7 +98,10 @@ def check_openspec_config(root: Path, errors: list[str]) -> None:
     banned = {
         "define-c1c2-contract": r"define-c1c2-contract",
         "vendor_dispatch": r"\b(Codex|Claude|Grok|Hermes)\b",
-        "provider": r"\bprovider\b",
+        "dispatch_assignment": r"\b(?:model|provider|vendor|agent|commander|controller|producer)\s*[:=]",
+        "current_change": r"\b(?:current[ _-]?change|active[ _-]?change|change[ _-]?id)\s*[:=]",
+        "phase_order": r"\b(?:phase|stage|milestone)\s*[:=]",
+        "git_route": r"\b(?:HEAD|branch|upstream|route)\s*[:=]",
         "operator_state": r"\b(pane|PID|simulator)\b",
         "repo_visibility": r"repo.{0,20}\b(public|private)\b",
     }
@@ -124,6 +139,8 @@ def check_exception_registry(root: Path, as_of: dt.date, errors: list[str]) -> N
         if item_id in ids:
             errors.append(f"E_EXCEPTION_DUPLICATE:{item_id}")
         ids.add(item_id)
+        if item["status"] not in ALLOWED_EXCEPTION_STATUSES:
+            errors.append(f"E_EXCEPTION_STATUS:{item_id}")
         try:
             valid_from = dt.date.fromisoformat(item["valid_from"])
             expires_on = dt.date.fromisoformat(item["expires_on"])
@@ -132,10 +149,17 @@ def check_exception_registry(root: Path, as_of: dt.date, errors: list[str]) -> N
             continue
         if valid_from > expires_on:
             errors.append(f"E_EXCEPTION_DATE_ORDER:{item_id}")
-        if item["status"] == "active" and expires_on < as_of:
-            errors.append(f"E_EXCEPTION_EXPIRED_ACTIVE:{item_id}")
+        if item["status"] == "active":
+            if valid_from > as_of:
+                errors.append(f"E_EXCEPTION_NOT_YET_ACTIVE:{item_id}")
+            if expires_on < as_of:
+                errors.append(f"E_EXCEPTION_EXPIRED_ACTIVE:{item_id}")
+        if set(item["allowed_subjects"]) != ALLOWED_SUBJECTS:
+            errors.append(f"E_EXCEPTION_SUBJECTS:{item_id}")
         if set(item["allowed_carriers"]) != ALLOWED_CARRIERS:
             errors.append(f"E_EXCEPTION_CARRIERS:{item_id}")
+        if set(item["conditions"]) != REQUIRED_CONDITIONS:
+            errors.append(f"E_EXCEPTION_CONDITIONS:{item_id}")
         if set(item["never_overrides"]) != never:
             errors.append(f"E_EXCEPTION_OVERRIDE_GAP:{item_id}")
         if not item["allowed_subjects"] or not item["conditions"]:
@@ -146,6 +170,8 @@ def check_exception_registry(root: Path, as_of: dt.date, errors: list[str]) -> N
             errors.append(f"E_EXCEPTION_BASIS_MISSING:{item_id}")
         elif len(basis_parts) != 2 or basis_parts[1] not in (root / basis_path).read_text(encoding="utf-8"):
             errors.append(f"E_EXCEPTION_BASIS_ANCHOR:{item_id}")
+    if ids != EXPECTED_EXCEPTION_IDS:
+        errors.append("E_EXCEPTION_ID_SET")
 
 
 def check_authority_surfaces(root: Path, errors: list[str]) -> None:

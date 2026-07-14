@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import tempfile
@@ -77,6 +78,21 @@ class GovernanceHygieneTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_OPENSPEC_DYNAMIC", result.stderr)
 
+    def test_dynamic_openspec_route_fields_fail_closed(self) -> None:
+        path = self.root / "openspec/config.yaml"
+        original = path.read_text(encoding="utf-8")
+        for injected in (
+            "current change: add-s8-runtime",
+            "phase: S8",
+            "model: Qwen3",
+        ):
+            with self.subTest(injected=injected):
+                path.write_text(original + f"\n# {injected}\n", encoding="utf-8")
+                result = self.run_checker()
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("E_OPENSPEC_DYNAMIC", result.stderr)
+        path.write_text(original, encoding="utf-8")
+
     def test_duplicate_frontmatter_key_fails_closed(self) -> None:
         self.replace("docs/CURRENT.md", "as_of: 2026-07-14", "as_of: 2026-07-14\nas_of: stale")
         result = self.run_checker()
@@ -104,6 +120,36 @@ class GovernanceHygieneTests(unittest.TestCase):
         result = self.run_checker()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_EXCEPTION_CARRIERS", result.stderr)
+
+    def mutate_exception(self, key: str, value: object) -> None:
+        path = self.root / "contracts/governance/public-repo-exceptions.v1.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["exceptions"][0][key] = value
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    def test_exception_subject_expansion_fails_closed(self) -> None:
+        self.mutate_exception("allowed_subjects", ["anything_nonempty"])
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_EXCEPTION_SUBJECTS", result.stderr)
+
+    def test_exception_condition_expansion_fails_closed(self) -> None:
+        self.mutate_exception("conditions", ["anything_nonempty"])
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_EXCEPTION_CONDITIONS", result.stderr)
+
+    def test_exception_not_yet_active_fails_closed(self) -> None:
+        self.mutate_exception("valid_from", "2026-07-15")
+        result = self.run_checker(as_of="2026-07-14")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_EXCEPTION_NOT_YET_ACTIVE", result.stderr)
+
+    def test_exception_unknown_status_fails_closed(self) -> None:
+        self.mutate_exception("status", "permanent")
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("E_EXCEPTION_STATUS", result.stderr)
 
     def test_missing_handoff_chain_fails_closed(self) -> None:
         self.replace(
