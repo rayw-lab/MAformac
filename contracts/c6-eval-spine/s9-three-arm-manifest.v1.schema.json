@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c6-eval-spine/s9-three-arm-manifest.v1.schema.json",
+  "title": "S9 three-arm manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "mode",
+    "repo_head",
+    "subject",
+    "holdout",
+    "b7",
+    "v1",
+    "arms",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": { "const": "s9_three_arm_manifest_v1" },
+    "run_id": { "type": "string" },
+    "mode": { "type": "string", "enum": ["fixture", "dry_run", "real"] },
+    "repo_head": { "type": "string" },
+    "subject": { "type": "object" },
+    "holdout": {
+      "type": "object",
+      "required": ["path", "sha256", "row_count"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "row_count": { "type": "integer" }
+      }
+    },
+    "b7": { "type": "object" },
+    "v1": { "type": "object" },
+    "arms": {
+      "type": "object",
+      "required": ["base", "old", "new"],
+      "properties": {
+        "base": { "type": "object" },
+        "old": { "type": "object" },
+        "new": { "type": "object" }
+      }
+    },
+    "exposure_gate": { "type": "object" },
+    "resume": { "type": "object" },
+    "claims": { "type": "object" }
+  },
+  "additionalProperties": true
+}

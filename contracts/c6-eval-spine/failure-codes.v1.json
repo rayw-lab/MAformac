@@ -1,0 +1,89 @@
+{
+  "schema_version": "c6_eval_spine_failure_codes_v1",
+  "codes": {
+    "E_MODE_REAL_WITHOUT_NEW_ADAPTER": {
+      "stage": "s9",
+      "description": "mode=real but arms.new.adapter_status is absent"
+    },
+    "E_FORGED_REAL_SCORE": {
+      "stage": "s9",
+      "description": "score_class=real_model without a present real adapter"
+    },
+    "E_HOLDOUT_SHA_MISMATCH": {
+      "stage": "preflight",
+      "description": "holdout bytes do not match D-127 pin sha256"
+    },
+    "E_HOLDOUT_ROW_COUNT_MISMATCH": {
+      "stage": "preflight",
+      "description": "holdout row_count is not 61"
+    },
+    "E_B7_DIGEST_MISMATCH": {
+      "stage": "preflight",
+      "description": "B7 assembled/compat/id-set digests do not match candidate"
+    },
+    "E_B7_NOT_FROZEN": {
+      "stage": "s9",
+      "description": "mode=real requires B7 freeze (is_b7_done=true)"
+    },
+    "E_V1_DIGEST_MISMATCH": {
+      "stage": "preflight",
+      "description": "V1 authority digest drift"
+    },
+    "E_V1_NOT_RATIFIED": {
+      "stage": "s10",
+      "description": "real verdict requires V1 status=RATIFIED"
+    },
+    "E_THRESHOLD_REINVENT": {
+      "stage": "s10",
+      "description": "second threshold set embedded; only V1 subject.four_layer_thresholds allowed"
+    },
+    "E_EXPOSURE_VIOLATION": {
+      "stage": "preflight",
+      "description": "train/eval exposure or near-dup leak"
+    },
+    "E_UNKNOWN_BEHAVIOR_CLASS": {
+      "stage": "s9b",
+      "description": "behavior class outside V1 five-class set"
+    },
+    "E_UNKNOWN_READBACK_FIELD": {
+      "stage": "s9",
+      "description": "Plan-P seven readback fields incomplete"
+    },
+    "E_MISSING_CASE": {
+      "stage": "s9b",
+      "description": "case_id missing from one or more arms"
+    },
+    "E_DUPLICATE_CASE": {
+      "stage": "s9b",
+      "description": "duplicate case_id within an arm"
+    },
+    "E_MISSING_ARM": {
+      "stage": "s9b",
+      "description": "required arm absent under real mode"
+    },
+    "E_RESUME_SUBJECT_DRIFT": {
+      "stage": "resume",
+      "description": "partial receipt subject does not match manifest subject"
+    },
+    "E_STATE_COLLAPSE": {
+      "stage": "s11",
+      "description": "renderer ack collapsed into promotion/signoff"
+    },
+    "E_PACKAGE_DONE_CLAIM": {
+      "stage": "any",
+      "description": "harness claimed B2/B3/B4 DONE or C6 acceptance"
+    },
+    "E_INCOMPARABLE_SUBJECT": {
+      "stage": "s9b",
+      "description": "same-subject exact join failed"
+    },
+    "E_SCHEMA": {
+      "stage": "any",
+      "description": "required field or type validation failure"
+    },
+    "E_NO_REAL_SCORES": {
+      "stage": "s10",
+      "description": "real mode without real_model scores"
+    }
+  }
+}

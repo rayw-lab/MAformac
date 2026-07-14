@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c6-eval-spine/s10-verdict.v1.schema.json",
+  "title": "S10 full verdict (not package DONE envelope)",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "mode",
+    "subject",
+    "authority",
+    "layers",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": { "const": "s10_verdict_v1" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED_AUTHORITY",
+        "BLOCKED_MISSING_REAL_SCORES",
+        "INCOMPARABLE"
+      ]
+    },
+    "mode": { "type": "string", "enum": ["fixture", "dry_run", "real"] },
+    "subject": { "type": "object" },
+    "authority": {
+      "type": "object",
+      "required": [
+        "authority_digest",
+        "required_status",
+        "observed_status",
+        "thresholds_source"
+      ]
+    },
+    "layers": {
+      "type": "object",
+      "required": ["golden", "demo_fuzz", "unsupported", "safety"]
+    },
+    "qa_safety": { "type": "object" },
+    "c5_phase1": { "type": "object" },
+    "joint_strike": { "type": "object" },
+    "d114_failure_class": { "type": ["string", "null"] },
+    "claims": {
+      "type": "object",
+      "required": ["package_b3_done", "c6_acceptance", "candidate_signed"]
+    },
+    "errors": { "type": "array" }
+  },
+  "additionalProperties": true
+}

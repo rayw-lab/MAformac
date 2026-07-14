@@ -1,0 +1,13 @@
+{
+  "artifact_kind": "s9_composite_eval_manifest",
+  "status": "FROZEN",
+  "case_bundle_path": "../../holdout/eval-holdout.jsonl",
+  "bundles": [
+    {
+      "name": "eval_holdout_d127",
+      "path": "../../holdout/eval-holdout.jsonl",
+      "row_count": 61,
+      "score_layer": "holdout_gate"
+    }
+  ]
+}
