@@ -48,9 +48,11 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "Tools"))
 import check_c6_active_authority_candidate as active_authority_checker  # noqa: E402
 from C6ActiveAuthority import export_ratification_packet  # noqa: E402
+from C6CorpusLineage import export_freeze_packet  # noqa: E402
 
 
 B7_ENVELOPE = ROOT / "closure/candidates/B7/c6-corpus-lineage.envelope.json"
+B7_FREEZE_PACKET = ROOT / "closure/candidates/B7/B7.v1.freeze-packet.candidate.json"
 V1_AUTHORITY = ROOT / "contracts/c6-active-authority/authority.v1.candidate.json"
 V1_RECEIPT = ROOT / "closure/candidates/V1/V1.v1.candidate-receipt.json"
 V1_PACKET = ROOT / "closure/candidates/V1/V1.v1.ratification-packet.candidate.json"
@@ -107,7 +109,7 @@ def refresh_candidate_identities(
     refresh_authority_source: str | None,
 ) -> tuple[Path, ...]:
     """Recompute the full B7/V1 candidate chain against staged registry bytes."""
-    required = (B7_ENVELOPE, V1_AUTHORITY, V1_RECEIPT, V1_PACKET)
+    required = (B7_ENVELOPE, B7_FREEZE_PACKET, V1_AUTHORITY, V1_RECEIPT, V1_PACKET)
     for path in required:
         if not path.is_file():
             raise ReanchorError("E_CANDIDATE_IDENTITY", f"missing candidate identity artifact: {path}")
@@ -120,6 +122,20 @@ def refresh_candidate_identities(
         b7,
         trailing_newline=B7_ENVELOPE.read_bytes().endswith(b"\n"),
     )
+
+    freeze_packet, freeze_errors = export_freeze_packet.build_packet()
+    if freeze_errors:
+        raise ReanchorError(
+            "E_CANDIDATE_IDENTITY",
+            f"B7 freeze packet rebuild refused: {freeze_errors}",
+        )
+    freeze_check_errors = export_freeze_packet.self_check(freeze_packet)
+    if freeze_check_errors:
+        raise ReanchorError(
+            "E_CANDIDATE_IDENTITY",
+            f"B7 freeze packet self-check refused: {freeze_check_errors}",
+        )
+    changes[B7_FREEZE_PACKET] = export_freeze_packet.canonical_bytes(freeze_packet)
 
     authority = load_envelope_payload(V1_AUTHORITY)
     source_members = authority.get("source_members", [])

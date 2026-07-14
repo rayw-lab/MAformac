@@ -28,6 +28,7 @@ SCHEMA_REL = Path("contracts/schemas/closure-work-packages.v1.schema.json")
 POLICY_REL = Path("contracts/closure-execution-window.v1.yaml")
 CANDIDATE_IDENTITY_RELS = (
     Path("closure/candidates/B7/c6-corpus-lineage.envelope.json"),
+    Path("closure/candidates/B7/B7.v1.freeze-packet.candidate.json"),
     Path("contracts/c6-active-authority/authority.v1.candidate.json"),
     Path("closure/candidates/V1/V1.v1.candidate-receipt.json"),
     Path("closure/candidates/V1/V1.v1.ratification-packet.candidate.json"),
@@ -135,10 +136,13 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
         )
 
         b7 = json.loads((clone / CANDIDATE_IDENTITY_RELS[0]).read_text(encoding="utf-8"))
-        authority_path = clone / CANDIDATE_IDENTITY_RELS[1]
+        freeze_packet = json.loads(
+            (clone / CANDIDATE_IDENTITY_RELS[1]).read_text(encoding="utf-8")
+        )
+        authority_path = clone / CANDIDATE_IDENTITY_RELS[2]
         authority = json.loads(authority_path.read_text(encoding="utf-8"))
-        receipt = json.loads((clone / CANDIDATE_IDENTITY_RELS[2]).read_text(encoding="utf-8"))
-        packet = json.loads((clone / CANDIDATE_IDENTITY_RELS[3]).read_text(encoding="utf-8"))
+        receipt = json.loads((clone / CANDIDATE_IDENTITY_RELS[3]).read_text(encoding="utf-8"))
+        packet = json.loads((clone / CANDIDATE_IDENTITY_RELS[4]).read_text(encoding="utf-8"))
         registry_sha = hashlib.sha256((clone / REGISTRY_REL).read_bytes()).hexdigest()
         authority_sha = hashlib.sha256(authority_path.read_bytes()).hexdigest()
         registry_member = next(
@@ -152,6 +156,13 @@ class ReanchorClosureRegistryTests(unittest.TestCase):
             if member["member_id"] == "closure_work_packages_v1"
         )
         self.assertEqual(b7["registry_digest"], digest)
+        decisions_ref = next(
+            ref for ref in freeze_packet["ratification_refs"] if ref["locator"] == "D-147"
+        )
+        self.assertEqual(
+            decisions_ref["sha256"],
+            hashlib.sha256((clone / "docs/commander-log/decisions.md").read_bytes()).hexdigest(),
+        )
         self.assertEqual(receipt["registry_digest"], digest)
         self.assertEqual(registry_member["sha256"], registry_sha)
         self.assertEqual(packet_member["sha256"], registry_sha)
