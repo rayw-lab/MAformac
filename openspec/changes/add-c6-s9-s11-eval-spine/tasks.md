@@ -16,6 +16,14 @@
 - [x] 0.6 `git diff --check` rc0；touched paths exact-set = 本 change 四文件（untracked，未 commit）
 - [x] 0.7 **不 commit / 不 push**（避免与实现 producer 争 index）
 
+## 0b. 文档级联（本批，文档 producer 在实现后追加）
+
+- [x] 0b.1 创建 `Tools/C6EvalSpine/LESSONS.md`：L1-L10 可复用教训（green tests hide schema skips, presence ≠ authority binding, producer-shaped expected_case_ids ≠ authority, all-zero digest, intermediate sealed/PASS as claim, coherent source drift, decision ratification vs artifact materialization, S9b status whitelist, fixture subset vs REAL caseset, no fallback thresholds）
+- [x] 0b.2 创建 `Tools/C6CorpusLineage/README.md`：B7 freeze packet 操作手册（CLI、确定性导出、ref allowlist、source_members 绑定、stdlib strict schema validation、deliberate-red 期望、外部 ceremony 边界）
+- [x] 0b.3 更新 `Tools/C6ActiveAuthority/README.md`：追加 V1 ratification packet 导出/ceremony 边界 section
+- [x] 0b.4 更新 `openspec/changes/add-c6-s9-s11-eval-spine/design.md`：追加文档级联表
+- [x] 0b.5 更新 `openspec/changes/add-c6-s9-s11-eval-spine/tasks.md`：追加本段 0b 任务
+
 ## 1. Schemas + failure codes + fixtures（实现 producer）
 
 - [ ] 1.1 创建 `contracts/c6-eval-spine/manifest.v1.json`：目录身份、stage 列表、non-claims、residual enum

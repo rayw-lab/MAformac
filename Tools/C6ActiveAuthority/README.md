@@ -87,3 +87,82 @@ Fail-closed gates include: stale hash, duplicate member_id/role/path/locator, mi
 - **Do not** modify the authority document in place — create a superseding version
 - **Do** run the source checker after any change
 - rebuild-C6 remains draft/acceptance-stopline; this candidate does not authorize `/opsx:apply` on rebuild-C6
+
+---
+
+## V1 Ratification Packet Exporter
+
+`Tools/C6ActiveAuthority/export_ratification_packet.py` 从 live V1 authority candidate 导出机械消费 packet。
+
+### 身份
+
+| 字段 | 值 |
+|------|-----|
+| `packet_id` | V1.ratification.v1 |
+| `schema_version` | `c6_active_authority_ratification_packet_v1` |
+| `status` | `CANDIDATE_PACKET_ONLY`（永不自动升格） |
+| `observed_status` | `CANDIDATE`（live 观察态） |
+| `target_status` | `RATIFIED`（ceremony 目标态） |
+| `is_v1_done` | `false`（永不自动翻 true） |
+| `requires_operator_ceremony` | `true` |
+
+### CLI
+
+```bash
+# 写 packet 到 closure/candidates/V1/
+python3 Tools/C6ActiveAuthority/export_ratification_packet.py
+
+# 打印到 stdout
+python3 Tools/C6ActiveAuthority/export_ratification_packet.py --stdout
+
+# --check: live recompute + byte-equal committed
+python3 Tools/C6ActiveAuthority/export_ratification_packet.py --check
+```
+
+### 确定性导出
+
+Canonical JSON（`sort_keys=True, separators=(",", ":")`）。同一 repo 状态两次导出必须字节级相等。
+
+### 严格 ref allowlist
+
+允许的顶层字段（`ALLOWED_TOP_LEVEL_KEYS`）：
+
+`schema_version`, `packet_id`, `package_id`, `status`, `observed_status`, `target_status`, `is_canonical`, `is_v1_done`, `requires_operator_ceremony`, `authority_binding`, `four_layer_thresholds`, `decision_refs`, `receipt_refs`, `non_claims`
+
+禁止的顶层字段（`FORBIDDEN_TOP_LEVEL_FIELDS`）：
+
+`operator`, `operator_id`, `signature`, `signed_at`, `ratified_at`, `ceremony`, `frozen_at`, `canonical_receipt`, `is_done`, `done`, `DONE`, `canonical` 等
+
+### 绑定
+
+| 绑定 | 来源 | 校验 |
+|------|------|------|
+| `authority_binding.digest_sha256` | 从 live authority candidate 用 `auth_checker.compute_digest()` 实时复算 | `--check` 断言 |
+| `four_layer_thresholds` | authority candidate `subject.four_layer_thresholds` | golden/unsupported/safety=1.0, demo_fuzz formula exact |
+| `decision_refs` | authority candidate 的 `decision_refs`（D-147 + D-144） | required_state=ratified |
+| `receipt_refs` | D-147 decisions.md + pool32 receipt 的 live sha | `--check` 实时复算 |
+
+### 外部 ceremony 边界
+
+本 packet **不**执行以下操作：
+
+- ❌ 不写 `closure/receipts/V1.v1.json`（DONE 信封留给 ceremony）
+- ❌ 不翻转 `status` 从 CANDIDATE 到 RATIFIED
+- ❌ 不翻转 registry `execution_state`
+- ❌ 不声称 `is_v1_done=true`、`is_canonical=true`
+- ❌ 不伪造 operator/time/signature
+- ❌ 不授权 S9/S10 real 执行
+
+### 验证命令
+
+```bash
+# 单元测试
+python3 -B scripts/test_export_c6_active_authority_ratification_packet.py
+
+# 回归：V1 candidate checker
+python3 -B scripts/check_c6_active_authority_candidate.py \
+  contracts/c6-active-authority/authority.v1.candidate.json
+
+# 实时复算 + byte-equal committed
+python3 Tools/C6ActiveAuthority/export_ratification_packet.py --check
+```

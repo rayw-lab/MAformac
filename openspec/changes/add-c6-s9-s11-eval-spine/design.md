@@ -200,6 +200,17 @@ harness 绿只允许 claims 如 `local_harness` / `fixture_replay` / `spine_read
 | `E_D114_HOLDOUT_COLLAPSE` | holdout 塌（禁 waiver） |
 | `E_QA_SAFETY_FAIL` / `E_C5_PHASE1_FAIL` | 对应门红 |
 
+## 已实现的文档级联
+
+以下文档已在实现阶段创建或更新，反映 spine 最终行为：
+
+| 文档 | 路径 | 类型 | 内容 |
+|------|------|------|------|
+| Durable lessons | `Tools/C6EvalSpine/LESSONS.md` | 新建 | L1-L10 可复用教训 |
+| Corpus lineage operator guide | `Tools/C6CorpusLineage/README.md` | 新建 | B7 freeze packet 操作手册 |
+| Authority packet guide | `Tools/C6ActiveAuthority/README.md` | 更新 | 追加 V1 ratification packet 导出/ceremony 边界 |
+| Eval spine README | `Tools/C6EvalSpine/README.md` | 已有（并行 producer 可能已更新） | 不在此 change 覆盖 |
+
 ## Pre-Mortem（已知失败模式）
 
 | tiger | 来源 | 防护 |
