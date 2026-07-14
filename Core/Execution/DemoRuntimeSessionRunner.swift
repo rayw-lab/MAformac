@@ -122,8 +122,28 @@ public final class DemoRuntimeSessionRunner {
         )
     }
 
+    /// Unit/default helper surface. Uses the optional constructor-bound provider
+    /// (typically `nil`). Not the App production surface.
     @discardableResult
     public func run(text: String) async throws -> RuntimePresentationPayload {
+        try await executeRun(text: text, correlationProvider: correlationProvider)
+    }
+
+    /// App production surface: per-call non-optional correlation provider.
+    /// The provider is selected for this invocation only and threaded to every
+    /// normal/partial `consumeTypedFactsIfWired` call — no shared mutable override.
+    @discardableResult
+    public func run(
+        text: String,
+        correlationProvider: RuntimeSessionCorrelationProvider
+    ) async throws -> RuntimePresentationPayload {
+        try await executeRun(text: text, correlationProvider: correlationProvider)
+    }
+
+    private func executeRun(
+        text: String,
+        correlationProvider: RuntimeSessionCorrelationProvider?
+    ) async throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(text)
         let frameResults: [ToolCallFrame]
         do {
@@ -203,18 +223,18 @@ public final class DemoRuntimeSessionRunner {
                 }
             )
             let dialogText = acceptedReadbacks.map(\.spokenText).joined(separator: "；")
+            let partialSpeechDidEnqueue = speakAcceptedDialogText(
+                dialogText,
+                traceID: partialResult.traceID
+            )
             if !dialogText.isEmpty {
-                let speechResult = speech.speak(dialogText)
-                if !speechResult.didEnqueue {
-                    traceLogger.recordReadback(
-                        traceID: partialResult.traceID,
-                        message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
-                        attributes: TraceAttributes(readbackResult: .failed)
-                    )
-                }
                 dialogueState.recordAssistantText(dialogText)
                 dialogueState.recordReadbacks(acceptedReadbacks)
-                consumeTypedFactsIfWired(frame: frameResult, traceID: partialResult.traceID)
+                consumeTypedFactsIfWired(
+                    frame: frameResult,
+                    traceID: partialResult.traceID,
+                    correlationProvider: correlationProvider
+                )
             }
 
             let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: partialResult.traceID)
@@ -248,6 +268,12 @@ public final class DemoRuntimeSessionRunner {
                         isActive: true
                     )
                 }
+                // Visual-first: keep orb/dialog; freeze Core voice to .idle when
+                // synthesis failed or speech text empty (AD-7 / S5 — never invent .speak).
+                let coreVoiceState = Self.coreVoiceDisplayState(
+                    dialogText: dialogText,
+                    speechDidEnqueue: partialSpeechDidEnqueue
+                )
                 let snapshot = PresentationSnapshot(
                     traceID: partialResult.traceID,
                     runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
@@ -256,7 +282,7 @@ public final class DemoRuntimeSessionRunner {
                     dialogText: dialogText.isEmpty ? nil : dialogText,
                     readbacks: acceptedReadbacks,
                     scopeOrigin: acceptedReadbacks.compactMap(\.scopeOrigin).first,
-                    voiceState: dialogText.isEmpty ? .idle : .speak,
+                    voiceState: coreVoiceState,
                     orbState: dialogText.isEmpty ? .idle : .speak,
                     proofClass: .localUnit,
                     traceEnvelope: traceEnvelope,
@@ -321,21 +347,27 @@ public final class DemoRuntimeSessionRunner {
             )
         }
         let dialogText = result.readbacks.map(\.spokenText).joined(separator: "；")
+        let fullSpeechDidEnqueue = speakAcceptedDialogText(
+            dialogText,
+            traceID: result.traceID
+        )
         if !dialogText.isEmpty {
-            let speechResult = speech.speak(dialogText)
-            if !speechResult.didEnqueue {
-                traceLogger.recordReadback(
-                    traceID: result.traceID,
-                    message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
-                    attributes: TraceAttributes(readbackResult: .failed)
-                )
-            }
             dialogueState.recordAssistantText(dialogText)
             dialogueState.recordReadbacks(result.readbacks)
-            consumeTypedFactsIfWired(frame: frame, traceID: result.traceID)
+            consumeTypedFactsIfWired(
+                frame: frame,
+                traceID: result.traceID,
+                correlationProvider: correlationProvider
+            )
         }
 
         let traceEnvelope = traceEnvelopeForCurrentTurn(traceID: result.traceID)
+        // Visual-first: keep orb/dialog; freeze Core voice to .idle when
+        // synthesis failed or speech text empty (AD-7 / S5 — never invent .speak).
+        let coreVoiceState = Self.coreVoiceDisplayState(
+            dialogText: dialogText,
+            speechDidEnqueue: fullSpeechDidEnqueue
+        )
         let snapshot = PresentationSnapshot(
             traceID: result.traceID,
             runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
@@ -344,7 +376,7 @@ public final class DemoRuntimeSessionRunner {
             dialogText: dialogText.isEmpty ? nil : dialogText,
             readbacks: result.readbacks,
             scopeOrigin: result.readbacks.compactMap(\.scopeOrigin).first,
-            voiceState: dialogText.isEmpty ? .idle : .speak,
+            voiceState: coreVoiceState,
             orbState: dialogText.isEmpty ? .idle : .speak,
             proofClass: .localUnit,
             traceEnvelope: traceEnvelope,
@@ -382,14 +414,9 @@ public final class DemoRuntimeSessionRunner {
                 decodeFailureKind: decodeFailureKind
             )
         )
-        let speechResult = speech.speak(context.ttsText)
-        if !speechResult.didEnqueue {
-            traceLogger.recordReadback(
-                traceID: traceID,
-                message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
-                attributes: TraceAttributes(readbackResult: .failed)
-            )
-        }
+        // Unsupported/fallback speech is fail-open visually, but must not invent
+        // voice success when synthesis fails (AD-7 / S5).
+        _ = speakAcceptedDialogText(context.ttsText, traceID: traceID)
         return RuntimePresentationPayload(
             traceID: traceID,
             turnID: turnID,
@@ -411,6 +438,38 @@ public final class DemoRuntimeSessionRunner {
         )
     }
 
+    /// Speak accepted/fallback dialog text. Returns whether synthesis enqueued.
+    /// Empty text is a no-op and reports not enqueued so Core voice freezes idle.
+    /// Synthesis failure is observable on the existing readback trace surface.
+    @discardableResult
+    private func speakAcceptedDialogText(_ dialogText: String, traceID: String) -> Bool {
+        guard !dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return false
+        }
+        let speechResult = speech.speak(dialogText)
+        if !speechResult.didEnqueue {
+            traceLogger.recordReadback(
+                traceID: traceID,
+                message: "tts_fail_open:\(speechResult.reason ?? "unknown")",
+                attributes: TraceAttributes(readbackResult: .failed)
+            )
+            return false
+        }
+        return true
+    }
+
+    /// Core `PresentationVoiceDisplayState` for accepted payload construction.
+    /// Synthesis failure / empty speech → `.idle` (never `.speak`).
+    private static func coreVoiceDisplayState(
+        dialogText: String,
+        speechDidEnqueue: Bool
+    ) -> PresentationVoiceDisplayState {
+        if dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return .idle
+        }
+        return speechDidEnqueue ? .speak : .idle
+    }
+
     public var currentDialogueState: DialogueState {
         dialogueState
     }
@@ -425,7 +484,11 @@ public final class DemoRuntimeSessionRunner {
     ///   - provider returns valid correlation   -> reducer appends, window bounded
     /// See `~/.claude/rules/claim-vs-reality-gap.md` 铁律 2 — deliberate negatives
     /// present downstream to prove the wire is not just "recorded a field".
-    private func consumeTypedFactsIfWired(frame: ToolCallFrame, traceID: String) {
+    private func consumeTypedFactsIfWired(
+        frame: ToolCallFrame,
+        traceID: String,
+        correlationProvider: RuntimeSessionCorrelationProvider?
+    ) {
         guard let provider = correlationProvider else {
             lastTypedFactsRecordResult = nil
             lastTypedFactsRefusal = nil

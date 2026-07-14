@@ -1,7 +1,18 @@
 import Foundation
 
+/// Typed fail-closed errors for the single customer-facing production composition root.
+enum FrontstageRuntimeCompositionError: Error, Equatable {
+    case currentTurnMismatch(expected: String?, actual: String)
+    case invalidTurnSequence(Int)
+    case emptyTurnIdentity(field: String)
+}
+
 /// App-owned frontstage composition. Production routing remains deny-first; the
 /// only positive binding is the separately admitted two-entry demo slice.
+///
+/// **S0 freeze:** This type is the sole customer-facing production composition root.
+/// It owns one cached `DemoSliceRoute` and one lifecycle/state/store path. Do not
+/// create a second root, coordinator, or ContentView-local production runner.
 @MainActor
 final class FrontstageRuntimeComposition {
     let session: FrontstageVoiceSession
@@ -29,7 +40,12 @@ final class FrontstageRuntimeComposition {
         traceLogger: any TraceLogger,
         speech: any SpeechSynthesisEngine
     ) async throws -> DemoSliceRouteResult {
-        precondition(isCurrentTurn(turn))
+        guard isCurrentTurn(turn) else {
+            throw FrontstageRuntimeCompositionError.currentTurnMismatch(
+                expected: currentTurnID,
+                actual: turn.turnID
+            )
+        }
         if sessionLifecycleGate == nil {
             sessionLifecycleGate = SessionLifecycleCompositionGate(
                 sessionID: SessionID(rawValue: session.sessionID),
@@ -44,6 +60,28 @@ final class FrontstageRuntimeComposition {
         else {
             throw SessionLifecycleCompositionGateError.unexpectedState(lifecycleSnapshot.state)
         }
+
+        // Fail-closed identity assembly before any catalog/runner success path.
+        let trimmedTurnID = turn.turnID.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedSessionID = turn.sessionID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedTurnID.isEmpty else {
+            throw FrontstageRuntimeCompositionError.emptyTurnIdentity(field: "turnID")
+        }
+        guard !trimmedSessionID.isEmpty else {
+            throw FrontstageRuntimeCompositionError.emptyTurnIdentity(field: "sessionID")
+        }
+        // Positive sequence required; also rejects values outside UInt32 domain.
+        guard turn.sequence > 0, let groupOrdinal = UInt32(exactly: turn.sequence) else {
+            throw FrontstageRuntimeCompositionError.invalidTurnSequence(turn.sequence)
+        }
+
+        let correlationProvider = try ProductionRouteCorrelationProvider.make(
+            routeTurnID: trimmedTurnID,
+            sessionRef: trimmedSessionID,
+            generationRef: String(lifecycleSnapshot.generation.value),
+            groupOrdinal: groupOrdinal
+        )
+
         if demoSliceRoute == nil {
             demoSliceRoute = try DemoSliceRoute(
                 store: store,
@@ -51,6 +89,9 @@ final class FrontstageRuntimeComposition {
                 speech: speech
             )
         }
-        return try await demoSliceRoute!.route(text: turn.utterance)
+        return try await demoSliceRoute!.route(
+            text: turn.utterance,
+            correlationProvider: correlationProvider
+        )
     }
 }

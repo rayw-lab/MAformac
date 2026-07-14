@@ -70,14 +70,15 @@ public final class AVSpeechSynthesisEngine: NSObject, SpeechSynthesisEngine, @un
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return .failed(reason: "empty_tts_text")
         }
+        // Hard gate: no Chinese voice → do not call synthesizer and do not
+        // invent silent systemDefault success (product-operator-spine AD-7 / S5).
+        guard let voice = voiceProvider() else {
+            return .failed(reason: "chinese_voice_unavailable")
+        }
         let utterance = AVSpeechUtterance(string: text)
-        let voice = voiceProvider()
         utterance.voice = voice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         synthesizer.speak(utterance)
-        guard let voice else {
-            return .enqueued(route: .systemDefault)
-        }
         return .enqueued(route: voice.language == "zh-CN" ? .preferredChinese : .fallbackChinese)
     }
 }
