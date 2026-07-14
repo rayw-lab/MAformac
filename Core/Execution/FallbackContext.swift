@@ -10,6 +10,82 @@ public struct FallbackOutcomeSummary: Codable, Equatable, Sendable {
     }
 }
 
+/// Finite disposition for the context-aware completion-phrase hard gate (AD-7 / S5).
+/// Scans only reject/clarify/safety/unsupported/unmounted/cancel-like error outcomes.
+/// Does not blanket-scan badge labels, accepted, alreadyDone, or partial accept/refuse.
+public enum FallbackCompletionPhraseGateDisposition: String, Codable, Equatable, Sendable {
+    /// Outcome family is outside the TTS hard-gate scan surface.
+    case notInScope = "not_in_scope"
+    /// In-scope error speech contains no forbidden completion phrase.
+    case pass
+    /// In-scope error speech contains a forbidden completion phrase.
+    case fail
+}
+
+/// Context-aware completion-phrase hard gate for FallbackContext error speech.
+public enum FallbackCompletionPhraseGate {
+    /// Forbidden whole-phrase completion promises for error-state dialog/tts only.
+    public static let forbiddenCompletionPhrases: [String] = [
+        "已完成",
+        "已设置成功",
+        "设置成功",
+        "操作成功",
+        "执行成功",
+        "已成功",
+        "已为您完成",
+        "控制成功",
+    ]
+
+    /// Evaluate a fully resolved FallbackContext (badgeLabel is never scanned).
+    public static func evaluate(_ context: FallbackContext) -> FallbackCompletionPhraseGateDisposition {
+        evaluate(
+            resultKind: context.outcome.resultKind,
+            safeReasonKind: context.outcome.safeReasonKind,
+            dialogText: context.dialogText,
+            ttsText: context.ttsText
+        )
+    }
+
+    /// Typed, testable evaluation surface: disposition is finite, not regex-only.
+    public static func evaluate(
+        resultKind: FallbackResultKind,
+        safeReasonKind: FallbackSafeReasonKind,
+        dialogText: String,
+        ttsText: String
+    ) -> FallbackCompletionPhraseGateDisposition {
+        guard isErrorOutcomeInScope(resultKind: resultKind, safeReasonKind: safeReasonKind) else {
+            return .notInScope
+        }
+        if containsForbiddenCompletionPhrase(dialogText) || containsForbiddenCompletionPhrase(ttsText) {
+            return .fail
+        }
+        return .pass
+    }
+
+    /// reject / clarify / safety / unsupported / unmounted / cancel-like only.
+    public static func isErrorOutcomeInScope(
+        resultKind: FallbackResultKind,
+        safeReasonKind: FallbackSafeReasonKind
+    ) -> Bool {
+        // Explicit exclusions from the product-operator TTS hard gate.
+        if safeReasonKind == .alreadyDone {
+            return false
+        }
+        switch resultKind {
+        case .acceptedToolCall, .alreadyStateNoop, .partialAcceptPartialRefuse, .interrupted:
+            return false
+        case .clarifyMissingSlot, .refusalNoAvailableTool, .refusalSafetyOrPolicy, .cancelled, .runtimeError:
+            return true
+        }
+    }
+
+    public static func containsForbiddenCompletionPhrase(_ text: String) -> Bool {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        return forbiddenCompletionPhrases.contains { trimmed.contains($0) }
+    }
+}
+
 /// Presentation-safe fallback facts produced by Core.
 /// Raw model output, raw tool names, ledger state, and finite runtime reasons do not belong here.
 public struct FallbackContext: Codable, Equatable, Sendable {
@@ -62,6 +138,11 @@ public struct FallbackContext: Codable, Equatable, Sendable {
 
     public var runtimeResult: DemoRuntimeResult {
         outcome.resultKind
+    }
+
+    /// Context-aware TTS hard-gate disposition for this fallback speech surface.
+    public var completionPhraseGateDisposition: FallbackCompletionPhraseGateDisposition {
+        FallbackCompletionPhraseGate.evaluate(self)
     }
 
     private init(entry: FallbackScriptCatalogEntry) {

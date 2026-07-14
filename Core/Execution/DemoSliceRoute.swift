@@ -53,12 +53,34 @@ public final class DemoSliceRoute {
         )
     }
 
+    /// Unit/default helper surface. Invokes the runner without a production
+    /// correlation provider (constructor default / nil). Not the App production surface.
     public func route(text: String) async throws -> DemoSliceRouteResult {
+        try await routeBody(text: text, correlationProvider: nil)
+    }
+
+    /// App production surface: per-call non-optional correlation provider.
+    public func route(
+        text: String,
+        correlationProvider: RuntimeSessionCorrelationProvider
+    ) async throws -> DemoSliceRouteResult {
+        try await routeBody(text: text, correlationProvider: correlationProvider)
+    }
+
+    private func routeBody(
+        text: String,
+        correlationProvider: RuntimeSessionCorrelationProvider?
+    ) async throws -> DemoSliceRouteResult {
         guard let admission = catalog.admission(for: text) else {
             return DemoSliceRouteResult(rejection: catalog.rejection(for: text) ?? .notInCatalog)
         }
         runnerCallCount += 1
-        let payload = try await runner.run(text: text)
+        let payload: RuntimePresentationPayload
+        if let correlationProvider {
+            payload = try await runner.run(text: text, correlationProvider: correlationProvider)
+        } else {
+            payload = try await runner.run(text: text)
+        }
         return DemoSliceRouteResult(
             execution: DemoSliceExecution(
                 admission: admission,

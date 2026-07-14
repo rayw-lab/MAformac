@@ -1,0 +1,3 @@
+{"utterance":"打开空调","expected_disposition":"accepted","expected_readback":"空调已打开","proof_class":"fixture_local"}
+{"utterance":"温度调到26度","expected_disposition":"accepted","expected_readback":"温度已调到26度","proof_class":"fixture_local"}
+{"utterance":"关闭车窗","expected_disposition":"accepted","expected_readback":"车窗已关闭","proof_class":"fixture_local"}

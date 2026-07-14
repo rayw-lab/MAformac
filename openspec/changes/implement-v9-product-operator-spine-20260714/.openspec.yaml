@@ -1,0 +1,116 @@
+schema: spec-driven
+created: 2026-07-14
+revised: 2026-07-14
+revision_label: commander-adjudication-r2
+change_id: implement-v9-product-operator-spine-20260714
+lane: B
+role: product-operator-spine-producer
+status: ready_for_apply
+independent_review_clear: true
+independent_review_p0: 0
+independent_review_p1: 0
+proof_cap: local_contract_and_fixture_prep_only
+authority: lane-B-v9-product-operator-spine
+basis_worktree: MAformac-v9-product-operator-20260714
+lane_closeout_note: >
+  Product lifecycle App wiring and W9 App force-catalog consumption remain
+  deferred; overall lane may close PARTIAL even when S0–S6 implemented units pass.
+  Forbidden claims: customer_path_DONE, W9_APP_CONSUMED, product cancel/recovery DONE.
+inputs:
+  - CLAUDE.md
+  - App/FrontstageRuntimeComposition.swift
+  - App/ContentView.swift
+  - Core/Execution/DemoSliceRoute.swift
+  - Core/Execution/DemoRuntimeSessionRunner.swift
+  - Core/Config/ForceStateDigest.swift
+  - Core/Config/ForceStateCatalog.swift
+  - Core/Config/DemoForceStateBoundary.swift
+  - Core/Lifecycle/SessionLifecycleFacts.swift
+  - Core/Lifecycle/SessionLifecycleCompositionGate.swift
+  - Core/State/DialogueStateEffectBoundary.swift
+  - Core/Voice/SpeechSynthesisEngine.swift
+  - openspec/changes/define-t07-operator-ceremony-carrier-20260712/specs/operator-ceremony/spec.md
+  - openspec/changes/add-w7-typed-schema-skeleton-p1p2/
+  - openspec/changes/define-dialogue-state-semantic-consumption/
+  - openspec/changes/implement-t09-session-lifecycle-child-registry-and-recovery/
+  - openspec/changes/define-demo-golden-run-and-voice/  # draft_deferred historical input only
+non_claims:
+  - not_customer_path_done
+  - not_actionDemoProven_handflip
+  - not_t07b_operator_pass
+  - not_w4_done
+  - not_v1_ratified
+  - not_define_demo_golden_run_and_voice_apply
+  - not_spm_unit_instantiates_app_types
+  - not_w9_app_consumed
+  - not_product_lifecycle_cancel_recovery_wired
+allowed_writeset_future_apply:
+  # Closed set. Apply diff MUST be subset. Placeholder path expansion is forbidden.
+  # Matches tasks.md exact paths after commander adjudication r2.
+  - App/FrontstageRuntimeComposition.swift
+  - App/ContentView.swift
+  - Core/Execution/DemoSliceRoute.swift
+  - Core/Execution/DemoRuntimeSessionRunner.swift
+  - Core/Execution/FallbackContext.swift
+  - Core/State/ProductionRouteCorrelationProvider.swift
+  - Core/Lifecycle/LifecycleFactsDialogueBridge.swift
+  - Core/Config/ForceStateDigestGate.swift
+  - Core/Voice/SpeechSynthesisEngine.swift
+  - Core/Ceremony/OperatorCeremonyAttemptLedger.swift
+  - scripts/run_v9_product_operator_tts_preflight.sh
+  - Tests/MAformacCoreTests/ProductOperatorCompositionRootTests.swift
+  - Tests/MAformacCoreTests/ProductOperatorCorrelationWireTests.swift
+  - Tests/MAformacCoreTests/ProductOperatorLifecycleFactsBridgeTests.swift
+  - Tests/MAformacCoreTests/ProductOperatorForceStateDigestGateTests.swift
+  - Tests/MAformacCoreTests/ProductOperatorGoldenContractTests.swift
+  - Tests/MAformacCoreTests/ProductOperatorReliabilityProvisionalTests.swift
+  - Tests/MAformacCoreTests/ProductOperatorTTSHardGateTests.swift  # S5 CREATE
+  - Tests/MAformacCoreTests/ProductOperatorT07aLedgerConsumerTests.swift
+  - Tests/MAformacCoreTests/D1TypedFactsWireDeliberateNegativeTests.swift
+  - Tests/MAformacCoreTests/ForceStateDigestTests.swift
+  - Tests/MAformacCoreTests/SessionLifecycleCompositionGateTests.swift
+  - Tests/MAformacCoreTests/FrontstageContainmentSourceContractTests.swift  # S0/S5 MODIFY
+  - Tests/MAformacCoreTests/SpeechSynthesisEngineTests.swift  # S5 MODIFY
+  - Tests/MAformacCoreTests/DemoSliceRouteTests.swift
+  - Tests/Fixtures/product-operator-golden/
+  - Tests/Fixtures/product-operator-reliability/
+  - Tests/Fixtures/t07a-synthetic/
+no_touch:
+  - Makefile
+  - Tools/C6*
+  - Tools/C5*
+  - contracts/c6-*
+  - contracts/closure-work-packages.v1.yaml
+  - scripts/check_closure_work_packages.py
+  - scripts/*train*
+  - Tests/test_closure_work_packages.py
+  - docs/roadmap*
+  - docs/commander-log/decisions.md
+  - docs/CURRENT.md
+  - closure/**
+  - candidates/**
+  - B7/**
+  - V1/**
+  - training/**
+  - Core/Training/**
+  - Tools/checks/closure*
+  - Core/ForceState/**
+  - Core/Config/ForceStateDigest.swift
+  - Core/Config/ForceStateCatalog.swift
+  - Core/Config/DemoForceStateBoundary.swift
+  - Core/State/DialogueStateEffectBoundary.swift
+  - openspec/changes/define-demo-golden-run-and-voice/**
+  - openspec/changes/define-t07-operator-ceremony-carrier-20260712/**
+# Note (not a path glob): mainline shared seams (Makefile/C6/closure/roadmap/decisions/
+# training/S8) stay out of this lane; see design No-Touch Matrix. Do not invent a
+# "mainline shared seams" write target.
+resource_deferred_tests:
+  - p95_latency_harness
+  - twenty_turn_soak
+  - three_hundred_second_soak
+  - runtime_local_customer_shaped_golden
+  - full_xcodebuild_when_s8_active
+  - force_catalog_app_consumption
+  - product_lifecycle_cancel_terminal_recovery_app_wiring
+dedupe_tests:
+  rule: extend existing D1/force-state/speech/composition source-contract tests when they already cover the behavior; create ProductOperator* only for genuine composition-spine gaps; do not MODIFY DialogueStateEffectBoundary or ForceStateCatalog/Digest in this change

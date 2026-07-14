@@ -1099,14 +1099,52 @@ struct ContentView: View {
 
     private func applyRuntimeReadbackStep(_ step: RuntimeReadbackEventStep) {
         let resolution = resolveRuntimeReadbackEvent(step.event)
-        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
-            snapshot = resolution.snapshot
+        // Capture synthesis result (AD-7 / S5). Visual-first progression continues
+        // regardless; App voiceState must not claim `.speaking` on synthesis failure.
+        let speechResult = speech.speak(step.speechText.text)
+        var appliedSnapshot = resolution.snapshot
+        if !speechResult.didEnqueue {
+            appliedSnapshot = Self.snapshotWithNonSpeakingVoice(appliedSnapshot)
+            observeRuntimeTTSFailure(
+                result: speechResult,
+                traceID: appliedSnapshot.traceId,
+                readbackID: step.event.readbackID
+            )
         }
-        _ = speech.speak(step.speechText.text)
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+            snapshot = appliedSnapshot
+        }
         guard shouldWaitForEnergyLine(signal: resolution.signal) else {
             completeRuntimeReadbackStep(readbackID: step.event.readbackID)
             return
         }
+    }
+
+    /// Freeze App `PresentationVoiceState` away from `.speaking` when TTS failed.
+    /// Visual card/dialog fields are preserved (visual-first).
+    private static func snapshotWithNonSpeakingVoice(
+        _ snapshot: StagePresentationSnapshot
+    ) -> StagePresentationSnapshot {
+        guard snapshot.voiceState == .speaking else { return snapshot }
+        var frozen = snapshot
+        frozen.voiceState = .idle
+        return frozen
+    }
+
+    /// Observable TTS failure on the existing InMemoryTraceLogger readback surface.
+    /// No new global state, root, or protocol.
+    private func observeRuntimeTTSFailure(
+        result: SpeechSynthesisResult,
+        traceID: String,
+        readbackID: String?
+    ) {
+        let reason = result.reason ?? "unknown"
+        let suffix = readbackID.map { " readback_id=\($0)" } ?? ""
+        traceLogger.recordReadback(
+            traceID: traceID,
+            message: "tts_fail_open:\(reason)\(suffix)",
+            attributes: TraceAttributes(readbackResult: .failed)
+        )
     }
 
     private func shouldWaitForEnergyLine(signal: RuntimeReadbackSignal?) -> Bool {

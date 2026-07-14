@@ -61,6 +61,66 @@ final class DemoSliceRouteTests: XCTestCase {
             XCTAssertEqual(harness.speech.spokenTexts, [], "input=\(input)")
         }
     }
+
+    // MARK: - S1 production surface (per-call correlation provider)
+
+    @MainActor
+    func testProductionRouteSurface_withCorrelationProviderRunsOnceAndMutatesStore() async throws {
+        let harness = try Harness()
+        let provider = try ProductionRouteCorrelationProvider.make(
+            routeTurnID: "slice-turn-1",
+            sessionRef: "slice-session-1",
+            generationRef: "slice-gen-1",
+            groupOrdinal: 1
+        )
+
+        let result = try await harness.route.route(
+            text: "打开空调",
+            correlationProvider: provider
+        )
+
+        let execution = try XCTUnwrap(result.execution)
+        XCTAssertEqual(execution.admission.entry.matrixID, 1)
+        XCTAssertEqual(harness.route.runnerCallCount, 1)
+        XCTAssertEqual(harness.store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(execution.payload.readbacks.map(\.key), ["ac.power"])
+        XCTAssertEqual(harness.speech.spokenTexts, ["空调已打开"])
+    }
+
+    @MainActor
+    func testLegacyRouteHelper_withoutProviderRemainsDefaultSurface() async throws {
+        // Legacy unit/default surface: single-arg route(text:) still works and
+        // remains the nil-provider helper (constructor runner has no provider).
+        let harness = try Harness()
+        let result = try await harness.route.route(text: "打开空调")
+        let execution = try XCTUnwrap(result.execution)
+        XCTAssertEqual(execution.admission.entry.matrixID, 1)
+        XCTAssertEqual(harness.route.runnerCallCount, 1)
+        XCTAssertEqual(harness.store.cell(for: "ac.power")?.actualValue, "on")
+    }
+
+    @MainActor
+    func testProductionRouteSurface_rejectionStillBypassesRunnerWithProviderPresent() async throws {
+        let harness = try Harness()
+        let provider = try ProductionRouteCorrelationProvider.make(
+            routeTurnID: "slice-turn-reject",
+            sessionRef: "slice-session-reject",
+            generationRef: "slice-gen-reject",
+            groupOrdinal: 2
+        )
+        let beforeRevision = harness.store.currentRevision
+
+        let result = try await harness.route.route(
+            text: "打开车窗",
+            correlationProvider: provider
+        )
+
+        XCTAssertEqual(result.rejection, .notInCatalog)
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(harness.route.runnerCallCount, 0)
+        XCTAssertEqual(harness.store.currentRevision, beforeRevision)
+        XCTAssertEqual(harness.speech.spokenTexts, [])
+    }
 }
 
 private extension DemoSliceRouteTests {

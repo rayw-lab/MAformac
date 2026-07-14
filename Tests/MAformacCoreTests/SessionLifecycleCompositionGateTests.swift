@@ -130,7 +130,13 @@ final class SessionLifecycleCompositionGateTests: XCTestCase {
 
         let ensureNeedle = "ensureActive"
         let demoSliceRouteCreate = "DemoSliceRoute("
-        let routeCall = ".route(text: turn.utterance)"
+        // Production multi-line surface (not legacy single-arg `.route(text: turn.utterance)`):
+        //   demoSliceRoute!.route(
+        //       text: turn.utterance,
+        //       correlationProvider: correlationProvider
+        //   )
+        let routeUtteranceArg = "text: turn.utterance"
+        let routeCorrelationArg = "correlationProvider: correlationProvider"
 
         XCTAssertTrue(routeSlice.contains(ensureNeedle), "routeDemoSlice must call ensureActive")
         XCTAssertTrue(
@@ -138,18 +144,32 @@ final class SessionLifecycleCompositionGateTests: XCTestCase {
             "routeDemoSlice still constructs DemoSliceRoute after guard"
         )
         XCTAssertTrue(
-            routeSlice.contains(routeCall),
+            routeSlice.contains(routeUtteranceArg),
             "routeDemoSlice still routes utterance after guard"
+        )
+        XCTAssertTrue(
+            routeSlice.contains(routeCorrelationArg),
+            "routeDemoSlice must pass product correlation provider on production route"
+        )
+        XCTAssertFalse(
+            routeSlice.contains(".route(text: turn.utterance)"),
+            "production path must not use legacy single-arg .route(text: turn.utterance)"
         )
 
         let ensureIdx = try index(of: ensureNeedle, in: routeSlice)
         let demoCreateIdx = try index(of: demoSliceRouteCreate, in: routeSlice)
-        let routeCallIdx = try index(of: routeCall, in: routeSlice)
+        let routeUtteranceIdx = try index(of: routeUtteranceArg, in: routeSlice)
+        let routeCorrelationIdx = try index(of: routeCorrelationArg, in: routeSlice)
         XCTAssertLessThan(ensureIdx, demoCreateIdx, "ensureActive must appear before DemoSliceRoute(")
         XCTAssertLessThan(
             ensureIdx,
-            routeCallIdx,
-            "ensureActive must appear before .route(text: turn.utterance)"
+            routeUtteranceIdx,
+            "ensureActive must appear before production route text: turn.utterance"
+        )
+        XCTAssertLessThan(
+            ensureIdx,
+            routeCorrelationIdx,
+            "ensureActive must appear before production route correlationProvider: correlationProvider"
         )
 
         // Explicit active-state guard + turn session identity wiring.
