@@ -104,6 +104,22 @@
     "E_REAL_ARTIFACT_DIGEST": {
       "stage": "s9",
       "description": "mode=real requires present arm artifact.sha256 digest (64 hex)"
+    },
+    "E_HOLDOUT_THREE_WAY_MISMATCH": {
+      "stage": "s9",
+      "description": "holdout pin, subject declaration, and loaded artifact sha256/row_count disagree"
+    },
+    "E_CASESET_INCOMPLETE": {
+      "stage": "s9b",
+      "description": "case set empty, truncated, duplicated, or not the authoritative 61-id set required for mode"
+    },
+    "E_V1_FORMULA_DRIFT": {
+      "stage": "s10",
+      "description": "demo_fuzz threshold formula is not the canonical 5*pass >= 4*eligible"
+    },
+    "E_RESULT_PROVENANCE_MISMATCH": {
+      "stage": "s9",
+      "description": "arm result score_class/artifact/scorer/mode does not bind to manifest arm descriptor"
     }
   }
 }

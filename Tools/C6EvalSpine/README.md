@@ -45,6 +45,17 @@ Thresholds are loaded from:
 
 Any embedded second set → `E_THRESHOLD_REINVENT`.
 
+`demo_fuzz` formula is bound to the canonical `5*pass >= 4*eligible` only (`E_V1_FORMULA_DRIFT` otherwise; e.g. `4*pass >= 3*eligible` is rejected).
+
+## Fail-closed bindings (REAL)
+
+| binding | rule | code |
+|---|---|---|
+| V1 digest | REAL mismatch cannot PASS/seal S9–S10 | `E_V1_DIGEST_MISMATCH` |
+| Holdout three-way | pin == subject == loaded artifact (sha + row_count) | `E_HOLDOUT_THREE_WAY_MISMATCH` |
+| Case set | REAL requires exact 61-id set per arm; empty always fails; fixture subset only if `fixture_subset=true` | `E_CASESET_INCOMPLETE` |
+| Result provenance | `real_model` results must bind arm descriptor score_class/status + artifact sha + scorer + mode | `E_RESULT_PROVENANCE_MISMATCH` |
+
 ## Residual (always honest; dispatch enum only)
 
 Machine residual enum (exact, still true for local harness):

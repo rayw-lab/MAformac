@@ -71,11 +71,30 @@ def build_s10_verdict(
             }
         )
 
+    # Layer formula binding errors from evaluate_layer_gate.
+    for layer_name, layer_out in layers_out.items():
+        if layer_out.get("formula_ok") is False:
+            errors.append(
+                {
+                    "code": "E_V1_FORMULA_DRIFT",
+                    "detail": (
+                        f"layer {layer_name} formula_ok=false "
+                        f"formula={layer_out.get('formula')!r}"
+                    ),
+                }
+            )
+
     status = "PASS"
     if force_status is not None and mode != Mode.REAL and not force_rejected:
         # Fixture/dry_run harness-only override (never used for real DONE claims).
         status = force_status
     elif mode == Mode.REAL:
+        # V1 digest mismatch is HARD under REAL — cannot PASS/sealed.
+        if any(e.get("code") == "E_V1_DIGEST_MISMATCH" for e in errors):
+            status = "BLOCKED_AUTHORITY"
+        if any(e.get("code") == "E_V1_FORMULA_DRIFT" for e in errors):
+            if status == "PASS":
+                status = "FAIL"
         if observed_status != "RATIFIED":
             status = "BLOCKED_AUTHORITY"
             errors.append(
@@ -135,15 +154,19 @@ def build_s10_verdict(
         # force rejection already recorded; ensure non-PASS if only force error somehow
         if force_rejected and status == "PASS":
             status = "FAIL"
+        # Final REAL invariant: any binding error forbids PASS.
+        if errors and status == "PASS":
+            status = "FAIL"
     else:
         # fixture/dry_run: may PASS harness-wise even if V1 is CANDIDATE
-        if any(e.get("code") == "E_THRESHOLD_REINVENT" for e in errors):
+        soft_codes = {"E_V1_DIGEST_MISMATCH"}
+        if any(e.get("code") in {"E_THRESHOLD_REINVENT", "E_V1_FORMULA_DRIFT"} for e in errors):
             status = "FAIL"
         elif s9b.get("status") in {"FAIL", "INCOMPARABLE"}:
             status = str(s9b.get("status"))
-        elif errors and any(e.get("code") not in {"E_V1_DIGEST_MISMATCH"} for e in errors):
+        elif errors and any(e.get("code") not in soft_codes for e in errors):
             # digest soft drift in fixture: warn but allow unless other hard errors
-            hard = [e for e in errors if e.get("code") != "E_V1_DIGEST_MISMATCH"]
+            hard = [e for e in errors if e.get("code") not in soft_codes]
             if hard:
                 status = "FAIL"
         else:

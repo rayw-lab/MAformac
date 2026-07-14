@@ -72,5 +72,9 @@ FORBIDDEN_CLAIM_KEYS = frozenset(
 EXPOSURE_CHECKER = REPO_ROOT / "scripts" / "check_train_eval_exposure.py"
 
 SCORER_ID_FIXTURE = "fixture_scorer_v1"
+SCORER_ID_REAL = "real_scorer_v1"
 PARSER_ID_FIXTURE = "fixture_parser_v1"
 PROMPT_POLICY_ID = "fixture_prompt_policy_v1"
+
+# Canonical demo_fuzz formula from V1 authority (exact binding; no silent reinvent).
+CANONICAL_DEMO_FUZZ_FORMULA = "5*pass >= 4*eligible"

@@ -290,6 +290,8 @@ def run_stage(
         in {
             "E_MODE_REAL_WITHOUT_NEW_ADAPTER",
             "E_V1_NOT_RATIFIED",
+            "E_V1_DIGEST_MISMATCH",
+            "E_V1_FORMULA_DRIFT",
             "E_B7_NOT_FROZEN",
             "E_NO_REAL_SCORES",
             "E_SYNTHETIC_SCORE_IN_REAL",
@@ -297,6 +299,9 @@ def run_stage(
             "E_FORCE_STATUS_REJECTED",
             "E_QA_SAFETY_FAIL",
             "E_C5_PHASE1_FAIL",
+            "E_HOLDOUT_THREE_WAY_MISMATCH",
+            "E_CASESET_INCOMPLETE",
+            "E_RESULT_PROVENANCE_MISMATCH",
         }
         for e in uniq
     ):

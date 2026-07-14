@@ -3,9 +3,110 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from typing import Any
 
-from .constants import ALLOWED_BEHAVIOR_CLASSES
+from .constants import ALLOWED_BEHAVIOR_CLASSES, HOLDOUT_ROW_COUNT
+from .holdout_pin import verify_holdout
 from .identity import join_subject_keys, subject_digest
 from .modes import Mode, normalize_mode
+
+
+def _authoritative_case_ids(s9_receipt: dict[str, Any]) -> list[str]:
+    explicit = s9_receipt.get("expected_case_ids")
+    if isinstance(explicit, list) and explicit:
+        return [str(x) for x in explicit]
+    holdout = verify_holdout()
+    return list(holdout.get("case_ids") or [])
+
+
+def _check_caseset_completeness(
+    *,
+    mode: Mode,
+    fixture_subset: bool,
+    expected_case_ids: list[str],
+    case_ids_by_arm: dict[str, list[str]],
+    active_arms: list[str],
+    results: list[Any],
+) -> list[dict[str, str]]:
+    """Empty always fails. REAL requires exact authoritative set per arm.
+
+    Fixture/dry_run may use a non-empty subset only when fixture_subset=true.
+    """
+    errors: list[dict[str, str]] = []
+    if not results:
+        errors.append(
+            {
+                "code": "E_CASESET_INCOMPLETE",
+                "detail": "empty results; never a real claim in any mode",
+            }
+        )
+        return errors
+
+    expected = set(expected_case_ids)
+    if mode == Mode.REAL:
+        # Every required arm must expose exactly the authoritative case set.
+        target_arms = active_arms or list(case_ids_by_arm.keys())
+        if not target_arms:
+            errors.append(
+                {
+                    "code": "E_CASESET_INCOMPLETE",
+                    "detail": "REAL mode has no arm case sets",
+                }
+            )
+            return errors
+        for arm_id in ("base", "old", "new"):
+            observed_list = case_ids_by_arm.get(arm_id) or []
+            observed = set(observed_list)
+            if len(observed_list) != len(observed):
+                errors.append(
+                    {
+                        "code": "E_CASESET_INCOMPLETE",
+                        "detail": f"arm {arm_id}: duplicate case ids in REAL caseset",
+                    }
+                )
+            if observed != expected:
+                missing = sorted(expected - observed)
+                extra = sorted(observed - expected)
+                errors.append(
+                    {
+                        "code": "E_CASESET_INCOMPLETE",
+                        "detail": (
+                            f"arm {arm_id}: REAL requires exact {len(expected)}-case set "
+                            f"(expected_row_count={HOLDOUT_ROW_COUNT}); "
+                            f"missing={len(missing)} extra={len(extra)}"
+                        ),
+                    }
+                )
+        return errors
+
+    # Fixture / dry_run
+    if fixture_subset:
+        # Subset allowed only if non-empty (already checked) and no arm is empty
+        # among active arms. Cross-arm consistency handled separately.
+        for arm_id in active_arms:
+            if not case_ids_by_arm.get(arm_id):
+                errors.append(
+                    {
+                        "code": "E_CASESET_INCOMPLETE",
+                        "detail": f"arm {arm_id}: empty case set under fixture_subset",
+                    }
+                )
+        return errors
+
+    # Full set required when not explicitly marked subset.
+    for arm_id in active_arms:
+        observed = set(case_ids_by_arm.get(arm_id) or [])
+        if observed != expected:
+            missing = sorted(expected - observed)
+            extra = sorted(observed - expected)
+            errors.append(
+                {
+                    "code": "E_CASESET_INCOMPLETE",
+                    "detail": (
+                        f"arm {arm_id}: full caseset required without fixture_subset=true; "
+                        f"missing={len(missing)} extra={len(extra)}"
+                    ),
+                }
+            )
+    return errors
 
 
 def aggregate_s9b(
@@ -22,6 +123,10 @@ def aggregate_s9b(
     subject = s9_receipt.get("subject") if isinstance(s9_receipt.get("subject"), dict) else {}
     results = s9_receipt.get("results") if isinstance(s9_receipt.get("results"), list) else []
     expected_join = join_subject_keys(subject)
+    fixture_subset = bool(s9_receipt.get("fixture_subset"))
+    if mode == Mode.REAL:
+        fixture_subset = False
+    expected_case_ids = _authoritative_case_ids(s9_receipt)
 
     by_arm: dict[str, list[dict[str, Any]]] = defaultdict(list)
     case_ids_by_arm: dict[str, list[str]] = defaultdict(list)
@@ -133,6 +238,18 @@ def aggregate_s9b(
                     }
                 )
 
+    # Authoritative caseset completeness (empty / truncation / full-set binding).
+    errors.extend(
+        _check_caseset_completeness(
+            mode=mode,
+            fixture_subset=fixture_subset,
+            expected_case_ids=expected_case_ids,
+            case_ids_by_arm=case_ids_by_arm,
+            active_arms=active_arms,
+            results=results,
+        )
+    )
+
     per_arm: dict[str, Any] = {}
     for arm_id, rows in by_arm.items():
         # REAL eligible counts only real_model; fixture/dry_run counts non-absent.
@@ -203,6 +320,8 @@ def aggregate_s9b(
         "subject": subject,
         "subject_digest": subject_digest(subject) if subject else None,
         "status": status,
+        "fixture_subset": fixture_subset,
+        "expected_case_ids": expected_case_ids,
         "per_arm": per_arm,
         "join": {
             "active_arms": active_arms,
@@ -211,6 +330,8 @@ def aggregate_s9b(
             "case_counts": {arm: len(ids) for arm, ids in case_ids_by_arm.items()},
             "seeds": [17, 29, 43],
             "seed": subject.get("seed"),
+            "expected_case_count": len(expected_case_ids),
+            "fixture_subset": fixture_subset,
         },
         "layers": layers,
         "buckets": {

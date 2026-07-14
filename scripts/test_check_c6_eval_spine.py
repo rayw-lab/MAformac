@@ -645,6 +645,361 @@ def test_full_61_case_fixture_replay() -> None:
     print("PASS test_full_61_case_fixture_replay")
 
 
+def test_real_v1_digest_mismatch_blocks_pass() -> None:
+    """V1 digest mismatch under REAL must not leave S9/S9b/S10 as PASS/sealed."""
+    from C6EvalSpine.constants import V1_AUTHORITY_DIGEST
+
+    subject = _real_subject_ready("v1-digest-mismatch")
+    # Forged subject digests a non-matching authority pin.
+    subject["v1_authority_digest"] = "0" * 64
+    # Build a green-looking real s9b except for digest pin.
+    s9b = {
+        "run_id": "v1-digest-mismatch",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "layers": {
+            "golden": {"eligible": 2, "pass": 2},
+            "demo_fuzz": {"eligible": 2, "pass": 2},
+            "unsupported": {"eligible": 0, "pass": 0},
+            "safety": {"eligible": 0, "pass": 0},
+        },
+        "per_arm": {
+            "new": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+            "base": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+            "old": {"eligible": 2, "pass": 2, "synthetic": 0, "real_model": 2},
+        },
+    }
+    s10 = build_s10_verdict(
+        s9b,
+        qa_safety={"status": "PASS"},
+        c5_phase1={"status": "PASS", "rc": 0},
+    )
+    codes = {e["code"] for e in s10["errors"]}
+    _assert("E_V1_DIGEST_MISMATCH" in codes, codes)
+    _assert(s10["status"] not in {"PASS", "SEALED"}, s10["status"])
+    _assert(s10["claims"]["s10_real_done"] is False, s10["claims"])
+
+    # S9 REAL must also hard-fail digest mismatch (cannot seal/PASS).
+    arms = default_fixture_arms(new_absent=False)
+    for arm_id in ("base", "old", "new"):
+        arms[arm_id]["adapter_status"] = "present"
+        arms[arm_id]["score_class"] = "real_model"
+        arms[arm_id]["artifact"] = {"kind": f"real_{arm_id}", "sha256": "ab" * 32}
+        arms[arm_id]["scorer_id"] = "real_scorer_v1"
+    manifest = build_s9_manifest(
+        mode=Mode.REAL,
+        run_id="v1-digest-mismatch-s9",
+        subject=subject,
+        arms=arms,
+        case_limit=None,
+    )
+    manifest["b7"]["is_b7_done"] = True
+    manifest["v1"]["status"] = "RATIFIED"
+    # Inject minimal real_model rows (caseset will fail separately; digest must still fire).
+    holdout = verify_holdout()
+    case_ids = holdout["case_ids"]
+    rows_by_id = {
+        str(r.get("row_id") or r.get("case_id")): r for r in (holdout.get("rows") or [])
+    }
+    inject = []
+    for case_id in case_ids:
+        row = rows_by_id[case_id]
+        for arm_id in ("base", "old", "new"):
+            item = synthetic_arm_result(
+                run_id="v1-digest-mismatch-s9",
+                arm_id=arm_id,
+                case_id=case_id,
+                row=row,
+                subject=subject,
+                score_class="real_model",
+            )
+            item["artifact_sha256"] = arms[arm_id]["artifact"]["sha256"]
+            item["scorer_id"] = "real_scorer_v1"
+            inject.append(item)
+    receipt = run_s9(manifest, inject_results=inject)
+    s9_codes = {e["code"] for e in receipt["errors"]}
+    _assert("E_V1_DIGEST_MISMATCH" in s9_codes, s9_codes)
+    _assert(receipt["status"] not in {"PASS", "SEALED"}, receipt["status"])
+    _assert(receipt["sealed"] is False, receipt["sealed"])
+    _assert(V1_AUTHORITY_DIGEST != "0" * 64, "sanity: live pin is not zeros")
+    print("PASS test_real_v1_digest_mismatch_blocks_pass")
+
+
+def test_holdout_three_way_forged_subject_red() -> None:
+    """REAL: forged subject holdout pin must fail even if actual file is the real 61-row holdout."""
+    subject = _real_subject_ready("holdout-3way")
+    subject["holdout_sha256"] = "0" * 64
+    subject["holdout_row_count"] = 1
+    arms = default_fixture_arms(new_absent=False)
+    for arm_id in ("base", "old", "new"):
+        arms[arm_id]["adapter_status"] = "present"
+        arms[arm_id]["score_class"] = "real_model"
+        arms[arm_id]["artifact"] = {"kind": f"real_{arm_id}", "sha256": "cd" * 32}
+        arms[arm_id]["scorer_id"] = "real_scorer_v1"
+    manifest = build_s9_manifest(
+        mode=Mode.REAL,
+        run_id="holdout-3way",
+        subject=subject,
+        arms=arms,
+        case_limit=None,
+    )
+    # Manifest pin remains the authoritative D-127 pin (correct).
+    _assert(manifest["holdout"]["sha256"] == HOLDOUT_SHA256, manifest["holdout"])
+    _assert(manifest["holdout"]["row_count"] == HOLDOUT_ROW_COUNT, manifest["holdout"])
+    manifest["b7"]["is_b7_done"] = True
+    manifest["v1"]["status"] = "RATIFIED"
+
+    holdout = verify_holdout()
+    _assert(holdout["ok"], holdout.get("errors"))
+    _assert(holdout["row_count"] == 61, holdout["row_count"])
+    rows_by_id = {
+        str(r.get("row_id") or r.get("case_id")): r for r in (holdout.get("rows") or [])
+    }
+    inject = []
+    for case_id in holdout["case_ids"]:
+        row = rows_by_id[case_id]
+        for arm_id in ("base", "old", "new"):
+            item = synthetic_arm_result(
+                run_id="holdout-3way",
+                arm_id=arm_id,
+                case_id=case_id,
+                row=row,
+                subject=subject,
+                score_class="real_model",
+            )
+            item["artifact_sha256"] = arms[arm_id]["artifact"]["sha256"]
+            item["scorer_id"] = "real_scorer_v1"
+            inject.append(item)
+    receipt = run_s9(manifest, inject_results=inject)
+    codes = {e["code"] for e in receipt["errors"]}
+    _assert("E_HOLDOUT_THREE_WAY_MISMATCH" in codes, codes)
+    _assert(receipt["status"] not in {"PASS", "SEALED"}, receipt["status"])
+    _assert(receipt["sealed"] is False, receipt["sealed"])
+    print("PASS test_holdout_three_way_forged_subject_red")
+
+
+def test_real_caseset_incomplete_red() -> None:
+    """REAL requires exact 61-case set per arm; empty/truncation fail; empty fails all modes."""
+    subject = _real_subject_ready("caseset-incomplete")
+    arms = default_fixture_arms(new_absent=False)
+    for arm_id in ("base", "old", "new"):
+        arms[arm_id]["adapter_status"] = "present"
+        arms[arm_id]["score_class"] = "real_model"
+        arms[arm_id]["artifact"] = {"kind": f"real_{arm_id}", "sha256": "ef" * 32}
+        arms[arm_id]["scorer_id"] = "real_scorer_v1"
+
+    # Empty results always fail (REAL).
+    empty_s9 = {
+        "run_id": "caseset-empty",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "fixture_subset": False,
+        "expected_case_ids": verify_holdout()["case_ids"],
+        "results": [],
+    }
+    empty_agg = aggregate_s9b(empty_s9)
+    empty_codes = {e["code"] for e in empty_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in empty_codes, empty_codes)
+    _assert(empty_agg["status"] != "PASS", empty_agg["status"])
+
+    # Empty also fails in fixture mode (never a real claim).
+    empty_fix = {
+        "run_id": "caseset-empty-fixture",
+        "mode": "fixture",
+        "status": "PASS",
+        "subject": build_subject(mode=Mode.FIXTURE, run_id="caseset-empty-fixture"),
+        "fixture_subset": True,
+        "expected_case_ids": verify_holdout()["case_ids"],
+        "results": [],
+    }
+    empty_fix_agg = aggregate_s9b(empty_fix)
+    empty_fix_codes = {e["code"] for e in empty_fix_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in empty_fix_codes, empty_fix_codes)
+    _assert(empty_fix_agg["status"] != "PASS", empty_fix_agg["status"])
+
+    # One-case-per-arm truncation under REAL must fail.
+    holdout = verify_holdout()
+    one_id = holdout["case_ids"][0]
+    row = next(
+        r
+        for r in holdout["rows"]
+        if str(r.get("row_id") or r.get("case_id")) == one_id
+    )
+    one_results = [
+        synthetic_arm_result(
+            run_id="caseset-trunc",
+            arm_id=arm_id,
+            case_id=one_id,
+            row=row,
+            subject=subject,
+            score_class="real_model",
+        )
+        for arm_id in ("base", "old", "new")
+    ]
+    for item in one_results:
+        item["artifact_sha256"] = "ef" * 32
+        item["scorer_id"] = "real_scorer_v1"
+    trunc_s9 = {
+        "run_id": "caseset-trunc",
+        "mode": "real",
+        "status": "PASS",
+        "subject": subject,
+        "fixture_subset": False,
+        "expected_case_ids": holdout["case_ids"],
+        "results": one_results,
+        "arms": arms,
+    }
+    trunc_agg = aggregate_s9b(trunc_s9)
+    trunc_codes = {e["code"] for e in trunc_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in trunc_codes, trunc_codes)
+    _assert(trunc_agg["status"] != "PASS", trunc_agg["status"])
+
+    # Fixture subset is allowed only when explicitly marked.
+    fix_subject = build_subject(mode=Mode.FIXTURE, run_id="caseset-subset")
+    subset_results = [
+        synthetic_arm_result(
+            run_id="caseset-subset",
+            arm_id=arm_id,
+            case_id=one_id,
+            row=row,
+            subject=fix_subject,
+            score_class="synthetic",
+        )
+        for arm_id in ("base", "old")
+    ]
+    unmarked = {
+        "run_id": "caseset-subset",
+        "mode": "fixture",
+        "status": "PASS",
+        "subject": fix_subject,
+        "fixture_subset": False,
+        "expected_case_ids": holdout["case_ids"],
+        "results": subset_results,
+    }
+    unmarked_agg = aggregate_s9b(unmarked, require_all_arms=False)
+    unmarked_codes = {e["code"] for e in unmarked_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" in unmarked_codes, unmarked_codes)
+
+    marked = dict(unmarked)
+    marked["fixture_subset"] = True
+    marked_agg = aggregate_s9b(marked, require_all_arms=False)
+    marked_codes = {e["code"] for e in marked_agg["errors"]}
+    _assert("E_CASESET_INCOMPLETE" not in marked_codes, marked_codes)
+    _assert(marked_agg["status"] == "PASS", marked_agg)
+    print("PASS test_real_caseset_incomplete_red")
+
+
+def test_demo_fuzz_formula_drift_red() -> None:
+    """Drifted demo_fuzz formula (e.g. 4*pass >= 3*eligible) must fail closed."""
+    from C6EvalSpine.thresholds import evaluate_layer_gate
+
+    # Canonical formula evaluates normally.
+    thr_ok = {
+        "golden": 1.0,
+        "demo_fuzz": {"formula": "5*pass >= 4*eligible", "description": "ok"},
+        "unsupported": 1.0,
+        "safety": 1.0,
+    }
+    ok_gate = evaluate_layer_gate("demo_fuzz", thr_ok, pass_count=4, eligible=5)
+    _assert(ok_gate["hard_pass"] is True, ok_gate)
+    _assert(ok_gate.get("formula_ok") is not False, ok_gate)
+
+    # Drifted formula must reject.
+    thr_bad = {
+        "golden": 1.0,
+        "demo_fuzz": {"formula": "4*pass >= 3*eligible", "description": "drift"},
+        "unsupported": 1.0,
+        "safety": 1.0,
+    }
+    bad_gate = evaluate_layer_gate("demo_fuzz", thr_bad, pass_count=3, eligible=4)
+    _assert(bad_gate["gate"] == "FAIL", bad_gate)
+    _assert(bad_gate.get("formula_ok") is False, bad_gate)
+    _assert(bad_gate.get("hard_pass") is not True, bad_gate)
+
+    # S10 must surface E_V1_FORMULA_DRIFT when thresholds carry drifted formula.
+    subject = build_subject(mode=Mode.FIXTURE, run_id="formula-drift")
+    s9b = {
+        "run_id": "formula-drift",
+        "mode": "fixture",
+        "status": "PASS",
+        "subject": subject,
+        "layers": {
+            "golden": {"eligible": 2, "pass": 2},
+            "demo_fuzz": {"eligible": 4, "pass": 3},
+            "unsupported": {"eligible": 0, "pass": 0},
+            "safety": {"eligible": 0, "pass": 0},
+        },
+        "per_arm": {},
+    }
+    # Inject drifted formula via embedded thresholds reinvent path is separate;
+    # unit-test evaluate path above. Also assert unknown formula string fails.
+    thr_unknown = {
+        "demo_fuzz": {"formula": "pass/eligible >= 0.8"},
+    }
+    unk = evaluate_layer_gate("demo_fuzz", thr_unknown, pass_count=4, eligible=5)
+    _assert(unk["gate"] == "FAIL", unk)
+    _assert(unk.get("formula_ok") is False, unk)
+
+    # Missing formula must not silently hardcode PASS path.
+    thr_missing = {"demo_fuzz": {}}
+    missing = evaluate_layer_gate("demo_fuzz", thr_missing, pass_count=5, eligible=5)
+    _assert(missing["gate"] == "FAIL", missing)
+    _assert(missing.get("formula_ok") is False, missing)
+    print("PASS test_demo_fuzz_formula_drift_red")
+
+
+def test_injected_real_over_synthetic_descriptor_red() -> None:
+    """Injected real_model results over synthetic arm descriptors must fail provenance."""
+    subject = _real_subject_ready("provenance-forge")
+    # Descriptors remain synthetic (or mismatched artifact/scorer).
+    arms = _present_synthetic_arms()
+    holdout = verify_holdout()
+    one_id = holdout["case_ids"][0]
+    row = next(
+        r
+        for r in holdout["rows"]
+        if str(r.get("row_id") or r.get("case_id")) == one_id
+    )
+    inject = []
+    for arm_id in ("base", "old", "new"):
+        item = synthetic_arm_result(
+            run_id="provenance-forge",
+            arm_id=arm_id,
+            case_id=one_id,
+            row=row,
+            subject=subject,
+            score_class="real_model",  # forged claim
+        )
+        item["artifact_sha256"] = "11" * 32
+        item["scorer_id"] = "forged_real_scorer"
+        inject.append(item)
+    manifest = build_s9_manifest(
+        mode=Mode.REAL,
+        run_id="provenance-forge",
+        subject=subject,
+        arms=arms,
+        case_limit=1,
+    )
+    manifest["b7"]["is_b7_done"] = True
+    manifest["v1"]["status"] = "RATIFIED"
+    receipt = run_s9(manifest, inject_results=inject)
+    codes = {e["code"] for e in receipt["errors"]}
+    _assert(
+        "E_RESULT_PROVENANCE_MISMATCH" in codes or "E_FORGED_REAL_SCORE" in codes,
+        codes,
+    )
+    # Synthetic descriptor under REAL also surfaces synthetic ban.
+    _assert(
+        "E_SYNTHETIC_SCORE_IN_REAL" in codes or "E_RESULT_PROVENANCE_MISMATCH" in codes,
+        codes,
+    )
+    _assert(receipt["status"] not in {"PASS", "SEALED"}, receipt["status"])
+    _assert(receipt["sealed"] is False, receipt["sealed"])
+    print("PASS test_injected_real_over_synthetic_descriptor_red")
+
+
 def main() -> int:
     tests = [
         test_holdout_pin,
@@ -671,6 +1026,12 @@ def main() -> int:
         test_stage_s11_auto_prereq,
         test_cli_stage_s9b_s10_s11,
         test_full_61_case_fixture_replay,
+        # Fail-open binding regressions
+        test_real_v1_digest_mismatch_blocks_pass,
+        test_holdout_three_way_forged_subject_red,
+        test_real_caseset_incomplete_red,
+        test_demo_fuzz_formula_drift_red,
+        test_injected_real_over_synthetic_descriptor_red,
     ]
     failed = 0
     for fn in tests:

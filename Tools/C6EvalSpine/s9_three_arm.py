@@ -20,6 +20,134 @@ from .holdout_pin import verify_holdout
 from .identity import build_subject, join_subject_keys, sha256_text, subject_digest
 from .modes import Mode, normalize_mode
 from .resume import check_resume_subject, load_partials, write_partial
+from .thresholds import load_thresholds_from_v1
+
+
+def verify_holdout_three_way(
+    *,
+    manifest_holdout: dict[str, Any] | None,
+    subject: dict[str, Any] | None,
+    actual: dict[str, Any] | None,
+) -> list[dict[str, str]]:
+    """Require pin == subject declaration == loaded artifact (sha256 + row_count)."""
+    errors: list[dict[str, str]] = []
+    pin = manifest_holdout if isinstance(manifest_holdout, dict) else {}
+    subj = subject if isinstance(subject, dict) else {}
+    act = actual if isinstance(actual, dict) else {}
+
+    pin_sha = pin.get("sha256")
+    pin_count = pin.get("row_count")
+    subj_sha = subj.get("holdout_sha256")
+    subj_count = subj.get("holdout_row_count")
+    act_sha = act.get("sha256")
+    act_count = act.get("row_count")
+
+    if not (pin_sha == subj_sha == act_sha) or not (pin_count == subj_count == act_count):
+        errors.append(
+            {
+                "code": "E_HOLDOUT_THREE_WAY_MISMATCH",
+                "detail": (
+                    f"pin=({pin_sha},{pin_count}) "
+                    f"subject=({subj_sha},{subj_count}) "
+                    f"actual=({act_sha},{act_count})"
+                ),
+            }
+        )
+    return errors
+
+
+def validate_result_provenance(
+    item: dict[str, Any],
+    arm: dict[str, Any] | None,
+    *,
+    mode: Mode,
+) -> list[dict[str, str]]:
+    """Bind result score_class/artifact/scorer/mode to arm descriptor + mode."""
+    errors: list[dict[str, str]] = []
+    arm_obj = arm if isinstance(arm, dict) else {}
+    arm_id = str(item.get("arm_id") or arm_obj.get("arm_id") or "?")
+    item_score = item.get("score_class")
+    arm_score = arm_obj.get("score_class")
+    arm_status = arm_obj.get("adapter_status")
+
+    if item_score == "real_model":
+        if arm_score != "real_model" or arm_status != "present":
+            errors.append(
+                {
+                    "code": "E_RESULT_PROVENANCE_MISMATCH",
+                    "detail": (
+                        f"arm {arm_id}: result score_class=real_model but descriptor "
+                        f"score_class={arm_score!r} adapter_status={arm_status!r}"
+                    ),
+                }
+            )
+        if mode != Mode.REAL:
+            errors.append(
+                {
+                    "code": "E_FORGED_REAL_SCORE",
+                    "detail": f"arm {arm_id}: real_model result forbidden in mode={mode.value}",
+                }
+            )
+
+        arm_artifact = arm_obj.get("artifact") if isinstance(arm_obj.get("artifact"), dict) else {}
+        arm_sha = arm_artifact.get("sha256")
+        item_sha = item.get("artifact_sha256")
+        if not isinstance(item_sha, str) or not item_sha or item_sha != arm_sha:
+            errors.append(
+                {
+                    "code": "E_RESULT_PROVENANCE_MISMATCH",
+                    "detail": (
+                        f"arm {arm_id}: artifact_sha256 mismatch "
+                        f"result={item_sha!r} descriptor={arm_sha!r}"
+                    ),
+                }
+            )
+
+        expected_scorer = arm_obj.get("scorer_id")
+        item_scorer = item.get("scorer_id")
+        if expected_scorer is not None and item_scorer != expected_scorer:
+            errors.append(
+                {
+                    "code": "E_RESULT_PROVENANCE_MISMATCH",
+                    "detail": (
+                        f"arm {arm_id}: scorer_id mismatch "
+                        f"result={item_scorer!r} descriptor={expected_scorer!r}"
+                    ),
+                }
+            )
+        elif expected_scorer is None and item_score == "real_model":
+            errors.append(
+                {
+                    "code": "E_RESULT_PROVENANCE_MISMATCH",
+                    "detail": f"arm {arm_id}: real_model descriptor missing scorer_id",
+                }
+            )
+
+        join_keys = item.get("join_keys") if isinstance(item.get("join_keys"), dict) else {}
+        join_mode = join_keys.get("mode")
+        if join_mode is not None and join_mode != mode.value:
+            errors.append(
+                {
+                    "code": "E_RESULT_PROVENANCE_MISMATCH",
+                    "detail": (
+                        f"arm {arm_id}: join_keys.mode={join_mode!r} != mode={mode.value}"
+                    ),
+                }
+            )
+
+    if item_score is not None and arm_score is not None and item_score != arm_score:
+        # Any score_class disagreement is provenance failure (covers synthetic↔real forge).
+        if not any(e.get("code") == "E_RESULT_PROVENANCE_MISMATCH" for e in errors):
+            errors.append(
+                {
+                    "code": "E_RESULT_PROVENANCE_MISMATCH",
+                    "detail": (
+                        f"arm {arm_id}: result score_class={item_score!r} "
+                        f"!= descriptor score_class={arm_score!r}"
+                    ),
+                }
+            )
+    return errors
 
 
 def _empty_readback(basis: str = "fixture_synthetic") -> dict[str, Any]:
@@ -293,11 +421,43 @@ def run_s9(
     run_id = str(manifest.get("run_id") or "s9-unknown")
     subject = manifest.get("subject") if isinstance(manifest.get("subject"), dict) else {}
     arms = manifest.get("arms") if isinstance(manifest.get("arms"), dict) else {}
+    manifest_holdout = (
+        manifest.get("holdout") if isinstance(manifest.get("holdout"), dict) else {}
+    )
 
-    # Holdout pin
+    # Holdout pin (loaded artifact)
     holdout_info = verify_holdout()
     if not holdout_info["ok"]:
         errors.extend(holdout_info["errors"])
+
+    # Three-way: manifest pin == subject declaration == loaded artifact.
+    # Hard fail always (forged subject with correct file must not green).
+    errors.extend(
+        verify_holdout_three_way(
+            manifest_holdout=manifest_holdout,
+            subject=subject,
+            actual=holdout_info,
+        )
+    )
+
+    # V1 authority digest binding (REAL: hard fail; fixture: soft via receipt only
+    # when subject pin matches live digest — mismatch always recorded).
+    expected_v1 = subject.get("v1_authority_digest")
+    if expected_v1 is None:
+        expected_v1 = (manifest.get("v1") or {}).get("authority_digest")
+    thr = load_thresholds_from_v1(expected_digest=expected_v1)
+    v1_errors = [
+        e
+        for e in (thr.get("errors") or [])
+        if e.get("code") in {"E_V1_DIGEST_MISMATCH", "E_V1_FORMULA_DRIFT", "E_SCHEMA"}
+    ]
+    if mode == Mode.REAL:
+        errors.extend(v1_errors)
+    else:
+        # Fixture/dry_run: digest soft unless other hard V1 errors (formula).
+        for e in v1_errors:
+            if e.get("code") != "E_V1_DIGEST_MISMATCH":
+                errors.append(e)
 
     # B7 pin (static expected digests)
     b7 = manifest.get("b7") if isinstance(manifest.get("b7"), dict) else {}
@@ -358,10 +518,35 @@ def run_s9(
         partials = load_partials(partial_dir)
         errors.extend(check_resume_subject(partials, subject))
 
+    expected_case_ids = list(holdout_info.get("case_ids") or [])
+    case_limit = manifest.get("case_limit")
+    # Explicit fixture_subset wins; else case_limit>0 in fixture/dry_run marks subset.
+    if "fixture_subset" in manifest:
+        fixture_subset = bool(manifest.get("fixture_subset"))
+    else:
+        fixture_subset = (
+            mode in {Mode.FIXTURE, Mode.DRY_RUN}
+            and isinstance(case_limit, int)
+            and case_limit > 0
+        )
+    # REAL never permits fixture_subset.
+    if mode == Mode.REAL:
+        fixture_subset = False
+
     results: list[dict[str, Any]] = []
     if inject_results is not None:
         results = list(inject_results)
+        if not results:
+            errors.append(
+                {
+                    "code": "E_CASESET_INCOMPLETE",
+                    "detail": "empty injected results; never a real claim",
+                }
+            )
         for item in results:
+            if not isinstance(item, dict):
+                errors.append({"code": "E_SCHEMA", "detail": "injected result not object"})
+                continue
             errors.extend(validate_readback(item.get("readback")))
             behavior = item.get("behavior_class_observed")
             if behavior not in ALLOWED_BEHAVIOR_CLASSES:
@@ -371,14 +556,19 @@ def run_s9(
                         "detail": f"unknown behavior_class_observed={behavior!r}",
                     }
                 )
+            arm_id = str(item.get("arm_id") or "")
+            arm = arms.get(arm_id) if isinstance(arms.get(arm_id), dict) else {}
+            errors.extend(validate_result_provenance(item, arm, mode=mode))
             item_score = item.get("score_class")
             if item_score == "real_model" and mode != Mode.REAL:
-                errors.append(
-                    {
-                        "code": "E_FORGED_REAL_SCORE",
-                        "detail": f"forged real score in mode={mode.value}",
-                    }
-                )
+                # provenance may already flag; keep explicit forge code
+                if not any(e.get("code") == "E_FORGED_REAL_SCORE" for e in errors):
+                    errors.append(
+                        {
+                            "code": "E_FORGED_REAL_SCORE",
+                            "detail": f"forged real score in mode={mode.value}",
+                        }
+                    )
             if mode == Mode.REAL and item_score == "synthetic":
                 errors.append(
                     {
@@ -399,8 +589,9 @@ def run_s9(
                         ),
                     }
                 )
-    elif mode == Mode.REAL and not errors:
+    elif mode == Mode.REAL:
         # REAL cannot invent real_model scores from synthetic fixture path.
+        # Still fail even if other errors already present (no auto-synthetic).
         errors.append(
             {
                 "code": "E_NO_REAL_SCORES",
@@ -408,9 +599,8 @@ def run_s9(
             }
         )
     elif not errors:
-        case_limit = manifest.get("case_limit")
-        rows = holdout_info.get("rows") or []
-        if isinstance(case_limit, int) and case_limit > 0:
+        rows = list(holdout_info.get("rows") or [])
+        if fixture_subset and isinstance(case_limit, int) and case_limit > 0:
             rows = rows[:case_limit]
         completed = {
             (str(p.get("case_id")), str(p.get("arm_id"))): p for p in partials if isinstance(p, dict)
@@ -445,6 +635,14 @@ def run_s9(
                         score_class=score_class,
                         model_hard_pass=True,
                     )
+                    # Bind artifact for synthetic descriptors (provenance parity).
+                    artifact = arm.get("artifact") if isinstance(arm.get("artifact"), dict) else {}
+                    if artifact.get("sha256"):
+                        result["artifact_sha256"] = artifact.get("sha256")
+                    if arm.get("scorer_id"):
+                        result["scorer_id"] = arm.get("scorer_id")
+                    elif score_class == "synthetic":
+                        result["scorer_id"] = SCORER_ID_FIXTURE
                 errors.extend(validate_readback(result.get("readback")))
                 if result["behavior_class_observed"] not in ALLOWED_BEHAVIOR_CLASSES:
                     errors.append(
@@ -456,6 +654,13 @@ def run_s9(
                 if partial_dir is not None:
                     write_partial(partial_dir, result)
                 results.append(result)
+        if not results:
+            errors.append(
+                {
+                    "code": "E_CASESET_INCOMPLETE",
+                    "detail": "empty generated results; never a real claim",
+                }
+            )
 
     sealed = False
     if not errors and results:
@@ -475,10 +680,21 @@ def run_s9(
             "E_NO_REAL_SCORES",
             "E_SYNTHETIC_SCORE_IN_REAL",
             "E_REAL_ARTIFACT_DIGEST",
+            "E_V1_DIGEST_MISMATCH",
+            "E_HOLDOUT_THREE_WAY_MISMATCH",
+            "E_RESULT_PROVENANCE_MISMATCH",
+            "E_CASESET_INCOMPLETE",
+            "E_V1_FORMULA_DRIFT",
         }
         for e in errors
     ):
         status = "BLOCKED"
+
+    # Never seal/PASS when binding errors present.
+    if errors:
+        sealed = False
+        if status == "PASS":
+            status = "FAIL"
 
     receipt = {
         "schema_version": "s9_run_receipt_v1",
@@ -496,6 +712,8 @@ def run_s9(
         "results": results,
         "result_count": len(results),
         "sealed": sealed,
+        "fixture_subset": fixture_subset,
+        "expected_case_ids": expected_case_ids,
         "errors": errors,
         "claims": {
             "package_b2_done": False,
