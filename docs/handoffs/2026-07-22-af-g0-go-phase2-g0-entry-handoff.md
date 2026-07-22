@@ -3,10 +3,8 @@ kind: af-g0-go-phase2-g0-entry-handoff
 project: MAformac
 as_of: 2026-07-22
 predecessor: docs/handoffs/2026-07-22-phase2-grill-freeze-human-review-handoff.md
-supersedes:
-  - docs/handoffs/2026-07-22-phase2-grill-freeze-human-review-handoff.md
-  - docs/handoffs/2026-07-22-phase2-grill-freeze-human-review-handoff.receipt.json
-supersedes_claim: "AF-G0=RED / Phase2=NO-GO / implementation=PAUSED 的权威路由口径（人审冻结 handoff 仍可作历史 provenance，不得再当 live verdict）"
+supersedes: docs/handoffs/2026-07-22-phase2-grill-freeze-human-review-handoff.md
+supersedes_claim: "AF-G0=RED / Phase2=NO-GO / implementation=PAUSED 的权威路由口径（人审冻结 handoff 仍可作历史 provenance，不得再当 live verdict）；receipt json 同批作历史 provenance"
 handoff_status: ACTIVE
 product_status: NOT_RELEASE_READY
 af_g0_verdict: GO_WITH_RESIDUALS
