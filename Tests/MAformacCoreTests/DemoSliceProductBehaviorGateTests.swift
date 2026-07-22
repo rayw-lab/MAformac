@@ -251,7 +251,80 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
         XCTAssertEqual(h.store.cells, cellsAfterFirst)
     }
 
-    // MARK: - G3 four-family gate extension (row167 compound + CUR OOR + moving refuse)
+    // MARK: - G3 four-family gate extension (AC/window new + ambient/seat under testG3_)
+
+    @MainActor
+    func testG3_ambient_openMutatesPowerWithReadbackAndUI() async throws {
+        let h = try Harness()
+        let result = try await h.route.route(text: "打开氛围灯")
+        let execution = try XCTUnwrap(result.execution)
+
+        XCTAssertNil(result.rejection)
+        XCTAssertEqual(execution.admission.entry.matrixID, 1972)
+        XCTAssertEqual(execution.admission.frame.toolName, "open_atmosphere_lamp")
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(execution.payload.mutationCount, 1)
+        XCTAssertEqual(h.store.cell(for: "ambient.power")?.actualValue, "on")
+        XCTAssertTrue(execution.payload.readbacks.contains {
+            $0.key == "ambient.power"
+                && $0.actualValue == "on"
+                && $0.revision == h.store.cell(for: "ambient.power")?.revision
+        })
+        let display = try XCTUnwrap(
+            VehicleCardDisplay.displays(from: [
+                try XCTUnwrap(h.store.cell(for: "ambient.power"))
+            ])
+            .first { $0.accessibilityKey == "ambient.power" }
+        )
+        XCTAssertEqual(display.valueText, "开")
+
+        let cellsAfterFirst = h.store.cells
+        let revisionAfterFirst = h.store.currentRevision
+        let second = try await h.route.route(text: "打开氛围灯")
+        let secondExecution = try XCTUnwrap(second.execution)
+        XCTAssertEqual(secondExecution.payload.outcome.result, .alreadyStateNoop)
+        XCTAssertEqual(secondExecution.payload.mutationCount, 0)
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(h.store.currentRevision, revisionAfterFirst)
+        XCTAssertEqual(h.store.cells, cellsAfterFirst)
+    }
+
+    @MainActor
+    func testG3_seat_openPassengerHeatMutatesLevelWithReadbackAndUI() async throws {
+        let h = try Harness()
+        let result = try await h.route.route(text: "打开副驾座椅加热")
+        let execution = try XCTUnwrap(result.execution)
+
+        XCTAssertNil(result.rejection)
+        XCTAssertEqual(execution.admission.entry.matrixID, 201)
+        XCTAssertEqual(execution.admission.frame.toolName, "open_seat_heat")
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(execution.payload.mutationCount, 1)
+        XCTAssertEqual(h.store.cell(for: "seat.heat_level[副驾]")?.actualValue, "1")
+        XCTAssertEqual(h.store.cell(for: "seat.heat_level[主驾]")?.actualValue, "0")
+        XCTAssertTrue(execution.payload.readbacks.contains {
+            $0.key == "seat.heat_level[副驾]"
+                && $0.actualValue == "1"
+                && $0.revision == h.store.cell(for: "seat.heat_level[副驾]")?.revision
+        })
+        let display = try XCTUnwrap(
+            VehicleCardDisplay.displays(from: [
+                try XCTUnwrap(h.store.cell(for: "seat.heat_level[副驾]"))
+            ])
+            .first { $0.accessibilityKey == "seat.heat_level[副驾]" }
+        )
+        XCTAssertEqual(display.valueText, "1挡")
+
+        let cellsAfterFirst = h.store.cells
+        let revisionAfterFirst = h.store.currentRevision
+        let second = try await h.route.route(text: "打开副驾座椅加热")
+        let secondExecution = try XCTUnwrap(second.execution)
+        XCTAssertEqual(secondExecution.payload.outcome.result, .alreadyStateNoop)
+        XCTAssertEqual(secondExecution.payload.mutationCount, 0)
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(h.store.currentRevision, revisionAfterFirst)
+        XCTAssertEqual(h.store.cells, cellsAfterFirst)
+    }
 
     @MainActor
     func testG3_row167_compoundColdStart_mutatesPowerModeTempWithReadbackAndUI() async throws {
