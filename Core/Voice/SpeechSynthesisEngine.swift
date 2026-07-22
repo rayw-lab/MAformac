@@ -3,6 +3,9 @@ import Foundation
 
 public protocol SpeechSynthesisEngine: Sendable {
     func speak(_ text: String) -> SpeechSynthesisResult
+    /// Synchronously cancel any pending / in-flight speech (G4 turn-lease barge-in).
+    /// Must not change the `speak(_:)` contract.
+    func cancelPendingSpeech()
 }
 
 public enum SpeechSynthesisStatus: String, Codable, Equatable, Sendable {
@@ -81,10 +84,15 @@ public final class AVSpeechSynthesisEngine: NSObject, SpeechSynthesisEngine, @un
         synthesizer.speak(utterance)
         return .enqueued(route: voice.language == "zh-CN" ? .preferredChinese : .fallbackChinese)
     }
+
+    public func cancelPendingSpeech() {
+        synthesizer.stopSpeaking(at: .immediate)
+    }
 }
 
 public final class RecordingSpeechSynthesisEngine: SpeechSynthesisEngine, @unchecked Sendable {
     public private(set) var spokenTexts: [String] = []
+    public private(set) var cancelPendingSpeechCallCount = 0
     public var nextResult: SpeechSynthesisResult
 
     public init(nextResult: SpeechSynthesisResult = .enqueued(route: .testDouble)) {
@@ -94,5 +102,9 @@ public final class RecordingSpeechSynthesisEngine: SpeechSynthesisEngine, @unche
     public func speak(_ text: String) -> SpeechSynthesisResult {
         spokenTexts.append(text)
         return nextResult
+    }
+
+    public func cancelPendingSpeech() {
+        cancelPendingSpeechCallCount += 1
     }
 }

@@ -21,7 +21,23 @@ public final class FrontstageCustomerIngress {
     }
 
     public func submit(_ input: FrontstageIngressInput) -> FrontstageIngressResult {
-        let request = session.issueIngressRequest(input)
+        let request: FrontstageIngressRequest
+        do {
+            request = try session.issueIngressRequest(input)
+        } catch FrontstageVoiceSessionError.sequenceExhausted {
+            // Fail-closed without new App-facing rejection cases (刀1 禁改 App switch).
+            let exhausted = FrontstageIngressRequest(
+                source: input.source,
+                rawText: input.rawText,
+                sessionID: session.sessionID,
+                sequence: Int.max,
+                turnID: UUID().uuidString.lowercased(),
+                eventID: UUID().uuidString.lowercased()
+            )
+            return .rejected(FrontstageIngressRejected(request: exhausted, reason: .unavailable))
+        } catch {
+            preconditionFailure("unexpected FrontstageVoiceSession issuance error: \(error)")
+        }
         let trimmed = input.rawText?.trimmingCharacters(in: .whitespacesAndNewlines)
         let rejection: FrontstageIngressRejection?
         if input.rawText == nil {

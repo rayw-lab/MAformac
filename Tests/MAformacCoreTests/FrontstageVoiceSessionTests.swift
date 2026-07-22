@@ -2,11 +2,11 @@ import XCTest
 @testable import MAformacCore
 
 final class FrontstageVoiceSessionTests: XCTestCase {
-    func testContainmentIsStableTypedNoWriteAcrossTwoTurns() {
+    func testContainmentIsStableTypedNoWriteAcrossTwoTurns() throws {
         let session = FrontstageVoiceSession(sessionID: "frontstage-test-session")
 
-        let first = session.submitContainment(utterance: "打开空调")
-        let second = session.submitContainment(utterance: "打开车窗")
+        let first = try session.submitContainment(utterance: "打开空调")
+        let second = try session.submitContainment(utterance: "打开车窗")
 
         XCTAssertEqual(first.sessionID, "frontstage-test-session")
         XCTAssertEqual(second.sessionID, first.sessionID)

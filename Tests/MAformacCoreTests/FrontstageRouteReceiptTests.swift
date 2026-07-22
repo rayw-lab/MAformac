@@ -33,7 +33,7 @@ final class FrontstageRouteReceiptTests: XCTestCase {
             ],
             currentDirectory: root
         )
-        let turn = FrontstageVoiceSession(sessionID: "session-1").submitContainment(utterance: "打开空调")
+        let turn = try FrontstageVoiceSession(sessionID: "session-1").submitContainment(utterance: "打开空调")
 
         let receiptURL = try XCTUnwrap(FrontstageRouteReceiptWriter.writeCurrent(turn, configuration: configuration, isCurrent: { true }))
         XCTAssertEqual(receiptURL.path, root.appendingPathComponent("receipts/c1/frontstage-route-receipt.v1.json").path)
@@ -63,7 +63,7 @@ final class FrontstageRouteReceiptTests: XCTestCase {
             ],
             currentDirectory: root
         )
-        let turn = FrontstageVoiceSession().submitContainment(utterance: "打开车窗")
+        let turn = try FrontstageVoiceSession().submitContainment(utterance: "打开车窗")
 
         XCTAssertNil(try FrontstageRouteReceiptWriter.writeCurrent(turn, configuration: configuration, isCurrent: { false }))
         XCTAssertFalse(FileManager.default.fileExists(atPath: configuration.receiptURL.path))

@@ -6,7 +6,7 @@ latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G3_COMPLETE
+phase2_product_coding: G4_IN_PROGRESS
 phase2_coding_gate: PHASE2_CODING_GATED
 g0_status: G0_COMPLETE
 g1_status: G1_FIRST_KNIFE_GREEN
@@ -38,9 +38,10 @@ g3_status: G3_COMPLETE
 
 ## 下一步（Phase2 G4）
 
-1. **G3 工程四子块本地 COMPLETE** 后：下一波 **G4 Turn Lease / cancel / last-intent-wins**（释放 C3 独占写锁；禁与 G3 同 commit 抢做）。
-2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-3. residual 强制账（不因 G3 收口消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
+1. **G3 工程四子块已 COMPLETE**（tip `6b498387`，`testG3_*` 7/7 全绿）。
+2. **G4 刀1 IN_PROGRESS→GREEN**：`RuntimeTurnLease` + `cancelPendingSpeech` + sequence overflow fail-closed；验收 `swift test --filter TurnLeaseCancellationTests`。下一刀：Runner 双门隔离（禁改 C3）。
+3. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
+4. residual 强制账（不因 G3/G4 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 
 ## 隔离后产品真态（candidate 口径）
 

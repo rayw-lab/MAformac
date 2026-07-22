@@ -1,25 +1,40 @@
 import Foundation
 
+/// Typed fail-closed errors for frontstage voice session issuance.
+public enum FrontstageVoiceSessionError: Error, Equatable, Sendable {
+    /// `latestSequence` cannot advance further (`addingReportingOverflow` reported overflow).
+    case sequenceExhausted
+}
+
 /// Stable deny-first boundary for customer-frontstage voice submissions.
 ///
 /// This type intentionally does not know about tool frames, planners, runners, or state stores.
 /// Positive admission remains blocked on the T03/T04 interface cut.
 public final class FrontstageVoiceSession {
     public let sessionID: String
-    private var latestSequence = 0
+    private var latestSequence: Int
 
-    public init(sessionID: String = UUID().uuidString.lowercased()) {
+    public init(
+        sessionID: String = UUID().uuidString.lowercased(),
+        startingSequence: Int = 0
+    ) {
         precondition(!sessionID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        precondition(startingSequence >= 0)
         self.sessionID = sessionID
+        self.latestSequence = startingSequence
     }
 
-    public func submitContainment(utterance: String) -> FrontstageVoiceTurn {
-        let request = issueIngressRequest(.init(source: .voiceTranscript, rawText: utterance))
+    public func submitContainment(utterance: String) throws -> FrontstageVoiceTurn {
+        let request = try issueIngressRequest(.init(source: .voiceTranscript, rawText: utterance))
         return makeContainmentTurn(request: request, utterance: utterance)
     }
 
-    public func issueIngressRequest(_ input: FrontstageIngressInput) -> FrontstageIngressRequest {
-        latestSequence += 1
+    public func issueIngressRequest(_ input: FrontstageIngressInput) throws -> FrontstageIngressRequest {
+        let (next, overflowed) = latestSequence.addingReportingOverflow(1)
+        guard !overflowed else {
+            throw FrontstageVoiceSessionError.sequenceExhausted
+        }
+        latestSequence = next
         return FrontstageIngressRequest(
             source: input.source,
             rawText: input.rawText,
