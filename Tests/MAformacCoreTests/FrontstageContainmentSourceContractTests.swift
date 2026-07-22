@@ -68,6 +68,11 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         let speechIdx = try index(of: "speech.cancelPendingSpeech()", in: scheduleBody)
         XCTAssertLessThan(cancelTaskIdx, markIdx, "cancel old Task before switching current identity")
         XCTAssertLessThan(markIdx, speechIdx, "switch current identity before cancelPendingSpeech")
+        XCTAssertTrue(
+            source.contains("notePreemptedInFlight"),
+            "knife4: preempt must note in-flight identity for 算了 link"
+        )
+        XCTAssertTrue(source.contains("pendingPreemptedInFlight"))
     }
 
     func testCompositionProductionCallsitePassesCorrelationProviderAndFailClosedIdentity() throws {

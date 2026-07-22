@@ -58,6 +58,10 @@ public final class DemoSliceRoute {
     private let store: DemoVehicleStateStore
     private let stateCells: StateCellContractLookup
     public private(set) var runnerCallCount = 0
+    /// Last successfully committed command lease identity (for post-commit `算了` → cancelTooLate).
+    public private(set) var lastCommittedTurn: RuntimeTurnIdentity?
+    /// Set when composition preempts an in-flight ingress Task (pre-commit cancel link target).
+    public private(set) var preemptedInFlightTurn: RuntimeTurnIdentity?
 
     public init(
         store: DemoVehicleStateStore,
@@ -86,6 +90,11 @@ public final class DemoSliceRoute {
                 )
             }
         )
+    }
+
+    /// Composition notes the preempted in-flight turn before routing `算了`.
+    public func notePreemptedInFlight(_ identity: RuntimeTurnIdentity) {
+        preemptedInFlightTurn = identity
     }
 
     /// Unit/default helper surface. Invokes the runner without a production
@@ -141,11 +150,92 @@ public final class DemoSliceRoute {
                 rejection: reason
             )
         case let .cancel(target):
-            return DemoSliceRouteResult(
+            return routeCancel(
+                target: target,
                 classification: classification,
-                rejection: .cancel(target: target)
+                lease: lease
             )
         }
+    }
+
+    /// Round 6 Q3: `算了` terminates before runner (runnerCallCount unchanged).
+    /// Pre-commit (preempted in-flight): cancelled ack linked to preempted identity.
+    /// Post-commit (no in-flight, lastCommitted set): cancelTooLate no-action; store untouched.
+    private func routeCancel(
+        target: String?,
+        classification: DemoSliceClassification,
+        lease: RuntimeTurnLease?
+    ) -> DemoSliceRouteResult {
+        _ = target
+        let preempted = preemptedInFlightTurn
+        preemptedInFlightTurn = nil
+
+        let linked: RuntimeTurnIdentity?
+        let cancelTooLate: Bool
+        if let preempted {
+            linked = preempted
+            cancelTooLate = false
+        } else if let committed = lastCommittedTurn {
+            linked = committed
+            cancelTooLate = true
+        } else {
+            linked = lease.map(RuntimeTurnIdentity.init)
+            cancelTooLate = false
+        }
+
+        let traceID = UUID().uuidString
+        let linkToken = linked?.linkToken ?? "none"
+        let result: DemoRuntimeResult
+        let reason: String
+        let dialogText: String
+        let eventPrefix: String
+        let safeReason: String
+        if cancelTooLate {
+            // Presentation allowlist keeps `no_action`; cancelTooLate detail in eventID (G5 owns typed copy).
+            result = .noAction
+            reason = "no_action"
+            dialogText = "命令已执行，如需撤销请说完整反向指令"
+            eventPrefix = "cancel-too-late"
+            safeReason = "no_action"
+        } else {
+            result = .cancelled
+            reason = "cancelled"
+            dialogText = "已取消"
+            eventPrefix = "cancel-preempt"
+            safeReason = "cancelled"
+        }
+
+        let snapshot = PresentationSnapshot(
+            traceID: traceID,
+            runtimeOutcome: DemoRuntimeOutcome(result: result, reason: reason),
+            cards: store.presentationCells,
+            dialogText: dialogText,
+            readbacks: [],
+            voiceState: .idle,
+            orbState: .idle,
+            mutationCount: 0,
+            proofClass: .localUnit,
+            isTerminal: true
+        )
+        let turnID = "\(eventPrefix)-\(traceID)"
+        let payload = RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: turnID,
+            eventID: "\(eventPrefix):\(linkToken)",
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: safeReason
+            )
+        )
+        // runnerCallCount NOT incremented — cancel terminates before runner.
+        return DemoSliceRouteResult(
+            classification: classification,
+            readOnly: DemoSliceReadOnlyOutcome(
+                classification: classification,
+                payload: payload,
+                runnerCallCount: runnerCallCount
+            )
+        )
     }
 
     private func routeCommand(
@@ -225,6 +315,9 @@ public final class DemoSliceRoute {
             )
         } else {
             payload = try await runner.run(text: text, lease: lease)
+        }
+        if payload.outcome.result == .acceptedToolCall, let lease {
+            lastCommittedTurn = RuntimeTurnIdentity(lease)
         }
         return DemoSliceRouteResult(
             classification: classification,

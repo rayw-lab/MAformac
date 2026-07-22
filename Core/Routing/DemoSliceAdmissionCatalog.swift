@@ -171,6 +171,10 @@ public struct DemoSliceAdmissionCatalog: Sendable {
     }
 
     private func classifyBody(_ normalized: String) -> DemoSliceClassification {
+        // Round 6 Q3: exact `算了` is cancel — never invent reverse compensation (e.g. close window).
+        if normalized == "算了" {
+            return .cancel(target: nil)
+        }
         if normalized == "打开空调" {
             return .command(powerOnAdmission(entry: entries[0], device: "ac", capabilityID: "vehicle.ac.toggle", toolName: "set_vehicle_control"))
         }

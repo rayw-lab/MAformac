@@ -671,18 +671,37 @@ struct ContentView: View {
     private func applyDemoSliceReadOnly(_ readOnly: DemoSliceReadOnlyOutcome, utterance: String) {
         let payload = readOnly.payload
         let dialogueText: String
-        if !payload.readbacks.isEmpty {
+        if case .cancel = readOnly.classification {
+            // G4: cancel/cancelTooLate copy from eventID prefix (payload omits snapshot.dialogText).
+            if payload.eventID?.hasPrefix("cancel-too-late") == true {
+                dialogueText = "命令已执行，如需撤销请说完整反向指令"
+            } else {
+                dialogueText = "已取消"
+            }
+        } else if !payload.readbacks.isEmpty {
             dialogueText = payload.readbacks.map(\.spokenText).joined(separator: "；")
         } else if case .capabilityQuery = readOnly.classification {
             dialogueText = "空调温度支持18到32度"
         } else {
             dialogueText = "已查询"
         }
+        let resultKind: DemoRuntimeResultKind
+        switch payload.outcome.result {
+        case .acceptedToolCall: resultKind = .acceptedToolCall
+        case .noAction: resultKind = .noAction
+        case .clarifyMissingSlot: resultKind = .clarifyMissingSlot
+        case .refusalNoAvailableTool: resultKind = .refusalNoAvailableTool
+        case .refusalSafetyOrPolicy: resultKind = .refusalSafetyOrPolicy
+        case .alreadyStateNoop: resultKind = .alreadyStateNoop
+        case .partialAcceptPartialRefuse: resultKind = .partialAcceptPartialRefuse
+        case .runtimeError: resultKind = .runtimeError
+        case .cancelled, .interrupted: resultKind = .cancelled
+        }
         snapshot = StagePresentationSnapshot.from(
             store: store,
             activeCells: snapshot.activeCells,
             context: snapshot.context,
-            resultKind: .noAction,
+            resultKind: resultKind,
             traceId: payload.traceID,
             scopeOrigins: snapshot.scopeOrigins,
             orbState: .idle,
@@ -692,7 +711,13 @@ struct ContentView: View {
             proofClass: .localMock
         )
         customerIngressStatusText = dialogueText
-        customerIngressProofText = "route=demo_slice;status=read_only_query;runner=0;mutation=0;readbacks=\(payload.readbacks.count);state_revision=\(store.currentRevision)"
+        let statusTag: String
+        if case .cancel = readOnly.classification {
+            statusTag = payload.eventID?.hasPrefix("cancel-too-late") == true ? "cancel_too_late" : "cancel_preempt"
+        } else {
+            statusTag = "read_only_query"
+        }
+        customerIngressProofText = "route=demo_slice;status=\(statusTag);runner=0;mutation=0;readbacks=\(payload.readbacks.count);state_revision=\(store.currentRevision)"
         messages.append(DialogueMessage(role: .user, text: utterance))
         messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }

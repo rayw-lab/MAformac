@@ -25,6 +25,10 @@ final class FrontstageRuntimeComposition {
     private var sessionLifecycleGate: SessionLifecycleCompositionGate?
     /// Sole customer-path route Task. New ingress cancels the previous handle.
     private var ingressRouteTask: Task<Void, Never>?
+    /// Lease identity of the current/in-flight ingress (for preempt → cancel link).
+    private var currentLeaseIdentity: RuntimeTurnIdentity?
+    /// Captured when preempting a non-nil ingress Task; drained into route before next route().
+    private var pendingPreemptedInFlight: RuntimeTurnIdentity?
 
     init(session: FrontstageVoiceSession = FrontstageVoiceSession()) {
         self.session = session
@@ -54,6 +58,10 @@ final class FrontstageRuntimeComposition {
         speech: any SpeechSynthesisEngine,
         onResult: @escaping @MainActor (Result<DemoSliceRouteResult, Error>) -> Void
     ) {
+        let hadInFlight = ingressRouteTask != nil
+        if hadInFlight, let identity = currentLeaseIdentity {
+            pendingPreemptedInFlight = identity
+        }
         ingressRouteTask?.cancel()
         ingressRouteTask = nil
 
@@ -150,6 +158,7 @@ final class FrontstageRuntimeComposition {
                 self?.currentTurnID == trimmedTurnID
             }
         )
+        currentLeaseIdentity = lease.identity
 
         if demoSliceRoute == nil {
             demoSliceRoute = try DemoSliceRoute(
@@ -157,6 +166,10 @@ final class FrontstageRuntimeComposition {
                 traceLogger: traceLogger,
                 speech: speech
             )
+        }
+        if let pending = pendingPreemptedInFlight {
+            demoSliceRoute!.notePreemptedInFlight(pending)
+            pendingPreemptedInFlight = nil
         }
         return try await demoSliceRoute!.route(
             text: turn.utterance,
