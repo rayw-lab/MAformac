@@ -122,14 +122,14 @@ verify-closure-work-packages: .venv/.deps.stamp
 		--subject-head "$$(git rev-parse HEAD)" \
 		--receipt .build/closure/closure-registry-check.v1.json
 
-verify-c6-authority-eval-live:
-	$(PYTHON_BOOTSTRAP) -B scripts/test_check_c6_corpus_lineage_candidate.py
-	$(PYTHON_BOOTSTRAP) -B scripts/test_check_c6_corpus_freeze_packet.py
-	$(PYTHON_BOOTSTRAP) -B scripts/test_check_c6_active_authority_candidate.py
-	$(PYTHON_BOOTSTRAP) -B scripts/test_check_c6_active_authority_ratification_packet.py
-	$(PYTHON_BOOTSTRAP) -B scripts/test_check_c6_eval_spine.py
-	$(PYTHON_BOOTSTRAP) -B scripts/check_c6_corpus_lineage_candidate.py
-	$(PYTHON_BOOTSTRAP) -B scripts/check_c6_active_authority_candidate.py \
+verify-c6-authority-eval-live: .venv/.deps.stamp
+	$(PYTHON) -B scripts/test_check_c6_corpus_lineage_candidate.py
+	$(PYTHON) -B scripts/test_check_c6_corpus_freeze_packet.py
+	$(PYTHON) -B scripts/test_check_c6_active_authority_candidate.py
+	$(PYTHON) -B scripts/test_check_c6_active_authority_ratification_packet.py
+	$(PYTHON) -B scripts/test_check_c6_eval_spine.py
+	$(PYTHON) -B scripts/check_c6_corpus_lineage_candidate.py
+	$(PYTHON) -B scripts/check_c6_active_authority_candidate.py \
 		contracts/c6-active-authority/authority.v1.candidate.json
 
 verify-closure-work-packages-static: .venv/.deps.stamp
