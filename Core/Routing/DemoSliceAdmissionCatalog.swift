@@ -28,6 +28,7 @@ public enum DemoSliceAdmissionRejection: Equatable, Sendable {
     case valueOutOfRange(actual: Int, allowed: ClosedRange<Int>)
     case clarifyMissingSlot
     case conjunctionOrMultiIntent
+    case cancel(target: String?)
 }
 
 public struct DemoSliceDesiredTarget: Equatable, Sendable {
@@ -161,8 +162,10 @@ public struct DemoSliceAdmissionCatalog: Sendable {
             return .clarifyMissingSlot
         case let .contractRefusal(reason):
             return reason
-        case .stateQuery, .capabilityQuery, .cancel:
-            // Query/cancel are not rejections; route handles them.
+        case let .cancel(target):
+            return .cancel(target: target)
+        case .stateQuery, .capabilityQuery:
+            // Queries are not rejections; route handles them.
             return nil
         }
     }

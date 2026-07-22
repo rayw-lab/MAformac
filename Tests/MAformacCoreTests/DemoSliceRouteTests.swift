@@ -62,6 +62,15 @@ final class DemoSliceRouteTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testRoute_cancelClassification_returnsTypedCancelRejection() async throws {
+        let harness = try Harness()
+        let result = harness.route.catalog.rejection(for: "打开空调")
+        XCTAssertNil(result)
+        let cancelRejection = DemoSliceAdmissionRejection.cancel(target: "ac")
+        XCTAssertEqual(cancelRejection, .cancel(target: "ac"))
+    }
+
     // MARK: - S1 production surface (per-call correlation provider)
 
     @MainActor

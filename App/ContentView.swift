@@ -712,11 +712,16 @@ struct ContentView: View {
         case .clarifyMissingSlot:
             message = "请告诉我空调要打开，还是调到多少度"
             resultKind = .clarifyMissingSlot
-        case .notInCatalog, .conjunctionOrMultiIntent:
+        case .notInCatalog, .conjunctionOrMultiIntent, .cancel:
             let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
             snapshot = update.snapshot
             customerIngressStatusText = update.snapshot.dialogText
-            let reason = rejection == .conjunctionOrMultiIntent ? "conjunction_or_multi_intent" : "not_in_catalog"
+            let reason: String
+            switch rejection {
+            case .conjunctionOrMultiIntent: reason = "conjunction_or_multi_intent"
+            case .cancel(let target): reason = target.map { "cancel_\($0)" } ?? "user_cancelled"
+            default: reason = "not_in_catalog"
+            }
             customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(reason);state_revision=\(store.currentRevision)"
             messages.append(contentsOf: update.dialogueTurns.map { dialogueTurn in
                 DialogueMessage(

@@ -139,7 +139,10 @@ final class DemoSliceClassificationTests: XCTestCase {
             case let .contractRefusal(reason):
                 XCTAssertNil(admission, sample)
                 XCTAssertEqual(rejection, reason, sample)
-            case .stateQuery, .capabilityQuery, .cancel:
+            case let .cancel(target):
+                XCTAssertNil(admission, sample)
+                XCTAssertEqual(rejection, .cancel(target: target), sample)
+            case .stateQuery, .capabilityQuery:
                 XCTAssertNil(admission, sample)
                 XCTAssertNil(rejection, sample)
             }

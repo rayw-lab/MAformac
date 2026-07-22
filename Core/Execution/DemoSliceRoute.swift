@@ -129,10 +129,10 @@ public final class DemoSliceRoute {
                 classification: classification,
                 rejection: reason
             )
-        case .cancel:
+        case let .cancel(target):
             return DemoSliceRouteResult(
                 classification: classification,
-                rejection: .notInCatalog
+                rejection: .cancel(target: target)
             )
         }
     }

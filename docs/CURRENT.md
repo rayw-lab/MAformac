@@ -6,12 +6,12 @@ latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G3_FIRST_KNIFE_IN_PROGRESS
+phase2_product_coding: G3_KNIFE2_WINDOW_CUR_IN_PROGRESS
 phase2_coding_gate: PHASE2_CODING_GATED
 g0_status: G0_COMPLETE
 g1_status: G1_FIRST_KNIFE_GREEN
 g2_status: G2_RESIDUAL_GREEN
-g3_status: G3_FIRST_KNIFE_IN_PROGRESS
+g3_status: G3_KNIFE2_WINDOW_CUR_IN_PROGRESS
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -56,6 +56,8 @@ g3_status: G3_FIRST_KNIFE_IN_PROGRESS
 3. `open_window_by_number` — 主驾车窗（**candidate · 禁演示**）
 4. `open_atmosphere_lamp` — 氛围灯（**candidate · 禁演示**）
 5. `open_seat_heat` — 副驾座椅加热（**candidate · 禁演示**）
+
+> 注：admission（6）= 上述 5 个 mounted tools + 1 个准入入口 row167（空调制热/微调复合入口 `主驾制热调{N}{unit}`，底层挂载至 `adjust_ac_temperature_to_number` 帧，禁抬 proven）。
 
 ### 仍不具备 / 未闭
 
