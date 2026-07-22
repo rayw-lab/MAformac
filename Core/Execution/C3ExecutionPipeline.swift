@@ -793,6 +793,9 @@ public struct C3ExecutionPipeline: Sendable {
             }
 
             if frame.value.ref == "CUR" {
+                // R2-Q4 / G3 CUR quartet: relative PERCENT/SPOT is additive points on
+                // live current (window 20 + 50 → 70), never absolute target, never clamp.
+                // Out-of-range (e.g. 70 + 50 → 120) fails closed at range.contains below.
                 let current = try requireIntegerCurrent(store: store, key: key)
                 let delta64: Int64
                 do {

@@ -22,7 +22,7 @@ g3_status: G3_KNIFE2_WINDOW_CUR_IN_PROGRESS
 ## Live 真态（2026-07-23）
 
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
-- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 首刀进行中**（settled replay 先 fresh-risk + unknown-state fail-closed；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
+- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 首刀 GREEN**（`4f38ab14` fresh-risk）→ **G3 刀2 进行中**（window CUR quartet 20→70 / range / generic；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
@@ -38,9 +38,9 @@ g3_status: G3_KNIFE2_WINDOW_CUR_IN_PROGRESS
 
 ## 下一步（Phase2 G3）
 
-1. **G3 首刀已合入本树**：settled replay 先 fresh-risk；下一刀串行 **window CUR quartet**（禁同 commit 做 row167 compound atomic）。
+1. **G3 刀2（window CUR quartet）合入本树后**：下一刀串行 **row167 compound atomic**（0–3 transitions / rollback；禁与 CUR 同 commit 抢做）。
 2. 严格遵守 shared-file 串行 owner（`C3ExecutionPipeline` / `ContractLookups`）；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-3. residual 强制账（不因本裁决消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；°F 准入已闭，row167 compound atomic 仍属后续 G3 刀。
+3. residual 强制账（不因本裁决消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；°F 准入已闭；四族行为门扩展仍属后续 G3 刀。
 
 ## 隔离后产品真态（candidate 口径）
 
