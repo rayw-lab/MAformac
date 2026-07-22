@@ -10,6 +10,9 @@ enum DemoRuntimeResultKind: String, CaseIterable, Codable, Equatable, Sendable {
     case runtimeError = "runtime_error"
     case cancelled
     case partialAcceptPartialRefuse = "partial_accept_partial_refuse"
+    case stateQuery = "state_query"
+    case capabilityQuery = "capability_query"
+    case refusalContractViolation = "refusal_contract_violation"
 }
 
 enum StagePresentationProofClass: String, Codable, Equatable, Sendable {

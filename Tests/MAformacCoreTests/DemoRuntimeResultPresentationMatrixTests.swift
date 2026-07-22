@@ -7,7 +7,7 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
 
         XCTAssertEqual(entries.map(\.resultKind), DemoRuntimeResultKind.allCases)
         XCTAssertEqual(Set(entries.map(\.resultKind)), Set(DemoRuntimeResultKind.allCases))
-        XCTAssertEqual(entries.count, 9)
+        XCTAssertEqual(entries.count, 12)
     }
 
     func testEachRuntimeResultKindHasVUIAndProofOutputs() {
@@ -34,7 +34,10 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
             (.alreadyStateNoop, .satisfied, .steadyAcknowledge),
             (.runtimeError, .unknown, .staticError),
             (.cancelled, .normal, .cancellationFade),
-            (.partialAcceptPartialRefuse, .blocked_with_alternative, .partialResult)
+            (.partialAcceptPartialRefuse, .blocked_with_alternative, .partialResult),
+            (.stateQuery, .normal, .steadyAcknowledge),
+            (.capabilityQuery, .normal, .steadyAcknowledge),
+            (.refusalContractViolation, .blocked_hard, .refusalShake)
         ]
 
         for (kind, visualState, motionKind) in expected {
@@ -43,6 +46,22 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
             XCTAssertEqual(entry.visualState, visualState, "\(kind.rawValue) visualState")
             XCTAssertEqual(entry.motionKind, motionKind, "\(kind.rawValue) motionKind")
         }
+    }
+
+    func testKnife1_allCasesHavePresentationEntry() {
+        for kind in DemoRuntimeResultKind.allCases {
+            let entry = DemoRuntimeResultPresentationMatrix.entry(for: kind)
+            XCTAssertEqual(entry.resultKind, kind)
+            XCTAssertEqual(entry.proofClass, .localMock)
+        }
+        XCTAssertNotEqual(
+            DemoRuntimeResultPresentationMatrix.entry(for: .refusalContractViolation).dialogText,
+            DemoRuntimeResultPresentationMatrix.entry(for: .refusalSafetyOrPolicy).dialogText
+        )
+        XCTAssertNotEqual(
+            DemoRuntimeResultPresentationMatrix.entry(for: .stateQuery).motionKind,
+            PresentationMotionKind.stateCommit
+        )
     }
 
     func testSixRuntimeErrorClassesMapToPresentationStates() {

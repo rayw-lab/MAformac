@@ -55,6 +55,12 @@ public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Hashabl
     case runtimeError = "runtime_error"
     case cancelled
     case interrupted
+    /// Read-only state query (G5); not a success/mutation terminal.
+    case stateQuery = "state_query"
+    /// Read-only capability/range query (G5); not a success/mutation terminal.
+    case capabilityQuery = "capability_query"
+    /// Contract/admission refusal distinct from safety/policy (G5).
+    case refusalContractViolation = "refusal_contract_violation"
 
     public init(behaviorClass: VehicleToolBehaviorClass) {
         switch behaviorClass {

@@ -72,9 +72,11 @@ public enum FallbackCompletionPhraseGate {
             return false
         }
         switch resultKind {
-        case .acceptedToolCall, .noAction, .alreadyStateNoop, .partialAcceptPartialRefuse, .interrupted:
+        case .acceptedToolCall, .noAction, .alreadyStateNoop, .partialAcceptPartialRefuse, .interrupted,
+             .stateQuery, .capabilityQuery:
             return false
-        case .clarifyMissingSlot, .refusalNoAvailableTool, .refusalSafetyOrPolicy, .cancelled, .runtimeError:
+        case .clarifyMissingSlot, .refusalNoAvailableTool, .refusalSafetyOrPolicy, .cancelled, .runtimeError,
+             .refusalContractViolation:
             return true
         }
     }

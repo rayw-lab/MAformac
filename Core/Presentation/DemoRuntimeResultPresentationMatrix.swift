@@ -232,6 +232,33 @@ enum DemoRuntimeResultPresentationMatrix {
                 ttsState: .speaking,
                 proofClass: .localMock
             )
+        case .stateQuery:
+            return DemoRuntimeResultPresentationEntry(
+                resultKind: kind,
+                visualState: .normal,
+                dialogText: "已查询当前状态",
+                motionKind: .steadyAcknowledge,
+                ttsState: .speaking,
+                proofClass: .localMock
+            )
+        case .capabilityQuery:
+            return DemoRuntimeResultPresentationEntry(
+                resultKind: kind,
+                visualState: .normal,
+                dialogText: "已查询可调范围",
+                motionKind: .steadyAcknowledge,
+                ttsState: .speaking,
+                proofClass: .localMock
+            )
+        case .refusalContractViolation:
+            return DemoRuntimeResultPresentationEntry(
+                resultKind: kind,
+                visualState: .blocked_hard,
+                dialogText: "当前输入不符合演示契约",
+                motionKind: .refusalShake,
+                ttsState: .speaking,
+                proofClass: .localMock
+            )
         }
     }
 }

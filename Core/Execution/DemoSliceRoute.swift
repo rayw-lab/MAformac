@@ -356,7 +356,7 @@ public final class DemoSliceRoute {
         let snapshot = PresentationSnapshot(
             traceID: traceID,
             runtimeOutcome: DemoRuntimeOutcome(
-                result: .noAction,
+                result: .stateQuery,
                 reason: "state_query"
             ),
             cards: store.presentationCells,
@@ -404,7 +404,7 @@ public final class DemoSliceRoute {
         let snapshot = PresentationSnapshot(
             traceID: traceID,
             runtimeOutcome: DemoRuntimeOutcome(
-                result: .noAction,
+                result: .capabilityQuery,
                 reason: "capability_query"
             ),
             cards: store.presentationCells,

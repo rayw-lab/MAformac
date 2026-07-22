@@ -176,7 +176,10 @@ enum RuntimePresentationConsumerMapping {
             "interrupted",
             localKind: .cancelled,
             note: "UIUE renders the interruption terminal result with the existing cancelled visual surface while preserving the source result name."
-        )
+        ),
+        resultEntry("state_query", localKind: .stateQuery),
+        resultEntry("capability_query", localKind: .capabilityQuery),
+        resultEntry("refusal_contract_violation", localKind: .refusalContractViolation)
     ]
 
     static let rowDispositions: [RuntimePresentationRowDisposition] = [

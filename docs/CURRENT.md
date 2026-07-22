@@ -6,13 +6,14 @@ latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G4_COMPLETE
+phase2_product_coding: G5_IN_PROGRESS
 phase2_coding_gate: PHASE2_CODING_GATED
 g0_status: G0_COMPLETE
 g1_status: G1_FIRST_KNIFE_GREEN
 g2_status: G2_RESIDUAL_GREEN
 g3_status: G3_COMPLETE
 g4_status: G4_COMPLETE
+g5_status: G5_IN_PROGRESS
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -25,6 +26,7 @@ g4_status: G4_COMPLETE
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
 - **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 COMPLETE**（刀1–3 + 刀4：`testG3_*` 盖 AC/window/ambient/seat 行为门+smoke；刀4 初推 `b919eb76` 曾 OVERCLAIM「四族」仅 AC+window，已补 ambient/seat `testG3_*`；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - **G4 工程 COMPLETE**（刀1–4）：Turn Lease / cancel / last-intent-wins；刀4 六大 RED 场景收口 + smoke（`TurnLeaseCancellationTests` + `testG3_*` + `make verify-e2e`）。**未抬** `actionDemoProven`；后三族仍禁演示。closeout：run-root `PHASE2-G4-KNIFE4-SCENARIO-CLOSEOUT.md`。
+- **G5 `G5_IN_PROGRESS`**：刀1 taxonomy GREEN — `DemoRuntimeResult`/`Kind` 增 `.stateQuery` / `.capabilityQuery` / `.refusalContractViolation`；route query 停用伪 `.noAction`；matrix/mapping 穷举迁完。**未**做 payload 去 `proofClass`。仍 **`PHASE2_CODING_GATED`**。closeout：run-root `PHASE2-G5-KNIFE1-TAXONOMY-CLOSEOUT.md`。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
@@ -40,11 +42,11 @@ g4_status: G4_COMPLETE
 
 ## 下一步（Phase2 G5）
 
-1. **G4 工程 COMPLETE**（刀1 `f5f00395` → 刀2 `528eefeb` → 刀3 `b11184fd` → 刀4 场景收口 + smoke）。仍 **`PHASE2_CODING_GATED`**。
-2. **下一阶段：G5** — Result taxonomy、payload 去 `proofClass`、UI 只渲染（见 WBS §G5 / G5 作战包待建或已建则开刀1）。
+1. **G5 刀1 GREEN**（result taxonomy + route 真投影）。仍 **`PHASE2_CODING_GATED`**。
+2. **下一刀：G5 刀2** — `ownership-map.yaml` typed reasons + generator 再生（禁手改 `*.generated.swift`）。
 3. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-4. residual 强制账（不因 G3/G4 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
-5. G5 开工前：读 WBS §G5 + openspec reason authority / generated 纪律；禁手改 generated；禁抬 proven。
+4. residual 强制账（不因 G3/G4/G5 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
+5. G5 后续刀：payload 去 `proofClass`（刀3）；ContentView 只渲染（刀4）。禁抬 proven。
 
 ## 隔离后产品真态（candidate 口径）
 
@@ -87,3 +89,4 @@ g4_status: G4_COMPLETE
 - 本页不授予 promotion、公开发布或破坏性 git 权限。
 - 本页不声称 AF-G0 alone 已全面解冻 Phase2；G0 COMPLETE 解锁对照冻结 plan 的切片编码（仍 `PHASE2_CODING_GATED`）。
 - G4_COMPLETE = Turn Lease / cancel / last-intent-wins **工程**收口；≠ release-ready / 演示解冻 / proven 翻格。
+- G5 刀1 GREEN = result taxonomy + route 真投影；≠ payload 已去 `proofClass` / UI 只渲染 / proven 翻格。

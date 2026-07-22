@@ -31,7 +31,10 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
             ("runtime_error", .runtimeError),
             ("cancelled", .cancelled),
             ("partial_accept_partial_refuse", .partialAcceptPartialRefuse),
-            ("interrupted", .cancelled)
+            ("interrupted", .cancelled),
+            ("state_query", .stateQuery),
+            ("capability_query", .capabilityQuery),
+            ("refusal_contract_violation", .refusalContractViolation)
         ]
 
         XCTAssertEqual(RuntimePresentationConsumerMapping.resultEntries.map(\.mainlineResultName), expected.map(\.0))
@@ -43,6 +46,25 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
                 mainlineName
             )
         }
+    }
+
+    func testKnife1_mainlineNamesIncludeQueryAndContractRefusal() {
+        let names = Set(RuntimePresentationConsumerMapping.resultEntries.map(\.mainlineResultName))
+        XCTAssertTrue(names.contains("state_query"))
+        XCTAssertTrue(names.contains("capability_query"))
+        XCTAssertTrue(names.contains("refusal_contract_violation"))
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.localResultKind(forMainlineResultName: "state_query"),
+            .stateQuery
+        )
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.localResultKind(forMainlineResultName: "capability_query"),
+            .capabilityQuery
+        )
+        XCTAssertEqual(
+            RuntimePresentationConsumerMapping.localResultKind(forMainlineResultName: "refusal_contract_violation"),
+            .refusalContractViolation
+        )
     }
 
     func testD17PayloadSchemaAndFieldsConsumeOnlyStableMainlineNames() throws {

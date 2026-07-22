@@ -133,11 +133,14 @@ struct ContentView: View {
             return "为您的安全已锁定"
         case .refusalNoAvailableTool:
             return "暂不支持该控制"
+        case .refusalContractViolation:
+            return "不符合演示契约"
         case .clarifyMissingSlot:
             return "需要确认后执行"
         case .runtimeError:
             return "演示状态异常"
-        case .acceptedToolCall, .noAction, .alreadyStateNoop, .cancelled, .partialAcceptPartialRefuse, .none:
+        case .acceptedToolCall, .noAction, .alreadyStateNoop, .cancelled, .partialAcceptPartialRefuse,
+             .stateQuery, .capabilityQuery, .none:
             return nil
         }
     }
@@ -645,6 +648,9 @@ struct ContentView: View {
         case .runtimeError: resultKind = .runtimeError
         case .cancelled: resultKind = .cancelled
         case .interrupted: resultKind = .cancelled
+        case .stateQuery: resultKind = .stateQuery
+        case .capabilityQuery: resultKind = .capabilityQuery
+        case .refusalContractViolation: resultKind = .refusalContractViolation
         }
         snapshot = StagePresentationSnapshot.from(
             store: store,
@@ -666,8 +672,7 @@ struct ContentView: View {
         messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
 
-    /// G2 read-only query path (state/capability). No runner, no mutation.
-    /// Full result taxonomy (`stateQuery`/`capabilityQuery`) remains G5.
+    /// G2/G5 read-only query path (state/capability). No runner, no mutation.
     private func applyDemoSliceReadOnly(_ readOnly: DemoSliceReadOnlyOutcome, utterance: String) {
         let payload = readOnly.payload
         let dialogueText: String
@@ -696,6 +701,9 @@ struct ContentView: View {
         case .partialAcceptPartialRefuse: resultKind = .partialAcceptPartialRefuse
         case .runtimeError: resultKind = .runtimeError
         case .cancelled, .interrupted: resultKind = .cancelled
+        case .stateQuery: resultKind = .stateQuery
+        case .capabilityQuery: resultKind = .capabilityQuery
+        case .refusalContractViolation: resultKind = .refusalContractViolation
         }
         snapshot = StagePresentationSnapshot.from(
             store: store,

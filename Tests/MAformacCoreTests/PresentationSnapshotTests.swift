@@ -12,10 +12,13 @@ final class PresentationSnapshotTests: XCTestCase {
             .alreadyStateNoop,
             .runtimeError,
             .cancelled,
-            .partialAcceptPartialRefuse
+            .partialAcceptPartialRefuse,
+            .stateQuery,
+            .capabilityQuery,
+            .refusalContractViolation
         ]
 
-        XCTAssertEqual(Set(all).count, 9)
+        XCTAssertEqual(Set(all).count, 12)
         XCTAssertEqual(DemoRuntimeResultKind.allCases, all)
     }
 

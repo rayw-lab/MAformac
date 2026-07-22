@@ -14,6 +14,29 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(outcome.behaviorClassSource, .toolCall)
     }
 
+    func testKnife1_allCasesRawValuesStable() {
+        let expected: [(DemoRuntimeResult, String)] = [
+            (.acceptedToolCall, "accepted_tool_call"),
+            (.noAction, "no_action"),
+            (.clarifyMissingSlot, "clarify_missing_slot"),
+            (.refusalNoAvailableTool, "refusal_no_available_tool"),
+            (.refusalSafetyOrPolicy, "refusal_safety_or_policy"),
+            (.alreadyStateNoop, "already_state_noop"),
+            (.partialAcceptPartialRefuse, "partial_accept_partial_refuse"),
+            (.runtimeError, "runtime_error"),
+            (.cancelled, "cancelled"),
+            (.interrupted, "interrupted"),
+            (.stateQuery, "state_query"),
+            (.capabilityQuery, "capability_query"),
+            (.refusalContractViolation, "refusal_contract_violation")
+        ]
+        XCTAssertEqual(DemoRuntimeResult.allCases.count, expected.count)
+        for (value, raw) in expected {
+            XCTAssertEqual(value.rawValue, raw)
+            XCTAssertEqual(DemoRuntimeResult(rawValue: raw), value)
+        }
+    }
+
     func testMissingScopeTravelsAsReasonNotCoreScopeOriginCase() {
         XCTAssertNil(ScopeOrigin(rawValue: "missing"))
 

@@ -195,9 +195,20 @@ final class DemoSliceClassificationTests: XCTestCase {
         XCTAssertEqual(harness.route.runnerCallCount, 0)
         XCTAssertEqual(readOnly.payload.mutationCount, 0)
         XCTAssertEqual(readOnly.payload.readbacks, [])
-        XCTAssertEqual(readOnly.payload.outcome.result, .noAction)
+        XCTAssertEqual(readOnly.payload.outcome.result, .capabilityQuery)
         XCTAssertEqual(harness.store.currentRevision, beforeRevision)
         XCTAssertEqual(harness.store.cells, before)
+    }
+
+    @MainActor
+    func testKnife1_capabilityQuery_resultIsCapabilityQuery_notNoAction() async throws {
+        let harness = try RouteHarness()
+        let result = try await harness.route.route(text: "空调能调到26度吗")
+        let readOnly = try XCTUnwrap(result.readOnly)
+        XCTAssertEqual(readOnly.payload.outcome.result, .capabilityQuery)
+        XCTAssertNotEqual(readOnly.payload.outcome.result, .noAction)
+        XCTAssertEqual(harness.route.runnerCallCount, 0)
+        XCTAssertEqual(readOnly.payload.mutationCount, 0)
     }
 
     @MainActor
@@ -217,6 +228,18 @@ final class DemoSliceClassificationTests: XCTestCase {
         XCTAssertEqual(readOnly.payload.readbacks.map(\.key), ["ac.temp_setpoint[主驾]"])
         XCTAssertEqual(readOnly.payload.readbacks.map(\.actualValue), ["22"])
         XCTAssertEqual(readOnly.payload.readbacks.map(\.revision), [revision])
+        XCTAssertEqual(readOnly.payload.outcome.result, .stateQuery)
+    }
+
+    @MainActor
+    func testKnife1_stateQuery_resultIsStateQuery_notNoAction() async throws {
+        let harness = try RouteHarness()
+        let result = try await harness.route.route(text: "现在空调多少度")
+        let readOnly = try XCTUnwrap(result.readOnly)
+        XCTAssertEqual(readOnly.payload.outcome.result, .stateQuery)
+        XCTAssertNotEqual(readOnly.payload.outcome.result, .noAction)
+        XCTAssertEqual(harness.route.runnerCallCount, 0)
+        XCTAssertEqual(readOnly.payload.mutationCount, 0)
     }
 
     @MainActor
