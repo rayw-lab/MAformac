@@ -151,10 +151,8 @@ final class SessionLifecycleCompositionGateTests: XCTestCase {
             routeSlice.contains(routeCorrelationArg),
             "routeDemoSlice must pass product correlation provider on production route"
         )
-        XCTAssertFalse(
-            routeSlice.contains(".route(text: turn.utterance)"),
-            "production path must not use legacy single-arg .route(text: turn.utterance)"
-        )
+        XCTAssertFalse(routeSlice.contains(".route(text: turn.utterance)"),
+        "production path must not use legacy single-arg .route(text: turn.utterance)")
 
         let ensureIdx = try index(of: ensureNeedle, in: routeSlice)
         let demoCreateIdx = try index(of: demoSliceRouteCreate, in: routeSlice)
@@ -187,19 +185,13 @@ final class SessionLifecycleCompositionGateTests: XCTestCase {
         )
 
         let initSection = try section(in: source, from: "init(session:", until: "func markCurrent")
-        XCTAssertFalse(
-            initSection.contains("sessionLifecycleGate"),
-            "init(session:) must not assign sessionLifecycleGate (lazy optional)"
-        )
+        XCTAssertFalse(initSection.contains("sessionLifecycleGate"),
+        "init(session:) must not assign sessionLifecycleGate (lazy optional)")
 
-        XCTAssertFalse(
-            routeSlice.contains("DemoRuntimeSessionRunner"),
-            "routeDemoSlice must not wire DemoRuntimeSessionRunner"
-        )
-        XCTAssertFalse(
-            routeSlice.contains("C3ExecutionPipeline"),
-            "routeDemoSlice must not wire C3ExecutionPipeline"
-        )
+        XCTAssertFalse(routeSlice.contains("DemoRuntimeSessionRunner"),
+        "routeDemoSlice must not wire DemoRuntimeSessionRunner")
+        XCTAssertFalse(routeSlice.contains("C3ExecutionPipeline"),
+        "routeDemoSlice must not wire C3ExecutionPipeline")
         XCTAssertEqual(occurrences(of: "DemoRuntimeSessionRunner", in: source), 0)
         XCTAssertEqual(occurrences(of: "C3ExecutionPipeline", in: source), 0)
     }
@@ -211,18 +203,12 @@ final class SessionLifecycleCompositionGateTests: XCTestCase {
             .appendingPathComponent("Core/Lifecycle/SessionLifecycleCompositionGate.swift")
         let source = try String(contentsOf: sourceURL, encoding: .utf8)
 
-        XCTAssertFalse(
-            source.contains("apply(.terminal"),
-            "gate must not apply terminal events"
-        )
-        XCTAssertFalse(
-            source.contains("recoveryReady"),
-            "gate must not surface recoveryReady transitions"
-        )
-        XCTAssertFalse(
-            source.contains("newGeneration"),
-            "gate must not surface newGeneration transitions"
-        )
+        XCTAssertFalse(source.contains("apply(.terminal"),
+        "gate must not apply terminal events")
+        XCTAssertFalse(source.contains("recoveryReady"),
+        "gate must not surface recoveryReady transitions")
+        XCTAssertFalse(source.contains("newGeneration"),
+        "gate must not surface newGeneration transitions")
         XCTAssertTrue(
             source.contains("private") && source.contains("ownerAuthority"),
             "ownerAuthority must be private"

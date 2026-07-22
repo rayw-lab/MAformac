@@ -166,6 +166,7 @@ final class VehicleStateStoreContractTests: XCTestCase {
     func testDemoActionExecutorOwnsMockStoreWritePath() throws {
         let store = DemoVehicleStateStore()
         let executor = DemoActionExecutor()
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let frame = ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.ac_power",

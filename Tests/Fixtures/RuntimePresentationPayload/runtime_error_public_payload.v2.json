@@ -21,6 +21,8 @@
   ],
   "eventID": "event-runtime-error-1",
   "isTerminal": true,
+  "mutationCount": 0,
+  "orbState": "idle",
   "outcome": {
     "reason": "execution_error",
     "result": "runtime_error"
@@ -31,11 +33,12 @@
     "safeReason": "execution_error",
     "status": "unavailable"
   },
-  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
   "traceEnvelope": {
     "entries": [],
     "traceID": "trace-runtime-error-1"
   },
   "traceID": "trace-runtime-error-1",
-  "turnID": "turn-runtime-error-1"
+  "turnID": "turn-runtime-error-1",
+  "voiceState": "idle"
 }

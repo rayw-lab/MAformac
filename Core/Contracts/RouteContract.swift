@@ -137,13 +137,16 @@ public struct RouteSubject: Codable, Equatable, Sendable {
 // belong to the D-domain service that tool binds to per jsonl. This map
 // records that binding.
 //
-// Live-verified via jsonl grep on 2026-07-13:
-//   grep '"intent":"adjust_ac_temperature_to_number"' \
-//     contracts/semantic-function-contract.jsonl
-// returns rows c1_airControl_000164, _000165, _000166 (all service=airControl).
+// Live-verified via jsonl grep on 2026-07-22:
+//   adjust_ac_temperature_to_number -> airControl rows c1_airControl_000164...166
+//   close_ac -> airControl rows c1_airControl_000008...009
+//   open_window_by_number -> carControl row c1_carControl_000021
+//   open_atmosphere_lamp -> carControl row c1_carControl_001972
+//   open_seat_heat -> carControl row c1_carControl_000201
 //
-// Currently the map has ONE entry (the sole mounted tool). When the catalog
-// expands, add the corresponding jsonl-verified service binding here.
+// Keep this projection synchronized with the mounted catalog. Hidden tools such
+// as close_ac support reviewed safety combinations without expanding the
+// customer-facing literal admission catalog.
 //
 // This is NOT a second registry — the *set of mounted names* still comes from
 // DDomainMountedToolCatalog.mountedToolNames. This map is a peer projection
@@ -151,7 +154,11 @@ public struct RouteSubject: Codable, Equatable, Sendable {
 // projection covers every mounted tool name (see RouteContractTests).
 public enum MountedToolServiceMap {
     public static let bindings: [String: RouteService] = [
-        "adjust_ac_temperature_to_number": .airControl
+        "adjust_ac_temperature_to_number": .airControl,
+        "close_ac": .airControl,
+        "open_atmosphere_lamp": .carControl,
+        "open_seat_heat": .carControl,
+        "open_window_by_number": .carControl
     ]
 
     /// Nil when the tool is not mounted at all (validator emits `.unmountedName`).

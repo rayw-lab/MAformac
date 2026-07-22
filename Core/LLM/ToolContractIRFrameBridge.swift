@@ -25,7 +25,8 @@ public enum ToolContractIRFrameBridge {
             slots: projectedSlots,
             value: ir.value,
             candidateSource: .modelRouter,
-            rawPayload: redactedRawPayload(for: rawCall, slotProjected: !projectedOutSlotKeys.isEmpty)
+            rawPayload: redactedRawPayload(for: rawCall, slotProjected: !projectedOutSlotKeys.isEmpty),
+            doNotAutoPowerOn: ir.doNotAutoPowerOn
         )
     }
 

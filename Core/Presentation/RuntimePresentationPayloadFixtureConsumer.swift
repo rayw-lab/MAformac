@@ -9,6 +9,8 @@ enum RuntimePresentationPayloadFixtureConsumerError: Error, Equatable, Sendable 
     case unknownVisualState(String)
     case unknownScopeOrigin(String)
     case unknownCardRole(String)
+    case unknownOrbState(String)
+    case unknownVoiceState(String)
 }
 
 enum RuntimePresentationPayloadFixtureConsumer {
@@ -33,6 +35,9 @@ private struct RuntimePresentationPayloadFixture: Decodable {
     var readbacks: [FixtureReadback]
     var reconciliation: FixtureReconciliation
     var traceEnvelope: FixtureTraceEnvelope?
+    var voiceState: String
+    var orbState: String
+    var mutationCount: Int
 
     private enum CodingKeys: String, CodingKey, CaseIterable {
         case schemaVersion
@@ -47,6 +52,9 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         case readbacks
         case reconciliation
         case traceEnvelope
+        case voiceState
+        case orbState
+        case mutationCount
     }
 
     init(from decoder: any Decoder) throws {
@@ -71,6 +79,9 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         readbacks = try container.decode([FixtureReadback].self, forKey: .readbacks)
         reconciliation = try container.decode(FixtureReconciliation.self, forKey: .reconciliation)
         traceEnvelope = try container.decodeIfPresent(FixtureTraceEnvelope.self, forKey: .traceEnvelope)
+        voiceState = try container.decode(String.self, forKey: .voiceState)
+        orbState = try container.decode(String.self, forKey: .orbState)
+        mutationCount = try container.decode(Int.self, forKey: .mutationCount)
     }
 
     func presentationSnapshot() throws -> StagePresentationSnapshot {
@@ -78,7 +89,6 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         let localReadbacks = try readbacks.map { try $0.demoReadback() }
         let localCards = try cards.map { try $0.demoCell() }
         let semantics = cardSemantics ?? []
-        let resultPresentation = DemoRuntimeResultPresentationMatrix.entry(for: resultKind)
         var scopeOrigins: [String: ScopeOrigin] = [:]
         var activeCells: [FamilyCardID: String] = [:]
         var refusedCell: String?
@@ -103,7 +113,16 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         }
 
         let dialogText = localReadbacks.map(\.spokenText).filter { !$0.isEmpty }.joined(separator: "；")
-        let resolvedDialogText = dialogText.isEmpty ? (outcome.reason ?? resultPresentation.dialogText) : dialogText
+        let resolvedDialogText = dialogText.isEmpty ? (outcome.reason ?? DemoRuntimeResultPresentationMatrix.entry(for: resultKind).dialogText) : dialogText
+
+        // Consume payload voice/orb truth directly (§3.3/§3.4); do not guess
+        // from hasDialog or static matrix (AF5 finding #4).
+        let resolvedOrbState = try RuntimePresentationPayloadFixtureConsumerBridge.orbState(
+            payloadOrbState: orbState
+        )
+        let resolvedVoiceState = try RuntimePresentationPayloadFixtureConsumerBridge.voiceState(
+            payloadVoiceState: voiceState
+        )
 
         return FrontstageRuntimePresentationAdapter.fixtureSnapshot(
             traceID: traceID,
@@ -111,11 +130,8 @@ private struct RuntimePresentationPayloadFixture: Decodable {
             activeCells: activeCells,
             refusedCell: refusedCell,
             scopeOrigins: scopeOrigins,
-            orbState: RuntimePresentationPayloadFixtureConsumerBridge.orbState(
-                resultKind: resultKind,
-                hasDialog: !resolvedDialogText.isEmpty
-            ),
-            voiceState: resultPresentation.ttsState,
+            orbState: resolvedOrbState,
+            voiceState: resolvedVoiceState,
             dialogText: resolvedDialogText,
             readbacks: localReadbacks,
             resultKind: resultKind,
@@ -482,14 +498,27 @@ private enum RuntimePresentationPayloadFixtureConsumerBridge {
         }
     }
 
-    static func orbState(resultKind: DemoRuntimeResultKind, hasDialog: Bool) -> PresentationOrbState {
-        switch resultKind {
-        case .clarifyMissingSlot, .refusalNoAvailableTool, .refusalSafetyOrPolicy, .runtimeError:
-            return .think
-        case .acceptedToolCall, .alreadyStateNoop, .partialAcceptPartialRefuse:
-            return hasDialog ? .speak : .idle
-        case .cancelled:
+    static func orbState(payloadOrbState: String) throws -> PresentationOrbState {
+        guard let value = PresentationOrbState(rawValue: payloadOrbState) else {
+            throw RuntimePresentationPayloadFixtureConsumerError.unknownOrbState(payloadOrbState)
+        }
+        return value
+    }
+
+    static func voiceState(payloadVoiceState: String) throws -> PresentationVoiceState {
+        // Map PresentationVoiceDisplayState raw values (speak/idle/listen/unavailable)
+        // to the App PresentationVoiceState surface (§3.3).
+        switch payloadVoiceState {
+        case "speak":
+            return .speaking
+        case "idle":
             return .idle
+        case "listen":
+            return .listening
+        case "unavailable":
+            return .idle
+        default:
+            throw RuntimePresentationPayloadFixtureConsumerError.unknownVoiceState(payloadVoiceState)
         }
     }
 }

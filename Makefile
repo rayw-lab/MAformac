@@ -27,7 +27,8 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e
+.PHONY: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -35,12 +36,78 @@ GENERATED_SWIFT := \
 	$(PIP) install -r scripts/requirements.txt
 	touch .venv/.deps.stamp
 
-verify: verify-governance-hygiene verify-c1-checker-files .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live diff test verify-contentview-wiring
+verify: verify-governance-hygiene verify-c1-checker-files .venv/.deps.stamp verify-source regen verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live diff test verify-contentview-wiring verify-anti-placebo
 
 verify-governance-hygiene:
 	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_check_governance_hygiene.py
 	$(PYTHON_BOOTSTRAP) scripts/check_governance_hygiene.py
 
+
+verify-anti-placebo:
+	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_verify_anti_placebo.py scripts/test_run_ui_e2e.py
+	$(PYTHON_BOOTSTRAP) scripts/verify_anti_placebo.py
+# FA-1 contract: stable gate must aggregate the full product-behavior class
+# (AC golden including test07/test03a) plus explicit WP21 batch filters.
+verify-e2e: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
+	$(PYTHON_BOOTSTRAP) scripts/verify_anti_placebo.py
+
+verify-e2e-product-behavior:
+	swift test --filter DemoSliceProductBehaviorGateTests
+
+verify-e2e-wp21-window:
+	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchA_
+
+verify-e2e-wp21-ambient:
+	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchB_
+
+verify-e2e-wp21-seat:
+	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchC_
+XCODEBUILD ?= xcodebuild
+UI_E2E_TEST_IDENTIFIER ?= MAformacIOSUITests/FrontstageCustomerIngressUITests
+UI_E2E_RESULT_PATH ?= $(PWD)/build/ui-e2e-$(shell date +%Y%m%d-%H%M%S).xcresult
+
+# XCUITest CI integration (WP1b-4): runs FrontstageCustomerIngressUITests on iOS 26.5 simulator
+# with pinned macos-26 runner, exact UDID resolution via simctl JSON (no fallback to "first iOS 26 device"),
+# .xcresult parsing proves test execution. The xcodebuild command is deliberately
+# not piped, so its exit status is captured directly and cannot be masked.
+verify-ui-e2e:
+	@echo "=== verify-ui-e2e: XCUITest CI Integration ==="
+	@echo "Checking macOS runner..."
+	@uname -m | grep -q 'arm64' || (echo "FAIL: Runner must be arm64 (macos-26)"; exit 1)
+	@echo "Runner arch: $$(uname -m)"
+	@echo "Checking Xcode version..."
+	@$(XCODEBUILD) -version
+	@echo "Resolving iPhone 17 Pro (iOS 26.5) simulator UDID..."; \
+	IOS26_UDID=$$(xcrun simctl list devices available --json 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); [print(dev["udid"]) for rt,devs in d.get("devices",{}).items() if "iOS-26-5" in rt for dev in devs if dev.get("name")=="iPhone 17 Pro"]'); \
+	if [ -z "$$IOS26_UDID" ]; then \
+		echo "FAIL: No iPhone 17 Pro (iOS 26.5) simulator found. Available:"; \
+		xcrun simctl list devices available --json 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); [print(f"{rt}: {dev[\"name\"]} ({dev[\"udid\"]})") for rt,devs in d.get("devices",{}).items() if "iOS-26-5" in rt for dev in devs]'; \
+		exit 1; \
+	fi; \
+	echo "Found iPhone 17 Pro (iOS 26.5) UDID: $$IOS26_UDID"; \
+	echo "Running $(UI_E2E_TEST_IDENTIFIER)..."; \
+	XCRESULT_PATH="$(UI_E2E_RESULT_PATH)"; \
+	mkdir -p "$$(dirname "$$XCRESULT_PATH")"; \
+	$(XCODEBUILD) test -project MAformac.xcodeproj -scheme MAformacIOS \
+		-only-testing:$(UI_E2E_TEST_IDENTIFIER) \
+		-destination "platform=iOS Simulator,id=$$IOS26_UDID" \
+		-resultBundlePath "$$XCRESULT_PATH" \
+		-quiet; \
+	XCBUILD_EXIT=$$?; \
+	echo "xcodebuild exit: $$XCBUILD_EXIT"; \
+	if [ ! -d "$$XCRESULT_PATH" ]; then \
+		echo "FAIL: xcresult not found at $$XCRESULT_PATH"; \
+		exit 1; \
+	fi; \
+	echo "Parsing .xcresult summary for test execution proof..."; \
+	$(PYTHON_BOOTSTRAP) scripts/run_ui_e2e.py --xcresult "$$XCRESULT_PATH"; \
+	SUMMARY_EXIT=$$?; \
+	if [ "$$SUMMARY_EXIT" -ne 0 ]; then \
+		echo "FAIL: xcresult summary did not prove a passed, non-empty UI test run."; \
+		exit "$$SUMMARY_EXIT"; \
+	fi; \
+	echo "SUCCESS: xcodebuild exit=$$XCBUILD_EXIT and xcresult summary passed"; \
+	exit "$$XCBUILD_EXIT"
 verify-a4-target-exclusions:
 	$(PYTHON_BOOTSTRAP) scripts/test_check_a4_app_target_exclusions.py
 	$(PYTHON_BOOTSTRAP) scripts/check_a4_app_target_exclusions.py
@@ -89,12 +156,12 @@ verify-closure-work-packages-local-fast: .venv/.deps.stamp
 	esac
 
 # Codex 审计 P2: make verify 只跑 python/source/regen/surface/diff/test, 不含 swift test → 靠人工双跑。
-# verify-all 聚合 swift test + make verify 一条命令, 作为完整本地验收门(D1 决策=本地 make verify 替 CI 轻治理)。
-verify-all: verify swift-test
+# verify-all additionally runs the product E2E gate and its anti-injection meta assertions.
+verify-all: verify swift-test verify-e2e
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: verify-c1-checker-files verify-governance-hygiene .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring
+verify-ci: verify-c1-checker-files verify-governance-hygiene .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring verify-anti-placebo verify-e2e
 
 # Source-free C1 checkers are hard CI dependencies. Missing files must stop verify-ci
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.
@@ -296,7 +363,7 @@ verify-refs: .venv/.deps.stamp
 	$(PYTHON) scripts/verify_refs.py
 
 # 手写契约(非生成), 纳入 diff 防未提交漂移; 不进 regen。risk-policy/demo-scenarios 2026-06-20 补入(审计:别让 reviewed 候选伪装闭合)
-HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml contracts/subset-grouping.yaml
+HANDWRITTEN_CONTRACTS := contracts/state-cells.yaml contracts/l1-demo-allowlist.yaml contracts/risk-policy.yaml contracts/demo-scenarios.yaml contracts/subset-grouping.yaml contracts/demo-runtime-bundle-selection.json contracts/c2-mounted-catalog-baseline.yaml
 
 diff: verify-c1-matrix-canonical
 	git diff --exit-code -- contracts/source-snapshot-manifest.yaml $(GENERATED_CONTRACTS) $(GENERATED_DOMAIN) $(GENERATED_SWIFT) $(HANDWRITTEN_CONTRACTS) scripts Makefile

@@ -119,6 +119,7 @@ public struct StateCellDefinition: Equatable, Sendable {
     public var readbackTemplate: String?
     public var defaultValue: String?      // cell 初值(S2 cut3: StateApplier data-driven 从 cell 取初值替硬编码 24/70 等)
     public var dependsOn: [String]        // 联动依赖 cell(写本 cell 时激活依赖, 如 ac.temp_setpoint→ac.power=on)
+    public var powerOnValue: String?      // power_on 目标值; nil=fail-closed(不猜 range.max)
 
     public init(
         id: String,
@@ -133,7 +134,8 @@ public struct StateCellDefinition: Equatable, Sendable {
         extremeMap: [String: Int] = [:],
         readbackTemplate: String? = nil,
         defaultValue: String? = nil,
-        dependsOn: [String] = []
+        dependsOn: [String] = [],
+        powerOnValue: String? = nil
     ) {
         self.id = id
         self.type = type
@@ -148,6 +150,7 @@ public struct StateCellDefinition: Equatable, Sendable {
         self.readbackTemplate = readbackTemplate
         self.defaultValue = defaultValue
         self.dependsOn = dependsOn
+        self.powerOnValue = powerOnValue
     }
 }
 
@@ -279,6 +282,8 @@ public struct StateCellContractLookup: Sendable {
                 current?.defaultValue = cleanValue(String(trimmed.dropFirst("default: ".count)))
             } else if trimmed.hasPrefix("depends_on: ") {
                 current?.dependsOn = parseArray(after: "depends_on:", in: trimmed)
+            } else if trimmed.hasPrefix("power_on_value: ") {
+                current?.powerOnValue = cleanValue(String(trimmed.dropFirst("power_on_value: ".count)))
             }
         }
         finishCurrent()
@@ -298,7 +303,11 @@ public struct RiskPolicyLookup: Sendable {
         public var triggerCell: String
         public var threshold: Int
         public var devices: [String]
+        public var gearCell: String
+        public var stationaryGearAllow: [String]
         public var refuseReadback: String
+        public var refuseGear: String
+        public var refusalUnknownState: String
     }
 
     public var forbiddenRules: [ForbiddenRule]
@@ -309,9 +318,35 @@ public struct RiskPolicyLookup: Sendable {
 
     public func evaluate(device: String, stateValues: [String: String]) -> RiskPolicyDecision {
         for rule in forbiddenRules where rule.devices.contains(device) {
-            let current = Int(stateValues[rule.triggerCell] ?? "") ?? 0
+            guard let rawValue = stateValues[rule.triggerCell], !rawValue.trimmingCharacters(in: .whitespaces).isEmpty else {
+                return .refuse(reason: rule.refusalUnknownState)
+            }
+            guard let current = Int(rawValue.trimmingCharacters(in: .whitespaces)) else {
+                return .refuse(reason: rule.refusalUnknownState)
+            }
+            guard current >= 0 else {
+                return .refuse(reason: rule.refusalUnknownState)
+            }
             if current > rule.threshold {
                 return .refuse(reason: rule.refuseReadback)
+            }
+
+            // B07 stationary gear gate (optional per rule). speed<=threshold already satisfied.
+            if !rule.stationaryGearAllow.isEmpty {
+                let gearKey = rule.gearCell.isEmpty ? "vehicle.gear" : rule.gearCell
+                guard let rawGear = stateValues[gearKey] else {
+                    return .refuse(reason: rule.refusalUnknownState)
+                }
+                let gear = rawGear.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                guard !gear.isEmpty else {
+                    return .refuse(reason: rule.refusalUnknownState)
+                }
+                let allowed = Set(rule.stationaryGearAllow.map { $0.uppercased() })
+                // Unknown / non-enumerable gears fail closed (not in allowlist).
+                if !allowed.contains(gear) {
+                    let reason = rule.refuseGear.isEmpty ? rule.refuseReadback : rule.refuseGear
+                    return .refuse(reason: reason)
+                }
             }
         }
         return .allow
@@ -349,7 +384,11 @@ public struct RiskPolicyLookup: Sendable {
                     triggerCell: "",
                     threshold: 0,
                     devices: [],
-                    refuseReadback: ""
+                    gearCell: "",
+                    stationaryGearAllow: [],
+                    refuseReadback: "",
+                    refuseGear: "",
+                    refusalUnknownState: ""
                 )
             } else if trimmed.hasPrefix("trigger: ") {
                 let trigger = cleanValue(String(trimmed.dropFirst("trigger: ".count)))
@@ -358,8 +397,16 @@ public struct RiskPolicyLookup: Sendable {
                 current?.threshold = Int(parts.dropFirst().first ?? "") ?? 0
             } else if trimmed.hasPrefix("devices: ") {
                 current?.devices = parseArray(after: "devices:", in: trimmed)
+            } else if trimmed.hasPrefix("gear_cell: ") {
+                current?.gearCell = cleanValue(String(trimmed.dropFirst("gear_cell: ".count)))
+            } else if trimmed.hasPrefix("stationary_gear_allow: ") {
+                current?.stationaryGearAllow = parseArray(after: "stationary_gear_allow:", in: trimmed)
             } else if trimmed.hasPrefix("refuse_readback_zh: ") {
                 current?.refuseReadback = cleanValue(String(trimmed.dropFirst("refuse_readback_zh: ".count)))
+            } else if trimmed.hasPrefix("refuse_gear_zh: ") {
+                current?.refuseGear = cleanValue(String(trimmed.dropFirst("refuse_gear_zh: ".count)))
+            } else if trimmed.hasPrefix("refusal_unknown_state_zh: ") {
+                current?.refusalUnknownState = cleanValue(String(trimmed.dropFirst("refusal_unknown_state_zh: ".count)))
             } else if !trimmed.hasPrefix("display_zh:"),
                       !trimmed.hasPrefix("risk_level:") {
                 continue

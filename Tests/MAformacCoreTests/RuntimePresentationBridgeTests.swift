@@ -153,7 +153,8 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                         observedReadbackCount: 0,
                         stateMutation: false
                     )
-                ]
+                ],
+                atomicityContract: .partial
             ),
             acceptedCards: [
                 DemoVehicleStateCell(key: "window.driver", actualValue: "closed", revision: 2, visualState: .satisfied)
@@ -205,7 +206,8 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     observedReadbackCount: 0,
                     stateMutation: false
                 )
-            ]
+            ],
+            atomicityContract: .partial
         )
 
         let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
@@ -587,6 +589,9 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     scopeOrigin: .explicit
                 )
             ],
+            voiceState: .speak,
+            orbState: .speak,
+            mutationCount: 1,
             proofClass: .localUnit,
             isTerminal: true,
             timestamp: timestamp
@@ -604,7 +609,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         )
         let decoded = try JSONDecoder().decode(RuntimePresentationPayload.self, from: JSONEncoder().encode(payload))
 
-        XCTAssertEqual(decoded.schemaVersion, .v1)
+        XCTAssertEqual(decoded.schemaVersion, .v2)
         XCTAssertEqual(decoded.traceID, "trace-payload")
         XCTAssertEqual(decoded.turnID, "turn-1")
         XCTAssertEqual(decoded.eventID, "event-1")
@@ -616,6 +621,9 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(decoded.readbacks.first?.spokenText, "空调已打开")
         XCTAssertEqual(decoded.reconciliation.status, .verified)
         XCTAssertEqual(decoded.reconciliation.readbackKey, "ac.power")
+        XCTAssertEqual(decoded.voiceState, .speak)
+        XCTAssertEqual(decoded.orbState, .speak)
+        XCTAssertEqual(decoded.mutationCount, 1)
     }
 
     func testRuntimePresentationPayloadRedactsPrivateAdapterAndRawMarkersFromEncoding() throws {
@@ -751,7 +759,8 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     observedReadbackCount: 0,
                     stateMutation: false
                 )
-            ]
+            ],
+            atomicityContract: .partial
         )
     }
 }

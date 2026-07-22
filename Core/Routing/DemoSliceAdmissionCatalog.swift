@@ -29,11 +29,16 @@ public enum DemoSliceAdmissionRejection: Equatable, Sendable {
     case clarifyMissingSlot
 }
 
-/// Phase-A customer-path admission. The positive surface is intentionally frozen
-/// to two semantic contract rows; every other utterance remains fail-closed.
+/// Customer-path admission for the finite, reviewed product surface.
+/// Every unmatched utterance remains fail-closed.
 public struct DemoSliceAdmissionCatalog: Sendable {
     public let routeMode = "demo_slice"
-    public let catalogDigestSHA256 = "36fba1b5ed14275504964a69236c0084456541a80be052c5de8f74a1a5317f9a"
+    public var catalogDigestSHA256: String {
+        let canonical = entries
+            .map { "\($0.matrixID)|\($0.contractRowID)|\($0.stateBase)" }
+            .joined(separator: "\n") + "\n"
+        return C6Hash.sha256Hex(Data(canonical.utf8))
+    }
     public let entries: [DemoSliceCatalogEntry] = [
         DemoSliceCatalogEntry(
             matrixID: 1,
@@ -44,6 +49,21 @@ public struct DemoSliceAdmissionCatalog: Sendable {
             matrixID: 4,
             contractRowID: "c1_airControl_000164",
             stateBase: "ac.temp_setpoint"
+        ),
+        DemoSliceCatalogEntry(
+            matrixID: 31,
+            contractRowID: "c1_carControl_000021",
+            stateBase: "window.position"
+        ),
+        DemoSliceCatalogEntry(
+            matrixID: 1972,
+            contractRowID: "c1_carControl_001972",
+            stateBase: "ambient.power"
+        ),
+        DemoSliceCatalogEntry(
+            matrixID: 201,
+            contractRowID: "c1_carControl_000201",
+            stateBase: "seat.heat_level"
         ),
     ]
 
@@ -63,6 +83,67 @@ public struct DemoSliceAdmissionCatalog: Sendable {
                     toolName: "set_vehicle_control",
                     device: "ac",
                     actionPrimitive: "power_on",
+                    value: ContractValue(offset: "on", type: "STATE"),
+                    candidateSource: .fastPath,
+                    rawPayload: evidencePayload(entry: entry, inputValue: nil),
+                    surfacePolicy: .primaryPanel
+                )
+            )
+        }
+
+        if normalized == "把主驾车窗再开50%" {
+            let entry = entries[2]
+            return DemoSliceAdmission(
+                entry: entry,
+                frame: ToolCallFrame(
+                    agentID: "vehicle-control",
+                    capabilityID: "vehicle.window.position",
+                    toolName: "open_window_by_number",
+                    device: "window",
+                    actionPrimitive: "by_percent",
+                    slots: ["position": "主驾"],
+                    value: ContractValue(
+                        ref: "CUR",
+                        direct: "+",
+                        offset: "50",
+                        type: "PERCENT"
+                    ),
+                    candidateSource: .fastPath,
+                    rawPayload: evidencePayload(entry: entry, inputValue: 50),
+                    surfacePolicy: .primaryPanel
+                )
+            )
+        }
+
+        if normalized == "打开氛围灯" {
+            let entry = entries[3]
+            return DemoSliceAdmission(
+                entry: entry,
+                frame: ToolCallFrame(
+                    agentID: "vehicle-control",
+                    capabilityID: "vehicle.ambient_light.power",
+                    toolName: "open_atmosphere_lamp",
+                    device: "atmosphere_lamp",
+                    actionPrimitive: "power_on",
+                    value: ContractValue(offset: "on", type: "STATE"),
+                    candidateSource: .fastPath,
+                    rawPayload: evidencePayload(entry: entry, inputValue: nil),
+                    surfacePolicy: .primaryPanel
+                )
+            )
+        }
+
+        if normalized == "打开副驾座椅加热" {
+            let entry = entries[4]
+            return DemoSliceAdmission(
+                entry: entry,
+                frame: ToolCallFrame(
+                    agentID: "vehicle-control",
+                    capabilityID: "vehicle.seat_heating.power",
+                    toolName: "open_seat_heat",
+                    device: "seat_heat",
+                    actionPrimitive: "power_on",
+                    slots: ["position": "副驾"],
                     value: ContractValue(offset: "on", type: "STATE"),
                     candidateSource: .fastPath,
                     rawPayload: evidencePayload(entry: entry, inputValue: nil),
@@ -109,14 +190,16 @@ public struct DemoSliceAdmissionCatalog: Sendable {
     }
 
     private func parsedTemperature(_ text: String) -> Int? {
-        let prefixes = ["把空调调到", "空调调到"]
-        guard let prefix = prefixes.first(where: text.hasPrefix), text.hasSuffix("度") else {
-            return nil
+        let prefixes = ["把空调调到", "空调调到", "打开空调到", "请把空调调到", "能把空调调到", "能调到"]
+        guard let prefix = prefixes.first(where: text.hasPrefix) else { return nil }
+        var suffix = text.dropFirst(prefix.count)
+        if suffix.hasSuffix("吗") || suffix.hasSuffix("呢") {
+            suffix = suffix.dropLast()
         }
-        let start = text.index(text.startIndex, offsetBy: prefix.count)
-        let end = text.index(before: text.endIndex)
-        guard start < end else { return nil }
-        return Int(text[start..<end])
+        guard suffix.hasSuffix("度") else { return nil }
+        let number = suffix.dropLast()
+        guard !number.isEmpty else { return nil }
+        return Int(number)
     }
 
     private func evidencePayload(entry: DemoSliceCatalogEntry, inputValue: Int?) -> JSONValue {
@@ -132,4 +215,29 @@ public struct DemoSliceAdmissionCatalog: Sendable {
         }
         return .object(payload)
     }
+    /// Pure projection through the same state-cell scope resolver used by C3.
+    /// No side effects and no store access.
+    public static func targetProjection(
+        for admission: DemoSliceAdmission,
+        stateCells: StateCellContractLookup
+    ) throws -> (targetKeys: [String], desiredValue: String) {
+        let entry = admission.entry
+        let frame = admission.frame
+        guard let definition = stateCells.cell(id: entry.stateBase) else {
+            throw ToolExecutionError.semanticInvalid("state_cell_not_found")
+        }
+        let targetKeys = try C2ScopeResolver.resolve(frame: frame, cell: definition).keys
+        let desiredValue: String
+        if frame.actionPrimitive == "power_on", let powerOnValue = definition.powerOnValue {
+            desiredValue = powerOnValue
+        } else if !frame.value.direct.isEmpty {
+            desiredValue = frame.value.direct
+        } else if !frame.value.offset.isEmpty {
+            desiredValue = frame.value.offset
+        } else {
+            desiredValue = frame.value.ref
+        }
+        return (targetKeys, desiredValue)
+    }
+
 }

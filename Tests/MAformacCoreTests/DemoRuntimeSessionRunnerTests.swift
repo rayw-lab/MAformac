@@ -17,7 +17,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let payload = try await runner.run(text: "打开空调")
 
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(payload.schemaVersion, .v1)
+        XCTAssertEqual(payload.schemaVersion, .v2)
         XCTAssertEqual(payload.proofClass, .localUnit)
         XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
         XCTAssertEqual(payload.reconciliation.status, .verified)
@@ -75,6 +75,52 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     @MainActor
+    func testDefaultRunnerEmitsTypedNoActionWithoutMutationSpeechOrFallback() async throws {
+        let store = DemoVehicleStateStore()
+        let initialRevision = store.currentRevision
+        let initialCells = store.presentationCells
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine()
+        let backend = DDomainToolPlanBackend(completionEnvelopeProvider: { _ in
+            DDomainCompletionEnvelope(
+                content: "",
+                finishReason: "stop",
+                stopReason: "end_turn",
+                toolCallCount: 0,
+                source: "demo_runtime_test"
+            )
+        })
+        let runner = try DemoRuntimeSessionRunner.defaultRunner(
+            store: store,
+            traceLogger: trace,
+            speech: speech,
+            modelBackend: backend
+        )
+
+        let payload = try await runner.run(text: "不用操作")
+
+        XCTAssertEqual(payload.outcome.result, .noAction)
+        XCTAssertEqual(payload.outcome.reason, "no_action")
+        XCTAssertEqual(payload.reconciliation.status, .notApplicable)
+        XCTAssertEqual(payload.reconciliation.safeReason, "no_action")
+        XCTAssertEqual(payload.orbState, .idle)
+        XCTAssertTrue(payload.readbacks.isEmpty)
+        XCTAssertEqual(payload.cards.map(\.key), initialCells.map(\.key))
+        XCTAssertEqual(payload.cards.map(\.actualValue), initialCells.map(\.actualValue))
+        XCTAssertEqual(payload.cards.map(\.revision), initialCells.map(\.revision))
+        XCTAssertEqual(store.presentationCells, initialCells)
+        XCTAssertEqual(store.currentRevision, initialRevision)
+        XCTAssertTrue(speech.spokenTexts.isEmpty)
+        let noActionEntry = try XCTUnwrap(
+            trace.entries.first { $0.stage == .decode && $0.message == "typed_no_action" }
+        )
+        XCTAssertEqual(noActionEntry.traceID, payload.traceID)
+        XCTAssertEqual(noActionEntry.attributes.toolCallCount, 0)
+        XCTAssertFalse(trace.entries.contains { $0.stage == .execute || $0.stage == .readback })
+        XCTAssertFalse(trace.entries.contains { $0.message == "unsupported_tool_plan" })
+    }
+
+    @MainActor
     func testDefaultRunnerPreservesAllRouterFramesAtMultiFrameExecutionSeam() async throws {
         let store = DemoVehicleStateStore()
         let first = acPowerFrame(id: "cmd-first", traceID: "trace-multi")
@@ -93,7 +139,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         } catch {
             XCTAssertEqual(
                 error as? DemoRuntimeSessionRunnerError,
-                .multiFramePlanRequiresPartialExecution(frameIDs: ["cmd-first", "cmd-second"])
+                .multiFramePlanContainsUnreviewedAction(frameIDs: ["cmd-first", "cmd-second"])
             )
         }
 
@@ -103,7 +149,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
                 $0.stage == .guard && $0.message == "multi_frame_plan_rejected"
             }
         )
-        XCTAssertEqual(guardEntry.attributes.guardReason, "multi_frame_plan_requires_partial_execution")
+        XCTAssertEqual(guardEntry.attributes.guardReason, "multi_frame_plan_contains_unreviewed_action")
         XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
         XCTAssertFalse(traceLogger.entries.contains { $0.stage == .execute })
         XCTAssertFalse(traceLogger.entries.contains { $0.stage == .readback })
@@ -112,10 +158,8 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     func testB3aDoesNotExtendTraceAttributeSchema() {
         let labels = Set(Mirror(reflecting: TraceAttributes()).children.compactMap(\.label))
 
-        XCTAssertFalse(
-            labels.contains("stateMutation"),
-            "B3a must consume the existing trace schema; B2c owns trace schema extensions"
-        )
+        XCTAssertFalse(labels.contains("stateMutation"),
+        "B3a must consume the existing trace schema; B2c owns trace schema extensions")
     }
 
     @MainActor
@@ -257,7 +301,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         for forbidden in ["DemoRuntimeAdapter", "RuntimeAdapterBox", "durableLedger", "requestFingerprint", "rawRuntimeStore"] {
             XCTAssertFalse(encoded.contains(forbidden), "payload leaked \(forbidden)")
         }
-        XCTAssertTrue(encoded.contains(#""schemaVersion":"r5_runtime_presentation_payload_v1""#))
+        XCTAssertTrue(encoded.contains(#""schemaVersion":"r5_runtime_presentation_payload_v2""#))
     }
 
     @MainActor
@@ -320,6 +364,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     private func acPowerFrame(id: String, traceID: String) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             traceID: traceID,
@@ -335,6 +380,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     private func windowFrame(id: String, traceID: String, stateRevision: Int) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             traceID: traceID,
@@ -372,8 +418,12 @@ private struct FixedMultiFrameBackend: LLMBackend {
 
     func load() async throws {}
 
-    func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] {
-        frames
+    func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan {
+        try RuntimePlan(
+            traceID: request.traceID,
+            frames: frames.map(RuntimeFrame.tool),
+            executionPolicy: .atomic
+        )
     }
 
     func streamText(for prompt: String) -> AsyncThrowingStream<String, Error> {

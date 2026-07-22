@@ -31,6 +31,9 @@ jobs:
           swift --version
           python3 --version
 
+      - name: Run reviewed product E2E gate
+        run: make verify-e2e
+
       - name: Run source-free verification gates
         run: make verify-ci
 

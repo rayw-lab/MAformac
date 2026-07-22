@@ -297,7 +297,13 @@ final class RouteContractTests: XCTestCase {
         // The validator consumes DDomainMountedToolCatalog.mountedToolNames only.
         XCTAssertEqual(
             DDomainMountedToolCatalog.mountedToolNames,
-            ["adjust_ac_temperature_to_number"]
+            [
+                "adjust_ac_temperature_to_number",
+                "close_ac",
+                "open_atmosphere_lamp",
+                "open_seat_heat",
+                "open_window_by_number",
+            ]
         )
         // personaAvoidListToolNames must not overlap with mountedToolNames.
         XCTAssertTrue(
@@ -587,7 +593,7 @@ final class RouteContractTests: XCTestCase {
 
     func testCarControlPositiveFixtureValidatorAccepts() throws {
         // carControl currently has no mounted D-domain tool
-        // (mountedToolNames = {'adjust_ac_temperature_to_number'} airControl only),
+        // (both mounted tools bind to airControl),
         // so the positive route is outcome=clarify with action_candidate=null.
         // jsonl binding intent is preserved in _source.jsonl_binding.
         guard let url = fixtureURL("positive", "carControl_candidate.json") else {

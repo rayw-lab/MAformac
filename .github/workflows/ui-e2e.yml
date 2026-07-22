@@ -1,0 +1,52 @@
+name: UI E2E Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      change_ids:
+        description: "Optional comma-separated OpenSpec change ids"
+        required: false
+        default: ""
+  pull_request:
+  push:
+    branches:
+      - main
+      - "codex/**"
+      - opt/streamline-macos-20260707
+
+jobs:
+  ui-e2e:
+    name: UI E2E (iOS 26.5 Simulator)
+    runs-on: macos-26
+    timeout-minutes: 10
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show toolchain
+        run: |
+          swift --version
+          python3 --version
+          xcodebuild -version
+          uname -m
+
+      - name: List available iOS 26 simulators
+        run: |
+          xcrun simctl list devices available | grep -E 'iOS 26' | head -10
+
+      - name: Run UI E2E tests (FrontstageCustomerIngressUITests)
+        run: make verify-ui-e2e
+
+      # Screenshots and proof artifacts are embedded inside the .xcresult bundle.
+      # No separate **/*-app.png upload needed — xcresult contains all attachments.
+      - name: Upload xcresult artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-e2e-xcresult
+          path: build/ui-e2e-*.xcresult
+          retention-days: 7

@@ -23,6 +23,7 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
     func testRuntimeResultsMapFromStableMainlineNamesToExistingUIUESurfaces() {
         let expected: [(String, DemoRuntimeResultKind)] = [
             ("accepted_tool_call", .acceptedToolCall),
+            ("no_action", .noAction),
             ("clarify_missing_slot", .clarifyMissingSlot),
             ("refusal_no_available_tool", .refusalNoAvailableTool),
             ("refusal_safety_or_policy", .refusalSafetyOrPolicy),
@@ -45,7 +46,7 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
     }
 
     func testD17PayloadSchemaAndFieldsConsumeOnlyStableMainlineNames() throws {
-        XCTAssertEqual(RuntimePresentationConsumerMapping.payloadSchemaNames, ["r5_runtime_presentation_payload_v1"])
+        XCTAssertEqual(RuntimePresentationConsumerMapping.payloadSchemaNames, ["r5_runtime_presentation_payload_v2"])
         XCTAssertEqual(
             RuntimePresentationConsumerMapping.payloadFieldNames,
             [
@@ -60,15 +61,21 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
                 "cardSemantics",
                 "readbacks",
                 "reconciliation",
-                "traceEnvelope"
+                "traceEnvelope",
+                "voiceState",
+                "orbState",
+                "mutationCount"
             ]
         )
 
-        try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v1")
+        try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v2")
         try RuntimePresentationConsumerMapping.validatePresentationField("reconciliation")
+        try RuntimePresentationConsumerMapping.validatePresentationField("voiceState")
+        try RuntimePresentationConsumerMapping.validatePresentationField("orbState")
+        try RuntimePresentationConsumerMapping.validatePresentationField("mutationCount")
 
-        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v2")) { error in
-            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPayloadSchema("r5_runtime_presentation_payload_v2"))
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v1")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPayloadSchema("r5_runtime_presentation_payload_v1"))
         }
         XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("requestFingerprint")) { error in
             XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .forbiddenPrivateName("requestFingerprint"))

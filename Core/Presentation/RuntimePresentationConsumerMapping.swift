@@ -37,7 +37,7 @@ enum RuntimePresentationConsumerValidationError: Error, Equatable, Sendable {
 
 enum RuntimePresentationConsumerMapping {
     static let payloadSchemaNames = [
-        "r5_runtime_presentation_payload_v1"
+        "r5_runtime_presentation_payload_v2"
     ]
 
     static let payloadEnvelopeFields = [
@@ -55,7 +55,10 @@ enum RuntimePresentationConsumerMapping {
         "cardSemantics",
         "readbacks",
         "reconciliation",
-        "traceEnvelope"
+        "traceEnvelope",
+        "voiceState",
+        "orbState",
+        "mutationCount"
     ]
 
     static var payloadFieldNames: [String] {
@@ -161,6 +164,7 @@ enum RuntimePresentationConsumerMapping {
 
     static let resultEntries: [RuntimePresentationResultConsumerEntry] = [
         resultEntry("accepted_tool_call", localKind: .acceptedToolCall),
+        resultEntry("no_action", localKind: .noAction),
         resultEntry("clarify_missing_slot", localKind: .clarifyMissingSlot),
         resultEntry("refusal_no_available_tool", localKind: .refusalNoAvailableTool),
         resultEntry("refusal_safety_or_policy", localKind: .refusalSafetyOrPolicy),

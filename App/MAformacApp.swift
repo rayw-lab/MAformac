@@ -116,9 +116,9 @@ enum DebugLaunchArguments {
 
     static var mockSnapshot: SnapshotPreset {
         if let goldenPath {
-            return SnapshotPreset(rawValue: goldenPath.snapshotPresetRawValue) ?? .cooling
+            return SnapshotPreset(rawValue: goldenPath.snapshotPresetRawValue) ?? .coldStart
         }
-        return value(after: "-mockSnapshot").flatMap(SnapshotPreset.init(rawValue:)) ?? .cooling
+        return value(after: "-mockSnapshot").flatMap(SnapshotPreset.init(rawValue:)) ?? .coldStart
     }
 
     static var mockTheme: PresentationTheme {

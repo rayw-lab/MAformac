@@ -2,9 +2,10 @@ import XCTest
 @testable import MAformacCore
 
 final class PresentationSnapshotTests: XCTestCase {
-    func testResultKindHasAllEightCases() {
+    func testResultKindHasAllNineCases() {
         let all: [DemoRuntimeResultKind] = [
             .acceptedToolCall,
+            .noAction,
             .clarifyMissingSlot,
             .refusalNoAvailableTool,
             .refusalSafetyOrPolicy,
@@ -14,7 +15,7 @@ final class PresentationSnapshotTests: XCTestCase {
             .partialAcceptPartialRefuse
         ]
 
-        XCTAssertEqual(Set(all).count, 8)
+        XCTAssertEqual(Set(all).count, 9)
         XCTAssertEqual(DemoRuntimeResultKind.allCases, all)
     }
 

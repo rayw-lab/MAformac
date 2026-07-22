@@ -3,6 +3,7 @@ import XCTest
 
 final class C3ToolCallFrameAndDecodeTests: XCTestCase {
     func testStrongToolCallFrameCodableRoundTripKeepsC1C2Fields() throws {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let frame = ToolCallFrame(
             traceID: "trace-1",
             agentID: "vehicle-control",
@@ -94,6 +95,7 @@ final class C3ToolCallFrameAndDecodeTests: XCTestCase {
 
 private extension ToolCallFrame {
     static func fixture(device: String, actionPrimitive: String) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.\(device)",

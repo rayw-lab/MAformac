@@ -14,8 +14,16 @@ final class UIValueTypeMappingTests: XCTestCase {
 
     // 🔴 gptpro 第2点修复验证：window.lock(enum locked/unlocked 二值锁) 原 default 吞成 badge，实为 toggle
     func testWindowLockIsToggleNotBadge() {
-        XCTAssertEqual(UIValueTypeMapper.uiValueType(forBase: "window.lock"), .toggle,
-                       "window.lock 是二值锁(locked/unlocked)，应 toggle，非被 default 吞成 badge")
+        XCTAssertEqual(UIValueTypeMapper.mapping["window.lock"], .toggle, "window.lock 二值锁应显式映射 toggle")
+    }
+
+    func testAmbientPowerIsToggle() {
+        XCTAssertEqual(UIValueTypeMapper.mapping["ambient.power"], .toggle, "ambient.power 二值开关应显式映射 toggle")
+    }
+
+    func testAmbientPowerDisplayTitle() {
+        let catalog = StateCellPresentationCatalog.load()
+        XCTAssertEqual(catalog.displayTitle(for: "ambient.power"), "氛围灯开关")
     }
 
     func testUnknownBaseDoesNotSilentlyFallbackToBadge() {
@@ -58,10 +66,8 @@ final class UIValueTypeMappingTests: XCTestCase {
     func testStateCellsYAMLDoesNotCarryProducerUIValueTypeField() throws {
         let yaml = try loadStateCellsYAML()
 
-        XCTAssertFalse(
-            yaml.contains("ui_value_type"),
-            "ui_value_type must remain consumer-side per ui-presentation spec R2 / AD-2"
-        )
+        XCTAssertFalse(yaml.contains("ui_value_type"),
+        "ui_value_type must remain consumer-side per ui-presentation spec R2 / AD-2")
     }
 
     // 各控件类型代表 base 映射正确（穷尽分类抽样）

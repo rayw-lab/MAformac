@@ -3,7 +3,7 @@
     {
       "cellKey": "ac.power",
       "isActive": true,
-      "reason": "user_requested",
+      "reason": "readback_mismatch",
       "role": "accepted",
       "scopeOrigin": "explicit",
       "siblingKeys": []
@@ -11,40 +11,44 @@
   ],
   "cards": [
     {
-      "actualValue": "on",
+      "actualValue": "off",
       "availability": "available",
       "key": "ac.power",
       "revision": 2,
       "source": "mock",
-      "visualState": "satisfied"
+      "visualState": "unknown"
     }
   ],
-  "eventID": "event-public-1",
+  "eventID": "event-reconciliation-mismatch-1",
   "isTerminal": true,
+  "mutationCount": 1,
+  "orbState": "speak",
   "outcome": {
-    "reason": "readback_verified",
+    "reason": "readback_mismatch",
     "result": "accepted_tool_call"
   },
   "proofClass": "local_unit",
   "readbacks": [
     {
-      "actualValue": "on",
+      "actualValue": "off",
       "key": "ac.power",
       "revision": 2,
       "scopeOrigin": "explicit",
-      "spokenText": "空调已打开"
+      "spokenText": "ac state was not verified"
     }
   ],
   "reconciliation": {
+    "mismatchClass": "value_mismatch",
     "readbackKey": "ac.power",
-    "safeReason": "readback_verified",
-    "status": "verified"
+    "safeReason": "c2_readback_mismatch",
+    "status": "mismatch"
   },
-  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
   "traceEnvelope": {
     "entries": [],
-    "traceID": "trace-public-1"
+    "traceID": "trace-reconciliation-mismatch-1"
   },
-  "traceID": "trace-public-1",
-  "turnID": "turn-public-1"
+  "traceID": "trace-reconciliation-mismatch-1",
+  "turnID": "turn-reconciliation-mismatch-1",
+  "voiceState": "speak"
 }

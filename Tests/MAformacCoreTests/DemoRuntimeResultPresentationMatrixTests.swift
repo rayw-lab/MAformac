@@ -7,14 +7,19 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
 
         XCTAssertEqual(entries.map(\.resultKind), DemoRuntimeResultKind.allCases)
         XCTAssertEqual(Set(entries.map(\.resultKind)), Set(DemoRuntimeResultKind.allCases))
-        XCTAssertEqual(entries.count, 8)
+        XCTAssertEqual(entries.count, 9)
     }
 
     func testEachRuntimeResultKindHasVUIAndProofOutputs() {
         for entry in DemoRuntimeResultPresentationMatrix.allEntries {
-            XCTAssertFalse(entry.dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            if entry.resultKind == .noAction {
+                XCTAssertTrue(entry.dialogText.isEmpty)
+                XCTAssertEqual(entry.ttsState, .idle)
+            } else {
+                XCTAssertFalse(entry.dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                XCTAssertEqual(entry.ttsState, .speaking)
+            }
             XCTAssertTrue(PresentationMotionKind.allCases.contains(entry.motionKind))
-            XCTAssertEqual(entry.ttsState, .speaking)
             XCTAssertEqual(entry.proofClass, .localMock)
         }
     }
@@ -22,6 +27,7 @@ final class DemoRuntimeResultPresentationMatrixTests: XCTestCase {
     func testRuntimeResultKindsMapToExpectedVisualAndMotionStates() {
         let expected: [(DemoRuntimeResultKind, DemoVisualState, PresentationMotionKind)] = [
             (.acceptedToolCall, .satisfied, .stateCommit),
+            (.noAction, .normal, .noAction),
             (.clarifyMissingSlot, .blocked_with_alternative, .clarificationPulse),
             (.refusalNoAvailableTool, .blocked_hard, .refusalShake),
             (.refusalSafetyOrPolicy, .unsafe, .safetyPulse),

@@ -51,10 +51,8 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         XCTAssertTrue(source.contains("generationRef:"))
         XCTAssertTrue(source.contains("groupOrdinal:"))
         XCTAssertTrue(source.contains("correlationProvider: correlationProvider"))
-        XCTAssertFalse(
-            source.contains(".route(text: turn.utterance)"),
-            "production path must pass correlationProvider (not legacy single-arg route)"
-        )
+        XCTAssertFalse(source.contains(".route(text: turn.utterance)"),
+        "production path must pass correlationProvider (not legacy single-arg route)")
 
         // Fail-closed identity assembly before route success.
         XCTAssertTrue(source.contains("FrontstageRuntimeCompositionError.currentTurnMismatch"))
@@ -97,10 +95,8 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
             stepBody.contains("let speechResult = speech.speak"),
             "S5: applyRuntimeReadbackStep must capture SpeechSynthesisResult"
         )
-        XCTAssertFalse(
-            stepBody.contains("_ = speech.speak"),
-            "S5: reject discarded speak result"
-        )
+        XCTAssertFalse(stepBody.contains("_ = speech.speak"),
+        "S5: reject discarded speak result")
         XCTAssertTrue(stepBody.contains("resolveRuntimeReadbackEvent"))
         XCTAssertTrue(stepBody.contains("appliedSnapshot"))
         XCTAssertTrue(stepBody.contains("!speechResult.didEnqueue"))

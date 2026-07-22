@@ -1,7 +1,7 @@
 import Foundation
 
 public enum DemoRuntimeSessionRunnerError: Error, Equatable {
-    case multiFramePlanRequiresPartialExecution(frameIDs: [String])
+    case multiFramePlanContainsUnreviewedAction(frameIDs: [String])
 }
 
 /// D1 wire producer contract: given the accepted `ToolCallFrame` of a turn,
@@ -41,7 +41,7 @@ public struct DemoRuntimeTypedFactsRecordDiagnostic: Equatable, Sendable {
 @MainActor
 public final class DemoRuntimeSessionRunner {
     public typealias FrameDecoder = (String) async throws -> ToolCallFrame
-    public typealias PlanDecoder = (String) async throws -> [ToolCallFrame]
+    public typealias PlanDecoder = (String) async throws -> RuntimePlan
 
     private let store: DemoVehicleStateStore
     private let pipeline: C3ExecutionPipeline
@@ -76,7 +76,14 @@ public final class DemoRuntimeSessionRunner {
         self.pipeline = pipeline
         self.traceLogger = traceLogger
         self.speech = speech
-        self.planDecoder = { text in [try await frameDecoder(text)] }
+        self.planDecoder = { text in
+            let frame = try await frameDecoder(text)
+            return try RuntimePlan(
+                traceID: frame.traceID,
+                frames: [.tool(frame)],
+                executionPolicy: .atomic
+            )
+        }
         self.alignsFrameStateRevisionToStore = alignsFrameStateRevisionToStore
         self.dialogueState = dialogueState
         self.timestampProvider = timestampProvider
@@ -140,25 +147,75 @@ public final class DemoRuntimeSessionRunner {
         try await executeRun(text: text, correlationProvider: correlationProvider)
     }
 
+    /// Executes a plan already decoded and reviewed by the caller. This keeps a
+    /// model-backed customer route single-call: decode once, review once, execute
+    /// that exact plan without asking the model a second time.
+    @discardableResult
+    public func run(
+        predecodedPlan plan: RuntimePlan,
+        customerText: String
+    ) throws -> RuntimePresentationPayload {
+        dialogueState.recordUserText(customerText)
+        return try executePlan(plan, correlationProvider: correlationProvider)
+    }
+
+    /// App production variant of the predecoded-plan surface.
+    @discardableResult
+    public func run(
+        predecodedPlan plan: RuntimePlan,
+        customerText: String,
+        correlationProvider: RuntimeSessionCorrelationProvider
+    ) throws -> RuntimePresentationPayload {
+        dialogueState.recordUserText(customerText)
+        return try executePlan(plan, correlationProvider: correlationProvider)
+    }
+
     private func executeRun(
         text: String,
         correlationProvider: RuntimeSessionCorrelationProvider?
     ) async throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(text)
-        let frameResults: [ToolCallFrame]
+        let plan: RuntimePlan
         do {
-            frameResults = try await planDecoder(text)
+            plan = try await planDecoder(text)
         } catch let failure as DDomainToolPlanFailure {
             return unsupportedPayload(
                 finiteReason: failure.finiteReason,
                 decodeFailureKind: failure.decodeFailureKind
             )
+        } catch is DDomainCompletionRejection {
+            return unsupportedPayload(finiteReason: .unsupportedToolPlan)
+        } catch is RuntimePlanError {
+            return unsupportedPayload(finiteReason: .unsupportedToolPlan)
         } catch FastPathIntentError.noMatch {
             return unsupportedPayload(finiteReason: .fastPathNoMatch)
         }
 
-        guard let frameResult = frameResults.first else {
-            throw DemoNLURouterError.noToolPlanFrames
+        return try executePlan(plan, correlationProvider: correlationProvider)
+    }
+
+    private func executePlan(
+        _ plan: RuntimePlan,
+        correlationProvider: RuntimeSessionCorrelationProvider?
+    ) throws -> RuntimePresentationPayload {
+        guard let firstFrame = plan.frames.first else {
+            return unsupportedPayload(finiteReason: .unsupportedToolPlan)
+        }
+        switch firstFrame {
+        case let .noAction(frame):
+            return noActionPayload(frame, traceID: plan.traceID)
+        case let .clarify(frame):
+            return clarificationPayload(frame, traceID: plan.traceID)
+        case .tool:
+            break
+        }
+
+        let frameResults = plan.frames.compactMap { frame -> ToolCallFrame? in
+            guard case let .tool(toolFrame) = frame else { return nil }
+            return toolFrame
+        }
+        guard frameResults.count == plan.frames.count, let frameResult = frameResults.first else {
+            return unsupportedPayload(finiteReason: .unsupportedToolPlan)
         }
         if frameResults.count > 1 {
             guard frameResults.allSatisfy(DemoRuntimePartialPlan.isReviewed) else {
@@ -168,15 +225,15 @@ public final class DemoRuntimeSessionRunner {
                     message: "multi_frame_plan_rejected",
                     attributes: TraceAttributes(
                         toolCallCount: 0,
-                        guardReason: "multi_frame_plan_requires_partial_execution"
+                        guardReason: "multi_frame_plan_contains_unreviewed_action"
                     )
                 )
-                throw DemoRuntimeSessionRunnerError.multiFramePlanRequiresPartialExecution(
+                throw DemoRuntimeSessionRunnerError.multiFramePlanContainsUnreviewedAction(
                     frameIDs: frameResults.map(\.id)
                 )
             }
             let partialResult = try DemoRuntimePartialPlan().execute(
-                frames: frameResults,
+                plan: plan,
                 store: store,
                 pipeline: pipeline,
                 traceLogger: traceLogger,
@@ -243,6 +300,8 @@ public final class DemoRuntimeSessionRunner {
                     executionResult: partialResult,
                     acceptedCards: acceptedCards,
                     refusedCardsBySubactionID: refusedCardsBySubactionID,
+                    speechDidEnqueue: partialSpeechDidEnqueue,
+                    dialogText: dialogText,
                     traceEnvelope: traceEnvelope,
                     timestamp: timestampProvider()
                 )
@@ -269,21 +328,27 @@ public final class DemoRuntimeSessionRunner {
                     )
                 }
                 // Visual-first: keep orb/dialog; freeze Core voice to .idle when
-                // synthesis failed or speech text empty (AD-7 / S5 — never invent .speak).
+                // synthesis failed or speech text empty (AD-7 / S5 - never invent .speak).
                 let coreVoiceState = Self.coreVoiceDisplayState(
                     dialogText: dialogText,
                     speechDidEnqueue: partialSpeechDidEnqueue
                 )
+                // Outcome from C3 provenance (§3.4): all alreadyStateNoop -> .alreadyStateNoop.
+                let outcomeResult: DemoRuntimeResult = partialResult.mutationCount == 0
+                    && partialResult.subactions.allSatisfy { $0.disposition == .accepted && $0.mutationCount == 0 }
+                    ? .alreadyStateNoop : .acceptedToolCall
+                let outcomeReason = outcomeResult == .alreadyStateNoop ? "already_done" : "readback_verified"
                 let snapshot = PresentationSnapshot(
                     traceID: partialResult.traceID,
-                    runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
+                    runtimeOutcome: DemoRuntimeOutcome(result: outcomeResult, reason: outcomeReason),
                     cards: acceptedCards,
                     cardSemantics: semantics,
                     dialogText: dialogText.isEmpty ? nil : dialogText,
                     readbacks: acceptedReadbacks,
                     scopeOrigin: acceptedReadbacks.compactMap(\.scopeOrigin).first,
                     voiceState: coreVoiceState,
-                    orbState: dialogText.isEmpty ? .idle : .speak,
+                    orbState: partialSpeechDidEnqueue ? .speak : .idle,
+                    mutationCount: partialResult.mutationCount,
                     proofClass: .localUnit,
                     traceEnvelope: traceEnvelope,
                     isTerminal: true,
@@ -311,6 +376,9 @@ public final class DemoRuntimeSessionRunner {
                 traceID: partialResult.traceID,
                 runtimeOutcome: DemoRuntimeOutcome(result: refusalResult, reason: refusalReason),
                 cards: store.presentationCells,
+                voiceState: .idle,
+                orbState: .idle,
+                mutationCount: 0,
                 proofClass: .localUnit,
                 traceEnvelope: traceEnvelope,
                 isTerminal: true,
@@ -368,16 +436,20 @@ public final class DemoRuntimeSessionRunner {
             dialogText: dialogText,
             speechDidEnqueue: fullSpeechDidEnqueue
         )
+        // Outcome from C3 provenance (§3.4): all alreadyStateNoop -> .alreadyStateNoop.
+        let outcomeResult: DemoRuntimeResult = result.isAllAlreadyStateNoop ? .alreadyStateNoop : .acceptedToolCall
+        let outcomeReason = outcomeResult == .alreadyStateNoop ? "already_done" : "readback_verified"
         let snapshot = PresentationSnapshot(
             traceID: result.traceID,
-            runtimeOutcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: "readback_verified"),
+            runtimeOutcome: DemoRuntimeOutcome(result: outcomeResult, reason: outcomeReason),
             cards: cards,
             cardSemantics: semantics,
             dialogText: dialogText.isEmpty ? nil : dialogText,
             readbacks: result.readbacks,
             scopeOrigin: result.readbacks.compactMap(\.scopeOrigin).first,
             voiceState: coreVoiceState,
-            orbState: dialogText.isEmpty ? .idle : .speak,
+            orbState: fullSpeechDidEnqueue ? .speak : .idle,
+            mutationCount: result.mutationCount,
             proofClass: .localUnit,
             traceEnvelope: traceEnvelope,
             isTerminal: true,
@@ -392,6 +464,74 @@ public final class DemoRuntimeSessionRunner {
                 status: .verified,
                 readbackKey: result.readbacks.last?.key,
                 safeReason: "c2_readback_verified"
+            )
+        )
+    }
+
+    private func noActionPayload(
+        _: NoActionFrame,
+        traceID: String
+    ) -> RuntimePresentationPayload {
+        let turnID = "no-action-\(traceID)"
+        traceLogger.recordDecode(
+            traceID: traceID,
+            message: "typed_no_action",
+            attributes: TraceAttributes(
+                toolCallCount: 0,
+                guardReason: "legitimate_no_action"
+            )
+        )
+        let snapshot = RuntimePresentationTerminalSnapshotAdapter.noAction(
+            traceID: traceID,
+            cards: store.presentationCells,
+            traceEnvelope: traceEnvelopeForCurrentTurn(traceID: traceID),
+            timestamp: timestampProvider()
+        )
+        return RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: turnID,
+            eventID: "\(turnID):runtime-presentation",
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: "no_action"
+            )
+        )
+    }
+
+    private func clarificationPayload(
+        _ frame: ClarifyFrame,
+        traceID: String
+    ) -> RuntimePresentationPayload {
+        let question = frame.question.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !question.isEmpty else {
+            return unsupportedPayload(finiteReason: .unsupportedToolPlan)
+        }
+        let turnID = "clarify-\(traceID)"
+        dialogueState.recordAssistantText(question)
+        let speechDidEnqueue = speakAcceptedDialogText(question, traceID: traceID)
+        let snapshot = PresentationSnapshot(
+            traceID: traceID,
+            runtimeOutcome: DemoRuntimeOutcome(
+                result: .clarifyMissingSlot,
+                reason: "missing_required_scope"
+            ),
+            cards: store.presentationCells,
+            dialogText: question,
+            readbacks: [],
+            voiceState: speechDidEnqueue ? .speak : .idle,
+            orbState: speechDidEnqueue ? .speak : .idle,
+            proofClass: .localUnit,
+            traceEnvelope: traceEnvelopeForCurrentTurn(traceID: traceID),
+            isTerminal: true,
+            timestamp: timestampProvider()
+        )
+        return RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: turnID,
+            eventID: "\(turnID):runtime-presentation",
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: "missing_required_scope"
             )
         )
     }
@@ -592,3 +732,4 @@ public struct DemoRuntimeContractBundle: Sendable {
         DemoRuntimeContractBundleCatalog.generatedDefault
     }
 }
+

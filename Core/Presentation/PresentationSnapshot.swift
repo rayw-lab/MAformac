@@ -2,6 +2,7 @@ import Foundation
 
 enum DemoRuntimeResultKind: String, CaseIterable, Codable, Equatable, Sendable {
     case acceptedToolCall = "accepted_tool_call"
+    case noAction = "no_action"
     case clarifyMissingSlot = "clarify_missing_slot"
     case refusalNoAvailableTool = "refusal_no_available_tool"
     case refusalSafetyOrPolicy = "refusal_safety_or_policy"

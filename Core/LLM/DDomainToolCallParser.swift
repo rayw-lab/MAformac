@@ -5,12 +5,25 @@ public struct DDomainParsedToolCall: Equatable, Sendable {
     public let arguments: [String: String]
 }
 
+public enum DDomainParsedPlan: Equatable, Sendable {
+    case noAction(NoActionFrame)
+    case toolCalls([DDomainParsedToolCall])
+}
+
 public enum DDomainToolCallParser {
     public static func parse(
         _ envelope: DDomainCompletionEnvelope,
         policy: ToolPlanCardinalityPolicy
-    ) throws -> [DDomainParsedToolCall] {
-        try validateMetadata(envelope)
+    ) throws -> DDomainParsedPlan {
+        try validateCommonMetadata(envelope)
+        if isLegitimateNoAction(envelope) {
+            return .noAction(
+                NoActionFrame(
+                    reason: envelope.stopReason.trimmingCharacters(in: .whitespacesAndNewlines)
+                )
+            )
+        }
+        try validateToolMetadata(envelope)
         let bodies = try extractToolCallBodies(from: envelope.content)
         guard bodies.count == envelope.toolCallCount else {
             throw DDomainCompletionRejection.toolCallCountMismatch(
@@ -21,26 +34,42 @@ public enum DDomainToolCallParser {
         guard policy.accepts(bodies.count) else {
             throw DDomainCompletionRejection.cardinalityRejected(policy: policy, actual: bodies.count)
         }
-        return try bodies.enumerated().map { index, body in
+        let calls = try bodies.enumerated().map { index, body in
             try parseBody(body, index: index)
         }
+        return .toolCalls(calls)
     }
 
-    private static func validateMetadata(_ envelope: DDomainCompletionEnvelope) throws {
+    private static func isLegitimateNoAction(_ envelope: DDomainCompletionEnvelope) -> Bool {
+        guard envelope.finishReason == "stop" else { return false }
+        guard envelope.toolCallCount == 0 else { return false }
+
+        let content = envelope.content.trimmingCharacters(in: .whitespacesAndNewlines)
+        let stopReason = envelope.stopReason.trimmingCharacters(in: .whitespacesAndNewlines)
+        return content.isEmpty && !stopReason.isEmpty
+    }
+
+    private static func validateCommonMetadata(_ envelope: DDomainCompletionEnvelope) throws {
         guard !envelope.source.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw DDomainCompletionRejection.missingSource
-        }
-        guard envelope.finishReason == "tool_calls" else {
-            throw DDomainCompletionRejection.unsupportedFinishReason(envelope.finishReason)
-        }
-        guard !envelope.stopReason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            throw DDomainCompletionRejection.missingStopReason
         }
         guard envelope.toolCallCount >= 0 else {
             throw DDomainCompletionRejection.invalidDeclaredToolCallCount(envelope.toolCallCount)
         }
         guard envelope.content.lengthOfBytes(using: .utf8) <= DDomainCompletionEnvelope.maximumContentBytes else {
             throw DDomainCompletionRejection.contentTooLarge
+        }
+    }
+
+    private static func validateToolMetadata(_ envelope: DDomainCompletionEnvelope) throws {
+        guard envelope.finishReason == "tool_calls" else {
+            throw DDomainCompletionRejection.unsupportedFinishReason(envelope.finishReason)
+        }
+        guard envelope.toolCallCount > 0 else {
+            throw DDomainCompletionRejection.invalidDeclaredToolCallCount(envelope.toolCallCount)
+        }
+        guard !envelope.stopReason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw DDomainCompletionRejection.missingStopReason
         }
     }
 

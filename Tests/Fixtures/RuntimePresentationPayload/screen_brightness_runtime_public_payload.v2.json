@@ -1,7 +1,7 @@
 {
   "cardSemantics": [
     {
-      "cellKey": "window.position[主驾]",
+      "cellKey": "screen.brightness[中控屏]",
       "isActive": true,
       "reason": "readback_verified",
       "role": "accepted",
@@ -11,16 +11,18 @@
   ],
   "cards": [
     {
-      "actualValue": "100",
+      "actualValue": "80",
       "availability": "available",
-      "key": "window.position[主驾]",
+      "key": "screen.brightness[中控屏]",
       "revision": 1,
       "source": "mock",
       "visualState": "changing"
     }
   ],
-  "eventID": "turn-d22-window-position-noop-1:runtime-presentation",
+  "eventID": "turn-d22-screen-brightness-1:runtime-presentation",
   "isTerminal": true,
+  "mutationCount": 1,
+  "orbState": "speak",
   "outcome": {
     "reason": "readback_verified",
     "result": "accepted_tool_call"
@@ -28,23 +30,24 @@
   "proofClass": "local_unit",
   "readbacks": [
     {
-      "actualValue": "100",
-      "key": "window.position[主驾]",
+      "actualValue": "80",
+      "key": "screen.brightness[中控屏]",
       "revision": 1,
       "scopeOrigin": "explicit",
-      "spokenText": "主驾车窗开度100%"
+      "spokenText": "中控屏亮度80%"
     }
   ],
   "reconciliation": {
-    "readbackKey": "window.position[主驾]",
+    "readbackKey": "screen.brightness[中控屏]",
     "safeReason": "c2_readback_verified",
     "status": "verified"
   },
-  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
   "traceEnvelope": {
     "entries": [],
-    "traceID": "trace-d22-window-position-noop-1"
+    "traceID": "trace-d22-screen-brightness-1"
   },
-  "traceID": "trace-d22-window-position-noop-1",
-  "turnID": "turn-d22-window-position-noop-1"
+  "traceID": "trace-d22-screen-brightness-1",
+  "turnID": "turn-d22-screen-brightness-1",
+  "voiceState": "speak"
 }

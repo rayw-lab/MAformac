@@ -71,6 +71,9 @@ final class RuntimeActionReadbackProbeTests: XCTestCase {
 
         }
 
+        // WP1a-7 TODO: this probe still primarily emits an evidence receipt; add post-run
+        // XCTAssertEqual checks for expectedStateDelta.afterValue and expectedReadback.actualValue
+        // before promoting it from observation probe to product behavior gate.
         try writeReceipt(catalog: catalog, cases: observedCases)
     }
 

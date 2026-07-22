@@ -6,6 +6,7 @@ enum PresentationMotionKind: String, CaseIterable, Equatable, Sendable {
     case refusalShake
     case safetyPulse
     case steadyAcknowledge
+    case noAction
     case staticError
     case cancellationFade
     case partialResult
@@ -157,6 +158,15 @@ enum DemoRuntimeResultPresentationMatrix {
                 dialogText: "已完成",
                 motionKind: .stateCommit,
                 ttsState: .speaking,
+                proofClass: .localMock
+            )
+        case .noAction:
+            return DemoRuntimeResultPresentationEntry(
+                resultKind: kind,
+                visualState: .normal,
+                dialogText: "",
+                motionKind: .noAction,
+                ttsState: .idle,
                 proofClass: .localMock
             )
         case .clarifyMissingSlot:

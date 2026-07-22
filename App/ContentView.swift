@@ -16,7 +16,11 @@ enum T3MacWindowContract {
     }
 
     static func shouldShowWarning(_ size: CGSize) -> Bool {
-        size.width < T3MacWindowContract.minWidth || size.height < T3MacWindowContract.minHeight
+        #if os(macOS)
+        return size.width < T3MacWindowContract.minWidth || size.height < T3MacWindowContract.minHeight
+        #else
+        return false
+        #endif
     }
 }
 
@@ -46,6 +50,7 @@ struct ContentView: View {
     @State private var mockVoiceResponseTask: Task<Void, Never>?
     @State private var frontstageRuntimeComposition = FrontstageRuntimeComposition()
     @State private var customerIngressText = ""
+    @FocusState private var customerIngressFocused: Bool
     @State private var customerIngressStatusText: String?
     @State private var customerIngressProofText = "route=demo_slice;status=idle;runner=0;mutation=0;readbacks=0"
     @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
@@ -90,7 +95,7 @@ struct ContentView: View {
         store: DemoVehicleStateStore,
         traceLogger: InMemoryTraceLogger,
         speech: any SpeechSynthesisEngine,
-        initialPreset: SnapshotPreset = .cooling,
+        initialPreset: SnapshotPreset = .coldStart,
         initialTheme: PresentationTheme = .ivory,
         initialAmbientBurstColor: String? = nil,
         initialContext: DemoContext? = nil,
@@ -132,7 +137,7 @@ struct ContentView: View {
             return "需要确认后执行"
         case .runtimeError:
             return "演示状态异常"
-        case .acceptedToolCall, .alreadyStateNoop, .cancelled, .partialAcceptPartialRefuse, .none:
+        case .acceptedToolCall, .noAction, .alreadyStateNoop, .cancelled, .partialAcceptPartialRefuse, .none:
             return nil
         }
     }
@@ -167,6 +172,13 @@ struct ContentView: View {
                         .zIndex(10)
                         .transition(.opacity.combined(with: .scale(scale: 0.92)))
                 }
+
+                demoPrototypeWatermark
+                    .padding(.top, topControlsTopPadding(for: size) + 2)
+                    .padding(.leading, horizontalPadding(for: size))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .allowsHitTesting(false)
+                    .zIndex(9)
 
                 if T3MacWindowContract.shouldShowWarning(size) {
                     minWindowWarningBanner(size: size)
@@ -357,18 +369,41 @@ struct ContentView: View {
         .accessibilityIdentifier("t3-min-window-warning")
     }
 
+    private var demoPrototypeWatermark: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.shield.fill")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(DesignTokens.stateOffline)
+            Text("模拟演示 · 非量产 · MOCK")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .lineLimit(1)
+                .foregroundStyle(DesignTokens.palette(for: theme).inkPrimary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(DesignTokens.palette(for: theme).surfaceElevated.opacity(0.96), in: Capsule())
+        .overlay {
+            Capsule().strokeBorder(DesignTokens.stateOffline.opacity(0.72), lineWidth: 0.8)
+        }
+        .shadow(color: DesignTokens.stateOffline.opacity(0.16), radius: 6, y: 3)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("模拟演示，非量产，mock 状态")
+        .accessibilityIdentifier("demo-prototype-watermark")
+    }
+
     @ViewBuilder
     private func bottomMicDock(size: CGSize) -> some View {
         let split = usesMacSplit(size: size)
         if !split {
             VStack(spacing: 8) {
                 customerIngressBar
+                    .frame(maxWidth: .infinity)
                 MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                     .frame(maxWidth: min(780, size.width - 70), minHeight: 70, maxHeight: 74)
             }
             .padding(.horizontal, horizontalPadding(for: size))
-            .padding(.bottom, 0)
-            .offset(y: 24)
+            .padding(.bottom, 8)
+            .offset(y: customerIngressFocused ? -300 : 0)
             .zIndex(7)
             .background {
                 Color.clear.accessibilityIdentifier("mic-dock-safe-area")
@@ -506,6 +541,7 @@ struct ContentView: View {
                 TextField("输入车控指令", text: $customerIngressText)
                     .textFieldStyle(.roundedBorder)
                     .accessibilityIdentifier("frontstage-customer-text-field")
+                    .focused($customerIngressFocused)
                     .onSubmit(submitCustomerText)
                 Button("发送", action: submitCustomerText)
                     .accessibilityIdentifier("frontstage-customer-text-submit")
@@ -524,6 +560,7 @@ struct ContentView: View {
     private func submitCustomerText() {
         let text = customerIngressText
         customerIngressText = ""
+        customerIngressFocused = false
         submitCustomerIngress(.init(source: .text, rawText: text))
     }
 
@@ -580,6 +617,10 @@ struct ContentView: View {
     private func applyDemoSliceExecution(_ execution: DemoSliceExecution, utterance: String) {
         let payload = execution.payload
         let dialogueText = payload.readbacks.map(\.spokenText).joined(separator: "；")
+        // Voice/orb/mutation are read-only from payload (§3.4 / ROB-1).
+        // App must not invent .speaking or hardcode mutation=1.
+        let orbState = Self.appOrbState(from: payload.orbState)
+        let voiceState: PresentationVoiceState = Self.appVoiceState(from: payload.voiceState)
         var activeCells = snapshot.activeCells
         var scopeOrigins = snapshot.scopeOrigins
         for readback in payload.readbacks {
@@ -591,11 +632,19 @@ struct ContentView: View {
                 scopeOrigins[readback.key] = scopeOrigin
             }
         }
+        // Exhaustive mapping of DemoRuntimeResult -> DemoRuntimeResultKind (no default).
         let resultKind: DemoRuntimeResultKind
         switch payload.outcome.result {
         case .acceptedToolCall: resultKind = .acceptedToolCall
+        case .noAction: resultKind = .noAction
+        case .clarifyMissingSlot: resultKind = .clarifyMissingSlot
+        case .refusalNoAvailableTool: resultKind = .refusalNoAvailableTool
+        case .refusalSafetyOrPolicy: resultKind = .refusalSafetyOrPolicy
         case .alreadyStateNoop: resultKind = .alreadyStateNoop
-        default: resultKind = .runtimeError
+        case .partialAcceptPartialRefuse: resultKind = .partialAcceptPartialRefuse
+        case .runtimeError: resultKind = .runtimeError
+        case .cancelled: resultKind = .cancelled
+        case .interrupted: resultKind = .cancelled
         }
         snapshot = StagePresentationSnapshot.from(
             store: store,
@@ -604,15 +653,15 @@ struct ContentView: View {
             resultKind: resultKind,
             traceId: payload.traceID,
             scopeOrigins: scopeOrigins,
-            orbState: .speak,
-            voiceState: .speaking,
+            orbState: orbState,
+            voiceState: voiceState,
             dialogText: dialogueText,
             readbacks: snapshot.readbacks + payload.readbacks,
             proofClass: .localMock
         )
         customerIngressStatusText = dialogueText
         let readbackValues = payload.readbacks.map { "\($0.key)=\($0.actualValue)" }.joined(separator: ",")
-        customerIngressProofText = "route=demo_slice;status=executed;runner=\(execution.runnerCallCount);mutation=1;matrix_id=\(execution.admission.entry.matrixID);contract_row_id=\(execution.admission.entry.contractRowID);state_revision=\(store.currentRevision);readbacks=\(payload.readbacks.count);values=\(readbackValues)"
+        customerIngressProofText = "route=demo_slice;source=\(execution.admission.frame.candidateSource.rawValue);status=executed;runner=\(execution.runnerCallCount);mutation=\(payload.mutationCount);matrix_id=\(String(execution.admission.entry.matrixID));contract_row_id=\(execution.admission.entry.contractRowID);state_revision=\(store.currentRevision);readbacks=\(payload.readbacks.count);values=\(readbackValues)"
         messages.append(DialogueMessage(role: .user, text: utterance))
         messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
@@ -1122,6 +1171,34 @@ struct ContentView: View {
 
     /// Freeze App `PresentationVoiceState` away from `.speaking` when TTS failed.
     /// Visual card/dialog fields are preserved (visual-first).
+    /// Map Core `PresentationVoiceDisplayState` (payload v2) to the App
+    /// `PresentationVoiceState` surface. Only `.speak` maps to `.speaking`;
+    /// everything else freezes to `.idle` so the App never invents speaking
+    /// on synthesis failure (ROB-1 / §3.4).
+    private static func appOrbState(from payloadOrb: PresentationOrbDisplayState?) -> PresentationOrbState {
+        guard let payloadOrb else { return .idle }
+        switch payloadOrb {
+        case .idle:
+            return .idle
+        case .think:
+            return .think
+        case .listen:
+            return .listen
+        case .speak:
+            return .speak
+        }
+    }
+
+    private static func appVoiceState(from payloadVoice: PresentationVoiceDisplayState?) -> PresentationVoiceState {
+        guard let payloadVoice else { return .idle }
+        switch payloadVoice {
+        case .speak:
+            return .speaking
+        case .idle, .listen, .unavailable:
+            return .idle
+        }
+    }
+
     private static func snapshotWithNonSpeakingVoice(
         _ snapshot: StagePresentationSnapshot
     ) -> StagePresentationSnapshot {

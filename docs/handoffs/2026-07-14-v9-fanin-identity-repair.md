@@ -4,7 +4,7 @@
 - repaired_from：`a3eaca03174f3266a2d52645648cadcfe5da8bb8`
 - live_head：以读取本文件时的 `git rev-parse HEAD` 为准；不得复用 repaired_from
 - authority：`GLOBAL-STRICT-AUDIT.md`，SHA-256 `a81953162e304f3515454ff141b25a7b36cbe1267c4cfb1e7f5d04ecd38db98a`
-- verdict：`DONE_TECHNICAL_FANIN_IDENTITY_ONLY`
+- verdict：`IDENTITY_REPAIR_ONLY`
 
 ## 已闭环
 

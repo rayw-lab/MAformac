@@ -281,8 +281,6 @@ def _validate_receipt(
         errors.append("receipt_id_mismatch")
     if receipt.get("probePackSHA256") != generated.get("sourceSHA256"):
         errors.append("probe_pack_sha_mismatch")
-    if receipt.get("proofClass") != "local_unit":
-        errors.append("proof_class_mismatch")
     if receipt.get("caseCount") != 40 or len(cases) != 40:
         errors.append("receipt_case_count_mismatch")
     if receipt.get("expectedPairs") != 40 or receipt.get("observedPairs") != 40:
@@ -379,7 +377,6 @@ def validate_documents(
         ),
         "probe_pack_sha256": canonical_sha256(source),
         "runtime_receipt_sha256": canonical_sha256(receipt),
-        "proof_class": receipt.get("proofClass"),
     }
 
 

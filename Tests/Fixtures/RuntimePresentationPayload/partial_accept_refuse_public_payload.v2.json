@@ -40,6 +40,8 @@
   ],
   "eventID": "event-partial-accept-refuse-1",
   "isTerminal": true,
+  "mutationCount": 1,
+  "orbState": "speak",
   "outcome": {
     "reason": "partial_accept_refuse",
     "result": "partial_accept_partial_refuse"
@@ -59,11 +61,12 @@
     "safeReason": "partial_readback_verified",
     "status": "verified"
   },
-  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
   "traceEnvelope": {
     "entries": [],
     "traceID": "trace-partial-accept-refuse-1"
   },
   "traceID": "trace-partial-accept-refuse-1",
-  "turnID": "turn-partial-accept-refuse-1"
+  "turnID": "turn-partial-accept-refuse-1",
+  "voiceState": "speak"
 }

@@ -2,7 +2,14 @@ import Foundation
 
 public enum DemoRuntimePartialPlanError: Error, Equatable, Sendable {
     case subactionLimitExceeded(limit: Int, actual: Int)
-    case refusedSubactionMutatedState(frameID: String)
+    case atomicRollbackFailed
+}
+
+/// Bounded multi-frame execution policy.
+/// Atomic rolls back the whole plan; partial isolates each reviewed subaction.
+public enum DemoRuntimeAtomicityContract: String, Equatable, Sendable {
+    case atomic = "atomic"
+    case partial = "partial"
 }
 
 public enum DemoRuntimePartialSubactionDisposition: String, Equatable, Sendable {
@@ -18,6 +25,9 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
     public var observedToolCallCount: Int
     public var observedReadbackCount: Int
     public var stateMutation: Bool
+    /// Provenance-sourced mutation count for this subaction (§3.4).
+    /// Only `.firstExecution` counts; `.alreadyStateNoop`/`.retryReplay` are zero.
+    public var mutationCount: Int
 
     public init(
         frameID: String,
@@ -26,7 +36,8 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
         finiteReason: RuntimeFiniteReason?,
         observedToolCallCount: Int,
         observedReadbackCount: Int,
-        stateMutation: Bool
+        stateMutation: Bool,
+        mutationCount: Int = 0
     ) {
         self.frameID = frameID
         self.disposition = disposition
@@ -35,16 +46,21 @@ public struct DemoRuntimePartialSubactionResult: Equatable, Sendable {
         self.observedToolCallCount = observedToolCallCount
         self.observedReadbackCount = observedReadbackCount
         self.stateMutation = stateMutation
+        self.mutationCount = mutationCount
     }
 }
 
 public struct DemoRuntimePartialPlanResult: Equatable, Sendable {
     public var traceID: String
     public var subactions: [DemoRuntimePartialSubactionResult]
+    /// The atomicity contract governing this multi-frame execution.
+    /// `.partial` preserves successful subactions while failed subactions roll back individually.
+    public var atomicityContract: DemoRuntimeAtomicityContract
 
-    public init(traceID: String, subactions: [DemoRuntimePartialSubactionResult]) {
+    public init(traceID: String, subactions: [DemoRuntimePartialSubactionResult], atomicityContract: DemoRuntimeAtomicityContract) {
         self.traceID = traceID
         self.subactions = subactions
+        self.atomicityContract = atomicityContract
     }
 
     public var acceptedReadbacks: [DemoActionReadback] {
@@ -58,10 +74,20 @@ public struct DemoRuntimePartialPlanResult: Equatable, Sendable {
     public var hasRefused: Bool {
         subactions.contains { $0.disposition == .refused }
     }
+
+    /// Total mutation count across all accepted subactions (§3.4).
+    public var mutationCount: Int {
+        subactions.reduce(0) { $0 + $1.mutationCount }
+    }
 }
 
 public struct DemoRuntimePartialPlan: Sendable {
     public static let maximumSubactionCount = 2
+
+    private struct AtomicFrameExecutionFailure: Error {
+        var frameID: String
+        var finiteReason: RuntimeFiniteReason
+    }
 
     public init() {}
 
@@ -71,12 +97,16 @@ public struct DemoRuntimePartialPlan: Sendable {
 
     @MainActor
     public func execute(
-        frames: [ToolCallFrame],
+        plan: RuntimePlan,
         store: DemoVehicleStateStore,
         pipeline: C3ExecutionPipeline,
         traceLogger: any TraceLogger,
         alignsFrameStateRevisionToStore: Bool
     ) throws -> DemoRuntimePartialPlanResult {
+        let frames = plan.toolFrames
+        guard frames.count == plan.frames.count else {
+            throw RuntimePlanError.controlFrameMustBeSingle
+        }
         guard frames.count <= Self.maximumSubactionCount else {
             throw DemoRuntimePartialPlanError.subactionLimitExceeded(
                 limit: Self.maximumSubactionCount,
@@ -84,99 +114,183 @@ public struct DemoRuntimePartialPlan: Sendable {
             )
         }
 
-        let traceID = frames.first?.traceID ?? UUID().uuidString
-        var subactions: [DemoRuntimePartialSubactionResult] = []
+        traceLogger.recordPlan(
+            traceID: plan.traceID,
+            message: "runtime_plan_policy:\(plan.executionPolicy.rawValue)",
+            attributes: TraceAttributes(toolCallCount: frames.count)
+        )
+        switch plan.executionPolicy {
+        case .atomic:
+            return try executeAtomic(
+                frames: frames,
+                traceID: plan.traceID,
+                store: store,
+                pipeline: pipeline,
+                traceLogger: traceLogger,
+                alignsFrameStateRevisionToStore: alignsFrameStateRevisionToStore
+            )
+        case .partial:
+            return try executePartial(
+                frames: frames,
+                traceID: plan.traceID,
+                store: store,
+                pipeline: pipeline,
+                traceLogger: traceLogger,
+                alignsFrameStateRevisionToStore: alignsFrameStateRevisionToStore
+            )
+        }
+    }
+
+    @MainActor
+    private func executePartial(
+        frames: [ToolCallFrame],
+        traceID: String,
+        store: DemoVehicleStateStore,
+        pipeline: C3ExecutionPipeline,
+        traceLogger: any TraceLogger,
+        alignsFrameStateRevisionToStore: Bool
+    ) throws -> DemoRuntimePartialPlanResult {
+        var items: [DemoRuntimePartialSubactionResult] = []
+        items.reserveCapacity(frames.count)
+
         for candidate in frames {
-            var frame = candidate
-            frame.traceID = traceID
-            if alignsFrameStateRevisionToStore {
-                frame.stateRevision = store.currentRevision
-            }
-
-            let before = canonicalState(store)
-            if let finiteReason = preflightFiniteReason(for: frame) {
-                subactions.append(
-                    try refusedSubaction(
+            let frame = preparedFrame(
+                candidate,
+                traceID: traceID,
+                stateRevision: alignsFrameStateRevisionToStore ? store.currentRevision : nil
+            )
+            let item: DemoRuntimePartialSubactionResult
+            if let reason = preflightFiniteReason(for: frame) {
+                item = refusedSubaction(frame: frame, finiteReason: reason)
+            } else {
+                let before = canonicalState(store)
+                do {
+                    let result = try pipeline.withAtomicRuntimeTransaction(store: store) {
+                        try pipeline.execute(frame, store: store, traceLogger: traceLogger)
+                    }
+                    item = acceptedSubaction(
                         frame: frame,
+                        result: result,
                         before: before,
-                        finiteReason: finiteReason,
-                        store: store,
-                        traceID: traceID,
-                        traceLogger: traceLogger
+                        store: store
                     )
-                )
-                continue
-            }
-
-            do {
-                let result = try pipeline.execute(frame, store: store, traceLogger: traceLogger)
-                let after = canonicalState(store)
-                let item = DemoRuntimePartialSubactionResult(
-                    frameID: frame.id,
-                    disposition: .accepted,
-                    readbacks: result.readbacks,
-                    finiteReason: nil,
-                    observedToolCallCount: 1,
-                    observedReadbackCount: result.readbacks.count,
-                    stateMutation: before != after
-                )
-                record(item, traceID: traceID, traceLogger: traceLogger)
-                subactions.append(item)
-            } catch ToolExecutionError.guardDenied {
-                subactions.append(
-                    try refusedSubaction(
-                        frame: frame,
-                        before: before,
-                        finiteReason: .safetyOrPolicyRefusal,
-                        store: store,
-                        traceID: traceID,
-                        traceLogger: traceLogger
-                    )
-                )
-            } catch ToolExecutionError.staleState {
-                subactions.append(
-                    try refusedSubaction(
-                        frame: frame,
-                        before: before,
-                        finiteReason: .staleStateRevision,
-                        store: store,
-                        traceID: traceID,
-                        traceLogger: traceLogger
-                    )
-                )
-            } catch ToolExecutionError.semanticInvalid {
-                subactions.append(
-                    try refusedSubaction(
-                        frame: frame,
-                        before: before,
-                        finiteReason: .unsupportedToolPlan,
-                        store: store,
-                        traceID: traceID,
-                        traceLogger: traceLogger
-                    )
-                )
-            } catch let ToolExecutionError.schemaInvalid(reason) {
-                let finiteReason: RuntimeFiniteReason
-                switch reason {
-                case .missingField:
-                    finiteReason = .clarifyMissingSlot
-                default:
-                    finiteReason = .unsupportedToolPlan
+                } catch C3ExecutionTransactionError.rollbackFailed {
+                    throw DemoRuntimePartialPlanError.atomicRollbackFailed
+                } catch {
+                    item = refusedSubaction(frame: frame, finiteReason: finiteReason(for: error))
                 }
-                subactions.append(
-                    try refusedSubaction(
-                        frame: frame,
-                        before: before,
-                        finiteReason: finiteReason,
-                        store: store,
-                        traceID: traceID,
-                        traceLogger: traceLogger
-                    )
+            }
+            record(item, traceID: traceID, traceLogger: traceLogger)
+            items.append(item)
+        }
+
+        return DemoRuntimePartialPlanResult(
+            traceID: traceID,
+            subactions: items,
+            atomicityContract: .partial
+        )
+    }
+
+
+    @MainActor
+    private func executeAtomic(
+        frames: [ToolCallFrame],
+        traceID: String,
+        store: DemoVehicleStateStore,
+        pipeline: C3ExecutionPipeline,
+        traceLogger: any TraceLogger,
+        alignsFrameStateRevisionToStore: Bool
+    ) throws -> DemoRuntimePartialPlanResult {
+        let scratch = DemoVehicleStateStore(cells: store.cells)
+        var prepared: [ToolCallFrame] = []
+        for candidate in frames {
+            let frame = preparedFrame(
+                candidate,
+                traceID: traceID,
+                stateRevision: alignsFrameStateRevisionToStore ? scratch.currentRevision : nil
+            )
+            if let reason = preflightFiniteReason(for: frame) {
+                return atomicRefusal(
+                    frames: frames,
+                    traceID: traceID,
+                    failingFrameID: frame.id,
+                    finiteReason: reason,
+                    traceLogger: traceLogger
+                )
+            }
+            do {
+                let preflight = try pipeline.preflight(frame, store: scratch)
+                for transition in preflight.transitions {
+                    _ = scratch.applyMockTransition(transition)
+                }
+                prepared.append(frame)
+            } catch {
+                return atomicRefusal(
+                    frames: frames,
+                    traceID: traceID,
+                    failingFrameID: frame.id,
+                    finiteReason: finiteReason(for: error),
+                    traceLogger: traceLogger
                 )
             }
         }
 
-        return DemoRuntimePartialPlanResult(traceID: traceID, subactions: subactions)
+        do {
+            let accepted = try pipeline.withAtomicRuntimeTransaction(store: store) {
+                var items: [DemoRuntimePartialSubactionResult] = []
+                for frame in prepared {
+                    let before = canonicalState(store)
+                    do {
+                        let result = try pipeline.execute(frame, store: store, traceLogger: traceLogger)
+                        items.append(
+                            acceptedSubaction(
+                                frame: frame,
+                                result: result,
+                                before: before,
+                                store: store
+                            )
+                        )
+                    } catch {
+                        throw AtomicFrameExecutionFailure(
+                            frameID: frame.id,
+                            finiteReason: finiteReason(for: error)
+                        )
+                    }
+                }
+                return items
+            }
+            for item in accepted {
+                record(item, traceID: traceID, traceLogger: traceLogger)
+            }
+            return DemoRuntimePartialPlanResult(
+                traceID: traceID,
+                subactions: accepted,
+                atomicityContract: .atomic
+            )
+        } catch C3ExecutionTransactionError.rollbackFailed {
+            throw DemoRuntimePartialPlanError.atomicRollbackFailed
+        } catch let failure as AtomicFrameExecutionFailure {
+            return atomicRefusal(
+                frames: frames,
+                traceID: traceID,
+                failingFrameID: failure.frameID,
+                finiteReason: failure.finiteReason,
+                traceLogger: traceLogger
+            )
+        }
+    }
+
+    private func preparedFrame(
+        _ candidate: ToolCallFrame,
+        traceID: String,
+        stateRevision: Int?
+    ) -> ToolCallFrame {
+        var frame = candidate
+        frame.traceID = traceID
+        if let stateRevision {
+            frame.stateRevision = stateRevision
+        }
+        return frame
     }
 
     private func preflightFiniteReason(for frame: ToolCallFrame) -> RuntimeFiniteReason? {
@@ -189,20 +303,48 @@ public struct DemoRuntimePartialPlan: Sendable {
         return nil
     }
 
+    private func finiteReason(for error: Error) -> RuntimeFiniteReason {
+        guard let executionError = error as? ToolExecutionError else {
+            return .runtimeExecutionError
+        }
+        switch executionError {
+        case .guardDenied:
+            return .safetyOrPolicyRefusal
+        case .staleState:
+            return .staleStateRevision
+        case .schemaInvalid(.missingField):
+            return .clarifyMissingSlot
+        case .schemaInvalid, .semanticInvalid, .noToolCall, .malformed, .thinkLeak:
+            return .unsupportedToolPlan
+        case .readbackMismatch:
+            return .runtimeExecutionError
+        }
+    }
+
     @MainActor
+    private func acceptedSubaction(
+        frame: ToolCallFrame,
+        result: C3ExecutionResult,
+        before: [String],
+        store: DemoVehicleStateStore
+    ) -> DemoRuntimePartialSubactionResult {
+        DemoRuntimePartialSubactionResult(
+            frameID: frame.id,
+            disposition: .accepted,
+            readbacks: result.readbacks,
+            finiteReason: nil,
+            observedToolCallCount: 1,
+            observedReadbackCount: result.readbacks.count,
+            stateMutation: before != canonicalState(store),
+            mutationCount: result.mutationCount
+        )
+    }
+
     private func refusedSubaction(
         frame: ToolCallFrame,
-        before: [String],
-        finiteReason: RuntimeFiniteReason,
-        store: DemoVehicleStateStore,
-        traceID: String,
-        traceLogger: any TraceLogger
-    ) throws -> DemoRuntimePartialSubactionResult {
-        let after = canonicalState(store)
-        guard before == after else {
-            throw DemoRuntimePartialPlanError.refusedSubactionMutatedState(frameID: frame.id)
-        }
-        let item = DemoRuntimePartialSubactionResult(
+        finiteReason: RuntimeFiniteReason
+    ) -> DemoRuntimePartialSubactionResult {
+        DemoRuntimePartialSubactionResult(
             frameID: frame.id,
             disposition: .refused,
             readbacks: [],
@@ -211,9 +353,36 @@ public struct DemoRuntimePartialPlan: Sendable {
             observedReadbackCount: 0,
             stateMutation: false
         )
-        record(item, traceID: traceID, traceLogger: traceLogger)
-        return item
     }
+
+    private func atomicRefusal(
+        frames: [ToolCallFrame],
+        traceID: String,
+        failingFrameID: String,
+        finiteReason: RuntimeFiniteReason,
+        traceLogger: any TraceLogger
+    ) -> DemoRuntimePartialPlanResult {
+        let subactions = frames.map { frame in
+            DemoRuntimePartialSubactionResult(
+                frameID: frame.id,
+                disposition: .refused,
+                readbacks: [],
+                finiteReason: frame.id == failingFrameID ? finiteReason : .runtimeExecutionError,
+                observedToolCallCount: 0,
+                observedReadbackCount: 0,
+                stateMutation: false
+            )
+        }
+        for item in subactions {
+            record(item, traceID: traceID, traceLogger: traceLogger)
+        }
+        return DemoRuntimePartialPlanResult(
+            traceID: traceID,
+            subactions: subactions,
+            atomicityContract: .atomic
+        )
+    }
+
 
     @MainActor
     private func canonicalState(_ store: DemoVehicleStateStore) -> [String] {

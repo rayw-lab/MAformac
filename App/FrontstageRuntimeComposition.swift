@@ -8,7 +8,7 @@ enum FrontstageRuntimeCompositionError: Error, Equatable {
 }
 
 /// App-owned frontstage composition. Production routing remains deny-first; the
-/// only positive binding is the separately admitted two-entry demo slice.
+/// only positive binding is the separately reviewed finite demo slice.
 ///
 /// **S0 freeze:** This type is the sole customer-facing production composition root.
 /// It owns one cached `DemoSliceRoute` and one lifecycle/state/store path. Do not

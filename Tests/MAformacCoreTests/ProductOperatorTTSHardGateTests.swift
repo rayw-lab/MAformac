@@ -4,7 +4,7 @@ import XCTest
 
 /// S5 product-operator TTS hard-gate proofs (AD-7).
 ///
-/// Covers: AV nil-voice fail-closed, runner full/partial voice freeze + visual-first,
+/// Covers: AV nil-voice fail-closed, runner full/atomic voice freeze + visual-first,
 /// context-aware FallbackCompletionPhraseGate, App applyRuntimeReadbackStep source
 /// contract, and runtime_local_preflight script contract.
 final class ProductOperatorTTSHardGateTests: XCTestCase {
@@ -119,7 +119,7 @@ final class ProductOperatorTTSHardGateTests: XCTestCase {
         )
     }
 
-    // MARK: - S5.2 Runner full + partial: visual truth + Core voice freeze
+    // MARK: - S5.2 Runner full + atomic multi-frame: visual truth + Core voice freeze
 
     @MainActor
     func testRunnerFullPath_failedSynthesisKeepsVisualTruthAndFreezesCoreVoiceIdle() async throws {
@@ -182,61 +182,67 @@ final class ProductOperatorTTSHardGateTests: XCTestCase {
     }
 
     @MainActor
-    func testRunnerPartialPath_failedSynthesisKeepsAcceptedVisualAndTracesFailure() async throws {
+    func testRunnerAtomicRefusal_failedSynthesizerIsNotInvokedForRolledBackReadback() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
         let speech = RecordingSpeechSynthesisEngine(
             nextResult: .failed(reason: "synthesizer_busy")
         )
-        let accepted = acPowerFrame(id: "accepted-ac", traceID: "trace-partial-tts")
-        let refused = unmountedWindowFrame(id: "refused-window", traceID: "trace-partial-tts")
+        let accepted = acPowerFrame(id: "accepted-ac", traceID: "trace-atomic-tts")
+        let refused = unmountedFragranceFrame(id: "refused-fragrance", traceID: "trace-atomic-tts")
         let runner = DemoRuntimeSessionRunner(
             store: store,
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: speech,
-            planDecoder: { _ in [accepted, refused] }
+            // GOVERNANCE: bypasses NLU by design (not product behavior)
+            planDecoder: { _ in try self.atomicRuntimePlan([accepted, refused]) }
         )
 
-        let payload = try await runner.run(text: "打开空调并打开车窗")
+        let payload = try await runner.run(text: "打开空调并关闭香氛")
 
-        XCTAssertEqual(payload.outcome.result, .partialAcceptPartialRefuse)
-        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(payload.readbacks.map(\.key), ["ac.power"])
-        XCTAssertFalse(speech.spokenTexts.isEmpty, "accepted dialog text must reach speech surface")
-        XCTAssertTrue(trace.entries.contains { entry in
-            entry.stage == .readback
-                && entry.message == "tts_fail_open:synthesizer_busy"
-                && entry.attributes.readbackResult == .failed
-        })
+        XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertTrue(payload.readbacks.isEmpty)
+        XCTAssertTrue(speech.spokenTexts.isEmpty)
+        XCTAssertFalse(trace.entries.contains { $0.message.hasPrefix("tts_fail_open:") })
         try assertRunnerCoreVoiceFreezeContract()
     }
 
     @MainActor
-    func testRunnerPartialPath_enqueuedSynthesisSpeaksAcceptedDialog() async throws {
+    func testRunnerAtomicRefusal_doesNotSpeakRolledBackAcceptedDialog() async throws {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
         let speech = RecordingSpeechSynthesisEngine(
             nextResult: .enqueued(route: .testDouble)
         )
-        let accepted = acPowerFrame(id: "accepted-ac", traceID: "trace-partial-ok")
-        let refused = unmountedWindowFrame(id: "refused-window", traceID: "trace-partial-ok")
+        let accepted = acPowerFrame(id: "accepted-ac", traceID: "trace-atomic-ok")
+        let refused = unmountedFragranceFrame(id: "refused-fragrance", traceID: "trace-atomic-ok")
         let runner = DemoRuntimeSessionRunner(
             store: store,
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: speech,
-            planDecoder: { _ in [accepted, refused] }
+            // GOVERNANCE: bypasses NLU by design (not product behavior)
+            planDecoder: { _ in try self.atomicRuntimePlan([accepted, refused]) }
         )
 
-        let payload = try await runner.run(text: "打开空调并打开车窗")
+        let payload = try await runner.run(text: "打开空调并关闭香氛")
 
-        XCTAssertEqual(payload.outcome.result, .partialAcceptPartialRefuse)
-        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(payload.readbacks.map(\.key), ["ac.power"])
-        XCTAssertEqual(speech.spokenTexts.count, 1)
+        XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "off")
+        XCTAssertTrue(payload.readbacks.isEmpty)
+        XCTAssertTrue(speech.spokenTexts.isEmpty)
         XCTAssertFalse(trace.entries.contains { $0.message.hasPrefix("tts_fail_open:") })
         try assertRunnerCoreVoiceFreezeContract()
+    }
+
+    private func atomicRuntimePlan(_ frames: [ToolCallFrame]) throws -> RuntimePlan {
+        try RuntimePlan(
+            traceID: frames.first?.traceID ?? "",
+            frames: frames.map(RuntimeFrame.tool),
+            executionPolicy: .atomic
+        )
     }
 
     /// Core PresentationSnapshot.voiceState is set from speechDidEnqueue and never
@@ -442,7 +448,6 @@ final class ProductOperatorTTSHardGateTests: XCTestCase {
             stepBody.contains("_ = speech.speak"),
             "must not discard speak result with _ ="
         )
-
         // Visual resolution applied regardless of TTS outcome.
         XCTAssertTrue(stepBody.contains("resolveRuntimeReadbackEvent"))
         XCTAssertTrue(stepBody.contains("appliedSnapshot"))
@@ -463,7 +468,6 @@ final class ProductOperatorTTSHardGateTests: XCTestCase {
             freezeBody.contains("voiceState = .speaking"),
             "failure freeze must not re-enter .speaking"
         )
-
         let observeBody = try section(
             in: source,
             from: "private func observeRuntimeTTSFailure",
@@ -532,6 +536,7 @@ final class ProductOperatorTTSHardGateTests: XCTestCase {
     }
 
     private func acPowerFrame(id: String, traceID: String) -> ToolCallFrame {
+        // WP1a-7: bypasses NLU, TODO Phase 2 fix
         ToolCallFrame(
             id: id,
             traceID: traceID,
@@ -546,16 +551,16 @@ final class ProductOperatorTTSHardGateTests: XCTestCase {
         )
     }
 
-    private func unmountedWindowFrame(id: String, traceID: String) -> ToolCallFrame {
+    private func unmountedFragranceFrame(id: String, traceID: String) -> ToolCallFrame {
+        // WP1a-7: bypasses NLU, TODO Phase 2 fix
         ToolCallFrame(
             id: id,
             traceID: traceID,
             agentID: "vehicle-control",
-            capabilityID: "cabin.window",
-            toolName: "open_window",
-            device: "window",
-            actionPrimitive: "power_on",
-            slots: ["position": "主驾"],
+            capabilityID: "cabin.fragrance",
+            toolName: "close_fragrance",
+            device: "fragrance",
+            actionPrimitive: "power_off",
             stateRevision: 0,
             candidateSource: .upstreamToolCall
         )

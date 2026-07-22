@@ -5,7 +5,8 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
     func testDirectValueToolCallBuildsModelRouterFrame() async throws {
         let backend = backend(completion: toolCall("adjust_ac_temperature_to_number", ["temperature": "26"]))
 
-        let frame = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度")).first
+        let plan = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+        let frame = plan.toolFrames.first
 
         XCTAssertEqual(frame?.device, "ac_temperature")
         XCTAssertEqual(frame?.value.direct, "26")
@@ -22,7 +23,8 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
             "mode": "制热"
         ]))
 
-        let frame = try await backend.generateToolPlan(for: ToolPlanRequest(text: "主驾空调制热调到24度")).first
+        let plan = try await backend.generateToolPlan(for: ToolPlanRequest(text: "主驾空调制热调到24度"))
+        let frame = plan.toolFrames.first
 
         XCTAssertEqual(frame?.value.direct, "24")
         XCTAssertNil(frame?.slots["direction"])
@@ -30,7 +32,7 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
     }
 
     func testUnmountedNameRejectedBeforeNormalizeAndC3() async {
-        await assertNameRejected(toolCall("open_ac", [:]), expectedName: "open_ac")
+        await assertNameRejected(toolCall("close_window", [:]), expectedName: "close_window")
     }
 
     func testMountedNameWithoutIRMappingFailsClosed() async {
@@ -78,9 +80,35 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
             completionEnvelopeProvider: { _ in completionEnvelope(first + second, toolCallCount: 2) }
         )
 
-        let frames = try await backend.generateToolPlan(for: ToolPlanRequest(text: "先调26度再调24度"))
+        let plan = try await backend.generateToolPlan(for: ToolPlanRequest(text: "先调26度再调24度"))
 
-        XCTAssertEqual(frames.map(\.value.direct), ["26", "24"])
+        XCTAssertEqual(plan.toolFrames.map(\.value.direct), ["26", "24"])
+        XCTAssertEqual(plan.executionPolicy, .partial)
+    }
+
+    func testExplicitACPowerOffAndTemperaturePlanIsAtomicAndSuppressesAutoPowerOn() async throws {
+        let powerOff = toolCall("close_ac", [:])
+        let temperature = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
+        let backend = DDomainToolPlanBackend(
+            cardinalityPolicy: .boundedReviewed(maximum: 2),
+            completionEnvelopeProvider: { _ in
+                completionEnvelope(powerOff + temperature, toolCallCount: 2)
+            }
+        )
+
+        let plan = try await backend.generateToolPlan(
+            for: ToolPlanRequest(text: "不要打开空调，只调到26度")
+        )
+
+        XCTAssertEqual(plan.toolFrames.map(\.toolName), [
+            "close_ac",
+            "adjust_ac_temperature_to_number",
+        ])
+        XCTAssertEqual(plan.executionPolicy, .atomic)
+        XCTAssertEqual(plan.toolFrames[0].actionPrimitive, "power_off")
+        XCTAssertFalse(plan.toolFrames[0].doNotAutoPowerOn)
+        XCTAssertEqual(plan.toolFrames[1].actionPrimitive, "adjust_to_number")
+        XCTAssertTrue(plan.toolFrames[1].doNotAutoPowerOn)
     }
 
     func testBackendRejectsCountMismatchBeforeProjection() async {

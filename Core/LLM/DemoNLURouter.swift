@@ -12,18 +12,17 @@ public struct DemoNLURouter: Sendable {
         self.backend = backend
     }
 
-    public func decodePlan(text: String) async throws -> [ToolCallFrame] {
-        let frames = try await backend.generateToolPlan(for: ToolPlanRequest(text: text))
-        guard !frames.isEmpty else {
-            throw DemoNLURouterError.noToolPlanFrames
-        }
-        return frames
+    public func decodePlan(text: String) async throws -> RuntimePlan {
+        try await backend.generateToolPlan(for: ToolPlanRequest(text: text))
     }
 
     public func decode(text: String) async throws -> ToolCallFrame {
-        let frames = try await decodePlan(text: text)
-        guard frames.count == 1, let frame = frames.first else {
-            throw DemoNLURouterError.expectedSingleToolPlanFrame(actual: frames.count)
+        let plan = try await decodePlan(text: text)
+        guard plan.frames.count == 1, let runtimeFrame = plan.frames.first else {
+            throw DemoNLURouterError.expectedSingleToolPlanFrame(actual: plan.frames.count)
+        }
+        guard case let .tool(frame) = runtimeFrame else {
+            throw DemoNLURouterError.noToolPlanFrames
         }
         return frame
     }
@@ -34,8 +33,14 @@ public struct FastPathDemoToolPlanBackend: LLMBackend {
 
     public func load() async throws {}
 
-    public func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] {
-        [try FastPathIntentEngine().decode(request.text)]
+    public func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan {
+        var frame = try FastPathIntentEngine().decode(request.text)
+        frame.traceID = request.traceID
+        return try RuntimePlan(
+            traceID: request.traceID,
+            frames: [.tool(frame)],
+            executionPolicy: .atomic
+        )
     }
 
     public func streamText(for prompt: String) -> AsyncThrowingStream<String, Error> {

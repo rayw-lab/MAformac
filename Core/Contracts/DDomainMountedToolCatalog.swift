@@ -10,7 +10,11 @@ public enum DDomainMountedToolCatalog {
     public static let mountedCatalogKind = "mounted_demo_catalog_sha"
 
     public static let mountedToolNames: Set<String> = [
-        "adjust_ac_temperature_to_number"
+        "adjust_ac_temperature_to_number",
+        "close_ac",
+        "open_atmosphere_lamp",
+        "open_seat_heat",
+        "open_window_by_number"
     ]
 
     public static let personaAvoidListToolNames: Set<String> = [

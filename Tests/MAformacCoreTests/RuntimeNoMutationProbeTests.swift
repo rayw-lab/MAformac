@@ -226,7 +226,7 @@ private struct ThrowingProbeBackend: LLMBackend {
     let failure: DDomainToolPlanFailure
 
     func load() async throws {}
-    func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] { throw failure }
+    func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan { throw failure }
     func streamText(for prompt: String) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { $0.finish() }
     }

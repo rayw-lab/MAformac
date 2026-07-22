@@ -21,6 +21,8 @@
   ],
   "eventID": "turn-d22-ambient-brightness-1:runtime-presentation",
   "isTerminal": true,
+  "mutationCount": 1,
+  "orbState": "speak",
   "outcome": {
     "reason": "readback_verified",
     "result": "accepted_tool_call"
@@ -40,11 +42,12 @@
     "safeReason": "c2_readback_verified",
     "status": "verified"
   },
-  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
   "traceEnvelope": {
     "entries": [],
     "traceID": "trace-d22-ambient-brightness-1"
   },
   "traceID": "trace-d22-ambient-brightness-1",
-  "turnID": "turn-d22-ambient-brightness-1"
+  "turnID": "turn-d22-ambient-brightness-1",
+  "voiceState": "speak"
 }

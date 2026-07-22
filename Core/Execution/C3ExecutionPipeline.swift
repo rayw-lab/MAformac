@@ -3,11 +3,36 @@ import Foundation
 public struct C3ExecutionResult: Equatable, Sendable {
     public var traceID: String
     public var readbacks: [DemoActionReadback]
+    /// Per-adapter-result provenance, preserving COR-7 no-op and retry-replay
+    /// identity through the pipeline (§3.4). FirstExecution is the only
+    /// provenance that counts as a real mutation.
+    public var provenance: [DemoRuntimeAdapterProvenance]
 
-    public init(traceID: String, readbacks: [DemoActionReadback]) {
+    public init(traceID: String, readbacks: [DemoActionReadback], provenance: [DemoRuntimeAdapterProvenance] = []) {
         self.traceID = traceID
         self.readbacks = readbacks
+        self.provenance = provenance
     }
+
+    /// Mutation count: only `.firstExecution` provenance counts (§3.4).
+    /// `.alreadyStateNoop` and `.retryReplay` do not count as new mutations.
+    public var mutationCount: Int {
+        provenance.filter { $0 == .firstExecution }.count
+    }
+
+    /// Outcome derived from provenance: if every adapter result was a no-op,
+    /// the outcome is `alreadyStateNoop` with zero mutations.
+    public var isAllAlreadyStateNoop: Bool {
+        !provenance.isEmpty && provenance.allSatisfy { $0 == .alreadyStateNoop }
+    }
+}
+
+struct C3ExecutionPreflight: Equatable, Sendable {
+    var transitions: [DemoMockTransition]
+}
+
+enum C3ExecutionTransactionError: Error, Equatable {
+    case rollbackFailed
 }
 
 public struct C2ReadbackVerifier: Sendable {
@@ -33,7 +58,7 @@ private struct PlannedTransition: Equatable {
     var scopeOrigin: ScopeOrigin?
 }
 
-private struct SettledPlan {
+private struct SettledPlan: Equatable {
     var parentRequestFingerprint: String
     var transitions: [PlannedTransition]
 }
@@ -169,6 +194,12 @@ private struct FileBackedC3SettledPlanStore: C3SettledPlanStore {
 }
 
 private final class RuntimeAdapterBox: @unchecked Sendable {
+    struct TransactionSnapshot {
+        var adapter: DemoRuntimeAdapterTransactionSnapshot
+        var settledPlans: [String: SettledPlan]
+        var settledPlanLoadFailed: Bool
+    }
+
     private let adapterLedgerStore: DemoRuntimeAdapterLedgerStore?
     private let settledPlanStore: C3SettledPlanStore?
     private var settledPlanLoadFailed = false
@@ -207,6 +238,38 @@ private final class RuntimeAdapterBox: @unchecked Sendable {
         }
         self.adapter = adapter
         return adapter
+    }
+
+    @MainActor
+    func transactionSnapshot() -> TransactionSnapshot {
+        TransactionSnapshot(
+            adapter: resolve().transactionSnapshot(),
+            settledPlans: settledPlans,
+            settledPlanLoadFailed: settledPlanLoadFailed
+        )
+    }
+
+    @MainActor
+    func restoreTransactionSnapshot(_ snapshot: TransactionSnapshot) throws {
+        let adapter = resolve()
+        let adapterChanged = adapter.transactionSnapshot() != snapshot.adapter
+        let settledPlansChanged =
+            settledPlans != snapshot.settledPlans ||
+            settledPlanLoadFailed != snapshot.settledPlanLoadFailed
+
+        if adapterChanged {
+            try adapter.restoreTransactionSnapshot(snapshot.adapter)
+        }
+        settledPlans = snapshot.settledPlans
+        settledPlanLoadFailed = snapshot.settledPlanLoadFailed
+        guard settledPlansChanged,
+              !snapshot.settledPlanLoadFailed,
+              let settledPlanStore else {
+            return
+        }
+        try settledPlanStore.save(C3SettledPlanSnapshot(
+            settledPlans: settledPlans.mapValues(DurableSettledPlan.init(settledPlan:))
+        ))
     }
 
     @MainActor
@@ -288,6 +351,36 @@ public struct C3ExecutionPipeline: Sendable {
     }
 
     @MainActor
+    func preflight(
+        _ frame: ToolCallFrame,
+        store: DemoVehicleStateStore
+    ) throws -> C3ExecutionPreflight {
+        try validateSemanticAndIntent(frame, traceLogger: nil)
+        let transitions = try validateFreshStateRiskAndPlan(frame, store: store, traceLogger: nil)
+        return C3ExecutionPreflight(transitions: transitions.map(\.transition))
+    }
+
+    @MainActor
+    func withAtomicRuntimeTransaction<Result>(
+        store: DemoVehicleStateStore,
+        _ operation: () throws -> Result
+    ) throws -> Result {
+        let cellsBefore = store.cells
+        let runtimeBefore = runtimeAdapterBox.transactionSnapshot()
+        do {
+            return try operation()
+        } catch {
+            store.replaceCells(cellsBefore)
+            do {
+                try runtimeAdapterBox.restoreTransactionSnapshot(runtimeBefore)
+            } catch {
+                throw C3ExecutionTransactionError.rollbackFailed
+            }
+            throw error
+        }
+    }
+
+    @MainActor
     public func execute(
         _ frame: ToolCallFrame,
         store: DemoVehicleStateStore,
@@ -304,48 +397,18 @@ public struct C3ExecutionPipeline: Sendable {
             attributes: decodeAttributes
         )
 
-        guard let semanticRow = semantic.first(device: frame.device, actionPrimitive: frame.actionPrimitive) else {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "semantic_invalid", attributes: TraceAttributes(guardReason: "semantic_invalid"))
-            throw ToolExecutionError.semanticInvalid("unknown_device_or_primitive")
-        }
-
-        // L1 primitive gate (gap#3 / design E7):device 在 L1 allowlist 内时,只有 reviewed primitives
-        // 才能走 L1 精做执行。合法 C1 但非 reviewed 的 primitive(如 ac_temperature.increase_by_number)
-        // 不得被当 L1 静默执行,deny 让其在全系统中改走 L2。
-        if let entry = allowlist.entry(device: frame.device),
-           !entry.primitives.isEmpty,
-           !entry.primitives.contains(frame.actionPrimitive) {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "primitive_not_in_l1_allowlist", attributes: TraceAttributes(guardReason: "primitive_not_in_l1_allowlist"))
-            throw ToolExecutionError.guardDenied("primitive_not_in_l1_allowlist")
-        }
-
-        if semanticRow.clarifyTag == "implicit", !intentConfirmedProvider() {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "intent_not_confirmed", attributes: TraceAttributes(guardReason: "intent_not_confirmed"))
-            throw ToolExecutionError.guardDenied("intent_not_confirmed")
-        }
+        try validateSemanticAndIntent(frame, traceLogger: traceLogger)
 
         if frame.stateRevision < store.currentRevision,
            let replay = try replaySettledStaleRequestIfAvailable(frame, store: store, traceLogger: traceLogger) {
             return replay
         }
 
-        guard frame.stateRevision >= store.currentRevision else {
-            traceLogger.recordGuard(traceID: frame.traceID, message: "stale_state", attributes: TraceAttributes(guardReason: "stale_state"))
-            throw ToolExecutionError.staleState(expected: store.currentRevision, actual: frame.stateRevision)
-        }
-
-        switch riskPolicy.evaluate(device: frame.device, stateValues: store.stateValues) {
-        case .allow:
-            break
-        case .confirm(let reason):
-            traceLogger.recordGuard(traceID: frame.traceID, message: reason, attributes: TraceAttributes(guardReason: reason))
-            throw ToolExecutionError.guardDenied(reason)
-        case .refuse(let reason):
-            traceLogger.recordGuard(traceID: frame.traceID, message: reason, attributes: TraceAttributes(guardReason: reason))
-            throw ToolExecutionError.guardDenied(reason)
-        }
-
-        let transitions = try planTransitions(for: frame, store: store)
+        let transitions = try validateFreshStateRiskAndPlan(
+            frame,
+            store: store,
+            traceLogger: traceLogger
+        )
         traceLogger.recordPlan(
             traceID: frame.traceID,
             message: transitions.map { "\($0.transition.key)=\($0.transition.desiredValue)" }.joined(separator: ",")
@@ -353,6 +416,7 @@ public struct C3ExecutionPipeline: Sendable {
         traceLogger.recordGuard(traceID: frame.traceID, message: "allow", attributes: TraceAttributes(guardReason: "allow"))
 
         var readbacks: [DemoActionReadback] = []
+        var provenance: [DemoRuntimeAdapterProvenance] = []
         for planned in transitions {
             let transition = planned.transition
             let commandID = adapterCommandID(parent: frame, transition: transition)
@@ -361,6 +425,7 @@ public struct C3ExecutionPipeline: Sendable {
                 frame: adapterFrame(parent: frame, transition: transition, commandID: commandID),
                 store: store
             )
+            provenance.append(adapterResult.provenance)
             traceLogger.recordExecute(
                 traceID: frame.traceID,
                 message: "\(adapterResult.readback.key)=\(adapterResult.readback.actualValue):\(adapterResult.provenance.rawValue)"
@@ -389,7 +454,73 @@ public struct C3ExecutionPipeline: Sendable {
             transitions: transitions
         )
 
-        return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks)
+        return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks, provenance: provenance)
+    }
+
+    private func validateSemanticAndIntent(
+        _ frame: ToolCallFrame,
+        traceLogger: (any TraceLogger)?
+    ) throws {
+        guard let semanticRow = semantic.first(device: frame.device, actionPrimitive: frame.actionPrimitive) else {
+            traceLogger?.recordGuard(
+                traceID: frame.traceID,
+                message: "semantic_invalid",
+                attributes: TraceAttributes(guardReason: "semantic_invalid")
+            )
+            throw ToolExecutionError.semanticInvalid("unknown_device_or_primitive")
+        }
+
+        if let entry = allowlist.entry(device: frame.device),
+           !entry.primitives.isEmpty,
+           !entry.primitives.contains(frame.actionPrimitive) {
+            traceLogger?.recordGuard(
+                traceID: frame.traceID,
+                message: "primitive_not_in_l1_allowlist",
+                attributes: TraceAttributes(guardReason: "primitive_not_in_l1_allowlist")
+            )
+            throw ToolExecutionError.guardDenied("primitive_not_in_l1_allowlist")
+        }
+
+        if semanticRow.clarifyTag == "implicit", !intentConfirmedProvider() {
+            traceLogger?.recordGuard(
+                traceID: frame.traceID,
+                message: "intent_not_confirmed",
+                attributes: TraceAttributes(guardReason: "intent_not_confirmed")
+            )
+            throw ToolExecutionError.guardDenied("intent_not_confirmed")
+        }
+    }
+
+    @MainActor
+    private func validateFreshStateRiskAndPlan(
+        _ frame: ToolCallFrame,
+        store: DemoVehicleStateStore,
+        traceLogger: (any TraceLogger)?
+    ) throws -> [PlannedTransition] {
+        guard frame.stateRevision >= store.currentRevision else {
+            traceLogger?.recordGuard(
+                traceID: frame.traceID,
+                message: "stale_state",
+                attributes: TraceAttributes(guardReason: "stale_state")
+            )
+            throw ToolExecutionError.staleState(
+                expected: store.currentRevision,
+                actual: frame.stateRevision
+            )
+        }
+
+        switch riskPolicy.evaluate(device: frame.device, stateValues: store.stateValues) {
+        case .allow:
+            break
+        case .confirm(let reason), .refuse(let reason):
+            traceLogger?.recordGuard(
+                traceID: frame.traceID,
+                message: reason,
+                attributes: TraceAttributes(guardReason: reason)
+            )
+            throw ToolExecutionError.guardDenied(reason)
+        }
+        return try planTransitions(for: frame, store: store)
     }
 
     @MainActor
@@ -419,8 +550,10 @@ public struct C3ExecutionPipeline: Sendable {
 
         traceLogger.recordGuard(traceID: frame.traceID, message: "stale_retry_replay", attributes: TraceAttributes(guardReason: "stale_retry_replay"))
         var readbacks: [DemoActionReadback] = []
+        var provenance: [DemoRuntimeAdapterProvenance] = []
         for (planned, adapterResult) in replayed {
             let transition = planned.transition
+            provenance.append(adapterResult.provenance)
             traceLogger.recordExecute(
                 traceID: frame.traceID,
                 message: "\(adapterResult.readback.key)=\(adapterResult.readback.actualValue):\(adapterResult.provenance.rawValue)"
@@ -446,7 +579,7 @@ public struct C3ExecutionPipeline: Sendable {
             )
             readbacks.append(verified)
         }
-        return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks)
+        return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks, provenance: provenance)
     }
 
     private func adapterCommandID(parent frame: ToolCallFrame, transition: DemoMockTransition) -> String {
@@ -499,6 +632,7 @@ public struct C3ExecutionPipeline: Sendable {
         var transitions: [PlannedTransition] = []
         if frame.device == "ac_temperature",
            frame.actionPrimitive != "query",
+           !frame.doNotAutoPowerOn,
            store.cell(for: "ac.power")?.actualValue != "on" {
             transitions.append(PlannedTransition(
                 transition: DemoMockTransition(key: "ac.power", desiredValue: "on"),
@@ -542,15 +676,24 @@ public struct C3ExecutionPipeline: Sendable {
         store: DemoVehicleStateStore
     ) throws -> String {
         if cell.type == "enum" {
-            if cell.id == "ac.power" {
-                return frame.actionPrimitive == "power_off" ? "off" : "on"
-            }
             if cell.id == "ambient.color" {
-                guard cell.values.contains(frame.value.offset) else {
+                let color = frame.value.direct.isEmpty ? frame.value.offset : frame.value.direct
+                guard cell.values.contains(color) else {
                     throw ToolExecutionError.schemaInvalid(.unknownEnum("ambient.color"))
                 }
-                return frame.value.offset
+                return color
             }
+            switch frame.actionPrimitive {
+            case "power_on":
+                if cell.values.contains("on") { return "on" }
+                if cell.values.contains("open") { return "open" }
+            case "power_off":
+                if cell.values.contains("off") { return "off" }
+                if cell.values.contains("closed") { return "closed" }
+            default:
+                break
+            }
+            throw ToolExecutionError.schemaInvalid(.unknownEnum(cell.id))
         }
 
         guard let range = cell.executionRange else {
@@ -561,7 +704,10 @@ public struct C3ExecutionPipeline: Sendable {
         let desired: Int
         switch frame.actionPrimitive {
         case "power_on":
-            desired = range.max
+            guard let powerOnValue = cell.powerOnValue, let powerOnInt = Int(powerOnValue) else {
+                throw ToolExecutionError.schemaInvalid(.unknownEnum(cell.id))
+            }
+            desired = powerOnInt
         case "power_off":
             desired = range.min
         case "adjust_to_max":

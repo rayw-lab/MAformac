@@ -9,7 +9,8 @@ final class DemoNLURouterTests: XCTestCase {
 
         let decoded = try await router.decodePlan(text: "调到26度并打开车窗")
 
-        XCTAssertEqual(decoded, [first, second])
+        XCTAssertEqual(decoded.frames, [.tool(first), .tool(second)])
+        XCTAssertEqual(decoded.executionPolicy, .partial)
     }
 
     func testSingleFrameDecodeRejectsUncheckedMultiFramePlan() async throws {
@@ -45,9 +46,32 @@ final class DemoNLURouterTests: XCTestCase {
 
         do {
             _ = try await router.decode(text: "调到26度")
-            XCTFail("expected noToolPlanFrames")
+            XCTFail("expected validated RuntimePlan to reject empty frames")
         } catch {
-            XCTAssertEqual(error as? DemoNLURouterError, .noToolPlanFrames)
+            XCTAssertEqual(error as? RuntimePlanError, .emptyFrames)
+        }
+    }
+
+    func testRuntimePlanRejectsMixedControlFramesAndSinglePartialPolicy() throws {
+        let tool = frame(id: "tool", device: "ac_temperature")
+
+        XCTAssertThrowsError(
+            try RuntimePlan(
+                traceID: "trace-mixed",
+                frames: [.tool(tool), .noAction(NoActionFrame(reason: "end_turn"))],
+                executionPolicy: .partial
+            )
+        ) { error in
+            XCTAssertEqual(error as? RuntimePlanError, .controlFrameMustBeSingle)
+        }
+        XCTAssertThrowsError(
+            try RuntimePlan(
+                traceID: "trace-single",
+                frames: [.tool(tool)],
+                executionPolicy: .partial
+            )
+        ) { error in
+            XCTAssertEqual(error as? RuntimePlanError, .singleFrameRequiresAtomic)
         }
     }
 
@@ -58,6 +82,7 @@ final class DemoNLURouterTests: XCTestCase {
         actionPrimitive: String = "adjust_to_number",
         candidateSource: ToolCandidateSource = .modelRouter
     ) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             traceID: "trace-\(id)",
@@ -77,8 +102,12 @@ private struct FixedPlanBackend: LLMBackend {
 
     func load() async throws {}
 
-    func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] {
-        frames
+    func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan {
+        try RuntimePlan(
+            traceID: request.traceID,
+            frames: frames.map(RuntimeFrame.tool),
+            executionPolicy: frames.count > 1 ? .partial : .atomic
+        )
     }
 
     func streamText(for prompt: String) -> AsyncThrowingStream<String, Error> {

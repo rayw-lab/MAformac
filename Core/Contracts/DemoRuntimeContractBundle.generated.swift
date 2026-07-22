@@ -3,11 +3,15 @@ import Foundation
 
 public enum DemoRuntimeContractBundleCatalog {
     public static let schemaVersion = "demo_runtime_contract_bundle_v1"
-    public static let runtimeContractBundleDigest = "ec50f3af672cc73c1a6ba2aa60e4a6be3c460d35f7b8ba5aa31f40b36409462e"
+    public static let runtimeContractBundleDigest = "5aba78b5275099712bebb8fa5cd018e41cfa2248e1dafc5f58ba03d012f45a39"
     public static let generatedDefault = DemoRuntimeContractBundle(
         semanticJSONL: """
 {"action_code":"activate_instant_device_or_function","action_primitive":"power_on","canonical_semantic_id":"sem_5de05fdd3626ba1a","clarify_tag":"implicit","contract_row_id":"c1_airControl_000006","dedupe_group_id":"dedupe_5de05fdd3626ba1a","dedupe_role":"primary","device":"ac","ds_protocol":{"intent":"open_ac","semantic":{"slots":{"device":"<空调设备>"}},"service":"airControl"},"evidence_ref_kind":"snapshot","example_utterance_hash":"90be2eac81755fc26e8484bd22466154b2d2e042ec3b5360cf977778e7f18fea","example_utterance_kind":"source_example","exec_tier":"L2","execution_range_ref":"","external_evidence_ref":"snapshot:c1-2026-06-19-9b7e4b82:semantic_protocol_edit:airControl:6","fc_flags":{"free":false,"free_hash":"0c70665b6eb65f1aebf3b59f684ce52ed3473b2443ed4b4e0b815e2e9d66b8c2","fuzzy":true,"fuzzy_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750"},"intent":"open_ac","primary_selection_rule_version":"v1:complete-ds-action-code-then-source-order","range":"device=空调|风扇|AC","range_class":"material_candidate","range_ref_kind":"none","redaction_state":"example_hash_only","risk":"","second_turn_refs":["trans_065e96415a081b21","trans_178627708109b299","trans_19dc05726b677c14","trans_1c865cc53b2fbb92","trans_1f773c4b8719d978","trans_220d4cb2b88b5a8d","trans_256a7f9d643182c5","trans_2fa22e5ce23a0d7d","trans_36ebe519a5f31000","trans_3cc606b21d5aa589","trans_3e187635c0a1354d","trans_42e6f50ebb3f5790","trans_42f308b8fb09aa0b","trans_59c7392500bb8101","trans_5d744d89139dd43a","trans_5ee6c3c27ca73fff","trans_6948196808f1e010","trans_88ed802aa80fe4be","trans_8b7d040128df2528","trans_8cdcbf0c7310d770","trans_aa612e64da58b1ca","trans_aac02d5300598d76","trans_ae65ee57c53fb3d5","trans_af88f4998a591b89","trans_b1912f013c2d93da","trans_b9001362ae1f42a7","trans_b90805f3be8576b2","trans_bb92a9b903262ef0","trans_df00b4ea3f0d2487","trans_e66f0e98187ff482","trans_e8a8b751952499d9"],"service":"airControl","slot":"device","slot_keys":["device"],"source_domain":"airControl","source_row_hash":"9201f4417f15980da8aa993abb3a98431efc4dc1ac3e726fd57aa432b1a54021","source_row_no":6,"source_sheet":"airControl","value":{"direct":"","offset":"","ref":"","type":""}}
+{"action_code":"deactivate_instant_device_or_function","action_primitive":"power_off","canonical_semantic_id":"sem_5f7aa4dba0f80dee","clarify_tag":"implicit","contract_row_id":"c1_airControl_000008","dedupe_group_id":"dedupe_5f7aa4dba0f80dee","dedupe_role":"primary","device":"ac","ds_protocol":{"intent":"close_ac","semantic":{"slots":{"device":"<空调设备>"}},"service":"airControl"},"evidence_ref_kind":"snapshot","example_utterance_hash":"2ac4797284c3c883d65ba54ed5b7859e17104a8cfb22201260661f3eabdff60a","example_utterance_kind":"source_example","exec_tier":"L2","execution_range_ref":"","external_evidence_ref":"snapshot:c1-2026-06-19-9b7e4b82:semantic_protocol_edit:airControl:8","fc_flags":{"free":false,"free_hash":"0c70665b6eb65f1aebf3b59f684ce52ed3473b2443ed4b4e0b815e2e9d66b8c2","fuzzy":true,"fuzzy_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750"},"intent":"close_ac","primary_selection_rule_version":"v1:complete-ds-action-code-then-source-order","range":"device=空调|风扇|AC","range_class":"material_candidate","range_ref_kind":"none","redaction_state":"example_hash_only","risk":"","second_turn_refs":["trans_1c08a97131da68fc","trans_ca485a5729d29ac7"],"service":"airControl","slot":"device","slot_keys":["device"],"source_domain":"airControl","source_row_hash":"2ac72d4d24d55efa1e44ec893c9b3ce9cd4482e117721d07641d6e9ba70b79aa","source_row_no":8,"source_sheet":"airControl","value":{"direct":"","offset":"","ref":"","type":""}}
 {"action_code":"adjust_value_to_specific_value","action_primitive":"adjust_to_number","canonical_semantic_id":"sem_bfe50f98f19b9faa","clarify_tag":"implicit","contract_row_id":"c1_airControl_000164","dedupe_group_id":"dedupe_bfe50f98f19b9faa","dedupe_role":"primary","device":"ac_temperature","ds_protocol":{"intent":"adjust_ac_temperature_to_number","semantic":{"slots":{"adjustment_mode":"<调温单位>","temperature":{"direct":"+","offset":"<具体数值>","ref":"ZERO","type":"SPOT"}}},"service":"airControl"},"evidence_ref_kind":"snapshot","example_utterance_hash":"e42c838d77451b9d05995a29d93245afa96cb96734c150a6c3a4a8b3e24aa167","example_utterance_kind":"source_example","exec_tier":"L1","execution_range_ref":"ac.temp_setpoint","external_evidence_ref":"snapshot:c1-2026-06-19-9b7e4b82:semantic_protocol_edit:airControl:164","fc_flags":{"free":false,"free_hash":"0c70665b6eb65f1aebf3b59f684ce52ed3473b2443ed4b4e0b815e2e9d66b8c2","fuzzy":true,"fuzzy_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750"},"intent":"adjust_ac_temperature_to_number","primary_selection_rule_version":"v1:complete-ds-action-code-then-source-order","range":"adjustment_mode=摄氏度|华氏度|挡位","range_class":"material_candidate","range_ref_kind":"concrete","redaction_state":"example_hash_only","risk":"","second_turn_refs":["trans_0f8a451b93bbef4b","trans_1bb803b03dc06e1b","trans_1f7aaf96f6272598","trans_2e7f555da37b81d1","trans_5ae242ceac3dc64b","trans_6853ec80cc335517","trans_75123b7ac7729a73","trans_7a45b2d8fb99f614","trans_937cd7609428bf73","trans_fe2889e909a68252"],"service":"airControl","slot":"adjustment_mode+temperature","slot_keys":["adjustment_mode","temperature"],"source_domain":"airControl","source_row_hash":"bbfe0f19c0a07dfe5c572e79d6c08463d6905dd743d2c0f01a324213dbe91c4c","source_row_no":164,"source_sheet":"airControl","value":{"direct":"","offset":"","ref":"","type":""}}
+{"action_code":"increase_position_value_by_percent","action_primitive":"by_percent","canonical_semantic_id":"sem_9f55d735f0de20e0","clarify_tag":"implicit","contract_row_id":"c1_carControl_000021","dedupe_group_id":"dedupe_9f55d735f0de20e0","dedupe_role":"primary","device":"window","ds_protocol":{"intent":"open_window_by_number","semantic":{"slots":{"position":"<车窗位置>","value":{"direct":"+","offset":"<百分比>","ref":"CUR","type":"PERCENT"}}},"service":"carControl"},"evidence_ref_kind":"snapshot","example_utterance_hash":"fca184a9a7a3b7af2e29e2d30b4052c326467bfe4031b946e5c37dd1273ab484","example_utterance_kind":"source_example","exec_tier":"L1","execution_range_ref":"window.position","external_evidence_ref":"snapshot:c1-2026-06-19-9b7e4b82:semantic_protocol_edit:carControl:21","fc_flags":{"free":false,"free_hash":"0c70665b6eb65f1aebf3b59f684ce52ed3473b2443ed4b4e0b815e2e9d66b8c2","fuzzy":true,"fuzzy_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750"},"intent":"open_window_by_number","primary_selection_rule_version":"v1:complete-ds-action-code-then-source-order","range":"position=主驾|副驾|左侧|左前|左后|右侧|右前|右后|前排|后排|第一排|第一排左|第一排右|第二排|第二排左|第二排右|第三排|第三排左|第三排右|前两排|前两排左|前两排中|前两排右|后两排|后两排左|后两排中|后两排右|最后一排|最后一排左|最后一排中|最后一排右|全车|斜对角","range_class":"material_candidate","range_ref_kind":"concrete","redaction_state":"example_hash_only","risk":"","second_turn_refs":[],"service":"carControl","slot":"position","slot_keys":["position"],"source_domain":"carControl","source_row_hash":"b7daab138f29afa91a896727762461eba97133b4cc5b5eac6d07d42a509307aa","source_row_no":21,"source_sheet":"carControl","value":{"direct":"+","offset":"<百分比>","ref":"CUR","type":"PERCENT"}}
+{"action_code":"activate_light_device_or_function","action_primitive":"power_on","canonical_semantic_id":"sem_3d2bf62beb619a73","clarify_tag":"implicit","contract_row_id":"c1_carControl_001972","dedupe_group_id":"dedupe_3d2bf62beb619a73","dedupe_role":"primary","device":"atmosphere_lamp","ds_protocol":{"intent":"open_atmosphere_lamp","semantic":{"slots":{}},"service":"carControl"},"evidence_ref_kind":"snapshot","example_utterance_hash":"03ce1ea40c517ae0dbf5241a6f4943f1edbca498bba21195754caac5595ecf85","example_utterance_kind":"source_example","exec_tier":"L2","execution_range_ref":"","external_evidence_ref":"snapshot:c1-2026-06-19-9b7e4b82:semantic_protocol_edit:carControl:1972","fc_flags":{"free":true,"free_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750","fuzzy":true,"fuzzy_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750"},"intent":"open_atmosphere_lamp","primary_selection_rule_version":"v1:complete-ds-action-code-then-source-order","range":"","range_class":"none","range_ref_kind":"none","redaction_state":"example_hash_only","risk":"","second_turn_refs":["trans_01a9a16b623bbc6a","trans_20d613b551af89b2","trans_2f6d96b6e2bd8633","trans_351bbb76320d11b1","trans_35adafdb539ac0cd","trans_66015814614f18a1","trans_768baef7eeaffad3","trans_a634434c73661422","trans_bdcf863357a5c9f1","trans_c45c9297223ec680","trans_f73f15b9756edae4"],"service":"carControl","slot":"none","slot_keys":[],"source_domain":"carControl","source_row_hash":"4481309392881ac4770fe6bcc4d02c6610c5e18075e34f04b2a01d28933af9fb","source_row_no":1972,"source_sheet":"carControl","value":{"direct":"","offset":"","ref":"","type":""}}
+{"action_code":"activate_position_instant_device_or_function","action_primitive":"power_on","canonical_semantic_id":"sem_5c562bb80d48eb10","clarify_tag":"implicit","contract_row_id":"c1_carControl_000201","dedupe_group_id":"dedupe_5c562bb80d48eb10","dedupe_role":"primary","device":"seat_heat","ds_protocol":{"intent":"open_seat_heat","semantic":{"slots":{"position":"<座椅位置>"}},"service":"carControl"},"evidence_ref_kind":"snapshot","example_utterance_hash":"cc2c2f8bfb0b0b4f6117dec3c6f91c6c7de414be1c518f7338ac5a20ec77d47b","example_utterance_kind":"source_example","exec_tier":"L2","execution_range_ref":"","external_evidence_ref":"snapshot:c1-2026-06-19-9b7e4b82:semantic_protocol_edit:carControl:201","fc_flags":{"free":true,"free_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750","fuzzy":true,"fuzzy_hash":"b5141d3d19e9a04855acdb2dd5218b0924254b73d3cb663557ed0f9f73403750"},"intent":"open_seat_heat","primary_selection_rule_version":"v1:complete-ds-action-code-then-source-order","range":"position=主驾|副驾|左侧|左前|左后|右侧|右前|右后|前排|后排|第一排|第一排左|第一排右|第二排|第二排左|第二排中|第二排右|第三排|第三排左|第三排中|第三排右|前两排|前两排左|前两排中|前两排右|后两排|后两排左|后两排中|后两排右|最后一排|最后一排左|最后一排中|最后一排右|全车","range_class":"material_candidate","range_ref_kind":"none","redaction_state":"example_hash_only","risk":"","second_turn_refs":[],"service":"carControl","slot":"position","slot_keys":["position"],"source_domain":"carControl","source_row_hash":"7cf33c3abe4d5170c2309205ced88d18d6d5afe1aff2a388f467eaaabe5cbc80","source_row_no":201,"source_sheet":"carControl","value":{"direct":"","offset":"","ref":"","type":""}}
 """,
         stateCellsYAML: """
 # C2 场景端态协议 — state cells（demo 自有 mock 态）
@@ -116,6 +120,7 @@ devices:
         gear_map: {"1挡": 25, "2挡": 50, "3挡": 75, "4挡": 100}  # 协议双轨(挡↔%), 映射=C2 决策
         state_kinds: [empty, known, unknown]
         default: 0                                 # S2 cut3: data-driven 初值(替旧硬编码 0)
+        power_on_value: 100                          # 打开车窗 → 全开(100%)
         readback_zh: "{位置}车窗开度{值}%"
       - id: window.motion
         display_zh: 车窗运动态
@@ -160,6 +165,14 @@ devices:
     display_zh: 氛围灯
     service: carControl                           # C1 jsonl device=atmosphere_lamp_* service=carControl(§28 已核)
     state_cells:
+      - id: ambient.power
+        display_zh: 氛围灯开关
+        type: enum
+        values: [on, off]
+        default: off
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "氛围灯{已打开|已关闭}"
       - id: ambient.color
         display_zh: 氛围灯颜色
         type: enum
@@ -181,12 +194,7 @@ devices:
         state_kinds: [empty, known, unknown]
         default: 70                                # S2 cut3: data-driven 初值(替旧硬编码 70)
         readback_zh: "{氛围灯}亮度{值}%"
-    readback_cell_group: [ambient.color, ambient.brightness]
-
-# ===== S3 横铺 6 族(座椅/车门/音量/雨刮/天窗遮阳/香氛, 范式同 ac/window; 6 族代表 cell 非191全集)=====
-# 数据源: jsonl service 路由实算(seat/door/wiper/sunroof/fragrance=carControl, volume=cmd) + 范围真值
-#   座椅档 0-3(CLAUDE.md §4 范围真值, 旧16-30/0-5拍错) / percent 类 0-100(同 window.position 口径)。
-# 191 全量 cell = DEFERRED(随 retrain-c5/rebuild-c6); S3 只建 demo-positive 代表 cell 让 C6 base 跑得动。
+    readback_cell_group: [ambient.power, ambient.color, ambient.brightness]
 
   seat:
     display_zh: 座椅
@@ -203,6 +211,7 @@ devices:
         exp_step: {little: 1}
         state_kinds: [empty, known, unknown]
         default: 0
+        power_on_value: 1                            # 打开座椅加热 → 1 挡
         readback_zh: "{位置}座椅加热{值}挡"
       - id: seat.vent_level
         display_zh: 座椅通风
@@ -503,6 +512,19 @@ forbidden:
     devices: [car_door, door, tailgate, electric_tailgate_switch]   # C1 实有意图（§28 已核）
     risk_level: R2
     refuse_readback_zh: 行驶中为了安全暂时不能开门, 停稳后我再帮您
+    refusal_unknown_state_zh: 车速状态未知, 安全起见暂不执行开门操作, 请确认传感器正常后重试
+
+  # FA-4 / B07=B（2026-07-22 磊哥拍板）：speed>0 一票拒绝；speed=0 时仅 P/N 允许，D/R 拒绝；坏状态 fail-closed
+  - rule_id: window_open_while_moving_or_unsafe_gear
+    display_zh: 行驶中或非驻车挡开窗
+    trigger: vehicle.speed > 0
+    gear_cell: vehicle.gear
+    stationary_gear_allow: [P, N]
+    devices: [window]
+    risk_level: R2
+    refuse_readback_zh: 行驶中为了安全暂时不能开窗, 停稳后我再帮您
+    refuse_gear_zh: 当前挡位不适合开窗, 请挂入 P 或 N 挡后再试
+    refusal_unknown_state_zh: 车速或挡位状态未知, 安全起见暂不执行开窗操作, 请确认传感器正常后重试
 
 # ===== 校验闭合（verify_risk_policy）=====
 closure_notes:

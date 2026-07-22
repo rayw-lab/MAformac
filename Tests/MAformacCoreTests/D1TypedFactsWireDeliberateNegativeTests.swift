@@ -45,6 +45,7 @@ final class D1TypedFactsWireDeliberateNegativeTests: XCTestCase {
     }
 
     private func acPowerFrame(id: String, traceID: String) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             traceID: traceID,

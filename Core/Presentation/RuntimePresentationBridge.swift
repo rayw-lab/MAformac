@@ -46,6 +46,7 @@ public struct DemoInteractionEvent: Codable, Equatable, Sendable {
 
 public enum DemoRuntimeResult: String, Codable, CaseIterable, Equatable, Hashable, Sendable {
     case acceptedToolCall = "accepted_tool_call"
+    case noAction = "no_action"
     case clarifyMissingSlot = "clarify_missing_slot"
     case refusalNoAvailableTool = "refusal_no_available_tool"
     case refusalSafetyOrPolicy = "refusal_safety_or_policy"
@@ -212,6 +213,7 @@ private enum PresentationPayloadSanitizer {
 
     private static let publicPayloadReasonPassthrough: Set<String> = [
         "backgrounding",
+        "no_action",
         "cancelled",
         "c2_readback_verified",
         "guard_denied",
@@ -424,6 +426,8 @@ public struct PresentationSnapshot: Codable, Equatable, Sendable {
     public var scopeFailureReason: String?
     public var voiceState: PresentationVoiceDisplayState?
     public var orbState: PresentationOrbDisplayState?
+    /// Mutation count from C3 provenance (§3.4). Only `.firstExecution` counts.
+    public var mutationCount: Int
     public var proofClass: PresentationProofClass
     public var traceEnvelope: TraceEnvelope?
     public var isTerminal: Bool
@@ -440,6 +444,7 @@ public struct PresentationSnapshot: Codable, Equatable, Sendable {
         scopeFailureReason: String? = nil,
         voiceState: PresentationVoiceDisplayState? = nil,
         orbState: PresentationOrbDisplayState? = nil,
+        mutationCount: Int = 0,
         proofClass: PresentationProofClass,
         traceEnvelope: TraceEnvelope? = nil,
         isTerminal: Bool,
@@ -455,6 +460,7 @@ public struct PresentationSnapshot: Codable, Equatable, Sendable {
         self.scopeFailureReason = scopeFailureReason
         self.voiceState = voiceState
         self.orbState = orbState
+        self.mutationCount = mutationCount
         self.proofClass = proofClass
         self.traceEnvelope = traceEnvelope
         self.isTerminal = isTerminal
@@ -463,7 +469,7 @@ public struct PresentationSnapshot: Codable, Equatable, Sendable {
 }
 
 public enum RuntimePresentationPayloadSchema: String, Codable, CaseIterable, Equatable, Sendable {
-    case v1 = "r5_runtime_presentation_payload_v1"
+    case v2 = "r5_runtime_presentation_payload_v2"
 }
 
 public enum PresentationReconciliationStatus: String, Codable, CaseIterable, Equatable, Sendable {
@@ -513,6 +519,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
     public var readbacks: [DemoActionReadback]
     public var reconciliation: PresentationReconciliation
     public var traceEnvelope: TraceEnvelope?
+    public var voiceState: PresentationVoiceDisplayState?
+    public var orbState: PresentationOrbDisplayState?
+    public var mutationCount: Int
     public var timestamp: Date
 
     private enum CodingKeys: String, CodingKey {
@@ -528,11 +537,14 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         case readbacks
         case reconciliation
         case traceEnvelope
+        case voiceState
+        case orbState
+        case mutationCount
         case timestamp
     }
 
     public init(
-        schemaVersion: RuntimePresentationPayloadSchema = .v1,
+        schemaVersion: RuntimePresentationPayloadSchema = .v2,
         traceID: String,
         turnID: String,
         eventID: String? = nil,
@@ -544,6 +556,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         readbacks: [DemoActionReadback] = [],
         reconciliation: PresentationReconciliation,
         traceEnvelope: TraceEnvelope? = nil,
+        voiceState: PresentationVoiceDisplayState? = nil,
+        orbState: PresentationOrbDisplayState? = nil,
+        mutationCount: Int = 0,
         timestamp: Date = Date()
     ) {
         self.schemaVersion = schemaVersion
@@ -558,6 +573,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         self.readbacks = readbacks.map(RuntimePresentationPayload.presentationSafe)
         self.reconciliation = RuntimePresentationPayload.presentationSafe(reconciliation)
         self.traceEnvelope = traceEnvelope?.presentationSafe()
+        self.voiceState = voiceState
+        self.orbState = orbState
+        self.mutationCount = mutationCount
         self.timestamp = timestamp
     }
 
@@ -579,6 +597,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             readbacks: snapshot.readbacks,
             reconciliation: reconciliation,
             traceEnvelope: snapshot.traceEnvelope,
+            voiceState: snapshot.voiceState,
+            orbState: snapshot.orbState,
+            mutationCount: snapshot.mutationCount,
             timestamp: snapshot.timestamp
         )
     }
@@ -598,6 +619,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             readbacks: try container.decode([DemoActionReadback].self, forKey: .readbacks),
             reconciliation: try container.decode(PresentationReconciliation.self, forKey: .reconciliation),
             traceEnvelope: try container.decodeIfPresent(TraceEnvelope.self, forKey: .traceEnvelope),
+            voiceState: try container.decodeIfPresent(PresentationVoiceDisplayState.self, forKey: .voiceState),
+            orbState: try container.decodeIfPresent(PresentationOrbDisplayState.self, forKey: .orbState),
+            mutationCount: try container.decode(Int.self, forKey: .mutationCount),
             timestamp: try container.decode(Date.self, forKey: .timestamp)
         )
     }
@@ -616,6 +640,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             readbacks: readbacks,
             reconciliation: reconciliation,
             traceEnvelope: traceEnvelope,
+            voiceState: voiceState,
+            orbState: orbState,
+            mutationCount: mutationCount,
             timestamp: timestamp
         )
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -631,6 +658,9 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         try container.encode(safe.readbacks, forKey: .readbacks)
         try container.encode(safe.reconciliation, forKey: .reconciliation)
         try container.encodeIfPresent(safe.traceEnvelope, forKey: .traceEnvelope)
+        try container.encodeIfPresent(safe.voiceState, forKey: .voiceState)
+        try container.encodeIfPresent(safe.orbState, forKey: .orbState)
+        try container.encode(safe.mutationCount, forKey: .mutationCount)
         try container.encode(safe.timestamp, forKey: .timestamp)
     }
 
@@ -756,10 +786,61 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         )
     }
 
+    public static func alreadyStateNoop(
+        traceID: String,
+        cards: [DemoVehicleStateCell] = [],
+        readbacks: [DemoActionReadback] = [],
+        proofClass: PresentationProofClass = .localUnit,
+        traceEnvelope: TraceEnvelope? = nil,
+        timestamp: Date = Date()
+    ) -> PresentationSnapshot {
+        terminalSnapshot(
+            traceID: traceID,
+            outcome: DemoRuntimeOutcome(
+                result: .alreadyStateNoop,
+                reason: "already_done"
+            ),
+            cards: cards,
+            readbacks: readbacks,
+            voiceState: .idle,
+            orbState: .idle,
+            mutationCount: 0,
+            proofClass: proofClass,
+            traceEnvelope: traceEnvelope,
+            timestamp: timestamp
+        )
+    }
+
+    public static func noAction(
+        traceID: String,
+        cards: [DemoVehicleStateCell] = [],
+        proofClass: PresentationProofClass = .localUnit,
+        traceEnvelope: TraceEnvelope? = nil,
+        timestamp: Date = Date()
+    ) -> PresentationSnapshot {
+        PresentationSnapshot(
+            traceID: traceID,
+            runtimeOutcome: DemoRuntimeOutcome(
+                result: .noAction,
+                reason: "no_action"
+            ),
+            cards: cards,
+            readbacks: [],
+            voiceState: .idle,
+            orbState: .idle,
+            proofClass: proofClass,
+            traceEnvelope: traceEnvelope?.presentationSafe(),
+            isTerminal: true,
+            timestamp: timestamp
+        )
+    }
+
     public static func partialAcceptRefuse(
         executionResult: DemoRuntimePartialPlanResult,
         acceptedCards: [DemoVehicleStateCell],
         refusedCardsBySubactionID: [String: DemoVehicleStateCell],
+        speechDidEnqueue: Bool = false,
+        dialogText: String = "",
         proofClass: PresentationProofClass = .localUnit,
         traceEnvelope: TraceEnvelope? = nil,
         timestamp: Date = Date()
@@ -836,6 +917,11 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
             )
         }
 
+        // Voice/orb from the same didEnqueue truth as the full-path (§3.4/ROB-1).
+        let coreVoiceState = coreVoiceDisplayState(
+            dialogText: dialogText,
+            speechDidEnqueue: speechDidEnqueue
+        )
         return terminalSnapshot(
             traceID: executionResult.traceID,
             outcome: DemoRuntimeOutcome(
@@ -845,6 +931,9 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
             cards: cards,
             cardSemantics: semantics,
             readbacks: acceptedReadbacks,
+            voiceState: coreVoiceState,
+            orbState: speechDidEnqueue ? .speak : .idle,
+            mutationCount: executionResult.mutationCount,
             proofClass: proofClass,
             traceEnvelope: traceEnvelope,
             timestamp: timestamp
@@ -906,6 +995,9 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
         cardSemantics: [PresentationCardSemantics]? = nil,
         readbacks: [DemoActionReadback],
         scopeOrigin: ScopeOrigin? = nil,
+        voiceState: PresentationVoiceDisplayState? = nil,
+        orbState: PresentationOrbDisplayState? = nil,
+        mutationCount: Int = 0,
         proofClass: PresentationProofClass,
         traceEnvelope: TraceEnvelope?,
         timestamp: Date
@@ -917,11 +1009,26 @@ public enum RuntimePresentationTerminalSnapshotAdapter {
             cardSemantics: cardSemantics,
             readbacks: readbacks,
             scopeOrigin: scopeOrigin,
+            voiceState: voiceState,
+            orbState: orbState,
+            mutationCount: mutationCount,
             proofClass: proofClass,
             traceEnvelope: traceEnvelope?.presentationSafe(),
             isTerminal: true,
             timestamp: timestamp
         )
+    }
+
+    /// Core `PresentationVoiceDisplayState` derived from `speechDidEnqueue`.
+    /// Synthesis failure / empty speech -> `.idle` (never `.speak`).
+    static func coreVoiceDisplayState(
+        dialogText: String,
+        speechDidEnqueue: Bool
+    ) -> PresentationVoiceDisplayState {
+        if dialogText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return .idle
+        }
+        return speechDidEnqueue ? .speak : .idle
     }
 
     private static func normalizedReason(_ reason: String, fallback: String) -> String {

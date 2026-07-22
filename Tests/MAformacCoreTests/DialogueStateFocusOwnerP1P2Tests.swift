@@ -78,10 +78,8 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             schemaVersion: .v1
         )
         // ordinal=1 匹配 owner，但 disposition=.unpairedUserOnly → 必须拒收（R5 enforce）。
-        XCTAssertFalse(
-            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedUserOnly)]),
-            "R5: unpaired group SHALL NOT renew focus (was declare-only in prior isValid)"
-        )
+        XCTAssertFalse(window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedUserOnly)]),
+        "R5: unpaired group SHALL NOT renew focus (was declare-only in prior isValid)")
     }
 
     func testUnpairedOwnerCannotBeFocusOwner_consecutiveUserSupersession() {
@@ -91,9 +89,7 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .untilOwnerWindowEvicted,
             schemaVersion: .v1
         )
-        XCTAssertFalse(
-            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedConsecutiveUserSupersession)])
-        )
+        XCTAssertFalse(window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedConsecutiveUserSupersession)]))
     }
 
     func testUnpairedOwnerCannotBeFocusOwner_assistantCancelled() {
@@ -103,9 +99,7 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .untilOwnerWindowEvicted,
             schemaVersion: .v1
         )
-        XCTAssertFalse(
-            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedAssistantCancelled)])
-        )
+        XCTAssertFalse(window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .unpairedAssistantCancelled)]))
     }
 
     func testUnpairedOwnerCannotBeFocusOwner_contextInvalid() {
@@ -115,9 +109,7 @@ final class DialogueStateFocusOwnerP1P2Tests: XCTestCase {
             activeUntil: .untilOwnerWindowEvicted,
             schemaVersion: .v1
         )
-        XCTAssertFalse(
-            window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .contextInvalid)])
-        )
+        XCTAssertFalse(window.isValid(givenActiveGroups: [unpairedRecord(1, disposition: .contextInvalid)]))
     }
 
     func testUnknownDispositionOwnerFailsClosed() throws {

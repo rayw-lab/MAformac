@@ -63,10 +63,8 @@ final class ProductOperatorCompositionRootTests: XCTestCase {
             0,
             "ContentView must not host a ContentView-local production runner"
         )
-        XCTAssertFalse(
-            source.contains("ProductionRouteCorrelationProvider.make"),
-            "correlation factory belongs in composition root, not ContentView"
-        )
+        XCTAssertFalse(source.contains("ProductionRouteCorrelationProvider.make"),
+        "correlation factory belongs in composition root, not ContentView")
     }
 
     // MARK: - Fail-closed typed errors before route success
@@ -119,10 +117,8 @@ final class ProductOperatorCompositionRootTests: XCTestCase {
         // Multi-line production call is: .route(\n text: turn.utterance,\n correlationProvider: ...)
         XCTAssertTrue(routeBody.contains("text: turn.utterance"))
         XCTAssertTrue(routeBody.contains("correlationProvider: correlationProvider"))
-        XCTAssertFalse(
-            routeBody.contains(".route(text: turn.utterance)"),
-            "production path must not use legacy single-arg route(text:) without correlationProvider"
-        )
+        XCTAssertFalse(routeBody.contains(".route(text: turn.utterance)"),
+        "production path must not use legacy single-arg route(text:) without correlationProvider")
     }
 
     func testProductionRootWiresLifecycleIdentityIntoFactoryInputs() throws {

@@ -6,7 +6,10 @@ final class DDomainCompletionEnvelopeTests: XCTestCase {
 
     func testValidEnvelopeParsesOneCall() throws {
         let parsed = try DDomainToolCallParser.parse(envelope(content: call), policy: .exactlyOne)
-        XCTAssertEqual(parsed.map(\.name), ["adjust_ac_temperature_to_number"])
+        guard case let .toolCalls(calls) = parsed else {
+            return XCTFail("expected typed tool-call plan")
+        }
+        XCTAssertEqual(calls.map(\.name), ["adjust_ac_temperature_to_number"])
     }
 
     func testMissingSourceFailsClosed() {
@@ -55,12 +58,18 @@ final class DDomainCompletionEnvelopeTests: XCTestCase {
     }
 
     func testExactlyOneRejectsZeroAndTwoCalls() {
-        assertRejected(envelope(content: "", toolCallCount: 0), .cardinalityRejected(policy: .exactlyOne, actual: 0))
+        assertRejected(envelope(content: "", toolCallCount: 0), .invalidDeclaredToolCallCount(0))
         assertRejected(envelope(content: call + call, toolCallCount: 2), .cardinalityRejected(policy: .exactlyOne, actual: 2))
     }
 
     func testBoundedReviewedAcceptsTwoAndRejectsThreeCalls() throws {
-        let two = try DDomainToolCallParser.parse(envelope(content: call + call, toolCallCount: 2), policy: .boundedReviewed(maximum: 2))
+        let parsed = try DDomainToolCallParser.parse(
+            envelope(content: call + call, toolCallCount: 2),
+            policy: .boundedReviewed(maximum: 2)
+        )
+        guard case let .toolCalls(two) = parsed else {
+            return XCTFail("expected typed tool-call plan")
+        }
         XCTAssertEqual(two.count, 2)
         assertRejected(
             envelope(content: call + call + call, toolCallCount: 3),
@@ -70,8 +79,8 @@ final class DDomainCompletionEnvelopeTests: XCTestCase {
     }
 
     @MainActor
-    func testBoundedReviewedProductionChainExecutesMountedAndRejectsUnmountedPerItem() async throws {
-        let unmounted = #"<tool_call>{"name":"open_window","arguments":{}}</tool_call>"#
+    func testBoundedReviewedProductionChainPreservesMountedSiblingWhenOtherItemIsUnmounted() async throws {
+        let unmounted = #"<tool_call>{"name":"close_fragrance","arguments":{}}</tool_call>"#
         let backend = DDomainToolPlanBackend(
             cardinalityPolicy: .boundedReviewed(maximum: 2),
             completionEnvelopeProvider: { [call] _ in
@@ -93,12 +102,15 @@ final class DDomainCompletionEnvelopeTests: XCTestCase {
             modelBackend: backend
         )
 
-        let payload = try await runner.run(text: "空调调到26度并打开车窗")
+        let payload = try await runner.run(text: "空调调到26度并关闭香氛")
 
         XCTAssertEqual(payload.outcome.result, .partialAcceptPartialRefuse)
-        XCTAssertTrue(payload.readbacks.contains { $0.key == "ac.temp_setpoint[主驾]" })
+        XCTAssertEqual(payload.readbacks.map(\.key), ["ac.power", "ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
         XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
-        XCTAssertEqual(store.cell(for: "window.position[主驾]")?.actualValue, "0")
+        XCTAssertEqual(store.currentRevision, 1)
+        XCTAssertEqual(payload.mutationCount, 2)
+        XCTAssertTrue(trace.entries.contains { $0.stage == .execute })
         XCTAssertTrue(
             trace.entries.contains {
                 $0.message.contains(":refused:") && $0.attributes.finiteReason == .unmountedToolName

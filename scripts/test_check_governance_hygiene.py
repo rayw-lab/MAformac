@@ -23,6 +23,9 @@ FILES = (
     "docs/README.md",
     "docs/handoffs/2026-07-14-governance-foundation.md",
     "docs/handoffs/2026-07-14-v9-fanin-identity-repair.md",
+    "docs/handoffs/2026-07-20-stage-acceptance-audit-wbs-frozen.md",
+    "docs/handoffs/2026-07-21-phase0-1a-1b-remediation-complete.md",
+    "docs/handoffs/2026-07-22-phase1-appendfix-isolation-baseline.md",
     "docs/lessons-learned.md",
     "docs/project/collaboration-and-roles.md",
     "docs/commander-log/decisions.md",
@@ -94,7 +97,10 @@ class GovernanceHygieneTests(unittest.TestCase):
         path.write_text(original, encoding="utf-8")
 
     def test_duplicate_frontmatter_key_fails_closed(self) -> None:
-        self.replace("docs/CURRENT.md", "as_of: 2026-07-14", "as_of: 2026-07-14\nas_of: stale")
+        path = self.root / "docs/CURRENT.md"
+        text = path.read_text(encoding="utf-8")
+        as_of_line = next(line for line in text.splitlines() if line.startswith("as_of:"))
+        path.write_text(text.replace(as_of_line, f"{as_of_line}\nas_of: stale", 1), encoding="utf-8")
         result = self.run_checker()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_FRONTMATTER_DUPLICATE", result.stderr)
@@ -152,11 +158,16 @@ class GovernanceHygieneTests(unittest.TestCase):
         self.assertIn("E_EXCEPTION_STATUS", result.stderr)
 
     def test_missing_handoff_chain_fails_closed(self) -> None:
-        self.replace(
-            "docs/handoffs/2026-07-14-governance-foundation.md",
-            "predecessor: docs/handoffs/2026-07-14-v9-fanin-identity-repair.md\n",
-            "",
+        current = (self.root / "docs/CURRENT.md").read_text(encoding="utf-8")
+        latest = next(
+            line.split(":", 1)[1].strip()
+            for line in current.splitlines()
+            if line.startswith("latest_handoff:")
         )
+        path = self.root / latest
+        text = path.read_text(encoding="utf-8")
+        predecessor_line = next(line for line in text.splitlines() if line.startswith("predecessor:"))
+        path.write_text(text.replace(f"{predecessor_line}\n", "", 1), encoding="utf-8")
         result = self.run_checker()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("E_HANDOFF_CHAIN:predecessor", result.stderr)

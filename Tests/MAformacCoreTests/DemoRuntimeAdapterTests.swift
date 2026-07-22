@@ -220,6 +220,7 @@ final class DemoRuntimeAdapterTests: XCTestCase {
         let directory = try temporaryLedgerDirectory()
         let ledgerStore = FileBackedDemoRuntimeAdapterLedgerStore(directory: directory)
         let store = DemoVehicleStateStore()
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let invalid = ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.runtime_adapter",
@@ -316,6 +317,7 @@ final class DemoRuntimeAdapterTests: XCTestCase {
     func testFailedCommandDoesNotCreateSuccessfulLedgerEntry() throws {
         let store = DemoVehicleStateStore()
         let adapter = DemoRuntimeAdapter()
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let invalid = ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.ac_power",
@@ -387,6 +389,7 @@ final class DemoRuntimeAdapterTests: XCTestCase {
     }
 
     private func frame(key: String, target: String) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.runtime_adapter",

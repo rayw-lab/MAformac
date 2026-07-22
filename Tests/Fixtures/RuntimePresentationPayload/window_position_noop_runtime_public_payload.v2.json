@@ -19,11 +19,13 @@
       "visualState": "changing"
     }
   ],
-  "eventID": "turn-d22-window-position-1:runtime-presentation",
+  "eventID": "turn-d22-window-position-noop-1:runtime-presentation",
   "isTerminal": true,
+  "mutationCount": 0,
+  "orbState": "speak",
   "outcome": {
-    "reason": "readback_verified",
-    "result": "accepted_tool_call"
+    "reason": "already_done",
+    "result": "already_state_noop"
   },
   "proofClass": "local_unit",
   "readbacks": [
@@ -40,11 +42,12 @@
     "safeReason": "c2_readback_verified",
     "status": "verified"
   },
-  "schemaVersion": "r5_runtime_presentation_payload_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
   "traceEnvelope": {
     "entries": [],
-    "traceID": "trace-d22-window-position-1"
+    "traceID": "trace-d22-window-position-noop-1"
   },
-  "traceID": "trace-d22-window-position-1",
-  "turnID": "turn-d22-window-position-1"
+  "traceID": "trace-d22-window-position-noop-1",
+  "turnID": "turn-d22-window-position-noop-1",
+  "voiceState": "speak"
 }

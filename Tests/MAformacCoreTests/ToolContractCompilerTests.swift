@@ -250,12 +250,12 @@ final class ToolContractCompilerTests: XCTestCase {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
         XCTAssertThrowsError(
             try ToolContractStateApplier.apply(
-                toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat", "action_primitive": "power_on"])],
+                toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "unknown_device", "action_primitive": "power_on"])],
                 to: ["x": "y"],
                 stateCells: stateCells
             )
         ) { error in
-            XCTAssertEqual(error as? ToolContractStateApplyError, .unmappedDevice("seat_heat"))
+            XCTAssertEqual(error as? ToolContractStateApplyError, .unmappedDevice("unknown_device"))
         }
     }
 
@@ -266,16 +266,62 @@ final class ToolContractCompilerTests: XCTestCase {
         for (device, cellID) in ToolContractStateApplier.deviceCellMap {
             XCTAssertNotNil(stateCells.cell(id: cellID), "deviceCellMap[\(device)]=\(cellID) 不在 state-cells(会 logUnmapped 不写 state)")
         }
-        XCTAssertEqual(ToolContractStateApplier.deviceCellMap.count, 24, "S2 7 族 + S3 17 = 24 device→cell 单源映射")
+        XCTAssertEqual(ToolContractStateApplier.deviceCellMap.count, 26, "S2 7 族 + S3 17 + atmosphere_lamp/seat_heat = 26 device→cell 单源映射")
     }
 
-    func testS3FamilyDeviceWritesStateNotUnmapped() throws {
+    func testDeviceCellMapAtmosphereLampAndSeatHeatExist() throws {
+        XCTAssertEqual(ToolContractStateApplier.deviceCellMap["atmosphere_lamp"], "ambient.power")
+        XCTAssertEqual(ToolContractStateApplier.deviceCellMap["seat_heat"], "seat.heat_level")
+    }
+
+    func testSeatHeatPowerOnUsesPowerOnValueFromCell() throws {
         let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
-        // seat_heat_temperature adjust_to_number → seat.heat_level[主驾] (S3 族 cell-driven 写 state, 非 unmapped)
+        let cell = try XCTUnwrap(stateCells.cell(id: "seat.heat_level"))
+        XCTAssertEqual(cell.powerOnValue, "1", "seat.heat_level power_on 应取 1 挡")
+    }
+
+    func testWindowPowerOnUsesPowerOnValueFromCell() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let cell = try XCTUnwrap(stateCells.cell(id: "window.position"))
+        XCTAssertEqual(cell.powerOnValue, "100", "window.position power_on 应取 100%")
+    }
+
+    // 新 deviceCellMap 条目 atmosphere_lamp→ambient.power 端到端验证
+    func testAtmosphereLampPowerOnWritesAmbientPowerOn() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
         let state = try ToolContractStateApplier.apply(
-            toolCalls: [C6ToolCall(name: "tool_call_frame", arguments: ["device": "seat_heat_temperature", "action_primitive": "adjust_to_number", "value.direct": "2"])],
-            to: [:], stateCells: stateCells)
-        XCTAssertEqual(state["seat.heat_level[主驾]"], "2", "seat 族 deviceCellMap+cell-driven 写 state")
+            toolCalls: [C6ToolCall(name: "open_atmosphere_lamp", arguments: [:])],
+            to: ["ambient.power": "off", "ambient.color": "白", "ambient.brightness[面发光氛围灯]": "70"],
+            stateCells: stateCells,
+            irMap: irMap
+        )
+        XCTAssertEqual(state["ambient.power"], "on", "open_atmosphere_lamp→ambient.power=on")
+    }
+
+    // 新 deviceCellMap 条目 seat_heat→seat.heat_level 端到端验证
+    func testSeatHeatPowerOnWritesSeatHeatLevelPowerOnValue() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        let state = try ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "open_seat_heat", arguments: [:])],
+            to: ["seat.heat_level[主驾]": "0"],
+            stateCells: stateCells,
+            irMap: irMap
+        )
+        XCTAssertEqual(state["seat.heat_level[主驾]"], "1", "open_seat_heat→seat.heat_level=1(powerOnValue)")
+    }
+
+    func testSeatHeatPowerOffUsesMin() throws {
+        let stateCells = try StateCellContractLookup(yaml: stateCellsYAML())
+        let irMap = try ToolContractNormalizer.loadIRMap(repoRoot: repoRoot())
+        let state = try ToolContractStateApplier.apply(
+            toolCalls: [C6ToolCall(name: "close_seat_heat", arguments: [:])],
+            to: ["seat.heat_level[主驾]": "1"],
+            stateCells: stateCells,
+            irMap: irMap
+        )
+        XCTAssertEqual(state["seat.heat_level[主驾]"], "0", "close_seat_heat→seat.heat_level=0(min)")
     }
 
     func testC3ExecutionCellReusesDeviceCellMapSingleSource() throws {

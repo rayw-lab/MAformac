@@ -19,7 +19,7 @@ enum PresentationReducedMotionPolicy {
 
     static func feedback(for motionKind: PresentationMotionKind) -> PresentationReducedMotionFeedback {
         switch motionKind {
-        case .stateCommit, .steadyAcknowledge, .cancellationFade:
+        case .stateCommit, .noAction, .steadyAcknowledge, .cancellationFade:
             return .staticState
         case .clarificationPulse, .partialResult:
             return .staticWarning

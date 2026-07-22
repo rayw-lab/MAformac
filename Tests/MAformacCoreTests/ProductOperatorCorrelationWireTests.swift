@@ -331,6 +331,7 @@ final class ProductOperatorCorrelationWireTests: XCTestCase {
     }
 
     private func acPowerFrame(id: String, traceID: String) -> ToolCallFrame {
+        // WP1a-7: bypasses NLU, TODO Phase 2 fix
         ToolCallFrame(
             id: id,
             traceID: traceID,

@@ -1,103 +1,107 @@
 {
-  "schemaVersion": "r5_runtime_presentation_payload_fixture_manifest_v1",
+  "schemaVersion": "r5_runtime_presentation_payload_fixture_manifest_v2",
   "sharedSchema": {
-    "name": "public_fixture_schema.v1.json",
-    "schemaVersion": "r5_runtime_presentation_public_fixture_schema_v1",
+    "name": "public_fixture_schema.v2.json",
+    "schemaVersion": "r5_runtime_presentation_public_fixture_schema_v2",
     "ownerRepo": "MAformac",
-    "ownerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json",
-    "sha256": "0833e599921bb680c8a6a80a51aecf4fb6e08241b1392661e2466ae5f345849b",
+    "ownerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v2.json",
+    "sha256": "9f0f54ff257be2dc0d15760007dc5bc85be11b1d48dd700554db9a7423bb870b",
     "consumerRepo": "MAformac-uiue",
-    "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json",
+    "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v2.json",
     "updateRule": "UIUE must copy this main-owned schema artifact unchanged or fail parity review."
   },
   "fixtures": [
     {
-      "name": "ac_power_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-AC-POWER-ACCEPTED-BRIDGE-V1",
+      "name": "ac_power_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-AC-POWER-ACCEPTED-BRIDGE-V2",
       "fixtureClass": "bridge_contract_fixture",
       "result": "accepted_tool_call",
       "familyCoverage": [
         "ac.power"
       ],
-      "sha256": "57951e0811bbb75f9a21516df41295ed1619e18ee6d804ac1ef1b21055cdff8f",
+      "sha256": "e6ea670b4170f7ea583a43ce6bd6f15b8a7c0365805f6b1f28a7de06d4169acc",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
-        "timestamp_fields_omitted_by_public_projection"
+        "timestamp_fields_omitted_by_public_projection",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "refusal_safety_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-REFUSAL-SAFETY-BRIDGE-V1",
+      "name": "refusal_safety_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-REFUSAL-SAFETY-BRIDGE-V2",
       "fixtureClass": "bridge_contract_fixture",
       "result": "refusal_safety_or_policy",
       "familyCoverage": [
         "door.lock",
         "safety_refusal"
       ],
-      "sha256": "1e6d704e92d3e4c513e29b42e8184df4e0dbe0dd7b1403319de6d37ecddc2a43",
+      "sha256": "8cdef78ddf265fbbee7ec6ec5c72304d9b9a965affb41e4ac2a54dcba34a5f45",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
-        "refusal_safety_or_policy_boundary"
+        "refusal_safety_or_policy_boundary",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "runtime_error_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-RUNTIME-ERROR-BRIDGE-V1",
+      "name": "runtime_error_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-RUNTIME-ERROR-BRIDGE-V2",
       "fixtureClass": "bridge_contract_fixture",
       "result": "runtime_error",
       "familyCoverage": [
         "ac.power",
         "runtime_error"
       ],
-      "sha256": "db65c8c97f11cefdb45d82da90b21a9653056d53f5762fc8a2602c7d50aa889f",
+      "sha256": "c6ffb19a140a91bf9741f6083f296e792f67bd21f1072b871c6cf725b9be3152",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
-        "runtime_error_boundary"
+        "runtime_error_boundary",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "reconciliation_mismatch_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-RECONCILIATION-MISMATCH-BRIDGE-V1",
+      "name": "reconciliation_mismatch_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-RECONCILIATION-MISMATCH-BRIDGE-V2",
       "fixtureClass": "bridge_contract_fixture",
       "result": "accepted_tool_call",
       "familyCoverage": [
         "ac.power",
         "reconciliation_mismatch"
       ],
-      "sha256": "6baee090729ac3c3db7e5d9041cd186d4a7eb993398aae4b2319cd059688f423",
+      "sha256": "b4b87eefdb85ca3a004236f767ff4460563b68ef65654f19735e5da0609a4b44",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
-        "reconciliation_mismatch_boundary"
+        "reconciliation_mismatch_boundary",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "partial_accept_refuse_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V1",
+      "name": "partial_accept_refuse_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V2",
       "fixtureClass": "bridge_contract_fixture",
       "result": "partial_accept_partial_refuse",
       "familyCoverage": [
@@ -105,101 +109,106 @@
         "window.position",
         "partial_accept_partial_refuse"
       ],
-      "sha256": "422ca788dd8f8a7cf708776ec8533c5bfcebe1c7775d557d6d76f023267c97c1",
+      "sha256": "d69e63db1672f06677d5686f5d8e1ff04482c1e47af3a172aaa9232d861106cd",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
-        "partial_accept_partial_refuse_boundary"
+        "partial_accept_partial_refuse_boundary",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "window_position_runtime_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V1",
+      "name": "window_position_runtime_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V2",
       "fixtureClass": "runtime_generated_fixture",
       "result": "accepted_tool_call",
       "familyCoverage": [
         "window.position"
       ],
-      "sha256": "ed6a5dae7a87e52a98181cf7429643afbc40ab85acf681b2923d3dcfc6fbe1e6",
+      "sha256": "2ec1943775b46f0ad1d31719c4a8de89adc3b348db2b92973bea0370dcdc4f11",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
         "runtime_generated_fixture",
-        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback"
+        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "screen_brightness_runtime_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-SCREEN-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+      "name": "screen_brightness_runtime_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-SCREEN-BRIGHTNESS-ACCEPTED-RUNTIME-V2",
       "fixtureClass": "runtime_generated_fixture",
       "result": "accepted_tool_call",
       "familyCoverage": [
         "screen.brightness"
       ],
-      "sha256": "f358b9162fc86d6d1366e06e1d4c4307337f46e7d81d17a104ab0feaa5747e7a",
+      "sha256": "56e1d060fb98a7a86074987d23dbe6e15748b1f970dc1b0c9d21d850541c224c",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
         "runtime_generated_fixture",
-        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback"
+        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "ambient_brightness_runtime_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-AMBIENT-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+      "name": "ambient_brightness_runtime_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-AMBIENT-BRIGHTNESS-ACCEPTED-RUNTIME-V2",
       "fixtureClass": "runtime_generated_fixture",
       "result": "accepted_tool_call",
       "familyCoverage": [
         "ambient.brightness"
       ],
-      "sha256": "717c187cb0bb97c3d802cc4e83d378405104cc464edd325b6478318ee9f1ea7f",
+      "sha256": "89de38c69e654782d66900108a311c23ca315a845daef9c04636829d38e92cc1",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ambient_brightness_runtime_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ambient_brightness_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/ambient_brightness_runtime_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/ambient_brightness_runtime_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
         "runtime_generated_fixture",
-        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback"
+        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback",
+        "v2_voice_orb_mutation"
       ]
     },
     {
-      "name": "window_position_noop_runtime_public_payload.v1.json",
-      "schemaVersion": "r5_runtime_presentation_payload_v1",
-      "caseID": "D22-WINDOW-POSITION-NOOP-RUNTIME-V1",
+      "name": "window_position_noop_runtime_public_payload.v2.json",
+      "schemaVersion": "r5_runtime_presentation_payload_v2",
+      "caseID": "D22-WINDOW-POSITION-NOOP-RUNTIME-V2",
       "fixtureClass": "runtime_generated_fixture",
-      "result": "accepted_tool_call",
+      "result": "already_state_noop",
       "familyCoverage": [
         "window.position",
         "already_state_noop"
       ],
-      "sha256": "f64650e29d2fd3bd138f46379ff863b40cbcc4fc8a801a77540a90c79158791a",
+      "sha256": "84669f0dbfee17c3ddf764d8e30a1c043a74696c616bae1b2c803d9f1696764d",
       "producerRepo": "MAformac",
-      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_noop_runtime_public_payload.v1.json",
+      "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_noop_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
-      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_noop_runtime_public_payload.v1.json",
+      "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_noop_runtime_public_payload.v2.json",
       "proofClass": "local_unit",
       "notes": [
         "presentation_safe_public_fixture",
         "runtime_generated_fixture",
         "already_state_noop_trace_asserted_by_main_test",
-        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback"
+        "generated_via_DemoRuntimeSessionRunner_C3_runtime_adapter_C2_readback",
+        "v2_voice_orb_mutation"
       ]
     }
   ]

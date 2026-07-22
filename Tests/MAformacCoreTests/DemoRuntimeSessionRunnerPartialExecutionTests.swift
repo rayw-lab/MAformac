@@ -14,7 +14,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, refused] }
+            planDecoder: { _ in try self.partialPlan([accepted, refused]) }
         )
 
         let payload = try await runner.run(text: "打开空调并打开车窗")
@@ -77,7 +77,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, refused] }
+            planDecoder: { _ in try self.partialPlan([accepted, refused]) }
         )
 
         let payload = try await runner.run(text: "打开空调并打开车门")
@@ -107,7 +107,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [power, temperature] }
+            planDecoder: { _ in try self.partialPlan([power, temperature]) }
         )
 
         let payload = try await runner.run(text: "打开空调并调到26度")
@@ -132,7 +132,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [first, second] }
+            planDecoder: { _ in try self.partialPlan([first, second]) }
         )
 
         let payload = try await runner.run(text: "打开两个未挂载车窗")
@@ -160,7 +160,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [temperature, refused] }
+            planDecoder: { _ in try self.partialPlan([temperature, refused]) }
         )
 
         let payload = try await runner.run(text: "空调调到26度并打开车窗")
@@ -186,7 +186,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, stale] },
+            planDecoder: { _ in try self.partialPlan([accepted, stale]) },
             alignsFrameStateRevisionToStore: false
         )
 
@@ -225,7 +225,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, unknown] }
+            planDecoder: { _ in try self.partialPlan([accepted, unknown]) }
         )
 
         let payload = try await runner.run(text: "打开空调并执行未知动作")
@@ -254,7 +254,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, badColor] }
+            planDecoder: { _ in try self.partialPlan([accepted, badColor]) }
         )
 
         let payload = try await runner.run(text: "打开空调并把氛围灯调成未知颜色")
@@ -307,7 +307,8 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
                     observedReadbackCount: 0,
                     stateMutation: false
                 )
-            ]
+            ],
+            atomicityContract: .partial
         )
         XCTAssertTrue(DemoRuntimePartialPlan.isReviewed(refused))
         XCTAssertFalse(
@@ -322,7 +323,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, refused] }
+            planDecoder: { _ in try self.partialPlan([accepted, refused]) }
         )
 
         do {
@@ -349,7 +350,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in [accepted, unreviewed] }
+            planDecoder: { _ in try self.partialPlan([accepted, unreviewed]) }
         )
 
         do {
@@ -358,7 +359,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         } catch {
             XCTAssertEqual(
                 error as? DemoRuntimeSessionRunnerError,
-                .multiFramePlanRequiresPartialExecution(frameIDs: ["accepted-ac", "unreviewed-generic"])
+                .multiFramePlanContainsUnreviewedAction(frameIDs: ["accepted-ac", "unreviewed-generic"])
             )
         }
 
@@ -370,7 +371,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
         XCTAssertEqual(
             guardEntry.attributes.guardReason,
-            "multi_frame_plan_requires_partial_execution"
+            "multi_frame_plan_contains_unreviewed_action"
         )
         XCTAssertFalse(trace.entries.contains { $0.stage == .execute })
         XCTAssertFalse(trace.entries.contains { $0.stage == .readback })
@@ -390,7 +391,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             pipeline: try makeRepoPipeline(),
             traceLogger: trace,
             speech: RecordingSpeechSynthesisEngine(),
-            planDecoder: { _ in frames }
+            planDecoder: { _ in try self.partialPlan(frames) }
         )
 
         do {
@@ -466,9 +467,9 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             traceID: traceID,
             agentID: "vehicle-control",
             capabilityID: "cabin.window",
-            toolName: "open_window",
+            toolName: "close_window",
             device: "window",
-            actionPrimitive: "power_on",
+            actionPrimitive: "power_off",
             slots: ["position": "主驾"],
             stateRevision: 0,
             candidateSource: .upstreamToolCall
@@ -557,6 +558,17 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
         )
     }
 
+    private func partialPlan(_ frames: [ToolCallFrame]) throws -> RuntimePlan {
+        guard let traceID = frames.first?.traceID else {
+            throw RuntimePlanError.emptyFrames
+        }
+        return try RuntimePlan(
+            traceID: traceID,
+            frames: frames.map(RuntimeFrame.tool),
+            executionPolicy: .partial
+        )
+    }
+
     private func readRepoFile(_ relativePath: String) throws -> String {
         let testFile = URL(fileURLWithPath: #filePath)
         let repoRoot = testFile
@@ -574,7 +586,7 @@ final class DemoRuntimeSessionRunnerPartialExecutionTests: XCTestCase {
             .deletingLastPathComponent()
         let fixtureURL = repoRoot
             .appendingPathComponent("Tests/Fixtures/RuntimePresentationPayload")
-            .appendingPathComponent("partial_accept_refuse_public_payload.v1.json")
+            .appendingPathComponent("partial_accept_refuse_public_payload.v2.json")
         let object = try JSONSerialization.jsonObject(with: Data(contentsOf: fixtureURL))
         return try XCTUnwrap(object as? [String: Any])
     }
