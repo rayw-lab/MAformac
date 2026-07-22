@@ -31,7 +31,7 @@ working_tree_postdates_handoff: true
 
 ## 下一步（pre-G0；非 AF-G0 GO）
 
-1. **P0-a（修 CI）**：`5d532b29` 修了 handoff 链；下一跳补 CG-080 baseline + matrix rematerialize（mounted=5 与 D123 32/82/1/5 对齐，`actionDemoProven` 仍 0/120）。禁装入「三族可演示」叙事。
+1. **P0-a（修 CI）**：`5a497a8e` 已级联 CG-080/matrix；本跳 reanchor closure（`E_STALE_BASIS`）。`actionDemoProven` 仍 0/120；禁「三族可演示」。
 2. release-only：UI-E2E workflow 已随 push 触发（尚未 required）；C5 env、E3 人类证据另账。
 3. 阶段收口审计对本波 FA-1..4 判 **PASS_WITH_FIXES**；权威级联已补；仍 **AF-G0=RED / PAUSED** 直至 `verify` 绿 + 明确裁决。
 4. 任何阶段切换、发布或范围变更都使用最新 handoff 的 stopline；**不得因 Ballot/FA 闭合而自动解冻 Phase2 实施**。
