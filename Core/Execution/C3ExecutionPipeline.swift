@@ -600,6 +600,7 @@ public struct C3ExecutionPipeline: Sendable {
             "value.direct=\(frame.value.direct)",
             "value.offset=\(frame.value.offset)",
             "value.type=\(frame.value.type)",
+            "value.sourceUnit=\(frame.value.sourceUnit?.rawValue ?? "")",
             "state_revision=\(frame.stateRevision)",
             "source=\(frame.candidateSource.rawValue)"
         ].joined(separator: "\u{1F}")
@@ -700,7 +701,8 @@ public struct C3ExecutionPipeline: Sendable {
             throw ToolExecutionError.semanticInvalid("missing_execution_range")
         }
 
-        let current = Int(store.cell(for: key)?.actualValue ?? "") ?? range.min
+        // G1: never fail-open missing/non-integer current to range.min.
+        // Absolute power/max/min paths do not need current; relative/query paths refuse.
         let desired: Int
         switch frame.actionPrimitive {
         case "power_on":
@@ -715,7 +717,7 @@ public struct C3ExecutionPipeline: Sendable {
         case "adjust_to_min":
             desired = cell.extremeMap["MIN"] ?? range.min
         default:
-            desired = try normalizeNumericValue(frame: frame, cell: cell, current: current, range: range)
+            desired = try normalizeNumericValue(frame: frame, cell: cell, key: key, store: store, range: range)
         }
 
         guard range.contains(desired) else {
@@ -724,37 +726,130 @@ public struct C3ExecutionPipeline: Sendable {
         return String(desired)
     }
 
+    @MainActor
+    private func requireIntegerCurrent(store: DemoVehicleStateStore, key: String) throws -> Int {
+        guard let raw = store.cell(for: key)?.actualValue, let value = Int(raw) else {
+            throw ToolExecutionError.semanticInvalid("malformed_current")
+        }
+        return value
+    }
+
+    @MainActor
     private func normalizeNumericValue(
         frame: ToolCallFrame,
         cell: StateCellDefinition,
-        current: Int,
+        key: String,
+        store: DemoVehicleStateStore,
         range: ExecutionRange
     ) throws -> Int {
+        // B09: relative Fahrenheit is fail-closed this wave.
+        if frame.value.sourceUnit == .fahrenheit,
+           frame.value.ref == "CUR" || frame.value.type == "EXP" {
+            throw ToolExecutionError.semanticInvalid("unsupported_unit_reference")
+        }
+
         switch frame.value.type {
         case "EXP":
+            let current = try requireIntegerCurrent(store: store, key: key)
             let step = cell.expStepLittle ?? range.step
-            let sign = frame.value.direct == "-" || frame.actionPrimitive.hasPrefix("decrease") ? -1 : 1
-            return current + sign * step
+            let decreasing = frame.value.direct == "-" || frame.actionPrimitive.hasPrefix("decrease")
+            return try checkedAdd(current: current, delta: step, decreasing: decreasing)
         case "SPOT", "PERCENT":
             let numericValue = frame.value.offset.isEmpty ? frame.value.direct : frame.value.offset
-            if let numeric = Int(numericValue) {
-                if frame.value.ref == "CUR" {
-                    let sign = frame.value.direct == "-" ? -1 : 1
-                    return current + sign * numeric
-                }
-                return numeric
-            }
             if let gear = cell.gearMap[numericValue] {
+                if frame.value.ref == "CUR" {
+                    let current = try requireIntegerCurrent(store: store, key: key)
+                    let decreasing = frame.value.direct == "-"
+                    return try checkedAdd(current: current, delta: gear, decreasing: decreasing)
+                }
                 return gear
             }
-            throw ToolExecutionError.schemaInvalid(.typeMismatch("value.offset"))
+
+            let rational: ExactRational
+            do {
+                rational = try ExactRational.parse(numericValue)
+            } catch ExactRational.ParseFailure.lexicalInvalid {
+                throw ToolExecutionError.semanticInvalid("lexical_invalid")
+            } catch ExactRational.ParseFailure.numericOverflow {
+                throw ToolExecutionError.semanticInvalid("numeric_overflow")
+            } catch ExactRational.ParseFailure.unsupportedPrecision {
+                throw ToolExecutionError.semanticInvalid("unsupported_precision")
+            } catch {
+                throw ToolExecutionError.schemaInvalid(.typeMismatch("value.offset"))
+            }
+
+            if frame.value.ref == "CUR" {
+                let current = try requireIntegerCurrent(store: store, key: key)
+                let delta64: Int64
+                do {
+                    delta64 = try rational.exactInt64()
+                } catch {
+                    throw ToolExecutionError.semanticInvalid("unsupported_precision")
+                }
+                guard let delta = Int(exactly: delta64) else {
+                    throw ToolExecutionError.semanticInvalid("arithmetic_overflow")
+                }
+                let decreasing = frame.value.direct == "-"
+                return try checkedAdd(current: current, delta: delta, decreasing: decreasing)
+            }
+
+            let canonical: ExactRational
+            do {
+                switch frame.value.sourceUnit {
+                case .fahrenheit:
+                    canonical = try rational.celsiusFromFahrenheit()
+                case .celsius, .none:
+                    canonical = rational
+                }
+            } catch ExactRational.ArithmeticFailure.numericOverflow {
+                throw ToolExecutionError.semanticInvalid("numeric_overflow")
+            } catch ExactRational.ArithmeticFailure.arithmeticOverflow {
+                throw ToolExecutionError.semanticInvalid("arithmetic_overflow")
+            } catch ExactRational.ArithmeticFailure.unsupportedPrecision {
+                throw ToolExecutionError.semanticInvalid("unsupported_precision")
+            } catch {
+                throw ToolExecutionError.semanticInvalid("unsupported_precision")
+            }
+
+            do {
+                return try canonical.integerMultiple(ofStep: range.step)
+            } catch ExactRational.ArithmeticFailure.unsupportedPrecision {
+                throw ToolExecutionError.semanticInvalid("unsupported_precision")
+            } catch ExactRational.ArithmeticFailure.numericOverflow {
+                throw ToolExecutionError.semanticInvalid("numeric_overflow")
+            } catch {
+                throw ToolExecutionError.semanticInvalid("unsupported_precision")
+            }
         case "":
             if frame.actionPrimitive == "query" {
-                return current
+                return try requireIntegerCurrent(store: store, key: key)
             }
             throw ToolExecutionError.schemaInvalid(.missingField("value.type"))
         default:
             throw ToolExecutionError.schemaInvalid(.unknownEnum("value.type"))
         }
+    }
+
+    private func checkedAdd(current: Int, delta: Int, decreasing: Bool) throws -> Int {
+        let current64 = Int64(current)
+        let delta64 = Int64(delta)
+        let result64: Int64
+        if decreasing {
+            let (sum, overflow) = current64.subtractingReportingOverflow(delta64)
+            if overflow {
+                throw ToolExecutionError.semanticInvalid("arithmetic_overflow")
+            }
+            result64 = sum
+        } else {
+            let (sum, overflow) = current64.addingReportingOverflow(delta64)
+            if overflow {
+                throw ToolExecutionError.semanticInvalid("arithmetic_overflow")
+            }
+            result64 = sum
+        }
+        guard let result = Int(exactly: result64) else {
+            throw ToolExecutionError.semanticInvalid("arithmetic_overflow")
+        }
+        return result
     }
 }

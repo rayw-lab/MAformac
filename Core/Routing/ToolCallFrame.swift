@@ -191,6 +191,9 @@ public struct ToolCallFrame: Codable, Equatable, Sendable, Identifiable {
         result["value.direct"] = value.direct
         result["value.offset"] = value.offset
         result["value.type"] = value.type
+        if let sourceUnit = value.sourceUnit {
+            result["value.sourceUnit"] = sourceUnit.rawValue
+        }
         result["state_revision"] = String(stateRevision)
         if candidateSource == .fastPath {
             result["state_key"] = device
@@ -518,11 +521,25 @@ public struct ToolCallCandidateDecoder: Sendable {
             }
             throw ToolExecutionError.schemaInvalid(.typeMismatch("value.\(key)"))
         }
+        let sourceUnit: ContractSourceUnit?
+        if let rawUnit = map["sourceUnit"] ?? map["source_unit"] {
+            if let unitString = rawUnit as? String, !unitString.isEmpty {
+                guard let parsed = ContractSourceUnit(rawValue: unitString) else {
+                    throw ToolExecutionError.schemaInvalid(.unknownEnum("value.sourceUnit"))
+                }
+                sourceUnit = parsed
+            } else {
+                throw ToolExecutionError.schemaInvalid(.typeMismatch("value.sourceUnit"))
+            }
+        } else {
+            sourceUnit = nil
+        }
         return ContractValue(
             ref: try string("ref"),
             direct: try string("direct"),
             offset: try string("offset"),
-            type: try string("type")
+            type: try string("type"),
+            sourceUnit: sourceUnit
         )
     }
 

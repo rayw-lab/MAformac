@@ -278,8 +278,17 @@ public enum ToolContractNormalizer {
               let actionPrimitive = call.arguments["action_primitive"] else {
             return []
         }
-        let reserved = Set(["device", "action_primitive", "value.ref", "value.direct", "value.offset", "value.type"])
+        let reserved = Set([
+            "device",
+            "action_primitive",
+            "value.ref",
+            "value.direct",
+            "value.offset",
+            "value.type",
+            "value.sourceUnit"
+        ])
         let slots = call.arguments.filter { !reserved.contains($0.key) }
+        let sourceUnit = call.arguments["value.sourceUnit"].flatMap(ContractSourceUnit.init(rawValue:))
         return [
             ToolContractIR(
                 sourceToolName: call.name,
@@ -290,7 +299,8 @@ public enum ToolContractNormalizer {
                     ref: call.arguments["value.ref"] ?? "",
                     direct: call.arguments["value.direct"] ?? "",
                     offset: call.arguments["value.offset"] ?? "",
-                    type: call.arguments["value.type"] ?? ""
+                    type: call.arguments["value.type"] ?? "",
+                    sourceUnit: sourceUnit
                 ),
                 rawArguments: call.arguments
             )

@@ -123,15 +123,35 @@ public enum DDomainToolCallParser {
     }
 
     private static func stringify(_ arguments: [String: Any]) -> [String: String] {
-        arguments.compactMapValues { value in
+        // G1: unit-aware numeric keys must keep string tokens (or integer NSNumber).
+        // Do not accept floating NSNumber as an exact numeric source (Double→stringify banned).
+        let exactNumericKeys: Set<String> = ["temperature", "fanSpeed", "value", "value.direct", "value.offset"]
+        var result: [String: String] = [:]
+        for (key, value) in arguments {
             switch value {
             case let string as String:
-                return string
+                result[key] = string
             case let number as NSNumber:
-                return number.stringValue
+                if exactNumericKeys.contains(key) {
+                    // Bool bridged as NSNumber — reject as numeric source.
+                    if CFGetTypeID(number) == CFBooleanGetTypeID() {
+                        continue
+                    }
+                    let dual = number.doubleValue
+                    guard dual.rounded() == dual,
+                          number.int64Value == Int64(dual),
+                          dual >= Double(Int64.min),
+                          dual <= Double(Int64.max) else {
+                        continue
+                    }
+                    result[key] = String(number.int64Value)
+                } else {
+                    result[key] = number.stringValue
+                }
             default:
-                return nil
+                continue
             }
         }
+        return result
     }
 }

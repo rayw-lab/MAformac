@@ -1,16 +1,32 @@
 import Foundation
 
+/// Source unit carried on `ContractValue` only (not on `ToolCallFrame`).
+/// Omitted / nil means unspecified → C3 treats absolute numeric as Celsius (B09).
+public enum ContractSourceUnit: String, Codable, Sendable {
+    case celsius
+    case fahrenheit
+}
+
 public struct ContractValue: Codable, Equatable, Sendable {
     public var ref: String
     public var direct: String
     public var offset: String
     public var type: String
+    /// Optional typed source unit; unique unit field (Round 5 / G1). Lexeme stays in `direct`/`offset`.
+    public var sourceUnit: ContractSourceUnit?
 
-    public init(ref: String = "", direct: String = "", offset: String = "", type: String = "") {
+    public init(
+        ref: String = "",
+        direct: String = "",
+        offset: String = "",
+        type: String = "",
+        sourceUnit: ContractSourceUnit? = nil
+    ) {
         self.ref = ref
         self.direct = direct
         self.offset = offset
         self.type = type
+        self.sourceUnit = sourceUnit
     }
 }
 

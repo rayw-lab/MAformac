@@ -6,8 +6,9 @@ latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G0_INVENTORY_AUTHORIZED
+phase2_product_coding: G1_FIRST_KNIFE_IN_PROGRESS
 phase2_coding_gate: PHASE2_CODING_GATED
+g0_status: G0_COMPLETE
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -18,7 +19,7 @@ phase2_coding_gate: PHASE2_CODING_GATED
 ## Live 真态（2026-07-22）
 
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
-- **`phase2_product_coding: G0_INVENTORY_AUTHORIZED`**；**`PHASE2_CODING_GATED`**：AF-G0 本裁决 **alone 不授权** Phase2 产品编码。磊哥「多路开干」仅覆盖 **G0 只读 inventory**（仓外 run-root 产物已有；异源抽核另路进行中）。G1+ 产品改码仍须对照冻结 plan，且不得演示 / 抬 proven。
+- **G0 inventory COMPLETE**（异源审 12/12 `G0_AUDIT_PASS`；仓外 `PHASE2-G0-COMPLETE-CLOSEOUT.md`）→ **G1 进行中**（plan 首刀：`sourceUnit` / ExactRational / 删 C3 `:703` fail-open）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
@@ -32,9 +33,9 @@ phase2_coding_gate: PHASE2_CODING_GATED
 2. 读本页 frontmatter 指向的最新 handoff + GO receipt。
 3. 需要状态时 live 重核 Git / remote Verify / Makefile recipe / matrix proven。
 
-## 下一步（Phase2 G0 inventory）
+## 下一步（Phase2 G1 首刀）
 
-1. **G0 inventory（只读）**：按冻结计划 DAG 抽核 live 锚；打不开/不符即整体 RED，不进 G1。仓外 run-root 盘点已落；异源抽核另路。
+1. **G1 typed value（进行中）**：`ContractValue.sourceUnit` + ExactRational + 关闭 C3 `:703` fail-open；对照冻结 plan，RED→GREEN→smoke。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 3. residual 强制账（不因本裁决消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 
@@ -69,10 +70,10 @@ phase2_coding_gate: PHASE2_CODING_GATED
 - 禁止修改 / commit protected：`CLAUDE.md`、`docs/lessons-learned.md`、`docs/project/collaboration-and-roles.md`、`docs/commander-log/COMMANDER-PLAYBOOK-ma10-ma18-for-codex.md`。
 - 禁止演示或合并后三族 candidate；禁止把 candidate 计入 `actionDemoProven`。
 - 禁止把 `AF-G0_GO_WITH_RESIDUALS` 外推为 release-ready / 真车可用 / 三族可演 / Phase2 产品编码全面解冻。
-- 禁止仅凭 AF-G0 裁决写「implementation unpaused」或自动开 G1+ 产品改码。
+- 禁止仅凭 AF-G0 裁决写「implementation unpaused」或把 G1 首刀外推为 G1–G9 全面解冻。
 
 ## Non-claims
 
 - 本页不声称三族可演示、proven>0、模型已接入、真车可用、UI-E2E required 绿、full suite 绿或产品已发布。
 - 本页不授予 promotion、公开发布或破坏性 git 权限。
-- 本页不声称 AF-G0  alone 已授权 Phase2 产品编码；仅 `G0_INVENTORY_AUTHORIZED`。
+- 本页不声称 AF-G0 alone 已全面解冻 Phase2；G0 COMPLETE 仅解锁对照冻结 plan 的 **G1 首刀**（仍 `PHASE2_CODING_GATED`）。

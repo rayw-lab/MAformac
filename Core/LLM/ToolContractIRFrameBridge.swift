@@ -11,7 +11,8 @@ public enum ToolContractIRFrameBridge {
             throw DDomainToolPlanFailure.bridgeFailed(ir.sourceToolName)
         }
         let projectedSlots = ir.slots.filter { projectedSlotKeys.contains($0.key) }
-        let valueArgumentKeys: Set<String> = ["temperature", "fanSpeed", "value", "value.type"]
+        // value.* (incl. sourceUnit on ContractValue) is carried via `ir.value`, not slot projection.
+        let valueArgumentKeys: Set<String> = ["temperature", "fanSpeed", "value", "value.type", "value.sourceUnit"]
         let projectedOutSlotKeys = Set(ir.slots.keys)
             .subtracting(projectedSlotKeys)
             .subtracting(valueArgumentKeys)
@@ -23,7 +24,7 @@ public enum ToolContractIRFrameBridge {
             device: ir.device,
             actionPrimitive: ir.actionPrimitive,
             slots: projectedSlots,
-            value: ir.value,
+            value: ir.value, // G1: sourceUnit end-to-end passthrough on ContractValue
             candidateSource: .modelRouter,
             rawPayload: redactedRawPayload(for: rawCall, slotProjected: !projectedOutSlotKeys.isEmpty),
             doNotAutoPowerOn: ir.doNotAutoPowerOn
