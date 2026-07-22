@@ -470,18 +470,41 @@ def check(repo_root: Path) -> dict[str, Any]:
     raw_t0 = registry.get("finiteReason_enum", [])
     t0_values = raw_t0 if isinstance(raw_t0, list) and all(isinstance(v, str) for v in raw_t0) else []
     t0_set = set(t0_values)
+    # Phase1 core ten + G5 knife2 typed reasons (numeric/query/contract/cancel).
+    # Count is not frozen; required core membership + projection totality gate drift.
+    REQUIRED_CORE_T0 = (
+        "safety_or_policy_refusal",
+        "clarify_missing_slot",
+        "unmounted_tool_name",
+        "name_rejected",
+        "fast_path_no_match",
+        "unsupported_tool_plan",
+        "no_representative_tool",
+        "runtime_execution_error",
+        "stale_state_revision",
+        "already_state_noop",
+    )
     projections = registry.get("finiteReason_projections", [])
     projection_values = [
         item.get("finiteReason")
         for item in projections
         if isinstance(item, dict) and isinstance(item.get("finiteReason"), str)
     ] if isinstance(projections, list) else []
-    if len(t0_values) != 10 or len(t0_set) != 10:
+    if len(t0_values) != len(t0_set):
         violations.append(
             violation(
                 "E_T0_LOCKED_SET_CHANGED",
                 REGISTRY,
-                f"expected exactly 10 unique T0 members, got {len(t0_values)} values/{len(t0_set)} unique",
+                f"T0 finiteReason_enum has duplicates: {len(t0_values)} values/{len(t0_set)} unique",
+            )
+        )
+    missing_core = [item for item in REQUIRED_CORE_T0 if item not in t0_set]
+    if missing_core:
+        violations.append(
+            violation(
+                "E_T0_LOCKED_SET_CHANGED",
+                REGISTRY,
+                f"required Phase1 core T0 members missing: {missing_core}",
             )
         )
     if sorted(projection_values) != sorted(t0_values):

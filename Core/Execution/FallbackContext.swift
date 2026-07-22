@@ -238,6 +238,36 @@ public struct FallbackContext: Codable, Equatable, Sendable {
         case .alreadyDone:
             dialogText = "当前已经是目标状态，无需重复操作。"
             badgeLabel = "已完成"
+        case .lexicalInvalid:
+            dialogText = "输入格式无效，请换个说法，车辆状态保持不变。"
+            badgeLabel = "格式无效"
+        case .numericOverflow:
+            dialogText = "数值超出可处理范围，车辆状态保持不变。"
+            badgeLabel = "数值溢出"
+        case .unsupportedPrecision:
+            dialogText = "精度不受支持，请使用整数或合法步进，车辆状态保持不变。"
+            badgeLabel = "精度不支持"
+        case .outOfRange:
+            dialogText = "目标超出可调范围，车辆状态保持不变。"
+            badgeLabel = "超出范围"
+        case .malformedCurrent:
+            dialogText = "当前状态异常，无法据此计算，车辆状态保持不变。"
+            badgeLabel = "状态异常"
+        case .unsupportedUnitReference:
+            dialogText = "该单位用法不受支持，车辆状态保持不变。"
+            badgeLabel = "单位不支持"
+        case .contractViolation:
+            dialogText = "当前输入不符合演示契约，车辆状态保持不变。"
+            badgeLabel = "约定不符"
+        case .stateQuery:
+            dialogText = "已查询当前状态"
+            badgeLabel = "状态查询"
+        case .capabilityQuery:
+            dialogText = "已查询可调范围"
+            badgeLabel = "能力查询"
+        case .cancelTooLate:
+            dialogText = "当前操作已提交，无法取消。"
+            badgeLabel = "取消过晚"
         }
         return FallbackContext(
             family: family,

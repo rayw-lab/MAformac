@@ -39,7 +39,18 @@
     "no_representative_tool",
     "runtime_execution_error",
     "stale_state_revision",
-    "already_state_noop"
+    "already_state_noop",
+    "lexical_invalid",
+    "numeric_overflow",
+    "arithmetic_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late"
   ],
   "fallback_reason_enum": [
     "safety_policy_refused",
@@ -48,7 +59,18 @@
     "unsupported_no_available_tool",
     "no_representative_tool__default_fallback",
     "runtime_error_typed",
-    "already_state_noop"
+    "already_state_noop",
+    "lexical_invalid",
+    "numeric_overflow",
+    "arithmetic_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late"
   ],
   "reasonKind_enum": [
     "safety_policy",
@@ -56,14 +78,28 @@
     "capability_not_mounted",
     "not_available_in_demo",
     "runtime_unavailable",
-    "already_done"
+    "already_done",
+    "lexical_invalid",
+    "numeric_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late"
   ],
   "bridge_result_enum": [
     "refusal_safety_or_policy",
     "clarify_missing_slot",
     "refusal_no_available_tool",
     "runtime_error",
-    "already_state_noop"
+    "already_state_noop",
+    "refusal_contract_violation",
+    "state_query",
+    "capability_query",
+    "cancelled"
   ],
   "finiteReason_projections": [
     {"finiteReason": "safety_or_policy_refusal", "fallback_reason": "safety_policy_refused", "reasonKind": "safety_policy", "bridge_result": "refusal_safety_or_policy"},
@@ -75,7 +111,18 @@
     {"finiteReason": "no_representative_tool", "fallback_reason": "no_representative_tool__default_fallback", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
     {"finiteReason": "runtime_execution_error", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
     {"finiteReason": "stale_state_revision", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
-    {"finiteReason": "already_state_noop", "fallback_reason": "already_state_noop", "reasonKind": "already_done", "bridge_result": "already_state_noop"}
+    {"finiteReason": "already_state_noop", "fallback_reason": "already_state_noop", "reasonKind": "already_done", "bridge_result": "already_state_noop"},
+    {"finiteReason": "lexical_invalid", "fallback_reason": "lexical_invalid", "reasonKind": "lexical_invalid", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "numeric_overflow", "fallback_reason": "numeric_overflow", "reasonKind": "numeric_overflow", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "arithmetic_overflow", "fallback_reason": "arithmetic_overflow", "reasonKind": "numeric_overflow", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "unsupported_precision", "fallback_reason": "unsupported_precision", "reasonKind": "unsupported_precision", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "out_of_range", "fallback_reason": "out_of_range", "reasonKind": "out_of_range", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "malformed_current", "fallback_reason": "malformed_current", "reasonKind": "malformed_current", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "unsupported_unit_reference", "fallback_reason": "unsupported_unit_reference", "reasonKind": "unsupported_unit_reference", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "contract_violation", "fallback_reason": "contract_violation", "reasonKind": "contract_violation", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "state_query", "fallback_reason": "state_query", "reasonKind": "state_query", "bridge_result": "state_query"},
+    {"finiteReason": "capability_query", "fallback_reason": "capability_query", "reasonKind": "capability_query", "bridge_result": "capability_query"},
+    {"finiteReason": "cancel_too_late", "fallback_reason": "cancel_too_late", "reasonKind": "cancel_too_late", "bridge_result": "cancelled"}
   ],
   "fallback_catalog_buckets": [
     {"reason_kind": "safety_or_clarify_reject", "finite_reasons": ["safety_or_policy_refusal", "clarify_missing_slot"]},

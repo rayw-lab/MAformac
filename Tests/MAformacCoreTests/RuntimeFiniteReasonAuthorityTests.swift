@@ -18,7 +18,7 @@ final class RuntimeFiniteReasonAuthorityTests: XCTestCase {
     }
 
     func testRuntimeFiniteReasonRejectsOutsideT0AtDecodeBoundary() throws {
-        XCTAssertEqual(RuntimeFiniteReason.allCases.count, 10)
+        XCTAssertEqual(RuntimeFiniteReason.allCases.count, 21)
         XCTAssertThrowsError(
             try JSONDecoder().decode(
                 RuntimeFiniteReason.self,
@@ -183,7 +183,58 @@ final class RuntimeFiniteReasonAuthorityTests: XCTestCase {
             .init(userText: "香氛", finiteReason: .alreadyStateNoop, family: .fragrance, result: .alreadyStateNoop, safeReason: .alreadyDone, dialogText: "当前已经是目标状态，无需重复操作。", ttsText: "当前已经是目标状态，无需重复操作。", badgeLabel: "已完成"),
         ]
 
-        XCTAssertEqual(cases.count, 100)
+        // G5 knife2 typed reasons: shared Chinese copy by SafeReasonKind (no catalog bucket expansion).
+        // Literal oracle — do not derive from generated RuntimePresentationReasonAuthority projections.
+        let g5FamilyHints: [(userText: String, family: FallbackScriptFamily?)] = [
+            ("空调", .ac),
+            ("座椅", .seat),
+            ("车窗", .window),
+            ("车门", .door),
+            ("氛围灯", .ambient),
+            ("中控屏", .screen),
+            ("音量", .volume),
+            ("雨刷", .wiper),
+            ("遮阳帘", .sunroofShade),
+            ("香氛", .fragrance),
+        ]
+        let g5ReasonOracle: [(
+            finiteReason: RuntimeFiniteReason,
+            result: DemoRuntimeResult,
+            safeReason: RuntimePresentationSafeReasonKind,
+            dialogText: String,
+            badgeLabel: String
+        )] = [
+            (.lexicalInvalid, .refusalContractViolation, .lexicalInvalid, "输入格式无效，请换个说法，车辆状态保持不变。", "格式无效"),
+            (.numericOverflow, .refusalContractViolation, .numericOverflow, "数值超出可处理范围，车辆状态保持不变。", "数值溢出"),
+            (.arithmeticOverflow, .refusalContractViolation, .numericOverflow, "数值超出可处理范围，车辆状态保持不变。", "数值溢出"),
+            (.unsupportedPrecision, .refusalContractViolation, .unsupportedPrecision, "精度不受支持，请使用整数或合法步进，车辆状态保持不变。", "精度不支持"),
+            (.outOfRange, .refusalContractViolation, .outOfRange, "目标超出可调范围，车辆状态保持不变。", "超出范围"),
+            (.malformedCurrent, .refusalContractViolation, .malformedCurrent, "当前状态异常，无法据此计算，车辆状态保持不变。", "状态异常"),
+            (.unsupportedUnitReference, .refusalContractViolation, .unsupportedUnitReference, "该单位用法不受支持，车辆状态保持不变。", "单位不支持"),
+            (.contractViolation, .refusalContractViolation, .contractViolation, "当前输入不符合演示契约，车辆状态保持不变。", "约定不符"),
+            (.stateQuery, .stateQuery, .stateQuery, "已查询当前状态", "状态查询"),
+            (.capabilityQuery, .capabilityQuery, .capabilityQuery, "已查询可调范围", "能力查询"),
+            (.cancelTooLate, .cancelled, .cancelTooLate, "当前操作已提交，无法取消。", "取消过晚"),
+        ]
+        var allCases = cases
+        for hint in g5FamilyHints {
+            for oracle in g5ReasonOracle {
+                allCases.append(
+                    .init(
+                        userText: hint.userText,
+                        finiteReason: oracle.finiteReason,
+                        family: hint.family,
+                        result: oracle.result,
+                        safeReason: oracle.safeReason,
+                        dialogText: oracle.dialogText,
+                        ttsText: oracle.dialogText,
+                        badgeLabel: oracle.badgeLabel
+                    )
+                )
+            }
+        }
+
+        XCTAssertEqual(allCases.count, 210)
         let expectedReasons: Set<RuntimeFiniteReason> = [
             .safetyOrPolicyRefusal,
             .clarifyMissingSlot,
@@ -195,13 +246,25 @@ final class RuntimeFiniteReasonAuthorityTests: XCTestCase {
             .runtimeExecutionError,
             .staleStateRevision,
             .alreadyStateNoop,
+            .lexicalInvalid,
+            .numericOverflow,
+            .arithmeticOverflow,
+            .unsupportedPrecision,
+            .outOfRange,
+            .malformedCurrent,
+            .unsupportedUnitReference,
+            .contractViolation,
+            .stateQuery,
+            .capabilityQuery,
+            .cancelTooLate,
         ]
+        XCTAssertEqual(expectedReasons, Set(RuntimeFiniteReason.allCases))
         for userText in ["空调", "座椅", "车窗", "车门", "氛围灯", "中控屏", "音量", "雨刷", "遮阳帘", "香氛"] {
-            let familyCells = cases.filter { $0.userText == userText }
-            XCTAssertEqual(familyCells.count, 10, userText)
+            let familyCells = allCases.filter { $0.userText == userText }
+            XCTAssertEqual(familyCells.count, 21, userText)
             XCTAssertEqual(Set(familyCells.map(\.finiteReason)), expectedReasons, userText)
         }
-        for expected in cases {
+        for expected in allCases {
             let coordinate = "\(expected.userText)/\(expected.finiteReason.rawValue)"
             let context = FallbackContext.resolve(userText: expected.userText, finiteReason: expected.finiteReason)
 
@@ -231,9 +294,20 @@ final class RuntimeFiniteReasonAuthorityTests: XCTestCase {
             (.runtimeExecutionError, "runtime_execution_error", "runtime_unavailable"),
             (.staleStateRevision, "stale_state_revision", "runtime_unavailable"),
             (.alreadyStateNoop, "already_state_noop", "already_done"),
+            (.lexicalInvalid, "lexical_invalid", "lexical_invalid"),
+            (.numericOverflow, "numeric_overflow", "numeric_overflow"),
+            (.arithmeticOverflow, "arithmetic_overflow", "numeric_overflow"),
+            (.unsupportedPrecision, "unsupported_precision", "unsupported_precision"),
+            (.outOfRange, "out_of_range", "out_of_range"),
+            (.malformedCurrent, "malformed_current", "malformed_current"),
+            (.unsupportedUnitReference, "unsupported_unit_reference", "unsupported_unit_reference"),
+            (.contractViolation, "contract_violation", "contract_violation"),
+            (.stateQuery, "state_query", "state_query"),
+            (.capabilityQuery, "capability_query", "capability_query"),
+            (.cancelTooLate, "cancel_too_late", "cancel_too_late"),
         ]
 
-        XCTAssertEqual(cases.count, 10)
+        XCTAssertEqual(cases.count, 21)
         for expected in cases {
             let traceID = "trace-hardcoded-\(expected.rawValue)"
             let attributes = TraceAttributes(finiteReason: expected.finiteReason)

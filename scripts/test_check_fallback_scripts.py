@@ -245,8 +245,13 @@ class FallbackScriptsCheckerTests(unittest.TestCase):
     def test_checker_emits_follow_up_observation_for_each_reason_specific_cell(self) -> None:
         result, receipt = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(len(receipt["follow_up_fact_observations"]), 40)
-        reasons = {entry["reason_kind"] for entry in receipt["follow_up_fact_observations"]}
+        resolutions = [
+            entry
+            for entry in receipt["follow_up_fact_observations"]
+            if "reason_kind" in entry and "kind" not in entry
+        ]
+        self.assertEqual(len(resolutions), 40)
+        reasons = {entry["reason_kind"] for entry in resolutions}
         self.assertEqual(
             reasons,
             {

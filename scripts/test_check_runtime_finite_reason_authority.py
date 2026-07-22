@@ -104,7 +104,7 @@ class RuntimeFiniteReasonAuthorityCheckerTests(unittest.TestCase):
             "Tests/MAformacCoreTests/RuntimeFiniteReasonAuthorityTests.swift",
             payload.get("scan_coverage", []),
         )
-        self.assertEqual(payload.get("t0_count"), 10)
+        self.assertEqual(payload.get("t0_count"), 21)
         self.assertEqual(payload.get("violations"), [])
 
     def assert_behavior_gate_missing(self, method: str, replacement: str) -> None:
