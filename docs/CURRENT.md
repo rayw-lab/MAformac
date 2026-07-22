@@ -6,12 +6,12 @@ latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G3_KNIFE3_ROW167_COMPOUND_GREEN
+phase2_product_coding: G3_COMPLETE
 phase2_coding_gate: PHASE2_CODING_GATED
 g0_status: G0_COMPLETE
 g1_status: G1_FIRST_KNIFE_GREEN
 g2_status: G2_RESIDUAL_GREEN
-g3_status: G3_KNIFE3_ROW167_COMPOUND_GREEN
+g3_status: G3_COMPLETE
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -22,7 +22,7 @@ g3_status: G3_KNIFE3_ROW167_COMPOUND_GREEN
 ## Live 真态（2026-07-23）
 
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
-- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 首刀 GREEN**（`4f38ab14` fresh-risk）→ **G3 刀2 GREEN**（`15c6476a` window CUR）→ **G3 刀3 GREEN**（row167 compound atomic 0–3 / rollback；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
+- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 COMPLETE**（刀1 fresh-risk `4f38ab14` → 刀2 window CUR `15c6476a` → 刀3 row167 compound `f37e0397` → 刀4 四族行为门+smoke；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
@@ -36,11 +36,11 @@ g3_status: G3_KNIFE3_ROW167_COMPOUND_GREEN
 2. 读本页 frontmatter 指向的最新 handoff + GO receipt。
 3. 需要状态时 live 重核 Git / remote Verify / Makefile recipe / matrix proven。
 
-## 下一步（Phase2 G3）
+## 下一步（Phase2 G4）
 
-1. **G3 刀3（row167 compound atomic）合入本树后**：下一刀串行 **子块4 四族行为门扩展 + G3 smoke**（禁与本刀同 commit 抢做）。
-2. 严格遵守 shared-file 串行 owner（`C3ExecutionPipeline` / `ContractLookups`）；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-3. residual 强制账（不因本裁决消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；°F 准入已闭；四族行为门扩展仍属后续 G3 刀。
+1. **G3 工程四子块本地 COMPLETE** 后：下一波 **G4 Turn Lease / cancel / last-intent-wins**（释放 C3 独占写锁；禁与 G3 同 commit 抢做）。
+2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
+3. residual 强制账（不因 G3 收口消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 
 ## 隔离后产品真态（candidate 口径）
 

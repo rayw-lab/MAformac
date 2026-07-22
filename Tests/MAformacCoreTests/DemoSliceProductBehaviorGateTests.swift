@@ -1,10 +1,13 @@
 import XCTest
 @testable import MAformacCore
 
-/// Phase 1a golden E2E gate: 12 条产品行为门。
+/// Phase 1a golden + G3 四族 mutation/readback 行为门。
 /// 元断言：每条必经 DemoSliceRoute.route(text:) 真实解析路径。
 /// 禁：直接构造帧 / 自定义解码器 / 预设规划器注入。
+/// 后三族仍为 Phase2 candidate：本门只证静止态 mutation/readback，不抬 proven / 不授权演示。
 final class DemoSliceProductBehaviorGateTests: XCTestCase {
+
+    private let windowMovingRefuse = "行驶中为了安全暂时不能开窗, 停稳后我再帮您"
 
     @MainActor
     struct Harness {
@@ -246,6 +249,170 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
         XCTAssertEqual(h.route.runnerCallCount, 1)
         XCTAssertEqual(h.store.currentRevision, revisionAfterFirst)
         XCTAssertEqual(h.store.cells, cellsAfterFirst)
+    }
+
+    // MARK: - G3 four-family gate extension (row167 compound + CUR OOR + moving refuse)
+
+    @MainActor
+    func testG3_row167_compoundColdStart_mutatesPowerModeTempWithReadbackAndUI() async throws {
+        let h = try Harness()
+        let result = try await h.route.route(text: "主驾制热调26度")
+        let execution = try XCTUnwrap(result.execution)
+
+        XCTAssertNil(result.rejection)
+        XCTAssertEqual(execution.admission.entry.matrixID, 167)
+        XCTAssertEqual(execution.admission.entry.contractRowID, "c1_airControl_000167")
+        XCTAssertEqual(execution.admission.frame.toolName, "adjust_ac_temperature_to_number")
+        XCTAssertEqual(execution.admission.frame.slots["direction"], "主驾")
+        XCTAssertEqual(execution.admission.frame.slots["mode"], "制热")
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(execution.payload.mutationCount, 3)
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(h.store.cell(for: "ac.mode")?.actualValue, "制热")
+        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+        XCTAssertEqual(
+            execution.payload.readbacks.map(\.key),
+            ["ac.power", "ac.mode", "ac.temp_setpoint[主驾]"]
+        )
+        XCTAssertTrue(execution.payload.readbacks.contains {
+            $0.key == "ac.power" && $0.actualValue == "on"
+                && $0.revision == h.store.cell(for: "ac.power")?.revision
+        })
+        XCTAssertTrue(execution.payload.readbacks.contains {
+            $0.key == "ac.mode" && $0.actualValue == "制热"
+                && $0.revision == h.store.cell(for: "ac.mode")?.revision
+        })
+        XCTAssertTrue(execution.payload.readbacks.contains {
+            $0.key == "ac.temp_setpoint[主驾]" && $0.actualValue == "26"
+                && $0.revision == h.store.cell(for: "ac.temp_setpoint[主驾]")?.revision
+        })
+
+        let powerDisplay = try XCTUnwrap(
+            VehicleCardDisplay.displays(from: [
+                try XCTUnwrap(h.store.cell(for: "ac.power"))
+            ])
+            .first { $0.accessibilityKey == "ac.power" }
+        )
+        XCTAssertEqual(powerDisplay.valueText, "开")
+
+        let modeDisplay = try XCTUnwrap(
+            VehicleCardDisplay.displays(from: [
+                try XCTUnwrap(h.store.cell(for: "ac.mode"))
+            ])
+            .first { $0.accessibilityKey == "ac.mode" }
+        )
+        XCTAssertEqual(modeDisplay.valueText, "制热")
+
+        let tempDisplay = try XCTUnwrap(
+            VehicleCardDisplay.displays(from: [
+                try XCTUnwrap(h.store.cell(for: "ac.temp_setpoint[主驾]"))
+            ])
+            .first { $0.accessibilityKey == "ac.temp_setpoint[主驾]" }
+        )
+        XCTAssertEqual(tempDisplay.valueText, "26℃")
+    }
+
+    @MainActor
+    func testG3_row167_onlyTempUnsatisfied_mutationOne() async throws {
+        var cells = DemoVehicleStateStore.defaultCells()
+        let powerIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.power" })
+        let modeIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.mode" })
+        let tempIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.temp_setpoint[主驾]" })
+        cells[powerIdx].actualValue = "on"
+        cells[modeIdx].actualValue = "制热"
+        cells[tempIdx].actualValue = "20"
+        let h = try Harness(cells: cells)
+
+        let result = try await h.route.route(text: "主驾制热调24度")
+        let execution = try XCTUnwrap(result.execution)
+
+        XCTAssertEqual(execution.admission.entry.matrixID, 167)
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(execution.payload.mutationCount, 1)
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(h.store.cell(for: "ac.mode")?.actualValue, "制热")
+        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "24")
+        XCTAssertEqual(execution.payload.readbacks.map(\.key), ["ac.temp_setpoint[主驾]"])
+        XCTAssertTrue(execution.payload.readbacks.contains {
+            $0.key == "ac.temp_setpoint[主驾]" && $0.actualValue == "24"
+        })
+    }
+
+    @MainActor
+    func testG3_row167_fullTargetsSatisfied_alreadyStateNoop() async throws {
+        var cells = DemoVehicleStateStore.defaultCells()
+        let powerIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.power" })
+        let modeIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.mode" })
+        let tempIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.temp_setpoint[主驾]" })
+        cells[powerIdx].actualValue = "on"
+        cells[modeIdx].actualValue = "制热"
+        cells[tempIdx].actualValue = "24"
+        let h = try Harness(cells: cells)
+        let cellsBefore = h.store.cells
+        let revisionBefore = h.store.currentRevision
+
+        let result = try await h.route.route(text: "主驾制热调24度")
+        let execution = try XCTUnwrap(result.execution)
+
+        XCTAssertEqual(execution.admission.entry.matrixID, 167)
+        XCTAssertEqual(execution.payload.outcome.result, .alreadyStateNoop)
+        XCTAssertEqual(execution.payload.mutationCount, 0)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(h.store.currentRevision, revisionBefore)
+        XCTAssertEqual(h.store.cells, cellsBefore)
+    }
+
+    @MainActor
+    func testG3_windowSeventyToHundredTwentyOutOfRangeFailClosed() async throws {
+        var cells = DemoVehicleStateStore.defaultCells()
+        let driverIndex = try XCTUnwrap(
+            cells.firstIndex { $0.key == "window.position[主驾]" }
+        )
+        cells[driverIndex].actualValue = "70"
+        let h = try Harness(cells: cells)
+        let beforeRevision = h.store.currentRevision
+        let beforeCells = h.store.cells
+
+        do {
+            _ = try await h.route.route(text: "把主驾车窗再开50%")
+            XCTFail("expected ToolExecutionError.schemaInvalid(.outOfRange)")
+        } catch let error as ToolExecutionError {
+            guard case .schemaInvalid(.outOfRange(let field)) = error else {
+                return XCTFail("expected .schemaInvalid(.outOfRange), got \(error)")
+            }
+            XCTAssertEqual(field, "window.position")
+        }
+
+        XCTAssertEqual(h.route.runnerCallCount, 1, "range refusal must still count a runner attempt")
+        XCTAssertEqual(h.store.currentRevision, beforeRevision)
+        XCTAssertEqual(h.store.cells, beforeCells)
+        XCTAssertEqual(h.store.cell(for: "window.position[主驾]")?.actualValue, "70")
+    }
+
+    @MainActor
+    func testG3_windowMovingSpeedRefusesWithoutMutation() async throws {
+        var cells = DemoVehicleStateStore.defaultCells()
+        let windowIdx = try XCTUnwrap(cells.firstIndex { $0.key == "window.position[主驾]" })
+        let speedIdx = try XCTUnwrap(cells.firstIndex { $0.key == "vehicle.speed" })
+        let gearIdx = try XCTUnwrap(cells.firstIndex { $0.key == "vehicle.gear" })
+        cells[windowIdx].actualValue = "20"
+        cells[speedIdx].actualValue = "30"
+        cells[gearIdx].actualValue = "D"
+        let h = try Harness(cells: cells)
+        let beforeRevision = h.store.currentRevision
+        let beforeCells = h.store.cells
+
+        do {
+            _ = try await h.route.route(text: "把主驾车窗再开50%")
+            XCTFail("expected ToolExecutionError.guardDenied(moving)")
+        } catch let error as ToolExecutionError {
+            XCTAssertEqual(error, .guardDenied(windowMovingRefuse))
+        }
+
+        XCTAssertEqual(h.route.runnerCallCount, 1, "safety refusal must still count a runner attempt")
+        XCTAssertEqual(h.store.currentRevision, beforeRevision)
+        XCTAssertEqual(h.store.cells, beforeCells)
+        XCTAssertEqual(h.store.cell(for: "window.position[主驾]")?.actualValue, "20")
     }
 
     @MainActor
