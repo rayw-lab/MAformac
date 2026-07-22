@@ -52,7 +52,7 @@
       "role": "registry_package_entry",
       "path": "contracts/closure-work-packages.v1.yaml",
       "locator": "V1",
-      "sha256": "ecef508f55ea7cd235129fd2db507c9f81cb2ea547f3615875ee1ca4714011f7",
+      "sha256": "1fedd473dd0e4ae4a9a78e6271c3ee9d8689238c15733afb559e0da33917447b",
       "subject_bindings": [
         "authority_id"
       ]
