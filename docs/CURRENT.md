@@ -31,9 +31,9 @@ working_tree_postdates_handoff: true
 
 ## 下一步（pre-G0；非 AF-G0 GO）
 
-1. **P0-a**：磊哥授权后按白名单 commit/push（禁装入未批准候选扩张 / 「三族可演示」叙事），取得 required `verify` 绿。
-2. release-only：UI-E2E required 注册、C5 env、E3 人类证据——不挡文档/安全 FixAppend，但挡 release-ready。
-3. 阶段收口审计（Cursor 内置 Grok 4.5）对本波 FA-1..4 判 **PASS_WITH_FIXES**；权威级联补丁后仍 **AF-G0=RED / PAUSED**。
+1. **P0-a（修 CI）**：`3df7c629` 远端 `verify` 红于 governance hygiene（latest handoff 缺链字段 / fixture 未拷贝）；正在补链并重推。禁装入「三族可演示」叙事。
+2. release-only：UI-E2E workflow 已随 push 触发（尚未 required）；C5 env、E3 人类证据另账。
+3. 阶段收口审计对本波 FA-1..4 判 **PASS_WITH_FIXES**；权威级联已补；仍 **AF-G0=RED / PAUSED** 直至 `verify` 绿 + 明确裁决。
 4. 任何阶段切换、发布或范围变更都使用最新 handoff 的 stopline；**不得因 Ballot/FA 闭合而自动解冻 Phase2 实施**。
 
 ## 隔离后产品真态（candidate 口径 · 2026-07-22 live 验）

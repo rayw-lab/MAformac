@@ -26,6 +26,7 @@ FILES = (
     "docs/handoffs/2026-07-20-stage-acceptance-audit-wbs-frozen.md",
     "docs/handoffs/2026-07-21-phase0-1a-1b-remediation-complete.md",
     "docs/handoffs/2026-07-22-phase1-appendfix-isolation-baseline.md",
+    "docs/handoffs/2026-07-22-phase2-grill-freeze-human-review-handoff.md",
     "docs/lessons-learned.md",
     "docs/project/collaboration-and-roles.md",
     "docs/commander-log/decisions.md",

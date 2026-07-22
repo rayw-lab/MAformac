@@ -2,6 +2,8 @@
 kind: phase2-human-review-handoff
 project: MAformac
 as_of: 2026-07-22
+predecessor: docs/handoffs/2026-07-22-phase1-appendfix-isolation-baseline.md
+supersedes: none
 handoff_status: COMPLETE
 product_status: NOT_RELEASE_READY
 phase2_status: NO_GO
