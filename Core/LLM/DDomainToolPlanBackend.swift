@@ -50,13 +50,19 @@ public struct DDomainToolPlanBackend: LLMBackend {
                 guard !irs.isEmpty else {
                     throw DDomainToolPlanFailure.irUnclassified(parsed.name)
                 }
-                return try irs.map {
-                    // G2: pass through all IR slots explicitly; bridge fail-closes on silent drop.
-                    try ToolContractIRFrameBridge.frame(
-                        from: $0,
+                return try irs.map { ir in
+                    // W20A: model-hallucinated direction/mode are projected out so execution
+                    // falls back to default scope; G3 row167 injects those slots via admission,
+                    // not this LLM backend path. Remaining slots still pass through for G2
+                    // fail-closed (no silent drop of reviewed non-value slots).
+                    var projected = ir
+                    let hallucinatedSlotKeys: Set<String> = ["direction", "mode"]
+                    projected.slots = projected.slots.filter { !hallucinatedSlotKeys.contains($0.key) }
+                    return try ToolContractIRFrameBridge.frame(
+                        from: projected,
                         traceID: request.traceID,
                         rawCall: call,
-                        projectedSlotKeys: Set($0.slots.keys)
+                        projectedSlotKeys: Set(projected.slots.keys)
                     )
                 }
             }

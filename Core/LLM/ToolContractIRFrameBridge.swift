@@ -24,6 +24,11 @@ public enum ToolContractIRFrameBridge {
             (projectedSlotKeys.contains($0.key) || valueArgumentKeys.contains($0.key))
                 && $0.key != "value.sourceUnit"
         }
+        // W20A: mark projection when raw non-value args were not retained on the frame
+        // (e.g. hallucinated direction/mode stripped before bridge).
+        let rawNonValueKeys = Set(rawCall.arguments.keys).subtracting(valueArgumentKeys)
+        let retainedNonValueKeys = Set(projectedSlots.keys).subtracting(valueArgumentKeys)
+        let slotProjected = !rawNonValueKeys.subtracting(retainedNonValueKeys).isEmpty
         return ToolCallFrame(
             traceID: traceID,
             agentID: "vehicle-control",
@@ -36,7 +41,7 @@ public enum ToolContractIRFrameBridge {
             candidateSource: .modelRouter,
             rawPayload: redactedRawPayload(
                 for: rawCall,
-                slotProjected: !projectedSlotKeys.isEmpty && projectedSlotKeys != Set(ir.slots.keys)
+                slotProjected: slotProjected
             ),
             doNotAutoPowerOn: ir.doNotAutoPowerOn
         )
