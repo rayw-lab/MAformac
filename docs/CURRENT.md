@@ -46,7 +46,7 @@ g7_status: G7_COMPLETE
 
 ## 下一步（Phase2 G8）
 
-1. **G7_COMPLETE（工程）**：行为门 + anti-placebo 有牙；下一 **G8 CI DAG 去重 / executed 证据 / artifact**。勿抬 proven；勿提前把 G8 写成解冻。
+1. **G7_COMPLETE（工程）**：行为门 + anti-placebo 有牙；**G8 作战包已建**（run-root `PHASE2-G8-CI-DAG-BATTLE-PACKET.md`）→ 下一落地 **G8 CI DAG 去重 / executed 证据 / artifact**。勿抬 proven；勿提前把 G8 写成解冻。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 3. residual 强制账（不因 G3/G4/G5/G6/G7 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 4. 禁抬 proven；禁演示后三族。
