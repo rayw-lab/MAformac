@@ -29,7 +29,6 @@ private struct RuntimePresentationPayloadFixture: Decodable {
     var eventID: String?
     var isTerminal: Bool
     var outcome: FixtureOutcome
-    var proofClass: String
     var cards: [FixtureCard]
     var cardSemantics: [FixtureCardSemantics]?
     var readbacks: [FixtureReadback]
@@ -46,7 +45,6 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         case eventID
         case isTerminal
         case outcome
-        case proofClass
         case cards
         case cardSemantics
         case readbacks
@@ -72,8 +70,6 @@ private struct RuntimePresentationPayloadFixture: Decodable {
         eventID = try container.decodeIfPresent(String.self, forKey: .eventID)
         isTerminal = try container.decode(Bool.self, forKey: .isTerminal)
         outcome = try container.decode(FixtureOutcome.self, forKey: .outcome)
-        proofClass = try container.decode(String.self, forKey: .proofClass)
-        try RuntimePresentationConsumerMapping.validateProofClass(proofClass)
         cards = try container.decode([FixtureCard].self, forKey: .cards)
         cardSemantics = try container.decodeIfPresent([FixtureCardSemantics].self, forKey: .cardSemantics)
         readbacks = try container.decode([FixtureReadback].self, forKey: .readbacks)
@@ -124,6 +120,8 @@ private struct RuntimePresentationPayloadFixture: Decodable {
             payloadVoiceState: voiceState
         )
 
+        // G5 knife3: customer payload no longer carries proofClass. Snapshot keeps a
+        // local fixture ceiling so stage adapters stay wired without promoting proof.
         return FrontstageRuntimePresentationAdapter.fixtureSnapshot(
             traceID: traceID,
             storeCells: localCards,
@@ -135,7 +133,7 @@ private struct RuntimePresentationPayloadFixture: Decodable {
             dialogText: resolvedDialogText,
             readbacks: localReadbacks,
             resultKind: resultKind,
-            proofClass: try RuntimePresentationPayloadFixtureConsumerBridge.proofClass(for: proofClass)
+            proofClass: .localMock
         )
     }
 }
@@ -483,21 +481,6 @@ private struct FixtureTimestamp: Decodable {
 }
 
 private enum RuntimePresentationPayloadFixtureConsumerBridge {
-    static func proofClass(for mainlineName: String) throws -> StagePresentationProofClass {
-        switch mainlineName {
-        case "local_unit":
-            return .localMock
-        case "docs_local", "openspec_contract", "local_static_contract", "local_shape_no_model", "local_receipt_consistency":
-            return .staticPreview
-        case "simulator_mock":
-            return .simulatorMock
-        case "external_gptpro_review":
-            return .operatorReview
-        default:
-            throw RuntimePresentationConsumerValidationError.unknownProofClass(mainlineName)
-        }
-    }
-
     static func orbState(payloadOrbState: String) throws -> PresentationOrbState {
         guard let value = PresentationOrbState(rawValue: payloadOrbState) else {
             throw RuntimePresentationPayloadFixtureConsumerError.unknownOrbState(payloadOrbState)

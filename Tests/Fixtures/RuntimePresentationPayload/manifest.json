@@ -5,7 +5,7 @@
     "schemaVersion": "r5_runtime_presentation_public_fixture_schema_v2",
     "ownerRepo": "MAformac",
     "ownerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v2.json",
-    "sha256": "9f0f54ff257be2dc0d15760007dc5bc85be11b1d48dd700554db9a7423bb870b",
+    "sha256": "02821c14cf306b6b436a2470f7f2eb6f97e38c05a8e91871a2c204073b4b1f50",
     "consumerRepo": "MAformac-uiue",
     "consumerPath": "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v2.json",
     "updateRule": "UIUE must copy this main-owned schema artifact unchanged or fail parity review."
@@ -20,7 +20,7 @@
       "familyCoverage": [
         "ac.power"
       ],
-      "sha256": "e6ea670b4170f7ea583a43ce6bd6f15b8a7c0365805f6b1f28a7de06d4169acc",
+      "sha256": "c820560575a9d9fc28cbb37a89cda51b687458ec1727a331a48c65b50f53b873",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ac_power_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -42,7 +42,7 @@
         "door.lock",
         "safety_refusal"
       ],
-      "sha256": "8cdef78ddf265fbbee7ec6ec5c72304d9b9a965affb41e4ac2a54dcba34a5f45",
+      "sha256": "9dee3e7d302c36813abcb6d511535134b61f415325d72d5b1e012303c676c85b",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/refusal_safety_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -64,7 +64,7 @@
         "ac.power",
         "runtime_error"
       ],
-      "sha256": "c6ffb19a140a91bf9741f6083f296e792f67bd21f1072b871c6cf725b9be3152",
+      "sha256": "5a94457d0fc19d4cd240594fa7526ef6aa7837f2f2d9de86afa828eb415fa5ac",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/runtime_error_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -86,7 +86,7 @@
         "ac.power",
         "reconciliation_mismatch"
       ],
-      "sha256": "b4b87eefdb85ca3a004236f767ff4460563b68ef65654f19735e5da0609a4b44",
+      "sha256": "ed1a10ada19db0b1359964355b2009ec2cfa1bfe5e0aded581c5a89a90e59db3",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/reconciliation_mismatch_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -109,7 +109,7 @@
         "window.position",
         "partial_accept_partial_refuse"
       ],
-      "sha256": "d69e63db1672f06677d5686f5d8e1ff04482c1e47af3a172aaa9232d861106cd",
+      "sha256": "d0c83b89a523ffb4b0f7f1abf8e37bc7a53c27b7ffb27c7748537ea01c5e5a5b",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/partial_accept_refuse_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -130,7 +130,7 @@
       "familyCoverage": [
         "window.position"
       ],
-      "sha256": "2ec1943775b46f0ad1d31719c4a8de89adc3b348db2b92973bea0370dcdc4f11",
+      "sha256": "207c721b7e782da76f82056509c9bb062a046e3aa5f76650625bdc72431876d2",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -152,7 +152,7 @@
       "familyCoverage": [
         "screen.brightness"
       ],
-      "sha256": "56e1d060fb98a7a86074987d23dbe6e15748b1f970dc1b0c9d21d850541c224c",
+      "sha256": "1ce72bd72a12222251bfdab55bde1dcee898d6a68d33253708e49bddd9778906",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/screen_brightness_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -174,7 +174,7 @@
       "familyCoverage": [
         "ambient.brightness"
       ],
-      "sha256": "89de38c69e654782d66900108a311c23ca315a845daef9c04636829d38e92cc1",
+      "sha256": "4e5c4b1383223ae538339d7730d10829c68c59d573e658e92fc50d0a120209c8",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/ambient_brightness_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",
@@ -197,7 +197,7 @@
         "window.position",
         "already_state_noop"
       ],
-      "sha256": "84669f0dbfee17c3ddf764d8e30a1c043a74696c616bae1b2c803d9f1696764d",
+      "sha256": "81c6eec12a40a35339a7eb4fdb2ed775d7715da834d0315826ae366b20ca1851",
       "producerRepo": "MAformac",
       "producerPath": "Tests/Fixtures/RuntimePresentationPayload/window_position_noop_runtime_public_payload.v2.json",
       "consumerRepo": "MAformac-uiue",

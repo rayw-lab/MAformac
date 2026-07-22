@@ -49,7 +49,6 @@ final class RuntimePresentationReasonAuthorityTests: XCTestCase {
                 turnID: "turn-1",
                 isTerminal: true,
                 outcome: DemoRuntimeOutcome(result: .acceptedToolCall, reason: expected.finiteReason),
-                proofClass: .localUnit,
                 cards: [],
                 cardSemantics: [
                     PresentationCardSemantics(
@@ -125,7 +124,6 @@ final class RuntimePresentationReasonAuthorityTests: XCTestCase {
                 reason: rawFiniteReason,
                 scopeFailureReason: rawFiniteReason
             ),
-            proofClass: .localUnit,
             cards: [],
             cardSemantics: [
                 PresentationCardSemantics(

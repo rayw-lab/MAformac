@@ -82,11 +82,11 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         }
 
         XCTAssertThrowsError(
-            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(proofClass: "runtime_ready"))
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""proofClass": "local_unit","#))
         ) { error in
             XCTAssertEqual(
-                error as? RuntimePresentationConsumerValidationError,
-                .unknownProofClass("runtime_ready")
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownTopLevelField("proofClass")
             )
         }
 
@@ -109,24 +109,26 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         }
     }
 
-    func testProofClassMappingsAreExplicitAndDoNotPromoteMainlineProofs() throws {
-        let expectedProofClasses: [String: StagePresentationProofClass] = [
-            "docs_local": .staticPreview,
-            "openspec_contract": .staticPreview,
-            "local_static_contract": .staticPreview,
-            "local_unit": .localMock,
-            "local_shape_no_model": .staticPreview,
-            "local_receipt_consistency": .staticPreview,
-            "simulator_mock": .simulatorMock,
-            "external_gptpro_review": .operatorReview
-        ]
-
-        XCTAssertEqual(Set(RuntimePresentationConsumerMapping.d15ProofClassNames), Set(expectedProofClasses.keys))
-
-        for (mainlineName, expectedProofClass) in expectedProofClasses {
-            let snapshot = try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(proofClass: mainlineName))
-            XCTAssertEqual(snapshot.proofClass, expectedProofClass, mainlineName)
+    func testPayloadProofClassIsRejectedAsUnknownTopLevelField() {
+        XCTAssertThrowsError(
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""proofClass": "docs_local","#))
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownTopLevelField("proofClass")
+            )
         }
+        XCTAssertThrowsError(
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""proofClass": "simulator_mock","#))
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownTopLevelField("proofClass")
+            )
+        }
+        // Manifest/governance still knows D15 proof labels; they are not payload fields.
+        XCTAssertFalse(RuntimePresentationConsumerMapping.payloadFieldNames.contains("proofClass"))
+        XCTAssertEqual(Set(RuntimePresentationConsumerMapping.d15ProofClassNames).count, 8)
     }
 
     func testConsumerRejectsForbiddenPrivateAndDurableMarkersAnywhereInFixture() {
@@ -567,7 +569,6 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
 
     private static func validPayload(
         schemaVersion: String = "r5_runtime_presentation_payload_v2",
-        proofClass: String = "local_unit",
         outcomeResult: String = "accepted_tool_call",
         outcomeReason: String = "readback_verified",
         reconciliationStatus: String = "verified",
@@ -590,7 +591,6 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
                 "result": "\(outcomeResult)",
                 "reason": "\(outcomeReason)"
               },
-              "proofClass": "\(proofClass)",
               "cards": [
                 {
                   \(extraCardField)

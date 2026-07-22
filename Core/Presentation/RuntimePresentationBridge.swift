@@ -519,7 +519,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
     public var eventID: String?
     public var isTerminal: Bool
     public var outcome: DemoRuntimeOutcome
-    public var proofClass: PresentationProofClass
     public var cards: [DemoVehicleStateCell]
     public var cardSemantics: [PresentationCardSemantics]?
     public var readbacks: [DemoActionReadback]
@@ -537,7 +536,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         case eventID
         case isTerminal
         case outcome
-        case proofClass
         case cards
         case cardSemantics
         case readbacks
@@ -556,7 +554,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         eventID: String? = nil,
         isTerminal: Bool,
         outcome: DemoRuntimeOutcome,
-        proofClass: PresentationProofClass,
         cards: [DemoVehicleStateCell],
         cardSemantics: [PresentationCardSemantics]? = nil,
         readbacks: [DemoActionReadback] = [],
@@ -573,7 +570,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         self.eventID = eventID.map { PresentationPayloadSanitizer.redacted($0) }
         self.isTerminal = isTerminal
         self.outcome = RuntimePresentationPayload.presentationSafe(outcome)
-        self.proofClass = proofClass
         self.cards = cards.map(RuntimePresentationPayload.presentationSafe)
         self.cardSemantics = cardSemantics?.map(RuntimePresentationPayload.presentationSafe)
         self.readbacks = readbacks.map(RuntimePresentationPayload.presentationSafe)
@@ -597,7 +593,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             eventID: eventID,
             isTerminal: snapshot.isTerminal,
             outcome: snapshot.runtimeOutcome,
-            proofClass: snapshot.proofClass,
             cards: snapshot.cards,
             cardSemantics: snapshot.cardSemantics,
             readbacks: snapshot.readbacks,
@@ -619,7 +614,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             eventID: try container.decodeIfPresent(String.self, forKey: .eventID),
             isTerminal: try container.decode(Bool.self, forKey: .isTerminal),
             outcome: try container.decode(DemoRuntimeOutcome.self, forKey: .outcome),
-            proofClass: try container.decode(PresentationProofClass.self, forKey: .proofClass),
             cards: try container.decode([DemoVehicleStateCell].self, forKey: .cards),
             cardSemantics: try container.decodeIfPresent([PresentationCardSemantics].self, forKey: .cardSemantics),
             readbacks: try container.decode([DemoActionReadback].self, forKey: .readbacks),
@@ -640,7 +634,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
             eventID: eventID,
             isTerminal: isTerminal,
             outcome: outcome,
-            proofClass: proofClass,
             cards: cards,
             cardSemantics: cardSemantics,
             readbacks: readbacks,
@@ -658,7 +651,6 @@ public struct RuntimePresentationPayload: Codable, Equatable, Sendable {
         try container.encodeIfPresent(safe.eventID, forKey: .eventID)
         try container.encode(safe.isTerminal, forKey: .isTerminal)
         try container.encode(safe.outcome, forKey: .outcome)
-        try container.encode(safe.proofClass, forKey: .proofClass)
         try container.encode(safe.cards, forKey: .cards)
         try container.encodeIfPresent(safe.cardSemantics, forKey: .cardSemantics)
         try container.encode(safe.readbacks, forKey: .readbacks)

@@ -638,7 +638,6 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(decoded.eventID, "event-1")
         XCTAssertTrue(decoded.isTerminal)
         XCTAssertEqual(decoded.outcome.result, .acceptedToolCall)
-        XCTAssertEqual(decoded.proofClass, .localUnit)
         XCTAssertEqual(decoded.cards.first?.key, "ac.power")
         XCTAssertEqual(decoded.cardSemantics?.first?.role, .accepted)
         XCTAssertEqual(decoded.readbacks.first?.spokenText, "空调已打开")
@@ -737,7 +736,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertTrue(encoded.contains("[redacted]"))
     }
 
-    func testRuntimePresentationPayloadEnumsFailClosedForUnknownReconciliationAndProofClass() {
+    func testRuntimePresentationPayloadEnumsFailClosedForUnknownReconciliationAndSchema() {
         XCTAssertThrowsError(try JSONDecoder().decode(PresentationReconciliationStatus.self, from: Data(#""runtime_ready""#.utf8)))
         XCTAssertThrowsError(try JSONDecoder().decode(PresentationReconciliationMismatchClass.self, from: Data(#""failureLedger""#.utf8)))
         XCTAssertThrowsError(try JSONDecoder().decode(RuntimePresentationPayloadSchema.self, from: Data(#""v2_unreviewed""#.utf8)))

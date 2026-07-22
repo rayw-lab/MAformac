@@ -27,7 +27,6 @@
     "reason": "safety_policy_refusal",
     "result": "refusal_safety_or_policy"
   },
-  "proofClass": "local_unit",
   "readbacks": [],
   "reconciliation": {
     "safeReason": "guard_refused",

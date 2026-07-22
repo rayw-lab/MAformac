@@ -50,7 +50,6 @@ enum RuntimePresentationConsumerMapping {
 
     static let payloadContentFields = [
         "outcome",
-        "proofClass",
         "cards",
         "cardSemantics",
         "readbacks",

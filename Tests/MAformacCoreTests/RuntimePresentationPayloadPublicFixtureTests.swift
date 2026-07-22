@@ -194,9 +194,12 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
 
             XCTAssertEqual(envelope.schemaVersion, .v2, fixture.name)
             XCTAssertEqual(envelope.outcome.result.rawValue, fixture.result, fixture.name)
-            XCTAssertEqual(envelope.proofClass.rawValue, fixture.proofClass, fixture.name)
             XCTAssertFalse(envelope.cards.isEmpty, fixture.name)
             XCTAssertEqual(envelope.traceEnvelope?.traceID, envelope.traceID, fixture.name)
+            XCTAssertNil(
+                (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["proofClass"],
+                fixture.name
+            )
         }
     }
 
@@ -357,7 +360,6 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         "eventID",
         "isTerminal",
         "outcome",
-        "proofClass",
         "cards",
         "cardSemantics",
         "readbacks",
@@ -593,7 +595,6 @@ final class RuntimePresentationPayloadPublicFixtureTests: XCTestCase {
         var schemaVersion: RuntimePresentationPayloadSchema
         var traceID: String
         var outcome: DemoRuntimeOutcome
-        var proofClass: PresentationProofClass
         var cards: [PublicFixtureTypedCard]
         var readbacks: [DemoActionReadback]
         var reconciliation: PresentationReconciliation

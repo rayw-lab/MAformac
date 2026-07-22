@@ -78,7 +78,6 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
                 "eventID",
                 "isTerminal",
                 "outcome",
-                "proofClass",
                 "cards",
                 "cardSemantics",
                 "readbacks",
@@ -95,6 +94,9 @@ final class RuntimePresentationConsumerMappingTests: XCTestCase {
         try RuntimePresentationConsumerMapping.validatePresentationField("voiceState")
         try RuntimePresentationConsumerMapping.validatePresentationField("orbState")
         try RuntimePresentationConsumerMapping.validatePresentationField("mutationCount")
+        XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePresentationField("proofClass")) { error in
+            XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPresentationField("proofClass"))
+        }
 
         XCTAssertThrowsError(try RuntimePresentationConsumerMapping.validatePayloadSchema("r5_runtime_presentation_payload_v1")) { error in
             XCTAssertEqual(error as? RuntimePresentationConsumerValidationError, .unknownPayloadSchema("r5_runtime_presentation_payload_v1"))

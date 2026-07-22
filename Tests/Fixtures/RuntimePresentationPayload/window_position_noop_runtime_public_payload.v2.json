@@ -27,7 +27,6 @@
     "reason": "already_done",
     "result": "already_state_noop"
   },
-  "proofClass": "local_unit",
   "readbacks": [
     {
       "actualValue": "100",

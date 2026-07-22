@@ -27,7 +27,6 @@
     "reason": "readback_verified",
     "result": "accepted_tool_call"
   },
-  "proofClass": "local_unit",
   "readbacks": [
     {
       "actualValue": "on",

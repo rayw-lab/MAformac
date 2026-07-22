@@ -46,7 +46,6 @@
     "reason": "partial_accept_refuse",
     "result": "partial_accept_partial_refuse"
   },
-  "proofClass": "local_unit",
   "readbacks": [
     {
       "actualValue": "on",

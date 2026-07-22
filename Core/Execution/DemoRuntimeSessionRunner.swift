@@ -610,7 +610,6 @@ public final class DemoRuntimeSessionRunner {
                 result: .cancelled,
                 reason: "cancelled"
             ),
-            proofClass: .localUnit,
             cards: store.presentationCells,
             readbacks: [],
             reconciliation: PresentationReconciliation(
@@ -654,7 +653,6 @@ public final class DemoRuntimeSessionRunner {
                 result: context.runtimeResult,
                 reason: context.outcome.safeReasonKind.rawValue
             ),
-            proofClass: .localUnit,
             cards: store.presentationCells,
             readbacks: [],
             reconciliation: PresentationReconciliation(

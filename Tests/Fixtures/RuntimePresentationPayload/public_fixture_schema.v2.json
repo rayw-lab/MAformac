@@ -52,7 +52,6 @@
     "eventID",
     "isTerminal",
     "outcome",
-    "proofClass",
     "cards",
     "cardSemantics",
     "readbacks",

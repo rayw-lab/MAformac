@@ -26,7 +26,7 @@ g5_status: G5_IN_PROGRESS
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
 - **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 COMPLETE**（刀1–3 + 刀4：`testG3_*` 盖 AC/window/ambient/seat 行为门+smoke；刀4 初推 `b919eb76` 曾 OVERCLAIM「四族」仅 AC+window，已补 ambient/seat `testG3_*`；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - **G4 工程 COMPLETE**（刀1–4）：Turn Lease / cancel / last-intent-wins；刀4 六大 RED 场景收口 + smoke（`TurnLeaseCancellationTests` + `testG3_*` + `make verify-e2e`）。**未抬** `actionDemoProven`；后三族仍禁演示。closeout：run-root `PHASE2-G4-KNIFE4-SCENARIO-CLOSEOUT.md`。
-- **G5 `G5_IN_PROGRESS`**：刀1 taxonomy GREEN；**刀2 reason registry GREEN** — `ownership-map.yaml` 扩 typed reasons（lexical/overflow/precision/range/malformed_current/unit_reference/contract_violation/state_query/capability_query/cancel_too_late 等，T0=21）+ generator 再生 authority/catalog；**禁手改** `*.generated.swift`。**未**做 payload 去 `proofClass`。仍 **`PHASE2_CODING_GATED`**。closeout：run-root `PHASE2-G5-KNIFE2-REASON-GEN-CLOSEOUT.md`。
+- **G5 `G5_IN_PROGRESS`**：刀1–2 GREEN；**刀3 payload 去 `proofClass` GREEN** — `RuntimePresentationPayload`/fixtures/consumer mapping 已删客户路径 `proofClass`；unknown field 仍 fail-closed；snapshot 舞台侧保留 localMock 天花板。仍 **`PHASE2_CODING_GATED`**。closeout：run-root `PHASE2-G5-KNIFE3-PROOFCLASS-REMOVAL-CLOSEOUT.md`。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
@@ -42,11 +42,11 @@ g5_status: G5_IN_PROGRESS
 
 ## 下一步（Phase2 G5）
 
-1. **G5 刀1–2 GREEN**（taxonomy + reason registry/generator）。仍 **`PHASE2_CODING_GATED`**。
-2. **下一刀：G5 刀3** — `RuntimePresentationPayload` 去 `proofClass` + fixtures/manifest 升版（unknown field 仍 fail-closed）。
+1. **G5 刀1–3 GREEN**（taxonomy + reason registry + payload 去 `proofClass`）。仍 **`PHASE2_CODING_GATED`**。
+2. **下一刀：G5 刀4** — ContentView 只渲染（禁自造文案/`resultKind` 硬判；由 payload outcome/voice/orb/readbacks 驱动）。
 3. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 4. residual 强制账（不因 G3/G4/G5 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
-5. G5 后续刀：ContentView 只渲染（刀4）。禁抬 proven。
+5. 禁抬 proven；禁演示后三族。
 
 ## 隔离后产品真态（candidate 口径）
 
@@ -89,4 +89,4 @@ g5_status: G5_IN_PROGRESS
 - 本页不授予 promotion、公开发布或破坏性 git 权限。
 - 本页不声称 AF-G0 alone 已全面解冻 Phase2；G0 COMPLETE 解锁对照冻结 plan 的切片编码（仍 `PHASE2_CODING_GATED`）。
 - G4_COMPLETE = Turn Lease / cancel / last-intent-wins **工程**收口；≠ release-ready / 演示解冻 / proven 翻格。
-- G5 刀1–2 GREEN = result taxonomy + reason registry/generator；≠ payload 已去 `proofClass` / UI 只渲染 / proven 翻格。
+- G5 刀1–3 GREEN = taxonomy + reason registry + payload 去 `proofClass`；≠ UI 只渲染 / proven 翻格 / G5 COMPLETE。

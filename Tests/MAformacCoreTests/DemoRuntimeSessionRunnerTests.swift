@@ -18,7 +18,6 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
 
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
         XCTAssertEqual(payload.schemaVersion, .v2)
-        XCTAssertEqual(payload.proofClass, .localUnit)
         XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
         XCTAssertEqual(payload.reconciliation.status, .verified)
         XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
