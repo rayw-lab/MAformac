@@ -588,16 +588,14 @@ struct ContentView: View {
             return
         }
         customerIngressStatusText = turn.utterance
-        frontstageRuntimeComposition.markCurrent(turn)
-        guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
-        Task { @MainActor in
-            do {
-                let routeResult = try await frontstageRuntimeComposition.routeDemoSlice(
-                    turn,
-                    store: store,
-                    traceLogger: traceLogger,
-                    speech: speech
-                )
+        frontstageRuntimeComposition.scheduleIngressRoute(
+            turn,
+            store: store,
+            traceLogger: traceLogger,
+            speech: speech
+        ) { result in
+            switch result {
+            case let .success(routeResult):
                 guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
                 if let execution = routeResult.execution {
                     applyDemoSliceExecution(execution, utterance: turn.utterance)
@@ -607,7 +605,7 @@ struct ContentView: View {
                     writeContainmentReceipt(turn)
                     applyDemoSliceRejection(rejection, turn: turn)
                 }
-            } catch {
+            case .failure:
                 guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
                 customerIngressStatusText = "演示链路暂时不可用"
                 messages.append(DialogueMessage(role: .assistant, text: "演示链路暂时不可用"))

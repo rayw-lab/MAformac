@@ -35,7 +35,7 @@ final class ProductOperatorCompositionRootTests: XCTestCase {
             "exactly one cached DemoSliceRoute optional"
         )
         XCTAssertEqual(
-            occurrences(of: "DemoSliceRoute(", in: source),
+            occurrences(of: "= try DemoSliceRoute(", in: source),
             1,
             "route must be constructed once (lazy cache), not per-call re-root"
         )
@@ -52,7 +52,7 @@ final class ProductOperatorCompositionRootTests: XCTestCase {
         )
 
         XCTAssertTrue(source.contains("FrontstageRuntimeComposition"))
-        XCTAssertTrue(source.contains("frontstageRuntimeComposition.routeDemoSlice"))
+        XCTAssertTrue(source.contains("frontstageRuntimeComposition.scheduleIngressRoute"))
         XCTAssertEqual(
             occurrences(of: "DemoSliceRoute(", in: source),
             0,
@@ -114,9 +114,13 @@ final class ProductOperatorCompositionRootTests: XCTestCase {
         )
 
         // Production surface must not call the nil-provider legacy helper as a single-arg route.
-        // Multi-line production call is: .route(\n text: turn.utterance,\n correlationProvider: ...)
+        // Multi-line production call is: .route(\n text: turn.utterance,\n correlationProvider: ...\n lease: lease)
         XCTAssertTrue(routeBody.contains("text: turn.utterance"))
         XCTAssertTrue(routeBody.contains("correlationProvider: correlationProvider"))
+        XCTAssertTrue(routeBody.contains("lease: lease"))
+        XCTAssertTrue(routeBody.contains("RuntimeTurnLease("))
+        XCTAssertTrue(source.contains("func scheduleIngressRoute"))
+        XCTAssertTrue(source.contains("ingressRouteTask"))
         XCTAssertFalse(routeBody.contains(".route(text: turn.utterance)"),
         "production path must not use legacy single-arg route(text:) without correlationProvider")
     }

@@ -151,6 +151,10 @@ final class SessionLifecycleCompositionGateTests: XCTestCase {
             routeSlice.contains(routeCorrelationArg),
             "routeDemoSlice must pass product correlation provider on production route"
         )
+        XCTAssertTrue(
+            routeSlice.contains("lease: lease"),
+            "routeDemoSlice must thread RuntimeTurnLease into production route"
+        )
         XCTAssertFalse(routeSlice.contains(".route(text: turn.utterance)"),
         "production path must not use legacy single-arg .route(text: turn.utterance)")
 

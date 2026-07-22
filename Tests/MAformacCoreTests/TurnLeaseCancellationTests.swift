@@ -297,4 +297,93 @@ final class TurnLeaseCancellationTests: XCTestCase {
         XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
         XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
     }
+
+    // MARK: - G4 刀3 Composition / Route lease threading (Core-reachable)
+
+    func testKnife3_sourceContract_compositionOwnsIngressTaskAndPreemptOrder() throws {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let composition = try String(
+            contentsOf: root.appendingPathComponent("App/FrontstageRuntimeComposition.swift"),
+            encoding: .utf8
+        )
+        let contentView = try String(
+            contentsOf: root.appendingPathComponent("App/ContentView.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertTrue(composition.contains("private var ingressRouteTask: Task<Void, Never>?"))
+        XCTAssertTrue(composition.contains("func scheduleIngressRoute"))
+        XCTAssertTrue(composition.contains("lease: lease"))
+        XCTAssertTrue(composition.contains("speech.cancelPendingSpeech()"))
+
+        // Customer path uses composition scheduler — no anonymous route Task.
+        XCTAssertTrue(contentView.contains("frontstageRuntimeComposition.scheduleIngressRoute"))
+        let ingressStart = contentView.range(of: "private func submitCustomerIngress")
+        let ingressEnd = contentView.range(of: "private func applyDemoSliceExecution")
+        XCTAssertNotNil(ingressStart)
+        XCTAssertNotNil(ingressEnd)
+        let ingressBody = String(contentView[ingressStart!.lowerBound..<ingressEnd!.lowerBound])
+        XCTAssertFalse(
+            ingressBody.contains("Task { @MainActor"),
+            "submitCustomerIngress must not spawn anonymous MainActor Tasks"
+        )
+        XCTAssertFalse(ingressBody.contains("frontstageRuntimeComposition.routeDemoSlice"))
+    }
+
+    @MainActor
+    func testKnife3_demoSliceRouteThreadsLease_staleAfterDecoder_zeroMutation() async throws {
+        let store = DemoVehicleStateStore()
+        let initialRevision = store.currentRevision
+        let initialPower = store.cell(for: "ac.power")?.actualValue
+        let speech = RecordingSpeechSynthesisEngine()
+        let flag = CurrentFlag(false) // already stale → Door-1 after sync decoder
+        let lease = RuntimeTurnLease(
+            sessionID: UUID(),
+            sequence: 11,
+            turnID: UUID(),
+            isCurrent: { flag.isCurrent }
+        )
+        let route = try DemoSliceRoute(
+            store: store,
+            traceLogger: InMemoryTraceLogger(),
+            speech: speech
+        )
+
+        let result = try await route.route(text: "打开空调", lease: lease)
+
+        XCTAssertNotNil(result.execution)
+        XCTAssertEqual(result.execution?.payload.outcome.result, .cancelled)
+        XCTAssertEqual(result.execution?.payload.mutationCount, 0)
+        XCTAssertTrue(result.execution?.payload.readbacks.isEmpty ?? false)
+        XCTAssertTrue(speech.spokenTexts.isEmpty)
+        XCTAssertEqual(store.currentRevision, initialRevision)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, initialPower)
+        XCTAssertEqual(result.execution?.runnerCallCount, 1)
+    }
+
+    @MainActor
+    func testKnife3_demoSliceRouteCurrentLease_stillMutates() async throws {
+        let store = DemoVehicleStateStore()
+        let speech = RecordingSpeechSynthesisEngine()
+        let lease = RuntimeTurnLease(
+            sessionID: UUID(),
+            sequence: 12,
+            turnID: UUID(),
+            isCurrent: { true }
+        )
+        let route = try DemoSliceRoute(
+            store: store,
+            traceLogger: InMemoryTraceLogger(),
+            speech: speech
+        )
+
+        let result = try await route.route(text: "打开空调", lease: lease)
+
+        XCTAssertEqual(result.execution?.payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
+    }
 }

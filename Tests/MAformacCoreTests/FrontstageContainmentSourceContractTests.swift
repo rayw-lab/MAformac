@@ -15,7 +15,11 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         XCTAssertFalse(source.contains("onMockVoiceSubmit: applyMockVoiceColdIntent"))
         let submission = try section(in: source, from: "private func submitCustomerMicDock", until: "private func applyMockVoiceColdIntent")
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.session"))
-        XCTAssertTrue(submission.contains("frontstageRuntimeComposition.routeDemoSlice"))
+        XCTAssertTrue(submission.contains("frontstageRuntimeComposition.scheduleIngressRoute"))
+        XCTAssertFalse(
+            submission.contains("Task { @MainActor"),
+            "G4 knife3: customer path must not spawn anonymous MainActor Tasks"
+        )
         XCTAssertTrue(submission.contains("applyDemoSliceExecution"))
         XCTAssertTrue(submission.contains("FrontstageRouteReceiptWriter.writeCurrent"))
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.isCurrentTurn"))
@@ -32,10 +36,30 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
 
         XCTAssertTrue(source.contains("let session: FrontstageVoiceSession"))
         XCTAssertTrue(source.contains("private var demoSliceRoute: DemoSliceRoute?"))
+        XCTAssertTrue(source.contains("private var ingressRouteTask: Task<Void, Never>?"))
+        XCTAssertTrue(source.contains("func scheduleIngressRoute"))
         XCTAssertTrue(source.contains("func routeDemoSlice"))
-        XCTAssertEqual(occurrences(of: "DemoSliceRoute(", in: source), 1)
+        XCTAssertTrue(source.contains("cancelPendingSpeech"))
+        XCTAssertTrue(source.contains("RuntimeTurnLease("))
+        XCTAssertTrue(source.contains("lease: lease"))
+        XCTAssertEqual(occurrences(of: "= try DemoSliceRoute(", in: source), 1)
         XCTAssertFalse(source.contains("DemoRuntimePartialPlan"))
         XCTAssertFalse(source.contains("MockVoicePresetPlanner"))
+    }
+
+    func testCompositionPreemptsOldIngressBeforeCancelPendingSpeech() throws {
+        let source = try String(contentsOf: repoRoot.appendingPathComponent("App/FrontstageRuntimeComposition.swift"), encoding: .utf8)
+        let scheduleBody = try section(in: source, from: "func scheduleIngressRoute", until: "func routeDemoSlice")
+
+        XCTAssertTrue(scheduleBody.contains("ingressRouteTask?.cancel()"))
+        XCTAssertTrue(scheduleBody.contains("markCurrent(turn)"))
+        XCTAssertTrue(scheduleBody.contains("speech.cancelPendingSpeech()"))
+
+        let cancelTaskIdx = try index(of: "ingressRouteTask?.cancel()", in: scheduleBody)
+        let markIdx = try index(of: "markCurrent(turn)", in: scheduleBody)
+        let speechIdx = try index(of: "speech.cancelPendingSpeech()", in: scheduleBody)
+        XCTAssertLessThan(cancelTaskIdx, markIdx, "cancel old Task before switching current identity")
+        XCTAssertLessThan(markIdx, speechIdx, "switch current identity before cancelPendingSpeech")
     }
 
     func testCompositionProductionCallsitePassesCorrelationProviderAndFailClosedIdentity() throws {
@@ -72,7 +96,8 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
             contentsOf: repoRoot.appendingPathComponent("App/ContentView.swift"),
             encoding: .utf8
         )
-        XCTAssertTrue(source.contains("frontstageRuntimeComposition.routeDemoSlice"))
+        XCTAssertTrue(source.contains("frontstageRuntimeComposition.scheduleIngressRoute"))
+        XCTAssertEqual(occurrences(of: "= try DemoSliceRoute(", in: source), 0)
         XCTAssertEqual(occurrences(of: "DemoSliceRoute(", in: source), 0)
         XCTAssertEqual(occurrences(of: "DemoRuntimeSessionRunner(", in: source), 0)
         XCTAssertFalse(source.contains("ProductionRouteCorrelationProvider"))
@@ -162,5 +187,16 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         let tail = source[startRange.lowerBound...]
         guard let endRange = tail.range(of: end) else { return String(tail) }
         return String(tail[..<endRange.lowerBound])
+    }
+
+    private func index(of needle: String, in source: String) throws -> String.Index {
+        guard let range = source.range(of: needle) else {
+            throw NSError(
+                domain: "FrontstageContainmentSourceContractTests",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "missing needle: \(needle)"]
+            )
+        }
+        return range.lowerBound
     }
 }

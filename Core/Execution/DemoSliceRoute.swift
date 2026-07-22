@@ -90,21 +90,31 @@ public final class DemoSliceRoute {
 
     /// Unit/default helper surface. Invokes the runner without a production
     /// correlation provider (constructor default / nil). Not the App production surface.
-    public func route(text: String) async throws -> DemoSliceRouteResult {
-        try await routeBody(text: text, correlationProvider: nil)
+    public func route(
+        text: String,
+        lease: RuntimeTurnLease? = nil
+    ) async throws -> DemoSliceRouteResult {
+        try await routeBody(text: text, correlationProvider: nil, lease: lease)
     }
 
     /// App production surface: per-call non-optional correlation provider.
+    /// Optional `lease` threads G4 Door-1/Door-2 fencing into the runner.
     public func route(
         text: String,
-        correlationProvider: RuntimeSessionCorrelationProvider
+        correlationProvider: RuntimeSessionCorrelationProvider,
+        lease: RuntimeTurnLease? = nil
     ) async throws -> DemoSliceRouteResult {
-        try await routeBody(text: text, correlationProvider: correlationProvider)
+        try await routeBody(
+            text: text,
+            correlationProvider: correlationProvider,
+            lease: lease
+        )
     }
 
     private func routeBody(
         text: String,
-        correlationProvider: RuntimeSessionCorrelationProvider?
+        correlationProvider: RuntimeSessionCorrelationProvider?,
+        lease: RuntimeTurnLease?
     ) async throws -> DemoSliceRouteResult {
         let classification = catalog.classify(for: text)
         switch classification {
@@ -113,7 +123,8 @@ public final class DemoSliceRoute {
                 admission: admission,
                 classification: classification,
                 text: text,
-                correlationProvider: correlationProvider
+                correlationProvider: correlationProvider,
+                lease: lease
             )
         case let .stateQuery(spec):
             return try routeStateQuery(spec: spec, classification: classification)
@@ -141,7 +152,8 @@ public final class DemoSliceRoute {
         admission: DemoSliceAdmission,
         classification: DemoSliceClassification,
         text: String,
-        correlationProvider: RuntimeSessionCorrelationProvider?
+        correlationProvider: RuntimeSessionCorrelationProvider?,
+        lease: RuntimeTurnLease?
     ) async throws -> DemoSliceRouteResult {
         // Reuse the same scope resolution as C3. Defaulted scopes (for example,
         // ac.temp_setpoint[主驾]) must not miss the pre-run no-op gate.
@@ -206,9 +218,13 @@ public final class DemoSliceRoute {
         runnerCallCount += 1
         let payload: RuntimePresentationPayload
         if let correlationProvider {
-            payload = try await runner.run(text: text, correlationProvider: correlationProvider)
+            payload = try await runner.run(
+                text: text,
+                correlationProvider: correlationProvider,
+                lease: lease
+            )
         } else {
-            payload = try await runner.run(text: text)
+            payload = try await runner.run(text: text, lease: lease)
         }
         return DemoSliceRouteResult(
             classification: classification,

@@ -13,6 +13,9 @@ enum FrontstageRuntimeCompositionError: Error, Equatable {
 /// **S0 freeze:** This type is the sole customer-facing production composition root.
 /// It owns one cached `DemoSliceRoute` and one lifecycle/state/store path. Do not
 /// create a second root, coordinator, or ContentView-local production runner.
+///
+/// **G4 刀3:** Owns the customer-path ingress `Task` handle and turn-lease
+/// issuance. ContentView must not spawn anonymous route Tasks.
 @MainActor
 final class FrontstageRuntimeComposition {
     let session: FrontstageVoiceSession
@@ -20,6 +23,8 @@ final class FrontstageRuntimeComposition {
     private(set) var currentTurnID: String?
     private var demoSliceRoute: DemoSliceRoute?
     private var sessionLifecycleGate: SessionLifecycleCompositionGate?
+    /// Sole customer-path route Task. New ingress cancels the previous handle.
+    private var ingressRouteTask: Task<Void, Never>?
 
     init(session: FrontstageVoiceSession = FrontstageVoiceSession()) {
         self.session = session
@@ -32,6 +37,47 @@ final class FrontstageRuntimeComposition {
 
     func isCurrentTurn(_ turn: FrontstageVoiceTurn) -> Bool {
         currentTurnID == turn.turnID
+    }
+
+    /// Schedule demo-slice routing under the composition-owned Task handle.
+    ///
+    /// Preempt order (Gemini 刀1/刀2 risk):
+    /// 1. `cancel()` previous ingress Task
+    /// 2. switch current identity (`markCurrent`) so lease capability flips
+    /// 3. `cancelPendingSpeech()` for the *old* turn (after identity switch — never
+    ///    kill speech belonging to the turn that just became current)
+    /// 4. start a new Task that issues lease and routes
+    func scheduleIngressRoute(
+        _ turn: FrontstageVoiceTurn,
+        store: DemoVehicleStateStore,
+        traceLogger: any TraceLogger,
+        speech: any SpeechSynthesisEngine,
+        onResult: @escaping @MainActor (Result<DemoSliceRouteResult, Error>) -> Void
+    ) {
+        ingressRouteTask?.cancel()
+        ingressRouteTask = nil
+
+        markCurrent(turn)
+        speech.cancelPendingSpeech()
+
+        let scheduledTurn = turn
+        ingressRouteTask = Task { @MainActor in
+            do {
+                let routeResult = try await self.routeDemoSlice(
+                    scheduledTurn,
+                    store: store,
+                    traceLogger: traceLogger,
+                    speech: speech
+                )
+                guard !Task.isCancelled else { return }
+                guard self.isCurrentTurn(scheduledTurn) else { return }
+                onResult(.success(routeResult))
+            } catch {
+                guard !Task.isCancelled else { return }
+                guard self.isCurrentTurn(scheduledTurn) else { return }
+                onResult(.failure(error))
+            }
+        }
     }
 
     func routeDemoSlice(
@@ -74,12 +120,28 @@ final class FrontstageRuntimeComposition {
         guard turn.sequence > 0, let groupOrdinal = UInt32(exactly: turn.sequence) else {
             throw FrontstageRuntimeCompositionError.invalidTurnSequence(turn.sequence)
         }
+        guard let sessionUUID = UUID(uuidString: trimmedSessionID),
+              let turnUUID = UUID(uuidString: trimmedTurnID),
+              let leaseSequence = UInt64(exactly: turn.sequence)
+        else {
+            throw FrontstageRuntimeCompositionError.emptyTurnIdentity(field: "leaseIdentity")
+        }
 
         let correlationProvider = try ProductionRouteCorrelationProvider.make(
             routeTurnID: trimmedTurnID,
             sessionRef: trimmedSessionID,
             generationRef: String(lifecycleSnapshot.generation.value),
             groupOrdinal: groupOrdinal
+        )
+
+        // Issue lease before any await so Door-1/Door-2 can fence this turn.
+        let lease = RuntimeTurnLease(
+            sessionID: sessionUUID,
+            sequence: leaseSequence,
+            turnID: turnUUID,
+            isCurrent: { [weak self] in
+                self?.currentTurnID == trimmedTurnID
+            }
         )
 
         if demoSliceRoute == nil {
@@ -91,7 +153,8 @@ final class FrontstageRuntimeComposition {
         }
         return try await demoSliceRoute!.route(
             text: turn.utterance,
-            correlationProvider: correlationProvider
+            correlationProvider: correlationProvider,
+            lease: lease
         )
     }
 }
