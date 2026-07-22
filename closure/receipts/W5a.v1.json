@@ -1,7 +1,7 @@
 {
   "schema_version": "closure_package_exit_envelope_v1",
   "registry_schema_major": "closure_work_packages_v1",
-  "registry_digest": "0c86fd54bbbd64cba049dd7d929cd12bf57ce0b0d31e12f15f56796b48878bc2",
+  "registry_digest": "542f61ba87963242d0d8e47840dbe7ca9234e17dbf0c9a31a7584213fca62c8d",
   "package_id": "W5a",
   "package_revision": 1,
   "native_receipt_schema_id": "t04_ingress_v1",
