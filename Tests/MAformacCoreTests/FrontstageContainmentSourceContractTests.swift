@@ -54,6 +54,14 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
         XCTAssertTrue(scheduleBody.contains("ingressRouteTask?.cancel()"))
         XCTAssertTrue(scheduleBody.contains("markCurrent(turn)"))
         XCTAssertTrue(scheduleBody.contains("speech.cancelPendingSpeech()"))
+        XCTAssertTrue(
+            scheduleBody.contains("self.ingressRouteTask = nil"),
+            "completed ingress Task must clear its handle"
+        )
+        XCTAssertTrue(
+            scheduleBody.contains("if !Task.isCancelled"),
+            "completion clear must not wipe a preempt successor"
+        )
 
         let cancelTaskIdx = try index(of: "ingressRouteTask?.cancel()", in: scheduleBody)
         let markIdx = try index(of: "markCurrent(turn)", in: scheduleBody)

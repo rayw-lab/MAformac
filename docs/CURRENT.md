@@ -42,6 +42,7 @@ g3_status: G3_COMPLETE
 2. **G4 刀1 GREEN**（`f5f00395`）→ **刀2 GREEN**（`528eefeb`）→ **刀3 GREEN**：App `ingressRouteTask` + `scheduleIngressRoute`；先 cancel 旧 Task → `markCurrent`/签发 lease → `cancelPendingSpeech`；`ContentView` 清匿名 route Task；lease 经 `DemoSliceRoute`→runner。下一刀：刀4 `TurnLeaseCancellationTests` 场景收口 + G4 smoke 聚合。
 3. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 4. residual 强制账（不因 G3/G4 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
+5. G5 作战包已建，待 G4 COMPLETE 后开工。
 
 ## 隔离后产品真态（candidate 口径）
 

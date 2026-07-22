@@ -318,6 +318,14 @@ final class TurnLeaseCancellationTests: XCTestCase {
         XCTAssertTrue(composition.contains("func scheduleIngressRoute"))
         XCTAssertTrue(composition.contains("lease: lease"))
         XCTAssertTrue(composition.contains("speech.cancelPendingSpeech()"))
+        XCTAssertTrue(
+            composition.contains("self.ingressRouteTask = nil"),
+            "knife3: Task handle must clear after completion"
+        )
+        XCTAssertTrue(
+            composition.contains("if !Task.isCancelled"),
+            "knife3: completion clear must skip when preempt-cancelled"
+        )
 
         // Customer path uses composition scheduler — no anonymous route Task.
         XCTAssertTrue(contentView.contains("frontstageRuntimeComposition.scheduleIngressRoute"))

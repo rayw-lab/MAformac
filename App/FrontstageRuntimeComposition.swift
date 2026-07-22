@@ -62,6 +62,13 @@ final class FrontstageRuntimeComposition {
 
         let scheduledTurn = turn
         ingressRouteTask = Task { @MainActor in
+            // Gemini: clear handle on completion; never wipe a successor
+            // scheduled after preempt (preempt already cancelled us).
+            defer {
+                if !Task.isCancelled {
+                    self.ingressRouteTask = nil
+                }
+            }
             do {
                 let routeResult = try await self.routeDemoSlice(
                     scheduledTurn,
