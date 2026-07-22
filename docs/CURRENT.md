@@ -39,7 +39,7 @@ g3_status: G3_COMPLETE
 ## 下一步（Phase2 G4）
 
 1. **G3 工程四子块已 COMPLETE**（tip `6b498387`，`testG3_*` 7/7 全绿）。
-2. **G4 刀1 IN_PROGRESS→GREEN**：`RuntimeTurnLease` + `cancelPendingSpeech` + sequence overflow fail-closed；验收 `swift test --filter TurnLeaseCancellationTests`。下一刀：Runner 双门隔离（禁改 C3）。
+2. **G4 刀1 GREEN**（`f5f00395`）→ **刀2 GREEN**：`DemoRuntimeSessionRunner` Door-1（`await planDecoder` 后）+ Door-2（`executePlan` 前）lease check；旧 turn 抢占 → `.cancelled` 零 mutation；禁改 C3。验收 `TurnLeaseCancellationTests` + `DemoRuntimeSessionRunnerTests`。下一刀：App Task handle + `cancelPendingSpeech` 级联。
 3. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 4. residual 强制账（不因 G3/G4 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 

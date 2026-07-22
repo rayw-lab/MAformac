@@ -131,9 +131,19 @@ public final class DemoRuntimeSessionRunner {
 
     /// Unit/default helper surface. Uses the optional constructor-bound provider
     /// (typically `nil`). Not the App production surface.
+    ///
+    /// Optional `lease` enables G4 Door-1/Door-2 fencing. `nil` preserves
+    /// legacy callers (always proceed; no second lock invented here).
     @discardableResult
-    public func run(text: String) async throws -> RuntimePresentationPayload {
-        try await executeRun(text: text, correlationProvider: correlationProvider)
+    public func run(
+        text: String,
+        lease: RuntimeTurnLease? = nil
+    ) async throws -> RuntimePresentationPayload {
+        try await executeRun(
+            text: text,
+            correlationProvider: correlationProvider,
+            lease: lease
+        )
     }
 
     /// App production surface: per-call non-optional correlation provider.
@@ -142,21 +152,33 @@ public final class DemoRuntimeSessionRunner {
     @discardableResult
     public func run(
         text: String,
-        correlationProvider: RuntimeSessionCorrelationProvider
+        correlationProvider: RuntimeSessionCorrelationProvider,
+        lease: RuntimeTurnLease? = nil
     ) async throws -> RuntimePresentationPayload {
-        try await executeRun(text: text, correlationProvider: correlationProvider)
+        try await executeRun(
+            text: text,
+            correlationProvider: correlationProvider,
+            lease: lease
+        )
     }
 
     /// Executes a plan already decoded and reviewed by the caller. This keeps a
     /// model-backed customer route single-call: decode once, review once, execute
     /// that exact plan without asking the model a second time.
+    ///
+    /// Predecoded path has no Door-1 (no await); Door-2 still gates before mutation.
     @discardableResult
     public func run(
         predecodedPlan plan: RuntimePlan,
-        customerText: String
+        customerText: String,
+        lease: RuntimeTurnLease? = nil
     ) throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(customerText)
-        return try executePlan(plan, correlationProvider: correlationProvider)
+        return try executePlan(
+            plan,
+            correlationProvider: correlationProvider,
+            lease: lease
+        )
     }
 
     /// App production variant of the predecoded-plan surface.
@@ -164,15 +186,21 @@ public final class DemoRuntimeSessionRunner {
     public func run(
         predecodedPlan plan: RuntimePlan,
         customerText: String,
-        correlationProvider: RuntimeSessionCorrelationProvider
+        correlationProvider: RuntimeSessionCorrelationProvider,
+        lease: RuntimeTurnLease? = nil
     ) throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(customerText)
-        return try executePlan(plan, correlationProvider: correlationProvider)
+        return try executePlan(
+            plan,
+            correlationProvider: correlationProvider,
+            lease: lease
+        )
     }
 
     private func executeRun(
         text: String,
-        correlationProvider: RuntimeSessionCorrelationProvider?
+        correlationProvider: RuntimeSessionCorrelationProvider?,
+        lease: RuntimeTurnLease?
     ) async throws -> RuntimePresentationPayload {
         dialogueState.recordUserText(text)
         let plan: RuntimePlan
@@ -191,13 +219,28 @@ public final class DemoRuntimeSessionRunner {
             return unsupportedPayload(finiteReason: .fastPathNoMatch)
         }
 
-        return try executePlan(plan, correlationProvider: correlationProvider)
+        // Door-1: after the only await suspension — stale lease → cancelled, zero subsequent work.
+        if let lease, !lease.isCurrent {
+            return cancelledLeasePayload(traceID: plan.traceID, door: .door1AfterDecoder)
+        }
+
+        return try executePlan(
+            plan,
+            correlationProvider: correlationProvider,
+            lease: lease
+        )
     }
 
     private func executePlan(
         _ plan: RuntimePlan,
-        correlationProvider: RuntimeSessionCorrelationProvider?
+        correlationProvider: RuntimeSessionCorrelationProvider?,
+        lease: RuntimeTurnLease?
     ) throws -> RuntimePresentationPayload {
+        // Door-2: before mutation-capable sync section (commit/readback must stay await-free).
+        if let lease, !lease.isCurrent {
+            return cancelledLeasePayload(traceID: plan.traceID, door: .door2BeforeExecute)
+        }
+
         guard let firstFrame = plan.frames.first else {
             return unsupportedPayload(finiteReason: .unsupportedToolPlan)
         }
@@ -534,6 +577,50 @@ public final class DemoRuntimeSessionRunner {
                 status: .notApplicable,
                 safeReason: "missing_required_scope"
             )
+        )
+    }
+
+    private enum LeaseDoor: String {
+        case door1AfterDecoder = "door1_after_decoder"
+        case door2BeforeExecute = "door2_before_execute"
+    }
+
+    /// Pre-commit lease miss: cancelled outcome, zero mutation / readback / speech.
+    /// Does **not** clear DialogueState history or invent post-commit undo.
+    private func cancelledLeasePayload(
+        traceID: String,
+        door: LeaseDoor
+    ) -> RuntimePresentationPayload {
+        let turnID = "cancelled-\(traceID)"
+        traceLogger.recordGuard(
+            traceID: traceID,
+            message: "turn_lease_cancelled",
+            attributes: TraceAttributes(
+                toolCallCount: 0,
+                guardReason: "turn_lease_stale:\(door.rawValue)"
+            )
+        )
+        // Reason must be presentation-allowlisted (`cancelled`); door detail lives on guard.
+        return RuntimePresentationPayload(
+            traceID: traceID,
+            turnID: turnID,
+            eventID: "\(turnID):runtime-presentation",
+            isTerminal: true,
+            outcome: DemoRuntimeOutcome(
+                result: .cancelled,
+                reason: "cancelled"
+            ),
+            proofClass: .localUnit,
+            cards: store.presentationCells,
+            readbacks: [],
+            reconciliation: PresentationReconciliation(
+                status: .notApplicable,
+                safeReason: "cancelled"
+            ),
+            voiceState: .idle,
+            orbState: .idle,
+            mutationCount: 0,
+            timestamp: timestampProvider()
         )
     }
 
