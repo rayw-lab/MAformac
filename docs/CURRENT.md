@@ -91,3 +91,4 @@ g6_status: G6_COMPLETE
 - 本页不声称 AF-G0 alone 已全面解冻 Phase2；G0 COMPLETE 解锁对照冻结 plan 的切片编码（仍 `PHASE2_CODING_GATED`）。
 - G4_COMPLETE = Turn Lease / cancel / last-intent-wins **工程**收口；≠ release-ready / 演示解冻 / proven 翻格。
 - G5_COMPLETE = taxonomy + reason registry + payload 去 `proofClass` + ContentView 只渲染 **工程**收口；≠ proven 翻格 / 后三族可演 / release-ready / G6 receipt 闭环。
+- G6_COMPLETE = RuntimeTurnReceipt v2 + Assembler/B10 + schema/digest/linked **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready。
