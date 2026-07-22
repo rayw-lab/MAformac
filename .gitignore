@@ -81,3 +81,6 @@ docs/research/2026-06-25-a2-execution/app-state-phase5-ambient/
 docs/research/2026-06-25-a2-execution/*-sidebyside.png
 Tools/paper-to-skill-gate/paper-repos/
 Tools/paper-to-skill-gate/reference-repos/
+
+# Cursor local IDE state (do not commit; confuses read-only external workers)
+.cursor/
