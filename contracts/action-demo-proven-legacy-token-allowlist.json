@@ -36,6 +36,12 @@
       "token_regex": "canDemo",
       "max_matches": 1,
       "purpose": "rename_migration_mapping"
+    },
+    {
+      "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "vendored_historical_ratification_receipt"
     }
   ]
 }
