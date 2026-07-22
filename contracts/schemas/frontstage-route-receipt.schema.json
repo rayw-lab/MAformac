@@ -3,10 +3,30 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version", "run_id", "run_nonce", "source_head_sha", "tested_checkout_sha", "session_id", "turn_id", "event_id", "sequence", "matrix_id", "matrix_source_sha256", "runtime_contract_bundle_digest", "app_executable_sha256", "proof_class", "result", "state_mutation", "readback_count"
+    "schema_version",
+    "run_id",
+    "run_nonce",
+    "source_head_sha",
+    "tested_checkout_sha",
+    "session_id",
+    "turn_id",
+    "event_id",
+    "sequence",
+    "matrix_id",
+    "matrix_source_sha256",
+    "runtime_contract_bundle_digest",
+    "app_executable_sha256",
+    "final_outcome",
+    "state_mutation",
+    "readback_count",
+    "mount_receipt_body_sha256",
+    "code_head_digest",
+    "mounted_catalog_digest",
+    "touched_cell_canonical_snapshot_digest",
+    "actions"
   ],
   "properties": {
-    "schema_version": {"const": "frontstage_route_receipt.v1"},
+    "schema_version": {"const": "frontstage_route_receipt.v2"},
     "run_id": {"type": "string", "minLength": 1},
     "run_nonce": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
     "source_head_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
@@ -19,9 +39,38 @@
     "matrix_source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "runtime_contract_bundle_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "app_executable_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "proof_class": {"const": "frontstage_route_local_integration"},
-    "result": {"const": "refusal_no_available_tool"},
-    "state_mutation": {"const": false},
-    "readback_count": {"const": 0}
+    "final_outcome": {"type": "string", "minLength": 1},
+    "state_mutation": {"type": "boolean"},
+    "readback_count": {"type": "integer", "minimum": 0},
+    "mount_receipt_body_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "code_head_digest": {"type": "string", "minLength": 1},
+    "mounted_catalog_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "touched_cell_canonical_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "linked_previous_turn_id": {"type": ["string", "null"]},
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action_index", "disposition", "is_virtual_readback"],
+        "properties": {
+          "action_index": {"type": "integer", "minimum": 0},
+          "frame_identity": {"type": ["string", "null"]},
+          "contract_identity": {"type": ["string", "null"]},
+          "tool_name": {"type": ["string", "null"]},
+          "device_name": {"type": ["string", "null"]},
+          "action_name": {"type": ["string", "null"]},
+          "slots_identity": {"type": ["string", "null"]},
+          "disposition": {"type": "string", "minLength": 1},
+          "failure_reason": {"type": ["string", "null"]},
+          "policy_decision": {"type": ["string", "null"]},
+          "before_revision": {"type": ["integer", "null"]},
+          "after_revision": {"type": ["integer", "null"]},
+          "readback": {"type": ["object", "null"]},
+          "replay_ref": {"type": ["string", "null"]},
+          "is_virtual_readback": {"type": "boolean"}
+        }
+      }
+    }
   }
 }

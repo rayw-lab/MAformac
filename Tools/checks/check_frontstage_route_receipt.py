@@ -22,11 +22,15 @@ def validate(receipt: dict[str, Any], schema_path: Path | None = None) -> dict[s
     nonce = receipt.get("run_nonce")
     if not isinstance(nonce, str) or re.fullmatch(r"[0-9a-f]{32}", nonce) is None:
         errors.append("E_RUN_NONCE")
-    if receipt.get("result") == "refusal_no_available_tool":
+    if receipt.get("final_outcome") == "refusal_no_available_tool":
         if receipt.get("state_mutation") is not False:
             errors.append("E_DENY_MUTATION")
         if receipt.get("readback_count") != 0:
             errors.append("E_DENY_READBACK")
+    if receipt.get("proof_class") is not None or receipt.get("proofClass") is not None:
+        errors.append("E_PROOF_CLASS_FORBIDDEN")
+    if receipt.get("schema_version") != "frontstage_route_receipt.v2":
+        errors.append("E_SCHEMA_VERSION")
     return {"status": "PASS" if not errors else "FAIL", "errors": sorted(set(errors))}
 
 

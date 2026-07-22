@@ -53,6 +53,10 @@ struct ContentView: View {
     @FocusState private var customerIngressFocused: Bool
     @State private var customerIngressStatusText: String?
     @State private var customerIngressProofText = "route=demo_slice;status=idle;runner=0;mutation=0;readbacks=0"
+    /// B10 session stopline: durable receipt write failed after committed work.
+    @State private var customerIngressSessionStopped = false
+    /// Linked-receipt chain (G6): previous successfully written turn_id.
+    @State private var lastRuntimeTurnReceiptTurnID: String?
     @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
@@ -570,23 +574,33 @@ struct ContentView: View {
     private func submitCustomerIngress(_ input: FrontstageIngressInput) {
         mockVoiceResponseTask?.cancel()
         runtimeReadbackQueue.cancel()
+        if customerIngressSessionStopped {
+            customerIngressStatusText = "会话已停止（记录失败后需重新进入）"
+            customerIngressProofText = "route=demo_slice;status=session_stopped;runner=0;mutation=0;readbacks=0;reason=durable_write_failed"
+            return
+        }
         precondition(frontstageRuntimeComposition.customerIngress.sessionID == frontstageRuntimeComposition.session.sessionID)
         let result = frontstageRuntimeComposition.customerIngress.submit(input)
         guard case let .accepted(turn) = result else {
             guard case let .rejected(rejected) = result else { return }
             let message: String
+            let reasonTag: String
             switch rejected.reason {
             case .unavailable:
                 message = "语音输入当前不可用"
+                reasonTag = "unavailable"
             case .blank:
                 message = "请输入车控指令"
+                reasonTag = "blank"
             case .oversize:
                 message = "指令过长，请简短输入"
+                reasonTag = "oversize"
             case .rejectedByValidator:
                 message = "这条指令未通过输入校验"
+                reasonTag = "rejected_by_validator"
             }
             customerIngressStatusText = message
-            customerIngressProofText = "route=demo_slice;status=ingress_rejected;runner=0;mutation=0;readbacks=0;reason=\(String(describing: rejected.reason))"
+            customerIngressProofText = "route=demo_slice;status=ingress_rejected;runner=0;mutation=0;readbacks=0;reason=\(reasonTag)"
             messages.append(DialogueMessage(role: .assistant, text: message))
             return
         }
@@ -600,14 +614,25 @@ struct ContentView: View {
             switch result {
             case let .success(routeResult):
                 guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+                // Apply UI first so B10 can keep actual readbacks if durable write fails.
+                let committedMutation: Bool
                 if let execution = routeResult.execution {
+                    committedMutation = execution.payload.mutationCount > 0
                     applyDemoSliceExecution(execution, utterance: turn.utterance)
                 } else if let readOnly = routeResult.readOnly {
+                    committedMutation = false
                     applyDemoSliceReadOnly(readOnly, utterance: turn.utterance)
                 } else if let rejection = routeResult.rejection {
-                    writeContainmentReceipt(turn)
+                    committedMutation = false
                     applyDemoSliceRejection(rejection, turn: turn)
+                } else {
+                    committedMutation = false
                 }
+                writeRuntimeTurnReceipt(
+                    turn: turn,
+                    routeResult: routeResult,
+                    committedMutation: committedMutation
+                )
             case .failure:
                 guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
                 customerIngressStatusText = "演示链路暂时不可用"
@@ -681,7 +706,22 @@ struct ContentView: View {
                 utterance: turn.utterance,
                 preserveActiveCells: true,
                 proofStatus: { _ in
-                    "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(String(describing: rejection));state_revision=\(store.currentRevision)"
+                    let reasonTag: String
+                    switch rejection {
+                    case .blank:
+                        reasonTag = "blank"
+                    case .valueOutOfRange(let actual, let allowed):
+                        reasonTag = "value_out_of_range:\(actual):\(allowed.lowerBound)-\(allowed.upperBound)"
+                    case .clarifyMissingSlot:
+                        reasonTag = "clarify_missing_slot"
+                    case .notInCatalog:
+                        reasonTag = "not_in_catalog"
+                    case .conjunctionOrMultiIntent:
+                        reasonTag = "conjunction_or_multi_intent"
+                    case .cancel(let target):
+                        reasonTag = target.map { "cancel_\($0)" } ?? "user_cancelled"
+                    }
+                    return "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(reasonTag);state_revision=\(store.currentRevision)"
                 }
             )
         }
@@ -730,21 +770,60 @@ struct ContentView: View {
         messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
 
-    private func writeContainmentReceipt(_ turn: FrontstageVoiceTurn) {
+    /// G6 route-level receipt write (Assembler outside runner). B10: durable fail after
+    /// committed mutation → keep actual UI, surface「已执行但记录失败」, stop session.
+    private func writeRuntimeTurnReceipt(
+        turn: FrontstageVoiceTurn,
+        routeResult: DemoSliceRouteResult,
+        committedMutation: Bool
+    ) {
         do {
             let receiptConfiguration = try FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)
             do {
-                _ = try FrontstageRouteReceiptWriter.writeCurrent(
-                    turn,
+                let written = try RuntimeTurnReceiptAssembler.assembleAndWrite(
+                    turn: turn,
+                    routeResult: routeResult,
                     configuration: receiptConfiguration,
-                    isCurrent: { frontstageRuntimeComposition.isCurrentTurn(turn) }
+                    isCurrent: { frontstageRuntimeComposition.isCurrentTurn(turn) },
+                    linkedPreviousTurnID: lastRuntimeTurnReceiptTurnID
                 )
+                if written != nil {
+                    lastRuntimeTurnReceiptTurnID = turn.turnID
+                }
             } catch {
                 emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_WRITE_FAILED")
+                applyDurableReceiptWriteFailure(committedMutation: committedMutation)
             }
         } catch {
             emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED")
         }
+    }
+
+    /// B10 fail-closed hook: never fake success / cancelled / rollback.
+    private func applyDurableReceiptWriteFailure(committedMutation: Bool) {
+        let message = committedMutation ? "已执行但记录失败" : "记录失败，会话已停止"
+        customerIngressStatusText = message
+        customerIngressProofText =
+            "route=demo_slice;status=durable_write_failed;committed_mutation=\(committedMutation ? 1 : 0);session_stop=1;state_revision=\(store.currentRevision)"
+        messages.append(DialogueMessage(role: .assistant, text: message))
+        stopCustomerIngressSession()
+    }
+
+    private func stopCustomerIngressSession() {
+        customerIngressSessionStopped = true
+        frontstageRuntimeComposition.markCurrent(
+            FrontstageVoiceTurn(
+                sessionID: frontstageRuntimeComposition.session.sessionID,
+                sequence: 0,
+                turnID: "session-stopped",
+                eventID: "session-stopped",
+                utterance: "",
+                outcome: DemoRuntimeOutcome(result: .runtimeError, reason: "durable_write_failed"),
+                proofClass: .localUnit,
+                stateMutation: false,
+                readbacks: []
+            )
+        )
     }
 
     private func emitFrontstageRouteReceiptDiagnostic(_ code: String) {

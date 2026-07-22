@@ -19,7 +19,7 @@ export C1_FRONTSTAGE_RECEIPT_EMIT C1_FRONTSTAGE_RUN_ID C1_FRONTSTAGE_RUN_NONCE C
 swift build --product FrontstageRouteGateCLI >/dev/null
 app_executable="$root/.build/debug/FrontstageRouteGateCLI"
 "$app_executable" >/dev/null
-receipt="$C1_RUN_DIR/receipts/c1/frontstage-route-receipt.v1.json"
+receipt="$C1_RUN_DIR/receipts/c1/frontstage-route-receipt.v2.json"
 "$python_bin" Tools/checks/check_frontstage_route_receipt.py \
   --receipt "$receipt" \
   --schema contracts/schemas/frontstage-route-receipt.schema.json \

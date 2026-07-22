@@ -30,7 +30,7 @@ class FrontstageRouteRunnerTests(unittest.TestCase):
                 ["bash", str(RUNNER)], cwd=REPO_ROOT, env=env, capture_output=True, text=True
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            receipt = run_root / "receipts/c1/frontstage-route-receipt.v1.json"
+            receipt = run_root / "receipts/c1/frontstage-route-receipt.v2.json"
             body = json.loads(receipt.read_text(encoding="utf-8"))
             self.assertEqual(body["run_id"], "frontstage-run-1")
             self.assertEqual(body["run_nonce"], "0123456789abcdef0123456789abcdef")
@@ -50,7 +50,7 @@ class FrontstageRouteRunnerTests(unittest.TestCase):
                 ["bash", str(RUNNER)], cwd=REPO_ROOT, env=env, capture_output=True, text=True
             )
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertFalse((Path(temp) / "owner/receipts/c1/frontstage-route-receipt.v1.json").exists())
+            self.assertFalse((Path(temp) / "owner/receipts/c1/frontstage-route-receipt.v2.json").exists())
 
     def test_each_foreign_abi_key_rejects_its_invalid_value_without_fallback_receipt(self):
         source_head = subprocess.check_output(
@@ -81,7 +81,7 @@ class FrontstageRouteRunnerTests(unittest.TestCase):
                     )
                     self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                     self.assertFalse(
-                        (run_root / "receipts/c1/frontstage-route-receipt.v1.json").exists(),
+                        (run_root / "receipts/c1/frontstage-route-receipt.v2.json").exists(),
                         f"{key} produced a receipt despite its invalid value",
                     )
                     self.assertFalse(

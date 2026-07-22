@@ -13,11 +13,12 @@ public enum FrontstageRouteReceiptConfigurationError: Error, Equatable {
 }
 
 public enum FrontstageRouteReceiptWriteError: Error, Equatable {
-    case nonContainmentTurn
     case appExecutableUnavailable
     case failedToCreateDirectory
     case failedToCreateTemporaryFile
     case failedToReplaceReceipt
+    /// B10: durable persist failed. App must not relabel committed mutation as cancelled/rolled back.
+    case durableWriteFailed(underlying: String)
 }
 
 public struct FrontstageRouteReceiptConfiguration: Equatable {
@@ -31,7 +32,7 @@ public struct FrontstageRouteReceiptConfiguration: Equatable {
         runDirectory
             .appendingPathComponent("receipts", isDirectory: true)
             .appendingPathComponent("c1", isDirectory: true)
-            .appendingPathComponent("frontstage-route-receipt.v1.json", isDirectory: false)
+            .appendingPathComponent("frontstage-route-receipt.v2.json", isDirectory: false)
     }
 
     public static func environment(
@@ -128,7 +129,82 @@ public struct FrontstageRouteReceiptConfiguration: Equatable {
     }
 }
 
-public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
+/// Per-action evidence inside unique RuntimeTurnReceipt v2 (B08; no proofClass).
+public struct RuntimeTurnActionEvidence: Codable, Equatable, Sendable {
+    public let actionIndex: Int
+    public let frameIdentity: String?
+    public let contractIdentity: String?
+    public let toolName: String?
+    public let deviceName: String?
+    public let actionName: String?
+    public let slotsIdentity: String?
+    public let disposition: String
+    public let failureReason: String?
+    public let policyDecision: String?
+    public let beforeRevision: Int?
+    public let afterRevision: Int?
+    public let readback: DemoActionReadback?
+    public let replayRef: String?
+    /// True when readback key is presentation-virtual (e.g. `presentation.cancel`), not a business cell.
+    public let isVirtualReadback: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case actionIndex = "action_index"
+        case frameIdentity = "frame_identity"
+        case contractIdentity = "contract_identity"
+        case toolName = "tool_name"
+        case deviceName = "device_name"
+        case actionName = "action_name"
+        case slotsIdentity = "slots_identity"
+        case disposition
+        case failureReason = "failure_reason"
+        case policyDecision = "policy_decision"
+        case beforeRevision = "before_revision"
+        case afterRevision = "after_revision"
+        case readback
+        case replayRef = "replay_ref"
+        case isVirtualReadback = "is_virtual_readback"
+    }
+
+    public init(
+        actionIndex: Int,
+        frameIdentity: String? = nil,
+        contractIdentity: String? = nil,
+        toolName: String? = nil,
+        deviceName: String? = nil,
+        actionName: String? = nil,
+        slotsIdentity: String? = nil,
+        disposition: String,
+        failureReason: String? = nil,
+        policyDecision: String? = nil,
+        beforeRevision: Int? = nil,
+        afterRevision: Int? = nil,
+        readback: DemoActionReadback? = nil,
+        replayRef: String? = nil,
+        isVirtualReadback: Bool = false
+    ) {
+        self.actionIndex = actionIndex
+        self.frameIdentity = frameIdentity
+        self.contractIdentity = contractIdentity
+        self.toolName = toolName
+        self.deviceName = deviceName
+        self.actionName = actionName
+        self.slotsIdentity = slotsIdentity
+        self.disposition = disposition
+        self.failureReason = failureReason
+        self.policyDecision = policyDecision
+        self.beforeRevision = beforeRevision
+        self.afterRevision = afterRevision
+        self.readback = readback
+        self.replayRef = replayRef
+        self.isVirtualReadback = isVirtualReadback
+    }
+}
+
+/// Unique Frontstage RuntimeTurnReceipt v2 (B08 clean-cutover; zero v1 shim; no proofClass).
+public struct RuntimeTurnReceipt: Codable, Equatable, Sendable {
+    public static let schemaVersionValue = "frontstage_route_receipt.v2"
+
     public let schemaVersion: String
     public let runID: String
     public let runNonce: String
@@ -142,10 +218,15 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
     public let matrixSourceSHA256: String
     public let runtimeContractBundleDigest: String
     public let appExecutableSHA256: String
-    public let proofClass: String
-    public let result: DemoRuntimeResult
+    public let finalOutcome: DemoRuntimeResult
     public let stateMutation: Bool
     public let readbackCount: Int
+    public let mountReceiptBodySHA256: String
+    public let codeHeadDigest: String
+    public let mountedCatalogDigest: String
+    public let touchedCellCanonicalSnapshotDigest: String
+    public let linkedPreviousTurnID: String?
+    public let actions: [RuntimeTurnActionEvidence]
 
     enum CodingKeys: String, CodingKey {
         case schemaVersion = "schema_version"
@@ -161,10 +242,63 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
         case matrixSourceSHA256 = "matrix_source_sha256"
         case runtimeContractBundleDigest = "runtime_contract_bundle_digest"
         case appExecutableSHA256 = "app_executable_sha256"
-        case proofClass = "proof_class"
-        case result
+        case finalOutcome = "final_outcome"
         case stateMutation = "state_mutation"
         case readbackCount = "readback_count"
+        case mountReceiptBodySHA256 = "mount_receipt_body_sha256"
+        case codeHeadDigest = "code_head_digest"
+        case mountedCatalogDigest = "mounted_catalog_digest"
+        case touchedCellCanonicalSnapshotDigest = "touched_cell_canonical_snapshot_digest"
+        case linkedPreviousTurnID = "linked_previous_turn_id"
+        case actions
+    }
+
+    public init(
+        schemaVersion: String = RuntimeTurnReceipt.schemaVersionValue,
+        runID: String,
+        runNonce: String,
+        sourceHeadSHA: String?,
+        testedCheckoutSHA: String?,
+        sessionID: String,
+        turnID: String,
+        eventID: String,
+        sequence: Int,
+        matrixID: Int?,
+        matrixSourceSHA256: String,
+        runtimeContractBundleDigest: String,
+        appExecutableSHA256: String,
+        finalOutcome: DemoRuntimeResult,
+        stateMutation: Bool,
+        readbackCount: Int,
+        mountReceiptBodySHA256: String,
+        codeHeadDigest: String,
+        mountedCatalogDigest: String,
+        touchedCellCanonicalSnapshotDigest: String,
+        linkedPreviousTurnID: String? = nil,
+        actions: [RuntimeTurnActionEvidence]
+    ) {
+        self.schemaVersion = schemaVersion
+        self.runID = runID
+        self.runNonce = runNonce
+        self.sourceHeadSHA = sourceHeadSHA
+        self.testedCheckoutSHA = testedCheckoutSHA
+        self.sessionID = sessionID
+        self.turnID = turnID
+        self.eventID = eventID
+        self.sequence = sequence
+        self.matrixID = matrixID
+        self.matrixSourceSHA256 = matrixSourceSHA256
+        self.runtimeContractBundleDigest = runtimeContractBundleDigest
+        self.appExecutableSHA256 = appExecutableSHA256
+        self.finalOutcome = finalOutcome
+        self.stateMutation = stateMutation
+        self.readbackCount = readbackCount
+        self.mountReceiptBodySHA256 = mountReceiptBodySHA256
+        self.codeHeadDigest = codeHeadDigest
+        self.mountedCatalogDigest = mountedCatalogDigest
+        self.touchedCellCanonicalSnapshotDigest = touchedCellCanonicalSnapshotDigest
+        self.linkedPreviousTurnID = linkedPreviousTurnID
+        self.actions = actions
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -182,42 +316,22 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
         try container.encode(matrixSourceSHA256, forKey: .matrixSourceSHA256)
         try container.encode(runtimeContractBundleDigest, forKey: .runtimeContractBundleDigest)
         try container.encode(appExecutableSHA256, forKey: .appExecutableSHA256)
-        try container.encode(proofClass, forKey: .proofClass)
-        try container.encode(result, forKey: .result)
+        try container.encode(finalOutcome, forKey: .finalOutcome)
         try container.encode(stateMutation, forKey: .stateMutation)
         try container.encode(readbackCount, forKey: .readbackCount)
+        try container.encode(mountReceiptBodySHA256, forKey: .mountReceiptBodySHA256)
+        try container.encode(codeHeadDigest, forKey: .codeHeadDigest)
+        try container.encode(mountedCatalogDigest, forKey: .mountedCatalogDigest)
+        try container.encode(touchedCellCanonicalSnapshotDigest, forKey: .touchedCellCanonicalSnapshotDigest)
+        try container.encode(linkedPreviousTurnID, forKey: .linkedPreviousTurnID)
+        try container.encode(actions, forKey: .actions)
     }
 
-    static func containment(_ turn: FrontstageVoiceTurn, configuration: FrontstageRouteReceiptConfiguration) throws -> FrontstageRouteReceipt {
-        guard turn.outcome.result == .refusalNoAvailableTool, !turn.stateMutation, turn.readbacks.isEmpty else {
-            throw FrontstageRouteReceiptWriteError.nonContainmentTurn
-        }
-        return FrontstageRouteReceipt(
-            schemaVersion: "frontstage_route_receipt.v1",
-            runID: configuration.runID,
-            runNonce: configuration.runNonce,
-            sourceHeadSHA: configuration.sourceHeadSHA,
-            testedCheckoutSHA: configuration.sourceHeadSHA,
-            sessionID: turn.sessionID,
-            turnID: turn.turnID,
-            eventID: turn.eventID,
-            sequence: turn.sequence,
-            matrixID: nil,
-            matrixSourceSHA256: DemoCapabilityMatrixCatalog.sourceSHA256,
-            runtimeContractBundleDigest: DemoRuntimeContractBundleCatalog.runtimeContractBundleDigest,
-            appExecutableSHA256: try executableSHA256(),
-            proofClass: "frontstage_route_local_integration",
-            result: turn.outcome.result,
-            stateMutation: turn.stateMutation,
-            readbackCount: turn.readbacks.count
-        )
+    public static func decode(from url: URL) throws -> RuntimeTurnReceipt {
+        try JSONDecoder().decode(RuntimeTurnReceipt.self, from: Data(contentsOf: url))
     }
 
-    public static func decode(from url: URL) throws -> FrontstageRouteReceipt {
-        try JSONDecoder().decode(FrontstageRouteReceipt.self, from: Data(contentsOf: url))
-    }
-
-    private static func executableSHA256() throws -> String {
+    static func executableSHA256() throws -> String {
         guard let executableURL = Bundle.main.executableURL else {
             throw FrontstageRouteReceiptWriteError.appExecutableUnavailable
         }
@@ -228,28 +342,34 @@ public struct FrontstageRouteReceipt: Codable, Equatable, Sendable {
 public enum FrontstageRouteReceiptWriter {
     @discardableResult
     public static func writeCurrent(
-        _ turn: FrontstageVoiceTurn,
+        _ receipt: RuntimeTurnReceipt,
         configuration: FrontstageRouteReceiptConfiguration,
         isCurrent: () -> Bool
     ) throws -> URL? {
         guard isCurrent() else { return nil }
-        let receipt = try FrontstageRouteReceipt.containment(turn, configuration: configuration)
         let destination = configuration.receiptURL
         let directory = destination.deletingLastPathComponent()
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         } catch {
-            throw FrontstageRouteReceiptWriteError.failedToCreateDirectory
+            throw FrontstageRouteReceiptWriteError.durableWriteFailed(underlying: "failedToCreateDirectory")
         }
 
         let temporary = directory.appendingPathComponent(".frontstage-route-receipt-\(UUID().uuidString.lowercased()).tmp")
-        let data = try JSONEncoder().encode(receipt)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let data = try encoder.encode(receipt)
         guard FileManager.default.createFile(atPath: temporary.path, contents: data) else {
-            throw FrontstageRouteReceiptWriteError.failedToCreateTemporaryFile
+            throw FrontstageRouteReceiptWriteError.durableWriteFailed(underlying: "failedToCreateTemporaryFile")
         }
-        let handle = try FileHandle(forWritingTo: temporary)
-        try handle.synchronize()
-        try handle.close()
+        do {
+            let handle = try FileHandle(forWritingTo: temporary)
+            try handle.synchronize()
+            try handle.close()
+        } catch {
+            try? FileManager.default.removeItem(at: temporary)
+            throw FrontstageRouteReceiptWriteError.durableWriteFailed(underlying: "failedToSynchronizeTemporaryFile")
+        }
 
         guard isCurrent() else {
             try? FileManager.default.removeItem(at: temporary)
@@ -257,7 +377,7 @@ public enum FrontstageRouteReceiptWriter {
         }
         guard Darwin.rename(temporary.path, destination.path) == 0 else {
             try? FileManager.default.removeItem(at: temporary)
-            throw FrontstageRouteReceiptWriteError.failedToReplaceReceipt
+            throw FrontstageRouteReceiptWriteError.durableWriteFailed(underlying: "failedToReplaceReceipt")
         }
         return destination
     }

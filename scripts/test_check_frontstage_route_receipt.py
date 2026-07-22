@@ -29,7 +29,7 @@ class FrontstageRouteReceiptCheckerTests(unittest.TestCase):
 
     def valid_receipt(self):
         return {
-            "schema_version": "frontstage_route_receipt.v1",
+            "schema_version": "frontstage_route_receipt.v2",
             "run_id": "run-1",
             "run_nonce": "0123456789abcdef0123456789abcdef",
             "source_head_sha": "a" * 40,
@@ -42,10 +42,22 @@ class FrontstageRouteReceiptCheckerTests(unittest.TestCase):
             "matrix_source_sha256": "b" * 64,
             "runtime_contract_bundle_digest": "b" * 64,
             "app_executable_sha256": "c" * 64,
-            "proof_class": "frontstage_route_local_integration",
-            "result": "refusal_no_available_tool",
+            "final_outcome": "refusal_no_available_tool",
             "state_mutation": False,
             "readback_count": 0,
+            "mount_receipt_body_sha256": "d" * 64,
+            "code_head_digest": "a" * 40,
+            "mounted_catalog_digest": "e" * 64,
+            "touched_cell_canonical_snapshot_digest": "f" * 64,
+            "linked_previous_turn_id": None,
+            "actions": [
+                {
+                    "action_index": 0,
+                    "disposition": "refused",
+                    "failure_reason": "not_available_in_demo",
+                    "is_virtual_readback": False,
+                }
+            ],
         }
 
     def test_valid_deny_receipt_passes(self):

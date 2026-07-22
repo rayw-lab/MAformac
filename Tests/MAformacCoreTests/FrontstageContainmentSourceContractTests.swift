@@ -21,12 +21,16 @@ final class FrontstageContainmentSourceContractTests: XCTestCase {
             "G4 knife3: customer path must not spawn anonymous MainActor Tasks"
         )
         XCTAssertTrue(submission.contains("applyDemoSliceExecution"))
-        XCTAssertTrue(submission.contains("FrontstageRouteReceiptWriter.writeCurrent"))
+        XCTAssertTrue(submission.contains("RuntimeTurnReceiptAssembler.assembleAndWrite"))
         XCTAssertTrue(submission.contains("frontstageRuntimeComposition.isCurrentTurn"))
         XCTAssertTrue(submission.contains("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED"))
         XCTAssertTrue(submission.contains("FRONTSTAGE_ROUTE_RECEIPT_WRITE_FAILED"))
+        XCTAssertTrue(submission.contains("已执行但记录失败"))
+        XCTAssertTrue(submission.contains("stopCustomerIngressSession"))
         XCTAssertFalse(submission.contains("try? FrontstageRouteReceiptConfiguration.environment"))
         XCTAssertFalse(submission.contains("_ = try? FrontstageRouteReceiptWriter.writeCurrent"))
+        XCTAssertFalse(submission.contains("_ = try? RuntimeTurnReceiptAssembler.assembleAndWrite"))
+        XCTAssertFalse(submission.contains("writeContainmentReceipt"))
         XCTAssertFalse(submission.contains("MockVoicePresetPlanner"))
         XCTAssertFalse(submission.contains("applyMockVoiceColdIntent"))
     }

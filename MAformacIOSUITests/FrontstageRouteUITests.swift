@@ -23,7 +23,7 @@ final class FrontstageRouteUITests: XCTestCase {
         XCTAssertTrue(app.wait(for: .runningForeground, timeout: 12))
         let mic = app.descendants(matching: .any)["mic-dock"]
         XCTAssertTrue(mic.waitForExistence(timeout: 12))
-        let receiptURL = runDirectory.appendingPathComponent("receipts/c1/frontstage-route-receipt.v1.json")
+        let receiptURL = runDirectory.appendingPathComponent("receipts/c1/frontstage-route-receipt.v2.json")
 
         mic.press(forDuration: 0.25)
         XCTAssertTrue(waitForReceipt(receiptURL))
@@ -49,7 +49,9 @@ final class FrontstageRouteUITests: XCTestCase {
         XCTAssertEqual(first["matrix_source_sha256"] as? String, second["matrix_source_sha256"] as? String)
         XCTAssertEqual(first["runtime_contract_bundle_digest"] as? String, second["runtime_contract_bundle_digest"] as? String)
         XCTAssertEqual(first["app_executable_sha256"] as? String, second["app_executable_sha256"] as? String)
-        XCTAssertEqual(second["result"] as? String, "refusal_no_available_tool")
+        XCTAssertEqual(second["final_outcome"] as? String, "refusal_no_available_tool")
+        XCTAssertNil(second["proof_class"])
+        XCTAssertEqual(second["schema_version"] as? String, "frontstage_route_receipt.v2")
         XCTAssertEqual(second["state_mutation"] as? Bool, false)
         XCTAssertEqual(second["readback_count"] as? Int, 0)
         #else

@@ -137,7 +137,7 @@ final class UIReadbackSourceTests: XCTestCase {
             encoding: .utf8
         )
         let start = try XCTUnwrap(source.range(of: "private func applyDemoSliceExecution"))
-        let end = try XCTUnwrap(source.range(of: "private func writeContainmentReceipt"))
+        let end = try XCTUnwrap(source.range(of: "private func writeRuntimeTurnReceipt"))
         let body = String(source[start.lowerBound..<end.lowerBound])
 
         let forbidden = [
