@@ -44,7 +44,7 @@ g6_status: G6_COMPLETE
 
 ## 下一步（Phase2 G7）
 
-1. **G6_COMPLETE（工程）**：下一刀进入 **G7**（按冻结 plan / remaining-map；勿抬 proven）。
+1. **G6_COMPLETE（工程）**：下一刀进入 **G7**（按冻结 plan / remaining-map；勿抬 proven）。**G7 作战包已建**（run-root `PHASE2-G7-BEHAVIOR-GATES-BATTLE-PACKET.md`）。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 3. residual 强制账（不因 G3/G4/G5/G6 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 4. 禁抬 proven；禁演示后三族。
