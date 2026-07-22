@@ -509,17 +509,7 @@ public struct C3ExecutionPipeline: Sendable {
             )
         }
 
-        switch riskPolicy.evaluate(device: frame.device, stateValues: store.stateValues) {
-        case .allow:
-            break
-        case .confirm(let reason), .refuse(let reason):
-            traceLogger?.recordGuard(
-                traceID: frame.traceID,
-                message: reason,
-                attributes: TraceAttributes(guardReason: reason)
-            )
-            throw ToolExecutionError.guardDenied(reason)
-        }
+        try evaluateFreshRiskOrThrow(frame, store: store, traceLogger: traceLogger)
         return try planTransitions(for: frame, store: store)
     }
 
@@ -533,6 +523,11 @@ public struct C3ExecutionPipeline: Sendable {
               settledPlan.parentRequestFingerprint == parentRequestFingerprint(for: frame) else {
             return nil
         }
+
+        // G3: settled hit must re-evaluate live risk before returning any prior success/readback.
+        // Refuse → new guardDenied (unknown-state fail-closed included); never replay old success.
+        try evaluateFreshRiskOrThrow(frame, store: store, traceLogger: traceLogger)
+
         let adapter = runtimeAdapterBox.resolve()
         var replayed: [(PlannedTransition, DemoRuntimeAdapterResult)] = []
         for planned in settledPlan.transitions {
@@ -580,6 +575,25 @@ public struct C3ExecutionPipeline: Sendable {
             readbacks.append(verified)
         }
         return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks, provenance: provenance)
+    }
+
+    @MainActor
+    private func evaluateFreshRiskOrThrow(
+        _ frame: ToolCallFrame,
+        store: DemoVehicleStateStore,
+        traceLogger: (any TraceLogger)?
+    ) throws {
+        switch riskPolicy.evaluate(device: frame.device, stateValues: store.stateValues) {
+        case .allow:
+            return
+        case .confirm(let reason), .refuse(let reason):
+            traceLogger?.recordGuard(
+                traceID: frame.traceID,
+                message: reason,
+                attributes: TraceAttributes(guardReason: reason)
+            )
+            throw ToolExecutionError.guardDenied(reason)
+        }
     }
 
     private func adapterCommandID(parent frame: ToolCallFrame, transition: DemoMockTransition) -> String {
