@@ -18,12 +18,12 @@ public enum RuntimeTurnReceiptAssembler {
         mountReceiptBodySHA256: String? = nil
     ) throws -> RuntimeTurnReceipt {
         let built = try buildEvidence(turn: turn, routeResult: routeResult)
-        let catalogDigest = DemoSliceAdmissionCatalog().catalogDigestSHA256
+        let catalogDigest = mountedCatalogDigest()
         let codeHead = configuration.sourceHeadSHA
             ?? C6Hash.sha256Hex(Data("local_unpinned_code_head".utf8))
         let mountDigest = mountReceiptBodySHA256
-            ?? C6Hash.sha256Hex(Data("mount_receipt_absent".utf8))
-        let touchedDigest = touchedCellDigest(from: built.businessReadbacks)
+            ?? Self.mountReceiptBodySHA256(from: nil)
+        let touchedDigest = touchedCellCanonicalSnapshotDigest(from: built.businessReadbacks)
 
         return RuntimeTurnReceipt(
             runID: configuration.runID,
@@ -77,6 +77,34 @@ public enum RuntimeTurnReceiptAssembler {
 
     public static func isVirtualReadbackKey(_ key: String) -> Bool {
         key.hasPrefix(virtualReadbackKeyPrefix)
+    }
+
+    /// Fact-recomputable mount body digest (G6 knife2). Absent body uses stable sentinel.
+    public static func mountReceiptBodySHA256(from body: Data?) -> String {
+        guard let body else {
+            return C6Hash.sha256Hex(Data("mount_receipt_absent".utf8))
+        }
+        return C6Hash.sha256Hex(body)
+    }
+
+    /// Fact-recomputable mounted catalog digest (G6 knife2). Independent of live store.
+    public static func mountedCatalogDigest(
+        catalog: DemoSliceAdmissionCatalog = DemoSliceAdmissionCatalog()
+    ) -> String {
+        catalog.catalogDigestSHA256
+    }
+
+    /// Fact-recomputable touched-cell snapshot digest (G6 knife2).
+    /// Multi-cell: key-sorted; excludes `presentation.*` virtual readbacks; trailing newline.
+    public static func touchedCellCanonicalSnapshotDigest(
+        from readbacks: [DemoActionReadback]
+    ) -> String {
+        let lines = readbacks
+            .filter { !isVirtualReadbackKey($0.key) }
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key)=\($0.actualValue)@\($0.revision)" }
+            .joined(separator: "\n")
+        return C6Hash.sha256Hex(Data((lines + "\n").utf8))
     }
 
     // MARK: - Evidence build
@@ -311,12 +339,4 @@ public enum RuntimeTurnReceiptAssembler {
         }.joined(separator: "&")
     }
 
-    private static func touchedCellDigest(from readbacks: [DemoActionReadback]) -> String {
-        let lines = readbacks
-            .filter { !isVirtualReadbackKey($0.key) }
-            .sorted { $0.key < $1.key }
-            .map { "\($0.key)=\($0.actualValue)@\($0.revision)" }
-            .joined(separator: "\n")
-        return C6Hash.sha256Hex(Data((lines + "\n").utf8))
-    }
 }
