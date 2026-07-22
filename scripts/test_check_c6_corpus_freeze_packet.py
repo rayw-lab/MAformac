@@ -492,22 +492,13 @@ def test_unknown_extra_ref_and_duplicate_ref_rejected() -> None:
 
 
 def test_sibling_absolute_receipt_rejected() -> None:
-    """Sibling run absolute receipt path must not be accepted as general absolute."""
+    """Any absolute receipt path must be rejected after pool32 was vendored in-repo."""
     mod = _load_mod("c6exp_b7_oor5")
-    sibling = (
-        "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/"
-        "reports/BALLOT-INDEX-v6.md"
-    )
-    if not Path(sibling).is_file():
-        # Fall back to any other existing file under the same parent dir.
-        parent = Path(mod.EXTERNAL_REF_ALLOWLIST_DECLARED).parent
-        candidates = [p for p in parent.iterdir() if p.is_file() and p.name != Path(mod.EXTERNAL_REF_ALLOWLIST_DECLARED).name]
-        assert candidates, "precondition: sibling receipt file must exist"
-        sibling = str(candidates[0])
+    sibling = "/tmp/not-an-allowlisted-receipt.md"
     resolved, err = mod._resolve_ref_strict(
         {"path": sibling, "locator": "sibling_receipt"}
     )
-    assert resolved is None and err, "sibling absolute receipt must be rejected"
+    assert resolved is None and err, "absolute receipt path must be rejected"
 
 
 def main() -> int:

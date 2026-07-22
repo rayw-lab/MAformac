@@ -89,10 +89,7 @@ EXPECTED_SOURCE_MEMBERS: dict[str, dict[str, object]] = {
     },
     "pool32_ratification_receipt": {
         "role": "ratification_receipt",
-        "path": (
-            "/Users/wanglei/Projects/agent-tmux-stack-research/"
-            "runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md"
-        ),
+        "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
         "locator": "pool32",
         "subject_bindings": ["ratification_receipt_sha256"],
     },

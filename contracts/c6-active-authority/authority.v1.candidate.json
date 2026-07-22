@@ -11,7 +11,7 @@
       "sha256": "e645ce44cc14f458381a4a0df49f7237102b138505e3fd633ccec2b87c88ad7e"
     },
     {
-      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md",
+      "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
       "locator": "pool32",
       "sha256": "70470bc39c8a3137a4c4d298de1533502ed18b78b237d22d53d4f7b1bb43eacb"
     }
@@ -40,7 +40,7 @@
     {
       "member_id": "pool32_ratification_receipt",
       "role": "ratification_receipt",
-      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md",
+      "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
       "locator": "pool32",
       "sha256": "70470bc39c8a3137a4c4d298de1533502ed18b78b237d22d53d4f7b1bb43eacb",
       "subject_bindings": [
@@ -52,7 +52,7 @@
       "role": "registry_package_entry",
       "path": "contracts/closure-work-packages.v1.yaml",
       "locator": "V1",
-      "sha256": "cb96b9371e69928aac2d790fef9553cacb05b208eb6201c1e052367292fb2350",
+      "sha256": "31a92b0c164315c81206d1985a16f990aaf6338951a9f039c655e42628798d68",
       "subject_bindings": [
         "authority_id"
       ]

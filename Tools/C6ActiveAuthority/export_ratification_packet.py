@@ -39,12 +39,13 @@ import check_c6_active_authority_candidate as auth_checker  # noqa: E402
 
 CANDIDATE_PATH = REPO_ROOT / "contracts" / "c6-active-authority" / "authority.v1.candidate.json"
 
-# Single known external receipt authority path (exact string; not prefix/glob).
-# Derived from the live B7/V1 packet authority refs (pool32 ratification receipt).
-EXTERNAL_REF_ALLOWLIST_DECLARED = (
-    "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/"
-    "reports/RATIFICATION-RECEIPT-pool32.md"
+# Pool32 ratification receipt is vendored in-repo so CI/reanchor can resolve it
+# without a machine-local absolute path. Absolute refs remain forbidden.
+POOL32_RECEIPT_RELATIVE = (
+    "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md"
 )
+# Legacy name kept for negative-path tests that assert absolute refs are rejected.
+EXTERNAL_REF_ALLOWLIST_DECLARED = POOL32_RECEIPT_RELATIVE
 
 # D-147 ratification refs bound mechanically (cannot forge T01/T02 ratification string).
 # Order is contractual: self_check requires exact ordered match.
@@ -54,7 +55,7 @@ RECEIPT_REFS = [
         "locator": "D-147",
     },
     {
-        "path": EXTERNAL_REF_ALLOWLIST_DECLARED,
+        "path": POOL32_RECEIPT_RELATIVE,
         "locator": "pool32",
     },
 ]
@@ -146,11 +147,6 @@ def _path_is_under_repo(resolved: Path) -> bool:
         return False
 
 
-def _external_allowlist_resolved() -> Path:
-    """Canonical absolute path of the single allowlisted external receipt."""
-    return Path(EXTERNAL_REF_ALLOWLIST_DECLARED).resolve()
-
-
 def _resolve_ref_strict(
     ref: dict,
     *,
@@ -159,10 +155,7 @@ def _resolve_ref_strict(
     """Fail-closed ref resolver. Never emits all-zero sha as valid evidence.
 
     Repo-relative refs must remain inside REPO_ROOT after symlink resolution.
-    Absolute refs are forbidden except the exact single pool32 allowlist entry:
-    declared path string must equal EXTERNAL_REF_ALLOWLIST_DECLARED, and the
-    resolved path must exact-match that allowlist entry (no prefix/glob/general
-    absolute paths, no sibling receipts, no /etc/hosts, no symlink escape).
+    Absolute refs are forbidden (pool32 receipt is vendored in-repo).
     """
     path_str = ref.get("path")
     locator = ref.get("locator")
@@ -174,19 +167,9 @@ def _resolve_ref_strict(
     try:
         resolved = p.resolve()
         if Path(path_str).is_absolute():
-            if path_str != EXTERNAL_REF_ALLOWLIST_DECLARED:
-                return None, (
-                    "absolute ref path not exactly the allowlisted pool32 receipt: "
-                    f"{path_str}"
-                )
-            if resolved != _external_allowlist_resolved():
-                return None, (
-                    "absolute ref resolved path does not exact-match allowlist entry: "
-                    f"{path_str}"
-                )
-        else:
-            if not _path_is_under_repo(resolved):
-                return None, f"ref path escapes repo root: {path_str}"
+            return None, f"absolute ref path forbidden: {path_str}"
+        if not _path_is_under_repo(resolved):
+            return None, f"ref path escapes repo root: {path_str}"
         if not p.exists() and not resolved.exists():
             return None, f"missing ref path: {path_str}"
         if not resolved.is_file():
