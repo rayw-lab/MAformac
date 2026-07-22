@@ -205,12 +205,21 @@ public final class DemoSliceRoute {
             safeReason = "cancelled"
         }
 
+        // G5 knife4: spoken copy rides on readbacks (payload has no dialogText field).
+        let readbacks = [
+            DemoActionReadback(
+                key: "presentation.cancel",
+                actualValue: cancelTooLate ? "too_late" : "preempt",
+                revision: store.currentRevision,
+                spokenText: dialogText
+            )
+        ]
         let snapshot = PresentationSnapshot(
             traceID: traceID,
             runtimeOutcome: DemoRuntimeOutcome(result: result, reason: reason),
             cards: store.presentationCells,
             dialogText: dialogText,
-            readbacks: [],
+            readbacks: readbacks,
             voiceState: .idle,
             orbState: .idle,
             mutationCount: 0,
@@ -401,6 +410,21 @@ public final class DemoSliceRoute {
         let evidence = "\(spec.stateBase):\(range.min)...\(range.max) step=\(range.step) unit=\(unit)"
         let digest = C6Hash.sha256Hex(Data(evidence.utf8))
         let traceID = UUID().uuidString
+        // G5 knife4: capability spoken copy on readbacks so App only renders payload.
+        let spoken: String
+        if spec.stateBase == "ac.temp_setpoint" {
+            spoken = "空调温度支持\(range.min)到\(range.max)度"
+        } else {
+            spoken = "\(spec.stateBase) 支持\(range.min)到\(range.max)"
+        }
+        let readbacks = [
+            DemoActionReadback(
+                key: "\(spec.stateBase).capability_range",
+                actualValue: "\(range.min)...\(range.max)",
+                revision: store.currentRevision,
+                spokenText: spoken
+            )
+        ]
         let snapshot = PresentationSnapshot(
             traceID: traceID,
             runtimeOutcome: DemoRuntimeOutcome(
@@ -408,7 +432,8 @@ public final class DemoSliceRoute {
                 reason: "capability_query"
             ),
             cards: store.presentationCells,
-            readbacks: [],
+            dialogText: spoken,
+            readbacks: readbacks,
             voiceState: .idle,
             orbState: .idle,
             proofClass: .localUnit,

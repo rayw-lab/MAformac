@@ -618,131 +618,40 @@ struct ContentView: View {
     }
 
     private func applyDemoSliceExecution(_ execution: DemoSliceExecution, utterance: String) {
-        let payload = execution.payload
-        let dialogueText = payload.readbacks.map(\.spokenText).joined(separator: "；")
-        // Voice/orb/mutation are read-only from payload (§3.4 / ROB-1).
-        // App must not invent .speaking or hardcode mutation=1.
-        let orbState = Self.appOrbState(from: payload.orbState)
-        let voiceState: PresentationVoiceState = Self.appVoiceState(from: payload.voiceState)
-        var activeCells = snapshot.activeCells
-        var scopeOrigins = snapshot.scopeOrigins
-        for readback in payload.readbacks {
-            let base = ScopedStateKey(readback.key).base
-            if let family = FamilyCardIDMapper.familyCardID(forBase: base) {
-                activeCells[family] = readback.key
+        applyDemoSlicePayload(
+            execution.payload,
+            utterance: utterance,
+            preserveActiveCells: false,
+            proofStatus: { payload in
+                let readbackValues = payload.readbacks.map { "\($0.key)=\($0.actualValue)" }.joined(separator: ",")
+                return "route=demo_slice;source=\(execution.admission.frame.candidateSource.rawValue);status=executed;runner=\(execution.runnerCallCount);mutation=\(payload.mutationCount);matrix_id=\(String(execution.admission.entry.matrixID));contract_row_id=\(execution.admission.entry.contractRowID);state_revision=\(store.currentRevision);readbacks=\(payload.readbacks.count);values=\(readbackValues)"
             }
-            if let scopeOrigin = readback.scopeOrigin {
-                scopeOrigins[readback.key] = scopeOrigin
-            }
-        }
-        // Exhaustive mapping of DemoRuntimeResult -> DemoRuntimeResultKind (no default).
-        let resultKind: DemoRuntimeResultKind
-        switch payload.outcome.result {
-        case .acceptedToolCall: resultKind = .acceptedToolCall
-        case .noAction: resultKind = .noAction
-        case .clarifyMissingSlot: resultKind = .clarifyMissingSlot
-        case .refusalNoAvailableTool: resultKind = .refusalNoAvailableTool
-        case .refusalSafetyOrPolicy: resultKind = .refusalSafetyOrPolicy
-        case .alreadyStateNoop: resultKind = .alreadyStateNoop
-        case .partialAcceptPartialRefuse: resultKind = .partialAcceptPartialRefuse
-        case .runtimeError: resultKind = .runtimeError
-        case .cancelled: resultKind = .cancelled
-        case .interrupted: resultKind = .cancelled
-        case .stateQuery: resultKind = .stateQuery
-        case .capabilityQuery: resultKind = .capabilityQuery
-        case .refusalContractViolation: resultKind = .refusalContractViolation
-        }
-        snapshot = StagePresentationSnapshot.from(
-            store: store,
-            activeCells: activeCells,
-            context: snapshot.context,
-            resultKind: resultKind,
-            traceId: payload.traceID,
-            scopeOrigins: scopeOrigins,
-            orbState: orbState,
-            voiceState: voiceState,
-            dialogText: dialogueText,
-            readbacks: snapshot.readbacks + payload.readbacks,
-            proofClass: .localMock
         )
-        customerIngressStatusText = dialogueText
-        let readbackValues = payload.readbacks.map { "\($0.key)=\($0.actualValue)" }.joined(separator: ",")
-        customerIngressProofText = "route=demo_slice;source=\(execution.admission.frame.candidateSource.rawValue);status=executed;runner=\(execution.runnerCallCount);mutation=\(payload.mutationCount);matrix_id=\(String(execution.admission.entry.matrixID));contract_row_id=\(execution.admission.entry.contractRowID);state_revision=\(store.currentRevision);readbacks=\(payload.readbacks.count);values=\(readbackValues)"
-        messages.append(DialogueMessage(role: .user, text: utterance))
-        messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
 
-    /// G2/G5 read-only query path (state/capability). No runner, no mutation.
+    /// G2/G5 read-only query path (state/capability/cancel). No runner, no mutation.
+    /// G5 knife4: dialogue / resultKind / orb / voice come only from payload.
     private func applyDemoSliceReadOnly(_ readOnly: DemoSliceReadOnlyOutcome, utterance: String) {
-        let payload = readOnly.payload
-        let dialogueText: String
-        if case .cancel = readOnly.classification {
-            // G4: cancel/cancelTooLate copy from eventID prefix (payload omits snapshot.dialogText).
-            if payload.eventID?.hasPrefix("cancel-too-late") == true {
-                dialogueText = "命令已执行，如需撤销请说完整反向指令"
-            } else {
-                dialogueText = "已取消"
+        applyDemoSlicePayload(
+            readOnly.payload,
+            utterance: utterance,
+            preserveActiveCells: true,
+            proofStatus: { payload in
+                let statusTag: String
+                if case .cancel = readOnly.classification {
+                    statusTag = payload.eventID?.hasPrefix("cancel-too-late") == true
+                        ? "cancel_too_late"
+                        : "cancel_preempt"
+                } else {
+                    statusTag = "read_only_query"
+                }
+                return "route=demo_slice;status=\(statusTag);runner=0;mutation=0;readbacks=\(payload.readbacks.count);state_revision=\(store.currentRevision)"
             }
-        } else if !payload.readbacks.isEmpty {
-            dialogueText = payload.readbacks.map(\.spokenText).joined(separator: "；")
-        } else if case .capabilityQuery = readOnly.classification {
-            dialogueText = "空调温度支持18到32度"
-        } else {
-            dialogueText = "已查询"
-        }
-        let resultKind: DemoRuntimeResultKind
-        switch payload.outcome.result {
-        case .acceptedToolCall: resultKind = .acceptedToolCall
-        case .noAction: resultKind = .noAction
-        case .clarifyMissingSlot: resultKind = .clarifyMissingSlot
-        case .refusalNoAvailableTool: resultKind = .refusalNoAvailableTool
-        case .refusalSafetyOrPolicy: resultKind = .refusalSafetyOrPolicy
-        case .alreadyStateNoop: resultKind = .alreadyStateNoop
-        case .partialAcceptPartialRefuse: resultKind = .partialAcceptPartialRefuse
-        case .runtimeError: resultKind = .runtimeError
-        case .cancelled, .interrupted: resultKind = .cancelled
-        case .stateQuery: resultKind = .stateQuery
-        case .capabilityQuery: resultKind = .capabilityQuery
-        case .refusalContractViolation: resultKind = .refusalContractViolation
-        }
-        snapshot = StagePresentationSnapshot.from(
-            store: store,
-            activeCells: snapshot.activeCells,
-            context: snapshot.context,
-            resultKind: resultKind,
-            traceId: payload.traceID,
-            scopeOrigins: snapshot.scopeOrigins,
-            orbState: .idle,
-            voiceState: .idle,
-            dialogText: dialogueText,
-            readbacks: snapshot.readbacks + payload.readbacks,
-            proofClass: .localMock
         )
-        customerIngressStatusText = dialogueText
-        let statusTag: String
-        if case .cancel = readOnly.classification {
-            statusTag = payload.eventID?.hasPrefix("cancel-too-late") == true ? "cancel_too_late" : "cancel_preempt"
-        } else {
-            statusTag = "read_only_query"
-        }
-        customerIngressProofText = "route=demo_slice;status=\(statusTag);runner=0;mutation=0;readbacks=\(payload.readbacks.count);state_revision=\(store.currentRevision)"
-        messages.append(DialogueMessage(role: .user, text: utterance))
-        messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
 
     private func applyDemoSliceRejection(_ rejection: DemoSliceAdmissionRejection, turn: FrontstageVoiceTurn) {
-        let message: String
-        let resultKind: DemoRuntimeResultKind
         switch rejection {
-        case .blank:
-            message = "请输入车控指令"
-            resultKind = .clarifyMissingSlot
-        case .valueOutOfRange:
-            message = "空调温度支持18到32度，请重新输入"
-            resultKind = .clarifyMissingSlot
-        case .clarifyMissingSlot:
-            message = "请告诉我空调要打开，还是调到多少度"
-            resultKind = .clarifyMissingSlot
         case .notInCatalog, .conjunctionOrMultiIntent, .cancel:
             let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
             snapshot = update.snapshot
@@ -761,25 +670,64 @@ struct ContentView: View {
                 )
             })
             return
+        case .blank, .valueOutOfRange, .clarifyMissingSlot:
+            let payload = DemoSliceAdmissionRejectionPresentation.payload(
+                for: rejection,
+                cards: store.presentationCells,
+                revision: store.currentRevision
+            )
+            applyDemoSlicePayload(
+                payload,
+                utterance: turn.utterance,
+                preserveActiveCells: true,
+                proofStatus: { _ in
+                    "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(String(describing: rejection));state_revision=\(store.currentRevision)"
+                }
+            )
         }
-        snapshot = StagePresentationSnapshot(
-            traceId: snapshot.traceId,
-            storeCells: snapshot.storeCells,
-            activeCells: snapshot.activeCells,
-            refusedCell: snapshot.refusedCell,
-            scopeOrigins: snapshot.scopeOrigins,
+    }
+
+    /// Shared payload → stage snapshot apply. App does not invent dialogue or resultKind.
+    private func applyDemoSlicePayload(
+        _ payload: RuntimePresentationPayload,
+        utterance: String,
+        preserveActiveCells: Bool,
+        proofStatus: (RuntimePresentationPayload) -> String
+    ) {
+        let dialogueText = RuntimePresentationUIRender.dialogueText(from: payload)
+        let resultKind = RuntimePresentationUIRender.resultKind(from: payload)
+        let orbState = Self.appOrbState(from: payload.orbState)
+        let voiceState = Self.appVoiceState(from: payload.voiceState)
+        var activeCells = snapshot.activeCells
+        var scopeOrigins = snapshot.scopeOrigins
+        if !preserveActiveCells {
+            for readback in payload.readbacks {
+                let base = ScopedStateKey(readback.key).base
+                if let family = FamilyCardIDMapper.familyCardID(forBase: base) {
+                    activeCells[family] = readback.key
+                }
+                if let scopeOrigin = readback.scopeOrigin {
+                    scopeOrigins[readback.key] = scopeOrigin
+                }
+            }
+        }
+        snapshot = StagePresentationSnapshot.from(
+            store: store,
+            activeCells: activeCells,
             context: snapshot.context,
-            orbState: .think,
-            voiceState: .idle,
-            dialogText: message,
-            readbacks: snapshot.readbacks,
             resultKind: resultKind,
-            proofClass: snapshot.proofClass
+            traceId: payload.traceID,
+            scopeOrigins: scopeOrigins,
+            orbState: orbState,
+            voiceState: voiceState,
+            dialogText: dialogueText,
+            readbacks: snapshot.readbacks + payload.readbacks,
+            proofClass: .localMock
         )
-        customerIngressStatusText = message
-        customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(String(describing: rejection));state_revision=\(store.currentRevision)"
-        messages.append(DialogueMessage(role: .user, text: turn.utterance))
-        messages.append(DialogueMessage(role: .assistant, text: message))
+        customerIngressStatusText = dialogueText
+        customerIngressProofText = proofStatus(payload)
+        messages.append(DialogueMessage(role: .user, text: utterance))
+        messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
 
     private func writeContainmentReceipt(_ turn: FrontstageVoiceTurn) {
