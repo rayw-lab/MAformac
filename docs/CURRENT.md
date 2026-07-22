@@ -46,8 +46,8 @@ g3_status: G3_FIRST_KNIFE_IN_PROGRESS
 
 ### 全局标签
 
-- 工作树是 **5 mounted / 5 admission 的 candidate 树**。
-- 空调两族（matrix 1、4）= Phase1 产品面；车窗 / 氛围灯 / 座椅（31、1972、201）= **Phase2 越前 candidate**。
+- 工作树是 **5 mounted / 6 admission**（+row167 `主驾制热调{N}{unit}`；仍含三族 candidate）。
+- 空调两族（matrix 1、4）= Phase1 产品面；车窗 / 氛围灯 / 座椅（31、1972、201）= **Phase2 越前 candidate**；row167 为空调 compound 客户入口（G2 余量，禁抬 proven）。
 
 ### mounted tools（5）
 
