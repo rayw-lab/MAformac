@@ -29,6 +29,7 @@ GENERATED_SWIFT := \
 
 .PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e
 .PHONY: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
+.PHONY: verify-e2e-row167 verify-e2e-query verify-e2e-risk verify-e2e-replay verify-e2e-cancel verify-e2e-receipt
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -47,8 +48,9 @@ verify-anti-placebo:
 	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_verify_anti_placebo.py scripts/test_run_ui_e2e.py
 	$(PYTHON_BOOTSTRAP) scripts/verify_anti_placebo.py
 # FA-1 contract: stable gate must aggregate the full product-behavior class
-# (AC golden including test07/test03a) plus explicit WP21 batch filters.
-verify-e2e: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
+# (AC golden including test07/test03a) plus explicit WP21 + G7 batch filters.
+# G7 knife1: row167/query/risk/replay/cancel/receipt exact-filter batches (each executed>0).
+verify-e2e: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat verify-e2e-row167 verify-e2e-query verify-e2e-risk verify-e2e-replay verify-e2e-cancel verify-e2e-receipt
 	$(PYTHON_BOOTSTRAP) scripts/verify_anti_placebo.py
 
 verify-e2e-product-behavior:
@@ -62,6 +64,24 @@ verify-e2e-wp21-ambient:
 
 verify-e2e-wp21-seat:
 	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchC_
+
+verify-e2e-row167:
+	swift test --filter DemoSliceProductBehaviorGateTests/testG3_row167_
+
+verify-e2e-query:
+	swift test --filter DemoSliceProductBehaviorGateTests/testG7_query_
+
+verify-e2e-risk:
+	swift test --filter DemoSliceProductBehaviorGateTests/testG3_window
+
+verify-e2e-replay:
+	swift test --filter DemoSliceProductBehaviorGateTests/testG7_replay_
+
+verify-e2e-cancel:
+	swift test --filter DemoSliceProductBehaviorGateTests/testG7_cancel_
+
+verify-e2e-receipt:
+	swift test --filter DemoSliceProductBehaviorGateTests/testG7_receipt_
 XCODEBUILD ?= xcodebuild
 UI_E2E_TEST_IDENTIFIER ?= MAformacIOSUITests/FrontstageCustomerIngressUITests
 UI_E2E_RESULT_PATH ?= $(PWD)/build/ui-e2e-$(shell date +%Y%m%d-%H%M%S).xcresult

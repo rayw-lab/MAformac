@@ -488,6 +488,207 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
         XCTAssertEqual(h.store.cell(for: "window.position[主驾]")?.actualValue, "20")
     }
 
+    // MARK: - G7 knife1 exact-filter batches (query / replay / cancel / receipt)
+    // Expected values are hardcoded fixtures — never reverse-generated from runtime authority.
+    // row167 → testG3_row167_*；risk → testG3_window*（Makefile exact-filter 抽前缀，不删不洗绿）。
+
+    @MainActor
+    func testG7_query_capabilityRange_zeroRunnerZeroMutation() async throws {
+        let h = try Harness()
+        let cellsBefore = h.store.cells
+        let revisionBefore = h.store.currentRevision
+
+        let result = try await h.route.route(text: "空调能调到26度吗")
+        guard case .capabilityQuery = result.classification else {
+            return XCTFail("expected capabilityQuery classification")
+        }
+        let readOnly = try XCTUnwrap(result.readOnly)
+
+        XCTAssertNil(result.execution)
+        XCTAssertNil(result.rejection)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(readOnly.payload.mutationCount, 0)
+        XCTAssertEqual(readOnly.payload.outcome.result, .capabilityQuery)
+        XCTAssertEqual(readOnly.payload.readbacks.count, 1)
+        XCTAssertEqual(readOnly.payload.readbacks.first?.spokenText, "空调温度支持18到32度")
+        XCTAssertEqual(h.store.currentRevision, revisionBefore)
+        XCTAssertEqual(h.store.cells, cellsBefore)
+    }
+
+    @MainActor
+    func testG7_query_stateTemperature_liveReadbackZeroRunner() async throws {
+        var cells = DemoVehicleStateStore.defaultCells()
+        let tempIdx = try XCTUnwrap(cells.firstIndex { $0.key == "ac.temp_setpoint[主驾]" })
+        cells[tempIdx].actualValue = "22"
+        let h = try Harness(cells: cells)
+        let revision = try XCTUnwrap(h.store.cell(for: "ac.temp_setpoint[主驾]")?.revision)
+
+        let result = try await h.route.route(text: "现在空调多少度")
+        guard case .stateQuery = result.classification else {
+            return XCTFail("expected stateQuery classification")
+        }
+        let readOnly = try XCTUnwrap(result.readOnly)
+
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(readOnly.payload.mutationCount, 0)
+        XCTAssertEqual(readOnly.payload.outcome.result, .stateQuery)
+        XCTAssertEqual(readOnly.payload.readbacks.map(\.key), ["ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(readOnly.payload.readbacks.map(\.actualValue), ["22"])
+        XCTAssertEqual(readOnly.payload.readbacks.map(\.revision), [revision])
+
+        let display = try XCTUnwrap(
+            VehicleCardDisplay.displays(from: [
+                try XCTUnwrap(h.store.cell(for: "ac.temp_setpoint[主驾]"))
+            ])
+            .first { $0.accessibilityKey == "ac.temp_setpoint[主驾]" }
+        )
+        XCTAssertEqual(display.valueText, "22℃")
+    }
+
+    @MainActor
+    func testG7_replay_sameUtteranceAfterAccept_zeroSecondMutation() async throws {
+        let h = try Harness()
+        let first = try await h.route.route(text: "打开空调")
+        let firstExec = try XCTUnwrap(first.execution)
+        XCTAssertEqual(firstExec.payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(firstExec.payload.mutationCount, 1)
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+
+        let cellsAfterFirst = h.store.cells
+        let revisionAfterFirst = h.store.currentRevision
+        let second = try await h.route.route(text: "打开空调")
+        let secondExec = try XCTUnwrap(second.execution)
+
+        // Customer-path idempotent replay: no second runner write, alreadyStateNoop.
+        XCTAssertEqual(secondExec.payload.outcome.result, .alreadyStateNoop)
+        XCTAssertEqual(secondExec.payload.mutationCount, 0)
+        XCTAssertEqual(h.route.runnerCallCount, 1)
+        XCTAssertEqual(h.store.currentRevision, revisionAfterFirst)
+        XCTAssertEqual(h.store.cells, cellsAfterFirst)
+        XCTAssertEqual(secondExec.payload.readbacks.map(\.key), ["ac.power"])
+        XCTAssertEqual(secondExec.payload.readbacks.map(\.actualValue), ["on"])
+    }
+
+    @MainActor
+    func testG7_cancel_idleSuanle_cancelledZeroRunnerZeroMutation() async throws {
+        let h = try Harness()
+        let cellsBefore = h.store.cells
+        let revisionBefore = h.store.currentRevision
+
+        XCTAssertEqual(h.route.catalog.classify(for: "算了"), .cancel(target: nil))
+        let result = try await h.route.route(text: "算了")
+        guard case .cancel = result.classification else {
+            return XCTFail("expected cancel classification")
+        }
+        let readOnly = try XCTUnwrap(result.readOnly)
+
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(readOnly.payload.outcome.result, .cancelled)
+        XCTAssertEqual(readOnly.payload.mutationCount, 0)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertTrue(readOnly.payload.eventID?.hasPrefix("cancel-preempt:") == true)
+        XCTAssertTrue(readOnly.payload.readbacks.contains {
+            $0.key == "presentation.cancel" && $0.actualValue == "preempt" && $0.spokenText == "已取消"
+        })
+        XCTAssertEqual(h.store.currentRevision, revisionBefore)
+        XCTAssertEqual(h.store.cells, cellsBefore)
+    }
+
+    @MainActor
+    func testG7_cancel_postCommitSuanle_tooLatePreservesMutation() async throws {
+        let h = try Harness()
+        let commitLease = RuntimeTurnLease(
+            sessionID: UUID(),
+            sequence: 10,
+            turnID: UUID(),
+            isCurrent: { true }
+        )
+        let committed = try await h.route.route(text: "打开空调", lease: commitLease)
+        XCTAssertEqual(committed.execution?.payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+        let committedIdentity = try XCTUnwrap(h.route.lastCommittedTurn)
+        XCTAssertEqual(committedIdentity, commitLease.identity)
+        let revisionAfterCommit = h.store.currentRevision
+        let runnerAfterCommit = h.route.runnerCallCount
+
+        let cancelLease = RuntimeTurnLease(
+            sessionID: UUID(),
+            sequence: 11,
+            turnID: UUID(),
+            isCurrent: { true }
+        )
+        let cancelResult = try await h.route.route(text: "算了", lease: cancelLease)
+        let readOnly = try XCTUnwrap(cancelResult.readOnly)
+
+        XCTAssertEqual(readOnly.payload.outcome.result, .noAction)
+        XCTAssertEqual(readOnly.payload.mutationCount, 0)
+        XCTAssertEqual(h.route.runnerCallCount, runnerAfterCommit)
+        XCTAssertTrue(readOnly.payload.eventID?.hasPrefix("cancel-too-late:") == true)
+        XCTAssertTrue(readOnly.payload.eventID?.contains(committedIdentity.linkToken) == true)
+        XCTAssertTrue(readOnly.payload.readbacks.contains {
+            $0.key == "presentation.cancel" && $0.actualValue == "too_late"
+        })
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(h.store.currentRevision, revisionAfterCommit)
+    }
+
+    @MainActor
+    func testG7_receipt_acceptedOpenAC_assemblesOutsideRunner() async throws {
+        let h = try Harness()
+        let routeResult = try await h.route.route(text: "打开空调")
+        let execution = try XCTUnwrap(routeResult.execution)
+        XCTAssertEqual(execution.payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(execution.admission.entry.matrixID, 1)
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(execution.payload.mutationCount, 1)
+
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("g7-receipt-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+
+        let configuration = try FrontstageRouteReceiptConfiguration.environment(
+            [
+                "C1_FRONTSTAGE_RECEIPT_EMIT": "1",
+                "C1_FRONTSTAGE_RUN_ID": "g7-knife1-receipt",
+                "C1_FRONTSTAGE_RUN_NONCE": "0123456789abcdef0123456789abcdef",
+                "C1_RUN_DIR": root.path,
+                "C1_FRONTSTAGE_SOURCE_HEAD_SHA": String(repeating: "d", count: 40)
+            ],
+            currentDirectory: root
+        )
+        let turn = try FrontstageVoiceSession(sessionID: "g7-receipt-session")
+            .submitContainment(utterance: "打开空调")
+
+        // Assembler/writer stay outside runner (G6 H7); gate only proves customer-path facts.
+        let receiptURL = try XCTUnwrap(
+            RuntimeTurnReceiptAssembler.assembleAndWrite(
+                turn: turn,
+                routeResult: routeResult,
+                configuration: configuration,
+                isCurrent: { true }
+            )
+        )
+        let receipt = try RuntimeTurnReceipt.decode(from: receiptURL)
+
+        XCTAssertEqual(receipt.schemaVersion, RuntimeTurnReceipt.schemaVersionValue)
+        XCTAssertEqual(receipt.runID, "g7-knife1-receipt")
+        XCTAssertEqual(receipt.finalOutcome, .acceptedToolCall)
+        XCTAssertTrue(receipt.stateMutation)
+        XCTAssertEqual(receipt.matrixID, 1)
+        XCTAssertEqual(receipt.readbackCount, 1)
+        XCTAssertEqual(receipt.actions.count, 1)
+        XCTAssertEqual(receipt.actions[0].disposition, "accepted")
+        XCTAssertEqual(receipt.actions[0].readback?.key, "ac.power")
+        XCTAssertEqual(receipt.actions[0].readback?.actualValue, "on")
+        XCTAssertNil(receipt.linkedPreviousTurnID)
+        XCTAssertFalse(receipt.mountReceiptBodySHA256.isEmpty)
+        XCTAssertFalse(receipt.mountedCatalogDigest.isEmpty)
+        XCTAssertFalse(receipt.touchedCellCanonicalSnapshotDigest.isEmpty)
+    }
+
     @MainActor
     func test04_setTemp26_polite() async throws {
         let h = try Harness()
