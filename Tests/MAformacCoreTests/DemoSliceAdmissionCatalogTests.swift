@@ -71,5 +71,15 @@ final class DemoSliceAdmissionCatalogTests: XCTestCase {
         XCTAssertEqual(catalog.rejection(for: "空调"), .clarifyMissingSlot)
         XCTAssertNil(catalog.admission(for: "   \n"))
         XCTAssertEqual(catalog.rejection(for: "   \n"), .blank)
+        XCTAssertEqual(catalog.rejection(for: "打开空调并调到26度"), .conjunctionOrMultiIntent)
+    }
+
+    func testClassify_capabilityVsPoliteCommandDisjoint() {
+        let catalog = DemoSliceAdmissionCatalog()
+        XCTAssertNotNil(catalog.admission(for: "能调到26度吗"))
+        XCTAssertNil(catalog.admission(for: "空调能调到26度吗"))
+        guard case .capabilityQuery = catalog.classify(for: "空调能调到26度吗") else {
+            return XCTFail("expected capabilityQuery")
+        }
     }
 }

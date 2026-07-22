@@ -12,14 +12,40 @@ public struct DemoSliceExecution: Equatable, Sendable {
     }
 }
 
+public struct DemoSliceReadOnlyOutcome: Equatable, Sendable {
+    public let classification: DemoSliceClassification
+    public let payload: RuntimePresentationPayload
+    public let runnerCallCount: Int
+
+    public init(
+        classification: DemoSliceClassification,
+        payload: RuntimePresentationPayload,
+        runnerCallCount: Int
+    ) {
+        self.classification = classification
+        self.payload = payload
+        self.runnerCallCount = runnerCallCount
+    }
+}
+
 public struct DemoSliceRouteResult: Equatable, Sendable {
+    public let classification: DemoSliceClassification
     public let execution: DemoSliceExecution?
     public let rejection: DemoSliceAdmissionRejection?
+    public let readOnly: DemoSliceReadOnlyOutcome?
 
-    public init(execution: DemoSliceExecution? = nil, rejection: DemoSliceAdmissionRejection? = nil) {
-        precondition((execution == nil) != (rejection == nil))
+    public init(
+        classification: DemoSliceClassification,
+        execution: DemoSliceExecution? = nil,
+        rejection: DemoSliceAdmissionRejection? = nil,
+        readOnly: DemoSliceReadOnlyOutcome? = nil
+    ) {
+        let filled = [execution != nil, rejection != nil, readOnly != nil].filter { $0 }.count
+        precondition(filled == 1)
+        self.classification = classification
         self.execution = execution
         self.rejection = rejection
+        self.readOnly = readOnly
     }
 }
 
@@ -80,37 +106,69 @@ public final class DemoSliceRoute {
         text: String,
         correlationProvider: RuntimeSessionCorrelationProvider?
     ) async throws -> DemoSliceRouteResult {
-        guard let admission = catalog.admission(for: text) else {
+        let classification = catalog.classify(for: text)
+        switch classification {
+        case let .command(admission):
+            return try await routeCommand(
+                admission: admission,
+                classification: classification,
+                text: text,
+                correlationProvider: correlationProvider
+            )
+        case let .stateQuery(spec):
+            return try routeStateQuery(spec: spec, classification: classification)
+        case let .capabilityQuery(spec):
+            return try routeCapabilityQuery(spec: spec, classification: classification)
+        case .clarification:
             return DemoSliceRouteResult(
-                rejection: catalog.rejection(for: text) ?? .notInCatalog
+                classification: classification,
+                rejection: .clarifyMissingSlot
+            )
+        case let .contractRefusal(reason):
+            return DemoSliceRouteResult(
+                classification: classification,
+                rejection: reason
+            )
+        case .cancel:
+            return DemoSliceRouteResult(
+                classification: classification,
+                rejection: .notInCatalog
             )
         }
+    }
 
+    private func routeCommand(
+        admission: DemoSliceAdmission,
+        classification: DemoSliceClassification,
+        text: String,
+        correlationProvider: RuntimeSessionCorrelationProvider?
+    ) async throws -> DemoSliceRouteResult {
         // Reuse the same scope resolution as C3. Defaulted scopes (for example,
         // ac.temp_setpoint[主驾]) must not miss the pre-run no-op gate.
         let projection = try DemoSliceAdmissionCatalog.targetProjection(
             for: admission,
             stateCells: stateCells
         )
-        let desiredValue = projection.desiredValue
-        let currentCells = projection.targetKeys.compactMap { store.cell(for: $0) }
         let implicitPowerTargetSatisfied =
             admission.frame.device != "ac_temperature"
             || admission.frame.actionPrimitive == "query"
             || admission.frame.doNotAutoPowerOn
             || store.cell(for: "ac.power")?.actualValue == "on"
 
-        if implicitPowerTargetSatisfied,
-           currentCells.count == projection.targetKeys.count,
-           currentCells.allSatisfy({ $0.actualValue == desiredValue }) {
+        let allTargetsSatisfied = projection.allSatisfy { target in
+            store.cell(for: target.key)?.actualValue == target.desired
+        }
+
+        if implicitPowerTargetSatisfied, allTargetsSatisfied {
             // Already at target state: short-circuit before runner, no mutation, no TTS
             let traceID = UUID().uuidString
-            let readbacks = currentCells.map {
-                DemoActionReadback(
-                    key: $0.key,
-                    actualValue: $0.actualValue,
-                    revision: $0.revision,
-                    spokenText: DemoVehicleStateStore.spokenText(for: $0)
+            let readbacks = projection.compactMap { target -> DemoActionReadback? in
+                guard let cell = store.cell(for: target.key) else { return nil }
+                return DemoActionReadback(
+                    key: cell.key,
+                    actualValue: cell.actualValue,
+                    revision: cell.revision,
+                    spokenText: DemoVehicleStateStore.spokenText(for: cell)
                 )
             }
             let snapshot = RuntimePresentationTerminalSnapshotAdapter.alreadyStateNoop(
@@ -131,6 +189,7 @@ public final class DemoSliceRoute {
             )
             // runnerCallCount NOT incremented; no runner/TTS invocation
             return DemoSliceRouteResult(
+                classification: classification,
                 execution: DemoSliceExecution(
                     admission: admission,
                     payload: payload,
@@ -148,8 +207,114 @@ public final class DemoSliceRoute {
             payload = try await runner.run(text: text)
         }
         return DemoSliceRouteResult(
+            classification: classification,
             execution: DemoSliceExecution(
                 admission: admission,
+                payload: payload,
+                runnerCallCount: runnerCallCount
+            )
+        )
+    }
+
+    private func routeStateQuery(
+        spec: StateQuerySpec,
+        classification: DemoSliceClassification
+    ) throws -> DemoSliceRouteResult {
+        guard let definition = stateCells.cell(id: spec.stateBase) else {
+            throw ToolExecutionError.semanticInvalid("state_cell_not_found")
+        }
+        let scope = spec.scopeHint ?? definition.defaultScope
+        let key: String
+        if let scope, !definition.scope.isEmpty {
+            key = "\(spec.stateBase)[\(scope)]"
+        } else {
+            key = spec.stateBase
+        }
+        guard let cell = store.cell(for: key) else {
+            throw ToolExecutionError.semanticInvalid("state_cell_missing_in_store")
+        }
+        let readback = DemoActionReadback(
+            key: cell.key,
+            actualValue: cell.actualValue,
+            revision: cell.revision,
+            spokenText: DemoVehicleStateStore.spokenText(for: cell)
+        )
+        let traceID = UUID().uuidString
+        let snapshot = PresentationSnapshot(
+            traceID: traceID,
+            runtimeOutcome: DemoRuntimeOutcome(
+                result: .noAction,
+                reason: "state_query"
+            ),
+            cards: store.presentationCells,
+            readbacks: [readback],
+            voiceState: .idle,
+            orbState: .idle,
+            mutationCount: 0,
+            proofClass: .localUnit,
+            isTerminal: true
+        )
+        let payload = RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: traceID,
+            eventID: "\(traceID):state-query",
+            reconciliation: PresentationReconciliation(
+                status: .verified,
+                readbackKey: readback.key,
+                safeReason: "state_query"
+            )
+        )
+        return DemoSliceRouteResult(
+            classification: classification,
+            readOnly: DemoSliceReadOnlyOutcome(
+                classification: classification,
+                payload: payload,
+                runnerCallCount: runnerCallCount
+            )
+        )
+    }
+
+    private func routeCapabilityQuery(
+        spec: CapabilityQuerySpec,
+        classification: DemoSliceClassification
+    ) throws -> DemoSliceRouteResult {
+        guard let definition = stateCells.cell(id: spec.stateBase) else {
+            throw ToolExecutionError.semanticInvalid("state_cell_not_found")
+        }
+        guard let range = definition.executionRange else {
+            throw ToolExecutionError.semanticInvalid("capability_range_missing")
+        }
+        let unit = definition.unit ?? "celsius"
+        let evidence = "\(spec.stateBase):\(range.min)...\(range.max) step=\(range.step) unit=\(unit)"
+        let digest = C6Hash.sha256Hex(Data(evidence.utf8))
+        let traceID = UUID().uuidString
+        let snapshot = PresentationSnapshot(
+            traceID: traceID,
+            runtimeOutcome: DemoRuntimeOutcome(
+                result: .noAction,
+                reason: "capability_query"
+            ),
+            cards: store.presentationCells,
+            readbacks: [],
+            voiceState: .idle,
+            orbState: .idle,
+            proofClass: .localUnit,
+            isTerminal: true
+        )
+        let payload = RuntimePresentationPayload(
+            snapshot: snapshot,
+            turnID: traceID,
+            eventID: "\(traceID):capability-query",
+            reconciliation: PresentationReconciliation(
+                status: .verified,
+                readbackKey: nil,
+                safeReason: "capability_query:\(digest)"
+            )
+        )
+        return DemoSliceRouteResult(
+            classification: classification,
+            readOnly: DemoSliceReadOnlyOutcome(
+                classification: classification,
                 payload: payload,
                 runnerCallCount: runnerCallCount
             )

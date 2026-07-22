@@ -10,12 +10,17 @@ public enum ToolContractIRFrameBridge {
         guard !ir.device.isEmpty, !ir.actionPrimitive.isEmpty else {
             throw DDomainToolPlanFailure.bridgeFailed(ir.sourceToolName)
         }
-        let projectedSlots = ir.slots.filter { projectedSlotKeys.contains($0.key) }
         // value.* (incl. sourceUnit on ContractValue) is carried via `ir.value`, not slot projection.
         let valueArgumentKeys: Set<String> = ["temperature", "fanSpeed", "value", "value.type", "value.sourceUnit"]
-        let projectedOutSlotKeys = Set(ir.slots.keys)
-            .subtracting(projectedSlotKeys)
-            .subtracting(valueArgumentKeys)
+        let nonValueSlotKeys = Set(ir.slots.keys).subtracting(valueArgumentKeys)
+        let discardedNonValueSlots = nonValueSlotKeys.subtracting(projectedSlotKeys)
+        // G2: non-value slots must not be silently dropped by projection.
+        if !discardedNonValueSlots.isEmpty {
+            throw DDomainToolPlanFailure.bridgeFailed(ir.sourceToolName)
+        }
+        let projectedSlots = ir.slots.filter {
+            projectedSlotKeys.contains($0.key) || valueArgumentKeys.contains($0.key)
+        }
         return ToolCallFrame(
             traceID: traceID,
             agentID: "vehicle-control",
@@ -26,7 +31,10 @@ public enum ToolContractIRFrameBridge {
             slots: projectedSlots,
             value: ir.value, // G1: sourceUnit end-to-end passthrough on ContractValue
             candidateSource: .modelRouter,
-            rawPayload: redactedRawPayload(for: rawCall, slotProjected: !projectedOutSlotKeys.isEmpty),
+            rawPayload: redactedRawPayload(
+                for: rawCall,
+                slotProjected: !projectedSlotKeys.isEmpty && projectedSlotKeys != Set(ir.slots.keys)
+            ),
             doNotAutoPowerOn: ir.doNotAutoPowerOn
         )
     }

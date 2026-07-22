@@ -27,6 +27,48 @@ public enum DemoSliceAdmissionRejection: Equatable, Sendable {
     case notInCatalog
     case valueOutOfRange(actual: Int, allowed: ClosedRange<Int>)
     case clarifyMissingSlot
+    case conjunctionOrMultiIntent
+}
+
+public struct DemoSliceDesiredTarget: Equatable, Sendable {
+    public let key: String
+    public let desired: String
+
+    public init(key: String, desired: String) {
+        self.key = key
+        self.desired = desired
+    }
+}
+
+public struct StateQuerySpec: Equatable, Sendable {
+    public let stateBase: String
+    public let scopeHint: String?
+
+    public init(stateBase: String, scopeHint: String? = nil) {
+        self.stateBase = stateBase
+        self.scopeHint = scopeHint
+    }
+}
+
+public struct CapabilityQuerySpec: Equatable, Sendable {
+    public let stateBase: String
+    public let probedTemperature: Int?
+
+    public init(stateBase: String, probedTemperature: Int? = nil) {
+        self.stateBase = stateBase
+        self.probedTemperature = probedTemperature
+    }
+}
+
+/// One-shot typed classification for the finite reviewed demo surface.
+/// Callers must not re-run admission then rejection.
+public enum DemoSliceClassification: Equatable, Sendable {
+    case command(DemoSliceAdmission)
+    case stateQuery(StateQuerySpec)
+    case capabilityQuery(CapabilityQuerySpec)
+    case clarification(reason: String)
+    case contractRefusal(DemoSliceAdmissionRejection)
+    case cancel(target: String?)
 }
 
 /// Customer-path admission for the finite, reviewed product surface.
@@ -71,135 +113,252 @@ public struct DemoSliceAdmissionCatalog: Sendable {
 
     public init() {}
 
-    public func admission(for text: String) -> DemoSliceAdmission? {
+    /// Single classification entry. Prefer this over `admission`/`rejection` dual-pass.
+    public func classify(for text: String) -> DemoSliceClassification {
         let normalized = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if normalized == "打开空调" {
-            let entry = entries[0]
-            return DemoSliceAdmission(
-                entry: entry,
-                frame: ToolCallFrame(
-                    agentID: "vehicle-control",
-                    capabilityID: "vehicle.ac.toggle",
-                    toolName: "set_vehicle_control",
-                    device: "ac",
-                    actionPrimitive: "power_on",
-                    value: ContractValue(offset: "on", type: "STATE"),
-                    candidateSource: .fastPath,
-                    rawPayload: evidencePayload(entry: entry, inputValue: nil),
-                    surfacePolicy: .primaryPanel
-                )
-            )
+        if normalized.isEmpty {
+            return .contractRefusal(.blank)
         }
+        if hasConjunctionOrMultiIntent(normalized) {
+            return .contractRefusal(.conjunctionOrMultiIntent)
+        }
+        if normalized.hasPrefix("不对，") {
+            let rest = String(normalized.dropFirst("不对，".count))
+            if rest.isEmpty {
+                return .clarification(reason: "incomplete_correction")
+            }
+            // Correction wrapper is exact `不对，` only; re-classify the remainder
+            // without allowing another correction wrapper nest.
+            if rest.hasPrefix("不对，") {
+                return .clarification(reason: "nested_correction")
+            }
+            let inner = classifyBody(rest)
+            if case .command = inner {
+                return inner
+            }
+            return .clarification(reason: "incomplete_correction")
+        }
+        return classifyBody(normalized)
+    }
 
-        if normalized == "把主驾车窗再开50%" {
-            let entry = entries[2]
-            return DemoSliceAdmission(
-                entry: entry,
-                frame: ToolCallFrame(
-                    agentID: "vehicle-control",
-                    capabilityID: "vehicle.window.position",
-                    toolName: "open_window_by_number",
-                    device: "window",
-                    actionPrimitive: "by_percent",
-                    slots: ["position": "主驾"],
-                    value: ContractValue(
-                        ref: "CUR",
-                        direct: "+",
-                        offset: "50",
-                        type: "PERCENT"
-                    ),
-                    candidateSource: .fastPath,
-                    rawPayload: evidencePayload(entry: entry, inputValue: 50),
-                    surfacePolicy: .primaryPanel
-                )
-            )
+    public func admission(for text: String) -> DemoSliceAdmission? {
+        if case let .command(admission) = classify(for: text) {
+            return admission
         }
-
-        if normalized == "打开氛围灯" {
-            let entry = entries[3]
-            return DemoSliceAdmission(
-                entry: entry,
-                frame: ToolCallFrame(
-                    agentID: "vehicle-control",
-                    capabilityID: "vehicle.ambient_light.power",
-                    toolName: "open_atmosphere_lamp",
-                    device: "atmosphere_lamp",
-                    actionPrimitive: "power_on",
-                    value: ContractValue(offset: "on", type: "STATE"),
-                    candidateSource: .fastPath,
-                    rawPayload: evidencePayload(entry: entry, inputValue: nil),
-                    surfacePolicy: .primaryPanel
-                )
-            )
-        }
-
-        if normalized == "打开副驾座椅加热" {
-            let entry = entries[4]
-            return DemoSliceAdmission(
-                entry: entry,
-                frame: ToolCallFrame(
-                    agentID: "vehicle-control",
-                    capabilityID: "vehicle.seat_heating.power",
-                    toolName: "open_seat_heat",
-                    device: "seat_heat",
-                    actionPrimitive: "power_on",
-                    slots: ["position": "副驾"],
-                    value: ContractValue(offset: "on", type: "STATE"),
-                    candidateSource: .fastPath,
-                    rawPayload: evidencePayload(entry: entry, inputValue: nil),
-                    surfacePolicy: .primaryPanel
-                )
-            )
-        }
-
-        guard let temperature = parsedTemperature(normalized), temperatureRange.contains(temperature) else {
-            return nil
-        }
-        let entry = entries[1]
-        return DemoSliceAdmission(
-            entry: entry,
-            frame: ToolCallFrame(
-                agentID: "vehicle-control",
-                capabilityID: "vehicle.ac.temperature",
-                toolName: "adjust_ac_temperature_to_number",
-                device: "ac_temperature",
-                actionPrimitive: "adjust_to_number",
-                value: ContractValue(direct: String(temperature), type: "SPOT"),
-                candidateSource: .fastPath,
-                rawPayload: evidencePayload(entry: entry, inputValue: temperature),
-                surfacePolicy: .primaryPanel
-            )
-        )
+        return nil
     }
 
     public func rejection(for text: String) -> DemoSliceAdmissionRejection? {
-        let normalized = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if normalized.isEmpty {
-            return .blank
-        }
-        if admission(for: normalized) != nil {
+        switch classify(for: text) {
+        case .command:
+            return nil
+        case .clarification:
+            return .clarifyMissingSlot
+        case let .contractRefusal(reason):
+            return reason
+        case .stateQuery, .capabilityQuery, .cancel:
+            // Query/cancel are not rejections; route handles them.
             return nil
         }
-        if normalized == "空调" {
-            return .clarifyMissingSlot
-        }
-        if let temperature = parsedTemperature(normalized), !temperatureRange.contains(temperature) {
-            return .valueOutOfRange(actual: temperature, allowed: temperatureRange)
-        }
-        return .notInCatalog
     }
 
-    private func parsedTemperature(_ text: String) -> Int? {
-        let prefixes = ["把空调调到", "空调调到", "打开空调到", "请把空调调到", "能把空调调到", "能调到"]
-        guard let prefix = prefixes.first(where: text.hasPrefix) else { return nil }
+    private func classifyBody(_ normalized: String) -> DemoSliceClassification {
+        if normalized == "打开空调" {
+            return .command(powerOnAdmission(entry: entries[0], device: "ac", capabilityID: "vehicle.ac.toggle", toolName: "set_vehicle_control"))
+        }
+        if normalized == "把主驾车窗再开50%" {
+            let entry = entries[2]
+            return .command(
+                DemoSliceAdmission(
+                    entry: entry,
+                    frame: ToolCallFrame(
+                        agentID: "vehicle-control",
+                        capabilityID: "vehicle.window.position",
+                        toolName: "open_window_by_number",
+                        device: "window",
+                        actionPrimitive: "by_percent",
+                        slots: ["position": "主驾"],
+                        value: ContractValue(
+                            ref: "CUR",
+                            direct: "+",
+                            offset: "50",
+                            type: "PERCENT"
+                        ),
+                        candidateSource: .fastPath,
+                        rawPayload: evidencePayload(entry: entry, inputValue: 50),
+                        surfacePolicy: .primaryPanel
+                    )
+                )
+            )
+        }
+        if normalized == "打开氛围灯" {
+            return .command(
+                powerOnAdmission(
+                    entry: entries[3],
+                    device: "atmosphere_lamp",
+                    capabilityID: "vehicle.ambient_light.power",
+                    toolName: "open_atmosphere_lamp"
+                )
+            )
+        }
+        if normalized == "打开副驾座椅加热" {
+            let entry = entries[4]
+            return .command(
+                DemoSliceAdmission(
+                    entry: entry,
+                    frame: ToolCallFrame(
+                        agentID: "vehicle-control",
+                        capabilityID: "vehicle.seat_heating.power",
+                        toolName: "open_seat_heat",
+                        device: "seat_heat",
+                        actionPrimitive: "power_on",
+                        slots: ["position": "副驾"],
+                        value: ContractValue(offset: "on", type: "STATE"),
+                        candidateSource: .fastPath,
+                        rawPayload: evidencePayload(entry: entry, inputValue: nil),
+                        surfacePolicy: .primaryPanel
+                    )
+                )
+            )
+        }
+
+        if normalized == "现在空调多少度" {
+            return .stateQuery(StateQuerySpec(stateBase: "ac.temp_setpoint", scopeHint: "主驾"))
+        }
+        if normalized == "空调支持多少度" {
+            return .capabilityQuery(CapabilityQuerySpec(stateBase: "ac.temp_setpoint"))
+        }
+        if normalized == "空调" {
+            return .clarification(reason: "missing_slot")
+        }
+        if normalized == "改成24度" || normalized.hasPrefix("改成") {
+            return .clarification(reason: "incomplete_correction")
+        }
+
+        if let capability = matchCapabilityTemperature(normalized) {
+            return capability
+        }
+        if let commandOrRefusal = matchCommandTemperature(normalized) {
+            return commandOrRefusal
+        }
+        return .contractRefusal(.notInCatalog)
+    }
+
+    private func matchCapabilityTemperature(_ text: String) -> DemoSliceClassification? {
+        // Capability templates are disjoint from polite command `能调到{N}度吗`.
+        let templates: [(prefix: String, allowsQuestionSuffix: Bool)] = [
+            ("空调能调到", true),
+            ("你能调到", true),
+            ("能不能调到", true),
+            ("可以调到", true),
+        ]
+        for template in templates {
+            guard let temperature = parseExactTemperature(
+                text,
+                prefix: template.prefix,
+                allowsQuestionSuffix: template.allowsQuestionSuffix
+            ) else { continue }
+            if !temperatureRange.contains(temperature) {
+                return .contractRefusal(.valueOutOfRange(actual: temperature, allowed: temperatureRange))
+            }
+            return .capabilityQuery(
+                CapabilityQuerySpec(stateBase: "ac.temp_setpoint", probedTemperature: temperature)
+            )
+        }
+        return nil
+    }
+
+    private func matchCommandTemperature(_ text: String) -> DemoSliceClassification? {
+        // Only templates that declare optional question-tail may strip 吗/呢.
+        // No global suffix strip.
+        let templates: [(prefix: String, allowsQuestionSuffix: Bool)] = [
+            ("把空调调到", false),
+            ("空调调到", false),
+            ("打开空调到", false),
+            ("请把空调调到", false),
+            ("能把空调调到", true),
+            ("能调到", true),
+        ]
+        for template in templates {
+            guard let temperature = parseExactTemperature(
+                text,
+                prefix: template.prefix,
+                allowsQuestionSuffix: template.allowsQuestionSuffix
+            ) else { continue }
+            if !temperatureRange.contains(temperature) {
+                return .contractRefusal(.valueOutOfRange(actual: temperature, allowed: temperatureRange))
+            }
+            let entry = entries[1]
+            return .command(
+                DemoSliceAdmission(
+                    entry: entry,
+                    frame: ToolCallFrame(
+                        agentID: "vehicle-control",
+                        capabilityID: "vehicle.ac.temperature",
+                        toolName: "adjust_ac_temperature_to_number",
+                        device: "ac_temperature",
+                        actionPrimitive: "adjust_to_number",
+                        value: ContractValue(direct: String(temperature), type: "SPOT"),
+                        candidateSource: .fastPath,
+                        rawPayload: evidencePayload(entry: entry, inputValue: temperature),
+                        surfacePolicy: .primaryPanel
+                    )
+                )
+            )
+        }
+        return nil
+    }
+
+    private func parseExactTemperature(
+        _ text: String,
+        prefix: String,
+        allowsQuestionSuffix: Bool
+    ) -> Int? {
+        guard text.hasPrefix(prefix) else { return nil }
         var suffix = text.dropFirst(prefix.count)
-        if suffix.hasSuffix("吗") || suffix.hasSuffix("呢") {
-            suffix = suffix.dropLast()
+        if allowsQuestionSuffix {
+            if suffix.hasSuffix("吗") || suffix.hasSuffix("呢") {
+                suffix = suffix.dropLast()
+            }
         }
         guard suffix.hasSuffix("度") else { return nil }
         let number = suffix.dropLast()
-        guard !number.isEmpty else { return nil }
+        guard !number.isEmpty, number.allSatisfy(\.isNumber) else { return nil }
+        // Exact template: nothing after optional question suffix beyond `{N}度`.
         return Int(number)
+    }
+
+    private func hasConjunctionOrMultiIntent(_ text: String) -> Bool {
+        if text.contains("\n") || text.contains("\r") { return true }
+        if text.contains(";") || text.contains("；") { return true }
+        if text.contains("{") || text.contains("}") { return true }
+        if text.contains("\"tool\"") || text.contains("tool_call") { return true }
+        if text.contains("并") || text.contains("然后") { return true }
+        if text.contains("，再") || text.contains(",再") { return true }
+        if text.contains("，不对，") || text.contains(",不对,") { return true }
+        return false
+    }
+
+    private func powerOnAdmission(
+        entry: DemoSliceCatalogEntry,
+        device: String,
+        capabilityID: String,
+        toolName: String
+    ) -> DemoSliceAdmission {
+        DemoSliceAdmission(
+            entry: entry,
+            frame: ToolCallFrame(
+                agentID: "vehicle-control",
+                capabilityID: capabilityID,
+                toolName: toolName,
+                device: device,
+                actionPrimitive: "power_on",
+                value: ContractValue(offset: "on", type: "STATE"),
+                candidateSource: .fastPath,
+                rawPayload: evidencePayload(entry: entry, inputValue: nil),
+                surfacePolicy: .primaryPanel
+            )
+        )
     }
 
     private func evidencePayload(entry: DemoSliceCatalogEntry, inputValue: Int?) -> JSONValue {
@@ -215,12 +374,13 @@ public struct DemoSliceAdmissionCatalog: Sendable {
         }
         return .object(payload)
     }
+
     /// Pure projection through the same state-cell scope resolver used by C3.
-    /// No side effects and no store access.
+    /// Per-key desired targets are shared by route pre-run gate and C3 plan.
     public static func targetProjection(
         for admission: DemoSliceAdmission,
         stateCells: StateCellContractLookup
-    ) throws -> (targetKeys: [String], desiredValue: String) {
+    ) throws -> [DemoSliceDesiredTarget] {
         let entry = admission.entry
         let frame = admission.frame
         guard let definition = stateCells.cell(id: entry.stateBase) else {
@@ -237,7 +397,6 @@ public struct DemoSliceAdmissionCatalog: Sendable {
         } else {
             desiredValue = frame.value.ref
         }
-        return (targetKeys, desiredValue)
+        return targetKeys.map { DemoSliceDesiredTarget(key: $0, desired: desiredValue) }
     }
-
 }

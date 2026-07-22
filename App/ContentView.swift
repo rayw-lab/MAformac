@@ -601,6 +601,8 @@ struct ContentView: View {
                 guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
                 if let execution = routeResult.execution {
                     applyDemoSliceExecution(execution, utterance: turn.utterance)
+                } else if let readOnly = routeResult.readOnly {
+                    applyDemoSliceReadOnly(readOnly, utterance: turn.utterance)
                 } else if let rejection = routeResult.rejection {
                     writeContainmentReceipt(turn)
                     applyDemoSliceRejection(rejection, turn: turn)
@@ -666,6 +668,37 @@ struct ContentView: View {
         messages.append(DialogueMessage(role: .assistant, text: dialogueText))
     }
 
+    /// G2 read-only query path (state/capability). No runner, no mutation.
+    /// Full result taxonomy (`stateQuery`/`capabilityQuery`) remains G5.
+    private func applyDemoSliceReadOnly(_ readOnly: DemoSliceReadOnlyOutcome, utterance: String) {
+        let payload = readOnly.payload
+        let dialogueText: String
+        if !payload.readbacks.isEmpty {
+            dialogueText = payload.readbacks.map(\.spokenText).joined(separator: "；")
+        } else if case .capabilityQuery = readOnly.classification {
+            dialogueText = "空调温度支持18到32度"
+        } else {
+            dialogueText = "已查询"
+        }
+        snapshot = StagePresentationSnapshot.from(
+            store: store,
+            activeCells: snapshot.activeCells,
+            context: snapshot.context,
+            resultKind: .noAction,
+            traceId: payload.traceID,
+            scopeOrigins: snapshot.scopeOrigins,
+            orbState: .idle,
+            voiceState: .idle,
+            dialogText: dialogueText,
+            readbacks: snapshot.readbacks + payload.readbacks,
+            proofClass: .localMock
+        )
+        customerIngressStatusText = dialogueText
+        customerIngressProofText = "route=demo_slice;status=read_only_query;runner=0;mutation=0;readbacks=\(payload.readbacks.count);state_revision=\(store.currentRevision)"
+        messages.append(DialogueMessage(role: .user, text: utterance))
+        messages.append(DialogueMessage(role: .assistant, text: dialogueText))
+    }
+
     private func applyDemoSliceRejection(_ rejection: DemoSliceAdmissionRejection, turn: FrontstageVoiceTurn) {
         let message: String
         let resultKind: DemoRuntimeResultKind
@@ -679,11 +712,12 @@ struct ContentView: View {
         case .clarifyMissingSlot:
             message = "请告诉我空调要打开，还是调到多少度"
             resultKind = .clarifyMissingSlot
-        case .notInCatalog:
+        case .notInCatalog, .conjunctionOrMultiIntent:
             let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
             snapshot = update.snapshot
             customerIngressStatusText = update.snapshot.dialogText
-            customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=not_in_catalog;state_revision=\(store.currentRevision)"
+            let reason = rejection == .conjunctionOrMultiIntent ? "conjunction_or_multi_intent" : "not_in_catalog"
+            customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(reason);state_revision=\(store.currentRevision)"
             messages.append(contentsOf: update.dialogueTurns.map { dialogueTurn in
                 DialogueMessage(
                     role: dialogueTurn.role == .user ? .user : .assistant,

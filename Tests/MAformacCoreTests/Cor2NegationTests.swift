@@ -136,7 +136,12 @@ final class Cor2NegationTests: XCTestCase {
                 throw DDomainToolPlanFailure.irUnclassified(parsed.name)
             }
             return try irs.map {
-                try ToolContractIRFrameBridge.frame(from: $0, traceID: traceID, rawCall: call)
+                try ToolContractIRFrameBridge.frame(
+                    from: $0,
+                    traceID: traceID,
+                    rawCall: call,
+                    projectedSlotKeys: Set($0.slots.keys)
+                )
             }
         }
     }

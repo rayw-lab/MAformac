@@ -51,11 +51,12 @@ public struct DDomainToolPlanBackend: LLMBackend {
                     throw DDomainToolPlanFailure.irUnclassified(parsed.name)
                 }
                 return try irs.map {
+                    // G2: pass through all IR slots explicitly; bridge fail-closes on silent drop.
                     try ToolContractIRFrameBridge.frame(
                         from: $0,
                         traceID: request.traceID,
                         rawCall: call,
-                        projectedSlotKeys: []
+                        projectedSlotKeys: Set($0.slots.keys)
                     )
                 }
             }
