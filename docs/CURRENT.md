@@ -1,15 +1,16 @@
 ---
 kind: current-router
-as_of: 2026-07-22
+as_of: 2026-07-23
 authority: router_only
 latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G2_FIRST_KNIFE_IN_PROGRESS
+phase2_product_coding: G2_RESIDUAL_GREEN
 phase2_coding_gate: PHASE2_CODING_GATED
 g0_status: G0_COMPLETE
 g1_status: G1_FIRST_KNIFE_GREEN
+g2_status: G2_RESIDUAL_GREEN
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -17,14 +18,14 @@ g1_status: G1_FIRST_KNIFE_GREEN
 
 本文件只回答「现在先读什么、下一步是什么、不能自动做什么」。**不构成产品或执行授权**；任何 HEAD、remote、测试或 runtime 状态必须 live 重核。
 
-## Live 真态（2026-07-22）
+## Live 真态（2026-07-23）
 
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
-- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`：`sourceUnit` / ExactRational / 关 C3 numeric fail-open）→ **G2 首刀进行中**（classification / scope / per-key projection）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
+- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` classification；本刀 row167 准入 + ScopeResolution `scope_conflict` typed refuse）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
-- live **mounted=5 / admission=5**；后三族（window / ambient / seat）仍为 **Phase2 越前 candidate**——**禁演示/合并/计入 proven**
+- live **mounted=5 / admission=6**（+row167 `主驾制热调{N}{unit}`）；后三族（window / ambient / seat）仍为 **Phase2 越前 candidate**——**禁演示/合并/计入 proven**
 - **`actionDemoProven=0/120`**；`GO_WITH_RESIDUALS` ≠ 三族可演示
 - 验收面：`文本 → route → C3 → state mutation → readback payload → UI`；ASR / TTS 不进当前产品门
 
@@ -34,11 +35,11 @@ g1_status: G1_FIRST_KNIFE_GREEN
 2. 读本页 frontmatter 指向的最新 handoff + GO receipt。
 3. 需要状态时 live 重核 Git / remote Verify / Makefile recipe / matrix proven。
 
-## 下一步（Phase2 G2 首刀）
+## 下一步（Phase2 G3）
 
-1. **G2 classification/scope（进行中）**：`DemoSliceClassification` 一次分类、capability/state query、conjunction fail-closed、per-key `targetProjection`；对照冻结 plan §G2，RED→GREEN→smoke。
+1. **G3 C3 fresh risk / 四族执行 / row167 compound atomic**（串行写 `C3ExecutionPipeline`；禁与 G2 余量并行抢写面）。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-3. residual 强制账（不因本裁决消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
+3. residual 强制账（不因本裁决消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；°F 客户入口完整消费仍待 G3/C3 路径。
 
 ## 隔离后产品真态（candidate 口径）
 

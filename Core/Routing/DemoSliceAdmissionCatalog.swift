@@ -107,6 +107,11 @@ public struct DemoSliceAdmissionCatalog: Sendable {
             contractRowID: "c1_carControl_000201",
             stateBase: "seat.heat_level"
         ),
+        DemoSliceCatalogEntry(
+            matrixID: 167,
+            contractRowID: "c1_airControl_000167",
+            stateBase: "ac.temp_setpoint"
+        ),
     ]
 
     private let temperatureRange = 18 ... 32
@@ -238,10 +243,68 @@ public struct DemoSliceAdmissionCatalog: Sendable {
         if let capability = matchCapabilityTemperature(normalized) {
             return capability
         }
+        // row167 is more specific than plain temperature templates; match first.
+        if let row167 = matchRow167(normalized) {
+            return row167
+        }
         if let commandOrRefusal = matchCommandTemperature(normalized) {
             return commandOrRefusal
         }
         return .contractRefusal(.notInCatalog)
+    }
+
+    /// Exact customer grammar: `主驾制热调{N}{unit}` → contract row167.
+    /// Units: `度` / `摄氏度` / `华氏度`. No global suffix strip.
+    private func matchRow167(_ text: String) -> DemoSliceClassification? {
+        let prefix = "主驾制热调"
+        guard text.hasPrefix(prefix) else { return nil }
+        let rest = String(text.dropFirst(prefix.count))
+        let unitSpecs: [(suffix: String, adjustmentMode: String, sourceUnit: ContractSourceUnit)] = [
+            ("华氏度", "华氏度", .fahrenheit),
+            ("摄氏度", "摄氏度", .celsius),
+            ("度", "摄氏度", .celsius),
+        ]
+        for spec in unitSpecs {
+            guard rest.hasSuffix(spec.suffix) else { continue }
+            let numberLexeme = String(rest.dropLast(spec.suffix.count))
+            guard !numberLexeme.isEmpty, numberLexeme.allSatisfy(\.isNumber) else {
+                return .contractRefusal(.notInCatalog)
+            }
+            guard let temperature = Int(numberLexeme) else {
+                return .contractRefusal(.notInCatalog)
+            }
+            // Celsius-bound only for °C lexemes; °F absolute conversion + step gate is C3 (G1/G3).
+            if spec.sourceUnit == .celsius, !temperatureRange.contains(temperature) {
+                return .contractRefusal(.valueOutOfRange(actual: temperature, allowed: temperatureRange))
+            }
+            let entry = entries.first { $0.matrixID == 167 } ?? entries[entries.count - 1]
+            return .command(
+                DemoSliceAdmission(
+                    entry: entry,
+                    frame: ToolCallFrame(
+                        agentID: "vehicle-control",
+                        capabilityID: "vehicle.ac.temperature",
+                        toolName: "adjust_ac_temperature_to_number",
+                        device: "ac_temperature",
+                        actionPrimitive: "adjust_to_number",
+                        slots: [
+                            "direction": "主驾",
+                            "mode": "制热",
+                            "adjustment_mode": spec.adjustmentMode,
+                        ],
+                        value: ContractValue(
+                            direct: String(temperature),
+                            type: "SPOT",
+                            sourceUnit: spec.sourceUnit
+                        ),
+                        candidateSource: .fastPath,
+                        rawPayload: evidencePayload(entry: entry, inputValue: temperature),
+                        surfacePolicy: .primaryPanel
+                    )
+                )
+            )
+        }
+        return nil
     }
 
     private func matchCapabilityTemperature(_ text: String) -> DemoSliceClassification? {
@@ -383,6 +446,32 @@ public struct DemoSliceAdmissionCatalog: Sendable {
     ) throws -> [DemoSliceDesiredTarget] {
         let entry = admission.entry
         let frame = admission.frame
+
+        // row167 compound: power + mode + scoped temp, distinct desired per key.
+        if entry.contractRowID == "c1_airControl_000167" {
+            guard let tempDefinition = stateCells.cell(id: "ac.temp_setpoint") else {
+                throw ToolExecutionError.semanticInvalid("state_cell_not_found")
+            }
+            let tempKeys = try C2ScopeResolver.resolve(frame: frame, cell: tempDefinition).keys
+            let mode = frame.slots["mode"] ?? "制热"
+            let tempDesired: String
+            if !frame.value.direct.isEmpty {
+                tempDesired = frame.value.direct
+            } else if !frame.value.offset.isEmpty {
+                tempDesired = frame.value.offset
+            } else {
+                tempDesired = frame.value.ref
+            }
+            var targets: [DemoSliceDesiredTarget] = [
+                DemoSliceDesiredTarget(key: "ac.power", desired: "on"),
+                DemoSliceDesiredTarget(key: "ac.mode", desired: mode),
+            ]
+            targets.append(contentsOf: tempKeys.map {
+                DemoSliceDesiredTarget(key: $0, desired: tempDesired)
+            })
+            return targets
+        }
+
         guard let definition = stateCells.cell(id: entry.stateBase) else {
             throw ToolExecutionError.semanticInvalid("state_cell_not_found")
         }

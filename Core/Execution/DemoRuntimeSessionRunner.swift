@@ -258,7 +258,8 @@ public final class DemoRuntimeSessionRunner {
                     let resolvedKey = definition.flatMap { definition in
                         try? C2ScopeResolver.resolve(frame: frame, cell: definition).keys.first
                     }
-                    let explicitlyScopedKey = C2ScopeResolver.requestedScope(from: frame).map {
+                    let requestedScope = (try? C2ScopeResolver.requestedScope(from: frame)).flatMap { $0 }
+                    let explicitlyScopedKey = requestedScope.map {
                         "\(executionCellID)[\($0)]"
                     }
                     let card = [resolvedKey, explicitlyScopedKey, executionCellID]

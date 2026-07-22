@@ -264,6 +264,142 @@ final class DemoSliceClassificationTests: XCTestCase {
         )
         XCTAssertEqual(frame.slots["position"], "主驾")
     }
+
+    func testRow167_admitsDriverHeatTuneWithSlotsAndUnit() {
+        let classification = catalog.classify(for: "主驾制热调24度")
+        guard case let .command(admission) = classification else {
+            return XCTFail("expected command, got \(classification)")
+        }
+        XCTAssertEqual(admission.entry.matrixID, 167)
+        XCTAssertEqual(admission.entry.contractRowID, "c1_airControl_000167")
+        XCTAssertEqual(admission.frame.slots["direction"], "主驾")
+        XCTAssertEqual(admission.frame.slots["mode"], "制热")
+        XCTAssertEqual(admission.frame.slots["adjustment_mode"], "摄氏度")
+        XCTAssertEqual(admission.frame.value.direct, "24")
+        XCTAssertEqual(admission.frame.value.sourceUnit, .celsius)
+    }
+
+    func testRow167_fahrenheitUnitCarriesSourceUnit() {
+        let classification = catalog.classify(for: "主驾制热调68华氏度")
+        guard case let .command(admission) = classification else {
+            return XCTFail("expected command, got \(classification)")
+        }
+        XCTAssertEqual(admission.frame.value.direct, "68")
+        XCTAssertEqual(admission.frame.value.sourceUnit, .fahrenheit)
+        XCTAssertEqual(admission.frame.slots["adjustment_mode"], "华氏度")
+    }
+
+    func testRow167_celsiusOutOfRange_refuses() {
+        let classification = catalog.classify(for: "主驾制热调17度")
+        guard case let .contractRefusal(reason) = classification else {
+            return XCTFail("expected refusal, got \(classification)")
+        }
+        XCTAssertEqual(reason, .valueOutOfRange(actual: 17, allowed: 18 ... 32))
+    }
+
+    func testRow167_targetProjection_perKeyPowerModeTemp() throws {
+        let admission = try XCTUnwrap(catalog.admission(for: "主驾制热调24度"))
+        let bundle = DemoRuntimeContractBundle.singleCommandDemoDefault
+        let pipeline = try bundle.makePipeline()
+        let projection = try DemoSliceAdmissionCatalog.targetProjection(
+            for: admission,
+            stateCells: pipeline.stateCells
+        )
+        XCTAssertEqual(
+            projection.map(\.key),
+            ["ac.power", "ac.mode", "ac.temp_setpoint[主驾]"]
+        )
+        XCTAssertEqual(projection.map(\.desired), ["on", "制热", "24"])
+    }
+
+    @MainActor
+    func testRoute_row167_fullTargetsSatisfied_preRunNoop() async throws {
+        let harness = try RouteHarness()
+        _ = harness.store.applyMockTransition(
+            DemoMockTransition(key: "ac.power", desiredValue: "on", source: .user)
+        )
+        _ = harness.store.applyMockTransition(
+            DemoMockTransition(key: "ac.mode", desiredValue: "制热", source: .user)
+        )
+        _ = harness.store.applyMockTransition(
+            DemoMockTransition(key: "ac.temp_setpoint[主驾]", desiredValue: "24", source: .user)
+        )
+        let before = harness.store.cells
+        let result = try await harness.route.route(text: "主驾制热调24度")
+        let exec = try XCTUnwrap(result.execution)
+        XCTAssertEqual(exec.payload.outcome.result, .alreadyStateNoop)
+        XCTAssertEqual(exec.payload.mutationCount, 0)
+        XCTAssertEqual(harness.route.runnerCallCount, 0)
+        XCTAssertEqual(harness.store.cells, before)
+    }
+
+    @MainActor
+    func testRoute_row167_onlyTempUnsatisfied_runnerOnce() async throws {
+        let harness = try RouteHarness()
+        _ = harness.store.applyMockTransition(
+            DemoMockTransition(key: "ac.power", desiredValue: "on", source: .user)
+        )
+        _ = harness.store.applyMockTransition(
+            DemoMockTransition(key: "ac.mode", desiredValue: "制热", source: .user)
+        )
+        _ = harness.store.applyMockTransition(
+            DemoMockTransition(key: "ac.temp_setpoint[主驾]", desiredValue: "20", source: .user)
+        )
+        let result = try await harness.route.route(text: "主驾制热调24度")
+        XCTAssertNotNil(result.execution)
+        XCTAssertEqual(harness.route.runnerCallCount, 1)
+        // Differential compound atomic transitions remain G3; G2 only gates runner boundary.
+    }
+
+    func testScopeResolution_conflictingExplicitScopes_typedRefuse() throws {
+        let pipeline = try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline()
+        let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "ac.temp_setpoint"))
+        let frame = ToolCallFrame(
+            agentID: "vehicle-control",
+            capabilityID: "vehicle.ac.temperature",
+            toolName: "adjust_ac_temperature_to_number",
+            device: "ac_temperature",
+            actionPrimitive: "adjust_to_number",
+            slots: ["direction": "主驾", "position": "副驾"],
+            value: ContractValue(direct: "24", type: "SPOT"),
+            candidateSource: .fastPath
+        )
+        XCTAssertThrowsError(try C2ScopeResolver.resolve(frame: frame, cell: cell)) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .semanticInvalid("scope_conflict"))
+        }
+        XCTAssertThrowsError(try C2ScopeResolver.requestedScope(from: frame)) { error in
+            XCTAssertEqual(error as? ToolExecutionError, .semanticInvalid("scope_conflict"))
+        }
+    }
+
+    func testScopeResolution_matchingExplicitScopes_keepsExplicit() throws {
+        let pipeline = try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline()
+        let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "ac.temp_setpoint"))
+        let frame = ToolCallFrame(
+            agentID: "vehicle-control",
+            capabilityID: "vehicle.ac.temperature",
+            toolName: "adjust_ac_temperature_to_number",
+            device: "ac_temperature",
+            actionPrimitive: "adjust_to_number",
+            slots: ["direction": "主驾", "position": "主驾"],
+            value: ContractValue(direct: "24", type: "SPOT"),
+            candidateSource: .fastPath
+        )
+        let resolution = try C2ScopeResolver.resolve(frame: frame, cell: cell)
+        XCTAssertEqual(resolution.origin, .explicit)
+        XCTAssertEqual(resolution.keys, ["ac.temp_setpoint[主驾]"])
+        XCTAssertEqual(try C2ScopeResolver.requestedScope(from: frame), "主驾")
+    }
+
+    func testScopeResolution_directionAndModeDoNotConflict() throws {
+        // mode is not a scope-bearing slot; must not first-wins-drop or conflict with direction.
+        let admission = try XCTUnwrap(catalog.admission(for: "主驾制热调24度"))
+        let pipeline = try DemoRuntimeContractBundle.singleCommandDemoDefault.makePipeline()
+        let cell = try XCTUnwrap(pipeline.stateCells.cell(id: "ac.temp_setpoint"))
+        let resolution = try C2ScopeResolver.resolve(frame: admission.frame, cell: cell)
+        XCTAssertEqual(resolution.origin, .explicit)
+        XCTAssertEqual(resolution.resolvedScopes, ["主驾"])
+    }
 }
 
 @MainActor

@@ -2,10 +2,10 @@ import XCTest
 @testable import MAformacCore
 
 final class DemoSliceAdmissionCatalogTests: XCTestCase {
-    func testCatalogIsTheExactFiveEntryRatifiedSet() {
+    func testCatalogIsTheExactReviewedEntrySet() {
         let catalog = DemoSliceAdmissionCatalog()
 
-        XCTAssertEqual(catalog.entries.map(\.matrixID), [1, 4, 31, 1972, 201])
+        XCTAssertEqual(catalog.entries.map(\.matrixID), [1, 4, 31, 1972, 201, 167])
         XCTAssertEqual(
             catalog.entries.map(\.contractRowID),
             [
@@ -14,11 +14,19 @@ final class DemoSliceAdmissionCatalogTests: XCTestCase {
                 "c1_carControl_000021",
                 "c1_carControl_001972",
                 "c1_carControl_000201",
+                "c1_airControl_000167",
             ]
         )
         XCTAssertEqual(
             catalog.entries.map(\.stateBase),
-            ["ac.power", "ac.temp_setpoint", "window.position", "ambient.power", "seat.heat_level"]
+            [
+                "ac.power",
+                "ac.temp_setpoint",
+                "window.position",
+                "ambient.power",
+                "seat.heat_level",
+                "ac.temp_setpoint",
+            ]
         )
         XCTAssertEqual(catalog.routeMode, "demo_slice")
         XCTAssertFalse(catalog.catalogDigestSHA256.isEmpty)
@@ -81,5 +89,18 @@ final class DemoSliceAdmissionCatalogTests: XCTestCase {
         guard case .capabilityQuery = catalog.classify(for: "空调能调到26度吗") else {
             return XCTFail("expected capabilityQuery")
         }
+    }
+
+    func testRow167_driverHeatTune_isAdmitted() throws {
+        let catalog = DemoSliceAdmissionCatalog()
+        let admission = try XCTUnwrap(catalog.admission(for: "主驾制热调24度"))
+
+        XCTAssertEqual(admission.entry.matrixID, 167)
+        XCTAssertEqual(admission.entry.contractRowID, "c1_airControl_000167")
+        XCTAssertEqual(admission.frame.slots["direction"], "主驾")
+        XCTAssertEqual(admission.frame.slots["mode"], "制热")
+        XCTAssertEqual(admission.frame.slots["adjustment_mode"], "摄氏度")
+        XCTAssertEqual(admission.frame.value.direct, "24")
+        XCTAssertEqual(admission.frame.value.sourceUnit, .celsius)
     }
 }

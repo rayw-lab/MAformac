@@ -149,8 +149,12 @@ public final class DemoSliceRoute {
             for: admission,
             stateCells: stateCells
         )
+        // row167 projection already includes ac.power; other ac_temperature
+        // frames still require the implicit power gate.
+        let isRow167 = admission.entry.contractRowID == "c1_airControl_000167"
         let implicitPowerTargetSatisfied =
-            admission.frame.device != "ac_temperature"
+            isRow167
+            || admission.frame.device != "ac_temperature"
             || admission.frame.actionPrimitive == "query"
             || admission.frame.doNotAutoPowerOn
             || store.cell(for: "ac.power")?.actualValue == "on"
