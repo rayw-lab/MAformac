@@ -19,10 +19,10 @@ MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.
 
 D123_BASELINE = {
     "safety_or_clarify_reject": 0,
-    "unmounted_name_rejected": 36,
+    "unmounted_name_rejected": 32,
     "fast_path_no_match_fallback": 82,
     "default_executable": 1,
-    "conditional_ddomain_executable": 1,
+    "conditional_ddomain_executable": 5,
 }
 
 

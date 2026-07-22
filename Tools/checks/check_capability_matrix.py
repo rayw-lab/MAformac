@@ -719,10 +719,10 @@ def validate_matrix(
     # D-123 fixed baselines: primary class counts
     D123_BASELINE = {
         "safety_or_clarify_reject": 0,
-        "unmounted_name_rejected": 36,
+        "unmounted_name_rejected": 32,
         "fast_path_no_match_fallback": 82,
         "default_executable": 1,
-        "conditional_ddomain_executable": 1,
+        "conditional_ddomain_executable": 5,
     }
 
     expected_counts = Counter(row["primary_class"] for row in manifest_rows)

@@ -61,7 +61,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             mounted_catalog_path=MOUNTED_CATALOG,
         )
         self.assertEqual(len(matrix["cells"]), 120)
-        self.assertEqual(matrix["source"]["manifest_sha256"], "5c8faa54c7b28efa4daf9dc1bf7262481b65b72d43bb5ea6aac9e0ad0d2ffba6")
+        self.assertEqual(matrix["source"]["manifest_sha256"], "49e0808a48b7456a52680ab42d7ab6babae25f2f351ef339ef373387a1baca24")
 
     def checker(self):
         if not CHECKER_PATH.exists():

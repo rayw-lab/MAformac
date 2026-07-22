@@ -5,8 +5,12 @@
 baseline:
   mounted_tool_names:
     - "adjust_ac_temperature_to_number"
-  catalog_sha: "616d4dbc07f21f1599a373af8aaf1d3152df05c5956ef61358c4645cc3a53fa5"
-  description: "C2 frozen baseline: mounted catalog 1→N forbidden, only adjust_ac_temperature_to_number allowed"
+    - "close_ac"
+    - "open_atmosphere_lamp"
+    - "open_seat_heat"
+    - "open_window_by_number"
+  catalog_sha: "b7ab19939cb5821962f706fe8f2b50524ac85acc1217599d14e10d14db0e5794"
+  description: "pre-G0 candidate mount (AF-G0 still RED): AC pair + window/ambient/seat candidates; actionDemoProven stays 0/120; 禁演示/合并"
 
 rollback_guard:
   affected_action_demo_proven_after_rollback: false

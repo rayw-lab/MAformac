@@ -20,10 +20,10 @@ from typing import Any
 
 D123_BASELINE = {
     "safety_or_clarify_reject": 0,
-    "unmounted_name_rejected": 36,
+    "unmounted_name_rejected": 32,
     "fast_path_no_match_fallback": 82,
     "default_executable": 1,
-    "conditional_ddomain_executable": 1,
+    "conditional_ddomain_executable": 5,
 }
 MOUNTED_CATALOG_PATH = Path("Core/Contracts/DDomainMountedToolCatalog.swift")
 MATRIX_PATH = Path("contracts/demo-capability-matrix.json")

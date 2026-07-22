@@ -778,12 +778,12 @@
       ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
-      "fallback_reason": "unmounted_name_rejected",
+      "fallback_reason": null,
       "family": "座椅 (`seat`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "conditional_executable_with_direct_text_local_unit_proof",
       "matrix_id": 13,
-      "mounted_status": "unmounted",
-      "primary_class": "unmounted_name_rejected",
+      "mounted_status": "mounted",
+      "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
         "observed": false,
         "probe_id": null,
@@ -791,7 +791,7 @@
         "source_ref": "manifest:matrix_id=13:action-readback-proof-pending",
         "status": "conditional_pending"
       },
-      "reasonKind": "capability_not_mounted",
+      "reasonKind": null,
       "register": "直述",
       "representative_tool": "open_seat_heat",
       "semantic_basis": {
@@ -842,9 +842,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "座椅 (`seat`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 14,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -904,9 +904,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "座椅 (`seat`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 15,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -1708,12 +1708,12 @@
       ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
-      "fallback_reason": "unmounted_name_rejected",
+      "fallback_reason": null,
       "family": "车窗 (`window`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "conditional_executable_with_direct_text_local_unit_proof",
       "matrix_id": 28,
-      "mounted_status": "unmounted",
-      "primary_class": "unmounted_name_rejected",
+      "mounted_status": "mounted",
+      "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
         "observed": false,
         "probe_id": null,
@@ -1721,7 +1721,7 @@
         "source_ref": "manifest:matrix_id=28:action-readback-proof-pending",
         "status": "conditional_pending"
       },
-      "reasonKind": "capability_not_mounted",
+      "reasonKind": null,
       "register": "直述",
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
@@ -1772,9 +1772,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "车窗 (`window`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 29,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -1834,9 +1834,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "车窗 (`window`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 30,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -1894,12 +1894,12 @@
       ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
-      "fallback_reason": "unmounted_name_rejected",
+      "fallback_reason": null,
       "family": "车窗 (`window`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "conditional_executable_with_direct_text_local_unit_proof",
       "matrix_id": 31,
-      "mounted_status": "unmounted",
-      "primary_class": "unmounted_name_rejected",
+      "mounted_status": "mounted",
+      "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
         "observed": false,
         "probe_id": null,
@@ -1907,7 +1907,7 @@
         "source_ref": "manifest:matrix_id=31:action-readback-proof-pending",
         "status": "conditional_pending"
       },
-      "reasonKind": "capability_not_mounted",
+      "reasonKind": null,
       "register": "直述",
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
@@ -1958,9 +1958,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "车窗 (`window`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 32,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -2020,9 +2020,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "车窗 (`window`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 33,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -3010,12 +3010,12 @@
       ],
       "default_path_status": "fast_path_no_match_fallback",
       "entrypointAliases": [],
-      "fallback_reason": "unmounted_name_rejected",
+      "fallback_reason": null,
       "family": "氛围灯 (`ambient`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "conditional_executable_with_direct_text_local_unit_proof",
       "matrix_id": 49,
-      "mounted_status": "unmounted",
-      "primary_class": "unmounted_name_rejected",
+      "mounted_status": "mounted",
+      "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
         "observed": false,
         "probe_id": null,
@@ -3023,7 +3023,7 @@
         "source_ref": "manifest:matrix_id=49:action-readback-proof-pending",
         "status": "conditional_pending"
       },
-      "reasonKind": "capability_not_mounted",
+      "reasonKind": null,
       "register": "直述",
       "representative_tool": "open_atmosphere_lamp",
       "semantic_basis": {
@@ -3074,9 +3074,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "氛围灯 (`ambient`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 50,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -3136,9 +3136,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "氛围灯 (`ambient`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 51,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -7437,17 +7437,17 @@
   "schema_version": "demo_capability_matrix_v2",
   "source": {
     "enum_contract": "T0:add-c1-demo-capability-governance",
-    "manifest_sha256": "5c8faa54c7b28efa4daf9dc1bf7262481b65b72d43bb5ea6aac9e0ad0d2ffba6",
+    "manifest_sha256": "49e0808a48b7456a52680ab42d7ab6babae25f2f351ef339ef373387a1baca24",
     "probe_pack_sha256": "f54bb4b5968dd31f290993dce8ac82a8022f66d7eb6eb2357a407149f1157f8f",
     "t0_design_sha256": "f0cb9bcbc051f6ebb7583a0edea88290f29532259a447ede234e2ffbaf51bb55"
   },
   "summary": {
     "blocked_unknown": 0,
     "primary_class_counts": {
-      "conditional_ddomain_executable": 1,
+      "conditional_ddomain_executable": 5,
       "default_executable": 1,
       "fast_path_no_match_fallback": 82,
-      "unmounted_name_rejected": 36
+      "unmounted_name_rejected": 32
     }
   }
 }
