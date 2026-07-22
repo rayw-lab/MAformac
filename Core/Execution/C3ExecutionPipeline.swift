@@ -415,46 +415,50 @@ public struct C3ExecutionPipeline: Sendable {
         )
         traceLogger.recordGuard(traceID: frame.traceID, message: "allow", attributes: TraceAttributes(guardReason: "allow"))
 
-        var readbacks: [DemoActionReadback] = []
-        var provenance: [DemoRuntimeAdapterProvenance] = []
-        for planned in transitions {
-            let transition = planned.transition
-            let commandID = adapterCommandID(parent: frame, transition: transition)
-            let adapterResult = try runtimeAdapterBox.resolve().execute(
-                commandID: commandID,
-                frame: adapterFrame(parent: frame, transition: transition, commandID: commandID),
-                store: store
-            )
-            provenance.append(adapterResult.provenance)
-            traceLogger.recordExecute(
-                traceID: frame.traceID,
-                message: "\(adapterResult.readback.key)=\(adapterResult.readback.actualValue):\(adapterResult.provenance.rawValue)"
-            )
-            var verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
-            verified.scopeOrigin = planned.scopeOrigin
-            // gap#5:播报优先消费 C2 readback_zh 模板,而非 store 硬编码兜底。
-            if let rendered = stateCells.renderReadback(
-                stateKey: transition.key,
-                scope: scope(forKey: transition.key),
-                value: verified.actualValue,
-                scopeOrigin: planned.scopeOrigin
-            ) {
-                verified.spokenText = rendered
+        // G3 row167 / multi-cell: apply 0…N transitions inside one runtime transaction.
+        // Mid-loop adapter/readback failure rolls back every cell touched by this action.
+        return try withAtomicRuntimeTransaction(store: store) {
+            var readbacks: [DemoActionReadback] = []
+            var provenance: [DemoRuntimeAdapterProvenance] = []
+            for planned in transitions {
+                let transition = planned.transition
+                let commandID = adapterCommandID(parent: frame, transition: transition)
+                let adapterResult = try runtimeAdapterBox.resolve().execute(
+                    commandID: commandID,
+                    frame: adapterFrame(parent: frame, transition: transition, commandID: commandID),
+                    store: store
+                )
+                provenance.append(adapterResult.provenance)
+                traceLogger.recordExecute(
+                    traceID: frame.traceID,
+                    message: "\(adapterResult.readback.key)=\(adapterResult.readback.actualValue):\(adapterResult.provenance.rawValue)"
+                )
+                var verified = try C2ReadbackVerifier.verify(store: store, key: transition.key, expectedValue: transition.desiredValue)
+                verified.scopeOrigin = planned.scopeOrigin
+                // gap#5:播报优先消费 C2 readback_zh 模板,而非 store 硬编码兜底。
+                if let rendered = stateCells.renderReadback(
+                    stateKey: transition.key,
+                    scope: scope(forKey: transition.key),
+                    value: verified.actualValue,
+                    scopeOrigin: planned.scopeOrigin
+                ) {
+                    verified.spokenText = rendered
+                }
+                traceLogger.recordReadback(
+                    traceID: frame.traceID,
+                    message: verified.spokenText,
+                    attributes: TraceAttributes(readbackResult: .verified)
+                )
+                readbacks.append(verified)
             }
-            traceLogger.recordReadback(
-                traceID: frame.traceID,
-                message: verified.spokenText,
-                attributes: TraceAttributes(readbackResult: .verified)
+            runtimeAdapterBox.recordSettledPlanIfAbsent(
+                parentID: frame.id,
+                parentRequestFingerprint: parentRequestFingerprint(for: frame),
+                transitions: transitions
             )
-            readbacks.append(verified)
-        }
-        runtimeAdapterBox.recordSettledPlanIfAbsent(
-            parentID: frame.id,
-            parentRequestFingerprint: parentRequestFingerprint(for: frame),
-            transitions: transitions
-        )
 
-        return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks, provenance: provenance)
+            return C3ExecutionResult(traceID: frame.traceID, readbacks: readbacks, provenance: provenance)
+        }
     }
 
     private func validateSemanticAndIntent(
@@ -644,6 +648,8 @@ public struct C3ExecutionPipeline: Sendable {
             throw ToolExecutionError.semanticInvalid("missing_c2_cell:\(cellID)")
         }
 
+        // row167 compound: mode slot present → power-if-needed + mode + scoped temp (0…3 differential).
+        let compoundMode = compoundACModeDesired(from: frame)
         var transitions: [PlannedTransition] = []
         if frame.device == "ac_temperature",
            frame.actionPrimitive != "query",
@@ -655,15 +661,45 @@ public struct C3ExecutionPipeline: Sendable {
             ))
         }
 
+        if let mode = compoundMode {
+            guard let modeCell = stateCells.cell(id: "ac.mode") else {
+                throw ToolExecutionError.semanticInvalid("missing_c2_cell:ac.mode")
+            }
+            guard modeCell.values.contains(mode) else {
+                throw ToolExecutionError.schemaInvalid(.unknownEnum("ac.mode"))
+            }
+            if store.cell(for: "ac.mode")?.actualValue != mode {
+                transitions.append(PlannedTransition(
+                    transition: DemoMockTransition(key: "ac.mode", desiredValue: mode),
+                    scopeOrigin: nil
+                ))
+            }
+        }
+
         let resolution = try C2ScopeResolver.resolve(frame: frame, cell: cell)
         for key in resolution.keys {
             let desiredValue = try normalizeValue(frame: frame, cell: cell, key: key, store: store)
+            // Compound differential: skip keys already at desired (mutationCount stays 0…3).
+            if compoundMode != nil, store.cell(for: key)?.actualValue == desiredValue {
+                continue
+            }
             transitions.append(PlannedTransition(
                 transition: DemoMockTransition(key: key, desiredValue: desiredValue),
                 scopeOrigin: resolution.origin
             ))
         }
         return transitions
+    }
+
+    /// row167 customer grammar carries `mode` on the ac_temperature frame; plain row164 does not.
+    private func compoundACModeDesired(from frame: ToolCallFrame) -> String? {
+        guard frame.device == "ac_temperature",
+              frame.actionPrimitive != "query",
+              let mode = frame.slots["mode"],
+              !mode.isEmpty else {
+            return nil
+        }
+        return mode
     }
 
     private func executionCellID(for frame: ToolCallFrame) -> String? {
