@@ -18,8 +18,11 @@ public enum ToolContractIRFrameBridge {
         if !discardedNonValueSlots.isEmpty {
             throw DDomainToolPlanFailure.bridgeFailed(ir.sourceToolName)
         }
+        let resolvedValue = try resolveSourceUnit(ir: ir, rawCall: rawCall)
+        // Keep value.* keys out of slots once unit lives on ContractValue (unique field).
         let projectedSlots = ir.slots.filter {
-            projectedSlotKeys.contains($0.key) || valueArgumentKeys.contains($0.key)
+            (projectedSlotKeys.contains($0.key) || valueArgumentKeys.contains($0.key))
+                && $0.key != "value.sourceUnit"
         }
         return ToolCallFrame(
             traceID: traceID,
@@ -29,13 +32,37 @@ public enum ToolContractIRFrameBridge {
             device: ir.device,
             actionPrimitive: ir.actionPrimitive,
             slots: projectedSlots,
-            value: ir.value, // G1: sourceUnit end-to-end passthrough on ContractValue
+            value: resolvedValue,
             candidateSource: .modelRouter,
             rawPayload: redactedRawPayload(
                 for: rawCall,
                 slotProjected: !projectedSlotKeys.isEmpty && projectedSlotKeys != Set(ir.slots.keys)
             ),
             doNotAutoPowerOn: ir.doNotAutoPowerOn
+        )
+    }
+
+    /// End-to-end sourceUnit: prefer `ContractValue`, recover from slot/raw arg, conflict → fail-closed.
+    private static func resolveSourceUnit(ir: ToolContractIR, rawCall: C6ToolCall) throws -> ContractValue {
+        let fromValue = ir.value.sourceUnit
+        let fromSlot = ir.slots["value.sourceUnit"].flatMap(ContractSourceUnit.init(rawValue:))
+        let fromRaw = rawCall.arguments["value.sourceUnit"].flatMap(ContractSourceUnit.init(rawValue:))
+        let present = [fromValue, fromSlot, fromRaw].compactMap { $0 }
+        if Set(present).count > 1 {
+            throw DDomainToolPlanFailure.bridgeFailed(ir.sourceToolName)
+        }
+        guard let unit = fromValue ?? fromSlot ?? fromRaw else {
+            return ir.value
+        }
+        if ir.value.sourceUnit == unit {
+            return ir.value
+        }
+        return ContractValue(
+            ref: ir.value.ref,
+            direct: ir.value.direct,
+            offset: ir.value.offset,
+            type: ir.value.type,
+            sourceUnit: unit
         )
     }
 

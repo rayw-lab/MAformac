@@ -254,29 +254,51 @@ public struct DemoSliceAdmissionCatalog: Sendable {
     }
 
     /// Exact customer grammar: `主驾制热调{N}{unit}` → contract row167.
-    /// Units: `度` / `摄氏度` / `华氏度`. No global suffix strip.
+    /// Units: `度` / `摄氏度` / `°C` / `℃` / `华氏度` / `°F` / `℉`. No global suffix strip.
+    /// °F keeps ExactRational lexeme on `ContractValue.direct`; C3 owns absolute conversion + step gate.
     private func matchRow167(_ text: String) -> DemoSliceClassification? {
         let prefix = "主驾制热调"
         guard text.hasPrefix(prefix) else { return nil }
         let rest = String(text.dropFirst(prefix.count))
+        // Longer aliases first so `华氏度`/`摄氏度` win over bare `度`.
         let unitSpecs: [(suffix: String, adjustmentMode: String, sourceUnit: ContractSourceUnit)] = [
             ("华氏度", "华氏度", .fahrenheit),
             ("摄氏度", "摄氏度", .celsius),
+            ("℉", "华氏度", .fahrenheit),
+            ("℃", "摄氏度", .celsius),
+            ("°F", "华氏度", .fahrenheit),
+            ("°C", "摄氏度", .celsius),
             ("度", "摄氏度", .celsius),
         ]
         for spec in unitSpecs {
             guard rest.hasSuffix(spec.suffix) else { continue }
             let numberLexeme = String(rest.dropLast(spec.suffix.count))
-            guard !numberLexeme.isEmpty, numberLexeme.allSatisfy(\.isNumber) else {
+            guard !numberLexeme.isEmpty else {
                 return .contractRefusal(.notInCatalog)
             }
-            guard let temperature = Int(numberLexeme) else {
+            // Bounded grammar only — never parse via Double.
+            guard (try? ExactRational.parse(numberLexeme)) != nil else {
                 return .contractRefusal(.notInCatalog)
             }
-            // Celsius-bound only for °C lexemes; °F absolute conversion + step gate is C3 (G1/G3).
-            if spec.sourceUnit == .celsius, !temperatureRange.contains(temperature) {
-                return .contractRefusal(.valueOutOfRange(actual: temperature, allowed: temperatureRange))
+
+            let directLexeme: String
+            let evidenceInt: Int?
+            if spec.sourceUnit == .celsius {
+                // Reviewed Celsius customer path stays integer + local range.
+                guard numberLexeme.allSatisfy(\.isNumber), let temperature = Int(numberLexeme) else {
+                    return .contractRefusal(.notInCatalog)
+                }
+                if !temperatureRange.contains(temperature) {
+                    return .contractRefusal(.valueOutOfRange(actual: temperature, allowed: temperatureRange))
+                }
+                directLexeme = String(temperature)
+                evidenceInt = temperature
+            } else {
+                // Fahrenheit: preserve source lexeme; range/step after F→C is C3.
+                directLexeme = numberLexeme
+                evidenceInt = Int(numberLexeme)
             }
+
             let entry = entries.first { $0.matrixID == 167 } ?? entries[entries.count - 1]
             return .command(
                 DemoSliceAdmission(
@@ -293,12 +315,12 @@ public struct DemoSliceAdmissionCatalog: Sendable {
                             "adjustment_mode": spec.adjustmentMode,
                         ],
                         value: ContractValue(
-                            direct: String(temperature),
+                            direct: directLexeme,
                             type: "SPOT",
                             sourceUnit: spec.sourceUnit
                         ),
                         candidateSource: .fastPath,
-                        rawPayload: evidencePayload(entry: entry, inputValue: temperature),
+                        rawPayload: evidencePayload(entry: entry, inputValue: evidenceInt),
                         surfacePolicy: .primaryPanel
                     )
                 )
