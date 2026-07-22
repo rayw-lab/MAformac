@@ -6,7 +6,7 @@ latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
 go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
 working_tree_postdates_handoff: false
 af_g0_verdict: GO_WITH_RESIDUALS
-phase2_product_coding: G7_IN_PROGRESS
+phase2_product_coding: G7_COMPLETE
 phase2_coding_gate: PHASE2_CODING_GATED
 g0_status: G0_COMPLETE
 g1_status: G1_FIRST_KNIFE_GREEN
@@ -15,7 +15,7 @@ g3_status: G3_COMPLETE
 g4_status: G4_COMPLETE
 g5_status: G5_COMPLETE
 g6_status: G6_COMPLETE
-g7_status: G7_KNIFE1_GREEN
+g7_status: G7_COMPLETE
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -30,7 +30,7 @@ g7_status: G7_KNIFE1_GREEN
 - **G4 工程 COMPLETE**（刀1–4）：Turn Lease / cancel / last-intent-wins；刀4 六大 RED 场景收口 + smoke（`TurnLeaseCancellationTests` + `testG3_*` + `make verify-e2e`）。**未抬** `actionDemoProven`；后三族仍禁演示。closeout：run-root `PHASE2-G4-KNIFE4-SCENARIO-CLOSEOUT.md`。
 - **G5 工程 COMPLETE**（刀1–4）：taxonomy + reason registry + payload 去 `proofClass` + **ContentView 只渲染**（outcome/voice/orb/readbacks；禁 App 自造文案/`resultKind` 硬判；保留 G4 `isCurrentTurn`）。仍 **`PHASE2_CODING_GATED`**；**`actionDemoProven=0/120`**；后三族禁演示。closeout：run-root `PHASE2-G5-KNIFE4-UI-RENDER-ONLY-CLOSEOUT.md`。
 - **G6 工程 COMPLETE**（刀1–2）：`RuntimeTurnReceipt v2` + Assembler + B10；刀2 schema/digest/linked 硬化（run-root `PHASE2-G6-KNIFE2-SCHEMA-DIGEST-CLOSEOUT.md`）。仍 **`PHASE2_CODING_GATED`**；**未抬** proven；后三族禁演示。**非** Phase2 解冻。
-- **G7 刀1 GREEN（工程）**：`DemoSliceProductBehaviorGateTests` 扩 query/replay/cancel/receipt 独立门 + Makefile exact-filter 批次（row167/query/risk/replay/cancel/receipt）入 `verify-e2e`；每 filter executed>0。仍 **`PHASE2_CODING_GATED`**；**`actionDemoProven=0/120`**；后三族禁。closeout：run-root `PHASE2-G7-KNIFE1-BEHAVIOR-GATES-CLOSEOUT.md`。下一刀＝anti-placebo 硬化。
+- **G7 工程 COMPLETE**（刀1–2）：刀1 行为门批次（row167/query/risk/replay/cancel/receipt）+ 刀2 anti-placebo 硬化（G7 六批锁表、逐批作用域锚点、meta 真红、`run_swift_test_exact --min-count 1` executed>0）。仍 **`PHASE2_CODING_GATED`**；**`actionDemoProven=0/120`**；后三族禁。closeout：run-root `PHASE2-G7-KNIFE1-BEHAVIOR-GATES-CLOSEOUT.md` / `PHASE2-G7-KNIFE2-ANTI-PLACEBO-CLOSEOUT.md`。下一＝G8 CI DAG。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
@@ -44,9 +44,9 @@ g7_status: G7_KNIFE1_GREEN
 2. 读本页 frontmatter 指向的最新 handoff + GO receipt。
 3. 需要状态时 live 重核 Git / remote Verify / Makefile recipe / matrix proven。
 
-## 下一步（Phase2 G7）
+## 下一步（Phase2 G8）
 
-1. **G7_IN_PROGRESS**：刀1 行为门扩展 GREEN；下一刀 **刀2 anti-placebo 硬化**（逐批作用域 + 反向生成/0-filter/空批次真红）。勿抬 proven。
+1. **G7_COMPLETE（工程）**：行为门 + anti-placebo 有牙；下一 **G8 CI DAG 去重 / executed 证据 / artifact**。勿抬 proven；勿提前把 G8 写成解冻。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 3. residual 强制账（不因 G3/G4/G5/G6/G7 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`。
 4. 禁抬 proven；禁演示后三族。
@@ -94,4 +94,4 @@ g7_status: G7_KNIFE1_GREEN
 - G4_COMPLETE = Turn Lease / cancel / last-intent-wins **工程**收口；≠ release-ready / 演示解冻 / proven 翻格。
 - G5_COMPLETE = taxonomy + reason registry + payload 去 `proofClass` + ContentView 只渲染 **工程**收口；≠ proven 翻格 / 后三族可演 / release-ready / G6 receipt 闭环。
 - G6_COMPLETE = RuntimeTurnReceipt v2 + Assembler/B10 + schema/digest/linked **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready。
-- G7 刀1 GREEN = 行为门批次扩展 **工程**收口；≠ G7 COMPLETE / anti-placebo 有牙 / proven 翻格 / 后三族可演。
+- G7_COMPLETE = 行为门批次 + anti-placebo 硬化 **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready / G8 CI DAG 已闭。

@@ -47,41 +47,53 @@ verify-governance-hygiene:
 verify-anti-placebo:
 	$(PYTHON_BOOTSTRAP) -m unittest -v scripts/test_verify_anti_placebo.py scripts/test_run_ui_e2e.py
 	$(PYTHON_BOOTSTRAP) scripts/verify_anti_placebo.py
-# FA-1 contract: stable gate must aggregate the full product-behavior class
-# (AC golden including test07/test03a) plus explicit WP21 + G7 batch filters.
-# G7 knife1: row167/query/risk/replay/cancel/receipt exact-filter batches (each executed>0).
+# FA-1 + G7 contract: full product-behavior class (AC golden incl. test07/test03a)
+# + WP21 + G7 batch filters. Each filter goes through run_swift_test_exact.py
+# --min-count 1 so 0-match cannot exit 0 (anti-placebo executed>0 gate).
+# G7 risk couples to legacy testG3_window (NOT testG7_risk_) — keep Makefile
+# filter, G7_TARGETS lock table, and docs in sync if renaming.
 verify-e2e: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat verify-e2e-row167 verify-e2e-query verify-e2e-risk verify-e2e-replay verify-e2e-cancel verify-e2e-receipt
 	$(PYTHON_BOOTSTRAP) scripts/verify_anti_placebo.py
 
 verify-e2e-product-behavior:
-	swift test --filter DemoSliceProductBehaviorGateTests
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests --min-count 1
 
 verify-e2e-wp21-window:
-	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchA_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testWP21BatchA_ --min-count 1
 
 verify-e2e-wp21-ambient:
-	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchB_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testWP21BatchB_ --min-count 1
 
 verify-e2e-wp21-seat:
-	swift test --filter DemoSliceProductBehaviorGateTests/testWP21BatchC_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testWP21BatchC_ --min-count 1
 
 verify-e2e-row167:
-	swift test --filter DemoSliceProductBehaviorGateTests/testG3_row167_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testG3_row167_ --min-count 1
 
 verify-e2e-query:
-	swift test --filter DemoSliceProductBehaviorGateTests/testG7_query_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testG7_query_ --min-count 1
 
 verify-e2e-risk:
-	swift test --filter DemoSliceProductBehaviorGateTests/testG3_window
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testG3_window --min-count 1
 
 verify-e2e-replay:
-	swift test --filter DemoSliceProductBehaviorGateTests/testG7_replay_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testG7_replay_ --min-count 1
 
 verify-e2e-cancel:
-	swift test --filter DemoSliceProductBehaviorGateTests/testG7_cancel_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testG7_cancel_ --min-count 1
 
 verify-e2e-receipt:
-	swift test --filter DemoSliceProductBehaviorGateTests/testG7_receipt_
+	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
+		--filter DemoSliceProductBehaviorGateTests/testG7_receipt_ --min-count 1
 XCODEBUILD ?= xcodebuild
 UI_E2E_TEST_IDENTIFIER ?= MAformacIOSUITests/FrontstageCustomerIngressUITests
 UI_E2E_RESULT_PATH ?= $(PWD)/build/ui-e2e-$(shell date +%Y%m%d-%H%M%S).xcresult

@@ -107,20 +107,42 @@ def check_verify_e2e(root: Path) -> list[str]:
     return []
 
 
-# ---- WP2-1 Anti-Placebo Product Gate Checker ----
+# ---- WP2-1 / G7 Anti-Placebo Product Gate Checker ----
 
-# Required anchor patterns that MUST be present in DemoSliceProductBehaviorGateTests.swift
-WP21_REQUIRED_ANCHORS = [
+# File-wide structural anchors (Harness / UI projection). Customer-path
+# anchors are checked per Make-batch body scope — file-wide wash is not enough.
+FILE_WIDE_REQUIRED_ANCHORS = [
     r"DemoSliceRoute\(",
-    r"\.route\(text:",
-    r"runnerCallCount",
-    r"\.store\b|\.store\.cell\b|store\.cell\b",
-    r"payload\.readbacks",
-    r"mutationCount|revision",
     r"VehicleCardDisplay\.displays",
 ]
 
-# Required test name prefixes (three batches required)
+# Default per-batch customer-path anchors (aggregate of all funcs under a prefix).
+DEFAULT_BATCH_BODY_ANCHORS = [
+    (r"\.route\(text:", ".route(text:)"),
+    (r"runnerCallCount", "runnerCallCount"),
+    (r"\.store\b|store\.cell\b", "store"),
+    (r"readbacks", "readbacks"),
+    (r"mutationCount", "mutationCount"),
+]
+
+# Specialized batches: risk fail-closed has no payload.readbacks; receipt
+# focuses on assembler-outside-runner facts (still needs route + store fence).
+BATCH_BODY_ANCHOR_OVERRIDES: dict[str, list[tuple[str, str]]] = {
+    "testG3_window": [
+        (r"\.route\(text:", ".route(text:)"),
+        (r"runnerCallCount", "runnerCallCount"),
+        (r"\.store\b|store\.cell\b", "store"),
+        (r"currentRevision|beforeRevision|revisionBefore", "revision-fence"),
+    ],
+    "testG7_receipt_": [
+        (r"\.route\(text:", ".route(text:)"),
+        (r"\.store\b|store\.cell\b", "store"),
+        (r"mutationCount", "mutationCount"),
+        (r"RuntimeTurnReceiptAssembler|assembleAndWrite", "receipt-assembler"),
+    ],
+}
+
+# Required test name prefixes (three WP21 batches)
 WP21_REQUIRED_TEST_PREFIXES = [
     "testWP21BatchA_",
     "testWP21BatchB_",
@@ -129,12 +151,33 @@ WP21_REQUIRED_TEST_PREFIXES = [
 
 PRODUCT_BEHAVIOR_TARGET = "verify-e2e-product-behavior"
 PRODUCT_BEHAVIOR_FILTER = "DemoSliceProductBehaviorGateTests"
+EXACT_RUNNER = "Tools/checks/run_swift_test_exact.py"
 
 WP21_TARGETS = {
     "verify-e2e-wp21-window": "testWP21BatchA_",
     "verify-e2e-wp21-ambient": "testWP21BatchB_",
     "verify-e2e-wp21-seat": "testWP21BatchC_",
 }
+
+# G7 knife1/2 lock table — must stay synced with Makefile exact-filter targets.
+# RISK COUPLING: verify-e2e-risk → testG3_window (legacy G3 window risk gate;
+# NOT testG7_risk_). Renaming requires Makefile + this table + docs together.
+G7_TARGETS = {
+    "verify-e2e-row167": "testG3_row167_",
+    "verify-e2e-query": "testG7_query_",
+    "verify-e2e-risk": "testG3_window",
+    "verify-e2e-replay": "testG7_replay_",
+    "verify-e2e-cancel": "testG7_cancel_",
+    "verify-e2e-receipt": "testG7_receipt_",
+}
+
+G7_RISK_FILTER_COUPLING = (
+    "verify-e2e-risk filter is locked to DemoSliceProductBehaviorGateTests/"
+    "testG3_window (legacy G3 window risk). Do not rename to testG7_risk_ "
+    "without syncing Makefile + G7_TARGETS + this note."
+)
+
+ALL_BATCH_TARGETS = {**WP21_TARGETS, **G7_TARGETS}
 
 # AC golden methods that must remain in the stable product-behavior class.
 GOLDEN_REQUIRED_TEST_PREFIXES = [
@@ -156,12 +199,12 @@ WP21_FORBIDDEN_PATTERNS = [
     r"sunroof",
 ]
 
-# Voice acceptance patterns that MUST NOT appear as acceptance assertions
-# These are forbidden when combined with XCTAssert/assertion context
-WP21_VOICE_ACCEPTANCE_PATTERNS = [
-    r"spokenTexts",
-    r"speechCount",
-    # TTS/audio/speech acceptance assertions (XCTAssert + TTS/audio/speech on same/adjacent line)
+# expected 由被测 runtime / catalog / authority 反向生成 → 假绿
+REVERSE_GENERATED_PATTERNS = [
+    r"let\s+expected\w*\s*=\s*[^\n]*(?:\.catalog\b|authority|matrixEntry|liveAuthority|runtimeAuthority)",
+    r"let\s+expected\w*\s*=\s*(?:result|execution|readOnly|payload|h\.store)\.",
+    r"let\s+expected\w*\s*=\s*[^\n]*\.actualValue",
+    r"//\s*(?:reverse[- ]generat|from\s+runtime\s+authority)",
 ]
 
 
@@ -185,12 +228,20 @@ def _read_product_gate_source(root: Path) -> str:
     return _strip_swift_strings(_strip_swift_comments(source))
 
 
-def _check_required_anchors(source: str) -> list[str]:
-    """Check all required anchor patterns are present."""
+def _read_product_gate_source_raw(root: Path) -> str:
+    """Raw source (comments kept) for reverse-generation comment markers."""
+    path = root / "Tests" / "MAformacCoreTests" / "DemoSliceProductBehaviorGateTests.swift"
+    if not path.exists():
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+def _check_file_wide_anchors(source: str) -> list[str]:
+    """Structural anchors that may live once (Harness / UI projection)."""
     failures = []
-    for pattern in WP21_REQUIRED_ANCHORS:
+    for pattern in FILE_WIDE_REQUIRED_ANCHORS:
         if not re.search(pattern, source):
-            failures.append(f"Missing required anchor: {pattern}")
+            failures.append(f"Missing file-wide anchor: {pattern}")
     return failures
 
 
@@ -203,40 +254,75 @@ def _check_required_test_prefixes(source: str) -> list[str]:
     for prefix in GOLDEN_REQUIRED_TEST_PREFIXES:
         if not re.search(rf"func\s+{re.escape(prefix)}", source):
             failures.append(f"Missing golden test prefix: {prefix}")
+    for prefix in G7_TARGETS.values():
+        if not re.search(rf"func\s+{re.escape(prefix)}", source):
+            failures.append(f"Missing G7 batch test prefix: {prefix}")
     return failures
 
 
-def _extract_swift_func_body(source: str, func_prefix: str) -> str | None:
-    """Return the body of the first `func <prefix>...` method, or None."""
-    match = re.search(rf"func\s+{re.escape(func_prefix)}\w*\s*\([^)]*\)[^{{]*\{{", source)
-    if match is None:
-        return None
-    start = match.end() - 1
-    depth = 0
-    for index, char in enumerate(source[start:], start=start):
-        if char == "{":
-            depth += 1
-        elif char == "}":
-            depth -= 1
-            if depth == 0:
-                return source[start + 1 : index]
-    return None
+def _extract_all_swift_func_bodies(source: str, func_prefix: str) -> list[tuple[str, str]]:
+    """Return [(func_name, body), ...] for every `func <prefix>...` method."""
+    results: list[tuple[str, str]] = []
+    for match in re.finditer(
+        rf"func\s+({re.escape(func_prefix)}\w*)\s*\([^)]*\)[^{{]*\{{",
+        source,
+    ):
+        name = match.group(1)
+        start = match.end() - 1
+        depth = 0
+        for index, char in enumerate(source[start:], start=start):
+            if char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+                if depth == 0:
+                    results.append((name, source[start + 1 : index]))
+                    break
+    return results
 
 
-def _check_wp21_batch_bodies_have_route(source: str) -> list[str]:
-    """Empty WP21 batch methods are placebo and must fail closed."""
+def _batch_anchors_for(prefix: str) -> list[tuple[str, str]]:
+    return BATCH_BODY_ANCHOR_OVERRIDES.get(prefix, DEFAULT_BATCH_BODY_ANCHORS)
+
+
+def _check_batch_scope_anchors(source: str) -> list[str]:
+    """
+    Per Make-batch scope: each locked prefix must have ≥1 non-empty method,
+    each method must call .route(text:), and the aggregate body must carry
+    the batch's required customer-path anchors (no file-wide wash).
+    """
     failures: list[str] = []
-    for prefix in WP21_REQUIRED_TEST_PREFIXES:
-        body = _extract_swift_func_body(source, prefix)
-        if body is None:
-            failures.append(f"Missing WP21 batch body: {prefix}")
+    for target, prefix in ALL_BATCH_TARGETS.items():
+        bodies = _extract_all_swift_func_bodies(source, prefix)
+        if not bodies:
+            failures.append(f"0-filter: no tests match prefix {prefix!r} for {target}")
             continue
-        compact = re.sub(r"\s+", "", body)
-        if not compact:
-            failures.append(f"Empty WP21 batch body: {prefix}")
+        aggregate_parts: list[str] = []
+        for name, body in bodies:
+            compact = re.sub(r"\s+", "", body)
+            if not compact:
+                failures.append(f"Empty batch body: {name} ({target})")
+                continue
+            if ".route(text:" not in body:
+                failures.append(f"Batch method missing .route(text:): {name} ({target})")
+            aggregate_parts.append(body)
+        if not aggregate_parts:
             continue
-        if ".route(text:" not in body:
-            failures.append(f"WP21 batch missing .route(text:): {prefix}")
+        aggregate = "\n".join(aggregate_parts)
+        for pattern, label in _batch_anchors_for(prefix):
+            if not re.search(pattern, aggregate):
+                failures.append(
+                    f"Batch scope missing {label}: {target} prefix={prefix!r}"
+                )
+    return failures
+
+
+def _check_reverse_generated_expected(raw_source: str) -> list[str]:
+    """Reject fixtures that derive expected from the runtime under test."""
+    failures: list[str] = []
+    for pattern in REVERSE_GENERATED_PATTERNS:
+        if re.search(pattern, raw_source):
+            failures.append(f"Reverse-generated expected pattern: {pattern}")
     return failures
 
 
@@ -258,18 +344,20 @@ def _check_voice_acceptance_guard(source: str) -> list[str]:
     failures = []
     lines = source.splitlines()
     for i, line in enumerate(lines):
-        # Check for spokenTexts / speechCount assertions
-        if re.search(r"XCTAssert.*spokenTexts", line) or re.search(r"XCTAssert.*speechCount", line):
+        if re.search(r"XCTAssert.*spokenTexts", line) or re.search(
+            r"XCTAssert.*speechCount", line
+        ):
             failures.append(f"Voice acceptance assertion at line {i+1}: {line.strip()[:120]}")
-        # Check for TTS/audio/speech acceptance assertions on same or adjacent lines
         if re.search(r"XCTAssert", line):
-            # Check current line and adjacent lines for TTS/audio/speech keywords
             context_lines = []
-            for j in range(max(0, i-1), min(len(lines), i+2)):
+            for j in range(max(0, i - 1), min(len(lines), i + 2)):
                 context_lines.append(lines[j])
             context = " ".join(context_lines)
             if re.search(r"TTS|audio|speech|synthesis|tts", context, re.IGNORECASE):
-                failures.append(f"TTS/audio/speech acceptance assertion near line {i+1}: {line.strip()[:120]}")
+                failures.append(
+                    f"TTS/audio/speech acceptance assertion near line {i+1}: "
+                    f"{line.strip()[:120]}"
+                )
     return failures
 
 
@@ -279,7 +367,6 @@ def _check_recording_speech_engine_only_in_harness(source: str) -> list[str]:
     forbid elsewhere in test methods (where it would be test-side injection).
     """
     failures = []
-    # Find Harness struct boundaries
     harness_match = re.search(r"struct Harness\s*\{([^}]+)\}", source, re.DOTALL)
     if harness_match:
         harness_body = harness_match.group(1)
@@ -288,14 +375,10 @@ def _check_recording_speech_engine_only_in_harness(source: str) -> list[str]:
     else:
         failures.append("Harness struct not found")
 
-    # Check that RecordingSpeechSynthesisEngine() is NOT constructed outside Harness
-    # (i.e., in test methods - this would be test-side injection)
-    # We'll check the whole file minus the Harness struct
     harness_start = source.find("struct Harness")
     if harness_start != -1:
         brace_start = source.find("{", harness_start)
         if brace_start != -1:
-            # Find matching closing brace
             depth = 0
             harness_end = brace_start
             for i, ch in enumerate(source[brace_start:], start=brace_start):
@@ -306,10 +389,12 @@ def _check_recording_speech_engine_only_in_harness(source: str) -> list[str]:
                     if depth == 0:
                         harness_end = i + 1
                         break
-            # Check outside Harness
             outside = source[:harness_start] + source[harness_end:]
             if "RecordingSpeechSynthesisEngine()" in outside:
-                failures.append("RecordingSpeechSynthesisEngine() constructed outside Harness (test-side injection)")
+                failures.append(
+                    "RecordingSpeechSynthesisEngine() constructed outside Harness "
+                    "(test-side injection)"
+                )
     return failures
 
 
@@ -326,11 +411,25 @@ def _make_target_body(makefile: str, target: str) -> str | None:
     return "\n".join(body)
 
 
+def _body_uses_exact_min_count(body: str, filter_token: str) -> bool:
+    """Require fail-closed exact runner with --min-count 1 (executed>0 gate)."""
+    if EXACT_RUNNER not in body and "run_swift_test_exact.py" not in body:
+        return False
+    if not re.search(r"--min-count\s+1\b", body):
+        return False
+    return bool(
+        re.search(
+            rf"--filter\s+{re.escape(filter_token)}\b",
+            body,
+        )
+    )
+
+
 def _check_verify_e2e_recipe(makefile: str) -> list[str]:
     """
-    Lock the FA-1 stable-gate contract:
-    verify-e2e must aggregate full-class product behavior + three WP21 filters.
-    WP21-only recipes must fail closed.
+    Lock the FA-1 + G7 stable-gate contract:
+    verify-e2e must aggregate full-class product behavior + WP21 + G7 filters,
+    each via run_swift_test_exact.py --min-count 1 (0-match must not exit 0).
     """
     failures: list[str] = []
     aggregate = re.search(r"(?m)^verify-e2e\s*:([^\n]*)$", makefile)
@@ -345,17 +444,13 @@ def _check_verify_e2e_recipe(makefile: str) -> list[str]:
     if product_body is None:
         failures.append(f"Makefile target missing: {PRODUCT_BEHAVIOR_TARGET}")
     else:
-        # Exact class filter only — a narrower /testWP21... suffix is recipe drift.
-        if not re.search(
-            rf"swift\s+test\s+--filter\s+{re.escape(PRODUCT_BEHAVIOR_FILTER)}\s*(?:#.*)?$",
-            product_body,
-            flags=re.MULTILINE,
-        ):
+        if not _body_uses_exact_min_count(product_body, PRODUCT_BEHAVIOR_FILTER):
             failures.append(
-                f"Exact full-class Swift filter missing: {PRODUCT_BEHAVIOR_TARGET}"
+                f"Exact runner + --min-count 1 missing: {PRODUCT_BEHAVIOR_TARGET}"
             )
+        # Narrowed class filter (/suffix) not allowed on full-class target.
         if re.search(
-            rf"swift\s+test\s+--filter\s+{re.escape(PRODUCT_BEHAVIOR_FILTER)}/",
+            rf"--filter\s+{re.escape(PRODUCT_BEHAVIOR_FILTER)}/",
             product_body,
         ):
             failures.append(
@@ -363,21 +458,36 @@ def _check_verify_e2e_recipe(makefile: str) -> list[str]:
             )
         if re.search(r"(?m)^\s*@?true\s*$", product_body):
             failures.append(f"Placebo true target: {PRODUCT_BEHAVIOR_TARGET}")
+        if re.search(r"(?m)^\s*swift\s+test\s+--filter\b", product_body):
+            failures.append(
+                f"Bare swift test --filter not allowed (0-match placebo): "
+                f"{PRODUCT_BEHAVIOR_TARGET}"
+            )
 
-    for target, test_prefix in WP21_TARGETS.items():
+    for target, test_prefix in ALL_BATCH_TARGETS.items():
         body = _make_target_body(makefile, target)
         if body is None:
             failures.append(f"Makefile target missing: {target}")
             continue
-        if not re.search(
-            rf"swift\s+test\s+--filter\s+DemoSliceProductBehaviorGateTests/{re.escape(test_prefix)}",
-            body,
-        ):
-            failures.append(f"Exact Swift filter missing: {target}")
+        filter_token = f"{PRODUCT_BEHAVIOR_FILTER}/{test_prefix}"
+        if not _body_uses_exact_min_count(body, filter_token):
+            failures.append(f"Exact runner + --min-count 1 missing: {target}")
         if re.search(r"(?m)^\s*@?true\s*$", body):
             failures.append(f"Placebo true target: {target}")
+        if re.search(r"(?m)^\s*swift\s+test\s+--filter\b", body):
+            failures.append(
+                f"Bare swift test --filter not allowed (0-match placebo): {target}"
+            )
         if target not in deps:
             failures.append(f"verify-e2e dependency missing: {target}")
+
+    # Documented risk↔testG3_window coupling must remain locked.
+    risk_body = _make_target_body(makefile, "verify-e2e-risk")
+    if risk_body is not None and "testG3_window" not in risk_body:
+        failures.append(
+            "verify-e2e-risk must keep filter testG3_window "
+            f"({G7_RISK_FILTER_COUPLING})"
+        )
     return failures
 
 
@@ -389,77 +499,57 @@ def _check_wp21_make_targets(root: Path) -> list[str]:
 
 def check_wp21_product_gate(root: Path) -> list[str]:
     """
-    WP2-1 产品行为门禁防安慰剂检查。
-    读取 Tests/MAformacCoreTests/DemoSliceProductBehaviorGateTests.swift，
-    去除 Swift 行/块注释后检查。
-    
-    必须有：
-    - DemoSliceRoute(、.route(text:、runnerCallCount、.store 或 store.cell、payload.readbacks、mutationCount/revision
-    - 三族计划 test 名前缀 testWP21BatchA_、testWP21BatchB_、testWP21BatchC_
-    
-    禁止（安慰剂指标）：
-    - 产品门测试代码中出现 ToolCallFrame(、planDecoder:、preset:、modelBackend:、MLXLocalToolPlanBackend、TenFamily、tailgate/sunroof 正向入口
-    - 语音非门：若产品 gate 出现 spokenTexts、speechCount 或 XCTAssert 同行/邻近 TTS/audio/speech acceptance，必须失败
-    - 允许 Harness 仅构造 RecordingSpeechSynthesisEngine()
-    
+    WP2-1 / G7 产品行为门禁防安慰剂检查。
+
+    - 文件级：DemoSliceRoute / VehicleCardDisplay / Harness / forbidden / voice
+    - 逐批作用域：WP21 + G7 六批各自非空、含 .route，聚合含客户链锚点
+    - recipe：全类 + WP21 + G7；每 filter 经 run_swift_test_exact --min-count 1
+    - 反向生成 expected → FAIL；0-filter（源码无匹配）→ FAIL
+
     Returns:
         List of failure messages. Empty list means pass.
     """
     failures = []
     source = _read_product_gate_source(root)
-    
+    raw_source = _read_product_gate_source_raw(root)
+
     if not source:
         return ["DemoSliceProductBehaviorGateTests.swift not found"]
-    
-    # Check required anchors
-    failures.extend(_check_required_anchors(source))
-    
-    # Check required test prefixes (three batches + AC golden)
-    failures.extend(_check_required_test_prefixes(source))
 
-    # Empty WP21 batch methods must fail closed
-    failures.extend(_check_wp21_batch_bodies_have_route(source))
-    
-    # Check forbidden patterns
+    failures.extend(_check_file_wide_anchors(source))
+    failures.extend(_check_required_test_prefixes(source))
+    failures.extend(_check_batch_scope_anchors(source))
+    failures.extend(_check_reverse_generated_expected(raw_source))
     failures.extend(_check_forbidden_patterns(source))
-    
-    # Check voice acceptance guard
     failures.extend(_check_voice_acceptance_guard(source))
-    
-    # Check RecordingSpeechSynthesisEngine only in Harness
     failures.extend(_check_recording_speech_engine_only_in_harness(source))
-    
     failures.extend(_check_wp21_make_targets(root))
 
     return failures
 
 
 def main() -> int:
-    """运行三项检查，任一失败则返回非零状态。"""
+    """运行检查，任一失败则返回非零状态。"""
     root = Path(__file__).resolve().parent.parent
-    
+
     all_failures = []
-    
-    # Check 1: Fact anchors
+
     fact_failures = check_fact_anchors(root)
     if fact_failures:
         all_failures.extend([f"FAIL: fact anchor: {f}" for f in fact_failures])
-    
-    # Check 2: Percentage progress
+
     pct_failures = check_percentage_progress(root)
     if pct_failures:
         all_failures.extend([f"FAIL: percentage progress: {f}" for f in pct_failures])
-    
-    # Check 3: verify-e2e target
+
     verify_failures = check_verify_e2e(root)
     if verify_failures:
         all_failures.extend([f"FAIL: verify-e2e: {f}" for f in verify_failures])
-    
-    # Check 4: WP2-1 product gate
+
     wp21_failures = check_wp21_product_gate(root)
     if wp21_failures:
         all_failures.extend([f"FAIL: wp21 product gate: {f}" for f in wp21_failures])
-    
+
     if all_failures:
         for failure in all_failures:
             print(failure, file=sys.stderr)
