@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "acceptance_route_registry_v1",
+  "routes": [
+    {
+      "acceptanceRouteID": "product.frontstage.text.v1",
+      "entryPoint": "DemoSliceRoute.route(text:)",
+      "pathKind": "product_acceptance_route",
+      "planDecoderSource": "DemoSliceAdmissionCatalog.admission(for:)",
+      "matrix_ids": [4, 5, 6],
+      "proofClassCeiling": "local_unit",
+      "ruleStages": [
+        "text_admission",
+        "tool_frame",
+        "c3_execution",
+        "state_readback"
+      ],
+      "ce_m7_closed": "2026-07-23",
+      "authority": "contracts/governance/acceptance-route-registry.json"
+    }
+  ]
+}

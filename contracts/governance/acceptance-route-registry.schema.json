@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AcceptanceRouteRegistry",
+  "type": "object",
+  "required": ["schemaVersion", "routes"],
+  "properties": {
+    "schemaVersion": { "const": "acceptance_route_registry_v1" },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "acceptanceRouteID",
+          "entryPoint",
+          "pathKind",
+          "planDecoderSource",
+          "matrix_ids",
+          "proofClassCeiling"
+        ],
+        "properties": {
+          "acceptanceRouteID": { "type": "string", "minLength": 1 },
+          "entryPoint": { "type": "string", "minLength": 1 },
+          "pathKind": { "const": "product_acceptance_route" },
+          "planDecoderSource": { "type": "string", "minLength": 1 },
+          "matrix_ids": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 1
+          },
+          "proofClassCeiling": { "type": "string", "minLength": 1 },
+          "ruleStages": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1
+          },
+          "ce_m7_closed": { "type": "string" },
+          "authority": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

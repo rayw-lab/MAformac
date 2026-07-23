@@ -29,6 +29,13 @@ SEMANTIC_CONTRACT = REPO_ROOT / "contracts" / "semantic-function-contract.jsonl"
 STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
 ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
+SCOPED_ACTION_PROBE_RECEIPT = (
+    REPO_ROOT / ".build" / "c1-run" / "receipts" / "c1" / "runtime-action-readback-probes-scoped-4.json"
+)
+BF8_PROMOTION_RECEIPT = (
+    Path("/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-17-s8-s9-successor-c-longrun")
+    / "bf8-promotion-receipt-matrix-4.json"
+)
 MATRIX = REPO_ROOT / "contracts" / "demo-capability-matrix.json"
 SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
 FIXTURES = REPO_ROOT / "Tools" / "checks" / "fixtures" / "demo_capability_matrix"
@@ -81,6 +88,31 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             state_cells_path=STATE_CELLS,
             mounted_catalog_path=MOUNTED_CATALOG,
         )
+
+    def materialize_tracked_baseline(self) -> tuple[object, dict]:
+        checker = self.checker()
+        common = dict(
+            manifest_path=MANIFEST,
+            t0_design_path=T0_DESIGN,
+            semantic_contract_path=SEMANTIC_CONTRACT,
+            state_cells_path=STATE_CELLS,
+            mounted_catalog_path=MOUNTED_CATALOG,
+        )
+        if SCOPED_ACTION_PROBE_RECEIPT.is_file():
+            receipt = load_json(SCOPED_ACTION_PROBE_RECEIPT)
+            kwargs = {}
+            if BF8_PROMOTION_RECEIPT.is_file():
+                kwargs["bf8_promotion_receipt"] = load_json(BF8_PROMOTION_RECEIPT)
+                kwargs["bf8_promotion_receipt_path"] = BF8_PROMOTION_RECEIPT
+            matrix = checker.materialize_matrix(
+                **common,
+                action_probe_receipt=receipt,
+                action_probe_receipt_path=SCOPED_ACTION_PROBE_RECEIPT,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+                **kwargs,
+            )
+            return checker, matrix
+        return self.materialize()
 
     def v2_matrix(self) -> dict:
         _, matrix = self.materialize()
@@ -136,7 +168,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     "register": probe["register"],
                     "utterance": probe["utterance"],
                     "representativeTool": probe["representativeTool"],
-                    "pathKind": "default_runtime",
+                    "pathKind": "product_acceptance_route",
                     "injectionUsed": False,
                     "traceID": f"trace-matrix-{probe['matrixID']}",
                     "stageTraceIDs": {
@@ -178,6 +210,104 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             "proofClass": "local_unit",
             "caseCount": len(cases),
             "cases": cases,
+        }
+
+    def valid_scoped_action_receipt(self, checker: object, matrix_ids: list[int] = [4]) -> dict:
+        catalog = load_json(ACTION_PROBE_CATALOG)
+        cases = []
+        for probe in catalog["probes"]:
+            if probe["matrixID"] not in matrix_ids:
+                continue
+            target = probe["expectedStateDelta"]
+            readback = probe["expectedReadback"]
+            cases.append(
+                {
+                    "probeID": probe["probeID"],
+                    "matrixID": probe["matrixID"],
+                    "register": probe["register"],
+                    "utterance": probe["utterance"],
+                    "representativeTool": probe["representativeTool"],
+                    "pathKind": "product_acceptance_route",
+                    "injectionUsed": False,
+                    "traceID": f"trace-matrix-{probe['matrixID']}",
+                    "stageTraceIDs": {
+                        "decode": [f"trace-matrix-{probe['matrixID']}"],
+                        "execute": [f"trace-matrix-{probe['matrixID']}"],
+                        "readback": [f"trace-matrix-{probe['matrixID']}"],
+                    },
+                    "observedToolCallCount": 1,
+                    "emittedToolNames": [probe["representativeTool"]],
+                    "stateBeforeSHA256": "a" * 64,
+                    "stateAfterSHA256": "b" * 64,
+                    "stateMutation": True,
+                    "stateDeltas": [
+                        {
+                            "key": target["key"],
+                            "beforeValue": target["beforeValue"],
+                            "afterValue": target["afterValue"],
+                        }
+                    ],
+                    "confirmedState": {
+                        "key": target["key"],
+                        "actualValue": target["afterValue"],
+                    },
+                    "resultKind": "accepted_tool_call",
+                    "reconciliationStatus": "verified",
+                    "readbacks": [
+                        {
+                            "key": readback["key"],
+                            "actualValue": readback["actualValue"],
+                            "spokenText": "主驾空调已调到26度",
+                        }
+                    ],
+                }
+            )
+        return {
+            "schemaVersion": "runtime_action_readback_receipt_v2",
+            "receiptID": catalog["receiptID"],
+            "probePackSHA256": checker.sha256_file(ACTION_PROBE_CATALOG),
+            "proofClass": "local_unit",
+            "caseCount": len(cases),
+            "scope": {
+                "matrix_ids": matrix_ids,
+                "knife": "s10_knife1",
+            },
+            "cases": cases,
+            "runID": "run-scoped-test",
+            "sourceHeadSHA": "a" * 40,
+            "testedCheckoutSHA": "b" * 40,
+            "nonce": "c" * 32,
+            "buildIdentity": "test-build",
+            "modelIdentity": "test-model",
+            "runtimeContractBundleDigest": load_json(
+                REPO_ROOT / "generated" / "demo-runtime-contract-bundle.manifest.json"
+            )["runtime_contract_bundle_digest"],
+            "probe_catalog_sha256": checker.sha256_file(ACTION_PROBE_CATALOG),
+        }
+
+    def valid_bf8_receipt(
+        self, checker: object, matrix_ids: list[int] = [4], subject_sha: str | None = None
+    ) -> dict:
+        if subject_sha is None:
+            try:
+                subject_sha = subprocess.run(
+                    ["git", "rev-parse", "HEAD"],
+                    cwd=REPO_ROOT,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout.strip()
+            except Exception:
+                subject_sha = "a" * 40
+        return {
+            "schemaVersion": "bf8_promotion_receipt_v1",
+            "receiptID": f"bf8-promotion-matrix-{'-'.join(map(str, matrix_ids))}-test",
+            "subjectSHA256": subject_sha,
+            "matrix_ids": matrix_ids,
+            "ceremony": {
+                "artifactRef": "runs/test/BF8-PASS-RECEIPT.md",
+                "approver": "磊哥",
+            },
         }
 
     def mutate_with_fixture(self, fixture_name: str) -> tuple[object, dict]:
@@ -226,13 +356,14 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(len(matrix["cells"]), 120)
         self.assertEqual({cell["matrix_id"] for cell in matrix["cells"]}, manifest_ids)
 
-    def test_each_cell_has_traceable_four_part_basis(self) -> None:
+    def test_each_cell_has_traceable_five_part_basis(self) -> None:
         _, matrix = self.materialize()
         required_basis = {
             "mounted_or_approved_action",
             "semantic_contract",
             "state_readback_cell",
             "readbackProbePass",
+            "bf8_promotion",
         }
         for cell in matrix["cells"]:
             self.assertEqual(set(cell["actionDemoProven_basis"]), required_basis)
@@ -245,6 +376,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             self.assertEqual(probe_basis["status"], "conditional_pending")
             self.assertIsNone(probe_basis["probe_id"])
             self.assertIsNone(probe_basis["probe_receipt_id"])
+            bf8 = cell["actionDemoProven_basis"]["bf8_promotion"]
+            self.assertFalse(bf8["observed"])
+            self.assertEqual(bf8["status"], "pending_human_bf8")
 
     def test_primary_class_conservation_diff_matches_manifest(self) -> None:
         checker, matrix = self.materialize()
@@ -265,7 +399,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(report["blocked_unknown_count"], 0)
         self.assertNotIn("E_T0_ENUM_UNKNOWN", report["errors"])
 
-    def test_action_demo_proven_is_logical_and_of_four_same_cell_action_bases(self) -> None:
+    def test_action_demo_proven_is_logical_and_of_five_same_cell_action_bases(self) -> None:
         checker, _ = self.materialize()
         all_true = {
             "mounted_or_approved_action": {"observed": True},
@@ -277,6 +411,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 "probe_receipt_id": "runtime-action-readback-probes",
                 "receipt_sha256": "c" * 64,
             },
+            "bf8_promotion": {"observed": True},
         }
         self.assertTrue(checker.compute_action_demo_proven(all_true))
         for key in all_true:
@@ -296,6 +431,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 "probe_receipt_id": "runtime-action-readback-probes",
                 "receipt_sha256": "c" * 64,
             },
+            "bf8_promotion": {"observed": True},
         }
         for missing_field in ("probe_id", "probe_receipt_id"):
             trial = copy.deepcopy(basis)
@@ -313,6 +449,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                 "probe_id": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
                 "probe_receipt_id": "runtime-no-mutation-40-probes",
             },
+            "bf8_promotion": {"observed": True},
         }
         self.assertFalse(checker.compute_action_demo_proven(basis))
 
@@ -462,9 +599,177 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             )
         self.assertEqual(
             [cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]],
-            [4, 5, 6],
+            [],
         )
-        self.assertIn("E_ACTION_DEMO_PROVEN_DEFAULT_PATH_CONTRADICTION", report["errors"])
+
+    def test_ce_m1_probe_green_without_bf8_keeps_action_demo_proven_false(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_action_receipt(checker)
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="ce-m1-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=receipt,
+                action_probe_receipt_path=receipt_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+            )
+            cell4 = next(cell for cell in matrix["cells"] if cell["matrix_id"] == 4)
+            self.assertTrue(cell4["actionDemoProven_basis"]["readbackProbePass"]["observed"])
+            self.assertFalse(cell4["actionDemoProven_basis"]["bf8_promotion"]["observed"])
+            self.assertFalse(cell4["actionDemoProven"])
+            report = checker.validate_matrix(
+                matrix=matrix,
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=receipt,
+                action_probe_receipt_path=receipt_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+            )
+            self.assertNotIn("E_ACTION_DEMO_PROVEN_MANUAL_OVERRIDE", report["errors"])
+
+    def test_ce_m2_default_materialize_adds_bf8_promotion_observed_false(self) -> None:
+        checker, matrix = self.materialize()
+        for cell in matrix["cells"]:
+            self.assertIn("bf8_promotion", cell["actionDemoProven_basis"])
+            bf8 = cell["actionDemoProven_basis"]["bf8_promotion"]
+            self.assertFalse(bf8["observed"])
+            self.assertEqual(bf8["status"], "pending_human_bf8")
+        # Missing field fails validation
+        del matrix["cells"][0]["actionDemoProven_basis"]["bf8_promotion"]
+        report = self.validate(checker, matrix)
+        self.assertIn("E_BASIS_UNTRACEABLE", report["errors"])
+
+    def test_ce_m3_scoped_receipt_matrix_4_only_updates_scoped_cell(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="ce-m3-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=receipt,
+                action_probe_receipt_path=receipt_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+            )
+            cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+            self.assertTrue(cells_by_id[4]["actionDemoProven_basis"]["readbackProbePass"]["observed"])
+            self.assertEqual(cells_by_id[4]["actionDemoProven_basis"]["readbackProbePass"]["status"], "passed")
+            self.assertFalse(cells_by_id[5]["actionDemoProven_basis"]["readbackProbePass"]["observed"])
+            self.assertEqual(cells_by_id[5]["actionDemoProven_basis"]["readbackProbePass"]["status"], "conditional_pending")
+            self.assertFalse(cells_by_id[6]["actionDemoProven_basis"]["readbackProbePass"]["observed"])
+            self.assertEqual(cells_by_id[6]["actionDemoProven_basis"]["readbackProbePass"]["status"], "conditional_pending")
+
+    def test_ce_m4_empty_scope_or_scope_case_mismatch_rejected(self) -> None:
+        checker, _ = self.materialize()
+        # Empty scope []
+        receipt_empty = self.valid_scoped_action_receipt(checker, matrix_ids=[4])
+        receipt_empty["scope"]["matrix_ids"] = []
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="ce-m4-empty-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt_empty), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_SCOPE_INVALID"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt_empty,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+        # Scope/case mismatch: scope has [4, 5] but cases only has matrix 4
+        receipt_mismatch = self.valid_scoped_action_receipt(checker, matrix_ids=[4])
+        receipt_mismatch["scope"]["matrix_ids"] = [4, 5]
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="ce-m4-mismatch-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt_mismatch), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_COVERAGE_MISMATCH"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt_mismatch,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_f2_no_bf8_receipt_all_cells_bf8_observed_false(self) -> None:
+        checker, matrix = self.materialize()
+        for cell in matrix["cells"]:
+            self.assertIn("bf8_promotion", cell["actionDemoProven_basis"])
+            bf8 = cell["actionDemoProven_basis"]["bf8_promotion"]
+            self.assertFalse(bf8["observed"])
+            self.assertEqual(bf8["status"], "pending_human_bf8")
+
+    def test_f2_bf8_receipt_matrix_4_only_cell_4_promoted(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_bf8_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="f2-m4-") as tmp:
+            receipt_path = Path(tmp) / "bf8_receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                bf8_promotion_receipt=receipt,
+                bf8_promotion_receipt_path=receipt_path,
+            )
+            cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+            cell4_bf8 = cells_by_id[4]["actionDemoProven_basis"]["bf8_promotion"]
+            self.assertTrue(cell4_bf8["observed"])
+            self.assertEqual(cell4_bf8["status"], "authorized")
+
+            cell5_bf8 = cells_by_id[5]["actionDemoProven_basis"]["bf8_promotion"]
+            self.assertFalse(cell5_bf8["observed"])
+            self.assertEqual(cell5_bf8["status"], "pending_human_bf8")
+
+            cell6_bf8 = cells_by_id[6]["actionDemoProven_basis"]["bf8_promotion"]
+            self.assertFalse(cell6_bf8["observed"])
+            self.assertEqual(cell6_bf8["status"], "pending_human_bf8")
+
+    def test_f2_bf8_receipt_with_scoped_probe_receipt(self) -> None:
+        checker, _ = self.materialize()
+        action_receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[4])
+        bf8_receipt = self.valid_bf8_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="f2-scoped-") as tmp:
+            action_path = Path(tmp) / "action_receipt.json"
+            bf8_path = Path(tmp) / "bf8_receipt.json"
+            action_path.write_text(json.dumps(action_receipt), encoding="utf-8")
+            bf8_path.write_text(json.dumps(bf8_receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=action_receipt,
+                action_probe_receipt_path=action_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+                bf8_promotion_receipt=bf8_receipt,
+                bf8_promotion_receipt_path=bf8_path,
+            )
+            cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+            cell4 = cells_by_id[4]
+            self.assertTrue(cell4["actionDemoProven_basis"]["readbackProbePass"]["observed"])
+            self.assertEqual(cell4["actionDemoProven_basis"]["readbackProbePass"]["status"], "passed")
+            self.assertTrue(cell4["actionDemoProven_basis"]["bf8_promotion"]["observed"])
+            self.assertEqual(cell4["actionDemoProven_basis"]["bf8_promotion"]["status"], "authorized")
+            self.assertTrue(cell4["actionDemoProven"])
+
+            cell5 = cells_by_id[5]
+            self.assertFalse(cell5["actionDemoProven_basis"]["bf8_promotion"]["observed"])
+            self.assertFalse(cell5["actionDemoProven"])
+
 
     def test_live_matrix_has_zero_probe_gated_demo_cells(self) -> None:
         checker, matrix = self.materialize()
@@ -474,7 +779,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(report["status"], "PASS")
 
     def test_tracked_matrix_is_byte_identical_to_fresh_materialization(self) -> None:
-        checker, expected = self.materialize()
+        _, expected = self.materialize_tracked_baseline()
         self.assertEqual(load_json(MATRIX), expected)
 
     def test_cli_rejects_named_canonical_envelope_mutations(self) -> None:
@@ -634,6 +939,179 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             self.assertEqual(report["status"], "PASS")
             self.assertEqual(report["actionDemoProven_count"], 0)
             self.assertEqual(report["conditional_pending_count"], 120)
+
+    def test_bf8_receipt_schema_validation_rejects_invalid(self) -> None:
+        checker = self.checker()
+        invalid_receipts = [
+            ("missing_ceremony", {"schemaVersion": "bf8_promotion_receipt_v1", "receiptID": "r1", "subjectSHA256": "a" * 40, "matrix_ids": [4]}),
+            ("invalid_version", {"schemaVersion": "invalid_v1", "receiptID": "r1", "subjectSHA256": "a" * 40, "matrix_ids": [4], "ceremony": {"artifactRef": "a", "approver": "b"}}),
+            ("empty_matrix_ids", {"schemaVersion": "bf8_promotion_receipt_v1", "receiptID": "r1", "subjectSHA256": "a" * 40, "matrix_ids": [], "ceremony": {"artifactRef": "a", "approver": "b"}}),
+            ("invalid_sha", {"schemaVersion": "bf8_promotion_receipt_v1", "receiptID": "r1", "subjectSHA256": "not-a-sha!", "matrix_ids": [4], "ceremony": {"artifactRef": "a", "approver": "b"}}),
+        ]
+        for name, receipt in invalid_receipts:
+            with self.subTest(name=name):
+                with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-test-") as tmp:
+                    r_path = Path(tmp) / "receipt.json"
+                    r_path.write_text(json.dumps(receipt), encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED"):
+                        checker.evaluate_bf8_promotion_receipt(
+                            receipt=receipt,
+                            receipt_path=r_path,
+                            authority_root=REPO_ROOT,
+                        )
+
+    def test_bf8_receipt_outside_authority_root_is_accepted(self) -> None:
+        checker = self.checker()
+        receipt = self.valid_bf8_receipt(checker)
+        with tempfile.TemporaryDirectory(prefix="outside-bf8-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            evaluation = checker.evaluate_bf8_promotion_receipt(
+                receipt=receipt,
+                receipt_path=r_path,
+                authority_root=REPO_ROOT,
+            )
+            self.assertEqual(evaluation["authorized_matrix_ids"], {4})
+            self.assertEqual(evaluation["receipt_id"], receipt["receiptID"])
+            self.assertEqual(evaluation["receipt_source"], str(r_path.resolve()))
+
+    def test_bf8_receipt_invalid_subject_sha_rejected(self) -> None:
+        checker = self.checker()
+        receipt = self.valid_bf8_receipt(checker, subject_sha="0" * 40)
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-sha-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH"):
+                checker.evaluate_bf8_promotion_receipt(
+                    receipt=receipt,
+                    receipt_path=r_path,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_scoped_bf8_promotion_receipt_matrix_4_only(self) -> None:
+        checker = self.checker()
+        receipt = self.valid_bf8_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-scoped-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                bf8_promotion_receipt=receipt,
+                bf8_promotion_receipt_path=r_path,
+            )
+            cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+            cell4_bf8 = cells_by_id[4]["actionDemoProven_basis"]["bf8_promotion"]
+            cell5_bf8 = cells_by_id[5]["actionDemoProven_basis"]["bf8_promotion"]
+            cell6_bf8 = cells_by_id[6]["actionDemoProven_basis"]["bf8_promotion"]
+
+            self.assertTrue(cell4_bf8["observed"])
+            self.assertEqual(cell4_bf8["status"], "authorized")
+            self.assertFalse(cell5_bf8["observed"])
+            self.assertEqual(cell5_bf8["status"], "pending_human_bf8")
+            self.assertFalse(cell6_bf8["observed"])
+            self.assertEqual(cell6_bf8["status"], "pending_human_bf8")
+
+    def test_bf8_alone_without_action_probe_keeps_action_demo_proven_false(self) -> None:
+        checker = self.checker()
+        receipt = self.valid_bf8_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-alone-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                bf8_promotion_receipt=receipt,
+                bf8_promotion_receipt_path=r_path,
+            )
+            self.assertEqual(sum(c["actionDemoProven"] for c in matrix["cells"]), 0)
+
+    def test_probe_green_and_bf8_receipt_promotes_cell_4_in_temp_materialize(self) -> None:
+        checker = self.checker()
+        probe_receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[4])
+        bf8_receipt = self.valid_bf8_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-probe-") as tmp:
+            tmp_path = Path(tmp)
+            p_path = tmp_path / "probe_receipt.json"
+            b_path = tmp_path / "bf8_receipt.json"
+            p_path.write_text(json.dumps(probe_receipt), encoding="utf-8")
+            b_path.write_text(json.dumps(bf8_receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                action_probe_receipt=probe_receipt,
+                action_probe_receipt_path=p_path,
+                action_probe_catalog_path=ACTION_PROBE_CATALOG,
+                bf8_promotion_receipt=bf8_receipt,
+                bf8_promotion_receipt_path=b_path,
+            )
+            cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+            cell4 = cells_by_id[4]
+            self.assertTrue(cell4["actionDemoProven_basis"]["readbackProbePass"]["observed"])
+            self.assertTrue(cell4["actionDemoProven_basis"]["bf8_promotion"]["observed"])
+            self.assertTrue(cell4["actionDemoProven"])
+            self.assertEqual(sum(c["actionDemoProven"] for c in matrix["cells"]), 1)
+
+    def test_cli_supports_bf8_receipt_option(self) -> None:
+        self.checker()
+        bf8_receipt = self.valid_bf8_receipt(self.checker(), matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="a1-bf8-cli-") as tmp:
+            tmp_path = Path(tmp)
+            bf8_path = tmp_path / "bf8.json"
+            matrix_path = tmp_path / "matrix.json"
+            receipt_path = tmp_path / "receipt.json"
+            bf8_path.write_text(json.dumps(bf8_receipt), encoding="utf-8")
+            materialize = subprocess.run(
+                [
+                    sys.executable,
+                    str(CHECKER_PATH),
+                    "materialize",
+                    "--t0-design",
+                    str(T0_DESIGN),
+                    "--bf8-receipt",
+                    str(bf8_path),
+                    "--output",
+                    str(matrix_path),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(materialize.returncode, 0, materialize.stderr)
+            matrix = load_json(matrix_path)
+            cell4 = next(c for c in matrix["cells"] if c["matrix_id"] == 4)
+            self.assertTrue(cell4["actionDemoProven_basis"]["bf8_promotion"]["observed"])
+
+            checked = subprocess.run(
+                [
+                    sys.executable,
+                    str(CHECKER_PATH),
+                    "check",
+                    "--t0-design",
+                    str(T0_DESIGN),
+                    "--matrix",
+                    str(matrix_path),
+                    "--bf8-receipt",
+                    str(bf8_path),
+                    "--receipt",
+                    str(receipt_path),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(checked.returncode, 0, checked.stderr)
+            report = load_json(receipt_path)
+            self.assertEqual(report["status"], "PASS")
 
 
 if __name__ == "__main__":

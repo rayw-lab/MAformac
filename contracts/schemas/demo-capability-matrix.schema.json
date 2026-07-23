@@ -35,12 +35,13 @@
           "readback_probe_basis": {"$ref": "#/$defs/readback_basis"},
           "actionDemoProven_basis": {
             "type": "object",
-            "required": ["mounted_or_approved_action", "semantic_contract", "state_readback_cell", "readbackProbePass"],
+            "required": ["mounted_or_approved_action", "semantic_contract", "state_readback_cell", "readbackProbePass", "bf8_promotion"],
             "properties": {
               "mounted_or_approved_action": {"$ref": "#/$defs/evidence_basis"},
               "semantic_contract": {"$ref": "#/$defs/evidence_basis"},
               "state_readback_cell": {"$ref": "#/$defs/evidence_basis"},
-              "readbackProbePass": {"$ref": "#/$defs/readback_basis"}
+              "readbackProbePass": {"$ref": "#/$defs/readback_basis"},
+              "bf8_promotion": {"$ref": "#/$defs/bf8_basis"}
             },
             "additionalProperties": false
           },
@@ -75,6 +76,17 @@
         "probe_receipt_id": {"type": ["string", "null"]},
         "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "runtimeContractBundleDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "source_ref": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "bf8_basis": {
+      "type": "object",
+      "required": ["observed", "status", "source_ref"],
+      "properties": {
+        "observed": {"type": "boolean"},
+        "status": {"type": "string"},
+        "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
         "source_ref": {"type": "string", "minLength": 1}
       },
       "additionalProperties": false

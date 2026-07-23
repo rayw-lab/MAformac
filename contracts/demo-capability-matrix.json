@@ -3,6 +3,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=1:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=1:tool-not-mounted=open_ac"
@@ -66,6 +71,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=2:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=2:tool-not-mounted=open_ac"
@@ -128,6 +138,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=3:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=3:tool-not-mounted=open_ac"
@@ -188,18 +203,25 @@
       "value_shape": "STATE"
     },
     {
-      "actionDemoProven": false,
+      "actionDemoProven": true,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": true,
+          "receipt_sha256": "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4",
+          "source_ref": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-17-s8-s9-successor-c-longrun/bf8-promotion-receipt-matrix-4.json#matrix_id=4",
+          "status": "authorized"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "manifest:matrix_id=4:action-readback-proof-pending",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.action.matrix.4.zh-CN",
+          "probe_receipt_id": "runtime-action-readback-probes",
+          "receipt_sha256": "5c4652725b1cca639d1c24b061f82d74c4d7510f73fc80a632af8a2042f2964d",
+          "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -231,11 +253,12 @@
       "mounted_status": "mounted",
       "primary_class": "conditional_ddomain_executable",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "manifest:matrix_id=4:action-readback-proof-pending",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.action.matrix.4.zh-CN",
+        "probe_receipt_id": "runtime-action-readback-probes",
+        "receipt_sha256": "5c4652725b1cca639d1c24b061f82d74c4d7510f73fc80a632af8a2042f2964d",
+        "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
+        "status": "passed"
       },
       "reasonKind": null,
       "register": "直述",
@@ -254,6 +277,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=5:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -317,6 +345,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=6:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -380,6 +413,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=7:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=7:tool-not-mounted=-"
@@ -440,6 +478,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=8:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=8:tool-not-mounted=-"
@@ -500,6 +543,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=9:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=9:tool-not-mounted=-"
@@ -560,6 +608,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=10:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=10:tool-not-mounted=adjust_ac_temperature_to_exp"
@@ -622,6 +675,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=11:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=11:tool-not-mounted=adjust_ac_temperature_to_exp"
@@ -684,6 +742,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=12:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=12:tool-not-mounted=adjust_ac_temperature_to_exp"
@@ -746,6 +809,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=13:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -808,6 +876,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=14:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -870,6 +943,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=15:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -932,6 +1010,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=16:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=16:tool-not-mounted=adjust_seat_heat_temperature_to_number"
@@ -994,6 +1077,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=17:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=17:tool-not-mounted=adjust_seat_heat_temperature_to_number"
@@ -1056,6 +1144,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=18:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=18:tool-not-mounted=adjust_seat_heat_temperature_to_number"
@@ -1118,6 +1211,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=19:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=19:tool-not-mounted=adjust_seat_position_to_number"
@@ -1180,6 +1278,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=20:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=20:tool-not-mounted=adjust_seat_position_to_number"
@@ -1242,6 +1345,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=21:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=21:tool-not-mounted=adjust_seat_position_to_number"
@@ -1304,6 +1412,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=22:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=22:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
@@ -1366,6 +1479,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=23:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=23:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
@@ -1428,6 +1546,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=24:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=24:tool-not-mounted=adjust_seat_heat_temperature_to_gear"
@@ -1490,6 +1613,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=25:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=25:tool-not-mounted=close_window"
@@ -1552,6 +1680,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=26:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=26:tool-not-mounted=close_window"
@@ -1614,6 +1747,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=27:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=27:tool-not-mounted=close_window"
@@ -1676,6 +1814,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=28:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -1738,6 +1881,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=29:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -1800,6 +1948,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=30:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -1862,6 +2015,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=31:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -1924,6 +2082,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=32:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -1986,6 +2149,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=33:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -2048,6 +2216,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=34:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=34:tool-not-mounted=open_window_little"
@@ -2110,6 +2283,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=35:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=35:tool-not-mounted=open_window_little"
@@ -2172,6 +2350,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=36:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=36:tool-not-mounted=open_window_little"
@@ -2234,6 +2417,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=37:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=37:tool-not-mounted=open_screen"
@@ -2296,6 +2484,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=38:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=38:tool-not-mounted=open_screen"
@@ -2358,6 +2551,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=39:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=39:tool-not-mounted=open_screen"
@@ -2420,6 +2618,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=40:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=40:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2482,6 +2685,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=41:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=41:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2544,6 +2752,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=42:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=42:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2606,6 +2819,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=43:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=43:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2668,6 +2886,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=44:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=44:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2730,6 +2953,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=45:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=45:tool-not-mounted=adjust_screen_brightness_to_number"
@@ -2792,6 +3020,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=46:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=46:tool-not-mounted=adjust_screen_brightness_to_gear"
@@ -2854,6 +3087,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=47:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=47:tool-not-mounted=adjust_screen_brightness_to_gear"
@@ -2916,6 +3154,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=48:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=48:tool-not-mounted=adjust_screen_brightness_to_gear"
@@ -2978,6 +3221,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=49:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -3040,6 +3288,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=50:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -3102,6 +3355,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=51:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
@@ -3164,6 +3422,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=52:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=52:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3226,6 +3489,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=53:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=53:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3288,6 +3556,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=54:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=54:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3350,6 +3623,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=55:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=55:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3412,6 +3690,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=56:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=56:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3474,6 +3757,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=57:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=57:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_number"
@@ -3536,6 +3824,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=58:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=58:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
@@ -3598,6 +3891,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=59:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=59:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
@@ -3660,6 +3958,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=60:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=60:tool-not-mounted=adjust_atmosphere_lamp_brightness_to_gear"
@@ -3722,6 +4025,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=61:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=61:tool-not-mounted=open_car_door"
@@ -3784,6 +4092,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=62:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=62:tool-not-mounted=open_car_door"
@@ -3846,6 +4159,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=63:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=63:tool-not-mounted=open_car_door"
@@ -3908,6 +4226,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=64:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=64:tool-not-mounted=set_door_speed_to_number"
@@ -3970,6 +4293,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=65:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=65:tool-not-mounted=set_door_speed_to_number"
@@ -4032,6 +4360,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=66:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=66:tool-not-mounted=set_door_speed_to_number"
@@ -4094,6 +4427,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=67:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=67:tool-not-mounted=open_door_by_number"
@@ -4156,6 +4494,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=68:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=68:tool-not-mounted=open_door_by_number"
@@ -4218,6 +4561,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=69:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=69:tool-not-mounted=open_door_by_number"
@@ -4280,6 +4628,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=70:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=70:tool-not-mounted=open_door_little"
@@ -4342,6 +4695,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=71:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=71:tool-not-mounted=open_door_little"
@@ -4404,6 +4762,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=72:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=72:tool-not-mounted=open_door_little"
@@ -4466,6 +4829,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=73:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=73:tool-not-mounted=volume_mute"
@@ -4528,6 +4896,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=74:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=74:tool-not-mounted=volume_mute"
@@ -4590,6 +4963,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=75:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=75:tool-not-mounted=volume_mute"
@@ -4652,6 +5030,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=76:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=76:tool-not-mounted=adjust_volume_to_number"
@@ -4714,6 +5097,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=77:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=77:tool-not-mounted=adjust_volume_to_number"
@@ -4776,6 +5164,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=78:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=78:tool-not-mounted=adjust_volume_to_number"
@@ -4838,6 +5231,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=79:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=79:tool-not-mounted=adjust_volume_to_number"
@@ -4900,6 +5298,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=80:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=80:tool-not-mounted=adjust_volume_to_number"
@@ -4962,6 +5365,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=81:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=81:tool-not-mounted=adjust_volume_to_number"
@@ -5024,6 +5432,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=82:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=82:tool-not-mounted=adjust_volume_to_gear"
@@ -5086,6 +5499,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=83:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=83:tool-not-mounted=adjust_volume_to_gear"
@@ -5148,6 +5566,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=84:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=84:tool-not-mounted=adjust_volume_to_gear"
@@ -5210,6 +5633,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=85:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=85:tool-not-mounted=open_wiper"
@@ -5272,6 +5700,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=86:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=86:tool-not-mounted=open_wiper"
@@ -5334,6 +5767,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=87:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=87:tool-not-mounted=open_wiper"
@@ -5396,6 +5834,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=88:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=88:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5458,6 +5901,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=89:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=89:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5520,6 +5968,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=90:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=90:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5582,6 +6035,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=91:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=91:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5644,6 +6102,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=92:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=92:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5706,6 +6169,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=93:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=93:tool-not-mounted=adjust_wiper_speed_to_number"
@@ -5768,6 +6236,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=94:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=94:tool-not-mounted=adjust_wiper_speed_to_gear"
@@ -5830,6 +6303,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=95:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=95:tool-not-mounted=adjust_wiper_speed_to_gear"
@@ -5892,6 +6370,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=96:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=96:tool-not-mounted=adjust_wiper_speed_to_gear"
@@ -5954,6 +6437,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=97:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=97:tool-not-mounted=open_sunroof"
@@ -6016,6 +6504,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=98:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=98:tool-not-mounted=open_sunroof"
@@ -6078,6 +6571,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=99:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=99:tool-not-mounted=open_sunroof"
@@ -6140,6 +6638,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=100:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=100:tool-not-mounted=open_sunroof_to_number"
@@ -6202,6 +6705,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=101:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=101:tool-not-mounted=open_sunroof_to_number"
@@ -6264,6 +6772,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=102:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=102:tool-not-mounted=open_sunroof_to_number"
@@ -6326,6 +6839,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=103:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=103:tool-not-mounted=open_sunroof_by_number"
@@ -6388,6 +6906,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=104:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=104:tool-not-mounted=open_sunroof_by_number"
@@ -6450,6 +6973,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=105:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=105:tool-not-mounted=open_sunroof_by_number"
@@ -6512,6 +7040,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=106:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=106:tool-not-mounted=open_sunroof_little"
@@ -6574,6 +7107,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=107:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=107:tool-not-mounted=open_sunroof_little"
@@ -6636,6 +7174,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=108:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=108:tool-not-mounted=open_sunroof_little"
@@ -6698,6 +7241,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=109:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=109:tool-not-mounted=open_fragrance"
@@ -6760,6 +7308,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=110:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=110:tool-not-mounted=open_fragrance"
@@ -6822,6 +7375,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=111:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=111:tool-not-mounted=open_fragrance"
@@ -6884,6 +7442,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=112:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=112:tool-not-mounted=adjust_fragrance_intensity_to_number"
@@ -6946,6 +7509,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=113:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=113:tool-not-mounted=adjust_fragrance_intensity_to_number"
@@ -7008,6 +7576,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=114:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=114:tool-not-mounted=adjust_fragrance_intensity_to_number"
@@ -7070,6 +7643,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=115:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=115:tool-not-mounted=-"
@@ -7130,6 +7708,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=116:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=116:tool-not-mounted=-"
@@ -7190,6 +7773,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=117:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=117:tool-not-mounted=-"
@@ -7250,6 +7838,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=118:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=118:tool-not-mounted=adjust_fragrance_intensity_to_gear"
@@ -7312,6 +7905,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=119:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=119:tool-not-mounted=adjust_fragrance_intensity_to_gear"
@@ -7374,6 +7972,11 @@
     {
       "actionDemoProven": false,
       "actionDemoProven_basis": {
+        "bf8_promotion": {
+          "observed": false,
+          "source_ref": "manifest:matrix_id=120:human-bf8-promotion-pending",
+          "status": "pending_human_bf8"
+        },
         "mounted_or_approved_action": {
           "observed": false,
           "source_ref": "manifest:matrix_id=120:tool-not-mounted=adjust_fragrance_intensity_to_gear"
@@ -7438,7 +8041,7 @@
   "source": {
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "49e0808a48b7456a52680ab42d7ab6babae25f2f351ef339ef373387a1baca24",
-    "probe_pack_sha256": "f54bb4b5968dd31f290993dce8ac82a8022f66d7eb6eb2357a407149f1157f8f",
+    "probe_pack_sha256": "130b84cf39c6a9d83092b91ece6a02714cecab94cf4fb0f83de3ddde62503e71",
     "t0_design_sha256": "f0cb9bcbc051f6ebb7583a0edea88290f29532259a447ede234e2ffbaf51bb55"
   },
   "summary": {

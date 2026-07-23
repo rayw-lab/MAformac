@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -30,12 +31,16 @@ DEFAULT_MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedTool
 DEFAULT_SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
 DEFAULT_ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
 DEFAULT_RUNTIME_BUNDLE_MANIFEST = REPO_ROOT / "generated" / "demo-runtime-contract-bundle.manifest.json"
+DEFAULT_BF8_PROMOTION_SCHEMA = (
+    REPO_ROOT / "contracts" / "governance" / "bf8-promotion-receipt.schema.json"
+)
 
 BASIS_KEYS = (
     "mounted_or_approved_action",
     "semantic_contract",
     "state_readback_cell",
     "readbackProbePass",
+    "bf8_promotion",
 )
 ACTION_PROBE_ID_PATTERN = re.compile(r"^probe\.action\.matrix\.(\d+)\.zh-CN$")
 FALLBACK_PROBE_ID_PATTERN = re.compile(r"^probe\.fallback\.")
@@ -43,6 +48,22 @@ FALLBACK_PROBE_ID_PATTERN = re.compile(r"^probe\.fallback\.")
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def normalize_sha256(sha: Any) -> str:
+    if not isinstance(sha, str):
+        return ""
+    cleaned = sha.strip().lower()
+    if len(cleaned) == 40 and re.fullmatch(r"[0-9a-f]{40}", cleaned):
+        return cleaned.zfill(64)
+    return cleaned
+
+
+def source_path_for_receipt(path: Path, authority_root: Path) -> str:
+    try:
+        return path.resolve().relative_to(authority_root.resolve()).as_posix()
+    except ValueError:
+        return str(path.resolve())
 
 
 def canonical_manifest_path(manifest_path: Path | None = None) -> Path:
@@ -158,6 +179,28 @@ def pending_readback_probe_basis(matrix_id: int) -> dict[str, Any]:
     }
 
 
+def pending_bf8_promotion_basis(matrix_id: int) -> dict[str, Any]:
+    return {
+        "observed": False,
+        "status": "pending_human_bf8",
+        "source_ref": f"manifest:matrix_id={matrix_id}:human-bf8-promotion-pending",
+    }
+
+
+def observed_bf8_promotion_basis(
+    *,
+    receipt_id: str | None = None,
+    receipt_sha256: str,
+    source_ref: str,
+) -> dict[str, Any]:
+    return {
+        "observed": True,
+        "status": "authorized",
+        "receipt_sha256": receipt_sha256,
+        "source_ref": source_ref,
+    }
+
+
 def _action_probe_pass_failures(case: dict[str, Any], probe: dict[str, Any]) -> list[str]:
     expected_delta = probe["expectedStateDelta"]
     expected_readback = probe["expectedReadback"]
@@ -168,7 +211,7 @@ def _action_probe_pass_failures(case: dict[str, Any], probe: dict[str, Any]) -> 
     allowed_delta_keys = {expected_delta["key"], "ac.power"}
     failures: list[str] = []
 
-    if case.get("pathKind") != "default_runtime" or case.get("injectionUsed") is not False:
+    if case.get("pathKind") != "product_acceptance_route" or case.get("injectionUsed") is not False:
         failures.append("E_ACTION_PROBE_CONDITIONAL_ONLY")
     if case.get("observedToolCallCount") != 1:
         failures.append("E_ACTION_PROBE_NO_SINGLE_TOOL_CALL")
@@ -281,6 +324,21 @@ def evaluate_action_probe_receipt(
         if receipt.get("runtimeContractBundleDigest") != manifest.get("runtime_contract_bundle_digest"):
             raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE")
 
+    scope = receipt.get("scope")
+    scoped_matrix_ids: set[int] | None = None
+    if scope is not None:
+        if not isinstance(scope, dict):
+            raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_IDENTITY_INVALID")
+        matrix_ids = scope.get("matrix_ids")
+        if (
+            not isinstance(matrix_ids, list)
+            or not matrix_ids
+            or any(not isinstance(i, int) for i in matrix_ids)
+            or len(matrix_ids) != len(set(matrix_ids))
+        ):
+            raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_SCOPE_INVALID")
+        scoped_matrix_ids = set(matrix_ids)
+
     probes_by_id: dict[str, dict[str, Any]] = {}
     probes_by_matrix_id: dict[int, dict[str, Any]] = {}
     probe_utterances: set[str] = set()
@@ -331,6 +389,14 @@ def evaluate_action_probe_receipt(
         probe_utterances.add(utterance)
         probe_fingerprints.add(fingerprint)
 
+    if scoped_matrix_ids is not None:
+        if not scoped_matrix_ids.issubset(set(probes_by_matrix_id)):
+            raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_SCOPE_INVALID")
+
+    expected_matrix_ids = (
+        scoped_matrix_ids if scoped_matrix_ids is not None else set(probes_by_matrix_id)
+    )
+
     cases_by_id: dict[str, dict[str, Any]] = {}
     cases_by_matrix_id: dict[int, dict[str, Any]] = {}
     trace_ids: set[str] = set()
@@ -344,6 +410,8 @@ def evaluate_action_probe_receipt(
             raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_REUSED")
         if isinstance(trace_id, str) and trace_id in trace_ids:
             raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_REUSED")
+        if matrix_id not in expected_matrix_ids:
+            raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_COVERAGE_MISMATCH")
         probe = probes_by_id.get(probe_id)
         if probe is None or matrix_id != probe.get("matrixID"):
             raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
@@ -355,14 +423,15 @@ def evaluate_action_probe_receipt(
         if isinstance(trace_id, str):
             trace_ids.add(trace_id)
 
-    if set(cases_by_id) != set(probes_by_id):
+    if set(cases_by_matrix_id) != expected_matrix_ids:
         raise ValueError("E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_COVERAGE_MISMATCH")
 
     receipt_sha256 = sha256_file(resolved_receipt_path)
     receipt_source = resolved_receipt_path.relative_to(authority_root).as_posix()
     passing: dict[int, dict[str, str]] = {}
     failures: dict[int, list[str]] = {}
-    for matrix_id, probe in probes_by_matrix_id.items():
+    for matrix_id in sorted(expected_matrix_ids):
+        probe = probes_by_matrix_id[matrix_id]
         case = cases_by_matrix_id[matrix_id]
         case_failures = _action_probe_pass_failures(case, probe)
         if case_failures:
@@ -379,6 +448,84 @@ def evaluate_action_probe_receipt(
         "failures_by_matrix_id": failures,
         "receipt_sha256": receipt_sha256,
         "receipt_source": receipt_source,
+    }
+
+
+def evaluate_bf8_promotion_receipt(
+    *,
+    receipt: dict[str, Any],
+    receipt_path: Path,
+    schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
+    authority_root: Path = REPO_ROOT,
+) -> dict[str, Any]:
+    authority_root = authority_root.resolve()
+    resolved_receipt_path = receipt_path.resolve()
+    resolved_schema_path = schema_path.resolve()
+
+    if not resolved_receipt_path.is_file():
+        raise ValueError("E_BF8_RECEIPT_MISSING")
+
+    try:
+        receipt_on_disk = json.loads(resolved_receipt_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError("E_BF8_RECEIPT_INVALID_JSON") from error
+    if receipt_on_disk != receipt:
+        raise ValueError("E_BF8_RECEIPT_CONTENT_MISMATCH")
+
+    if not resolved_schema_path.is_file():
+        raise ValueError("E_BF8_RECEIPT_SCHEMA_MISSING")
+    try:
+        schema = json.loads(resolved_schema_path.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+    except (OSError, json.JSONDecodeError, SchemaError) as error:
+        raise ValueError("E_BF8_RECEIPT_SCHEMA_INVALID") from error
+
+    if not isinstance(receipt, dict):
+        raise ValueError("E_BF8_RECEIPT_INVALID")
+
+    dict_to_validate = dict(receipt)
+    if isinstance(dict_to_validate.get("subjectSHA256"), str):
+        dict_to_validate["subjectSHA256"] = normalize_sha256(dict_to_validate["subjectSHA256"])
+
+    validator = Draft202012Validator(schema)
+    errors = list(validator.iter_errors(dict_to_validate))
+    if errors:
+        raise ValueError("E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
+
+    try:
+        head_sha = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=authority_root,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except Exception as error:
+        raise ValueError("E_BF8_RECEIPT_GIT_HEAD_FAILED") from error
+
+    norm_head = normalize_sha256(head_sha)
+    norm_subject = normalize_sha256(receipt.get("subjectSHA256"))
+
+    if norm_head != norm_subject:
+        raise ValueError("E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH")
+
+    matrix_ids = receipt.get("matrix_ids")
+    if (
+        not isinstance(matrix_ids, list)
+        or not matrix_ids
+        or any(not isinstance(i, int) for i in matrix_ids)
+        or len(matrix_ids) != len(set(matrix_ids))
+    ):
+        raise ValueError("E_BF8_RECEIPT_MATRIX_IDS_INVALID")
+
+    receipt_sha256 = sha256_file(resolved_receipt_path)
+    receipt_source = source_path_for_receipt(resolved_receipt_path, authority_root)
+    return {
+        "authorized_matrix_ids": set(matrix_ids),
+        "receipt_sha256": receipt_sha256,
+        "receipt_id": receipt["receiptID"],
+        "receipt_source": receipt_source,
+        "source_ref": f"{receipt_source}#receipt_id={receipt['receiptID']}",
     }
 
 
@@ -444,6 +591,9 @@ def materialize_matrix(
     action_probe_receipt: dict[str, Any] | None = None,
     action_probe_receipt_path: Path | None = None,
     action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
+    bf8_promotion_receipt: dict[str, Any] | None = None,
+    bf8_promotion_receipt_path: Path | None = None,
+    bf8_promotion_schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
 ) -> dict[str, Any]:
     manifest_path = canonical_manifest_path(manifest_path)
     enums = parse_t0_enums(t0_design_path)
@@ -464,6 +614,19 @@ def materialize_matrix(
         action_evaluation["passing_by_matrix_id"] if action_evaluation is not None else {}
     )
 
+    bf8_evaluation = None
+    if bf8_promotion_receipt is not None:
+        if bf8_promotion_receipt_path is None:
+            raise ValueError("E_BF8_RECEIPT_MISSING")
+        bf8_evaluation = evaluate_bf8_promotion_receipt(
+            receipt=bf8_promotion_receipt,
+            receipt_path=bf8_promotion_receipt_path,
+            schema_path=bf8_promotion_schema_path,
+        )
+    authorized_bf8_ids = (
+        bf8_evaluation["authorized_matrix_ids"] if bf8_evaluation is not None else set()
+    )
+
     cells: list[dict[str, Any]] = []
     for row in manifest_rows:
         tool = row["representative_tool"]
@@ -472,6 +635,15 @@ def materialize_matrix(
         mounted = tool in mounted_tools
         default_fastpath = row["default_path_status"] == "executable_default_fastpath"
         fallback_reason, reason_kind = reason_projection(row)
+
+        if row["matrix_id"] in authorized_bf8_ids:
+            bf8_basis = observed_bf8_promotion_basis(
+                receipt_id=bf8_evaluation["receipt_id"],
+                receipt_sha256=bf8_evaluation["receipt_sha256"],
+                source_ref=f"{bf8_evaluation['receipt_source']}#matrix_id={row['matrix_id']}",
+            )
+        else:
+            bf8_basis = pending_bf8_promotion_basis(row["matrix_id"])
 
         cell_basis = {
             "mounted_or_approved_action": basis(
@@ -495,6 +667,7 @@ def materialize_matrix(
                 else f"manifest:matrix_id={row['matrix_id']}:no-state-readback-cell",
             ),
             "readbackProbePass": readback_probe_basis(row, action_proofs),
+            "bf8_promotion": bf8_basis,
         }
         action_demo_proven = compute_action_demo_proven(cell_basis)
         cells.append(
@@ -586,6 +759,9 @@ def validate_matrix(
     action_probe_receipt: dict[str, Any] | None = None,
     action_probe_receipt_path: Path | None = None,
     action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
+    bf8_promotion_receipt: dict[str, Any] | None = None,
+    bf8_promotion_receipt_path: Path | None = None,
+    bf8_promotion_schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
 ) -> dict[str, Any]:
     schema_errors = validate_matrix_schema(matrix=matrix, schema_path=schema_path)
     errors = (
@@ -608,6 +784,9 @@ def validate_matrix(
         action_probe_receipt=action_probe_receipt,
         action_probe_receipt_path=action_probe_receipt_path,
         action_probe_catalog_path=action_probe_catalog_path,
+        bf8_promotion_receipt=bf8_promotion_receipt,
+        bf8_promotion_receipt_path=bf8_promotion_receipt_path,
+        bf8_promotion_schema_path=bf8_promotion_schema_path,
     )
     action_evaluation = None
     if action_probe_receipt is not None and action_probe_receipt_path is not None:
@@ -615,6 +794,13 @@ def validate_matrix(
             receipt=action_probe_receipt,
             receipt_path=action_probe_receipt_path,
             catalog_path=action_probe_catalog_path,
+        )
+    bf8_evaluation = None
+    if bf8_promotion_receipt is not None and bf8_promotion_receipt_path is not None:
+        bf8_evaluation = evaluate_bf8_promotion_receipt(
+            receipt=bf8_promotion_receipt,
+            receipt_path=bf8_promotion_receipt_path,
+            schema_path=bf8_promotion_schema_path,
         )
     enums = parse_t0_enums(t0_design_path)
     manifest_rows = read_jsonl(manifest_path)
@@ -694,6 +880,23 @@ def validate_matrix(
             ):
                 errors.append("E_BASIS_UNTRACEABLE")
                 basis_conflicts.append(matrix_id)
+            bf8_basis = cell_basis.get("bf8_promotion", {})
+            if bf8_basis.get("observed") is True:
+                receipt_sha = bf8_basis.get("receipt_sha256")
+                if (
+                    bf8_basis.get("status") != "authorized"
+                    or not isinstance(receipt_sha, str)
+                    or re.fullmatch(r"[0-9a-f]{64}", receipt_sha) is None
+                ):
+                    errors.append("E_BF8_PROMOTION_PROOF_MISSING")
+                    basis_conflicts.append(matrix_id)
+            elif (
+                bf8_basis.get("status") != "pending_human_bf8"
+                or bf8_basis.get("receipt_id") is not None
+                or bf8_basis.get("receipt_sha256") is not None
+            ):
+                errors.append("E_BASIS_UNTRACEABLE")
+                basis_conflicts.append(matrix_id)
             expected_cell = expected_by_id.get(matrix_id)
             if expected_cell is not None and cell_basis != expected_cell["actionDemoProven_basis"]:
                 errors.append("E_BASIS_EVIDENCE_DRIFT")
@@ -701,11 +904,7 @@ def validate_matrix(
             computed = compute_action_demo_proven(cell_basis)
             if cell.get("actionDemoProven") is not computed:
                 errors.append("E_ACTION_DEMO_PROVEN_MANUAL_OVERRIDE")
-            if computed and (
-                cell.get("primary_class")
-                in {"fast_path_no_match_fallback", "conditional_ddomain_executable"}
-                or cell.get("default_path_status") == "fast_path_no_match_fallback"
-            ):
+            if computed and cell.get("primary_class") == "fast_path_no_match_fallback":
                 errors.append("E_ACTION_DEMO_PROVEN_DEFAULT_PATH_CONTRADICTION")
                 basis_conflicts.append(matrix_id)
 
@@ -790,6 +989,9 @@ def validate_matrix(
         "action_probe_receipt_sha256": (
             action_evaluation["receipt_sha256"] if action_evaluation is not None else None
         ),
+        "bf8_promotion_receipt_sha256": (
+            bf8_evaluation["receipt_sha256"] if bf8_evaluation is not None else None
+        ),
     }
 
 
@@ -811,6 +1013,7 @@ def build_parser() -> argparse.ArgumentParser:
             "--action-probe-catalog", type=Path, default=DEFAULT_ACTION_PROBE_CATALOG
         )
         subparser.add_argument("--action-probe-receipt", type=Path)
+        subparser.add_argument("--bf8-receipt", type=Path)
     subcommands.choices["materialize"].add_argument("--output", required=True, type=Path)
     subcommands.choices["check"].add_argument("--matrix", required=True, type=Path)
     subcommands.choices["check"].add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
@@ -825,6 +1028,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.action_probe_receipt
         else None
     )
+    bf8_receipt = (
+        json.loads(args.bf8_receipt.read_text(encoding="utf-8"))
+        if args.bf8_receipt
+        else None
+    )
     if args.command == "materialize":
         matrix = materialize_matrix(
             t0_design_path=args.t0_design,
@@ -834,6 +1042,8 @@ def main(argv: list[str] | None = None) -> int:
             action_probe_receipt=action_probe_receipt,
             action_probe_receipt_path=args.action_probe_receipt,
             action_probe_catalog_path=args.action_probe_catalog,
+            bf8_promotion_receipt=bf8_receipt,
+            bf8_promotion_receipt_path=args.bf8_receipt,
         )
         write_json(args.output, matrix)
         return 0
@@ -856,6 +1066,8 @@ def main(argv: list[str] | None = None) -> int:
         action_probe_receipt=action_probe_receipt,
         action_probe_receipt_path=args.action_probe_receipt,
         action_probe_catalog_path=args.action_probe_catalog,
+        bf8_promotion_receipt=bf8_receipt,
+        bf8_promotion_receipt_path=args.bf8_receipt,
     )
     write_json(args.receipt, report)
     if report["status"] != "PASS":

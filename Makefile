@@ -27,6 +27,9 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
+SCOPED_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json
+BF8_PROMOTION_RECEIPT ?= /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-17-s8-s9-successor-c-longrun/bf8-promotion-receipt-matrix-4.json
+
 .PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e
 .PHONY: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
 .PHONY: verify-e2e-row167 verify-e2e-query verify-e2e-risk verify-e2e-replay verify-e2e-cancel verify-e2e-receipt
@@ -234,19 +237,35 @@ verify-c1-finite-reason-authority:
 
 verify-c1-matrix: verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
+	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
+		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
+		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--output contracts/demo-capability-matrix.json
 	$(PYTHON) -m unittest scripts/test_check_capability_matrix.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py check \
-		--action-probe-receipt .build/c1-run/receipts/c1/runtime-action-readback-probes.json \
+		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
+		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
 		--matrix contracts/demo-capability-matrix.json \
 		--receipt .build/c1-run/receipts/c1/capability-matrix.json
 
 # Fail closed on the full authority -> matrix -> Swift projection chain.  The
 # temporary artifacts ensure a dirty tracked file cannot self-certify.
-verify-c1-matrix-canonical: .venv/.deps.stamp
+verify-c1-matrix-canonical: .venv/.deps.stamp verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/canonical
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
+		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
+		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--output contracts/demo-capability-matrix.json
+	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
+		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
+		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
 		--output .build/c1-run/canonical/demo-capability-matrix.json
 	cmp -s contracts/demo-capability-matrix.json .build/c1-run/canonical/demo-capability-matrix.json
+	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
+		--input contracts/demo-capability-matrix.json \
+		--output Core/Contracts/DemoCapabilityMatrix.generated.swift
 	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
 		--input .build/c1-run/canonical/demo-capability-matrix.json \
 		--output .build/c1-run/canonical/DemoCapabilityMatrix.generated.swift
@@ -288,7 +307,13 @@ verify-frontstage-route: .venv/.deps.stamp
 	PYTHON_BIN="$(PYTHON)" ./scripts/run_frontstage_route_gate.sh
 
 verify-c1-action-probes: verify-runtime-bundle
-	C1_RUN_DIR="$(CURDIR)/.build/c1-run" swift test --filter RuntimeActionReadbackProbeTests
+	C1_RUN_DIR="$(CURDIR)/.build/c1-run" \
+	C1_WITNESS_RUN_ID="local:verify-c1-action-probes" \
+	C1_WITNESS_SOURCE_HEAD_SHA="$$(git rev-parse HEAD)" \
+	C1_WITNESS_TESTED_CHECKOUT_SHA="$$(git rev-parse HEAD)" \
+	C1_WITNESS_NONCE="$${C1_WITNESS_NONCE:-c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1}" \
+	C1_WITNESS_PROBE_CATALOG_SHA256="$$(openssl dgst -sha256 contracts/runtime-action-readback-probes.json | awk '{print $$2}')" \
+	swift test --filter RuntimeActionReadbackProbeTests
 	test -f .build/c1-run/receipts/c1/runtime-action-readback-probes.json
 	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/runtime-action-readback-receipt-v2.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path(".build/c1-run/receipts/c1/runtime-action-readback-probes.json").read_text()))'
 
@@ -341,10 +366,20 @@ verify-mounted-catalog-no-delta: .venv/.deps.stamp
 	$(PYTHON) -m unittest scripts/test_check_mounted_catalog_no_delta.py
 	$(PYTHON) scripts/check_mounted_catalog_no_delta.py
 
-verify-action-demo-proven-rename: .venv/.deps.stamp verify-c1-finite-reason-authority verify-mounted-catalog-no-delta
+verify-action-demo-proven-rename: .venv/.deps.stamp verify-c1-finite-reason-authority verify-mounted-catalog-no-delta verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1 .build/c1-run/canonical
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
+	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
+		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
+		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--output contracts/demo-capability-matrix.json
+	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
+		--input contracts/demo-capability-matrix.json \
+		--output Core/Contracts/DemoCapabilityMatrix.generated.swift
 	$(PYTHON) -m unittest -v scripts/test_check_capability_matrix.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py check \
+		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
+		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
 		--matrix contracts/demo-capability-matrix.json \
 		--receipt .build/c1-run/receipts/c1/capability-matrix-rename.json
 	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \

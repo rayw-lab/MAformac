@@ -18,6 +18,8 @@ g6_status: G6_COMPLETE
 g7_status: G7_COMPLETE
 g8_status: G8_COMPLETE
 g9_status: G9_KNIFE2_BASELINE_LANDED
+s10_wave5_status: F5_COMPLETE
+action_demo_proven: 1/120
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -30,15 +32,16 @@ g9_status: G9_KNIFE2_BASELINE_LANDED
 - **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
 - **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 COMPLETE**（刀1–3 + 刀4：`testG3_*` 盖 AC/window/ambient/seat 行为门+smoke；刀4 初推 `b919eb76` 曾 OVERCLAIM「四族」仅 AC+window，已补 ambient/seat `testG3_*`；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
 - **G4 工程 COMPLETE**（刀1–4）：Turn Lease / cancel / last-intent-wins；刀4 六大 RED 场景收口 + smoke（`TurnLeaseCancellationTests` + `testG3_*` + `make verify-e2e`）。**未抬** `actionDemoProven`；后三族仍禁演示。closeout：run-root `PHASE2-G4-KNIFE4-SCENARIO-CLOSEOUT.md`。
-- **G5 工程 COMPLETE**（刀1–4）：taxonomy + reason registry + payload 去 `proofClass` + **ContentView 只渲染**（outcome/voice/orb/readbacks；禁 App 自造文案/`resultKind` 硬判；保留 G4 `isCurrentTurn`）。仍 **`PHASE2_CODING_GATED`**；**`actionDemoProven=0/120`**；后三族禁演示。closeout：run-root `PHASE2-G5-KNIFE4-UI-RENDER-ONLY-CLOSEOUT.md`。
+- **G5 工程 COMPLETE**（刀1–4）：taxonomy + reason registry + payload 去 `proofClass` + **ContentView 只渲染**（outcome/voice/orb/readbacks；禁 App 自造文案/`resultKind` 硬判；保留 G4 `isCurrentTurn`）。仍 **`PHASE2_CODING_GATED`**；G5 收口时 **未抬** proven；后三族禁演示。closeout：run-root `PHASE2-G5-KNIFE4-UI-RENDER-ONLY-CLOSEOUT.md`。
 - **G6 工程 COMPLETE**（刀1–2）：`RuntimeTurnReceipt v2` + Assembler + B10；刀2 schema/digest/linked 硬化（run-root `PHASE2-G6-KNIFE2-SCHEMA-DIGEST-CLOSEOUT.md`）。仍 **`PHASE2_CODING_GATED`**；**未抬** proven；后三族禁演示。**非** Phase2 解冻。
-- **G7 工程 COMPLETE**（刀1–2）：刀1 行为门批次（row167/query/risk/replay/cancel/receipt）+ 刀2 anti-placebo 硬化（G7 六批锁表、逐批作用域锚点、meta 真红、`run_swift_test_exact --min-count 1` executed>0）。仍 **`PHASE2_CODING_GATED`**；**`actionDemoProven=0/120`**；后三族禁。closeout：run-root `PHASE2-G7-KNIFE1-BEHAVIOR-GATES-CLOSEOUT.md` / `PHASE2-G7-KNIFE2-ANTI-PLACEBO-CLOSEOUT.md`。
-- **G8 工程 COMPLETE**（刀1=唯一刀）：`verify-ci` 摘掉嵌套 `verify-e2e`；workflow 保留显式 `make verify-e2e`；Verify receipt `if: always()` + non-empty + CI 拒空 `GITHUB_SHA`；UI E2E 仍独立 `ui-e2e.yml`。commit **`f7a2a0aa`**。closeout：run-root `PHASE2-G8-CI-DAG-CLOSEOUT.md`。仍 **`PHASE2_CODING_GATED`**；**`actionDemoProven=0/120`**；后三族禁。**非**解冻 / **非** BF-6 required 已闭。
+- **G7 工程 COMPLETE**（刀1–2）：刀1 行为门批次（row167/query/risk/replay/cancel/receipt）+ 刀2 anti-placebo 硬化（G7 六批锁表、逐批作用域锚点、meta 真红、`run_swift_test_exact --min-count 1` executed>0）。仍 **`PHASE2_CODING_GATED`**；G7 收口时 **未抬** proven；后三族禁。closeout：run-root `PHASE2-G7-KNIFE1-BEHAVIOR-GATES-CLOSEOUT.md` / `PHASE2-G7-KNIFE2-ANTI-PLACEBO-CLOSEOUT.md`。
+- **G8 工程 COMPLETE**（刀1=唯一刀）：`verify-ci` 摘掉嵌套 `verify-e2e`；workflow 保留显式 `make verify-e2e`；Verify receipt `if: always()` + non-empty + CI 拒空 `GITHUB_SHA`；UI E2E 仍独立 `ui-e2e.yml`。commit **`f7a2a0aa`**。closeout：run-root `PHASE2-G8-CI-DAG-CLOSEOUT.md`。仍 **`PHASE2_CODING_GATED`**；G8 收口时 **未抬** proven；后三族禁。**非**解冻 / **非** BF-6 required 已闭。
+- **S10 Wave5 F3–F5 COMPLETE**（局部解冻 · **matrix_id=4 only**）：磊哥 preapproval + BF-8 receipt 消费；`actionDemoProven` **0→1（1/120）**；m5/m6 未污染；F5 五门禁全绿 @ live **`f26054f5`**。closeout：run-root `PHASE2-S10-WAVE5-FLIP-CLOSEOUT-GEMINI36.md`。仍 **`PHASE2_CODING_GATED`**；后三族禁演示。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
 - live **mounted=5 / admission=6**（+row167 `主驾制热调{N}{unit}`）；后三族（window / ambient / seat）仍为 **Phase2 越前 candidate**——**禁演示/合并/计入 proven**
-- **`actionDemoProven=0/120`**；`GO_WITH_RESIDUALS` ≠ 三族可演示
+- **`actionDemoProven=1/120`**（**仅 matrix_id=4**）；`GO_WITH_RESIDUALS` ≠ 三族可演示
 - 验收面：`文本 → route → C3 → state mutation → readback payload → UI`；ASR / TTS 不进当前产品门
 
 ## 起手路由
@@ -51,8 +54,9 @@ g9_status: G9_KNIFE2_BASELINE_LANDED
 
 1. **磊哥拍板（2026-07-23 · 均 A）**：① Lane B 绿后 push 绑 remote ② 首个 S10 exact set = **单 Phase1 AC cell**（默认 **matrix_id=4** `adjust_ac_temperature_to_number`）③ **局部解冻** only，全局仍 `PHASE2_CODING_GATED`。receipt：run-root `PHASE2-BASIS-BINDING-DECISION-RECEIPT.md`。
 2. **Lane 证据**：A `verify-ci` PASS @ `2490d79f`；B `verify-e2e` PASS @ `121f4ae0`；C/D 分报（R2 UI OPEN）。
-3. **推进链**：basis-binding（push+remote）→ S10 局部 grill（≤10 题）→ 一页 carrier → 0–3 刀 → BF-8 亲验 → 才允许翻格。
-4. residual：R2/R3/BF-7/8/10；`actionDemoProven=0/120`；后三族禁演示。
+3. **推进链**：… → proof-contract repair **设计已批 + OpenSpec propose** → **I1/I2/I3 实现（当前）** → 刀1 重授权 → …
+4. **刀1 stopline**：仍 `NO_RETRY` 直至 I1+I2+I3 齐绿。审批：run-root `PHASE2-S10-PROOF-CONTRACT-REPAIR-磊哥-APPROVAL-RECEIPT.md`；OpenSpec：`openspec/changes/repair-s10-action-demo-proven-promotion/`。
+5. residual：R2/R3/BF-7/8/10；`actionDemoProven=1/120`（m4 only）；后三族禁演示；下一 S10 cell 仍须独立 BF-8。
 
 ## 隔离后产品真态（candidate 口径）
 
@@ -74,7 +78,7 @@ g9_status: G9_KNIFE2_BASELINE_LANDED
 ### 仍不具备 / 未闭
 
 - App 客户文本入口仍走有限 literal；**模型输出未接入产品执行链**。
-- **`actionDemoProven=0/120`**
+- **`actionDemoProven=1/120`**（m4 only；119 cells 仍 false）
 - ASR=stub；TTS/真实音频 **不进当前产品门**
 - window 安全门代码已闭（FA-4 本机门），**仍禁演示/合并开窗句与后三族**
 - UI-E2E 未 required（同 SHA cancelled）；E3 人类证据未闭；C5/full suite 另账
@@ -91,7 +95,7 @@ g9_status: G9_KNIFE2_BASELINE_LANDED
 
 ## Non-claims
 
-- 本页不声称三族可演示、proven>0、模型已接入、真车可用、UI-E2E required 绿、full suite 绿或产品已发布。
+- 本页不声称三族可演示、proven>1/120 全面翻格（仅 matrix_id=4 为 1/120；≠ Phase2解冻 ≠ 后三族 ≠ G9_COMPLETE）、模型已接入、真车可用、UI-E2E required 绿、full suite 绿或产品已发布。
 - 本页不授予 promotion、公开发布或破坏性 git 权限。
 - 本页不声称 AF-G0 alone 已全面解冻 Phase2；G0 COMPLETE 解锁对照冻结 plan 的切片编码（仍 `PHASE2_CODING_GATED`）。
 - G4_COMPLETE = Turn Lease / cancel / last-intent-wins **工程**收口；≠ release-ready / 演示解冻 / proven 翻格。

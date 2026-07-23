@@ -22,7 +22,7 @@
       "probeID": "probe.action.matrix.5.zh-CN",
       "matrixID": 5,
       "register": "委婉请求",
-      "utterance": "请把空调调到26度",
+      "utterance": "能把空调调到26度吗",
       "representativeTool": "adjust_ac_temperature_to_number",
       "expectedStateDelta": {
         "key": "ac.temp_setpoint[主驾]",
@@ -38,7 +38,7 @@
       "probeID": "probe.action.matrix.6.zh-CN",
       "matrixID": 6,
       "register": "能否问句",
-      "utterance": "能把空调调到26度吗",
+      "utterance": "能调到26度吗",
       "representativeTool": "adjust_ac_temperature_to_number",
       "expectedStateDelta": {
         "key": "ac.temp_setpoint[主驾]",

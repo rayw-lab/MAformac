@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BF8PromotionReceipt",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "receiptID",
+    "subjectSHA256",
+    "matrix_ids",
+    "ceremony"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "bf8_promotion_receipt_v1" },
+    "receiptID": { "type": "string" },
+    "subjectSHA256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "matrix_ids": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "minItems": 1
+    },
+    "ceremony": {
+      "type": "object",
+      "required": ["artifactRef", "approver"],
+      "properties": {
+        "artifactRef": { "type": "string", "minLength": 1 },
+        "approver": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

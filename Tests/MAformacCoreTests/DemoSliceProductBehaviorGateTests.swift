@@ -38,13 +38,13 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     }
 
     @MainActor
-    func test02_setTemp26_prefixA() async throws {
+    func test02_setTemp26_failClosed_baPrefix() async throws {
         let h = try Harness()
         let result = try await h.route.route(text: "把空调调到26度")
-        let exec = try XCTUnwrap(result.execution)
-        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
-        XCTAssertTrue(exec.payload.readbacks.contains { $0.actualValue == "26" })
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(result.rejection, .notInCatalog)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "24")
     }
 
     @MainActor
@@ -73,7 +73,7 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     func test03a_freshDefaultTemp24StillPowersOn() async throws {
         let h = try Harness()
 
-        let result = try await h.route.route(text: "把空调调到24度")
+        let result = try await h.route.route(text: "空调调到24度")
         let execution = try XCTUnwrap(result.execution)
 
         XCTAssertEqual(execution.payload.outcome.result, .acceptedToolCall)
@@ -690,12 +690,13 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     }
 
     @MainActor
-    func test04_setTemp26_polite() async throws {
+    func test04_setTemp26_failClosed_politePrefix() async throws {
         let h = try Harness()
         let result = try await h.route.route(text: "请把空调调到26度")
-        XCTAssertNotNil(result.execution)
-        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(result.rejection, .notInCatalog)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "24")
     }
 
     @MainActor
@@ -708,12 +709,13 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     }
 
     @MainActor
-    func test06_setTemp26_openTo() async throws {
+    func test06_setTemp26_failClosed_openTo() async throws {
         let h = try Harness()
         let result = try await h.route.route(text: "打开空调到26度")
-        XCTAssertNotNil(result.execution)
-        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(result.rejection, .notInCatalog)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(h.store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "24")
     }
 
     // MARK: - Negative: 拒绝并不变更状态
@@ -765,7 +767,7 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     @MainActor
     func test10_outOfRange_low() async throws {
         let h = try Harness()
-        let result = try await h.route.route(text: "把空调调到17度")
+        let result = try await h.route.route(text: "空调调到17度")
         XCTAssertNil(result.execution)
         XCTAssertEqual(result.rejection, .valueOutOfRange(actual: 17, allowed: 18...32))
         XCTAssertEqual(h.store.currentRevision, 0)
@@ -774,7 +776,7 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     @MainActor
     func test11_outOfRange_high() async throws {
         let h = try Harness()
-        let result = try await h.route.route(text: "把空调调到33度")
+        let result = try await h.route.route(text: "空调调到33度")
         XCTAssertNil(result.execution)
         XCTAssertEqual(result.rejection, .valueOutOfRange(actual: 33, allowed: 18...32))
         XCTAssertEqual(h.store.currentRevision, 0)

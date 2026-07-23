@@ -364,10 +364,7 @@ public struct DemoSliceAdmissionCatalog: Sendable {
         // Only templates that declare optional question-tail may strip 吗/呢.
         // No global suffix strip.
         let templates: [(prefix: String, allowsQuestionSuffix: Bool)] = [
-            ("把空调调到", false),
             ("空调调到", false),
-            ("打开空调到", false),
-            ("请把空调调到", false),
             ("能把空调调到", true),
             ("能调到", true),
         ]

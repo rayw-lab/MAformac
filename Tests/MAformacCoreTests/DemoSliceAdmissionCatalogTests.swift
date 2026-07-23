@@ -44,7 +44,7 @@ final class DemoSliceAdmissionCatalogTests: XCTestCase {
 
     func testTemperatureValueIsParsedFromInputAndBoundedByStateCellRange() throws {
         let catalog = DemoSliceAdmissionCatalog()
-        let twentyTwo = try XCTUnwrap(catalog.admission(for: "把空调调到22度"))
+        let twentyTwo = try XCTUnwrap(catalog.admission(for: "空调调到22度"))
         let twentySix = try XCTUnwrap(catalog.admission(for: "空调调到26度"))
 
         XCTAssertEqual(twentyTwo.entry.matrixID, 4)
@@ -102,5 +102,44 @@ final class DemoSliceAdmissionCatalogTests: XCTestCase {
         XCTAssertEqual(admission.frame.slots["adjustment_mode"], "摄氏度")
         XCTAssertEqual(admission.frame.value.direct, "24")
         XCTAssertEqual(admission.frame.value.sourceUnit, .celsius)
+    }
+
+    func testS10_matrix4_exactUtterance_directCommand_admitted() throws {
+        let catalog = DemoSliceAdmissionCatalog()
+        let admission = try XCTUnwrap(catalog.admission(for: "空调调到26度"))
+
+        XCTAssertEqual(admission.entry.matrixID, 4)
+        XCTAssertEqual(admission.entry.contractRowID, "c1_airControl_000164")
+        XCTAssertEqual(admission.frame.value.direct, "26")
+    }
+
+    func testS10_matrix4_exactUtterance_politeQuestion_admitted() throws {
+        let catalog = DemoSliceAdmissionCatalog()
+        let admission = try XCTUnwrap(catalog.admission(for: "能调到26度吗"))
+
+        XCTAssertEqual(admission.entry.matrixID, 4)
+        XCTAssertEqual(admission.entry.contractRowID, "c1_airControl_000164")
+        XCTAssertEqual(admission.frame.value.direct, "26")
+    }
+
+    func testS10_matrix4_failClosedVariants_rejected() {
+        let catalog = DemoSliceAdmissionCatalog()
+        let variants = [
+            "把空调调到26度",
+            "打开空调到26度",
+            "请帮我调到26度",
+            "调到26度",
+        ]
+        for variant in variants {
+            XCTAssertNil(catalog.admission(for: variant), "Expected '\(variant)' to yield nil admission (fail-closed)")
+        }
+    }
+
+    func testS10_matrix4_noGlobalQuestionSuffixStrip() {
+        let catalog = DemoSliceAdmissionCatalog()
+        // Template ("空调调到", false) does not allow question suffix strip.
+        // No global suffix strip per DemoSliceAdmissionCatalog.swift:364-365.
+        XCTAssertNil(catalog.admission(for: "把空调调到26度吗"))
+        XCTAssertNil(catalog.admission(for: "空调调到26度吗"))
     }
 }

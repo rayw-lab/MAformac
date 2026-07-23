@@ -63,6 +63,7 @@ def validate_basis(cell: dict[str, Any]) -> None:
         "semantic_contract",
         "state_readback_cell",
         "readbackProbePass",
+        "bf8_promotion",
     }
     if not isinstance(basis, dict) or set(basis) != required:
         raise ValueError(f"matrix_id={matrix_id} has invalid actionDemoProven_basis keys")
