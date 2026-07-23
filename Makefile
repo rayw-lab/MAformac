@@ -28,7 +28,7 @@ GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
 SCOPED_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json
-BF8_PROMOTION_RECEIPT ?= /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-17-s8-s9-successor-c-longrun/bf8-promotion-receipt-matrix-4.json
+BF8_PROMOTION_RECEIPT ?= contracts/governance/bf8-promotion-receipt-matrix-4.json
 
 .PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e
 .PHONY: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat

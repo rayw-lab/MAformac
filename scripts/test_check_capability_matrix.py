@@ -33,8 +33,7 @@ SCOPED_ACTION_PROBE_RECEIPT = (
     REPO_ROOT / ".build" / "c1-run" / "receipts" / "c1" / "runtime-action-readback-probes-scoped-4.json"
 )
 BF8_PROMOTION_RECEIPT = (
-    Path("/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-17-s8-s9-successor-c-longrun")
-    / "bf8-promotion-receipt-matrix-4.json"
+    REPO_ROOT / "contracts" / "governance" / "bf8-promotion-receipt-matrix-4.json"
 )
 MATRIX = REPO_ROOT / "contracts" / "demo-capability-matrix.json"
 SCHEMA = REPO_ROOT / "contracts" / "schemas" / "demo-capability-matrix.schema.json"
@@ -262,6 +261,16 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     ],
                 }
             )
+        try:
+            subject_sha = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        except Exception:
+            subject_sha = "a" * 40
         return {
             "schemaVersion": "runtime_action_readback_receipt_v2",
             "receiptID": catalog["receiptID"],
@@ -274,8 +283,8 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             },
             "cases": cases,
             "runID": "run-scoped-test",
-            "sourceHeadSHA": "a" * 40,
-            "testedCheckoutSHA": "b" * 40,
+            "sourceHeadSHA": subject_sha,
+            "testedCheckoutSHA": subject_sha,
             "nonce": "c" * 32,
             "buildIdentity": "test-build",
             "modelIdentity": "test-model",
@@ -987,6 +996,54 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     receipt_path=r_path,
                     authority_root=REPO_ROOT,
                 )
+
+    def test_bf8_receipt_subject_matching_explicit_expected_subject_is_accepted(self) -> None:
+        checker = self.checker()
+        subject_sha = "a" * 40
+        receipt = self.valid_bf8_receipt(checker, subject_sha=subject_sha)
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-expected-subject-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            evaluation = checker.evaluate_bf8_promotion_receipt(
+                receipt=receipt,
+                receipt_path=r_path,
+                authority_root=REPO_ROOT,
+                expected_subject_sha=subject_sha,
+            )
+            self.assertEqual(evaluation["authorized_matrix_ids"], {4})
+            self.assertEqual(evaluation["receipt_id"], receipt["receiptID"])
+
+    def test_bf8_receipt_subject_ancestor_of_expected_subject_is_accepted(self) -> None:
+        checker = self.checker()
+        try:
+            ancestor_sha = subprocess.run(
+                ["git", "rev-parse", "HEAD^"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+            expected_sha = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        except Exception as error:
+            self.skipTest(f"git ancestry unavailable: {error}")
+        receipt = self.valid_bf8_receipt(checker, subject_sha=ancestor_sha)
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-ancestor-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            evaluation = checker.evaluate_bf8_promotion_receipt(
+                receipt=receipt,
+                receipt_path=r_path,
+                authority_root=REPO_ROOT,
+                expected_subject_sha=expected_sha,
+            )
+            self.assertEqual(evaluation["authorized_matrix_ids"], {4})
+            self.assertEqual(evaluation["receipt_id"], receipt["receiptID"])
 
     def test_scoped_bf8_promotion_receipt_matrix_4_only(self) -> None:
         checker = self.checker()

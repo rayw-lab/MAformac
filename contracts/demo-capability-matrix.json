@@ -208,7 +208,7 @@
         "bf8_promotion": {
           "observed": true,
           "receipt_sha256": "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4",
-          "source_ref": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-17-s8-s9-successor-c-longrun/bf8-promotion-receipt-matrix-4.json#matrix_id=4",
+          "source_ref": "contracts/governance/bf8-promotion-receipt-matrix-4.json#matrix_id=4",
           "status": "authorized"
         },
         "mounted_or_approved_action": {
@@ -219,7 +219,7 @@
           "observed": true,
           "probe_id": "probe.action.matrix.4.zh-CN",
           "probe_receipt_id": "runtime-action-readback-probes",
-          "receipt_sha256": "5c4652725b1cca639d1c24b061f82d74c4d7510f73fc80a632af8a2042f2964d",
+          "receipt_sha256": "e271220f7793e39646c7651f403953e897be514bb6d12e3927d36af4e1ee2774",
           "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
           "status": "passed"
         },
@@ -256,7 +256,7 @@
         "observed": true,
         "probe_id": "probe.action.matrix.4.zh-CN",
         "probe_receipt_id": "runtime-action-readback-probes",
-        "receipt_sha256": "5c4652725b1cca639d1c24b061f82d74c4d7510f73fc80a632af8a2042f2964d",
+        "receipt_sha256": "e271220f7793e39646c7651f403953e897be514bb6d12e3927d36af4e1ee2774",
         "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
         "status": "passed"
       },

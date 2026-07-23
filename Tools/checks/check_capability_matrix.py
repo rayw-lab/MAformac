@@ -59,6 +59,16 @@ def normalize_sha256(sha: Any) -> str:
     return cleaned
 
 
+def expected_bf8_subject_sha(action_probe_receipt: dict[str, Any] | None) -> str | None:
+    if not isinstance(action_probe_receipt, dict):
+        return None
+    for key in ("sourceHeadSHA", "testedCheckoutSHA"):
+        value = action_probe_receipt.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
 def source_path_for_receipt(path: Path, authority_root: Path) -> str:
     try:
         return path.resolve().relative_to(authority_root.resolve()).as_posix()
@@ -457,6 +467,7 @@ def evaluate_bf8_promotion_receipt(
     receipt_path: Path,
     schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
     authority_root: Path = REPO_ROOT,
+    expected_subject_sha: str | None = None,
 ) -> dict[str, Any]:
     authority_root = authority_root.resolve()
     resolved_receipt_path = receipt_path.resolve()
@@ -503,11 +514,38 @@ def evaluate_bf8_promotion_receipt(
     except Exception as error:
         raise ValueError("E_BF8_RECEIPT_GIT_HEAD_FAILED") from error
 
-    norm_head = normalize_sha256(head_sha)
-    norm_subject = normalize_sha256(receipt.get("subjectSHA256"))
+    expected_subject = expected_subject_sha or head_sha
+    norm_expected_subject = normalize_sha256(expected_subject)
+    subject_sha = receipt.get("subjectSHA256")
+    norm_subject = normalize_sha256(subject_sha)
 
-    if norm_head != norm_subject:
-        raise ValueError("E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH")
+    if norm_expected_subject != norm_subject:
+        expected_commit = None
+        subject_commit = None
+        for candidate, slot in ((expected_subject, "expected"), (subject_sha, "subject")):
+            if not isinstance(candidate, str):
+                continue
+            cleaned = candidate.strip().lower()
+            commit = None
+            if re.fullmatch(r"[0-9a-f]{40}", cleaned):
+                commit = cleaned
+            elif re.fullmatch(r"0{24}[0-9a-f]{40}", cleaned):
+                commit = cleaned[-40:]
+            if slot == "expected":
+                expected_commit = commit
+            else:
+                subject_commit = commit
+        if expected_commit is None or subject_commit is None:
+            raise ValueError("E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH")
+        ancestry_check = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", subject_commit, expected_commit],
+            cwd=authority_root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if ancestry_check.returncode != 0:
+            raise ValueError("E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH")
 
     matrix_ids = receipt.get("matrix_ids")
     if (
@@ -622,6 +660,7 @@ def materialize_matrix(
             receipt=bf8_promotion_receipt,
             receipt_path=bf8_promotion_receipt_path,
             schema_path=bf8_promotion_schema_path,
+            expected_subject_sha=expected_bf8_subject_sha(action_probe_receipt),
         )
     authorized_bf8_ids = (
         bf8_evaluation["authorized_matrix_ids"] if bf8_evaluation is not None else set()
@@ -801,6 +840,7 @@ def validate_matrix(
             receipt=bf8_promotion_receipt,
             receipt_path=bf8_promotion_receipt_path,
             schema_path=bf8_promotion_schema_path,
+            expected_subject_sha=expected_bf8_subject_sha(action_probe_receipt),
         )
     enums = parse_t0_enums(t0_design_path)
     manifest_rows = read_jsonl(manifest_path)
