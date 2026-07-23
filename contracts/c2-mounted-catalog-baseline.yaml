@@ -6,11 +6,12 @@ baseline:
   mounted_tool_names:
     - "adjust_ac_temperature_to_number"
     - "close_ac"
+    - "open_ac"
     - "open_atmosphere_lamp"
     - "open_seat_heat"
     - "open_window_by_number"
-  catalog_sha: "b7ab19939cb5821962f706fe8f2b50524ac85acc1217599d14e10d14db0e5794"
-  description: "pre-G0 candidate mount (AF-G0 still RED): AC pair + window/ambient/seat candidates; actionDemoProven stays 0/120; 禁演示/合并"
+  catalog_sha: "23ee4ccccbc76744c4a4564a26c08bd9bb9e55063ddab89983c128a48aada0a1"
+  description: "S10 Wave6 intentional Phase1 local thaw: add open_ac (matrix_id=1) while retaining window/ambient/seat candidates; no m1/m5/m6 action or rejection promotion; 后三族禁演示/合并"
 
 rollback_guard:
   affected_action_demo_proven_after_rollback: false

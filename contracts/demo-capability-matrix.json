@@ -222,7 +222,7 @@
           "observed": true,
           "probe_id": "probe.action.matrix.4.zh-CN",
           "probe_receipt_id": "runtime-action-readback-probes",
-          "receipt_sha256": "354344bc5d8cb92fe985989421dbfac69c6b74b99d3eb99132c7acc2fd0ea034",
+          "receipt_sha256": "1aba6e83e0228fa270a9a74edf21902a769c424b9e9c0e7cc8d82d22d6075f3a",
           "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
           "status": "passed"
         },
@@ -259,7 +259,7 @@
         "observed": true,
         "probe_id": "probe.action.matrix.4.zh-CN",
         "probe_receipt_id": "runtime-action-readback-probes",
-        "receipt_sha256": "354344bc5d8cb92fe985989421dbfac69c6b74b99d3eb99132c7acc2fd0ea034",
+        "receipt_sha256": "1aba6e83e0228fa270a9a74edf21902a769c424b9e9c0e7cc8d82d22d6075f3a",
         "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
         "status": "passed"
       },
