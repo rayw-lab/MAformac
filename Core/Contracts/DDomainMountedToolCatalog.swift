@@ -12,6 +12,7 @@ public enum DDomainMountedToolCatalog {
     public static let mountedToolNames: Set<String> = [
         "adjust_ac_temperature_to_number",
         "close_ac",
+        "open_ac",
         "open_atmosphere_lamp",
         "open_seat_heat",
         "open_window_by_number"

@@ -30,11 +30,26 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
     @MainActor
     func test01_openAC_powerOn() async throws {
         let h = try Harness()
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "off", "Pre-state ac.power must be off")
         let result = try await h.route.route(text: "打开空调")
         let exec = try XCTUnwrap(result.execution)
-        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(exec.admission.entry.matrixID, 1, "Utterance '打开空调' must route to matrix_id=1")
+        XCTAssertEqual(exec.admission.entry.contractRowID, "c1_airControl_000006")
+        XCTAssertEqual(exec.admission.entry.stateBase, "ac.power")
+        XCTAssertEqual(exec.admission.frame.toolName, "set_vehicle_control")
+        XCTAssertEqual(exec.admission.frame.device, "ac")
+        XCTAssertEqual(exec.admission.frame.actionPrimitive, "power_on")
+        XCTAssertEqual(h.store.cell(for: "ac.power")?.actualValue, "on", "State delta must mutate ac.power to on")
         XCTAssertEqual(h.route.runnerCallCount, 1)
-        XCTAssertTrue(exec.payload.readbacks.contains { $0.key == "ac.power" })
+        XCTAssertEqual(exec.payload.mutationCount, 1)
+        XCTAssertTrue(
+            exec.payload.readbacks.contains {
+                $0.key == "ac.power"
+                    && $0.actualValue == "on"
+                    && !$0.spokenText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            },
+            "Readback must contain valid success language for ac.power=on"
+        )
     }
 
     @MainActor

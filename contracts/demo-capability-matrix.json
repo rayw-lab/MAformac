@@ -9,8 +9,8 @@
           "status": "pending_human_bf8"
         },
         "mounted_or_approved_action": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=1:tool-not-mounted=open_ac"
+          "observed": true,
+          "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
           "observed": false,
@@ -45,7 +45,7 @@
       "family": "空调 (`ac`)",
       "injected_path_status": "unmounted_name_rejected_if_emitted",
       "matrix_id": 1,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "default_executable",
       "readback_probe_basis": {
         "observed": false,
@@ -56,6 +56,7 @@
       },
       "reasonKind": null,
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_ac",
       "semantic_basis": {
         "observed": true,
@@ -77,8 +78,8 @@
           "status": "pending_human_bf8"
         },
         "mounted_or_approved_action": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=2:tool-not-mounted=open_ac"
+          "observed": true,
+          "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
           "observed": false,
@@ -110,9 +111,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "空调 (`ac`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 2,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -123,6 +124,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_ac",
       "semantic_basis": {
         "observed": true,
@@ -144,8 +146,8 @@
           "status": "pending_human_bf8"
         },
         "mounted_or_approved_action": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=3:tool-not-mounted=open_ac"
+          "observed": true,
+          "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
           "observed": false,
@@ -177,9 +179,9 @@
       "entrypointAliases": [],
       "fallback_reason": "unsupported_no_available_tool",
       "family": "空调 (`ac`)",
-      "injected_path_status": "unmounted_name_rejected_if_emitted",
+      "injected_path_status": "mounted_tool_supported_if_emitted__register_emission_unproven",
       "matrix_id": 3,
-      "mounted_status": "unmounted",
+      "mounted_status": "mounted",
       "primary_class": "fast_path_no_match_fallback",
       "readback_probe_basis": {
         "observed": false,
@@ -190,6 +192,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_ac",
       "semantic_basis": {
         "observed": true,
@@ -219,7 +222,7 @@
           "observed": true,
           "probe_id": "probe.action.matrix.4.zh-CN",
           "probe_receipt_id": "runtime-action-readback-probes",
-          "receipt_sha256": "e271220f7793e39646c7651f403953e897be514bb6d12e3927d36af4e1ee2774",
+          "receipt_sha256": "354344bc5d8cb92fe985989421dbfac69c6b74b99d3eb99132c7acc2fd0ea034",
           "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
           "status": "passed"
         },
@@ -256,12 +259,13 @@
         "observed": true,
         "probe_id": "probe.action.matrix.4.zh-CN",
         "probe_receipt_id": "runtime-action-readback-probes",
-        "receipt_sha256": "e271220f7793e39646c7651f403953e897be514bb6d12e3927d36af4e1ee2774",
+        "receipt_sha256": "354344bc5d8cb92fe985989421dbfac69c6b74b99d3eb99132c7acc2fd0ea034",
         "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
         "status": "passed"
       },
       "reasonKind": null,
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_ac_temperature_to_number",
       "semantic_basis": {
         "observed": true,
@@ -330,6 +334,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_ac_temperature_to_number",
       "semantic_basis": {
         "observed": true,
@@ -398,6 +403,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_ac_temperature_to_number",
       "semantic_basis": {
         "observed": true,
@@ -463,6 +469,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "-",
       "semantic_basis": {
         "observed": false,
@@ -528,6 +535,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "-",
       "semantic_basis": {
         "observed": false,
@@ -593,6 +601,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "-",
       "semantic_basis": {
         "observed": false,
@@ -660,6 +669,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_ac_temperature_to_exp",
       "semantic_basis": {
         "observed": true,
@@ -727,6 +737,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_ac_temperature_to_exp",
       "semantic_basis": {
         "observed": true,
@@ -794,6 +805,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_ac_temperature_to_exp",
       "semantic_basis": {
         "observed": true,
@@ -861,6 +873,7 @@
       },
       "reasonKind": null,
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_seat_heat",
       "semantic_basis": {
         "observed": true,
@@ -928,6 +941,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_seat_heat",
       "semantic_basis": {
         "observed": true,
@@ -995,6 +1009,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_seat_heat",
       "semantic_basis": {
         "observed": true,
@@ -1062,6 +1077,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_heat_temperature_to_number",
       "semantic_basis": {
         "observed": true,
@@ -1129,6 +1145,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_heat_temperature_to_number",
       "semantic_basis": {
         "observed": true,
@@ -1196,6 +1213,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_heat_temperature_to_number",
       "semantic_basis": {
         "observed": true,
@@ -1263,6 +1281,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_position_to_number",
       "semantic_basis": {
         "observed": true,
@@ -1330,6 +1349,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_position_to_number",
       "semantic_basis": {
         "observed": true,
@@ -1397,6 +1417,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_position_to_number",
       "semantic_basis": {
         "observed": true,
@@ -1464,6 +1485,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_heat_temperature_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -1531,6 +1553,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_heat_temperature_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -1598,6 +1621,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_seat_heat_temperature_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -1665,6 +1689,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "close_window",
       "semantic_basis": {
         "observed": true,
@@ -1732,6 +1757,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "close_window",
       "semantic_basis": {
         "observed": true,
@@ -1799,6 +1825,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "close_window",
       "semantic_basis": {
         "observed": true,
@@ -1866,6 +1893,7 @@
       },
       "reasonKind": null,
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
         "observed": true,
@@ -1933,6 +1961,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
         "observed": true,
@@ -2000,6 +2029,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
         "observed": true,
@@ -2067,6 +2097,7 @@
       },
       "reasonKind": null,
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
         "observed": true,
@@ -2134,6 +2165,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
         "observed": true,
@@ -2201,6 +2233,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_by_number",
       "semantic_basis": {
         "observed": true,
@@ -2268,6 +2301,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_little",
       "semantic_basis": {
         "observed": true,
@@ -2335,6 +2369,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_little",
       "semantic_basis": {
         "observed": true,
@@ -2402,6 +2437,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_window_little",
       "semantic_basis": {
         "observed": true,
@@ -2469,6 +2505,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_screen",
       "semantic_basis": {
         "observed": true,
@@ -2536,6 +2573,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_screen",
       "semantic_basis": {
         "observed": true,
@@ -2603,6 +2641,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_screen",
       "semantic_basis": {
         "observed": true,
@@ -2670,6 +2709,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -2737,6 +2777,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -2804,6 +2845,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -2871,6 +2913,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -2938,6 +2981,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3005,6 +3049,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3072,6 +3117,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -3139,6 +3185,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -3206,6 +3253,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_screen_brightness_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -3273,6 +3321,7 @@
       },
       "reasonKind": null,
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_atmosphere_lamp",
       "semantic_basis": {
         "observed": true,
@@ -3340,6 +3389,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_atmosphere_lamp",
       "semantic_basis": {
         "observed": true,
@@ -3407,6 +3457,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_atmosphere_lamp",
       "semantic_basis": {
         "observed": true,
@@ -3474,6 +3525,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3541,6 +3593,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3608,6 +3661,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3675,6 +3729,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3742,6 +3797,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3809,6 +3865,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_number",
       "semantic_basis": {
         "observed": true,
@@ -3876,6 +3933,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -3943,6 +4001,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -4010,6 +4069,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_atmosphere_lamp_brightness_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -4077,6 +4137,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_car_door",
       "semantic_basis": {
         "observed": true,
@@ -4144,6 +4205,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_car_door",
       "semantic_basis": {
         "observed": true,
@@ -4211,6 +4273,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_car_door",
       "semantic_basis": {
         "observed": true,
@@ -4278,6 +4341,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "set_door_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -4345,6 +4409,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "set_door_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -4412,6 +4477,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "set_door_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -4479,6 +4545,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_door_by_number",
       "semantic_basis": {
         "observed": true,
@@ -4546,6 +4613,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_door_by_number",
       "semantic_basis": {
         "observed": true,
@@ -4613,6 +4681,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_door_by_number",
       "semantic_basis": {
         "observed": true,
@@ -4680,6 +4749,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_door_little",
       "semantic_basis": {
         "observed": true,
@@ -4747,6 +4817,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_door_little",
       "semantic_basis": {
         "observed": true,
@@ -4814,6 +4885,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_door_little",
       "semantic_basis": {
         "observed": true,
@@ -4881,6 +4953,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "volume_mute",
       "semantic_basis": {
         "observed": true,
@@ -4948,6 +5021,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "volume_mute",
       "semantic_basis": {
         "observed": true,
@@ -5015,6 +5089,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "volume_mute",
       "semantic_basis": {
         "observed": true,
@@ -5082,6 +5157,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5149,6 +5225,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5216,6 +5293,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5283,6 +5361,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5350,6 +5429,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5417,6 +5497,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5484,6 +5565,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -5551,6 +5633,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -5618,6 +5701,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_volume_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -5685,6 +5769,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_wiper",
       "semantic_basis": {
         "observed": true,
@@ -5752,6 +5837,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_wiper",
       "semantic_basis": {
         "observed": true,
@@ -5819,6 +5905,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_wiper",
       "semantic_basis": {
         "observed": true,
@@ -5886,6 +5973,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -5953,6 +6041,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6020,6 +6109,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6087,6 +6177,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6154,6 +6245,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6221,6 +6313,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6288,6 +6381,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -6355,6 +6449,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -6422,6 +6517,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_wiper_speed_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -6489,6 +6585,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof",
       "semantic_basis": {
         "observed": true,
@@ -6556,6 +6653,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof",
       "semantic_basis": {
         "observed": true,
@@ -6623,6 +6721,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof",
       "semantic_basis": {
         "observed": true,
@@ -6690,6 +6789,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6757,6 +6857,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6824,6 +6925,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_to_number",
       "semantic_basis": {
         "observed": true,
@@ -6891,6 +6993,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_by_number",
       "semantic_basis": {
         "observed": true,
@@ -6958,6 +7061,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_by_number",
       "semantic_basis": {
         "observed": true,
@@ -7025,6 +7129,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_by_number",
       "semantic_basis": {
         "observed": true,
@@ -7092,6 +7197,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_little",
       "semantic_basis": {
         "observed": true,
@@ -7159,6 +7265,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_little",
       "semantic_basis": {
         "observed": true,
@@ -7226,6 +7333,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_sunroof_little",
       "semantic_basis": {
         "observed": true,
@@ -7293,6 +7401,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "open_fragrance",
       "semantic_basis": {
         "observed": true,
@@ -7360,6 +7469,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "open_fragrance",
       "semantic_basis": {
         "observed": true,
@@ -7427,6 +7537,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "open_fragrance",
       "semantic_basis": {
         "observed": true,
@@ -7494,6 +7605,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_fragrance_intensity_to_number",
       "semantic_basis": {
         "observed": true,
@@ -7561,6 +7673,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_fragrance_intensity_to_number",
       "semantic_basis": {
         "observed": true,
@@ -7628,6 +7741,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_fragrance_intensity_to_number",
       "semantic_basis": {
         "observed": true,
@@ -7693,6 +7807,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "-",
       "semantic_basis": {
         "observed": false,
@@ -7758,6 +7873,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "-",
       "semantic_basis": {
         "observed": false,
@@ -7823,6 +7939,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "-",
       "semantic_basis": {
         "observed": false,
@@ -7890,6 +8007,7 @@
       },
       "reasonKind": "capability_not_mounted",
       "register": "直述",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_fragrance_intensity_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -7957,6 +8075,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "委婉请求",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_fragrance_intensity_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -8024,6 +8143,7 @@
       },
       "reasonKind": "not_available_in_demo",
       "register": "能否问句",
+      "rejectionDemoProven": false,
       "representative_tool": "adjust_fragrance_intensity_to_gear",
       "semantic_basis": {
         "observed": true,
@@ -8040,7 +8160,7 @@
   "schema_version": "demo_capability_matrix_v2",
   "source": {
     "enum_contract": "T0:add-c1-demo-capability-governance",
-    "manifest_sha256": "49e0808a48b7456a52680ab42d7ab6babae25f2f351ef339ef373387a1baca24",
+    "manifest_sha256": "9d54ab13552e46c072ecd9696cd36bfe645254425df8679b46c0828c449e7d58",
     "probe_pack_sha256": "130b84cf39c6a9d83092b91ece6a02714cecab94cf4fb0f83de3ddde62503e71",
     "t0_design_sha256": "f0cb9bcbc051f6ebb7583a0edea88290f29532259a447ede234e2ffbaf51bb55"
   },

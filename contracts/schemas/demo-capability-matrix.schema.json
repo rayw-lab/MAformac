@@ -16,7 +16,7 @@
           "matrix_id", "family", "value_shape", "register", "representative_tool",
           "primary_class", "default_path_status", "injected_path_status", "entrypointAliases",
           "mounted_status", "semantic_basis", "state_cell_basis", "readback_probe_basis",
-          "actionDemoProven_basis", "actionDemoProven", "fallback_reason", "reasonKind",
+          "actionDemoProven_basis", "actionDemoProven", "rejectionDemoProven", "fallback_reason", "reasonKind",
           "source_hash", "anchors"
         ],
         "properties": {
@@ -46,6 +46,7 @@
             "additionalProperties": false
           },
           "actionDemoProven": {"type": "boolean"},
+          "rejectionDemoProven": {"type": "boolean"},
           "fallback_reason": {"type": ["string", "null"]},
           "reasonKind": {"type": ["string", "null"]},
           "source_hash": {"type": "string"},

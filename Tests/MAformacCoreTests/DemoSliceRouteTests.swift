@@ -22,7 +22,7 @@ final class DemoSliceRouteTests: XCTestCase {
         for value in [22, 26] {
             let harness = try Harness()
 
-            let result = try await harness.route.route(text: "把空调调到\(value)度")
+            let result = try await harness.route.route(text: "空调调到\(value)度")
 
             let execution = try XCTUnwrap(result.execution)
             XCTAssertEqual(execution.admission.entry.matrixID, 4)

@@ -67,7 +67,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             mounted_catalog_path=MOUNTED_CATALOG,
         )
         self.assertEqual(len(matrix["cells"]), 120)
-        self.assertEqual(matrix["source"]["manifest_sha256"], "49e0808a48b7456a52680ab42d7ab6babae25f2f351ef339ef373387a1baca24")
+        self.assertEqual(matrix["source"]["manifest_sha256"], "9d54ab13552e46c072ecd9696cd36bfe645254425df8679b46c0828c449e7d58")
 
     def checker(self):
         if not CHECKER_PATH.exists():
@@ -1170,6 +1170,60 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             report = load_json(receipt_path)
             self.assertEqual(report["status"], "PASS")
 
+    def test_rejection_cell_with_action_demo_proven_true_emits_contradiction_error(self) -> None:
+        checker, matrix = self.materialize()
+        cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+        cells_by_id[5]["actionDemoProven"] = True
+        report = self.validate(checker, matrix)
+        self.assertEqual(report["status"], "FAIL")
+        self.assertIn("E_ACTION_DEMO_PROVEN_DEFAULT_PATH_CONTRADICTION", report["errors"])
+
+    def test_rejection_demo_proven_field_missing_emits_error(self) -> None:
+        checker, matrix = self.materialize()
+        del matrix["cells"][0]["rejectionDemoProven"]
+        report = self.validate(checker, matrix)
+        self.assertEqual(report["status"], "FAIL")
+        self.assertTrue(
+            "E_REJECTION_DEMO_PROVEN_MISSING" in report["errors"]
+            or "E_MATRIX_SCHEMA_INVALID" in report["errors"]
+        )
+
+    def test_bf8_receipt_rejection_execution_overlap_raises(self) -> None:
+        checker = self.checker()
+        receipt = self.valid_bf8_receipt(checker, matrix_ids=[4, 5])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-overlap-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaises(ValueError) as ctx:
+                checker.evaluate_bf8_promotion_receipt(
+                    receipt=receipt,
+                    receipt_path=r_path,
+                    authority_root=REPO_ROOT,
+                )
+            self.assertEqual(str(ctx.exception), "E_BF8_RECEIPT_REJECTION_EXECUTION_OVERLAP")
+
+    def test_execution_bf8_receipt_does_not_promote_rejection_cell(self) -> None:
+        checker = self.checker()
+        receipt = self.valid_bf8_receipt(checker, matrix_ids=[4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="bf8-exec-rejection-") as tmp:
+            r_path = Path(tmp) / "receipt.json"
+            r_path.write_text(json.dumps(receipt), encoding="utf-8")
+            matrix = checker.materialize_matrix(
+                manifest_path=MANIFEST,
+                t0_design_path=T0_DESIGN,
+                semantic_contract_path=SEMANTIC_CONTRACT,
+                state_cells_path=STATE_CELLS,
+                mounted_catalog_path=MOUNTED_CATALOG,
+                bf8_promotion_receipt=receipt,
+                bf8_promotion_receipt_path=r_path,
+            )
+            cells_by_id = {c["matrix_id"]: c for c in matrix["cells"]}
+            self.assertFalse(cells_by_id[5]["actionDemoProven"])
+            self.assertFalse(cells_by_id[5]["rejectionDemoProven"])
+            self.assertFalse(cells_by_id[6]["actionDemoProven"])
+            self.assertFalse(cells_by_id[6]["rejectionDemoProven"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+

@@ -492,7 +492,7 @@ final class TurnLeaseCancellationTests: XCTestCase {
             turnID: UUID(),
             isCurrent: { true }
         )
-        let second = try await route.route(text: "把空调调到26度", lease: lease2)
+        let second = try await route.route(text: "空调调到26度", lease: lease2)
         XCTAssertEqual(second.execution?.payload.outcome.result, .acceptedToolCall)
         // History (power on) retained; new command wins temperature.
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
@@ -531,7 +531,7 @@ final class TurnLeaseCancellationTests: XCTestCase {
             turnID: UUID(),
             isCurrent: { true }
         )
-        let second = try await route.route(text: "把空调调到26度", lease: lease2)
+        let second = try await route.route(text: "空调调到26度", lease: lease2)
         XCTAssertEqual(second.execution?.payload.outcome.result, .acceptedToolCall)
         XCTAssertEqual(speech.spokenTexts.last, store.cell(for: "ac.temp_setpoint[主驾]").map {
             DemoVehicleStateStore.spokenText(for: $0)

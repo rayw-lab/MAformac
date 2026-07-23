@@ -330,6 +330,12 @@ verify-ci-receipt:
 	$(PYTHON_BOOTSTRAP) scripts/test_verify_ci_checker_presence.py
 
 swift-test:
+	C1_RUN_DIR="$${C1_RUN_DIR:-$(CURDIR)/.build/c1-run}" \
+	C1_WITNESS_RUN_ID="$${C1_WITNESS_RUN_ID:-local:swift-test}" \
+	C1_WITNESS_SOURCE_HEAD_SHA="$${C1_WITNESS_SOURCE_HEAD_SHA:-$${GITHUB_SHA:-$$(git rev-parse HEAD)}}" \
+	C1_WITNESS_TESTED_CHECKOUT_SHA="$${C1_WITNESS_TESTED_CHECKOUT_SHA:-$${GITHUB_SHA:-$$(git rev-parse HEAD)}}" \
+	C1_WITNESS_NONCE="$${C1_WITNESS_NONCE:-c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1}" \
+	C1_WITNESS_PROBE_CATALOG_SHA256="$${C1_WITNESS_PROBE_CATALOG_SHA256:-$$(openssl dgst -sha256 contracts/runtime-action-readback-probes.json | awk '{print $$2}')}" \
 	swift test
 
 check-tts-preflight:

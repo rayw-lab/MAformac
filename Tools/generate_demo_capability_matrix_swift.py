@@ -129,6 +129,7 @@ def validate_source(root: Any) -> list[dict[str, Any]]:
         swift_string_array(cell.get("anchors"))
         validate_basis(cell)
         require_bool(cell.get("actionDemoProven"), f"matrix_id={matrix_id}.actionDemoProven")
+        require_bool(cell.get("rejectionDemoProven"), f"matrix_id={matrix_id}.rejectionDemoProven")
     return cells
 
 
@@ -181,6 +182,7 @@ def render_cell(cell: dict[str, Any]) -> str:
             + render_readback_basis(basis["readbackProbePass"]),
             "            ),",
             f"            actionDemoProven: {str(cell['actionDemoProven']).lower()},",
+            f"            rejectionDemoProven: {str(cell['rejectionDemoProven']).lower()},",
             f"            fallbackReason: {swift_optional_string(cell.get('fallback_reason'))},",
             f"            reasonKind: {swift_optional_string(cell.get('reasonKind'))},",
             f"            sourceHash: {swift_string(cell['source_hash'])},",
@@ -237,6 +239,7 @@ public struct DemoCapabilityMatrixCell: Codable, Equatable, Hashable, Sendable {
     public let mountedStatus: String
     public let actionDemoProvenBasis: DemoCapabilityActionDemoProvenBasis
     public let actionDemoProven: Bool
+    public let rejectionDemoProven: Bool
     public let fallbackReason: String?
     public let reasonKind: String?
     public let sourceHash: String

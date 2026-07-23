@@ -556,10 +556,34 @@ def evaluate_bf8_promotion_receipt(
     ):
         raise ValueError("E_BF8_RECEIPT_MATRIX_IDS_INVALID")
 
+    manifest_rows = read_jsonl(canonical_manifest_path())
+    rejection_matrix_ids = {
+        r["matrix_id"] for r in manifest_rows if r["primary_class"] == "fast_path_no_match_fallback"
+    }
+    execution_matrix_ids = {
+        r["matrix_id"] for r in manifest_rows if r["primary_class"] != "fast_path_no_match_fallback"
+    }
+
+    receipt_matrix_ids = set(matrix_ids)
+    has_rejection = bool(receipt_matrix_ids & rejection_matrix_ids)
+    has_execution = bool(receipt_matrix_ids & execution_matrix_ids)
+
+    if has_rejection and has_execution:
+        raise ValueError("E_BF8_RECEIPT_REJECTION_EXECUTION_OVERLAP")
+
+    subject = receipt.get("subject")
+    if isinstance(subject, str):
+        subject_lower = subject.lower()
+        if "rejection" in subject_lower and has_execution:
+            raise ValueError("E_BF8_RECEIPT_REJECTION_SUBJECT_MISMATCH")
+        if "execution" in subject_lower and has_rejection:
+            raise ValueError("E_BF8_RECEIPT_EXECUTION_SUBJECT_MISMATCH")
+
     receipt_sha256 = sha256_file(resolved_receipt_path)
     receipt_source = source_path_for_receipt(resolved_receipt_path, authority_root)
     return {
-        "authorized_matrix_ids": set(matrix_ids),
+        "authorized_matrix_ids": receipt_matrix_ids,
+        "is_rejection": has_rejection,
         "receipt_sha256": receipt_sha256,
         "receipt_id": receipt["receiptID"],
         "receipt_source": receipt_source,
@@ -675,14 +699,19 @@ def materialize_matrix(
         default_fastpath = row["default_path_status"] == "executable_default_fastpath"
         fallback_reason, reason_kind = reason_projection(row)
 
+        is_rejection_bf8 = bf8_evaluation.get("is_rejection", False) if bf8_evaluation is not None else False
+        is_rejection_row = row["primary_class"] == "fast_path_no_match_fallback"
+
         if row["matrix_id"] in authorized_bf8_ids:
             bf8_basis = observed_bf8_promotion_basis(
                 receipt_id=bf8_evaluation["receipt_id"],
                 receipt_sha256=bf8_evaluation["receipt_sha256"],
                 source_ref=f"{bf8_evaluation['receipt_source']}#matrix_id={row['matrix_id']}",
             )
+            rejection_demo_proven = is_rejection_bf8 and is_rejection_row
         else:
             bf8_basis = pending_bf8_promotion_basis(row["matrix_id"])
+            rejection_demo_proven = False
 
         cell_basis = {
             "mounted_or_approved_action": basis(
@@ -708,7 +737,7 @@ def materialize_matrix(
             "readbackProbePass": readback_probe_basis(row, action_proofs),
             "bf8_promotion": bf8_basis,
         }
-        action_demo_proven = compute_action_demo_proven(cell_basis)
+        action_demo_proven = compute_action_demo_proven(cell_basis) if not is_rejection_row and not is_rejection_bf8 else False
         cells.append(
             {
                 "matrix_id": row["matrix_id"],
@@ -726,6 +755,7 @@ def materialize_matrix(
                 "readback_probe_basis": cell_basis["readbackProbePass"],
                 "actionDemoProven_basis": cell_basis,
                 "actionDemoProven": action_demo_proven,
+                "rejectionDemoProven": rejection_demo_proven,
                 "fallback_reason": fallback_reason,
                 "reasonKind": reason_kind,
                 "source_hash": row["source_hash"],
@@ -762,7 +792,7 @@ def validate_required_matrix_v2_schema_contract(schema: dict[str, Any]) -> None:
         required = set(cell_schema["required"])
     except (KeyError, TypeError):
         raise ValueError("E_MATRIX_SCHEMA_CONTRACT_INVALID") from None
-    locked = {"actionDemoProven", "actionDemoProven_basis"}
+    locked = {"actionDemoProven", "actionDemoProven_basis", "rejectionDemoProven"}
     if (
         schema.get("properties", {}).get("schema_version", {}).get("const")
         != "demo_capability_matrix_v2"
@@ -944,9 +974,15 @@ def validate_matrix(
             computed = compute_action_demo_proven(cell_basis)
             if cell.get("actionDemoProven") is not computed:
                 errors.append("E_ACTION_DEMO_PROVEN_MANUAL_OVERRIDE")
-            if computed and cell.get("primary_class") == "fast_path_no_match_fallback":
+            if (cell.get("actionDemoProven") is True or computed) and cell.get("primary_class") == "fast_path_no_match_fallback":
                 errors.append("E_ACTION_DEMO_PROVEN_DEFAULT_PATH_CONTRADICTION")
-                basis_conflicts.append(matrix_id)
+                if matrix_id not in basis_conflicts:
+                    basis_conflicts.append(matrix_id)
+
+            if "rejectionDemoProven" not in cell or not isinstance(cell.get("rejectionDemoProven"), bool):
+                errors.append("E_REJECTION_DEMO_PROVEN_MISSING")
+            elif expected_cell is not None and cell.get("rejectionDemoProven") != expected_cell.get("rejectionDemoProven"):
+                errors.append("E_REJECTION_DEMO_PROVEN_MANUAL_OVERRIDE")
 
         expected_status = _expected_mounted_status(cell.get("representative_tool", "-"), mounted_tools)
         if cell.get("mounted_status") != expected_status:

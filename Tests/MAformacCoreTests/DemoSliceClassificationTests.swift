@@ -15,7 +15,7 @@ final class DemoSliceClassificationTests: XCTestCase {
     }
 
     func testPleaseSetTemperature_isCommand() {
-        let classification = catalog.classify(for: "请把空调调到26度")
+        let classification = catalog.classify(for: "空调调到26度")
         guard case let .command(admission) = classification else {
             return XCTFail("expected command, got \(classification)")
         }
@@ -58,7 +58,7 @@ final class DemoSliceClassificationTests: XCTestCase {
     }
 
     func testCorrectionWrapper_fullCommand_isNewTurnCommand() {
-        let classification = catalog.classify(for: "不对，把空调调到24度")
+        let classification = catalog.classify(for: "不对，空调调到24度")
         guard case let .command(admission) = classification else {
             return XCTFail("expected command, got \(classification)")
         }
@@ -150,7 +150,7 @@ final class DemoSliceClassificationTests: XCTestCase {
     }
 
     func testTargetProjection_returnsPerKeyDesired() throws {
-        let admission = try XCTUnwrap(catalog.admission(for: "把空调调到26度"))
+        let admission = try XCTUnwrap(catalog.admission(for: "空调调到26度"))
         let bundle = DemoRuntimeContractBundle.singleCommandDemoDefault
         let pipeline = try bundle.makePipeline()
         let projection = try DemoSliceAdmissionCatalog.targetProjection(
