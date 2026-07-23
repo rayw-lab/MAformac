@@ -48,7 +48,7 @@ g8_status: G8_COMPLETE
 
 ## 下一步（Phase2 G9）
 
-1. **G8_COMPLETE（工程）**：CI DAG 去重 + failure-retainable head-bound receipt；下一＝**G9**（对照冻结 remaining-map）。勿抬 proven；勿把 G8/G9 写成解冻。
+1. **G8_COMPLETE（工程）**：CI DAG 去重 + failure-retainable head-bound receipt；**G9 作战包已建**（run-root `PHASE2-G9-GOVERNANCE-REDUCTION-BATTLE-PACKET.md`）；下一＝按包 **1 刀**做治理 reduction。勿抬 proven；勿把 G8/G9 写成解冻。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
 3. residual 强制账（不因 G3–G8 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；**tip `verify-c1-ownership` 红**（`E_GENERATED_RUNTIME_REASON_DRIFT` / finite-reason projection）= 另账，非 G8 写面。
 4. 禁抬 proven；禁演示后三族。
