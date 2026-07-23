@@ -17,6 +17,7 @@ g5_status: G5_COMPLETE
 g6_status: G6_COMPLETE
 g7_status: G7_COMPLETE
 g8_status: G8_COMPLETE
+g9_status: G9_IN_PROGRESS
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -48,9 +49,9 @@ g8_status: G8_COMPLETE
 
 ## 下一步（Phase2 G9）
 
-1. **G8_COMPLETE（工程）**：CI DAG 去重 + failure-retainable head-bound receipt；**G9 作战包已建**（run-root `PHASE2-G9-GOVERNANCE-REDUCTION-BATTLE-PACKET.md`）；下一＝按包 **1 刀**做治理 reduction。勿抬 proven；勿把 G8/G9 写成解冻。
+1. **G9_IN_PROGRESS（刀1 前半）**：run-root 已建 `PHASE2-G9-ACTIVE-GATE-INVENTORY.md`（tip `51a24af3` Makefile `verify*` = **47**）+ `PHASE2-G9-REDUCTION-TABLE.md`（草稿 · `pending_adversarial_and_human_review`；before_recipe 47 → after survivor **43** + merged 2 + deferred_out 2；**未** archive）。下一＝异源审守恒表 → 人审后才可 archive / day-zero。仍 **`PHASE2_CODING_GATED`**；勿抬 proven；勿写 G9_COMPLETE / 首日全绿 /「≤12」。
 2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-3. residual 强制账（不因 G3–G8 推进而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；**tip `verify-c1-ownership` 红**（`E_GENERATED_RUNTIME_REASON_DRIFT` / finite-reason projection）= 另账，非 G8 写面。
+3. residual 强制账（不因 G3–G9 前半而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；**R1 tip `verify-c1-ownership` 红仍 OPEN**（禁删 ownership 门躲红）；R2 UI N3N4 / R3 G6 P1 仍 OPEN。
 4. 禁抬 proven；禁演示后三族。
 
 ## 隔离后产品真态（candidate 口径）
