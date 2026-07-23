@@ -140,6 +140,7 @@ public struct RouteSubject: Codable, Equatable, Sendable {
 // Live-verified via jsonl grep on 2026-07-22:
 //   adjust_ac_temperature_to_number -> airControl rows c1_airControl_000164...166
 //   close_ac -> airControl rows c1_airControl_000008...009
+//   open_ac -> airControl row c1_airControl_000006
 //   open_window_by_number -> carControl row c1_carControl_000021
 //   open_atmosphere_lamp -> carControl row c1_carControl_001972
 //   open_seat_heat -> carControl row c1_carControl_000201
@@ -156,6 +157,7 @@ public enum MountedToolServiceMap {
     public static let bindings: [String: RouteService] = [
         "adjust_ac_temperature_to_number": .airControl,
         "close_ac": .airControl,
+        "open_ac": .airControl,
         "open_atmosphere_lamp": .carControl,
         "open_seat_heat": .carControl,
         "open_window_by_number": .carControl

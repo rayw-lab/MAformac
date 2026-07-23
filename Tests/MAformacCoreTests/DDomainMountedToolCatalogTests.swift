@@ -14,6 +14,7 @@ final class DDomainMountedToolCatalogTests: XCTestCase {
             [
                 "adjust_ac_temperature_to_number",
                 "close_ac",
+                "open_ac",
                 "open_atmosphere_lamp",
                 "open_seat_heat",
                 "open_window_by_number",
@@ -28,7 +29,7 @@ final class DDomainMountedToolCatalogTests: XCTestCase {
         for unwanted in ["model", "tailgate", "sunroof"] {
             XCTAssertFalse(mounted.contains { $0.contains(unwanted) }, "unexpected tool containing '\(unwanted)'")
         }
-        let carControlTools = mounted.subtracting(["adjust_ac_temperature_to_number", "close_ac"])
+        let carControlTools = mounted.subtracting(["adjust_ac_temperature_to_number", "close_ac", "open_ac"])
         XCTAssertEqual(carControlTools, ["open_atmosphere_lamp", "open_seat_heat", "open_window_by_number"])
     }
 

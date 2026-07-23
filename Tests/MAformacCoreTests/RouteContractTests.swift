@@ -300,6 +300,7 @@ final class RouteContractTests: XCTestCase {
             [
                 "adjust_ac_temperature_to_number",
                 "close_ac",
+                "open_ac",
                 "open_atmosphere_lamp",
                 "open_seat_heat",
                 "open_window_by_number",
