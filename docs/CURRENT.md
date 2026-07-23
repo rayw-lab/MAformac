@@ -36,7 +36,7 @@ action_demo_proven: 1/120
 - **G6 工程 COMPLETE**（刀1–2）：`RuntimeTurnReceipt v2` + Assembler + B10；刀2 schema/digest/linked 硬化（run-root `PHASE2-G6-KNIFE2-SCHEMA-DIGEST-CLOSEOUT.md`）。仍 **`PHASE2_CODING_GATED`**；**未抬** proven；后三族禁演示。**非** Phase2 解冻。
 - **G7 工程 COMPLETE**（刀1–2）：刀1 行为门批次（row167/query/risk/replay/cancel/receipt）+ 刀2 anti-placebo 硬化（G7 六批锁表、逐批作用域锚点、meta 真红、`run_swift_test_exact --min-count 1` executed>0）。仍 **`PHASE2_CODING_GATED`**；G7 收口时 **未抬** proven；后三族禁。closeout：run-root `PHASE2-G7-KNIFE1-BEHAVIOR-GATES-CLOSEOUT.md` / `PHASE2-G7-KNIFE2-ANTI-PLACEBO-CLOSEOUT.md`。
 - **G8 工程 COMPLETE**（刀1=唯一刀）：`verify-ci` 摘掉嵌套 `verify-e2e`；workflow 保留显式 `make verify-e2e`；Verify receipt `if: always()` + non-empty + CI 拒空 `GITHUB_SHA`；UI E2E 仍独立 `ui-e2e.yml`。commit **`f7a2a0aa`**。closeout：run-root `PHASE2-G8-CI-DAG-CLOSEOUT.md`。仍 **`PHASE2_CODING_GATED`**；G8 收口时 **未抬** proven；后三族禁。**非**解冻 / **非** BF-6 required 已闭。
-- **S10 Wave5 F3–F5 COMPLETE**（局部解冻 · **matrix_id=4 only**）：磊哥 preapproval + BF-8 receipt 消费；`actionDemoProven` **0→1（1/120）**；m5/m6 未污染；F5 五门禁全绿 @ live **`f26054f5`**。closeout：run-root `PHASE2-S10-WAVE5-FLIP-CLOSEOUT-GEMINI36.md`。仍 **`PHASE2_CODING_GATED`**；后三族禁演示。
+- **S10 Wave5 F3–F5 COMPLETE**（局部解冻 · **matrix_id=4 only**）：磊哥 preapproval + BF-8 receipt 消费；`actionDemoProven` **0→1（1/120）**；m5/m6 未污染；F5 五门禁全绿；Grok **audit_pass**；push **`0f90f61f`**。closeout：run-root `PHASE2-S10-WAVE5-FLIP-CLOSEOUT-GEMINI36.md`。仍 **`PHASE2_CODING_GATED`**；后三族禁演示。
 - 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
 - Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
 - FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
