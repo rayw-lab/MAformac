@@ -8,7 +8,7 @@
   "native_receipt_schema_id": "corpus_lineage_v1",
   "package_id": "B7",
   "package_revision": 1,
-  "registry_digest": "d53b7bdf39e82508dfd5ab1d52037d9177fc265ac82d5715b7c1111299160611",
+  "registry_digest": "be3bdc7279d037d44848cf835de0bc6e60b20c56b7c626e2bcd6a1b7ec2e7b39",
   "registry_schema_major": "closure_work_packages_v1",
   "schema_version": "closure_package_exit_envelope_v1",
   "status": "CANDIDATE_LOCAL_ONLY",
