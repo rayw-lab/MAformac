@@ -8,7 +8,11 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from verify_anti_placebo import check_verify_e2e, check_wp21_product_gate  # noqa: E402
+from verify_anti_placebo import (  # noqa: E402
+    check_verify_ci_does_not_nest_verify_e2e,
+    check_verify_e2e,
+    check_wp21_product_gate,
+)
 
 
 VALID_WP21_SOURCE = """
@@ -209,6 +213,37 @@ class VerifyAntiPlaceboBehaviorTests(unittest.TestCase):
                 "steps:\n  - run: make verify-ci\n", encoding="utf-8"
             )
             self.assertEqual(check_verify_e2e(root), [".github/workflows/verify.yml"])
+
+    def test_verify_ci_must_not_nest_verify_e2e(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Makefile").write_text(
+                "verify-ci: swift-test verify-anti-placebo verify-e2e\n",
+                encoding="utf-8",
+            )
+            failures = check_verify_ci_does_not_nest_verify_e2e(root)
+            self.assertTrue(failures)
+            self.assertIn("must not depend on verify-e2e", failures[0])
+
+    def test_verify_ci_without_nested_e2e_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Makefile").write_text(
+                "verify-ci: swift-test verify-anti-placebo\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(check_verify_ci_does_not_nest_verify_e2e(root), [])
+
+    def test_verify_ci_must_not_nest_verify_ui_e2e(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "Makefile").write_text(
+                "verify-ci: swift-test verify-ui-e2e\n",
+                encoding="utf-8",
+            )
+            failures = check_verify_ci_does_not_nest_verify_e2e(root)
+            self.assertTrue(failures)
+            self.assertIn("must not depend on verify-ui-e2e", failures[0])
 
     def test_wp21_valid_data_flow_gate_passes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

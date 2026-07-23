@@ -193,7 +193,10 @@ verify-all: verify swift-test verify-e2e
 
 # GitHub runner 没有本机 raw/source-snapshots,不能诚实执行 verify-source/regen(gen_c1 读 source snapshot)。
 # verify-ci 只跑 source-free 的 committed-contract 引用/表面/default-scope/diff/python/swift 门;完整 head-bound 证明仍由本地 receipt 跑 verify-all。
-verify-ci: verify-c1-checker-files verify-governance-hygiene .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring verify-anti-placebo verify-e2e
+# G8: verify-ci MUST NOT depend on verify-e2e — CI DAG 去重。reviewed product E2E 由
+# .github/workflows/verify.yml 显式 `make verify-e2e` step 单独跑（anti-placebo 硬约束）。
+# 勿把 verify-ui-e2e 塞进本链（UI E2E 仅 ui-e2e.yml / macos-26 独立 runner）。
+verify-ci: verify-c1-checker-files verify-governance-hygiene .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring verify-anti-placebo
 
 # Source-free C1 checkers are hard CI dependencies. Missing files must stop verify-ci
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.

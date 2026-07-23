@@ -18,6 +18,7 @@ jobs:
   verify:
     # Defaults to GitHub-hosted macOS. D24 may temporarily set
     # MAFORMAC_VERIFY_RUNNER='["self-hosted","macOS","ARM64","maformac-d24"]'.
+    # Must stay independent of ui-e2e.yml (no job-level needs either direction).
     runs-on: ${{ fromJSON(vars.MAFORMAC_VERIFY_RUNNER || '["macos-latest"]') }}
     timeout-minutes: 30
     steps:
@@ -31,6 +32,8 @@ jobs:
           swift --version
           python3 --version
 
+      # Anti-placebo hard constraint: exact `make verify-e2e` step required.
+      # G8: verify-ci no longer nests verify-e2e — this is the sole CI e2e run.
       - name: Run reviewed product E2E gate
         run: make verify-e2e
 
@@ -44,7 +47,9 @@ jobs:
           # docs/evidence-frozen/** 豁免：历史证据逐字节冻结（MANIFEST.sha256 锁 hash），清洗空白破对账（D-112 MT3）
           git diff --check "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" -- . ':(exclude)docs/evidence-frozen'
 
+      # G8: failure-retainable head-bound receipt (always attempt; refuse empty file).
       - name: Write head-bound CI receipt
+        if: always()
         env:
           VERIFY_CI_CHANGE_IDS: ${{ inputs.change_ids || '' }}
           GITHUB_PR_NUMBER: ${{ github.event.pull_request.number || '' }}
@@ -52,10 +57,14 @@ jobs:
           python3 Tools/checks/write_verify_ci_receipt.py \
             --output "$RUNNER_TEMP/verify-ci-receipt.json" \
             --change-ids "$VERIFY_CI_CHANGE_IDS"
+          test -s "$RUNNER_TEMP/verify-ci-receipt.json"
           shasum -a 256 "$RUNNER_TEMP/verify-ci-receipt.json"
 
       - name: Upload CI receipt
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: verify-ci-receipt
           path: ${{ runner.temp }}/verify-ci-receipt.json
+          if-no-files-found: error
+          retention-days: 14

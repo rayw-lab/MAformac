@@ -8,6 +8,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,6 +31,19 @@ def optional_pr_number(raw: str) -> int | None:
     return int(raw) if raw.isdigit() else None
 
 
+def resolve_head_commit() -> str:
+    """Return head SHA; refuse empty SHA under GitHub Actions (head-unbound ban)."""
+    sha = os.environ.get("GITHUB_SHA", "").strip()
+    in_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+    if in_actions and not sha:
+        print(
+            "ERROR: GITHUB_SHA empty in GitHub Actions; refuse head-unbound verify-ci receipt",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+    return sha
+
+
 def build_receipt(change_ids: str) -> dict[str, object]:
     run_id = os.environ.get("GITHUB_RUN_ID", "local")
     run_attempt = os.environ.get("GITHUB_RUN_ATTEMPT", "1")
@@ -40,12 +54,14 @@ def build_receipt(change_ids: str) -> dict[str, object]:
         "change_ids": parse_change_ids(change_ids),
         "proof_class": "ci_source_free",
         "event_name": os.environ.get("GITHUB_EVENT_NAME", "local"),
-        "head_commit": os.environ.get("GITHUB_SHA", ""),
+        "head_commit": resolve_head_commit(),
         "base_ref": os.environ.get("GITHUB_BASE_REF", ""),
         "head_ref": os.environ.get("GITHUB_HEAD_REF", ""),
         "pull_request_number": optional_pr_number(os.environ.get("GITHUB_PR_NUMBER", "")),
         "dirty_worktree": dirty_worktree(),
+        # G8 DAG: e2e is an independent workflow step (not nested under verify-ci).
         "commands": [
+            "make verify-e2e (independent reviewed product gate step)",
             "make verify-ci",
             "git diff --check (pull_request only)",
         ],
@@ -53,6 +69,8 @@ def build_receipt(change_ids: str) -> dict[str, object]:
             "source-free committed-contract proof only",
             "raw-dependent local verification is not covered",
             "not runtime, operator, mobile, true-device, live-api, C5 or C6 acceptance",
+            "verify-ci does not nest verify-e2e (G8 CI DAG dedupe)",
+            "UI E2E remains a separate workflow/runner (not covered here)",
         ],
     }
 

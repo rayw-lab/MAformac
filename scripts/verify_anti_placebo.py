@@ -107,6 +107,38 @@ def check_verify_e2e(root: Path) -> list[str]:
     return []
 
 
+def check_verify_ci_does_not_nest_verify_e2e(root: Path) -> list[str]:
+    """G8: verify-ci must not nest verify-e2e (CI DAG dedupe / no double-run).
+
+    Reviewed product E2E stays an independent workflow step
+    (``run: make verify-e2e``); nesting it under verify-ci recreates the
+    dual-run failure mode this gate exists to prevent.
+    """
+    makefile = root / "Makefile"
+    if not makefile.exists():
+        return ["Makefile missing"]
+    verify_ci_line = None
+    for line in makefile.read_text(encoding="utf-8").splitlines():
+        if line.startswith("verify-ci:"):
+            verify_ci_line = line
+            break
+    if verify_ci_line is None:
+        return ["verify-ci target missing from Makefile"]
+    prerequisites = verify_ci_line.split(":", 1)[1].split()
+    failures: list[str] = []
+    if "verify-e2e" in prerequisites:
+        failures.append(
+            "verify-ci must not depend on verify-e2e "
+            "(G8 CI DAG dedupe; keep workflow explicit make verify-e2e step)"
+        )
+    if "verify-ui-e2e" in prerequisites:
+        failures.append(
+            "verify-ci must not depend on verify-ui-e2e "
+            "(UI E2E stays independent ui-e2e.yml / macos-26 runner)"
+        )
+    return failures
+
+
 # ---- WP2-1 / G7 Anti-Placebo Product Gate Checker ----
 
 # File-wide structural anchors (Harness / UI projection). Customer-path
@@ -545,6 +577,10 @@ def main() -> int:
     verify_failures = check_verify_e2e(root)
     if verify_failures:
         all_failures.extend([f"FAIL: verify-e2e: {f}" for f in verify_failures])
+
+    nest_failures = check_verify_ci_does_not_nest_verify_e2e(root)
+    if nest_failures:
+        all_failures.extend([f"FAIL: verify-ci nest: {f}" for f in nest_failures])
 
     wp21_failures = check_wp21_product_gate(root)
     if wp21_failures:
