@@ -35,7 +35,7 @@ W8-K0 已把 broad B3.K0/OpenSpec 权威**收窄**为 exact K1 schema-only。本
 
 ### Modified Capabilities
 
-- `session-lifecycle`：增加 **K1 schema-core delivery contract**——Core single owner；session/generation identity；可执行 `ready→active` 与 `active→terminal`；first cause immutable；fail-closed；parent session vs child turn 分离；F11 fact-schema only / UI deferred K3+；fixtures 子集 F01,F02,F03,F09,F10,F11。  
+- `session-lifecycle`：增加 **K1 schema-core delivery contract**——Core single owner；session/generation identity；可执行 `ready→active` 与 `active→terminal`；first cause immutable；fail-closed；parent session vs child turn 分离；F11 fact-schema only / UI deferred K3+；fixtures 子集 F01,F02,F03,F09,F10,F11。
   **SHALL NOT** 删除或弱化 base 中 child disposition、recoveryReady join、010a profile、010b recipe、planned gates、owner-boundary 等 K2–K6 全量 requirement；那些要求保持 documentary / deferred，本 change 只声明 **K1 不实现**。
 
 ## Impact
@@ -84,11 +84,11 @@ W8-K0 已把 broad B3.K0/OpenSpec 权威**收窄**为 exact K1 schema-only。本
 
 ## OpenSpec agree-before-build
 
-1. 本 change 四件套（proposal/design/spec/tasks）独立审通过。  
-2. strict validate 绿。  
-3. tasks / applyRequires ready（schema-only）。  
-4. fresh repo rehash 确认 basis。  
-5. 计划 diff 无既有 HIGH/CRITICAL 编辑。  
+1. 本 change 四件套（proposal/design/spec/tasks）独立审通过。
+2. strict validate 绿。
+3. tasks / applyRequires ready（schema-only）。
+4. fresh repo rehash 确认 basis。
+5. 计划 diff 无既有 HIGH/CRITICAL 编辑。
 
 以上全部关闭前：**coding forbidden**。
 

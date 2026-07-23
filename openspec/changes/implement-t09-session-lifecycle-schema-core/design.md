@@ -213,29 +213,29 @@ W8-K0 HUMAN_AGREE packet（B2）已把 broad B3.K0/OpenSpec 权威**收窄**为 
 
 ## Migration Plan
 
-1. **本 change 文档波（当前）**  
-   - 写入 proposal（已有）→ design（本文件）→ delta spec → tasks（另 writer 或后续）。  
-   - `status = REVISION_1_PENDING_FOCUSED_RECHECK`；**不** self-CLEAR。  
+1. **本 change 文档波（当前）**
+   - 写入 proposal（已有）→ design（本文件）→ delta spec → tasks（另 writer 或后续）。
+   - `status = REVISION_1_PENDING_FOCUSED_RECHECK`；**不** self-CLEAR。
    - `openspec validate implement-t09-session-lifecycle-schema-core --strict`（及项目要求的 all-strict）在四件套齐后执行。
 
-2. **agree-before-build 门（编码前全绿）**  
-   - 独立审 CLEAR（producer ≠ auditor）。  
-   - strict validate rc0。  
-   - tasks / applyRequires 对 schema-only apply 为 ready。  
-   - fresh repo rehash 确认 basis。  
+2. **agree-before-build 门（编码前全绿）**
+   - 独立审 CLEAR（producer ≠ auditor）。
+   - strict validate rc0。
+   - tasks / applyRequires 对 schema-only apply 为 ready。
+   - fresh repo rehash 确认 basis。
    - 计划 diff 无既有 HIGH/CRITICAL 编辑。
 
-3. **未来 apply（另键；本 design 不执行）**  
-   - RED：仅五 CREATE 中的两测试文件，先挂 F01–F03/F09–F11 失败断言。  
-   - GREEN：三 Core 文件实现 D1–D7 同步状态机。  
+3. **未来 apply（另键；本 design 不执行）**
+   - RED：仅五 CREATE 中的两测试文件，先挂 F01–F03/F09–F11 失败断言。
+   - GREEN：三 Core 文件实现 D1–D7 同步状态机。
    - 验证：目标测绿 + `git diff` 恰五新文件零 MODIFY + claim 仍 `PARTIAL_SCHEMA_ONLY`。
 
-4. **Rollback**  
-   - 文档波：删/停本 change 树即可，无代码回滚。  
+4. **Rollback**
+   - 文档波：删/停本 change 树即可，无代码回滚。
    - 若错误 apply：删除五新文件即可；因零 MODIFY，无生产符号修复面。
 
-5. **后续键**  
-   - K2+：child/recovery/profile/gates — **新 change / 新 agree**，不 silently 扩本 change。  
+5. **后续键**
+   - K2+：child/recovery/profile/gates — **新 change / 新 agree**，不 silently 扩本 change。
    - K3：生产接线 + 可选 actor 包装 — 需 GitNexus impact + 可能 HIGH/CRITICAL risk-ack。
 
 ---
@@ -244,10 +244,10 @@ W8-K0 HUMAN_AGREE packet（B2）已把 broad B3.K0/OpenSpec 权威**收窄**为 
 
 （不阻塞本 design 冻结；编码前若影响 API 形状再上抛）
 
-1. **Authority identity 具体值形态**：opaque token vs 与 session 绑定的 value — 实现可在测试可区分前提下选取，但须 enforce「错 identity → 零突变」。  
-2. **Terminal cause 封闭枚举的最终 case 表**：须覆盖 F11 分类与 cancel 映射；精确拼写可在 apply 时用 table-driven 测钉死，但不得出现 success 升格路径。  
-3. **Batch API 形状** — **CLOSED（REVISION_1）**：唯一 shape = **`apply(batch:)`**；canonicalize → scratch 整批模拟 → 一次性 commit；**禁止** submit+commit dual API；**禁止** batch 中间 snapshot。见 D4。  
-4. **K3 包装时机**：何时引入 `@MainActor`/actor 与 runner 提交面 — **明确不在 K1**；保持 OPEN 直至独立 impact + risk-ack。  
+1. **Authority identity 具体值形态**：opaque token vs 与 session 绑定的 value — 实现可在测试可区分前提下选取，但须 enforce「错 identity → 零突变」。
+2. **Terminal cause 封闭枚举的最终 case 表**：须覆盖 F11 分类与 cancel 映射；精确拼写可在 apply 时用 table-driven 测钉死，但不得出现 success 升格路径。
+3. **Batch API 形状** — **CLOSED（REVISION_1）**：唯一 shape = **`apply(batch:)`**；canonicalize → scratch 整批模拟 → 一次性 commit；**禁止** submit+commit dual API；**禁止** batch 中间 snapshot。见 D4。
+4. **K3 包装时机**：何时引入 `@MainActor`/actor 与 runner 提交面 — **明确不在 K1**；保持 OPEN 直至独立 impact + risk-ack。
 5. **是否需要只读 published generation 计数器在 K1**：非必需；若加，仅用于 F01/F10 断言，不暗示 monotonic new-session 已实现（那是 recovery 后 K2+）。
 
 ---

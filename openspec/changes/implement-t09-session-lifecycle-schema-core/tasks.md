@@ -15,8 +15,8 @@ independent_reviewer: non-producer Claude; verifies only, does not write product
 revision: REVISION_1
 ```
 
-> 格式：numbered `##` 段；每任务 `- [ ] X.Y …`；全部初始 unchecked。  
-> 每条目标 = 单 session 可完成；写清 **产出 + 验收**；需要时标注 Superpowers：`[TDD]` / `[verification]` / `[debugging-if-red]`。  
+> 格式：numbered `##` 段；每任务 `- [ ] X.Y …`；全部初始 unchecked。
+> 每条目标 = 单 session 可完成；写清 **产出 + 验收**；需要时标注 Superpowers：`[TDD]` / `[verification]` / `[debugging-if-red]`。
 > 本 artifact **不** self-CLEAR；独立审通过前 coding 仍受 agree-before-build 约束。
 
 ## 1. Preflight / authority

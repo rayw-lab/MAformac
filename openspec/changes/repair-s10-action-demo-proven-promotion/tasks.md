@@ -1,6 +1,6 @@
 # Tasks — repair-s10-action-demo-proven-promotion
 
-> Run-root authority: `PHASE2-S10-PROOF-CONTRACT-REPAIR-磊哥-APPROVAL-RECEIPT.md`  
+> Run-root authority: `PHASE2-S10-PROOF-CONTRACT-REPAIR-磊哥-APPROVAL-RECEIPT.md`
 > Knife 1 retry **blocked** until I1+I2+I3 gates below are all green.
 
 ## I1 — BF-8 promotion basis (P-A)
@@ -67,4 +67,3 @@
 - Tasks checked ≠ knife 1 green
 - No `actionDemoProven>0` until BF-8 after knives complete
 - No FastPath edits unless separate approved change
-

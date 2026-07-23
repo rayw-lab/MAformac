@@ -744,10 +744,10 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
         let revAfterFirst = h.store.currentRevision
         let cellsAfterFirst = h.store.cells
         let runnerCountAfterFirst = h.route.runnerCallCount
-        
+
         let result2 = try await h.route.route(text: "打开空调")
         let exec2 = try XCTUnwrap(result2.execution)
-        
+
         // Second call: alreadyStateNoop - no runner increment or mutation
         XCTAssertEqual(h.route.runnerCallCount, runnerCountAfterFirst, "runnerCallCount should not increment on already-on")
         XCTAssertEqual(h.store.currentRevision, revAfterFirst, "store revision should not change on already-on")

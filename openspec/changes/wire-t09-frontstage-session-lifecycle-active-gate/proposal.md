@@ -41,14 +41,14 @@ K1（`implement-t09-session-lifecycle-schema-core`）已交付 **schema-core** c
 
 ### Modified Capabilities
 
-- `session-lifecycle`：增加 **K3 frontstage parent-session active gate（production-shaped local subslice）**——composition gate、ensureActive 语义、consumer-before-route、activation boundary before catalog admission、exact scope / nonclaims / proof class。  
+- `session-lifecycle`：增加 **K3 frontstage parent-session active gate（production-shaped local subslice）**——composition gate、ensureActive 语义、consumer-before-route、activation boundary before catalog admission、exact scope / nonclaims / proof class。
   **SHALL NOT** 删除或弱化 base / K1 / documentary 中 K2–K6 全量 requirement；那些保持 deferred。
 
 ## Impact
 
 ### OpenSpec（本波次唯一允许）
 
-- `openspec/changes/wire-t09-frontstage-session-lifecycle-active-gate/**`  
+- `openspec/changes/wire-t09-frontstage-session-lifecycle-active-gate/**`
   （proposal / design / specs/session-lifecycle/spec.md / tasks.md）
 
 ### 未来 code（**仅在** independent review CLEAR + `openspec validate --strict` 绿 + tasks 门闭合后）

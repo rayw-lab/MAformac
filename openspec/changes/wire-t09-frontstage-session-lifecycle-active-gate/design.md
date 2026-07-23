@@ -27,9 +27,9 @@ p2_routed: activation boundary before DemoSliceAdmissionCatalog; catalog rejecti
 
 ### Controller P2（必须进本 design / delta spec）
 
-**Activation boundary：**  
-`FrontstageCustomerIngress` accepted + current turn 之后 → 进入 `routeDemoSlice` 时 **先** ensure parent **active** → **然后** 才可到 `DemoSliceAdmissionCatalog` / route。  
-catalog rejection **不** 回滚 parent active。  
+**Activation boundary：**
+`FrontstageCustomerIngress` accepted + current turn 之后 → 进入 `routeDemoSlice` 时 **先** ensure parent **active** → **然后** 才可到 `DemoSliceAdmissionCatalog` / route。
+catalog rejection **不** 回滚 parent active。
 **不是** turn-as-session。
 
 ---
@@ -59,9 +59,9 @@ catalog rejection **不** 回滚 parent active。
 
 **选择：** `public @MainActor final class SessionLifecycleCompositionGate`，位于 `Core/Lifecycle/`。
 
-- `private` owner authority + `private` coordinator  
-- bound `SessionID` + generation **0** at construction  
-- App 只持有 gate 引用；**永不**暴露 token  
+- `private` owner authority + `private` coordinator
+- bound `SessionID` + generation **0** at construction
+- App 只持有 gate 引用；**永不**暴露 token
 
 **可选：** public **read-only** snapshot accessor（测试 / consumer 只读），不得突变。
 
@@ -86,7 +86,7 @@ catalog rejection **不** 回滚 parent active。
 private var sessionLifecycleGate: SessionLifecycleCompositionGate?  // lazy; default nil
 ```
 
-- **不改** `init(session:)` 主体赋值语义（init 仍只设 session + customerIngress）  
+- **不改** `init(session:)` 主体赋值语义（init 仍只设 session + customerIngress）
 - `routeDemoSlice`：
   1. 保留 `precondition(isCurrentTurn(turn))`
   2. 若 gate == nil → 以 `session.sessionID` + generation 0 懒建
@@ -104,7 +104,7 @@ ingress accepted → markCurrent / current turn
         → DemoSliceAdmissionCatalog / DemoSliceRoute.route
 ```
 
-- catalog **rejection** → parent 可保持 **active**；**不** 回滚  
+- catalog **rejection** → parent 可保持 **active**；**不** 回滚
 - turn 结束 / payload terminal **≠** parent terminal（K3 不推进 parent terminal）
 
 ### D5. Production seam 与证明面
@@ -118,20 +118,20 @@ ingress accepted → markCurrent / current turn
 
 ### D6. Risk / W5c
 
-- class CRITICAL 225/223 **已** human risk-ack（binding）  
-- method LOW 3/1/process1 **不可**替代 class ack  
-- W5c override **仅** property + routeDemoSlice guard  
+- class CRITICAL 225/223 **已** human risk-ack（binding）
+- method LOW 3/1/process1 **不可**替代 class ack
+- W5c override **仅** property + routeDemoSlice guard
 - 编码前仍须 **fresh** GitNexus impact on live basis + 编码后 `detect_changes`
 
 ### D7. 测试策略
 
 唯一新测文件：`SessionLifecycleCompositionGateTests.swift`
 
-- unit：first active / idempotent / cross-session zero mutation / non-active fail-closed  
-- **source-contract**：读 `App/FrontstageRuntimeComposition.swift` 源，证明  
-  - 持有 gate property  
-  - `ensureActive` / active guard **出现在** `DemoSliceRoute(` 创建/调用之前  
-  - 无 runner/pipeline/ContentView 接线字符串  
+- unit：first active / idempotent / cross-session zero mutation / non-active fail-closed
+- **source-contract**：读 `App/FrontstageRuntimeComposition.swift` 源，证明
+  - 持有 gate property
+  - `ensureActive` / active guard **出现在** `DemoSliceRoute(` 创建/调用之前
+  - 无 runner/pipeline/ContentView 接线字符串
 
 ---
 

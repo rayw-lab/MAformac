@@ -818,4 +818,3 @@ public struct DemoRuntimeContractBundle: Sendable {
         DemoRuntimeContractBundleCatalog.generatedDefault
     }
 }
-

@@ -14,17 +14,17 @@ coding_writer: Grok released
 independent_reviewer: Codex controller released
 ```
 
-> 格式：numbered `##`；本 closeout 将 0.1–11.1 真实完成项勾 `[x]`。  
-> **严格 RED→GREEN** 已落地；independent review CLEAR 由 Codex controller 裁决。  
+> 格式：numbered `##`；本 closeout 将 0.1–11.1 真实完成项勾 `[x]`。
+> **严格 RED→GREEN** 已落地；independent review CLEAR 由 Codex controller 裁决。
 > proposal / design / spec **未改**。
 
 ## 0. Authority / binding / review / rehash
 
 - [x] 0.1 Cite-verify HUMAN_AGREE binding sidecar 与 packet / CLAIM / HEAD。
-  - Output: 对照  
-    - binding: `.../W8-K3-HUMAN-AGREE-RISK-ACK-BINDING.md` sha `5b4fda7888435f85d1dd4960a2cabf564e368122f6c58e232793c7ad5c534782`  
-    - packet SHA `38d974643318d0bc2dad103016de536bc1b60c49eacf9339a82d8871d06ad9ea`  
-    - CLAIM markers SHA `ab862712430f9da4f1e87cebef325b8696bae5c766d68e4e2d311da11a97076e`  
+  - Output: 对照
+    - binding: `.../W8-K3-HUMAN-AGREE-RISK-ACK-BINDING.md` sha `5b4fda7888435f85d1dd4960a2cabf564e368122f6c58e232793c7ad5c534782`
+    - packet SHA `38d974643318d0bc2dad103016de536bc1b60c49eacf9339a82d8871d06ad9ea`
+    - CLAIM markers SHA `ab862712430f9da4f1e87cebef325b8696bae5c766d68e4e2d311da11a97076e`
     - `git rev-parse HEAD` == `f5c963fcb5d48a5d7c0ace67a423ac1a39517313`
   - Acceptance: 全一致；分歧 → **HOLD** re-agree。
   - Superpowers: `[verification]`

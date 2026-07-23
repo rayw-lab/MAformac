@@ -72,7 +72,7 @@ Wave5 已将 `actionDemoProven` 翻到 1/120（仅 matrix_id=4）。当前系统
 
 ### D3: open_ac 三门顺序（catalog → manifest → readback probe）
 
-**Decision:** 
+**Decision:**
 1. **Catalog 门**：`DDomainMountedToolCatalog.swift` 加入 `"open_ac"`
 2. **Manifest 门**：`demo-capability-matrix.json` matrix_id=1 改 `mounted_status: "mounted"`、`mounted_or_approved_action.observed: true`、basis 注明物质化来源
 3. **Readback probe 门**：e2e 测试「打开空调」→ accepted tool + state delta + readback 硬断言
@@ -103,7 +103,7 @@ Wave5 已将 `actionDemoProven` 翻到 1/120（仅 matrix_id=4）。当前系统
 
 ### D5: BF-8 分账（execution 独立 receipt，rejection 独立 receipt）
 
-**Decision:** 
+**Decision:**
 - m1 execution BF-8：独立 receipt `matrix_ids=[1]`，`subject=open_ac execution`，翻 `actionDemoProven`
 - m5+m6 rejection BF-8（后置）：独立 receipt `matrix_ids=[5,6]`，`subject=rejection fail-closed`，翻 `rejectionDemoProven`
 - **禁止**：复用 matrix_id=4 receipt 翻 m1/m5/m6
