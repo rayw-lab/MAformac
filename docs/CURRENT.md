@@ -17,7 +17,7 @@ g5_status: G5_COMPLETE
 g6_status: G6_COMPLETE
 g7_status: G7_COMPLETE
 g8_status: G8_COMPLETE
-g9_status: G9_IN_PROGRESS
+g9_status: G9_KNIFE2_BASELINE_LANDED
 ---
 <!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
@@ -49,10 +49,10 @@ g9_status: G9_IN_PROGRESS
 
 ## 下一步（Phase2 G9）
 
-1. **G9_IN_PROGRESS（刀1 前半）**：run-root 已建 `PHASE2-G9-ACTIVE-GATE-INVENTORY.md`（tip `51a24af3` Makefile `verify*` = **47**）+ `PHASE2-G9-REDUCTION-TABLE.md`（草稿 · `pending_adversarial_and_human_review`；before_recipe 47 → after survivor **43** + merged 2 + deferred_out 2；**未** archive）。下一＝异源审守恒表 → 人审后才可 archive / day-zero。仍 **`PHASE2_CODING_GATED`**；勿抬 proven；勿写 G9_COMPLETE / 首日全绿 /「≤12」。
-2. 严格遵守 shared-file 串行 owner；candidate 家族零演示、零合并、零翻 `actionDemoProven`。
-3. residual 强制账（不因 G3–G9 前半而消失）：BF-3 candidate 冻结；BF-6 UI-E2E cancelled+未 required；BF-7 C5/full suite；BF-8 人类亲验；BF-10 protected dirty；`actionDemoProven=0/120`；**R1 tip `verify-c1-ownership` 红仍 OPEN**（禁删 ownership 门躲红）；R2 UI N3N4 / R3 G6 P1 仍 OPEN。
-4. 禁抬 proven；禁演示后三族。
+1. **G9 knife2 baseline 已落盘**（磊哥 `APPROVE_WITH_EDITS`）：`47 = 45 survivor + 2 deferred`（**0 merged**；G13/G14 保留独立 recipe）。run-root：`PHASE2-G9-REDUCTION-TABLE.md`（定稿）、`PHASE2-G9-DAY-ZERO-BASELINE.md`（四 lane 分报）；仓内 `docs/governance/G9-DEFERRED-GATES.md`（G25/G37 owner·trigger·non-claim）。**未** gate archive / **未** OpenSpec archive / **未**删移 target。仍 **`PHASE2_CODING_GATED`**。
+2. **R1**：`LOCAL_PASS_UNCOMMITTED` @ **`38b8ce1f`**（四文件 scoped commit）；待 **`make verify-ci` PASS** 后记 `CLOSED_AT_SHA`。禁删 G18 躲红。
+3. **Day-zero 分报**（禁 `make verify` 冒充全绿）：Lane A `verify-ci` · Lane B `verify-e2e` · Lane C `verify-ui-e2e` · Lane D deferred（G25/G37）。
+4. residual：BF-3/6/7/8/10；**R2** UI N3N4 OPEN；**R3** G6 P1 OPEN；`actionDemoProven=0/120`；禁演示后三族。
 
 ## 隔离后产品真态（candidate 口径）
 
@@ -98,4 +98,5 @@ g9_status: G9_IN_PROGRESS
 - G5_COMPLETE = taxonomy + reason registry + payload 去 `proofClass` + ContentView 只渲染 **工程**收口；≠ proven 翻格 / 后三族可演 / release-ready / G6 receipt 闭环。
 - G6_COMPLETE = RuntimeTurnReceipt v2 + Assembler/B10 + schema/digest/linked **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready。
 - G7_COMPLETE = 行为门批次 + anti-placebo 硬化 **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready。
-- G8_COMPLETE = CI DAG 去重 + failure-retainable head-bound Verify receipt + UI E2E 分离保持 **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / BF-6 required 已闭 / tip `make verify-ci` 全绿（ownership drift 另账）/ UI E2E 产品绿。
+- G8_COMPLETE = CI DAG 去重 + failure-retainable head-bound Verify receipt + UI E2E 分离保持 **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / BF-6 required 已闭 / 四 lane day-zero 全绿 / UI E2E 产品绿。
+- G9 knife2 baseline = 人审定稿 reduction（45+2）+ day-zero 四 lane 分报 + deferred 登记；≠ G9_COMPLETE / ≠ gate archive / ≠ OpenSpec archive / ≠ ≤12 / ≠ 三个月不回潮。
