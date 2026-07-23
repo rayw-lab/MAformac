@@ -48,7 +48,7 @@ Coverage: CG-002, CG-004, CG-005, CG-007, CG-008, CG-009, CG-014, CG-015, CG-019
 
 ### Requirement: Governance enums and projections SHALL be closed
 
-The system SHALL reject unknown or free-string values for `primary_class`, fallback classification, internal `finiteReason`, `fallback_reason`, and customer-safe `reasonKind`. The governance fallback classification SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, or `unknown_no_representative_entry`. Internal `finiteReason` SHALL be exactly one of `safety_or_policy_refusal`, `clarify_missing_slot`, `unmounted_tool_name`, `name_rejected`, `fast_path_no_match`, `unsupported_tool_plan`, `no_representative_tool`, `runtime_execution_error`, `stale_state_revision`, or `already_state_noop`; `partial_accept_partial_refuse` is a bridge result wrapper and SHALL NOT be admitted as `finiteReason`.
+The system SHALL reject unknown or free-string values for `primary_class`, fallback classification, internal `finiteReason`, `fallback_reason`, and customer-safe `reasonKind`. The governance fallback classification SHALL be one of `safety_or_clarify_reject`, `unmounted_name_rejected`, `fast_path_no_match_fallback`, or `unknown_no_representative_entry`. Internal `finiteReason` SHALL be exactly one of `safety_or_policy_refusal`, `clarify_missing_slot`, `unmounted_tool_name`, `name_rejected`, `fast_path_no_match`, `unsupported_tool_plan`, `no_representative_tool`, `runtime_execution_error`, `stale_state_revision`, `already_state_noop`, `lexical_invalid`, `numeric_overflow`, `arithmetic_overflow`, `unsupported_precision`, `out_of_range`, `malformed_current`, `unsupported_unit_reference`, `contract_violation`, `state_query`, `capability_query`, or `cancel_too_late`; `partial_accept_partial_refuse` is a bridge result wrapper and SHALL NOT be admitted as `finiteReason`.
 
 Coverage: CG-005, CG-022, CG-023, CG-024, CG-025, CG-038, CG-039, CG-068, CG-074.
 
@@ -61,7 +61,17 @@ The mapping SHALL preserve these meanings:
 - no representative action: internal `no_representative_tool` → `no_representative_tool__default_fallback` → safe `not_available_in_demo`;
 - typed runtime execution error: internal `runtime_execution_error` → `runtime_error_typed` → safe `runtime_unavailable`;
 - stale-state gate refusal: internal `stale_state_revision` → `runtime_error_typed` → safe `runtime_unavailable`;
-- already-satisfied state: internal `already_state_noop` → `already_state_noop` → safe `already_done`.
+- already-satisfied state: internal `already_state_noop` → `already_state_noop` → safe `already_done`;
+- lexical or parse contract violation: internal `lexical_invalid` → `lexical_invalid` → safe `lexical_invalid` → bridge `refusal_contract_violation`;
+- numeric overflow: internal `numeric_overflow` or `arithmetic_overflow` → `numeric_overflow` or `arithmetic_overflow` → safe `numeric_overflow` → bridge `refusal_contract_violation`;
+- unsupported precision: internal `unsupported_precision` → `unsupported_precision` → safe `unsupported_precision` → bridge `refusal_contract_violation`;
+- out-of-range value: internal `out_of_range` → `out_of_range` → safe `out_of_range` → bridge `refusal_contract_violation`;
+- malformed current state: internal `malformed_current` → `malformed_current` → safe `malformed_current` → bridge `refusal_contract_violation`;
+- unsupported unit reference: internal `unsupported_unit_reference` → `unsupported_unit_reference` → safe `unsupported_unit_reference` → bridge `refusal_contract_violation`;
+- contract violation: internal `contract_violation` → `contract_violation` → safe `contract_violation` → bridge `refusal_contract_violation`;
+- state query: internal `state_query` → `state_query` → safe `state_query` → bridge `state_query`;
+- capability query: internal `capability_query` → `capability_query` → safe `capability_query` → bridge `capability_query`;
+- cancel too late: internal `cancel_too_late` → `cancel_too_late` → safe `cancel_too_late` → bridge `cancelled`.
 
 The governance mapping SHALL NOT define public payload field names or schema versions. Public results and encoded projection remain bridge-owned.
 

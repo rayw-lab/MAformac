@@ -27,7 +27,7 @@ The system SHALL use a mainline-visible Runtime -> Presentation bridge carrier a
 
 ### Requirement: Runtime result vocabulary
 
-The system SHALL classify runtime results before presentation renders them, preserving accepted action, clarify/missing-slot, unsupported/no-tool refusal, safety/policy refusal, already-state no-op, partial accept plus partial refuse, runtime error, and cancelled/interrupted outcomes as machine-readable classes.
+The system SHALL classify runtime results before presentation renders them, preserving accepted action, clarify/missing-slot, unsupported/no-tool refusal, safety/policy refusal, already-state no-op, contract-violation refusal (`refusal_contract_violation`), state query (`state_query`), capability query (`capability_query`), partial accept plus partial refuse, runtime error, and cancelled/interrupted outcomes (`cancelled`) as machine-readable classes.
 
 #### Scenario: Already-state result is not unsupported
 

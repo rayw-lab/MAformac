@@ -212,7 +212,7 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
         self.assert_failure("semantic_gaps")
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
-    def test_registry_projection_rejects_eleventh_finite_reason_in_locked_fix_scope(self) -> None:
+    def test_registry_projection_rejects_unregistered_finite_reason_beyond_t0(self) -> None:
         payload = self.load_map()
         payload["finiteReason_enum"].append("future_registered_reason")
         payload["finiteReason_projections"].append(
@@ -228,14 +228,30 @@ class C1OwnershipMapCheckerTests(unittest.TestCase):
         spec = self.change / "specs/demo-capability-governance/spec.md"
         spec.write_text(
             spec.read_text(encoding="utf-8").replace(
-                "or `already_state_noop`",
-                "`future_registered_reason`, or `already_state_noop`",
+                "or `cancel_too_late`",
+                "`future_registered_reason`, or `cancel_too_late`",
                 1,
             ),
             encoding="utf-8",
         )
 
-        self.assert_failure("E_T0_LOCKED_SET_CHANGED")
+        result = self.run_checker()
+        self.assertNotEqual(result.returncode, 0, result.stdout)
+        receipt = json.loads(result.stdout)
+        violation_codes = {
+            item.get("code")
+            for item in receipt.get("runtime_finite_reason_violations", [])
+            if isinstance(item, dict)
+        }
+        self.assertTrue(
+            violation_codes
+            & {
+                "E_T0_LOCKED_SET_CHANGED",
+                "E_T0_PROJECTION_DRIFT",
+                "E_GENERATED_RUNTIME_REASON_DRIFT",
+            },
+            receipt,
+        )
 
     @unittest.skipUnless(CHECKER.exists(), "checker implementation pending")
     def test_free_string_finite_reason_fails_closed(self) -> None:

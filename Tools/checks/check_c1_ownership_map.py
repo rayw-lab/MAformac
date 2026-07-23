@@ -42,6 +42,16 @@ SAFE_REASON_KINDS = {
     "not_available_in_demo",
     "runtime_unavailable",
     "already_done",
+    "lexical_invalid",
+    "numeric_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late",
 }
 FALLBACK_REASONS = {
     "safety_policy_refused",
@@ -51,6 +61,17 @@ FALLBACK_REASONS = {
     "no_representative_tool__default_fallback",
     "runtime_error_typed",
     "already_state_noop",
+    "lexical_invalid",
+    "numeric_overflow",
+    "arithmetic_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late",
 }
 BRIDGE_RESULTS = {
     "refusal_safety_or_policy",
@@ -58,6 +79,10 @@ BRIDGE_RESULTS = {
     "refusal_no_available_tool",
     "runtime_error",
     "already_state_noop",
+    "refusal_contract_violation",
+    "state_query",
+    "capability_query",
+    "cancelled",
 }
 CG_PATTERN = re.compile(r"CG-\d{3}")
 RATIFIED_CG_PATTERN = re.compile(r"^\|\s*(CG-\d{3})\s*\|", re.MULTILINE)
