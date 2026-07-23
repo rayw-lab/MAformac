@@ -47,12 +47,12 @@ g9_status: G9_KNIFE2_BASELINE_LANDED
 2. 读本页 frontmatter 指向的最新 handoff + GO receipt。
 3. 需要状态时 live 重核 Git / remote Verify / Makefile recipe / matrix proven。
 
-## 下一步（Phase2 G9）
+## 下一步（Phase2 basis-binding → S10）
 
-1. **G9 knife2 baseline 已落盘**（磊哥 `APPROVE_WITH_EDITS`）：`47 = 45 survivor + 2 deferred`（**0 merged**；G13/G14 保留独立 recipe）。run-root：`PHASE2-G9-REDUCTION-TABLE.md`（定稿）、`PHASE2-G9-DAY-ZERO-BASELINE.md`（四 lane 分报）；仓内 `docs/governance/G9-DEFERRED-GATES.md`（G25/G37 owner·trigger·non-claim）。**未** gate archive / **未** OpenSpec archive / **未**删移 target。仍 **`PHASE2_CODING_GATED`**。
-2. **R1**：**`CLOSED_AT_SHA=2490d79f`** — `verify-c1-ownership` + Lane A `make verify-ci` PASS（`huggingface-hub` 升级至 1.24.0 @ Homebrew python3.13）。禁删 G18 躲红。
-3. **Day-zero 分报**（禁 `make verify` 冒充全绿）：Lane A `verify-ci` · Lane B `verify-e2e` · Lane C `verify-ui-e2e` · Lane D deferred（G25/G37）。
-4. residual：BF-3/6/7/8/10；**R2** UI N3N4 OPEN；**R3** G6 P1 OPEN；`actionDemoProven=0/120`；禁演示后三族。
+1. **磊哥拍板（2026-07-23 · 均 A）**：① Lane B 绿后 push 绑 remote ② 首个 S10 exact set = **单 Phase1 AC cell**（默认 **matrix_id=4** `adjust_ac_temperature_to_number`）③ **局部解冻** only，全局仍 `PHASE2_CODING_GATED`。receipt：run-root `PHASE2-BASIS-BINDING-DECISION-RECEIPT.md`。
+2. **Lane 证据**：A `verify-ci` PASS @ `2490d79f`；B `verify-e2e` PASS @ `121f4ae0`；C/D 分报（R2 UI OPEN）。
+3. **推进链**：basis-binding（push+remote）→ S10 局部 grill（≤10 题）→ 一页 carrier → 0–3 刀 → BF-8 亲验 → 才允许翻格。
+4. residual：R2/R3/BF-7/8/10；`actionDemoProven=0/120`；后三族禁演示。
 
 ## 隔离后产品真态（candidate 口径）
 
