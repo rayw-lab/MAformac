@@ -50,7 +50,7 @@ g9_status: G9_KNIFE2_BASELINE_LANDED
 ## 下一步（Phase2 G9）
 
 1. **G9 knife2 baseline 已落盘**（磊哥 `APPROVE_WITH_EDITS`）：`47 = 45 survivor + 2 deferred`（**0 merged**；G13/G14 保留独立 recipe）。run-root：`PHASE2-G9-REDUCTION-TABLE.md`（定稿）、`PHASE2-G9-DAY-ZERO-BASELINE.md`（四 lane 分报）；仓内 `docs/governance/G9-DEFERRED-GATES.md`（G25/G37 owner·trigger·non-claim）。**未** gate archive / **未** OpenSpec archive / **未**删移 target。仍 **`PHASE2_CODING_GATED`**。
-2. **R1**：`LOCAL_PASS` @ **`38b8ce1f`**；`verify-c1-ownership` @ tip **`3f515859` PASS**；**`CLOSED_AT_SHA` 未记** — Lane A `make verify-ci` 在 `swift-test`/C5 环境红（BF-7，非 ownership）。禁删 G18 躲红。
+2. **R1**：**`CLOSED_AT_SHA=2490d79f`** — `verify-c1-ownership` + Lane A `make verify-ci` PASS（`huggingface-hub` 升级至 1.24.0 @ Homebrew python3.13）。禁删 G18 躲红。
 3. **Day-zero 分报**（禁 `make verify` 冒充全绿）：Lane A `verify-ci` · Lane B `verify-e2e` · Lane C `verify-ui-e2e` · Lane D deferred（G25/G37）。
 4. residual：BF-3/6/7/8/10；**R2** UI N3N4 OPEN；**R3** G6 P1 OPEN；`actionDemoProven=0/120`；禁演示后三族。
 
