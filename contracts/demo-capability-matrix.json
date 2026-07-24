@@ -222,7 +222,7 @@
           "observed": true,
           "probe_id": "probe.action.matrix.4.zh-CN",
           "probe_receipt_id": "runtime-action-readback-probes",
-          "receipt_sha256": "0914d0061605a72bfe61d8ea3f2361ec47ae253d6fc2ad9baed28de7d4288886",
+          "receipt_sha256": "4c5f470530c6e21583f9b77c427ffe80209a19c663febec93a2066223b23b337",
           "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
           "status": "passed"
         },
@@ -259,7 +259,7 @@
         "observed": true,
         "probe_id": "probe.action.matrix.4.zh-CN",
         "probe_receipt_id": "runtime-action-readback-probes",
-        "receipt_sha256": "0914d0061605a72bfe61d8ea3f2361ec47ae253d6fc2ad9baed28de7d4288886",
+        "receipt_sha256": "4c5f470530c6e21583f9b77c427ffe80209a19c663febec93a2066223b23b337",
         "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
         "status": "passed"
       },
@@ -8190,7 +8190,7 @@
     "bf8_registry_sha256": "a2721fc9444b35aaaa91dd5e7567d196d46ef62db1da9947c704809a695b7513",
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "9d54ab13552e46c072ecd9696cd36bfe645254425df8679b46c0828c449e7d58",
-    "probe_pack_sha256": "130b84cf39c6a9d83092b91ece6a02714cecab94cf4fb0f83de3ddde62503e71",
+    "probe_pack_sha256": "58ff831d64fdb659e2cce18d5a24fd49ed0c436dd42b20387b0fc53723168765",
     "t0_design_sha256": "f0cb9bcbc051f6ebb7583a0edea88290f29532259a447ede234e2ffbaf51bb55"
   },
   "summary": {
