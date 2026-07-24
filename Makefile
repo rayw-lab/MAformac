@@ -237,7 +237,7 @@ verify-c1-finite-reason-authority:
 	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
 		--filter RuntimeFiniteReasonAuthorityTests/testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace
 
-verify-bf8-receipt-set:
+verify-bf8-receipt-set: .venv/.deps.stamp
 	$(PYTHON) -m py_compile Tools/checks/check_capability_matrix.py scripts/test_check_capability_matrix.py scripts/test_bf8_receipt_set.py
 	$(PYTHON) -m unittest -v scripts/test_bf8_receipt_set.py
 verify-c1-matrix: verify-bf8-receipt-set verify-c1-action-probes
