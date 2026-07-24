@@ -1,23 +1,25 @@
 {
   "cells": [
     {
-      "actionDemoProven": false,
+      "actionDemoProven": true,
       "actionDemoProven_basis": {
         "bf8_promotion": {
-          "observed": false,
-          "source_ref": "manifest:matrix_id=1:human-bf8-promotion-pending",
-          "status": "pending_human_bf8"
+          "observed": true,
+          "receipt_sha256": "cfc0356b1cae5d55db435c03c88e617873dee4708bce625c060ef077e05c45a2",
+          "source_ref": "contracts/governance/bf8-promotion-receipt-matrix-1.json#matrix_id=1",
+          "status": "authorized"
         },
         "mounted_or_approved_action": {
           "observed": true,
           "source_ref": "Core/Contracts/DDomainMountedToolCatalog.swift#mountedToolNames"
         },
         "readbackProbePass": {
-          "observed": false,
-          "probe_id": null,
-          "probe_receipt_id": null,
-          "source_ref": "manifest:matrix_id=1:action-readback-proof-pending",
-          "status": "conditional_pending"
+          "observed": true,
+          "probe_id": "probe.action.matrix.1.zh-CN",
+          "probe_receipt_id": "runtime-action-readback-probes",
+          "receipt_sha256": "e77c86e5371bcbdcc47fe4b1e56068b74d60e07afe5f9cbb4e449e7223ee145f",
+          "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json#probe_id=probe.action.matrix.1.zh-CN",
+          "status": "passed"
         },
         "semantic_contract": {
           "observed": true,
@@ -48,11 +50,12 @@
       "mounted_status": "mounted",
       "primary_class": "default_executable",
       "readback_probe_basis": {
-        "observed": false,
-        "probe_id": null,
-        "probe_receipt_id": null,
-        "source_ref": "manifest:matrix_id=1:action-readback-proof-pending",
-        "status": "conditional_pending"
+        "observed": true,
+        "probe_id": "probe.action.matrix.1.zh-CN",
+        "probe_receipt_id": "runtime-action-readback-probes",
+        "receipt_sha256": "e77c86e5371bcbdcc47fe4b1e56068b74d60e07afe5f9cbb4e449e7223ee145f",
+        "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json#probe_id=probe.action.matrix.1.zh-CN",
+        "status": "passed"
       },
       "reasonKind": null,
       "register": "直述",
@@ -222,8 +225,8 @@
           "observed": true,
           "probe_id": "probe.action.matrix.4.zh-CN",
           "probe_receipt_id": "runtime-action-readback-probes",
-          "receipt_sha256": "4c5f470530c6e21583f9b77c427ffe80209a19c663febec93a2066223b23b337",
-          "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
+          "receipt_sha256": "e77c86e5371bcbdcc47fe4b1e56068b74d60e07afe5f9cbb4e449e7223ee145f",
+          "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json#probe_id=probe.action.matrix.4.zh-CN",
           "status": "passed"
         },
         "semantic_contract": {
@@ -259,8 +262,8 @@
         "observed": true,
         "probe_id": "probe.action.matrix.4.zh-CN",
         "probe_receipt_id": "runtime-action-readback-probes",
-        "receipt_sha256": "4c5f470530c6e21583f9b77c427ffe80209a19c663febec93a2066223b23b337",
-        "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
+        "receipt_sha256": "e77c86e5371bcbdcc47fe4b1e56068b74d60e07afe5f9cbb4e449e7223ee145f",
+        "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json#probe_id=probe.action.matrix.4.zh-CN",
         "status": "passed"
       },
       "reasonKind": null,
@@ -8180,14 +8183,24 @@
         "receipt_sha256": "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4",
         "subject_id": 4,
         "subject_type": "primary_matrix"
+      },
+      {
+        "active": true,
+        "order": 2,
+        "receipt_id": "bf8-promotion-matrix-1-20260724",
+        "receipt_path": "contracts/governance/bf8-promotion-receipt-matrix-1.json",
+        "receipt_sha256": "cfc0356b1cae5d55db435c03c88e617873dee4708bce625c060ef077e05c45a2",
+        "subject_id": 1,
+        "subject_type": "primary_matrix"
       }
     ],
     "bf8_authorized_primary_ids": [
+      1,
       4
     ],
     "bf8_authorized_secondary_ids": [],
-    "bf8_ordered_active_sha256": "06fa87c9494215d5ec34565c72c323b7d57d67b8e1f62d7fb2f97ede4f98c712",
-    "bf8_registry_sha256": "a2721fc9444b35aaaa91dd5e7567d196d46ef62db1da9947c704809a695b7513",
+    "bf8_ordered_active_sha256": "c5adc255814b11f8fbe46c117283a5578717e467d7c6815576b39ca6615f62e5",
+    "bf8_registry_sha256": "407820b86e2c248b95d9e8f16ee5b9bf7d57734a21e52964e9bf44898a5ac260",
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "9d54ab13552e46c072ecd9696cd36bfe645254425df8679b46c0828c449e7d58",
     "probe_pack_sha256": "58ff831d64fdb659e2cce18d5a24fd49ed0c436dd42b20387b0fc53723168765",

@@ -37,7 +37,7 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
 
     def test_canonical_positive(self):
         result = self.mod.evaluate_receipt_set()
-        self.assertEqual(result["authorized_primary_ids"], [4])
+        self.assertEqual(result["authorized_primary_ids"], [1, 4])
         self.assertEqual(result["entries"][0]["receipt_sha256"], M4_SHA)
 
     def test_registry_sha_differs_from_immutable_m4(self):

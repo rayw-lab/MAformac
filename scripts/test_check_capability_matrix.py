@@ -429,7 +429,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             self.assertIsNone(probe_basis["probe_id"])
             self.assertIsNone(probe_basis["probe_receipt_id"])
             bf8 = cell["actionDemoProven_basis"]["bf8_promotion"]
-            if cell["matrix_id"] == 4:
+            if cell["matrix_id"] in (1, 4):
                 self.assertTrue(bf8["observed"])
                 self.assertEqual(bf8["status"], "authorized")
             else:
@@ -663,7 +663,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             )
         self.assertEqual(
             [cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]],
-            [4],
+            [1, 4],
         )
 
     def test_ce_m1_probe_green_without_bf8_keeps_action_demo_proven_false(self) -> None:
@@ -706,7 +706,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         for cell in matrix["cells"]:
             self.assertIn("bf8_promotion", cell["actionDemoProven_basis"])
             bf8 = cell["actionDemoProven_basis"]["bf8_promotion"]
-            if cell["matrix_id"] == 4:
+            if cell["matrix_id"] in (1, 4):
                 self.assertTrue(bf8["observed"])
                 self.assertEqual(bf8["status"], "authorized")
             else:
@@ -990,7 +990,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         for cell in matrix["cells"]:
             self.assertIn("bf8_promotion", cell["actionDemoProven_basis"])
             bf8 = cell["actionDemoProven_basis"]["bf8_promotion"]
-            if cell["matrix_id"] == 4:
+            if cell["matrix_id"] in (1, 4):
                 self.assertTrue(bf8["observed"])
                 self.assertEqual(bf8["status"], "authorized")
             else:
@@ -1000,9 +1000,9 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def test_f2_bf8_receipt_set_matrix_4_only_cell_4_promoted(self) -> None:
         checker, matrix = self.materialize()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(evaluation["authorized_primary_ids"], [4])
+        self.assertEqual(evaluation["authorized_primary_ids"], [1, 4])
         self.assertEqual(evaluation["secondary"], [])
-        self.assertEqual(matrix["source"]["bf8_authorized_primary_ids"], [4])
+        self.assertEqual(matrix["source"]["bf8_authorized_primary_ids"], [1, 4])
     def test_f2_bf8_receipt_set_with_scoped_probe_receipt(self) -> None:
         checker, matrix = self.materialize_tracked_baseline()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
@@ -1184,8 +1184,8 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def test_bf8_receipt_set_schema_validation_is_executed(self) -> None:
         checker = self.checker()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(evaluation["authorized_primary_ids"], [4])
-        self.assertEqual(len(evaluation["entries"]), 1)
+        self.assertEqual(evaluation["authorized_primary_ids"], [1, 4])
+        self.assertEqual(len(evaluation["entries"]), 2)
     def test_bf8_receipt_set_requires_canonical_authority_path(self) -> None:
         checker = self.checker()
         with self.assertRaisesRegex(ValueError, "E_RECEIPT_SET_NONCANONICAL"):
@@ -1197,25 +1197,25 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def test_bf8_receipt_set_subject_scope_is_primary_matrix_4(self) -> None:
         checker = self.checker()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(evaluation["authorized_primary_ids"], [4])
+        self.assertEqual(evaluation["authorized_primary_ids"], [1, 4])
         self.assertEqual(evaluation["entries"][0]["subject_type"], "primary_matrix")
     def test_bf8_receipt_set_lineage_is_evaluated(self) -> None:
         checker = self.checker()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
         self.assertEqual(evaluation["entries"][0]["subject_id"], 4)
-        self.assertEqual(evaluation["authorized_primary_ids"], [4])
+        self.assertEqual(evaluation["authorized_primary_ids"], [1, 4])
     def test_scoped_bf8_receipt_set_matrix_4_only(self) -> None:
         checker, matrix = self.materialize()
-        self.assertEqual(checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)["authorized_primary_ids"], [4])
+        self.assertEqual(checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)["authorized_primary_ids"], [1, 4])
         self.assertEqual(matrix["source"]["bf8_authorized_secondary_ids"], [])
     def test_bf8_receipt_set_alone_without_action_probe_keeps_action_demo_proven_false(self) -> None:
         checker, matrix = self.materialize()
-        self.assertEqual(checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)["authorized_primary_ids"], [4])
+        self.assertEqual(checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)["authorized_primary_ids"], [1, 4])
         self.assertEqual(sum(c["actionDemoProven"] for c in matrix["cells"]), 0)
     def test_probe_green_and_bf8_receipt_set_promotes_cell_4_in_tracked_materialize(self) -> None:
         checker, matrix = self.materialize_tracked_baseline()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(evaluation["authorized_primary_ids"], [4])
+        self.assertEqual(evaluation["authorized_primary_ids"], [1, 4])
         self.assertIn("bf8_promotion", matrix["cells"][3]["actionDemoProven_basis"])
     def test_cli_supports_bf8_receipt_set_option(self) -> None:
         with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="a1-bf8-cli-") as tmp:
@@ -1258,7 +1258,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def test_e4_receipt_set_provenance_and_scope(self) -> None:
         checker, matrix = self.materialize()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(matrix["source"]["bf8_authorized_primary_ids"], [4])
+        self.assertEqual(matrix["source"]["bf8_authorized_primary_ids"], [1, 4])
         self.assertEqual(matrix["source"]["bf8_authorized_secondary_ids"], [])
         self.assertEqual(evaluation["entries"][0]["receipt_sha256"], "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4")
 
@@ -1266,7 +1266,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         checker = self.checker()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
         self.assertEqual(checker.sha256_file(BF8_PROMOTION_RECEIPT), "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4")
-        self.assertEqual(evaluation["authorized_primary_ids"], [4])
+        self.assertEqual(evaluation["authorized_primary_ids"], [1, 4])
         self.assertEqual(evaluation["secondary"], [])
 
     def test_secondary_tool_account_is_top_level_pending_only(self) -> None:
