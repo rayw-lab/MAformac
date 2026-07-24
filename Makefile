@@ -27,7 +27,7 @@ GENERATED_DOMAIN := \
 GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
-SCOPED_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json
+SCOPED_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json
 SCOPED_M1_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json
 BF8_PROMOTION_RECEIPT_SET := contracts/governance/bf8-promotion-receipt-set.v1.json
 
@@ -242,7 +242,7 @@ verify-bf8-receipt-set: .venv/.deps.stamp
 	$(PYTHON) -m unittest -v scripts/test_bf8_receipt_set.py
 verify-c1-matrix: verify-bf8-receipt-set verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1
-	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py --matrix-ids 1,4
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
 		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
@@ -258,7 +258,7 @@ verify-c1-matrix: verify-bf8-receipt-set verify-c1-action-probes
 # temporary artifacts ensure a dirty tracked file cannot self-certify.
 verify-c1-matrix-canonical: verify-bf8-receipt-set .venv/.deps.stamp verify-c1-action-probes
 	mkdir -p .build/c1-run/canonical
-	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py --matrix-ids 1,4
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
 		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
@@ -418,7 +418,7 @@ verify-mounted-catalog-no-delta: .venv/.deps.stamp
 
 verify-action-demo-proven-rename: .venv/.deps.stamp verify-c1-finite-reason-authority verify-mounted-catalog-no-delta verify-c1-probes verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1 .build/c1-run/canonical
-	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py --matrix-ids 1,4
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
 		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \

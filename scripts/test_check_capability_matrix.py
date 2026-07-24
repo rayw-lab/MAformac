@@ -31,7 +31,7 @@ STATE_CELLS = REPO_ROOT / "contracts" / "state-cells.yaml"
 MOUNTED_CATALOG = REPO_ROOT / "Core" / "Contracts" / "DDomainMountedToolCatalog.swift"
 ACTION_PROBE_CATALOG = REPO_ROOT / "contracts" / "runtime-action-readback-probes.json"
 SCOPED_ACTION_PROBE_RECEIPT = (
-    REPO_ROOT / ".build" / "c1-run" / "receipts" / "c1" / "runtime-action-readback-probes-scoped-4.json"
+    REPO_ROOT / ".build" / "c1-run" / "receipts" / "c1" / "runtime-action-readback-probes-scoped-1-4.json"
 )
 BF8_RECEIPT_SET = REPO_ROOT / "contracts" / "governance" / "bf8-promotion-receipt-set.v1.json"
 BF8_PROMOTION_RECEIPT = REPO_ROOT / "contracts" / "governance" / "bf8-promotion-receipt-matrix-4.json"
@@ -1288,10 +1288,10 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         )
         self.assertTrue(all("secondary_tools" not in cell for cell in matrix["cells"]))
 
-    def test_matrix_primary_accounting_is_120_with_only_four_proven(self) -> None:
+    def test_matrix_primary_accounting_is_120_with_m1_m4_proven(self) -> None:
         _, matrix = self.materialize_tracked_baseline()
         self.assertEqual(len(matrix["cells"]), 120)
-        self.assertEqual([cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]], [4])
+        self.assertEqual([cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]], [1, 4])
 
     def test_secondary_authorization_list_remains_empty(self) -> None:
         checker, matrix = self.materialize()
