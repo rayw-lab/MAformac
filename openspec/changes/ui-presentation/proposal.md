@@ -1,6 +1,10 @@
 status: `agreed_apply_in_progress`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+v6_package_ids: [V5,V7,W2,O5]
+v8_relation: non_hard_evidence_relation
+hard_denominator: false
+status_action_now: keep_apply_in_progress
 
 > ✅ **AGREED（2026-06-24 磊哥审 spec agree，正式 propose 通过；B 严格 OpenSpec gate 解除）**：proposal/design/tasks/spec 已填实（**5 Req / 29 Scenario**，`openspec validate --strict` 绿）+ subagent CC 前端专项审计 CLEAR（2 P1 修复）。Phase 4 契约（R5 default_scope 消费 + 裂缝⑤⑥④）**文档先行**写定。
 > 🔴 **apply 状态（claim-vs-reality）**：Phase 1b 工程前置 ✅ done（mic/speech/deployment 锁 iOS26/2 gate 已挂/tokens 冻结/截图管线）；**Phase 3 D7 7 态消费已 apply（commit `6a3e3f9`，审计 CLEAR）**；Phase 4 卡片 apply 待后端 `default_scope` 落 main（防返工）。

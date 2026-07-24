@@ -1,0 +1,24 @@
+{
+  "fixture_id": "W8-K2-F08-interleaving-profile-seed-A",
+  "capability": "session-lifecycle",
+  "change_id": "implement-t09-session-lifecycle-child-registry-and-recovery",
+  "claim_class": "profile_only",
+  "provenance_note": "does not satisfy proof_runtime; not W8 DONE; not operator-pass; not V-PASS; not C5 V-PASS; not C6 acceptance; not mobile; not true-device; not live proof",
+  "seed": 42,
+  "schedule_events": [
+    "register:a",
+    "register:b",
+    "cancelAll",
+    "ack:a:terminal",
+    "fence:b",
+    "rotate:2",
+    "stale-late:b"
+  ],
+  "canonical_serialization": "seed=42;schedule=register:a|register:b|cancelAll|ack:a:terminal|fence:b|rotate:2|stale-late:b",
+  "canonical_serialization_note": "K2 test computes SHA-256 hex over the canonical_serialization UTF-8 bytes via CommonCrypto CC_SHA256; asserts equal to expected_ledger_digest_hex.",
+  "expected_ledger_digest_hex": "017311631c4c637188f43fb53a81fef53cdcb4384fb7faa20a818bd33ffc748e",
+  "expected_stale_mutation_count": 1,
+  "expected_stale_mutation_source": "SessionLifecycleRecoveryCoordinator.oldGenerationStaleCallbackCount() after schedule replay; incremented by delivering a lifecycle event carrying the pre-rotation generation to RecoveryCoordinator.apply(_:authority:) after rotate. The child registry's own stale counter is separate and covers pre-fence late callbacks referencing still-known children.",
+  "recipe_provenance_reference": "010b RECIPE-REAL-PROCESS-HARNESS sha256 93c7623846cc7d407ec120ad926620d24f2bc1f5893b7dae2baca41c8ced20ed (reference only; K2 unit + profile does NOT satisfy that recipe's proof_runtime cap)",
+  "test_oracle_independence_note": "K2 test hard-codes expected_ledger_digest_hex above; independently computes SHA-256 in-test via CommonCrypto over canonical_serialization and asserts both against the fixture value and against a K2-driven schedule re-serialization. K2 implementation code MUST NOT expose the digest as a property that the test would then read back to itself."
+}

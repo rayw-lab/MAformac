@@ -19,12 +19,15 @@ public struct ScopeResolution: Equatable, Sendable {
 }
 
 public enum C2ScopeResolver {
+    /// Scope-bearing slot keys. Distinct non-empty values across these → typed refuse.
+    public static let scopeSlotKeys = ["direction", "position", "screen_type", "name"]
+
     public static func resolve(frame: ToolCallFrame, cell: StateCellDefinition) throws -> ScopeResolution {
         guard !cell.scope.isEmpty else {
             return ScopeResolution(keys: [cell.id], resolvedScopes: [], origin: .explicit)
         }
 
-        if let requested = requestedScope(from: frame), !requested.isEmpty {
+        if let requested = try requestedScope(from: frame), !requested.isEmpty {
             if isCollectionAlias(requested, cell: cell) {
                 let scopes = executableScopes(for: cell)
                 return ScopeResolution(
@@ -53,11 +56,18 @@ public enum C2ScopeResolver {
         )
     }
 
-    public static func requestedScope(from frame: ToolCallFrame) -> String? {
-        frame.slots["direction"]
-            ?? frame.slots["position"]
-            ?? frame.slots["screen_type"]
-            ?? frame.slots["name"]
+    /// Collects explicit scope lexemes. Conflicting distinct values refuse (no first-wins).
+    public static func requestedScope(from frame: ToolCallFrame) throws -> String? {
+        let present = scopeSlotKeys.compactMap { key -> String? in
+            guard let value = frame.slots[key], !value.isEmpty else { return nil }
+            return value
+        }
+        guard !present.isEmpty else { return nil }
+        let unique = Array(Set(present))
+        guard unique.count == 1 else {
+            throw ToolExecutionError.semanticInvalid("scope_conflict")
+        }
+        return unique[0]
     }
 
     private static func isCollectionAlias(_ value: String, cell: StateCellDefinition) -> Bool {

@@ -2,6 +2,7 @@ import Foundation
 
 enum DemoRuntimeResultKind: String, CaseIterable, Codable, Equatable, Sendable {
     case acceptedToolCall = "accepted_tool_call"
+    case noAction = "no_action"
     case clarifyMissingSlot = "clarify_missing_slot"
     case refusalNoAvailableTool = "refusal_no_available_tool"
     case refusalSafetyOrPolicy = "refusal_safety_or_policy"
@@ -9,6 +10,9 @@ enum DemoRuntimeResultKind: String, CaseIterable, Codable, Equatable, Sendable {
     case runtimeError = "runtime_error"
     case cancelled
     case partialAcceptPartialRefuse = "partial_accept_partial_refuse"
+    case stateQuery = "state_query"
+    case capabilityQuery = "capability_query"
+    case refusalContractViolation = "refusal_contract_violation"
 }
 
 enum StagePresentationProofClass: String, Codable, Equatable, Sendable {

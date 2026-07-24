@@ -1,6 +1,10 @@
 status: `active_contract_carrier`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+v6_package_ids: [W2,W5c,V7,V8,O5]
+relation_type: owns_presentation_bridge
+W5d_decode_policy_owner: tool-execution
+no_second_bridge_ssot: true
 
 ## Why
 

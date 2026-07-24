@@ -16,7 +16,39 @@
 		A10000000000000000000002 /* MAformacIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MAformacIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B10000000000000000000001 /* MAformacIOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MAformacIOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D10000000000000000000001 /* MAformacCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MAformacCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E10000000000000000000001 /* MAformacMacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MAformacMacUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A4E000000000000000000001 /* A4-0 dev-source exclusions for MAformacMac */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Bench/C5DataGate.swift,
+				Bench/C6ContractBundleFingerprint.swift,
+				Bench/C6SubsetContext.swift,
+				Bench/C6VehicleToolBench.swift,
+				Generation/Gate7GeneratorPipeline.swift,
+				Training/C5LoRATraining.swift,
+				Training/C5TinyAblationHarness.swift,
+				"Training/ToolContractCompiler+Seeds.swift",
+			);
+			target = A50000000000000000000001 /* MAformacMac */;
+		};
+		A4E000000000000000000002 /* A4-0 dev-source exclusions for MAformacIOS */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Bench/C5DataGate.swift,
+				Bench/C6ContractBundleFingerprint.swift,
+				Bench/C6SubsetContext.swift,
+				Bench/C6VehicleToolBench.swift,
+				Generation/Gate7GeneratorPipeline.swift,
+				Training/C5LoRATraining.swift,
+				Training/C5TinyAblationHarness.swift,
+				"Training/ToolContractCompiler+Seeds.swift",
+			);
+			target = A50000000000000000000002 /* MAformacIOS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A20000000000000000000001 /* App */ = {
@@ -26,6 +58,10 @@
 		};
 		A20000000000000000000002 /* Core */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A4E000000000000000000001 /* A4-0 dev-source exclusions for MAformacMac */,
+				A4E000000000000000000002 /* A4-0 dev-source exclusions for MAformacIOS */,
+			);
 			path = Core;
 			sourceTree = "<group>";
 		};
@@ -77,6 +113,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -99,6 +142,7 @@
 				A10000000000000000000002 /* MAformacIOS.app */,
 				B10000000000000000000001 /* MAformacIOSUITests.xctest */,
 				D10000000000000000000001 /* MAformacCoreTests.xctest */,
+				E10000000000000000000001 /* MAformacMacUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -119,6 +163,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A50000000000000000000002;
 			remoteInfo = MAformacIOS;
+		};
+		E40000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A60000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A50000000000000000000001;
+			remoteInfo = MAformacMac;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -219,6 +270,29 @@
 			productReference = D10000000000000000000001 /* MAformacCoreTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		E50000000000000000000001 /* MAformacMacUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E90000000000000000000001 /* Build configuration list for PBXNativeTarget "MAformacMacUITests" */;
+			buildPhases = (
+				E70000000000000000000001 /* Sources */,
+				E30000000000000000000001 /* Frameworks */,
+				E80000000000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E60000000000000000000001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B20000000000000000000001 /* MAformacIOSUITests */,
+			);
+			name = MAformacMacUITests;
+			packageProductDependencies = (
+			);
+			productName = MAformacMacUITests;
+			productReference = E10000000000000000000001 /* MAformacMacUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -243,6 +317,10 @@
 						CreatedOnToolsVersion = 26.5;
 						TestTargetID = A50000000000000000000002;
 					};
+					E50000000000000000000001 = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = A50000000000000000000001;
+					};
 				};
 			};
 			buildConfigurationList = A90000000000000000000001 /* Build configuration list for PBXProject "MAformac" */;
@@ -266,6 +344,7 @@
 				A50000000000000000000002 /* MAformacIOS */,
 				B50000000000000000000001 /* MAformacIOSUITests */,
 				D50000000000000000000001 /* MAformacCoreTests */,
+				E50000000000000000000001 /* MAformacMacUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -293,6 +372,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D80000000000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E80000000000000000000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -330,6 +416,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E70000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -342,6 +435,11 @@
 			isa = PBXTargetDependency;
 			target = A50000000000000000000002 /* MAformacIOS */;
 			targetProxy = D40000000000000000000001 /* PBXContainerItemProxy */;
+		};
+		E60000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A50000000000000000000001 /* MAformacMac */;
+			targetProxy = E40000000000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -667,6 +765,63 @@
 			};
 			name = Release;
 		};
+		E90000000000000000000002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MAformacMacUITests;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = lab.rayw.MAformac.macUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TEST_TARGET_NAME = MAformacMac;
+			};
+			name = Debug;
+		};
+		E90000000000000000000003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MAformacMacUITests;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = lab.rayw.MAformac.macUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				TEST_TARGET_NAME = MAformacMac;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -711,6 +866,15 @@
 			buildConfigurations = (
 				D90000000000000000000002 /* Debug */,
 				D90000000000000000000003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E90000000000000000000001 /* Build configuration list for PBXNativeTarget "MAformacMacUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E90000000000000000000002 /* Debug */,
+				E90000000000000000000003 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

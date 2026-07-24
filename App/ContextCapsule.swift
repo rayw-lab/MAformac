@@ -10,8 +10,11 @@ struct ContextCapsuleView: View {
     var theme: PresentationTheme
     var context: DemoContext
     var route: ContextCapsuleRoute = .cLite
+    /// 三档预算（RSB §3.4）；默认 fullShowcase 保 L0 parity（animated 1/30）。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var rainSystem = VortexSystem.rain.makeUniqueCopy()
     @State private var smokeSystem = VortexSystem.smoke.makeUniqueCopy()
 
@@ -23,8 +26,11 @@ struct ContextCapsuleView: View {
 
     var body: some View {
         Group {
-            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            // 三档 budget 驱动 ContextCapsule 档（RSB §3.4）：animated=1/30fps / lowFPS=1/15fps / staticImage=静态。
+            // reduceMotion 强制静态（L2），保 L0 现状 parity（animated 1/30）。
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion),
+               capsuleMode != .staticImage {
+                TimelineView(.animation(minimumInterval: capsuleFrameInterval)) { timeline in
                     capsuleContent(phase: timeline.date.timeIntervalSinceReferenceDate)
                 }
             } else {
@@ -33,6 +39,16 @@ struct ContextCapsuleView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
+    }
+
+    /// budget 有效 capsule 档（reduceMotion 强制 staticImage）。
+    private var capsuleMode: ContextCapsuleMotionMode {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: reduceMotion, requested: motionBudget)
+            .contextCapsuleMode
+    }
+    /// 档 → 帧间隔（animated 1/30 / lowFPS 1/15）。
+    private var capsuleFrameInterval: Double {
+        capsuleMode == .lowFPS ? 1.0 / 15.0 : 1.0 / 30.0
     }
 
     private func capsuleContent(phase: TimeInterval) -> some View {
@@ -63,14 +79,27 @@ struct ContextCapsuleView: View {
     }
 
     private var capsuleChrome: some View {
-        Capsule()
-            .fill(Color.clear)
-            .glassEffect(.regular, in: Capsule())
-            .opacity(theme == .ivory ? 0.34 : 0.55)
+        capsuleChromeBase
+            .opacity(reduceTransparency ? 1.0 : (theme == .ivory ? 0.34 : 0.55))
             .overlay {
-                Capsule().strokeBorder(Color.white.opacity(theme == .ivory ? 0.16 : 0.12), lineWidth: 0.8)
+                Capsule().strokeBorder(
+                    DesignTokens.contextCapsuleChromeStroke(theme: theme, reduceTransparency: reduceTransparency),
+                    lineWidth: reduceTransparency ? 1.1 : 0.8
+                )
             }
             .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private var capsuleChromeBase: some View {
+        if reduceTransparency {
+            Capsule()
+                .fill(DesignTokens.contextCapsuleChromeFill(theme: theme, reduceTransparency: true))
+        } else {
+            Capsule()
+                .fill(DesignTokens.contextCapsuleChromeFill(theme: theme, reduceTransparency: false))
+                .glassEffect(.regular, in: Capsule())
+        }
     }
 
     @ViewBuilder

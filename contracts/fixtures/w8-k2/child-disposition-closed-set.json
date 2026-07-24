@@ -1,0 +1,26 @@
+{
+  "fixture_id": "W8-K2-F04-closed-set",
+  "capability": "session-lifecycle",
+  "change_id": "implement-t09-session-lifecycle-child-registry-and-recovery",
+  "claim_class": "recipe_only",
+  "provenance_note": "does not satisfy proof_runtime; not W8 DONE; not operator-pass; not V-PASS; not C6 acceptance; not mobile; not true-device; not live proof",
+  "settled_disposition_set_from_define_t09": [
+    "cancelled",
+    "terminal",
+    "unsupported",
+    "timedOutFenced"
+  ],
+  "settled_cardinality": 4,
+  "settled_source_of_truth": "openspec/changes/define-t09-session-lifecycle-recovery/specs/session-lifecycle/spec.md heading '### Requirement: Child disposition and cancellation fence' SHALL clause naming cancelled/terminal/unsupported/timedOutFenced",
+  "k2_extension_initial_state": "pending",
+  "k2_extension_note": "K2 delivery layer adds a 'pending' initial state that precedes any settled disposition. 'pending' is NOT in the define-t09 SHALL settled set; it is the pre-settlement bookkeeping state used only inside SessionLifecycleChildRegistry until an ack or fence transitions to a settled disposition.",
+  "k2_closed_set_members": [
+    "pending",
+    "cancelled",
+    "terminal",
+    "unsupported",
+    "timedOutFenced"
+  ],
+  "k2_cardinality": 5,
+  "test_oracle_independence_note": "K2 tests hard-code these member names as expected assertion values; tests MUST NOT derive expected values by iterating SessionChildDisposition.allCases (that would be self-referential to the implementation under test)."
+}

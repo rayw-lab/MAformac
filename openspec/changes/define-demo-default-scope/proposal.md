@@ -1,6 +1,10 @@
 status: `active_construction`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+v6_disposition: candidate_archive_after_controller_review
+v6_package_ids: [W5a,W5c,V6p,B7,O5]
+relation_type: owns
+archive_now: false
 
 ## Why
 

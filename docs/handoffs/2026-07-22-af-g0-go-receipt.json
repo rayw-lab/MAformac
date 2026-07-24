@@ -1,0 +1,83 @@
+{
+  "status": "AF_G0_GO_WITH_RESIDUALS",
+  "af_g0_verdict": "GO_WITH_RESIDUALS",
+  "phase2_product_coding": "G0_INVENTORY_AUTHORIZED",
+  "phase2_coding_gate": "PHASE2_CODING_GATED",
+  "done_with_known_risks": true,
+  "as_of": "2026-07-22T21:15:24+08:00",
+  "head_commit": "769ce3c3d9e4b7fd2fcde3440b1f226d71efd1cc",
+  "branch": "opt/streamline-macos-20260707",
+  "subject": "tip 769ce3c3 + 2026-07-22 live probes only; no extrapolation of protected dirty cleanup or unrun full suite",
+  "owner": "磊哥",
+  "authorization": "AF-G0 flip + multi-lane start verbal; multi-lane covers G0 read-only inventory only (run-root artifacts exist; cross-source spot-check on separate lane)",
+  "independent_audit": "AF-G0_GO_WITH_RESIDUALS",
+  "scope_claim": "Authority routing flip only to AF-G0_GO_WITH_RESIDUALS; CURRENT + handoff rewritten under audit ceilings. AF-G0 alone does not authorize Phase2 product coding. No Phase2 product code written by this lane. Do not commit protected dirty paths.",
+  "non_claims": [
+    "Does not claim bare AF-G0 GO / Phase2 GO / implementation unpaused.",
+    "Does not claim AF-G0 alone authorizes Phase2 product coding; only G0_INVENTORY_AUTHORIZED.",
+    "Does not claim candidate families are demoable, mergeable, or countable in actionDemoProven.",
+    "Does not claim actionDemoProven > 0/120.",
+    "Does not claim full Swift suite or make verify-ci green (not extrapolated).",
+    "Does not claim remote UI-E2E required or green (same SHA cancelled).",
+    "Does not claim E3/human acceptance closed.",
+    "Does not claim FA-4 authorizes demo/merge of window phrases or later three families; FA-4 proves local window gate only.",
+    "Does not claim release-ready, true-vehicle, live-model, ASR/TTS product gates.",
+    "Does not claim protected dirty cleanup; do not commit those four paths.",
+    "Does not claim this receipt was pushed by this lane."
+  ],
+  "closed_bfs": ["BF-1", "BF-2", "BF-4", "BF-5", "BF-9"],
+  "residual_mandatory": [
+    "BF-3_candidate_freeze",
+    "BF-6_UI_E2E_cancelled_not_required",
+    "BF-7_C5_full_suite",
+    "BF-8_human_evidence",
+    "BF-10_protected_dirty",
+    "actionDemoProven_0_of_120",
+    "legacy_P0a_stale_red_sentence_corrected"
+  ],
+  "residual_bfs": ["BF-3_freeze_discipline", "BF-6", "BF-7", "BF-8", "BF-10"],
+  "evidence": [
+    {
+      "id": "BF-1",
+      "command": "gh run view 29919618354 --json conclusion,status,headSha,url,workflowName",
+      "result": "Verify success @ 769ce3c3; https://github.com/rayw-lab/MAformac/actions/runs/29919618354; legacy P0-a stale red corrected",
+      "verdict": "pass"
+    },
+    {
+      "id": "BF-2",
+      "command": "read Makefile verify-e2e recipe; python3 scripts/verify_anti_placebo.py",
+      "result": "full DemoSliceProductBehaviorGateTests + WP21 filters; anti-placebo PASS exit 0; sha256 48cce601486a69f19d65a80ab4fcc70606fc6c98643a9867f8b839eebd688a00",
+      "verdict": "pass"
+    },
+    {
+      "id": "FA-4",
+      "command": "read contracts/risk-policy.yaml window_open_while_moving_or_unsafe_gear; ContractLookups RiskPolicyLookup",
+      "result": "local window safety gate closed (B07=B); still bans demo/merge of window phrases and later three families",
+      "verdict": "pass_local_gate_only"
+    },
+    {
+      "id": "proven",
+      "command": "python3 count actionDemoProven in contracts/demo-capability-matrix.json",
+      "result": "true=0 false=120 total=120",
+      "verdict": "observed"
+    },
+    {
+      "id": "BF-6",
+      "command": "gh api repos/rayw-lab/MAformac/commits/769ce3c3/check-runs",
+      "result": "UI E2E (iOS 26.5 Simulator) conclusion=cancelled; run 29919618353; not required",
+      "verdict": "residual"
+    }
+  ],
+  "changed_files": [
+    "docs/CURRENT.md",
+    "docs/handoffs/2026-07-22-af-g0-go-receipt.md",
+    "docs/handoffs/2026-07-22-af-g0-go-receipt.json",
+    "docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md"
+  ],
+  "proof_class_ceiling": "remote_github_actions_verify_success_plus_local_makefile_recipe_and_anti_placebo",
+  "next_actions": [
+    "Phase2 lane stays at G0 read-only inventory under G0_INVENTORY_AUTHORIZED; PHASE2_CODING_GATED for G1+.",
+    "Keep candidate families undemoable and actionDemoProven at 0/120.",
+    "Track residual BF-3/6/7/8/10 on independent ledgers; do not commit protected dirty paths."
+  ]
+}

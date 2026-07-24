@@ -1,6 +1,10 @@
 status: `draft_deferred`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
+v6_package_ids: [W10,V4,V6p,V2,O5]
+relation_type: blocks/consumes
+blocked_on: G4 RATIFIED + upstream carriers
+status_action_now: keep_draft
 
 > ⚠️ DRAFT SKELETON（2026-06-23 第一个长跑起草，标 DRAFT 待人审 propose）
 > 本 change 仅为骨架：proposal Why/What Changes 指向已拍决策，specs delta 占位待补，tasks 待细化。

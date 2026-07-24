@@ -1,0 +1,43 @@
+{
+  "cardSemantics": [
+    {
+      "cellKey": "ac.power",
+      "isActive": false,
+      "reason": "execution_error",
+      "role": "context",
+      "scopeOrigin": "explicit",
+      "siblingKeys": []
+    }
+  ],
+  "cards": [
+    {
+      "actualValue": "off",
+      "availability": "unknown",
+      "key": "ac.power",
+      "revision": 2,
+      "source": "mock",
+      "visualState": "unknown"
+    }
+  ],
+  "eventID": "event-runtime-error-1",
+  "isTerminal": true,
+  "mutationCount": 0,
+  "orbState": "idle",
+  "outcome": {
+    "reason": "execution_error",
+    "result": "runtime_error"
+  },
+  "readbacks": [],
+  "reconciliation": {
+    "safeReason": "execution_error",
+    "status": "unavailable"
+  },
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
+  "traceEnvelope": {
+    "entries": [],
+    "traceID": "trace-runtime-error-1"
+  },
+  "traceID": "trace-runtime-error-1",
+  "turnID": "turn-runtime-error-1",
+  "voiceState": "idle"
+}

@@ -10,6 +10,7 @@ final class C3TraceAttributesTests: XCTestCase {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
         let pipeline = try makePipeline(intentConfirmed: true)
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let frame = ToolCallFrame(
             traceID: "trace-attr",
             agentID: "vehicle-control",
@@ -144,6 +145,7 @@ private extension ToolCallFrame {
         value: ContractValue = ContractValue(),
         stateRevision: Int
     ) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.\(device)",

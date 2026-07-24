@@ -1,0 +1,20 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "outcome=candidate SHALL carry action_candidate. Setting action_candidate=null while outcome=candidate is an illegal combination. SHALL 'Route result MUST carry the minimum wire fields' scenario 'Candidate outcome carries action_candidate'.",
+    "expected_error": "illegal_combination"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-illegal-combo-000001",
+    "trace_id": "trace-neg-illegal-combo-000001",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": null,
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

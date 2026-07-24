@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W5d",
+  "package_revision": 1,
+  "sequence": 2,
+  "from_state": "planned",
+  "to_state": "ready",
+  "trigger_decision": "W5d tranche aligned to the accepted completion-decode authority carrier",
+  "evidence": {"root": "repo", "path": "openspec/changes/harden-d-domain-completion/proposal.md", "sha256": "03b4265b32f5a46109094af15fbd2b9ad551f5d3eb78420029d37e058506c22e"},
+  "repo_head": "24b562b05ac388d3bd771c4d368d1a35ad3087ae",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

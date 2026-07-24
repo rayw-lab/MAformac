@@ -5,7 +5,8 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
     func testDirectValueToolCallBuildsModelRouterFrame() async throws {
         let backend = backend(completion: toolCall("adjust_ac_temperature_to_number", ["temperature": "26"]))
 
-        let frame = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度")).first
+        let plan = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+        let frame = plan.toolFrames.first
 
         XCTAssertEqual(frame?.device, "ac_temperature")
         XCTAssertEqual(frame?.value.direct, "26")
@@ -22,7 +23,8 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
             "mode": "制热"
         ]))
 
-        let frame = try await backend.generateToolPlan(for: ToolPlanRequest(text: "主驾空调制热调到24度")).first
+        let plan = try await backend.generateToolPlan(for: ToolPlanRequest(text: "主驾空调制热调到24度"))
+        let frame = plan.toolFrames.first
 
         XCTAssertEqual(frame?.value.direct, "24")
         XCTAssertNil(frame?.slots["direction"])
@@ -30,7 +32,24 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
     }
 
     func testUnmountedNameRejectedBeforeNormalizeAndC3() async {
-        await assertNameRejected(toolCall("open_ac", [:]), expectedName: "open_ac")
+        await assertNameRejected(toolCall("close_window", [:]), expectedName: "close_window")
+    }
+
+    func testMountedNameWithoutIRMappingFailsClosed() async {
+        let name = "adjust_ac_temperature_to_number"
+        let completion = #"<tool_call>{"name":"adjust_ac_temperature_to_number","arguments":{"temperature":"26"}}</tool_call>"#
+        let backend = DDomainToolPlanBackend(
+            mountedToolNames: [name],
+            irMap: [:],
+            completionEnvelopeProvider: { _ in completionEnvelope(completion) }
+        )
+
+        do {
+            _ = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+            XCTFail("expected ir_unclassified")
+        } catch {
+            XCTAssertEqual(error as? DDomainToolPlanFailure, .irUnclassified(name))
+        }
     }
 
     func testEXPAndLockACToolNamesAreRejected() async {
@@ -42,7 +61,7 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
         let completion = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
         let backend = DDomainToolPlanBackend(
             mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
-            completionProvider: { _ in completion },
+            completionEnvelopeProvider: { _ in completionEnvelope(completion) },
             streamTextProvider: { _ in
                 XCTFail("streamText must not participate in W20A tool plan")
                 return AsyncThrowingStream<String, Error> { $0.finish() }
@@ -50,6 +69,61 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
         )
 
         _ = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+    }
+
+    func testBoundedReviewedTwoCallsProjectsBothInOrder() async throws {
+        let first = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
+        let second = toolCall("adjust_ac_temperature_to_number", ["temperature": "24"])
+        let backend = DDomainToolPlanBackend(
+            mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
+            cardinalityPolicy: .boundedReviewed(maximum: 2),
+            completionEnvelopeProvider: { _ in completionEnvelope(first + second, toolCallCount: 2) }
+        )
+
+        let plan = try await backend.generateToolPlan(for: ToolPlanRequest(text: "先调26度再调24度"))
+
+        XCTAssertEqual(plan.toolFrames.map(\.value.direct), ["26", "24"])
+        XCTAssertEqual(plan.executionPolicy, .partial)
+    }
+
+    func testExplicitACPowerOffAndTemperaturePlanIsAtomicAndSuppressesAutoPowerOn() async throws {
+        let powerOff = toolCall("close_ac", [:])
+        let temperature = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
+        let backend = DDomainToolPlanBackend(
+            cardinalityPolicy: .boundedReviewed(maximum: 2),
+            completionEnvelopeProvider: { _ in
+                completionEnvelope(powerOff + temperature, toolCallCount: 2)
+            }
+        )
+
+        let plan = try await backend.generateToolPlan(
+            for: ToolPlanRequest(text: "不要打开空调，只调到26度")
+        )
+
+        XCTAssertEqual(plan.toolFrames.map(\.toolName), [
+            "close_ac",
+            "adjust_ac_temperature_to_number",
+        ])
+        XCTAssertEqual(plan.executionPolicy, .atomic)
+        XCTAssertEqual(plan.toolFrames[0].actionPrimitive, "power_off")
+        XCTAssertFalse(plan.toolFrames[0].doNotAutoPowerOn)
+        XCTAssertEqual(plan.toolFrames[1].actionPrimitive, "adjust_to_number")
+        XCTAssertTrue(plan.toolFrames[1].doNotAutoPowerOn)
+    }
+
+    func testBackendRejectsCountMismatchBeforeProjection() async {
+        let completion = toolCall("adjust_ac_temperature_to_number", ["temperature": "26"])
+        let backend = DDomainToolPlanBackend(
+            mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
+            completionEnvelopeProvider: { _ in completionEnvelope(completion, toolCallCount: 2) }
+        )
+
+        do {
+            _ = try await backend.generateToolPlan(for: ToolPlanRequest(text: "调到26度"))
+            XCTFail("expected count mismatch")
+        } catch {
+            XCTAssertEqual(error as? DDomainCompletionRejection, .toolCallCountMismatch(declared: 2, parsed: 1))
+        }
     }
 
     private func assertNameRejected(_ completion: String, expectedName: String) async {
@@ -65,7 +139,7 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
     private func backend(completion: String) -> DDomainToolPlanBackend {
         DDomainToolPlanBackend(
             mountedToolNames: DDomainMountedToolCatalog.mountedToolNames,
-            completionProvider: { _ in completion }
+            completionEnvelopeProvider: { _ in completionEnvelope(completion) }
         )
     }
 
@@ -76,4 +150,14 @@ final class W20ALLMBackendToolPlanTests: XCTestCase {
             .joined(separator: ",")
         return #"<tool_call>{"name":"\#(name)","arguments":{\#(args)}}</tool_call>"#
     }
+}
+
+private func completionEnvelope(_ content: String, toolCallCount: Int = 1) -> DDomainCompletionEnvelope {
+    DDomainCompletionEnvelope(
+        content: content,
+        finishReason: "tool_calls",
+        stopReason: "end_turn",
+        toolCallCount: toolCallCount,
+        source: "test_model"
+    )
 }

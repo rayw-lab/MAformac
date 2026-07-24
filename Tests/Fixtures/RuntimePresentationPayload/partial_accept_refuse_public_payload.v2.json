@@ -1,0 +1,71 @@
+{
+  "cardSemantics": [
+    {
+      "cellKey": "window.position[主驾]",
+      "isActive": false,
+      "reason": "capability_not_mounted",
+      "role": "refused",
+      "siblingKeys": [
+        "ac.power"
+      ]
+    },
+    {
+      "cellKey": "ac.power",
+      "isActive": true,
+      "reason": "readback_verified",
+      "role": "accepted",
+      "scopeOrigin": "explicit",
+      "siblingKeys": [
+        "window.position[主驾]"
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "actualValue": "closed",
+      "availability": "available",
+      "key": "window.position[主驾]",
+      "revision": 0,
+      "source": "mock",
+      "visualState": "blocked_with_alternative"
+    },
+    {
+      "actualValue": "on",
+      "availability": "available",
+      "key": "ac.power",
+      "revision": 2,
+      "source": "mock",
+      "visualState": "satisfied"
+    }
+  ],
+  "eventID": "event-partial-accept-refuse-1",
+  "isTerminal": true,
+  "mutationCount": 1,
+  "orbState": "speak",
+  "outcome": {
+    "reason": "partial_accept_refuse",
+    "result": "partial_accept_partial_refuse"
+  },
+  "readbacks": [
+    {
+      "actualValue": "on",
+      "key": "ac.power",
+      "revision": 2,
+      "scopeOrigin": "explicit",
+      "spokenText": "ac opened"
+    }
+  ],
+  "reconciliation": {
+    "readbackKey": "ac.power",
+    "safeReason": "partial_readback_verified",
+    "status": "verified"
+  },
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
+  "traceEnvelope": {
+    "entries": [],
+    "traceID": "trace-partial-accept-refuse-1"
+  },
+  "traceID": "trace-partial-accept-refuse-1",
+  "turnID": "turn-partial-accept-refuse-1",
+  "voiceState": "speak"
+}

@@ -57,7 +57,7 @@ There is no `direct_no_call` bucket for in-scope cockpit-control commands. This 
 
 Model hard-pass must exclude renderer readback. `verify-gold` must retain deterministic C2 `renderReadback` validity as renderer evidence. Clarify and refusal text evidence still counts when asserted by the case schema, because that is model decision behavior, not renderer polish.
 
-Receipts should make the split visible through fields such as `model_hard_pass_basis`, `readback_applicable`, `readback_match`, and `readback_excluded_from_model_hard_pass`.
+Receipts must expose exactly this observable seven-field readback split: `model_hard_pass_basis`, `model_hard_failed`, `readback_applicable`, `readback_match`, `readback_hard_failed`, `readback_excluded_from_model_hard_pass`, and `renderer_contract_digest`. Missing fields are unknown/blocking. Renderer mismatch sets renderer/readback failure but never changes the model-hard numerator.
 
 ### AD-C6-009: Contract bundle fingerprint is a versioned component manifest
 
@@ -98,6 +98,24 @@ This lane must not run Swift tests, `make verify`, C6 acceptance, model evaluati
 ### AD-C6-012: Implementation must reconfirm baseline and load-bearing APIs
 
 Q3 file:line evidence was gathered against a historical branch. Before any implementation, record branch, `HEAD`, `origin/main`, and current symbol presence for `ScopeOrigin`, `ScopeResolution.keys`, `ScopeResolution.resolvedScopes`, `C2ScopeResolver.scopedKey()`, and `ToolContractStateApplier.applyWithEvidence`. If any symbol moved, disappeared, or changed semantics, halt and re-grill instead of applying stale line-level instructions.
+
+### AD-C6-013: Demo-fuzz family v2 has one selector and fresh identity owner
+
+Only `demo_fuzz` uses the seven-family roster keyed by `tags.contract_device`. The selector owns the eligible denominator; the corpus manifest owns canonical case bytes; the run manifest joins selector digest, corpus digest, family roster digest, result-set digest, and receipt digest. Every digest is recomputed from fresh bytes. A family with denominator zero, a missing family run, or denominator-positive/pass-zero is an extinction failure. No separate per-family 80% rule is introduced.
+
+### AD-C6-014: Comparison identity is a typed same-subject join
+
+Base and candidate comparison uses `n=3`, seeds `[17,29,43]`, all `3/3` runs present, and hard-pass spread `max-min <= 1` percentage point. Each paired run must have equal prompt, parser, mock-state, scorer, selector/corpus, contract bundle, and replay fingerprint identities. Missing, duplicate, or unequal join fields make results incomparable; there is no manual override.
+
+### AD-C6-015: Promotion governance has five independent axes
+
+Construction, candidate formation, authorization, execution, and acceptance are separate state axes. Artifact builders own construction facts; candidate assembly owns immutable candidate identity; the human authority owns authorization; the runner owns execution facts but never signing; acceptance consumes completed evidence and sign-or-block predicates. `required_judge_lanes=[]` means no automated judge can silently become acceptance authority.
+
+Release corpus carries `must_not_train=true`. Exposure is a five-level enum: `release_corpus`, `training`, `checkpoint_selection`, `prompt_tuning`, `s9_repair`, with any non-release exposure blocking candidate and verdict until revoked and rematerialized from clean inputs.
+
+### AD-C6-016: Legacy cutover is shadow-first and authority-monotonic
+
+Before activation, old runner and fixtures are `legacy_observation_only`: they may emit diagnostics but cannot sign acceptance. The new gate must shadow the current 57-case snapshot, N1-N6, and named deliberate-red fixtures before an activation receipt changes authority. Rollback stops new promotion and returns execution to diagnostic observation; it never restores old acceptance authority.
 
 ## Non-Goals
 

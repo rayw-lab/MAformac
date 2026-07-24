@@ -7,9 +7,16 @@ struct MAformacApp: App {
     private let speech = AVSpeechSynthesisEngine()
 
     var body: some Scene {
+        #if os(macOS)
         WindowGroup {
             rootView
         }
+        .windowResizability(.contentMinSize)
+        #else
+        WindowGroup {
+            rootView
+        }
+        #endif
     }
 
     @ViewBuilder private var rootView: some View {
@@ -54,10 +61,24 @@ struct MAformacApp: App {
                 initialAmbientBurstColor: DebugLaunchArguments.ambientBurstColor,
                 initialContext: DebugLaunchArguments.mockContext,
                 contextCapsuleRoute: DebugLaunchArguments.contextCapsuleRoute,
-                forceReduceMotion: DebugLaunchArguments.forceReduceMotion
+                motionBudget: DebugLaunchArguments.motionBudget,
+                forceReduceMotion: DebugLaunchArguments.forceReduceMotion,
+                visualSwapEnabled: DebugLaunchArguments.visualSwapEnabled
             )
+            #if os(macOS)
+            .frame(minWidth: T3MacWindowContract.minWidth, minHeight: T3MacWindowContract.minHeight)
+            #endif
         #else
-        ContentView(store: vehicleStore, traceLogger: traceLogger, speech: speech)
+        ContentView(
+            store: vehicleStore,
+            traceLogger: traceLogger,
+            speech: speech,
+            motionBudget: .preset(.fullShowcase),
+            visualSwapEnabled: T7DVisualSwapFeature.isEnabled()
+        )
+            #if os(macOS)
+            .frame(minWidth: T3MacWindowContract.minWidth, minHeight: T3MacWindowContract.minHeight)
+            #endif
         #endif
     }
 }
@@ -85,11 +106,19 @@ enum DebugLaunchArguments {
         ProcessInfo.processInfo.environment["FORCE_REDUCE_MOTION"] == "1"
     }
 
+    static var visualSwapEnabled: Bool {
+        T7DVisualSwapFeature.isEnabled()
+    }
+
+    static var motionBudget: PresentationMotionBudget {
+        MotionBudgetLaunchArgumentSelector.requestedBudget(arguments: ProcessInfo.processInfo.arguments)
+    }
+
     static var mockSnapshot: SnapshotPreset {
         if let goldenPath {
-            return SnapshotPreset(rawValue: goldenPath.snapshotPresetRawValue) ?? .cooling
+            return SnapshotPreset(rawValue: goldenPath.snapshotPresetRawValue) ?? .coldStart
         }
-        return value(after: "-mockSnapshot").flatMap(SnapshotPreset.init(rawValue:)) ?? .cooling
+        return value(after: "-mockSnapshot").flatMap(SnapshotPreset.init(rawValue:)) ?? .coldStart
     }
 
     static var mockTheme: PresentationTheme {

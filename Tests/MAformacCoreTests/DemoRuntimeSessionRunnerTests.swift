@@ -17,8 +17,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         let payload = try await runner.run(text: "打开空调")
 
         XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
-        XCTAssertEqual(payload.schemaVersion, .v1)
-        XCTAssertEqual(payload.proofClass, .localUnit)
+        XCTAssertEqual(payload.schemaVersion, .v2)
         XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
         XCTAssertEqual(payload.reconciliation.status, .verified)
         XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
@@ -55,7 +54,15 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
             store: store,
             traceLogger: trace,
             speech: speech,
-            modelBackend: DDomainToolPlanBackend(completionProvider: { _ in completion })
+            modelBackend: DDomainToolPlanBackend(completionEnvelopeProvider: { _ in
+                DDomainCompletionEnvelope(
+                    content: completion,
+                    finishReason: "tool_calls",
+                    stopReason: "end_turn",
+                    toolCallCount: 1,
+                    source: "demo_runtime_test"
+                )
+            })
         )
 
         let payload = try await runner.run(text: "空调调到26度")
@@ -64,6 +71,185 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         XCTAssertEqual(store.cell(for: "ac.temp_setpoint[主驾]")?.actualValue, "26")
         XCTAssertTrue(payload.readbacks.contains { $0.key == "ac.temp_setpoint[主驾]" && $0.actualValue == "26" })
         XCTAssertEqual(payload.reconciliation.safeReason, "c2_readback_verified")
+    }
+
+    @MainActor
+    func testDefaultRunnerEmitsTypedNoActionWithoutMutationSpeechOrFallback() async throws {
+        let store = DemoVehicleStateStore()
+        let initialRevision = store.currentRevision
+        let initialCells = store.presentationCells
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine()
+        let backend = DDomainToolPlanBackend(completionEnvelopeProvider: { _ in
+            DDomainCompletionEnvelope(
+                content: "",
+                finishReason: "stop",
+                stopReason: "end_turn",
+                toolCallCount: 0,
+                source: "demo_runtime_test"
+            )
+        })
+        let runner = try DemoRuntimeSessionRunner.defaultRunner(
+            store: store,
+            traceLogger: trace,
+            speech: speech,
+            modelBackend: backend
+        )
+
+        let payload = try await runner.run(text: "不用操作")
+
+        XCTAssertEqual(payload.outcome.result, .noAction)
+        XCTAssertEqual(payload.outcome.reason, "no_action")
+        XCTAssertEqual(payload.reconciliation.status, .notApplicable)
+        XCTAssertEqual(payload.reconciliation.safeReason, "no_action")
+        XCTAssertEqual(payload.orbState, .idle)
+        XCTAssertTrue(payload.readbacks.isEmpty)
+        XCTAssertEqual(payload.cards.map(\.key), initialCells.map(\.key))
+        XCTAssertEqual(payload.cards.map(\.actualValue), initialCells.map(\.actualValue))
+        XCTAssertEqual(payload.cards.map(\.revision), initialCells.map(\.revision))
+        XCTAssertEqual(store.presentationCells, initialCells)
+        XCTAssertEqual(store.currentRevision, initialRevision)
+        XCTAssertTrue(speech.spokenTexts.isEmpty)
+        let noActionEntry = try XCTUnwrap(
+            trace.entries.first { $0.stage == .decode && $0.message == "typed_no_action" }
+        )
+        XCTAssertEqual(noActionEntry.traceID, payload.traceID)
+        XCTAssertEqual(noActionEntry.attributes.toolCallCount, 0)
+        XCTAssertFalse(trace.entries.contains { $0.stage == .execute || $0.stage == .readback })
+        XCTAssertFalse(trace.entries.contains { $0.message == "unsupported_tool_plan" })
+    }
+
+    @MainActor
+    func testDefaultRunnerPreservesAllRouterFramesAtMultiFrameExecutionSeam() async throws {
+        let store = DemoVehicleStateStore()
+        let first = acPowerFrame(id: "cmd-first", traceID: "trace-multi")
+        let second = windowFrame(id: "cmd-second", traceID: "trace-multi", stateRevision: 0)
+        let traceLogger = InMemoryTraceLogger()
+        let runner = try DemoRuntimeSessionRunner.defaultRunner(
+            store: store,
+            traceLogger: traceLogger,
+            speech: RecordingSpeechSynthesisEngine(),
+            modelBackend: FixedMultiFrameBackend(frames: [first, second])
+        )
+
+        do {
+            _ = try await runner.run(text: "打开空调并打开车窗")
+            XCTFail("expected the multi-frame plan to stop at the B3b execution boundary")
+        } catch {
+            XCTAssertEqual(
+                error as? DemoRuntimeSessionRunnerError,
+                .multiFramePlanContainsUnreviewedAction(frameIDs: ["cmd-first", "cmd-second"])
+            )
+        }
+
+        XCTAssertEqual(store.currentRevision, 0)
+        let guardEntry = try XCTUnwrap(
+            traceLogger.entries.first {
+                $0.stage == .guard && $0.message == "multi_frame_plan_rejected"
+            }
+        )
+        XCTAssertEqual(guardEntry.attributes.guardReason, "multi_frame_plan_contains_unreviewed_action")
+        XCTAssertEqual(guardEntry.attributes.toolCallCount, 0)
+        XCTAssertFalse(traceLogger.entries.contains { $0.stage == .execute })
+        XCTAssertFalse(traceLogger.entries.contains { $0.stage == .readback })
+    }
+
+    func testB3aDoesNotExtendTraceAttributeSchema() {
+        let labels = Set(Mirror(reflecting: TraceAttributes()).children.compactMap(\.label))
+
+        XCTAssertFalse(labels.contains("stateMutation"),
+        "B3a must consume the existing trace schema; B2c owns trace schema extensions")
+    }
+
+    @MainActor
+    func testTTSFailureDoesNotBlockVisualReadbackPresentation() async throws {
+        let store = DemoVehicleStateStore()
+        let trace = InMemoryTraceLogger()
+        let speech = RecordingSpeechSynthesisEngine(nextResult: .failed(reason: "synthesizer_busy"))
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: trace,
+            speech: speech
+        )
+
+        let payload = try await runner.run(text: "打开空调")
+
+        XCTAssertEqual(store.cell(for: "ac.power")?.actualValue, "on")
+        XCTAssertEqual(payload.outcome.result, .acceptedToolCall)
+        XCTAssertEqual(payload.reconciliation.status, .verified)
+        XCTAssertEqual(payload.readbacks.first?.key, "ac.power")
+        XCTAssertEqual(speech.spokenTexts, ["空调已打开"])
+        XCTAssertTrue(trace.entries.contains { entry in
+            entry.stage == .readback
+                && entry.message == "tts_fail_open:synthesizer_busy"
+                && entry.attributes.readbackResult == .failed
+        })
+    }
+
+    @MainActor
+    func testRunnerUpdatesShortTermDialogueStateFromMockReadback() async throws {
+        let store = DemoVehicleStateStore()
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: InMemoryTraceLogger(),
+            speech: RecordingSpeechSynthesisEngine()
+        )
+
+        _ = try await runner.run(text: "打开空调")
+        let state = runner.currentDialogueState
+
+        XCTAssertEqual(state.turns.map(\.role), [.user, .assistant])
+        XCTAssertEqual(state.turns.map(\.text), ["打开空调", "空调已打开"])
+        XCTAssertEqual(state.focusEntity, "ac")
+        XCTAssertEqual(state.lastReadback?.key, "ac.power")
+    }
+
+    @MainActor
+    func testUnsupportedTurnKeepsPreviousFocusEntityForShortTermSemantics() async throws {
+        let store = DemoVehicleStateStore()
+        let initialState = DialogueState(
+            turns: [
+                DialogueTurn(role: .user, text: "打开空调"),
+                DialogueTurn(role: .assistant, text: "空调已打开")
+            ],
+            focusEntity: "ac",
+            lastReadback: DemoActionReadback(
+                key: "ac.power",
+                actualValue: "on",
+                revision: 1,
+                spokenText: "空调已打开"
+            ),
+            maxTurns: 3
+        )
+        let runner = DemoRuntimeSessionRunner(
+            store: store,
+            pipeline: try makeRepoPipeline(),
+            traceLogger: InMemoryTraceLogger(),
+            speech: RecordingSpeechSynthesisEngine(),
+            frameDecoder: { text in throw FastPathIntentError.noMatch(text) },
+            dialogueState: initialState
+        )
+
+        let payload = try await runner.run(text: "顺便安排一个火箭座椅")
+        let state = runner.currentDialogueState
+
+        XCTAssertEqual(payload.outcome.result, .refusalNoAvailableTool)
+        XCTAssertEqual(payload.outcome.reason, RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue)
+        XCTAssertEqual(
+            payload.reconciliation.safeReason,
+            RuntimePresentationSafeReasonKind.notAvailableInDemo.rawValue
+        )
+        XCTAssertEqual(state.focusEntity, "ac")
+        XCTAssertEqual(state.lastReadback?.key, "ac.power")
+        XCTAssertEqual(
+            state.turns.map(\.text),
+            ["空调已打开", "顺便安排一个火箭座椅", "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。"]
+        )
+        let encoded = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("fast_path_no_match"))
+        XCTAssertFalse(encoded.contains("这个我先记下来，稍后帮您处理"))
     }
 
     @MainActor
@@ -114,7 +300,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         for forbidden in ["DemoRuntimeAdapter", "RuntimeAdapterBox", "durableLedger", "requestFingerprint", "rawRuntimeStore"] {
             XCTAssertFalse(encoded.contains(forbidden), "payload leaked \(forbidden)")
         }
-        XCTAssertTrue(encoded.contains(#""schemaVersion":"r5_runtime_presentation_payload_v1""#))
+        XCTAssertTrue(encoded.contains(#""schemaVersion":"r5_runtime_presentation_payload_v2""#))
     }
 
     @MainActor
@@ -177,6 +363,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     private func acPowerFrame(id: String, traceID: String) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             traceID: traceID,
@@ -192,6 +379,7 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
     }
 
     private func windowFrame(id: String, traceID: String, stateRevision: Int) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             traceID: traceID,
@@ -222,4 +410,24 @@ final class DemoRuntimeSessionRunnerTests: XCTestCase {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
     }
+}
+
+private struct FixedMultiFrameBackend: LLMBackend {
+    let frames: [ToolCallFrame]
+
+    func load() async throws {}
+
+    func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan {
+        try RuntimePlan(
+            traceID: request.traceID,
+            frames: frames.map(RuntimeFrame.tool),
+            executionPolicy: .atomic
+        )
+    }
+
+    func streamText(for prompt: String) -> AsyncThrowingStream<String, Error> {
+        AsyncThrowingStream { $0.finish() }
+    }
+
+    func cancel() {}
 }

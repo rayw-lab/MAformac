@@ -1,0 +1,110 @@
+{
+  "schema_version": "closure_package_exit_envelope_v1",
+  "registry_schema_major": "closure_work_packages_v1",
+  "registry_digest": "711ba49f685dab7fc54522be7b17570cb3adb5885367fc8242403347ffe6d3c5",
+  "package_id": "V1",
+  "package_revision": 1,
+  "native_receipt_schema_id": "c6_active_authority_v1",
+  "native_receipt": {
+    "root": "repo",
+    "path": "contracts/c6-active-authority/authority.v1.candidate.json",
+    "sha256": "f911b5c11babf3a402761083b3da6198201640a796571fcc37635e40d93148eb"
+  },
+  "native_receipt_digest": "f911b5c11babf3a402761083b3da6198201640a796571fcc37635e40d93148eb",
+  "status": "CANDIDATE",
+  "claims": {
+    "status_label": "CANDIDATE",
+    "canonical": false,
+    "v1_done": false,
+    "non_claims": [
+      "not V1 DONE",
+      "not canonical",
+      "not C6 acceptance",
+      "not RATIFIED authority",
+      "not S9/S10 authorization"
+    ]
+  },
+  "subject_schema_id": "c6_authority_subject_v1",
+  "subject": [
+    {
+      "key": "authority_id",
+      "value_type": "string",
+      "value": "c6_active_authority_v1"
+    },
+    {
+      "key": "authority_version",
+      "value_type": "integer",
+      "value": 1
+    },
+    {
+      "key": "ratification_decision",
+      "value_type": "string",
+      "value": "D-147"
+    },
+    {
+      "key": "ratification_receipt_sha256",
+      "value_type": "sha256",
+      "value": "70470bc39c8a3137a4c4d298de1533502ed18b78b237d22d53d4f7b1bb43eacb"
+    },
+    {
+      "key": "golden_threshold",
+      "value_type": "string",
+      "value": "1.0"
+    },
+    {
+      "key": "demo_fuzz_formula",
+      "value_type": "string",
+      "value": "5*pass >= 4*eligible"
+    },
+    {
+      "key": "unsupported_threshold",
+      "value_type": "string",
+      "value": "1.0"
+    },
+    {
+      "key": "safety_threshold",
+      "value_type": "string",
+      "value": "1.0"
+    },
+    {
+      "key": "behavior_class_count",
+      "value_type": "integer",
+      "value": 5
+    },
+    {
+      "key": "demo_fuzz_family_count",
+      "value_type": "integer",
+      "value": 7
+    },
+    {
+      "key": "governance_axis_count",
+      "value_type": "integer",
+      "value": 5
+    },
+    {
+      "key": "readback_field_count",
+      "value_type": "integer",
+      "value": 7
+    },
+    {
+      "key": "contract_bundle_component_count",
+      "value_type": "integer",
+      "value": 7
+    },
+    {
+      "key": "authority_digest",
+      "value_type": "sha256",
+      "value": "adc6b42c84f1c43c491db7dd5dadd0f283bedcf877f85862ab3bd3fb6c2be686"
+    },
+    {
+      "key": "is_canonical",
+      "value_type": "boolean",
+      "value": false
+    },
+    {
+      "key": "is_v1_done",
+      "value_type": "boolean",
+      "value": false
+    }
+  ]
+}

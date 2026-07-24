@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "catalog_schema_version", "runtime_contract_bundle_digest", "selection_manifest_sha256", "selection_schema_sha256", "generator_contract", "selected_semantic_rows", "digest_input"],
+  "properties": {
+    "schema_version": {"const": "demo_runtime_contract_bundle_manifest_v1"},
+    "catalog_schema_version": {"const": "demo_runtime_contract_bundle_v1", "not": {"const": "demo_runtime_contract_bundle_manifest_v1"}},
+    "runtime_contract_bundle_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "selection_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "selection_schema_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "generator_contract": {"const": "demo_runtime_contract_bundle_generator_v1"},
+    "selected_semantic_rows": {"type": "array"},
+    "digest_input": {"type": "object"}
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "default_policy": "deny",
+  "never_exempt": [
+    "secrets_credentials_tokens",
+    "personal_data",
+    "pricing_and_cost",
+    "real_customer_identity",
+    "restricted_internal_source_text",
+    "training_data_from_restricted_sources"
+  ],
+  "exceptions": [
+    {
+      "id": "D-049-NARROW-PUBLIC-RESEARCH-202607",
+      "status": "active",
+      "basis": "docs/commander-log/decisions.md#D-049",
+      "valid_from": "2026-07-03",
+      "expires_on": "2026-08-02",
+      "allowed_subjects": [
+        "non_identifying_vehicle_or_platform_codes",
+        "vendor_or_product_names_from_public_sources"
+      ],
+      "allowed_carriers": [
+        "docs/research/**",
+        "referencerepo/reports/**"
+      ],
+      "conditions": [
+        "source_is_public_or_separately_approved_for_public_citation",
+        "use_is_minimal_and_research_only",
+        "not_training_data",
+        "not_customer_facing_demo_copy"
+      ],
+      "never_overrides": [
+        "secrets_credentials_tokens",
+        "personal_data",
+        "pricing_and_cost",
+        "real_customer_identity",
+        "restricted_internal_source_text",
+        "training_data_from_restricted_sources"
+      ]
+    }
+  ]
+}

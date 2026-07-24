@@ -1,0 +1,17 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W1",
+  "package_revision": 1,
+  "sequence": 2,
+  "from_state": "planned",
+  "to_state": "ready",
+  "trigger_decision": "D-142 identified W1 as the first READY_NOW implementation package",
+  "evidence": {
+    "root": "repo",
+    "path": "docs/commander-log/decisions.md",
+    "sha256": "75a4132d162706b3f6bcb6dd99965cb06d8542539d44f56b46251464ff4f120a"
+  },
+  "repo_head": "5771c51951968cdbd2e03917006403220c729617",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

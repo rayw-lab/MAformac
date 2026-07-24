@@ -1,0 +1,20 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "clarify_tag=ambiguous is a runtime routing state, NOT a jsonl row-level clarify_tag value. SHALL 'clarify_tag alphabet is not widened' scenario. Correct path SHALL be outcome=clarify with explicit reason.",
+    "expected_error": "unknown_enum"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-widened-tag-000001",
+    "trace_id": "trace-neg-widened-tag-000001",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "ambiguous",
+    "service": "airControl",
+    "action_candidate": null,
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

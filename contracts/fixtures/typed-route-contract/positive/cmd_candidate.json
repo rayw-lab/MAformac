@@ -1,0 +1,39 @@
+{
+  "_source": {
+    "contract_row_id": "c1_cmd_000002",
+    "jsonl_path": "contracts/semantic-function-contract.jsonl",
+    "captured_at": "2026-07-13",
+    "note": "Positive fixture proving the R2 clarify path for the cmd service. Live-cored 2026-07-13: Core/Contracts/DDomainMountedToolCatalog.swift:12-14 mountedToolNames = {'adjust_ac_temperature_to_number'} — only one D-domain tool currently mounted. A cmd candidate has no directly-mounted tool at this checkpoint, so the correct route is outcome=clarify (docs/srd-three-layer-intent-routing.md:52 clarifyTag=implicit route). jsonl_binding records the intent/service/device/action_primitive/action_code so a fixture checker still cross-checks against a real jsonl row. Third-service coverage {airControl, carControl, cmd} verified via live jsonl service distribution (docs/baseline-semantic-protocol-2026-06-19.md:16).",
+    "jsonl_binding": {
+      "intent": "open_bluetooth",
+      "service": "cmd",
+      "device": "bluetooth",
+      "action_primitive": "power_on",
+      "action_code": "activate_instant_device_or_function",
+      "clarify_tag": "implicit",
+      "exec_tier": "L2"
+    }
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-cmd-000002",
+    "trace_id": "trace-cmd-000002",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "implicit",
+    "service": "cmd",
+    "action_candidate": null,
+    "trace_digest": "e4d228b7c8c34bf087c52f481acd5e161dcefaba4ade2a24ae80cbeb2812a21b",
+    "rejection_reason": null
+  },
+  "route_trace_load_bearing": {
+    "schema_version": "typed_route_contract.v1",
+    "turn_id": "turn-cmd-000002",
+    "trace_id": "trace-cmd-000002",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "implicit",
+    "redaction_policy_id": "redaction_policy.v1"
+  }
+}

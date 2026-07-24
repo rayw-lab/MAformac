@@ -16,14 +16,6 @@ public struct ToolContractCompiler: Sendable {
         self.dDomainCatalog = dDomainCatalog
     }
 
-    public init(seeds: [C5SemanticSeed], dDomainCatalog: [DDomainToolEntry] = []) {
-        self.devices = Self.unique(seeds.map(\.device))
-        self.actionPrimitives = Self.unique(seeds.map(\.actionPrimitive))
-        self.valueTypes = Self.unique(seeds.map { $0.value.type })
-        self.slotKeys = Self.unique(seeds.flatMap(\.slotKeys))
-        self.dDomainCatalog = dDomainCatalog
-    }
-
     // D-domain 具名工具目录加载(generated/ 被 Package.swift exclude, 走 repoRoot 文件加载, 仿 C6 :1381)。
     public static func loadDDomainCatalog(repoRoot: URL) throws -> [DDomainToolEntry] {
         let url = repoRoot.appendingPathComponent("generated/D_domain.tools.demo.json")
@@ -137,6 +129,9 @@ public struct ToolContractIR: Equatable, Sendable {
     public var slots: [String: String]
     public var value: ContractValue
     public var rawArguments: [String: String]
+    /// 显式否定语义：当上级调用已明确 power=off 时，禁止下游自动开机。
+    /// 默认 false（允许自动开机）；仅当父级工具调用已明确"关"语义时置 true。
+    public var doNotAutoPowerOn: Bool
 
     public init(
         sourceToolName: String,
@@ -144,7 +139,8 @@ public struct ToolContractIR: Equatable, Sendable {
         actionPrimitive: String,
         slots: [String: String] = [:],
         value: ContractValue = ContractValue(),
-        rawArguments: [String: String] = [:]
+        rawArguments: [String: String] = [:],
+        doNotAutoPowerOn: Bool = false
     ) {
         self.sourceToolName = sourceToolName
         self.device = device
@@ -152,6 +148,7 @@ public struct ToolContractIR: Equatable, Sendable {
         self.slots = slots
         self.value = value
         self.rawArguments = rawArguments
+        self.doNotAutoPowerOn = doNotAutoPowerOn
     }
 }
 
@@ -281,8 +278,17 @@ public enum ToolContractNormalizer {
               let actionPrimitive = call.arguments["action_primitive"] else {
             return []
         }
-        let reserved = Set(["device", "action_primitive", "value.ref", "value.direct", "value.offset", "value.type"])
+        let reserved = Set([
+            "device",
+            "action_primitive",
+            "value.ref",
+            "value.direct",
+            "value.offset",
+            "value.type",
+            "value.sourceUnit"
+        ])
         let slots = call.arguments.filter { !reserved.contains($0.key) }
+        let sourceUnit = call.arguments["value.sourceUnit"].flatMap(ContractSourceUnit.init(rawValue:))
         return [
             ToolContractIR(
                 sourceToolName: call.name,
@@ -293,7 +299,8 @@ public enum ToolContractNormalizer {
                     ref: call.arguments["value.ref"] ?? "",
                     direct: call.arguments["value.direct"] ?? "",
                     offset: call.arguments["value.offset"] ?? "",
-                    type: call.arguments["value.type"] ?? ""
+                    type: call.arguments["value.type"] ?? "",
+                    sourceUnit: sourceUnit
                 ),
                 rawArguments: call.arguments
             )
@@ -302,15 +309,16 @@ public enum ToolContractNormalizer {
 
     private static func normalizeAC(_ call: C6ToolCall) -> [ToolContractIR] {
         var result: [ToolContractIR] = []
+        let explicitPowerOff = call.arguments["power"] == "off"
         if let power = call.arguments["power"], power != "unchanged" {
             result.append(ir(call, device: "ac", action: power == "off" ? "power_off" : "power_on", value: ContractValue(offset: power, type: "STATE")))
         }
         if let temp = call.arguments["target_temperature"] {
-            result.append(ir(call, device: "ac_temperature", action: "adjust_to_number", value: ContractValue(direct: temp, type: "SPOT")))
+            result.append(ir(call, device: "ac_temperature", action: "adjust_to_number", value: ContractValue(direct: temp, type: "SPOT"), doNotAutoPowerOn: explicitPowerOff))
         }
         if let delta = call.arguments["delta"], delta != "none" {
             let action = delta == "warmer" ? "increase_by_exp" : "decrease_by_exp"
-            result.append(ir(call, device: "ac_temperature", action: action, value: ContractValue(offset: delta, type: "EXP")))
+            result.append(ir(call, device: "ac_temperature", action: action, value: ContractValue(offset: delta, type: "EXP"), doNotAutoPowerOn: explicitPowerOff))
         }
         return result
     }
@@ -373,7 +381,8 @@ public enum ToolContractNormalizer {
         device: String,
         action: String,
         slots: [String: String]? = nil,
-        value: ContractValue
+        value: ContractValue,
+        doNotAutoPowerOn: Bool = false
     ) -> ToolContractIR {
         ToolContractIR(
             sourceToolName: call.name,
@@ -381,7 +390,8 @@ public enum ToolContractNormalizer {
             actionPrimitive: action,
             slots: slots ?? call.arguments,
             value: value,
-            rawArguments: call.arguments
+            rawArguments: call.arguments,
+            doNotAutoPowerOn: doNotAutoPowerOn
         )
     }
 }
@@ -476,6 +486,8 @@ public enum ToolContractStateApplier {
         "window": "window.position",
         "screen_brightness": "screen.brightness",
         "atmosphere_lamp_color": "ambient.color",
+        "atmosphere_lamp": "ambient.power",
+        "seat_heat": "seat.heat_level",
         "atmosphere_lamp_brightness": "ambient.brightness",
         // S3 座椅
         "seat_heat_temperature": "seat.heat_level",
@@ -586,16 +598,23 @@ public enum ToolContractStateApplier {
             } else {
                 newValue = target
             }
+        } else if isOn(ir.actionPrimitive, value: ir.value) {
+            guard let powerOn = cell.powerOnValue else {
+                throw ToolContractStateApplyError.unsupportedStateMutation(
+                    device: ir.device,
+                    primitive: ir.actionPrimitive,
+                    cellID: cellID
+                )
+            }
+            newValue = powerOn
         } else if isOff(ir.actionPrimitive, value: ir.value) {
-            newValue = String(cell.executionRange?.min ?? 0)        // power_off → 下界(window 0)
+            newValue = String(cell.executionRange?.min ?? 0)
         } else if ir.actionPrimitive == "increase_by_exp" {
             let current = Int(state[currentKey] ?? "") ?? initial
             newValue = String(clampUpper(current + (cell.expStepLittle ?? 0), cell.executionRange))
         } else if ir.actionPrimitive == "decrease_by_exp" {
             let current = Int(state[currentKey] ?? "") ?? initial
             newValue = String(clampLower(current - (cell.expStepLittle ?? 0), cell.executionRange))
-        } else if ir.device == "window" {
-            newValue = String(cell.executionRange?.max ?? 100)      // window power_on 无 target → 全开(复现旧)
         } else {
             newValue = nil
         }
@@ -630,6 +649,7 @@ public enum ToolContractStateApplier {
         }
         return writes
     }
+
 
     private static func clampUpper(_ value: Int, _ range: ExecutionRange?) -> Int {
         guard let range else { return value }

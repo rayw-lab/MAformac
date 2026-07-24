@@ -21,6 +21,23 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(snapshot.proofClass, .localMock)
     }
 
+    func testConsumerRejectsMissingV2RuntimeTruthFields() throws {
+        let baseline = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Self.validPayload()) as? [String: Any]
+        )
+
+        for field in ["voiceState", "orbState", "mutationCount"] {
+            var payload = baseline
+            payload.removeValue(forKey: field)
+            let data = try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys])
+
+            XCTAssertThrowsError(
+                try RuntimePresentationPayloadFixtureConsumer.consume(data),
+                "missing required field: \(field)"
+            )
+        }
+    }
+
     func testConsumerRejectsUnknownTopLevelPayloadFields() {
         let payload = Self.validPayload(extraTopLevel: #""timestamp": 0,"#)
 
@@ -56,20 +73,20 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
 
     func testConsumerRejectsUnknownSchemaProofOutcomeAndReconciliationValues() {
         XCTAssertThrowsError(
-            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(schemaVersion: "r5_runtime_presentation_payload_v2"))
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(schemaVersion: "r5_runtime_presentation_payload_v1"))
         ) { error in
             XCTAssertEqual(
                 error as? RuntimePresentationConsumerValidationError,
-                .unknownPayloadSchema("r5_runtime_presentation_payload_v2")
+                .unknownPayloadSchema("r5_runtime_presentation_payload_v1")
             )
         }
 
         XCTAssertThrowsError(
-            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(proofClass: "runtime_ready"))
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""proofClass": "local_unit","#))
         ) { error in
             XCTAssertEqual(
-                error as? RuntimePresentationConsumerValidationError,
-                .unknownProofClass("runtime_ready")
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownTopLevelField("proofClass")
             )
         }
 
@@ -92,24 +109,26 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         }
     }
 
-    func testProofClassMappingsAreExplicitAndDoNotPromoteMainlineProofs() throws {
-        let expectedProofClasses: [String: StagePresentationProofClass] = [
-            "docs_local": .staticPreview,
-            "openspec_contract": .staticPreview,
-            "local_static_contract": .staticPreview,
-            "local_unit": .localMock,
-            "local_shape_no_model": .staticPreview,
-            "local_receipt_consistency": .staticPreview,
-            "simulator_mock": .simulatorMock,
-            "external_gptpro_review": .operatorReview
-        ]
-
-        XCTAssertEqual(Set(RuntimePresentationConsumerMapping.d15ProofClassNames), Set(expectedProofClasses.keys))
-
-        for (mainlineName, expectedProofClass) in expectedProofClasses {
-            let snapshot = try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(proofClass: mainlineName))
-            XCTAssertEqual(snapshot.proofClass, expectedProofClass, mainlineName)
+    func testPayloadProofClassIsRejectedAsUnknownTopLevelField() {
+        XCTAssertThrowsError(
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""proofClass": "docs_local","#))
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownTopLevelField("proofClass")
+            )
         }
+        XCTAssertThrowsError(
+            try RuntimePresentationPayloadFixtureConsumer.consume(Self.validPayload(extraTopLevel: #""proofClass": "simulator_mock","#))
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPayloadFixtureConsumerError,
+                .unknownTopLevelField("proofClass")
+            )
+        }
+        // Manifest/governance still knows D15 proof labels; they are not payload fields.
+        XCTAssertFalse(RuntimePresentationConsumerMapping.payloadFieldNames.contains("proofClass"))
+        XCTAssertEqual(Set(RuntimePresentationConsumerMapping.d15ProofClassNames).count, 8)
     }
 
     func testConsumerRejectsForbiddenPrivateAndDurableMarkersAnywhereInFixture() {
@@ -169,7 +188,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(acPower.resultKind, .acceptedToolCall)
         XCTAssertEqual(acPower.proofClass, .localMock)
 
-        let refusal = try XCTUnwrap(snapshots["refusal_safety_public_payload.v1.json"])
+        let refusal = try XCTUnwrap(snapshots["refusal_safety_public_payload.v2.json"])
         XCTAssertEqual(refusal.storeCells.map(\.key), ["door.lock"])
         XCTAssertEqual(refusal.storeCells.first?.visualState, .unsafe)
         XCTAssertTrue(refusal.activeCells.isEmpty)
@@ -178,7 +197,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(refusal.resultKind, .refusalSafetyOrPolicy)
         XCTAssertEqual(refusal.proofClass, .localMock)
 
-        let runtimeError = try XCTUnwrap(snapshots["runtime_error_public_payload.v1.json"])
+        let runtimeError = try XCTUnwrap(snapshots["runtime_error_public_payload.v2.json"])
         XCTAssertEqual(runtimeError.storeCells.map(\.key), ["ac.power"])
         XCTAssertTrue(runtimeError.activeCells.isEmpty)
         XCTAssertNil(runtimeError.refusedCell)
@@ -186,17 +205,17 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(runtimeError.resultKind, .runtimeError)
         XCTAssertEqual(runtimeError.proofClass, .localMock)
 
-        let mismatch = try XCTUnwrap(snapshots["reconciliation_mismatch_public_payload.v1.json"])
+        let mismatch = try XCTUnwrap(snapshots["reconciliation_mismatch_public_payload.v2.json"])
         XCTAssertEqual(mismatch.activeCells[.ac], "ac.power")
         XCTAssertEqual(mismatch.dialogText, "ac state was not verified")
         XCTAssertEqual(mismatch.readbacks.first?.actualValue, "off")
         XCTAssertEqual(mismatch.resultKind, .acceptedToolCall)
         XCTAssertEqual(mismatch.proofClass, .localMock)
 
-        let partial = try XCTUnwrap(snapshots["partial_accept_refuse_public_payload.v1.json"])
-        XCTAssertEqual(partial.storeCells.map(\.key), ["ac.power", "door.lock"])
+        let partial = try XCTUnwrap(snapshots["partial_accept_refuse_public_payload.v2.json"])
+        XCTAssertEqual(partial.storeCells.map(\.key), ["window.position[主驾]", "ac.power"])
         XCTAssertEqual(partial.activeCells[.ac], "ac.power")
-        XCTAssertEqual(partial.refusedCell, "door.lock")
+        XCTAssertEqual(partial.refusedCell, "window.position[主驾]")
         XCTAssertEqual(partial.dialogText, "ac opened")
         XCTAssertEqual(partial.resultKind, .partialAcceptPartialRefuse)
         XCTAssertEqual(partial.proofClass, .localMock)
@@ -231,7 +250,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         XCTAssertEqual(noop.activeCells[.window], "window.position[主驾]")
         XCTAssertEqual(noop.dialogText, "主驾车窗开度100%")
         XCTAssertEqual(noop.readbacks.first?.revision, 1)
-        XCTAssertEqual(noop.resultKind, .acceptedToolCall)
+        XCTAssertEqual(noop.resultKind, .alreadyStateNoop)
         XCTAssertEqual(noop.proofClass, .localMock)
     }
 
@@ -240,7 +259,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
         let schema = try Self.loadSharedSchema()
 
         XCTAssertEqual(manifest.schemaVersion, schema.manifestSchemaVersion)
-        XCTAssertEqual(manifest.sharedSchema.name, "public_fixture_schema.v1.json")
+        XCTAssertEqual(manifest.sharedSchema.name, "public_fixture_schema.v2.json")
         XCTAssertEqual(manifest.sharedSchema.schemaVersion, schema.schemaVersion)
         XCTAssertEqual(manifest.sharedSchema.ownerRepo, "MAformac")
         XCTAssertEqual(manifest.sharedSchema.ownerPath, schema.ownerPath)
@@ -294,11 +313,11 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
     func testSharedPublicFixtureSchemaIsMainOwnedAndMappedByUIUEConsumer() throws {
         let schema = try Self.loadSharedSchema()
 
-        XCTAssertEqual(schema.schemaVersion, "r5_runtime_presentation_public_fixture_schema_v1")
+        XCTAssertEqual(schema.schemaVersion, "r5_runtime_presentation_public_fixture_schema_v2")
         XCTAssertEqual(schema.ownerRepo, "MAformac")
-        XCTAssertEqual(schema.ownerPath, "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v1.json")
-        XCTAssertEqual(schema.manifestSchemaVersion, "r5_runtime_presentation_payload_fixture_manifest_v1")
-        XCTAssertEqual(schema.payloadSchemaVersion, "r5_runtime_presentation_payload_v1")
+        XCTAssertEqual(schema.ownerPath, "Tests/Fixtures/RuntimePresentationPayload/public_fixture_schema.v2.json")
+        XCTAssertEqual(schema.manifestSchemaVersion, "r5_runtime_presentation_payload_fixture_manifest_v2")
+        XCTAssertEqual(schema.payloadSchemaVersion, "r5_runtime_presentation_payload_v2")
         XCTAssertEqual(schema.fixtureCount, Self.expectedFixtureNames.count)
         XCTAssertEqual(Set(schema.fixtureNames), Self.expectedFixtureNames)
         XCTAssertEqual(Set(schema.allowedFixtureClasses), Self.allowedFixtureClasses)
@@ -330,21 +349,21 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
             throw XCTSkip("sibling main repo fixture directory is not available in this checkout")
         }
 
-        for fileName in ["manifest.json", "public_fixture_schema.v1.json"] + schema.fixtureNames {
+        for fileName in ["manifest.json", "public_fixture_schema.v2.json"] + schema.fixtureNames {
             let uiueURL = Self.fixturesDirectory.appendingPathComponent(fileName)
             let mainURL = mainFixtureDirectory.appendingPathComponent(fileName)
             XCTAssertEqual(try C6Hash.fileHash(url: uiueURL), try C6Hash.fileHash(url: mainURL), fileName)
         }
     }
 
-    private static let fixtureName = "ac_power_public_payload.v1.json"
+    private static let fixtureName = "ac_power_public_payload.v2.json"
 
     private static let expectedFixtureNames: Set<String> = [
         fixtureName,
-        "refusal_safety_public_payload.v1.json",
-        "runtime_error_public_payload.v1.json",
-        "reconciliation_mismatch_public_payload.v1.json",
-        "partial_accept_refuse_public_payload.v1.json",
+        "refusal_safety_public_payload.v2.json",
+        "runtime_error_public_payload.v2.json",
+        "reconciliation_mismatch_public_payload.v2.json",
+        "partial_accept_refuse_public_payload.v2.json",
         RuntimeFixtureName.windowPosition,
         RuntimeFixtureName.screenBrightness,
         RuntimeFixtureName.ambientBrightness,
@@ -352,10 +371,10 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
     ]
 
     private enum RuntimeFixtureName {
-        static let windowPosition = "window_position_runtime_public_payload.v1.json"
-        static let screenBrightness = "screen_brightness_runtime_public_payload.v1.json"
-        static let ambientBrightness = "ambient_brightness_runtime_public_payload.v1.json"
-        static let windowPositionNoop = "window_position_noop_runtime_public_payload.v1.json"
+        static let windowPosition = "window_position_runtime_public_payload.v2.json"
+        static let screenBrightness = "screen_brightness_runtime_public_payload.v2.json"
+        static let ambientBrightness = "ambient_brightness_runtime_public_payload.v2.json"
+        static let windowPositionNoop = "window_position_noop_runtime_public_payload.v2.json"
     }
 
     private static let allowedFixtureClasses: Set<String> = [
@@ -381,57 +400,57 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
 
     private static let expectedManifestMetadata: [String: ManifestExpectation] = [
         fixtureName: ManifestExpectation(
-            caseID: "D22-AC-POWER-ACCEPTED-BRIDGE-V1",
+            caseID: "D22-AC-POWER-ACCEPTED-BRIDGE-V2",
             fixtureClass: "bridge_contract_fixture",
             result: "accepted_tool_call",
             familyCoverage: ["ac.power"]
         ),
-        "refusal_safety_public_payload.v1.json": ManifestExpectation(
-            caseID: "D22-REFUSAL-SAFETY-BRIDGE-V1",
+        "refusal_safety_public_payload.v2.json": ManifestExpectation(
+            caseID: "D22-REFUSAL-SAFETY-BRIDGE-V2",
             fixtureClass: "bridge_contract_fixture",
             result: "refusal_safety_or_policy",
             familyCoverage: ["door.lock", "safety_refusal"]
         ),
-        "runtime_error_public_payload.v1.json": ManifestExpectation(
-            caseID: "D22-RUNTIME-ERROR-BRIDGE-V1",
+        "runtime_error_public_payload.v2.json": ManifestExpectation(
+            caseID: "D22-RUNTIME-ERROR-BRIDGE-V2",
             fixtureClass: "bridge_contract_fixture",
             result: "runtime_error",
             familyCoverage: ["ac.power", "runtime_error"]
         ),
-        "reconciliation_mismatch_public_payload.v1.json": ManifestExpectation(
-            caseID: "D22-RECONCILIATION-MISMATCH-BRIDGE-V1",
+        "reconciliation_mismatch_public_payload.v2.json": ManifestExpectation(
+            caseID: "D22-RECONCILIATION-MISMATCH-BRIDGE-V2",
             fixtureClass: "bridge_contract_fixture",
             result: "accepted_tool_call",
             familyCoverage: ["ac.power", "reconciliation_mismatch"]
         ),
-        "partial_accept_refuse_public_payload.v1.json": ManifestExpectation(
-            caseID: "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V1",
+        "partial_accept_refuse_public_payload.v2.json": ManifestExpectation(
+            caseID: "D22-PARTIAL-ACCEPT-REFUSE-BRIDGE-V2",
             fixtureClass: "bridge_contract_fixture",
             result: "partial_accept_partial_refuse",
-            familyCoverage: ["ac.power", "door.lock", "partial_accept_partial_refuse"]
+            familyCoverage: ["ac.power", "window.position", "partial_accept_partial_refuse"]
         ),
         RuntimeFixtureName.windowPosition: ManifestExpectation(
-            caseID: "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V1",
+            caseID: "D22-WINDOW-POSITION-ACCEPTED-RUNTIME-V2",
             fixtureClass: "runtime_generated_fixture",
             result: "accepted_tool_call",
             familyCoverage: ["window.position"]
         ),
         RuntimeFixtureName.screenBrightness: ManifestExpectation(
-            caseID: "D22-SCREEN-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+            caseID: "D22-SCREEN-BRIGHTNESS-ACCEPTED-RUNTIME-V2",
             fixtureClass: "runtime_generated_fixture",
             result: "accepted_tool_call",
             familyCoverage: ["screen.brightness"]
         ),
         RuntimeFixtureName.ambientBrightness: ManifestExpectation(
-            caseID: "D22-AMBIENT-BRIGHTNESS-ACCEPTED-RUNTIME-V1",
+            caseID: "D22-AMBIENT-BRIGHTNESS-ACCEPTED-RUNTIME-V2",
             fixtureClass: "runtime_generated_fixture",
             result: "accepted_tool_call",
             familyCoverage: ["ambient.brightness"]
         ),
         RuntimeFixtureName.windowPositionNoop: ManifestExpectation(
-            caseID: "D22-WINDOW-POSITION-NOOP-RUNTIME-V1",
+            caseID: "D22-WINDOW-POSITION-NOOP-RUNTIME-V2",
             fixtureClass: "runtime_generated_fixture",
-            result: "accepted_tool_call",
+            result: "already_state_noop",
             familyCoverage: ["window.position", "already_state_noop"]
         )
     ]
@@ -441,7 +460,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
     }
 
     private static var sharedSchemaURL: URL {
-        fixturesDirectory.appendingPathComponent("public_fixture_schema.v1.json")
+        fixturesDirectory.appendingPathComponent("public_fixture_schema.v2.json")
     }
 
     private static var fixturesDirectory: URL {
@@ -549,8 +568,7 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
     }
 
     private static func validPayload(
-        schemaVersion: String = "r5_runtime_presentation_payload_v1",
-        proofClass: String = "local_unit",
+        schemaVersion: String = "r5_runtime_presentation_payload_v2",
         outcomeResult: String = "accepted_tool_call",
         outcomeReason: String = "readback_verified",
         reconciliationStatus: String = "verified",
@@ -566,11 +584,13 @@ final class RuntimePresentationPayloadFixtureConsumerTests: XCTestCase {
               "turnID": "turn-1",
               "eventID": "event-1",
               "isTerminal": true,
+              "mutationCount": 1,
+              "orbState": "speak",
+              "voiceState": "speak",
               "outcome": {
                 "result": "\(outcomeResult)",
                 "reason": "\(outcomeReason)"
               },
-              "proofClass": "\(proofClass)",
               "cards": [
                 {
                   \(extraCardField)

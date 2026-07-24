@@ -1,0 +1,17 @@
+{
+  "schema_version": "holdout_pin_v1",
+  "decision_ref": "D-127",
+  "sha256": "77853caea4598f334fb4a7ed89eafc348746adf333d647306aa94f0b68da2f64",
+  "row_count": 61,
+  "buckets": {
+    "primary_can_question": 33,
+    "topic_fronted": 9,
+    "negative_can_question": 10,
+    "particle_tail": 9
+  },
+  "repo_fixture_path": "Tools/C6EvalSpine/fixtures/holdout/eval-holdout.jsonl",
+  "source_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s9-eval-freeze/holdout/eval-holdout.jsonl",
+  "immutable": true,
+  "must_not_train": true,
+  "note": "Byte-identical pin of frozen holdout. Do not reformat or rewrite rows."
+}

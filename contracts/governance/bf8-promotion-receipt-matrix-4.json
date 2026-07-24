@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "bf8_promotion_receipt_v1",
+  "receiptID": "bf8-promotion-matrix-4-20260723",
+  "subjectSHA256": "f26054f51aa23b772b839700ddb69b221a7e7cb9",
+  "matrix_ids": [4],
+  "ceremony": {
+    "artifactRef": "runs/2026-07-17-s8-s9-successor-c-longrun/PHASE2-S10-BF8-PASS-磊哥-DELEGATED-APPROVAL-RECEIPT.md",
+    "approver": "磊哥"
+  }
+}

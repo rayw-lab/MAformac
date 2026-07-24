@@ -1,6 +1,9 @@
 status: `active_contract_carrier`
-status_source: `D-115/N4`
-status_updated: `2026-07-07`
+execution_state: `HOLD_FRONTSTAGE_BINDING_RECONCILIATION`
+status_source: `D-115/N4 + DRAFT-rtadapter-task-reconciliation`
+status_updated: `2026-07-11`
+reconciliation_note: `12.1-12.5` are historical D14 Gate4 completions (12.3 is superseded/clarified by D15-D19); `17.1-17.2` are historical implementations whose live App/frontstage binding is absent. This carrier remains active, not archivable.
+blocked_on: `T03_route_contract_cut + T04_customer_ingress_and_production_composition + T09_lifecycle_contract_for_T04b`
 
 ## Why
 

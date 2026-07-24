@@ -1,0 +1,16 @@
+test_completion_manifest_joins_start_and_recomputes_subject (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_completion_manifest_rejects_missing_rc_sidecar (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_completion_manifest_rejects_non_monotonic_metrics (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_seal_cli_failure_does_not_write_success_manifest (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... G1_FRESH_FULL_SEAL_BLOCKED E_START_NONCE_MISSING: launch_identity.nonce
+ok
+test_seal_cli_writes_manifest_after_all_gates_pass (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_start_preflight_rejects_incomplete_inventory_checked_set (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_start_preflight_rejects_missing_explicit_resume_null (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_start_preflight_rejects_missing_inventory (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_start_preflight_rejects_missing_nonce (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+test_start_preflight_rejects_non_null_resume_adapter (scripts.test_s8_g1_receipt.S8G1ReceiptTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.041s
+
+OK

@@ -8,9 +8,29 @@ final class DDomainMountedToolCatalogTests: XCTestCase {
         XCTAssertGreaterThan(DDomainIRMap.irMapCompiled.count, DDomainMountedToolCatalog.mountedToolNames.count)
     }
 
-    func testMountedDemoCatalogIsMinimalClaimedRuntimeSurface() {
-        XCTAssertEqual(DDomainMountedToolCatalog.mountedToolNames, ["adjust_ac_temperature_to_number"])
+    func testMountedDemoCatalogContainsOnlyPhaseTwoReviewedRuntimeTools() {
+        XCTAssertEqual(
+            DDomainMountedToolCatalog.mountedToolNames,
+            [
+                "adjust_ac_temperature_to_number",
+                "close_ac",
+                "open_ac",
+                "open_atmosphere_lamp",
+                "open_seat_heat",
+                "open_window_by_number",
+            ]
+        )
         XCTAssertEqual(DDomainMountedToolCatalog.mountedCatalogKind, "mounted_demo_catalog_sha")
+    }
+
+    func testMountedCatalogExcludesModelTailgateSunroof() {
+        // Phase 2 WP2-1 mounts only the reviewed AC/window/ambient/seat tools.
+        let mounted = DDomainMountedToolCatalog.mountedToolNames
+        for unwanted in ["model", "tailgate", "sunroof"] {
+            XCTAssertFalse(mounted.contains { $0.contains(unwanted) }, "unexpected tool containing '\(unwanted)'")
+        }
+        let carControlTools = mounted.subtracting(["adjust_ac_temperature_to_number", "close_ac", "open_ac"])
+        XCTAssertEqual(carControlTools, ["open_atmosphere_lamp", "open_seat_heat", "open_window_by_number"])
     }
 
     func testMountedCatalogAllNamesResolveToExecutionCell() {

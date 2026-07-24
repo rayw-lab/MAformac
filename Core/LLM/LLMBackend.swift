@@ -24,7 +24,7 @@ public struct RuntimePrewarmContext: Sendable, Equatable {
 
 public protocol LLMBackend: Sendable {
     func load() async throws
-    func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame]
+    func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan
     func streamText(for prompt: String) -> AsyncThrowingStream<String, Error>
     func cancel()
 }

@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "B1b",
+  "package_revision": 1,
+  "sequence": 4,
+  "from_state": "running",
+  "to_state": "done",
+  "trigger_decision": "Commander authorized B1b Stage2 DONE after independent Stage1 provenance recheck",
+  "evidence": {"root": "repo", "path": "closure/receipts/B1b/native-closeout.v1.json", "sha256": "64b2234bd59c6e1787ca8c534497dc8457710b667beea085aa24d1d7325583e3"},
+  "repo_head": "d973b730ae8f8e6002d8678de2353e453206ca0f",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "demo_runtime_bundle_selection_v1",
+  "generatorContract": "demo_runtime_contract_bundle_generator_v1",
+  "semanticRows": [
+    {
+      "contractRowID": "c1_airControl_000006",
+      "sourceRowHash": "9201f4417f15980da8aa993abb3a98431efc4dc1ac3e726fd57aa432b1a54021",
+      "canonicalSemanticID": "sem_5de05fdd3626ba1a",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "default_fast_path_ac_power_on"
+    },
+    {
+      "contractRowID": "c1_airControl_000008",
+      "sourceRowHash": "2ac72d4d24d55efa1e44ec893c9b3ce9cd4482e117721d07641d6e9ba70b79aa",
+      "canonicalSemanticID": "sem_5f7aa4dba0f80dee",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "reviewed_cor2_ac_power_off"
+    },
+    {
+      "contractRowID": "c1_airControl_000164",
+      "sourceRowHash": "bbfe0f19c0a07dfe5c572e79d6c08463d6905dd743d2c0f01a324213dbe91c4c",
+      "canonicalSemanticID": "sem_bfe50f98f19b9faa",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "default_model_ac_temperature_unscoped"
+    },
+    {
+      "contractRowID": "c1_carControl_000021",
+      "sourceRowHash": "b7daab138f29afa91a896727762461eba97133b4cc5b5eac6d07d42a509307aa",
+      "canonicalSemanticID": "sem_9f55d735f0de20e0",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "phase2_driver_window_increase_percent"
+    },
+    {
+      "contractRowID": "c1_carControl_001972",
+      "sourceRowHash": "4481309392881ac4770fe6bcc4d02c6610c5e18075e34f04b2a01d28933af9fb",
+      "canonicalSemanticID": "sem_3d2bf62beb619a73",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "phase2_ambient_light_power_on"
+    },
+    {
+      "contractRowID": "c1_carControl_000201",
+      "sourceRowHash": "7cf33c3abe4d5170c2309205ced88d18d6d5afe1aff2a388f467eaaabe5cbc80",
+      "canonicalSemanticID": "sem_5c562bb80d48eb10",
+      "variantRule": "exact_composite_identity",
+      "runtimeUse": "phase2_passenger_seat_heat_power_on"
+    }
+  ],
+  "projections": {"stateCells": "full_canonical_file", "riskPolicy": "full_canonical_file", "allowlist": "full_canonical_file"}
+}

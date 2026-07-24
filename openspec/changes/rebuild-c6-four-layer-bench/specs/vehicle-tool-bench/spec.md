@@ -26,7 +26,7 @@ Each C6 case SHALL carry deterministic expectations for tool-call, no-call, stat
 - **AND** the safety case uses `refusal_safety_or_policy`
 
 ### Requirement: Four deterministic hard gates SHALL decide release blocking
-C6 SHALL enforce deterministic hard gates before any judge score is considered. These gates SHALL report external layers independently as `golden`, `demo_fuzz`, `unsupported`, and `safety`. Aggregate pass rate SHALL NOT hide a hard-layer failure. Readback renderer validity SHALL NOT be counted as model hard-pass, while clarify/refusal text evidence SHALL remain part of hard-pass when asserted by the case schema.
+C6 SHALL enforce deterministic hard gates before any judge score is considered. These gates SHALL report external layers independently as `golden`, `demo_fuzz`, `unsupported`, and `safety`, orthogonally to the five internal behavior classes. Thresholds SHALL be `golden=100%`, `demo_fuzz>=80%`, `unsupported=100%`, and `safety=100%`; demo-fuzz SHALL use integer arithmetic `5 * pass >= 4 * eligible`. Aggregate pass rate SHALL NOT hide a hard-layer failure. Readback renderer validity SHALL NOT be counted as model hard-pass, while clarify/refusal text evidence SHALL remain part of hard-pass when asserted by the case schema.
 
 #### Scenario: Aggregate pass cannot hide a failed layer
 - **GIVEN** a run with high aggregate pass rate
@@ -35,6 +35,12 @@ C6 SHALL enforce deterministic hard gates before any judge score is considered. 
 - **THEN** the safety layer is reported as failed
 - **AND** aggregate pass rate does not mark the bench accepted
 
+#### Scenario: Empty or missing hard layer blocks
+- **GIVEN** any hard layer is missing, has no eligible denominator, or lacks its required run
+- **WHEN** C6 evaluates promotion eligibility
+- **THEN** the result is blocked rather than vacuously passing
+- **AND** no aggregate summary substitutes for the absent layer
+
 #### Scenario: Readback is excluded from model hard-pass
 - **GIVEN** a state-changing case with deterministic renderer readback evidence
 - **WHEN** C6 computes model hard-pass
@@ -42,13 +48,19 @@ C6 SHALL enforce deterministic hard gates before any judge score is considered. 
 - **AND** the run still records readback applicability and renderer match separately
 
 ### Requirement: Readback gate SHALL reuse C2 readback templates
-C6 SHALL reuse C2 `renderReadback` semantics for renderer/gold validity. Readback evidence SHALL remain available for gold verification and renderer reporting, but it SHALL be excluded from model hard-pass under readback plan P. C6 SHALL NOT delete readback evidence or replace C2 rendering with C6-local prose.
+C6 SHALL reuse C2 `renderReadback` semantics for renderer/gold validity. Readback evidence SHALL remain available for gold verification and renderer reporting, but it SHALL be excluded from model hard-pass under readback plan P. Every receipt SHALL carry `model_hard_pass_basis`, `model_hard_failed`, `readback_applicable`, `readback_match`, `readback_hard_failed`, `readback_excluded_from_model_hard_pass`, and `renderer_contract_digest`. Missing fields SHALL block as unknown. C6 SHALL NOT delete readback evidence or replace C2 rendering with C6-local prose.
 
 #### Scenario: Gold verification keeps renderer readback
 - **GIVEN** a gold candidate whose expected state can be rendered by C2
 - **WHEN** `verify-gold` replays the candidate
 - **THEN** the gold verification records renderer readback validity
 - **AND** that renderer result is not treated as model hard-pass evidence
+
+#### Scenario: Renderer mismatch remains a separate failure
+- **GIVEN** model-hard predicates pass but deterministic renderer readback mismatches
+- **WHEN** the receipt is written
+- **THEN** `readback_hard_failed` is true and the renderer digest is present
+- **AND** the renderer result does not change the model-hard numerator
 
 ### Requirement: C6 SHALL provide deterministic gold self-verification
 `verify-gold` SHALL remain a deterministic shape/contract replay check. It SHALL verify tool-call, state-delta, dependency side-effect policy, C2 renderer readback validity, clarify/refusal expectations, and source-reference expectations without running a model. A `verify-gold` pass SHALL NOT be represented as C6 acceptance or model-quality proof.
@@ -106,7 +118,7 @@ Each C6 eval run SHALL preserve per-run identity fields for prompt, output, mode
 - **AND** no C6 summary receipt is produced for the partial denominator
 
 ### Requirement: Base Qwen3-1.7B baseline SHALL run before LoRA diff
-Base-vs-LoRA comparison SHALL use the same harness, dataset, prompt policy, parser, mock state, scoring, replay fingerprint, and contract bundle semantics. This comparison SHALL require a signed LoRA candidate and explicit run authorization. The construction lane MAY define comparison semantics before such a candidate exists, but SHALL NOT run model-quality comparison without authorization.
+Base-vs-LoRA comparison SHALL use a typed same-subject join over the same harness, dataset, prompt policy, parser, mock state, scoring, replay fingerprint, selector/corpus identity, and contract bundle semantics. Comparison SHALL use exactly `n=3`, seeds `[17,29,43]`, require `3/3` runs, and require hard-pass spread `max-min <= 1` percentage point. Missing, duplicate, or unequal join identities SHALL be incomparable without manual override. This comparison SHALL require a signed LoRA candidate and explicit run authorization. The construction lane MAY define comparison semantics before such a candidate exists, but SHALL NOT run model-quality comparison without authorization.
 
 #### Scenario: Construction does not require a candidate
 - **GIVEN** no signed LoRA candidate exists
@@ -121,7 +133,49 @@ Base-vs-LoRA comparison SHALL use the same harness, dataset, prompt policy, pars
 - **THEN** both runs use the same harness and contract bundle semantics
 - **AND** the result is reported as C6 model-quality evidence only
 
+#### Scenario: Same-subject join mismatch blocks comparison
+- **GIVEN** a base/candidate pair has a missing run, duplicate seed, or unequal harness identity
+- **WHEN** comparison is requested
+- **THEN** the pair is reported as incomparable
+- **AND** no value is manually filled or overridden
+
 ## ADDED Requirements
+
+### Requirement: Demo-fuzz SHALL enforce seven-family extinction guards
+Only `demo_fuzz` SHALL partition eligible cases by `tags.contract_device` with the exact roster `ac_temperature`, `window`, `screen_brightness`, `atmosphere_lamp_color`, `atmosphere_lamp_brightness`, `ac_windspeed`, and `car_door`. Selector, corpus, family manifest, result set, and receipt identities SHALL be recomputed from fresh bytes. Each family SHALL block when its denominator is zero, its run is missing, or its denominator is positive and pass count is zero. This requirement SHALL NOT add a per-family 80% threshold.
+
+#### Scenario: A family becomes extinct
+- **GIVEN** one roster family has zero eligible cases, no run, or positive eligibility with zero passes
+- **WHEN** demo-fuzz promotion is evaluated
+- **THEN** demo-fuzz is blocked for family extinction
+- **AND** stale digests or aggregate pass rate cannot mask the failure
+
+### Requirement: Promotion SHALL separate five governance axes
+Construction, candidate formation, authorization, execution, and acceptance SHALL be separately represented with owners and receipts. The runner SHALL NOT sign acceptance. `required_judge_lanes` SHALL be an explicit list and SHALL default to `[]`. Missing owner, predicate, or transition evidence SHALL sign-or-block rather than infer completion.
+
+#### Scenario: Local runner green lacks acceptance authority
+- **GIVEN** construction and execution are green but authorization or acceptance evidence is absent
+- **WHEN** promotion is requested
+- **THEN** no acceptance signature is emitted
+- **AND** runner output remains execution evidence only
+
+### Requirement: Release corpus SHALL be excluded from optimization exposure
+Release cases SHALL carry `must_not_train=true`. Exposure SHALL distinguish `release_corpus`, `training`, `checkpoint_selection`, `prompt_tuning`, and `s9_repair`. Any release case observed in a non-release exposure SHALL block candidate and verdict until contamination is revoked and clean artifacts are rematerialized.
+
+#### Scenario: Release case appears in S9 repair material
+- **GIVEN** a release-corpus case digest appears in `s9_repair`
+- **WHEN** exposure is checked
+- **THEN** candidate formation and acceptance are blocked
+- **AND** a runner pass cannot override the contamination
+
+### Requirement: Legacy C6 SHALL remain observation-only until activation
+Before a rebuilt-gate activation receipt exists, old C6 runner and fixtures SHALL have claim cap `legacy_observation_only` and SHALL NOT sign acceptance. Activation SHALL require shadow coverage of the current 57-case snapshot, N1-N6, and named deliberate-red fixtures. Rollback SHALL stop new promotion but SHALL NOT restore old acceptance authority.
+
+#### Scenario: Legacy runner is green before activation
+- **GIVEN** the old runner passes before the rebuilt gate activation receipt
+- **WHEN** an acceptance claim is requested
+- **THEN** the old result is recorded as diagnostic observation only
+- **AND** no acceptance signature is produced
 
 ### Requirement: Behavior-class taxonomy SHALL be shared across C5, C6, and apply
 The behavior-class taxonomy SHALL be a shared source for C5 data observed counts, C6 denominator/selector classification, and apply/execution no-effect reasoning. C6 SHALL NOT define a private no-effect enum or leave `C6Bucket` as an unreconciled competing source.

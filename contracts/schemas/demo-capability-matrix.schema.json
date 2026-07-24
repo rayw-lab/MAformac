@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DemoCapabilityMatrix",
+  "type": "object",
+  "required": ["schema_version", "source", "cells", "summary", "secondary_tools"],
+  "properties": {
+    "schema_version": {"const": "demo_capability_matrix_v2"},
+    "source": {"type": "object"},
+    "secondary_tools": {
+      "type": "object",
+      "required": ["close_ac"],
+      "properties": {
+        "close_ac": {
+          "type": "object",
+          "required": ["mounted_status", "customer_admitted", "proven", "proven_basis"],
+          "properties": {
+            "mounted_status": {"const": "mounted"},
+            "customer_admitted": {"const": true},
+            "proven": {"const": false},
+            "proven_basis": {"$ref": "#/$defs/bf8_basis"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 120,
+      "maxItems": 120,
+      "items": {
+        "type": "object",
+        "required": ["matrix_id", "family", "value_shape", "register", "representative_tool", "primary_class", "default_path_status", "injected_path_status", "entrypointAliases", "mounted_status", "semantic_basis", "state_cell_basis", "readback_probe_basis", "actionDemoProven_basis", "actionDemoProven", "rejectionDemoProven", "fallback_reason", "reasonKind", "source_hash", "anchors"],
+        "properties": {
+          "matrix_id": {"type": "integer", "minimum": 1},
+          "family": {"type": "string"},
+          "value_shape": {"type": "string"},
+          "register": {"type": "string"},
+          "representative_tool": {"type": "string"},
+          "primary_class": {"type": "string"},
+          "default_path_status": {"type": "string"},
+          "injected_path_status": {"type": "string"},
+          "entrypointAliases": {"type": "array", "items": {"type": "string"}},
+          "mounted_status": {"type": "string"},
+          "semantic_basis": {"$ref": "#/$defs/evidence_basis"},
+          "state_cell_basis": {"$ref": "#/$defs/evidence_basis"},
+          "readback_probe_basis": {"$ref": "#/$defs/readback_basis"},
+          "actionDemoProven_basis": {
+            "type": "object",
+            "required": ["mounted_or_approved_action", "semantic_contract", "state_readback_cell", "readbackProbePass", "bf8_promotion"],
+            "properties": {
+              "mounted_or_approved_action": {"$ref": "#/$defs/evidence_basis"},
+              "semantic_contract": {"$ref": "#/$defs/evidence_basis"},
+              "state_readback_cell": {"$ref": "#/$defs/evidence_basis"},
+              "readbackProbePass": {"$ref": "#/$defs/readback_basis"},
+              "bf8_promotion": {"$ref": "#/$defs/bf8_basis"}
+            },
+            "additionalProperties": false
+          },
+          "actionDemoProven": {"type": "boolean"},
+          "rejectionDemoProven": {"type": "boolean"},
+          "fallback_reason": {"type": ["string", "null"]},
+          "reasonKind": {"type": ["string", "null"]},
+          "source_hash": {"type": "string"},
+          "anchors": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {"type": "object"}
+  },
+  "$defs": {
+    "evidence_basis": {
+      "type": "object",
+      "required": ["observed", "source_ref"],
+      "properties": {"observed": {"type": "boolean"}, "source_ref": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "readback_basis": {
+      "type": "object",
+      "required": ["observed", "status", "probe_id", "probe_receipt_id", "source_ref"],
+      "properties": {
+        "observed": {"type": "boolean"}, "status": {"type": "string"}, "probe_id": {"type": ["string", "null"]}, "probe_receipt_id": {"type": ["string", "null"]}, "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "runtimeContractBundleDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "source_ref": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "bf8_basis": {
+      "type": "object",
+      "required": ["observed", "status", "source_ref"],
+      "properties": {"observed": {"type": "boolean"}, "status": {"type": "string"}, "receipt_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "source_ref": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

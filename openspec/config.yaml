@@ -1,63 +1,34 @@
 schema: spec-driven
 
-# 项目上下文 —— 创建任何 proposal/spec/design/tasks 时自动喂给 AI(防漂移)
+# 仅注入长期稳定的项目背景与 artifact 纪律；动态路线由 CURRENT/live Git 恢复。
 context: |
-  MAformac = Master Agent for macOS / iOS。纯端侧、完全离线的车控「方案演示助手」
-  (方案经理给客户现场演示用,**非量产、非真车控、非客户侧运行产品**)。
+  MAformac 是纯端侧、完全离线的车控方案演示助手，用于现场方案演示，
+  不是量产座舱、真车控制、客户侧运行产品或多租户服务。
 
-  北极星:客户现场 5 分钟内——听懂中文、反应快、不崩、看着惊艳、断网也能跑。
+  北极星是五分钟内听懂中文、反应快、不崩、视觉清晰、断网可演。
+  车控执行端只改变 mock UI 状态并给出 TTS/readback；安全检查由代码执行，
+  模型不直接执行动作，错误不得冒充成功。
 
-  技术(候选,非锁死):
-  - 大脑 Qwen3-1.7B + LoRA 为**主线**;0.6B / FoundationModels / llama.cpp 仅作轻量备选 / baseline / 对照,
-    **不作默认方案**。先用 1.7B 推进,不前置做 benchmark;**除非真机实测 1.7B 跑不动,不提前降级**。
-    LLMBackend 协议可换。
-  - 车控全 mock:端状态自包含 = UI 卡片亮暗 + TTS 模拟,无外部系统方喂状态。
-  - 规则吃 80% 高频明确指令,LLM 只碰 20% 模糊/跨域;LoRA 必做(只练"模糊说→跨域映射")。
-  - 平台 SwiftUI(macOS+iOS),无后端;Python 库零进 iOS(只在 Mac 开发期用)。
+  行为契约以已生效的 openspec/specs 为准；可执行语义以 contracts/source/checker 为准。
+  proposal、plan、handoff 和 Memory 都不能提升 proof class。
 
-  推进方法论:OpenSpec(做什么)+ Pocock(现在哪一阶段)+ Superpowers(怎么高质量执行)。
-  详见 docs/project/collaboration-and-roles.md §7。
+  源料只抽象语义、架构与协议。密钥、个人数据、报价/成本、真实客户身份、
+  受限原文和受限源料训练数据永不入仓；任何例外只认项目 exception registry。
 
-  默认路线(方向非瀑布门):S0 资料堆 → S1 OpenSpec 建项契约 → S2 capability 样板 → S3 文本 mock 闭环
-           → S4 模型 benchmark → S5 离线语音闭环 → S6 iOS/macOS 个人演示包。
-
-  OpenSpec change 拆法(v2,2026-06-19 全量重构;旧 7-change 已物理 park → openspec/changes/_parked/,见其 README 复用度):
-  ✅ define-demo-mvp-contract done+archive(成功标准/non-goals/边界/MVP/5幕,骨架保留)
-  ⚠️ define-capability-contract done+archive(扁平 8 能力)→ 被 C1 supersede(新 semantic-function-contract spec 替代 vehicle-capabilities)
-  **当前:define-c1c2-contract(一个 change,两个 capability spec delta,CC 亲自设计)**
-    - C1 semantic-function-contract:源行级 JSONL 全集(airControl/carControl/cmd,source_rows≈3990,codegen 派生非手写)+ value 四件套 + device×原语×槽三元 + clarifyTag + followup sidecar + risk-policy + l1-allowlist + 冻结快照 manifest + 分流账本(unclassified=0/quarantine≠drop)+ make verify 本地门
-    - C2 scenario-state-protocol:demo 场景端态(L1_device_cells ∪ scenario_required_cells ∪ safety_cells)+ execution_range 权威 + demo scenarios + 脱敏参考映射
-    - 接口互锁(execution_range_ref/range_ref_kind/l1-allowlist)写 design.md 共享段;archive 同波(避双向循环)
-  C3–C7(parked,C1/C2 archive 后按 _parked/README 复用度 rebase):C3 执行(←execution,骨架可复用 46340f1)/ C4 三层路由+意图收缩(←intent-routing,重写)/ C5 LoRA 全量(←lora,重写)/ C6 vehicle-tool-bench(←bench,重写)/ C7 voice(←voice,高可复用)
-  依赖序:C1+C2(当前,CC 设计)→ C3 → C4 → C5 → C6 → C7。甲档=生成式全集精确(codegen 派生非手写)+ 甲-混节奏(C1/C2 先做对,纵切 空调温度+车窗 验全栈,再横铺)。
-  决策全料:docs/c1-q1-q10-claude-oracle-grill-2026-06-19.md + docs/adr/0001-generated-full-contract-with-mixed-delivery.md + CONTEXT.md(领域语言)。
-
-  边界红线(无例外):
-  - 不做真车控 / CAN·ECU·OBD / 量产座舱 / 客户侧运行产品。
-  - 源料来自真实座舱项目(某车厂)+ 开源 repo 研究:只抽象语义/协议骨架进契约,不复制原文语料。
-    **分级脱敏**(2026-06-19 校准):🔴 绝不入仓 = 密钥 / PII / 报价 / 真实人名 / 禁外传原文;
-    🟡 private 内网可接受 = 车型代号(AH8/T19 等)/ 供应商名(非密钥,仅 private 仓,绝不进训练集 / 不上公开仓);客户公司名正文仍统一「某车厂」。
-  - **真实座舱 bug 训练集(即便本地脱敏)不入仓、不上云;仅 LoRA 权重产物可入仓**。
-  - 唯一契约源(v2):contracts/semantic-function-contract.jsonl(C1 源行级主源;function-spec-full.yaml/规则查表/LoRA 话术/bench fixture 皆生成物;旧 capabilities.yaml 被 C1 supersede)。冻结源 xlsx 快照在外部 raw 只读 + manifest 锚 content_digest,仓内只放 manifest + JSONL 镜像 + coverage 报告(源料绝不进仓)。
-
-# 各 artifact 的硬规则 —— 创建对应 artifact 时强制遵守
 rules:
   proposal:
-    - 必须有 Non-goals 段(显式列出"不做什么")
-    - 必须有可验收的成功标准(如"固定演示集 N 条,断网全过,错误不冒充成功")
-    - 商业 / 主观信号(客户反应、听感)不混入硬验收,单列为非自动化 success signal
-    - 只写演示语境:车控 = mock 卡片 + TTS,不是真车控制
+    - 必须包含 Non-goals，并明确本次不改变的产品面和 proof ceiling
+    - 成功标准必须可观察、可复算；主观体验信号与自动化 hard gate 分开
+    - 车控语境必须明确为 mock state + readback，不得写成真实车辆执行
   specs:
-    - 只写可观察行为(Requirement SHALL/MUST + Scenario GIVEN/WHEN/THEN),不写类名 / 库 / 文件名 / 实现步骤
-    - 行为契约必含:只 mock 车控、断网可演、错误不冒充成功(读回 mock 态才算成功)
-    - 数值范围 / 枚举只引"能力声明的范围",不在 spec 写死具体数值(v2:执行边界数值在 C2 `contracts/state-cells.yaml` 的 execution_range;语义 range 在 C1 `semantic-function-contract.jsonl`;旧 capabilities.yaml 已被 C1/C2 supersede)
+    - 只写可观察行为，使用 Requirement SHALL/MUST 与 Scenario GIVEN/WHEN/THEN
+    - 错误不得冒充成功；需要状态变化的行为以 readback 作为完成证据
+    - 不复制 contracts 中的机器枚举、范围或计数，使用稳定引用
   design:
-    - 主链路明确:文本输入 → 意图解析 → ToolCall → DemoGuard → mock state → trace
-    - 安全门控是代码不是 prompt;模型不直接执行动作
-    - Pre-Mortem(坑点先行,方法论 = Klein/HBR;移植 vibecosystem 的 scout+oracle,非闭门造):每个新技术点/库/模型 propose/动手前跑——
-      **scout** = 搜本机 38 repo + 历史做法(file:line);**oracle** = CC subagent + CC 多路 WebSearch 搜外部 pitfall(GitHub issues +「known issues/gotchas」;**不派 Codex/GPT Pro**——每个 agent 用自己的 subagent+web)。
-      Risks 段必须写「已搜到的具体失败模式 + 来源」,不写空泛通用风险;「应该能 work」念头 = 强制搜坑信号(乐观不是放行)。
-      spike 报告必含「测了哪些 failure mode / 哪些没测」。详见 memory `premortem-adopt-vibecosystem`。
+    - 明确输入、决策、安全门、mock state、readback 和 trace 的责任边界
+    - 风险必须绑定具体 failure mode 与可验证缓解，不写空泛风险
+    - 说明证据等级以及尚未覆盖的 runtime/device/live-api 面
   tasks:
-    - 拆到 Codex 可独立执行(每条有明确产出 + 验收标准)
-    - 标注是否需叠加 Superpowers(TDD / 调试 / verification)
+    - 每项任务写明产出、验收标准、scope in/out 和禁止提升的 claim
+    - 先跑针对性门，再按风险决定 build/integration；禁止用 agent prose 代替结果
+    - closeout 必须绑定 exact subject、验证结果、proof class 与 non-claims

@@ -1,0 +1,21 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "session_id must not appear in RouteResult ontology. SHALL 'Route result MUST carry the minimum wire fields' scenario 'Session identity leaks are forbidden'.",
+    "expected_error": "payload_invalid"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-session-leak-000001",
+    "trace_id": "trace-neg-session-leak-000001",
+    "exec_tier": "L2",
+    "outcome": "clarify",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": null,
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null,
+    "session_id": "leaked-session-000001"
+  }
+}

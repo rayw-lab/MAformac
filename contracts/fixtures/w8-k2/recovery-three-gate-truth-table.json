@@ -1,0 +1,89 @@
+{
+  "fixture_id": "W8-K2-F06-recovery-truth-table",
+  "capability": "session-lifecycle",
+  "change_id": "implement-t09-session-lifecycle-child-registry-and-recovery",
+  "claim_class": "recipe_only",
+  "provenance_note": "does not satisfy proof_runtime; not W8 DONE; not operator-pass; not V-PASS; not C6 acceptance; not mobile; not true-device; not live proof",
+  "condition_axes": {
+    "k1Terminal": "K1 SessionLifecycleCoordinator snapshot.state == .terminal",
+    "checkpoint": "SessionLifecycleRecoveryCoordinator.stableCheckpoint is not nil",
+    "pendingPlanOnly": "stableCheckpoint is nil AND pendingPlan is not nil",
+    "fenceJoinAllowed": "SessionLifecycleChildRegistry.fenceJoinOutcome() in { .allAcked, .timedOutFenced }",
+    "authorityMatches": "requestRecovery authority == ownerAuthority",
+    "generationMonotonic": "requestRecovery newGeneration.value > currentGeneration.value"
+  },
+  "rows": [
+    {
+      "row_id": "row-01-grant",
+      "k1Terminal": true,
+      "checkpoint": true,
+      "pendingPlanOnly": false,
+      "fenceJoinAllowed": true,
+      "authorityMatches": true,
+      "generationMonotonic": true,
+      "expected_outcome": "granted"
+    },
+    {
+      "row_id": "row-02-deniedTerminalIncomplete",
+      "k1Terminal": false,
+      "checkpoint": true,
+      "pendingPlanOnly": false,
+      "fenceJoinAllowed": true,
+      "authorityMatches": true,
+      "generationMonotonic": true,
+      "expected_outcome": "deniedTerminalIncomplete"
+    },
+    {
+      "row_id": "row-03-deniedCheckpointMissing",
+      "k1Terminal": true,
+      "checkpoint": false,
+      "pendingPlanOnly": false,
+      "fenceJoinAllowed": true,
+      "authorityMatches": true,
+      "generationMonotonic": true,
+      "expected_outcome": "deniedCheckpointMissing"
+    },
+    {
+      "row_id": "row-04-deniedPendingPlanOnly",
+      "k1Terminal": true,
+      "checkpoint": false,
+      "pendingPlanOnly": true,
+      "fenceJoinAllowed": true,
+      "authorityMatches": true,
+      "generationMonotonic": true,
+      "expected_outcome": "deniedPendingPlanOnly"
+    },
+    {
+      "row_id": "row-05-deniedChildJoinIncomplete",
+      "k1Terminal": true,
+      "checkpoint": true,
+      "pendingPlanOnly": false,
+      "fenceJoinAllowed": false,
+      "authorityMatches": true,
+      "generationMonotonic": true,
+      "expected_outcome": "deniedChildJoinIncomplete"
+    },
+    {
+      "row_id": "row-06-deniedAuthority",
+      "k1Terminal": true,
+      "checkpoint": true,
+      "pendingPlanOnly": false,
+      "fenceJoinAllowed": true,
+      "authorityMatches": false,
+      "generationMonotonic": true,
+      "expected_outcome": "deniedAuthority"
+    },
+    {
+      "row_id": "row-07-deniedStaleGeneration",
+      "k1Terminal": true,
+      "checkpoint": true,
+      "pendingPlanOnly": false,
+      "fenceJoinAllowed": true,
+      "authorityMatches": true,
+      "generationMonotonic": false,
+      "expected_outcome": "deniedStaleGeneration"
+    }
+  ],
+  "row_count": 7,
+  "test_oracle_independence_note": "K2 tests hard-code each row's expected_outcome case; assertions MUST switch on the exact SessionRecoveryOutcome case (not via a boolean isGranted derived from the enum by implementation code)."
+}

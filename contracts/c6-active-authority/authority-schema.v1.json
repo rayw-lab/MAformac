@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/c6-active-authority/authority-schema.v1.schema.json",
+  "title": "C6 Active Authority V1",
+  "description": "The V1 active authority for C6 measurement yardstick (T01). Defines the identity, thresholds, behavior classes, demo-fuzz roster, governance axes, readback fields, contract bundle fingerprint, and exact source_members manifest that together constitute the signed C6 authority. Freshness policy: immutable_digest — once signed, the authority is frozen and cannot be amended without a superseding authority version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "authority_id",
+    "authority_version",
+    "schema_version",
+    "subject_schema_id",
+    "status",
+    "ratification_refs",
+    "decision_refs",
+    "source_members",
+    "subject",
+    "digest"
+  ],
+  "properties": {
+    "authority_id": {
+      "const": "c6_active_authority_v1"
+    },
+    "authority_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "schema_version": {
+      "const": "c6_active_authority_v1"
+    },
+    "subject_schema_id": {
+      "const": "c6_authority_subject_v1"
+    },
+    "status": {
+      "enum": ["CANDIDATE", "RATIFIED", "SUPERSEDED"]
+    },
+    "ratification_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "locator", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "locator": {"type": "string", "minLength": 1},
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "not": {"const": "0000000000000000000000000000000000000000000000000000000000000000"}
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "decision_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["decision_id", "required_state"],
+        "properties": {
+          "decision_id": {"type": "string", "pattern": "^D-\\d+$"},
+          "required_state": {"const": "ratified"}
+        }
+      },
+      "minItems": 1
+    },
+    "source_members": {
+      "type": "array",
+      "description": "Exact machine-readable D-147/T01 → live source file mapping. Unique role/id/path/locator/sha256 with subject bindings. README prose is not a substitute.",
+      "minItems": 7,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "member_id",
+          "role",
+          "path",
+          "locator",
+          "sha256",
+          "subject_bindings"
+        ],
+        "properties": {
+          "member_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]{1,63}$"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z][a-z0-9_]{1,63}$"
+          },
+          "path": {"type": "string", "minLength": 1},
+          "locator": {"type": "string", "minLength": 1},
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "not": {"const": "0000000000000000000000000000000000000000000000000000000000000000"}
+          },
+          "subject_bindings": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[a-z][a-z0-9_]{1,63}$"
+            }
+          }
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "four_layer_thresholds",
+        "behavior_classes",
+        "demo_fuzz_family_roster",
+        "governance_axes",
+        "readback_fields",
+        "contract_bundle_component_ids",
+        "hard_layer_denominators"
+      ],
+      "properties": {
+        "four_layer_thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["golden", "demo_fuzz", "unsupported", "safety"],
+          "properties": {
+            "golden": {"const": 1.0, "description": "100% pass required"},
+            "demo_fuzz": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["formula", "description"],
+              "properties": {
+                "formula": {"const": "5*pass >= 4*eligible"},
+                "description": {"type": "string"}
+              }
+            },
+            "unsupported": {"const": 1.0, "description": "100% pass required"},
+            "safety": {"const": 1.0, "description": "100% pass required"}
+          }
+        },
+        "behavior_classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "tool_call",
+              "clarify_missing_slot",
+              "refusal_no_available_tool",
+              "refusal_safety_or_policy",
+              "already_state_noop"
+            ]
+          },
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "demo_fuzz_family_roster": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "ac_temperature",
+              "window",
+              "screen_brightness",
+              "atmosphere_lamp_color",
+              "atmosphere_lamp_brightness",
+              "ac_windspeed",
+              "car_door"
+            ]
+          },
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "governance_axes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "construction",
+              "candidate_formation",
+              "authorization",
+              "execution",
+              "acceptance"
+            ]
+          },
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "readback_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "model_hard_pass_basis",
+              "model_hard_failed",
+              "readback_applicable",
+              "readback_match",
+              "readback_hard_failed",
+              "readback_excluded_from_model_hard_pass",
+              "renderer_contract_digest"
+            ]
+          },
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "contract_bundle_component_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 7,
+          "uniqueItems": true
+        },
+        "hard_layer_denominators": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["golden", "demo_fuzz", "unsupported", "safety"],
+          "properties": {
+            "golden": {"type": "integer", "minimum": 0},
+            "demo_fuzz": {"type": "integer", "minimum": 0},
+            "unsupported": {"type": "integer", "minimum": 0},
+            "safety": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "algorithm"],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "not": {"const": "0000000000000000000000000000000000000000000000000000000000000000"}
+        },
+        "algorithm": {"const": "sha256"}
+      }
+    }
+  }
+}

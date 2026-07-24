@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c6-eval-spine/s9-arm-result.v1.schema.json",
+  "title": "S9 per-arm per-case result",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "arm_id",
+    "case_id",
+    "score_class",
+    "behavior_class_observed",
+    "model_hard_pass",
+    "readback",
+    "join_keys"
+  ],
+  "properties": {
+    "schema_version": { "const": "s9_arm_result_v1" },
+    "run_id": { "type": "string" },
+    "arm_id": { "type": "string", "enum": ["base", "old", "new"] },
+    "case_id": { "type": "string" },
+    "score_class": {
+      "type": "string",
+      "enum": ["real_model", "synthetic", "absent"]
+    },
+    "behavior_class_observed": { "type": "string" },
+    "model_hard_pass": { "type": "boolean" },
+    "readback": {
+      "type": "object",
+      "required": [
+        "model_hard_pass_basis",
+        "model_hard_failed",
+        "readback_applicable",
+        "readback_match",
+        "readback_hard_failed",
+        "readback_excluded_from_model_hard_pass",
+        "renderer_contract_digest"
+      ]
+    },
+    "join_keys": { "type": "object" },
+    "raw_output_sha256": { "type": ["string", "null"] },
+    "error_code": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,11 @@
+fixture_contract: closure_registry_negative_fixture_v1
+id: handwritten-count-token
+patches:
+  - target: roadmap
+    op: insert_after
+    path: /outside_generated_block
+    value_from: canonical_count_token_of_base_registry
+expect:
+  rc: 68
+  status: BLOCKED
+  errors_exact: [E_HANDWRITTEN_COUNT]

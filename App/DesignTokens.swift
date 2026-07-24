@@ -19,6 +19,14 @@ enum PresentationTheme: String, CaseIterable, Identifiable {
         case .deepSpace: return .dark
         }
     }
+
+    /// 纯值主题标识（桥接 Core `DesignTokenValues`，取语义 token / 对比度 / 降级 SSOT）。
+    var tokenID: TokenThemeID {
+        switch self {
+        case .ivory: return .ivory
+        case .deepSpace: return .deepSpace
+        }
+    }
 }
 
 struct ThemePalette {
@@ -39,9 +47,15 @@ struct ThemePalette {
 
 /// 视觉 Design Tokens — Swift 镜像 `docs/design/tokens.md`（视觉 SSOT 单源）。
 ///
-/// 🔴 view 里禁手填 hex，只从 `DesignTokens.*` 取（spec ui-presentation R4）。
+/// 🔴 **token = 视觉地板（floor）声明（D0G-018）**：view 只能【等于或超过】token 声明的
+/// 视觉质量（对比度 / 色感 / 降级双通道），SHALL NOT 低于——view 禁手填 hex，只从
+/// `DesignTokens.*` 取（spec ui-presentation R4）。
 /// 语义分类 FROZEN v1.0（2026-06-24 磊哥审签）；hex 值 DRAFT（实渲微调后冻结，tasks 3.7）。
 /// 锁 iOS26/macOS26（App target deployment）：API 直接用，无 `#available` 版本守卫。
+///
+/// **语义值 SSOT 在 Core `DesignTokenValues`**（纯值，无 SwiftUI）：七态 × 主题的
+/// 对比度门（D0G-004，`swift test` 可测）、文案通道、RM/RT 降级变体、colorset 桥皆在其中；
+/// 本 App 层把纯值映射成 SwiftUI `Color` 渲染（App/Core 同 Xcode 模块，无需 import）。
 enum DesignTokens {
     static func palette(for theme: PresentationTheme) -> ThemePalette {
         switch theme {
@@ -78,6 +92,21 @@ enum DesignTokens {
                 userBubbleEnd: glowViolet
             )
         }
+    }
+
+    static func reduceTransparencyBackdropFill(for theme: PresentationTheme) -> Color {
+        let palette = palette(for: theme)
+        return palette.surface.opacity(theme == .ivory ? 0.96 : 0.94)
+    }
+
+    static func reduceTransparencyChromeFill(for theme: PresentationTheme) -> Color {
+        let palette = palette(for: theme)
+        return palette.surfaceElevated.opacity(theme == .ivory ? 0.98 : 0.96)
+    }
+
+    static func reduceTransparencyCardFill(for theme: PresentationTheme) -> Color {
+        let palette = palette(for: theme)
+        return palette.surfaceElevated
     }
 
     // MARK: 底色 / 中性（tokens.md §1.1 深空层次）
@@ -143,8 +172,55 @@ enum DesignTokens {
         }
     }
 
+    /// ContextCapsule 的 reduceTransparency 实心 chrome fallback。
+    /// token 层只给颜色语义；是否替换 `.glassEffect` 由渲染层结合系统开关决定。
+    static func contextCapsuleChromeFill(theme: PresentationTheme, reduceTransparency: Bool) -> Color {
+        guard reduceTransparency else { return .clear }
+        switch theme {
+        case .ivory:
+            return palette(for: theme).surfaceElevated.opacity(0.92)
+        case .deepSpace:
+            return bgDeepest.opacity(0.86)
+        }
+    }
+
+    static func contextCapsuleChromeStroke(theme: PresentationTheme, reduceTransparency: Bool) -> Color {
+        guard reduceTransparency else {
+            return Color.white.opacity(theme == .ivory ? 0.16 : 0.12)
+        }
+        switch theme {
+        case .ivory:
+            return glowCyan.opacity(0.26)
+        case .deepSpace:
+            return glowCyan.opacity(0.34)
+        }
+    }
+
     // MARK: 动效时长（tokens.md §4）
     static let ambientBurstDuration: TimeInterval = 5.0
+
+    /// 主题切换 crossfade 时长 —— **320ms**（D0G-017：ivory 默认强制不跟系统 + 手动切换 crossfade）。
+    /// 单源自 Core `DesignTokenValues`（swift test 锁值）。
+    static let themeCrossfadeDuration: TimeInterval = DesignTokenValues.themeCrossfadeDuration
+
+    // MARK: Asset Catalog colorset 桥（HA2 P1-1：token enum ↔ Assets.xcassets colorset 双向）
+
+    /// 态 → Asset Catalog colorset 名（`Assets.xcassets/<name>.colorset`，含 light/dark appearance）。
+    /// 单源自 Core `DesignTokenValues.colorsetName`。
+    static func stateColorsetName(for state: DemoVisualState) -> String {
+        DesignTokenValues.colorsetName(for: state)
+    }
+
+    /// 态 → 语义强调 `Color`，**按 `theme` 参数确定性解析**（TX1 修复，T1 对抗审 P1）。
+    ///
+    /// 🔴 **不走 `Color(name:bundle:)` 解析 Asset colorset**——那依赖【环境 colorScheme】，
+    /// 与 D0G-017「ivory 强制不跟系统」冲突：系统处于 dark 时，即便 theme=ivory，环境 colorScheme
+    /// 仍可能是 dark → colorset 会渗入 deepSpace(dark) appearance。故本访问器直接从 Core
+    /// `DesignTokenValues.token(for:theme:).border`（纯值，按 theme 参数 keyed）取色，**env 无关**。
+    /// Asset Catalog colorset 仍作 HA2 P1-1 设计侧产物（名映射见 `stateColorsetName`），运行时不靠它解析。
+    static func stateColor(for state: DemoVisualState, theme: PresentationTheme) -> Color {
+        Color(token: DesignTokenValues.token(for: state, theme: theme.tokenID).border)
+    }
 }
 
 extension Color {
@@ -155,6 +231,11 @@ extension Color {
         let b = Double(hex24 & 0xFF) / 255
         self.init(.sRGB, red: r, green: g, blue: b, opacity: opacity)
     }
+
+    /// Core `TokenRGB`（纯值 SSOT）→ SwiftUI `Color`（env 无关，sRGB 确定性）。
+    init(token: TokenRGB, opacity: Double = 1.0) {
+        self.init(.sRGB, red: token.r, green: token.g, blue: token.b, opacity: opacity)
+    }
 }
 
 /// `DemoVisualState` 7 态视觉外观（spec ui-presentation R1：穷尽 switch + 四态分开）。
@@ -164,13 +245,31 @@ extension Color {
 struct CardAppearance: Equatable {
     let background: Color
     let border: Color
-    let icon: String?     // SF Symbol；nil = 无图标
+    let icon: String?     // SF Symbol（图形通道）；nil = 无图标（仅 normal）
     let breathing: Bool   // 呼吸动效（satisfied 稳定已完成）
     let pulsing: Bool     // 脉冲动效（changing 执行中）
+    /// 文案通道（三通道之一，D0G-001）—— 态默认语义标签；runtime `reason` 可覆盖，token 是 floor。
+    /// 默认值保持既有 memberwise init 兼容（工厂内 hex 表达式零改，渲染不回退）。
+    var reason: String = ""
+
+    /// RM / RT 降级变体（D0G-002 停循环动效保双通道 / D0G-003 内容实心化）。
+    /// 关呼吸/脉冲循环，**保 icon + 文案双通道**（态语义不塌，色盲/低对比可辨）。
+    /// 背景实心化（去半透明）由渲染层结合 `reduceTransparency` 应用；本层承诺「无循环 + 双通道」。
+    func reducedVariant() -> CardAppearance {
+        CardAppearance(background: background, border: border, icon: icon,
+                       breathing: false, pulsing: false, reason: reason)
+    }
 
     /// 7 态穷尽映射 —— **无 `default` 分支**（spec R1：SHALL NOT default 吞态）。
     /// 新增 `DemoVisualState` case 时编译器强制此处补分支（穷尽性即保护）。
+    /// 文案通道单源自 Core `DesignTokenValues`（态默认文案）。
     static func of(_ state: DemoVisualState) -> CardAppearance {
+        var appearance = base(state)
+        appearance.reason = DesignTokenValues.token(for: state, theme: .deepSpace).reason
+        return appearance
+    }
+
+    private static func base(_ state: DemoVisualState) -> CardAppearance {
         switch state {
         case .normal:                       // 默认未激活 → 灰蓝静默
             CardAppearance(background: DesignTokens.inkDim2.opacity(0.10),
@@ -204,6 +303,12 @@ struct CardAppearance: Equatable {
     }
 
     static func of(_ state: DemoVisualState, theme: PresentationTheme) -> CardAppearance {
+        var appearance = base(state, theme: theme)
+        appearance.reason = DesignTokenValues.token(for: state, theme: theme.tokenID).reason
+        return appearance
+    }
+
+    private static func base(_ state: DemoVisualState, theme: PresentationTheme) -> CardAppearance {
         let palette = DesignTokens.palette(for: theme)
         switch state {
         case .normal:

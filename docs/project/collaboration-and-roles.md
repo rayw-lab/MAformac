@@ -1,106 +1,79 @@
 ---
-retire_trigger: "Retire when superseded by archived OpenSpec specs or explicit user decision."
-expires: "2026-08-15"
+document_role: collaboration_strategy
+retire_trigger: Retire when superseded by explicit user decision or a newer collaboration strategy.
+updated: 2026-07-14
 ---
 
 # MAformac 协作分工与推进机制
 
-> 配套 `CLAUDE.md`(项目宪法)。本文件定义**谁干什么、超长任务怎么用 harness 管控、agent 间怎么交接**。状态:candidate(随项目演进更新)。
-> 更新:2026-06-17
+> 配套 `CLAUDE.md` 的稳定宪法。本文件定义按任务形态组织 controller、producer 与 reviewer 的默认策略；具体模型、provider、席位和命令由本机配置或单次任务合同决定。
 
-## 1. 角色分工(磊哥 + 4 agent)
+## 1. 角色按任务形态分配
 
-| 角色 | 主职责 | sweet spot | 不可代理 |
-|---|---|---|---|
-| **磊哥** | 项目总监;唯一拍板;发起 Codex 长跑;现场演示 | 战略/审美/听感判断 | **V-PASS(视觉)/ S-PASS(听感)/ U-PASS(战略)** |
-| **Claude (CC)** | 和磊哥聊天/脑暴/规划/综合/跨 PR 元认知;**前端 + 原型设计**;openspec 编排;cross-vendor 二审 | narrative / synthesis / **前端原型 / 视觉** | — |
-| **GPT Pro** | 和磊哥聊天/深度推理;heavy producer(one-shot 大产出);云端 GitHub PR 审计 | 深思 / 大体量回稿 / PR 审计 | — |
-| **Codex** | **代码开发执行**(长跑,可连续 20h,质量高);boundary 守护;实装 | long runner / 实装 / 边界守护 | — |
-
-**一句话**:磊哥拍板;Claude+GPT Pro 陪磊哥想清楚(what);Claude 出前端原型;Codex 把它写成代码(how);GPT Pro 云端审。
-
-## 2. 协作流(意图 → 代码)
-
-```
-磊哥意图/脑暴
-  ↔ Claude / GPT Pro   (聊清 what + 定 spec)
-        │
-        ├─► Claude: 前端 + 原型设计(SwiftUI 原型/视觉稿,给 Codex 视觉参照)
-        │
-        └─► openspec change(proposal/specs/design/tasks)= Claude/磊哥 ↔ Codex 的契约
-                  │
-                  └─► Codex: 按 tasks.md 长跑实装(TDD 红绿重构)
-                            │
-                            └─► GPT Pro / Claude: 审(cross-vendor)+ 磊哥 V/S/U-PASS
-```
-
-- **定 what**:磊哥 ↔ Claude/GPT Pro 聊天 → openspec `proposal`/`specs`(行为契约)。
-- **前端/原型**:Claude 出 SwiftUI 原型 + 视觉(守审美 5 Gate),作为 Codex 实装的视觉参照。
-- **实装**:Codex 按 `tasks.md` 长跑写代码(TDD)。
-- **审**:GPT Pro 云端 GitHub PR 审计 + Claude 二审;磊哥最终 V/S/U-PASS。
-
-## 3. 超长任务 harness(Codex 20h 连续跑的护栏)
-
-Codex 可连续跑 20h、质量高——但**长跑必须有 harness 防跑偏**。三层管控:
-
-| harness | 作用 | 谁产出 |
+| 角色 | 主职责 | 不可替代的边界 |
 |---|---|---|
-| **OpenSpec(SDD)** | change 的 `proposal/specs/design/tasks` = 长跑的 guardrail;Codex 按 `tasks.md` checklist 推进,完成即 `archive` merge 进 specs | Claude/磊哥定,Codex 执行 |
-| **TDD** | 红绿重构:测试先行,Codex 实装走 RED→GREEN→REFACTOR,防"跑了 20h 跑歪" | Codex |
-| **行为契约(spec)** | agree before build:`specs/`(Requirement+Scenario)先对齐,Codex 不偏离契约 | Claude/磊哥 |
+| 磊哥 | 定目标、优先级与产品方向；可随时纠偏 | secrets、付费、对外发布、主观体验拍板等个人权限动作 |
+| Controller | 绑定 live authority，拆依赖，分配不重叠写集，整合、验证并终判 | 不替用户执行未授权的不可逆动作 |
+| Producer | 在明确 scope 内实现、测试、研究或文档级联 | 不自授越界范围，不以自报替代 PASS |
+| Reviewer | 对共享安全/契约 seam 提供反例、finding 与 proof-ceiling 检查 | 不以身份替代机械证据 |
 
-**融合超长任务的方法**:把大目标拆成 openspec change → 每个 change 的 `tasks.md` 是 Codex 一次长跑的工作清单 → Codex 跑完 → archive → 下个 change。**spec/tasks 是 Claude(规划)与 Codex(实装)之间的唯一契约,不靠口头**。
+Controller 优先编排、整合和最终判断；极小、低风险、可逆且不会造成 ownership 冲突的修复可以直接完成。这是默认组织策略，不是“controller 永不写代码”的不可变宪法。具体模型不是岗位，审计也不是默认流水线。
 
-## 4. 交接纪律
+## 2. 协作流
 
-- **Claude → Codex**:交付 openspec change(proposal+specs+design+tasks),tasks 必须细到 Codex 可独立执行;前端原型/视觉稿随附。
-- **Codex → 审**:产出走 GitHub PR → GPT Pro 云端 connector 审计 + Claude 二审 → 磊哥拍板。
-- **跨 vendor 审计**:Codex 一审(boundary)+ Claude/GPT Pro 二审(catch 同 model bias),如本仓 `docs/second-review-2026-06-17/` 即 Codex 对 Claude 的二审范例。Codex subagent 审计只能算 same-vendor pre-check; 高风险 gate/signoff 必须明确是否完成异源/反框审计,或记录磊哥 waiver。
-- **状态同步**:重大决策入 `docs/decisions.md`;跨 session 靠 `docs/handoffs/`。
-
-## 4.5 长任务开发规范(Pi 形态吸收 #34-38,模板级,不引入 runtime/DB/hook 系统)
-
-> 深扒 Pi(earendil-works/pi ⭐64k)协作层 → 吸收 3 个工程形态为长任务纪律(star>1000 不降级)。**只落模板级,零行代码进产品 runtime**(Pi 是 Node/agent loop,与 MAformac「三层路由+单发」runtime 哲学相反,只站它「让长任务可靠」的工程肩膀)。来源 `docs/research/2026-06-20-pi-teardown-collaboration-layer.md`。
-
-1. **handoff append-only(事件溯源)**:`docs/handoffs/` **永不回改旧 handoff**,每 session 只 append 一条;当前状态 = 顺读全部 handoff 重放(不依赖记忆/快照)。治本反复失忆。
-2. **七段 session-closure 硬模板**:每次收工 handoff 用固定七段——`Goal / Constraints & Preferences / Progress(Done/In Progress/Blocked) / Key Decisions / Next Steps / Critical Context`,**强令保留精确 `file:line` + 报错原文 + 碰过的文件血缘**。让任意 LLM/agent 无缝接力长任务。
-3. **派单 before/after gate**:dispatch 验收门把「prevent rule」写进 schema 而非靠执行端自觉——**before**(动手前 grep 一手源、block 越界 / 禁区不改)+ **after**(动完读回 mock 态校验 / 报告附 ground-truth `swift test`+`git status`+`make verify` stdout)。落地 codex-metacognition §5。
-
-> 边界:**不引入 Pi 的 Node runtime / agent loop / session DB / hook 系统**;不考虑 sandbox/隔离(内部 demo 本机单人)。
-
-## 5. 边界(各角色都守)
-
-- Codex 实装守 `CLAUDE.md` 边界:客户名一律「某车厂」、全 mock 车控、Python 零进 iOS、安全检查是代码不是 prompt。
-- Claude 前端原型守**审美 5 Gate**(层级/对齐/遮挡/字体/重量)。
-- 客户原始协议(讯飞表格等)+ 源 xlsx 冻结快照 **不进仓、不上云**;只抽象进 **C1 `contracts/semantic-function-contract.jsonl`**(源行级 SSOT,v2;旧 `capabilities.yaml` 已被 supersede),冻结快照在外部 raw 只读 + manifest 锚 content_digest。
-
-## 6. 与 CLAUDE.md / openspec 的关系
-
-本文件是**协作层**(谁干什么);`CLAUDE.md` 是**宪法层**(项目是什么+技术锁定);openspec 是**执行层**(change 怎么推进)。三者配套:宪法定边界,本文件定分工,openspec 管落地。
-
-## 7. 想清楚 → 执行:Pocock / OpenSpec / Superpowers 三工具协作
-
-> 磊哥 2026-06-17 定调。三者不冲突,是一条流水线;别一上来乱用技能,也别跳过"想清楚"直奔 propose。
-
-| 工具 | 管什么 | 一句话 |
-|---|---|---|
-| **Pocock**(`~/.codex/skills/pocock`) | **现在处在哪一阶段** | 现有仓库二开的路由器:先分诊(S0 intake / S1 grill / S2 design / S3 spec / S4 build / S5 diagnose / S6 close),**只推荐一个主技能**,grill-first,写入门禁(dry-run)。 |
-| **OpenSpec** | **做什么** | 变更与行为契约的事实源。车控 demo / 能力 schema / 安全门控 / LoRA trace 都先进 `openspec/changes/<change>/` 再落 `specs/`。 |
-| **Superpowers** | **怎么高质量执行** | brainstorming / writing-plans / TDD / systematic-debugging / verification 等纪律技能,保证实现·测试·验证不虚。 |
-
-```
-Pocock 先判断这是什么活
-   ↓
-OpenSpec 把要做的行为 / 变更写成契约
-   ↓
-Superpowers 按工程纪律执行、验证、收口
+```text
+用户目标 + live authority + scope/proof ceiling
+                    |
+                    v
+             Controller 拆依赖
+              /       |       \
+       Producer    Test/probe   可选 reviewer
+              \       |       /
+             Controller 集成与机械门
+                    |
+                    v
+        exact-subject closeout + non-claims
 ```
 
-**MAformac 推荐流水线**:
-1. 模糊想法:`pocock` 分诊 + `openspec-explore` 拆问题(+ `superpowers:brainstorming` 设计探索)
-2. 方向清楚:`/opsx:propose <change>` 生成 proposal / design / tasks / specs；AD 级决策进 `design.md` Architecture Decisions, `tasks.md` 只放执行步骤与证据 artifact
-3. 实现:`/opsx:apply <change>` + 按需叠加 Superpowers(TDD / 调试 / 验证)
-4. 做完:`openspec-sync-specs` 合 delta 回主规格 → `openspec-archive-change` 归档
-5. 涉分支 / PR:Superpowers 收口类(verification / finishing-branch)+ GPT Pro 云端审
+- 目标不清时先 grill；目标、authority 与 stopline 已清楚时直接推进，不为形式反复呈拍。
+- 不同写集可并行；同一文件或共享状态保持唯一 writer。
+- 测试、build、mutation、runtime/readback 是主证据。agent prose、ack 和 producer 自报只能作线索。
+- 普通本地切片不强制异源审；共享 CRITICAL、安全或契约边界可增加一次高价值复核。clean 后停止，不生成重复审计文书。
 
-**铁律(2026-06-17 教训)**:起任何 change 前,**Pocock 先判断要不要先 grill / 设计拷打**;不跳过"想清楚"直奔 propose。
+## 3. 长任务 harness
+
+| harness | 作用 |
+|---|---|
+| OpenSpec | 固定产品可观察行为和 non-goals；不是逐分钟计划或 agent 排班表 |
+| TDD / targeted tests | 在实现面建立 RED→GREEN→REFACTOR 证据 |
+| Proof contract | 预先写清 exact subject、hard gates、proof class 与不能声称什么 |
+| Recoverable state | 长任务分阶段保存 commit/receipt/log，resume 时重新核 live Git/process/runtime |
+
+任务 DAG 可以按依赖重排；`tasks.md` 不固定厂商、模型、席位或所有步骤顺序。治理/config/lint 修复不应为了形式新建产品 OpenSpec change。
+
+## 4. 交接与恢复
+
+- 新 handoff 必须声明 `predecessor` 与 `supersedes`；旧 handoff 不原地改写。
+- 恢复当前态只读 `docs/CURRENT.md` 指向的最新节点，再沿显式链定向追溯；禁止顺读全部 handoff 后自行合成。
+- Handoff 至少写 Goal、Constraints、Progress、Key Decisions、Next Steps 和 Critical Context，并绑定 exact subject、关键路径与 proof ceiling；不以固定段数制造形式门。
+- Closeout 只引用必要的原始验证，不复制多份 evidence table。报告/receipt 落盘后先核文件、hash、内容，再接受消息层 REPORT。
+
+## 5. 并发、ownership 与 stopline
+
+- 每个 writer 必须有明确 writable paths、no-touch paths 和完成标准；共享工作树中重叠写集只能有一个 owner。
+- Producer 完成派单后停止；发现越界问题只登记 residual，不擅自扩大实现。
+- Controller 对浏览器登录态、设备、全局配置、发布动作和最终裁决串行管理。
+- 具体外部 agent 路由见 `docs/operators/agent-orchestration.md`，但 live model/provider 只由运行时配置确认。
+
+## 6. Authority 与边界
+
+完整 authority matrix 见 `CLAUDE.md §3`。本文件只负责协作策略，不负责产品行为、机器语义或动态运行状态。
+
+所有角色均遵守公开仓 exception registry、mock 车控、安全检查代码化、受限源料不入仓/训练集等边界。低等级 local/mock proof 不得冒充 runtime、operator、device 或 live-api 验收。
+
+## 7. Pocock / OpenSpec / 工程验证
+
+- Pocock 判断任务类型与当前阶段。
+- OpenSpec 定义产品行为变化；proposal/change 在 archive 前不自动成为生效规格。
+- 工程验证证明实现和治理 claim；先跑针对性检查，再按风险补 integration/build/runtime。
+- 完成后通过 sync/archive 处理产品 spec；纯治理收口通过 governance lint、配置解析、引用链检查和 closeout 完成。

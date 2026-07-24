@@ -104,6 +104,7 @@ devices:
         gear_map: {"1挡": 25, "2挡": 50, "3挡": 75, "4挡": 100}  # 协议双轨(挡↔%), 映射=C2 决策
         state_kinds: [empty, known, unknown]
         default: 0                                 # S2 cut3: data-driven 初值(替旧硬编码 0)
+        power_on_value: 100                          # 打开车窗 → 全开(100%)
         readback_zh: "{位置}车窗开度{值}%"
       - id: window.motion
         display_zh: 车窗运动态
@@ -148,6 +149,14 @@ devices:
     display_zh: 氛围灯
     service: carControl                           # C1 jsonl device=atmosphere_lamp_* service=carControl(§28 已核)
     state_cells:
+      - id: ambient.power
+        display_zh: 氛围灯开关
+        type: enum
+        values: [on, off]
+        default: off
+        state_kinds: [empty, known, unknown]
+        source_kind: c2_demo_decision
+        readback_zh: "氛围灯{已打开|已关闭}"
       - id: ambient.color
         display_zh: 氛围灯颜色
         type: enum
@@ -169,12 +178,7 @@ devices:
         state_kinds: [empty, known, unknown]
         default: 70                                # S2 cut3: data-driven 初值(替旧硬编码 70)
         readback_zh: "{氛围灯}亮度{值}%"
-    readback_cell_group: [ambient.color, ambient.brightness]
-
-# ===== S3 横铺 6 族(座椅/车门/音量/雨刮/天窗遮阳/香氛, 范式同 ac/window; 6 族代表 cell 非191全集)=====
-# 数据源: jsonl service 路由实算(seat/door/wiper/sunroof/fragrance=carControl, volume=cmd) + 范围真值
-#   座椅档 0-3(CLAUDE.md §4 范围真值, 旧16-30/0-5拍错) / percent 类 0-100(同 window.position 口径)。
-# 191 全量 cell = DEFERRED(随 retrain-c5/rebuild-c6); S3 只建 demo-positive 代表 cell 让 C6 base 跑得动。
+    readback_cell_group: [ambient.power, ambient.color, ambient.brightness]
 
   seat:
     display_zh: 座椅
@@ -191,6 +195,7 @@ devices:
         exp_step: {little: 1}
         state_kinds: [empty, known, unknown]
         default: 0
+        power_on_value: 1                            # 打开座椅加热 → 1 挡
         readback_zh: "{位置}座椅加热{值}挡"
       - id: seat.vent_level
         display_zh: 座椅通风

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BF8PromotionReceipt",
+  "type": "object",
+  "required": ["schemaVersion", "receiptID", "subjectSHA256", "ceremony"],
+  "properties": {
+    "schemaVersion": { "const": "bf8_promotion_receipt_v1" },
+    "receiptID": { "type": "string", "minLength": 1 },
+    "subjectSHA256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "subject_type": { "enum": ["primary_matrix", "secondary_tool"] },
+    "subject_id": {},
+    "matrix_ids": {},
+    "ceremony": {
+      "type": "object",
+      "required": ["artifactRef", "approver"],
+      "properties": {
+        "artifactRef": { "type": "string", "minLength": 1 },
+        "approver": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "actionSourceSHA256": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "testedCheckoutSHA256": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "receiptSourceSHA256": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "sourceHeadSHA": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "testedCheckoutSHA": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "receiptSourceSHA": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+  },
+  "oneOf": [
+    {
+      "required": ["subject_type", "subject_id", "matrix_ids"],
+      "properties": {
+        "subject_type": { "const": "primary_matrix" },
+        "subject_id": { "type": "integer", "minimum": 1 },
+        "matrix_ids": {
+          "type": "array",
+          "prefixItems": [{ "type": "integer", "minimum": 1 }],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    },
+    {
+      "required": ["subject_type", "subject_id"],
+      "properties": {
+        "subject_type": { "const": "secondary_tool" },
+        "subject_id": { "const": "close_ac" }
+      },
+      "not": { "required": ["matrix_ids"] }
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-07-13
+status: DRAFT
+# 窄授权 carrier：仅授权 B7 (T02 corpus lineage) 的 durable LOCAL candidate。
+# 不 supersede / 不 rewrite rebuild-c6-four-layer-bench。
+# 不声称 /opsx:apply、不声称 T02 freeze 授权、不声称 B7 DONE、不声称 C6 acceptance。

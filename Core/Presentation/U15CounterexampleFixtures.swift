@@ -102,7 +102,8 @@ enum U15CounterexampleFixtures {
                 refusedCell: "sunroof.position[全景天窗]",
                 proofIntent: "多意图中成功和拒绝必须共存呈现，不把局部失败吞掉。"
             )
-        case .acceptedToolCall, .alreadyStateNoop, .runtimeError, .cancelled:
+        case .acceptedToolCall, .noAction, .alreadyStateNoop, .runtimeError, .cancelled,
+             .stateQuery, .capabilityQuery, .refusalContractViolation:
             preconditionFailure("U15 fixture only covers counterexample result kinds: \(kind.rawValue)")
         }
     }

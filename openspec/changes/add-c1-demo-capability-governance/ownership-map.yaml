@@ -1,0 +1,155 @@
+{
+  "schema_version": "c1_ownership_map.v1",
+  "change_id": "add-c1-demo-capability-governance",
+  "ratified_source": "docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md",
+  "capabilities": [
+    {"name": "demo-capability-governance", "mode": "ADDED"},
+    {"name": "tool-execution", "mode": "MODIFIED"},
+    {"name": "runtime-presentation-bridge", "mode": "MODIFIED"}
+  ],
+  "forbidden_capabilities": ["runtime-presentation-payload"],
+  "ownership_claims": [
+    {"concern": "matrix_eligibility", "owner": "demo-capability-governance"},
+    {"concern": "matrix_basis_and_primary_class", "owner": "demo-capability-governance"},
+    {"concern": "fallback_taxonomy_and_catalog", "owner": "demo-capability-governance"},
+    {"concern": "probe_policy", "owner": "demo-capability-governance"},
+    {"concern": "mounted_expansion_and_rollback_policy", "owner": "demo-capability-governance"},
+    {"concern": "bounded_execution_gates", "owner": "tool-execution"},
+    {"concern": "accepted_refused_identity_and_mutation", "owner": "tool-execution"},
+    {"concern": "observed_tool_calls_readback_and_internal_finite_reason", "owner": "tool-execution"},
+    {"concern": "execution_receipt_facts", "owner": "tool-execution"},
+    {"concern": "public_result_and_safe_reason_kind", "owner": "runtime-presentation-bridge"},
+    {"concern": "payload_schema_cards_and_readback_rendering", "owner": "runtime-presentation-bridge"},
+    {"concern": "presentation_safe_trace_and_proof_cap", "owner": "runtime-presentation-bridge"}
+  ],
+  "ratified_cg_ids": [
+    "CG-002", "CG-004", "CG-005", "CG-007", "CG-008", "CG-009", "CG-014", "CG-015", "CG-019",
+    "CG-022", "CG-023", "CG-024", "CG-025", "CG-026", "CG-027", "CG-028", "CG-036", "CG-038",
+    "CG-039", "CG-041", "CG-044", "CG-045", "CG-048", "CG-049", "CG-050", "CG-053", "CG-054",
+    "CG-055", "CG-057", "CG-058", "CG-059", "CG-060", "CG-063", "CG-065", "CG-068", "CG-074",
+    "CG-076", "CG-080"
+  ],
+  "finiteReason_enum": [
+    "safety_or_policy_refusal",
+    "clarify_missing_slot",
+    "unmounted_tool_name",
+    "name_rejected",
+    "fast_path_no_match",
+    "unsupported_tool_plan",
+    "no_representative_tool",
+    "runtime_execution_error",
+    "stale_state_revision",
+    "already_state_noop",
+    "lexical_invalid",
+    "numeric_overflow",
+    "arithmetic_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late"
+  ],
+  "fallback_reason_enum": [
+    "safety_policy_refused",
+    "clarify_missing_slot",
+    "unmounted_name_rejected",
+    "unsupported_no_available_tool",
+    "no_representative_tool__default_fallback",
+    "runtime_error_typed",
+    "already_state_noop",
+    "lexical_invalid",
+    "numeric_overflow",
+    "arithmetic_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late"
+  ],
+  "reasonKind_enum": [
+    "safety_policy",
+    "clarification_required",
+    "capability_not_mounted",
+    "not_available_in_demo",
+    "runtime_unavailable",
+    "already_done",
+    "lexical_invalid",
+    "numeric_overflow",
+    "unsupported_precision",
+    "out_of_range",
+    "malformed_current",
+    "unsupported_unit_reference",
+    "contract_violation",
+    "state_query",
+    "capability_query",
+    "cancel_too_late"
+  ],
+  "bridge_result_enum": [
+    "refusal_safety_or_policy",
+    "clarify_missing_slot",
+    "refusal_no_available_tool",
+    "runtime_error",
+    "already_state_noop",
+    "refusal_contract_violation",
+    "state_query",
+    "capability_query",
+    "cancelled"
+  ],
+  "finiteReason_projections": [
+    {"finiteReason": "safety_or_policy_refusal", "fallback_reason": "safety_policy_refused", "reasonKind": "safety_policy", "bridge_result": "refusal_safety_or_policy"},
+    {"finiteReason": "clarify_missing_slot", "fallback_reason": "clarify_missing_slot", "reasonKind": "clarification_required", "bridge_result": "clarify_missing_slot"},
+    {"finiteReason": "unmounted_tool_name", "fallback_reason": "unmounted_name_rejected", "reasonKind": "capability_not_mounted", "bridge_result": "refusal_no_available_tool"},
+    {"finiteReason": "name_rejected", "fallback_reason": "unmounted_name_rejected", "reasonKind": "capability_not_mounted", "bridge_result": "refusal_no_available_tool"},
+    {"finiteReason": "fast_path_no_match", "fallback_reason": "unsupported_no_available_tool", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
+    {"finiteReason": "unsupported_tool_plan", "fallback_reason": "unsupported_no_available_tool", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
+    {"finiteReason": "no_representative_tool", "fallback_reason": "no_representative_tool__default_fallback", "reasonKind": "not_available_in_demo", "bridge_result": "refusal_no_available_tool"},
+    {"finiteReason": "runtime_execution_error", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
+    {"finiteReason": "stale_state_revision", "fallback_reason": "runtime_error_typed", "reasonKind": "runtime_unavailable", "bridge_result": "runtime_error"},
+    {"finiteReason": "already_state_noop", "fallback_reason": "already_state_noop", "reasonKind": "already_done", "bridge_result": "already_state_noop"},
+    {"finiteReason": "lexical_invalid", "fallback_reason": "lexical_invalid", "reasonKind": "lexical_invalid", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "numeric_overflow", "fallback_reason": "numeric_overflow", "reasonKind": "numeric_overflow", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "arithmetic_overflow", "fallback_reason": "arithmetic_overflow", "reasonKind": "numeric_overflow", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "unsupported_precision", "fallback_reason": "unsupported_precision", "reasonKind": "unsupported_precision", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "out_of_range", "fallback_reason": "out_of_range", "reasonKind": "out_of_range", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "malformed_current", "fallback_reason": "malformed_current", "reasonKind": "malformed_current", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "unsupported_unit_reference", "fallback_reason": "unsupported_unit_reference", "reasonKind": "unsupported_unit_reference", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "contract_violation", "fallback_reason": "contract_violation", "reasonKind": "contract_violation", "bridge_result": "refusal_contract_violation"},
+    {"finiteReason": "state_query", "fallback_reason": "state_query", "reasonKind": "state_query", "bridge_result": "state_query"},
+    {"finiteReason": "capability_query", "fallback_reason": "capability_query", "reasonKind": "capability_query", "bridge_result": "capability_query"},
+    {"finiteReason": "cancel_too_late", "fallback_reason": "cancel_too_late", "reasonKind": "cancel_too_late", "bridge_result": "cancelled"}
+  ],
+  "fallback_catalog_buckets": [
+    {"reason_kind": "safety_or_clarify_reject", "finite_reasons": ["safety_or_policy_refusal", "clarify_missing_slot"]},
+    {"reason_kind": "unmounted_name_rejected", "finite_reasons": ["unmounted_tool_name", "name_rejected"]},
+    {"reason_kind": "fast_path_no_match_fallback", "finite_reasons": ["fast_path_no_match", "unsupported_tool_plan"]},
+    {"reason_kind": "unknown_no_representative_entry", "finite_reasons": ["no_representative_tool"]}
+  ],
+  "semantic_assertions": [
+    {
+      "cg": "CG-024",
+      "path": "specs/demo-capability-governance/spec.md",
+      "tokens": ["CG-024", "`typed_gap`", "SHALL register safety refusal as an SSOT classification"]
+    },
+    {
+      "cg": "CG-048",
+      "path": "specs/demo-capability-governance/spec.md",
+      "tokens": ["hedged_strike_rate=0.90", "can_question_strike_rate=0.35", "joint_strike_rate=0.35", "SHALL NOT authorize expansion"]
+    },
+    {
+      "cg": "CG-049",
+      "path": "specs/demo-capability-governance/spec.md",
+      "tokens": ["hedged_strike_rate=0.35", "can_question_strike_rate=0.90", "joint_strike_rate=0.35", "SHALL NOT authorize expansion"]
+    },
+    {
+      "cg": "CG-074",
+      "path": "specs/tool-execution/spec.md",
+      "tokens": ["ToolExecutionError", "SHALL classify it as typed fallback, clarify or safety", "SHALL NOT be collapsed into generic `runtime_error`"]
+    }
+  ]
+}

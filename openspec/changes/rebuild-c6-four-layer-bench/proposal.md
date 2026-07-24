@@ -2,6 +2,39 @@ status: `draft_needs_human_propose`
 status_source: `D-115/N4`
 status_updated: `2026-07-07`
 
+```yaml
+typed_status:
+  lifecycle_status: draft_needs_human_propose
+  c08_disposition: UNLOCKED_PENDING_OPSX_PROPOSE_HUMAN_REVIEW
+  previous_wait: WAIT_G2_V3_RATIFICATION
+  previous_wait_condition: resolved
+  wait_resolution:
+    decision: D-147
+    result: G2_wave_closed_66_of_66
+    ratification_receipt: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md
+    g2_038_c1:
+      disposition: RATIFIED_AS_STARRED_OPTION_B
+      family_key: tags.contract_device
+      exact_family_roster:
+        - ac_temperature
+        - window
+        - screen_brightness
+        - atmosphere_lamp_color
+        - atmosphere_lamp_brightness
+        - ac_windspeed
+        - car_door
+      representation_source: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/G2-038-C1-REVISED.md
+  next_status_recommendation: run_opsx_propose_and_obtain_human_review
+  status_action_this_change: keep_draft_needs_human_propose
+  propose_performed_this_change: false
+  implementation_authorized_this_change: false
+  amendments_instruction:
+    decision: LEIGE_BATCH2_KEY1
+    receipt: /Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/reports/KEYS-RECEIPT-ma15-leige-batch2.md
+    disposition: WRITEBACK_AUTHORIZED_PENDING_HUMAN_PROPOSAL_ACCEPTANCE
+    parallel_change_forbidden: true
+```
+
 > DRAFT SKELETON（2026-06-24 Q1-Q4 文档吸收版，待人审 propose）
 >
 > This change is an OpenSpec carrier for rebuilding C6 as the trusted yardstick before C5 retraining. It is documentation absorption only until propose acceptance and route gates are satisfied.
@@ -42,6 +75,10 @@ The stale whole-change dependency on `retrain-c5-lora-d-domain` is intentionally
 - **Contract bundle fingerprint.** Add a versioned component manifest over contract inputs and a bundle hash, while preserving existing per-run prompt/output/model/artifact digests.
 - **Readback plan P.** Model hard-pass excludes renderer readback; `verify-gold` keeps deterministic C2 renderer readback validity; clarify/refusal text evidence still counts when asserted.
 - **Historical vs future base semantics.** Old 10/23 generic-frame evidence remains `historical_base_anchor`; future D-domain base-anchor design is deferred semantics, not permission to rerun recalibration.
+- **Exact hard-layer thresholds.** `golden=100%`, `demo_fuzz>=80%`, `unsupported=100%`, and `safety=100%`; demo-fuzz uses integer arithmetic `5 * pass >= 4 * eligible`. Empty, missing, or red hard layers block promotion.
+- **Demo-fuzz family-v2 extinction guard.** Only `demo_fuzz` is partitioned by the seven-value `tags.contract_device` roster above. Every family must have a fresh selected corpus and run; denominator zero, missing run, or denominator-positive/pass-zero blocks promotion. This is an extinction guard, not a per-family 80% threshold.
+- **Five-axis governance.** Construction, candidate formation, authorization, execution, and acceptance are separate transitions with separate owners and evidence. A runner never signs; automated judge lanes are optional (`required_judge_lanes=[]`), release corpus is `must_not_train`, and disclosure is recorded on a five-level scale.
+- **Legacy cutover.** Until the rebuilt gate has an activation receipt, old C6 runner/fixtures are `legacy_observation_only` and cannot sign acceptance. Activation requires shadow coverage of the current 57-case snapshot, N1-N6, and named deliberate-red fixtures.
 
 ## Phase 0 Decisions Required Before Apply
 
@@ -70,6 +107,8 @@ D1-D10 user decisions are accepted in `docs/project/phase0/phase0-d1-d10-user-de
 - No private C6-only taxonomy for no-effect/already-state/refusal buckets.
 - No C6-owned implementation of apply diagnostics. Apply/execution produces applied-write evidence; C6 consumes it.
 - No use of C6 release cases as checkpoint-selection oracle.
+- No parallel or same-name rebuild-C6 change; this existing carrier is the sole proposal route.
+- No proposal writeback shall be interpreted as `/opsx:apply`, T02 corpus freeze, S9/S10 authorization, comparison authorization, or C6 acceptance.
 - No copying raw cockpit/customer source text, PII, secrets, or "internal only" material into bench cases.
 
 ## Success Criteria
@@ -88,6 +127,7 @@ Future construction criteria, after propose/apply authorization:
 - Four external layers and five internal behavior classes are independently reported.
 - Behavior-class SSOT is reconciled across C5 data counts, C6 selectors/denominators, and apply no-effect reasoning.
 - Readback exclusion, replay fact bundle, applied-write consumption, unexpected mutation derivation, and contract bundle fingerprint are recorded in receipts.
+- Exact thresholds, family-v2 extinction guards, seven readback fields, typed same-subject comparison joins, five-axis transition ownership, release-corpus ACL/disclosure, and legacy cutover are contractually represented.
 
 Future comparison criteria, after signed candidate and explicit run authorization:
 

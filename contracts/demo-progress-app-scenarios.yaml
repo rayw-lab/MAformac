@@ -1,0 +1,68 @@
+{
+  "schema_version": "demo_progress_app_scenarios_v1",
+  "meta": {
+    "owner": "operator / 方案经理",
+    "purpose": "三层字段登记：runtime_path_reachable + operator_pass（actionDemoProven 由 matrix receipt 机器派生，不手写）",
+    "authority": "tracking_not_ssot",
+    "non_claims": [
+      "not_actionDemoProven_handwrite",
+      "not_single_demoable_kpi",
+      "not_operator_pass_ceremony_ssot",
+      "not_c6_acceptance",
+      "not_v_pass"
+    ],
+    "layers": {
+      "actionDemoProven": "Tools/checks/check_capability_matrix.py receipt actionDemoProven_count/row_count",
+      "runtime_path_reachable": "scenarios[].layers.runtime_path_reachable == true",
+      "operator_pass": "scenarios[].layers.operator_pass == true AND evidence complete (operator + basis_head40 + recording/screenshot on disk)"
+    },
+    "count_rule": "A_den = scenarios with count_in_denominator != false; L2_num = runtime_path_reachable true; L3_num = operator_pass true + evidence_complete",
+    "note": "File body is JSON-in-.yaml for zero-deps parse (json.loads). PyYAML also accepts it."
+  },
+  "scenarios": [
+    {
+      "id": "app-ac-power-on-zh",
+      "title": "客户文本打开空调",
+      "count_in_denominator": true,
+      "route_mode": "demo_slice",
+      "matrix_id": 1,
+      "contract_row_id": "c1_airControl_000006",
+      "layers": {
+        "runtime_path_reachable": true,
+        "operator_pass": false
+      },
+      "evidence": {
+        "operator": "codex-w4",
+        "basis_head": "0d5416df4fac1d7c846094ac8937cee3ebd54b76",
+        "proof_class": "desktop_operator_equivalent",
+        "receipt_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/live-proof.txt",
+        "receipt_sha256": "594a8ffd3e6da0d0e9ececea51f5e08c5103fab27e1e3d85a73c7afa6b66e32b",
+        "screenshot_paths": [
+          "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/P1-open-ac.png"
+        ]
+      }
+    },
+    {
+      "id": "app-ac-temp-22-zh",
+      "title": "客户文本把空调调到22度",
+      "count_in_denominator": true,
+      "route_mode": "demo_slice",
+      "matrix_id": 4,
+      "contract_row_id": "c1_airControl_000164",
+      "layers": {
+        "runtime_path_reachable": true,
+        "operator_pass": false
+      },
+      "evidence": {
+        "operator": "codex-w4",
+        "basis_head": "0d5416df4fac1d7c846094ac8937cee3ebd54b76",
+        "proof_class": "desktop_operator_equivalent",
+        "receipt_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/live-proof.txt",
+        "receipt_sha256": "594a8ffd3e6da0d0e9ececea51f5e08c5103fab27e1e3d85a73c7afa6b66e32b",
+        "screenshot_paths": [
+          "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-12-ma18/receipts/slice-impl-w4/P2-temp-22.png"
+        ]
+      }
+    }
+  ]
+}

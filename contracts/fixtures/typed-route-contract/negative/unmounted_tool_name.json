@@ -1,0 +1,30 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "mounted_tool_name=raise_ac_temperature_by_exp is in Core/Contracts/DDomainMountedToolCatalog.swift:16-20 personaAvoidListToolNames but NOT in mountedToolNames (live-cored). SHALL 'action_candidate SHALL bind to a mounted D-domain tool name and never claim action success' scenario 'Unmounted tool name is rejected'.",
+    "expected_error": "unmounted_name"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-unmounted-000001",
+    "trace_id": "trace-neg-unmounted-000001",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": {
+      "intent": "raise_ac_temperature_by_exp",
+      "service": "airControl",
+      "mounted_tool_name": "raise_ac_temperature_by_exp",
+      "action_primitive": "increase_by_exp",
+      "action_code": "increase_value_little",
+      "device": "ac_temperature",
+      "slot": "none",
+      "slot_keys": [],
+      "value": {"ref": "CUR", "direct": "+", "offset": "LITTLE", "type": "EXP"}
+    },
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

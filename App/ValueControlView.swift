@@ -31,7 +31,12 @@ struct ValueControlView: View {
     var badgeOptions: [String] = []
     var primaryActionIdentifier: String? = nil
     var tint: Color = DesignTokens.glowCyan
+    var forceReduceMotion = false
     var actions = ValueControlActions()
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     var body: some View {
         // 🔴 spec R2：穷尽 switch（无 default），每类 dedicated 分支，禁 AnyView（保静态类型 diff 高效，C11/C12）
@@ -176,13 +181,17 @@ struct ValueControlView: View {
                         .fill(LinearGradient(colors: DesignTokens.ambientGradient(named: name), startPoint: .topLeading, endPoint: .bottomTrailing))
                         .frame(width: 18, height: 18)
                         .overlay(Circle().strokeBorder(.white.opacity(0.48), lineWidth: 0.6))
-                        .shadow(color: DesignTokens.ambientColor(named: name).opacity(0.7), radius: 6)
+                        .shadow(
+                            color: DesignTokens.ambientColor(named: name).opacity(effectiveReduceMotion ? 0 : 0.7),
+                            radius: effectiveReduceMotion ? 0 : 6
+                        )
                     Text(displayText).font(.caption.weight(.semibold)).foregroundStyle(DesignTokens.inkPrimary)
                 }
                 if !badgeOptions.isEmpty {
                     AmbientColorPalette(
                         options: badgeOptions,
                         selectedName: name,
+                        forceReduceMotion: effectiveReduceMotion,
                         onSelect: { option in
                             if let selectBadge = actions.selectBadge {
                                 selectBadge(option)
@@ -311,6 +320,7 @@ private struct ModeOptionPalette: View {
 private struct AmbientColorPalette: View {
     let options: [String]
     let selectedName: String
+    var forceReduceMotion = false
     let onSelect: (String) -> Void
 
     private var rows: [[String]] {
@@ -339,7 +349,7 @@ private struct AmbientColorPalette: View {
                                     )
                                 )
                                 .shadow(color: DesignTokens.ambientColor(named: option).opacity(isSelected(option) ? 0.78 : 0.38),
-                                        radius: isSelected(option) ? 6 : 3)
+                                        radius: forceReduceMotion ? 0 : (isSelected(option) ? 6 : 3))
                                 .contentShape(Circle())
                         }
                         .buttonStyle(.plain)

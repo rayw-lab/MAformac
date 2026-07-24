@@ -16,8 +16,15 @@ struct AmbientEdgeBurst: View {
     let trigger: AmbientBurstTrigger
     var theme: PresentationTheme
     var onFinished: (UUID) -> Void
+    /// 三档预算（RSB §3.4）；默认 fullShowcase 保 L0 parity（burst 250/310）。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// budget 感知有效档（reduceMotion 强制 L2：allowBurstParticles=false）。
+    private var effectiveBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: reduceMotion, requested: motionBudget)
+    }
 
     private var gradient: [Color] {
         let mapped = DesignTokens.ambientGradient(named: trigger.colorName)
@@ -47,7 +54,13 @@ struct AmbientEdgeBurst: View {
         GeometryReader { proxy in
             let size = proxy.size
             ZStack {
-                TimedAmbientEdgeGlow(trigger: trigger, colors: gradient, theme: theme, reduceMotion: reduceMotion)
+                TimedAmbientEdgeGlow(
+                    trigger: trigger,
+                    colors: gradient,
+                    theme: theme,
+                    reduceMotion: reduceMotion,
+                    allowLargeBlurAndShadow: effectiveBudget.allowLargeBlurAndShadow
+                )
 
                 if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
                     PhaseAnimator(AmbientBurstPhase.allCases, trigger: trigger.id) { phase in
@@ -56,8 +69,10 @@ struct AmbientEdgeBurst: View {
                         phase.animation
                     }
 
-                    if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
-                        AmbientParticleCanvas(trigger: trigger, colors: gradient, theme: theme)
+                    if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion),
+                       effectiveBudget.allowBurstParticles {
+                        AmbientParticleCanvas(trigger: trigger, colors: gradient, theme: theme,
+                                              motionBudget: effectiveBudget)
                     }
                 } else {
                     edgeGlow(size: size, phase: .linger)
@@ -84,6 +99,10 @@ struct AmbientEdgeBurst: View {
         let ringInset = max(6, width * 0.018)
         let ringCorner = min(width * 0.105, 72)
         let energy = theme == .ivory ? 0.78 : 1.0
+        let allowLargeBlurAndShadow = effectiveBudget.allowLargeBlurAndShadow
+        let primaryShadowRadius = allowLargeBlurAndShadow ? phase.shadowRadius : 0
+        let secondaryShadowRadius = allowLargeBlurAndShadow ? phase.shadowRadius * 1.55 : 0
+        let accentBlurRadius = allowLargeBlurAndShadow ? 1.2 : 0
 
         ZStack {
             VStack(spacing: 0) {
@@ -126,13 +145,13 @@ struct AmbientEdgeBurst: View {
                     lineWidth: phase.ringWidth
                 )
                 .padding(ringInset)
-                .shadow(color: primary.opacity(phase.ringOpacity * 0.92 * energy), radius: phase.shadowRadius, y: 0)
-                .shadow(color: secondary.opacity(phase.ringOpacity * 0.60 * energy), radius: phase.shadowRadius * 1.55, y: 0)
+                .shadow(color: primary.opacity(phase.ringOpacity * 0.92 * energy), radius: primaryShadowRadius, y: 0)
+                .shadow(color: secondary.opacity(phase.ringOpacity * 0.60 * energy), radius: secondaryShadowRadius, y: 0)
 
             RoundedRectangle(cornerRadius: ringCorner + 12, style: .continuous)
                 .strokeBorder(primary.opacity(phase.ringOpacity * 0.28 * energy), lineWidth: 1)
                 .padding(ringInset + 12)
-                .blur(radius: 1.2)
+                .blur(radius: accentBlurRadius)
 
             RadialGradient(
                 colors: [
@@ -227,6 +246,7 @@ private struct TimedAmbientEdgeGlow: View {
     let colors: [Color]
     var theme: PresentationTheme
     var reduceMotion = false
+    var allowLargeBlurAndShadow = true
 
     var body: some View {
         Group {
@@ -259,6 +279,9 @@ private struct TimedAmbientEdgeGlow: View {
         let ringInset = max(4, minSide * 0.012)
         let ringCorner = min(minSide * 0.115, 78)
         let base = theme == .ivory ? 0.94 : 1.12
+        let primaryShadowRadius: CGFloat = allowLargeBlurAndShadow ? 34 : 0
+        let secondaryShadowRadius: CGFloat = allowLargeBlurAndShadow ? 64 : 0
+        let accentBlurRadius: CGFloat = allowLargeBlurAndShadow ? 1.8 : 0
 
         ZStack {
             VStack(spacing: 0) {
@@ -325,13 +348,13 @@ private struct TimedAmbientEdgeGlow: View {
                     lineWidth: 7
                 )
                 .padding(ringInset)
-                .shadow(color: primary.opacity(0.96 * energy * base), radius: 34)
-                .shadow(color: primary.opacity(0.54 * energy * base), radius: 64)
+                .shadow(color: primary.opacity(0.96 * energy * base), radius: primaryShadowRadius)
+                .shadow(color: primary.opacity(0.54 * energy * base), radius: secondaryShadowRadius)
 
             RoundedRectangle(cornerRadius: ringCorner + 18, style: .continuous)
                 .strokeBorder(primary.opacity(0.45 * energy * base), lineWidth: 2)
                 .padding(ringInset + 16)
-                .blur(radius: 1.8)
+                .blur(radius: accentBlurRadius)
         }
         .opacity(energy)
         .blendMode(theme == .deepSpace ? .plusLighter : .normal)
@@ -342,6 +365,8 @@ private struct AmbientParticleCanvas: View {
     let trigger: AmbientBurstTrigger
     let colors: [Color]
     var theme: PresentationTheme
+    /// L0 用 theme count(250/310)保 parity；L1/L2 用 budget.burstParticleCount(120/0)降档。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 45.0)) { timeline in
@@ -361,7 +386,9 @@ private struct AmbientParticleCanvas: View {
         context.blendMode = theme == .deepSpace ? .plusLighter : .normal
         let minSide = min(size.width, size.height)
         let edgeDepth = max(50, minSide * (theme == .ivory ? 0.20 : 0.24))
-        let count = theme == .ivory ? 250 : 310
+        let base = theme == .ivory ? 250 : 310
+        // L0 保 theme 原值（parity）；降档用 budget 值（120/0）
+        let count = motionBudget.level == .fullShowcase ? base : motionBudget.burstParticleCount
         let seed = Double(abs(trigger.id.uuidString.hashValue % 10_000))
         let rampIn = min(1, progress / 0.10)
         let fadeOut = pow(max(0, 1 - progress), theme == .ivory ? 1.35 : 1.12)

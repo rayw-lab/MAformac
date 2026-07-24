@@ -1,0 +1,21 @@
+{
+  "version": "bf8_promotion_receipt_set_v1",
+  "entries": [
+    {
+      "order": 1,
+      "receipt_path": "contracts/governance/bf8-promotion-receipt-matrix-4.json",
+      "receipt_id": "bf8-promotion-matrix-4-20260723",
+      "receipt_sha256": "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4",
+      "subject_type": "primary_matrix",
+      "subject_id": 4
+    },
+    {
+      "order": 2,
+      "receipt_path": "contracts/governance/bf8-promotion-receipt-matrix-1.json",
+      "receipt_id": "bf8-promotion-matrix-1-20260724",
+      "receipt_sha256": "cfc0356b1cae5d55db435c03c88e617873dee4708bce625c060ef077e05c45a2",
+      "subject_type": "primary_matrix",
+      "subject_id": 1
+    }
+  ]
+}

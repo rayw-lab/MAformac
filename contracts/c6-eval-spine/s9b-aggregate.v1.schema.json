@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c6-eval-spine/s9b-aggregate.v1.schema.json",
+  "title": "S9b same-subject aggregate",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "mode",
+    "subject",
+    "status",
+    "per_arm",
+    "join",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": { "const": "s9b_aggregate_v1" },
+    "run_id": { "type": "string" },
+    "mode": { "type": "string", "enum": ["fixture", "dry_run", "real"] },
+    "subject": { "type": "object" },
+    "status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "INCOMPARABLE", "BLOCKED"]
+    },
+    "per_arm": { "type": "object" },
+    "join": { "type": "object" },
+    "layers": { "type": "object" },
+    "buckets": { "type": "object" },
+    "claims": { "type": "object" },
+    "errors": { "type": "array" }
+  },
+  "additionalProperties": true
+}

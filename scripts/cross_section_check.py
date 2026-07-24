@@ -27,6 +27,10 @@ BASELINE_GLOBS = [
     "docs/c5-recovery-2026-06-22/*.md",
     "docs/roadmap-2026-06-20-from-c6-done.md",
     "docs/grill-tournament/*.md",
+    # v6 active baseline + commander decisions authority (exact paths; NO bare commander-log/*.md)
+    # roster-sync rule v2 修法2: registry/authority-derived expected set, not heterogeneous glob.
+    "docs/roadmap-2026-07-11-v6-closure-baseline.md",
+    "docs/commander-log/decisions.md",
 ]
 
 # 存档态过滤：含这些标记的【行】跳过（有意保留的历史/被取代值）

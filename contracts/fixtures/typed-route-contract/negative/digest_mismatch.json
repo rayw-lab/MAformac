@@ -1,0 +1,39 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "RouteResult.trace_digest is set to all zeros while the accompanying route_trace_load_bearing block deterministically hashes to 52da606ccf54836fee1a7c4042662bca45d782f3598f4baab99175fc0b163c57 under RouteCanonicalJSON.sha256Hex (Swift/Python bytes-parity probe). Joint validator RouteContractValidator.validate(_:trace:) SHALL fail with digestMismatch(expected: '000...', actual: '52da...'). SHALL 'Digest mismatch between RouteResult and RouteTrace is rejected' scenario.",
+    "expected_error": "digest_mismatch"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-digest-mismatch-000001",
+    "trace_id": "trace-digest-mismatch-000001",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": {
+      "intent": "open_ac_set_interface",
+      "service": "airControl",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "power_on",
+      "action_code": "open_page",
+      "device": "ac_set_interface",
+      "slot": "none",
+      "slot_keys": [],
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  },
+  "route_trace_load_bearing": {
+    "schema_version": "typed_route_contract.v1",
+    "turn_id": "turn-digest-mismatch-000001",
+    "trace_id": "trace-digest-mismatch-000001",
+    "exec_tier": "L2",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "redaction_policy_id": "redaction_policy.v1"
+  }
+}

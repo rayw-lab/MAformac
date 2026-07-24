@@ -170,13 +170,11 @@ struct VehicleCardDisplay: Identifiable, Equatable {
         }
     }
 
+    /// 族态 dominant —— **委托单一 SSOT `StateVisualPriorityResolver`**（TXB 修①）。
+    /// 旧硬编码序（unsafe>clarify>unsupported>crash>changing）与 commander 终序漂移，已消除；
+    /// 现与 `StateVisualPriorityResolver` 同源（终序 safety>crash>clarify>changing>hover>unsupported>satisfied）。
     private static func dominantVisualState(_ states: [DemoVisualState]) -> DemoVisualState {
-        for state in [DemoVisualState.unsafe, .blocked_with_alternative, .blocked_hard, .unknown, .changing, .satisfied] {
-            if states.contains(state) {
-                return state
-            }
-        }
-        return .normal
+        StateVisualPriorityResolver.dominant(among: states) ?? .normal
     }
 
     // MARK: - 10 族全景常驻摘要层（AD-9/10/11）
@@ -349,10 +347,9 @@ enum UIValueTypeMapper {
         "ac.fan_speed": .stepper, "seat.heat_level": .stepper, "seat.vent_level": .stepper,
         "seat.massage_force": .stepper, "wiper.speed": .stepper, "fragrance.intensity": .stepper,
         // toggle — 二值开关（enum 2 values）
-        "ac.power": .toggle, "door.central_lock": .toggle, "door.child_lock": .toggle,
+        "ac.power": .toggle, "ambient.power": .toggle, "door.central_lock": .toggle, "door.child_lock": .toggle,
         "volume.mute": .toggle, "fragrance.power": .toggle, "wiper.power": .toggle,
         "window.lock": .toggle,   // 🔴 gptpro 第2点修：原 default 吞成 badge，实为二值锁 locked/unlocked
-        // badge — intentional allowlist（多值枚举模式 / RGB / 只读仪表 / 多态运动）
         "ac.mode": .badge, "ambient.color": .badge, "seat.massage_mode": .badge,
         "volume.mode": .badge, "wiper.mode": .badge, "fragrance.mode": .badge,
         "door.car_door": .badge,        // 5 态运动枚举 open/closed/opening/closing/paused，非二值
@@ -504,6 +501,7 @@ struct StateCellPresentationCatalog {
         case "screen.brightness": return "屏幕亮度"
         case "ambient.brightness": return "氛围灯亮度"
         case "ambient.color": return "氛围灯颜色"
+        case "ambient.power": return "氛围灯"
         case "seat.heat_level": return "座椅加热"
         case "seat.vent_level": return "座椅通风"
         case "seat.backrest_angle": return "座椅靠背"

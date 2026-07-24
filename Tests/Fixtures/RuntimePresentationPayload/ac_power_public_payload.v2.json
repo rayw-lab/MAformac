@@ -1,0 +1,52 @@
+{
+  "cardSemantics": [
+    {
+      "cellKey": "ac.power",
+      "isActive": true,
+      "reason": "user_requested",
+      "role": "accepted",
+      "scopeOrigin": "explicit",
+      "siblingKeys": []
+    }
+  ],
+  "cards": [
+    {
+      "actualValue": "on",
+      "availability": "available",
+      "key": "ac.power",
+      "revision": 2,
+      "source": "mock",
+      "visualState": "satisfied"
+    }
+  ],
+  "eventID": "event-public-1",
+  "isTerminal": true,
+  "mutationCount": 1,
+  "orbState": "speak",
+  "outcome": {
+    "reason": "readback_verified",
+    "result": "accepted_tool_call"
+  },
+  "readbacks": [
+    {
+      "actualValue": "on",
+      "key": "ac.power",
+      "revision": 2,
+      "scopeOrigin": "explicit",
+      "spokenText": "空调已打开"
+    }
+  ],
+  "reconciliation": {
+    "readbackKey": "ac.power",
+    "safeReason": "readback_verified",
+    "status": "verified"
+  },
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
+  "traceEnvelope": {
+    "entries": [],
+    "traceID": "trace-public-1"
+  },
+  "traceID": "trace-public-1",
+  "turnID": "turn-public-1",
+  "voiceState": "speak"
+}

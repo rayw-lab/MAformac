@@ -1,41 +1,95 @@
 import Foundation
 
 public struct DDomainToolPlanBackend: LLMBackend {
-    public typealias CompletionProvider = @Sendable (ToolPlanRequest) async throws -> String
+    public typealias CompletionEnvelopeProvider = @Sendable (ToolPlanRequest) async throws -> DDomainCompletionEnvelope
     public typealias StreamTextProvider = @Sendable (String) -> AsyncThrowingStream<String, Error>
 
     private let mountedToolNames: Set<String>
     private let irMap: [String: DDomainIRMapEntry]
-    private let completionProvider: CompletionProvider
+    private let completionEnvelopeProvider: CompletionEnvelopeProvider
+    private let cardinalityPolicy: ToolPlanCardinalityPolicy
     private let streamTextProvider: StreamTextProvider
 
     public init(
         mountedToolNames: Set<String> = DDomainMountedToolCatalog.mountedToolNames,
         irMap: [String: DDomainIRMapEntry] = DDomainIRMap.irMapCompiled,
-        completionProvider: @escaping CompletionProvider,
+        cardinalityPolicy: ToolPlanCardinalityPolicy = .exactlyOne,
+        completionEnvelopeProvider: @escaping CompletionEnvelopeProvider,
         streamTextProvider: @escaping StreamTextProvider = { _ in AsyncThrowingStream { $0.finish() } }
     ) {
         self.mountedToolNames = mountedToolNames
         self.irMap = irMap
-        self.completionProvider = completionProvider
+        self.cardinalityPolicy = cardinalityPolicy
+        self.completionEnvelopeProvider = completionEnvelopeProvider
         self.streamTextProvider = streamTextProvider
     }
 
     public func load() async throws {}
 
-    public func generateToolPlan(for request: ToolPlanRequest) async throws -> [ToolCallFrame] {
-        let completion = try await completionProvider(request)
-        let parsed = try DDomainToolCallParser.parse(completion)
-        guard mountedToolNames.contains(parsed.name) else {
-            throw DDomainToolPlanFailure.nameRejected(parsed.name)
-        }
-        let call = C6ToolCall(name: parsed.name, arguments: parsed.arguments)
-        let irs = ToolContractNormalizer.normalize(call, irMap: irMap)
-        guard !irs.isEmpty else {
-            throw DDomainToolPlanFailure.irUnclassified(parsed.name)
-        }
-        return try irs.map {
-            try ToolContractIRFrameBridge.frame(from: $0, traceID: request.traceID, rawCall: call)
+    public func generateToolPlan(for request: ToolPlanRequest) async throws -> RuntimePlan {
+        let envelope = try await completionEnvelopeProvider(request)
+        switch try DDomainToolCallParser.parse(envelope, policy: cardinalityPolicy) {
+        case let .noAction(frame):
+            return try RuntimePlan(
+                traceID: request.traceID,
+                frames: [.noAction(frame)],
+                executionPolicy: .atomic
+            )
+
+        case let .toolCalls(parsedCalls):
+            // Ordinary bounded multi-call plans retain per-item refusal semantics.
+            // Mount checks are deferred for those plans so the partial executor can
+            // preserve accepted siblings while refusing unmounted items.
+            let defersMountChecksToPerItemRuntime = parsedCalls.count > 1
+            var frames = try parsedCalls.flatMap { parsed in
+                guard mountedToolNames.contains(parsed.name) || defersMountChecksToPerItemRuntime else {
+                    throw DDomainToolPlanFailure.nameRejected(parsed.name)
+                }
+                let call = C6ToolCall(name: parsed.name, arguments: parsed.arguments)
+                let irs = ToolContractNormalizer.normalize(call, irMap: irMap)
+                guard !irs.isEmpty else {
+                    throw DDomainToolPlanFailure.irUnclassified(parsed.name)
+                }
+                return try irs.map { ir in
+                    // W20A: model-hallucinated direction/mode are projected out so execution
+                    // falls back to default scope; G3 row167 injects those slots via admission,
+                    // not this LLM backend path. Remaining slots still pass through for G2
+                    // fail-closed (no silent drop of reviewed non-value slots).
+                    var projected = ir
+                    let hallucinatedSlotKeys: Set<String> = ["direction", "mode"]
+                    projected.slots = projected.slots.filter { !hallucinatedSlotKeys.contains($0.key) }
+                    return try ToolContractIRFrameBridge.frame(
+                        from: projected,
+                        traceID: request.traceID,
+                        rawCall: call,
+                        projectedSlotKeys: Set(projected.slots.keys)
+                    )
+                }
+            }
+            let hasExplicitACPowerOff = frames.contains {
+                $0.device == "ac" && $0.actionPrimitive == "power_off"
+            }
+            let hasACTemperatureMutation = frames.contains {
+                $0.device == "ac_temperature" && $0.actionPrimitive != "query"
+            }
+            if hasExplicitACPowerOff && hasACTemperatureMutation {
+                frames = frames.map { candidate in
+                    var frame = candidate
+                    if frame.device == "ac_temperature", frame.actionPrimitive != "query" {
+                        frame.doNotAutoPowerOn = true
+                    }
+                    return frame
+                }
+            }
+            let executionPolicy: DemoRuntimeAtomicityContract =
+                hasExplicitACPowerOff && hasACTemperatureMutation
+                ? .atomic
+                : (parsedCalls.count > 1 ? .partial : .atomic)
+            return try RuntimePlan(
+                traceID: request.traceID,
+                frames: frames.map(RuntimeFrame.tool),
+                executionPolicy: executionPolicy
+            )
         }
     }
 

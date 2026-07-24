@@ -84,6 +84,11 @@ struct DemoRuntimeAdapterLedgerSnapshot: Codable, Equatable, Sendable {
     }
 }
 
+struct DemoRuntimeAdapterTransactionSnapshot: Equatable, Sendable {
+    var successLedger: [String: DemoRuntimeAdapterSuccessRecord]
+    var failureLedger: [DemoRuntimeAdapterFailureRecord]
+}
+
 enum DemoRuntimeAdapterLedgerStoreError: Error, Equatable {
     case unsupportedSchema(String)
     case unknownKey(String)
@@ -187,6 +192,19 @@ public final class DemoRuntimeAdapter {
         }
     }
 
+    func transactionSnapshot() -> DemoRuntimeAdapterTransactionSnapshot {
+        DemoRuntimeAdapterTransactionSnapshot(
+            successLedger: ledger,
+            failureLedger: failureLedger
+        )
+    }
+
+    func restoreTransactionSnapshot(_ snapshot: DemoRuntimeAdapterTransactionSnapshot) throws {
+        ledger = snapshot.successLedger
+        failureLedger = snapshot.failureLedger
+        try persistSnapshot()
+    }
+
     public func execute(
         commandID: String,
         frame: ToolCallFrame,
@@ -237,7 +255,19 @@ public final class DemoRuntimeAdapter {
         let provenance: DemoRuntimeAdapterProvenance = current.actualValue == plannedTransition.desiredValue
             ? .alreadyStateNoop
             : .firstExecution
-        let readback = store.applyMockTransition(plannedTransition)
+        let readback: DemoActionReadback
+        if current.actualValue == plannedTransition.desiredValue {
+            // COR-7: alreadyStateNoop - already at target state, no mutation, no fake acceptedToolCall
+            // Return readback without mutating store (store.applyMockTransition already handles no-op case)
+            readback = DemoActionReadback(
+                key: current.key,
+                actualValue: current.actualValue,
+                revision: current.revision,
+                spokenText: DemoVehicleStateStore.spokenText(for: current)
+            )
+        } else {
+            readback = store.applyMockTransition(plannedTransition)
+        }
         guard let verified = store.cell(for: plannedTransition.key), verified.actualValue == plannedTransition.desiredValue else {
             let actual = store.cell(for: plannedTransition.key)?.actualValue ?? "missing"
             recordFailure(

@@ -1,0 +1,137 @@
+{
+  "schema_version": "c6_eval_spine_failure_codes_v1",
+  "codes": {
+    "E_MODE_REAL_WITHOUT_NEW_ADAPTER": {
+      "stage": "s9",
+      "description": "mode=real but arms.new.adapter_status is absent"
+    },
+    "E_FORGED_REAL_SCORE": {
+      "stage": "s9",
+      "description": "score_class=real_model without a present real adapter"
+    },
+    "E_HOLDOUT_SHA_MISMATCH": {
+      "stage": "preflight",
+      "description": "holdout bytes do not match D-127 pin sha256"
+    },
+    "E_HOLDOUT_ROW_COUNT_MISMATCH": {
+      "stage": "preflight",
+      "description": "holdout row_count is not 61"
+    },
+    "E_B7_DIGEST_MISMATCH": {
+      "stage": "preflight",
+      "description": "B7 assembled/compat/id-set digests do not match candidate"
+    },
+    "E_B7_NOT_FROZEN": {
+      "stage": "s9",
+      "description": "mode=real requires B7 freeze (is_b7_done=true)"
+    },
+    "E_V1_DIGEST_MISMATCH": {
+      "stage": "preflight",
+      "description": "V1 authority digest drift"
+    },
+    "E_V1_NOT_RATIFIED": {
+      "stage": "s10",
+      "description": "real verdict requires V1 status=RATIFIED"
+    },
+    "E_THRESHOLD_REINVENT": {
+      "stage": "s10",
+      "description": "second threshold set embedded; only V1 subject.four_layer_thresholds allowed"
+    },
+    "E_EXPOSURE_VIOLATION": {
+      "stage": "preflight",
+      "description": "train/eval exposure or near-dup leak"
+    },
+    "E_UNKNOWN_BEHAVIOR_CLASS": {
+      "stage": "s9b",
+      "description": "behavior class outside V1 five-class set"
+    },
+    "E_UNKNOWN_READBACK_FIELD": {
+      "stage": "s9",
+      "description": "Plan-P seven readback fields incomplete"
+    },
+    "E_MISSING_CASE": {
+      "stage": "s9b",
+      "description": "case_id missing from one or more arms"
+    },
+    "E_DUPLICATE_CASE": {
+      "stage": "s9b",
+      "description": "duplicate case_id within an arm"
+    },
+    "E_MISSING_ARM": {
+      "stage": "s9b",
+      "description": "required arm absent under real mode"
+    },
+    "E_RESUME_SUBJECT_DRIFT": {
+      "stage": "resume",
+      "description": "partial receipt subject does not match manifest subject"
+    },
+    "E_STATE_COLLAPSE": {
+      "stage": "s11",
+      "description": "renderer ack collapsed into promotion/signoff"
+    },
+    "E_PACKAGE_DONE_CLAIM": {
+      "stage": "any",
+      "description": "harness claimed B2/B3/B4 DONE or C6 acceptance"
+    },
+    "E_INCOMPARABLE_SUBJECT": {
+      "stage": "s9b",
+      "description": "same-subject exact join failed"
+    },
+    "E_SCHEMA": {
+      "stage": "any",
+      "description": "required field or type validation failure"
+    },
+    "E_NO_REAL_SCORES": {
+      "stage": "s10",
+      "description": "real mode without real_model scores"
+    },
+    "E_SYNTHETIC_SCORE_IN_REAL": {
+      "stage": "s9",
+      "description": "mode=real forbids score_class=synthetic on any required arm"
+    },
+    "E_FORCE_STATUS_REJECTED": {
+      "stage": "s10",
+      "description": "force_status override is rejected under mode=real; all gates still run"
+    },
+    "E_QA_SAFETY_FAIL": {
+      "stage": "s10",
+      "description": "mode=real requires qa_safety.status=PASS"
+    },
+    "E_C5_PHASE1_FAIL": {
+      "stage": "s10",
+      "description": "mode=real requires c5_phase1.status=PASS and rc=0"
+    },
+    "E_REAL_ARTIFACT_DIGEST": {
+      "stage": "s9",
+      "description": "mode=real requires present arm artifact.sha256 digest (64 hex)"
+    },
+    "E_HOLDOUT_THREE_WAY_MISMATCH": {
+      "stage": "s9",
+      "description": "holdout pin, subject declaration, and loaded artifact sha256/row_count disagree"
+    },
+    "E_CASESET_INCOMPLETE": {
+      "stage": "s9b",
+      "description": "case set empty, truncated, duplicated, or not the authoritative 61-id set required for mode; receipt expected_case_ids is assertion-only vs D-127 holdout"
+    },
+    "E_V1_FORMULA_DRIFT": {
+      "stage": "s10",
+      "description": "demo_fuzz threshold formula is not the canonical 5*pass >= 4*eligible"
+    },
+    "E_RESULT_PROVENANCE_MISMATCH": {
+      "stage": "s9",
+      "description": "arm result score_class/artifact/scorer/mode does not bind to manifest arm descriptor"
+    },
+    "E_THRESHOLD_INCOMPLETE": {
+      "stage": "s10",
+      "description": "V1 four_layer_thresholds missing/extra/malformed; never synthesize defaults for absent layers"
+    },
+    "E_S9B_STATUS_NOT_PASS": {
+      "stage": "s10",
+      "description": "REAL S10 requires s9b.status==PASS; BLOCKED/NOT_RUN/UNKNOWN/missing/other fail closed"
+    },
+    "E_BINDING_MISSING": {
+      "stage": "s9",
+      "description": "required subject/manifest binding field missing before evaluation (B7 digests, holdout, V1, mode, scorer)"
+    }
+  }
+}

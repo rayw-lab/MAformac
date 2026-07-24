@@ -1,0 +1,1008 @@
+{
+  "schemaVersion": "demo_fallback_probes_catalog_v1",
+  "sourceSHA256": "3ae98df5b712216d951a0bb45335697311ed4820193ad58c5fcf3c5f4a862190",
+  "fallbackSourceSHA256": "306144f6ba9edeedc171820c1248bf0e0f95947f79cc61841181bbdf335d893c",
+  "receiptID": "runtime-no-mutation-40-probes",
+  "probes": [
+    {
+      "probeID": "probe.fallback.ac.safety_or_clarify_reject.zh-CN",
+      "family": "ac",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "空调执行高风险动作",
+      "fallbackCellID": "fallback.ac.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "请先确认温区或目标温度，我先保持空调状态不变。",
+        "ttsText": "请先确认温区或目标温度，我先保持空调状态不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ac.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ac.unmounted_name_rejected.zh-CN",
+      "family": "ac",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "空调执行未挂载动作",
+      "fallbackCellID": "fallback.ac.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "这项空调控制暂未接入演示版，我先不改车内状态。",
+        "ttsText": "这项空调控制暂未接入演示版，我先不改车内状态。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ac.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ac.fast_path_no_match_fallback.zh-CN",
+      "family": "ac",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把空调调一下",
+      "fallbackCellID": "fallback.ac.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个空调说法还没稳稳接住，您可以说空调调到26度。",
+        "ttsText": "这个空调说法还没稳稳接住，您可以说空调调到26度。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ac.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ac.unknown_no_representative_entry.zh-CN",
+      "family": "ac",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "空调切到银河模式",
+      "fallbackCellID": "fallback.ac.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类空调能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类空调能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ac.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.seat.safety_or_clarify_reject.zh-CN",
+      "family": "seat",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "座椅执行高风险动作",
+      "fallbackCellID": "fallback.seat.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "座椅动作需要确认位置，我先保持座椅不动。",
+        "ttsText": "座椅动作需要确认位置，我先保持座椅不动。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.seat.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.seat.unmounted_name_rejected.zh-CN",
+      "family": "seat",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "座椅执行未挂载动作",
+      "fallbackCellID": "fallback.seat.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "座椅控制暂未接入演示版，我先不移动座椅。",
+        "ttsText": "座椅控制暂未接入演示版，我先不移动座椅。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.seat.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.seat.fast_path_no_match_fallback.zh-CN",
+      "family": "seat",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把座椅调一下",
+      "fallbackCellID": "fallback.seat.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。",
+        "ttsText": "这个座椅说法还没稳稳接住，您可以说主驾座椅加热打开。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.seat.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.seat.unknown_no_representative_entry.zh-CN",
+      "family": "seat",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "座椅切到银河模式",
+      "fallbackCellID": "fallback.seat.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类座椅能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类座椅能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.seat.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.window.safety_or_clarify_reject.zh-CN",
+      "family": "window",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "车窗执行高风险动作",
+      "fallbackCellID": "fallback.window.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "车窗动作需要确认位置和开度，我先保持车窗不变。",
+        "ttsText": "车窗动作需要确认位置和开度，我先保持车窗不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.window.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.window.unmounted_name_rejected.zh-CN",
+      "family": "window",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "车窗执行未挂载动作",
+      "fallbackCellID": "fallback.window.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "车窗控制暂未接入演示版，我先不动车窗。",
+        "ttsText": "车窗控制暂未接入演示版，我先不动车窗。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.window.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.window.fast_path_no_match_fallback.zh-CN",
+      "family": "window",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把车窗调一下",
+      "fallbackCellID": "fallback.window.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个车窗说法还没稳稳接住，您可以说主驾车窗打开一半。",
+        "ttsText": "这个车窗说法还没稳稳接住，您可以说主驾车窗打开一半。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.window.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.window.unknown_no_representative_entry.zh-CN",
+      "family": "window",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "车窗切到银河模式",
+      "fallbackCellID": "fallback.window.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类车窗能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类车窗能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.window.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.door.safety_or_clarify_reject.zh-CN",
+      "family": "door",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "车门执行高风险动作",
+      "fallbackCellID": "fallback.door.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_safety_or_policy",
+        "safeReasonKind": "safety_policy",
+        "badgeLabel": "安全拦截",
+        "dialogText": "行驶中为了安全不能开门；停稳后请再说一次，我先保持车门不变。",
+        "ttsText": "行驶中为了安全不能开门；停稳后请再说一次，我先保持车门不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.door.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.door.unmounted_name_rejected.zh-CN",
+      "family": "door",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "车门执行未挂载动作",
+      "fallbackCellID": "fallback.door.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "车门控制暂未接入演示版，我先不动车门。",
+        "ttsText": "车门控制暂未接入演示版，我先不动车门。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.door.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.door.fast_path_no_match_fallback.zh-CN",
+      "family": "door",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把车门调一下",
+      "fallbackCellID": "fallback.door.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个车门说法还没稳稳接住，我先保持车门状态不变。",
+        "ttsText": "这个车门说法还没稳稳接住，我先保持车门状态不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.door.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.door.unknown_no_representative_entry.zh-CN",
+      "family": "door",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "车门切到银河模式",
+      "fallbackCellID": "fallback.door.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类车门能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类车门能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.door.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ambient.safety_or_clarify_reject.zh-CN",
+      "family": "ambient",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "氛围灯执行高风险动作",
+      "fallbackCellID": "fallback.ambient.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "氛围灯效果需要确认颜色或亮度，我先保持灯光不变。",
+        "ttsText": "氛围灯效果需要确认颜色或亮度，我先保持灯光不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ambient.unmounted_name_rejected.zh-CN",
+      "family": "ambient",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "氛围灯执行未挂载动作",
+      "fallbackCellID": "fallback.ambient.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "氛围灯控制暂未接入演示版，我先不改灯光。",
+        "ttsText": "氛围灯控制暂未接入演示版，我先不改灯光。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ambient.fast_path_no_match_fallback.zh-CN",
+      "family": "ambient",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把氛围灯调一下",
+      "fallbackCellID": "fallback.ambient.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个氛围灯说法还没稳稳接住，您可以说氛围灯调亮一点。",
+        "ttsText": "这个氛围灯说法还没稳稳接住，您可以说氛围灯调亮一点。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.ambient.unknown_no_representative_entry.zh-CN",
+      "family": "ambient",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "氛围灯切到银河模式",
+      "fallbackCellID": "fallback.ambient.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类氛围灯能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类氛围灯能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.ambient.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.screen.safety_or_clarify_reject.zh-CN",
+      "family": "screen",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "屏幕执行高风险动作",
+      "fallbackCellID": "fallback.screen.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "屏幕设置需要确认目标屏幕，我先保持显示不变。",
+        "ttsText": "屏幕设置需要确认目标屏幕，我先保持显示不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.screen.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.screen.unmounted_name_rejected.zh-CN",
+      "family": "screen",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "屏幕执行未挂载动作",
+      "fallbackCellID": "fallback.screen.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "屏幕控制暂未接入演示版，我先不改屏幕设置。",
+        "ttsText": "屏幕控制暂未接入演示版，我先不改屏幕设置。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.screen.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.screen.fast_path_no_match_fallback.zh-CN",
+      "family": "screen",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把屏幕调一下",
+      "fallbackCellID": "fallback.screen.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个屏幕说法还没稳稳接住，您可以说中控屏亮度调高。",
+        "ttsText": "这个屏幕说法还没稳稳接住，您可以说中控屏亮度调高。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.screen.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.screen.unknown_no_representative_entry.zh-CN",
+      "family": "screen",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "屏幕切到银河模式",
+      "fallbackCellID": "fallback.screen.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类屏幕能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类屏幕能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.screen.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.volume.safety_or_clarify_reject.zh-CN",
+      "family": "volume",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "音量执行高风险动作",
+      "fallbackCellID": "fallback.volume.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "音量变化需要确认方向，我先保持当前音量。",
+        "ttsText": "音量变化需要确认方向，我先保持当前音量。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.volume.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.volume.unmounted_name_rejected.zh-CN",
+      "family": "volume",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "音量执行未挂载动作",
+      "fallbackCellID": "fallback.volume.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "音量控制暂未接入演示版，我先不改音量。",
+        "ttsText": "音量控制暂未接入演示版，我先不改音量。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.volume.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.volume.fast_path_no_match_fallback.zh-CN",
+      "family": "volume",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把音量调一下",
+      "fallbackCellID": "fallback.volume.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个音量说法还没稳稳接住，您可以说音量调低一点。",
+        "ttsText": "这个音量说法还没稳稳接住，您可以说音量调低一点。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.volume.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.volume.unknown_no_representative_entry.zh-CN",
+      "family": "volume",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "音量切到银河模式",
+      "fallbackCellID": "fallback.volume.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类音量能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类音量能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.volume.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.wiper.safety_or_clarify_reject.zh-CN",
+      "family": "wiper",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "雨刮执行高风险动作",
+      "fallbackCellID": "fallback.wiper.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "雨刮动作需要确认模式或速度，我先保持雨刮不变。",
+        "ttsText": "雨刮动作需要确认模式或速度，我先保持雨刮不变。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.wiper.unmounted_name_rejected.zh-CN",
+      "family": "wiper",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "雨刮执行未挂载动作",
+      "fallbackCellID": "fallback.wiper.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "雨刮控制暂未接入演示版，我先不动雨刮。",
+        "ttsText": "雨刮控制暂未接入演示版，我先不动雨刮。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.wiper.fast_path_no_match_fallback.zh-CN",
+      "family": "wiper",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把雨刮调一下",
+      "fallbackCellID": "fallback.wiper.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个雨刮说法还没稳稳接住，您可以说打开雨刮。",
+        "ttsText": "这个雨刮说法还没稳稳接住，您可以说打开雨刮。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.wiper.unknown_no_representative_entry.zh-CN",
+      "family": "wiper",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "雨刮切到银河模式",
+      "fallbackCellID": "fallback.wiper.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类雨刮能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类雨刮能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.wiper.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+      "family": "sunroofShade",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "遮阳帘执行高风险动作",
+      "fallbackCellID": "fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "天窗遮阳需要确认部件和开度，我先保持当前位置。",
+        "ttsText": "天窗遮阳需要确认部件和开度，我先保持当前位置。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+      "family": "sunroofShade",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "遮阳帘执行未挂载动作",
+      "fallbackCellID": "fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "天窗遮阳控制暂未接入演示版，我先不动车顶部件。",
+        "ttsText": "天窗遮阳控制暂未接入演示版，我先不动车顶部件。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+      "family": "sunroofShade",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把遮阳帘调一下",
+      "fallbackCellID": "fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个天窗遮阳说法还没稳稳接住，您可以说打开天窗遮阳帘。",
+        "ttsText": "这个天窗遮阳说法还没稳稳接住，您可以说打开天窗遮阳帘。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+      "family": "sunroofShade",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "遮阳帘切到银河模式",
+      "fallbackCellID": "fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类车顶部件不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类车顶部件不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.sunroofShade.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.fragrance.safety_or_clarify_reject.zh-CN",
+      "family": "fragrance",
+      "reasonKind": "safety_or_clarify_reject",
+      "locale": "zh-CN",
+      "fixturePath": "guard_or_clarify_stub",
+      "probeUtterance": "香氛执行高风险动作",
+      "fallbackCellID": "fallback.fragrance.safety_or_clarify_reject.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "clarify_missing_slot",
+        "safeReasonKind": "clarification_required",
+        "badgeLabel": "需确认",
+        "dialogText": "香氛设置需要确认模式或浓度，我先保持当前香氛。",
+        "ttsText": "香氛设置需要确认模式或浓度，我先保持当前香氛。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.safety_or_clarify_reject.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=guard_or_clarify_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.fragrance.unmounted_name_rejected.zh-CN",
+      "family": "fragrance",
+      "reasonKind": "unmounted_name_rejected",
+      "locale": "zh-CN",
+      "fixturePath": "injected_tool_plan_stub",
+      "probeUtterance": "香氛执行未挂载动作",
+      "fallbackCellID": "fallback.fragrance.unmounted_name_rejected.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "capability_not_mounted",
+        "badgeLabel": "暂未接入",
+        "dialogText": "香氛控制暂未接入演示版，我先不改香氛设置。",
+        "ttsText": "香氛控制暂未接入演示版，我先不改香氛设置。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.unmounted_name_rejected.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=injected_tool_plan_stub"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+      "family": "fragrance",
+      "reasonKind": "fast_path_no_match_fallback",
+      "locale": "zh-CN",
+      "fixturePath": "default_text_runner",
+      "probeUtterance": "能不能把香氛调一下",
+      "fallbackCellID": "fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "换个说法",
+        "dialogText": "这个香氛说法还没稳稳接住，您可以说打开香氛。",
+        "ttsText": "这个香氛说法还没稳稳接住，您可以说打开香氛。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.fast_path_no_match_fallback.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=default_text_runner"
+      ]
+    },
+    {
+      "probeID": "probe.fallback.fragrance.unknown_no_representative_entry.zh-CN",
+      "family": "fragrance",
+      "reasonKind": "unknown_no_representative_entry",
+      "locale": "zh-CN",
+      "fixturePath": "matrix_no_representative_stub",
+      "probeUtterance": "香氛切到银河模式",
+      "fallbackCellID": "fallback.fragrance.unknown_no_representative_entry.zh-CN",
+      "expectedStateDelta": {
+        "kind": "none",
+        "mutated_cells": [],
+        "full_state_hash": "unchanged"
+      },
+      "expectedUIReadback": {
+        "resultKind": "refusal_no_available_tool",
+        "safeReasonKind": "not_available_in_demo",
+        "badgeLabel": "不在范围",
+        "dialogText": "这类香氛能力不在本轮演示范围，我先保持原样。",
+        "ttsText": "这类香氛能力不在本轮演示范围，我先保持原样。"
+      },
+      "assertionSource": [
+        "contracts/fallback-scripts.yaml#cell_id=fallback.fragrance.unknown_no_representative_entry.zh-CN",
+        "Tests/MAformacCoreTests/RuntimeNoMutationProbeTests.swift#fixture_path=matrix_no_representative_stub"
+      ]
+    }
+  ]
+}

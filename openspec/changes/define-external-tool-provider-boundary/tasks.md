@@ -7,25 +7,25 @@ gate: Slice A/C = 本批；Slice B/D = gated after commander 批
 
 ## Slice A: DomainRegistry + DomainDescriptor（本批）
 
-- [ ] A.1 定义 `DomainDescriptor` struct（domainID / displayName / enabled / availability / connectorKind / proofCap）
-- [ ] A.2 定义 `DomainID` enum（.vehicle / .navigation / .music / .foodDelivery）
-- [ ] A.3 定义 `DomainRegistry`：只读注册表，预置 3 个 disabled planned entry（navigation/music/foodDelivery，全 enabled=false availability=.planned connector=.mcp）
-- [ ] A.4 `DomainRegistry` SHALL NOT 注册 vehicle domain（vehicle 走 CapabilityRegistry，不进 DomainRegistry）
-- [ ] A.5 单元测试 `DomainRegistryTests`：3 entry 全 disabled + 无 vehicle entry + 只读不可变
+- [x] A.1 定义 `DomainDescriptor` struct（domainID / displayName / enabled / availability / connectorKind / proofCap）
+- [x] A.2 定义 `DomainID` enum（.vehicle / .navigation / .music / .foodDelivery）
+- [x] A.3 定义 `DomainRegistry`：只读注册表，预置 3 个 disabled planned entry（navigation/music/foodDelivery，全 enabled=false availability=.planned connector=.mcp）
+- [x] A.4 `DomainRegistry` SHALL NOT 注册 vehicle domain（vehicle 走 CapabilityRegistry，不进 DomainRegistry）
+- [x] A.5 单元测试 `DomainRegistryTests`：3 entry 全 disabled + 无 vehicle entry + 只读不可变
 
 验证：`swift test --filter DomainRegistryTests` + `git diff --check`
 
 ## Slice C: ExternalToolInvocation vocabulary + ToolProvider stub + Guard（本批）
 
-- [ ] C.1 定义 `ExternalToolSchema`（toolName / argumentsSchema / proofClass）
-- [ ] C.2 定义 `ExternalToolInvocation`（domainID / toolName / arguments / connector / proofClass / status）
-- [ ] C.3 定义 `ExternalToolResult` + `ExternalToolStatus`（首批只有 `planned_connector_disabled`，**无 `.success`**）
-- [ ] C.4 定义 `ToolProviderDescriptor`（domainID / connector / enabled / availability / proofCap）
-- [ ] C.5 定义 `ToolProvider` protocol（`listTools()` + `invoke(_:)`）
-- [ ] C.6 实现 `DisabledMcpToolProvider` stub（connector=.mcp / enabled=false / availability=.planned / invoke throws `planned_connector_disabled`）
-- [ ] C.7 定义 `DomainProviderGuard`：fail-closed（enabled=false → reject；availability≠.planned → reject；connector 未知 → reject；domain 未在 DomainRegistry → reject）
-- [ ] C.8 单元测试 `ExternalToolInvocationTests`：disabled provider invoke returns `planned_connector_disabled` + guard reject enabled=false + guard reject unknown connector + no `.success` in vocabulary
-- [ ] C.9 强词 grep：`rg -n "DemoVehicleStateStore|C3ExecutionPipeline|DemoRuntimeSessionRunner|\.success" Core/Domain` = 0 命中
+- [x] C.1 定义 `ExternalToolSchema`（toolName / argumentsSchema / proofClass）
+- [x] C.2 定义 `ExternalToolInvocation`（domainID / toolName / arguments / connector / proofClass / status）
+- [x] C.3 定义 `ExternalToolResult` + `ExternalToolStatus`（首批只有 `planned_connector_disabled`，**无 `.success`**）
+- [x] C.4 定义 `ToolProviderDescriptor`（domainID / connector / enabled / availability / proofCap）
+- [x] C.5 定义 `ToolProvider` protocol（`listTools()` + `invoke(_:)`）
+- [x] C.6 实现 `DisabledMcpToolProvider` stub（connector=.mcp / enabled=false / availability=.planned / invoke throws `planned_connector_disabled`）
+- [x] C.7 定义 `DomainProviderGuard`：fail-closed（enabled=false → reject；availability≠.planned → reject；connector 未知 → reject；domain 未在 DomainRegistry → reject）
+- [x] C.8 单元测试 `ExternalToolInvocationTests`：disabled provider invoke returns `planned_connector_disabled` + guard reject enabled=false + guard reject unknown connector + no `.success` in vocabulary
+- [x] C.9 强词 grep：`rg -n "DemoVehicleStateStore|C3ExecutionPipeline|DemoRuntimeSessionRunner|\.success" Core/Domain` = 0 命中
 
 验证：`swift test --filter ExternalToolInvocationTests` + `git diff --check` + 强词 grep
 

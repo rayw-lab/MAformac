@@ -127,6 +127,7 @@ private extension ToolCallFrame {
         value: ContractValue = ContractValue(),
         stateRevision: Int
     ) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             agentID: "vehicle-control",
             capabilityID: "cabin.\(device)",

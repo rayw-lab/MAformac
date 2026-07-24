@@ -101,11 +101,11 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 12. D14 Gate 4 Commander Reconcile
 
-- [ ] 12.1 Reconfirm Gate 3 PASS before UIUE docs work.
-- [ ] 12.2 Update UIUE reconcile receipt, decomposition map, and burndown according to actual D14 proof.
-- [ ] 12.3 Preserve proof caps, non-claims, access gaps, C005/C061/C018/C052 dispositions, and D15 boundary.
-- [ ] 12.4 Validate with `git diff --check`, `openspec validate ui-presentation --strict`, `git diff --cached --name-only`, and `git diff --cached --check`.
-- [ ] 12.5 Run Codex native subagent Gate 4 audit within 1200 seconds and require empty P0/P1.
+- [x] 12.1 Reconfirm Gate 3 PASS before UIUE docs work. **Reconciled historical completion:** `docs/project/phase0/r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md:44-51,90-98` records Gate3 DONE, commit `66dda25`, and Codex substitute verifier PASS; this is not rewritten as a Hermes anchor.
+- [x] 12.2 Update UIUE reconcile receipt, decomposition map, and burndown according to actual D14 proof. **Reconciled historical completion:** `docs/project/phase0/r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md:53-70`; `docs/roadmaps/2026-06-28-uiue-r5-dispatch-ready-decomposition-map.md:198`.
+- [x] 12.3 Preserve proof caps, non-claims, access gaps, C005/C061/C018/C052 dispositions, and D15 boundary. **Reconciled historical completion; current disposition superseded/clarified by D15-D19:** D14 receipt `docs/project/phase0/r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md:53-70,132-147`; current rows `docs/roadmaps/2026-06-28-uiue-r5-dispatch-ready-decomposition-map.md:131-141,199-201,329-332`. Do not restore the old C018/non-durable wording.
+- [x] 12.4 Validate with `git diff --check`, `openspec validate ui-presentation --strict`, `git diff --cached --name-only`, and `git diff --cached --check`. **Reconciled historical completion:** D14 receipt `docs/project/phase0/r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md:100-107` records all required staged-doc validations; do not replay a 2026-06 UIUE staged state now.
+- [x] 12.5 Run Codex native subagent Gate 4 audit within 1200 seconds and require empty P0/P1. **Reconciled historical completion:** D14 receipt `docs/project/phase0/r5-d14-runtime-adapter-residual-commander-reconcile-2026-06-29.md:8-14,100-108` records Gate4 DONE and Codex audit `019f124c-...` with empty P0/P1/P2.
 
 ## 13. D18 Gate 1 Runtime Durability Authority
 
@@ -144,8 +144,8 @@ Historical D12 row closed by the UIUE D12 commander reconcile receipt. It remain
 
 ## 17. R5 D20 App Runtime Entry Under Proof Cap
 
-- [x] 17.1 Move the main app text command entry off `DemoWalkingSkeleton` and onto a main-owned `DemoRuntimeSessionRunner`.
-- [x] 17.2 Route decoded command text through `C3ExecutionPipeline` and the runtime adapter path before producing `RuntimePresentationPayload`.
+- [ ] 17.1 Move the main app text command entry off `DemoWalkingSkeleton` and onto a main-owned `DemoRuntimeSessionRunner`. **🔴 checklist-vs-frontstage 失真，live App 零接线（GAP-HUNT T04）。** Historical implementation existed at `15216238`, but current `App` has no `DemoRuntimeSessionRunner` or text-input reachability; keep the historical lineage without claiming current completion.
+- [ ] 17.2 Route decoded command text through `C3ExecutionPipeline` and the runtime adapter path before producing `RuntimePresentationPayload`. **🔴 checklist-vs-frontstage 失真，live App 零接线（GAP-HUNT T04）。** Historical implementation existed at `15216238`, but current customer MicDock remains mock-bound and current App has no runner reachability; v5b containment is deny-only, not this production binding.
 - [x] 17.3 Preserve C3 stale/replay and readback verification semantics; do not promote local/runtime adapter proof to production runtime readiness.
 - [x] 17.4 Add local/unit tests proving app-facing command text emits sanitized runtime presentation payloads and preserves durable stale replay without a second write.
 - [x] 17.5 Validate with targeted Swift tests, OpenSpec strict checks, `git diff --check`, staged diff checks, and Gate audit evidence.

@@ -82,6 +82,21 @@ final class U44LiquidGlassHardeningInventoryTests: XCTestCase {
         XCTAssertEqual(pathsWithGlassEffect["App/DemoControlPanel.swift"], 1)
     }
 
+    func testContextCapsuleReduceTransparencyUsesTokenSolidFallback() throws {
+        let contextCapsule = try source(at: "App/ContextCapsule.swift")
+        let designTokens = try source(at: "App/DesignTokens.swift")
+
+        XCTAssertTrue(contextCapsule.contains("@Environment(\\.accessibilityReduceTransparency)"))
+        XCTAssertTrue(contextCapsule.contains("if reduceTransparency"))
+        XCTAssertTrue(contextCapsule.contains("DesignTokens.contextCapsuleChromeFill(theme: theme, reduceTransparency: true)"))
+        XCTAssertTrue(contextCapsule.contains("DesignTokens.contextCapsuleChromeStroke(theme: theme, reduceTransparency: reduceTransparency)"))
+        XCTAssertTrue(contextCapsule.contains(".glassEffect(.regular, in: Capsule())"))
+
+        XCTAssertTrue(designTokens.contains("static func contextCapsuleChromeFill(theme: PresentationTheme, reduceTransparency: Bool) -> Color"))
+        XCTAssertTrue(designTokens.contains("static func contextCapsuleChromeStroke(theme: PresentationTheme, reduceTransparency: Bool) -> Color"))
+        XCTAssertTrue(designTokens.contains("guard reduceTransparency else { return .clear }"))
+    }
+
     private func stripLineComments(_ source: String) -> String {
         source
             .split(separator: "\n", omittingEmptySubsequences: false)

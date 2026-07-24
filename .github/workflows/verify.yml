@@ -1,26 +1,41 @@
 name: Verify
 
 "on":
+  workflow_dispatch:
+    inputs:
+      change_ids:
+        description: "Optional comma-separated OpenSpec change ids"
+        required: false
+        default: ""
   pull_request:
   push:
     branches:
       - main
       - "codex/**"
+      - opt/streamline-macos-20260707
 
 jobs:
   verify:
     # Defaults to GitHub-hosted macOS. D24 may temporarily set
     # MAFORMAC_VERIFY_RUNNER='["self-hosted","macOS","ARM64","maformac-d24"]'.
+    # Must stay independent of ui-e2e.yml (no job-level needs either direction).
     runs-on: ${{ fromJSON(vars.MAFORMAC_VERIFY_RUNNER || '["macos-latest"]') }}
     timeout-minutes: 30
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Show toolchain
         run: |
           swift --version
           python3 --version
+
+      # Anti-placebo hard constraint: exact `make verify-e2e` step required.
+      # G8: verify-ci no longer nests verify-e2e — this is the sole CI e2e run.
+      - name: Run reviewed product E2E gate
+        run: make verify-e2e
 
       - name: Run source-free verification gates
         run: make verify-ci
@@ -32,36 +47,24 @@ jobs:
           # docs/evidence-frozen/** 豁免：历史证据逐字节冻结（MANIFEST.sha256 锁 hash），清洗空白破对账（D-112 MT3）
           git diff --check "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" -- . ':(exclude)docs/evidence-frozen'
 
+      # G8: failure-retainable head-bound receipt (always attempt; refuse empty file).
       - name: Write head-bound CI receipt
+        if: always()
+        env:
+          VERIFY_CI_CHANGE_IDS: ${{ inputs.change_ids || '' }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number || '' }}
         run: |
-          dirty_worktree=false
-          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
-            dirty_worktree=true
-          fi
-          cat > "$RUNNER_TEMP/verify-ci-receipt.json" <<JSON
-          {
-            "receipt_id": "verify-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}",
-            "created_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "change_id": "define-demo-default-scope",
-            "proof_class": "ci_source_free",
-            "event_name": "${GITHUB_EVENT_NAME}",
-            "head_commit": "${GITHUB_SHA}",
-            "dirty_worktree": ${dirty_worktree},
-            "commands": [
-              "make verify-ci",
-              "git diff --check (pull_request only; skipped on push)"
-            ],
-            "claim_boundaries": [
-              "source-free CI proof only",
-              "local make verify-all receipt remains required for raw snapshot bound proof",
-              "no_training_no_c6_acceptance_no_golden_no_voice_no_uiue_merge"
-            ]
-          }
-          JSON
+          python3 Tools/checks/write_verify_ci_receipt.py \
+            --output "$RUNNER_TEMP/verify-ci-receipt.json" \
+            --change-ids "$VERIFY_CI_CHANGE_IDS"
+          test -s "$RUNNER_TEMP/verify-ci-receipt.json"
           shasum -a 256 "$RUNNER_TEMP/verify-ci-receipt.json"
 
       - name: Upload CI receipt
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: verify-ci-receipt
           path: ${{ runner.temp }}/verify-ci-receipt.json
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "c6-eval-spine/s11-renderer-ack.v1.schema.json",
+  "title": "S11 renderer ack / downstream envelope",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "ack_id",
+    "s10_verdict_digest",
+    "renderer_contract_digest",
+    "downstream_envelope",
+    "state_separation",
+    "claims"
+  ],
+  "properties": {
+    "schema_version": { "const": "s11_renderer_ack_v1" },
+    "ack_id": { "type": "string" },
+    "s10_verdict_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "renderer_contract_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "downstream_envelope": {
+      "type": "object",
+      "required": ["consumers", "payload_kind", "not"]
+    },
+    "state_separation": {
+      "type": "object",
+      "required": [
+        "renderer_ack",
+        "promotion_transaction",
+        "candidate_signoff"
+      ],
+      "properties": {
+        "renderer_ack": {
+          "type": "string",
+          "enum": ["EMITTED", "ABSENT"]
+        },
+        "promotion_transaction": {
+          "type": "string",
+          "enum": ["NOT_STARTED", "IN_PROGRESS", "DONE"]
+        },
+        "candidate_signoff": {
+          "type": "string",
+          "enum": ["UNSIGNED", "SIGNED"]
+        }
+      }
+    },
+    "claims": { "type": "object" },
+    "errors": { "type": "array" }
+  },
+  "additionalProperties": true
+}

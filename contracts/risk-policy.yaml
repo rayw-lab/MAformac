@@ -54,6 +54,19 @@ forbidden:
     devices: [car_door, door, tailgate, electric_tailgate_switch]   # C1 实有意图（§28 已核）
     risk_level: R2
     refuse_readback_zh: 行驶中为了安全暂时不能开门, 停稳后我再帮您
+    refusal_unknown_state_zh: 车速状态未知, 安全起见暂不执行开门操作, 请确认传感器正常后重试
+
+  # FA-4 / B07=B（2026-07-22 磊哥拍板）：speed>0 一票拒绝；speed=0 时仅 P/N 允许，D/R 拒绝；坏状态 fail-closed
+  - rule_id: window_open_while_moving_or_unsafe_gear
+    display_zh: 行驶中或非驻车挡开窗
+    trigger: vehicle.speed > 0
+    gear_cell: vehicle.gear
+    stationary_gear_allow: [P, N]
+    devices: [window]
+    risk_level: R2
+    refuse_readback_zh: 行驶中为了安全暂时不能开窗, 停稳后我再帮您
+    refuse_gear_zh: 当前挡位不适合开窗, 请挂入 P 或 N 挡后再试
+    refusal_unknown_state_zh: 车速或挡位状态未知, 安全起见暂不执行开窗操作, 请确认传感器正常后重试
 
 # ===== 校验闭合（verify_risk_policy）=====
 closure_notes:

@@ -1,0 +1,20 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "invalid_reason": "outcome=reject SHALL carry rejection_reason. rejection_reason=null with outcome=reject is an illegal combination. SHALL 'Route result MUST carry the minimum wire fields' scenario 'Reject outcome carries rejection_reason'.",
+    "expected_error": "illegal_combination"
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-neg-reject-no-reason-000001",
+    "trace_id": "trace-neg-reject-no-reason-000001",
+    "exec_tier": "L2",
+    "outcome": "reject",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": null,
+    "trace_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "rejection_reason": null
+  }
+}

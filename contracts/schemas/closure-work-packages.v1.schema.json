@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/schemas/closure-work-packages.v1.schema.json",
+  "title": "MAformac closure work packages registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_id", "artifact_kind", "authority", "basis", "source_snapshot", "edge_basis", "requires_checker", "allowed_roots", "closure_roots", "proof_profiles", "o6_resource_policy_ref", "receipt_envelope_contract", "external_facts", "packages"],
+  "properties": {
+    "schema_version": {"const": "closure_work_packages_v1"},
+    "registry_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "artifact_kind": {"const": "closure_work_packages_registry"},
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "source_path", "source_sha256", "bootstrap_ratification_receipt"],
+      "properties": {
+        "state": {"enum": ["draft", "ratified", "retired"]},
+        "source_path": {"$ref": "#/$defs/path"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "bootstrap_ratification_receipt": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/artifact"}]}
+      }
+    },
+    "basis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repo_head", "captured_at", "roadmap_path", "roadmap_sha256"],
+      "properties": {
+        "repo_head": {"$ref": "#/$defs/git_sha"},
+        "captured_at": {"type": "string", "format": "date-time"},
+        "roadmap_path": {"$ref": "#/$defs/path"},
+        "roadmap_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "source_snapshot": {"$ref": "#/$defs/source_snapshot"},
+    "edge_basis": {"$ref": "#/$defs/edge_basis"},
+    "requires_checker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_id", "generated_block_required"],
+      "properties": {
+        "contract_id": {"const": "closure_registry_checker_v1"},
+        "generated_block_required": {"const": true}
+      }
+    },
+    "allowed_roots": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repo", "run_dir", "runs_archive", "build"],
+      "properties": {
+        "repo": {"$ref": "#/$defs/path"}, "run_dir": {"$ref": "#/$defs/path"},
+        "runs_archive": {"$ref": "#/$defs/path"}, "build": {"$ref": "#/$defs/path"}
+      }
+    },
+    "closure_roots": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/package_id"}},
+    "proof_profiles": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/proof_profile"}},
+    "o6_resource_policy_ref": {"$ref": "#/$defs/o6_ref"},
+    "receipt_envelope_contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_id", "registry_schema_major", "require_registry_digest", "require_package_revision", "require_typed_subject"],
+      "properties": {
+        "schema_id": {"const": "closure_package_exit_envelope_v1"},
+        "registry_schema_major": {"const": "closure_work_packages_v1"},
+        "require_registry_digest": {"const": true},
+        "require_package_revision": {"const": true},
+        "require_typed_subject": {"const": true}
+      }
+    },
+    "external_facts": {"type": "array", "items": {"$ref": "#/$defs/external_fact"}},
+    "packages": {"type": "array", "minItems": 29, "items": {"$ref": "#/$defs/package"}}
+  },
+  "$defs": {
+    "package_id": {"type": "string", "pattern": "^[A-Z][A-Za-z0-9]{0,15}$"},
+    "path": {"type": "string", "minLength": 1, "maxLength": 1024},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "git_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["root", "path", "availability", "sha256"],
+      "properties": {
+        "root": {"enum": ["repo", "run_dir", "runs_archive", "build"]},
+        "path": {"$ref": "#/$defs/path"},
+        "availability": {"enum": ["existing", "planned", "missing"]},
+        "sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]}
+      }
+    },
+    "authority_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "locator", "required_state"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"}, "locator": {"type": "string", "minLength": 1},
+        "required_state": {"enum": ["draft", "ratified", "retired"]}
+      }
+    },
+    "edge": {
+      "type": "object", "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {"from": {"$ref": "#/$defs/package_id"}, "to": {"$ref": "#/$defs/package_id"}}
+    },
+    "source_snapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["manifest_id", "source_path", "source_sha256", "repo_head", "package_ids", "hard_edges"],
+      "properties": {
+        "manifest_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+        "source_path": {"$ref": "#/$defs/path"}, "source_sha256": {"$ref": "#/$defs/sha256"},
+        "repo_head": {"$ref": "#/$defs/git_sha"},
+        "package_ids": {"type": "array", "minItems": 29, "uniqueItems": true, "items": {"$ref": "#/$defs/package_id"}},
+        "hard_edges": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/edge"}}
+      }
+    },
+    "edge_basis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["default_basis", "default_authority_refs", "overrides"],
+      "properties": {
+        "default_basis": {"const": "conservative_v2"},
+        "default_authority_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/authority_ref"}},
+        "overrides": {"type": "array", "items": {"$ref": "#/$defs/edge_basis_entry"}}
+      }
+    },
+    "edge_basis_entry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["from", "to", "basis", "authority_refs"],
+      "properties": {
+        "from": {"$ref": "#/$defs/package_id"}, "to": {"$ref": "#/$defs/package_id"},
+        "basis": {"enum": ["source_inherited", "audit_repair_v2", "ratified_override"]},
+        "authority_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/authority_ref"}}
+      }
+    },
+    "proof_class": {"enum": ["local", "mock", "unit", "integration", "runtime", "mac_runtime_smoke", "desktop_operator_equivalent", "operator_pass", "mobile", "true_device", "live_api"]},
+    "proof_profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "allowed_claims", "forbidden_claims", "done_requires"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^proof_[a-z0-9_]{3,63}$"},
+        "allowed_claims": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "forbidden_claims": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "done_requires": {
+          "type": "object", "additionalProperties": false, "required": ["all_of", "any_of"],
+          "properties": {
+            "all_of": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/proof_class"}},
+            "any_of": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/proof_class"}}
+          }
+        }
+      }
+    },
+    "o6_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["authority", "schema_id", "artifact", "policy_sha256", "lease_required_for_states"],
+      "properties": {
+        "authority": {"const": "O6"}, "schema_id": {"const": "closure_execution_window_v1"},
+        "artifact": {"$ref": "#/$defs/artifact"},
+        "policy_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "lease_required_for_states": {"type": "array", "prefixItems": [{"const": "running"}], "items": false, "minItems": 1, "maxItems": 1}
+      }
+    },
+    "external_fact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "status", "evidence"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+        "status": {"enum": ["satisfied", "pending", "blocked", "not_applicable"]},
+        "evidence": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/artifact"}]}
+      }
+    },
+    "counting": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "count_key", "count_in_hard_denominator", "deliverable_keys"],
+      "properties": {
+        "role": {"enum": ["leaf", "aggregate", "control"]}, "count_key": {"type": "string", "minLength": 1},
+        "count_in_hard_denominator": {"type": "boolean"},
+        "deliverable_keys": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "decision_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["declared", "authority_refs"],
+      "properties": {
+        "declared": {"enum": ["draft", "ratified", "retired"]},
+        "authority_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/authority_ref"}}
+      }
+    },
+    "execution_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["declared", "stage", "readiness_mode", "reason_codes", "transition_receipts"],
+      "properties": {
+        "declared": {"enum": ["gap", "planned", "blocked", "ready", "running", "paused", "done", "failed"]},
+        "stage": {"enum": ["design", "preflight", "implementation", "verification", "closeout"]},
+        "readiness_mode": {"enum": ["not_applicable", "now", "after_human_key", "after_predecessors", "after_predecessors_and_human_key"]},
+        "reason_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "transition_receipts": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/artifact"}}
+      }
+    },
+    "proof_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["class", "artifact", "claim"],
+      "properties": {"class": {"$ref": "#/$defs/proof_class"}, "artifact": {"$ref": "#/$defs/artifact"}, "claim": {"type": "string"}}
+    },
+    "proof_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["declared", "evidence", "verdict"],
+      "properties": {
+        "declared": {"enum": ["none", "partial", "satisfied", "blocked"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/proof_evidence"}},
+        "verdict": {"enum": ["none", "t_pass", "operator_pass", "v_pass", "blocked"]}
+      }
+    },
+    "prerequisite": {
+      "type": "object", "additionalProperties": false,
+      "required": ["package_id", "require_decision", "require_execution", "require_receipt"],
+      "properties": {
+        "package_id": {"$ref": "#/$defs/package_id"}, "require_decision": {"enum": ["draft", "ratified", "retired"]},
+        "require_execution": {"enum": ["gap", "planned", "blocked", "ready", "running", "paused", "done", "failed"]},
+        "require_receipt": {"type": "boolean"}
+      }
+    },
+    "external_gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["fact_id", "require_status"],
+      "properties": {"fact_id": {"type": "string"}, "require_status": {"enum": ["satisfied", "pending", "blocked", "not_applicable"]}}
+    },
+    "command": {
+      "type": "object", "additionalProperties": false,
+      "required": ["availability", "cwd", "argv", "timeout_seconds", "shell", "env_names", "success_exit_codes"],
+      "properties": {
+        "availability": {"enum": ["existing", "planned", "missing"]}, "cwd": {"enum": ["repo", "run_dir", "build"]},
+        "argv": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "timeout_seconds": {"type": "integer", "minimum": 1}, "shell": {"const": false},
+        "env_names": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "success_exit_codes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer"}}
+      }
+    },
+    "check_command": {
+      "type": "object", "additionalProperties": false, "required": ["entry", "exit"],
+      "properties": {"entry": {"$ref": "#/$defs/command"}, "exit": {"$ref": "#/$defs/command"}}
+    },
+    "join_input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["gate_id", "digest_subject_key", "artifact"],
+      "properties": {
+        "gate_id": {"enum": ["model", "capability", "architecture", "demo", "honesty", "operator"]},
+        "digest_subject_key": {"type": "string"}, "artifact": {"$ref": "#/$defs/artifact"}
+      }
+    },
+    "exit_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact", "envelope_schema_id", "native_schema_id", "owner_package_id", "success_pointer", "success_values", "freshness_policy", "subject_schema_id"],
+      "properties": {
+        "artifact": {"$ref": "#/$defs/artifact"}, "envelope_schema_id": {"const": "closure_package_exit_envelope_v1"},
+        "native_schema_id": {"type": "string"}, "native_artifact": {"$ref": "#/$defs/artifact"},
+        "owner_package_id": {"$ref": "#/$defs/package_id"}, "success_pointer": {"type": "string", "pattern": "^/"},
+        "success_values": {"type": "array", "minItems": 1, "uniqueItems": true},
+        "freshness_policy": {"enum": ["immutable_digest", "same_repo_head", "same_subject"]},
+        "subject_schema_id": {"type": "string"}, "join_inputs": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"$ref": "#/$defs/join_input"}}
+      }
+    },
+    "package": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "source_id", "revision", "kind", "scope_class", "closure_required", "counting", "decision_state", "execution_state", "proof_state", "prerequisites", "external_gates", "exit_receipt", "check_command", "proof_profile_id", "resource_claim_refs"],
+      "properties": {
+        "id": {"$ref": "#/$defs/package_id"}, "source_id": {"$ref": "#/$defs/package_id"},
+        "revision": {"type": "integer", "minimum": 1}, "kind": {"enum": ["authority", "implementation", "execution", "acceptance", "accounting"]},
+        "scope_class": {"enum": ["hard", "non_hard"]}, "closure_required": {"type": "boolean"},
+        "counting": {"$ref": "#/$defs/counting"}, "decision_state": {"$ref": "#/$defs/decision_state"},
+        "execution_state": {"$ref": "#/$defs/execution_state"}, "proof_state": {"$ref": "#/$defs/proof_state"},
+        "prerequisites": {"type": "array", "items": {"$ref": "#/$defs/prerequisite"}},
+        "external_gates": {"type": "array", "items": {"$ref": "#/$defs/external_gate"}},
+        "exit_receipt": {"$ref": "#/$defs/exit_receipt"}, "check_command": {"$ref": "#/$defs/check_command"},
+        "proof_profile_id": {"type": "string"}, "resource_claim_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    }
+  }
+}

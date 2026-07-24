@@ -1,0 +1,47 @@
+{
+  "_source": {
+    "contract_row_id": "c1_airControl_000164",
+    "jsonl_path": "contracts/semantic-function-contract.jsonl",
+    "captured_at": "2026-07-13",
+    "note": "Positive candidate fixture — grok-4.5 xAI review P1-A1 fix (2026-07-13). Previous revision used c1_airControl_000002 (intent=open_ac_set_interface) with mounted_tool_name=adjust_ac_temperature_to_number, which violated the D-domain paradigm (docs/c5-recovery-2026-06-22/grill-decisions-amend-paradigm-tool-surface.md:13 'intent == 工具名') — surface binding was fake. Now uses the real jsonl row where intent==mounted_tool_name: c1_airControl_000164 (grep-verified 2026-07-13; adjacent rows _000165/_000166 share the same intent but differ in slot/action_code). All action_candidate fields (intent/service/device/action_primitive/action_code/slot/slot_keys/value) are verbatim from that jsonl row. trace_digest computed via RouteCanonicalJSON.sha256Hex over the extended load-bearing set that now includes action_candidate_summary (grok-4.5 review P1-B2 fix)."
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-airControl-000164",
+    "trace_id": "trace-airControl-000164",
+    "exec_tier": "L1",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "service": "airControl",
+    "action_candidate": {
+      "intent": "adjust_ac_temperature_to_number",
+      "service": "airControl",
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "action_primitive": "adjust_to_number",
+      "action_code": "adjust_value_to_specific_value",
+      "device": "ac_temperature",
+      "slot": "adjustment_mode+temperature",
+      "slot_keys": ["adjustment_mode", "temperature"],
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "trace_digest": "fb9646f6eae34745ec15c3916f08ab3d5125013e83f945b0988c9f02833adeec",
+    "rejection_reason": null
+  },
+  "route_trace_load_bearing": {
+    "schema_version": "typed_route_contract.v1",
+    "turn_id": "turn-airControl-000164",
+    "trace_id": "trace-airControl-000164",
+    "exec_tier": "L1",
+    "outcome": "candidate",
+    "clarify_tag": "implicit",
+    "action_candidate_summary": {
+      "mounted_tool_name": "adjust_ac_temperature_to_number",
+      "service": "airControl",
+      "action_primitive": "adjust_to_number",
+      "action_code": "adjust_value_to_specific_value",
+      "value": {"ref": "", "direct": "", "offset": "", "type": ""}
+    },
+    "redaction_policy_id": "redaction_policy.v1"
+  }
+}

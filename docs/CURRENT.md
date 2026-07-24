@@ -1,150 +1,106 @@
 ---
-status: active_router_only_not_ssot
-artifact_kind: current_route_board
-authority: router_only_not_contract
-updated: 2026-07-07晚
-last_verified_origin_main: b2a25da7（PR #40 merge commit；head_truth_rule 以 live git 为准）
-branch: codex/rebuild-c6-doc-absorption-20260624
-head_truth_rule: "Run git rev-parse HEAD and git rev-parse @{u}; this route board records verification inputs and loses to live repo state."
-expires_when: "S4 首批 judge 工艺 PASS 或 S7c 触发"
+kind: current-router
+as_of: 2026-07-23
+authority: router_only
+latest_handoff: docs/handoffs/2026-07-22-af-g0-go-phase2-g0-entry-handoff.md
+go_receipt: docs/handoffs/2026-07-22-af-g0-go-receipt.md
+working_tree_postdates_handoff: false
+af_g0_verdict: GO_WITH_RESIDUALS
+phase2_product_coding: G8_COMPLETE
+phase2_coding_gate: PHASE2_CODING_GATED
+g0_status: G0_COMPLETE
+g1_status: G1_FIRST_KNIFE_GREEN
+g2_status: G2_RESIDUAL_GREEN
+g3_status: G3_COMPLETE
+g4_status: G4_COMPLETE
+g5_status: G5_COMPLETE
+g6_status: G6_COMPLETE
+g7_status: G7_COMPLETE
+g8_status: G8_COMPLETE
+g9_status: G9_KNIFE2_BASELINE_LANDED
+s10_wave5_status: F5_COMPLETE
+action_demo_proven: 1/120
 ---
+<!-- 产品行为是唯一阻塞指标；治理检查只证明治理健康，不替代真实用户路径。 -->
 
-# CURRENT — MAformac 当前路由牌
+# CURRENT — MAformac 当前路由牌（router_only）
 
-> 本文件是交通牌不是事实源。与 `CLAUDE.md`、grill SSOT、签字证据、live repo 冲突时本文件让位并须更新。
-> 前版（D25 K1 spike-ledger 路由，updated 2026-06-30）已被本版 supersede：D25 之后项目经历了 C5 训练就绪 grill（442+ 决策）→ 5-gate construction（PR #9/#10/#11 merge）→ overnight wave-1（gate8/gate2/grill 补深），路线对象已从「D25 K1 receipts」变为「pre-LoRA 训练前节点」。D25 K1 的 8 行 receipt 工作若仍需要，见 baseline-roadmap §2 节点 M3（磊哥单独拍）。
+本文件只回答「现在先读什么、下一步是什么、不能自动做什么」。**不构成产品或执行授权**；任何 HEAD、remote、测试或 runtime 状态必须 live 重核。
 
-## 当前阶段（2026-07-07晚：**S4 生产相开跑；清理 6/6 收口；第二批 grill READY**）
+## Live 真态（2026-07-23）
 
-🔴 **本节 supersede 下方 2026-07-07 register 补洞窗计划相旧态段**。本文件只作 router-only 指针；推进事实源以 roadmap v3、decisions D-114~D-118 和 run-dir board 为准。
+- **`af_g0_verdict: GO_WITH_RESIDUALS`**（owner=磊哥口头授权翻门 +「多路开干」；证据 `docs/handoffs/2026-07-22-af-g0-go-receipt.md`）。subject 精确到 tip **`769ce3c3`** + 当日 live probes；**不**外推 protected dirty 清理或未跑 full suite。
+- **G0 inventory COMPLETE**；**G1 首刀 GREEN**（`abfe715a`）→ **G2 首刀 + 余量 GREEN**（`f7599b5c` / `745f1c5b`）→ **G2-P3 °F 客户入口 GREEN** → **G3 COMPLETE**（刀1–3 + 刀4：`testG3_*` 盖 AC/window/ambient/seat 行为门+smoke；刀4 初推 `b919eb76` 曾 OVERCLAIM「四族」仅 AC+window，已补 ambient/seat `testG3_*`；未抬 proven）。仍 **`PHASE2_CODING_GATED`**：非全面解冻；禁演示 / 抬 proven。
+- **G4 工程 COMPLETE**（刀1–4）：Turn Lease / cancel / last-intent-wins；刀4 六大 RED 场景收口 + smoke（`TurnLeaseCancellationTests` + `testG3_*` + `make verify-e2e`）。**未抬** `actionDemoProven`；后三族仍禁演示。closeout：run-root `PHASE2-G4-KNIFE4-SCENARIO-CLOSEOUT.md`。
+- **G5 工程 COMPLETE**（刀1–4）：taxonomy + reason registry + payload 去 `proofClass` + **ContentView 只渲染**（outcome/voice/orb/readbacks；禁 App 自造文案/`resultKind` 硬判；保留 G4 `isCurrentTurn`）。仍 **`PHASE2_CODING_GATED`**；G5 收口时 **未抬** proven；后三族禁演示。closeout：run-root `PHASE2-G5-KNIFE4-UI-RENDER-ONLY-CLOSEOUT.md`。
+- **G6 工程 COMPLETE**（刀1–2）：`RuntimeTurnReceipt v2` + Assembler + B10；刀2 schema/digest/linked 硬化（run-root `PHASE2-G6-KNIFE2-SCHEMA-DIGEST-CLOSEOUT.md`）。仍 **`PHASE2_CODING_GATED`**；**未抬** proven；后三族禁演示。**非** Phase2 解冻。
+- **G7 工程 COMPLETE**（刀1–2）：刀1 行为门批次（row167/query/risk/replay/cancel/receipt）+ 刀2 anti-placebo 硬化（G7 六批锁表、逐批作用域锚点、meta 真红、`run_swift_test_exact --min-count 1` executed>0）。仍 **`PHASE2_CODING_GATED`**；G7 收口时 **未抬** proven；后三族禁。closeout：run-root `PHASE2-G7-KNIFE1-BEHAVIOR-GATES-CLOSEOUT.md` / `PHASE2-G7-KNIFE2-ANTI-PLACEBO-CLOSEOUT.md`。
+- **G8 工程 COMPLETE**（刀1=唯一刀）：`verify-ci` 摘掉嵌套 `verify-e2e`；workflow 保留显式 `make verify-e2e`；Verify receipt `if: always()` + non-empty + CI 拒空 `GITHUB_SHA`；UI E2E 仍独立 `ui-e2e.yml`。commit **`f7a2a0aa`**。closeout：run-root `PHASE2-G8-CI-DAG-CLOSEOUT.md`。仍 **`PHASE2_CODING_GATED`**；G8 收口时 **未抬** proven；后三族禁。**非**解冻 / **非** BF-6 required 已闭。
+- **S10 Wave5 F3–F5 COMPLETE**（局部解冻 · **matrix_id=4 only**）：磊哥 preapproval + BF-8 receipt 消费；`actionDemoProven` **0→1（1/120）**；m5/m6 未污染；F5 五门禁全绿；Grok **audit_pass**；push **`0f90f61f`**。closeout：run-root `PHASE2-S10-WAVE5-FLIP-CLOSEOUT-GEMINI36.md`。仍 **`PHASE2_CODING_GATED`**；后三族禁演示。
+- 已知 Verify 绿 SHA：**`769ce3c3`**（https://github.com/rayw-lab/MAformac/actions/runs/29919618354）
+- Ballot B07–B11 已拍（run-root `PHASE2-BALLOT-RATIFICATION-RECEIPT.md`）
+- FA-1..3 已闭：`make verify-e2e`=全类 golden+WP21；CURRENT/demo-script/isolation.v3 对齐。**FA-4 只证 window 本机安全门**（B07=B）；仍 **禁演示/合并开窗句与后三族**
+- live **mounted=5 / admission=6**（+row167 `主驾制热调{N}{unit}`）；后三族（window / ambient / seat）仍为 **Phase2 越前 candidate**——**禁演示/合并/计入 proven**
+- **`actionDemoProven=1/120`**（**仅 matrix_id=4**）；`GO_WITH_RESIDUALS` ≠ 三族可演示
+- 验收面：`文本 → route → C3 → state mutation → readback payload → UI`；ASR / TTS 不进当前产品门
 
-- **roadmap v3 指针**：`docs/roadmap-2026-07-07-macos-closure-baseline.md` = 三线融合基线 v3（两轮审计毕）；决策入口 = `docs/commander-log/decisions.md` D-114~D-118。
-- **任务①精简收口**：终审 GO，分支 `opt/streamline-macos-20260707`；物理清理 6 批完成，tracked -611；fullgate 597/0。
-- **任务② register 窗**：S4 生产相已开跑；Q-03 三轮收敛；golden 62 行；run-auth 条件式 = S7c PASS 生效；五管道阵容运行，`%34` judge 待命。
-- **任务③能力面**：能力面已立项；task3 teardown 真值为 `ir_map=562` / `mounted=1` / 120 格仅 1 格可演；BATCH1 19 题已拍，MG-7=C；第二批 grill READY。
-- **非声明**：当前仍不得写 candidate signed、C5 V-PASS、C6 acceptance、mobile/true-device acceptance 或 UIUE/voice readiness。
+## 起手路由
 
-📌 **下一步**：S4 首批样本生成与 judge 工艺验证；S7c 触发后才按 D-114 run-auth 条件式推进。
+1. 读 `CLAUDE.md` 的稳定约束。
+2. 读本页 frontmatter 指向的最新 handoff + GO receipt。
+3. 需要状态时 live 重核 Git / remote Verify / Makefile recipe / matrix proven。
 
-## 【历史】2026-07-07：register 补洞窗计划相 v3 定稿；PR #39/#40 均已 MERGED 进 main
+## 下一步（Phase2 basis-binding → S10）
 
-🔴 **本节 supersede 下方 D-111 honest-frozen-closeout 旧态段**。本文件只作 router-only 指针，不复制 register grill 20 条正文；裁决全文、消费清单和计划以 run-dir SSOT 为准。
+1. **磊哥拍板（2026-07-23 · 均 A）**：① Lane B 绿后 push 绑 remote ② 首个 S10 exact set = **单 Phase1 AC cell**（默认 **matrix_id=4** `adjust_ac_temperature_to_number`）③ **局部解冻** only，全局仍 `PHASE2_CODING_GATED`。receipt：run-root `PHASE2-BASIS-BINDING-DECISION-RECEIPT.md`。
+2. **Lane 证据**：A `verify-ci` PASS @ `2490d79f`；B `verify-e2e` PASS @ `121f4ae0`；C/D 分报（R2 UI OPEN）。
+3. **推进链**：… → proof-contract repair **设计已批 + OpenSpec propose** → **I1/I2/I3 实现（当前）** → 刀1 重授权 → …
+4. **刀1 stopline**：仍 `NO_RETRY` 直至 I1+I2+I3 齐绿。审批：run-root `PHASE2-S10-PROOF-CONTRACT-REPAIR-磊哥-APPROVAL-RECEIPT.md`；OpenSpec：`openspec/changes/repair-s10-action-demo-proven-promotion/`。
+5. residual：R2/R3/BF-7/8/10；`actionDemoProven=1/120`（m4 only）；后三族禁演示；下一 S10 cell 仍须独立 BF-8。
 
-- **PR 真态（live-verified via `gh pr view`）**：PR #39 `MERGED`（merge commit `3744d9da`）；PR #40 `MERGED`（W20A 8 stage 收口 + D-112/D-113 + register S0/S1 scanner v3，merge commit `b2a25da7`）。W20A 仍只证明 `runtime_path_reachable`，不签 candidate、不升格 V-PASS/C6 acceptance/mobile/true-device。
-- **register grill 20/20 全拍**：SSOT=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/PARADIGM-LEDGER.md`；一页消费清单=`runs/2026-07-07-w20a-grill-closeout/register-window/grill-20/FINAL-LIST.md`。口径：Q13 golden boundary、Q16 机械前置+阈值、Q19 A supersede 均已拍；不把 20 条正文搬进 `CURRENT.md`。
-- **实施计划 v3 定稿**：计划=`runs/2026-07-07-w20a-grill-closeout/register-window/IMPL-PLAN-v3.md`，status=`XFRAME_ABSORBED_PENDING_RUNAUTH`；S7c `learnability micro-probe` 已由磊哥 3B 拍为必跑前置，不再作为 run-auth 可选项。
-- **决策指针**：D-112 / D-113 见 `docs/commander-log/decisions.md`。注意 D-113 是指针式落库：goal 层 supersede，data/candidate 层仍 `PENDING_GATES`，旧 tail1200/R3-QNEG-clean basis 在新门全绿前仍是回退承重墙。
-- **交接指针**：`docs/commander-log/COMMANDER-HANDOVER-2026-07-07.md`。
+## 隔离后产品真态（candidate 口径）
 
-📌 **下一步**：S2 golden boundary 已拍补录完（golden 50 全绿 rows=50 pairs=10 boundary=10，Python runner 口径）；S3 生成 SPEC 可备稿。🔴 **D-114（2026-07-07 下午磊哥四拍，见 decisions.md）**：① run-auth **条件式预授权**——S7c learnability micro-probe PASS 即生效，无需再拍 ② Q18 现在不拍，S10 触发后按失败类型分流 ③ tail1200/R3-QNEG-clean 承重墙默认保持，S10 全绿才 data supersede；S10 不绿四类分流（runtime qa fail→修 guard/harness / coverage debt→新 data repair / coverage 足但 action-question 仍 fail→judge causal bet falsified / holdout 塌→话术收窄或新窗口，**waiver 通道对 holdout 关闭**）④ host HOLD ⭐关重 GUI fresh resample PASS，**不默认 waiver-key**（污染归因），时间窗口极硬才例外。S8 点火五布尔=S7c PASS(=run-auth 生效) + host fresh resample PASS + W20A mechanical green receipt + S7b causal-bet receipt + IMPL-PLAN v3 gates；缺任一保持 `BLOCKED/PARTIAL`，不得写 candidate signed、C5 V-PASS、C6 acceptance 或 mobile/true-device acceptance。
+### 全局标签
 
-## 当前阶段（2026-07-06：**C5 收尾定调 A = honest-frozen-closeout（D-111 磊哥拍）**；不重训 1800；candidate unsigned）
+- 工作树是 **5 mounted / 6 admission**（+row167 `主驾制热调{N}{unit}`；仍含三族 candidate）。
+- 空调两族（matrix 1、4）= Phase1 产品面；车窗 / 氛围灯 / 座椅（31、1972、201）= **Phase2 越前 candidate**；row167 为空调 compound 客户入口（G2 余量，禁抬 proven）。
 
-🔴 **本节 supersede 下方 tail1200 live-training-monitor 态**（那是 D-111 之前「continue evidence run」路线；tail1200 iter600 现被 D-111 定为**冻结对象**，非无限续跑）。
+### mounted tools（5）
 
-- **定调=A honest-frozen-closeout（decisions.md D-111，:847-859）**：① 冻结 tail1200 iter600 **unsigned** artifact（tail1200 收尾 demo-ready；`formal 1800` 待 run-auth 作磊哥保留 goal 并行、1800 不大动=不重训别配方/不大改 recipe）② runtime 接线 W20A 让 demo direct-value 可演（R1-correct：`<tool_call>`parser + `ToolContractNormalizer.normalize`(562, `ir_map` ⭐C 编译常量) + 新增 `IR→ToolCallFrame` 桥 → `C3ExecutionPipeline`；**不走 `decode:306`**，名字守护落 normalizer irMap 白名单 miss→reject）③ Lane2 slot 白名单投影防 arguments 幻觉 ④ 三缺陷（EXP 反向 / arguments 幻觉 / action-question under-action）显式 DEFER ledger ⑤ 机械防假绿门（`RuntimeAdapterMountReceipt.validate()` 硬编码 unsigned + grep 0 命中 V-PASS/signed）。
-- 🔴 **qa vs action-question 两面分诊**（此前混淆，D-111 reconcile）：
-  - **qa（over-actuation）** = D-106 三轮 **9/9/9** 模型固有 actuation prior 硬墙 → **D-108 B runtime-gated 已 waive**。
-  - **action-question（under-action）** = **14/18**，根因 trainpack「能不能」register 0 覆盖（W15）；**D-108 B 不覆盖** → **本轮 DEFER**。
-- 🔴 **诚实分叉**：runtime 接线让「调到26度」在 app 生效 **≠ C5 training V-PASS**（接线不改 14/18）；不重训补 register。
-- **grill SSOT**：`runs/2026-07-06-c5-runtime-mainpath-grill/`（GRILL-README + lane-1~4 + reduction + impl-plan + superaudit）。
+1. `adjust_ac_temperature_to_number` — 空调调温（Phase1）
+2. `close_ac` — 空调关机（Phase1）
+3. `open_window_by_number` — 主驾车窗（**candidate · 禁演示**）
+4. `open_atmosphere_lamp` — 氛围灯（**candidate · 禁演示**）
+5. `open_seat_heat` — 副驾座椅加热（**candidate · 禁演示**）
 
-📌 **当前路线（双轨并行）**：**主活 = honest-frozen-closeout** —— 冻结 tail1200 unsigned artifact → runtime 接线 W20A（R1-correct，demo direct-value 可演，superaudit CONDITIONAL_GO 91/100 已过，实装需 run-auth）→ DEFER ledger（三缺陷）→ 机械防假绿门；**并行 = formal 1800 待 run-auth**（磊哥保留 goal，1800 不大动=不重训别配方/不大改 recipe）。**不强求 V-PASS、candidate 保持 unsigned**。
-> non-claims：not candidate signoff / not V-PASS / not C6 acceptance / not runtime 已实装（W20A 未写码）/ not formal 结果达标（formal 1800 尚未跑/未 run-auth）；`adapter_learned_qa=false`。
+> 注：admission（6）= 上述 5 个 mounted tools + 1 个准入入口 row167（空调制热/微调复合入口 `主驾制热调{N}{unit}`，底层挂载至 `adjust_ac_temperature_to_number` 帧，禁抬 proven）。
 
-## 【收尾对象·historical live 态】当前阶段（2026-07-06 早：**tail1200 full-envelope/no-auto-watchdog live；非 true resume；candidate 仍 unsigned**）
+### 仍不具备 / 未闭
 
-🔴 **Formal lane 最新真态（本节 supersede 下方 2026-07-05 host-HOLD/not-launched 旧态与 L-BF/L-BJ 15GB 旧约束）**：
-- **资源 authority 已换挡**：`15GB` 训练 lane 旧约束已被磊哥最新 full-envelope/no-auto-watchdog authority supersede；watchdog 不做 auto-interrupt，冻结/手动关 app 风险由用户接受。secretary 只记录状态，不提供 launch authority。
-- **旧 formal 234208 是历史 HOLD**：`formal-run-20260705T234208+0800` 以 `FORMAL_TRAIN_HOLD_TRAINER_RC_143` 停在 `iteration=1692` / `update_step=423`，无 iter1800 final、无 checkpoint1800；`candidate_status=unsigned`，`adapter_learned_qa=false`。
-- **当前 active run**：`formal-run-20260706T090552+0800-tail1200-full-envelope`；live probe `2026-07-06T09:22:38+08:00` 看到 trainer pid `42505` 仍活，命令加载旧 run 的 `0001200_adapters.safetensors`，`--iters 600`，输出到 tail1200 run dir。
-- **proof boundary**：当前 tail1200 是 `checkpoint1200 weight-init new trajectory`，不是 optimizer/RNG/dataloader/iteration true resume，不是 frozen formal 1800 completion，不是 candidate，不是 C6/V-PASS/behavior pass。
-- **latest live metrics（只按 live metrics 写）**：L-CJ 记录 active `090552` 已过 iter400 validation，checkpoint300 仍已 banked：`metrics.jsonl:145` val iteration `400`, val_loss `0.028200536966323853`, val_time `75.8426699170086`；`metrics.jsonl:147` optimizer_update iteration `400`, update_step `100`, loss `0.043255108408629894`；`metrics.jsonl:148` train_report iteration `400`, train_loss `0.06799046993255616`, it/s `0.04399540526746031`, peak `17.974112558GB`, trained_tokens `17803`；`train.log:56-57` corroborates iter400 val/train。主 passive receipt 是 watchdog iter400 L-CI，状态 `PASSIVE_ITER400_VAL_CONFIRMED__TRAINER_LIVE__ITER600_FINAL_PENDING`；早期同里程碑 receipt 是 watchdog L-BY，二者都不同于更早 monitor/stale-label L-BY artifacts。host free pct 曾到 `4` 后恢复到 `8/9`，passive/no-auto-watchdog、no kill、no armed watchdog。
+- App 客户文本入口仍走有限 literal；**模型输出未接入产品执行链**。
+- **`actionDemoProven=1/120`**（m4 only；119 cells 仍 false）
+- ASR=stub；TTS/真实音频 **不进当前产品门**
+- window 安全门代码已闭（FA-4 本机门），**仍禁演示/合并开窗句与后三族**
+- UI-E2E 未 required（同 SHA cancelled）；E3 人类证据未闭；C5/full suite 另账
+- protected dirty 仍在：**勿 commit** 四路径；未授权不得清理
 
-📌 **当前路线**：保持 `LIVE_TAIL1200_ITER400_VAL_PASS_CHECKPOINT300_BANKED_PID42505__ITER600_FINAL_PENDING__WEIGHT_INIT_NEW_TRAJECTORY__FULL_ENVELOPE_NO_AUTO_WATCHDOG__NONCLAIMS_PRESERVED`。下一步只继续监控 iter600 final/checkpoint、shadow/passive monitor 与后续 eval/signoff；不得把 live pid、低 loss、checkpoint300、iter400 pass 或 partial adapter basis 推成 candidate/C6/V-PASS。
-> non-claims：not true resume / not frozen formal completion / no formal candidate / no C6 acceptance / no V-PASS / no behavior pass / no UIUE·voice；旧 234208 `adapter_learned_qa=false`，当前 tail1200 仍需完成 receipt 与后续 eval。
+## 不能自动做什么
 
-## 【历史】2026-07-05 晚：**run-auth 已接受；formal 1800 仍 NO-GO/HOST_GATE_HOLD；command/watchdog v2 clear**（已被 2026-07-06 full-envelope tail1200 live 态 supersede）
+- 禁止 mock 成功、擅自 push、发布、改旧 receipt 或改写冻结 WBS 而不做显式 supersession。
+- 禁止把 worker 自报、测试数量或治理绿灯当作产品验收。
+- 禁止修改 / commit protected：`CLAUDE.md`、`docs/lessons-learned.md`、`docs/project/collaboration-and-roles.md`、`docs/commander-log/COMMANDER-PLAYBOOK-ma10-ma18-for-codex.md`。
+- 禁止演示或合并后三族 candidate；禁止把 candidate 计入 `actionDemoProven`。
+- 禁止把 `AF-G0_GO_WITH_RESIDUALS` 外推为 release-ready / 真车可用 / 三族可演 / Phase2 产品编码全面解冻。
+- 禁止仅凭 AF-G0 裁决写「implementation unpaused」或把 G1/G2 首刀外推为 G1–G9 全面解冻。
 
-🔴 **Formal launch 最新真态（本节 supersede 下方「等磊哥 run-auth 起 formal 1800」旧态）**：
-- `run-auth` 已接受：磊哥已给“C5闭环 / 中间全部授权同意 / 不要停”。这只解锁进入 launch flow，**不替代 host baseline、watchdog 真 pid、first-real LR gate**。
-- **Phase 1 CLEAN / Phase 4 B / Launch Packet 静态包仍有效**：`6a4b6b82`、trainpack `5653`、sha `fa5690400f67...`、LR 450 fixture rc0；formal 仍只能是 `evidence-run-only`。
-- **command v2 clear**：W-G2 `LAUNCH_COMMAND_V2_READY_BUT_HOST_HOLD`，旧 `COMMAND-CANDIDATES.txt` 的 shorttrain watchdog 段被 v2 supersede。
-- **watchdog v2 clear but not armed**：W-H2 `WATCHDOG_V2_CLEAR_BUT_HOST_HOLD`；尚无 trainer pid，尚未 armed。
-- **host gate HOLD / not launched**：三次 launch-adjacent host sample 均低于 21GB：W-I `17.867GB<21`，W-I2 quiet `18.554GB<21`，W-I3 forced `18.554GB<21`；swap 约 `0.29GB` PASS 不能覆盖 free-memory FAIL；无 `host-waiver-key`。
-- **GitNexus 节点完成但不外溢**：W-K4 `node .gitnexus/run.cjs analyze` rc0/18s，index 更新到 `6a4b6b8`（30002 symbols / 52715 relationships / 300 flows）；AGENTS/CLAUDE generated GitNexus block 已更新。本轮 host-HOLD 窗口不再 reindex，GitNexus tooling rc0 不代表 launch/candidate 进展。
+## Non-claims
 
-📌 **当前路线**：保持 `NO_GO_HOST_GATE_HOLD__RUN_AUTH_ACCEPTED__COMMAND_V2_CLEAR__WATCHDOG_V2_CLEAR__NOT_LAUNCHED`。下一步只能二选一：**A** 关闭重 GUI 后 fresh host resample 到 PASS；或 **B** 磊哥显式给 `host-waiver-key`。之后才可显式指派 high Codex executor 起 formal 1800 `R3-QNEG-clean`（rank16/iters1800/updates450/warmup36）+ arm watchdog 真 pid + first-real LR gate。
-> non-claims：未 launch / 未 watchdog armed / 未 first-real LR / 未 formal-run 完成 / 未 candidate signoff / 未 C6 acceptance·V-PASS·UIUE·voice；`adapter_learned_qa=false`，`candidate_status=unsigned`。
-
-## 【前一阶段】D-106/D-107 后 baseline——先做 Phase 1（2026-07-05 早，historical，已被上方 Phase 1 CLEAN supersede）
-
-🔴 **D-106/D-107 最新真态（本节 supersede 下方 R3 in-flight 旧态）**：D-105/D-106 坐实 qa 三轮可比真数 adapter `any_tool_call_fail`=**9/9/9**（scanner 硬化后，旧「9→8→10 恶化」叙事作废——R3=8 是漏计 `query_volume` artifact），逐 case 揭示=**模型固有 actuation prior 硬墙**（base 原模型也失败 4 个 WINDOW/DOOR/SUNROOF/SUNSHADE），adapter-only 数据法两轮（R3 堆量/R4 改挂载形态）纹丝不动。**D-107（磊哥拍）**：从 D-106 出发开新执行锚——① `docs/baseline-roadmap-2026-07-05-c5-d106.md`=当前 C5 起手 baseline（planning，非契约）② Codex App worker 接管执行基线，commander 纯编排 ③ formal 1800 **HOLD pending Phase 1-4** ④ R-L17=`route-only signed; candidate signoff unsigned` ⑤ 第一执行单=**Phase 1 ONLY**（scanner hardening 正式化 + 6 label authority 冲突裁决表→repo 可复跑 gate）。stoplines：不训练/不生成新数据/不启动 formal/不 merge UIUE/不碰 `Core/Training`。
-
-📌 **当前路线（Phase 序，baseline §2 鸟瞰）**：Phase 1 量尺+标签权威修复（判断系统先可靠）→ Phase 2 runtime query safety gate（主线，OpenSpec `RuntimeQueryGuard`）→ Phase 3 R5 pair-boundary one-shot（旁线 falsification）→ Phase 4 D-085 gate semantics 重拍（adapter-only qa=0 vs runtime-gated safety）→ Phase 5 formal 1800（若 Phase 4 允许）→ Phase 6 C5 exit package。🔴 **Phase 1 依赖一手产物**：`R5-SCANNER-HARDENED.md`（9/9/9 规则+失败四分类）+`R5-LABEL-AUTHORITY-AUDIT.md`（9 冲突归属矩阵，含 LABEL-AUTH-005/007/008 天窗/遮阳帘 default_scope=**磊哥 LEIGE_KEY 待拍**）；`tools/check_eval_mount_validity.py` 与 scanner 门当前仍是 run-dir 脚本、**未进 repo**=Phase 1 待迁。
-
-## 【前情】D-097 后 R3 in-flight（2026-07-05 凌晨，historical，已被上方 D-106/D-107 supersede）
-
-🔴 **D-095~D-102 最新真态**：R2b run `155204` 训练健康完成（600/600，val 0.010），T-D 初判 `F044_R2B_FAIL_STRATIFIED` 后被 **D-097 翻案**：门轨 11/64 case mount-invalid（A5 错位拼接+B6 挂载缺失，根因=case source_sample_id 按序号 join），A/B 有效上限被坏量尺压成 10/15+9/15；v3 量尺修复+配对重评后现有 adapter 有效面 **A 15/15 / B 15/15 / D 19/34**=D-085 三轴 PASS。唯一真残余=expanded qa 负面，口径固定四数字 `total=11 / adapter=9 / base=2 / original_v3=0`。R3 修复=qa qneg 154 行（108 unsupported+36 对照+10 真 query guard），trainpack 5653 静态门/judge 全绿；**R3 短训第三跑在飞**（`F044-r3train-run-20260704T211035+0800`，%1 executor+夜间 watchdog --armed；前两跑被 operator redline 拦停归档 PARTIAL）。
-
-📌 **当前路线**：R3 训完→四轴 eval（W52 跑道，v3 base 锚 A3/B14/D18）→verdict 达 D-085（A≥12/B>9 非零 delta/D≥18/qa=0 跨轨）+Launch Packet 六件+host baseline+watchdog --armed（pct4 版 sha e8257fab）全绿 → **正式 1800 iters 起跑**（D-100 磊哥提前授权条件式）；任一不绿=停在 verdict/分诊。D-102 条款：formal 起跑 swap>1GB 必上抛磊哥。
-
-## 前一阶段（2026-07-03 午前：**N4-ACCEPTED-LOCAL**，goal N0-N4 兑现，已被 D-053 训练 smoke 改写）
-
-🎯 **goal 收口（D-043）**：N0 落账✅ N1 备份 PR #30✅（CONFLICTING 转分级整编，裁决表 keep-main 51/take-branch 4/union 11 已出）N2 五支 PR 修复-复核链全闭环✅（#26=`edfc2198` 全 PASS / #27=`a400b01a` APPROVE / #28=`49fa0b9b` APPROVE+claim correction / #29=`871307d9` APPROVE_FOR_PR29_P1_SCOPE / #31=`f163eedf` APPROVE_FOR_PR31_DELTA，全 local verify 非 CI）N3 GF rev3✅ **N4 验收=`docs/c5-training-readiness-grill/n4-train-readiness-acceptance-2026-07-03.md`（N4-ACCEPTED-LOCAL：preflight strict exit0 commander 独立复跑+DataGate 语义门对抗探针 fail-closed+配方锚/F-044 默认锁+premortem/runbook 门）**。🔴 不清的帐：prepare receipt broader gates / run-auth+R7(N6/N7) / CI billing / GitHub reviews=0。run-auth 后第一动作=T1 smoke（D-043 预测风险写作 mlx-lm#1348 hang；D-053 已实跑改判为 Metal OOM）。
-
-🎉 **canary 收敛 + N5E 锁定（D-047/D-048，2026-07-03 午后）**：canary 60 行两轮收敛 **CANARY_PASS_EXPAND_OK**（v1 FAIL=跨厂商 judge 抓溯源缺陷（机械门全绿仍 FAIL）→ ledger 修复 → v2 PASS；验收报告+lineage INDEX 28 artifact sha 绑定，run 目录 N5-canary/）。**N5E 扩量 grill 消减锁定**（`docs/c5-training-readiness-grill/n5-expansion-grill-2026-07-03.md`）：12 题=10 default_locked（含声称分层条款：语义抽样维禁升格全量声称）+ **2 磊哥键（N5E-005 人工精度门 / N5E-006 基座 pin=billing→merge 后自动满足）**；landing rev2 三线在途（批契约/验收门/judge 作业书）；M2 树盘点 ready 等授权。D-046「重要节点必 grill 范式」首个完整闭环当日跑通。
-
-🔀 **路线更新（D-044/D-045，磊哥 2026-07-03 午拍）**：第一步工程面已收干净——**docs 合流走 PR #32**（整编支 `e01aa7c3`，%43 复核 APPROVE，MERGEABLE；#30 留备份勿合）；billing 修复后 commander 自动 rerun checks，**CI 真绿按依赖序合 #26→#27→#28→#29→#31→#32**。第二步 **N5 canary 进行中（只生成+judge 不训练，目标=候选数据质量）**：Anthropic 生成=后台 subagent CC（Opus）/ OpenAI judge=codex worker——**云凭证键解除**，剩 **3 键：billing / merge / run-auth**。canary 管道=sub-CC 60 行（字段模板取 N4A 真实行保 digest 正确+open-close 极性对称）→ DataGate（含硬化语义门+redaction）→ %43 judge → 验收报告 → 过了才扩 wave-1。
-
-## 前情（2026-07-03 晨：外审收窄落账 D-040 + goal=N0-N4 自动推进 train-readiness）
-
-🔴 **外审收窄（磊哥转达，D-040，全部 live 亲核成立）**：v6 结论保留但窄化——A 轴 adapter 15/15（verdict:46）证「A+ 契约解 v5 NO_TOOL」=YES；B 11/15 未达 draft 门 14/15（verdict:16,29，终值待 lock）；v6.1 EOS 重复病理 68/68→1/68 真进展，但同帐 C 4/4→2/4、D 8/34→5/34、+4 parse_error（verdict:48-50）→ 表述统一「**EOS 改善重复病理，tiny 稀疏下仍有 parse/早停/泛化退化残留**」，禁写"输出稳定"。**PR #26-29 live 实况（2026-07-03 gh 亲核）：全 OPEN、GitHub latestReviews=0、verify check 全 FAILURE×2**（billing 归因，但 FAILURE 不写绿/不写 merge-ready/本地 worker review≠GitHub review）；#26 head 已变 `e6a8849f`（旧本地 APPROVE 绑 `3b081823` 失效）→ 四支 PR 全部需绑当前 head 重审（#27=`a400b01a`/#28=`49fa0b9b`/#29=`5c68f945`）。**wave-1 口径 = protocol-string substrate built（4500 行）+ C5DataGate local pass，NOT train-ready**：builder receipt blocked + loss-mask preflight strict exit66（294 长行>8192 / valid-test under-supervised / 云生成 + cross-vendor judge 未跑，verdict:55）。训练风险进配方锚：D 轴 18/34→8/34→5/34 窄化 + **query→actuation（只读变控制）安全级**。
-
-**当前 goal（磊哥 2026-07-03 晨 /goal，纯自动）**：N0 落账收窄→N1 docs 分支收编（推新分支；behind-7 旧 commit 已核全在 origin/main）→N2 PR head 重审 wave（%43 #26增量+#29 / %44 #27#28，绑 head SHA + ≥1 实跑）→N3 GF rev3→**N4 wave-1 train-readiness 闭环收尾并验收**（E-2 降档挂载实装 + preflight strict exit0 + valid/test 监督契约 + 配方锚 + F-044 默认 14/15 标可 override）。人审键现状（D-045/D-049 后）：云凭证已解除（subCC+codex 方案）、billing 已解除（repo 转 public）→ 剩 merge 链 / run-auth / N5E-005 人工门；§6 脱敏红线 10 天豁免窗口至 2026-07-13（D-049）。路线图快照=`~/workspace/data/exports/snapshot-20260703-065315.md`。v5 verdict=BLOCKED_INVALID 维持（历史）；R7 route-only 至 2026-07-23，candidate 仍 unsigned。
-
-## 前情（2026-07-03 凌晨通宵收官 historical；「双审 APPROVE/数据门全量兑现」表述已被上方 D-040 收窄 supersede）
-
-v6 tiny-ablation verdict（`docs/c5-training-readiness-grill/v6-tiny-ablation-verdict-2026-07-03.md`+附录3件）；paired 配对暴露 tiny 过拟合窄化（D delta -10）；晨报=`docs/handoffs/2026-07-03-overnight-v6-verdict-morning-brief.md`（其 0-5 拍清单中 PR/数据门表述以 D-040 为准）。
-
-## 前情（2026-07-02 晚，M1 已收口；本节 historical snapshot，后续见 commander-log D-028~034）
-
-**M1 consolidation 完成（D-018）：wave-1 全部合流 main=`80ea379c`，验收 PASS（main 范围）。** 四支 PR 链：#13 α gate2 masking（token 真 enforce + 反向 guard 三 split）→ #12 β gate8（562 工厂实算）→ #14 γ 40 件文档整编（grill 语料/commander-log/基线双文档进 main）→ #15 δ 验收修复（gate8 曾改派生物没改工厂，验收 diff 门抓到 → 工厂实算 + regen 重排）。每支经交叉审/亲核（α 曾被对抗 fixture 抓 P0 guard 漏 test split，修后 P0-RESOLVED）。验收唯一残留 = sibling UIUE fixture 环境噪声（非 M1 回归，M4 收口消解）。**E-2 已 locked+G7A-D 实装 merged**（本段为 M1 收口时 historical；governance-fit 治理 grill W1/W2/W3 各 40 决策另见 grill README）。
-
-## 两份当前基线文档（起手读）
-
-1. ⭐ `docs/baseline-roadmap-2026-07-02-pre-lora.md` — 全树/分支/PR 状态矩阵、合并节点计划（M1 consolidation staged PR → M2 清理 → M3 D25 receipts → M4 UIUE）、现状 verdict=HOLD、3 worker 目录规则、文档级联指针。
-2. ⭐ `docs/lora-loop-blueprint-2026-07-02.md` — 此刻→训练结束闭环鸟瞰：8 gate+2 裁决门真实态、生成→门→裁决→训→评循环总图、run receipt 契约、节点序 A-H、巨人肩膀使用矩阵（home-llm/Hammer/xLAM/BFCL/hf-skills）。
-
-## 决策台账（原 5 件已全落 + 新周期）
-
-原 5 件全 CLOSED：①masking override locked+merged ②E-2 locked（grill 43 决策+G7A-D 实装 merged）③grill 58 条 locked ④tiny v5 已真跑（→重标 BLOCKED_INVALID，v6 另签）⑤consolidation done（13+ PR 合流）。**当前等磊哥**：v6 run-auth（Phase 0-3 完成后按 FINAL 档 §5 签）；M2 树清理授权；M4 UIUE。R7 已续签至 **2026-07-23**。
-
-## 禁止动作 / stoplines（formal launch HOST_HOLD 态）
-
-- 🔴 不得把 R2b/R3 train_health 写成 behavior pass / candidate pass / C6 acceptance / V-S-U-PASS。
-- 🔴 formal 1800 起跑必须现核：Launch Packet 六件（W53 R3 对齐版）、fresh host baseline PASS 或显式 `host-waiver-key`、watchdog --armed 真 pid、first-real LR 450-schedule rc0（tools/verify_formal_lr_schedule.py 跑真 metrics/log）；任一缺失=HOLD/PARTIAL。当前 host gate 明确 HOLD。
-- 🔴 D-102：R3 短训限定的 host-predicate-v2/quiet-window waiver 不外推 formal；formal swap>1GB 按 D-094 上抛磊哥。
-- 🔴 C6 acceptance/comparison、demo-golden、voice/live-loop 产品声称仍需 candidate signoff+proof-class 对应证据（R-L17 体系）。
-- 🔴 不删不合任何隔离树/分支（含 g5/g6/g7——分支 tip 落后，直合会回退 main 上更新的文件，见 baseline-roadmap §1）；清理等节点 M2 一次性授权。
-- 🔴 doc-absorption / grill 两分支**禁整支合 main**（147 behind，分支侧 CURRENT/README 旧于 main）——文档进 main 走 M1-γ 新开文档整编支。
-- 🔴 raw 座舱原文/PII/报价不入 bench/训练数据（CLAUDE §6）。
-
-## 权威指针
-
-- 决策台账：`docs/commander-log/decisions.md` **D-095~D-102**（当夜主线）+ grill 总 SSOT `docs/grill-tournament/grill-decisions-master.md`
-- run 恢复板（压缩失忆第一读）：`~/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/STATUS-BOARD.md`
-- Formal launch / tail current run：`~/Projects/agent-tmux-stack-research/runs/2026-07-05-formal-1800-launch/secretary/STATUS-BOARD.md` + `EVIDENCE-INDEX.md`（当前权威状态板：active `formal-run-20260706T090552+0800-tail1200-full-envelope` / pid `42505` / full-envelope no-auto-watchdog / checkpoint1200 weight-init new trajectory；old `formal-run-20260705T234208+0800` 仅作 historical HOLD rc143、iter1692/no1800 证据）
-- R3 grill：`docs/c5-training-readiness-grill/f044-r3-grill-2026-07-04.md`；R3 eval/launch packet：run-dir `W52-R3-EVAL-PREFLIGHT.md`+`W53-REFRESH-NOTE.md`+`FORMAL-LAUNCH-CONDITIONS.md`
-- UIUE 合并路线：`docs/superpowers/plans/2026-07-05-uiue-merge-battle-plan.md`（v2，执行前 live git 重核）；晨报骨架：`docs/handoffs/2026-07-05-r3-overnight-morning-brief.md`
-- 最近 handoff：`docs/handoffs/2026-07-04-f044-round2-morning-brief.md`
-- wave-1 / 基线盘点一手档（仓外）：`~/Projects/agent-tmux-stack-research/runs/2026-07-02-{overnight-pre-lora-push,baseline-roadmap}/`
-- OpenSpec 活跃 carrier：`openspec/changes/{rebuild-c6-four-layer-bench,retrain-c5-lora-d-domain,define-runtime-presentation-bridge}/`（retrain-c5 是 draft 非执行授权）
-
-## 本地 iOS build truth（沿用）
-
-- 本 worktree Codex `build-ios-apps` profile=`ios`，scheme=`MAformacIOS`，专属模拟器 `iPhone 17 Pro`；UIUE worktree 必须用不同模拟器（同 bundle id 互相覆盖）。
-
-## UIUE 隔离树（沿用）
-
-- `/Users/wanglei/workspace/MAformac-uiue`（uiue/phase4，R7 显式 blocks `uiue_merge_to_mainline`）：主线只做 read-only 交叉检查；引用 UIUE file:line 前必 live 重确认。收口随 baseline-roadmap 节点 M4。
+- 本页不声称三族可演示、proven>1/120 全面翻格（仅 matrix_id=4 为 1/120；≠ Phase2解冻 ≠ 后三族 ≠ G9_COMPLETE）、模型已接入、真车可用、UI-E2E required 绿、full suite 绿或产品已发布。
+- 本页不授予 promotion、公开发布或破坏性 git 权限。
+- 本页不声称 AF-G0 alone 已全面解冻 Phase2；G0 COMPLETE 解锁对照冻结 plan 的切片编码（仍 `PHASE2_CODING_GATED`）。
+- G4_COMPLETE = Turn Lease / cancel / last-intent-wins **工程**收口；≠ release-ready / 演示解冻 / proven 翻格。
+- G5_COMPLETE = taxonomy + reason registry + payload 去 `proofClass` + ContentView 只渲染 **工程**收口；≠ proven 翻格 / 后三族可演 / release-ready / G6 receipt 闭环。
+- G6_COMPLETE = RuntimeTurnReceipt v2 + Assembler/B10 + schema/digest/linked **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready。
+- G7_COMPLETE = 行为门批次 + anti-placebo 硬化 **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / release-ready。
+- G8_COMPLETE = CI DAG 去重 + failure-retainable head-bound Verify receipt + UI E2E 分离保持 **工程**收口；≠ Phase2 解冻 / proven 翻格 / 后三族可演 / BF-6 required 已闭 / 四 lane day-zero 全绿 / UI E2E 产品绿。
+- G9 knife2 baseline = 人审定稿 reduction（45+2）+ day-zero 四 lane 分报 + deferred 登记；≠ G9_COMPLETE / ≠ gate archive / ≠ OpenSpec archive / ≠ ≤12 / ≠ 三个月不回潮。

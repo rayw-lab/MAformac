@@ -1,0 +1,79 @@
+{
+  "schema_version": "c6_eval_spine_manifest_v1",
+  "spine_id": "c6_eval_spine_v1",
+  "authority": "contracts_not_ssot_for_package_done",
+  "stages": ["s9", "s9b", "s10", "s11"],
+  "modes": ["fixture", "dry_run", "real"],
+  "holdout": {
+    "pin_id": "EVAL-HOLDOUT-D127",
+    "sha256": "77853caea4598f334fb4a7ed89eafc348746adf333d647306aa94f0b68da2f64",
+    "row_count": 61,
+    "buckets": {
+      "primary_can_question": 33,
+      "topic_fronted": 9,
+      "negative_can_question": 10,
+      "particle_tail": 9
+    },
+    "repo_fixture_path": "Tools/C6EvalSpine/fixtures/holdout/eval-holdout.jsonl",
+    "source_path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s9-eval-freeze/holdout/eval-holdout.jsonl",
+    "decision_ref": "D-127"
+  },
+  "b7_candidate_bindings": {
+    "receipt_path": "closure/candidates/B7/c6-corpus-lineage.receipt.json",
+    "assembled_sha256": "6952a7e8f9526242d9b948538653f82603351aa24b6910050e59c9c39778a3a7",
+    "compat_sha256": "47806412a9b168595e732bf116a293a5582cf566d0fb63173d48343bd11fecfa",
+    "unordered_id_set_sha256": "e40555682fb2a5ef65d6737a8aa0c39f69bd702de23d5b98266e2f397c566f76",
+    "is_b7_done": false
+  },
+  "v1_candidate_bindings": {
+    "authority_path": "contracts/c6-active-authority/authority.v1.candidate.json",
+    "authority_digest": "adc6b42c84f1c43c491db7dd5dadd0f283bedcf877f85862ab3bd3fb6c2be686",
+    "status": "CANDIDATE",
+    "thresholds_ref": "subject.four_layer_thresholds"
+  },
+  "comparison": {
+    "ad": "AD-C6-014",
+    "seeds": [17, 29, 43],
+    "n": 3,
+    "spread_pp_max": 1
+  },
+  "exposure": {
+    "checker": "scripts/check_train_eval_exposure.py",
+    "ad": "AD-C6-016",
+    "enum": [
+      "release_corpus",
+      "training",
+      "checkpoint_selection",
+      "prompt_tuning",
+      "s9_repair"
+    ]
+  },
+  "claims": {
+    "allowed": [
+      "local_harness",
+      "fixture_replay",
+      "dry_run",
+      "spine_ready_for_s8_fanin"
+    ],
+    "forbidden": [
+      "b2_done",
+      "b3_done",
+      "b4_done",
+      "s9_real_done",
+      "s10_real_done",
+      "c6_acceptance",
+      "v_pass",
+      "candidate_signed",
+      "operator_pass"
+    ]
+  },
+  "proof_class": "local_unit_integration_fixture",
+  "non_claims": [
+    "Not B2/B3/B4 package DONE",
+    "Not B7/V1 canonical DONE/RATIFIED",
+    "Not real three-arm model quality",
+    "Not C6 acceptance / V-PASS / candidate signed",
+    "Not S8 complete / adapter present",
+    "fixture green != evaluation green"
+  ]
+}

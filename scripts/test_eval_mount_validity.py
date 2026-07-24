@@ -63,6 +63,34 @@ def main() -> int:
             if payload.get("coverage_error_reason") != "zero_checked_rows":
                 failures.append(f"empty mount reason mismatch: {payload.get('coverage_error_reason')}")
 
+        s6_cases = root / "s6-mounted-shape.jsonl"
+        s6_report = root / "s6-report.json"
+        write_jsonl(
+            s6_cases,
+            [
+                {
+                    "row_id": "s6-shape-001",
+                    "expected_tool_calls": [{"name": "open_window", "arguments": {"position": "主驾"}}],
+                    "mounted_tool_shape": {
+                        "kind": "target_present_min",
+                        "mounted_tools": ["open_window"],
+                    },
+                }
+            ],
+        )
+        s6 = subprocess.run(
+            [sys.executable, str(CHECKER), str(s6_cases), "--output", str(s6_report)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if s6.returncode != 0:
+            failures.append(f"s6 mounted_tool_shape expected rc=0, got {s6.returncode}: {s6.stderr}")
+        else:
+            payload = json.loads(s6_report.read_text(encoding="utf-8"))
+            if payload.get("status") != "PASS":
+                failures.append(f"s6 mounted_tool_shape status expected PASS, got {payload.get('status')}")
+
     if failures:
         print("test_eval_mount_validity FAILED", file=sys.stderr)
         for failure in failures:

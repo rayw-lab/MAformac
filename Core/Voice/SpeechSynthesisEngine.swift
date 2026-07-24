@@ -2,31 +2,109 @@ import AVFoundation
 import Foundation
 
 public protocol SpeechSynthesisEngine: Sendable {
-    func speak(_ text: String)
+    func speak(_ text: String) -> SpeechSynthesisResult
+    /// Synchronously cancel any pending / in-flight speech (G4 turn-lease barge-in).
+    /// Must not change the `speak(_:)` contract.
+    func cancelPendingSpeech()
+}
+
+public enum SpeechSynthesisStatus: String, Codable, Equatable, Sendable {
+    case enqueued
+    case failed
+}
+
+public enum SpeechSynthesisRoute: String, Codable, Equatable, Sendable {
+    case preferredChinese = "preferred_chinese"
+    case fallbackChinese = "fallback_chinese"
+    case systemDefault = "system_default"
+    case testDouble = "test_double"
+    case unavailable
+}
+
+public struct SpeechSynthesisResult: Codable, Equatable, Sendable {
+    public var status: SpeechSynthesisStatus
+    public var route: SpeechSynthesisRoute
+    public var reason: String?
+
+    public init(status: SpeechSynthesisStatus, route: SpeechSynthesisRoute, reason: String? = nil) {
+        self.status = status
+        self.route = route
+        self.reason = reason
+    }
+
+    public static func enqueued(route: SpeechSynthesisRoute) -> SpeechSynthesisResult {
+        SpeechSynthesisResult(status: .enqueued, route: route)
+    }
+
+    public static func failed(route: SpeechSynthesisRoute = .unavailable, reason: String) -> SpeechSynthesisResult {
+        SpeechSynthesisResult(status: .failed, route: route, reason: reason)
+    }
+
+    public var didEnqueue: Bool {
+        status == .enqueued
+    }
 }
 
 public final class AVSpeechSynthesisEngine: NSObject, SpeechSynthesisEngine, @unchecked Sendable {
     private let synthesizer = AVSpeechSynthesizer()
+    private let voiceProvider: @Sendable () -> AVSpeechSynthesisVoice?
 
-    public override init() {
+    public init(voiceProvider: @escaping @Sendable () -> AVSpeechSynthesisVoice? = AVSpeechSynthesisEngine.bestChineseVoice) {
+        self.voiceProvider = voiceProvider
         super.init()
     }
 
-    public func speak(_ text: String) {
+    public static func bestChineseVoice() -> AVSpeechSynthesisVoice? {
+        if let preferred = AVSpeechSynthesisVoice(language: "zh-CN") {
+            return preferred
+        }
+        return AVSpeechSynthesisVoice.speechVoices()
+            .filter { $0.language.hasPrefix("zh") }
+            .sorted { lhs, rhs in
+                if lhs.quality != rhs.quality {
+                    return lhs.quality.rawValue > rhs.quality.rawValue
+                }
+                return lhs.language < rhs.language
+            }
+            .first
+    }
+
+    public func speak(_ text: String) -> SpeechSynthesisResult {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return .failed(reason: "empty_tts_text")
+        }
+        // Hard gate: no Chinese voice → do not call synthesizer and do not
+        // invent silent systemDefault success (product-operator-spine AD-7 / S5).
+        guard let voice = voiceProvider() else {
+            return .failed(reason: "chinese_voice_unavailable")
+        }
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "zh-CN")
+        utterance.voice = voice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         synthesizer.speak(utterance)
+        return .enqueued(route: voice.language == "zh-CN" ? .preferredChinese : .fallbackChinese)
+    }
+
+    public func cancelPendingSpeech() {
+        synthesizer.stopSpeaking(at: .immediate)
     }
 }
 
 public final class RecordingSpeechSynthesisEngine: SpeechSynthesisEngine, @unchecked Sendable {
     public private(set) var spokenTexts: [String] = []
+    public private(set) var cancelPendingSpeechCallCount = 0
+    public var nextResult: SpeechSynthesisResult
 
-    public init() {}
+    public init(nextResult: SpeechSynthesisResult = .enqueued(route: .testDouble)) {
+        self.nextResult = nextResult
+    }
 
-    public func speak(_ text: String) {
+    public func speak(_ text: String) -> SpeechSynthesisResult {
         spokenTexts.append(text)
+        return nextResult
+    }
+
+    public func cancelPendingSpeech() {
+        cancelPendingSpeechCallCount += 1
     }
 }
-

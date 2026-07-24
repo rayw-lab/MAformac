@@ -14,6 +14,29 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(outcome.behaviorClassSource, .toolCall)
     }
 
+    func testKnife1_allCasesRawValuesStable() {
+        let expected: [(DemoRuntimeResult, String)] = [
+            (.acceptedToolCall, "accepted_tool_call"),
+            (.noAction, "no_action"),
+            (.clarifyMissingSlot, "clarify_missing_slot"),
+            (.refusalNoAvailableTool, "refusal_no_available_tool"),
+            (.refusalSafetyOrPolicy, "refusal_safety_or_policy"),
+            (.alreadyStateNoop, "already_state_noop"),
+            (.partialAcceptPartialRefuse, "partial_accept_partial_refuse"),
+            (.runtimeError, "runtime_error"),
+            (.cancelled, "cancelled"),
+            (.interrupted, "interrupted"),
+            (.stateQuery, "state_query"),
+            (.capabilityQuery, "capability_query"),
+            (.refusalContractViolation, "refusal_contract_violation")
+        ]
+        XCTAssertEqual(DemoRuntimeResult.allCases.count, expected.count)
+        for (value, raw) in expected {
+            XCTAssertEqual(value.rawValue, raw)
+            XCTAssertEqual(DemoRuntimeResult(rawValue: raw), value)
+        }
+    }
+
     func testMissingScopeTravelsAsReasonNotCoreScopeOriginCase() {
         XCTAssertNil(ScopeOrigin(rawValue: "missing"))
 
@@ -123,7 +146,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(snapshot.proofClass, .localUnit)
     }
 
-    func testPartialAcceptRefuseCarriesMixedCardsAndCompositeReadback() {
+    func testPartialAcceptRefuseCarriesMixedCardsAndCompositeReadback() throws {
         let acceptedReadback = DemoActionReadback(
             key: "window.driver",
             actualValue: "closed",
@@ -131,16 +154,42 @@ final class RuntimePresentationBridgeTests: XCTestCase {
             spokenText: "主驾车窗已关闭",
             scopeOrigin: .explicit
         )
-        let snapshot = RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
-            traceID: "trace-partial",
-            acceptedReadbacks: [acceptedReadback],
+        let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+            executionResult: DemoRuntimePartialPlanResult(
+                traceID: "trace-partial",
+                subactions: [
+                    DemoRuntimePartialSubactionResult(
+                        frameID: "accepted-window",
+                        disposition: .accepted,
+                        readbacks: [acceptedReadback],
+                        finiteReason: nil,
+                        observedToolCallCount: 1,
+                        observedReadbackCount: 1,
+                        stateMutation: true
+                    ),
+                    DemoRuntimePartialSubactionResult(
+                        frameID: "refused-door",
+                        disposition: .refused,
+                        readbacks: [],
+                        finiteReason: .safetyOrPolicyRefusal,
+                        observedToolCallCount: 0,
+                        observedReadbackCount: 0,
+                        stateMutation: false
+                    )
+                ],
+                atomicityContract: .partial
+            ),
             acceptedCards: [
                 DemoVehicleStateCell(key: "window.driver", actualValue: "closed", revision: 2, visualState: .satisfied)
             ],
-            refusedCards: [
-                DemoVehicleStateCell(key: "door.lock", actualValue: "locked", revision: 1, visualState: .unsafe)
-            ],
-            reason: "partial_accept_refuse"
+            refusedCardsBySubactionID: [
+                "refused-door": DemoVehicleStateCell(
+                    key: "door.lock",
+                    actualValue: "locked",
+                    revision: 1,
+                    visualState: .unsafe
+                )
+            ]
         )
 
         XCTAssertTrue(snapshot.isTerminal)
@@ -148,7 +197,183 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertEqual(snapshot.runtimeOutcome.result, .partialAcceptPartialRefuse)
         XCTAssertEqual(snapshot.runtimeOutcome.reason, "partial_accept_refuse")
         XCTAssertEqual(snapshot.readbacks, [acceptedReadback])
-        XCTAssertEqual(snapshot.cards.map(\.visualState), [.satisfied, .unsafe])
+        XCTAssertEqual(Set(snapshot.cards.map(\.visualState)), [.satisfied, .unsafe])
+    }
+
+    func testPartialExecutionResultProjectsThroughExistingV1FieldsWithSafeRefusedReason() throws {
+        let acceptedReadback = DemoActionReadback(
+            key: "ac.power",
+            actualValue: "on",
+            revision: 1,
+            spokenText: "空调已打开",
+            scopeOrigin: .explicit
+        )
+        let result = DemoRuntimePartialPlanResult(
+            traceID: "trace-partial-public",
+            subactions: [
+                DemoRuntimePartialSubactionResult(
+                    frameID: "accepted-ac",
+                    disposition: .accepted,
+                    readbacks: [acceptedReadback],
+                    finiteReason: nil,
+                    observedToolCallCount: 1,
+                    observedReadbackCount: 1,
+                    stateMutation: true
+                ),
+                DemoRuntimePartialSubactionResult(
+                    frameID: "refused-window",
+                    disposition: .refused,
+                    readbacks: [],
+                    finiteReason: .unmountedToolName,
+                    observedToolCallCount: 0,
+                    observedReadbackCount: 0,
+                    stateMutation: false
+                )
+            ],
+            atomicityContract: .partial
+        )
+
+        let snapshot = try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+            executionResult: result,
+            acceptedCards: [
+                DemoVehicleStateCell(
+                    key: "ac.power",
+                    actualValue: "on",
+                    revision: 1,
+                    visualState: .satisfied
+                )
+            ],
+            refusedCardsBySubactionID: [
+                "refused-window": DemoVehicleStateCell(
+                    key: "window.position[主驾]",
+                    actualValue: "closed"
+                )
+            ],
+            traceEnvelope: TraceEnvelope(
+                validatedTraceID: result.traceID,
+                entries: [
+                    TraceEntry(
+                        stage: .guard,
+                        traceID: result.traceID,
+                        message: "partial_subaction:refused-window:refused:state_mutation=false",
+                        attributes: TraceAttributes(
+                            toolCallCount: 0,
+                            guardReason: "unmounted_tool_name",
+                            readbackResult: .notApplicable,
+                            finiteReason: .unmountedToolName
+                        )
+                    )
+                ]
+            )
+        )
+
+        XCTAssertEqual(snapshot.runtimeOutcome.result, .partialAcceptPartialRefuse)
+        XCTAssertEqual(snapshot.runtimeOutcome.reason, "partial_accept_refuse")
+        XCTAssertEqual(snapshot.readbacks, [acceptedReadback])
+        XCTAssertEqual(snapshot.cards.map(\.key), ["window.position[主驾]", "ac.power"])
+        XCTAssertEqual(snapshot.cards.map(\.visualState), [.blocked_with_alternative, .satisfied])
+        XCTAssertNil(snapshot.traceEnvelope?.entries.first?.attributes.finiteReason)
+        XCTAssertEqual(
+            snapshot.traceEnvelope?.entries.first?.attributes.guardReason,
+            "capability_not_mounted"
+        )
+        XCTAssertEqual(
+            snapshot.cardSemantics,
+            [
+                PresentationCardSemantics(
+                    cellKey: "window.position[主驾]",
+                    role: .refused,
+                    reason: "capability_not_mounted",
+                    siblingKeys: ["ac.power"]
+                ),
+                PresentationCardSemantics(
+                    cellKey: "ac.power",
+                    role: .accepted,
+                    scopeOrigin: .explicit,
+                    reason: "readback_verified",
+                    isActive: true,
+                    siblingKeys: ["window.position[主驾]"]
+                )
+            ]
+        )
+
+        let encoded = String(decoding: try JSONEncoder().encode(snapshot), as: UTF8.self)
+        XCTAssertFalse(encoded.contains("unmounted_tool_name"))
+        XCTAssertFalse(encoded.contains("finiteReason"))
+        XCTAssertTrue(encoded.contains("capability_not_mounted"))
+    }
+
+    func testPartialProjectionMutationReplayFailsClosed() {
+        let acceptedCard = DemoVehicleStateCell(
+            key: "ac.power",
+            actualValue: "on",
+            revision: 1,
+            visualState: .satisfied
+        )
+        let refusedCards = [
+            "refused-window": DemoVehicleStateCell(
+                key: "window.position[主驾]",
+                actualValue: "closed"
+            )
+        ]
+
+        XCTAssertThrowsError(
+            try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                executionResult: Self.partialExecutionResult(
+                    acceptedReadbacks: [],
+                    refusedFiniteReason: .unmountedToolName
+                ),
+                acceptedCards: [acceptedCard],
+                refusedCardsBySubactionID: refusedCards
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPartialProjectionError,
+                .acceptedSubactionMissingReadback(frameID: "accepted-ac")
+            )
+        }
+
+        XCTAssertThrowsError(
+            try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                executionResult: Self.partialExecutionResult(
+                    acceptedReadbacks: [Self.acceptedReadback],
+                    refusedFiniteReason: .unmountedToolName
+                ),
+                acceptedCards: [
+                    acceptedCard,
+                    DemoVehicleStateCell(
+                        key: "seat.heating[主驾]",
+                        actualValue: "off",
+                        visualState: .satisfied
+                    )
+                ],
+                refusedCardsBySubactionID: refusedCards
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPartialProjectionError,
+                .acceptedCardMissingReadback(key: "seat.heating[主驾]")
+            )
+        }
+
+        XCTAssertNil(RuntimeFiniteReason(rawValue: "unmounted_name_rejected"))
+
+        XCTAssertThrowsError(
+            try RuntimePresentationTerminalSnapshotAdapter.partialAcceptRefuse(
+                executionResult: Self.partialExecutionResult(
+                    acceptedReadbacks: [Self.acceptedReadback],
+                    refusedFiniteReason: .unmountedToolName
+                ),
+                acceptedCards: [acceptedCard],
+                refusedCardsBySubactionID: refusedCards,
+                proofClass: .simulatorMock
+            )
+        ) { error in
+            XCTAssertEqual(
+                error as? RuntimePresentationPartialProjectionError,
+                .proofClassUpgrade(.simulatorMock)
+            )
+        }
     }
 
     func testCancelInterruptionTimeoutAndBackgroundingProduceTerminalSnapshots() {
@@ -387,6 +612,9 @@ final class RuntimePresentationBridgeTests: XCTestCase {
                     scopeOrigin: .explicit
                 )
             ],
+            voiceState: .speak,
+            orbState: .speak,
+            mutationCount: 1,
             proofClass: .localUnit,
             isTerminal: true,
             timestamp: timestamp
@@ -404,18 +632,20 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         )
         let decoded = try JSONDecoder().decode(RuntimePresentationPayload.self, from: JSONEncoder().encode(payload))
 
-        XCTAssertEqual(decoded.schemaVersion, .v1)
+        XCTAssertEqual(decoded.schemaVersion, .v2)
         XCTAssertEqual(decoded.traceID, "trace-payload")
         XCTAssertEqual(decoded.turnID, "turn-1")
         XCTAssertEqual(decoded.eventID, "event-1")
         XCTAssertTrue(decoded.isTerminal)
         XCTAssertEqual(decoded.outcome.result, .acceptedToolCall)
-        XCTAssertEqual(decoded.proofClass, .localUnit)
         XCTAssertEqual(decoded.cards.first?.key, "ac.power")
         XCTAssertEqual(decoded.cardSemantics?.first?.role, .accepted)
         XCTAssertEqual(decoded.readbacks.first?.spokenText, "空调已打开")
         XCTAssertEqual(decoded.reconciliation.status, .verified)
         XCTAssertEqual(decoded.reconciliation.readbackKey, "ac.power")
+        XCTAssertEqual(decoded.voiceState, .speak)
+        XCTAssertEqual(decoded.orbState, .speak)
+        XCTAssertEqual(decoded.mutationCount, 1)
     }
 
     func testRuntimePresentationPayloadRedactsPrivateAdapterAndRawMarkersFromEncoding() throws {
@@ -506,7 +736,7 @@ final class RuntimePresentationBridgeTests: XCTestCase {
         XCTAssertTrue(encoded.contains("[redacted]"))
     }
 
-    func testRuntimePresentationPayloadEnumsFailClosedForUnknownReconciliationAndProofClass() {
+    func testRuntimePresentationPayloadEnumsFailClosedForUnknownReconciliationAndSchema() {
         XCTAssertThrowsError(try JSONDecoder().decode(PresentationReconciliationStatus.self, from: Data(#""runtime_ready""#.utf8)))
         XCTAssertThrowsError(try JSONDecoder().decode(PresentationReconciliationMismatchClass.self, from: Data(#""failureLedger""#.utf8)))
         XCTAssertThrowsError(try JSONDecoder().decode(RuntimePresentationPayloadSchema.self, from: Data(#""v2_unreviewed""#.utf8)))
@@ -516,5 +746,43 @@ final class RuntimePresentationBridgeTests: XCTestCase {
     private struct UnsafeTraceEnvelope: Codable {
         var traceID: String
         var entries: [TraceEntry]
+    }
+
+    private static let acceptedReadback = DemoActionReadback(
+        key: "ac.power",
+        actualValue: "on",
+        revision: 1,
+        spokenText: "空调已打开",
+        scopeOrigin: .explicit
+    )
+
+    private static func partialExecutionResult(
+        acceptedReadbacks: [DemoActionReadback],
+        refusedFiniteReason: RuntimeFiniteReason
+    ) -> DemoRuntimePartialPlanResult {
+        DemoRuntimePartialPlanResult(
+            traceID: "trace-partial-mutation",
+            subactions: [
+                DemoRuntimePartialSubactionResult(
+                    frameID: "accepted-ac",
+                    disposition: .accepted,
+                    readbacks: acceptedReadbacks,
+                    finiteReason: nil,
+                    observedToolCallCount: acceptedReadbacks.count,
+                    observedReadbackCount: acceptedReadbacks.count,
+                    stateMutation: !acceptedReadbacks.isEmpty
+                ),
+                DemoRuntimePartialSubactionResult(
+                    frameID: "refused-window",
+                    disposition: .refused,
+                    readbacks: [],
+                    finiteReason: refusedFiniteReason,
+                    observedToolCallCount: 0,
+                    observedReadbackCount: 0,
+                    stateMutation: false
+                )
+            ],
+            atomicityContract: .partial
+        )
     }
 }

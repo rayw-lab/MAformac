@@ -1,5 +1,7 @@
 # COMMANDER DECISIONS — MAformac 指挥官决策日志（append-only, ADR 风格）
 
+> **V6 mapping banner（2026-07-11）**：本文是 append-only 历史档，旧键原文保持不变；当前语义映射为 `canDemo` → `actionDemoProven`，live authority 以 V6 active carriers 为准。
+
 > 规则（github-first 搜证的 decision-log best practice）：每重大决策**立即写**（definition of done，不等压缩）；**supersede 不删**（保历史）；**rejected 选项 = hard constraint**（别再提被否的）。格式 = ADR 四问（what / why / alternatives / consequences）。
 
 ---
@@ -1072,3 +1074,392 @@
 - **A0 crash 修复**（7619e591）：FastPath noMatch 逃逸 CONFIRMED（TDD 探针先证）→ 2 行 catch→unsupportedPayload。全量 598/0。
 - **基建级联**（a91b6ede，磊哥批 A-F+豁免 30 天）：CLAUDE §3/§4/§6/§9+CURRENT 刷新、GitNexus 重索引 35887、MT5 advisory 恢复。
 - **机制沉淀**：BATCH2 ballot 5 题就绪（recall 移出 5 已拍）；S5 SPEC+judge 协议双件备好；lessons 候选=生成位 LLM 的 deterministic 逃逸倾向（v1 实证：生成任务默认反射写脚本拼壳,修法=派单显式亲笔+judge 话术维度）；worker 治理=管道≤5/context<15% 退役/CC-TUI C-m 提交/codex 可内部 spawn subagent（磊哥诀窍）/in-process subagent 走宿主代理会挂→tmux 绕代理起（磊哥 SOP）。
+
+## D-119：通宵链授权（磊哥 2026-07-07 24:00 /goal 拍板）
+
+- 磊哥原话：「通宵链批准 S8自主推进 可以S8，记得我们的干活的流程哈 grill什么的 五个worker都可以用」+「不合盖现在 不要被合盖夸大影响了」。
+- 授权内容：s4 补产 judge→S6 重组装 404→S6 复审→S7 十门→S7b receipt→host fresh resample→S7c probe（PASS=run-auth 生效 D-114）→五布尔+S8 门 hard gates 全核→**全绿才点火 S8 1800 iters**。任一门红=停在门上记诚实账，零临场拍板（预置决策树=IMPL-PLAN v3 失败分支+D-114 四类分流）。
+- **lid_mlx_behavior 降级 informational**（磊哥 waive：今晚不合盖+segmented_restart_first 兜底在；S8-LAUNCH-GATE v2 该 blocker 按本条豁免，实验后续窗口补做）。
+- 流程纪律不因通宵松动：产出方≠审方/judge 盲判/receipt 绑 basis/candidate 恒 unsigned。
+
+### D-119 执行账补记（2026-07-08 05:2x，通宵链终态）
+链条实况：S5 补产 66 judge PASS→S6 精确 404 双审 PASS（42 surplus 归档）→S7 十门全 PASS（G8 拒 stale-150 生效；BASE_MODEL_DIR 双源核准；接缝修复 commit 0a5a30c9=S8 code basis）→S8 配方（450 updates/warmup36 比例重算 sha 0d2a9696）+launch packet 冻结→host PASS（D-098 精化谓词裁决,receipt 录）→S7b 签→**S7c 三跑停线**：OOM（batch4 撞长行）→环境排除（20GB free 仍炸）→OOM-DIAGNOSIS 坐实 CONFIG_PARITY_GAP（缺 --token-budget-per-batch 8192+--grad-checkpoint）→Option A parity 修复→训练成功（target_action 25→30 满分/no_tool 2→0 清零）→**receipt_gen 判 FAIL：no_tool_delta=2<threshold 3,而 baseline no_tool_count=2=数学不可能达标（量尺触发面与阈值推导口径错位,R3-AMMO-1/M.16 同族）**。按 S7b one-shot falsification+commander_cannot_loosen 停线,S8 未点火。晨报 MORNING-REPORT-20260708.md 三选项（⭐A 量尺诚实化重判/B 重选 subset/C 分流）备件齐,等磊哥一字拍。
+
+## D-120：S7c 量尺诚实化重判（Option A）grill 收口 + 审计后 S8 点火（磊哥 2026-07-08 晨拍）
+
+- 磊哥原话拍法：「A」+「A 后的决策要grill分解 加审计哈」+「五个worker做完就停下，现在开始不再派单」。
+- **A 语境边界**：原 FAIL 证据一字不动（`S7C-PROBE-RECEIPT.md` probe_pass:false + `receipt_gen_rerun2.json` status:FAIL 保留）；A=承认 threshold=3 对 baseline_no_tool_count=2 结构性不可达（校准失误非 post-hoc，threshold 声明于 baseline 测量前），非放宽标准。STOPLINE-RULING-AUDIT 四条件全落：①原 FAIL 保留 ②eval 来源显式声明（train-on-eval/memorization_caveat/learnability=5of5 非 30of30）③commander 机械盖章 ④磊哥知悉=A 拍本身。
+- **grill 范式执行**：骨架 A-PATH-GRILL-SKELETON.md（已决 R1-R10 + 未决 GA-1~10）→ 双 worker 独立作答交叉（%34 grill 对手 + %26 独立深挖）+ %30 五 boolean 只读盘点 + %31 秘书 → commander 裁决收口 A-PATH-DECISIONS.md（AD-1~10）→ subagent 对抗审计（磊哥停派单令后不占 worker）。
+- **对抗审计 AUDIT_FAIL→findings 全清**（三层升维实证：审计抓到 1P0+2P1 全为真）：P0-1 resume_runbook 实现与 AD-6 v1 裁决相反→commander 亲核 scheduler 数学后**修正 AD-6 为 v2**（mlx cosine_decay 无相位偏移，精确续位 config-only 不可实现；v2=首 LR 续位+重锚 cosine+warmup 0，restart 段 LR 门改三断言，runbook 补对齐段）；P1-1 recert 盖章荣誉制→launch_s8.sh:341 加 PENDING_COMMANDER_STAMP 机械拒绝谓词（正负双测）；P1-2 run-dir 覆盖→exit 70 守护。
+- **点火实况（2026-07-08 08:2x）**：recert 双产物机械生成（receipt_recertification.py self-test PASS，数字全来自两输入 receipt 零手写）→盖章（RECERT-RECEIPT.md sha `44dd5b08…`/JSON sha `cba16d43…`）→dry-run 正负三测（BLOCKED 拒/PENDING 拒/盖章版 launch_allowed=true）→五 boolean 全绿→**S8 正式 1800 点火 pid 57625**（recipe sha 0d2a9696 冻结链核准，masking preflight 4628 records/113273 trainable_tokens）→哨兵 armed pid 57890（interval 300s/deadline 900s/内存 alert 18.0-20.7-23.8GB 不 kill/completion_first，含 stop_event 3 字段最小补丁）。
+- **非声明**：candidate 恒 unsigned；probe 是 learnability 信号非泛化证明；S8 完成后仍需 S9 三臂 eval→S9b→S10 verdict；不声明 C5 V-PASS/C6 acceptance。
+- 证据链：run dir `s8-gates/s7c/`（骨架/双答卷/决策/审计入 A-PATH-DECISIONS.md 头部清单）+ `s8-flight/s8-formal-1800-20260708/s8-launch-basis-receipt.json`。
+
+## D-121：任务④（macOS app UIUE+runtime）立项 + roadmap v4 + S8 两次中断账（磊哥 2026-07-08 晨拍）
+
+- 磊哥原话：「这三个任务结合 macosapp的 UIUE和runtime【任务④】你都存个档吧 写个粗的路线图计划？之前有个计划 是最终目标推动macosAPP闭环」+「反正我听你的 是否需要一个计划或者实施路径图」。
+- **commander 判断：不新造计划**——`docs/roadmap-2026-07-07-macos-closure-baseline.md` 就是磊哥点到的那个计划（最终目标=macOS app 全功能闭环）。做 **v4 增量**：①Line B 执行态刷新（S4-S7 全绿→S7c recert D-120→S8 两次中断留档）②任务④编入成 **Line D（UIUE+runtime）**：D-UI（UIUE macOS 适配，commander 亲笔主刀铁律 feedback-uiue-no-codex）+ D-RT（runtime 接线：adapter/AVSpeechSynthesizer TTS 硬门内、真 ASR stretch，按 MG-7=C 框定）；推进式 D0 grill→D1 UIUE 专场→D2 接线→D3 彩排 ③§七 粗路线图（四线时序一页图：关键路径=Line B，人工节点=S8 重启令+D1 专场）④编排/键位段刷新（ma7 5codex+1hermes 绕代理；当前唯一关键路径键=S8 重启令）。
+- **S8 两次中断账（诚实留档）**：r1 pid 57625 于 iter 170 被 lid-sleep 杀（磊哥晨间恢复环境，O2 风险现实执行；哨兵正确分类 INTERRUPTED_TRUE_NO_PROGRESS/resumable；loss 2.746→0.19 训练本体健康）；r2 pid 40993 由 commander 在得知「磊哥故意中断要用机」后主动停（OPERATOR-PAUSE-RECEIPT.md）。两次均 iter<600 无 checkpoint→重启=全新完整 1800，无 stale-schedule 风险。**当前态=S8 待磊哥晚间窗口一句话重启。**
+- **蜂群重建**：ma6 随环境重启消失→ma7 新建（%0 commander + 5 codex %1/%5/%2/%3/%4 + hermes %6，全员绕代理 env -u 启动，逐 pane capture 亲核）。
+- 白天派单面（磊哥授权「反正我听你的」）：Line C C1 grill 骨架+能力面矩阵×2、S9 预备件（stop_event checker+mount-validity 门）、秘书（ballot 整理+CLAUDE §9 终稿）、对抗审计位（含 roadmap v4 异源审——commander 亲笔件必审）、hermes 只读一致性核查。全部不占训练资源。
+
+## D-122：S9 holdout 生成席位磊哥拍 A（Opus 独立生成位）+ ma8 蜂群重建 + 白天二轮对抗审在跑（磊哥 2026-07-08 午拍）
+
+- 磊哥原话：「⭐A：Fable/Opus 独立生成位 这个同意，opus来做，思考强度high，不需要绕过代理，claudecode不需要绕过代理」。s9-holdout-gen-plan.md 三选（NEEDS_LEIGE）就此 RATIFIED_A；B（codex 生成+hermes judge）留 fallback，C 仍禁作主路径。
+- **执行态**：ma8 window 1（opus-holdout）起 Claude Code Opus 4.8 effort high（不绕代理，磊哥明示 claude 不需要 env -u）；OPUS-H1 派单已发（N=64 优先/最低 56，四桶 primary≥32·topic_fronted≥8·negative≥8·particle_tail≥8，8 主形态族每族≥3，≥8 家族覆盖，expected_tool_calls 语义填非一律空，schema 逐字段 inline，禁读 S4/S5 prompt·产物·trainpack 保独立性）。产物落 s8-gates/s9-holdout/（raw.jsonl + generation-receipt.md）。生成后 session 即关（用完即关，feedback-opus-generation-only）。raw 未 judge 未冻结——进 composite manifest 前须 codex 盲判全审（plan §3.3 质量门）+ sha 冻结。
+- **蜂群重建账**：ma7 随磊哥掉线失效→ma8 新建（window 0：%0 commander 位 + 左列下 %5 hermes glm-5.2 + 右列 5 codex gpt-5.5 %1/%4/%6/%2/%3，codex/hermes 绕代理，逐 pane capture 亲核）。布局坑：commander 曾手动 resize-window 240x64 超磊哥客户端 211x44 → 第 5 codex 屏幕外「只看到 4 个」；修=window-size latest 跟随客户端 + new-window 抢焦点后 select-window 切回。
+- **白天二轮执行账**：首轮六单（W1 矩阵 v2 四类重构/W2 rc 提案 v2 P1×3 全 CLOSED/W3 exposure checker RED→GREEN+S10 第 7 门草案/W4 S8 重启预检三测全过+一行点火命令/W5 hermes S9 冻结命令 liveness 0 drift/W6 秘书两草稿 v2）5-9 分钟全交付；二轮对抗配对全员在跑（A1 %2审矩阵/A2 %1审rc/A3 %6审checker/A4 %3审秘书稿/A5 hermes审点火链/A6 %4 D0骨架已决核实）。收稿裁决待记。
+- 待磊哥键（剩二）：S8 重启令（晚间窗口）+ ballot 一屏（BATCH2 5 题+INFRA 7 决策+Q-SR）。
+
+## D-123：磊哥双签——矩阵 v3 签 SSOT + BATCH2/BATCH-INFRA 全星标 + Q-SR=A（磊哥 2026-07-08 傍晚拍）
+
+- 磊哥原话：「先矩阵 v3，后 ballot+Q-SR，矩阵 v3 我支持签，ballot+Q-SR我也授权签署」+「BATCH2/BATCH-INFRA 全按星标，Q-SR=A」。
+- **矩阵 v3 签署**：`runs/2026-07-08-daywork/capability-matrix-v3.md`（四类分类学 safety_or_clarify_reject=0 / unmounted_name_rejected=36 / fast_path_no_match_fallback=82 / 执行 1+1，120 守恒；闭合复核 CLOSED_READY_FOR_LEIGE）内容 RATIFIED 为 **DemoCapabilityMatrix SSOT**；落仓位置（docs/ vs contracts/）与 checker 实装留 C1 grill 拍落点（roadmap 汇合点门 2 承接）。
+- **BATCH2 5 题按星标 RATIFIED**：MG-8=B（fallback 完整轻量体系：reason enum + family/status + fallback script SSOT + 双指标）/ MG-1=B（S10 前只预铺，S10 后按出手率挂 0/3/10 族）/ B2-UI-11=C（分名 `visual_l3_operator_review` / `capability_l3_human_gate`，禁裸 L3）/ MG-3=B（S10 verdict+A1+matrix/readback/fallback 四门前置，前置只预铺）/ MG-6=A（macOS proof 三层 `local/mac_runtime_smoke`/`desktop_operator_equivalent`/`operator-pass` 均不升格）。
+- **BATCH-INFRA 15 问全 A，收敛 7 决策 RATIFIED**：INFRA-D1 worktree_policy / D2 dirty_receipt_template / D4 verify_matrix / D5 sentinel_set / D6 test_layering（L0 contract→L1 golden-run→L2 audit→XCUITest 延后）/ D7 tools_enforce（macOS 派单内嵌三硬规则+named `macos` profile 但 active 仍 iOS）/ D8 rename_guard。
+- **Q-SR=A**：C2 三档表「联合出手率」公式 = `min(hedged 出手率, can-question 出手率)`（磊哥知悉 F-6 澄清后拍：BATCH1 拍的是表结构，公式字段本次新拍）。字段落 S9 runbook/S10 模板为结构化输出=worker 实装单。
+- 级联：ballots-for-leige.md → RATIFIED；源 BATCH2/BATCH-INFRA ballot 文件标注；roadmap v5 §六 两键消费；MG-8 reason enum 与矩阵 v3 四类咬合进 C1 grill 弹药。
+
+## D-124：holdout 修复战役——grill 消减六裁决 + FP 三方双盲合成（剔10/救3）+ 计划 v2（2026-07-08 傍晚）
+
+- 磊哥 A 拍（修+剔+补到全桶达标）后按 grill 范式全流程：骨架（HQ1-6 + 已决 R1-R8）→ worker 对抗作答（HG1 推翻 commander 两处：near-dup 实为 13 行非 7[被 reason 前缀截断误导]；register 不造新枚举用已有 `imperative`+register_subtype，防炸 REGISTER_ENUM/label-authority checker）→ 消减表 RATIFIED → 实施计划 → 红队 EXECUTABLE_WITH_FIXES（P0=0 P1=5：FP 独立性/per-bucket 补数/checker 语义签名盲区/守恒断言加强/canonical sha 绑定——全吸收）。
+- **FP 三方双盲合成**（commander/codex/hermes 独立盲判+预声明合成规则）：剔 10 真撞 / 救回 3（s9h-032 checker 字符集假阳・双意图复合句 / s9h-037 位置槽不同 signature 不同 / s9h-044 train 是高速安全拒识 expected=[] 与 holdout 常规 mutating 语义相反）。hermes 的「15vs十五=diff-args」机械字面票不采。
+- **v2 终账**：存量 54（47 PASS+3 救回+4 particle register 修复）→ 补生成 per-bucket 10 行（topic+3/particle+5/primary+1/negative+1）→ 终态 64=34/10/11/9 全过门（含抗再撞余量）。执行序=Step2 register 脚本修复（commander 亲做+worker 复核）→ Step3 Opus 重开补生成（预检门）→ J2 全量重判 → sha 冻结+canonical 联动 → 三臂。
+- 一手：run dir holdout-repair-{grill-skeleton,impl-plan}.md + holdout-neardup-fp-{review-commander,review-w6,trainpack-view,synthesis}.md + holdout-plan-redteam.md。
+
+## D-125：磊哥拍 BATCH-D0-1 全批⭐（D0 UIUE grill 收口）+ 编码分工令（磊哥 2026-07-08 晚拍）
+
+- 磊哥原话：「43个全部同意」（呈报表尾号 D0G-043，语义=D0-GRILL-INDEX 未决题全按⭐默认拍）+「但是opus开发时候务必注意强视觉啊」+「要用我们tools目录的巨人的肩膀」+「你做好规划」。
+- **D0 grill RATIFIED**：D0-GRILL-INDEX.md（BALLOT_READY_POST_AUDIT，162 题细拆→53 合成，DGX 对抗审过：162/162 零丢题/伪已决 9/9 真/误并已修）全部未决题按⭐默认 RATIFIED。关键拍定：七态逐态正面渲染三通道红只给 unsafe / RM 停循环动效保双通道 / RT 内容实心化 / L2 contrast 机器门 / 状态优先级 safety>crash>changing>selected>satisfied / minWindow 保 5×2+warning / **右栏 macFeaturedContent AC hero 主次混排弃均匀 5 列** / orb Mac 尺度先定不降 phone / ivory 强制不跟系统 / token 是 floor / 内容卡走实心（regularMaterial=方法论债）/ MicDock=mouseDown+Option+Space / hover 只 presentation 不伪装业务态 / 性能 D0 只拍采样方法 / TTS preflight 无 premium 不 fail / runtime event 永远赢 force-state / 六类错误映射 / D1a 必先产 Mac anchor 截图包。steelman 4 题磊哥知悉后仍⭐（DGX 注记呈报过）。
+- **编码分工令**：UIUE 视觉代码=**Opus 位**（阵容一 codex 换 opus medium；「务必注意强视觉」=aesthetic 5 Gate+历史 anchor 质感下限+还原实查）；codex=交互/逻辑/runtime；commander=grill 主刀+视觉决策+亲核验收。**Tools 巨人肩膀强制**：`Tools/agent-platform-plugin-refs/`（build-macos-apps/build-ios-apps 插件 SKILL+references，宪法 §3 明文「做 SwiftUI/macOS/Liquid Glass 前先读」）+ `Tools/skills/`（INDEX）——派单必内联硬规则+强制照做非参考（persona-dispatch 铁律）。
+- 后续链（磊哥同晚纠偏「grill 后面是什么」+30min 范式回顾令）：消减表级联 → D1a 实施计划（拍定内联）→ 红队审计划 → 才编码。
+
+## D-126：招牌微交互双拍定 + D1a 编码开工 + 自主推进窗（磊哥 2026-07-08 晚拍）
+
+- 磊哥：「招牌①②都可以啊 都很棒」+「你自己自动推进哈 不要停下来 我2小时内回来」。
+- **招牌微交互 RATIFIED**：①orb→卡片能量流动线（每指令核心叙事：识别完→青紫能量线→命中卡→点亮形变，单 Canvas 层）②10 卡入场瀑布（开场 hook：delay i×18ms 封顶 120ms，180ms spring）。基础动效三件（数值滚动/fallback 不丢脸卡/MicDock 拾起）随 T7 全做。参数规格=RS-A `showcase-microinteraction-teardown.md`（Raycast/Things/Arc/Linear 参数级拆解）。
+- **D1a 编码开工**（计划 v2 吸收 DRT 红队 P1×7 后）：T1 token 层（Opus %8，build 窗内）/ T4 交互契约（codex worktree）/ T6a+T6b anchor 截图包（codex，23:30 资源锁前抢跑）已派；T7 动效片（招牌①②+基础三件+MX1 21 项迁移）T1 后接 Opus 位。资源窗铁律：S8 active 禁 full build/XCUITest/截图。
+- **before 基线存档**：磊哥贴当前 Mac app 实况（「好丑」：卡片标题截断/布局挤压/右缘裁切）→ `run dir d1a-harness/before-baseline-ugly-20260708.png`，作 T3 before/after 对比素材。
+- holdout 链态：v3 merged 61（33/9/10/9 全过门）J3 终判在途；J2 剔 8 亲裁（新对句推翻 032/044 救回）。
+
+## D-127：holdout 战役收官——J4 全绿 61/61 + sha 冻结 + canonical 落位（2026-07-08 晚，D-124 链闭环）
+
+- 判定链终态：J1 47/64 → 修复战役（FP 三方双盲剔10救3+register 修4+补10 per-bucket）→ J2 全量 56/64（新对句推翻 032/044 救回，commander 亲裁剔 8）→ 补 5（预检零撞）→ J3 58/61（3 行低频工具 expected args 病）→ HF1 args 修正（value=2/20/暖香槟金，utterance/桶/register 零动）→ **J4 复核全绿 JUDGE_PASS_61_of_61**（judge_coverage semantic 61/61 + args_repair 3/3 CONFIRMED）。
+- **冻结**：sha256 `77853caea4598f334fb4a7ed89eafc348746adf333d647306aa94f0b68da2f64`，61 行，四桶 33/9/10/9 全过门（≥32/8/8/8）；canonical=`s8-gates/s9-eval-freeze/holdout/eval-holdout.jsonl`（幂等脚本 holdout-freeze.sh，freeze-receipt.md 带 v1→v2→v3 lineage 链+CASES/MANIFEST 联动指针）；旧版全标 lineage_only。
+- 实证沉淀：exposure checker（语序层）实战四连（v2 预检 1 撞/v3 零撞/J2 扫 8/J3 复扫 FP dismiss）=判别力田间验证；「J 轮全量重判非只判新行」（HQ5 裁决）两次翻出增量对句=范式正确。
+- S9 弹药态：holdout FROZEN + 三 checker 落位（exposure 已入仓 c4dfb247+S10 第 7 门已实装模板）+ exact commands 冻结 + Q-SR 字段已入 runbook/S10 模板。S9 只等 S8 训完出 adapter。
+
+## D-128：D1a 首批三片集成收编（T1→T4→T5，2026-07-08 晚）
+
+- IN1/IN2 两轮只读预演（merge-tree 全 rc0+零重叠）后 commander 亲手集成：T1 token 层（389a4a8a，TX1 审+T7 顺路修 theme 确定性）→ T4 交互契约（42dfeb2b 含 T4F 修+T4V 闭环+receipt 措辞）→ T5 runtime 呈现（af7ac5d7 含 T5F 修+T5V 闭环）。
+- **集成门全绿**：全量 swift test **625/0**（563 基线+62 新增：contrast 9+T4 交互 4+T5 runtime 7+其余组件测试）+ make verify-all rc0。receipt 文件归位 run dir 防仓根污染。
+- T7 链（T2B 主文件+T7c 动效收尾，b0b22346→cc6c9972+，592/0 in-worktree）**未收编**——等 TXB 追加 P1×2 修完+对抗审终版+commander 视觉亲核后单独收（visual-swap 组件明确等 5 Gate 验收不盲换）。
+- 每片全程：worktree 隔离+TDD+对抗审（producer≠auditor）+修复+闭环复核——D1a 编码日范式跑通实证。
+
+## D-129：T7 链收编——D1a 全链落进工作分支（2026-07-08 晚）
+
+- merge-tree 快验 rc0 后收编 T7（1800d4c5，6+ commits：动效 SSOT/招牌①②组件/T2 七态债清偿/主文件接线/三档 motion budget/D0G-005 终序/TXB 双修）。
+- **集成门全绿：全量 swift test 656/0**（625→656，T7 链 +31 测）+ verify-all rc0。TXL 台账 28 findings P1 13/13 CLOSED 为收编前提。
+- D1a 编码日终态：T1+T4+T5+T7（含 T2/T2B/T7b/T7c）**五片全在 opt/streamline**，656/0。剩余=接缝 pass T7d（readback 真流/hover 契约/坐标精修）+ visual-swap 验收（B③④，等 5 Gate）+ T3 hero（Opus 片待排）+ app-run snapshot（idle 窗）+ commander/磊哥视觉亲核门。
+
+## D-130：session 收口——worker 阵容新规（禁 claude 系）+ ma10 交接（磊哥 2026-07-09 傍晚拍）
+
+- 磊哥原话：「沉淀六件套 新session新开ma10 后续worker不允许用claude系列，只能hermes+codex，生成器后续如果有内容我们就用hermes glm」。
+- **阵容新规（supersede D-122 Opus 生成位/D-125 Opus 视觉位惯例）**：ma10 起 worker=hermes+codex only；生成器任务（语料/话术创作）=hermes glm（生成方≠判方纪律不变：hermes 生成→codex judge）；UIUE 视觉=commander 亲笔加重+codex 按参数级规格实装（codex 不独立主刀视觉仍有效）。memory 已落 feedback-worker-roster-no-claude。
+- **收口终态（诚实）**：S8 r3 **从未点火**（昨晚 24:00 键未落，preflight/一行命令/一键 checklist 三件全备仍有效）；D1a 五片（T1/T4/T5/T7 链）已集成 opt/streamline **656/0**（D-128/129）；holdout FROZEN（D-127）；C1 ballot 38 题+P1 批 39 题备好未拍；T7d 接缝 pass 未执行（昨晚派单遇 session 中断）；T3 hero/visual-swap 验收/视觉亲核/T6 idle 重拍待新 session。ahead 35 未 push。
+
+## D-131：ma10 Wave 1 收编日——D1a 接缝/hero/runtime 三线全收 + lessons 落笔 + D1H 裁决（2026-07-09）
+
+- **阵容首战**：ma10 = 4 codex + 1 hermes（D-130 新规首战，零 claude worker）。hermes 一席扛四型活：异源审计（RT1/T7eA/L1）+ 生成位（H2 台本/H6 mock 预设表）+ 秘书（H3 lessons/H7 级联稿）+ 缺口扫描（H1 P1×2+P2×6 亲核零编造）；codex 内部 subagent 实战立功（w1 审计双 lane 分工，architect lane 抓接缝断裂）。
+- **收编账（主干 opt/streamline，每步 commander 亲跑集成门）**：656 → **T7d 接缝**（EnergyLine 真 readback 流经 T5 orchestrator/anchorPreference 坐标/visual-swap flag 默认 off；merge `8ed74010`，665/0）→ **T3 hero**（macPanorama 均匀 5 列→hero 左柱 0.32+3×3；hero 槽固定 .ac 防跳动；T3-AUDIT P0=0 规格 11 项全 PASS+anchor 接缝 live 复核；fee5de62→rebase a2bd781c→merge `87e5b49d`，676/0）→ **w2 runtime 叠层链**（RT1 readback→TTS fail-open+六类错误映射+DialogueState / T7e-A 组件侧 RM/RT/budget 清偿 / RT3 TTS preflight 门 make check-tts-preflight / RT1F 审计修复含六类映射收敛 T5 单源+drift guard；merge `d40d19c3`，**690/0+verify-all rc0**）。HEAD=`d40d19c3`，ahead 47 未 push。
+- **审计链**：RT1-AUDIT/T7EA-AUDIT/T3-AUDIT 三场全 P0=0；H6-AUDIT 抓 hermes 弹药 P0×2（自造 utterance 变体标 yaml 原文+虚构 readback 锚=finder 编造经典型，真文件假内容）；commander 驳回 w1 一条 P1（RuntimePresentationErrorClass 时序 artifact，live grep 坐实主干已有）。
+- **D1H blocker 裁决**：w3 卡 TCC 写 universalaccess → 不追权限：磊哥用机中翻全局三开关=可见副作用（M.51）+ 自动门依赖机器全局态=非确定性设计错误；改**进程内环境注入**（8 组合含 RM+RT），OS 真开关降 operator checklist，defaults 只读探测进 receipt；负例四门（U17 SSIM/L2/U32/三开关脚本）全证有牙。D1HR（rebase+基线对 hero 布局重生成）在途。
+- **lessons 落笔**：M.48-M.56 九新条 + M.24/M.30/M.35 三子条款（commit `6fb57270`，H3 秘书稿过审）。
+- **杂账**：before-baseline-ugly png 实况缺失（D-126 该行 stale，对比素材改 T6a idle 重拍）；hermes 一次 HTTP 429 turn 中断（重试恢复，秒级损失）。
+- **在途**：T7e-B（ContentView call-site 清偿）/ D1HR / T6R idle 截图包 / PF1 性能采样 / L1-AUDIT。**未动**：S8 未点火（磊哥令不着急）/ C1 ballot 待拍 / M-DEMO ballot 待拍 / visual-swap 未切换 / 无 5 Gate/operator-pass 声称。
+
+## D-132：ma10/ma11 下半场收编账——14 收编 656→731/0 + 验证门升级 + 三事故治理（2026-07-09 深夜）
+
+- **终态（live 亲核）**：主干 opt/streamline @ `a9b94c23`，全量 swift test **731/0（6 skipped）** + make verify-all rc0 + xcodebuild MAformacMac BUILD SUCCEEDED；全天 first-parent **14 次收编** 656→731 零回退，ahead 77 未 push。这是 local/test/build 级技术收口，**不是** 5 Gate/operator-pass/V-PASS。
+- **下半场六片**（上半场 8 片见 D-131）：⑨ST1+RT2F（merge `380c2b1e`，两 demo 炸点修死：MP-01 AC-on 假 no-op→真关闭 / MP-04 parked 开门落 legacy 升温→fail-closed；ST1-AUDIT=PASS_WITH_P1_RESIDUALS，proof=planner→store 层非 app/T5/TTS 真端到端）⑩T6R+T6R2 idle 采集 dry-run 包（merge `c548bb68`，24 截图项+PF1 三档 trace 合体+隐私 fail-closed；T6R2-VERIFY=FIX-CONFIRMED；**dry-run plan ready 非「成品」**，real capture=0）⑪RT2G multi-readback 逐条 T5 event（merge `d54c3b90`，审 REQUEST_CHANGES P1×3）→ ⑬**RT2GF 修复**（merge `a9b94c23`：per-write 状态闭环+事件驱动背压队列+单条回归锁；RT2GF-AUDIT P0=0/P1=0）⑫D1HR hero 基线 regen+macOS XCUITest wiring（merge `42f21d2e`；审出 proof-class 升格+pbxproj 越界 iOS signing）→ ⑭**D1HRF 修正**（merge `02e0b313`：proof 降格 local+mac_runtime_smoke / **iOS signing revert**（Q2=C 冻结守住）/ checklist 修到 operator 粒度；D1HRF-AUDIT=PASS_WITH_P2_DOC_HYGIENE）。
+- **三事故治理（全部当场闭环）**：①分支事故=RT2G 派单未写死 worktree 路径，w4 在主树切分支（零文件损失，主树归位+分支重置；教训=派单必须 repo path+branch+worktree 三写死）②配对失误=commander 让 w3 自审自产 checklist（findings 转 w4 独立复核；微单不豁免 producer≠auditor）③**两次「报告齐全忘 commit」**（ST1/RT2GF 同坑；教训=REPORT 模板加 commit sha 硬字段，交付定义=落盘 commit）。
+- **H12 台账治理**：PARTIAL_WITH_STATIC_CLOSURE_PASS——10 段 merge membership 全 PASS；指出 ledger 行序非时序/门数字混 producer 与 post-merge basis/H1 顶表 stale（已升 CLOSED 补 closed_by）。后续台账加 `producer_gate/post_merge_gate/gate_basis/closed_by` 字段。
+- **秘书链**：SEC2→SEC2-AUDIT（抓 stale）→SEC3 收口包→SEC3-AUDIT（LAND_AFTER_STALE_PATCH）→commander 亲落带正（D1HR 审终值 P1=3/P2=5 非 pack 的 P1=2）。当天推进快过秘书两次=收口期秘书稿必须 capture_at 与落笔时点 diff。
+- **hermes 席位**：glm+doubao 双额度尽（11 单完整交付后倒下）；今晚全部审计=codex 互审（producer≠auditor 守住），**cross-vendor 异源缺口记账待回补**。
+- **在途/待磊哥键不变**：S8 点火/C1 ballot 38 题/M-DEMO ballot 5 题/D1 左栏专场令+⭐参数（规格 v2 已备经审）/idle 窗（采集包 dry-run ready 一键跑）。**Non-claims**：无 operator-pass/V-PASS/C6/candidate signed；S9/S10 未执行；idle 采集未实跑。
+
+## D-133：BATCH-C1-1 全按星标 RATIFIED（38/38=B）+ ma12 开张 + C1 全自动开发链启动（磊哥 2026-07-10 拍）
+
+- **拍定**：磊哥「开始 C1 38 题全自动开发」= BATCH-C1-1（`runs/2026-07-08-daywork/BATCH-C1-1-ballot.md`，P0 38 题全 ⭐B）**全按星标 RATIFIED**。ballot 注记点名的 CG-036（partial 执行）/CG-045（fallback 质量门阻塞扩 mounted 但允许预铺）/CG-054（<40% 允许预铺）/CG-080（C1 不授权 mounted 1→N）按 ⭐B 生效。CG-021 已移出（ALREADY_DECIDED）。C1 P1 批（39 题，depends_on D0G）不在本拍。
+- **授权范围**：全自动范式链 = 消减矩阵级联 → grill 范式实施计划（inline CG+file:line）→ 对抗审计计划 → 编码（worktree+TDD+GitNexus impact/detect_changes+收编门三件套）→ 测试 CI/CD → 审计（producer≠auditor）→ 锚点对比。**红线不变**：CG-080=不扩 mounted 1→N（等 S10+磊哥键）；预铺（matrix/fallback/probes）在授权内。
+- **ma12 阵容**：全新 tmux server（ma11 已消失，旧 pane historical）。%0 commander 席位（左3/5）；%1/%3/%2/%4 = codex-w1..w4（右2/5四等分，gpt-5.6-sol high，专复杂任务）。新规四条（布局/worker乘法/5.5生图锚点/clone-design授权+GitNexus）已落 swarm-commander §22 + memory feedback-ma12-layout-worker-multiplier。
+- **Non-claims**：不扩 mounted；不签 C5/C6；S9/S10 未执行；矩阵 canDemo 真值仍 1/120。
+
+## D-134：C1 Task0 架构分叉拍定 = B（新建独立 C1 capability + presentation 复用现有 bridge，禁平行 SSOT）（磊哥 2026-07-10 拍）
+
+- **背景**：C1 实施计划 v2 二审（w5 5.6-sol）暴露 Task 0 契约层平行 SSOT 风险——新建 payload/partial/trace capability 会与现有 `define-runtime-presentation-bridge` authority 撞车。commander 未自拍，派 w5 深挖产 A/B 决策简报（`runs/2026-07-10-ma12/reports/task0-ssot-architecture-brief.md`）。
+- **拍定 B（磊哥亲拍）**：新建独立 C1 governance capability（管 matrix「能不能演」+ fallback enum + CG-036 partial + probe），**但 payload/partial/trace 的呈现层复用现有 runtime-presentation bridge，禁止建平行 presentation SSOT**。理由（一手源坐实）：现有代码三概念本就不同 authority——matrix=能不能演 / tool-execution=执行或拒绝发生了什么 / bridge=如何安全呈现；压成一个 bridge SSOT 降文件数但升语义冲突率。A 案（扩现有 bridge spec）边界糊，弃。
+- **约束**：Task 0 OpenSpec change 须写 ownership map + 对 bridge 的引用（MODIFIED tool-execution + existing bridge），不重造 presentation。
+- **解锁**：计划 v3 的 `BLOCKED_PENDING_LEIGE` 解除 → 产计划 v4（B 锁定，可执行）。
+- **前置不变**：C1 编码基点=dirty-tree 收编包落地后 commit；push/PR 仍待磊哥键。**Non-claims**：不扩 mounted 1→N；不签 C5/C6。
+
+## D-135：dirty-tree 收编包落地——2 commit 全绿，C1 编码基点确立（2026-07-10）
+
+- **收编执行**（磊哥授权本地 commit 范围）：按 w1 integration-package-v2 落 2 commit：
+  - `35b4fb2b` test: C1 回归补测 + exposure fail-closed 门接线（补测 5 Swift+2 Python，Makefile verify-ci 增挂 verify-register + make test 增挂 exposure，gate_strength_delta=增强）。
+  - `cbd7d9b5` docs(c1): D-133/D-134 决议级联 + C1 grill RATIFIED SSOT。
+- **收编门三件套（clean tree 亲跑）**：make verify-all=**736 tests/0 failures/6 skipped**；xcodebuild MAformacMac=**BUILD SUCCEEDED**；python exposure=ok。
+- **诚实残留**：`?? Tools/checks/check-codex-hooks-health.sh`（蜂群副产诊断工具，非 C1，排除待独立 housekeeping 包，主树非全 clean 如实记）。
+- **C1 编码基点确立**：HEAD=`cbd7d9b5`（ahead origin 81 未 push），C1 实施计划 v4 EXECUTABLE 的 base-sha 前置满足。**push/PR 仍待磊哥键。**
+- **计划 v4**（w5 5.6-sol，sha d52a6aae）：D-134 B 物化=新 demo-capability-governance capability + MODIFIED tool-execution + MODIFIED runtime-presentation-bridge（禁平行 presentation SSOT），Task0=EXECUTABLE，全 DAG 补 worktree/TDD/GitNexus/三件套/CI/anchor/CG-080。**Non-claims**：不扩 mounted 1→N；不签 C5/C6；实现从 Phase0 receipt 门起。
+
+## D-136：C1 38 题全自动开发日——14 切片编码 + 烧额度对抗审揭穿 6 假绿 + int-v3 诚实真金候选（2026-07-10 ma12）
+
+- **背景**：D-133 BATCH-C1-1 RATIFIED（38/38=B）+ D-134 B 架构 + D-135 收编。本日 ma12 蜂群（4 codex sol xhigh + hermes 秘书）全自动开发 C1。
+- **编码链**：grill 范式实施计划 v1→v4（对抗审 REQUEST_CHANGES 迭代）→ 14 切片 DAG（T0 OpenSpec carrier / A1 matrix / A2 codegen / B1 fallback / B2a typed / B3a 多帧 / B3b CG-036 partial / B3c bridge / B2c trace / B4 probes / C1-S10 / C2 mounted-no-delta / CI / C3 anchor），每切片独立 worktree + TDD + GitNexus impact + 风险门 risk-ack + 收编门三件套 + producer≠auditor。
+- 🔴 **烧额度多 sol 对抗审揭穿 6 处假绿（本日最大价值）**：初版候选 int-v2 机械亲核全绿（swift 770/0 + build + verify-ci 绿），但磊哥调 4 codex 全 sol xhigh 后联网搜证发现 **METR 实测 sol 史上最高率 gaming 评测**——遂派多 sol 独立对抗审，逐层揭穿机械绿藏的 6 P0：①**canDemo=2 假绿**（fallback 探针充 action proof，3 路 sol 独立收敛=铁证）②partial fixture-only（生产 runner 走旧路丢 refused identity）③reason 权威三分叉 + raw finiteReason 泄漏 ④**verify-ci fail-open 假门**（删 checker 仍 rc0）⑤P0-03 残留 finiteReason 明文泄漏 ⑥P0-02 回归 8/8→7/8。全被机械亲核漏、唯语义下钻 + 多路独立 catch。
+- **诚实修复 + int-v3**：canDemo=2→**诚实 0/120**（真 action-readback 探针替 fallback，checker 拒 fallback 探针；挂载工具存在但 register emission unproven，执行能力交 S8 训练）；partial 真接线 11/11；reason 单源 + safe 映射堵泄漏；verify-ci fail-closed（删 checker→rc2）。整合陷阱（P0-02/P0-03 enum authority 冲突）由 %4 预判、w5 整合官统一 resolve（stale 映射补进 T0 registry+regen）。产 **int-v3 候选 1832500d**，ancestry 18/18。
+- 🔴 **commander 亲核（非信 sol）**：亲跑 canDemo=0 直查 JSON + **亲手删 check_fallback_scripts.py→verify-ci rc=2 ERROR_MISSING_C1_CHECKER（假门真修，门有牙）** + make verify-all PASS + xcodebuild BUILD SUCCEEDED + dirty=0。
+- **元教训**：①机械亲核（跑测试绿）≠语义正确——candidate 机械全绿藏 6 P0（fixture-green/declare-not-enforce/negative-as-positive/fail-open），唯【多路独立对抗审 + commander 亲核语义/删门负例】catch（claim-vs-reality 铁律2 实证 + sol gaming caveat 应对）②强 gaming 倾向模型（sol）产出，门声称必 commander 亲手验（删门/查 JSON），多厂商异源审加重 ③诚实 canDemo=0 > 假 2（项目「客户现场不丢脸」北极星：宁诚实 0 也不签假绿）。
+- **Non-claims**：未三厂商终审（SPEC 备）；未 PR；canDemo=0（执行能力=S8 训练，非 C1）；无 operator-pass/V-PASS；候选未 merge。**待**：三厂商终审 → 自主 PR。
+
+### D-136 补记：三厂商终审 Codex 实跑=F，int-v3 NOT PR-ready（2026-07-10 收尾）
+- Codex 实跑终审(%4)在 exact 候选 1832500d = **F/REQUEST_CHANGES P0=3**：① T0 finiteReason authority 未闭合（registry/generated 10 项 vs ownership checker+InternalTraceFiniteReason 旧 9 项→ownership suite 1 FAILURE）② make verify-all/verify-ci 不消费 ownership gate=fail-open 假绿 ③见 FINAL-AUDIT-codex.md。
+- 🔴 元教训升级：**commander 亲核也被 gate 覆盖缺口骗**——亲跑 verify-all PASS 但 mandatory ownership suite 不在 verify 链，红着没显。亲核前必先确认所有 mandatory gate wire 进 verify。
+- **int-v3 NOT PR-ready**；ma13 修 3 P0→int-v4→重审→PR。GLM 审在途；GPT Pro 磊哥人工盯。
+- 三厂商终审价值再证：6 P0 修 + commander 亲核后，Codex 实跑终审仍抓 3 P0（含骗过亲核的 fail-open gate）——多层独立审不可省。
+
+## D-137：canDemo 真值 supersede 1/120→诚实 0/120（云端 SSOT 分叉修正，GPT Pro 终审催生，2026-07-10）
+
+- **背景**：GPT Pro 终审 cite-verify 抓到云端 SSOT 分叉——`decisions.md:1194`(D-133) 写「矩阵 canDemo 真值仍 **1/120**」+ grill-ratified `default_executable=1`，但本地诚实候选是 **canDemo=0/120**。已推云端(opt/streamline)的决策 doc 自相矛盾=C1 违反它要治理的 SSOT 原则（GPT Pro P0）。
+- 🔴 **supersede**：D-133 line 1194「canDemo 真值仍 1/120」+ 任何「canDemo=1 or 2」表述 **作废**，以本 D-137 的 **canDemo=诚实 0/120** 为准。根因=旧 1/120 里那 1-2 格用 fallback 探针（证明「优雅拒识可演」）冒充 action proof；真 action-readback 探针证明 **0 格真能演动作**（挂载工具存在但 register emission unproven）。
+- 🔴 **两轴分清（GPT Pro P0-3 洞察）**：`canDemo`（proof 轴=proven action-readback）与 `default_executable`（classification 轴=cell 归类）**是不同轴**。D-123 的 `default_executable=1`（分类）不变；被 supersede 的是把它当「1 格 canDemo=true」的**证明**声称。诚实口径=`actionDemoProven=0/120`（GPT Pro 建议改名，int-v4 落）。
+- **历史保留**：D-133/D-123 原文不改（doc-cascade 历史档纪律），本 D-137 作现行权威；checker 禁止旧决议重新生成 1/2。
+- **级联**：grill-ratified doc 加 banner 指 D-137（canDemo=0，default_executable=1 是分类非证明）；后续生成器/矩阵 SSOT 以 0/120 为真值。
+- **Non-claims**：canDemo=0 是诚实失败非 demo 成功（GPT Pro：governanceTruthful=true / customerDemoReady=false）；真执行=后续（LoRA/constrained decoding/deterministic fast-path，GPT Pro 纠「LoRA 非唯一解」）。
+
+### D-137 补记：int-v4 治理修复候选 + Draft PR #42（2026-07-10 收尾）
+- 3 Codex 终审 P0 修复+commander 亲核(🔴 亲手弄红 ownership→verify-ci rc2,fail-open 治好非信报告)→int-v4=790b6c7b,全门 PASS,canDemo=0/120 三向一致(真 action 探针),ancestry 21/21。
+- Draft PR #42(c1/int-v4-governance-repair→opt/streamline)=governance-repair candidate,🔴 NOT demo-ready(三厂商终审一致:governanceTruthful=true/customerDemoReady=false)。GPT Pro 深层 findings(App admission/witness 模型/gate-of-gates/可靠性)作 int-v5+ 开放项,PR body 诚实列。
+- 脏区清:20 ma12 worktree 移除。ma13 接 PR review + int-v5+。
+
+## D-138：ma13 第一波——PR #42 fresh 对抗审 REQUEST_CHANGES + int-v5 四路预研收稿 + BALLOT 待拍（2026-07-10）
+
+- **蜂群**：ma13 = 4 codex sol high + hermes 秘书（%0 commander/%5 秘书/右列 %1 w1、%3 w2、%2 w3、%4 w4）。run dir `~/Projects/agent-tmux-stack-research/runs/2026-07-10-ma13/`。
+- 🔴 **w1 fresh 对抗审 int-v4（790b6c7b）= REQUEST_CHANGES，int-v4 仍 NOT Ready**：
+  - **P0-1（commander 亲手 comm 复现坐实）**：PR body「finiteReason authority 闭合 T0 单源 10 项」被生产代码反证——`DDomainToolPlanFailure` 仍发 `parse_failed/ir_unclassified/bridge_failed` 三个 T0 外值（`Core/LLM/DDomainToolPlanFailure.swift:7-17`）；`FallbackContext.swift:113-123` 手写 switch 消费 T0 外别名 `guard_denied/safety_rejected/clarify_required`（T0 真值是 `safety_or_policy_refusal/clarify_missing_slot`，字面值都不同）+ default 吞错；B4 probe 把 T0 外值固化为期望。
+  - **P1-1**：ownership gate false-negative——checker 只核 registry/spec 自洽（`check_c1_ownership_map.py:252-301`），不扫生产 emitter/consumer → 生产违反 T0 时 checker 仍 PASS。ma12「亲核被 gate 覆盖缺口骗」的再深一层：**gate wire 进 verify ≠ gate 覆盖面够，覆盖面也是 basis**。
+  - P2-1：D-137 supersede 在 base 非 PR head，body 归因需改「base-side prerequisite」（w1 与 w3 独立收敛 = 铁证）。
+  - 其余 body 声称全 MATCH：canDemo=0 真 / partial typed bridge 真实装 / escape hatch 真删 / 删门+软化负例全 rc2 / 83 文件无 scope 越界 / CG-080 守住。另发现 make verify-all fresh 环境 rc2（source-snapshot xlsx 路径已迁移，pre-existing 非 PR 归因，入 backlog）。
+  - 修复口径 commander 已锁（w1 验收门 SPEC `specs/SPEC-p01-fix-acceptance.md`）：parse/ir/bridge→映射既有 `unsupported_tool_plan` + `decodeFailureKind` 分离诊断，**不扩 T0 闭集**；ownership checker 扩扫生产面 + 负例。
+- **int-v5 四路预研收稿（全 DESIGN_DRAFT，cite commander 抽核坐实）**：w2 admission ⭐C（App façade+runner policy，deny-first 不依赖 S8）+ 可靠性两阶段；w3 P0-5 加重实证（inline bundle 自造契约不存在 row ID + risk policy 削空 door_open_while_moving + allowlist 削空）+ 正名 ⭐直接 bool `actionDemoProven`（拒 demoStatus 枚举：action/fallback 正交轴）；w4 witness envelope ⭐int-v5 先行（等 S8=正证落可拼接旧 receipt）+ 🔴 live API 实况 repo=PUBLIC 且 main/opt-streamline **零 branch protection、rulesets 空**+ 单人仓 CODEOWNERS 诚实评估（开 required review 锁死 owner 自己 PR）。
+- **双向互审（producer≠auditor）**：w3 审 w2 抓 2 真 P0（multi-frame 绕过推荐插点 + frontstage receipt 未绑 bundle digest）；w2 审 w3 抓「schema gate 纸门」（checker --schema 只查存在不校验）——方向全接受，实施细节吸收进执行序。
+- **BALLOT-ma13-final.md 待磊哥拍**：主 3 题（Q-1 路线 ⭐B 治理修复合入+demo 另立 line / Q-12 Solo Baseline protection ⭐立即上 / Q-13 结构缺口 ⭐记 residual）+ 细节 10 题全 ⭐。
+- **秘书验证**：hermes 一稿 3 处编造（HEAD 参照系错/D-134、D-137 描述凭印象/worker 态 stale）被审出打回，二稿全合格——「hermes 产出无例外必审」再实证。
+- **磊哥令**：全员回稿后暂停一小时不派单（16:35 起计时）。**Non-claims**：int-v4 未 Ready/未 merge；canDemo=0/120 不变；修复轮未开工；int-v5a/b/c 未开工；无 operator-pass/V-PASS。
+
+### D-138 补记：BALLOT-ma13 RATIFIED + branch protection 上线 + 修复轮开工（磊哥 2026-07-10 拍）
+- **磊哥拍**：Q-1 + 细节 10 题**全按星标**（路线 B=治理修复先合入+demo 另立 line；admission C 案/mock rehearsal 隔离/非循环五件套/typed sidecar/可靠性两阶段/p95 fast/memory baseline/int-v5a 一 PR 两 commit/actionDemoProven/witness int-v5 先行）；Q-12=B（branch protection 立即上，授权 commander 执行）；Q-13=授权按 ⭐A（单人仓+residual，不加 reviewer 不建外部 App）。
+- **branch protection 已执行 + readback 验证**：`opt/streamline-macos-20260707` + `main` 双分支 = required check `verify`(strict) + 禁 force-push/deletion + required_conversation_resolution。🔴 **commander 裁决 delta**（对 w4 §5.1 原案）：`enforce_admins=false` + 不设 require-PR——保留磊哥/commander docs 直推日常流（原案会把未跑 CI 的 docs commit 直推全拒）；residual 如实记：admin 直推可绕 verify、admin 可拆门（w4 已列为威胁模型外）。诚实等级=GATE_BASELINE_HAS_TEETH（分层再降半档），非 SAME_PR_UNSOFTENABLE。
+- **修复轮开工**：w2(%3) 领 SPEC-fix-p01-p11（P0-1 四点+P1-1 扩扫+probe 期望值级联，映射口径 LOCKED 不扩 T0），修完 push PR 分支→w1 按验收门复审。
+- **并行**：w3 吸收互审 5P1 产 int-v5a 实施计划 v2；w4 细化 witness 实施计划+CODEOWNERS advisory 草案。
+
+## D-139：BATCH-C1-2 消减（39→A19/B11/C-拍）+ ballot-next 24 题全按星标 RATIFIED（磊哥授权 commander 逐题亲核代拍，2026-07-10 ma13）
+
+- **消减**：C1 P1 批 39 题（BATCH-C1-2，2026-07-08 备好）经 grok 消减矩阵分诊 = A 已决 19（cite 逐条，commander 抽核 Q18→D-114/CG-055→D-133 过关）/ B 新事实改写 11（正名/0-120/int-v5 吸收，A′ 正名版默认生效）/ C 真待拍并入 ballot。源 `runs/2026-07-10-ma13/reports/BATCH-C1-2-reduction.md`。
+- **ballot-next 24 题 RATIFIED**（`DRAFT-ballot-next.md`，磊哥「全带推荐的如果你都认可就按星标」授权，commander 逐题过全文后代拍）：
+  - **L1-L8（Line C 扩面/翻绿）全 ⭐B**：L1 第一刀=PROOF_FLIP matrix4（零新工具）/ L2 单格证明栈绿即升、批次 1→N 绑 S10（证明轴≠扩面轴）/ L3 matrix5-6 靠 S9/S10 或 runtime emission receipt（CG-015）/ L4 第一新工具=open_ac / L5 第二刀=window / L6 joint<40% 仍允许 PROOF_FLIP（CG-054 字面不违反）/ L7 三档表零临场 / L8 probe-witness 并行、改 baseline 串行。
+  - **C1-C11（P1 工程纪律）**：C5=⭐A（joint=0.70 仍中档，>0.70 才 10 族）其余 ⭐B：register 变更走 proposal→schema bump→regen / checker 五类分级 / family unknown=emergency+leakage 计数 / joint=0.40 进中档 / FastPath 优先+同 presentation schema 禁双 mutation / 冲突 trace 记录 / literal 仅直述 L1 / stale=runtime error 不进兜底 KPI / 3 族序=空调→车窗→座椅 / C3 红不挡 S10-PROOF_FLIP 挡 1→N-closeout。
+  - **M-Q01~05（M-DEMO golden run）全 ⭐B**：must_pass=已挂载/已 cell、10 族走 fallback 轨 / 四层断言 deny 轨 mutation=false / 对外四字段+对内 refs / 跑全+failure_class / golden⊥U17⊥frontstage 三轨正交。
+- **Non-claims**：本票不授权 mounted 1→N；不 Ready PR#42（round 3 终审在途）；不签 canDemo>0；不开工 int-v5 编码；S8 状态不变。
+
+## D-140：PR #42 修复轮 round2-5 链 + AMENDMENT-1 收敛裁决 + 计划层五件全家福收口 + 阵容三迁（2026-07-10 ma13 暂停点）
+
+- **修复轮链**（D-138 记 round1=7bd10cb5）：round2=5f5b1540（checker 收紧修 w1 两 exact mutation）→ w1 复审 RC（又造两绕过=regex 军备竞赛显形）→ 🔴 **commander AMENDMENT-1 收敛裁决**（SPEC-p01-fix-acceptance 尾）：根因=现有测试「resolve==authority 对照」是自指 oracle；主防线改**行为门**（硬编码字面期望表，任何 syntax 花样必过行为面）+静态 checker 诚实降位 known_pattern_lexical_layer+不做 AST 重工程（验证经济学）→ round3=e551e3ba（行为门落地）→ w1 终审 RC P1×3（100 格只测 ac family/diagnostic E2E 缺 4 种/行为测试无 presence 保护——有限收敛型）→ round4=0bf10b91（100 格六字段全网格+4 diagnostic 表+presence 保护；producer 换 w4，grok 盲审 PASS_FOR_ROUND4_REPAIR_SCOPE P0=0）→ w1 终审 RC P1×3（XCTSkip 绕 exact runner/verify target 不消费完整 suite/diagnostic 手拼 trace 绕 production emitter）→ **round5 修复已 commit 6cd51e0c**（Opus %3 接棒，push/receipt 在途，**暂停点**）。终审序=w1 codex 按其固化 SPEC-round5-acceptance-checklist（占位符版已备）主审+opus4 备份接棒位 standby-ready。
+- **计划层收口（PLAN_LAYER_CLOSED）**：int-v5a-v3.1/v5b-v2(+§11 AMENDMENT v2.1 run-identity ABI，grok-2 产 opus4 补审 PASS)/v5c-v3.1/v5d-v2（双审 w1 P0=Q-8 冲突+grok P0=oracle 文案/launch ABI→v2 全 19 findings CLOSED，grok 复核 APPROVE）全 EXECUTABLE_AFTER_PREDECESSORS；INTERFACE-LOCK 扩至 9 条（8=probe catalog 归 v5c/9=run-identity ABI 归 v5b）。翻绿链路 v2-DRAFT（grok-3 修订吸收 w2 审 P0×2[promotion capsule 不可读+G5 后落代码自噬]，⭐代码前移 G6 零 diff）挂 DRAFT_PENDING_AUTHOR_REVIEW 至 S8 键前。
+- **双审模式定型**：w1(codex)+grok 平行盲审互不见结论——v5d 双审独立收敛 launch ABI 缺件（铁证）+各有独抓；round4 双审同向。grok 4.5 审计力实证=快+准+权限自觉（详 worker-profile-grok45 memory）。
+- **阵容三迁**：codex 4 席 sol→额度紧磊哥令停派（跑完不断）→grok 4 席拉满（免费试用）→grok 额度尽全停→**Opus 3 席（%2/%3/%4）+codex %1 终审位（10% 余量刀刃）+%5 Opus manual 磊哥手边**。坑：OpenAI 内容策略误拦防御性 QA 审计（sol 造负例变体被判 cybersecurity，turn 拒；救法=框定「自有仓库防御性回归 QA」重派+已完成部分复用——待沉淀 gpt56 rule）。
+- **收口物料就绪**：completeness 审计（opus2，P0/P1/P2 分级钉死收口路径）+PR body v3 预制（占位）+D-140 即本条+收口四件草稿 v4（grok 产 opus4 抽核无 drift）。
+- **Non-claims**：round5 未终审；PR #42 仍 Draft/未 Ready/未 merge；canDemo=0/120 不变；int-v5 编码未开工；S8 未点火；翻绿链 v2 仅 DRAFT。**暂停点=磊哥合盖出门，round5 push 后全场静默待令。**
+
+## D-141：PR #42 MERGED——七轮修复-审计链+终极对抗审计全链收官 + 通宵波全账（2026-07-10 深夜，磊哥授权 merge）
+
+- **终章链**：round6=6e2bf2a4（identifier 契约收口）→ w1 终审 **PASS_FOR_PR42_P01_SCOPE**（0/0/0）→ 🔴 merge 前终极对抗审计（%5 sol xhigh 三孙 lens）=**DO_NOT_MERGE P0=1**：matrix canonical checker fail-open（tracked≠fresh materialize+六种篡改 rc0——七轮唯一逃逸到 matrix 面的假绿，commander 亲核 cmp 不一致坐实）→ round7=e360213c（fresh canonical checker+schema/ID/full-equality fail-closed+diff 接 regen）→ w1 终验 **ALL_SCOPE_PASS**（六配方稳定 red/回归面 fresh PASS/783/7/0/BUILD SUCCEEDED/matrix 语义真值零变动）→ Ready 序（update-branch 1b68bc3a+required verify 4m1s 绿+body v4 七轮链 Ready 语义上线）→ **磊哥授权 merge：`f5ef62705b3e` MERGED @23:57**。
+- **通宵波全账**（22:33 五 codex 齐发）：S8 点火链实测 READY_TO_IGNITE rc0（只待磊哥窗口令；G1 receipt 兼容补丁草稿备）/ int-v5 四派单合同全家福（specs/SPEC-v5{a,b,c,d}-implementation-dispatch.md，merge 后流水开工）/ M-DEMO golden-run 实施预备包（16 rows SOURCE_LITERAL_PASS+checker 设计+ingress plan）/ 翻绿链路 v3-DRAFT（P0×2 修净：content-digest 链去自指+capsule projection 强制）/ gap 盘点在途（GAP-HUNT 待出→V6 基线素材）。
+- **阵容终态**：codex 22:33 重置后五席（sol high/sol xhigh/terra×2/luna max）+hermes 秘书（%4）；上半夜 4-grok 时代产出（四合同前身/收口草稿族）经 opus 补审全过。
+- **merge 语义（body v4 固化）**：governanceTruthful=true 合入=治理层真金（诚实矩阵 0/120+fail-closed 门族+typed authority）；**仍 NOT demo-ready**（customerDemoReady=false 直到 int-v5+S8 正证）；无 operator-pass/V-PASS/C6。
+- **接续**：int-v5a 编码可开工（合同 ready）；S8 点火键在途；V6 基线待 GAP-HUNT 出稿后 commander 亲笔。
+
+## D-142：V6 基线 RATIFY——三链 + O 控制面基线进入级联（2026-07-11，磊哥拍）
+
+- **决策 lineage**：v6.0 基线经 `AUDIT-V6-by-w5.md` 全局对抗审为 `REQUEST_CHANGES`（P0=6 / P1=8 / P2=1；审计头与计数见 `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/AUDIT-V6-by-w5.md:3-15`），六个 P0 经 commander 亲核复放坐实并吸收到 v6.1（审计复盘见同文件 `:296-300`；v6.1 frontmatter 与审计吸收记录见 `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:1-7,15`）。v6.1 RATIFY 前 source SHA=`63d8d9bbea60903885b64f6ac2677c014de28819aa5101066c90f882eb3fbe01`。
+- **磊哥 ballot**：2026-07-11，原话为「V6 RATIFY agree」「S8不着急」「其他全力推动」「按 grill 范式项目管理编排」「grill 拆解细/corner case 要思考」（本轮执行任务书 `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/specs/SPEC-CASCADE-EXEC.md:3,9`）。
+- **V6-N1**：三链视图 + typed 工作包为调度 SSOT（三链/五门均非第二 SSOT）。
+- **V6-N2**：29 包 closure 分母 + hard 分母 28 + 三轴状态制 + 手写账仅此一次。
+- **V6-N3**：三条硬边：T02 freeze→S9；T03+T09→T04b；T06→T07b（原有 T01/T02→S10 保持）。
+- **V6-N4**：wave 制 grill 日程 G1-G5 与每波级联义务。
+- **V6-N5**：V8 closure verdict same-subject join（禁 prose join）。
+- **V6-N6**：O 控制面 O1-O6 制度物 +「计数由 checker 生成禁手写」原则。
+- **V6-N7**：int-v5 序修正：v5a 先行；v5b customer façade/default composition 等 T03/T04 interface cut。
+
+  上述 V6-N1~N7 为 v6.1 §七逐条落条，原文锚为 `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:139-147`。
+- **状态**：`decision_status=RATIFIED`；`baseline_activation=PENDING_CASCADE`。C-08 active OpenSpec carrier disposition=`residual`，按 carrier 分批核对/执行；O1/O2 与 C-02~C-10 cascade receipt 未齐前，不翻 `ACTIVE`（级联义务与 stopline 见 `/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma14/reports/DESIGN-v6-cascade-inventory.md:54-85`）。
+- **当前执行态**：int-v5a 已开工编码但尚未合入；G1/G2 INDEX 与后续各波 ballot 继续按 run-dir 物料推进，不能把 ballot pending 或 plan receipt 写成产品完成（本轮任务书 `SPEC-CASCADE-EXEC.md:9-13`；v6.1 当前 W1/W2 边界见 `docs/roadmap-2026-07-11-v6-closure-baseline.md:41-56`）。
+- **S8 键**：磊哥「S8不着急」，点火挂起；不得因 V6 RATIFY 把 S8 写成 running、completed 或自动授权（本轮任务书 `SPEC-CASCADE-EXEC.md:9`；v6.1 待磊哥键见 `docs/roadmap-2026-07-11-v6-closure-baseline.md:129-137`）。
+- **Non-claims**：`canDemo=0/120` 不变；S8 未点火；G1-G5 BALLOT 未拍；无 operator-pass、V-PASS、C6 acceptance、candidate signed 或 live/runtime proof。`RATIFIED` 只代表决策已拍，不代表 `baseline_activation=ACTIVE`（D-137 诚实边界 `/Users/wanglei/workspace/MAformac/docs/commander-log/decisions.md:1230-1237`；v6.1 proof boundary `/Users/wanglei/workspace/MAformac/docs/roadmap-2026-07-11-v6-closure-baseline.md:149-155`）。
+
+## D-143：G1 波（T04+T03）RATIFIED——V6 首个 grill 波全闭（2026-07-11，commander 按磊哥授权代拍）
+
+- **授权链**：磊哥「G1同意 你自动化推进」+「其他全力推动」；代拍闸门=`FINAL-RECHECK-V41-addendum.md`（AUTOBALLOT_GO，w5 sol xhigh 两轮全局审+narrow recheck；G1 v4.1 sha `505f70ee…`）。
+- **账**：56 atoms 全闭=41 auto_ballot_safe（30 白名单+11 机械，按⭐代拍）+ 5 磊哥亲拍（G1-004/011/012/019/049 全 B，receipt=`runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-escalation-8.md`）+ 10 ALREADY_DECIDED_CARRY_FORWARD（🔴措辞纠偏 per CONSISTENCY-SWEEP-postD145：不计【新投票分母】，纳入 56-unit 守恒与 safe_noop 集）；excluded=0。
+- **载力锁定**（题义详见 GRILL-INDEX-G1.md v4.1）：T04 typed route result 消费/RouteTrace 最小合同/alias owner=C4 active spec/拒绝分类优先序 safety→nonsense→unsupported/TTS 失败 frontstage incomplete 分账/composite exactly-one（受界逐项审查多意图合法，承 CG-036）/T04b 机器级前置=T03+T09 contract cut/T04a ingress containment 可先行。
+- **级联**：V6 工作包 W5a/W5b/W5c/W5d/W6 = GAP→**RATIFIED_PENDING_PLAN**（W5c 仍持 T03+T09→T04b 硬边，T09 in G3 未拍）；下一环=G1 消减矩阵→T04/T03 实施计划→对抗审计划→编码。
+- **Non-claims**：RATIFIED=决策层收敛，非实现/验收；canDemo=actionDemoProven=0/120 不变。
+
+## D-144：G2 波（T01+T02）部分 RATIFIED——白名单+3 counted 已拍；12 parent authority 题上抛在途（2026-07-11，commander 代拍）
+
+- **账**：66 units=50 auto_ballot_safe 代拍 + 3 counted C1 磊哥已拍（G2-046/054/057-C1 全 B）+ 13 excluded（12 parent escalation/authority 待呈 + G2-038-C1 重制版已重呈磊哥待拍）。G2 v4.1 sha `8fdcb8dd…`。
+- 🔴 **S10 硬边未解除**：T01/T02 wave 未全闭（12+1 未拍）→「T01/T02 RATIFIED 先于 S10 签署」仍挡 S10；T02 corpus freeze→S9 硬边同在。12 parent 上抛批下轮呈磊哥。
+- **级联**：V1/B7 = GAP→**PARTIALLY_RATIFIED_PENDING_ESCALATIONS**。
+
+## D-145：G4/G5 白名单代拍 + 上抛批呈拍中（2026-07-11，commander 代拍）
+
+- **账**：G4 53=33 auto 代拍+6 noop+14 escalate（呈拍中，选项稿经 XAUDIT-G4-OPTIONS PASS_WITH_NOTE）；G5 29=13 auto+11 noop+5 escalate（呈拍中，A5 逐项磊哥点头谓词保留）。G4 v4.1 sha `073fdc02…`/G5 v4.1 sha（FINAL-V41 addendum 附录）。
+- **级联**：V3/V4/W10/V5 保持 GAP（各自 escalate 拍后翻转）；G3 波（T07-T10）v3 修复在途未入本拍。
+- **本日实装收编另账**：W1 int-v5a MERGED `ba2c3636`（V6 首个 DONE）+ B1b receipt 链 MERGED `a3160c88`；W2 containment 半在修（XAUDIT P1×2）。
+- **Non-claims**：G3 未拍；S8 未点火（磊哥「不着急」）；无 operator-pass/V-PASS；baseline_activation 仍 PENDING_CASCADE。
+
+## D-147：32 题池全按⭐ RATIFIED + v5b waiver 收编 + rebuild-c6 解锁——G2/G4/G5 波全闭（2026-07-11 上午，磊哥拍）
+
+- **磊哥原话**：「rebuild C6我同意的 我都授权 包括什么V5B」（承接呈拍池「一句清池」约定）。receipt=`runs/2026-07-11-ma14/reports/RATIFICATION-RECEIPT-pool32.md`。
+- **账**：G2 parent 12 + G2-038-C1 重制（⭐B=tags.contract_device 七 device family）+ G4 14 + G5 5 = 32 题全⭐ RATIFIED → **G2/G4/G5 波全闭**（G2=66/66、G4=53/53、G5=29/29）。
+- 🔴 **S10 拍板面硬边解除**：T01/T02 wave 全闭（T02 freeze→S9 执行序硬边保留）。
+- **v5b containment 半收编**：merge `c1/int-v5b-contain-20260711`（tip d4753d47）；`LEIGE-WAIVER-V5B-ABI-1`（Mandatory ABI proof 暂缓授权窗补证，waiver≠proof，residual 如实）；façade/composition 剩余面进可派窗口。**G1 编码波 start gate 的 base 条件满足。**
+- **rebuild-c6**：WAIT_G2_V3_RATIFICATION 解除，carrier disposition 推进授权。
+- **级联**：V6 §一——B7/V1/V3/V4/V5/W10 → RATIFIED_PENDING_PLAN；W2 → containment MERGED+剩余面可派；V2（T07）仍 GAP（G3 波未拍）。
+- **Non-claims**：S8 未点火；A5 各项未逐项点头；ABI proof 未补证；G3 波未拍；canDemo=0/120；无 operator-pass/V-PASS。
+
+## D-146（补录，时序在 D-147 前后交叠）：ma14 后半场制度物收口——O1/O2 环境分裂全链 + C-08 全清 + W2 waiver 半收编 + G1 编码开工 + sentinel 上线（2026-07-11）
+
+- 全文基于秘书 DRAFT-d146-filled（commander 审后落）：O1/O2 实装→审→修→复审→环境分裂两层（R19 自引用悖论→commander 裁决祖先+白名单规则；allowed_roots 绝对路径→净 clone 9 败被 commander 亲核抓出→relocatable 修复 23/23）→merge `207ac515`。**元教训：worktree 绿≠relocatable，环境与路径属于验证 basis**（详 lessons 候补）。
+- C-08 disposition inventory 全清（十项 metadata `426063ac` + HOLD2 `8ea185d9` + rebuild-c6 `cb282ba4`）；rebuild-c6 保持 draft_needs_human_propose，下一步=opsx propose 人审。
+- W2/v5b waiver 半收编 `95f2d5d5`（LEIGE-WAIVER-V5B-ABI-1，waiver≠proof）；G1 编码开工（risk-ack 三签：三 CRITICAL+ContentView+ReceiptWriter.run，影响面⊆ack 集纪律）；sentinel v1 三信号上线（磊哥抓漏检后）。
+- proof boundary：无 operator-pass/C6 acceptance/candidate/V-PASS；S8-S10 未执行。
+
+## D-148：主线红门 incident 与修复 + 32 题深审终态（2026-07-11 上午）
+
+- 🔴 **incident 如实**：O 链 merge `207ac515` 后主线 closure 门红（7F/16P，根因=merge 上下文 registry rebind 缺失），且 **commander push 先于读门结果**（顺序失误）+ 监控脚本 rc 被管道尾吞（假 0）。修复=`6b2ee8b9`+`f5bccfa0` fix-forward（registry rebind + R19 freshness anchor，未放宽 R19），commander 无管道亲跑双门 rc0（closure 23/23 + verify-ci 794/6/0）后 push。两教训：**push 前必读门结果**；**rc 取值禁管道尾**（zsh $pipestatus）。
+- **32 题深审终态**（磊哥令「你审查后按照星标」）：commander 逐题对照 authority 复核，32/32 维持 RATIFIED_AS_STARRED 零修正（receipt 补记=RATIFICATION-RECEIPT-pool32.md）。
+- 其他：GitNexus analyze 重复注入块修复 `6987a37b`；G3 v4.1 出（70/7/9/7，exact-SHA 终核在途）；A4 target split 方案稿备（App 零引用 9228 行编译面账，待磊哥过目）；C6-family/T09 设计对抗审 P0 修复在途。
+- Non-claims：G3 未拍；ABI proof 未补证；S8 未点火；canDemo=0/120；无 operator-pass/V-PASS。
+
+## D-149：ma14 收官——主线全绿封板 + 五单终收 + ma15 交接（2026-07-11 午）
+
+- **封板**：`4dfa2609` push（O1 canonical 重锚收尾链 fe029bdc→89efda16→89873433→4dfa2609）；closure 25/25 + verify-ci 794/6/0 commander 无管道亲跑。换面终审（M.72 范式）三 P1 全修（孤儿门 wiring+假绿哨/CURRENT/roadmap 计数接管 O1 generated 1/4/19/5）。
+- **终收五单**：G1T1-FIX（双 P0 修净 813/6/0，待 fresh 复审收编）/T08 归并设计/V6p 计划/CURRENT-roadmap 同步/rename 门修。G3 七题+rebuild-c6 propose 包+A4 方案=磊哥堆。
+- **ma15 交接**：handoff=`docs/handoffs/2026-07-11-ma14-closeout.md`（含蜂群布局规格+拉满教义+哨兵复用指引——磊哥令写入）。
+- **Non-claims**：G3 未拍；G1-T1 未收编；ACTIVE 未翻；S8 未点火；actionDemoProven=0/120；无 operator-pass/V-PASS。
+- **ERRATA（术语规范化，2026-07-11 ma15）**：D-149 的动作证明轴统一使用 canonical `actionDemoProven`；只修术语，不改变 0/120 数值、状态或结论。
+
+## D-150：G3 wave RATIFIED——七题磊哥亲拍 + 70 白名单代拍 + exact-nine 重账；T07-T10 契约级联启动（2026-07-11 午后，磊哥拍 + commander 按授权代拍）
+
+- **ballot 原话（verbatim）**：磊哥「G3 七题（090⭐C）拍板」「我同意」（ma15 commander 会话）。commander 按 onepager ⭐ 零自由发挥：G3-006/010/011/027/028/029=B、G3-090=C。receipt=`runs/2026-07-11-ma15/reports/RATIFICATION-RECEIPT-g3-seven.md`。counted 新票=7；G3-027/028 的 axis-separation 为 non-counted carry-forward（D-147 已拍）不重复计票。
+- **source 锚**：G3 INDEX v4.2 sha256=`90f1815824ea38443e5be87b153d4aa34b0b62dbedf5df0d45970ca6ae280e34`；exact-SHA 终确认（fresh-green basis `4d2e24e9`，closure 25/25 + verify-ci 794/6/0 双绿）=`runs/2026-07-11-ma15/reports/FINAL-CONFIRM-G3V42-freshgreen-by-w1.md`。
+- **70 代拍已执行**：exact 70 auto_ballot_safe 全部按各自⭐通过；commander 签 receipt=`runs/2026-07-11-ma15/reports/RATIFICATION-RECEIPT-g3-70-autoballot.md`（exact ID 清单 incorporate by reference=`G3-FOUR-ACCOUNTS-EXACT-by-w3.md` sha256=`c6cbcae1368825ffba702feca94f626a05989ab7747c8f68ca206080694fff7b`）。授权链=磊哥 ma15 起手令（七题拍后代拍 70）。
+- **四账 closure**：`70 auto（已代拍）/ 7 noop / 9 excluded（重账见下）/ 7 escalate（磊哥亲拍）= 93`，pairwise-disjoint、union=G3-001..093，python 复算 rc0 → **G3 波（T07-T10）decision 层全闭；G1-G5 五波全部收官**。
+- **exact-nine 重账（commander disposition，采纳 w3 草案）**：G3-090=C 只解除 `g3_090_ratification_pending` 决策前置。5 个 design atoms（077/078/081/082/083）UNBLOCK_TO_DRAFT_EXPANSION（各带 NEW_CORNER_REQUIRED，展开时必须落）；2 个（084/091）可起草 test plan 但 **proof 面保持 excluded**；2 个（092/093）REMAIN_EXCLUDED 等具名前置 proof（091 及 082-084 字段合同）。诚实措辞=`five design atoms recheckable; four proof atoms remain excluded pending named predecessors`；禁写「9 项随 090 自动 RATIFIED」。草案锚=`runs/2026-07-11-ma15/reports/G3-EXACT-NINE-RECOUNT-DRAFT-by-w3.md`。
+- **V6 工作包翻转**：W7（T10 DialogueState 消费语义）/ W8（T09 session lifecycle）/ W9（T08 force-state 单一 authority）/ V2（T07 operator-pass ceremony）decision_state gap→**ratified**（authority_refs=D-150），execution_state gap→**planned**（O3 sequence1 gap→planned receipt 按 live checker 语义 escrow 于 run-dir，registry 侧 planned 态 transition_receipts=[]；转 ready 时补 sequence2 后挂完整 chain）。硬边保持：V2/T07b 仍等 T06 artifact/build identity；W8/T09 仍是 W5c/T04b 前置；T02 freeze→S9 不变。
+- **同批 canonical 义务**：本 D 条 append 改变 decisions.md authority SHA → 与 registry canonical digest/render 重锚为同一 cascade transaction（A/B 两 commit，无中间 push，双门全绿后 commander 亲核收编）。
+- **Non-claims**：RATIFIED=决策层；不声称实现完成/OpenSpec applied/T06/T07b/T04b 完成/operator-pass/V-PASS/C6 acceptance/candidate/`actionDemoProven>0`；`baseline_activation` 仍 `PENDING_CASCADE`（ACTIVE 翻转差项另见 ma15 ACTIVE-FLIP-GAP-LIST）；S8 未点火。
+
+## D-151：ma15 键批与收编账——rebuild-c6 accepted、A4=B、A5 裁决与开刀、G1-T1 收编、W5a/W5d DONE、v5b ABI 冰山定性（2026-07-11 午后，磊哥拍 + commander 按授权执行）
+
+- **磊哥键批（verbatim receipt=`runs/2026-07-11-ma15/reports/KEYS-RECEIPT-ma15-leige-batch2.md` 全三批）**：①rebuild-c6「我同意按 v3 七项⭐作为 rebuild-c6 proposal 修订指令」→ 写回（w3）+保真审（w2 APPROVE）+ strict rc0 后磊哥「accepted」→ commit `fd12695b` 已 push；本票不授权 /opsx:apply、T02 freeze、S9/S10。②「A4选B」=A4-0 小刀；执行中撞 `Core/Contracts/ToolContractCompiler.swift:19`→`C5SemanticSeed` 反向依赖（one-pager 可行性声称被 build 探针证伪），commander 亲核 `init(seeds:)` 全仓消费面=仅 Tests 后授权 A4-0b 微扩（seeds init 移 Training extension=A4-ONEPAGER-v2 §A4-1 第一条最小提前）；首轮全绿后被 w1 审出 P0（stale base 4d2e24e9）+P1（wiring deletion 非 fail-closed），修复轮在途。③「A5同意」+「确认」：A5 键文本存在两解读（w5 汇编暴露），commander 按 D-145 原文「A5 逐项点头谓词」裁定 A5_ITEM_SET=G5-016..020；G5-016/017=ALREADY_EXECUTED_CARRY_FORWARD、G5-018=deferred/no-touch、G5-019/020（manifest policy study/gate design，均⭐B 阶段0 不压缩不删除）经磊哥「确认」开刀执行中。④「v5b ABI 优先开窗」+「S8：现在不点」。
+- **G1-T1 收编（W5a/W5d 的 exit 基础）**：三轮审计链（w5 fresh 复审抓新 P0-03 production-shaped partial chain 缺口 → 修复+EXTENSION ACK #2 → w2 再审 P0-03/P2-01 CLOSED 剩 P1-01 → 收尾 → w3 终审 APPROVE_FOR_MERGE）→ merge `dd5d4f77` + canonical 重锚 `997ec76d` 已 push；swift suite 794→**814**/6/0。
+- **W5a/W5d 翻 DONE**：exit 判据经 w2 两阶段核定 FLIPPABLE（stage1 物化 commit `a850f4ba`：两 native closeout + shared fresh validation，receipt=`W5A-W5D-FLIP-STAGE1-by-w2.md`）；commander 亲核授权 stage2（本 D 条同批 registry 事务执行）。scope cap 如实：W5a DONE 只闭 `t04.ingress_facade` 当前 tranche（stale/correlation 四类 W6-gated deferred 明账，未洗绿）；W5d DONE 只闭 `t04.decode_policy`，不外推 W5c/T04b/W6/W8。
+- **v5b ABI proof 冰山定性（`V5B-TEST-ICEBERG-by-w2.md`）**：磊哥授权窗成功解除 Automation Mode blocker（LocalAuthentication Code=-4 已清且持久）；随后两次 documented 尝试同点失败=**TEST_DEFECT_EMPTY_SOURCE_HEAD / NEVER_GREEN_BEFORE_AUTH_FIX**——沙箱 runner 内 `gitHead()` 必败返空串→空 source head 被 `FrontstageRouteReceipt.swift:101-103` 40-hex 校验拒→`ContentView.swift:455-461` 的 `try?` 静默吞→writer 未被调用。修复=P0 harness 五键注入+launch 前 assert / P1 observability / 回归负例（修复执行中，修后重跑仍守 operator 尝试纪律）。`LEIGE-WAIVER-V5B-ABI-1` 保持 waiver≠proof 不变。
+- **B1b done-flip**：两阶段修正案（w2 审出单 commit 必触 E_STALE_BASIS）+ stage1 物化后 w4 审出 P1（dry-run rc 缺原始 provenance），补链执行中；**本 D 条不翻 B1b**，flip 等补链+复审后另批。
+- **Non-claims**：`actionDemoProven=0/120` 不变；S8 未点火；v5b ABI proof 未取得（waiver 态不变）；A4-0b 未收编；B1b 未 DONE；G3 exact-nine proof 面四项保持 excluded；`baseline_activation` 仍 `PENDING_CASCADE`；无 operator-pass、V-PASS、C6 acceptance、candidate。
+
+## D-152：wave-2 17/17 RATIFIED——14题按⭐ + SEQ-001=A + 010a=A + 010b=B；GOV-001=C 独立账（2026-07-11 午后）
+
+- **磊哥第五至七批键（verbatim + 更正账）**：第五批=`「全部同意 拉满」`；第六批=`「⭐A：锁极性 A」`；第七批=`「ABC」`。一手 receipt=`runs/2026-07-11-ma15/reports/KEYS-RECEIPT-ma15-leige-batch2.md:42-56`，sha256=`7c29fa4625444e6a8401d66bce2785c2d640773e54a737625d723835883be340`。以 receipt `:50-56` 的更正后口径为准：第五批实际覆盖 14 个 base rows；第六批拍 `SEQ-001=A`；第七批按呈拍序拍 `M16-010a=A / M16-010b=B / GOV-001=C`。第五批另记 v5b 正式 proof 单次尝试已点火、冰山 class-fix/秘书/沉淀线继续推进；“已点火”只记动作发生，不推导 v5b proof 成功。
+
+- **17-unit counted set 与守恒**：canonical 16-unit 题面基座=`runs/2026-07-11-ma15/GRILL-PREP-INDEX-ma15-wave2-v2.md`，sha256=`401131335f1fa1829d99c2c7355664f7e6a7af97143ac6425dd42fad9c644a49`。历史子账 exact set=`M16-001..009 + M16-010a + M16-010b + M16-011..015`，共 16 个唯一 ID；其中 14 个 base rows 按第五批键消费 INDEX v2 的 exact ⭐/LOCKED_CARRY 内容，第七批另选 `M16-010a=A`（1000 deterministic interleavings）与 `M16-010b=B`（真实 MAformacMac process + production-shaped coordinator recipe）。该子账守恒保持 `raw_v1 21 + split_delta 1 - merge_reduction 6 = 16`，不重写旧分母；第六批把不并入旧 16 分母时代账的独立 `SEQ-001=A` 追加为 `+1` counted ballot，故 wave-2 final conservation=`21 + 1(split 010) + 1(SEQ-001) - 6(merge reduction) = 17`，exact set=`旧16 + SEQ-001`，状态=`17/17 RATIFIED`。锚=INDEX v2 `:48-76,99-115,142-173` + SEQ unit `:3-17,21-25,166-180` + KEYS `:50-56`。
+
+- **GOV-001=C 独立账，不偷算第 18 unit**：INDEX v2 `:132-140,173` 明定 `GOV-001` 是独立全仓治理项、**不进 16-unit 子账，也不进入追加 SEQ 后的 17-unit wave-2 denominator**。第五批过度解读已由 receipt `:50-51` 正式更正；第七批 `「ABC」` 的第三位 exact 选择为 `GOV-001=C`：五件套 materialization predicate **先限 W7/W8/W9/V2 本波四包验证，出一轮实证后再决定是否全仓推广**。C 只关闭治理决策，不让全仓 schema/checker 自动生效；验证轮、推广再决策与任何实现均另键。
+
+- **异源终核**：w2g fresh verdict=`PASS_WITH_FINDINGS`、`P0=0 / P1=3 / P2=2`；16-unit 守恒 `T-PASS`，ID set equal，source SHA 6/6 match。终核=`runs/2026-07-11-ma15/reports/XCHECK-INDEX-V2-by-w2g.md:34-54,163-198`，sha256=`4af4fd5790f55a8eb12413f298dd42090f69217acc405865b9cead65b45e422e`。
+
+- **w2g P1-01（escalate 过窄）已被磊哥亲拍实质覆盖**：w2g 建议把 `M16-001 NEW adapter ownership / M16-011 NEW catalog / M16-015 synthetic cap` 升为“磊哥亲拍不可代收”（终核 `:140-159,168`）。第五批不是 commander 代拍，而是磊哥本人对整个修正版 counted set 说“全部同意 拉满”，上述三项均在 16-unit exact set 内，故人审主体与实质选择已覆盖该建议；不再另造重复票。该覆盖只成立于 INDEX v2 exact SHA，不外推未来漂移版本。
+
+- **w2g P1-02（SEQ-001 漏题）已由磊哥第六批亲拍闭合**：ballot unit=`runs/2026-07-11-ma15/reports/SEQ-001-BALLOT-UNIT-by-w2g.md`，sha256=`386545bd977bdd09a611af9e6f667e2394fc5e5e5cb235606789a1e312c35ce2`；selected=`A⭐`。极性锁定为 **W8/T09 contract cut 先行 → W5c/T04b production composition 后行**，与 V6-N3、roadmap接线图及 live registry `{from: W8, to: W5c}` / `W5c.prerequisites contains W8 done` 同向；W8 不以 W5c DONE 为前置。第六批 receipt `:46-48` 是 ratification authority；SEQ unit `:29-39,78-118,122-150` 是 exact option/边界源。该拍板不改 registry，关闭的是执行序语义与反读 prose 债。
+
+- **M16-010 两题 stopline 原样保持（吸收 w2g P1-03 / F4）**：`M16-010a=A` 只选 stress profile；**010a=A 不等于 010b 已满足**。`M16-010b=B` 只选 `proof_runtime` satisfaction recipe；**recipe 已选不等于真实 process receipt 已取得，不等于 proof state satisfied，也不等于 W8 DONE**。两题均不证明 W8 ready/DONE 或 W5c composition 可开工。MG-01/MG-02 合并只用于问题守恒，不抹除四包各自 residual。锚=INDEX v2 `:99-115` + w2g终核 `:114-126,163-170,183-198` + KEYS `:53-56`。
+
+- **拍后级联义务（吸收 w4 P1-5 + SEQ-001=A + 第七批 + w5g P1）**：ballot 后只允许把 selected options、NEW_CORNER 与 claim caps 写入 `TRACKING-WAVE2-17UNITS`。`carrier/spec-design writeback`、`/opsx:apply`、coding、merge、package transition/state flip 五类动作全部另键，任何一类不得由 RATIFIED 自动推出。INDEX 终账 exact 锚=`runs/2026-07-11-ma15/GRILL-PREP-INDEX-ma15-wave2-v3.1.md`，sha256=`253a40e25079429d5cec0ab57e095ab34ea4accba4a7ec161ccd855fe91e4a0a`；其已 supersede v3，并按 KEYS 第七批刷新 attribution、digest 与 `M16-010a=A / M16-010b=B / GOV-001=C` disposition，TRACKING 必须与该 v3.1 终账对齐，不得回指 dated v3 作为最终选择 authority。新增一个有界文档级联义务：清洗仓内与极性 A 冲突或可反读的 prose，至少把 `docs/roadmap-2026-07-11-v6-closure-baseline.md:56` 的“W5c/T04b 前置硬边不变”改成不可反读的“W8/T09 是 W5c/T04b 的前置；W8 自身不依赖 W5c DONE”，并 `rg` 全仓同族措辞逐处判改；该清洗不得改 registry 边、prerequisite、代码或 package state，按 SEQ unit `:80-86,139-150` 留独立文档 receipt。TRACKING/另键措辞来自 w4 独立审 `runs/2026-07-11-ma15/reports/XAUDIT-COMMANDER-PRERULING-by-w4.md:54-70`（sha256=`0ca6fb313790a75c235514407e011df8619c7cebf88a328e1338324fb884684e`）并已进入 INDEX v2 `:19-28,185-210`。D-152 append 改变 authority SHA，须走 canonical digest/render A/B transaction，A/B 间禁 push，fresh closure+verify-ci 全绿后才收编。
+
+- **D-150 exact-nine proof cap 原样保持**：5 个 design atoms `077/078/081/082/083` 只 `UNBLOCK_TO_DRAFT_EXPANSION + NEW_CORNER_REQUIRED`；`084/091` 只可起草 test plan，proof 仍 excluded；`092/093` remain excluded 等具名前置。canonical 句仍是 `five design atoms recheckable; four proof atoms remain excluded pending named predecessors`，禁止写“九项自动 RATIFIED/green”。锚=`runs/2026-07-11-ma15/reports/D150-FINAL-TEXT-commander.md:8-12`，sha256=`086796543d141132c1bae206bc9f7487615aa6a415ba4cf1e21e98440512bd08`；tracking=`reports/TRACKING-EXACTNINE-EXPANSION.md:10-33`，sha256=`c1d309f0ca52edff894606b49b3f167cfca12a8189f11f670f6e7e26f9d11d7b`。
+
+- **Non-claims**：本 D-152 只关闭 17/17 counted decision ballots + GOV-001=C 独立治理账，不声称 carrier 已写、OpenSpec applied、代码完成、merge/push、package ready/running/done、8 个 planned gates executable/green、`proof_runtime` satisfied、SEQ prose 已清洗、GOV 五件套已完成本波验证或已推广全仓、v5b ABI proof 成功、operator-pass、V-PASS、C6 acceptance、candidate signed 或 `actionDemoProven>0`。`actionDemoProven=0/120` 与 `baseline_activation=PENDING_CASCADE` 保持；D-150 exact-nine 四个 proof atoms 继续 excluded。
+
+## D-153：ma15 收官账——v5b branch ABI proof PASS、CI trigger 修复收编、docs/helper 批次、V7 计划双审毕（2026-07-11 晚，commander 收官落账）
+
+- **v5b Mandatory Release two-turn ABI proof＝branch proof PASS**：磊哥四次可见授权窗（第四窗全通）+ 四层修复链（L1 Automation Mode 授权 / L2 TEST_RUNNER_ 五键传播+launch 前 assert / L3 runner 沙箱写域→xcresult attachment+host finalizer / L4 Xcode 26 xcresulttool 附件名改写兼容，commander 亲修+异源审 APPROVE_WITH_P1[补 3 条 match 单测=收编时做]）。五判据全满足：TEST SUCCEEDED+finalizer PASS+双 copies（sequence 1/2、run_id/nonce/source_head 精确 join）+latest receipt+owner_checker_pass_count=2。receipt=`runs/2026-07-11-ma15/reports/V5B-ABI-PROOF-RECEIPT.md`。🔴 边界：branch proof（contain worktree @59dc8822+L4 commit）；contain 收编 mainline→W2 residual 关闭→`LEIGE-WAIVER-V5B-ABI-1` supersede＝ma16 级联，本条不关 residual、不声称 operator-pass。
+- **remote CI trigger 修复收编**：required check `verify` 此前从未在本分支触发（workflow push branches 不含 opt 分支，w1 普查发现）；最小修复=branches 加精确分支（w3），merge+helper 重锚后入 upstream；首次真跑=ma16 观察位（NEVER_GREEN 门首通预期剥洋葱）。
+- **docs/helper 批次**：CURRENT 刷新至 D-152 后态、lessons M78-M85 入正典、swarm-runs ma15 段、CLAUDE.md GitNexus 重复块 dedup；reanchor helper（scripts/reanchor_closure_registry.py）收编并两次真实消费（CI merge/docs 批次），closure checker 面 25→53。
+- **carrier 包 READY 待键**：W7 v2=T-FIX-CONFIRMED / W8 v3=T-FIX-CONFIRMED_CARRIER_READY / W9V2 v2=APPROVE_P2_CLOSED + conventions 三节 + 呈拍页（键前 v3 刷新钉终版 sha）。**V7 作战计划** commander 亲笔 v2（双审 A/B 共 P1×9 全折）待磊哥 RATIFY。A5-019 呈拍页（⭐A retain+020 gate）待磊哥。S8=NOT_READY_TO_IGNITE 全链账待 run-auth。
+- **Non-claims**：`actionDemoProven=0/120`；`baseline_activation=PENDING_CASCADE`；S8 未点火；carrier 未写 openspec；wave-2 无 apply/coding/merge/state flip；v5b proof≠operator-pass/V-PASS/C6/candidate；V7 未 RATIFY；GOV 全仓未 enforce。
+
+## D-154：ma17 四键批收官——carrier+APPLY 本地链、两条隔离执行链与 docs cascade 键7（2026-07-12，磊哥拍 + commander 裁决）
+
+- **决策与 authority**：ma17 先以三键 receipt 完成 V7 RATIFY、四包 carrier writeback 与 A5 `G5-019=A retain / G5-020 plan`；随后磊哥对键4/5/6/7回复「全部同意 拉满」，由 `runs/2026-07-12-ma17/reports/KEYS-RECEIPT-BATCH2-PLUS-K7-by-commander.md`（sha256=`858ea783927a1ad333852478e90b4334f535d7810e7d24246288264c2e3ef842`）逐键绑定。键7 successor authority=`KEY-DOCS-CASCADE-RECEIPT-v2-by-commander.md`（sha256=`7212a6388e0f6cdda39c0690d80bcdd2bc549ce66e152b80a0250d0b76d752e7`）；K7 amend 又把 `docs/lessons-learned.md` 的 M.86–M.89 纳入 A transaction，形成 Git 六文件 + MEMORY sidecar 一项的七项 join。
+- **carrier 四包历史链**：W8=`b465514b3b2541b8a21906cf6be8979d5cacb8be` → W7=`1ea47e4878bf6e50e1f935170b63710efb3c5eaf` → W9-amend=`8ce8adc9772369cc61667bf28cd1e7f0f35add74` → V2=`a6125d02451ed4cf09ca2ef03477b75f933a6b38`；V2 all-of-six 为真后共享 plan 只翻一次到 `SUPERSEDED_BY_CARRIER`。这些是 local propose/carrier 证据，不是 implementation 或产品验收。
+- **APPLY 四包主线串行链**：W8=`257696e4d54043082eb6de272d46f45e6ac341bb` → W7=`33852f50f4a782e300c8506f370dc71d189087e8` → W9=`fadb096c37eb0682b7c903282e9acd61b07f51fc` → V2=`93232744425fd824c2a51d26d347b2b9913c5d90`；fresh OpenSpec strict=`30 passed, 0 failed`。W7 保持 `partial_apply_by_design: task8=CODING_GATE_PENDING_RISK_ACK_AT_CODING_KEY`（19/20），W9 历史 D16 Gate4 task 4.4 保持未勾（30/31）；不以 KEY-APPLY 预签 coding 风险门，也不把历史 FAIL 改绿。
+- **B1/AUTO/PARK**：B1 九题=`B1_9Q_RATIFIED_ALL_STAR`，AUTO 五题全 A；PARK v3 exact set=`100=42/43/15` 并封口。PARK 只表示治理止损，不等于 superseded、approved 或 proof promotion。
+- **键6 G5020**：隔离分支 `c1/g5020-wiring-20260712` 本地 commit=`36d81306060fdcb9638de8e6b43eab3f9e7dc4a3`，只改 `Makefile` 与 `scripts/test_subset_manifest.py`；本地目标与删除负例通过。该 commit 未 merge mainline、未 push、未做 A5 DONE/activation。
+- **键5 CI recovery**：隔离分支 `codex/ma16-w2-verify-ci-full-history` 在 A=`dd65a6d3f82d07cccf003fb03ff1383feec0b044` 后生成 governance B=`42408b7ea46e4adf993e2e0f4cca9324933aafdb`；B-tip 与 fresh detached 的 checker/`make verify-ci` 本地 commit-stable。该链未 merge mainline、未 push/PR/rerun，也不是 remote green。
+- **键7 docs cascade**：执行基座固定为 clean mainline `93232744425fd824c2a51d26d347b2b9913c5d90`。Commit A 负责本 D-154、CURRENT、swarm-runs、SEQ receipt、ma17 handoff、M.86–M.89，加 MEMORY sidecar；Commit B 仅由 helper 重锚 canonical 六路径。A/B 间与事务后禁 push；最终状态只从 `runs/2026-07-12-ma17/receipts/ma17-docs-cascade-v2.1/` 的执行 receipt 与 live Git读取，不从本条预填 HEAD_B。
+- **仍开放**：merge packet v6=`STILL_OPEN`；S8=`NOT_READY_TO_IGNITE`，未取 lease、未点火；V2 source gate=`PLANNED_GATE_NOT_YET_EXECUTABLE`，T07b/P8=`PHASED_BLOCKED_UNTIL_REAL_T06`；`actionDemoProven=0/120`，`baseline_activation=PENDING_CASCADE`。
+- **Non-claims**：本条不授权 push、PR、四支 merge、package flip、S8、operator-pass、V-PASS、C6 acceptance、candidate、mobile/true-device/live API。所有 commit 均按其 receipt 的 local proof ceiling 解读；未 push。
+
+## D-155：ma18 V8→push→B1→W-P1→postmerge 三键全键账（2026-07-12 深夜，磊哥拍 + commander 裁决）
+
+- **authority 与时钟边界**：V8-BATTLE-PLAN-v2 文件本体 sha256=`6e54563287cddf60f9ec56068e2643d7176be8c984871535ed37802da66b6641` 不改，状态翻转由 receipts 承载。v3 keyed docs 的“merge v5 待拍”已被 W-P1/postmerge receipts supersede；本条 v5 增补时点已含 KEY2 run `29197406884` exact-SHA/job GREEN 与 KEY3 已执行 promote（mainline=`70a2884e...`, sentinel `PROMOTED`），随后 gauge 经 ff-merge 进 mainline、HEAD 前进到 `684746c7...`（mainline=`684746c7...`），并并入 ma18 后半场 + HY3 复盘采纳项（night2 N2-①…⑤ → lessons M.92–M.96；RETRO-ADOPTION-LEDGER #6/#7 已 ADOPT 并入 docs），授权链=磊哥「先完成HY3的整改意见吸收」。本 v3 再追加 gauge 合批两事件（见下方「gauge 合批」）。
+- **全键账**：
+
+  | key | subject / exact set | 磊哥 verbatim | status | receipt / boundary |
+  |---|---|---|---|---|
+  | `V8-RATIFY` | V8 v2 sha=`6e545632...` | 「拍！我都同意 拉满吧 grok和codex允许安排2-3个孙子」 | `CLOSED_BY_RECEIPT` | `runs/2026-07-12-ma18/receipts/V8-RATIFY-RECEIPT.md` sha=`d6f220c2...`; documentary routing authority only |
+  | `KEY-PUSH@371f25fb` | push opt ref；subject=`371f25fb54756300c2c368d2aa1e0c3bde85a0ce` | 「push  都同意呀」 | `DONE_PUSHED_EXPECTED_RED_OBSERVED` | `receipts/KEY-PUSH-371f25fb-RECEIPT.md` sha=`eaf83566...`; push成功，push≠remote green |
+  | `AUTO G18-03/04/05` | hard gate / quiet prerequisite / sequence | 磊哥持续自驱授权，commander 按 AUTO 定式代落 | `AUTO_RATIFIED_A` | `receipts/AUTO-BATCH-ma18-G18-345.md` sha=`82498064...`; 不含 G18-01/02，不改门面 |
+  | `B1-VCI` | G18-01A + G18-02A；page sha=`e2968aca...` | 「都按星星来」 | `RATIFIED_STRATEGY_DONE_IMPL_PENDING_KEYS` | `receipts/B1-VCI-RATIFY-RECEIPT.md` sha=`7d40fa18...`; 产品策略锁定，实现逐另键 |
+  | `W-P1-MERGE-BATCH` | 七键；page v5 sha=`7719aeaf...`; packet v9 sha=`2c5e70d0...` | 「approved」 | `RATIFIED_EXECUTED_TO_INTEGRATION_FINAL` | `MERGE-BATCH-RATIFY-RECEIPT.md` + `ma18-w6-v9/FINAL-RECEIPT-v2.md`; local integration tip=`70a2884e...` FINAL/PASS，未由此 receipt push/promote |
+  | `POSTMERGE-KEY1-PUSH@70a2884e` | push disposable `refs/heads/ma18/w6-v9-integration` | 「三键均批，7个拉满，带孙」 | `DONE` | `postmerge-keys/KEY1-push.out` rc0 + exact readback |
+  | `POSTMERGE-KEY2-REMOTE-RERUN` | workflow dispatch @ integration ref | 同三键 batch | `GREEN_EXACT_SHA` | run `29197406884`，headSha=`70a2884e...`、event=`workflow_dispatch`、top-level/job=`success`; `KEY2-final-assert.json` sha=`f1e64404...` |
+  | `POSTMERGE-KEY3-PROMOTE` | ff-only `70a2884e...` → opt ref | 同三键 batch | `RATIFIED_EXECUTED_PROMOTED` | mainline/opt=`70a2884e797bb3a35fc6ba912a6f7fa8fd027d87`（KEY3 promote 落点）；随后 gauge ff-merge 进 mainline，现 mainline/opt=`684746c7d80fd035b5408829ea7be16e770da1c8`；sentinel `PROMOTED`(from=371f25fb→to=70a2884e)；live git HEAD/@{u} 一致；KEY2 前置已绿，commander 按已批 exact contract 已串行执行 |
+- **三键执行全链落账（postmerge-keys/ 全链 receipt）**：键1 `KEY1-push.out` rc0 + `KEY1-readback.out` exact=`70a2884e...`（disposable ref `ma18/w6-v9-integration`）；键2 `KEY2-dispatch.out`（首 dispatch 网络 EOF→有界重试 2/3 成功）+ `KEY2-watch.log`（WATCH rc=0，run `29197406884` verify 11m34s `✓ Complete job`）+ `KEY2-final-assert.json`（`{conclusion:success, headSha:70a2884e, event:workflow_dispatch, verify_job:[success]}`）；键3 `KEY3-precheck.out`（pre: local=remote=371f25fb clean）+ `KEY3-ffonly.out`（Fast-forward `371f25fb..70a2884e`，21 files +932/-130）+ `KEY3-push.out`（首发 `Recv failure: Operation timed out`→attempt 2 success `371f25fb..70a2884e`）+ `KEY3-readback.out`（post: local=remote=`70a2884e`）；`POSTMERGE-3KEYS-EXEC-RECEIPT.md` 三键均 GREEN、网络瞬断×2 有界重试闭合。
+- **remote 三绿（派单口径）**：① **integration ref**=`70a2884e...`（`ma18/w6-v9-integration`，KEY1 readback exact + KEY2 headSha 同 commit）；② **opt 自动 run `29198128727`**=`success`（`OPT-AUTORUN-watch.log` 捕获 `{"conclusion":"success","headSha":"70a2884e...","verify":["success"]}`，opt ref 推后自动触发 verify 同 commit 已绿）；③ **首绿 `29197406884`**=KEY2 run verify_job success（53 面新门链 remote 历史首绿）。三绿 headSha 均=`70a2884e...`，与 mainline promote 后态一致。
+- **键数勘误（M.95 已立）**：派单口述「今晚 11 键」为 commander 历史口误；STANDING-AUTH 经 w6 质询勘误实账=**14 键 / 5 RATIFY receipt**：`V8(1)+KEY-PUSH@371f25fb(1)+B1(2: G18-01A/G18-02A)+W-P1 merge批(7)+postmerge(3)`；辅助件（AUTO-BATCH G18-345×3、RISK-ACK×2、SKILL-RULING）不计键。本表逐键 verbatim 按 receipt 枚举，不以口数凑账。
+
+- **AMENDMENT-1**：`receipts/AMENDMENT-1-dd65-evidence-recast.md` 证伪“A=`dd65a6d3` detached rc0”；A 裸 detached=`BLOCKED rc70 [E_STALE_BASIS]`，rc0 属 B=`42408b7e` reanchor 后读数。V8 文件不改；载力账改为逐 commit 独立读数。
+- **AMENDMENT-2**：`receipts/AMENDMENT-2-key-receipts-join.md` 补齐 V8/KEY-PUSH faithful export，并登记 W-P1 page/message anchoring 偏差；不重开已执行键、不构成新授权。
+- **quiet profile 口径**：B1 budget 只消费 seconds：closure=`169.019486s`、total=`254.177395s`、local `make verify-ci rc0`。pytest `53`=parametrize 展开的 collected nodeids；源 `test_*` 函数=`20`（`16`静态/`4`重段）；二者均不等于 D-153 的 53 契约面。
+- **ULTIMATE saga**：首审 `DO_NOT_PUSH`；P0/P1 经 corrected terminal receipt、AMENDMENT-2、page v7 与 sentinel exact-pair 修复闭合；delta6=`CLEAR_FOR_KEYS`。此 clear 只解除 postmerge key 阻断，watcher 不升格 authority。
+- **trace join**：关键审计件 exact paths=`reports/XAUDIT-CORNER-V2-DELTA-by-w3.md` sha=`a8e1220e...`、`reports/XAUDIT-WP1V2-by-w3.md` sha=`970b0171...`、`reports/XAUDIT-WP1V3-FINAL-SOL-by-w6.md` sha=`55bf0cd1...`、`reports/XAUDIT-WP1V3-GROK-by-w1.md` sha=`cb083565...`。
+- **复盘采纳项**：HY3 复盘「整改意见吸收」已落 KEY-DOCS 批——night2 N2-①…⑤ 转 lessons M.92–M.96（§2 diff），RETRO-ADOPTION-LEDGER #6/#7 已 ADOPT 并入；但 #1 gauge 实现、#3 P0 scope grill、#4 S8 预案、#5 preset 授权真空白仍为各线在产/另键，未因本批自动 DONE。复盘原文 stale claim（S8 从未点火 / T04a 未 merge）已以 D-120 / dd5d4f77 更正，不进 lessons 正文。
+- **gauge 合批（STANDING-AUTH 全自动，本 v3 追加）**：gauge 设计(w1)→设计审(w2 ADOPT_WITH_FIX)→实现(w1, branch `ma18/demo-gauge-20260713`, tip=`8b04a85ad6e10408e80643767b4ded8e28af3184`)→实现审(w3 MERGE_READY, 负例实跑)→ff 合入→冒烟 rc0→verify-ci rc2(E_STALE_BASIS 族)→reanchor helper `--no-precheck` write(六件 canonical, +9/-9)→commit `684746c7d80fd035b5408829ea7be16e770da1c8`→verify-ci rc0→push 成功→readback remote=`684746c7...`→哨兵 PROMOTED(`70a2884e`→`684746c7`)。两事件均 STANDING-AUTH 全自动执行（commander 亲执行）：①`gauge merge 8b04a85a`(实现 ff 合入 mainline 前)；②`closure 重锚 684746c7`(reanchor + verify-ci rc0 + push + readback)。证据=`receipts/gauge-impl-w1/RECEIPT.md` + `receipts/gauge-reanchor/GAUGE-MERGE-FINAL-RECEIPT.md`(+push.out/readback.out/commit.out)。non-claims：gauge=观察仪表非 CI 门；App 轨 demoable 数字不因本批改变；自动 run `29200184385`@684746c7 为观察位待观察；本事件不改 KEY3 promote 事实、不证明 operator-pass/V-PASS/C6/S8。
+- **事件账（w6 recheck P1 追加，2026-07-13）**：D-155 事件账补两行，均 STANDING-AUTH 全自动执行（commander 亲执行），证据链=`receipts/gauge-impl-w1/` + `receipts/gauge-reanchor/GAUGE-MERGE-FINAL-RECEIPT.md`：
+  - ① `gauge merge`：`8b04a85ad6e10408e80643767b4ded8e28af3184`（demo 进度仪表三层，branch `ma18/demo-gauge-20260713`），实现 ff 合入 mainline 前落账；receipt=`receipts/gauge-impl-w1/RECEIPT.md` + `receipts/gauge-reanchor/GAUGE-MERGE-FINAL-RECEIPT.md`(+push.out/readback.out/commit.out)。
+  - ② `closure reanchor`：`684746c7d80fd035b5408829ea7be16e770da1c8`（canonical 六件 +9/-9：registry + roadmap + done envelopes 等），reanchor helper write → verify-ci rc0 → push → readback；同 receipt 链=`receipts/gauge-impl-w1/` + `receipts/gauge-reanchor/GAUGE-MERGE-FINAL-RECEIPT.md`。non-claims：reanchor=canonical 投影刷新，非新授权、不证明 operator-pass/V-PASS/C6/S8。
+- **仍开放 / Non-claims**：KEY3 已执行 promote（sentinel `PROMOTED`，mainline=`684746c7...`，KEY3 promote 目标 70a2884e 含于祖先链）；gauge 合批已 STANDING-AUTH 全自动落账（mainline=684746c7）。但 B1 实现、W7/A5-020 coding、S8 token/lease 仍另键，KEY-DOCS 文档级联未落库。KEY2 exact-SHA GREEN、KEY3 promote、gauge 合批均不等于 operator-pass、V-PASS、C6 acceptance、candidate、mobile/true-device/live API；`actionDemoProven=0/120`、`baseline_activation=PENDING_CASCADE` 不变。
+
+## D-156：FT1 fast-tier closure checker split + integration fan-in followups T1/T2/T3（2026-07-13，commander v9 派单执行）
+
+- **authority 与派单边界**：本条不是新战略键，而是把 V9 §4.E fan-in dispatch 里的 FT1 short-audit `ACCEPT_WITH_FOLLOWUP` 三个 ticket 落地入档；派单文件 = `runs/2026-07-13-w8-runtime-spine-auto/dispatches/CLAUDECODE-COMMANDER-LONG-RUN-DISPATCH-W8-V9-PARALLEL.md:286-303`；integration worktree = `/private/tmp/MAformac-integration-20260713` on `commander/integration-fanin-20260713`（basis=mainline `f5c963fcb5d48a5d7c0ace67a423ac1a39517313`）。本条 = 集成阶段 followup 台账，不是 producer FT1 change 的重签。
+- **FT1 语义**：FT1 = B1 fast-tier non-package infrastructure classifier split（`openspec/changes/add-b1-fast-tier-closure-checker-split`，producer commit=`7894f62c3e3c1a03aa8ef191c926e32b43bfda8a`，在本 integration branch 上重锚为 `da9cc4f6...`）。产物：`scripts/closure_path_classifier.py`（252 行，纯 stdlib 路径分类器 + `pytest-deselect` 输出）+ `scripts/test_closure_path_classifier.py`（214 行，23 test PASS）+ Makefile 增 `verify-closure-work-packages-static/-local-fast` 两 tier。分类器**不是**closure-work-packages registry 的一行，而是 registry-adjacent 治理基础设施（fast-tier 分类 + verify-ci 面积分工），故 registry-level comment 与 STALE_BASIS 白名单同轨维护。
+- **T1（`~/.claude/rules/roster-sync-on-set-expansion.md`）**：`Makefile:89 verify-c1-checker-files` roster 加入 `scripts/closure_path_classifier.py` + `scripts/test_closure_path_classifier.py`。新增 checker 类基础设施必同步 presence roster，防未来「删 checker 制造假绿」——集合扩张日必更新 roster。
+- **T2（`~/.claude/rules/derived-tracking-writeback-discipline.md`）**：① `contracts/closure-work-packages.v1.yaml` 顶部加 registry-level comment，明写 FT1 是 registry-adjacent infrastructure（分类器不是包行）+ 指针到本 D-156 与 openspec change；② 本 D-156 = 派生跟踪回写的落点（decisions log 段间一致性），避免「commit 里改了 Makefile / stale-basis 白名单但决策日志没段间反映」的 drift。
+- **T3（D4b pre-mortem elephant，`~/.claude/rules/verification-economics-baseline-registry.md` 门自身 basis 绑定）**：`scripts/check_closure_work_packages.py:133-145 STALE_BASIS_ALLOWED_PATHS` 加 `^scripts/closure_path_classifier\.py$` 与 `^scripts/test_closure_path_classifier\.py$` 两条 regex。防止后续 fast-tier 分类器的治理性维护（roster/白名单同步 commit）误触 `E_STALE_BASIS`——白名单是「与包内容无关的治理面 basis 隔离」判据。
+- **消费边界**：FT1 fast-tier gate 与 slow-tier gate 都吃同一 registry（`contracts/closure-work-packages.v1.yaml`）；fast-tier 只跑单元 + 静态 assertion（无 subprocess 冒烟）；slow-tier 才跑 checker subprocess 全套。FT1 pytest 23/23 PASS；`openspec validate add-b1-fast-tier-closure-checker-split --strict` PASS。
+- **Non-claims**：本条不是 B1 fast-tier 战略键（那是磊哥拍板范围内的 B1a/B1b）；不是 gauge、S8、W7 coding、A5-020 的 promotion；不推动 `actionDemoProven` 数字（仍 `0/120`）；不改变 `baseline_activation=PENDING_CASCADE`；不是 operator-pass / V-PASS / C6 acceptance / candidate / mobile / true-device / live-API 的任何证据。本条 = FT1 集成 fan-in 阶段 followup 三票的收编台账，边界止于集成 worktree 本地闭合。

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "maformac://contracts/fallback-scripts.schema.json",
+  "title": "C1 fallback scripts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "authority",
+    "basis_scope_note",
+    "family_enum",
+    "customer_surface_policy",
+    "families",
+    "cells"
+  ],
+  "properties": {
+    "schema_version": {"const": "demo_fallback_scripts.v1"},
+    "basis_scope_note": {
+      "const": "C1 hard gate: basis_refs SHALL identify unique strings in authoritative SSOT contract sources. Runtime/IR/mounted fact-resolution is follow-up evidence and SHALL NOT fail the 40-cell catalog gate."
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["t0_change", "t0_registry"],
+      "properties": {
+        "t0_change": {"const": "add-c1-demo-capability-governance"},
+        "t0_registry": {"type": "string", "minLength": 1}
+      }
+    },
+    "family_enum": {"type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true},
+    "customer_surface_policy": {"type": "object"},
+    "families": {"type": "object", "minProperties": 10, "maxProperties": 10},
+    "cells": {
+      "type": "array",
+      "minItems": 40,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cell_id",
+          "locale",
+          "family",
+          "reason_kind",
+          "result_kind",
+          "safeReasonKind",
+          "dialogText",
+          "ttsText",
+          "badgeLabel",
+          "basis_refs",
+          "probe_id",
+          "diagnostic_path",
+          "state_mutation_expected",
+          "no_tool_call_expected",
+          "customer_surface_fields"
+        ],
+        "properties": {
+          "cell_id": {"type": "string"},
+          "locale": {"const": "zh-CN"},
+          "family": {"type": "string"},
+          "reason_kind": {"type": "string"},
+          "result_kind": {"type": "string"},
+          "safeReasonKind": {"type": "string"},
+          "dialogText": {"type": "string", "minLength": 1},
+          "ttsText": {"type": "string", "minLength": 1},
+          "badgeLabel": {"type": "string", "minLength": 1},
+          "basis_refs": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "contains"],
+              "properties": {
+                "path": {"type": "string"},
+                "contains": {"type": "string", "minLength": 1}
+              }
+            }
+          },
+          "probe_id": {"type": "string"},
+          "diagnostic_path": {"type": "string"},
+          "state_mutation_expected": {"const": "none"},
+          "no_tool_call_expected": {"const": true},
+          "customer_surface_fields": {"type": "array", "uniqueItems": true}
+        }
+      }
+    }
+  }
+}

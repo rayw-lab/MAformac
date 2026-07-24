@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schemaVersion", "generatorContract", "semanticRows", "projections"],
+  "properties": {
+    "schemaVersion": {"const": "demo_runtime_bundle_selection_v1"},
+    "generatorContract": {"const": "demo_runtime_contract_bundle_generator_v1"},
+    "semanticRows": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contractRowID", "sourceRowHash", "canonicalSemanticID", "variantRule", "runtimeUse"],
+      "properties": {
+        "contractRowID": {"type": "string", "pattern": "^c1_[A-Za-z0-9]+_[0-9]{6}$"},
+        "sourceRowHash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "canonicalSemanticID": {"type": "string", "pattern": "^sem_[0-9a-f]{16}$"},
+        "variantRule": {"const": "exact_composite_identity"},
+        "runtimeUse": {"type": "string", "minLength": 1}
+      }
+    }},
+    "projections": {"type": "object", "additionalProperties": false, "required": ["stateCells", "riskPolicy", "allowlist"], "properties": {
+      "stateCells": {"const": "full_canonical_file"}, "riskPolicy": {"const": "full_canonical_file"}, "allowlist": {"const": "full_canonical_file"}
+    }}
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "_source": {
+    "captured_at": "2026-07-13",
+    "note": "R0 risk-policy rejection fixture. Illustrates outcome=reject SHALL carry rejection_reason AND action_candidate SHALL be absent (spec 'Route result MUST carry the minimum wire fields' + 'Route error enum SHALL be closed and cover risk-policy R0-R3'). R0 mapping anchored to CLAUDE.md:109 D37 amend."
+  },
+  "route_result": {
+    "schema_version": "typed_route_contract.v1",
+    "route_schema": "route_schema.demo.v1",
+    "turn_id": "turn-reject-R0-000001",
+    "trace_id": "trace-reject-R0-000001",
+    "exec_tier": "L2",
+    "outcome": "reject",
+    "clarify_tag": "implicit",
+    "service": "carControl",
+    "action_candidate": null,
+    "trace_digest": "37510cc280ce7271b91411e04bd5ed2fe90d10ccdcce358103277e208cd79505",
+    "rejection_reason": {
+      "code": "risk_r0_forbidden",
+      "detail": "driving forbidden: open door while speed>0"
+    }
+  },
+  "route_trace_load_bearing": {
+    "schema_version": "typed_route_contract.v1",
+    "turn_id": "turn-reject-R0-000001",
+    "trace_id": "trace-reject-R0-000001",
+    "exec_tier": "L2",
+    "outcome": "reject",
+    "clarify_tag": "implicit",
+    "rejection_reason": {
+      "code": "risk_r0_forbidden",
+      "detail": "driving forbidden: open door while speed>0"
+    },
+    "redaction_policy_id": "redaction_policy.v1"
+  }
+}

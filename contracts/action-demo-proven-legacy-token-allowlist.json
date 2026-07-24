@@ -1,0 +1,47 @@
+{
+  "schema_version": "action_demo_proven_legacy_allowlist_v1",
+  "entries": [
+    {
+      "path": "Tools/checks/fixtures/demo_capability_matrix/legacy-action-key.json",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "negative_fixture"
+    },
+    {
+      "path": "scripts/test_check_capability_matrix.py",
+      "token_regex": "canDemo",
+      "max_matches": 2,
+      "purpose": "negative_fixture_builder"
+    },
+    {
+      "path": "docs/commander-log/decisions.md",
+      "token_regex": "canDemo",
+      "max_matches": 26,
+      "purpose": "historical_mapping"
+    },
+    {
+      "path": "docs/grill-tournament/c1-capability-grill-ratified-2026-07-10.md",
+      "token_regex": "canDemo",
+      "max_matches": 8,
+      "purpose": "historical_mapping"
+    },
+    {
+      "path": "closure/registry/native/W1-int-v5a-recheck.md",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "historical_verification_receipt"
+    },
+    {
+      "path": "docs/roadmap-2026-07-11-v6-closure-baseline.md",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "rename_migration_mapping"
+    },
+    {
+      "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
+      "token_regex": "canDemo",
+      "max_matches": 1,
+      "purpose": "vendored_historical_ratification_receipt"
+    }
+  ]
+}

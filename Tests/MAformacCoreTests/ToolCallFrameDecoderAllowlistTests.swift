@@ -6,10 +6,10 @@ final class ToolCallFrameDecoderAllowlistTests: XCTestCase {
 
     func testDecodeNonStreamingCompletionRejectsUnmountedCatalogName() {
         XCTAssertThrowsError(try decoder.decodeNonStreamingCompletion(
-            completion(for: "open_ac", device: "ac", actionPrimitive: "power_on"),
+            completion(for: "close_window", device: "window", actionPrimitive: "power_off"),
             allowedToolNames: DDomainMountedToolCatalog.mountedToolNames
         )) { error in
-            XCTAssertEqual(error as? ToolExecutionError, .schemaInvalid(.unknownToolName("open_ac")))
+            XCTAssertEqual(error as? ToolExecutionError, .schemaInvalid(.unknownToolName("close_window")))
         }
     }
 

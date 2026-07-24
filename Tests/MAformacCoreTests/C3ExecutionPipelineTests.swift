@@ -7,6 +7,7 @@ final class C3ExecutionPipelineTests: XCTestCase {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
         let pipeline = try makePipeline(intentConfirmed: true)
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let frame = ToolCallFrame(
             traceID: "trace-ac-exp",
             agentID: "vehicle-control",
@@ -172,6 +173,7 @@ final class C3ExecutionPipelineTests: XCTestCase {
         let store = DemoVehicleStateStore()
         let trace = InMemoryTraceLogger()
         let pipeline = try makePipeline(intentConfirmed: true)
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let first = ToolCallFrame(
             id: "cmd-ac-stale-replay",
             traceID: "trace-ac-stale-replay",
@@ -190,6 +192,7 @@ final class C3ExecutionPipelineTests: XCTestCase {
         let powerAfterFirst = try XCTUnwrap(store.cell(for: "ac.power"))
         let tempAfterFirst = try XCTUnwrap(store.cell(for: "ac.temp_setpoint[主驾]"))
 
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         let staleRetry = ToolCallFrame(
             id: "cmd-ac-stale-replay",
             traceID: "trace-ac-stale-replay",
@@ -717,6 +720,41 @@ final class C3ExecutionPipelineTests: XCTestCase {
     }
 
     @MainActor
+    func testAmbientPowerOnOffThroughC3Pipeline() throws {
+        let store = DemoVehicleStateStore()
+        let pipeline = try makePipeline(intentConfirmed: true)
+
+        // 氛围灯初始状态应为 off（defaultCells 中 ambient.power=off）
+        XCTAssertEqual(store.cell(for: "ambient.power")?.actualValue, "off")
+
+        // 打开氛围灯 → atmosphere_lamp device → power_on → ambient.power=on
+        let on = ToolCallFrame.fixture(
+            device: "atmosphere_lamp",
+            actionPrimitive: "power_on",
+            stateRevision: 0
+        )
+        let onResult = try pipeline.execute(on, store: store, traceLogger: InMemoryTraceLogger())
+        XCTAssertEqual(store.cell(for: "ambient.power")?.actualValue, "on")
+        XCTAssertEqual(onResult.readbacks.first?.key, "ambient.power")
+
+        // 关闭氛围灯 → power_off → ambient.power=off
+        let off = ToolCallFrame.fixture(
+            device: "atmosphere_lamp",
+            actionPrimitive: "power_off",
+            stateRevision: store.currentRevision
+        )
+        _ = try pipeline.execute(off, store: store, traceLogger: InMemoryTraceLogger())
+        XCTAssertEqual(store.cell(for: "ambient.power")?.actualValue, "off")
+    }
+
+    @MainActor
+    func testAmbientPowerDefaultInStore() {
+        let store = DemoVehicleStateStore()
+        XCTAssertEqual(store.cell(for: "ambient.power")?.actualValue, "off", "ambient.power 默认应为 off")
+        XCTAssertEqual(store.cell(for: "seat.heat_level[副驾]")?.actualValue, "0", "seat.heat_level[副驾] 默认应为 0")
+    }
+
+    @MainActor
     func testReadbackVerifierFailsWhenActualStateDiffersFromExpected() {
         let store = DemoVehicleStateStore()
         _ = store.applyMockTransition(DemoMockTransition(key: "screen.brightness[中控屏]", desiredValue: "20"))
@@ -804,6 +842,7 @@ private extension ToolCallFrame {
         value: ContractValue = ContractValue(),
         stateRevision: Int
     ) -> ToolCallFrame {
+        // GOVERNANCE: bypasses NLU by design (not product behavior)
         ToolCallFrame(
             id: id,
             agentID: "vehicle-control",

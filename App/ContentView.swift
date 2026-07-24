@@ -1,4 +1,28 @@
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
+
+enum T3MacWindowContract {
+    static let minWidth: CGFloat = 1280
+    static let minHeight: CGFloat = 800
+    static let warningText = "窗口低于演示安全尺寸，10 卡已保留，视觉可能压缩"
+
+    static func heroWidth(forContentWidth contentWidth: CGFloat) -> CGFloat {
+        let usesNarrowBand = contentWidth < 900
+        let ratio: CGFloat = usesNarrowBand ? 0.28 : 0.32
+        let lowerBound: CGFloat = usesNarrowBand ? 240 : 260
+        return min(340, max(lowerBound, contentWidth * ratio))
+    }
+
+    static func shouldShowWarning(_ size: CGSize) -> Bool {
+        #if os(macOS)
+        return size.width < T3MacWindowContract.minWidth || size.height < T3MacWindowContract.minHeight
+        #else
+        return false
+        #endif
+    }
+}
 
 struct ContentView: View {
     @Bindable var store: DemoVehicleStateStore
@@ -6,6 +30,7 @@ struct ContentView: View {
     let speech: any SpeechSynthesisEngine
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var snapshot: StagePresentationSnapshot
     @State private var theme: PresentationTheme
     @State private var focus = FocusController()
@@ -15,28 +40,82 @@ struct ContentView: View {
     @State private var messages: [DialogueMessage]
     @State private var ambientBurst: AmbientBurstTrigger?
     @State private var didTriggerInitialAmbientBurst = false
+    /// 招牌② 瀑布重放代号：reset/开场递增 → 卡真重入场（TXB 修②）。
+    @State private var waterfallGeneration = 0
+    /// T7d：T5 runtime readback 事件 → EnergyLine 触发 token（runtime wins force-state）。
+    @State private var t5PresentationEvent: T5PresentationEvent?
+    @State private var energyLineSignal: RuntimeReadbackSignal?
+    @State private var energyLineTriggerToken = 0
+    @State private var mockVoiceScriptIndex = 0
+    @State private var mockVoiceResponseTask: Task<Void, Never>?
+    @State private var frontstageRuntimeComposition = FrontstageRuntimeComposition()
+    @State private var customerIngressText = ""
+    @FocusState private var customerIngressFocused: Bool
+    @State private var customerIngressStatusText: String?
+    @State private var customerIngressProofText = "route=demo_slice;status=idle;runner=0;mutation=0;readbacks=0"
+    /// B10 session stopline: durable receipt write failed after committed work.
+    @State private var customerIngressSessionStopped = false
+    /// Linked-receipt chain (G6): previous successfully written turn_id.
+    @State private var lastRuntimeTurnReceiptTurnID: String?
+    @State private var runtimeReadbackQueue = RuntimeReadbackEventQueue()
     private let initialAmbientBurstColor: String?
     private let contextCapsuleRoute: ContextCapsuleRoute
+    private let requestedMotionBudget: PresentationMotionBudget
     private let forceReduceMotion: Bool
+    private let visualSwapEnabled: Bool
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
+    private var runtimeMotionBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(
+            reduceMotion: effectiveReduceMotion,
+            requested: requestedMotionBudget
+        )
+    }
+    /// D2 W9 force-state cutover — observable failure ack channel. Populated
+    /// whenever `stateApplier.apply(...)` throws (digest / primary-class /
+    /// authority gate refusal). Direct answer to grok-4.5 short review P1-2:
+    /// before this channel existed, `try? apply` silently swallowed the
+    /// applier's fail-closed signal. See CLOSEOUT.md v2 §"P1 Fix Section".
+    @State private var stateApplierFailureLog: [DemoVehicleStateApplierFailureRecord] = []
+    /// D2 W9 force-state cutover — the sole App-layer path to write to `store`.
+    /// Constructed per access (value type) so every write site is bound to the
+    /// canonical `DemoCapabilityMatrixCatalog.sourceSHA256` at call time; a
+    /// codegen refresh flips the digest and any stale caller fails closed at
+    /// the applier gate instead of writing against an unknown baseline. Passes
+    /// a failureReceiver so refusals populate `stateApplierFailureLog` in
+    /// addition to throwing — observers can distinguish "never attempted"
+    /// (log stays empty) from "gate refused" (log gains a record). See
+    /// `Core/State/DemoVehicleStateApplier.swift` and CLAUDE.md §9 canonical
+    /// digest consumption clause.
+    private var stateApplier: DemoVehicleStateApplier {
+        DemoVehicleStateApplier(
+            store: store,
+            failureReceiver: { record in
+                self.stateApplierFailureLog.append(record)
+            }
+        )
+    }
 
     init(
         store: DemoVehicleStateStore,
         traceLogger: InMemoryTraceLogger,
         speech: any SpeechSynthesisEngine,
-        initialPreset: SnapshotPreset = .cooling,
+        initialPreset: SnapshotPreset = .coldStart,
         initialTheme: PresentationTheme = .ivory,
         initialAmbientBurstColor: String? = nil,
         initialContext: DemoContext? = nil,
         contextCapsuleRoute: ContextCapsuleRoute = .cLite,
-        forceReduceMotion: Bool = false
+        motionBudget: PresentationMotionBudget = .preset(.fullShowcase),
+        forceReduceMotion: Bool = false,
+        visualSwapEnabled: Bool = false
     ) {
         self.store = store
         self.traceLogger = traceLogger
         self.speech = speech
         self.initialAmbientBurstColor = initialAmbientBurstColor
         self.contextCapsuleRoute = contextCapsuleRoute
+        self.requestedMotionBudget = motionBudget
         self.forceReduceMotion = forceReduceMotion
+        self.visualSwapEnabled = visualSwapEnabled
         let initial = Self.phase2State(for: initialPreset)
         var snapshot = initial.snapshot
         if let initialContext {
@@ -58,11 +137,14 @@ struct ContentView: View {
             return "为您的安全已锁定"
         case .refusalNoAvailableTool:
             return "暂不支持该控制"
+        case .refusalContractViolation:
+            return "不符合演示契约"
         case .clarifyMissingSlot:
             return "需要确认后执行"
         case .runtimeError:
             return "演示状态异常"
-        case .acceptedToolCall, .alreadyStateNoop, .cancelled, .partialAcceptPartialRefuse, .none:
+        case .acceptedToolCall, .noAction, .alreadyStateNoop, .cancelled, .partialAcceptPartialRefuse,
+             .stateQuery, .capabilityQuery, .none:
             return nil
         }
     }
@@ -72,7 +154,7 @@ struct ContentView: View {
             let size = proxy.size
             ZStack(alignment: .topTrailing) {
                 DeepSpaceBackground(theme: theme)
-                StageAtmosphereLayer(theme: theme, orbState: snapshot.orbState)
+                StageAtmosphereLayer(theme: theme, orbState: snapshot.orbState, motionBudget: runtimeMotionBudget)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
 
@@ -98,6 +180,19 @@ struct ContentView: View {
                         .transition(.opacity.combined(with: .scale(scale: 0.92)))
                 }
 
+                demoPrototypeWatermark
+                    .padding(.top, topControlsTopPadding(for: size) + 2)
+                    .padding(.leading, horizontalPadding(for: size))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .allowsHitTesting(false)
+                    .zIndex(9)
+
+                if T3MacWindowContract.shouldShowWarning(size) {
+                    minWindowWarningBanner(size: size)
+                        .padding(.top, topControlsTopPadding(for: size) + 2)
+                        .zIndex(9)
+                }
+
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 bottomMicDock(size: size)
@@ -109,6 +204,10 @@ struct ContentView: View {
                         .zIndex(12)
                         .transition(.opacity)
                 }
+            }
+            .overlayPreferenceValue(EnergyLineFramePreferenceKey.self) { frames in
+                energyLineOverlay(frames: frames)
+                    .zIndex(11)
             }
         }
         .preferredColorScheme(theme.colorScheme)
@@ -150,7 +249,9 @@ struct ContentView: View {
                     layout: .macPanorama,
                     bottomInset: 0,
                     onTapFamily: { focus.toggle($0) },
-                    onValueScrub: applyMockTransition
+                    onValueScrub: applyMockTransition,
+                    forceReduceMotion: forceReduceMotion,
+                    waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, 64)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -158,17 +259,20 @@ struct ContentView: View {
         } else {
             VStack(alignment: .leading, spacing: 10) {
                 topContextBand(size: size, showsControls: true)
-                DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
+                DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion, motionBudget: runtimeMotionBudget)
+                    .energyLineOrbAnchor()
                     .frame(maxWidth: .infinity)
                     .frame(height: orbHeight(for: size))
-                DialogueStream(messages: messages, theme: theme)
+                DialogueStream(messages: messages, theme: theme, forceReduceMotion: forceReduceMotion)
                     .frame(height: dialogueHeight(for: size))
                 VehicleCardsGrid(displays: familyDisplays,
                     theme: theme,
                     layout: .phoneScroll,
                     bottomInset: bottomDockInset(for: size),
                     onTapFamily: { focus.toggle($0) },
-                    onValueScrub: applyMockTransition
+                    onValueScrub: applyMockTransition,
+                    forceReduceMotion: forceReduceMotion,
+                    waterfallGeneration: waterfallGeneration
                 )
                 .padding(.top, vehicleControlsTopPadding(for: size))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -181,12 +285,14 @@ struct ContentView: View {
             topContextBand(size: size)
                 .padding(.trailing, 86)
             Spacer(minLength: 12)
-            DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion)
+            DemoOrbView(theme: theme, state: snapshot.orbState, forceReduceMotion: forceReduceMotion, motionBudget: runtimeMotionBudget)
+                .energyLineOrbAnchor()
                 .frame(maxWidth: .infinity)
-            DialogueStream(messages: messages, theme: theme)
+            DialogueStream(messages: messages, theme: theme, forceReduceMotion: forceReduceMotion)
                 .frame(minHeight: 240, maxHeight: 330)
             Spacer(minLength: 28)
-            MicDock(theme: theme, state: snapshot.voiceState, onMockVoiceSubmit: applyMockVoiceColdIntent)
+            customerIngressBar
+            MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                 .frame(maxWidth: .infinity, minHeight: 76, maxHeight: 80)
                 .padding(.bottom, 10)
         }
@@ -249,37 +355,93 @@ struct ContentView: View {
         .clipShape(Capsule())
     }
 
+    private func minWindowWarningBanner(size: CGSize) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12, weight: .semibold))
+            Text(T3MacWindowContract.warningText)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+        }
+        .foregroundStyle(DesignTokens.palette(for: theme).inkPrimary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(DesignTokens.stateOffline.opacity(theme == .ivory ? 0.18 : 0.22), in: Capsule())
+        .overlay {
+            Capsule().strokeBorder(DesignTokens.stateOffline.opacity(0.52), lineWidth: 0.7)
+        }
+        .shadow(color: DesignTokens.stateOffline.opacity(0.18), radius: 8, y: 4)
+        .frame(maxWidth: max(280, min(size.width * 0.48, 520)))
+        .accessibilityIdentifier("t3-min-window-warning")
+    }
+
+    private var demoPrototypeWatermark: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.shield.fill")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(DesignTokens.stateOffline)
+            Text("模拟演示 · 非量产 · MOCK")
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .lineLimit(1)
+                .foregroundStyle(DesignTokens.palette(for: theme).inkPrimary)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(DesignTokens.palette(for: theme).surfaceElevated.opacity(0.96), in: Capsule())
+        .overlay {
+            Capsule().strokeBorder(DesignTokens.stateOffline.opacity(0.72), lineWidth: 0.8)
+        }
+        .shadow(color: DesignTokens.stateOffline.opacity(0.16), radius: 6, y: 3)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("模拟演示，非量产，mock 状态")
+        .accessibilityIdentifier("demo-prototype-watermark")
+    }
+
     @ViewBuilder
     private func bottomMicDock(size: CGSize) -> some View {
         let split = usesMacSplit(size: size)
         if !split {
-            HStack {
-                MicDock(theme: theme, state: snapshot.voiceState, onMockVoiceSubmit: applyMockVoiceColdIntent)
+            VStack(spacing: 8) {
+                customerIngressBar
+                    .frame(maxWidth: .infinity)
+                MicDock(theme: theme, state: snapshot.voiceState, forceReduceMotion: forceReduceMotion, onMockVoiceSubmit: submitCustomerMicDock)
                     .frame(maxWidth: min(780, size.width - 70), minHeight: 70, maxHeight: 74)
             }
             .padding(.horizontal, horizontalPadding(for: size))
-            .padding(.bottom, 0)
-            .offset(y: 24)
+            .padding(.bottom, 8)
+            .offset(y: customerIngressFocused ? -300 : 0)
             .zIndex(7)
-            .accessibilityIdentifier("mic-dock-safe-area")
+            .background {
+                Color.clear.accessibilityIdentifier("mic-dock-safe-area")
+            }
         }
     }
 
     @ViewBuilder
     private func expandedOverlay(_ family: FamilyCardID) -> some View {
         ZStack {
-            Rectangle()
-                .fill(.ultraThinMaterial)
+            expandedOverlayBackdrop
                 .ignoresSafeArea()
                 .onTapGesture { focus.dismiss() }
                 .accessibilityLabel("收起展开卡")
             ExpandedFamilyCard(
                 display: ExpandedFamilyDisplay.make(for: family, from: snapshot.storeCells),
                 onDismiss: { focus.dismiss() },
+                forceReduceMotion: forceReduceMotion,
                 onMockTransition: { key, desiredValue in
                     applyMockTransition(family: family, key: key, desiredValue: desiredValue)
                 }
             )
+        }
+    }
+
+    @ViewBuilder
+    private var expandedOverlayBackdrop: some View {
+        if reduceTransparency {
+            Rectangle().fill(DesignTokens.reduceTransparencyBackdropFill(for: theme))
+        } else {
+            Rectangle().fill(.ultraThinMaterial)
         }
     }
 
@@ -303,7 +465,9 @@ struct ContentView: View {
     }
 
     private func applySnapshot(_ preset: SnapshotPreset) {
-        withAnimation(.snappy(duration: 0.32)) {
+        runtimeReadbackQueue.cancel()
+        waterfallGeneration += 1   // 招牌②：开场/reset/换场景 → 卡真重入场（TXB 修②）
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: effectiveReduceMotion)) {
             let state = Self.phase2State(for: preset)
             snapshot = state.snapshot
             messages = state.messages
@@ -322,7 +486,26 @@ struct ContentView: View {
                 visualState: .normal
             ))
         }
-        store.replaceCells(cells)
+        // D2 cutover (grok-4.5 short review P1-1 + P1-2): route through
+        // DemoVehicleStateApplier instead of touching store.replaceCells
+        // directly. If the applier gate refuses (digest / primary-class /
+        // authority mismatch), we MUST NOT continue into store.applyMockTransition
+        // — writing a mock mutation against a baseline the applier just refused
+        // to establish is exactly the fail-closed violation this cutover was
+        // added to prevent (~/.claude/rules/claim-vs-reality-gap.md 铁律 1
+        // "enforce not declare"). Explicit do-catch (no more try?): failures
+        // populate stateApplierFailureLog via failureReceiver, and this call
+        // site returns early instead of falling back into the pre-cutover mock
+        // apply path.
+        do {
+            _ = try stateApplier.apply(cells: cells, authority: .appMockTransition)
+        } catch {
+            // Applier gate refused; failureReceiver already recorded the
+            // structured failure. Do not proceed to mutate store on an unknown
+            // baseline. Return so no readback / snapshot advance / burst
+            // triggers off a gate refusal.
+            return
+        }
         let readback = store.applyMockTransition(
             DemoMockTransition(key: key, desiredValue: desiredValue, source: .user)
         )
@@ -333,8 +516,8 @@ struct ContentView: View {
         )
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = .explicit
-        withAnimation(.snappy(duration: 0.28)) {
-            snapshot = StagePresentationSnapshot.from(
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
+            let nextSnapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [family: key],
                 context: snapshot.context,
@@ -347,13 +530,416 @@ struct ContentView: View {
                 readbacks: snapshot.readbacks + [readback],
                 proofClass: .simulatorMock
             )
+            // T7d 接线点：scrub/readback 走 T5 runtime event，不再走 EnergyLine stub。
+            snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(readback))
         }
         if let burstColor {
             triggerAmbientBurst(colorName: burstColor)
         }
     }
 
+    private func submitCustomerMicDock() {
+        submitCustomerIngress(.init(source: .voiceTranscript, rawText: nil))
+    }
+
+    private var customerIngressBar: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                TextField("输入车控指令", text: $customerIngressText)
+                    .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("frontstage-customer-text-field")
+                    .focused($customerIngressFocused)
+                    .onSubmit(submitCustomerText)
+                Button("发送", action: submitCustomerText)
+                    .accessibilityIdentifier("frontstage-customer-text-submit")
+            }
+            Text(customerIngressStatusText ?? "等待输入")
+                .font(.caption)
+                .accessibilityIdentifier("frontstage-customer-ingress-status")
+            Text(customerIngressProofText)
+                .font(.system(size: 1))
+                .foregroundStyle(.clear)
+                .frame(height: 1)
+                .accessibilityIdentifier("frontstage-demo-slice-proof")
+        }
+    }
+
+    private func submitCustomerText() {
+        let text = customerIngressText
+        customerIngressText = ""
+        customerIngressFocused = false
+        submitCustomerIngress(.init(source: .text, rawText: text))
+    }
+
+    private func submitCustomerIngress(_ input: FrontstageIngressInput) {
+        mockVoiceResponseTask?.cancel()
+        runtimeReadbackQueue.cancel()
+        if customerIngressSessionStopped {
+            customerIngressStatusText = "会话已停止（记录失败后需重新进入）"
+            customerIngressProofText = "route=demo_slice;status=session_stopped;runner=0;mutation=0;readbacks=0;reason=durable_write_failed"
+            return
+        }
+        precondition(frontstageRuntimeComposition.customerIngress.sessionID == frontstageRuntimeComposition.session.sessionID)
+        let result = frontstageRuntimeComposition.customerIngress.submit(input)
+        guard case let .accepted(turn) = result else {
+            guard case let .rejected(rejected) = result else { return }
+            let message: String
+            let reasonTag: String
+            switch rejected.reason {
+            case .unavailable:
+                message = "语音输入当前不可用"
+                reasonTag = "unavailable"
+            case .blank:
+                message = "请输入车控指令"
+                reasonTag = "blank"
+            case .oversize:
+                message = "指令过长，请简短输入"
+                reasonTag = "oversize"
+            case .rejectedByValidator:
+                message = "这条指令未通过输入校验"
+                reasonTag = "rejected_by_validator"
+            }
+            customerIngressStatusText = message
+            customerIngressProofText = "route=demo_slice;status=ingress_rejected;runner=0;mutation=0;readbacks=0;reason=\(reasonTag)"
+            messages.append(DialogueMessage(role: .assistant, text: message))
+            return
+        }
+        customerIngressStatusText = turn.utterance
+        frontstageRuntimeComposition.scheduleIngressRoute(
+            turn,
+            store: store,
+            traceLogger: traceLogger,
+            speech: speech
+        ) { result in
+            switch result {
+            case let .success(routeResult):
+                guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+                // Apply UI first so B10 can keep actual readbacks if durable write fails.
+                let committedMutation: Bool
+                if let execution = routeResult.execution {
+                    committedMutation = execution.payload.mutationCount > 0
+                    applyDemoSliceExecution(execution, utterance: turn.utterance)
+                } else if let readOnly = routeResult.readOnly {
+                    committedMutation = false
+                    applyDemoSliceReadOnly(readOnly, utterance: turn.utterance)
+                } else if let rejection = routeResult.rejection {
+                    committedMutation = false
+                    applyDemoSliceRejection(rejection, turn: turn)
+                } else {
+                    committedMutation = false
+                }
+                writeRuntimeTurnReceipt(
+                    turn: turn,
+                    routeResult: routeResult,
+                    committedMutation: committedMutation
+                )
+            case .failure:
+                guard frontstageRuntimeComposition.isCurrentTurn(turn) else { return }
+                customerIngressStatusText = "演示链路暂时不可用"
+                messages.append(DialogueMessage(role: .assistant, text: "演示链路暂时不可用"))
+                emitFrontstageRouteReceiptDiagnostic("DEMO_SLICE_ROUTE_FAILED")
+            }
+        }
+    }
+
+    private func applyDemoSliceExecution(_ execution: DemoSliceExecution, utterance: String) {
+        applyDemoSlicePayload(
+            execution.payload,
+            utterance: utterance,
+            preserveActiveCells: false,
+            proofStatus: { payload in
+                let readbackValues = payload.readbacks.map { "\($0.key)=\($0.actualValue)" }.joined(separator: ",")
+                return "route=demo_slice;source=\(execution.admission.frame.candidateSource.rawValue);status=executed;runner=\(execution.runnerCallCount);mutation=\(payload.mutationCount);matrix_id=\(String(execution.admission.entry.matrixID));contract_row_id=\(execution.admission.entry.contractRowID);state_revision=\(store.currentRevision);readbacks=\(payload.readbacks.count);values=\(readbackValues)"
+            }
+        )
+    }
+
+    /// G2/G5 read-only query path (state/capability/cancel). No runner, no mutation.
+    /// G5 knife4: dialogue / resultKind / orb / voice come only from payload.
+    private func applyDemoSliceReadOnly(_ readOnly: DemoSliceReadOnlyOutcome, utterance: String) {
+        applyDemoSlicePayload(
+            readOnly.payload,
+            utterance: utterance,
+            preserveActiveCells: true,
+            proofStatus: { payload in
+                let statusTag: String
+                if case .cancel = readOnly.classification {
+                    statusTag = payload.eventID?.hasPrefix("cancel-too-late") == true
+                        ? "cancel_too_late"
+                        : "cancel_preempt"
+                } else {
+                    statusTag = "read_only_query"
+                }
+                return "route=demo_slice;status=\(statusTag);runner=0;mutation=0;readbacks=\(payload.readbacks.count);state_revision=\(store.currentRevision)"
+            }
+        )
+    }
+
+    private func applyDemoSliceRejection(_ rejection: DemoSliceAdmissionRejection, turn: FrontstageVoiceTurn) {
+        switch rejection {
+        case .notInCatalog, .conjunctionOrMultiIntent, .cancel:
+            let update = FrontstageRuntimePresentationAdapter.containmentUpdate(turn, preserving: snapshot)
+            snapshot = update.snapshot
+            customerIngressStatusText = update.snapshot.dialogText
+            let reason: String
+            switch rejection {
+            case .conjunctionOrMultiIntent: reason = "conjunction_or_multi_intent"
+            case .cancel(let target): reason = target.map { "cancel_\($0)" } ?? "user_cancelled"
+            default: reason = "not_in_catalog"
+            }
+            customerIngressProofText = "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(reason);state_revision=\(store.currentRevision)"
+            messages.append(contentsOf: update.dialogueTurns.map { dialogueTurn in
+                DialogueMessage(
+                    role: dialogueTurn.role == .user ? .user : .assistant,
+                    text: dialogueTurn.text
+                )
+            })
+            return
+        case .blank, .valueOutOfRange, .clarifyMissingSlot:
+            let payload = DemoSliceAdmissionRejectionPresentation.payload(
+                for: rejection,
+                cards: store.presentationCells,
+                revision: store.currentRevision
+            )
+            applyDemoSlicePayload(
+                payload,
+                utterance: turn.utterance,
+                preserveActiveCells: true,
+                proofStatus: { _ in
+                    let reasonTag: String
+                    switch rejection {
+                    case .blank:
+                        reasonTag = "blank"
+                    case .valueOutOfRange(let actual, let allowed):
+                        reasonTag = "value_out_of_range:\(actual):\(allowed.lowerBound)-\(allowed.upperBound)"
+                    case .clarifyMissingSlot:
+                        reasonTag = "clarify_missing_slot"
+                    case .notInCatalog:
+                        reasonTag = "not_in_catalog"
+                    case .conjunctionOrMultiIntent:
+                        reasonTag = "conjunction_or_multi_intent"
+                    case .cancel(let target):
+                        reasonTag = target.map { "cancel_\($0)" } ?? "user_cancelled"
+                    }
+                    return "route=demo_slice;status=contained;runner=0;mutation=0;readbacks=0;reason=\(reasonTag);state_revision=\(store.currentRevision)"
+                }
+            )
+        }
+    }
+
+    /// Shared payload → stage snapshot apply. App does not invent dialogue or resultKind.
+    private func applyDemoSlicePayload(
+        _ payload: RuntimePresentationPayload,
+        utterance: String,
+        preserveActiveCells: Bool,
+        proofStatus: (RuntimePresentationPayload) -> String
+    ) {
+        let dialogueText = RuntimePresentationUIRender.dialogueText(from: payload)
+        let resultKind = RuntimePresentationUIRender.resultKind(from: payload)
+        let orbState = Self.appOrbState(from: payload.orbState)
+        let voiceState = Self.appVoiceState(from: payload.voiceState)
+        var activeCells = snapshot.activeCells
+        var scopeOrigins = snapshot.scopeOrigins
+        if !preserveActiveCells {
+            for readback in payload.readbacks {
+                let base = ScopedStateKey(readback.key).base
+                if let family = FamilyCardIDMapper.familyCardID(forBase: base) {
+                    activeCells[family] = readback.key
+                }
+                if let scopeOrigin = readback.scopeOrigin {
+                    scopeOrigins[readback.key] = scopeOrigin
+                }
+            }
+        }
+        snapshot = StagePresentationSnapshot.from(
+            store: store,
+            activeCells: activeCells,
+            context: snapshot.context,
+            resultKind: resultKind,
+            traceId: payload.traceID,
+            scopeOrigins: scopeOrigins,
+            orbState: orbState,
+            voiceState: voiceState,
+            dialogText: dialogueText,
+            readbacks: snapshot.readbacks + payload.readbacks,
+            proofClass: .localMock
+        )
+        customerIngressStatusText = dialogueText
+        customerIngressProofText = proofStatus(payload)
+        messages.append(DialogueMessage(role: .user, text: utterance))
+        messages.append(DialogueMessage(role: .assistant, text: dialogueText))
+    }
+
+    /// G6 route-level receipt write (Assembler outside runner). B10: durable fail after
+    /// committed mutation → keep actual UI, surface「已执行但记录失败」, stop session.
+    private func writeRuntimeTurnReceipt(
+        turn: FrontstageVoiceTurn,
+        routeResult: DemoSliceRouteResult,
+        committedMutation: Bool
+    ) {
+        do {
+            let receiptConfiguration = try FrontstageRouteReceiptConfiguration.environment(ProcessInfo.processInfo.environment)
+            do {
+                let written = try RuntimeTurnReceiptAssembler.assembleAndWrite(
+                    turn: turn,
+                    routeResult: routeResult,
+                    configuration: receiptConfiguration,
+                    isCurrent: { frontstageRuntimeComposition.isCurrentTurn(turn) },
+                    linkedPreviousTurnID: lastRuntimeTurnReceiptTurnID
+                )
+                if written != nil {
+                    lastRuntimeTurnReceiptTurnID = turn.turnID
+                }
+            } catch {
+                emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_WRITE_FAILED")
+                applyDurableReceiptWriteFailure(committedMutation: committedMutation)
+            }
+        } catch {
+            emitFrontstageRouteReceiptDiagnostic("FRONTSTAGE_ROUTE_RECEIPT_CONFIGURATION_REJECTED")
+        }
+    }
+
+    /// B10 fail-closed hook: never fake success / cancelled / rollback.
+    private func applyDurableReceiptWriteFailure(committedMutation: Bool) {
+        let message = committedMutation ? "已执行但记录失败" : "记录失败，会话已停止"
+        customerIngressStatusText = message
+        customerIngressProofText =
+            "route=demo_slice;status=durable_write_failed;committed_mutation=\(committedMutation ? 1 : 0);session_stop=1;state_revision=\(store.currentRevision)"
+        messages.append(DialogueMessage(role: .assistant, text: message))
+        stopCustomerIngressSession()
+    }
+
+    private func stopCustomerIngressSession() {
+        customerIngressSessionStopped = true
+        frontstageRuntimeComposition.markCurrent(
+            FrontstageVoiceTurn(
+                sessionID: frontstageRuntimeComposition.session.sessionID,
+                sequence: 0,
+                turnID: "session-stopped",
+                eventID: "session-stopped",
+                utterance: "",
+                outcome: DemoRuntimeOutcome(result: .runtimeError, reason: "durable_write_failed"),
+                proofClass: .localUnit,
+                stateMutation: false,
+                readbacks: []
+            )
+        )
+    }
+
+    private func emitFrontstageRouteReceiptDiagnostic(_ code: String) {
+        FileHandle.standardError.write(Data("\(code)\n".utf8))
+    }
+
     private func applyMockVoiceColdIntent() {
+        mockVoiceResponseTask?.cancel()
+        runtimeReadbackQueue.cancel()
+        let utterance = MockVoicePresetScript.utterance(at: mockVoiceScriptIndex)
+        mockVoiceScriptIndex += 1
+        guard let plan = MockVoicePresetPlanner.plan(
+            utterance: utterance,
+            cells: snapshot.storeCells,
+            context: snapshot.context,
+            priorReadbacks: snapshot.readbacks
+        ) else {
+            applyLegacyMockVoiceColdIntent()
+            return
+        }
+        messages.append(DialogueMessage(role: .user, text: utterance))
+        switch plan.timing {
+        case .eventDriven:
+            commitMockVoicePlan(plan)
+        case let .safetyFixed(milliseconds):
+            applyMockVoiceThinkingState(for: plan)
+            mockVoiceResponseTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: UInt64(milliseconds) * 1_000_000)
+                guard !Task.isCancelled else { return }
+                commitMockVoicePlan(plan)
+            }
+        }
+    }
+
+    private func applyMockVoiceThinkingState(for plan: MockVoicePresetPlan) {
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.24), reduceMotion: effectiveReduceMotion)) {
+            snapshot = StagePresentationSnapshot(
+                traceId: snapshot.traceId,
+                storeCells: snapshot.storeCells,
+                activeCells: plan.activeCells,
+                refusedCell: plan.refusedCell,
+                scopeOrigins: snapshot.scopeOrigins.merging(plan.scopeOrigins) { _, new in new },
+                context: snapshot.context,
+                orbState: .think,
+                voiceState: .transcribing,
+                dialogText: "正在判断安全状态",
+                readbacks: snapshot.readbacks,
+                resultKind: nil,
+                proofClass: .simulatorMock
+            )
+        }
+    }
+
+    private func commitMockVoicePlan(_ plan: MockVoicePresetPlan) {
+        let initialStoreCells = snapshot.storeCells
+        let priorReadbacks = snapshot.readbacks
+        // D2 cutover (grok-4.5 short review P1-2): direct store.replaceCells
+        // removed. Applier gate refusal populates stateApplierFailureLog so the
+        // signal is observable, unlike the earlier try? that silently ate the
+        // error. This call site does not have a follow-on mock-apply step
+        // (the write is atomic with plan.cells), so on refusal we still emit
+        // the snapshot advance below because it derives from `store` which
+        // stays on the pre-attempt baseline — not a fallback to a raw
+        // replaceCells, just a snapshot render of the current store state.
+        do {
+            _ = try stateApplier.apply(cells: plan.cells, authority: .appMockVoicePlan)
+        } catch {
+            // Applier gate refused; snapshot advance below still renders the
+            // pre-refusal store state (a truthful render, not a fallback write).
+        }
+        var scopeOrigins = snapshot.scopeOrigins
+        for (key, origin) in plan.scopeOrigins {
+            scopeOrigins[key] = origin
+        }
+        let nextSnapshot = StagePresentationSnapshot.from(
+            store: store,
+            activeCells: plan.activeCells,
+            context: snapshot.context,
+            resultKind: plan.resultKind,
+            traceId: snapshot.traceId,
+            refusedCell: plan.refusedCell,
+            scopeOrigins: scopeOrigins,
+            orbState: plan.orbState,
+            voiceState: plan.voiceState,
+            dialogText: plan.dialogText,
+            readbacks: priorReadbacks + plan.readbacks,
+            proofClass: plan.proofClass
+        )
+        let readbackSteps = RuntimeReadbackEventSequence.steps(
+            snapshot: nextSnapshot,
+            initialStoreCells: initialStoreCells,
+            priorReadbacks: priorReadbacks,
+            readbacks: plan.readbacks
+        )
+        commitRuntimeReadbackSteps(readbackSteps, fallbackSnapshot: nextSnapshot)
+        messages.append(assistantMessage(for: plan))
+    }
+
+    private func assistantMessage(for plan: MockVoicePresetPlan) -> DialogueMessage {
+        let emphasis: String?
+        let tint: ThermalTint
+        switch plan.presetID {
+        case .acOnTemp24:
+            emphasis = "24度"
+            tint = .cooling
+        case .movingDoorSafetyRefusal, .movingTailgateSafetyRefusal:
+            emphasis = "安全"
+            tint = .heating
+        default:
+            emphasis = nil
+            tint = .cooling
+        }
+        return DialogueMessage(role: .assistant, text: plan.dialogText, emphasis: emphasis, emphasisTint: tint)
+    }
+
+    private func applyLegacyMockVoiceColdIntent() {
         let key = primaryACSetpointKey(in: snapshot.storeCells)
         let currentTemp = Int(cellValue(key, in: snapshot.storeCells) ?? "") ?? 26
         let targetTemp = Int(ValueRangeMapper.clamp(Double(currentTemp + 2), forBase: "ac.temp_setpoint"))
@@ -369,14 +955,22 @@ struct ContentView: View {
                 visualState: .normal
             ))
         }
-        store.replaceCells(cells)
+        // D2 cutover (grok-4.5 short review P1-1 + P1-2): mirrors the
+        // applyMockTransition fix. Applier gate refusal MUST NOT be followed
+        // by a mock apply on an unknown baseline. On refusal we return early;
+        // failureReceiver already recorded the reason tag.
+        do {
+            _ = try stateApplier.apply(cells: cells, authority: .appLegacyMockVoiceColdIntent)
+        } catch {
+            return
+        }
         let readback = store.applyMockTransition(
             DemoMockTransition(key: key, desiredValue: targetValue, source: .mock)
         )
         var scopeOrigins = snapshot.scopeOrigins
         scopeOrigins[key] = scopeOrigins[key] ?? .defaulted
-        withAnimation(.snappy(duration: 0.30)) {
-            snapshot = StagePresentationSnapshot.from(
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+            let nextSnapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: [.ac: key],
                 context: snapshot.context,
@@ -389,6 +983,7 @@ struct ContentView: View {
                 readbacks: snapshot.readbacks + [readback],
                 proofClass: .simulatorMock
             )
+            snapshot = resolveRuntimeReadbackSnapshot(nextSnapshot, readbackID: readbackRuntimeID(readback))
             messages.append(DialogueMessage(role: .user, text: "我有点冷了"))
             messages.append(DialogueMessage(
                 role: .assistant,
@@ -408,6 +1003,7 @@ struct ContentView: View {
     }
 
     private func applyNormalRunPreset() {
+        waterfallGeneration += 1   // 招牌②：reset-normal → 卡真重入场（TXB 修②）
         controlPanelState = DemoControlPanelState()
         let cells = normalRunCells()
         applySnapshotCells(
@@ -493,8 +1089,18 @@ struct ContentView: View {
         activeCells: [FamilyCardID: String],
         dialogText: String
     ) {
-        store.replaceCells(cells)
-        withAnimation(.snappy(duration: 0.28)) {
+        runtimeReadbackQueue.cancel()
+        // D2 cutover (grok-4.5 short review P1-2): force-state 控制台 / debug
+        // snapshot path. Applier refusal populates stateApplierFailureLog and
+        // this call site continues to render the snapshot from the pre-attempt
+        // store state (truthful render, not a raw replaceCells fallback).
+        do {
+            _ = try stateApplier.apply(cells: cells, authority: .appForceStateSnapshot)
+        } catch {
+            // Applier gate refused; failureReceiver already recorded the
+            // structured failure. Snapshot below renders the pre-refusal store.
+        }
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.28), reduceMotion: effectiveReduceMotion)) {
             snapshot = StagePresentationSnapshot.from(
                 store: store,
                 activeCells: activeCells,
@@ -556,9 +1162,172 @@ struct ContentView: View {
 
     private func clearAmbientBurst(id: UUID) {
         guard ambientBurst?.id == id else { return }
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(MotionAnimationFactory.guarded(.easeOut(duration: 0.18), reduceMotion: effectiveReduceMotion)) {
             ambientBurst = nil
         }
+    }
+
+    @ViewBuilder
+    private func energyLineOverlay(frames: EnergyLineFramePreferences) -> some View {
+        GeometryReader { proxy in
+            if visualSwapEnabled,
+               let signal = energyLineSignal,
+               let orb = frames.orb,
+               let target = frames.cards[signal.targetFamilyID] {
+                let orbFrame = proxy[orb]
+                let targetFrame = proxy[target]
+                // T7d 接线点：真实 anchor frame，resize/minWindow 下不使用硬编码坐标。
+                EnergyLineOverlay(
+                    from: CGPoint(x: orbFrame.midX, y: orbFrame.midY),
+                    to: CGPoint(x: targetFrame.midX, y: targetFrame.midY),
+                    triggerToken: energyLineTriggerToken,
+                    reduceMotion: effectiveReduceMotion,
+                    budget: runtimeMotionBudget,
+                    onCompletion: {
+                        completeRuntimeReadbackStep(readbackID: signal.readbackID)
+                    }
+                )
+            } else if visualSwapEnabled, let signal = energyLineSignal {
+                Color.clear
+                    .onAppear {
+                        completeRuntimeReadbackStep(readbackID: signal.readbackID)
+                    }
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func resolveRuntimeReadbackSnapshot(
+        _ nextSnapshot: StagePresentationSnapshot,
+        readbackID: String
+    ) -> StagePresentationSnapshot {
+        let incoming = T5PresentationEvent.runtime(snapshot: nextSnapshot, readbackID: readbackID)
+        return resolveRuntimeReadbackSnapshot(incoming)
+    }
+
+    private func resolveRuntimeReadbackSnapshot(_ incoming: T5PresentationEvent) -> StagePresentationSnapshot {
+        resolveRuntimeReadbackEvent(incoming).snapshot
+    }
+
+    private struct RuntimeReadbackResolution {
+        var snapshot: StagePresentationSnapshot
+        var signal: RuntimeReadbackSignal?
+    }
+
+    private func resolveRuntimeReadbackEvent(_ incoming: T5PresentationEvent) -> RuntimeReadbackResolution {
+        let resolved = T5PresentationOrchestrator().resolve(current: t5PresentationEvent, incoming: incoming)
+        t5PresentationEvent = resolved
+        let signal = RuntimeReadbackSignal.from(event: resolved)
+        if let signal {
+            energyLineSignal = signal
+            energyLineTriggerToken += 1
+        }
+        return RuntimeReadbackResolution(snapshot: resolved.snapshot, signal: signal)
+    }
+
+    private func readbackRuntimeID(_ readback: DemoActionReadback) -> String {
+        RuntimeReadbackEventSequence.readbackRuntimeID(readback)
+    }
+
+    private func commitRuntimeReadbackSteps(
+        _ steps: [RuntimeReadbackEventStep],
+        fallbackSnapshot: StagePresentationSnapshot
+    ) {
+        guard let firstStep = runtimeReadbackQueue.start(steps) else {
+            withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+                snapshot = fallbackSnapshot
+            }
+            return
+        }
+
+        applyRuntimeReadbackStep(firstStep)
+    }
+
+    private func applyRuntimeReadbackStep(_ step: RuntimeReadbackEventStep) {
+        let resolution = resolveRuntimeReadbackEvent(step.event)
+        // Capture synthesis result (AD-7 / S5). Visual-first progression continues
+        // regardless; App voiceState must not claim `.speaking` on synthesis failure.
+        let speechResult = speech.speak(step.speechText.text)
+        var appliedSnapshot = resolution.snapshot
+        if !speechResult.didEnqueue {
+            appliedSnapshot = Self.snapshotWithNonSpeakingVoice(appliedSnapshot)
+            observeRuntimeTTSFailure(
+                result: speechResult,
+                traceID: appliedSnapshot.traceId,
+                readbackID: step.event.readbackID
+            )
+        }
+        withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.30), reduceMotion: effectiveReduceMotion)) {
+            snapshot = appliedSnapshot
+        }
+        guard shouldWaitForEnergyLine(signal: resolution.signal) else {
+            completeRuntimeReadbackStep(readbackID: step.event.readbackID)
+            return
+        }
+    }
+
+    /// Freeze App `PresentationVoiceState` away from `.speaking` when TTS failed.
+    /// Visual card/dialog fields are preserved (visual-first).
+    /// Map Core `PresentationVoiceDisplayState` (payload v2) to the App
+    /// `PresentationVoiceState` surface. Only `.speak` maps to `.speaking`;
+    /// everything else freezes to `.idle` so the App never invents speaking
+    /// on synthesis failure (ROB-1 / §3.4).
+    private static func appOrbState(from payloadOrb: PresentationOrbDisplayState?) -> PresentationOrbState {
+        guard let payloadOrb else { return .idle }
+        switch payloadOrb {
+        case .idle:
+            return .idle
+        case .think:
+            return .think
+        case .listen:
+            return .listen
+        case .speak:
+            return .speak
+        }
+    }
+
+    private static func appVoiceState(from payloadVoice: PresentationVoiceDisplayState?) -> PresentationVoiceState {
+        guard let payloadVoice else { return .idle }
+        switch payloadVoice {
+        case .speak:
+            return .speaking
+        case .idle, .listen, .unavailable:
+            return .idle
+        }
+    }
+
+    private static func snapshotWithNonSpeakingVoice(
+        _ snapshot: StagePresentationSnapshot
+    ) -> StagePresentationSnapshot {
+        guard snapshot.voiceState == .speaking else { return snapshot }
+        var frozen = snapshot
+        frozen.voiceState = .idle
+        return frozen
+    }
+
+    /// Observable TTS failure on the existing InMemoryTraceLogger readback surface.
+    /// No new global state, root, or protocol.
+    private func observeRuntimeTTSFailure(
+        result: SpeechSynthesisResult,
+        traceID: String,
+        readbackID: String?
+    ) {
+        let reason = result.reason ?? "unknown"
+        let suffix = readbackID.map { " readback_id=\($0)" } ?? ""
+        traceLogger.recordReadback(
+            traceID: traceID,
+            message: "tts_fail_open:\(reason)\(suffix)",
+            attributes: TraceAttributes(readbackResult: .failed)
+        )
+    }
+
+    private func shouldWaitForEnergyLine(signal: RuntimeReadbackSignal?) -> Bool {
+        visualSwapEnabled && RuntimeReadbackSignalRouter.shouldFireEnergyLine(signal)
+    }
+
+    private func completeRuntimeReadbackStep(readbackID: String? = nil) {
+        guard let nextStep = runtimeReadbackQueue.completeInFlight(readbackID: readbackID) else { return }
+        applyRuntimeReadbackStep(nextStep)
     }
 
     private func upsertCell(
@@ -894,9 +1663,12 @@ struct DialogueMessage: Identifiable, Equatable {
 struct DialogueStream: View {
     let messages: [DialogueMessage]
     var theme: PresentationTheme
+    var forceReduceMotion = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isAtBottom = true
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     var body: some View {
         GeometryReader { geometry in
@@ -924,7 +1696,7 @@ struct DialogueStream: View {
                 )
                 .onChange(of: messages.last?.id) { _, id in
                     guard isAtBottom, let id else { return }
-                    withAnimation(.snappy(duration: 0.22)) {
+                    withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.22), reduceMotion: effectiveReduceMotion)) {
                         proxy.scrollTo(id, anchor: .bottom)
                     }
                 }
@@ -1036,58 +1808,275 @@ struct DialogueBubbleTail: Shape {
 struct MicDock: View {
     var theme: PresentationTheme
     var state: PresentationVoiceState
+    var forceReduceMotion = false
     var onMockVoiceSubmit: () -> Void = {}
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var isPressing = false
+    @State private var isCancelled = false
+    @State private var pressStartedInside = false
+    @FocusState private var isFocused: Bool
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
     private var isListening: Bool { state == .listening || isPressing }
+    private let permissionPreflightStatus: MicPermissionPreflightStatus = .stubDisabledGuidance
+    private var micLabel: String {
+        if isCancelled { return "已取消" }
+        switch state {
+        case .speaking:
+            return "正在回应"
+        case .transcribing:
+            return "正在整理"
+        case .listening:
+            return "松开发送"
+        case .idle:
+            return isPressing ? "松开发送" : "按住说话 · Option+Space"
+        }
+    }
 
     var body: some View {
-        Button(action: onMockVoiceSubmit) {
-            HStack(spacing: 16) {
-                Circle()
-                    .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
-                    .frame(width: 16, height: 16)
-                    .shadow(color: DesignTokens.glowCyan.opacity(isListening ? 0.65 : 0.35), radius: isListening ? 12 : 6)
-                Text(isListening ? "松开发送" : "按住说话")
-                    .font(.system(size: 21, weight: .semibold, design: .rounded))
-                    .foregroundStyle(palette.inkPrimary)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity)
-                WaveformMark(active: isListening, theme: theme)
-                    .frame(width: 58, height: 42)
-            }
+        GeometryReader { proxy in
+            micChrome
+                .contentShape(Capsule())
+                .gesture(pressGesture(in: proxy.size))
+        }
+        .focusable(true)
+        .focused($isFocused)
+        .onChange(of: isFocused) { _, focused in
+            if !focused { cancelPress() } // drag-out/失焦 cancel，D0G-033/D0G-034。
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { cancelPress() }
+        }
+        .micDockExitCommand(cancelPress)
+        .overlay { macKeyMonitor }
+        .accessibilityIdentifier("mic-dock")
+        .accessibilityLabel(micLabel)
+        .accessibilityHint(permissionPreflightStatus.guidance)
+    }
+
+    @ViewBuilder
+    private var micChrome: some View {
+        let content = micChromeContent
             .padding(.horizontal, 22)
-            .background(.regularMaterial, in: Capsule())
-            .glassEffect()
             .overlay {
                 Capsule().strokeBorder(palette.hairline, lineWidth: 0.5)
             }
             .shadow(color: DesignTokens.glowCyan.opacity(theme == .ivory ? 0.20 : 0.30), radius: 18, y: 8)
             .scaleEffect(isPressing ? 1.018 : 1.0)
+
+        if reduceTransparency {
+            content
+                .background {
+                    Capsule().fill(DesignTokens.reduceTransparencyChromeFill(for: theme))
+                }
+        } else {
+            content
+                .background(.regularMaterial, in: Capsule())
+                .glassEffect()
         }
-        .buttonStyle(.plain)
-        .onLongPressGesture(minimumDuration: 0.05, maximumDistance: 28) {
-        } onPressingChanged: { pressing in
-            if reduceMotion {
-                isPressing = pressing
-            } else {
-                withAnimation(.snappy(duration: 0.18)) {
-                    isPressing = pressing
+    }
+
+    private var micChromeContent: some View {
+        HStack(spacing: 16) {
+            Circle()
+                .fill(isListening ? DesignTokens.glowCyan : DesignTokens.semanticCool)
+                .frame(width: 16, height: 16)
+                .shadow(color: DesignTokens.glowCyan.opacity(isListening ? 0.65 : 0.35), radius: isListening ? 12 : 6)
+            Text(micLabel)
+                .font(.system(size: 21, weight: .semibold, design: .rounded))
+                .foregroundStyle(palette.inkPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.74)
+                .frame(maxWidth: .infinity)
+            WaveformMark(active: isListening, theme: theme, forceReduceMotion: forceReduceMotion)
+                .frame(width: 58, height: 42)
+        }
+    }
+
+    private func pressGesture(in size: CGSize) -> some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let inside = CGRect(origin: .zero, size: size).contains(value.location)
+                if !pressStartedInside && inside {
+                    pressStartedInside = true
+                    startPress()
+                } else if pressStartedInside && !inside {
+                    cancelPress()
                 }
             }
+            .onEnded { value in
+                let inside = CGRect(origin: .zero, size: size).contains(value.location)
+                guard pressStartedInside, inside else {
+                    cancelPress()
+                    return
+                }
+                commitPress()
+            }
+    }
+
+    private func startPress() {
+        isFocused = true
+        isCancelled = false
+        setPressing(true)
+    }
+
+    private func commitPress() {
+        guard isPressing else { return }
+        setPressing(false)
+        pressStartedInside = false
+        isFocused = false
+        onMockVoiceSubmit()
+    }
+
+    private func cancelPress() {
+        guard isPressing || pressStartedInside else { return }
+        setPressing(false)
+        pressStartedInside = false
+        isFocused = false
+        isCancelled = true
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 650_000_000)
+            isCancelled = false
         }
-        .accessibilityIdentifier("mic-dock")
-        .accessibilityLabel("按住说话")
+    }
+
+    private func setPressing(_ pressing: Bool) {
+        if effectiveReduceMotion {
+            isPressing = pressing
+        } else {
+            withAnimation(.snappy(duration: 0.18)) {
+                isPressing = pressing
+            }
+        }
+    }
+
+    @ViewBuilder private var macKeyMonitor: some View {
+        #if os(macOS)
+        MacPushToTalkKeyMonitor(
+            onStart: startPress,
+            onCommit: commitPress,
+            onCancel: cancelPress
+        )
+        .frame(width: 0, height: 0)
+        #endif
     }
 }
+
+enum MicPermissionPreflightStatus: String {
+    case stubDisabledGuidance
+
+    var guidance: String {
+        switch self {
+        case .stubDisabledGuidance:
+            return "麦克风权限预检接缝已保留；无权限时应禁用并显示指引，不作为现场失败。"
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func micDockExitCommand(_ action: @escaping () -> Void) -> some View {
+        #if os(macOS)
+        self.onExitCommand(perform: action)
+        #else
+        self
+        #endif
+    }
+}
+
+#if os(macOS)
+private struct MacPushToTalkKeyMonitor: NSViewRepresentable {
+    var onStart: () -> Void
+    var onCommit: () -> Void
+    var onCancel: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onStart: onStart, onCommit: onCommit, onCancel: onCancel)
+    }
+
+    func makeNSView(context: Context) -> NSView {
+        context.coordinator.install()
+        return NSView(frame: .zero)
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        context.coordinator.onStart = onStart
+        context.coordinator.onCommit = onCommit
+        context.coordinator.onCancel = onCancel
+    }
+
+    static func dismantleNSView(_ nsView: NSView, coordinator: Coordinator) {
+        coordinator.uninstall()
+    }
+
+    final class Coordinator {
+        private let optionSpaceKeyCode: UInt16 = 49
+        private let escapeKeyCode: UInt16 = 53
+        private var monitor: Any?
+        private var optionSpaceDown = false
+        var onStart: () -> Void
+        var onCommit: () -> Void
+        var onCancel: () -> Void
+
+        init(onStart: @escaping () -> Void, onCommit: @escaping () -> Void, onCancel: @escaping () -> Void) {
+            self.onStart = onStart
+            self.onCommit = onCommit
+            self.onCancel = onCancel
+        }
+
+        func install() {
+            guard monitor == nil else { return }
+            monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { [weak self] event in
+                self?.handle(event) ?? event
+            }
+        }
+
+        func uninstall() {
+            if let monitor {
+                NSEvent.removeMonitor(monitor)
+            }
+            monitor = nil
+        }
+
+        private func handle(_ event: NSEvent) -> NSEvent? {
+            if event.type == .keyDown, event.keyCode == escapeKeyCode {
+                optionSpaceDown = false
+                onCancel()
+                return nil
+            }
+
+            if event.keyCode == optionSpaceKeyCode {
+                if event.type == .keyDown,
+                   event.modifierFlags.intersection(.deviceIndependentFlagsMask).contains(.option),
+                   !event.isARepeat,
+                   !optionSpaceDown {
+                    optionSpaceDown = true
+                    onStart()
+                    return nil
+                }
+                if event.type == .keyUp, optionSpaceDown {
+                    optionSpaceDown = false
+                    onCommit()
+                    return nil
+                }
+            }
+
+            return event
+        }
+    }
+}
+#endif
 
 struct WaveformMark: View {
     var active: Bool
     var theme: PresentationTheme
+    var forceReduceMotion = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
 
     private var barHeights: [CGFloat] {
         active ? [14, 24, 34, 28, 20, 12] : [10, 18, 26, 22, 15, 10]
@@ -1100,7 +2089,7 @@ struct WaveformMark: View {
                     .fill(DesignTokens.palette(for: theme).inkPrimary.opacity(index == 0 || index == 5 ? 0.46 : 0.92))
                     .frame(width: 4, height: barHeights[index])
                     .animation(
-                        reduceMotion ? nil : .easeInOut(duration: 0.42).repeatForever(autoreverses: true).delay(Double(index) * 0.04),
+                        effectiveReduceMotion ? nil : .easeInOut(duration: 0.42).repeatForever(autoreverses: true).delay(Double(index) * 0.04),
                         value: active
                     )
             }
@@ -1114,11 +2103,22 @@ struct DemoOrbView: View {
     var theme: PresentationTheme
     var state: PresentationOrbState
     var forceReduceMotion = false
+    /// 三档动效预算（RSB §3.4）；默认 fullShowcase 保 L0 现状 parity。runtime/MLX active 时降档。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
     private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
+    private var effectiveMotionBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: effectiveReduceMotion, requested: motionBudget)
+    }
+    /// budget 感知的 orb 粒子数（reduceMotion 强制 L2 独立于 GPU budget，D0G-002/RSB §5.3）。
+    private var effectiveOrbParticleCount: Int {
+        PresentationReducedMotionPolicy.particleCount(kind: .orb,
+                                                      reduceMotion: effectiveReduceMotion,
+                                                      budget: motionBudget)
+    }
     private var diameter: CGFloat {
         switch state {
         case .idle: return 88
@@ -1129,8 +2129,8 @@ struct DemoOrbView: View {
 
     var body: some View {
         Group {
-            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion) {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion, budget: motionBudget) {
+                TimelineView(.animation(minimumInterval: PresentationReducedMotionPolicy.frameInterval(reduceMotion: effectiveReduceMotion, budget: motionBudget))) { timeline in
                     orbBody(phase: timeline.date.timeIntervalSinceReferenceDate)
                 }
             } else {
@@ -1142,7 +2142,7 @@ struct DemoOrbView: View {
     }
 
     private func orbBody(phase: TimeInterval) -> some View {
-        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion)
+        let pulse = PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion, budget: effectiveMotionBudget)
             ? 1 + sin(phase * 1.8) * 0.025
             : 1
 
@@ -1163,7 +2163,7 @@ struct DemoOrbView: View {
                     )
                     .frame(width: diameter * 1.36, height: diameter * 1.36)
                     .blur(radius: 3)
-                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion) ? 1 + sin(phase * 0.9) * 0.012 : 1)
+                    .scaleEffect(PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion, budget: effectiveMotionBudget) ? 1 + sin(phase * 0.9) * 0.012 : 1)
                 Circle()
                     .fill(
                         RadialGradient(
@@ -1226,8 +2226,9 @@ struct DemoOrbView: View {
                         .symbolRenderingMode(.hierarchical)
                         .accessibilityHidden(true)
                 }
-                if PresentationReducedMotionPolicy.allowsParticles(reduceMotion: effectiveReduceMotion) {
-                    OrbParticleField(diameter: diameter, phase: phase, theme: theme)
+                if effectiveOrbParticleCount > 0 {
+                    OrbParticleField(diameter: diameter, phase: phase, theme: theme,
+                                     particleCount: effectiveOrbParticleCount)
                 }
             }
             .frame(width: diameter, height: diameter)
@@ -1268,11 +2269,13 @@ struct OrbParticleField: View {
     var diameter: CGFloat
     var phase: TimeInterval
     var theme: PresentationTheme
+    /// 粒子数由三档 budget 控制（RSB §3.4：L0 72 / L1 48 / L2 0-24）；默认 72 保 L0 现状 parity。
+    var particleCount: Int = 72
 
     var body: some View {
         Canvas { context, size in
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            for index in 0..<72 {
+            for index in 0..<max(particleCount, 0) {
                 let xSeed = CGFloat((index * 37 + 19) % 101) / 50.5 - 1
                 let ySeed = CGFloat((index * 61 + 7) % 101) / 50.5 - 1
                 let drift = CGFloat(sin(phase * 0.34 + Double(index) * 0.71))
@@ -1342,13 +2345,25 @@ struct DeepSpaceBackground: View {
 struct StageAtmosphereLayer: View {
     var theme: PresentationTheme
     var orbState: PresentationOrbState
+    /// 三档预算（RSB §3.4）；默认 fullShowcase 保 L0 parity=138。
+    var motionBudget: PresentationMotionBudget = .preset(.fullShowcase)
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var effectiveMotionBudget: PresentationMotionBudget {
+        PresentationReducedMotionPolicy.effectiveBudget(reduceMotion: reduceMotion, requested: motionBudget)
+    }
+
+    /// budget 感知的 stage 粒子数（reduceMotion 强制 L2=0）。
+    private var effectiveStageParticleCount: Int {
+        PresentationReducedMotionPolicy.particleCount(kind: .stage,
+                                                      reduceMotion: reduceMotion,
+                                                      budget: motionBudget)
+    }
 
     var body: some View {
         Group {
-            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion) {
-                TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            if PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion, budget: motionBudget) {
+                TimelineView(.animation(minimumInterval: PresentationReducedMotionPolicy.frameInterval(reduceMotion: reduceMotion, budget: motionBudget))) { timeline in
                     GeometryReader { proxy in
                         atmosphereContent(
                             size: proxy.size,
@@ -1370,7 +2385,7 @@ struct StageAtmosphereLayer: View {
     @ViewBuilder
     private func atmosphereContent(size: CGSize, phase: TimeInterval, showParticles: Bool) -> some View {
         ZStack {
-            if showParticles, PresentationReducedMotionPolicy.allowsParticles(reduceMotion: reduceMotion) {
+            if showParticles, effectiveMotionBudget.stageParticleCount > 0 {
                 particleCanvas(size: size, phase: phase)
             }
             edgeSheen(size: size, phase: phase)
@@ -1379,7 +2394,7 @@ struct StageAtmosphereLayer: View {
 
     private func particleCanvas(size: CGSize, phase: TimeInterval) -> some View {
         Canvas { context, canvasSize in
-            for index in 0..<138 {
+            for index in 0..<max(effectiveStageParticleCount, 0) {
                 let xSeed = CGFloat((index * 43 + 17) % 997) / 997
                 let ySeed = CGFloat((index * 61 + 29) % 991) / 991
                 let drift = CGFloat(sin(phase * 0.18 + Double(index) * 0.37))
@@ -1491,12 +2506,25 @@ struct VehicleCardsGrid: View {
     var bottomInset: CGFloat = 108
     var onTapFamily: (FamilyCardID) -> Void = { _ in }
     var onValueScrub: (FamilyCardID, String, String) -> Void = { _, _, _ in }
+    var forceReduceMotion = false
 
     @State private var isUserScrolling = false
+
+    /// 招牌② 瀑布入场的 reduceMotion 守卫（D0G-002）。
+    @Environment(\.accessibilityReduceMotion) private var gridReduceMotion
+    private var gridEffectiveReduceMotion: Bool { gridReduceMotion || forceReduceMotion }
+
+    /// 招牌② 重放代号（reset/开场递增触发重入场，TXB 修②）。
+    var waterfallGeneration: Int = 0
 
     #if !os(macOS)
     @Environment(\.horizontalSizeClass) private var sizeClass
     #endif
+
+    /// 卡在全集里的扁平序号（招牌② 瀑布 delay = min(i*18ms,120ms)）。
+    private func waterfallIndex(of display: VehicleCardDisplay) -> Int {
+        displays.firstIndex { $0.id == display.id } ?? 0
+    }
 
     private var columnCount: Int {
         switch layout {
@@ -1516,8 +2544,17 @@ struct VehicleCardsGrid: View {
     }
 
     private var activeFamily: FamilyCardID? {
-        displays.first { $0.activeCell != nil }?.familyCardID ??
-            displays.first { $0.visualState != .normal }?.familyCardID
+        if let active = displays.first(where: { $0.activeCell != nil }) {
+            return active.familyCardID
+        }
+        // 清偿二值压缩债（D7/D0G-005）：按状态优先级 resolver 选【主导态】卡，
+        // 而非 binary「首个非 normal」（satisfied 在 unsafe 前时旧逻辑会误选 satisfied）。
+        let states = displays.map { $0.visualState }
+        if let idx = StateVisualPriorityResolver.featuredIndex(states: states),
+           displays[idx].visualState != .normal {
+            return displays[idx].familyCardID
+        }
+        return nil
     }
 
     private var featuredHeroFamily: FamilyCardID {
@@ -1546,7 +2583,7 @@ struct VehicleCardsGrid: View {
     var body: some View {
         Group {
             if layout == .macPanorama {
-                gridContent
+                macFeaturedContent
                     .accessibilityIdentifier("vehicle-cards-mac-panorama")
             } else {
                 ScrollViewReader { proxy in
@@ -1592,6 +2629,84 @@ struct VehicleCardsGrid: View {
         compactGridContent(for: displays)
     }
 
+    private var macFeaturedContent: some View {
+        GeometryReader { proxy in
+            let trailingInset: CGFloat = 16
+            let available = max(0, proxy.size.width - trailingInset)
+            let gap: CGFloat = 14
+            let heroWidth = macHeroColumnWidth(for: available)
+            let secondaryWidth = max(0, available - gap - heroWidth)
+            let heroFamily = featuredHeroFamily
+            HStack(alignment: .top, spacing: gap) {
+                if let display = display(for: heroFamily) {
+                    VehicleStateCard(
+                        display: display,
+                        theme: theme,
+                        isHero: true,
+                        isFaded: false,
+                        layout: layout,
+                        onTap: onTapFamily,
+                        onValueScrub: onValueScrub,
+                        forceReduceMotion: forceReduceMotion
+                    )
+                    .cardWaterfallEntrance(index: 0,
+                                           replayToken: waterfallGeneration,
+                                           reduceMotion: gridEffectiveReduceMotion)
+                    .id(display.familyCardID?.rawValue ?? display.id)
+                    .frame(width: heroWidth, alignment: .topLeading)
+                    .frame(maxHeight: .infinity, alignment: .topLeading)
+                    .energyLineCardAnchor(family: display.familyCardID)
+                }
+
+                Grid(alignment: .topLeading, horizontalSpacing: 12, verticalSpacing: 12) {
+                    ForEach(Array(macSecondaryRows.enumerated()), id: \.offset) { rowIndex, families in
+                        GridRow {
+                            ForEach(Array(families.enumerated()), id: \.element) { columnIndex, family in
+                                if let display = display(for: family) {
+                                    VehicleStateCard(
+                                        display: display,
+                                        theme: theme,
+                                        isHero: false,
+                                        isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
+                                        layout: layout,
+                                        onTap: onTapFamily,
+                                        onValueScrub: onValueScrub,
+                                        forceReduceMotion: forceReduceMotion
+                                    )
+                                    .cardWaterfallEntrance(index: macSecondaryWaterfallIndex(row: rowIndex, column: columnIndex),
+                                                           replayToken: waterfallGeneration,
+                                                           reduceMotion: gridEffectiveReduceMotion)
+                                    .energyLineCardAnchor(family: display.familyCardID)
+                                    .id(display.familyCardID?.rawValue ?? display.id)
+                                }
+                            }
+                        }
+                    }
+                }
+                .frame(width: secondaryWidth, alignment: .topLeading)
+            }
+            .padding(.trailing, trailingInset)
+        }
+    }
+
+    private func macHeroColumnWidth(for contentWidth: CGFloat) -> CGFloat {
+        T3MacWindowContract.heroWidth(forContentWidth: contentWidth)
+    }
+
+    private var macSecondaryFamilies: [FamilyCardID] {
+        FamilyCardID.displayOrder.filter { $0 != featuredHeroFamily }
+    }
+
+    private var macSecondaryRows: [[FamilyCardID]] {
+        stride(from: 0, to: macSecondaryFamilies.count, by: 3).map { index in
+            Array(macSecondaryFamilies[index ..< min(index + 3, macSecondaryFamilies.count)])
+        }
+    }
+
+    private func macSecondaryWaterfallIndex(row: Int, column: Int) -> Int {
+        return row * 3 + column + 1
+    }
+
     private var phoneFeaturedContent: some View {
         GeometryReader { proxy in
             let sideInset: CGFloat = 16
@@ -1610,8 +2725,10 @@ struct VehicleCardsGrid: View {
                             isFaded: false,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                     ForEach(displays(for: leftFeaturedFamilies(excluding: heroFamily))) { display in
@@ -1622,8 +2739,10 @@ struct VehicleCardsGrid: View {
                             isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -1638,8 +2757,10 @@ struct VehicleCardsGrid: View {
                             isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -1674,8 +2795,14 @@ struct VehicleCardsGrid: View {
                             isFaded: hasActiveFamily && display.familyCardID?.rawValue != activeFamilyID,
                             layout: layout,
                             onTap: onTapFamily,
-                            onValueScrub: onValueScrub
+                            onValueScrub: onValueScrub,
+                            forceReduceMotion: forceReduceMotion
                         )
+                        // 招牌②：10 卡入场瀑布（onAppear 首播；reset/开场 waterfallGeneration 递增真重播，TXB 修②）
+                        .cardWaterfallEntrance(index: waterfallIndex(of: display),
+                                               replayToken: waterfallGeneration,
+                                               reduceMotion: gridEffectiveReduceMotion)
+                        .energyLineCardAnchor(family: display.familyCardID)
                         .id(display.familyCardID?.rawValue ?? display.id)
                     }
                 }
@@ -1702,7 +2829,7 @@ struct VehicleCardsGrid: View {
     private func scrollActiveIntoView(_ proxy: ScrollViewProxy) {
         guard !isUserScrolling, let id = activeFamilyID else { return }
         DispatchQueue.main.async {
-            withAnimation(.snappy(duration: 0.32)) {
+            withAnimation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: gridEffectiveReduceMotion)) {
                 proxy.scrollTo(id, anchor: .top)
             }
         }
@@ -1717,11 +2844,19 @@ struct VehicleStateCard: View {
     var layout: VehicleCardsGridLayout = .phoneScroll
     var onTap: (FamilyCardID) -> Void = { _ in }
     var onValueScrub: (FamilyCardID, String, String) -> Void = { _, _, _ in }
+    var forceReduceMotion = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @State private var breathe = false
+    @State private var isHovered = false
+    @State private var showsDwellTooltip = false
+    @State private var hoverTask: Task<Void, Never>?
+    @FocusState private var isKeyboardFocused: Bool
+    private let hoverDwellNanoseconds: UInt64 = 800_000_000
 
     private var palette: ThemePalette { DesignTokens.palette(for: theme) }
+    private var effectiveReduceMotion: Bool { reduceMotion || forceReduceMotion }
     private var appearance: CardAppearance { CardAppearance.of(display.visualState, theme: theme) }
     private var effectiveAppearance: CardAppearance {
         isFaded ? CardAppearance.of(.normal, theme: theme) : appearance
@@ -1737,6 +2872,17 @@ struct VehicleStateCard: View {
     private var edgeAccentColor: Color {
         usesDeepSpaceHeatingEdge ? DesignTokens.semanticWarmGoldGray : effectiveAppearance.border
     }
+    private var hoverActive: Bool {
+        isHovered && !isKeyboardFocused // keyboard focus wins hover, D0G-031.
+    }
+    private var interactionScale: CGFloat {
+        if isKeyboardFocused { return 1.014 }
+        if hoverActive { return 1.01 }
+        return 1
+    }
+    private var interactionLift: CGFloat {
+        isKeyboardFocused ? 7 : (hoverActive ? 4 : 0)
+    }
 
     var body: some View {
         Button {
@@ -1746,10 +2892,92 @@ struct VehicleStateCard: View {
         }
         .buttonStyle(.plain)
         .opacity(isFaded ? 0.96 : 1.0)
-        .scaleEffect(isHero ? 1.018 : 1.0, anchor: .center)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.32), value: isHero)
+        .scaleEffect((isHero ? 1.018 : 1.0) * interactionScale, anchor: .center)
+        .offset(y: -interactionLift)
+        .overlay { interactionOutline }
+        .overlay(alignment: .topLeading) { dwellTooltip }
+        .focusable(true)
+        .focused($isKeyboardFocused)
+        .onHover(perform: updateHover)
+        .onChange(of: isKeyboardFocused) { _, focused in
+            if focused {
+                showsDwellTooltip = false
+            }
+        }
+        .onChange(of: display.visualState) { _, _ in
+            resetHoverPresentation()
+        }
+        .onChange(of: display.accessibilityKey) { _, _ in
+            resetHoverPresentation()
+        }
+        .animation(MotionAnimationFactory.guarded(.snappy(duration: 0.32), reduceMotion: effectiveReduceMotion), value: isHero)
+        .animation(MotionAnimationFactory.guarded(.snappy(duration: 0.18), reduceMotion: effectiveReduceMotion), value: hoverActive)
+        .animation(MotionAnimationFactory.guarded(.snappy(duration: 0.18), reduceMotion: effectiveReduceMotion), value: isKeyboardFocused)
+        .help(helpText)
         .accessibilityIdentifier("vehicle-card-\(display.accessibilityKey)")
         .accessibilityLabel("\(display.title) \(display.valueText) \(a11yState)")
+    }
+
+    @ViewBuilder private var interactionOutline: some View {
+        if isKeyboardFocused || hoverActive {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .strokeBorder(
+                    isKeyboardFocused ? DesignTokens.semanticCoolBright : palette.hairline.opacity(0.84),
+                    lineWidth: isKeyboardFocused ? 2.4 : 1.3
+                )
+                .shadow(
+                    color: DesignTokens.semanticCoolBright.opacity(isKeyboardFocused ? 0.26 : 0.14),
+                    radius: isKeyboardFocused ? 10 : 5
+                )
+                .allowsHitTesting(false)
+        }
+    }
+
+    @ViewBuilder private var dwellTooltip: some View {
+        if showsDwellTooltip, hoverActive {
+            Text(helpText)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(palette.inkPrimary)
+                .lineLimit(1)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(palette.surface.opacity(theme == .ivory ? 0.96 : 0.88), in: Capsule())
+                .overlay {
+                    Capsule().strokeBorder(palette.hairline, lineWidth: 0.6)
+                }
+                .padding(10)
+                .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                .allowsHitTesting(false)
+        }
+    }
+
+    private var helpText: String {
+        if let reason = display.reason, !reason.isEmpty {
+            return reason
+        }
+        return "\(display.title)：Enter 或 Space 查看详情"
+    }
+
+    private func updateHover(_ hovering: Bool) {
+        isHovered = hovering
+        hoverTask?.cancel()
+        hoverTask = nil
+        if hovering {
+            hoverTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: hoverDwellNanoseconds)
+                guard !Task.isCancelled else { return }
+                showsDwellTooltip = isHovered && !isKeyboardFocused
+            }
+        } else {
+            showsDwellTooltip = false
+        }
+    }
+
+    private func resetHoverPresentation() {
+        isHovered = false
+        showsDwellTooltip = false
+        hoverTask?.cancel()
+        hoverTask = nil
     }
 
     private var cardContent: some View {
@@ -1774,7 +3002,7 @@ struct VehicleStateCard: View {
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .onAppear { updateBreathe() }
             .onChange(of: glowActive) { _, _ in updateBreathe() }
-            .onChange(of: reduceMotion) { _, _ in updateBreathe() }
+            .onChange(of: effectiveReduceMotion) { _, _ in updateBreathe() }
     }
 
     private var cardSpecularLayer: some View {
@@ -1826,6 +3054,7 @@ struct VehicleStateCard: View {
                         .font(.system(size: isHero ? 16 : 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(palette.inkPrimary)
                         .lineLimit(1)
+                        .minimumScaleFactor(isHero ? 0.85 : 0.78)
                         .truncationMode(.tail)
                     if let badge = display.scopeBadge {
                         scopeBadgeView(badge)
@@ -1855,11 +3084,17 @@ struct VehicleStateCard: View {
             }
 
             if let reason = display.reason {
+                // D0G-006：clarify/兜底态 reason 卡内展示；tooltip 与卡内文案【同源】(同一 reason 串)，
+                // 截断时 hover 悬停展开全文，**无二次执行按钮**（澄清不放独立 action）。
                 Text(reason)
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(palette.inkDim)
                     .lineLimit(1)
+                    .minimumScaleFactor(isHero ? 0.85 : 0.75)
                     .truncationMode(.tail)
+                    .help(reason)
+                    // B⑤ fallback 不丢脸卡：reason badge 滑入(x -4→0，40-160ms)，兜底态入场契约（teardown §5.4）
+                    .fallbackBadgeTransition(visible: true, reduceMotion: effectiveReduceMotion)
             }
         }
     }
@@ -1909,7 +3144,7 @@ struct VehicleStateCard: View {
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
                 .foregroundStyle(valueColor)
                 .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .snappy, value: display.valueText)
+                .animation(MotionAnimationFactory.guarded(.snappy, reduceMotion: effectiveReduceMotion), value: display.valueText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
                 .truncationMode(.tail)
@@ -1925,7 +3160,7 @@ struct VehicleStateCard: View {
                 .font(.system(size: standardValueSize, weight: standardValueWeight, design: .rounded))
                 .foregroundStyle(valueColor)
                 .contentTransition(.numericText())
-                .animation(reduceMotion ? nil : .snappy, value: display.valueText)
+                .animation(MotionAnimationFactory.guarded(.snappy, reduceMotion: effectiveReduceMotion), value: display.valueText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.58)
                 .truncationMode(.tail)
@@ -1976,8 +3211,7 @@ struct VehicleStateCard: View {
 
     @ViewBuilder private var cardBackground: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(.regularMaterial)
+            cardMaterialBase
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(palette.surfaceElevated.opacity(surfaceOpacity))
             LinearGradient(colors: [
@@ -1994,6 +3228,16 @@ struct VehicleStateCard: View {
                 LinearGradient(colors: DesignTokens.thermalGradient(for: thermalTint).map { $0.opacity(theme == .ivory ? (isHero ? 0.105 : 0.055) : 0.16) },
                                startPoint: .leading, endPoint: .trailing)
             }
+        }
+    }
+
+    @ViewBuilder private var cardMaterialBase: some View {
+        if reduceTransparency {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(DesignTokens.reduceTransparencyCardFill(for: theme))
+        } else {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(.regularMaterial)
         }
     }
 
@@ -2249,7 +3493,7 @@ struct VehicleStateCard: View {
     }
 
     private func updateBreathe() {
-        guard PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: reduceMotion), glowActive || isHero else {
+        guard PresentationReducedMotionPolicy.allowsContinuousAnimation(reduceMotion: effectiveReduceMotion), glowActive || isHero else {
             breathe = false
             return
         }

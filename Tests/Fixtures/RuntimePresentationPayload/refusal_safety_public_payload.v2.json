@@ -1,0 +1,43 @@
+{
+  "cardSemantics": [
+    {
+      "cellKey": "door.lock",
+      "isActive": false,
+      "reason": "safety_policy_refusal",
+      "role": "refused",
+      "scopeOrigin": "explicit",
+      "siblingKeys": []
+    }
+  ],
+  "cards": [
+    {
+      "actualValue": "locked",
+      "availability": "available",
+      "key": "door.lock",
+      "revision": 3,
+      "source": "mock",
+      "visualState": "unsafe"
+    }
+  ],
+  "eventID": "event-refusal-safety-1",
+  "isTerminal": true,
+  "mutationCount": 0,
+  "orbState": "think",
+  "outcome": {
+    "reason": "safety_policy_refusal",
+    "result": "refusal_safety_or_policy"
+  },
+  "readbacks": [],
+  "reconciliation": {
+    "safeReason": "guard_refused",
+    "status": "not_applicable"
+  },
+  "schemaVersion": "r5_runtime_presentation_payload_v2",
+  "traceEnvelope": {
+    "entries": [],
+    "traceID": "trace-refusal-safety-1"
+  },
+  "traceID": "trace-refusal-safety-1",
+  "turnID": "turn-refusal-safety-1",
+  "voiceState": "idle"
+}

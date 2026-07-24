@@ -1,0 +1,13 @@
+{
+  "schema_version": "closure_status_transition_receipt_v1",
+  "package_id": "W5a",
+  "package_revision": 1,
+  "sequence": 3,
+  "from_state": "ready",
+  "to_state": "running",
+  "trigger_decision": "G1-T1 implementation round entered production-shaped repair",
+  "evidence": {"root": "repo", "path": "Core/Presentation/FrontstageCustomerIngress.swift", "sha256": "5c3fb675b4da516a1e04cd2c49bb327ac0eca463d405b52a03aefa6bbaac6a5b"},
+  "repo_head": "0d5e5f8121ea4291dced05cb32f3b3a2960f5add",
+  "command_rc": 0,
+  "reviewer": "commander"
+}

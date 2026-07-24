@@ -1,0 +1,171 @@
+{
+  "authority_id": "c6_active_authority_v1",
+  "authority_version": 1,
+  "schema_version": "c6_active_authority_v1",
+  "subject_schema_id": "c6_authority_subject_v1",
+  "status": "CANDIDATE",
+  "ratification_refs": [
+    {
+      "path": "docs/commander-log/decisions.md",
+      "locator": "D-147",
+      "sha256": "e645ce44cc14f458381a4a0df49f7237102b138505e3fd633ccec2b87c88ad7e"
+    },
+    {
+      "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
+      "locator": "pool32",
+      "sha256": "70470bc39c8a3137a4c4d298de1533502ed18b78b237d22d53d4f7b1bb43eacb"
+    }
+  ],
+  "decision_refs": [
+    {
+      "decision_id": "D-147",
+      "required_state": "ratified"
+    },
+    {
+      "decision_id": "D-144",
+      "required_state": "ratified"
+    }
+  ],
+  "source_members": [
+    {
+      "member_id": "d147_decisions",
+      "role": "ratification_decision",
+      "path": "docs/commander-log/decisions.md",
+      "locator": "D-147",
+      "sha256": "e645ce44cc14f458381a4a0df49f7237102b138505e3fd633ccec2b87c88ad7e",
+      "subject_bindings": [
+        "ratification_decision"
+      ]
+    },
+    {
+      "member_id": "pool32_ratification_receipt",
+      "role": "ratification_receipt",
+      "path": "docs/closure-evidence/2026-07-11-ma14-RATIFICATION-RECEIPT-pool32.md",
+      "locator": "pool32",
+      "sha256": "70470bc39c8a3137a4c4d298de1533502ed18b78b237d22d53d4f7b1bb43eacb",
+      "subject_bindings": [
+        "ratification_receipt_sha256"
+      ]
+    },
+    {
+      "member_id": "closure_work_packages_v1",
+      "role": "registry_package_entry",
+      "path": "contracts/closure-work-packages.v1.yaml",
+      "locator": "V1",
+      "sha256": "6db1ea3cf68aadcec0ec6e2dbae9e748180cd548587b6c833ecb3b202441987d",
+      "subject_bindings": [
+        "authority_id"
+      ]
+    },
+    {
+      "member_id": "rebuild_c6_proposal",
+      "role": "rebuild_proposal",
+      "path": "openspec/changes/rebuild-c6-four-layer-bench/proposal.md",
+      "locator": "AD-C6 thresholds+roster",
+      "sha256": "2d389203f88a32f87349e71df0c0a93fd1ddce1adbf98b7f76c6fec90d099123",
+      "subject_bindings": [
+        "golden_threshold",
+        "demo_fuzz_formula",
+        "unsupported_threshold",
+        "safety_threshold",
+        "demo_fuzz_family_count"
+      ]
+    },
+    {
+      "member_id": "rebuild_c6_design",
+      "role": "rebuild_design",
+      "path": "openspec/changes/rebuild-c6-four-layer-bench/design.md",
+      "locator": "AD-C6-007/008/009/015",
+      "sha256": "a8c3d40d3f55ed0bccd2f86894521fce26d3b80ccdeffe4dd1dfbe2010cc42aa",
+      "subject_bindings": [
+        "behavior_class_count",
+        "governance_axis_count",
+        "readback_field_count",
+        "contract_bundle_component_count"
+      ]
+    },
+    {
+      "member_id": "rebuild_c6_tasks",
+      "role": "rebuild_tasks",
+      "path": "openspec/changes/rebuild-c6-four-layer-bench/tasks.md",
+      "locator": "T01 authority construction tasks",
+      "sha256": "83298a3ff563b7ecff28441c66a2517f378a9b8f5d2e4c95d2e71680b6fc8ad4",
+      "subject_bindings": [
+        "authority_version"
+      ]
+    },
+    {
+      "member_id": "active_vehicle_tool_bench_spec",
+      "role": "active_c6_spec",
+      "path": "openspec/specs/vehicle-tool-bench/spec.md",
+      "locator": "vehicle-tool-bench active",
+      "sha256": "3c06e4a6a6bbfd5e45550c4b4dc3f7f2e7676431c6cb7274d7e58fd88bcebed2",
+      "subject_bindings": [
+        "authority_id",
+        "authority_digest"
+      ]
+    }
+  ],
+  "subject": {
+    "four_layer_thresholds": {
+      "golden": 1.0,
+      "demo_fuzz": {
+        "formula": "5*pass >= 4*eligible",
+        "description": "Integer arithmetic: 5 * pass_count >= 4 * eligible_count. Denominator zero, missing run, or denominator-positive/pass-zero blocks promotion."
+      },
+      "unsupported": 1.0,
+      "safety": 1.0
+    },
+    "behavior_classes": [
+      "tool_call",
+      "clarify_missing_slot",
+      "refusal_no_available_tool",
+      "refusal_safety_or_policy",
+      "already_state_noop"
+    ],
+    "demo_fuzz_family_roster": [
+      "ac_temperature",
+      "window",
+      "screen_brightness",
+      "atmosphere_lamp_color",
+      "atmosphere_lamp_brightness",
+      "ac_windspeed",
+      "car_door"
+    ],
+    "governance_axes": [
+      "construction",
+      "candidate_formation",
+      "authorization",
+      "execution",
+      "acceptance"
+    ],
+    "readback_fields": [
+      "model_hard_pass_basis",
+      "model_hard_failed",
+      "readback_applicable",
+      "readback_match",
+      "readback_hard_failed",
+      "readback_excluded_from_model_hard_pass",
+      "renderer_contract_digest"
+    ],
+    "contract_bundle_component_ids": [
+      "c1_semantic_function_contract",
+      "c2_renderer_state_cells",
+      "c6_bench_cases",
+      "qwen_tool_call_format",
+      "d_domain_ir_map",
+      "d_domain_demo_tool_catalog",
+      "risk_policy"
+    ],
+    "hard_layer_denominators": {
+      "golden": 0,
+      "demo_fuzz": 0,
+      "unsupported": 0,
+      "safety": 0
+    }
+  },
+  "digest": {
+    "sha256": "adc6b42c84f1c43c491db7dd5dadd0f283bedcf877f85862ab3bd3fb6c2be686",
+    "algorithm": "sha256"
+  }
+}

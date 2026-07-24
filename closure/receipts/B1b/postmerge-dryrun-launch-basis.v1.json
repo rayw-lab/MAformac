@@ -1,0 +1,105 @@
+{
+  "artifact_kind": "s8_flight_launch_basis",
+  "basis": {
+    "all_gates": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s7-formal/all-gates-receipt.json",
+      "status": "PASS"
+    },
+    "host": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s7-formal/launch-packet/host-fresh-resample-receipt.txt",
+      "status": "PASS_D098_REFINED_SWAP_PREDICATE"
+    },
+    "launch_packet_recipe": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s7-formal/launch-packet/s8-recipe-1800.yaml",
+      "sha256": "0d2a9696a98892d31d71cb58adb2eabaa3c3fb0f3703a9c65ed20cafc1ebbf16"
+    },
+    "recipe": {
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s8-recipe-1800.yaml",
+      "sha256": "0d2a9696a98892d31d71cb58adb2eabaa3c3fb0f3703a9c65ed20cafc1ebbf16"
+    },
+    "s7c": {
+      "launch_ok": false,
+      "operator_override_allowed_blocked_s7c": false,
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s7c/S7C-PROBE-RECEIPT.md",
+      "status": "NOT_UNLOCKED_OR_BLOCKED"
+    },
+    "sha256sums": {
+      "check_status": "PASS",
+      "path": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s7-formal/launch-packet/SHA256SUMS",
+      "stdout": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-postmerge-20260711T143544+0800/sha256sums.check.stdout"
+    }
+  },
+  "created_at": "2026-07-11T14:35:44+0800",
+  "fresh_full": {
+    "prelaunch_inventory": {
+      "checked": [
+        "adapters-rank16",
+        "metrics.jsonl",
+        "checkpoints",
+        "trainer.pid",
+        "train.stdout.log",
+        "train.stderr.log",
+        "c5_mlx_train_loop.snapshot.py",
+        "trainer.rc",
+        "trainer.supervisor.pid",
+        "s8-model-artifact-manifest.v1.json"
+      ],
+      "empty": true,
+      "present": [],
+      "run_dir_existed": true
+    },
+    "resume_adapter_file": null
+  },
+  "gate_strength_delta": "strengthened",
+  "gate_strength_delta_detail": {
+    "after": "pre-materialization zero-residue inventory; nonce/PID identity; explicit resume null; supervisor rc sidecar",
+    "before": "train.stdout.log-only residue check; no nonce; no explicit resume null; no rc sidecar producer"
+  },
+  "launch_allowed": false,
+  "launch_identity": {
+    "nonce": "4578bab0-aec1-4025-8c24-f769d123c02b",
+    "run_id": "b1b-stage1-postmerge-20260711T143544+0800",
+    "trainer_pid": "DRY_RUN_NOT_STARTED"
+  },
+  "mode": "dry-run",
+  "non_claims": [
+    "not_candidate_signed",
+    "not_c6_vpass",
+    "not_true_resume",
+    "not_training_completion"
+  ],
+  "proof_class": "local_dry_run",
+  "rendered": {
+    "base_model": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-03-n2n4-train-readiness/PR38-final-n4a-recipe-build/qwen3-1_7b-training-tokenizer-patched",
+    "command_file": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-postmerge-20260711T143544+0800/train.command.txt",
+    "command_sha256": "e54a0c0ea52adb57a7fbc5d7e2b6fc18e559ef7515674ca694023c38e55ffc6a",
+    "config": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-postmerge-20260711T143544+0800/mlx-lora-config.yaml",
+    "source_mlx_data": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-07-w20a-grill-closeout/register-window/s8-gates/s7-formal/prepare/mlx-data",
+    "train_loop": "/Users/wanglei/workspace/MAformac-b1b-stage1/Tools/C5TrainingCLI/c5_mlx_train_loop.py"
+  },
+  "restart_policy": {
+    "default_mode": "segmented_restart_first",
+    "resume_semantics_correctness": "segmented_restart_declared",
+    "resume_truth_class": "adapter_warm_start_only",
+    "true_resume_supported": false
+  },
+  "run_dir": "/Users/wanglei/Projects/agent-tmux-stack-research/runs/2026-07-11-ma15/evidence/b1b-stage1-postmerge-20260711T143544+0800",
+  "schema_version": "s8_launch_basis_receipt_v2",
+  "status": "DRY_RUN_READY_NOT_LAUNCHED",
+  "trainer_pid": "DRY_RUN_NOT_STARTED",
+  "training_recipe_lock": {
+    "batch_size": 4,
+    "checkpoint_iters": [
+      600,
+      1200,
+      1800
+    ],
+    "grad_accumulation_steps": 4,
+    "grad_checkpoint": true,
+    "iters": 1800,
+    "lr_schedule_decay_steps": 450,
+    "recipe_id": "S8-RW-NEW-RECIPE-RANK16-1800",
+    "token_budget_per_batch": 8192,
+    "warmup_steps": 36
+  }
+}
