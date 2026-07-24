@@ -40,10 +40,15 @@ final class RuntimeActionReadbackProbeTests: XCTestCase {
   func testProductAcceptanceRoutePassesActionProbeCatalog() async throws {
     let witness = try requireWitnessBindings()
     let catalog = try loadCatalog()
-    XCTAssertEqual(catalog.probes.count, 3)
+    XCTAssertEqual(catalog.probes.count, 4)
 
     var observedCases: [ObservedActionProbeCase] = []
     for probe in catalog.probes {
+      let manifestCell = try XCTUnwrap(
+        DemoCapabilityMatrixCatalog.cells.first { $0.matrixID == probe.matrixID },
+        probe.probeID
+      )
+      XCTAssertEqual(manifestCell.representativeTool, probe.representativeTool, probe.probeID)
       let store = DemoVehicleStateStore()
       let trace = InMemoryTraceLogger()
       let speech = RecordingSpeechSynthesisEngine()
@@ -68,10 +73,12 @@ final class RuntimeActionReadbackProbeTests: XCTestCase {
       let traceEntries = trace.entries.filter { $0.traceID == payload.traceID }
       let observedToolCallCount = route.runnerCallCount
       let emittedToolNames = [execution.admission.frame.toolName]
+      let emittedActionPrimitive = execution.admission.frame.actionPrimitive
       let stateDeltas = stateDeltas(before: beforeCells, after: store.cells)
 
       XCTAssertEqual(observedToolCallCount, 1, probe.probeID)
-      XCTAssertEqual(emittedToolNames, [probe.representativeTool], probe.probeID)
+      XCTAssertEqual(emittedToolNames, [probe.requiredEmittedToolName], probe.probeID)
+      XCTAssertEqual(emittedActionPrimitive, probe.requiredActionPrimitive, probe.probeID)
       XCTAssertTrue(beforeHash != afterHash, probe.probeID)
       XCTAssertEqual(
         store.cell(for: probe.expectedStateDelta.key)?.actualValue,
@@ -122,6 +129,9 @@ final class RuntimeActionReadbackProbeTests: XCTestCase {
           stageTraceIDs: stageTraceIDs,
           observedToolCallCount: observedToolCallCount,
           emittedToolNames: emittedToolNames,
+          requiredEmittedToolName: probe.requiredEmittedToolName,
+          requiredActionPrimitive: probe.requiredActionPrimitive,
+          emittedActionPrimitive: emittedActionPrimitive,
           stateBeforeSHA256: beforeHash,
           stateAfterSHA256: afterHash,
           stateMutation: true,
@@ -295,6 +305,8 @@ private struct ActionProbe: Decodable {
   let register: String
   let utterance: String
   let representativeTool: String
+  let requiredEmittedToolName: String
+  let requiredActionPrimitive: String
   let expectedStateDelta: ExpectedStateDelta
   let expectedReadback: ExpectedReadback
 }
@@ -340,6 +352,9 @@ private struct ObservedActionProbeCase: Codable {
   let stageTraceIDs: [String: [String]]
   let observedToolCallCount: Int
   let emittedToolNames: [String]
+  let requiredEmittedToolName: String
+  let requiredActionPrimitive: String
+  let emittedActionPrimitive: String
   let stateBeforeSHA256: String
   let stateAfterSHA256: String
   let stateMutation: Bool

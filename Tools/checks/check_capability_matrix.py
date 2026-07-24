@@ -418,8 +418,14 @@ def _action_probe_pass_failures(case: dict[str, Any], probe: dict[str, Any]) -> 
         failures.append("E_ACTION_PROBE_CONDITIONAL_ONLY")
     if case.get("observedToolCallCount") != 1:
         failures.append("E_ACTION_PROBE_NO_SINGLE_TOOL_CALL")
-    if case.get("emittedToolNames") != [probe["representativeTool"]]:
+    if case.get("emittedToolNames") != [probe["requiredEmittedToolName"]]:
         failures.append("E_ACTION_PROBE_TOOL_MISMATCH")
+    if case.get("requiredEmittedToolName") != probe["requiredEmittedToolName"]:
+        failures.append("E_ACTION_PROBE_EMITTED_TOOL_IDENTITY_MISMATCH")
+    if case.get("requiredActionPrimitive") != probe["requiredActionPrimitive"]:
+        failures.append("E_ACTION_PROBE_PRIMITIVE_IDENTITY_MISMATCH")
+    if case.get("emittedActionPrimitive") != probe["requiredActionPrimitive"]:
+        failures.append("E_ACTION_PROBE_PRIMITIVE_MISMATCH")
     if (
         case.get("stateMutation") is not True
         or case.get("stateBeforeSHA256") == case.get("stateAfterSHA256")
@@ -526,6 +532,8 @@ def evaluate_action_probe_receipt(
             raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE") from error
         if receipt.get("runtimeContractBundleDigest") != manifest.get("runtime_contract_bundle_digest"):
             raise ValueError("E_ACTION_PROBE_RUNTIME_BUNDLE_STALE")
+        if receipt.get("probe_catalog_sha256") != sha256_file(catalog_path):
+            raise ValueError("E_ACTION_PROBE_CATALOG_SHA_MISMATCH")
 
     scope = receipt.get("scope")
     scoped_matrix_ids: set[int] | None = None
@@ -568,6 +576,8 @@ def evaluate_action_probe_receipt(
                 "register": probe.get("register"),
                 "utterance": utterance,
                 "representativeTool": probe.get("representativeTool"),
+                "requiredEmittedToolName": probe.get("requiredEmittedToolName"),
+                "requiredActionPrimitive": probe.get("requiredActionPrimitive"),
                 "expectedStateDelta": probe.get("expectedStateDelta"),
                 "expectedReadback": probe.get("expectedReadback"),
             },
@@ -587,6 +597,15 @@ def evaluate_action_probe_receipt(
             or probe.get("representativeTool") != canonical_row.get("representative_tool")
         ):
             raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
+        required_emitted_tool_name = probe.get("requiredEmittedToolName")
+        required_action_primitive = probe.get("requiredActionPrimitive")
+        if (
+            not isinstance(required_emitted_tool_name, str)
+            or not required_emitted_tool_name.strip()
+            or not isinstance(required_action_primitive, str)
+            or not required_action_primitive.strip()
+        ):
+            raise ValueError("E_ACTION_PROBE_DUAL_IDENTITY_MISSING")
         probes_by_id[probe_id] = probe
         probes_by_matrix_id[matrix_id] = probe
         probe_utterances.add(utterance)
@@ -618,7 +637,7 @@ def evaluate_action_probe_receipt(
         probe = probes_by_id.get(probe_id)
         if probe is None or matrix_id != probe.get("matrixID"):
             raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
-        for key in ("register", "utterance", "representativeTool"):
+        for key in ("register", "utterance", "representativeTool", "requiredEmittedToolName", "requiredActionPrimitive"):
             if case.get(key) != probe.get(key):
                 raise ValueError("E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH")
         cases_by_id[probe_id] = case
@@ -1165,6 +1184,10 @@ def build_parser() -> argparse.ArgumentParser:
     subcommands.choices["check"].add_argument("--matrix", required=True, type=Path)
     subcommands.choices["check"].add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
     subcommands.choices["check"].add_argument("--receipt", required=True, type=Path)
+    action_probes = subcommands.add_parser("action-probes")
+    action_probes.add_argument("--action-probe-catalog", type=Path, default=DEFAULT_ACTION_PROBE_CATALOG)
+    action_probes.add_argument("--action-probe-receipt", required=True, type=Path)
+    action_probes.add_argument("--output", type=Path)
     return parser
 
 
@@ -1186,6 +1209,23 @@ def main(argv: list[str] | None = None) -> int:
             bf8_receipt_set_path=args.bf8_receipt_set,
         )
         write_json(args.output, matrix)
+        return 0
+    if args.command == "action-probes":
+        try:
+            evaluation = evaluate_action_probe_receipt(
+                receipt=action_probe_receipt,
+                receipt_path=args.action_probe_receipt,
+                catalog_path=args.action_probe_catalog,
+            )
+        except ValueError as error:
+            print(str(error), file=sys.stderr)
+            return 1
+        if args.output:
+            write_json(args.output, evaluation)
+        if evaluation["failures_by_matrix_id"]:
+            print(json.dumps(evaluation, ensure_ascii=False, sort_keys=True), file=sys.stderr)
+            return 1
+        print(json.dumps(evaluation, ensure_ascii=False, sort_keys=True))
         return 0
     if not args.schema.exists():
         print(f"missing schema: {args.schema}", file=sys.stderr)

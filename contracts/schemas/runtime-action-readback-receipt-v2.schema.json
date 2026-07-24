@@ -11,7 +11,7 @@
     "nonce": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
     "buildIdentity": {"type": "string", "minLength": 1}, "modelIdentity": {"type": "string", "minLength": 1},
     "runtimeContractBundleDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "probe_catalog_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "probe_catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "scope": {
       "type": "object",
       "required": ["matrix_ids"],
@@ -21,7 +21,40 @@
       },
       "additionalProperties": false
     },
-    "cases": {"type": "array", "minItems": 1, "items": {"type": "object"}}
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["probeID", "matrixID", "representativeTool", "requiredEmittedToolName", "requiredActionPrimitive", "emittedToolNames", "emittedActionPrimitive", "observedToolCallCount", "stateMutation", "stateDeltas", "confirmedState", "resultKind", "reconciliationStatus", "readbacks"],
+        "properties": {
+          "probeID": {"type": "string", "pattern": "^probe\\.action\\.matrix\\.\\d+\\.zh-CN$"},
+          "matrixID": {"type": "integer"},
+          "register": {"type": "string"},
+          "utterance": {"type": "string"},
+          "representativeTool": {"type": "string", "minLength": 1},
+          "requiredEmittedToolName": {"type": "string", "minLength": 1},
+          "requiredActionPrimitive": {"type": "string", "minLength": 1},
+          "emittedActionPrimitive": {"type": "string", "minLength": 1},
+          "pathKind": {"type": "string"},
+          "injectionUsed": {"type": "boolean"},
+          "acceptanceRouteID": {"type": "string"},
+          "traceID": {"type": "string"},
+          "stageTraceIDs": {"type": "object"},
+          "observedToolCallCount": {"type": "integer"},
+          "emittedToolNames": {"type": "array", "items": {"type": "string"}},
+          "stateBeforeSHA256": {"type": "string"},
+          "stateAfterSHA256": {"type": "string"},
+          "stateMutation": {"type": "boolean"},
+          "stateDeltas": {"type": "array"},
+          "confirmedState": {"type": "object"},
+          "resultKind": {"type": "string"},
+          "reconciliationStatus": {"type": "string"},
+          "readbacks": {"type": "array"}
+        },
+        "additionalProperties": false
+      }
+    }
   },
   "additionalProperties": false
 }

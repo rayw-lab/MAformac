@@ -28,11 +28,13 @@ GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
 SCOPED_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json
+SCOPED_M1_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-1-4.json
 BF8_PROMOTION_RECEIPT_SET := contracts/governance/bf8-promotion-receipt-set.v1.json
 
 .PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e verify-bf8-receipt-set
 .PHONY: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
 .PHONY: verify-e2e-row167 verify-e2e-query verify-e2e-risk verify-e2e-replay verify-e2e-cancel verify-e2e-receipt
+.PHONY: verify-m1-action-probe-receipt
 
 .venv/.deps.stamp: scripts/requirements.txt
 	$(PYTHON_BOOTSTRAP) -m venv .venv
@@ -319,6 +321,45 @@ verify-c1-action-probes: verify-runtime-bundle
 	swift test --filter RuntimeActionReadbackProbeTests
 	test -f .build/c1-run/receipts/c1/runtime-action-readback-probes.json
 	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/runtime-action-readback-receipt-v2.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path(".build/c1-run/receipts/c1/runtime-action-readback-probes.json").read_text()))'
+
+# m1 pre-H2 WaveA gate: exact dual-identity (representativeTool vs requiredEmittedToolName/
+# requiredActionPrimitive) action-probe receipt scoped to [1,4]. Ephemeral .build receipts
+# only — NONPROMOTABLE_PRECOMMIT: no BF8 issuance, no registry append, no matrix/Swift
+# materialization, no proven claim. H_e1 is evidence-only; promotion to BF8/registry/proven
+# requires H2 post-E1 and never happens in this gate.
+verify-m1-action-probe-receipt: verify-runtime-bundle
+	$(PYTHON) -m py_compile Tools/checks/check_capability_matrix.py scripts/knife1_scope_action_probe_receipt.py scripts/test_knife1_scope_action_probe_receipt.py scripts/test_check_capability_matrix.py scripts/test_int_v5a_v5c_preflight_contract.py
+	$(PYTHON) -m unittest -v scripts/test_knife1_scope_action_probe_receipt.py scripts/test_int_v5a_v5c_preflight_contract.py
+	$(PYTHON) -m unittest -v \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_receipt_path_must_exist_inside_authority_root \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_receipt_requires_independent_probe_per_cell \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_probe_catalog_requires_unique_utterance_and_fingerprint \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_probe_catalog_must_match_canonical_cell_register_and_tool \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_receipt_fails_closed_on_conditional_or_incomplete_truth \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_pass_cannot_hide_fallback_classification \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_ce_m1_probe_green_without_bf8_keeps_action_demo_proven_false \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_ce_m3_scoped_receipt_matrix_4_only_updates_scoped_cell \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_ce_m4_empty_scope_or_scope_case_mismatch_rejected \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_probe_catalog_requires_dual_identity_on_every_row \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_action_receipt_dual_identity_fail_closed \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_m1_exact_scope_1_4_passes_and_m5_m6_contamination_fails_closed \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_stale_probe_pack_basis_fails_closed \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_v2_probe_catalog_sha256_must_equal_catalog_file \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_v2_runtime_bundle_digest_must_match_manifest \
+	scripts.test_check_capability_matrix.CapabilityMatrixCheckerTests.test_v2_scoped_receipt_with_real_bundle_digest_and_catalog_sha_passes
+	C1_RUN_DIR="$(CURDIR)/.build/c1-run" \
+	C1_WITNESS_RUN_ID="local:verify-m1-action-probe-receipt" \
+	C1_WITNESS_SOURCE_HEAD_SHA="$$(git rev-parse HEAD)" \
+	C1_WITNESS_TESTED_CHECKOUT_SHA="$$(git rev-parse HEAD)" \
+	C1_WITNESS_NONCE="$${C1_WITNESS_NONCE:-c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1}" \
+	C1_WITNESS_PROBE_CATALOG_SHA256="$$(openssl dgst -sha256 contracts/runtime-action-readback-probes.json | awk '{print $$2}')" \
+	swift test --filter RuntimeActionReadbackProbeTests
+	test -f .build/c1-run/receipts/c1/runtime-action-readback-probes.json
+	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/runtime-action-readback-receipt-v2.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path(".build/c1-run/receipts/c1/runtime-action-readback-probes.json").read_text()))'
+	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py --matrix-ids 1,4 --knife m1_action_probe_pre_h2 --output $(SCOPED_M1_ACTION_PROBE_RECEIPT)
+	$(PYTHON) -c 'import json; from jsonschema import Draft202012Validator; from pathlib import Path; s=json.loads(Path("contracts/schemas/runtime-action-readback-receipt-v2.schema.json").read_text()); Draft202012Validator(s).validate(json.loads(Path("$(SCOPED_M1_ACTION_PROBE_RECEIPT)").read_text()))'
+	$(PYTHON) Tools/checks/check_capability_matrix.py action-probes --action-probe-receipt $(SCOPED_M1_ACTION_PROBE_RECEIPT) --output .build/c1-run/receipts/c1/runtime-action-readback-m1-evaluation.json
+	$(PYTHON) -c 'import json; from pathlib import Path; e=json.loads(Path(".build/c1-run/receipts/c1/runtime-action-readback-m1-evaluation.json").read_text()); assert sorted(int(k) for k in e["passing_by_matrix_id"])==[1,4], e; assert e["failures_by_matrix_id"]=={}, e'
 
 verify-c1-s10:
 	@if [ ! -f scripts/check_s10_receipt.py ]; then \

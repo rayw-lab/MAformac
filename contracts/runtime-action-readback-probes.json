@@ -3,11 +3,31 @@
   "receiptID": "runtime-action-readback-probes",
   "probes": [
     {
+      "probeID": "probe.action.matrix.1.zh-CN",
+      "matrixID": 1,
+      "register": "直述",
+      "utterance": "打开空调",
+      "representativeTool": "open_ac",
+      "requiredEmittedToolName": "set_vehicle_control",
+      "requiredActionPrimitive": "power_on",
+      "expectedStateDelta": {
+        "key": "ac.power",
+        "beforeValue": "off",
+        "afterValue": "on"
+      },
+      "expectedReadback": {
+        "key": "ac.power",
+        "actualValue": "on"
+      }
+    },
+    {
       "probeID": "probe.action.matrix.4.zh-CN",
       "matrixID": 4,
       "register": "直述",
       "utterance": "空调调到26度",
       "representativeTool": "adjust_ac_temperature_to_number",
+      "requiredEmittedToolName": "adjust_ac_temperature_to_number",
+      "requiredActionPrimitive": "adjust_to_number",
       "expectedStateDelta": {
         "key": "ac.temp_setpoint[主驾]",
         "beforeValue": "24",
@@ -24,6 +44,8 @@
       "register": "委婉请求",
       "utterance": "能把空调调到26度吗",
       "representativeTool": "adjust_ac_temperature_to_number",
+      "requiredEmittedToolName": "adjust_ac_temperature_to_number",
+      "requiredActionPrimitive": "adjust_to_number",
       "expectedStateDelta": {
         "key": "ac.temp_setpoint[主驾]",
         "beforeValue": "24",
@@ -40,6 +62,8 @@
       "register": "能否问句",
       "utterance": "能调到26度吗",
       "representativeTool": "adjust_ac_temperature_to_number",
+      "requiredEmittedToolName": "adjust_ac_temperature_to_number",
+      "requiredActionPrimitive": "adjust_to_number",
       "expectedStateDelta": {
         "key": "ac.temp_setpoint[主驾]",
         "beforeValue": "24",

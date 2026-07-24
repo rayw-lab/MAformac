@@ -238,7 +238,10 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                         "readback": [f"trace-matrix-{probe['matrixID']}"],
                     },
                     "observedToolCallCount": 1,
-                    "emittedToolNames": [probe["representativeTool"]],
+                    "emittedToolNames": [probe["requiredEmittedToolName"]],
+                    "requiredEmittedToolName": probe["requiredEmittedToolName"],
+                    "requiredActionPrimitive": probe["requiredActionPrimitive"],
+                    "emittedActionPrimitive": probe["requiredActionPrimitive"],
                     "stateBeforeSHA256": "a" * 64,
                     "stateAfterSHA256": "b" * 64,
                     "stateMutation": True,
@@ -259,7 +262,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                         {
                             "key": readback["key"],
                             "actualValue": readback["actualValue"],
-                            "spokenText": "主驾空调已调到26度",
+                            "spokenText": "空调已打开" if probe["matrixID"] == 1 else "主驾空调已调到26度",
                         }
                     ],
                 }
@@ -297,7 +300,10 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                         "readback": [f"trace-matrix-{probe['matrixID']}"],
                     },
                     "observedToolCallCount": 1,
-                    "emittedToolNames": [probe["representativeTool"]],
+                    "emittedToolNames": [probe["requiredEmittedToolName"]],
+                    "requiredEmittedToolName": probe["requiredEmittedToolName"],
+                    "requiredActionPrimitive": probe["requiredActionPrimitive"],
+                    "emittedActionPrimitive": probe["requiredActionPrimitive"],
                     "stateBeforeSHA256": "a" * 64,
                     "stateAfterSHA256": "b" * 64,
                     "stateMutation": True,
@@ -318,7 +324,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                         {
                             "key": readback["key"],
                             "actualValue": readback["actualValue"],
-                            "spokenText": "主驾空调已调到26度",
+                            "spokenText": "空调已打开" if probe["matrixID"] == 1 else "主驾空调已调到26度",
                         }
                     ],
                 }
@@ -572,8 +578,8 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
             with self.subTest(label=label):
                 catalog = load_json(ACTION_PROBE_CATALOG)
                 receipt = self.valid_action_receipt(checker)
-                catalog["probes"][1][field] = value
-                receipt["cases"][1][field] = value
+                catalog["probes"][2][field] = value
+                receipt["cases"][2][field] = value
                 with tempfile.TemporaryDirectory(
                     dir=REPO_ROOT / ".build", prefix="action-cell-binding-"
                 ) as tmp:
@@ -596,6 +602,12 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         mutations = {
             "conditional": lambda case: case.update(injectionUsed=True),
             "no_tool_call": lambda case: case.update(observedToolCallCount=0),
+            "duplicate_tool_call": lambda case: case.update(observedToolCallCount=2),
+            "noop_already_on": lambda case: case.update(
+                stateMutation=True,
+                stateAfterSHA256=case["stateBeforeSHA256"],
+                stateDeltas=[],
+            ),
             "no_state_delta": lambda case: case.update(
                 stateMutation=False,
                 stateAfterSHA256=case["stateBeforeSHA256"],
@@ -607,7 +619,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         for label, mutate in mutations.items():
             with self.subTest(label=label):
                 receipt = self.valid_action_receipt(checker)
-                mutate(receipt["cases"][0])
+                mutate(receipt["cases"][1])
                 with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="action-receipt-") as tmp:
                     receipt_path = Path(tmp) / "receipt.json"
                     receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
@@ -759,6 +771,219 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
                     catalog_path=ACTION_PROBE_CATALOG,
                     authority_root=REPO_ROOT,
                 )
+
+    def test_action_probe_catalog_requires_dual_identity_on_every_row(self) -> None:
+        checker, _ = self.materialize()
+        catalog = load_json(ACTION_PROBE_CATALOG)
+        for probe in catalog["probes"]:
+            self.assertTrue(probe["requiredEmittedToolName"].strip(), probe["probeID"])
+            self.assertTrue(probe["requiredActionPrimitive"].strip(), probe["probeID"])
+
+        # Missing dual identity on any row fails closed at the structural gate.
+        for field in ("requiredEmittedToolName", "requiredActionPrimitive"):
+            with self.subTest(field=field):
+                mutated_catalog = load_json(ACTION_PROBE_CATALOG)
+                receipt = self.valid_action_receipt(checker)
+                del mutated_catalog["probes"][0][field]
+                del receipt["cases"][0][field]
+                with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="dual-id-missing-") as tmp:
+                    tmp_path = Path(tmp)
+                    catalog_path = tmp_path / "catalog.json"
+                    receipt_path = tmp_path / "receipt.json"
+                    catalog_path.write_text(json.dumps(mutated_catalog), encoding="utf-8")
+                    receipt["probePackSHA256"] = checker.sha256_file(catalog_path)
+                    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "E_ACTION_PROBE_DUAL_IDENTITY_MISSING"):
+                        checker.evaluate_action_probe_receipt(
+                            receipt=receipt,
+                            receipt_path=receipt_path,
+                            catalog_path=catalog_path,
+                            authority_root=REPO_ROOT,
+                        )
+
+        # Blank dual identity fails closed even when the field is present.
+        blank_catalog = load_json(ACTION_PROBE_CATALOG)
+        receipt = self.valid_action_receipt(checker)
+        blank_catalog["probes"][0]["requiredActionPrimitive"] = "   "
+        receipt["cases"][0]["requiredActionPrimitive"] = "   "
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="dual-id-blank-") as tmp:
+            tmp_path = Path(tmp)
+            catalog_path = tmp_path / "catalog.json"
+            receipt_path = tmp_path / "receipt.json"
+            catalog_path.write_text(json.dumps(blank_catalog), encoding="utf-8")
+            receipt["probePackSHA256"] = checker.sha256_file(catalog_path)
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_PROBE_DUAL_IDENTITY_MISSING"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt,
+                    receipt_path=receipt_path,
+                    catalog_path=catalog_path,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_action_receipt_dual_identity_fail_closed(self) -> None:
+        checker, _ = self.materialize()
+        probe = load_json(ACTION_PROBE_CATALOG)["probes"][0]
+        self.assertEqual(probe["matrixID"], 1)
+        self.assertNotEqual(probe["representativeTool"], probe["requiredEmittedToolName"])
+
+        # Case-carried identity that diverges the catalog fails the structural gate.
+        for field, wrong in (
+            ("requiredEmittedToolName", "open_ac"),
+            ("requiredActionPrimitive", "power_off"),
+        ):
+            with self.subTest(label=f"case_identity_mismatch_{field}"):
+                receipt = self.valid_action_receipt(checker)
+                receipt["cases"][0][field] = wrong
+                with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="dual-id-case-") as tmp:
+                    receipt_path = Path(tmp) / "receipt.json"
+                    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+                    with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_PROBE_CELL_MISMATCH"):
+                        checker.evaluate_action_probe_receipt(
+                            receipt=receipt,
+                            receipt_path=receipt_path,
+                            catalog_path=ACTION_PROBE_CATALOG,
+                            authority_root=REPO_ROOT,
+                        )
+
+        # Canonical/emitted collapse: emitting the representative tool instead of
+        # the required emitted tool must fail the behavioral gate.
+        collapse = self.valid_action_receipt(checker)
+        collapse["cases"][0]["emittedToolNames"] = [probe["representativeTool"]]
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="dual-id-collapse-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(collapse), encoding="utf-8")
+            evaluation = checker.evaluate_action_probe_receipt(
+                receipt=collapse,
+                receipt_path=receipt_path,
+                catalog_path=ACTION_PROBE_CATALOG,
+                authority_root=REPO_ROOT,
+            )
+        self.assertNotIn(1, evaluation["passing_by_matrix_id"])
+        self.assertIn("E_ACTION_PROBE_TOOL_MISMATCH", evaluation["failures_by_matrix_id"][1])
+
+        # Wrong observed primitive fails the behavioral gate.
+        wrong_primitive = self.valid_action_receipt(checker)
+        wrong_primitive["cases"][0]["emittedActionPrimitive"] = "power_off"
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="dual-id-prim-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(wrong_primitive), encoding="utf-8")
+            evaluation = checker.evaluate_action_probe_receipt(
+                receipt=wrong_primitive,
+                receipt_path=receipt_path,
+                catalog_path=ACTION_PROBE_CATALOG,
+                authority_root=REPO_ROOT,
+            )
+        self.assertNotIn(1, evaluation["passing_by_matrix_id"])
+        self.assertIn("E_ACTION_PROBE_PRIMITIVE_MISMATCH", evaluation["failures_by_matrix_id"][1])
+
+    def test_m1_exact_scope_1_4_passes_and_m5_m6_contamination_fails_closed(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[1, 4])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="scope-1-4-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            evaluation = checker.evaluate_action_probe_receipt(
+                receipt=receipt,
+                receipt_path=receipt_path,
+                catalog_path=ACTION_PROBE_CATALOG,
+                authority_root=REPO_ROOT,
+            )
+        self.assertEqual(sorted(evaluation["passing_by_matrix_id"]), [1, 4])
+        self.assertEqual(evaluation["failures_by_matrix_id"], {})
+
+        # m5/m6 contamination: an extra case outside the exact scope fails closed.
+        contaminated = self.valid_scoped_action_receipt(checker, matrix_ids=[1, 4])
+        extra_case = dict(self.valid_action_receipt(checker)["cases"][2])
+        contaminated["cases"].append(extra_case)
+        contaminated["caseCount"] = len(contaminated["cases"])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="scope-1-4-contam-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(contaminated), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_COVERAGE_MISMATCH"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=contaminated,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+        # Missing case for a scoped id fails closed.
+        short = self.valid_scoped_action_receipt(checker, matrix_ids=[1, 4])
+        short["cases"] = [case for case in short["cases"] if case["matrixID"] != 1]
+        short["caseCount"] = len(short["cases"])
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="scope-1-4-short-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(short), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_COVERAGE_MISMATCH"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=short,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_stale_probe_pack_basis_fails_closed(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_action_receipt(checker)
+        receipt["probePackSHA256"] = "0" * 64
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="stale-basis-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_DEMO_PROVEN_ACTION_RECEIPT_IDENTITY_INVALID"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_v2_probe_catalog_sha256_must_equal_catalog_file(self) -> None:
+        checker, _ = self.materialize()
+        for mutation in ("0" * 64, None):
+            receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[1, 4])
+            receipt["probe_catalog_sha256"] = mutation
+            with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="v2-catalog-sha-") as tmp:
+                receipt_path = Path(tmp) / "receipt.json"
+                receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "E_ACTION_PROBE_CATALOG_SHA_MISMATCH"):
+                    checker.evaluate_action_probe_receipt(
+                        receipt=receipt,
+                        receipt_path=receipt_path,
+                        catalog_path=ACTION_PROBE_CATALOG,
+                        authority_root=REPO_ROOT,
+                    )
+
+    def test_v2_runtime_bundle_digest_must_match_manifest(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[1, 4])
+        receipt["runtimeContractBundleDigest"] = "0" * 64
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="v2-bundle-digest-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "E_ACTION_PROBE_RUNTIME_BUNDLE_STALE"):
+                checker.evaluate_action_probe_receipt(
+                    receipt=receipt,
+                    receipt_path=receipt_path,
+                    catalog_path=ACTION_PROBE_CATALOG,
+                    authority_root=REPO_ROOT,
+                )
+
+    def test_v2_scoped_receipt_with_real_bundle_digest_and_catalog_sha_passes(self) -> None:
+        checker, _ = self.materialize()
+        receipt = self.valid_scoped_action_receipt(checker, matrix_ids=[1, 4])
+        self.assertEqual(receipt["probe_catalog_sha256"], checker.sha256_file(ACTION_PROBE_CATALOG))
+        with tempfile.TemporaryDirectory(dir=REPO_ROOT / ".build", prefix="v2-valid-") as tmp:
+            receipt_path = Path(tmp) / "receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            evaluation = checker.evaluate_action_probe_receipt(
+                receipt=receipt,
+                receipt_path=receipt_path,
+                catalog_path=ACTION_PROBE_CATALOG,
+                authority_root=REPO_ROOT,
+            )
+        self.assertEqual(sorted(evaluation["passing_by_matrix_id"]), [1, 4])
+        self.assertEqual(evaluation["failures_by_matrix_id"], {})
 
     def test_f2_no_bf8_receipt_all_cells_bf8_observed_false(self) -> None:
         checker, matrix = self.materialize()
