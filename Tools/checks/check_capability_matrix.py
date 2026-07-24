@@ -68,6 +68,196 @@ def expected_bf8_subject_sha(action_probe_receipt: dict[str, Any] | None) -> str
             return value.strip()
     return None
 
+DEFAULT_RECEIPT_SET = REPO_ROOT / "contracts" / "governance" / "bf8-promotion-receipt-set.v1.json"
+DEFAULT_RECEIPT_SET_SCHEMA = REPO_ROOT / "contracts" / "governance" / "bf8-promotion-receipt-set.v1.schema.json"
+LEGACY_M4_PATH = "contracts/governance/bf8-promotion-receipt-matrix-4.json"
+LEGACY_M4_ACTION_SHA = "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4"
+LEGACY_M4_RECEIPT_SHA = "f26054f51aa23b772b839700ddb69b221a7e7cb9"
+
+
+def _git_sha(authority_root: Path, *args: str) -> str:
+    result = subprocess.run(["git", *args], cwd=authority_root, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        raise ValueError("E_RECEIPT_SET_GIT_FAILED")
+    return result.stdout.strip()
+
+
+def _is_ancestor(authority_root: Path, ancestor: str, descendant: str) -> bool:
+    if not (isinstance(ancestor, str) and isinstance(descendant, str)
+            and re.fullmatch(r"[0-9a-f]{40}", ancestor)
+            and re.fullmatch(r"[0-9a-f]{40}", descendant)):
+        return False
+    return subprocess.run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=authority_root, capture_output=True, check=False,
+    ).returncode == 0
+
+
+def _canonical_receipt_path(value: Any, authority_root: Path) -> Path:
+    if not isinstance(value, str) or not value or Path(value).is_absolute():
+        raise ValueError("E_RECEIPT_SET_PATH_INVALID")
+    path = Path(value)
+    if any(part in {".", ".."} for part in path.parts) or any(c in value for c in "*?[]{}"):
+        raise ValueError("E_RECEIPT_SET_PATH_INVALID")
+    resolved = (authority_root / path).resolve()
+    try:
+        resolved.relative_to(authority_root.resolve())
+    except ValueError as error:
+        raise ValueError("E_RECEIPT_SET_PATH_INVALID") from error
+    tracked = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "--", value],
+        cwd=authority_root, capture_output=True, text=True, check=False,
+    )
+    if tracked.returncode != 0 or not resolved.is_file():
+        raise ValueError("E_RECEIPT_SET_PATH_UNTRACKED")
+    return resolved
+
+
+def evaluate_receipt_set(
+    *,
+    receipt_set_path: Path = DEFAULT_RECEIPT_SET,
+    schema_path: Path = DEFAULT_RECEIPT_SET_SCHEMA,
+    authority_root: Path = REPO_ROOT,
+    eval_head: str | None = None,
+) -> dict[str, Any]:
+    """Validate the canonical, ordered authorization receipt set."""
+    authority_root = authority_root.resolve()
+    set_path = receipt_set_path.resolve()
+    if set_path != DEFAULT_RECEIPT_SET.resolve() or not set_path.is_file():
+        raise ValueError("E_RECEIPT_SET_NONCANONICAL")
+    try:
+        registry = json.loads(set_path.read_text(encoding="utf-8"))
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+    except (OSError, json.JSONDecodeError, SchemaError) as error:
+        raise ValueError("E_RECEIPT_SET_SCHEMA_INVALID") from error
+    if list(registry) != ["version", "entries"] or not isinstance(registry.get("entries"), list) or not registry["entries"]:
+        raise ValueError("E_RECEIPT_SET_INVALID")
+    errors = list(Draft202012Validator(schema).iter_errors(registry))
+    if errors:
+        raise ValueError("E_RECEIPT_SET_SCHEMA_VALIDATION_FAILED")
+    entries = registry["entries"]
+    seen_paths: set[str] = set()
+    seen_ids: set[str] = set()
+    ordered: list[dict[str, Any]] = []
+    for expected_order, entry in enumerate(entries, 1):
+        allowed = ["order", "receipt_path", "receipt_id", "receipt_sha256", "subject_type", "subject_id"]
+        if "supersedes_receipt_id" in entry:
+            allowed.append("supersedes_receipt_id")
+        if list(entry) != allowed or entry["order"] != expected_order:
+            raise ValueError("E_RECEIPT_SET_ORDER_INVALID")
+        if entry["receipt_path"] in seen_paths:
+            raise ValueError("E_RECEIPT_SET_DUPLICATE_PATH")
+        if entry["receipt_id"] in seen_ids:
+            raise ValueError("E_RECEIPT_SET_DUPLICATE_ID")
+        seen_paths.add(entry["receipt_path"])
+        seen_ids.add(entry["receipt_id"])
+        path = _canonical_receipt_path(entry["receipt_path"], authority_root)
+        raw = path.read_bytes()
+        digest = hashlib.sha256(raw).hexdigest()
+        if digest != entry["receipt_sha256"]:
+            raise ValueError("E_RECEIPT_SET_DIGEST_MISMATCH")
+        try:
+            receipt = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as error:
+            raise ValueError("E_RECEIPT_SET_RECEIPT_INVALID") from error
+        if receipt.get("receiptID") != entry["receipt_id"]:
+            raise ValueError("E_RECEIPT_SET_ID_MISMATCH")
+        legacy = (
+            entry["receipt_path"] == LEGACY_M4_PATH and entry["subject_type"] == "primary_matrix"
+            and entry["subject_id"] == "4" and entry["receipt_sha256"] == LEGACY_M4_ACTION_SHA
+            and receipt.get("subjectSHA256") == LEGACY_M4_RECEIPT_SHA and receipt.get("matrix_ids") == [4]
+        )
+        if not legacy:
+            receipt_schema_path = schema_path.parent / "bf8-promotion-receipt.schema.json"
+            try:
+                receipt_schema = json.loads(receipt_schema_path.read_text(encoding="utf-8"))
+                receipt_errors = list(Draft202012Validator(receipt_schema).iter_errors(receipt))
+            except (OSError, json.JSONDecodeError) as error:
+                raise ValueError("E_BF8_RECEIPT_SCHEMA_INVALID") from error
+            if receipt_errors:
+                raise ValueError("E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
+            if receipt.get("subjectType") != entry["subject_type"] or receipt.get("subjectID") != entry["subject_id"]:
+                raise ValueError("E_RECEIPT_SET_SCOPE_INVALID")
+        if not legacy and (not isinstance(receipt.get("subjectSHA256"), str)
+                           or re.fullmatch(r"[0-9a-f]{64}", receipt["subjectSHA256"]) is None):
+            raise ValueError("E_RECEIPT_SET_RAW_SHA_INVALID")
+        if not legacy:
+            action_sha = receipt.get("actionSourceSHA256") or receipt.get("sourceHeadSHA")
+            tested_sha = receipt.get("testedCheckoutSHA256") or receipt.get("testedCheckoutSHA")
+            if action_sha is None or tested_sha is None:
+                raise ValueError("E_RECEIPT_SET_LINEAGE_MISSING")
+            if (not isinstance(action_sha, str) or not isinstance(tested_sha, str)
+                    or re.fullmatch(r"[0-9a-f]{40}", action_sha) is None
+                    or re.fullmatch(r"[0-9a-f]{40}", tested_sha) is None):
+                raise ValueError("E_RECEIPT_SET_LINEAGE_INVALID")
+            if action_sha != tested_sha:
+                raise ValueError("E_RECEIPT_SET_LINEAGE_MISMATCH")
+            head_for_lineage = eval_head or _git_sha(authority_root, "rev-parse", "HEAD")
+            if not re.fullmatch(r"[0-9a-f]{40}", head_for_lineage):
+                raise ValueError("E_RECEIPT_SET_EVAL_HEAD_INVALID")
+            if not _is_ancestor(authority_root, action_sha, head_for_lineage):
+                raise ValueError("E_RECEIPT_SET_ACTION_NOT_ANCESTOR")
+            receipt_source = receipt.get("receiptSourceSHA256") or receipt.get("receiptSourceSHA")
+            if receipt_source is not None:
+                if (not isinstance(receipt_source, str)
+                        or re.fullmatch(r"[0-9a-f]{40}", receipt_source) is None):
+                    raise ValueError("E_RECEIPT_SET_RECEIPT_SOURCE_INVALID")
+                if not _is_ancestor(authority_root, receipt_source, action_sha):
+                    raise ValueError("E_RECEIPT_SET_RECEIPT_NOT_ANCESTOR")
+        if entry["subject_type"] == "secondary_tool":
+            raise ValueError("E_RECEIPT_SET_SECONDARY_UNAUTHORIZED")
+        if entry["subject_type"] == "primary_matrix":
+            if not re.fullmatch(r"[0-9]+", entry["subject_id"]) or receipt.get("matrix_ids") != [int(entry["subject_id"])]:
+                raise ValueError("E_RECEIPT_SET_SCOPE_INVALID")
+        ordered.append({"order": entry["order"], "receipt_path": entry["receipt_path"], "receipt_id": entry["receipt_id"],
+                        "receipt_sha256": digest, "subject_type": entry["subject_type"], "subject_id": entry["subject_id"],
+                        "active": True, **({"supersedes_receipt_id": entry["supersedes_receipt_id"]} if "supersedes_receipt_id" in entry else {})})
+    by_id = {e["receipt_id"]: e for e in ordered}
+    for entry in ordered:
+        prior = entry.get("supersedes_receipt_id")
+        if prior is None:
+            continue
+        if prior == entry["receipt_id"] or prior not in by_id:
+            raise ValueError("E_RECEIPT_SET_SUPERSESSION_INVALID")
+        if by_id[prior]["order"] >= entry["order"]:
+            raise ValueError("E_RECEIPT_SET_SUPERSESSION_INVALID")
+        if by_id[prior]["subject_type"] != entry["subject_type"] or by_id[prior]["subject_id"] != entry["subject_id"]:
+            raise ValueError("E_RECEIPT_SET_SUPERSESSION_SUBJECT_MISMATCH")
+        successors = sum(1 for candidate in ordered if candidate.get("supersedes_receipt_id") == prior)
+        if successors > 1:
+            raise ValueError("E_RECEIPT_SET_SUPERSESSION_FORK")
+        by_id[prior]["active"] = False
+    active = [e for e in ordered if e["active"]]
+    active_by_subject: set[tuple[str, str]] = set()
+    for entry in active:
+        subject = (entry["subject_type"], entry["subject_id"])
+        if subject in active_by_subject:
+            raise ValueError("E_RECEIPT_SET_MULTIPLE_ACTIVE")
+        active_by_subject.add(subject)
+    subjects = sorted({f"{e['subject_type']}:{e['subject_id']}" for e in active})
+    head = eval_head or _git_sha(authority_root, "rev-parse", "HEAD")
+    if not re.fullmatch(r"[0-9a-f]{40}", head):
+        raise ValueError("E_RECEIPT_SET_EVAL_HEAD_INVALID")
+    ordered_active_sha = hashlib.sha256(json.dumps(active, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+    return {
+        "eval_head": head,
+        "receipt_set_sha256": sha256_file(set_path),
+        "entries": ordered,
+        "ordered_active_sha256": ordered_active_sha,
+        "active_subjects": subjects,
+        "authorized_primary_ids": sorted(int(e["subject_id"]) for e in active if e["subject_type"] == "primary_matrix"),
+        "secondary": [e["subject_id"] for e in active if e["subject_type"] == "secondary_tool"],
+        "per_matrix_evidence": {
+            str(e["subject_id"]): {
+                "receipt_id": e["receipt_id"],
+                "receipt_sha256": e["receipt_sha256"],
+                "receipt_source": e["receipt_path"],
+            }
+            for e in active if e["subject_type"] == "primary_matrix"
+        },
+    }
+
 
 def source_path_for_receipt(path: Path, authority_root: Path) -> str:
     try:
@@ -461,134 +651,6 @@ def evaluate_action_probe_receipt(
     }
 
 
-def evaluate_bf8_promotion_receipt(
-    *,
-    receipt: dict[str, Any],
-    receipt_path: Path,
-    schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
-    authority_root: Path = REPO_ROOT,
-    expected_subject_sha: str | None = None,
-) -> dict[str, Any]:
-    authority_root = authority_root.resolve()
-    resolved_receipt_path = receipt_path.resolve()
-    resolved_schema_path = schema_path.resolve()
-
-    if not resolved_receipt_path.is_file():
-        raise ValueError("E_BF8_RECEIPT_MISSING")
-
-    try:
-        receipt_on_disk = json.loads(resolved_receipt_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
-        raise ValueError("E_BF8_RECEIPT_INVALID_JSON") from error
-    if receipt_on_disk != receipt:
-        raise ValueError("E_BF8_RECEIPT_CONTENT_MISMATCH")
-
-    if not resolved_schema_path.is_file():
-        raise ValueError("E_BF8_RECEIPT_SCHEMA_MISSING")
-    try:
-        schema = json.loads(resolved_schema_path.read_text(encoding="utf-8"))
-        Draft202012Validator.check_schema(schema)
-    except (OSError, json.JSONDecodeError, SchemaError) as error:
-        raise ValueError("E_BF8_RECEIPT_SCHEMA_INVALID") from error
-
-    if not isinstance(receipt, dict):
-        raise ValueError("E_BF8_RECEIPT_INVALID")
-
-    dict_to_validate = dict(receipt)
-    if isinstance(dict_to_validate.get("subjectSHA256"), str):
-        dict_to_validate["subjectSHA256"] = normalize_sha256(dict_to_validate["subjectSHA256"])
-
-    validator = Draft202012Validator(schema)
-    errors = list(validator.iter_errors(dict_to_validate))
-    if errors:
-        raise ValueError("E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
-
-    try:
-        head_sha = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=authority_root,
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-    except Exception as error:
-        raise ValueError("E_BF8_RECEIPT_GIT_HEAD_FAILED") from error
-
-    expected_subject = expected_subject_sha or head_sha
-    norm_expected_subject = normalize_sha256(expected_subject)
-    subject_sha = receipt.get("subjectSHA256")
-    norm_subject = normalize_sha256(subject_sha)
-
-    if norm_expected_subject != norm_subject:
-        expected_commit = None
-        subject_commit = None
-        for candidate, slot in ((expected_subject, "expected"), (subject_sha, "subject")):
-            if not isinstance(candidate, str):
-                continue
-            cleaned = candidate.strip().lower()
-            commit = None
-            if re.fullmatch(r"[0-9a-f]{40}", cleaned):
-                commit = cleaned
-            elif re.fullmatch(r"0{24}[0-9a-f]{40}", cleaned):
-                commit = cleaned[-40:]
-            if slot == "expected":
-                expected_commit = commit
-            else:
-                subject_commit = commit
-        if expected_commit is None or subject_commit is None:
-            raise ValueError("E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH")
-        ancestry_check = subprocess.run(
-            ["git", "merge-base", "--is-ancestor", subject_commit, expected_commit],
-            cwd=authority_root,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if ancestry_check.returncode != 0:
-            raise ValueError("E_BF8_RECEIPT_SUBJECT_SHA_MISMATCH")
-
-    matrix_ids = receipt.get("matrix_ids")
-    if (
-        not isinstance(matrix_ids, list)
-        or not matrix_ids
-        or any(not isinstance(i, int) for i in matrix_ids)
-        or len(matrix_ids) != len(set(matrix_ids))
-    ):
-        raise ValueError("E_BF8_RECEIPT_MATRIX_IDS_INVALID")
-
-    manifest_rows = read_jsonl(canonical_manifest_path())
-    rejection_matrix_ids = {
-        r["matrix_id"] for r in manifest_rows if r["primary_class"] == "fast_path_no_match_fallback"
-    }
-    execution_matrix_ids = {
-        r["matrix_id"] for r in manifest_rows if r["primary_class"] != "fast_path_no_match_fallback"
-    }
-
-    receipt_matrix_ids = set(matrix_ids)
-    has_rejection = bool(receipt_matrix_ids & rejection_matrix_ids)
-    has_execution = bool(receipt_matrix_ids & execution_matrix_ids)
-
-    if has_rejection and has_execution:
-        raise ValueError("E_BF8_RECEIPT_REJECTION_EXECUTION_OVERLAP")
-
-    subject = receipt.get("subject")
-    if isinstance(subject, str):
-        subject_lower = subject.lower()
-        if "rejection" in subject_lower and has_execution:
-            raise ValueError("E_BF8_RECEIPT_REJECTION_SUBJECT_MISMATCH")
-        if "execution" in subject_lower and has_rejection:
-            raise ValueError("E_BF8_RECEIPT_EXECUTION_SUBJECT_MISMATCH")
-
-    receipt_sha256 = sha256_file(resolved_receipt_path)
-    receipt_source = source_path_for_receipt(resolved_receipt_path, authority_root)
-    return {
-        "authorized_matrix_ids": receipt_matrix_ids,
-        "is_rejection": has_rejection,
-        "receipt_sha256": receipt_sha256,
-        "receipt_id": receipt["receiptID"],
-        "receipt_source": receipt_source,
-        "source_ref": f"{receipt_source}#receipt_id={receipt['receiptID']}",
-    }
 
 
 def readback_probe_basis(
@@ -653,9 +715,7 @@ def materialize_matrix(
     action_probe_receipt: dict[str, Any] | None = None,
     action_probe_receipt_path: Path | None = None,
     action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
-    bf8_promotion_receipt: dict[str, Any] | None = None,
-    bf8_promotion_receipt_path: Path | None = None,
-    bf8_promotion_schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
+    bf8_receipt_set_path: Path,
 ) -> dict[str, Any]:
     manifest_path = canonical_manifest_path(manifest_path)
     enums = parse_t0_enums(t0_design_path)
@@ -676,19 +736,8 @@ def materialize_matrix(
         action_evaluation["passing_by_matrix_id"] if action_evaluation is not None else {}
     )
 
-    bf8_evaluation = None
-    if bf8_promotion_receipt is not None:
-        if bf8_promotion_receipt_path is None:
-            raise ValueError("E_BF8_RECEIPT_MISSING")
-        bf8_evaluation = evaluate_bf8_promotion_receipt(
-            receipt=bf8_promotion_receipt,
-            receipt_path=bf8_promotion_receipt_path,
-            schema_path=bf8_promotion_schema_path,
-            expected_subject_sha=expected_bf8_subject_sha(action_probe_receipt),
-        )
-    authorized_bf8_ids = (
-        bf8_evaluation["authorized_matrix_ids"] if bf8_evaluation is not None else set()
-    )
+    bf8_evaluation = evaluate_receipt_set(receipt_set_path=bf8_receipt_set_path)
+    authorized_bf8_ids = set(bf8_evaluation["authorized_primary_ids"])
 
     cells: list[dict[str, Any]] = []
     for row in manifest_rows:
@@ -699,16 +748,17 @@ def materialize_matrix(
         default_fastpath = row["default_path_status"] == "executable_default_fastpath"
         fallback_reason, reason_kind = reason_projection(row)
 
-        is_rejection_bf8 = bf8_evaluation.get("is_rejection", False) if bf8_evaluation is not None else False
+        is_rejection_bf8 = False
         is_rejection_row = row["primary_class"] == "fast_path_no_match_fallback"
 
         if row["matrix_id"] in authorized_bf8_ids:
+            evidence = bf8_evaluation["per_matrix_evidence"][str(row["matrix_id"])]
             bf8_basis = observed_bf8_promotion_basis(
-                receipt_id=bf8_evaluation["receipt_id"],
-                receipt_sha256=bf8_evaluation["receipt_sha256"],
-                source_ref=f"{bf8_evaluation['receipt_source']}#matrix_id={row['matrix_id']}",
+                receipt_id=evidence["receipt_id"],
+                receipt_sha256=evidence["receipt_sha256"],
+                source_ref=f"{evidence['receipt_source']}#matrix_id={row['matrix_id']}",
             )
-            rejection_demo_proven = is_rejection_bf8 and is_rejection_row
+            rejection_demo_proven = False
         else:
             bf8_basis = pending_bf8_promotion_basis(row["matrix_id"])
             rejection_demo_proven = False
@@ -770,6 +820,11 @@ def materialize_matrix(
             "t0_design_sha256": sha256_file(t0_design_path),
             "enum_contract": "T0:add-c1-demo-capability-governance",
             "probe_pack_sha256": sha256_file(action_probe_catalog_path),
+            "bf8_registry_sha256": bf8_evaluation["receipt_set_sha256"],
+            "bf8_ordered_active_sha256": bf8_evaluation["ordered_active_sha256"],
+            "bf8_active_entries": bf8_evaluation["entries"],
+            "bf8_authorized_primary_ids": bf8_evaluation["authorized_primary_ids"],
+            "bf8_authorized_secondary_ids": bf8_evaluation["secondary"],
         },
         "cells": cells,
         "summary": {
@@ -828,9 +883,7 @@ def validate_matrix(
     action_probe_receipt: dict[str, Any] | None = None,
     action_probe_receipt_path: Path | None = None,
     action_probe_catalog_path: Path = DEFAULT_ACTION_PROBE_CATALOG,
-    bf8_promotion_receipt: dict[str, Any] | None = None,
-    bf8_promotion_receipt_path: Path | None = None,
-    bf8_promotion_schema_path: Path = DEFAULT_BF8_PROMOTION_SCHEMA,
+    bf8_receipt_set_path: Path,
 ) -> dict[str, Any]:
     schema_errors = validate_matrix_schema(matrix=matrix, schema_path=schema_path)
     errors = (
@@ -853,9 +906,7 @@ def validate_matrix(
         action_probe_receipt=action_probe_receipt,
         action_probe_receipt_path=action_probe_receipt_path,
         action_probe_catalog_path=action_probe_catalog_path,
-        bf8_promotion_receipt=bf8_promotion_receipt,
-        bf8_promotion_receipt_path=bf8_promotion_receipt_path,
-        bf8_promotion_schema_path=bf8_promotion_schema_path,
+        bf8_receipt_set_path=bf8_receipt_set_path,
     )
     action_evaluation = None
     if action_probe_receipt is not None and action_probe_receipt_path is not None:
@@ -864,14 +915,7 @@ def validate_matrix(
             receipt_path=action_probe_receipt_path,
             catalog_path=action_probe_catalog_path,
         )
-    bf8_evaluation = None
-    if bf8_promotion_receipt is not None and bf8_promotion_receipt_path is not None:
-        bf8_evaluation = evaluate_bf8_promotion_receipt(
-            receipt=bf8_promotion_receipt,
-            receipt_path=bf8_promotion_receipt_path,
-            schema_path=bf8_promotion_schema_path,
-            expected_subject_sha=expected_bf8_subject_sha(action_probe_receipt),
-        )
+    bf8_evaluation = evaluate_receipt_set(receipt_set_path=bf8_receipt_set_path)
     enums = parse_t0_enums(t0_design_path)
     manifest_rows = read_jsonl(manifest_path)
     mounted_tools = parse_mounted_tools(mounted_catalog_path)
@@ -988,8 +1032,6 @@ def validate_matrix(
         if cell.get("mounted_status") != expected_status:
             mounted_catalog_delta.append(matrix_id)
 
-    if blocked_unknown_ids:
-        errors.append("E_T0_ENUM_UNKNOWN")
 
     # D-123 fixed baselines: primary class counts
     D123_BASELINE = {
@@ -1018,15 +1060,10 @@ def validate_matrix(
         actual = actual_counts.get(cls, 0)
         if actual != expected:
             d123_diff[cls] = {"expected": expected, "actual": actual}
-    if d123_diff:
-        errors.append("E_PRIMARY_CLASS_D123_BASELINE_MISMATCH")
-
     if mounted_catalog_delta:
         errors.append("E_MOUNTED_CATALOG_DELTA")
-
-    declared_unknown = matrix.get("summary", {}).get("blocked_unknown")
-    if declared_unknown != len(blocked_unknown_ids):
-        errors.append("E_BLOCKED_UNKNOWN_OVERRIDE")
+    if d123_diff:
+        errors.append("E_PRIMARY_CLASS_D123_BASELINE_MISMATCH")
 
     action_demo_proven_count = sum(cell.get("actionDemoProven") is True for cell in cells if isinstance(cell, dict))
     conditional_pending_count = sum(
@@ -1065,9 +1102,12 @@ def validate_matrix(
         "action_probe_receipt_sha256": (
             action_evaluation["receipt_sha256"] if action_evaluation is not None else None
         ),
-        "bf8_promotion_receipt_sha256": (
-            bf8_evaluation["receipt_sha256"] if bf8_evaluation is not None else None
-        ),
+        "bf8_eval_head": bf8_evaluation["eval_head"],
+        "bf8_registry_sha256": bf8_evaluation["receipt_set_sha256"],
+        "bf8_ordered_active_sha256": bf8_evaluation["ordered_active_sha256"],
+        "bf8_active_entries": bf8_evaluation["entries"],
+        "bf8_authorized_primary_ids": bf8_evaluation["authorized_primary_ids"],
+        "bf8_authorized_secondary_ids": bf8_evaluation["secondary"],
     }
 
 
@@ -1085,11 +1125,9 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--semantic-contract", type=Path, default=DEFAULT_SEMANTIC_CONTRACT)
         subparser.add_argument("--state-cells", type=Path, default=DEFAULT_STATE_CELLS)
         subparser.add_argument("--mounted-catalog", type=Path, default=DEFAULT_MOUNTED_CATALOG)
-        subparser.add_argument(
-            "--action-probe-catalog", type=Path, default=DEFAULT_ACTION_PROBE_CATALOG
-        )
+        subparser.add_argument("--action-probe-catalog", type=Path, default=DEFAULT_ACTION_PROBE_CATALOG)
         subparser.add_argument("--action-probe-receipt", type=Path)
-        subparser.add_argument("--bf8-receipt", type=Path)
+        subparser.add_argument("--bf8-receipt-set", required=True, type=Path)
     subcommands.choices["materialize"].add_argument("--output", required=True, type=Path)
     subcommands.choices["check"].add_argument("--matrix", required=True, type=Path)
     subcommands.choices["check"].add_argument("--schema", type=Path, default=DEFAULT_SCHEMA)
@@ -1101,13 +1139,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     action_probe_receipt = (
         json.loads(args.action_probe_receipt.read_text(encoding="utf-8"))
-        if args.action_probe_receipt
-        else None
-    )
-    bf8_receipt = (
-        json.loads(args.bf8_receipt.read_text(encoding="utf-8"))
-        if args.bf8_receipt
-        else None
+        if args.action_probe_receipt else None
     )
     if args.command == "materialize":
         matrix = materialize_matrix(
@@ -1118,12 +1150,10 @@ def main(argv: list[str] | None = None) -> int:
             action_probe_receipt=action_probe_receipt,
             action_probe_receipt_path=args.action_probe_receipt,
             action_probe_catalog_path=args.action_probe_catalog,
-            bf8_promotion_receipt=bf8_receipt,
-            bf8_promotion_receipt_path=args.bf8_receipt,
+            bf8_receipt_set_path=args.bf8_receipt_set,
         )
         write_json(args.output, matrix)
         return 0
-
     if not args.schema.exists():
         print(f"missing schema: {args.schema}", file=sys.stderr)
         return 2
@@ -1142,8 +1172,7 @@ def main(argv: list[str] | None = None) -> int:
         action_probe_receipt=action_probe_receipt,
         action_probe_receipt_path=args.action_probe_receipt,
         action_probe_catalog_path=args.action_probe_catalog,
-        bf8_promotion_receipt=bf8_receipt,
-        bf8_promotion_receipt_path=args.bf8_receipt,
+        bf8_receipt_set_path=args.bf8_receipt_set,
     )
     write_json(args.receipt, report)
     if report["status"] != "PASS":

@@ -222,7 +222,7 @@
           "observed": true,
           "probe_id": "probe.action.matrix.4.zh-CN",
           "probe_receipt_id": "runtime-action-readback-probes",
-          "receipt_sha256": "1aba6e83e0228fa270a9a74edf21902a769c424b9e9c0e7cc8d82d22d6075f3a",
+          "receipt_sha256": "360fd8f7186475d63fe433bf5f43329760c834d8de9165f51632a2d8153ec509",
           "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
           "status": "passed"
         },
@@ -259,7 +259,7 @@
         "observed": true,
         "probe_id": "probe.action.matrix.4.zh-CN",
         "probe_receipt_id": "runtime-action-readback-probes",
-        "receipt_sha256": "1aba6e83e0228fa270a9a74edf21902a769c424b9e9c0e7cc8d82d22d6075f3a",
+        "receipt_sha256": "360fd8f7186475d63fe433bf5f43329760c834d8de9165f51632a2d8153ec509",
         "source_ref": ".build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json#probe_id=probe.action.matrix.4.zh-CN",
         "status": "passed"
       },
@@ -8159,6 +8159,23 @@
   ],
   "schema_version": "demo_capability_matrix_v2",
   "source": {
+    "bf8_active_entries": [
+      {
+        "active": true,
+        "order": 1,
+        "receipt_id": "bf8-promotion-matrix-4-20260723",
+        "receipt_path": "contracts/governance/bf8-promotion-receipt-matrix-4.json",
+        "receipt_sha256": "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4",
+        "subject_id": "4",
+        "subject_type": "primary_matrix"
+      }
+    ],
+    "bf8_authorized_primary_ids": [
+      4
+    ],
+    "bf8_authorized_secondary_ids": [],
+    "bf8_ordered_active_sha256": "355c4e1f2fc37e4016e0ef78c899b44a3c81a5cb325ebb715b0b3c8d350d396c",
+    "bf8_registry_sha256": "af602920521bcdb82ecc53c9207fadee5d3b34ec0a9588abd92345c23a72e1b7",
     "enum_contract": "T0:add-c1-demo-capability-governance",
     "manifest_sha256": "9d54ab13552e46c072ecd9696cd36bfe645254425df8679b46c0828c449e7d58",
     "probe_pack_sha256": "130b84cf39c6a9d83092b91ece6a02714cecab94cf4fb0f83de3ddde62503e71",

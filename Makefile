@@ -28,9 +28,9 @@ GENERATED_SWIFT := \
 	Core/Contracts/DDomainIRMap.generated.swift
 
 SCOPED_ACTION_PROBE_RECEIPT := .build/c1-run/receipts/c1/runtime-action-readback-probes-scoped-4.json
-BF8_PROMOTION_RECEIPT ?= contracts/governance/bf8-promotion-receipt-matrix-4.json
+BF8_PROMOTION_RECEIPT_SET := contracts/governance/bf8-promotion-receipt-set.v1.json
 
-.PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e
+.PHONY: verify verify-all verify-ci verify-ci-receipt verify-governance-hygiene verify-anti-placebo verify-a4-target-exclusions verify-c1-checker-files verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-matrix-canonical verify-c1-fallback verify-c1-probes verify-c1-action-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-runtime-bundle verify-frontstage-route verify-closure-work-packages verify-closure-work-packages-static verify-closure-work-packages-local-fast verify-c6-authority-eval-live swift-test check-tts-preflight verify-generated regen regen-tool-contract verify-subset-budget verify-source verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-c5-phase1-gates diff test clean-venv demo-progress verify-e2e verify-ui-e2e verify-bf8-receipt-set
 .PHONY: verify-e2e-product-behavior verify-e2e-wp21-window verify-e2e-wp21-ambient verify-e2e-wp21-seat
 .PHONY: verify-e2e-row167 verify-e2e-query verify-e2e-risk verify-e2e-replay verify-e2e-cancel verify-e2e-receipt
 
@@ -199,7 +199,7 @@ verify-all: verify swift-test verify-e2e
 # G8: verify-ci MUST NOT depend on verify-e2e — CI DAG 去重。reviewed product E2E 由
 # .github/workflows/verify.yml 显式 `make verify-e2e` step 单独跑（anti-placebo 硬约束）。
 # 勿把 verify-ui-e2e 塞进本链（UI E2E 仅 ui-e2e.yml / macos-26 独立 runner）。
-verify-ci: verify-c1-checker-files verify-governance-hygiene .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring verify-anti-placebo
+verify-ci: verify-bf8-receipt-set verify-c1-checker-files verify-governance-hygiene .venv/.deps.stamp verify-refs verify-cross-section verify-surface verify-c6-shape verify-default-scope verify-register verify-a4-target-exclusions verify-c1-ownership verify-c1-finite-reason-authority verify-c1-matrix verify-c1-fallback verify-c1-probes verify-c1-s10 verify-mounted-catalog-no-delta verify-action-demo-proven-rename verify-closure-work-packages verify-c6-authority-eval-live verify-ci-receipt diff test swift-test verify-contentview-wiring verify-anti-placebo
 
 # Source-free C1 checkers are hard CI dependencies. Missing files must stop verify-ci
 # before any expensive gate runs; otherwise deleting a checker can manufacture green.
@@ -235,32 +235,35 @@ verify-c1-finite-reason-authority:
 	$(PYTHON_BOOTSTRAP) Tools/checks/run_swift_test_exact.py \
 		--filter RuntimeFiniteReasonAuthorityTests/testDiagnosticFailuresTraverseProductionRunnerAndRedactPresentationTrace
 
-verify-c1-matrix: verify-c1-probes verify-c1-action-probes
+verify-bf8-receipt-set:
+	$(PYTHON) -m py_compile Tools/checks/check_capability_matrix.py scripts/test_check_capability_matrix.py scripts/test_bf8_receipt_set.py
+	$(PYTHON) -m unittest -v scripts/test_bf8_receipt_set.py
+verify-c1-matrix: verify-bf8-receipt-set verify-c1-action-probes
 	mkdir -p .build/c1-run/receipts/c1
 	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
-		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
 		--output contracts/demo-capability-matrix.json
 	$(PYTHON) -m unittest scripts/test_check_capability_matrix.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py check \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
-		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
 		--matrix contracts/demo-capability-matrix.json \
 		--receipt .build/c1-run/receipts/c1/capability-matrix.json
 
 # Fail closed on the full authority -> matrix -> Swift projection chain.  The
 # temporary artifacts ensure a dirty tracked file cannot self-certify.
-verify-c1-matrix-canonical: .venv/.deps.stamp verify-c1-probes verify-c1-action-probes
+verify-c1-matrix-canonical: verify-bf8-receipt-set .venv/.deps.stamp verify-c1-action-probes
 	mkdir -p .build/c1-run/canonical
 	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
-		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
 		--output contracts/demo-capability-matrix.json
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
-		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
 		--output .build/c1-run/canonical/demo-capability-matrix.json
 	cmp -s contracts/demo-capability-matrix.json .build/c1-run/canonical/demo-capability-matrix.json
 	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
@@ -377,7 +380,7 @@ verify-action-demo-proven-rename: .venv/.deps.stamp verify-c1-finite-reason-auth
 	$(PYTHON) scripts/knife1_scope_action_probe_receipt.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py materialize \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
-		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
 		--output contracts/demo-capability-matrix.json
 	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
 		--input contracts/demo-capability-matrix.json \
@@ -385,7 +388,7 @@ verify-action-demo-proven-rename: .venv/.deps.stamp verify-c1-finite-reason-auth
 	$(PYTHON) -m unittest -v scripts/test_check_capability_matrix.py
 	$(PYTHON) Tools/checks/check_capability_matrix.py check \
 		--action-probe-receipt $(SCOPED_ACTION_PROBE_RECEIPT) \
-		--bf8-receipt $(BF8_PROMOTION_RECEIPT) \
+		--bf8-receipt-set $(BF8_PROMOTION_RECEIPT_SET) \
 		--matrix contracts/demo-capability-matrix.json \
 		--receipt .build/c1-run/receipts/c1/capability-matrix-rename.json
 	$(PYTHON) Tools/generate_demo_capability_matrix_swift.py \
