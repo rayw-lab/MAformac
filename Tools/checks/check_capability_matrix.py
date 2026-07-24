@@ -165,8 +165,9 @@ def evaluate_receipt_set(
             raise ValueError("E_RECEIPT_SET_ID_MISMATCH")
         legacy = (
             entry["receipt_path"] == LEGACY_M4_PATH and entry["subject_type"] == "primary_matrix"
-            and entry["subject_id"] == "4" and entry["receipt_sha256"] == LEGACY_M4_ACTION_SHA
+            and entry["subject_id"] == 4 and entry["receipt_sha256"] == LEGACY_M4_ACTION_SHA
             and receipt.get("subjectSHA256") == LEGACY_M4_RECEIPT_SHA and receipt.get("matrix_ids") == [4]
+            and set(receipt) == {"schemaVersion", "receiptID", "subjectSHA256", "matrix_ids", "ceremony"}
         )
         if not legacy:
             receipt_schema_path = schema_path.parent / "bf8-promotion-receipt.schema.json"
@@ -177,7 +178,9 @@ def evaluate_receipt_set(
                 raise ValueError("E_BF8_RECEIPT_SCHEMA_INVALID") from error
             if receipt_errors:
                 raise ValueError("E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
-            if receipt.get("subjectType") != entry["subject_type"] or receipt.get("subjectID") != entry["subject_id"]:
+            if receipt.get("subject_type") != entry["subject_type"] or receipt.get("subject_id") != entry["subject_id"]:
+                raise ValueError("E_RECEIPT_SET_SCOPE_INVALID")
+            if entry["subject_type"] == "primary_matrix" and receipt.get("matrix_ids") != [entry["subject_id"]]:
                 raise ValueError("E_RECEIPT_SET_SCOPE_INVALID")
         if not legacy and (not isinstance(receipt.get("subjectSHA256"), str)
                            or re.fullmatch(r"[0-9a-f]{64}", receipt["subjectSHA256"]) is None):
@@ -208,7 +211,7 @@ def evaluate_receipt_set(
         if entry["subject_type"] == "secondary_tool":
             raise ValueError("E_RECEIPT_SET_SECONDARY_UNAUTHORIZED")
         if entry["subject_type"] == "primary_matrix":
-            if not re.fullmatch(r"[0-9]+", entry["subject_id"]) or receipt.get("matrix_ids") != [int(entry["subject_id"])]:
+            if not isinstance(entry["subject_id"], int) or entry["subject_id"] < 1 or receipt.get("matrix_ids") != [entry["subject_id"]]:
                 raise ValueError("E_RECEIPT_SET_SCOPE_INVALID")
         ordered.append({"order": entry["order"], "receipt_path": entry["receipt_path"], "receipt_id": entry["receipt_id"],
                         "receipt_sha256": digest, "subject_type": entry["subject_type"], "subject_id": entry["subject_id"],
@@ -812,7 +815,6 @@ def materialize_matrix(
                 "anchors": row["anchors"],
             }
         )
-
     return {
         "schema_version": "demo_capability_matrix_v2",
         "source": {
@@ -825,6 +827,18 @@ def materialize_matrix(
             "bf8_active_entries": bf8_evaluation["entries"],
             "bf8_authorized_primary_ids": bf8_evaluation["authorized_primary_ids"],
             "bf8_authorized_secondary_ids": bf8_evaluation["secondary"],
+        },
+        "secondary_tools": {
+            "close_ac": {
+                "mounted_status": "mounted",
+                "customer_admitted": True,
+                "proven": False,
+                "proven_basis": {
+                    "observed": False,
+                    "status": "pending_human_bf8",
+                    "source_ref": "secondary_tools.close_ac:bf8-promotion-pending",
+                },
+            }
         },
         "cells": cells,
         "summary": {
@@ -921,6 +935,25 @@ def validate_matrix(
     mounted_tools = parse_mounted_tools(mounted_catalog_path)
     cells = matrix.get("cells", [])
     basis_conflicts: list[int] = []
+    secondary_tools = matrix.get("secondary_tools")
+    if not isinstance(secondary_tools, dict) or set(secondary_tools) != {"close_ac"}:
+        errors.append("E_SECONDARY_TOOL_SHAPE_INVALID")
+    else:
+        close_ac = secondary_tools.get("close_ac")
+        if (
+            not isinstance(close_ac, dict)
+            or set(close_ac) != {"mounted_status", "customer_admitted", "proven", "proven_basis"}
+            or close_ac.get("mounted_status") != "mounted"
+            or not isinstance(close_ac.get("proven"), bool)
+        ):
+            errors.append("E_SECONDARY_TOOL_SHAPE_INVALID")
+        elif close_ac.get("proven") is True and "close_ac" not in bf8_evaluation["secondary"]:
+            errors.append("E_SECONDARY_PROVEN_UNAUTHORIZED")
+    if any(
+        isinstance(container, (dict, list)) and "secondary_tools" in json.dumps(container, ensure_ascii=False)
+        for container in (matrix.get("cells"), matrix.get("summary"))
+    ):
+        errors.append("E_SECONDARY_DATA_IN_CELLS_SUMMARY")
 
     ids = [cell.get("matrix_id") for cell in cells if isinstance(cell, dict)]
     if len(ids) != len(set(ids)):

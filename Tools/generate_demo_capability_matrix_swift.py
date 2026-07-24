@@ -96,6 +96,18 @@ def validate_source(root: Any) -> list[dict[str, Any]]:
     if not isinstance(root, dict) or root.get("schema_version") != "demo_capability_matrix_v2":
         raise ValueError("input must be demo_capability_matrix_v2")
     cells = root.get("cells")
+    secondary_tools = root.get("secondary_tools")
+    if not isinstance(secondary_tools, dict) or set(secondary_tools) != {"close_ac"}:
+        raise ValueError("secondary_tools must contain only close_ac")
+    close_ac = secondary_tools["close_ac"]
+    if (
+        not isinstance(close_ac, dict)
+        or set(close_ac) != {"mounted_status", "customer_admitted", "proven", "proven_basis"}
+        or close_ac.get("mounted_status") != "mounted"
+        or close_ac.get("customer_admitted") is not True
+        or close_ac.get("proven") is not False
+    ):
+        raise ValueError("secondary_tools.close_ac has invalid shape")
     if not isinstance(cells, list) or len(cells) != 120:
         raise ValueError("matrix must contain exactly 120 cells")
     if not all(isinstance(cell, dict) for cell in cells):
@@ -191,9 +203,9 @@ def render_cell(cell: dict[str, Any]) -> str:
         ]
     )
 
-
 def render_swift(root: dict[str, Any], source_sha256: str) -> str:
     cells = validate_source(root)
+    close_ac_basis = root["secondary_tools"]["close_ac"]["proven_basis"]
     primary_cases = "\n".join(
         f"    case {case_name} = {swift_string(raw_value)}"
         for raw_value, case_name in PRIMARY_CLASS_CASES.items()
@@ -226,6 +238,13 @@ public struct DemoCapabilityActionDemoProvenBasis: Codable, Equatable, Hashable,
     public let readbackProbePass: DemoCapabilityReadbackProbeBasis
 }}
 
+public struct DemoCapabilitySecondaryToolStatus: Codable, Equatable, Hashable, Sendable {{
+    public let mountedStatus: String
+    public let customerAdmitted: Bool
+    public let proven: Bool
+    public let provenBasis: DemoCapabilityEvidenceBasis
+}}
+
 public struct DemoCapabilityMatrixCell: Codable, Equatable, Hashable, Sendable {{
     public let matrixID: Int
     public let family: String
@@ -251,13 +270,22 @@ public struct DemoCapabilityMatrixCell: Codable, Equatable, Hashable, Sendable {
 public enum DemoCapabilityMatrixCatalog {{
     public static let schemaVersion = "demo_capability_matrix_v2"
     public static let sourceSHA256 = "{source_sha256}"
+    public static let secondaryTools: [String: DemoCapabilitySecondaryToolStatus] = [
+        "close_ac": DemoCapabilitySecondaryToolStatus(
+            mountedStatus: "mounted",
+            customerAdmitted: true,
+            proven: false,
+            provenBasis: DemoCapabilityEvidenceBasis(
+                observed: {str(close_ac_basis["observed"]).lower()},
+                sourceRef: {swift_string(close_ac_basis["source_ref"])}
+            )
+        )
+    ]
     public static let cells: [DemoCapabilityMatrixCell] = [
 {rendered_cells}
     ]
 }}
 '''
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)

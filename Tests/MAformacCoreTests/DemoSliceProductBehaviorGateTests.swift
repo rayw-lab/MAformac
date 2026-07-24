@@ -806,4 +806,17 @@ final class DemoSliceProductBehaviorGateTests: XCTestCase {
         XCTAssertNotNil(result.rejection)
         XCTAssertEqual(h.route.runnerCallCount, 0)
     }
+    @MainActor
+    func testT2_closeACUnprovenBlocksBeforeNoopOrRunner() async throws {
+        let h = try Harness()
+        let beforeCells = h.store.cells
+        let beforeRevision = h.store.currentRevision
+        let result = try await h.route.route(text: "关闭空调")
+        XCTAssertNil(result.execution)
+        XCTAssertEqual(result.rejection, .notInCatalog)
+        XCTAssertEqual(h.route.runnerCallCount, 0)
+        XCTAssertEqual(h.store.cells, beforeCells)
+        XCTAssertEqual(h.store.currentRevision, beforeRevision)
+    }
+
 }

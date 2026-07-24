@@ -254,6 +254,15 @@ public final class DemoSliceRoute {
         correlationProvider: RuntimeSessionCorrelationProvider?,
         lease: RuntimeTurnLease?
     ) async throws -> DemoSliceRouteResult {
+        // F4: secondary tools are admitted only when the generated promotion is proven.
+        // This guard intentionally precedes projection, already-state/no-op, and runner.
+        if case let .secondaryTool(toolName) = admission.entry.subject,
+           DemoCapabilityMatrixCatalog.secondaryTools[toolName]?.proven != true {
+            return DemoSliceRouteResult(
+                classification: classification,
+                rejection: .notInCatalog
+            )
+        }
         // Reuse the same scope resolution as C3. Defaulted scopes (for example,
         // ac.temp_setpoint[主驾]) must not miss the pre-run no-op gate.
         let projection = try DemoSliceAdmissionCatalog.targetProjection(

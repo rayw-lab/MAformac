@@ -1,16 +1,49 @@
 import Foundation
 
+public enum DemoSliceCatalogSubject: Equatable, Sendable {
+    case primaryMatrix(Int)
+    case secondaryTool(String)
+
+    public var type: String {
+        switch self {
+        case .primaryMatrix: return "primary_matrix"
+        case .secondaryTool: return "secondary_tool"
+        }
+    }
+
+    public var id: String {
+        switch self {
+        case let .primaryMatrix(matrixID): return String(matrixID)
+        case let .secondaryTool(toolName): return toolName
+        }
+    }
+}
+
 public struct DemoSliceCatalogEntry: Equatable, Sendable {
-    public let matrixID: Int
+    public let subject: DemoSliceCatalogSubject
+    public let matrixID: Int?
     public let contractRowID: String
     public let stateBase: String
 
     public init(matrixID: Int, contractRowID: String, stateBase: String) {
+        self.subject = .primaryMatrix(matrixID)
         self.matrixID = matrixID
         self.contractRowID = contractRowID
         self.stateBase = stateBase
     }
+
+    public init(subject: DemoSliceCatalogSubject, contractRowID: String, stateBase: String) {
+        self.subject = subject
+        if case let .primaryMatrix(matrixID) = subject {
+            self.matrixID = matrixID
+        } else {
+            self.matrixID = nil
+        }
+        self.contractRowID = contractRowID
+        self.stateBase = stateBase
+    }
 }
+
 
 public struct DemoSliceAdmission: Equatable, Sendable {
     public let entry: DemoSliceCatalogEntry
@@ -78,7 +111,9 @@ public struct DemoSliceAdmissionCatalog: Sendable {
     public let routeMode = "demo_slice"
     public var catalogDigestSHA256: String {
         let canonical = entries
-            .map { "\($0.matrixID)|\($0.contractRowID)|\($0.stateBase)" }
+            .map { entry in
+                "\(entry.subject.type)|\(entry.subject.id)|\(entry.contractRowID)|\(entry.stateBase)"
+            }
             .joined(separator: "\n") + "\n"
         return C6Hash.sha256Hex(Data(canonical.utf8))
     }
@@ -114,6 +149,33 @@ public struct DemoSliceAdmissionCatalog: Sendable {
             stateBase: "ac.temp_setpoint"
         ),
     ]
+    private var closeACEntry: DemoSliceCatalogEntry {
+        DemoSliceCatalogEntry(
+            subject: .secondaryTool("close_ac"),
+            contractRowID: "secondary_tools.close_ac",
+            stateBase: "ac.power"
+        )
+    }
+
+    private func closeACAdmission() -> DemoSliceAdmission {
+        let entry = closeACEntry
+        return DemoSliceAdmission(
+            entry: entry,
+            frame: ToolCallFrame(
+                agentID: "vehicle-control",
+                capabilityID: "vehicle.ac.toggle",
+                toolName: "set_vehicle_control",
+                device: "ac",
+                actionPrimitive: "power_off",
+                slots: ["frame": "甲"],
+                value: ContractValue(offset: "off", type: "STATE"),
+                candidateSource: .fastPath,
+                rawPayload: evidencePayload(entry: entry, inputValue: nil),
+                surfacePolicy: .primaryPanel,
+                doNotAutoPowerOn: true
+            )
+        )
+    }
 
     private let temperatureRange = 18 ... 32
 
@@ -174,6 +236,9 @@ public struct DemoSliceAdmissionCatalog: Sendable {
         // Round 6 Q3: exact `算了` is cancel — never invent reverse compensation (e.g. close window).
         if normalized == "算了" {
             return .cancel(target: nil)
+        }
+        if normalized == "关闭空调" {
+            return .command(closeACAdmission())
         }
         if normalized == "打开空调" {
             return .command(powerOnAdmission(entry: entries[0], device: "ac", capabilityID: "vehicle.ac.toggle", toolName: "set_vehicle_control"))
@@ -449,15 +514,18 @@ public struct DemoSliceAdmissionCatalog: Sendable {
             )
         )
     }
-
     private func evidencePayload(entry: DemoSliceCatalogEntry, inputValue: Int?) -> JSONValue {
         var payload: [String: JSONValue] = [
             "route_mode": .string(routeMode),
             "catalog_digest_sha256": .string(catalogDigestSHA256),
-            "matrix_id": .number(Double(entry.matrixID)),
             "contract_row_id": .string(entry.contractRowID),
             "state_base": .string(entry.stateBase),
+            "subject_type": .string(entry.subject.type),
+            "subject_id": .string(entry.subject.id),
         ]
+        if let matrixID = entry.matrixID {
+            payload["matrix_id"] = .number(Double(matrixID))
+        }
         if let inputValue {
             payload["input_value"] = .number(Double(inputValue))
         }

@@ -142,4 +142,23 @@ final class DemoSliceAdmissionCatalogTests: XCTestCase {
         XCTAssertNil(catalog.admission(for: "把空调调到26度吗"))
         XCTAssertNil(catalog.admission(for: "空调调到26度吗"))
     }
+    func testCloseACExactSecondaryAdmissionIsTypedAndUnproven() throws {
+        let catalog = DemoSliceAdmissionCatalog()
+        let admission = try XCTUnwrap(catalog.admission(for: "关闭空调"))
+        XCTAssertEqual(admission.entry.subject, .secondaryTool("close_ac"))
+        XCTAssertNil(admission.entry.matrixID)
+        XCTAssertEqual(admission.frame.toolName, "set_vehicle_control")
+        XCTAssertEqual(admission.frame.actionPrimitive, "power_off")
+        XCTAssertEqual(admission.frame.value.offset, "off")
+        guard case let .object(payload) = admission.frame.rawPayload else {
+            return XCTFail("expected structured admission evidence payload")
+        }
+        XCTAssertEqual(payload["subject_type"], .string("secondary_tool"))
+        XCTAssertEqual(payload["subject_id"], .string("close_ac"))
+        XCTAssertNil(payload["matrix_id"])
+        XCTAssertFalse(payload.keys.contains { $0.contains("subjectType") || $0.contains("subjectID") })
+        XCTAssertNil(catalog.admission(for: "请关闭空调"))
+        XCTAssertNil(catalog.admission(for: "关闭空调然后打开空调"))
+    }
+
 }

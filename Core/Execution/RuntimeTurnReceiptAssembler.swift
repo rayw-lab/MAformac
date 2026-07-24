@@ -194,6 +194,8 @@ public enum RuntimeTurnReceiptAssembler {
             deviceName: frame.device,
             actionName: frame.actionPrimitive,
             slotsIdentity: slotsIdentity(frame.slots),
+            subjectType: entry.subject.type,
+            subjectID: entry.subject.id,
             disposition: disposition(for: payload.outcome.result, stateMutation: mutation),
             failureReason: stableFailureReason(from: payload.outcome),
             policyDecision: nil,

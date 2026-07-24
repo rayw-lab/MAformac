@@ -51,6 +51,26 @@ final class RuntimeTurnReceiptDigestTests: XCTestCase {
         XCTAssertEqual(independentCatalogDigest(DemoSliceAdmissionCatalog()), receipt.mountedCatalogDigest)
     }
 
+    func testTaggedCatalogIdentitySeparatesSecondaryToolFromMatrixSentinels() {
+        let secondary = DemoSliceCatalogEntry(
+            subject: .secondaryTool("close_ac"),
+            contractRowID: "secondary_tools.close_ac",
+            stateBase: "ac.power"
+        )
+        let canonical = independentCatalogCanonicalBytes([secondary])
+        XCTAssertEqual(canonical, "secondary_tool|close_ac|secondary_tools.close_ac|ac.power\n")
+        XCTAssertFalse(canonical.contains("secondary_tool|0|"))
+
+        for sentinel in [0, 1, 121] {
+            let legacySentinelBytes = "\(sentinel)|secondary_tools.close_ac|ac.power\n"
+            XCTAssertNotEqual(
+                C6Hash.sha256Hex(Data(canonical.utf8)),
+                C6Hash.sha256Hex(Data(legacySentinelBytes.utf8)),
+                "secondary identity must not collide with matrix sentinel \(sentinel)"
+            )
+        }
+    }
+
     func testTouchedCellDigestIsKeyOrderStableAcrossMultiCellPermutations() throws {
         let cellA = DemoActionReadback(key: "ac.power", actualValue: "on", revision: 3, spokenText: "已打开空调")
         let cellB = DemoActionReadback(key: "ac.temp_setpoint", actualValue: "22", revision: 5, spokenText: "温度22度")
@@ -193,11 +213,28 @@ final class RuntimeTurnReceiptDigestTests: XCTestCase {
             )
         )
         let receipt2 = try RuntimeTurnReceipt.decode(from: url2)
-        XCTAssertEqual(receipt2.linkedPreviousTurnID, receipt1.turnID)
+        XCTAssertEqual(receipt2.schemaVersion, RuntimeTurnReceipt.schemaVersionValue)
+        XCTAssertEqual(receipt2.runID, "digest-linked")
+        XCTAssertEqual(receipt2.runNonce, "0123456789abcdef0123456789abcdef")
+        XCTAssertEqual(receipt2.sourceHeadSHA, String(repeating: "e", count: 40))
+        XCTAssertEqual(receipt2.testedCheckoutSHA, String(repeating: "e", count: 40))
+        XCTAssertEqual(receipt2.sessionID, turn2.sessionID)
+        XCTAssertEqual(receipt2.turnID, turn2.turnID)
+        XCTAssertEqual(receipt2.eventID, "cancel-preempt:\(turn1.turnID)")
+        XCTAssertEqual(receipt2.sequence, turn2.sequence)
+        XCTAssertNil(receipt2.matrixID)
         XCTAssertEqual(receipt2.finalOutcome, .cancelled)
         XCTAssertFalse(receipt2.stateMutation)
         XCTAssertEqual(receipt2.readbackCount, 0)
-        XCTAssertTrue(receipt2.actions[0].isVirtualReadback)
+        let cancelAction = try XCTUnwrap(receipt2.actions.first)
+        XCTAssertEqual(receipt2.actions.count, 1)
+        XCTAssertEqual(cancelAction.actionIndex, 0)
+        XCTAssertEqual(cancelAction.disposition, "cancelled")
+        XCTAssertTrue(cancelAction.isVirtualReadback)
+        XCTAssertEqual(cancelAction.readback?.key, "presentation.cancel")
+        XCTAssertEqual(cancelAction.readback?.actualValue, "preempt")
+        XCTAssertEqual(cancelAction.readback?.revision, 0)
+        XCTAssertEqual(cancelAction.readback?.spokenText, "已取消")
         XCTAssertEqual(
             receipt2.touchedCellCanonicalSnapshotDigest,
             independentTouchedCellDigest(from: [])
@@ -214,10 +251,15 @@ final class RuntimeTurnReceiptDigestTests: XCTestCase {
     // MARK: - Independent fact recalculation (does not call Assembler helpers under test for catalog/touched)
 
     private func independentCatalogDigest(_ catalog: DemoSliceAdmissionCatalog) -> String {
-        let canonical = catalog.entries
-            .map { "\($0.matrixID)|\($0.contractRowID)|\($0.stateBase)" }
+        C6Hash.sha256Hex(Data(independentCatalogCanonicalBytes(catalog.entries).utf8))
+    }
+
+    private func independentCatalogCanonicalBytes(_ entries: [DemoSliceCatalogEntry]) -> String {
+        entries
+            .map { entry in
+                "\(entry.subject.type)|\(entry.subject.id)|\(entry.contractRowID)|\(entry.stateBase)"
+            }
             .joined(separator: "\n") + "\n"
-        return C6Hash.sha256Hex(Data(canonical.utf8))
     }
 
     private func independentTouchedCellDigest(from readbacks: [DemoActionReadback]) -> String {

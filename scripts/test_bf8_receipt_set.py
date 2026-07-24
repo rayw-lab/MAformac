@@ -54,7 +54,7 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
         self._git(root, "init", "-q")
         self._git(root, "config", "user.name", "test")
         self._git(root, "config", "user.email", "test@example.com")
-        receipt = {"schemaVersion": "bf8_promotion_receipt_v1", "receiptID": "r1", "subjectSHA256": "a" * 64, "subjectType": "primary_matrix", "subjectID": "1", "matrix_ids": [1], "ceremony": {"artifactRef": "x", "approver": "tester"}}
+        receipt = {"schemaVersion": "bf8_promotion_receipt_v1", "receiptID": "r1", "subjectSHA256": "a" * 64, "subject_type": "primary_matrix", "subject_id": 1, "matrix_ids": [1], "ceremony": {"artifactRef": "x", "approver": "tester"}}
         if extra_receipt:
             receipt.update(extra_receipt)
         (root / "receipt.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8")
@@ -69,7 +69,7 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
                 self._git(root, "add", "receipt.json")
                 self._git(root, "commit", "-qm", "lineage")
         if entries is None:
-            entries = [{"order": 1, "receipt_path": "receipt.json", "receipt_id": receipt["receiptID"], "receipt_sha256": hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest(), "subject_type": "primary_matrix", "subject_id": "1"}]
+            entries = [{"order": 1, "receipt_path": "receipt.json", "receipt_id": receipt["receiptID"], "receipt_sha256": hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest(), "subject_type": "primary_matrix", "subject_id": 1}]
         registry = {"version": "bf8_promotion_receipt_set_v1", "entries": entries}
         set_path = root / "set.json"
         set_path.write_text(json.dumps(registry, indent=2), encoding="utf-8")
@@ -153,23 +153,23 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
 
     def test_primary_scope_rejection(self):
         td, root, path, reg = self._fixture(); self.addCleanup(td.cleanup)
-        reg["entries"][0]["subject_id"] = "2"; path.write_text(json.dumps(reg), encoding="utf-8")
+        reg["entries"][0]["subject_id"] = 2; path.write_text(json.dumps(reg), encoding="utf-8")
         self._error(path, root, "E_RECEIPT_SET_SCOPE_INVALID")
 
     def test_secondary_fail_closed(self):
         td, root, path, reg = self._fixture(); self.addCleanup(td.cleanup)
-        receipt = json.loads((root / "receipt.json").read_text()); receipt["subjectType"] = "secondary_tool"; receipt["subjectID"] = "tool"; (root / "receipt.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt.json"); self._git(root, "commit", "-qm", "secondary")
-        reg["entries"][0]["receipt_sha256"] = hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest(); reg["entries"][0]["subject_type"] = "secondary_tool"; reg["entries"][0]["subject_id"] = "tool"; path.write_text(json.dumps(reg), encoding="utf-8")
+        receipt = json.loads((root / "receipt.json").read_text()); receipt["subject_type"] = "secondary_tool"; receipt["subject_id"] = "close_ac"; receipt.pop("matrix_ids"); (root / "receipt.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt.json"); self._git(root, "commit", "-qm", "secondary")
+        reg["entries"][0]["receipt_sha256"] = hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest(); reg["entries"][0]["subject_type"] = "secondary_tool"; reg["entries"][0]["subject_id"] = "close_ac"; path.write_text(json.dumps(reg), encoding="utf-8")
         self._error(path, root, "E_RECEIPT_SET_SECONDARY_UNAUTHORIZED")
     def test_legacy_exact_tuple_allows_missing_discriminator(self):
         result = self.mod.evaluate_receipt_set()
-        self.assertEqual(result["entries"][0]["subject_id"], "4")
+        self.assertEqual(result["entries"][0]["subject_id"], 4)
 
     def test_nonlegacy_missing_discriminator_rejected(self):
         td, root, path, reg = self._fixture(); self.addCleanup(td.cleanup)
-        receipt = json.loads((root / "receipt.json").read_text()); receipt.pop("subjectType"); receipt.pop("subjectID"); (root / "receipt.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt.json"); self._git(root, "commit", "-qm", "missing discriminator")
+        receipt = json.loads((root / "receipt.json").read_text()); receipt.pop("subject_type"); receipt.pop("subject_id"); (root / "receipt.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt.json"); self._git(root, "commit", "-qm", "missing discriminator")
         reg["entries"][0]["receipt_sha256"] = hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest(); path.write_text(json.dumps(reg), encoding="utf-8")
-        self._error(path, root, "E_RECEIPT_SET_SCOPE_INVALID")
+        self._error(path, root, "E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
 
     def test_legacy_40hex_wrong_tuple_fails(self):
         td, root, path, reg = self._fixture(); self.addCleanup(td.cleanup)
@@ -195,7 +195,7 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
     def test_supersession_valid_preserves_authorization(self):
         td, root, path, reg = self._fixture(); self.addCleanup(td.cleanup)
         second = json.loads((root / "receipt.json").read_text()); second["receiptID"] = "r2"; (root / "receipt2.json").write_text(json.dumps(second, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt2.json"); self._git(root, "commit", "-qm", "second")
-        e2 = {"order": 2, "receipt_path": "receipt2.json", "receipt_id": "r2", "receipt_sha256": hashlib.sha256((root / "receipt2.json").read_bytes()).hexdigest(), "subject_type": "primary_matrix", "subject_id": "1", "supersedes_receipt_id": "r1"}; reg["entries"].append(e2); path.write_text(json.dumps(reg), encoding="utf-8")
+        e2 = {"order": 2, "receipt_path": "receipt2.json", "receipt_id": "r2", "receipt_sha256": hashlib.sha256((root / "receipt2.json").read_bytes()).hexdigest(), "subject_type": "primary_matrix", "subject_id": 1, "supersedes_receipt_id": "r1"}; reg["entries"].append(e2); path.write_text(json.dumps(reg), encoding="utf-8")
         result = self._evaluate(path, root); self.assertEqual(result["authorized_primary_ids"], [1]); self.assertFalse(result["entries"][0]["active"])
 
     def test_supersession_later_entry_rejected(self):
@@ -228,8 +228,8 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
     def test_supersession_cross_subject_rejected(self):
         td, root, path, reg = self._fixture(); self.addCleanup(td.cleanup)
         self._copy_receipt(root, "receipt2.json", "r2")
-        receipt = json.loads((root / "receipt2.json").read_text()); receipt["subjectID"] = "2"; receipt["matrix_ids"] = [2]; (root / "receipt2.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt2.json"); self._git(root, "commit", "-qm", "cross subject")
-        e = copy.deepcopy(reg["entries"][0]); e.update({"order": 2, "receipt_path": "receipt2.json", "receipt_id": "r2", "receipt_sha256": hashlib.sha256((root / "receipt2.json").read_bytes()).hexdigest(), "subject_id": "2", "supersedes_receipt_id": "r1"}); reg["entries"].append(e); path.write_text(json.dumps(reg), encoding="utf-8")
+        receipt = json.loads((root / "receipt2.json").read_text()); receipt["subject_id"] = 2; receipt["matrix_ids"] = [2]; (root / "receipt2.json").write_text(json.dumps(receipt, separators=(",", ":")), encoding="utf-8"); self._git(root, "add", "receipt2.json"); self._git(root, "commit", "-qm", "cross subject")
+        e = copy.deepcopy(reg["entries"][0]); e.update({"order": 2, "receipt_path": "receipt2.json", "receipt_id": "r2", "receipt_sha256": hashlib.sha256((root / "receipt2.json").read_bytes()).hexdigest(), "subject_id": 2, "supersedes_receipt_id": "r1"}); reg["entries"].append(e); path.write_text(json.dumps(reg), encoding="utf-8")
         self._error(path, root, "E_RECEIPT_SET_SUPERSESSION_SUBJECT_MISMATCH")
 
     def test_supersession_fork_rejected(self):
@@ -274,6 +274,33 @@ class ReceiptSetBehaviorTests(unittest.TestCase):
                    "supersedes_receipt_id": "r1"})
         reg["entries"].append(e2); path.write_text(json.dumps(reg), encoding="utf-8")
         self._error(path, root, "E_RECEIPT_SET_SUPERSESSION_INVALID")
+
+    def test_camel_case_alias_rejected(self):
+        td, root, path, reg = self._fixture(extra_receipt={"subjectType": "primary_matrix", "subjectID": "1"})
+        self.addCleanup(td.cleanup)
+        reg["entries"][0]["receipt_sha256"] = hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest()
+        path.write_text(json.dumps(reg), encoding="utf-8")
+        self._error(path, root, "E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
+
+    def test_primary_multi_matrix_ids_rejected(self):
+        td, root, path, reg = self._fixture(extra_receipt={"matrix_ids": [1, 2]})
+        self.addCleanup(td.cleanup)
+        reg["entries"][0]["receipt_sha256"] = hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest()
+        path.write_text(json.dumps(reg), encoding="utf-8")
+        self._error(path, root, "E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
+
+    def test_secondary_matrix_ids_null_rejected(self):
+        td, root, path, reg = self._fixture(extra_receipt={"subject_type": "secondary_tool", "subject_id": "close_ac", "matrix_ids": None})
+        self.addCleanup(td.cleanup)
+        reg["entries"][0].update({"subject_type": "secondary_tool", "subject_id": "close_ac", "receipt_sha256": hashlib.sha256((root / "receipt.json").read_bytes()).hexdigest()})
+        path.write_text(json.dumps(reg), encoding="utf-8")
+        self._error(path, root, "E_BF8_RECEIPT_SCHEMA_VALIDATION_FAILED")
+
+    def test_canonical_evaluation_is_idempotent(self):
+        first = self.mod.evaluate_receipt_set()
+        second = self.mod.evaluate_receipt_set(eval_head=first["eval_head"])
+        self.assertEqual(first["ordered_active_sha256"], second["ordered_active_sha256"])
+        self.assertEqual(first["active_subjects"], second["active_subjects"])
 
 if __name__ == "__main__":
     unittest.main()

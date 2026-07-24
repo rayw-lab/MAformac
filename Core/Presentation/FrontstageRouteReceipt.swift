@@ -138,6 +138,8 @@ public struct RuntimeTurnActionEvidence: Codable, Equatable, Sendable {
     public let deviceName: String?
     public let actionName: String?
     public let slotsIdentity: String?
+    public let subjectType: String?
+    public let subjectID: String?
     public let disposition: String
     public let failureReason: String?
     public let policyDecision: String?
@@ -154,6 +156,8 @@ public struct RuntimeTurnActionEvidence: Codable, Equatable, Sendable {
         case contractIdentity = "contract_identity"
         case toolName = "tool_name"
         case deviceName = "device_name"
+        case subjectType = "subject_type"
+        case subjectID = "subject_id"
         case actionName = "action_name"
         case slotsIdentity = "slots_identity"
         case disposition
@@ -174,6 +178,8 @@ public struct RuntimeTurnActionEvidence: Codable, Equatable, Sendable {
         deviceName: String? = nil,
         actionName: String? = nil,
         slotsIdentity: String? = nil,
+        subjectType: String? = nil,
+        subjectID: String? = nil,
         disposition: String,
         failureReason: String? = nil,
         policyDecision: String? = nil,
@@ -188,6 +194,8 @@ public struct RuntimeTurnActionEvidence: Codable, Equatable, Sendable {
         self.contractIdentity = contractIdentity
         self.toolName = toolName
         self.deviceName = deviceName
+        self.subjectType = subjectType
+        self.subjectID = subjectID
         self.actionName = actionName
         self.slotsIdentity = slotsIdentity
         self.disposition = disposition
@@ -312,7 +320,7 @@ public struct RuntimeTurnReceipt: Codable, Equatable, Sendable {
         try container.encode(turnID, forKey: .turnID)
         try container.encode(eventID, forKey: .eventID)
         try container.encode(sequence, forKey: .sequence)
-        try container.encode(matrixID, forKey: .matrixID)
+        try container.encodeIfPresent(matrixID, forKey: .matrixID)
         try container.encode(matrixSourceSHA256, forKey: .matrixSourceSHA256)
         try container.encode(runtimeContractBundleDigest, forKey: .runtimeContractBundleDigest)
         try container.encode(appExecutableSHA256, forKey: .appExecutableSHA256)

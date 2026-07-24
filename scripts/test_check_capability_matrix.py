@@ -781,7 +781,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def test_f2_bf8_receipt_set_with_scoped_probe_receipt(self) -> None:
         checker, matrix = self.materialize_tracked_baseline()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(evaluation["entries"][0]["subject_id"], "4")
+        self.assertEqual(evaluation["entries"][0]["subject_id"], 4)
         self.assertEqual(matrix["source"]["bf8_active_entries"][0]["receipt_sha256"], evaluation["entries"][0]["receipt_sha256"])
     def test_live_matrix_has_zero_probe_gated_demo_cells(self) -> None:
         checker, matrix = self.materialize()
@@ -977,7 +977,7 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
     def test_bf8_receipt_set_lineage_is_evaluated(self) -> None:
         checker = self.checker()
         evaluation = checker.evaluate_receipt_set(receipt_set_path=BF8_RECEIPT_SET)
-        self.assertEqual(evaluation["entries"][0]["subject_id"], "4")
+        self.assertEqual(evaluation["entries"][0]["subject_id"], 4)
         self.assertEqual(evaluation["authorized_primary_ids"], [4])
     def test_scoped_bf8_receipt_set_matrix_4_only(self) -> None:
         checker, matrix = self.materialize()
@@ -1043,6 +1043,35 @@ class CapabilityMatrixCheckerTests(unittest.TestCase):
         self.assertEqual(checker.sha256_file(BF8_PROMOTION_RECEIPT), "ab0c7bbda03bd7ab6a12882bd4cbc1b68e321cc234023a66d8094f8967226bc4")
         self.assertEqual(evaluation["authorized_primary_ids"], [4])
         self.assertEqual(evaluation["secondary"], [])
+
+    def test_secondary_tool_account_is_top_level_pending_only(self) -> None:
+        _, matrix = self.materialize()
+        self.assertEqual(
+            matrix["secondary_tools"],
+            {
+                "close_ac": {
+                    "mounted_status": "mounted",
+                    "customer_admitted": True,
+                    "proven": False,
+                    "proven_basis": {
+                        "observed": False,
+                        "status": "pending_human_bf8",
+                        "source_ref": "secondary_tools.close_ac:bf8-promotion-pending",
+                    },
+                }
+            },
+        )
+        self.assertTrue(all("secondary_tools" not in cell for cell in matrix["cells"]))
+
+    def test_matrix_primary_accounting_is_120_with_only_four_proven(self) -> None:
+        _, matrix = self.materialize_tracked_baseline()
+        self.assertEqual(len(matrix["cells"]), 120)
+        self.assertEqual([cell["matrix_id"] for cell in matrix["cells"] if cell["actionDemoProven"]], [4])
+
+    def test_secondary_authorization_list_remains_empty(self) -> None:
+        checker, matrix = self.materialize()
+        report = self.validate(checker, matrix)
+        self.assertEqual(report["bf8_authorized_secondary_ids"], [])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
